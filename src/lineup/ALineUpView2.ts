@@ -1,8 +1,7 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {AView, EViewMode, IViewContext, ISelection} from '../View';
-import ViewWrapper from '../ViewWrapper';
+import {AView, EViewMode, IViewContext, ISelection} from '../views';
 import LineUp, {ILineUpConfig} from 'lineupjs/src/lineup';
 import Column from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/';
@@ -15,19 +14,19 @@ import {LocalDataProvider,} from 'lineupjs/src/provider';
 import * as d3 from 'd3';
 import {resolve, IDType} from 'phovea_core/src/idtype';
 import {list as rlist, RangeLike, Range} from 'phovea_core/src/range';
-import * as cmds from './cmds';
+import {} from './internal/cmds';
 import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../Dialogs';
-import {LineUpRankingButtons} from './LineUpRankingButtons';
-import {LineUpSelectionHelper, array_diff, set_diff} from './LineUpSelectionHelper';
+import LineUpRankingButtons from './internal/LineUpRankingButtons';
+import LineUpSelectionHelper, {array_diff, set_diff} from './internal/LineUpSelectionHelper';
 import IScore, {IScoreRow, createAccessor} from './IScore';
 import {stringCol, useDefaultLayout, IAdditionalColumnDesc} from './desc';
-import {pushScoreAsync} from './scorecmds';
+import {pushScoreAsync} from './internal/scorecmds';
 import {ISelect2Option} from '../form';
 
 export abstract class ALineUpView2 extends AView {
 
-  resolver: (d: any) => void;
+  private resolver: (d: any) => void;
 
   protected lineup: LineUp;
 

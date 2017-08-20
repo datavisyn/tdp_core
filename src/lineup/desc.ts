@@ -9,7 +9,7 @@ import {VALUE_TYPE_STRING, VALUE_TYPE_CATEGORICAL, VALUE_TYPE_REAL, VALUE_TYPE_I
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
-  selectedSubType?: string;
+  selectedSubtype?: string;
 }
 
 export function numberCol(col: string, rows: any[], label = col, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
@@ -112,8 +112,17 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
   return r;
 }
 
-export function useDefaultLayout(instance: LineUp) {
-  instance.data.deriveDefault();
-  //insert selection column
-  instance.data.insert(instance.data.getRankings()[0], 1, createSelectionDesc());
+export function createInitialRanking(lineup: LineUp) {
+  const provider = lineup.data;
+  const ranking = provider.pushRanking();
+  ranking.push(provider.create(createSelectionDesc()));
+
+  lineup.data.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
+    const col = this.provider.create(d);
+    // set initial column width
+    if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {
+      col.setWidth((<any>d).width);
+    }
+    ranking.push(col);
+  });
 }

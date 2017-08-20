@@ -2,11 +2,12 @@
  * Created by sam on 13.02.2017.
  */
 
-import {ISelection} from '../views';
+import {ISelection} from '../../views';
 import LineUp from 'lineupjs/src/lineup';
 import {IDType} from 'phovea_core/src/idtype';
 import {list as rlist} from 'phovea_core/src/range';
 import {EventHandler} from 'phovea_core/src/event';
+import {IRow} from '../interfaces';
 
 
 /**
@@ -36,21 +37,10 @@ export function set_diff<T>(set1: Set<T>, set2: Set<T>) : Set<T> {
   return diff;
 }
 
-export interface IRow {
-  /**
-   * id, e.g. ESNGxxxx
-   */
-  id: string;
-  /**
-   * unique internal number id, e.g. 42
-   */
-  _id: number;
-}
-
-export class LineUpSelectionHelper extends EventHandler {
+export default class LineUpSelectionHelper extends EventHandler {
   static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';
 
-  private _rows: {id: string, _id: number}[] = [];
+  private _rows: IRow[] = [];
 
   /**
    * selected indices ordered by selection order, i.e. the first selected is the 0. item
@@ -61,10 +51,6 @@ export class LineUpSelectionHelper extends EventHandler {
 
   constructor(private readonly lineup: LineUp, private readonly idType: IDType) {
     super();
-  }
-
-  init() {
-    this.buildCache();
     this.addEventListener();
   }
 
@@ -73,6 +59,8 @@ export class LineUpSelectionHelper extends EventHandler {
     this._rows.forEach((row, i) => {
       this.uid2index.set(row._id, i);
     });
+    // fill up id cache for faster mapping
+    this.idType.fillMapCache(this._rows.map((r) => r._id), this._rows.map((r) => r.id));
   }
 
   private addEventListener() {
@@ -109,12 +97,12 @@ export class LineUpSelectionHelper extends EventHandler {
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }
 
-  set rows(rows: any[]) {
+  set rows(rows: IRow[]) {
     this._rows = rows;
     this.buildCache();
   }
 
-  get rows(): any[] {
+  get rows(): IRow[] {
     return this._rows;
   }
 
@@ -150,9 +138,4 @@ export class LineUpSelectionHelper extends EventHandler {
     this.lineup.data.setSelection(indices);
     this.addEventListener();
   }
-
-  destroy() {
-    this.removeEventListener();
-  }
-
 }

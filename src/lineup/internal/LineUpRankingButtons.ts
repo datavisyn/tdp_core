@@ -13,7 +13,7 @@ import {
   IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
 } from '../../extensions';
-import LineUp from 'lineupjs/src/lineup';
+import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import * as $ from 'jquery';
 
 interface IColumnWrapper<T> {
@@ -53,7 +53,7 @@ export default class LineUpRankingButtons extends EventHandler {
 
   private readonly $ul: d3.Selection<HTMLUListElement>;
 
-  constructor(private readonly lineup: LineUp, private readonly $node: d3.Selection<any>, private readonly idType: IDType, private readonly extraArgs: any) {
+  constructor(private readonly provider: ADataProvider, private readonly $node: d3.Selection<any>, private readonly idType: IDType, private readonly extraArgs: object|(() => object)) {
     super();
 
     this.$ul = this.$node.append('ul').classed('tdp-button-group', true);
@@ -79,7 +79,7 @@ export default class LineUpRankingButtons extends EventHandler {
 
   private appendDownload() {
     const listener = (ranking: Ranking) => {
-      this.lineup.data.exportTable(ranking, {separator: ';', quote: true}).then((content) => {
+      this.provider.exportTable(ranking, {separator: ';', quote: true}).then((content) => {
         const downloadLink = document.createElement('a');
         const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
         downloadLink.href = URL.createObjectURL(blob);
@@ -128,6 +128,10 @@ export default class LineUpRankingButtons extends EventHandler {
     });
   }
 
+  private resolveArgs() {
+    return typeof this.extraArgs === 'function' ? this.extraArgs() : this.extraArgs;
+  }
+
   private async appendMoreColumns() {
     const $dropdownLi = this.createMarkup('Add Column', 'fa fa-plus dropdown-toggle', null, 'dropdown');
 
@@ -155,7 +159,7 @@ export default class LineUpRankingButtons extends EventHandler {
     const loadedScorePlugins = ordinoScores.map((desc) => wrap(desc));
 
 
-    const columns: IWrappedColumnDesc[] = this.lineup.data.getColumns()
+    const columns: IWrappedColumnDesc[] = this.provider.getColumns()
       .filter((d) => !(<any>d)._score)
       .map((d) => ({ text: d.label, id: (<any>d).column, column: d }))
       .sort((a, b) => a.text.localeCompare(b.text));
@@ -166,8 +170,8 @@ export default class LineUpRankingButtons extends EventHandler {
     ];
 
     const lineUpAction: (wrappedColumn: IWrappedColumnDesc) => void = (wrappedColumn: IWrappedColumnDesc) => {
-      const ranking = this.lineup.data.getLastRanking();
-      this.lineup.data.push(ranking, wrappedColumn.column);
+      const ranking = this.provider.getLastRanking();
+      this.provider.push(ranking, wrappedColumn.column);
     };
 
     const columnsWrapper: IColumnWrapper<IScoreLoader|IWrappedColumnDesc>[] = [
@@ -181,10 +185,10 @@ export default class LineUpRankingButtons extends EventHandler {
         plugins: loadedScorePlugins,
         action: (scorePlugin: IScoreLoader) => {
           // number of rows of the last ranking
-          const amountOfRows: number = this.lineup.data.getLastRanking().getOrder().length;
+          const amountOfRows: number = this.provider.getLastRanking().getOrder().length;
 
           // the factory function call executes the score's implementation
-          scorePlugin.factory(this.extraArgs, amountOfRows).then((params) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.id, params));
+          scorePlugin.factory(this.resolveArgs(), amountOfRows).then((params) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.id, params));
         }
       },
       {
@@ -262,9 +266,9 @@ export default class LineUpRankingButtons extends EventHandler {
       plugins: columns,
       action: (plugin: IScoreLoader) => {
         // number of rows of the last ranking
-        const amountOfRows: number = this.lineup.data.getLastRanking().getOrder().length;
+        const amountOfRows: number = this.provider.getLastRanking().getOrder().length;
 
-        const params = plugin.factory(this.extraArgs, amountOfRows);
+        const params = plugin.factory(this.resolveArgs(), amountOfRows);
         this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, plugin.scoreId, params);
       }
     };
@@ -273,7 +277,7 @@ export default class LineUpRankingButtons extends EventHandler {
   private scoreColumnDialog(scorePlugin: IRankingButtonExtension) {
     //TODO clueify
     // pass dataSource into InvertedAggregatedScore factory method
-    Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType, this.extraArgs)) // open modal dialog
+    Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType, this.resolveArgs())) // open modal dialog
       .then((scoreImpl) => { // modal dialog is closed and score created
         if(Array.isArray(scoreImpl)) {
           scoreImpl.forEach((impl) => this.fire(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, impl, scorePlugin));

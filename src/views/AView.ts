@@ -29,7 +29,7 @@ export abstract class AView extends EventHandler implements IView {
    */
   static readonly EVENT_LOADING_FINISHED = 'loadingFinished';
 
-  private itemSelection: ISelection = { idtype: null, range: none() };
+  protected itemSelection: ISelection = { idtype: null, range: none() };
   readonly idType: IDType;
   readonly node: HTMLElement;
   private params: FormBuilder;
@@ -146,7 +146,12 @@ export abstract class AView extends EventHandler implements IView {
         selection.idtype.select(selection.range);
       }
     }
+    this.itemSelectionChanged();
     this.fire(AView.EVENT_ITEM_SELECT, this.itemSelection, this.itemSelection = selection);
+  }
+
+  protected itemSelectionChanged() {
+    // hook
   }
 
   getItemSelection() {
