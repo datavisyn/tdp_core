@@ -2,12 +2,11 @@
  * Created by Holger Stitz on 07.09.2016.
  */
 
-import {api2absURL} from 'phovea_core/src/ajax';
 import {mixin} from 'phovea_core/src/index';
-import {IViewContext, ISelection, EViewMode} from './interfaces';
+import {IViewContext, ISelection} from './interfaces';
 import {FormElementType, IFormSelectElement, IFormSelectOption} from '../form';
 import AD3View from './AD3View';
-import {AView} from './AView';
+import {getProxyUrl} from '../rest';
 
 export const FORM_ID_SELECTED_ITEM = 'externalItem';
 
@@ -22,7 +21,7 @@ export interface IProxyViewOptions {
 /**
  * helper view for proxying an existing external website
  */
-export class ProxyView extends AD3View {
+export default class ProxyView extends AD3View {
   protected options: IProxyViewOptions = {
     /**
      * proxy key - will be redirected through a local server proxy
@@ -60,10 +59,10 @@ export class ProxyView extends AD3View {
   protected createUrl(args: any) {
     //use internal proxy
     if (this.options.proxy) {
-      return api2absURL('/targid/proxy/' + this.options.proxy, args);
+      return getProxyUrl(this.options.proxy, args);
     }
     if (this.options.site) {
-      return this.options.site.replace(/\{([^}]+)\}/gi, (match, variable) => args[variable]);
+      return this.options.site.replace(/{([^}]+)}/gi, (match, variable) => args[variable]);
     }
     return null;
   }
@@ -160,14 +159,14 @@ export class ProxyView extends AD3View {
       .on('load', () => {
         this.setBusy(false);
         //console.log('finished loading', this.$node.select('iframe').node().getBoundingClientRect());
-        this.fire(AView.EVENT_LOADING_FINISHED);
+        this.fire(ProxyView.EVENT_LOADING_FINISHED);
       });
   }
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
     this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${this.options.idtype}</i>.</p>`);
-    this.fire(AView.EVENT_LOADING_FINISHED);
+    this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
 
   private static isNoNSecurePage(url: string) {
@@ -186,6 +185,6 @@ export class ProxyView extends AD3View {
             Please use the following <a href="${url}" target="_blank" class="alert-link">link</a> to open the website in a separate window:
             <br><br><a href="${url}" target="_blank" class="alert-link">${url}</a>
         </div></p><p></p>`);
-    this.fire(AView.EVENT_LOADING_FINISHED);
+    this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
 }
