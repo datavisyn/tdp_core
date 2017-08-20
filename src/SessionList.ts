@@ -3,8 +3,6 @@
  */
 
 import {areyousure} from 'phovea_ui/src/dialogs';
-import {IPluginDesc} from 'phovea_core/src/plugin';
-import {IStartMenuSectionEntry, IStartMenuOptions} from './StartMenu';
 import {select, Selection, event} from 'd3';
 import * as $ from 'jquery';
 import {currentUserNameOrAnonymous, canWrite} from 'phovea_core/src/security';
@@ -13,28 +11,21 @@ import {IProvenanceGraphDataDescription, op} from 'phovea_core/src/provenance';
 import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import {showErrorModalDialog} from './Dialogs';
 import {
-  default as EditProvenanceGraphMenu,
+  GLOBAL_EVENT_MANIPULATED,
   editProvenanceGraphMetaData, isPersistent, isPublic,
   persistProvenanceGraphMetaData
-} from './EditProvenanceGraphMenu';
+} from './internal/EditProvenanceGraphMenu';
 import {on as globalOn} from 'phovea_core/src/event';
-import {fromNow} from './utils';
-import {GLOBAL_EVENT_MANIPULATED} from './EditProvenanceGraphMenu';
+import {fromNow} from './internal/utils';
 
-abstract class ASessionList implements IStartMenuSectionEntry {
-  constructor(private readonly parent: HTMLElement, public readonly desc: IPluginDesc, private readonly options: IStartMenuOptions) {
-
-    const manager = options.targid.graphManager;
-    this.build(manager).then((update) => {
+abstract class ASessionList {
+  constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager) {
+    this.build(graphManager).then((update) => {
       globalOn(GLOBAL_EVENT_MANIPULATED, () => update());
     });
   }
 
-  getEntryPointLists() {
-    return [];
-  }
-
-  protected createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
+  protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
     switch (type) {
       case 'delete':
         return `<a href="#" data-action="delete" title="Delete Session" ><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>`;
@@ -122,8 +113,7 @@ function byDateDesc(a: any, b: any) {
   return -((a.ts || 0) - (b.ts || 0));
 }
 
-
-class TemporarySessionList extends ASessionList {
+export class TemporarySessionList extends ASessionList {
 
   protected async getData(manager: CLUEGraphManager) {
     let workspaces = (await manager.list()).filter((d) => !isPersistent(d)).sort(byDateDesc);
@@ -166,7 +156,7 @@ class TemporarySessionList extends ASessionList {
       const $trEnter = $tr.enter().append('tr').html(`
           <td></td>
           <td></td>
-          <td>${this.createButton('select')}${this.createButton('clone')}${this.createButton('persist')}${this.createButton('delete')}</td>`);
+          <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</td>`);
 
       this.registerActionListener(manager, $trEnter);
       $tr.select('td').text((d) => d.name).attr('class', (d) => isPublic(d) ? 'public' : 'private');
@@ -182,7 +172,7 @@ class TemporarySessionList extends ASessionList {
   }
 }
 
-class PersistentSessionList extends ASessionList {
+export class PersistentSessionList extends ASessionList {
 
   protected async getData(manager: CLUEGraphManager) {
     return (await manager.list()).filter((d) => isPersistent(d)).sort(byDateDesc);
@@ -250,7 +240,7 @@ class PersistentSessionList extends ASessionList {
             <td></td>
             <td class="text-center"><i class="fa"></i></td>
             <td></td>
-            <td>${this.createButton('select')}${this.createButton('clone')}${this.createButton('edit')}${this.createButton('delete')}</td>`);
+            <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton('delete')}</td>`);
 
         this.registerActionListener(manager, $trEnter);
         $tr.select('td').text((d) => d.name);
@@ -270,7 +260,7 @@ class PersistentSessionList extends ASessionList {
             <td></td>
             <td></td>
             <td></td>
-            <td>${this.createButton('clone')}</td>`);
+            <td>${ASessionList.createButton('clone')}</td>`);
 
         this.registerActionListener(manager, $trEnter);
         $tr.select('td').text((d) => d.name);
@@ -286,12 +276,3 @@ class PersistentSessionList extends ASessionList {
     return () => this.getData(manager).then(update);
   }
 }
-
-export function createTemporary(parent: HTMLElement, desc: IPluginDesc, options: IStartMenuOptions) {
-  return new TemporarySessionList(parent, desc, options);
-}
-
-export function createPersistent(parent: HTMLElement, desc: IPluginDesc, options: IStartMenuOptions) {
-  return new PersistentSessionList(parent, desc, options);
-}
-

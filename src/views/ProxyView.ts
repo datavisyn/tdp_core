@@ -4,18 +4,26 @@
 
 import {api2absURL} from 'phovea_core/src/ajax';
 import {mixin} from 'phovea_core/src/index';
-import {AView, IViewContext, ISelection, EViewMode} from './View';
-import {IPluginDesc} from 'phovea_core/src/plugin';
-import {FormBuilder, IFormSelectDesc, FormElementType, IFormSelectElement, IFormSelectOption} from './FormBuilder';
+import {IViewContext, ISelection, EViewMode} from './interfaces';
+import {FormElementType, IFormSelectElement, IFormSelectOption} from '../form';
+import AD3View from './AD3View';
+import {AView} from './AView';
+
+export const FORM_ID_SELECTED_ITEM = 'externalItem';
+
+export interface IProxyViewOptions {
+  proxy?: string;
+  site?: string;
+  argument: string;
+  idtype?: string;
+  extra: object;
+}
 
 /**
  * helper view for proxying an existing external website
  */
-export class ProxyView extends AView {
-
-  protected static SELECTED_ITEM = 'externalItem';
-
-  protected options = {
+export class ProxyView extends AD3View {
+  protected options: IProxyViewOptions = {
     /**
      * proxy key - will be redirected through a local server proxy
      */
@@ -35,18 +43,13 @@ export class ProxyView extends AView {
     extra: {}
   };
 
-  protected paramForm:FormBuilder;
-
-  constructor(context:IViewContext, protected selection: ISelection, parent:Element, options:any, plugin: IPluginDesc) {
-    super(context, parent, options);
-    mixin(this.options, plugin, options);
+  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
+    super(context, selection, parent);
+    mixin(this.options, context.desc, options);
+    this.$node.classed('proxy_view', true);
   }
 
-  init() {
-    super.init();
-
-    this.$node.classed('proxy_view', true);
-
+  protected initImpl() {
     // update the selection first, then update the proxy view
     this.updateSelectedItemSelect()
       .then(() => {
@@ -65,48 +68,25 @@ export class ProxyView extends AView {
     return null;
   }
 
-  buildParameterUI($parent: d3.Selection<any>, onChange: (name: string, value: any)=>Promise<any>) {
-    this.paramForm = new FormBuilder($parent);
-
-    const paramDesc:IFormSelectDesc[] = [
-      {
-        type: FormElementType.SELECT,
-        label: 'Show',
-        id: ProxyView.SELECTED_ITEM,
-        options: {
-          optionsData: [],
-        },
-        useSession: true
-      }
-    ];
-
-    // map FormElement change function to provenance graph onChange function
-    paramDesc.forEach((p) => {
-      p.options.onChange = (selection, formElement) => onChange(formElement.id, selection.value);
-    });
-
-    this.paramForm.build(paramDesc);
-
-    // add other fields
-    super.buildParameterUI($parent, onChange);
+  protected getParameterFormDescs() {
+    return super.getParameterFormDescs().concat([{
+      type: FormElementType.SELECT,
+      label: 'Show',
+      id: FORM_ID_SELECTED_ITEM,
+      options: {
+        optionsData: [],
+      },
+      useSession: true
+    }]);
   }
 
-  getParameter(name: string): any {
-    if(this.paramForm.getElementById(name).value === null) {
-      return '';
-    }
-
-    return this.paramForm.getElementById(name).value;
-  }
-
-  setParameter(name: string, value: any) {
-    this.paramForm.getElementById(name).value = value;
+  protected parameterChanged(name: string) {
+    super.parameterChanged(name);
     this.updateProxyView();
   }
 
-  changeSelection(selection:ISelection) {
-    this.selection = selection;
-
+  protected selectionChanged() {
+    super.selectionChanged();
     // update the selection first, then update the proxy view
     this.updateSelectedItemSelect(true) // true = force use last selection
       .then(() => {
@@ -115,12 +95,12 @@ export class ProxyView extends AView {
   }
 
   protected updateSelectedItemSelect(forceUseLastSelection = false) {
-    return this.resolveIds(this.selection.idtype, this.selection.range, this.idType)
+    return this.resolveSelection()
       .then((names) => Promise.all<any>([names, this.getSelectionSelectData(names)]))
       .then((args: any[]) => {
         const names = <string[]>args[0]; // use names to get the last selected element
-        const data = <{value:string, name:string, data:any}[]>args[1];
-        const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.paramForm.getElementById(ProxyView.SELECTED_ITEM);
+        const data = <{ value: string, name: string, data: any }[]>args[1];
+        const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(FORM_ID_SELECTED_ITEM);
 
         // backup entry and restore the selectedIndex by value afterwards again,
         // because the position of the selected element might change
@@ -128,11 +108,11 @@ export class ProxyView extends AView {
         selectedItemSelect.updateOptionElements(data);
 
         // select last item from incoming `selection.range`
-        if(forceUseLastSelection) {
-          selectedItemSelect.value = data.filter((d) => d.value === names[names.length-1])[0];
+        if (forceUseLastSelection) {
+          selectedItemSelect.value = data.filter((d) => d.value === names[names.length - 1])[0];
 
-        // otherwise try to restore the backup
-        } else if(bak !== null) {
+          // otherwise try to restore the backup
+        } else if (bak !== null) {
           selectedItemSelect.value = bak;
         }
 
@@ -141,8 +121,8 @@ export class ProxyView extends AView {
       });
   }
 
-  protected getSelectionSelectData(names:string[]):Promise<IFormSelectOption[]> {
-    if(names === null) {
+  protected getSelectionSelectData(names: string[]): Promise<IFormSelectOption[]> {
+    if (names === null) {
       return Promise.resolve([]);
     }
 
@@ -151,10 +131,10 @@ export class ProxyView extends AView {
   }
 
   protected updateProxyView() {
-    this.loadProxyPage(this.getParameter(ProxyView.SELECTED_ITEM).value);
+    this.loadProxyPage(this.getParameter(FORM_ID_SELECTED_ITEM));
   }
 
-  protected loadProxyPage(selectedItemId) {
+  protected loadProxyPage(selectedItemId: string) {
     if (selectedItemId === null) {
       this.showErrorMessage(selectedItemId);
       return;
@@ -198,7 +178,7 @@ export class ProxyView extends AView {
     return url.startsWith('http://');
   }
 
-  protected showNoHttpsMessage(url: string) {
+  private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
         <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em"><strong>Security Information: </strong>The Target Discovery Platform uses HTTPS to secure your communication with our server.
@@ -208,13 +188,4 @@ export class ProxyView extends AView {
         </div></p><p></p>`);
     this.fire(AView.EVENT_LOADING_FINISHED);
   }
-
-  modeChanged(mode:EViewMode) {
-    super.modeChanged(mode);
-  }
 }
-
-export function create(context:IViewContext, selection:ISelection, parent:Element, options, plugin: IPluginDesc) {
-  return new ProxyView(context, selection, parent, options, plugin);
-}
-

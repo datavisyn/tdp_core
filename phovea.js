@@ -49,24 +49,6 @@ module.exports = function (registry) {
   'factory': 'compress',
   'matches': '(ordinoAddScore|ordinoRemoveScore)'
  });
-
-  registry.push('targidStartMenuSection', 'targid_temporary_session', function () {
-    return import('./src/SessionList');
-  }, {
-    name: 'Temporary Sessions <i class="fa fa-question-circle-o" title="temporary sessions are stored on your local browser only and are limited to the 5 recent ones"></i>',
-    cssClass: 'targidSessionTemporaryData',
-    factory: 'createTemporary',
-    priority: 90
-  });
-
-  registry.push('targidStartMenuSection', 'targid_persistent_session', function () {
-    return import('./src/SessionList');
-  }, {
-    name: 'Persistent Sessions',
-    cssClass: 'targidSessionPersistentData',
-    factory: 'createPersistent',
-    priority: 95
-  });
-
+  
   // generator-phovea:end
 };
