@@ -3,15 +3,10 @@
 @import "~phovea_clue/src/styles/annotation";
 @import "~phovea_clue/src/styles/provvis";
 @import "~phovea_clue/src/styles/storyvis";
+
 /**
  * All rules in this file override or directly extend the original clue styles
  */
-
-// overrides caleydo_clue/styles/base
-body {
-  font-family: Yantramanav, 'Helvetica Neue', Helvetica, sans-serif;
-  font-weight: 400;
-}
 
 // overrides caleydo_clue/styles/base
 header.clue-modeselector {
@@ -26,7 +21,7 @@ aside {
   margin: 0;
 
   &.provenance-layout-vis {
-    border-color:$core_colour_selected;
+    border-color: $core_colour_selected;
   }
 
   &.provenance-story-vis {
@@ -40,7 +35,6 @@ aside {
     }
   }
 }
-
 
 // overrides caleydo_clue/styles/base
 label {
@@ -60,11 +54,9 @@ label {
   }
 }
 
-
 // overrides caleydo_clue/styles/storyvis
 .provenance-story-vis {
   width: auto;
-
 
   div.current {
     margin: .2em .5em;
@@ -85,7 +77,6 @@ div.stories {
 
   }
 }
-
 
 // overrides caleydo_clue/styles/provvis
 .provenance-layout-vis {

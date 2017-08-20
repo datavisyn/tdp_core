@@ -6,8 +6,8 @@ $hover-presentation-color: #f0bb00;
 
 $core_colour: #f0f0f0;
 $core_colour_text: #333;
-$core_colour_selected:#ddd;
-$core_border : #ddd;
+$core_colour_selected: #ddd;
+$core_border: #ddd;
 
 $exploration-stage: $core_colour;
 $exploration-stage-hover: $core_colour_selected;
@@ -18,8 +18,7 @@ $presentation-stage: $core_colour;
 $presentation-stage-hover: $core_colour_selected;
 
 $core_player: $authoring-stage;
-$core_duration:#D8D8D8;
-
+$core_duration: #D8D8D8;
 
 $header-menu-bg-color: #ddd;
 $header-menu-color: #333;
@@ -35,6 +34,4 @@ $anchor_color_hover: darken($anchor_color, 20%);
 $select-data-color: orange;
 $hover-data-color: #ffc46b;
 
-
-$ordinoAssetDir: './images' !default;
-$boostrapAssetDir: '~phovea_ui/src/assets';
+$tdp-css-prefix: 'tdp'

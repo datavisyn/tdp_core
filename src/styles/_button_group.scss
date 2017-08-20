@@ -1,5 +1,6 @@
+@import './vars';
 
-.ordino-button-group {
+.#{$tdp-css-prefix}-button-group {
   margin: 0;
   padding: 5px 5px;
   list-style: none;
@@ -45,7 +46,7 @@
   }
 }
 
-.rankingbuttons > .ordino-button-group {
+.lu .rankingbuttons > .#{$tdp-css-prefix}-button-group {
   padding: 0 0 0 2px;
   max-width: 64px;
   flex-wrap: wrap;

@@ -11,31 +11,34 @@ import * as cmode from 'phovea_clue/src/mode';
 import {create as createProvVis} from 'phovea_clue/src/provvis';
 import LoginMenu from 'phovea_clue/src/menu/LoginMenu';
 import {isLoggedIn} from 'phovea_core/src/security';
-
-export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 import ACLUEWrapper, {createStoryVis} from 'phovea_clue/src/ACLUEWrapper';
-import EditProvenanceGraphMenu from './EditProvenanceGraphMenu';
+import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './Dialogs';
 import {mixin} from 'phovea_core/src';
+import 'phovea_ui/src/_bootstrap';
+import 'phovea_ui/src/_font-awesome';
+import './style.scss';
 
-export interface IOrdinoOptions {
-  loginForm?: string;
-  name?: string;
-  prefix?: string;
+export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
+
+export interface ITDPOptions {
+  loginForm: string|undefined;
+  name: string;
+  prefix: string;
 }
 
-export abstract class AOrdino<T> extends ACLUEWrapper {
+export abstract class ATDPApplication<T> extends ACLUEWrapper {
   static readonly EVENT_OPEN_START_MENU = 'openStartMenu';
 
-  private readonly options: IOrdinoOptions = {
+  private readonly options: ITDPOptions = {
     loginForm: undefined,
-    name: 'Ordino',
-    prefix: 'ordino'
+    name: 'Target Discovery Platform',
+    prefix: 'tdp'
   };
 
   protected app: Promise<T> = null;
 
-  constructor(options: IOrdinoOptions = {}) {
+  constructor(options: Partial<ITDPOptions> = {}) {
     super();
     mixin(this.options, options);
     this.build(document.body, {replaceBody: false});
@@ -47,7 +50,7 @@ export abstract class AOrdino<T> extends ACLUEWrapper {
       showOptionsLink: true, // always activate options
       appLink: new AppHeaderLink(this.options.name, (event) => {
         event.preventDefault();
-        this.fire(AOrdino.EVENT_OPEN_START_MENU);
+        this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
         return false;
       })
     };
@@ -142,4 +145,4 @@ export abstract class AOrdino<T> extends ACLUEWrapper {
   protected abstract initSessionImpl(app: T);
 }
 
-export default AOrdino;
+export default ATDPApplication;

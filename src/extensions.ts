@@ -2,9 +2,14 @@ import {IPlugin, IPluginDesc} from 'phovea_core/src/plugin';
 import {IScore} from './lineup/IScore';
 import IDType from 'phovea_core/src/idtype/IDType';
 
-export const EXTENSION_POINT_TDP_CORE_SCORE = 'tdp_coreScore';
-export const EXTENSION_POINT_TDP_CORE_SCORE_LOADER = 'tdp_coreScoreLoader';
-export const EXTENSION_POINT_TDP_CORE_RANKING_BUTTON = 'tdp_coreRankingButton';
+export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
+export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
+export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
+export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
+//filter to disable certain views
+export const EXTENSION_POINT_DISABLE_VIEW = 'disableTDPView';
+// filter extensions
+export const EXTENSION_POINT_LIST_FILTERS = 'tdpListFilters';
 
 export interface IScoreLoader {
   /**

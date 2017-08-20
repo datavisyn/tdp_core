@@ -30,6 +30,8 @@ interface IWrappedColumnDesc {
   column: IColumnDesc;
 }
 
+const ADDITIONAL_COLUMN_ID = 'tdp.lineup.column.add';
+
 /**
  * Wraps the ordinoScore such that the plugin is loaded and the score modal opened, when the factory function is called
  * @param ordinoScore
@@ -57,7 +59,7 @@ export class LineUpRankingButtons extends EventHandler {
   constructor(private lineup: LineUp, private $node: d3.Selection<any>, private idType: IDType, private extraArgs: any) {
     super();
 
-    this.$ul = this.$node.append('ul').classed('ordino-button-group', true);
+    this.$ul = this.$node.append('ul').classed('tdp-button-group', true);
 
     this.appendDownload();
     this.appendSaveRanking();
@@ -198,7 +200,7 @@ export class LineUpRankingButtons extends EventHandler {
 
     const elements: (IFormElementDesc)[] = [{
       type: FormElementType.SELECT2,
-      id: OrdinoFormIds.ADDITIONAL_COLUMN,
+      id: ADDITIONAL_COLUMN_ID,
       attributes: {
         style: 'width:250px'
       },
@@ -213,7 +215,7 @@ export class LineUpRankingButtons extends EventHandler {
           };
         }),
         onChange: () => {
-          const select = builder.getElementById(OrdinoFormIds.ADDITIONAL_COLUMN);
+          const select = builder.getElementById(ADDITIONAL_COLUMN_ID);
           const result = select.value;
 
           select.value = null;
@@ -237,7 +239,7 @@ export class LineUpRankingButtons extends EventHandler {
 
     $($dropdownLi.node()).on('shown.bs.dropdown', () => {
       // show Select2 options by default when the dropdown is visible to have Select2 calculate the correct position
-      builder.getElementById(OrdinoFormIds.ADDITIONAL_COLUMN).focus();
+      builder.getElementById(ADDITIONAL_COLUMN_ID).focus();
 
       // HACK: keep dropdown open even when the input element inside Select2 is clicked
       // this EventListener can only be applied when the dropdown is shown, because otherwise the element does not exist

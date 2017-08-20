@@ -1,9 +1,4 @@
 
-@mixin fontAwesome() {
-  margin-right: 0.2em;
-  font-family: "FontAwesome", serif;
-}
-
 @mixin idtype_color($idType, $color) {
   form.search {
     label.checkbox-inline[data-idtype="#{$idType}"] {

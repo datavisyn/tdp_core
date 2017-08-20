@@ -1,3 +1,5 @@
+@import '~phovea_ui/src/fonts/yantramanav';
+
 body, html {
   font-family: Yantramanav, 'Helvetica Neue', Helvetica, sans-serif;
   font-weight: 400;
@@ -27,7 +29,7 @@ b,
 /**
  * Hide options menu
  */
-li[data-header="optionsLink"] {
+li[data-header=optionsLink] {
   display: none;
 }
 
