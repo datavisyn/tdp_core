@@ -9,13 +9,6 @@ module.exports = function (registry) {
   //registry.push('extension-type', 'extension-id', function() { return System.import('./src/extension_impl'); }, {});
   // generator-phovea:begin
 
-  registry.push('actionFactory', 'ordino', function () {
-    return System.import('./src/cmds');
-  }, {
-    'factory': 'createCmd',
-    'creates': '(targidCreateView|targidRemoveView|targidReplaceView|targidInitSession|targidSetParameter|targidSetSelection)'
-  });
-
   registry.push('actionFactory', 'ordino', function() { return System.import('./src/lineup/cmds'); }, {
   'factory': 'createCmd',
   'creates': '(lineupAddRanking|lineupSetRankingSortCriteria|lineupSetColumn|lineupAddColumn)'
@@ -72,4 +65,3 @@ module.exports = function (registry) {
 
   // generator-phovea:end
 };
-

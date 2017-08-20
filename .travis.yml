@@ -30,18 +30,18 @@ deploy:
     secure: tHOB+9MiKbMc6GlvkMa+sSV0q4g58y8M7TJrqvGa60dxKt+KdJkGJb/4Imd3vSeNN9zNaps6OHETcR9roNe7xQMwu8qKgXcRec4M9WZESPhQPhEWP/NBWIzz13QI4uCrUo2Sotoopbc3QMcHSPsgBKFDOSDTBnMZe/q409gapJfz7ml4Z2gdU3QRC59LY54+rIA1SVAdv/T0mmXMR6MTogSmoYIX4QCX0Bart03GnRqQmq44hd0yboSxMQ3nFjoMUyihZxtkPdKwD/YjEnUkQqrrA1VDstFMMrmINC7F9ZB/QdtaMQsTdepRIi+xTaUTGRHEq359iN7575YUG+a4eEh2xsgfNp/rptcygUWqrQ69zqnhGJ3JjdcFkJFbU9Th5PqQ1w9Zhgv8dlXoeO1NxOwBwUN4N9L0YIIWvdzmTlI2z5Q5beVFzSwMJ6ywi6dfgy8kwRxD9ajduNFDkbBdKxB4Ho7dTt50onEDJtP5Wb7T5qhJfuc+PeMOG0hoEptUgHhVoJN8/1auBEWdfI3Q+eg6P7BwGO3p61pr3aJkCE24Qr16BQ1SNxSe/IsPGYqYjSDFHXUXt+UOGp6za0WfYyQIL425+MJQc35YZhCNXEGLXzUU+daWBI8EmuCxZ97T3gCSLbbLltdKQm8lMwbb/xCBHNVwp1uCH0ab31EMQas=
   file_glob: true
   file:
-  - dist/ordino*.egg
-  - dist/ordino.tar.gz
+  - dist/tdp_core*.egg
+  - dist/tdp_core.tar.gz
   on:
     tags: true
-    repo: Caleydo/ordino
+    repo: datavisyn/tdp_core
 - provider: npm
   email: samuel.gratzl@jku.at
   api_key:
     secure: MUaouieuD9IzZx5BvCrHEpLIQ8moTATlqIUjnf1jWfF0OaxJY1P7wR+SzwCLRpTN1ySNdYj2fzgvQXahkG+usAHqKZGDhBl4l7N2aZyXRM8oBgDcRYoP70+EHPq6kmgWgLOjEXyV1wC2cY0Ppy/6yyYrf+uJdoSJSo9+0CITJBziFU1cGmvu36/LmAsVGR/Kgp6kmcuaGiJC+5BMyPmS2bXH9hRVXbCCQBulTI/X+xIKUyFNB8+uQYVLPAMcPQHIztKWQTxtZlX+7EpoZ0s+E/7IXDpoTlYxRXVwOW+UsteUYZ9U/bbua4M4Pio3pEQ+/mUParCjX0UHHcBZpSUItjXCHDGny1xYtQ/i6fpPAyFP8hV12Guk4apuCS627SEbK4xyMYAEryJJw8HwjgMtzpKleWIzZpBNXHHMXNEqbnVJCykDQ08f7MU+smLz1foUtgzDmjY7HeL10bD7uNgcumuV4Lap6U5AoUYXYO+Vhk+QnASeSAQw573h5p24DI4J77GLcRUwiFM2eI4Xd0m4dh5e4rnXZxuw1vIMrnNM+LvwjnUxU74VPHE7ejmBL2lvAVm7DV30op/pQY2hvfvu7AnBjGMddmsS+oAHQ0gmYyDjcQROfEbIh77RYOKK0iyhwhKQHoQMQIImAdFa477ssNPYoRoNKlQi1rpanr3X+yA=
   on:
     tags: true
-    repo: Caleydo/ordino
+    repo: datavisyn/tdp_core
 - provider: pypi
   user: caleydo-bot
   password:
@@ -49,4 +49,4 @@ deploy:
   on:
     tags: true
     distributions: sdist bdist_wheel
-    repo: Caleydo/ordino
+    repo: datavisyn/tdp_core

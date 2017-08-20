@@ -8,7 +8,7 @@ import phovea_server.range as ranges
 import logging
 
 __author__ = 'Samuel Gratzl'
-c = phovea_server.config.view('ordino')
+c = phovea_server.config.view('tdp_core')
 _log = logging.getLogger(__name__)
 
 app = Namespace(__name__)

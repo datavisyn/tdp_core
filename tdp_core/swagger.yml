@@ -19,7 +19,7 @@ tags:
 paths:
   db/:
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.list_databases
       description: list all known databases
       tags:
@@ -38,7 +38,7 @@ paths:
     parameters:
       - $ref: '#/parameters/database'
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.list_view
       description: list all views of a given database
       tags:
@@ -60,7 +60,7 @@ paths:
       - $ref: '#/parameters/database'
       - $ref: '#/parameters/view'
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.get_data_api
       description: execute the view and return the data the arguments depend on the definition
       tags:
@@ -85,7 +85,7 @@ paths:
       - $ref: '#/parameters/database'
       - $ref: '#/parameters/view'
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.get_filtered_data
       description: see the base version with additional filter possiblities
       tags:
@@ -110,7 +110,7 @@ paths:
       - $ref: '#/parameters/database'
       - $ref: '#/parameters/view'
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.get_score_data
       description: see the base version with additional filter possiblities and score mapping
       tags:
@@ -140,7 +140,7 @@ paths:
       - $ref: '#/parameters/database'
       - $ref: '#/parameters/view'
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.get_count_data
       description: see the base version but returns just the number of results
       tags:
@@ -160,7 +160,7 @@ paths:
       - $ref: '#/parameters/database'
       - $ref: '#/parameters/view'
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.get_desc
       description: returns the description information of the given view
       tags:
@@ -186,7 +186,7 @@ paths:
       - $ref: '#/parameters/database'
       - $ref: '#/parameters/view'
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: sql.lookup
       description: lookups up the given query term using this view
       tags:
@@ -244,7 +244,7 @@ paths:
         required: true
         description: the site key as defined in the targid_proxy extension point
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: proxy.get_details
       description: proxy to another get another website
       tags:
@@ -260,7 +260,7 @@ paths:
           $ref: '#/responses/notAllowed'
   storage/namedsets/:
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: storage.list_namedset
       description: list or add namedsets
       tags:
@@ -284,7 +284,7 @@ paths:
         '403':
           $ref: '#/responses/notAllowed'
     post:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: storage.list_namedset_post
       description: add a new namedset
       tags:
@@ -350,7 +350,7 @@ paths:
         required: true
         type: string
     get:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: storage.get_namedset
       description: get a dataset
       tags:
@@ -365,7 +365,7 @@ paths:
         '403':
           $ref: '#/responses/notAllowed'
     delete:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: storage.get_namedset_delete
       description: deletes the given named set
       tags:
@@ -381,7 +381,7 @@ paths:
         '403':
           $ref: '#/responses/notAllowed'
     put:
-      x-swagger-router-controller: ordino
+      x-swagger-router-controller: tdp_core
       operationId: storage.get_namedset_put
       description: update the given namedset
       tags:

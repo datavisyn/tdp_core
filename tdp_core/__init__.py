@@ -11,26 +11,26 @@ def phovea(registry):
   :param registry:
   """
   # generator-phovea:begin
-  registry.append('namespace', 'ordino', 'ordino.proxy',
+  registry.append('namespace', 'tdp_core', 'tdp_core.proxy',
                   {
-                      'namespace': '/api/targid/proxy'
+                      'namespace': '/api/tdp/proxy'
                   })
 
-  registry.append('namespace', 'db_connector', 'ordino.sql',
+  registry.append('namespace', 'db_connector', 'tdp_core.sql',
                   {
-                      'namespace': '/api/targid/db'
+                      'namespace': '/api/tdp/db'
                   })
 
-  registry.append('namespace', 'targid_storage', 'ordino.storage',
+  registry.append('namespace', 'targid_storage', 'tdp_core.storage',
                   {
-                      'namespace': '/api/targid/storage'
+                      'namespace': '/api/tdp/storage'
                   })
 
-  registry.append('namespace', 'processing', 'ordino.processing',
+  registry.append('namespace', 'processing', 'tdp_core.processing',
                   {
-                      'namespace': '/api/targid/processing'
+                      'namespace': '/api/tdp/processing'
                   })
-  registry.append('mapping_provider', 'ordino', 'ordino.mapping_table')
+  registry.append('mapping_provider', 'tdp_core', 'tdp_core.mapping_table')
   # generator-phovea:end
   pass
 

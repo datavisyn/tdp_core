@@ -2,9 +2,9 @@ import {IPlugin, IPluginDesc} from 'phovea_core/src/plugin';
 import {IScore} from './lineup/IScore';
 import IDType from 'phovea_core/src/idtype/IDType';
 
-export const EXTENSION_POINT_ORDINO_SCORE = 'ordinoScore';
-export const EXTENSION_POINT_ORDINO_SCORE_LOADER = 'ordinoScoreLoader';
-export const EXTENSION_POINT_ORDINO_RANKING_BUTTON = 'ordinoRankingButton';
+export const EXTENSION_POINT_TDP_CORE_SCORE = 'tdp_coreScore';
+export const EXTENSION_POINT_TDP_CORE_SCORE_LOADER = 'tdp_coreScoreLoader';
+export const EXTENSION_POINT_TDP_CORE_RANKING_BUTTON = 'tdp_coreRankingButton';
 
 export interface IScoreLoader {
   /**

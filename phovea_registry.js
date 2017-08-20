@@ -12,4 +12,4 @@ import {register} from 'phovea_core/src/plugin';
 //other modules
 import 'phovea_clue/phovea_registry.js';
 //self
-register('ordino',require('./phovea.js'));
+register('tdp_core',require('./phovea.js'));
