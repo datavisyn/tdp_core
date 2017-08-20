@@ -3,29 +3,29 @@
  */
 
 
-import {IObjectRef, action, meta, cat, op, ICmdFunction, ProvenanceGraph, ActionNode} from 'phovea_core/src/provenance';
+import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ActionNode} from 'phovea_core/src/provenance';
 import {get as getPlugin} from 'phovea_core/src/plugin';
 import Column from 'lineupjs/src/model/Column';
-import IScore from './IScore';
+import IScore from '../IScore';
+import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../extensions';
 
-export const EXTENSION_POINT_SCORE_IMPL = 'ordinoScoreImpl';
-export const CMD_ADD_SCORE = 'ordinoAddScore';
-export const CMD_REMOVE_SCORE = 'ordinoRemoveScore';
+export const CMD_ADD_SCORE = 'tdpAddScore';
+export const CMD_REMOVE_SCORE = 'tdpRemoveScore';
 
 
 export interface IViewProvider {
   getInstance(): {
-    addTrackedScoreColumn(score: IScore<any>): Promise<{ col: Column, loaded: Promise<Column>}>;
+    addTrackedScoreColumn(score: IScore<any>): Promise<{ col: Column, loaded: Promise<Column> }>;
     removeTrackedScoreColumn(columnId: string);
   };
 }
 
-async function addScoreLogic(waitForScore: boolean, inputs:IObjectRef<IViewProvider>[], parameter:any) {
+async function addScoreLogic(waitForScore: boolean, inputs: IObjectRef<IViewProvider>[], parameter: any) {
   const scoreId: string = parameter.id;
-  const pluginDesc = getPlugin(EXTENSION_POINT_SCORE_IMPL, scoreId);
+  const pluginDesc = getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
   const plugin = await pluginDesc.load();
   const view = await inputs[0].v.then((vi) => vi.getInstance());
-  const score: IScore<any>|IScore<any>[] = plugin.factory(parameter.params, pluginDesc);
+  const score: IScore<any> | IScore<any>[] = plugin.factory(parameter.params, pluginDesc);
   const scores = Array.isArray(score) ? score : [score];
 
   const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
@@ -36,18 +36,17 @@ async function addScoreLogic(waitForScore: boolean, inputs:IObjectRef<IViewProvi
   };
 }
 
-function addScoreImpl(inputs:IObjectRef<IViewProvider>[], parameter:any) {
+export function addScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
   return addScoreLogic(true, inputs, parameter);
 }
 
-async function addScoreAsync(inputs:IObjectRef<IViewProvider>[], parameter:any) {
+async function addScoreAsync(inputs: IObjectRef<IViewProvider>[], parameter: any) {
   return addScoreLogic(false, inputs, parameter);
 }
 
-
-async function removeScoreImpl(inputs:IObjectRef<IViewProvider>[], parameter:any) {
+export async function removeScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
   const view = await inputs[0].v.then((vi) => vi.getInstance());
-  const columnId: string|string[] = parameter.columnId;
+  const columnId: string | string[] = parameter.columnId;
   const columnIds = Array.isArray(columnId) ? columnId : [columnId];
 
   columnIds.forEach((id) => view.removeTrackedScoreColumn(id));
@@ -57,20 +56,20 @@ async function removeScoreImpl(inputs:IObjectRef<IViewProvider>[], parameter:any
   };
 }
 
-export function addScore(provider:IObjectRef<IViewProvider>, scoreId: string, params: any) {
+export function addScore(provider: IObjectRef<IViewProvider>, scoreId: string, params: any) {
   return action(meta('Add Score', cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], {
     id: scoreId,
     params
   });
 }
 
-export async function pushScoreAsync(graph: ProvenanceGraph, provider:IObjectRef<IViewProvider>, scoreId: string, params: any) {
+export async function pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreId: string, params: any) {
   const actionParams = {id: scoreId, params};
   const result = await addScoreAsync([provider], actionParams);
   return graph.pushWithResult(action(meta('Add Score', cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], actionParams), result);
 }
 
-export function removeScore(provider:IObjectRef<IViewProvider>, scoreId: string, params: any, columnId: string|string[]) {
+export function removeScore(provider: IObjectRef<IViewProvider>, scoreId: string, params: any, columnId: string | string[]) {
   return action(meta('Remove Score', cat.data, op.remove), CMD_REMOVE_SCORE, removeScoreImpl, [provider], {
     id: scoreId,
     params,
@@ -90,7 +89,7 @@ function shallowEqualObjects(a: any, b: any) {
   if (keysA.length !== keysB.length) {
     return false;
   }
-  if (keysA.some((k) => keysB.indexOf(k) <0)) {
+  if (keysA.some((k) => keysB.indexOf(k) < 0)) {
     return false;
   }
   return keysA.every((k) => {
@@ -103,16 +102,20 @@ function shallowEqualObjects(a: any, b: any) {
 /**
  * compresses score creation and removal
  */
-export function compress(path:ActionNode[]) {
+export function compress(path: ActionNode[]) {
+  return compressImpl(path, CMD_ADD_SCORE, CMD_REMOVE_SCORE);
+}
+
+function compressImpl(path: ActionNode[], addCmd: string, remCmd: string) {
   const manipulate = path.slice();
   const r: ActionNode[] = [];
   outer: for (let i = 0; i < manipulate.length; ++i) {
     const act = manipulate[i];
-    if (act.f_id === CMD_ADD_SCORE) {
+    if (act.f_id === addCmd) {
       // try to find its removal
       for (let j = i + 1; j < manipulate.length; ++j) {
         const next = manipulate[j];
-        if (next.f_id === CMD_REMOVE_SCORE && shallowEqualObjects(act.parameter, next.parameter)) {
+        if (next.f_id === remCmd && shallowEqualObjects(act.parameter, next.parameter)) {
           //TODO remove lineup actions that uses this score -> how to identify?
           //found match, delete both
           manipulate.slice(j, 1); //delete remove cmd
@@ -125,13 +128,6 @@ export function compress(path:ActionNode[]) {
   return r;
 }
 
-
-export function createCmd(id):ICmdFunction {
-  switch (id) {
-    case CMD_ADD_SCORE:
-      return addScoreImpl;
-    case CMD_REMOVE_SCORE:
-      return removeScoreImpl;
-  }
-  return null;
+export function compressComp(path: ActionNode[]) {
+  return compressImpl(path, 'ordinoAddScore', 'ordinoRemoveScore');
 }

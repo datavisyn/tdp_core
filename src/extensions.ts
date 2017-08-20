@@ -3,6 +3,7 @@ import {IScore} from './lineup/IScore';
 import IDType from 'phovea_core/src/idtype/IDType';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
+export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';

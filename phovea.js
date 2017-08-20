@@ -15,9 +15,7 @@ module.exports = function (registry) {
   registry.push('actionFunction', 'tdpSetParameter', function () { return import('./src/internal/cmds') }, {
     'factory': 'setParameterImpl'
   });
-  registry.push('actionCompressor', 'tdpCompressSetParameter', function () {
-    return System.import('./src/internal/cmds');
-  }, {
+  registry.push('actionCompressor', 'tdpCompressSetParameter', function () { return System.import('./src/internal/cmds') }, {
     'factory': 'compressSetParameter',
     'matches': '(tdpSetParameter)'
   });
@@ -37,18 +35,43 @@ module.exports = function (registry) {
   });
 
 
+  registry.push('actionFunction', 'tdpAddScore', function () { return import('./src/lineup/internal/scorecmds') }, {
+    'factory': 'addScoreImpl'
+  });
+  registry.push('actionFunction', 'tdpRemoveScore', function () { return import('./src/lineup/internal/scorecmds') }, {
+    'factory': 'removeScoreImpl'
+  });
+
+  registry.push('actionCompressor', 'tdpScoreCompressor', function() { return import('./src/lineup/internal/scorecmds'); }, {
+    'factory': 'compress',
+    'matches': '(tdpAddScore|tdpRemoveScore)'
+   });
+
+  // compatibility
+  registry.push('actionFunction', 'ordinoAddScore', function () { return import('./src/lineup/internal/scorecmds') }, {
+    'factory': 'addScoreImpl'
+  });
+  registry.push('actionFunction', 'ordinoRemoveScore', function () { return import('./src/lineup/internal/scorecmds') }, {
+    'factory': 'removeScoreImpl'
+  });
+  registry.push('actionCompressor', 'ordinoScoreCompressor', function() { return import('./src/lineup/internal/scorecmds'); }, {
+    'factory': 'compressComp',
+    'matches': '(ordinoAddScore|ordinoRemoveScore)'
+  });
+
+  registry.push('actionFunction', 'lineupAddRanking', function () { return import('./src/lineup/internal/cmds') }, {
+    'factory': 'addRankingImpl'
+  });
+  registry.push('actionFunction', 'lineupSetRankingSortCriteria', function () { return import('./src/lineup/internal/cmds') }, {
+    'factory': 'setRankingSortCriteriaImpl'
+  });
+  registry.push('actionFunction', 'lineupSetColumn', function () { return import('./src/lineup/internal/cmds') }, {
+    'factory': 'setColumnImpl'
+  });
+  registry.push('actionFunction', 'lineupAddRanking', function () { return import('./src/lineup/internal/cmds') }, {
+    'factory': 'addColumnImpl'
+  });
 
 
-
-  registry.push('actionFactory', 'ordinoScore', function() { return import('./src/lineup/scorecmds'); }, {
-  'factory': 'createCmd',
-  'creates': '(ordinoAddScore|ordinoRemoveScore)'
- });
-
-  registry.push('actionCompressor', 'ordinoScoreCompressor', function() { return import('./src/lineup/scorecmds'); }, {
-  'factory': 'compress',
-  'matches': '(ordinoAddScore|ordinoRemoveScore)'
- });
-  
   // generator-phovea:end
 };
