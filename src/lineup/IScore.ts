@@ -11,11 +11,14 @@ export interface IScoreRow<T> {
 
 export interface IScore<T> {
   idType: IDType;
+
   createDesc(): any;
+
   /**
    * Start the computation of the score for the given ids
    * @param ids
    * @param idtype
+   * @param extras
    */
   compute(ids: RangeLike, idtype: IDType, extras?: any): Promise<IScoreRow<T>[]>;
 }

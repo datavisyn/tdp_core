@@ -6,15 +6,13 @@ import {createStackDesc, IColumnDesc, createScriptDesc, Ranking} from 'lineupjs/
 import * as d3 from 'd3';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
-import {editDialog} from '../storage';
+import {editDialog} from '../../storage';
 import {EventHandler} from 'phovea_core/src/event';
-import {FormElementType, IFormElementDesc} from '../form';
-import {OrdinoFormIds} from '../constants';
+import {FormElementType, IFormElementDesc, FormBuilder} from '../../form';
 import {
-  IScoreLoader, EXTENSION_POINT_ORDINO_SCORE_LOADER, EXTENSION_POINT_ORDINO_SCORE, EXTENSION_POINT_ORDINO_RANKING_BUTTON,
+  IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
-} from '../extensions';
-import FormBuilder from '../form/FormBuilder';
+} from '../../extensions';
 import LineUp from 'lineupjs/src/lineup';
 import * as $ from 'jquery';
 
@@ -30,33 +28,32 @@ interface IWrappedColumnDesc {
   column: IColumnDesc;
 }
 
-const ADDITIONAL_COLUMN_ID = 'tdp.lineup.column.add';
+const FORM_ID_ADDITIONAL_COLUMN = 'tdp.lineup.column.add';
 
 /**
- * Wraps the ordinoScore such that the plugin is loaded and the score modal opened, when the factory function is called
- * @param ordinoScore
+ * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
+ * @param score
  * @returns {IScoreLoader}
  */
-export default function wrap(ordinoScore: IPluginDesc): IScoreLoader {
+export function wrap(score: IPluginDesc): IScoreLoader {
   return {
-    text: ordinoScore.name,
-    id: ordinoScore.id,
-    scoreId: ordinoScore.id,
+    text: score.name,
+    id: score.id,
+    scoreId: score.id,
     factory(extraArgs: object, count: number) {
-      return ordinoScore.load().then((p) => Promise.resolve(p.factory(ordinoScore, extraArgs, count)));
+      return score.load().then((p) => Promise.resolve(p.factory(score, extraArgs, count)));
     }
   };
 }
 
-export class LineUpRankingButtons extends EventHandler {
-
-  static readonly SAVE_NAMED_SET = 'saveNamedSet';
-  static readonly ADD_SCORE_COLUMN = 'addScoreColumn';
-  static readonly ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
+export default class LineUpRankingButtons extends EventHandler {
+  static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
+  static readonly EVENT_ADD_SCORE_COLUMN = 'addScoreColumn';
+  static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
 
   private readonly $ul: d3.Selection<HTMLUListElement>;
 
-  constructor(private lineup: LineUp, private $node: d3.Selection<any>, private idType: IDType, private extraArgs: any) {
+  constructor(private readonly lineup: LineUp, private readonly $node: d3.Selection<any>, private readonly idType: IDType, private readonly extraArgs: any) {
     super();
 
     this.$ul = this.$node.append('ul').classed('tdp-button-group', true);
@@ -110,7 +107,7 @@ export class LineUpRankingButtons extends EventHandler {
 
   private saveRankingDialog(order: number[]) {
     editDialog(null, (name, description, isPublic) => {
-      this.fire(LineUpRankingButtons.SAVE_NAMED_SET, order, name, description, isPublic);
+      this.fire(LineUpRankingButtons.EVENT_SAVE_NAMED_SET, order, name, description, isPublic);
     });
   }
 
@@ -142,8 +139,8 @@ export class LineUpRankingButtons extends EventHandler {
     const builder = new FormBuilder($selectWrapper);
 
     // load plugins, which need to be checked if the IDTypes are mappable
-    const ordinoScores: IPluginDesc[] = await LineUpRankingButtons.findMappablePlugins(this.idType, listPlugins(EXTENSION_POINT_ORDINO_SCORE));
-    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await LineUpRankingButtons.findMappablePlugins(this.idType, listPlugins(EXTENSION_POINT_ORDINO_SCORE_LOADER));
+    const ordinoScores: IPluginDesc[] = await LineUpRankingButtons.findMappablePlugins(this.idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
+    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await LineUpRankingButtons.findMappablePlugins(this.idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
     const metaDataPluginPromises: Promise<IColumnWrapper<IScoreLoader>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
@@ -187,7 +184,7 @@ export class LineUpRankingButtons extends EventHandler {
           const amountOfRows: number = this.lineup.data.getLastRanking().getOrder().length;
 
           // the factory function call executes the score's implementation
-          scorePlugin.factory(this.extraArgs, amountOfRows).then((params) => this.fire(LineUpRankingButtons.ADD_TRACKED_SCORE_COLUMN, scorePlugin.id, params));
+          scorePlugin.factory(this.extraArgs, amountOfRows).then((params) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.id, params));
         }
       },
       {
@@ -200,7 +197,7 @@ export class LineUpRankingButtons extends EventHandler {
 
     const elements: (IFormElementDesc)[] = [{
       type: FormElementType.SELECT2,
-      id: ADDITIONAL_COLUMN_ID,
+      id: FORM_ID_ADDITIONAL_COLUMN,
       attributes: {
         style: 'width:250px'
       },
@@ -215,7 +212,7 @@ export class LineUpRankingButtons extends EventHandler {
           };
         }),
         onChange: () => {
-          const select = builder.getElementById(ADDITIONAL_COLUMN_ID);
+          const select = builder.getElementById(FORM_ID_ADDITIONAL_COLUMN);
           const result = select.value;
 
           select.value = null;
@@ -239,7 +236,7 @@ export class LineUpRankingButtons extends EventHandler {
 
     $($dropdownLi.node()).on('shown.bs.dropdown', () => {
       // show Select2 options by default when the dropdown is visible to have Select2 calculate the correct position
-      builder.getElementById(ADDITIONAL_COLUMN_ID).focus();
+      builder.getElementById(FORM_ID_ADDITIONAL_COLUMN).focus();
 
       // HACK: keep dropdown open even when the input element inside Select2 is clicked
       // this EventListener can only be applied when the dropdown is shown, because otherwise the element does not exist
@@ -248,7 +245,7 @@ export class LineUpRankingButtons extends EventHandler {
   }
 
   private appendExtraButtons() {
-    const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_ORDINO_RANKING_BUTTON);
+    const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_RANKING_BUTTON);
     buttons.forEach((button) => {
       const listener = () => {
         (<Event>d3.event).preventDefault();
@@ -268,7 +265,7 @@ export class LineUpRankingButtons extends EventHandler {
         const amountOfRows: number = this.lineup.data.getLastRanking().getOrder().length;
 
         const params = plugin.factory(this.extraArgs, amountOfRows);
-        this.fire(LineUpRankingButtons.ADD_TRACKED_SCORE_COLUMN, plugin.scoreId, params);
+        this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, plugin.scoreId, params);
       }
     };
   }
@@ -279,9 +276,9 @@ export class LineUpRankingButtons extends EventHandler {
     Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType, this.extraArgs)) // open modal dialog
       .then((scoreImpl) => { // modal dialog is closed and score created
         if(Array.isArray(scoreImpl)) {
-          scoreImpl.forEach((impl) => this.fire(LineUpRankingButtons.ADD_SCORE_COLUMN, impl, scorePlugin));
+          scoreImpl.forEach((impl) => this.fire(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, impl, scorePlugin));
         } else {
-          this.fire(LineUpRankingButtons.ADD_SCORE_COLUMN, scoreImpl, scorePlugin);
+          this.fire(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, scoreImpl, scorePlugin);
         }
       });
   }

@@ -2,8 +2,8 @@
  * Created by sam on 13.02.2017.
  */
 
-import {ISelection} from '../View';
-import * as d3 from 'd3';
+import {ISelection} from '../views';
+import LineUp from 'lineupjs/src/lineup';
 import {IDType} from 'phovea_core/src/idtype';
 import {list as rlist} from 'phovea_core/src/range';
 import {EventHandler} from 'phovea_core/src/event';
@@ -36,23 +36,30 @@ export function set_diff<T>(set1: Set<T>, set2: Set<T>) : Set<T> {
   return diff;
 }
 
+export interface IRow {
+  /**
+   * id, e.g. ESNGxxxx
+   */
+  id: string;
+  /**
+   * unique internal number id, e.g. 42
+   */
+  _id: number;
+}
+
 export class LineUpSelectionHelper extends EventHandler {
-  static readonly SET_ITEM_SELECTION = 'setItemSelection';
+  static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';
 
-  private _rows: any[] = [];
+  private _rows: {id: string, _id: number}[] = [];
 
-  private orderedSelectionIndicies: number[] = [];
+  /**
+   * selected indices ordered by selection order, i.e. the first selected is the 0. item
+   * @type {number[]}
+   */
+  private readonly orderedSelectedIndices = <number[]>[];
+  private uid2index = new Map<number, number>();
 
-  private id2index = d3.map<number>();
-  public index2id = d3.map<number>();
-
-  // key: id (e.g., Ensembl), value: _id (Caleydo Mapping Id from Redis DB)
-  private id2UnderscoreId = d3.map<number>();
-
-  // Returns the _id for a given `id`
-  public underscoreIdAccessor = (id: string) => this.id2UnderscoreId.get(id);
-
-  constructor(private lineup, private idType: IDType, private idAccessor) {
+  constructor(private readonly lineup: LineUp, private readonly idType: IDType) {
     super();
   }
 
@@ -64,47 +71,42 @@ export class LineUpSelectionHelper extends EventHandler {
   private buildCache() {
     // create lookup cache
     this._rows.forEach((row, i) => {
-      this.id2index.set(String(this.idAccessor(row)), i);
-      this.index2id.set(String(i), this.idAccessor(row));
-      this.id2UnderscoreId.set(row.id, row._id);
+      this.uid2index.set(row._id, i);
     });
   }
 
   private addEventListener() {
-    this.lineup.on('multiSelectionChanged', (indices) => {
+    this.lineup.on(LineUp.EVENT_MULTISELECTION_CHANGED, (indices: number[]) => {
       this.onMultiSelectionChanged(indices);
     });
   }
 
   private removeEventListener() {
-    this.lineup.on('multiSelectionChanged', null);
+    this.lineup.on(LineUp.EVENT_MULTISELECTION_CHANGED, null);
   }
 
-  private onMultiSelectionChanged(indices) {
+  private onMultiSelectionChanged(indices: number[]) {
     // compute the difference
-    const diffAdded = array_diff(indices, this.orderedSelectionIndicies);
-    const diffRemoved = array_diff(this.orderedSelectionIndicies, indices);
-
-    // add new element to the end
-    if (diffAdded.length > 0) {
-      diffAdded.forEach((d) => {
-        this.orderedSelectionIndicies.push(d);
-      });
-    }
+    const diffAdded = array_diff(indices, this.orderedSelectedIndices);
+    const diffRemoved = array_diff(this.orderedSelectedIndices, indices);
 
     // remove elements within, but preserve order
-    if (diffRemoved.length > 0) {
-      diffRemoved.forEach((d) => {
-        this.orderedSelectionIndicies.splice(this.orderedSelectionIndicies.indexOf(d), 1);
-      });
-    }
+    diffRemoved.forEach((d) => {
+      this.orderedSelectedIndices.splice(this.orderedSelectedIndices.indexOf(d), 1);
+    });
 
-    const ids = rlist(this.orderedSelectionIndicies.map((i) => this.idAccessor(this._rows[i])));
+    // add new element to the end
+    diffAdded.forEach((d) => {
+      this.orderedSelectedIndices.push(d);
+    });
+
+
+    const uids = rlist(this.orderedSelectedIndices.map((i) => this._rows[i]._id));
     //console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
 
-    const selection: ISelection = {idtype: this.idType, range: ids};
+    const selection: ISelection = {idtype: this.idType, range: uids};
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
-    this.fire(LineUpSelectionHelper.SET_ITEM_SELECTION, selection);
+    this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }
 
   set rows(rows: any[]) {
@@ -122,9 +124,10 @@ export class LineUpSelectionHelper extends EventHandler {
   rowIdsAsSet(indices: number[]) {
     let ids: number[];
     if (indices.length === this._rows.length) {
-      ids = this._rows.map((d) => this.idAccessor(d));
+      //all
+      ids = this._rows.map((d) => d._id);
     } else {
-      ids = indices.map((i) => this.index2id.get(String(i)));
+      ids = indices.map((i) => this._rows[i]._id);
     }
     ids.sort((a, b) => a - b); // sort by number
     return rlist(ids);
@@ -136,8 +139,8 @@ export class LineUpSelectionHelper extends EventHandler {
     }
 
     const indices: number[] = [];
-    sel.range.dim(0).forEach((id) => {
-      const index = this.id2index.get(String(id));
+    sel.range.dim(0).forEach((uid) => {
+      const index = this.uid2index.get(uid);
       if (typeof index === 'number') {
         indices.push(index);
       }

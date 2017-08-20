@@ -71,7 +71,6 @@ export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], para
 }
 
 
-
 export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any) {
   return action(meta('Change Sort Criteria', cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
     rid,
