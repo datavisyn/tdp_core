@@ -1,4 +1,4 @@
-tdp_core [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+tdp_core [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm-url] [![Build Status][circleci-image]][circleci-url]
 =====================
 
 Target discovery platform for exploring rankings of genes, disease models, and other entities.
@@ -38,7 +38,5 @@ This repository is part of **[Phovea](http://phovea.caleydo.org/)**, a platform 
 [phovea-url]: https://phovea.caleydo.org
 [npm-image]: https://badge.fury.io/js/tdp_core.svg
 [npm-url]: https://npmjs.org/package/tdp_core
-[travis-image]: https://travis-ci.org/datavisyn/tdp_core.svg?branch=master
-[travis-url]: https://travis-ci.org/datavisyn/tdp_core
-[daviddm-image]: https://david-dm.org/datavisyn/tdp_core/status.svg
-[daviddm-url]: https://david-dm.org/datavisyn/tdp_core
+[circleci-image]: https://circleci.com/gh/datavisyn/tdp_core.svg?style=shield&circle-token=021e456dc4d0e7ae082476213aada47bc0fd864b
+[circleci-url]: https://circleci.com/gh/datavisyn/tdp_core
