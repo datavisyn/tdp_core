@@ -9,10 +9,13 @@ import {
   currentUserNameOrAnonymous, ALL_READ_NONE, ISecureItem, ALL_READ_READ, EEntity, hasPermission
 } from 'phovea_core/src/security';
 import {FormDialog} from 'phovea_ui/src/dialogs';
+import {REST_NAMESPACE as TDP_NAMESPACE} from './rest';
 
 export enum ENamedSetType {
   NAMEDSET, CUSTOM, PANEL, FILTER
 }
+
+const REST_NAMESPACE = `${TDP_NAMESPACE}/storage`;
 
 export interface IBaseNamedSet {
   /**
@@ -83,7 +86,7 @@ export declare type INamedSet = IFilterNamedSet | IPanelNamedSet | IStoredNamedS
 
 export function listNamedSets(idType: IDType | string = null): Promise<IStoredNamedSet[]> {
   const args = idType ? {idType: resolve(idType).id} : {};
-  return getAPIJSON('/targid/storage/namedsets/', args).then((sets: IStoredNamedSet[]) => {
+  return getAPIJSON(`${REST_NAMESPACE}/namedsets/`, args).then((sets: IStoredNamedSet[]) => {
     // default value
     sets.forEach((s) => s.type = s.type || ENamedSetType.NAMEDSET);
     return sets;
@@ -106,15 +109,15 @@ export function saveNamedSet(name: string, idType: IDType | string, ids: RangeLi
     subTypeValue: subType.value,
     description
   };
-  return sendAPI('/targid/storage/namedsets/', data, 'POST');
+  return sendAPI(`${REST_NAMESPACE}/namedsets/`, data, 'POST');
 }
 
 export function deleteNamedSet(id: string) {
-  return sendAPI(`/targid/storage/namedset/${id}`, {}, 'DELETE');
+  return sendAPI(`${REST_NAMESPACE}/namedset/${id}`, {}, 'DELETE');
 }
 
 export function editNamedSet(id: string, data: { [key: string]: any }) {
-  return sendAPI(`/targid/storage/namedset/${id}`, data, 'PUT').then((s) => {
+  return sendAPI(`${REST_NAMESPACE}/namedset/${id}`, data, 'PUT').then((s) => {
     s.type = s.type || ENamedSetType.NAMEDSET;
     return s;
   });

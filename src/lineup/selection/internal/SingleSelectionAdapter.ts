@@ -7,9 +7,9 @@ import {IAdditionalColumnDesc} from '../../desc';
 import {IScoreRow} from '../../IScore';
 
 export interface ISingleSelectionAdapter {
-  createDesc(context: IContext, id: number): Promise<IAdditionalColumnDesc>;
+  createDesc(_id: number, id: string): Promise<IAdditionalColumnDesc>;
 
-  loadData(context: IContext, id: number): Promise<IScoreRow<any>[]>;
+  loadData(_id: number, id: string): Promise<IScoreRow<any>[]>;
 }
 
 export default class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
@@ -20,7 +20,7 @@ export default class SingleSelectionAdapter extends ABaseSelectionAdapter implem
     // dummy
   }
 
-  protected createColumnsFor(context: IContext, id: number) {
-    return this.adapter.createDesc(context, id).then((desc) => [{desc, data: this.adapter.loadData(context, id), id}]);
+  protected createColumnsFor(context: IContext, _id: number, id: string) {
+    return this.adapter.createDesc(_id, id).then((desc) => [{desc, data: this.adapter.loadData(_id, id), id: _id}]);
   }
 }

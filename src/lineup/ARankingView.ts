@@ -25,6 +25,7 @@ import {extent} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from './interfaces';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
+import {IServerColumn, IViewDescription} from '../rest';
 
 export interface IARankingViewOptions {
   itemName: string;
@@ -33,18 +34,6 @@ export interface IARankingViewOptions {
   additionalScoreParameter: object | (() => object);
   additionalComputeScoreParameter: object | (() => object);
   subType: { key: string, value: string };
-  selectionAdapter: ISelectionAdapter;
-}
-
-export interface IServerColumn {
-  label: string;
-  column: string;
-  type: 'categorical' | 'number' | 'string';
-
-  categories?: string[];
-
-  min?: number;
-  max?: number;
 }
 
 export abstract class ARankingView extends AView {
@@ -91,19 +80,21 @@ export abstract class ARankingView extends AView {
 
   private readonly colors = new LineUpColors();
 
-  private readonly options: Readonly<IARankingViewOptions> = {
+  protected readonly options: Readonly<IARankingViewOptions> = {
     itemName: 'item',
     itemNamePlural: 'items',
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
-    subType: {key: '', value: ''},
-    selectionAdapter: none()
+    subType: {key: '', value: ''}
   };
+
+  private readonly selectionAdapter: ISelectionAdapter;
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
-    mixin(this.options, options);
+    const names = options.itemName ? {itemNamePlural: `${options.itemName}s`} : {};
+    mixin(this.options, names, options);
 
     this.node.classList.add('lineup');
     this.node.insertAdjacentHTML('beforeend', `<p class="nodata hidden">No data found for selection and parameter.</p>`);
@@ -121,6 +112,7 @@ export abstract class ARankingView extends AView {
       this.setItemSelection(selection);
       this.updateLineUpStats();
     });
+    this.selectionAdapter = this.createSelectionAdapter();
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
@@ -129,6 +121,10 @@ export abstract class ARankingView extends AView {
     params.lastElementChild!.appendChild(this.stats);
 
     super.init(params, onParameterChange);
+  }
+
+  protected createSelectionAdapter(): ISelectionAdapter {
+    return none();
   }
 
   protected initImpl() {
@@ -142,8 +138,8 @@ export abstract class ARankingView extends AView {
 
   protected parameterChanged(name: string) {
     super.parameterChanged(name);
-    if (this.options.selectionAdapter) {
-      this.options.selectionAdapter.parameterChanged(this.createContext());
+    if (this.selectionAdapter) {
+      this.selectionAdapter.parameterChanged(this.createContext());
     }
   }
 
@@ -153,8 +149,8 @@ export abstract class ARankingView extends AView {
   }
 
   protected selectionChanged() {
-    if (this.options.selectionAdapter) {
-      this.options.selectionAdapter.selectionChanged(this.createContext());
+    if (this.selectionAdapter) {
+      this.selectionAdapter.selectionChanged(this.createContext());
     }
   }
 
@@ -321,7 +317,7 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  protected abstract loadColumnDesc(): Promise<{ columns: IServerColumn[] }>;
+  protected abstract loadColumnDesc(): Promise<IViewDescription>;
 
   protected abstract loadRows(): Promise<IRow[]>;
 
@@ -352,23 +348,36 @@ export abstract class ARankingView extends AView {
     this.setBusy(true);
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];
+      columns.forEach((c) => this.provider.pushDesc(c));
       const rows: IRow[] = r[1];
 
-      if (rows.length > 0) {
-        this.noData.classList.add('hidden');
-      } else {
-        this.noData.classList.remove('hidden');
-      }
-      columns.forEach((c) => this.provider.pushDesc(c));
-      this.provider.setData(rows);
-      this.selectionHelper.rows = rows;
-      this.selectionHelper.setItemSelection(this.getItemSelection());
+      this.setLineUpData(rows);
       createInitialRanking(this.lineup);
-
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
     }).catch(() => {
       this.setBusy(false);
+    });
+  }
+
+  private setLineUpData(rows: IRow[]) {
+    if (rows.length > 0) {
+      this.noData.classList.add('hidden');
+    } else {
+      this.noData.classList.remove('hidden');
+    }
+    this.provider.setData(rows);
+    this.selectionHelper.rows = rows;
+    this.selectionHelper.setItemSelection(this.getItemSelection());
+  }
+
+  /**
+   * similar to rebuild but just loads new data and keep the columns
+   */
+  protected reloadData() {
+    return this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
+      const rows: IRow[] = r[1];
+      this.setLineUpData(rows);
     });
   }
 
