@@ -1,22 +1,26 @@
 
 
 
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {IPlugin, IPluginDesc} from 'phovea_core/src/plugin';
 import IDType from 'phovea_core/src/idtype/IDType';
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {IObjectRef} from 'phovea_core/src/provenance';
 import {IEventHandler} from 'phovea_core/src/event';
 import Range from 'phovea_core/src/range/Range';
-import {IFormElementDesc} from '../form';
 
 export enum EViewMode {
   FOCUS, CONTEXT, HIDDEN
 }
 
 export interface IViewPluginDesc extends IPluginDesc {
-  selection: string; //none (0), single (1), multiple (>=1),
+  selection: 'none'|'0'|'any'|'single'|'1'|'small_multiple'|'multiple'|'chooser'|'some'|'2'; //none (0), single (1), multiple (>=1),
   idtype?: string;
-  mockup?: boolean;
+  load(): Promise<IViewPlugin>;
+}
+
+export interface IViewPlugin {
+  readonly desc: IViewPluginDesc;
+  factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
 export function toViewPluginDesc(p : IPluginDesc): IViewPluginDesc {

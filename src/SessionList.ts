@@ -17,6 +17,7 @@ import {
 } from './internal/EditProvenanceGraphMenu';
 import {on as globalOn} from 'phovea_core/src/event';
 import {fromNow} from './internal/utils';
+export {isPublic} from './internal/EditProvenanceGraphMenu';
 
 abstract class ASessionList {
   constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager) {
