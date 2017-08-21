@@ -5,4 +5,4 @@
 export {default as ARankingView, IARankingViewOptions} from './ARankingView';
 export {ISelectionAdapter, multi, single} from './selection';
 export {IScore, IScoreRow, IScoreParam} from './IScore';
-export {numberCol2, numberCol} from './desc';
+export {numberCol, stringCol, categoricalCol, booleanCol} from './desc';

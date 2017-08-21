@@ -14,7 +14,7 @@ import {LocalDataProvider,} from 'lineupjs/src/provider';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
-import {showErrorModalDialog} from '../Dialogs';
+import {showErrorModalDialog} from '../dialogs';
 import LineUpRankingButtons from './internal/LineUpRankingButtons';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import IScore, {IScoreRow, createAccessor} from './IScore';

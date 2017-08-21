@@ -13,7 +13,7 @@ import LoginMenu from 'phovea_clue/src/menu/LoginMenu';
 import {isLoggedIn} from 'phovea_core/src/security';
 import ACLUEWrapper, {createStoryVis} from 'phovea_clue/src/ACLUEWrapper';
 import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
-import {showProveanceGraphNotFoundDialog} from './Dialogs';
+import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
 import 'phovea_ui/src/_bootstrap';
 import 'phovea_ui/src/_font-awesome';

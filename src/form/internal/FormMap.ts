@@ -85,7 +85,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   private rows: IFormRow[] = [];
   private readonly inline: boolean;
 
-  private readonly inlineOnChange: (value: any, element: FormMap)=>void;
+  private readonly inlineOnChange: (formElement: IFormElement, value: any, data: any)=>void;
 
   /**
    * Constructor
@@ -211,7 +211,8 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       // trigger change on onChange listener just when the dialog is closed
       $(this.$node.node()).on('hidden.bs.dropdown', () => {
         if (changed) {
-          this.inlineOnChange(this.value, this);
+          const v = this.value;
+          this.inlineOnChange(this, v, toData(v));
         }
         changed = false;
       });

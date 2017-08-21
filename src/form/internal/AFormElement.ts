@@ -152,7 +152,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   abstract focus();
 }
 
-function toData(value: any) {
+export function toData(value: any) {
   if (Array.isArray(value)) {
     return value.map(toData);
   }
