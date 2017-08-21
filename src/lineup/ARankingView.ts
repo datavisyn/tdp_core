@@ -24,6 +24,7 @@ import {mixin} from 'phovea_core/src';
 import {extent} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from './interfaces';
+import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/ISelectionAdapter';
 
 export interface IARankingViewOptions {
   itemName: string;
@@ -32,6 +33,7 @@ export interface IARankingViewOptions {
   additionalScoreParameter: object|(() => object);
   additionalComputeScoreParameter: object|(() => object);
   subType: {key: string, value: string};
+  selectionAdapter: ISelectionAdapter|null;
 }
 
 export interface IServerColumn {
@@ -95,7 +97,8 @@ export abstract class ARankingView extends AView {
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
-    subType: { key: '', value: ''}
+    subType: { key: '', value: ''},
+    selectionAdapter: null
   };
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
@@ -137,9 +140,36 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? resolve(this.options.itemIDType): null;
   }
 
+  protected parameterChanged(name: string) {
+    super.parameterChanged(name);
+    if (this.options.selectionAdapter) {
+      this.options.selectionAdapter.parameterChanged(this.createContext());
+    }
+  }
+
   protected itemSelectionChanged() {
     this.selectionHelper.setItemSelection(this.itemSelection);
     super.itemSelectionChanged();
+  }
+
+  protected selectionChanged() {
+    if (this.options.selectionAdapter) {
+      this.options.selectionAdapter.selectionChanged(this.createContext());
+    }
+  }
+
+  private createContext(): IContext {
+    return {
+      columns: this.provider.getLastRanking().flatColumns,
+      selection: this.selection,
+      freeColor: (id: number) => this.colors.freeColumnColor(id),
+      add: (columns: ISelectionColumn[]) => this.withoutTracking(() => {
+        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id));
+      }),
+      remove: (columns: Column[]) => this.withoutTracking(() => {
+        columns.forEach((c) => c.removeMe());
+      })
+    };
   }
 
   /**
@@ -208,6 +238,8 @@ export abstract class ARankingView extends AView {
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column>} {
     const ranking = this.provider.getLastRanking();
 
+     //mark as lazy loaded
+    (<any>colDesc).lazyLoaded = true;
     colDesc.color = this.colors.getColumnColor(id);
     const accessor = createAccessor(colDesc);
 
