@@ -302,7 +302,7 @@ export abstract class ARankingView extends AView {
     return withoutTracking(this.context.ref, () => f(this.lineup));
   }
 
-  private addTrackedScoreColumn(score: IScore<any>) {
+  addTrackedScoreColumn(score: IScore<any>) {
     return this.withoutTracking(() => this.addScoreColumn(score));
   }
 

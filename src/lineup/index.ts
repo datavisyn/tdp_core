@@ -7,3 +7,4 @@ export {ISelectionAdapter, multi, single} from './selection';
 export {IScore, IScoreRow, IScoreParam} from './IScore';
 export {numberCol, stringCol, categoricalCol, booleanCol} from './desc';
 export {IRow} from './interfaces';
+export {IViewProvider} from './internal/scorecmds';
