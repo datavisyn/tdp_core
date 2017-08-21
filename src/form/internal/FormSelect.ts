@@ -14,29 +14,18 @@ export interface IFormSelectOption {
   data: any;
 }
 
+export declare type ISelectOptions = ((string|IFormSelectOption)[]|Promise<(string|IFormSelectOption)[]>);
 
 export interface IFormSelectOptions {
   /**
-   * Custom on change function that is executed when the selection has changed
-   * @param selection
-   * @param formElement
-   */
-  onChange?: (selection: IFormSelectOption, formElement: IFormElement) => any;
-  /**
    * Data for the options elements of the select
    */
-  optionsData?: (string|IFormSelectOption)[];
-  /**
-   * Function to generate dynamic options based on the selection of the depending form element
-   * @param selection selection of the depending form element (see `dependsOn` property)
-   */
-  optionsFnc?: (selection: IFormSelectOption[]) => string[]|IFormSelectOption[];
+  optionsData?: ISelectOptions|((dependents: any[]) => ISelectOptions);
   /**
    * Index of the selected option; this option overrides the selected index from the `useSession` property
    */
   selectedIndex?: number;
 }
-
 
 /**
  * Add specific options for select form elements
@@ -76,6 +65,20 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     this.build();
   }
 
+  protected updateStoredValue() {
+    if (!this.desc.useSession) {
+      return;
+    }
+    session.store(`${this.id}_selectedIndex`, this.getSelectedIndex());
+  }
+
+  protected getStoredValue<T>(defaultValue:T): T {
+    if (!this.desc.useSession) {
+      return defaultValue;
+    }
+    return session.retrieve(`${this.id}_selectedIndex`, defaultValue);
+  }
+
   /**
    * Build the label and select element
    * Bind the change listener and propagate the selection by firing a change event
@@ -83,87 +86,40 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   protected build() {
     super.build();
 
+    const options = this.desc.options;
     this.$select = this.$node.append('select');
     this.setAttributes(this.$select, this.desc.attributes);
-    this.handleOptions(this.$select, this.desc.options);
-    this.handleShowIf();
 
     // propagate change action with the data of the selected option
     this.$select.on('change.propagate', () => {
-      this.fire('change', d3.select((<HTMLSelectElement>this.$select.node()).selectedOptions[0]).datum(), this.$select);
+      this.fire(FormSelect.EVENT_CHANGE, this.value, this.$select);
     });
-  }
 
-  /**
-   * Handle select form element specific options
-   * @param $select
-   * @param options
-   */
-  private handleOptions($select: d3.Selection<any>, options: IFormSelectOptions) {
-    if (!options) {
-      return;
-    }
+    const data = resolveData();
 
-    // custom on change function
-    if (options.onChange) {
-      $select.on('change.customListener', () => {
-        options.onChange(this.value, this);
+    const values = this.handleDependent((values) => {
+      data(values).then((items) => {
+        this.updateOptionElements(items);
+        this.$select.property('selectedIndex', options.selectedIndex || 0);
+        this.fire(FormSelect.EVENT_CHANGE, this.value, this.$select);
       });
-    }
+    });
 
-    let optionsData = options.optionsData;
+    const defaultSelectedIndex = this.getStoredValue(0);
 
-    if (this.desc.dependsOn && options.optionsFnc) {
-      const dependElements = this.desc.dependsOn.map((depOn) => this.parent.getElementById(depOn));
-
-      const values = <IFormSelectOption[]>dependElements.map((d) => d.value);
-      optionsData = options.optionsFnc(values);
-
-      const onDependentChange = () => {
-        const values = <IFormSelectOption[]>dependElements.map((d) => d.value);
-        this.updateOptionElements(options.optionsFnc(values));
-        $select.property('selectedIndex', options.selectedIndex || 0);
-
-        // propagate that options has changed
-        this.fire('change', this.value, $select);
-      };
-
-      dependElements.forEach((depElem) => {
-        depElem.on('change', onDependentChange);
-      });
-    }
-
-    let defaultSelectedIndex = 0;
-    if (this.desc.useSession) {
-      defaultSelectedIndex = session.retrieve(this.id + '_selectedIndex', defaultSelectedIndex);
-
-      // old selected index is out of bounce for current number of options -> set to 0
-      if (optionsData.length <= defaultSelectedIndex) {
-        defaultSelectedIndex = 0;
-      }
-
-      $select.on('change.storeInSession', () => {
-        session.store(this.id + '_selectedIndex', (<HTMLSelectElement>$select.node()).selectedIndex);
-      });
-    }
-
-    this.updateOptionElements(optionsData);
-
-    $select.property('selectedIndex', options.selectedIndex || defaultSelectedIndex);
+    data(values).then((items) => {
+      this.updateOptionElements(items);
+      this.$select.property('selectedIndex', options.selectedIndex !== undefined ? options.selectedIndex : defaultSelectedIndex);
+    });
   }
 
   /**
    * Returns the selectedIndex. If the option `useSession` is enabled,
    * the index from the session will be used as fallback
    */
-  getSelectedIndex() {
-    let defaultSelectedIndex = 0;
-    const currentSelectedIndex = this.$select.property('selectedIndex');
-
-    if (this.desc.useSession) {
-      defaultSelectedIndex = session.retrieve(this.id + '_selectedIndex', defaultSelectedIndex);
-    }
-
+  getSelectedIndex(): number {
+    const defaultSelectedIndex = this.getStoredValue(0);
+    const currentSelectedIndex = <number>this.$select.property('selectedIndex');
     return (currentSelectedIndex === -1) ? defaultSelectedIndex : currentSelectedIndex;
   }
 
@@ -172,18 +128,12 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
    * @param data
    */
   updateOptionElements(data: (string|IFormSelectOption)[]) {
-    const options: IFormSelectOption[] = data.map((d) => {
-      if (typeof d === 'string') {
-        return {name: d, value: d, data: d};
-      }
-      return <IFormSelectOption>d;
-    });
+    const options = data.map(toOption);
 
     const $options = this.$select.selectAll('option').data(options);
     $options.enter().append('option');
 
-    $options.attr('value', (d) => d.value)
-      .html((d) => d.name);
+    $options.attr('value', (d) => d.value).html((d) => d.name);
 
     $options.exit().remove();
   }
@@ -222,5 +172,25 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   focus() {
     (<HTMLSelectElement>this.$select.node()).focus();
   }
+}
 
+function toOption(d: string|IFormSelectOption): IFormSelectOption {
+  if (typeof d === 'string') {
+    return {name: d, value: d, data: d};
+  }
+  return d;
+}
+
+export function resolveData(data?: ISelectOptions|((dependents: any[]) => ISelectOptions)): ((dependents: any[]) => Promise<IFormSelectOption[]>) {
+  if (data === undefined) {
+    return () => Promise.resolve([]);
+  }
+  if (Array.isArray(data)) {
+    return () => Promise.resolve(data.map(toOption));
+  }
+  if (data instanceof Promise) {
+    return () => data.then((r) => r.map(toOption));
+  }
+  //assume it is a function
+  return (dependents: any[]) => Promise.resolve(data(dependents)).then((r) => r.map(toOption));
 }

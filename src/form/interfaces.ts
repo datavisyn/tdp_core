@@ -90,8 +90,15 @@ export interface IFormElementDesc {
    * hide label
    */
   hideLabel?: boolean;
-}
 
+  /**
+   * generic on change handler
+   * @param {IFormElement} formElement
+   * @param value
+   * @param data
+   */
+  onChange?: (formElement: IFormElement, value: any, data: any)=>void;
+}
 
 
 export interface IFormParent {

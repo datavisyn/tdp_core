@@ -52,6 +52,7 @@ export default class FormButton extends EventHandler implements IFormElement {
       (<Event>d3.event).preventDefault();
       (<Event>d3.event).stopPropagation();
     });
+    //TODO doesn't support show if
   }
 
   focus() {

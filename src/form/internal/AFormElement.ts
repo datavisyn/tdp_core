@@ -5,11 +5,13 @@
 import * as d3 from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
 import {IFormElementDesc, IFormParent, IFormElement} from '../interfaces';
+import * as session from 'phovea_core/src/session';
 
 /**
  * Abstract form element class that is used as parent class for other form elements
  */
 export abstract class AFormElement<T extends IFormElementDesc> extends EventHandler implements IFormElement {
+  static readonly EVENT_CHANGE = 'change';
 
   readonly id: string;
 
@@ -23,6 +25,20 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   constructor(protected readonly parent: IFormParent, protected readonly desc: T) {
     super();
     this.id = desc.id;
+  }
+
+  protected updateStoredValue() {
+    if (!this.desc.useSession) {
+      return;
+    }
+    session.store(`${this.id}_value`, this.value);
+  }
+
+  protected getStoredValue<T>(defaultValue:T): T {
+    if (!this.desc.useSession) {
+      return defaultValue;
+    }
+    return session.retrieve(`${this.id}_value`, defaultValue);
   }
 
   isRequired() {
@@ -39,9 +55,8 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   protected hasValue() {
-    return !!this.value;
+    return Boolean(this.value);
   }
-
 
   isVisible() {
     return !this.$node.classed('hidden');
@@ -56,6 +71,16 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   protected build() {
+    if (this.desc.useSession || this.desc.onChange) {
+      this.on(AFormElement.EVENT_CHANGE, () => {
+        this.updateStoredValue();
+        if (this.desc.onChange) {
+          const value = this.value;
+          this.desc.onChange(this, value, toData(value));
+        }
+      });
+    }
+
     if (this.desc.visible === false) {
       this.$node.classed('hidden', true);
     }
@@ -85,22 +110,31 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     }
   }
 
-  protected handleShowIf() {
-    if (!this.desc.dependsOn || !this.desc.showIf) {
-      return;
+  protected handleDependent(onDependentChange?: (values: any[]) => void): any[] {
+    if (!this.desc.dependsOn && !onDependentChange) {
+      return [];
     }
+
+    const showIf = this.desc.showIf;
 
     const dependElements = this.desc.dependsOn.map((depOn) => this.parent.getElementById(depOn));
 
     dependElements.forEach((depElem) => {
-      depElem.on('change', (evt, value) => {
+      depElem.on(AFormElement.EVENT_CHANGE, () => {
         const values = dependElements.map((d) => d.value);
-        return this.$node.classed('hidden', !this.desc.showIf(values));
+        onDependentChange(values);
+        if (showIf) {
+          this.$node.classed('hidden', !showIf(values));
+        }
       });
     });
 
+    // initial values
     const values = dependElements.map((d) => d.value);
-    this.$node.classed('hidden', !this.desc.showIf(values));
+    if (showIf) {
+      this.$node.classed('hidden', !this.desc.showIf(values));
+    }
+    return values;
   }
 
   /**
@@ -116,6 +150,13 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   abstract set value(v: any);
 
   abstract focus();
+}
+
+function toData(value: any) {
+  if (Array.isArray(value)) {
+    return value.map(toData);
+  }
+  return (value !== null && value.data !== undefined) ? value.data : value;
 }
 
 export default AFormElement;

@@ -1,12 +1,16 @@
 import {IFormElementDesc, IFormParent} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
-import * as session from 'phovea_core/src/session';
-import {mixin} from 'phovea_core/src';
 
 export interface ICheckBoxElementDesc extends IFormElementDesc {
   options: {
+    /**
+     * checked value
+     */
     checked?: any;
+    /**
+     * unchecked value
+     */
     unchecked?: any;
   };
 }
@@ -21,8 +25,8 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @param $parent
    * @param desc
    */
-  constructor(parent: IFormParent, $parent, desc: ICheckBoxElementDesc) {
-    super(parent, mixin({options: { checked: true, unchecked: false}}, desc));
+  constructor(parent: IFormParent, $parent: d3.Selection<any>, desc: ICheckBoxElementDesc) {
+    super(parent, Object.assign({options: { checked: true, unchecked: false}}, desc));
 
     this.$node = $parent.append('div').classed('checkbox', true);
 
@@ -45,20 +49,13 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     this.$input.classed('form-control', false); //remove falsy class again
 
     const options = this.desc.options;
-    if (this.desc.useSession) {
-      this.$input.property('checked', session.retrieve(this.id + '_value', options.unchecked) === options.checked);
-    } else {
-      this.$input.property('checked', false);
-    }
+    this.$input.property('checked', this.getStoredValue(options.unchecked) === options.checked);
 
-    this.handleShowIf();
+    this.handleDependent();
 
     // propagate change action with the data of the selected option
     this.$input.on('change.propagate', () => {
-      if (this.desc.useSession) {
-        session.store(this.id+'_value', this.value);
-      }
-      this.fire('change', this.value, this.$input);
+      this.fire(FormCheckBox.EVENT_CHANGE, this.value, this.$input);
     });
   }
 

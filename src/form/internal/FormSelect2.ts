@@ -6,12 +6,15 @@ import 'select2';
 import * as d3 from 'd3';
 import * as $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
-import * as session from 'phovea_core/src/session';
 import {api2absURL} from 'phovea_core/src/ajax';
 import AFormElement from './AFormElement';
-import {IFormElement, IFormParent} from '../interfaces';
-import {IFormSelectDesc, IFormSelectOption} from './FormSelect';
+import {IFormParent} from '../interfaces';
+import {IFormSelectDesc} from './FormSelect';
 
+declare type IFormSelect2Options = Select2Options & {
+  return?: 'text'|'id';
+  data?: ISelect2Option[] | ((dependents: any)=>ISelect2Option[]);
+};
 
 /**
  * Add specific options for select form elements
@@ -20,27 +23,25 @@ export interface IFormSelect2 extends IFormSelectDesc {
   /**
    * Additional options
    */
-  options?: Select2Options & {
-    return?: 'text'|'id';
-    onChange?: (selection: IFormSelectOption, formElement: IFormElement) => any
-  };
+  options?: IFormSelect2Options;
 }
 
 export interface ISelect2Option {
   id: string;
   text: string;
+  data?: any;
 }
 
 export const DEFAULT_OPTIONS = {
-    placeholder: 'Start typing...',
-    theme: 'bootstrap',
-    minimumInputLength: 0,
-    //selectOnClose: true,
-    //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
-    escapeMarkup: (markup) => markup,
-    templateResult: (item: any) => item.text,
-    templateSelection: (item: any) => item.text
-  };
+  placeholder: 'Start typing...',
+  theme: 'bootstrap',
+  minimumInputLength: 0,
+  //selectOnClose: true,
+  //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
+  escapeMarkup: (markup) => markup,
+  templateResult: (item: any) => item.text,
+  templateSelection: (item: any) => item.text
+};
 
 export const DEFAULT_AJAX_OPTIONS = Object.assign({
   ajax: {
@@ -77,7 +78,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
   private readonly multiple: boolean;
 
   private readonly listener = () => {
-    this.fire('change', this.value, this.$select);
+    this.fire(FormSelect2.EVENT_CHANGE, this.value, this.$select);
   }
 
   /**
@@ -85,6 +86,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
    * @param parent
    * @param $parent
    * @param desc
+   * @param multiple
    */
   constructor(parent: IFormParent, $parent, desc: IFormSelect2, multiple: 'multiple'|'single' = 'single') {
     super(parent, desc);
@@ -105,10 +107,13 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     const $select = this.$node.append('select');
     this.setAttributes($select, this.desc.attributes);
 
-    this.$select = this.buildSelect2($select, this.desc.options);
+    const values = this.handleDependent(() => {
+      //not supported
+    });
+    const df = this.desc.options.data;
+    const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
+    this.$select = this.buildSelect2($select, this.desc.options || {}, data);
 
-    this.handleOptions(this.$select, this.desc.options);
-    this.handleShowIf();
 
     // propagate change action with the data of the selected option
     this.$select.on('change.propagate', this.listener);
@@ -116,31 +121,24 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
 
   /**
    * Builds the jQuery select2
-   * @param $select
-   * @param options
-   * @returns {JQuery}
    */
-  private buildSelect2($select: d3.Selection<any>, options?) {
-    if (!options) {
-      options = {};
-    }
-    const select2Options: any = {};
+  private buildSelect2($select: d3.Selection<any>, options: IFormSelect2Options, data?: ISelect2Option[]) {
+    const select2Options: Select2Options = {};
 
     let initialValue: string[] = [];
-    if (this.desc.useSession) {
-      const defaultVal: any = session.retrieve(this.id + '_defaultVal', null);
-      if (defaultVal) {
-        if (this.multiple) {
-          const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];
-          initialValue = defaultValues.map((d) => typeof d === 'string' ? d : d.id);
-          if (!options.data) { //derive default data if none is set explictly
-            select2Options.data = defaultValues.map((d) => (typeof d === 'string' ? ({id: d, text: d}) : d));
-          }
-        } else {
-          initialValue = [typeof defaultVal === 'string' ? defaultVal : <string>defaultVal.id];
-          if (!options.data) {
-            select2Options.data = [typeof defaultVal === 'string' ? ({id: defaultVal, text: defaultVal}) : defaultVal];
-          }
+    const defaultVal: any = this.getStoredValue(null);
+
+    if (defaultVal) {
+      if (this.multiple) {
+        const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];
+        initialValue = defaultValues.map((d) => typeof d === 'string' ? d : d.id);
+        if (!data) { //derive default data if none is set explictly
+          data = defaultValues.map((d) => (typeof d === 'string' ? ({id: d, text: d}) : d));
+        }
+      } else {
+        initialValue = [typeof defaultVal === 'string' ? defaultVal : <string>defaultVal.id];
+        if (!data) {
+          data = [typeof defaultVal === 'string' ? ({id: defaultVal, text: defaultVal}) : defaultVal];
         }
       }
     }
@@ -149,49 +147,9 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
       select2Options.multiple = true;
       select2Options.allowClear = true;
     }
-    mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options);
+    mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
 
     return (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
-  }
-
-  /**
-   * Handle select form element specific options
-   * @param $select
-   * @param options
-   */
-  private handleOptions($select, options) {
-    if (!options) {
-      return;
-    }
-
-    // custom on change function
-    if (options.onChange) {
-      this.on('change', () => {
-        options.onChange(this.value, this);
-      });
-    }
-
-    let optionsData = options.optionsData;
-
-    if (this.desc.dependsOn && options.optionsFnc) {
-      const dependElements = this.desc.dependsOn.map((depOn) => this.parent.getElementById(depOn));
-
-      dependElements.forEach((depElem) => {
-        const values = dependElements.map((d) => d.value);
-        optionsData = options.optionsFnc(values);
-
-        depElem.on('change', (evt, value) => {
-          // propagate that options has changed
-          this.fire('change', this.value, $select);
-        });
-      });
-    }
-
-    if (this.desc.useSession) {
-      this.$select.on('change.storeInSession', () => {
-        session.store(this.id + '_defaultVal', this.value);
-      });
-    }
   }
 
   /**

@@ -3,7 +3,6 @@
  */
 
 import * as d3 from 'd3';
-import * as session from 'phovea_core/src/session';
 import AFormElement from './AFormElement';
 import {IFormElementDesc, IFormParent} from '../interfaces';
 
@@ -52,20 +51,13 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
     this.setAttributes(this.$input, this.desc.attributes);
 
     const defaultValue = (this.desc.options || {}).type === 'number' ? '0' : '';
-    if (this.desc.useSession) {
-      this.$input.property('value', session.retrieve(this.id + '_value', defaultValue));
-    } else {
-      this.$input.property('value', defaultValue);
-    }
+    this.$input.property('value', this.getStoredValue(defaultValue));
 
-    this.handleShowIf();
+    this.handleDependent();
 
     // propagate change action with the data of the selected option
     this.$input.on('change.propagate', () => {
-      if (this.desc.useSession) {
-        session.store(this.id+'_value', this.value);
-      }
-      this.fire('change', this.value, this.$input);
+      this.fire(FormInputText.EVENT_CHANGE, this.value, this.$input);
     });
   }
 

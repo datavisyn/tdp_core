@@ -27,6 +27,7 @@ export default class FormBuilder {
   /**
    * Constructor
    * @param $parent Node that the form should be attached to
+   * @param formId unique form id
    */
   constructor($parent: d3.Selection<any>, private readonly formId = randomId()) {
     this.$node = $parent.append('form').attr('id', this.formId);
