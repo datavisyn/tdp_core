@@ -15,7 +15,7 @@ module.exports = function (registry) {
   registry.push('actionFunction', 'tdpSetParameter', function () { return import('./src/internal/cmds') }, {
     'factory': 'setParameterImpl'
   });
-  registry.push('actionCompressor', 'tdpCompressSetParameter', function () { return System.import('./src/internal/cmds') }, {
+  registry.push('actionCompressor', 'tdpCompressSetParameter', function () { return import('./src/internal/cmds') }, {
     'factory': 'compressSetParameter',
     'matches': '(tdpSetParameter)'
   });
