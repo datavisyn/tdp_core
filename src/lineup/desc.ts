@@ -12,52 +12,10 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedSubtype?: string;
 }
 
-export function numberCol(col: string, rows: any[], label = col, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
-  return {
-    type: 'number',
-    column: col,
-    label,
-    domain: extent(rows, (d) => d[col]),
-    color: '',
-    visible,
-    width,
-    selectedId,
-    selectedSubtype
-  };
-}
-
-export function numberCol2(col: string, min: number, max: number, label = col, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
-  return {
-    type: 'number',
-    column: col,
-    label,
-    domain: [min, max],
-    color: '',
-    visible,
-    width,
-    selectedId,
-    selectedSubtype
-  };
-}
-
-export function categoricalCol(col: string, categories: (string|{label?: string, name: string, color?: string})[], label = col, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
-  return {
-    type: 'categorical',
-    column: col,
-    label,
-    categories,
-    color: '',
-    visible,
-    width,
-    selectedId,
-    selectedSubtype
-  };
-}
-
-export function stringCol(col: string, label = col, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
+function baseColumn(column: string, label = column, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
   return {
     type: 'string',
-    column: col,
+    column,
     label,
     color: '',
     visible,
@@ -67,19 +25,36 @@ export function stringCol(col: string, label = col, visible = true, width = -1, 
   };
 }
 
-export function booleanCol(col: string, label = col, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
-  return {
-    type: 'boolean',
-    column: col,
-    label,
-    color: '',
-    visible,
-    width,
-    selectedId,
-    selectedSubtype
-  };
+export function numberColFromArray(column: string, rows: any[], label = column, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
+  return Object.assign(baseColumn(column, label, visible, width, selectedId, selectedSubtype), {
+    type: 'number',
+    domain: extent(rows, (d) => d[column])
+  });
 }
 
+export function numberCol(column: string, min: number, max: number, label = column, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
+  return Object.assign(baseColumn(column, label, visible, width, selectedId, selectedSubtype), {
+    type: 'number',
+    domain: [min, max],
+  });
+}
+
+export function categoricalCol(column: string, categories: (string|{label?: string, name: string, color?: string})[], label = column, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
+  return Object.assign(baseColumn(column, label, visible, width, selectedId, selectedSubtype), {
+    type: 'categorical',
+    categories
+  });
+}
+
+export function stringCol(column: string, label = column, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
+  return Object.assign(baseColumn(column, label, visible, width, selectedId, selectedSubtype), {});
+}
+
+export function booleanCol(column: string, label = column, visible = true, width = -1, selectedId = -1, selectedSubtype?: string) {
+  return Object.assign(baseColumn(column, label, visible, width, selectedId, selectedSubtype), {
+    type: 'boolean'
+  });
+}
 
 export function deriveCol(col: IAnyVector): IColumnDesc {
   const r: any = {

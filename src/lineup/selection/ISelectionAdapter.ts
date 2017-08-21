@@ -19,7 +19,6 @@ export interface IContext {
   freeColor(id: number): void;
 }
 
-
 export interface ISelectionAdapter {
   parameterChanged(context: IContext): void;
 

@@ -18,7 +18,7 @@ import {showErrorModalDialog} from '../Dialogs';
 import LineUpRankingButtons from './internal/LineUpRankingButtons';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import IScore, {IScoreRow, createAccessor} from './IScore';
-import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol2} from './desc';
+import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol} from './desc';
 import {pushScoreAsync} from './internal/scorecmds';
 import {mixin} from 'phovea_core/src';
 import {extent} from 'd3';
@@ -29,17 +29,17 @@ import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 export interface IARankingViewOptions {
   itemName: string;
   itemNamePlural: string;
-  itemIDType: IDTypeLike|null;
-  additionalScoreParameter: object|(() => object);
-  additionalComputeScoreParameter: object|(() => object);
-  subType: {key: string, value: string};
+  itemIDType: IDTypeLike | null;
+  additionalScoreParameter: object | (() => object);
+  additionalComputeScoreParameter: object | (() => object);
+  subType: { key: string, value: string };
   selectionAdapter: ISelectionAdapter;
 }
 
 export interface IServerColumn {
   label: string;
   column: string;
-  type: 'categorical'|'number'|'string';
+  type: 'categorical' | 'number' | 'string';
 
   categories?: string[];
 
@@ -72,7 +72,7 @@ export abstract class ARankingView extends AView {
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
    */
-  private dump: Map<string, number|boolean> = null;
+  private dump: Map<string, number | boolean> = null;
 
   /**
    * DOM element with message when no data is available
@@ -97,7 +97,7 @@ export abstract class ARankingView extends AView {
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
-    subType: { key: '', value: ''},
+    subType: {key: '', value: ''},
     selectionAdapter: none()
   };
 
@@ -123,7 +123,7 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any)=>Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
     // inject stats
     params.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
     params.lastElementChild!.appendChild(this.stats);
@@ -137,7 +137,7 @@ export abstract class ARankingView extends AView {
   }
 
   get itemIDType() {
-    return this.options.itemIDType ? resolve(this.options.itemIDType): null;
+    return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
 
   protected parameterChanged(name: string) {
@@ -202,14 +202,14 @@ export abstract class ARankingView extends AView {
       return;
     }
 
-    if(this.dump !== null) {
+    if (this.dump !== null) {
       return;
     }
 
     const s = ranking.getSortCriteria();
     const labelColumn = ranking.children.filter((c) => c.desc.type === 'string')[0];
 
-    this.dump = new Map<string, number|boolean>();
+    this.dump = new Map<string, number | boolean>();
     ranking.children.forEach((c) => {
       if (c === labelColumn ||
         c === s.col ||
@@ -235,10 +235,10 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, this.itemIDType, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column>} {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column> } {
     const ranking = this.provider.getLastRanking();
 
-     //mark as lazy loaded
+    //mark as lazy loaded
     (<any>colDesc).lazyLoaded = true;
     colDesc.color = this.colors.getColumnColor(id);
     const accessor = createAccessor(colDesc);
@@ -321,18 +321,19 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  protected abstract loadColumnDesc(): Promise<{columns: IServerColumn[]}>;
+  protected abstract loadColumnDesc(): Promise<{ columns: IServerColumn[] }>;
+
   protected abstract loadRows(): Promise<IRow[]>;
 
   protected getColumnDescs(columns: IServerColumn[]) {
     const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
 
     return columns.map((col) => {
-      switch(col.type) {
+      switch (col.type) {
         case 'categorical':
           return categoricalCol(col.column, col.categories, niceName(col.label), false);
         case 'number':
-          return numberCol2(col.column, col.min, col.max, niceName(col.label), false);
+          return numberCol(col.column, col.min, col.max, niceName(col.label), false);
         case 'string':
           return stringCol(col.column, niceName(col.label), false);
       }
@@ -385,7 +386,7 @@ export abstract class ARankingView extends AView {
    */
   private updateLineUpStats() {
     const showStats = (total: number, selected = 0, shown = 0) => {
-      return `Showing ${shown} ${total > 0 ? `of ${total}`: ''}${selected > 0 ? `; ${selected} ${selected === 1 ? this.options.itemName : this.options.itemNamePlural}` : ''}`;
+      return `Showing ${shown} ${total > 0 ? `of ${total}` : ''}${selected > 0 ? `; ${selected} ${selected === 1 ? this.options.itemName : this.options.itemNamePlural}` : ''}`;
     };
 
     const selected = this.provider.getSelection().length;

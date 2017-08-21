@@ -48,4 +48,4 @@ export abstract class ABaseSelectionAdapter {
   protected abstract createColumnsFor(context: IContext, id: number): Promise<ISelectionColumn[]>;
 }
 
-export default ABaseSelectionColumnAdapter;
+export default ABaseSelectionAdapter;

@@ -1,5 +1,3 @@
-
-
 import {ISelectionAdapter} from './ISelectionAdapter';
 import SingleSelectionAdapter, {ISingleSelectionAdapter} from './internal/SingleSelectionAdapter';
 import MultiSelectionAdapter, {IMultiSelectionAdapter} from './internal/MultiSelectionAdapter';
@@ -18,7 +16,7 @@ export function multi(adapter: IMultiSelectionAdapter): ISelectionAdapter {
 
 export function none(): ISelectionAdapter {
   return {
-    parameterChanged: ()=>undefined,
-    selectionChanged: ()=>undefined
+    parameterChanged: () => undefined,
+    selectionChanged: () => undefined
   };
 }
