@@ -1,16 +1,14 @@
 {
   "generator-phovea": {
-    "type": "app-slib",
+    "type": "lib-slib",
     "name": "tdp_core",
     "author": "datavisyn",
     "githubAccount": "datavisyn",
     "modules": [
       "phovea_clue"
     ],
-    "extensions": [
-    ],
-    "sextensions": [
-    ],
+    "extensions": [],
+    "sextensions": [],
     "libraries": [
       "d3",
       "jquery",

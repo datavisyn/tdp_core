@@ -4,7 +4,7 @@
   "homepage": "https://phovea.caleydo.org",
   "version": "2.1.2-SNAPSHOT",
   "author": {
-    "name": "The Caleydo Team",
+    "name": "datavisyn",
     "email": "contact@caleydo.org",
     "url": "https://caleydo.org"
   },
@@ -37,7 +37,7 @@
     "iojs": ">= 3"
   },
   "scripts": {
-    "check": "flake8",
+    "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules",
     "pretest": "echo hybrid",
     "test": "npm run test:web && npm run test:python",
     "predist": "echo hybrid",
@@ -87,6 +87,7 @@
     "@types/jquery": "2.0.33",
     "jquery": "3.1.1"
   },
+  "main": "build/tdp_core.js",
   "devDependencies": {
     "@types/jasmine": "2.5.41",
     "awesome-typescript-loader": "3.0.3",
@@ -117,6 +118,6 @@
     "typescript": "2.2.0",
     "url-loader": "0.5.7",
     "webpack": "2.2.1",
-    "webpack-dev-server": "2.3.0"
+    "webpack-dev-server": "2.4.2"
   }
 }
