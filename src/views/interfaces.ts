@@ -1,6 +1,3 @@
-
-
-
 import {IPlugin, IPluginDesc} from 'phovea_core/src/plugin';
 import IDType from 'phovea_core/src/idtype/IDType';
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
@@ -8,29 +5,48 @@ import {IObjectRef} from 'phovea_core/src/provenance';
 import {IEventHandler} from 'phovea_core/src/event';
 import Range from 'phovea_core/src/range/Range';
 
+/**
+ * mode of the view depending on the view state
+ */
 export enum EViewMode {
   FOCUS, CONTEXT, HIDDEN
 }
 
 export interface IViewPluginDesc extends IPluginDesc {
-  selection: 'none'|'0'|'any'|'single'|'1'|'small_multiple'|'multiple'|'chooser'|'some'|'2'; //none (0), single (1), multiple (>=1),
+  /**
+   * how many selection this view can handle and requires
+   */
+  selection: 'none' | '0' | 'any' | 'single' | '1' | 'small_multiple' | 'multiple' | 'chooser' | 'some' | '2';
+  /**
+   * idType regex that is required by this view
+   */
   idtype?: string;
+
   load(): Promise<IViewPlugin>;
 }
 
 export interface IViewPlugin {
   readonly desc: IViewPluginDesc;
+
+  /**
+   * factory for building a view
+   * @param {IViewContext} context view context
+   * @param {ISelection} selection the current input selection
+   * @param {HTMLElement} parent parent dom element
+   * @param options additional options
+   * @returns {IView}
+   */
   factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
-export function toViewPluginDesc(p : IPluginDesc): IViewPluginDesc {
-  const r : any = p;
+export function toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
+  const r: any = p;
   r.selection = r.selection || 'none';
   return r;
 }
 
 export function matchLength(s: any, length: number) {
-  switch(String(s)) {
+  switch (String(s)) {
     case '':
     case 'none':
     case '0':
@@ -70,7 +86,13 @@ export function willShowChooser(desc: any) {
   return desc.selection === 'chooser';
 }
 
-export function isSameSelection(a: ISelection, b: ISelection) {
+/**
+ * compares two selections and return true if they are the same
+ * @param {ISelection} a
+ * @param {ISelection} b
+ * @returns {boolean}
+ */
+export function isSameSelection(a: ISelection, b: ISelection): boolean {
   const aNull = (a === null || a.idtype === null);
   const bNull = (b === null || b.idtype === null);
   if (aNull || bNull) {
@@ -79,7 +101,7 @@ export function isSameSelection(a: ISelection, b: ISelection) {
   return a.idtype.id === b.idtype.id && a.range.eq(b.range);
 }
 
-export function createContext(graph:ProvenanceGraph, desc: IPluginDesc, ref: IObjectRef<any>):IViewContext {
+export function createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IObjectRef<any>): IViewContext {
   return {
     graph,
     desc: toViewPluginDesc(desc),
@@ -87,10 +109,9 @@ export function createContext(graph:ProvenanceGraph, desc: IPluginDesc, ref: IOb
   };
 }
 
-
 export interface ISelection {
-  idtype: IDType;
-  range: Range;
+  readonly idtype: IDType;
+  readonly range: Range;
 }
 
 export interface IViewContext {
@@ -103,24 +124,74 @@ export interface IViewClass {
   new(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
+/**
+ * event when one or more elements are selected for the next level
+ * @type {string}
+ * @argument selection {ISelection}
+ */
+export const VIEW_EVENT_ITEM_SELECT = 'select';
+
 export interface IView extends IEventHandler {
+  /**
+   * the node of this view
+   */
   readonly node: HTMLElement;
+  /**
+   * the id type required for the input selection
+   */
   readonly idType: IDType;
-  readonly itemIDType: IDType|null;
+  /**
+   * the id type of the shown items
+   */
+  readonly itemIDType: IDType | null;
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any)=>Promise<any>): void;
+  /**
+   * initialized this view
+   * @param {HTMLElement} params place to put parameter forms
+   * @param {(name: string, value: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes
+   */
+  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>): void;
 
+  /**
+   * changes the input selection as given to the constructor of this class
+   * @param {ISelection} selection
+   */
   setInputSelection(selection: ISelection): void;
 
+  /**
+   * sets the selection of the items within this view
+   * @param {ISelection} selection
+   */
   setItemSelection(selection: ISelection): void;
 
+  /**
+   * returns the current item selection
+   * @returns {ISelection}
+   */
   getItemSelection(): ISelection;
 
-  getParameter(name: string): any;
+  /**
+   * return the current parameter value for the given name
+   * @param {string} name parameter name
+   * @returns {any}
+   */
+  getParameter(name: string): any | null;
 
+  /**
+   * sets the parameter within this view
+   * @param {string} name
+   * @param value
+   */
   setParameter(name: string, value: any): void;
 
-  modeChanged(mode:EViewMode): void;
+  /**
+   * notify the view that its view mode has changed
+   * @param {EViewMode} mode
+   */
+  modeChanged(mode: EViewMode): void;
 
+  /**
+   * destroys this view
+   */
   destroy(): void;
 }

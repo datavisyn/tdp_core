@@ -1,16 +1,24 @@
 /**
  * Created by Samuel Gratzl on 07.06.2017.
  */
-import {FormDialog} from 'phovea_ui/src/dialogs';
+import {FormDialog as Dialog} from 'phovea_ui/src/dialogs';
 import {randomId} from 'phovea_core/src';
 import FormBuilder from './FormBuilder';
 import {IFormElementDesc} from './interfaces';
 import {select} from 'd3';
 
-
-export default class FormBuilderDialog extends FormDialog {
+/**
+ * a utililty dialog to show a dialog modal using a FormBuilder
+ * @see FormBuilder
+ */
+export default class FormDialog extends Dialog {
   readonly builder: FormBuilder;
 
+  /**
+   * @param {string} title popup title
+   * @param {string} primaryButton name of the primary button
+   * @param {string} formId form id to use to avoid conflicts
+   */
   constructor(title: string, primaryButton: string, formId = 'form' + randomId(5)) {
     super(title, primaryButton, formId);
     this.body.innerHTML = ''; //clear old form since the form builder brings its own
@@ -21,10 +29,19 @@ export default class FormBuilderDialog extends FormDialog {
     });
   }
 
+  /**
+   * adds additional form builder elememts
+   * @param {IFormElementDesc} elements
+   */
   append(...elements: IFormElementDesc[]) {
     this.builder.build(elements);
   }
 
+  /**
+   * register a callback when the form is submitted
+   * @param {(builder?: FormBuilder) => void} callback called when submitted
+   * @returns {JQuery}
+   */
   onSubmit(callback: (builder?: FormBuilder)=>void) {
     return super.onSubmit(() => {
       if (!this.builder.validate()) {
@@ -35,6 +52,11 @@ export default class FormBuilderDialog extends FormDialog {
     });
   }
 
+  /**
+   * utility to show this dialog and resolve as soon it has been been submited
+   * @param {(builder: FormBuilder) => T} processData converter from a form builder to the output format
+   * @returns {Promise<T>}
+   */
   showAsPromise<T>(processData: (builder: FormBuilder) => T) {
     return new Promise<T>((resolve) => {
       this.onSubmit((builder) => {

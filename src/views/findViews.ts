@@ -17,6 +17,12 @@ import {
 import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import Range from 'phovea_core/src/range/Range';
 
+/**
+ * finds for the given IDType and selection matching views
+ * @param {IDType} idtype the idtype to lookfor
+ * @param {Range} selection the current input selection
+ * @returns {Promise<{enabled: boolean; v: IViewPluginDesc}[]>} list of views and whether the current selection count matches their requirements
+ */
 export default async function findViews(idtype: IDType, selection: Range): Promise<{ enabled: boolean, v: IViewPluginDesc }[]> {
   if (idtype === null) {
     return Promise.resolve([]);

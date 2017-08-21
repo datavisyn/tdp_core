@@ -38,13 +38,9 @@ export interface IBaseNamedSet {
    */
   idType: string;
   /**
-   * Name of a categorical column (e.g., species)
+   * extra key/value pair
    */
   subTypeKey?: string;
-
-  /**
-   * Value of the categorical column (e.g., "Homo_sapiens" as value for species)
-   */
   subTypeValue?: string;
 
   /**

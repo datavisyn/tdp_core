@@ -20,6 +20,12 @@ export default function cached<T>(key: string, creator: () => T) {
   return v;
 }
 
+/**
+ * similar to @see cached but the result is lazily evaluated
+ * @param {string} key key to store
+ * @param {() => T} creator the function to create in case the values not yet cached
+ * @returns {() => T}
+ */
 export function cachedLazy<T>(key: string, creator: () => T): (() => T)  {
   return () => cached(key, creator);
 }

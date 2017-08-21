@@ -3,32 +3,9 @@
  */
 import {RangeLike, Range} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
-import {IRow} from './interfaces';
+import {IRow} from '../rest';
 
-export interface IScoreRow<T> {
-  readonly id: string;
-  score: T;
-}
 
-export interface IScore<T> {
-  idType: IDType;
-
-  createDesc(): any;
-
-  /**
-   * Start the computation of the score for the given ids
-   * @param ids
-   * @param idtype
-   * @param extras
-   */
-  compute(ids: RangeLike, idtype: IDType, extras?: any): Promise<IScoreRow<T>[]>;
-}
-
-export interface IScoreParam {
-  [key: string]: any;
-}
-
-export default IScore;
 
 export class AScoreAccessorProxy<T> {
   /**

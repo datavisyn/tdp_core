@@ -4,14 +4,32 @@
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
 import {set_diff} from '../../internal/LineUpSelectionHelper';
-import {IScoreRow} from '../../IScore';
+import {IScoreRow} from '../../';
 import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 
 export interface IMultiSelectionAdapter {
-  createDescs(_id: number, id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]>;
-
+  /**
+   * returns the list of currently selected sub types
+   * @returns {string[]}
+   */
   getSelectedSubTypes(): string[];
 
+  /**
+   * create the column descriptions for the given selection and sub types
+   * @param {number} _id the internal unique number
+   * @param {string} id the associated name of the unique id
+   * @param {string[]} subTypes the currently selected sub types
+   * @returns {Promise<IAdditionalColumnDesc[]>} the created descriptions
+   */
+  createDescs(_id: number, id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]>;
+
+  /**
+   * load the data for the given selection and the selected descriptions
+   * @param {number} _id the internal unique number
+   * @param {string} id the associated name of the unique id
+   * @param {IAdditionalColumnDesc[]} descs list of scores to load
+   * @returns {Promise<IScoreRow<any>[][]>} data
+   */
   loadData(_id: number, id: string, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[][]>;
 }
 

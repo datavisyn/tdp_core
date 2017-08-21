@@ -22,11 +22,23 @@ import './style.scss';
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
 export interface ITDPOptions {
+  /**
+   * alternative login formular
+   */
   loginForm: string|undefined;
+  /**
+   * name of this application
+   */
   name: string;
+  /**
+   * prefix used for provenance graphs and used to identify matching provenance graphs
+   */
   prefix: string;
 }
 
+/**
+ * base class for TDP based applications
+ */
 export abstract class ATDPApplication<T> extends ACLUEWrapper {
   static readonly EVENT_OPEN_START_MENU = 'openStartMenu';
 
@@ -140,8 +152,19 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     return {graph, manager: clueManager, storyVis};
   }
 
+  /**
+   * build the actual main application given the arguments
+   * @param {ProvenanceGraph} graph the resolved current provenance graph
+   * @param {CLUEGraphManager} manager its manager
+   * @param {HTMLElement} main root dom element
+   * @returns {Promise<T> | T}
+   */
   protected abstract createApp(graph: ProvenanceGraph, manager: CLUEGraphManager, main: HTMLElement): Promise<T> | T;
 
+  /**
+   * triggered after the user is logged in and the session can be started or continued
+   * @param {T} app the current app
+   */
   protected abstract initSessionImpl(app: T);
 }
 

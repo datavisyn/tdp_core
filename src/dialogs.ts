@@ -6,6 +6,11 @@ import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {generateDialog} from 'phovea_ui/src/dialogs';
 export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';
 
+/**
+ * utility dialog when a session was not found
+ * @param {CLUEGraphManager} manager
+ * @param {string} id session id
+ */
 export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string) {
   const dialog = generateDialog('Session Not Found!', 'Create New Temporary Session');
   // append bg-danger to the dialog parent element

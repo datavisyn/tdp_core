@@ -8,6 +8,9 @@ export interface IAStartListOptions extends IARankingViewOptions {
   namedSet: INamedSet;
 }
 
+/**
+ * base class for ranking views start doen't require any input but can have as additional input a NamedSet they are representing
+ */
 export abstract class AStartList extends ARankingView {
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IAStartListOptions> = {}) {
     super(context, selection, parent, {

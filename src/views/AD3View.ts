@@ -8,6 +8,10 @@ import {select, Selection} from 'd3';
 
 export {resolveIds, resolveId, resolveIdToNames} from './AView';
 
+/**
+ * utiltity view to work with the node using d3
+ * @deprecated
+ */
 export abstract class AD3View extends AView {
   protected $node: Selection<this>;
 

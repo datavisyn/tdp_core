@@ -19,7 +19,7 @@ export interface IProxyViewOptions {
 }
 
 /**
- * helper view for proxying an existing external website
+ * helper view for proxying an existing external website using an iframe
  */
 export default class ProxyView extends AD3View {
   protected options: IProxyViewOptions = {

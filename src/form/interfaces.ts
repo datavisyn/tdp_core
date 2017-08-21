@@ -10,12 +10,39 @@ import {IEventHandler} from 'phovea_core/src/event';
  * @see FormBuilder.appendElement()
  */
 export enum FormElementType {
+  /**
+   * shows a simple select box
+   * @see IFormSelectDesc
+   */
   SELECT,
+    /**
+     * shows a select box based on select2
+     * @see IFormSelect2
+     */
   SELECT2,
+    /**
+     * similar to SELECT2 but with multiple selections allowed
+     */
   SELECT2_MULTIPLE,
+    /**
+     * a text field
+     * @see IFormInputTextDesc
+     */
   INPUT_TEXT,
+    /**
+     * a complex dynamic sub map form element
+     * @see IFormMapDesc
+     */
   MAP,
+    /**
+     * a simple button
+     * @see IButtonElementDesc
+     */
   BUTTON,
+    /**
+     * a checkbox
+     * @see ICheckBoxElementDesc
+     */
   CHECKBOX
 }
 
@@ -94,8 +121,8 @@ export interface IFormElementDesc {
   /**
    * generic on change handler
    * @param {IFormElement} formElement
-   * @param value
-   * @param data
+   * @param value the current value
+   * @param data the data associated with the the value, i.e. value.data || value
    */
   onChange?: (formElement: IFormElement, value: any, data: any)=>void;
 }

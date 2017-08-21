@@ -16,11 +16,10 @@ export default class FormBuilder {
   /**
    * DOM node for the form itself
    */
-  private $node: d3.Selection<any>;
+  private readonly $node: d3.Selection<any>;
 
   /**
    * Map of all appended form elements with the element id as key
-   * @type {d3.Map<IFormElement>}
    */
   private readonly elements = new Map<string, IFormElement>();
 

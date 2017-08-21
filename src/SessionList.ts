@@ -114,6 +114,9 @@ function byDateDesc(a: any, b: any) {
   return -((a.ts || 0) - (b.ts || 0));
 }
 
+/**
+ * a table ot the temporary sessions within this application
+ */
 export class TemporarySessionList extends ASessionList {
 
   protected async getData(manager: CLUEGraphManager) {
@@ -173,6 +176,10 @@ export class TemporarySessionList extends ASessionList {
   }
 }
 
+
+/**
+ * a table ot the persistent sessions within this application
+ */
 export class PersistentSessionList extends ASessionList {
 
   protected async getData(manager: CLUEGraphManager) {

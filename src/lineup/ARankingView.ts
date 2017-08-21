@@ -17,25 +17,50 @@ import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
 import LineUpRankingButtons from './internal/LineUpRankingButtons';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
-import IScore, {IScoreRow, createAccessor} from './IScore';
+import {IScore, IScoreRow} from '../extensions';
+import {createAccessor} from './internal/utils';
 import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol} from './desc';
 import {pushScoreAsync} from './internal/scorecmds';
 import {mixin} from 'phovea_core/src';
 import {extent} from 'd3';
 import LineUpColors from './internal/LineUpColors';
-import {IRow} from './interfaces';
+import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 
 export interface IARankingViewOptions {
+  /**
+   * name of a single item in LineUp
+   * @default item
+   */
   itemName: string;
+  /**
+   * plural version of before
+   * @default items
+   */
   itemNamePlural: string;
+  /**
+   * the idtype of the shown items
+   */
   itemIDType: IDTypeLike | null;
+
+  /**
+   * custom argument (or callback function) to pass to scores dialogs
+   */
   additionalScoreParameter: object | (() => object);
+  /**
+   * custom argument (or callback function) to pass to scores computations
+   */
   additionalComputeScoreParameter: object | (() => object);
+  /**
+   * additional attributes for stored named sets
+   */
   subType: { key: string, value: string };
 }
 
+/**
+ * base class for views based on LineUp
+ */
 export abstract class ARankingView extends AView {
 
   private readonly config: ILineUpConfig = {
@@ -76,6 +101,10 @@ export abstract class ARankingView extends AView {
   private readonly lineup: LineUp;
   private readonly selectionHelper: LineUpSelectionHelper;
 
+  /**
+   * promise resolved when everything is built
+   * @type {any}
+   */
   protected built: Promise<any> = null;
 
   private readonly colors = new LineUpColors();
@@ -93,8 +122,12 @@ export abstract class ARankingView extends AView {
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
+
+    // variants for deriving the item name
+    const idTypeNames = options.itemIDType ? {itemName: resolve(options.itemIDType).name, itemNamePlural: resolve(options.itemIDType).name}: {};
     const names = options.itemName ? {itemNamePlural: `${options.itemName}s`} : {};
-    mixin(this.options, names, options);
+    mixin(this.options, idTypeNames, names, options);
+
 
     this.node.classList.add('lineup');
     this.node.insertAdjacentHTML('beforeend', `<p class="nodata hidden">No data found for selection and parameter.</p>`);
@@ -123,15 +156,27 @@ export abstract class ARankingView extends AView {
     super.init(params, onParameterChange);
   }
 
+  /**
+   * create the selection adapter used to map input selections to LineUp columns
+   * @default no columns are created
+   * @returns {ISelectionAdapter}
+   */
   protected createSelectionAdapter(): ISelectionAdapter {
     return none();
   }
 
+  /**
+   * custom initialization function at the build will be called
+   */
   protected initImpl() {
     super.initImpl();
     this.built = this.build();
   }
 
+  /**
+   * return the idType of the shown items in LineUp
+   * @returns {IDType}
+   */
   get itemIDType() {
     return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
@@ -302,14 +347,24 @@ export abstract class ARankingView extends AView {
     return withoutTracking(this.context.ref, () => f(this.lineup));
   }
 
+  /**
+   * used by commands to trigger adding a tracked score
+   * @param {IScore<any>} score
+   * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
+   */
   addTrackedScoreColumn(score: IScore<any>) {
     return this.withoutTracking(() => this.addScoreColumn(score));
   }
 
-  pushTrackedScoreColumn(scoreId: string, params: any) {
+  private pushTrackedScoreColumn(scoreId: string, params: any) {
     return pushScoreAsync(this.context.graph, this.context.ref, scoreId, params);
   }
 
+  /**
+   * used by commands to remove a tracked score again
+   * @param {string} columnId
+   * @returns {Promise<boolean>}
+   */
   removeTrackedScoreColumn(columnId: string) {
     return this.withoutTracking((lineup) => {
       const column = lineup.data.find(columnId);
@@ -317,21 +372,34 @@ export abstract class ARankingView extends AView {
     });
   }
 
+  /**
+   * load the table description from the server
+   * @returns {Promise<IViewDescription>} the column descriptions
+   */
   protected abstract loadColumnDesc(): Promise<IViewDescription>;
 
+  /**
+   * load the rows of LineUp
+   * @returns {Promise<IRow[]>} the rows at least containing the represented ids
+   */
   protected abstract loadRows(): Promise<IRow[]>;
 
+  /**
+   * generates the column descriptions based on the given server columns by default they are mapped
+   * @param {IServerColumn[]} columns
+   * @returns {IAdditionalColumnDesc[]}
+   */
   protected getColumnDescs(columns: IServerColumn[]): IAdditionalColumnDesc[] {
     const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
 
     return columns.map((col) => {
       switch (col.type) {
         case 'categorical':
-          return categoricalCol(col.column, col.categories, niceName(col.label), false);
+          return categoricalCol(col.column, col.categories, {label: niceName(col.label)});
         case 'number':
-          return numberCol(col.column, col.min, col.max, niceName(col.label), false);
+          return numberCol(col.column, col.min, col.max, {label: niceName(col.label)});
         case 'string':
-          return stringCol(col.column, niceName(col.label), false);
+          return stringCol(col.column, {label: niceName(col.label)});
       }
     });
   }
@@ -373,6 +441,7 @@ export abstract class ARankingView extends AView {
 
   /**
    * similar to rebuild but just loads new data and keep the columns
+   * @returns {Promise<any[]>} promise when done
    */
   protected reloadData() {
     return this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
@@ -383,7 +452,7 @@ export abstract class ARankingView extends AView {
 
   /**
    * clears and rebuilds this lineup instance from scratch
-   * @returns {Promise<any[]>}
+   * @returns {Promise<any[]>} promise when done
    */
   protected rebuild() {
     this.clear();
@@ -407,7 +476,7 @@ export abstract class ARankingView extends AView {
   }
 
   /**
-   * Destroy LineUp instance
+   * removes alls data from lineup and resets it
    */
   protected clear() {
     //reset

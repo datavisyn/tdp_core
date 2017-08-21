@@ -5,7 +5,7 @@
 import {IDType, resolve, defaultSelectionType} from 'phovea_core/src/idtype';
 import {none} from 'phovea_core/src/range';
 import {EventHandler} from 'phovea_core/src/event';
-import {EViewMode, ISelection, isSameSelection, IView, IViewContext} from './interfaces';
+import {EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT} from './interfaces';
 import {IFormElementDesc} from '../form';
 import FormBuilder from '../form/FormBuilder';
 import {select} from 'd3';
@@ -14,33 +14,33 @@ import {resolveIds} from './resolve';
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
 
+/**
+ * base class for all views
+ */
 export abstract class AView extends EventHandler implements IView {
-  /**
-   * event when one or more elements are selected for the next level
-   * @type {string}
-   * @argument selection {ISelection}
-   */
-  static readonly EVENT_ITEM_SELECT = 'select';
+
+  static readonly EVENT_ITEM_SELECT = VIEW_EVENT_ITEM_SELECT;
   static readonly EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
-  /**
-   * event is fired when the loading of the iframe has finished
-   * @type {string}
-   * @argument selection {ISelection}
-   */
+
   static readonly EVENT_LOADING_FINISHED = 'loadingFinished';
 
-  protected itemSelection: ISelection = { idtype: null, range: none() };
   readonly idType: IDType;
   readonly node: HTMLElement;
-  private params: FormBuilder;
 
-  constructor(public readonly context:IViewContext, protected selection: ISelection, parent:HTMLElement) {
+  private params: FormBuilder;
+  private itemSelection: ISelection = { idtype: null, range: none() };
+
+  constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
     this.node = parent.ownerDocument.createElement('div');
     this.node.innerHTML = `<div class="busy hidden"></div>`;
     this.idType = resolve(context.desc.idtype);
   }
 
+  /**
+   * helper to marks this view busy showing a loading icon
+   * @param {boolean} busy
+   */
   protected setBusy(busy: boolean) {
     const node = <HTMLElement>this.node.querySelector('div.busy');
     if (!node) {
@@ -58,6 +58,9 @@ export abstract class AView extends EventHandler implements IView {
     this.initImpl();
   }
 
+  /**
+   * hook for custom initialization
+   */
   protected initImpl() {
     // hook
   }
@@ -76,15 +79,27 @@ export abstract class AView extends EventHandler implements IView {
     return builder;
   }
 
+  /**
+   * return a list of FormBuilder element descriptions to build the parameter form
+   * @returns {IFormElementDesc[]}
+   */
   protected getParameterFormDescs(): IFormElementDesc[] {
     // hook
     return [];
   }
 
+  /**
+   * finds the element form element based on the given id
+   * @param {string} id
+   * @returns {IFormElement}
+   */
   protected getParameterElement(id: string) {
     return this.params.getElementById(id);
   }
 
+  /**
+   * returns the value of the given parameter
+   */
   /*final*/ getParameter(name: string): any {
     const elem = this.getParameterElement(name);
     if (!elem) {
@@ -110,6 +125,10 @@ export abstract class AView extends EventHandler implements IView {
     this.parameterChanged(name);
   }
 
+  /**
+   * hook triggerd when the parameter has changed
+   * @param {string} _name the name of the parameter
+   */
   protected parameterChanged(_name: string) {
     // hook
   }
@@ -122,6 +141,9 @@ export abstract class AView extends EventHandler implements IView {
     this.selectionChanged();
   }
 
+  /**
+   * hook triggerd when the input selection has changed
+   */
   protected selectionChanged() {
     // hook
   }
@@ -130,6 +152,10 @@ export abstract class AView extends EventHandler implements IView {
     return this.itemSelection.idtype;
   }
 
+  /**
+   * resolve the name of the current input selection
+   * @returns {Promise<string[]>}
+   */
   protected resolveSelection(): Promise<string[]> {
     return resolveIds(this.selection.idtype, this.selection.range, this.idType);
   }
@@ -150,6 +176,9 @@ export abstract class AView extends EventHandler implements IView {
     this.fire(AView.EVENT_ITEM_SELECT, this.itemSelection, this.itemSelection = selection);
   }
 
+  /**
+   * hook when the item selection has changed
+   */
   protected itemSelectionChanged() {
     // hook
   }
