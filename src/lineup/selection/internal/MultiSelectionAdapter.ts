@@ -21,8 +21,8 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
   }
   parameterChanged(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
-    this.addDynamicColumns(context, selectedIds);
     this.removePartialDynamicColumns(context, selectedIds);
+    context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
   }
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {

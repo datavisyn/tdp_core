@@ -1,5 +1,5 @@
 import {IPlugin, IPluginDesc} from 'phovea_core/src/plugin';
-import {IScore} from './lineup/IScore';
+import {IScore} from './lineup';
 import IDType from 'phovea_core/src/idtype/IDType';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';

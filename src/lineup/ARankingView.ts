@@ -321,7 +321,7 @@ export abstract class ARankingView extends AView {
 
   protected abstract loadRows(): Promise<IRow[]>;
 
-  protected getColumnDescs(columns: IServerColumn[]) {
+  protected getColumnDescs(columns: IServerColumn[]): IAdditionalColumnDesc[] {
     const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
 
     return columns.map((col) => {
