@@ -3,10 +3,9 @@
  */
 import {IAdditionalColumnDesc} from '../../desc';
 import {array_diff} from '../../internal/LineUpSelectionHelper';
-import {IScoreRow} from '../../IScore';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
 
-export abstract class ABaseSelectionColumnAdapter {
+export abstract class ABaseSelectionAdapter {
 
   protected addDynamicColumns(context: IContext, ids: number[]) : void {
     Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {

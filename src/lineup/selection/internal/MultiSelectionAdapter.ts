@@ -1,13 +1,24 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {IContext, ISelectionAdapter} from './ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../desc';
-import {set_diff} from '../internal/LineUpSelectionHelper';
-import {IScoreRow} from '../IScore';
-import {ABaseSelectionColumnAdapter} from './internal/ABaseSelectionColumnAdapter';
+import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
+import {IAdditionalColumnDesc} from '../../desc';
+import {set_diff} from '../../internal/LineUpSelectionHelper';
+import {IScoreRow} from '../../IScore';
+import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 
-export abstract class AMultiSelectionColumnAdapter extends ABaseSelectionColumnAdapter implements ISelectionAdapter {
+export interface IMultiSelectionAdapter {
+  createDescs(context: IContext, id: number, subTypes: string[]): Promise<IAdditionalColumnDesc[]>;
+
+  getSelectedSubTypes(): string[];
+
+  loadData(context: IContext, id: number, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[][]>;
+}
+
+export default class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
+  constructor(private readonly adapter: IMultiSelectionAdapter) {
+    super();
+  }
   parameterChanged(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
     this.addDynamicColumns(context, selectedIds);
@@ -15,8 +26,8 @@ export abstract class AMultiSelectionColumnAdapter extends ABaseSelectionColumnA
   }
 
   protected createColumnsFor(context: IContext, id: number) {
-    const selectedSubTypes = this.getSelectedSubTypes();
-    return this.createDescs(context, id, selectedSubTypes).then((descs) => {
+    const selectedSubTypes = this.adapter.getSelectedSubTypes();
+    return this.adapter.createDescs(context, id, selectedSubTypes).then((descs) => {
       if (descs.length <= 0) {
         return [];
       }
@@ -33,7 +44,7 @@ export abstract class AMultiSelectionColumnAdapter extends ABaseSelectionColumnA
       }
       // Filter the descriptions to only leave the new columns and load them
       const columnsToBeAdded = descs.filter((desc) => addedParameters.has(`${id}_${desc.selectedSubtype}`));
-      const data = this.loadData(context, id, columnsToBeAdded);
+      const data = this.adapter.loadData(context, id, columnsToBeAdded);
 
       return columnsToBeAdded.map((desc, i) => ({desc, data: data.then((d) => d[i]), id}));
     });
@@ -41,7 +52,7 @@ export abstract class AMultiSelectionColumnAdapter extends ABaseSelectionColumnA
 
   private removePartialDynamicColumns(context: IContext, ids: number[]): void {
     const columns = context.columns;
-    const selectedSubTypes = this.getSelectedSubTypes();
+    const selectedSubTypes = this.adapter.getSelectedSubTypes();
     if (selectedSubTypes.length === 0) {
       ids.forEach((id) => context.freeColor(id));
     }
@@ -60,12 +71,4 @@ export abstract class AMultiSelectionColumnAdapter extends ABaseSelectionColumnA
       return usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === param);
     })));
   }
-
-  protected abstract createDescs(context: IContext, id: number, subTypes: string[]): Promise<IAdditionalColumnDesc[]>;
-
-  protected abstract getSelectedSubTypes(): string[];
-
-  protected abstract loadData(context: IContext, id: number, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[][]>;
 }
-
-export default AMultiSelectionColumnAdapter;

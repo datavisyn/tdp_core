@@ -3,14 +3,14 @@ import {ISelection} from '../../views';
 import {IScoreRow} from '../IScore';
 
 export interface ISelectionColumn {
-  desc: IColumnDesc;
-  data: Promise<IScoreRow<any>[]>;
-  id: number;
+  readonly desc: IColumnDesc;
+  readonly data: Promise<IScoreRow<any>[]>;
+  readonly id: number;
 }
 
 export interface IContext {
-  columns: Column[];
-  selection: ISelection;
+  readonly columns: Column[];
+  readonly selection: ISelection;
 
   add(columns: ISelectionColumn[]): void;
 

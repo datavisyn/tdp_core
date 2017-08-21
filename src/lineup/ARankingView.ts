@@ -24,7 +24,7 @@ import {mixin} from 'phovea_core/src';
 import {extent} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from './interfaces';
-import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/ISelectionAdapter';
+import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 
 export interface IARankingViewOptions {
   itemName: string;
@@ -33,7 +33,7 @@ export interface IARankingViewOptions {
   additionalScoreParameter: object|(() => object);
   additionalComputeScoreParameter: object|(() => object);
   subType: {key: string, value: string};
-  selectionAdapter: ISelectionAdapter|null;
+  selectionAdapter: ISelectionAdapter;
 }
 
 export interface IServerColumn {
@@ -98,7 +98,7 @@ export abstract class ARankingView extends AView {
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
     subType: { key: '', value: ''},
-    selectionAdapter: null
+    selectionAdapter: none()
   };
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
