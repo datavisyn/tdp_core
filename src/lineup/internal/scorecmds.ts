@@ -6,7 +6,7 @@
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ActionNode} from 'phovea_core/src/provenance';
 import {get as getPlugin} from 'phovea_core/src/plugin';
 import Column from 'lineupjs/src/model/Column';
-import IScore from '../IScore';
+import {IScore} from '../';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../extensions';
 
 export const CMD_ADD_SCORE = 'tdpAddScore';

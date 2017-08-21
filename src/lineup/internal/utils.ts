@@ -1,11 +1,7 @@
 /**
  * Created by sam on 13.02.2017.
  */
-import {RangeLike, Range} from 'phovea_core/src/range';
-import {IDType} from 'phovea_core/src/idtype';
-import {IRow} from '../rest';
-
-
+import {IRow, IScoreRow} from '../';
 
 export class AScoreAccessorProxy<T> {
   /**

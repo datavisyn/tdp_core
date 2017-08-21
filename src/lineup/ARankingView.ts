@@ -189,7 +189,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected itemSelectionChanged() {
-    this.selectionHelper.setItemSelection(this.itemSelection);
+    this.selectionHelper.setItemSelection(this.getItemSelection());
     super.itemSelectionChanged();
   }
 
