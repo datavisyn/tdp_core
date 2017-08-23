@@ -2,15 +2,15 @@
  * Created by Holger Stitz on 27.07.2016.
  */
 
-import {IDType, resolve} from 'phovea_core/src/idtype';
+import {IDType} from 'phovea_core/src/idtype';
 import {areyousure} from 'phovea_ui/src/dialogs';
 import editDialog from './editDialog';
 import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
 import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
-import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
+import {list as listPlugins} from 'phovea_core/src/plugin';
 import {showErrorModalDialog} from '../dialogs';
-import {EXTENSION_POINT_FILTER_LIST} from '../extensions';
-import {Selection, select} from 'd3';
+import {EXTENSION_POINT_TDP_LIST_FILTERS} from '../extensions';
+import {Selection, select, event as d3event} from 'd3';
 import {ALL_NONE_NONE, ALL_READ_READ, canWrite, currentUserNameOrAnonymous, EEntity,  hasPermission} from 'phovea_core/src/security';
 
 export default class NamedSetList {
@@ -21,7 +21,7 @@ export default class NamedSetList {
 
     constructor(protected readonly idType: IDType, private readonly sessionCreator: (namedSet: INamedSet)=>void, doc = document) {
         this.node = doc.createElement('div');
-        hhis.build();
+        this.build();
     }
 
     protected async build() {
@@ -53,8 +53,7 @@ export default class NamedSetList {
     };
 
     protected update() {
-        let data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
-        const that = this;
+        const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
 
         const predefinedNamedSets = data.filter((d) => d.type !== ENamedSetType.NAMEDSET);
         const me = currentUserNameOrAnonymous();
@@ -62,17 +61,15 @@ export default class NamedSetList {
         const otherNamedSets = data.filter((d) => d.type === ENamedSetType.NAMEDSET && d.creator !== me);
 
         const $node = select(this.node);
-        const namedSetItems = this.$node.select('.predefined-named-sets ul').selectAll('li');
-        const customNamedSetItems = this.$node.select('.custom-named-sets ul').selectAll('li');
-        const otherNamedSetItems = this.$node.select('.other-named-sets ul').selectAll('li');
 
         // append the list items
-        this.updateGroup(namedSetItems.data(predefinedNamedSets));
-        this.updateGroup(customNamedSetItems.data(customNamedSets));
-        this.updateGroup(otherNamedSetItems.data(otherNamedSets));
+        this.updateGroup($node.select('.predefined-named-sets ul'), predefinedNamedSets);
+        this.updateGroup($node.select('.custom-named-sets ul'), customNamedSets);
+        this.updateGroup($node.select('.other-named-sets ul'), otherNamedSets);
     }
 
-    private updateGroup($options: Selection<INamedSet[]>) {
+    private updateGroup($base: Selection<any>, data: INamedSet[]) {
+      const $options = $base.selectAll('li').data(data);
       const $enter = $options.enter()
         .append('li').classed('namedset', (d) => d.type === ENamedSetType.NAMEDSET);
 
@@ -81,7 +78,7 @@ export default class NamedSetList {
         .attr('href', '#')
         .on('click', (namedSet: INamedSet) => {
             // prevent changing the hash (href)
-            (<Event>d3.event).preventDefault();
+            (<Event>d3event).preventDefault();
             this.sessionCreator(namedSet);
           });
 
@@ -91,9 +88,9 @@ export default class NamedSetList {
         .html(`<i class="fa fa-fw" aria-hidden="true"></i> <span class="sr-only"></span>`)
         .on('click', (namedSet: INamedSet) => {
           // prevent changing the hash (href)
-          (<Event>d3.event).preventDefault();
-          this.edit(namedSet);
-        }));
+          (<Event>d3event).preventDefault();
+          this.edit(<IStoredNamedSet>namedSet);
+        });
 
       $enter.append('a')
         .classed('edit', true)
@@ -102,7 +99,7 @@ export default class NamedSetList {
         .attr('title', 'Edit')
         .on('click', (namedSet: IStoredNamedSet) => {
           // prevent changing the hash (href)
-          (<Event>d3.event).preventDefault();
+          (<Event>d3event).preventDefault();
           this.edit(namedSet);
         });
 
@@ -113,7 +110,7 @@ export default class NamedSetList {
         .attr('title', 'Delete')
         .on('click', async (namedSet: IStoredNamedSet) => {
           // prevent changing the hash (href)
-          (<Event>d3.event).preventDefault();
+          (<Event>d3event).preventDefault();
 
           if (!canWrite(namedSet)) {
             return;
@@ -124,7 +121,7 @@ export default class NamedSetList {
           );
           if (deleteIt) {
             await deleteNamedSet(namedSet.id);
-            this.removeNamedSet(namedSet);
+            this.remove(namedSet);
           }
         });
 
@@ -159,7 +156,7 @@ export default class NamedSetList {
     }
 
     protected findFilters() {
-      return Promise.all(listPlugins(EXTENSION_POINT_FILTER_LIST).map((plugin) => plugin.load())).then((filters) => {
+      return Promise.all(listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load())).then((filters) => {
         return (metaData: object) => filters.every((f) => f.factory(metaData));
       });
     }

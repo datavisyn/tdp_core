@@ -1,3 +1,4 @@
+import {ISecureItem} from 'phovea_core/src/security';
 
 export enum ENamedSetType {
   NAMEDSET, CUSTOM, PANEL, FILTER

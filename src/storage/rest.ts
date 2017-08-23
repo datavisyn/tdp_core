@@ -1,10 +1,9 @@
 import {getAPIJSON, sendAPI} from 'phovea_core/src/ajax';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {parse, RangeLike} from 'phovea_core/src/range';
-import {
-  currentUserNameOrAnonymous, ALL_READ_NONE, ISecureItem, ALL_READ_READ, EEntity, hasPermission
-} from 'phovea_core/src/security';
-import {REST_NAMESPACE as TDP_NAMESPACE} from './rest';
+import {currentUserNameOrAnonymous, ALL_READ_NONE, ALL_READ_READ} from 'phovea_core/src/security';
+import {REST_NAMESPACE as TDP_NAMESPACE} from '../rest';
+import {ENamedSetType, IStoredNamedSet} from './interfaces';
 
 
 const REST_NAMESPACE = `${TDP_NAMESPACE}/storage`;
