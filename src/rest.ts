@@ -19,6 +19,25 @@ export interface IRow {
   [key: string]: any;
 }
 
+export function getTDPDatabases(): Promise<string[]> {
+  return getAPIJSON(`${REST_NAMESPACE}/db/`);
+}
+
+export interface IViewDesc {
+  name: string;
+  description: string;
+  arguments: string[];
+  query: string;
+  columns?: IServerColumn[];
+  idType?: string;
+  filters?: string[];
+  queries?: { [name: string]: string };
+}
+
+export function getTDPViews(database: string): Promise<Readonly<IViewDesc>[]> {
+  return getAPIJSON(`${REST_NAMESPACE}/db/${database}/`);
+}
+
 /**
  * return the website url based on the registered proxy page
  * @param {string} proxy proxy page identifier
