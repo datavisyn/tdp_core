@@ -1,7 +1,8 @@
 import {api2absURL, getAPIJSON} from 'phovea_core/src/ajax';
 import {IScoreRow} from './lineup';
 
-export const REST_NAMESPACE = 'tdp';
+export const REST_NAMESPACE = '/tdp';
+export const REST_DB_NAMESPACE = `${REST_NAMESPACE}/db`;
 
 /**
  * common interface for a row as used in LineUp
@@ -21,7 +22,7 @@ export interface IRow {
 
 
 export function getTDPDatabases(): Promise<string[]> {
-  return getAPIJSON(`${REST_NAMESPACE}/db/`);
+  return getAPIJSON(`${REST_DB_NAMESPACE}/`);
 }
 
 export interface IViewDesc {
@@ -36,7 +37,7 @@ export interface IViewDesc {
 }
 
 export function getTDPViews(database: string): Promise<Readonly<IViewDesc>[]> {
-  return getAPIJSON(`${REST_NAMESPACE}/db/${database}/`);
+  return getAPIJSON(`${REST_DB_NAMESPACE}/${database}/`);
 }
 
 /**
@@ -58,7 +59,7 @@ function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter
   if (assignIds) {
     params._assignids = true; // assign globally ids on the server side
   }
-  return getAPIJSON(`${REST_NAMESPACE}/db/${database}/${view}${mmethod}`, params);
+  return getAPIJSON(`${REST_DB_NAMESPACE}/${database}/${view}${mmethod}`, params);
 }
 
 /**
@@ -139,7 +140,7 @@ export interface ILookupResult {
 }
 
 export function getTDPLookupUrl(database: string, view: string, params: IParams = {}) {
-  return api2absURL(`${REST_NAMESPACE}/db/${database}/${view}/lookup`, params);
+  return api2absURL(`${REST_DB_NAMESPACE}/${database}/${view}/lookup`, params);
 }
 /**
  * lookup utility function as used for auto completion within select2 form elements
