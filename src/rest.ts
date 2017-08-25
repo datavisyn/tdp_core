@@ -19,6 +19,7 @@ export interface IRow {
   [key: string]: any;
 }
 
+
 export function getTDPDatabases(): Promise<string[]> {
   return getAPIJSON(`${REST_NAMESPACE}/db/`);
 }
@@ -137,6 +138,9 @@ export interface ILookupResult {
   more: boolean;
 }
 
+export function getTDPLookupUrl(database: string, view: string, params: IParams = {}) {
+  return api2absURL(`${REST_NAMESPACE}/db/${database}/${view}/lookup`, params);
+}
 /**
  * lookup utility function as used for auto completion within select2 form elements
  * @param {string} database the database connector key

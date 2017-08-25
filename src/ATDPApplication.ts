@@ -17,7 +17,6 @@ import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
 import 'phovea_ui/src/_bootstrap';
 import 'phovea_ui/src/_font-awesome';
-import './style.scss';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
