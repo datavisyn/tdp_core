@@ -273,7 +273,7 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
-    this.fire(AView.EVENT_UPDATE_ENTRY_POINT, this.itemIDType, namedSet);
+    this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column> } {

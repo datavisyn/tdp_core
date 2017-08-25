@@ -7,6 +7,6 @@ export {FormElementType, IFormElementDesc, IFormElement} from './interfaces';
 export {IFormInputTextDesc} from './internal/FormInputText';
 export {IFormSelectOption, IFormSelectDesc, IFormSelectOptions, IFormSelectElement} from './internal/FormSelect';
 export {IFormSelect2, ISelect2Option} from './internal/FormSelect2';
-export {IFormMapDesc} from './internal/FormMap';
+export {IFormMapDesc, convertRow2MultiMap} from './internal/FormMap';
 export {IButtonElementDesc} from './internal/FormButton';
 export {default as FormDialog} from './FormDialog';

@@ -2,7 +2,7 @@
  * Created by Holger Stitz on 27.07.2016.
  */
 
-import {IDType, IDTypeLike, resolve} from 'phovea_core/src/idtype';
+import {IDType} from 'phovea_core/src/idtype';
 import {areyousure} from 'phovea_ui/src/dialogs';
 import editDialog from './editDialog';
 import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
@@ -20,21 +20,18 @@ import {
   hasPermission
 } from 'phovea_core/src/security';
 
-export abstract class ANamedSetList {
+export default class NamedSetList {
   readonly node: HTMLElement;
 
   private data: INamedSet[] = [];
   private filter: (metaData: object) => boolean = () => true;
 
-  constructor(doc = document) {
+  constructor(private readonly idType: IDType, private readonly sessionCreator: (namedSet: INamedSet) => void, doc = document) {
     this.node = doc.createElement('div');
     this.build();
   }
 
-  protected abstract createSession(namedSet: INamedSet): void;
-
-
-  protected async build() {
+  private async build() {
     this.node.innerHTML = `
       <section class="predefined-named-sets"><header>Predefined Sets</header><ul></ul></section>
       <section class="custom-named-sets"><header>My Sets</header><ul></ul></section>
@@ -62,7 +59,7 @@ export abstract class ANamedSetList {
     });
   };
 
-  protected update() {
+  update() {
     const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
 
     const predefinedNamedSets = data.filter((d) => d.type !== ENamedSetType.NAMEDSET);
@@ -89,7 +86,7 @@ export abstract class ANamedSetList {
       .on('click', (namedSet: INamedSet) => {
         // prevent changing the hash (href)
         (<Event>d3event).preventDefault();
-        this.createSession(namedSet);
+        this.sessionCreator(namedSet);
       });
 
     $enter.append('a')
@@ -150,8 +147,8 @@ export abstract class ANamedSetList {
     $options.exit().remove();
   }
 
-  push(namedSet: INamedSet) {
-    this.data.push(namedSet);
+  push(...namedSet: INamedSet[]) {
+    this.data.push(...namedSet);
     this.update();
   }
 
@@ -171,10 +168,8 @@ export abstract class ANamedSetList {
     });
   }
 
-  protected abstract getIdType(): IDTypeLike;
-
   protected list(): Promise<INamedSet[]> {
-    return listNamedSets(resolve(this.getIdType()))
+    return listNamedSets(this.idType)
       .catch(showErrorModalDialog)
       .catch((error) => {
         console.error(error);
@@ -182,5 +177,3 @@ export abstract class ANamedSetList {
       });
   }
 }
-
-export default ANamedSetList;
