@@ -33,12 +33,12 @@ export interface IARankingViewOptions {
    * name of a single item in LineUp
    * @default item
    */
-  itemName: string;
+  itemName: string | (() => string);
   /**
    * plural version of before
    * @default items
    */
-  itemNamePlural: string;
+  itemNamePlural: string | (() => string);
   /**
    * the idtype of the shown items
    */
@@ -125,7 +125,7 @@ export abstract class ARankingView extends AView {
 
     // variants for deriving the item name
     const idTypeNames = options.itemIDType ? {itemName: resolve(options.itemIDType).name, itemNamePlural: resolve(options.itemIDType).name}: {};
-    const names = options.itemName ? {itemNamePlural: `${options.itemName}s`} : {};
+    const names = options.itemName ? {itemNamePlural: typeof options.itemName === 'function' ? () => `${(<any>options.itemName)()}s` : `${options.itemName}s`} : {};
     mixin(this.options, idTypeNames, names, options);
 
 
@@ -140,7 +140,7 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
     this.lineup = new LineUp(this.node, this.provider, this.config);
-    this.selectionHelper = new LineUpSelectionHelper(this.lineup, this.itemIDType);
+    this.selectionHelper = new LineUpSelectionHelper(this.lineup, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
       this.setItemSelection(selection);
       this.updateLineUpStats();
@@ -464,7 +464,8 @@ export abstract class ARankingView extends AView {
    */
   private updateLineUpStats() {
     const showStats = (total: number, selected = 0, shown = 0) => {
-      return `Showing ${shown} ${total > 0 ? `of ${total}` : ''}${selected > 0 ? `; ${selected} ${selected === 1 ? this.options.itemName : this.options.itemNamePlural}` : ''}`;
+      const name = selected === 1 ? this.options.itemName : this.options.itemNamePlural;
+      return `Showing ${shown} ${total > 0 ? `of ${total}` : ''}${selected > 0 ? `; ${selected} ${typeof name === 'function' ? name() : name} 1` : ''}`;
     };
 
     const selected = this.provider.getSelection().length;

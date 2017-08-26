@@ -5,6 +5,11 @@ import {IAdditionalColumnDesc} from '../../desc';
 import {array_diff} from '../../internal/LineUpSelectionHelper';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
 
+export function patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
+  desc.selectedId = selectedId;
+  return desc;
+}
+
 export abstract class ABaseSelectionAdapter {
 
   protected addDynamicColumns(context: IContext, _ids: number[], ids: string[]): void {

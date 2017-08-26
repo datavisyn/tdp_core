@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
+import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
 import {IScoreRow} from '../../';
@@ -13,7 +13,7 @@ export interface ISingleSelectionAdapter {
    * @param {string} id the associated name of the unique id
    * @returns {Promise<IAdditionalColumnDesc>} the created description
    */
-  createDesc(_id: number, id: string): Promise<IAdditionalColumnDesc>;
+  createDesc(_id: number, id: string): Promise<IAdditionalColumnDesc>|IAdditionalColumnDesc;
 
   /**
    * loads the score data for the given selection
@@ -33,6 +33,6 @@ export default class SingleSelectionAdapter extends ABaseSelectionAdapter implem
   }
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
-    return this.adapter.createDesc(_id, id).then((desc) => [{desc, data: this.adapter.loadData(_id, id), id: _id}]);
+    return Promise.resolve(this.adapter.createDesc(_id, id)).then((desc) => [{desc: patchDesc(desc, _id), data: this.adapter.loadData(_id, id), id: _id}]);
   }
 }

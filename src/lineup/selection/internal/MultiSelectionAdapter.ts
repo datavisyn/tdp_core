@@ -5,7 +5,7 @@ import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
 import {set_diff} from '../../internal/LineUpSelectionHelper';
 import {IScoreRow} from '../../';
-import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
+import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
 
 export interface IMultiSelectionAdapter {
   /**
@@ -21,7 +21,7 @@ export interface IMultiSelectionAdapter {
    * @param {string[]} subTypes the currently selected sub types
    * @returns {Promise<IAdditionalColumnDesc[]>} the created descriptions
    */
-  createDescs(_id: number, id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]>;
+  createDescs(_id: number, id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]>|IAdditionalColumnDesc[];
 
   /**
    * load the data for the given selection and the selected descriptions
@@ -30,7 +30,7 @@ export interface IMultiSelectionAdapter {
    * @param {IAdditionalColumnDesc[]} descs list of scores to load
    * @returns {Promise<IScoreRow<any>[][]>} data
    */
-  loadData(_id: number, id: string, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[][]>;
+  loadData(_id: number, id: string, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[]>[];
 }
 
 export default class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
@@ -45,10 +45,12 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
     const selectedSubTypes = this.adapter.getSelectedSubTypes();
-    return this.adapter.createDescs(_id, id, selectedSubTypes).then((descs) => {
+    return Promise.resolve(this.adapter.createDescs(_id, id, selectedSubTypes)).then((descs) => {
       if (descs.length <= 0) {
         return [];
       }
+      descs.forEach((d) => patchDesc(d, _id));
+
       const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
       const dynamicColumnIDs = new Set<string>(usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`));
       // Save which columns have been added for a specific element in the selection
@@ -64,7 +66,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
       const columnsToBeAdded = descs.filter((desc) => addedParameters.has(`${_id}_${desc.selectedSubtype}`));
       const data = this.adapter.loadData(_id, id, columnsToBeAdded);
 
-      return columnsToBeAdded.map((desc, i) => ({desc, data: data.then((d) => d[i]), id: _id}));
+      return columnsToBeAdded.map((desc, i) => ({desc, data: data[i], id: _id}));
     });
   }
 

@@ -40,11 +40,6 @@ export interface IColumnOptions {
    * @default: undefined
    */
   selectedSubtype: string;
-
-  /**
-   * extra args
-   */
-  [key: string]: any;
 }
 
 function baseColumn(column: string, options: Partial<IColumnOptions>): IAdditionalColumnDesc {
