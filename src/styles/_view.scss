@@ -1,5 +1,18 @@
 @import './vars';
 
+svg {
+  // generic axes styles
+  path,
+  .axis path,
+  line,
+  .axis line {
+    fill: none;
+    stroke-width: 1;
+    stroke: black;
+    shape-rendering: crispEdges;
+  }
+}
+  
 div.busy {
   //display: none;
   position: absolute;
