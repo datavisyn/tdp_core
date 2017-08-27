@@ -10,7 +10,6 @@
 import IDType from 'phovea_core/src/idtype/IDType';
 import {IViewPluginDesc, matchLength, showAsSmallMultiple, toViewPluginDesc} from './interfaces';
 import {
-  EXTENSION_POINT_TDP_DISABLE_VIEW,
   EXTENSION_POINT_TDP_LIST_FILTERS,
   EXTENSION_POINT_TDP_VIEW
 } from '../extensions';
@@ -37,13 +36,6 @@ export default async function findViews(idtype: IDType, selection: Range): Promi
     return all.some((i) => pattern.test(i.id)) && !matchLength(p.selection, 0);
   }
 
-  //disable certain views based on another plugin
-  const disabler = listPlugins(EXTENSION_POINT_TDP_DISABLE_VIEW).map((p: any) => new RegExp(p.filter));
-
-  function disabled(p: IPluginDesc) {
-    return disabler.some((re) => re.test(p.id));
-  }
-
   function bySelection(p: any) {
     return (matchLength(p.selection, selectionLength) || (showAsSmallMultiple(p) && selectionLength > 1));
   }
@@ -57,7 +49,7 @@ export default async function findViews(idtype: IDType, selection: Range): Promi
   }
 
   return listPlugins(EXTENSION_POINT_TDP_VIEW)
-    .filter((p) => byType(p) && !disabled(p) && extensionFilters(p))
+    .filter((p) => byType(p) && extensionFilters(p))
     .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
     .map((v) => ({enabled: bySelection(v), v: toViewPluginDesc(v)}));
 }

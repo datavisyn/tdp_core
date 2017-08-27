@@ -9,8 +9,6 @@ export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
-//filter to disable certain views
-export const EXTENSION_POINT_TDP_DISABLE_VIEW = 'disableTDPView';
 // filter extensions
 export const EXTENSION_POINT_TDP_LIST_FILTERS = 'tdpListFilters';
 
