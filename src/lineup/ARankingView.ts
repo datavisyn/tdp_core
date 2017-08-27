@@ -89,10 +89,6 @@ export abstract class ARankingView extends AView {
   private dump: Map<string, number | boolean> = null;
 
   /**
-   * DOM element with message when no data is available
-   */
-  private readonly noData: HTMLElement;
-  /**
    * DOM element for LineUp stats in parameter UI
    */
   private readonly stats: HTMLElement;
@@ -130,8 +126,6 @@ export abstract class ARankingView extends AView {
 
 
     this.node.classList.add('lineup');
-    this.node.insertAdjacentHTML('beforeend', `<p class="nodata hidden">No data found for selection and parameter.</p>`);
-    this.noData = <HTMLElement>this.node.lastElementChild!;
 
     this.stats = this.node.ownerDocument.createElement('p');
 
@@ -434,9 +428,9 @@ export abstract class ARankingView extends AView {
 
   private setLineUpData(rows: IRow[]) {
     if (rows.length > 0) {
-      this.noData.classList.add('hidden');
+      this.node.classList.remove('nodata');
     } else {
-      this.noData.classList.remove('hidden');
+      this.node.classList.add('nodata');
     }
     this.provider.setData(rows);
     this.selectionHelper.rows = rows;

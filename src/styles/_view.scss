@@ -12,16 +12,20 @@ svg {
     shape-rendering: crispEdges;
   }
 }
-  
-div.busy {
-  //display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.26) url('~phovea_ui/src/assets/caleydo_c_anim.svg') no-repeat center center;
-  z-index: 9;
+
+.#{$tdp-css-prefix}-view.busy {
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.26) url('~phovea_ui/src/assets/caleydo_c_anim.svg') no-repeat center center;
+    z-index: 9;
+  }
+  > * {
+    display: none;
+  }
 }
 
 .proxy_view {
@@ -39,9 +43,10 @@ div.busy {
 }
 
 
-div.lineup {
-  .nodata {
+.#{$tdp-css-prefix}-view.lineup {
+  &.nodata::before {
     margin-top: 40px;
+    content: 'No data found for selection and parameter.';
   }
 }
 

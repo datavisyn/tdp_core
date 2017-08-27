@@ -33,7 +33,8 @@ export abstract class AView extends EventHandler implements IView {
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
     this.node = parent.ownerDocument.createElement('div');
-    this.node.innerHTML = `<div class="busy hidden"></div>`;
+    this.node.classList.add('tdp-view');
+    parent.appendChild(this.node);
     this.idType = resolve(context.desc.idtype);
   }
 
@@ -42,14 +43,10 @@ export abstract class AView extends EventHandler implements IView {
    * @param {boolean} busy
    */
   protected setBusy(busy: boolean) {
-    const node = <HTMLElement>this.node.querySelector('div.busy');
-    if (!node) {
-      return;
-    }
     if (busy) {
-      node.classList.remove('hidden');
+      this.node.classList.add('busy');
     } else {
-      node.classList.add('hidden');
+      this.node.classList.remove('busy');
     }
   }
 

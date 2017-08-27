@@ -55,6 +55,7 @@ export default class LineUpSelectionHelper extends EventHandler {
   }
 
   private buildCache() {
+    this.uid2index.clear();
     // create lookup cache
     this._rows.forEach((row, i) => {
       this.uid2index.set(row._id, i);
