@@ -111,7 +111,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   protected handleDependent(onDependentChange?: (values: any[]) => void): any[] {
-    if (!this.desc.dependsOn && !onDependentChange) {
+    if (!this.desc.dependsOn) {
       return [];
     }
 

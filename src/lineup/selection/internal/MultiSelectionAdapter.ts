@@ -6,6 +6,7 @@ import {IAdditionalColumnDesc} from '../../desc';
 import {set_diff} from '../../internal/LineUpSelectionHelper';
 import {IScoreRow} from '../../';
 import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
+import {resolveImmediately} from 'phovea_core/src';
 
 export interface IMultiSelectionAdapter {
   /**
@@ -45,7 +46,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
     const selectedSubTypes = this.adapter.getSelectedSubTypes();
-    return Promise.resolve(this.adapter.createDescs(_id, id, selectedSubTypes)).then((descs) => {
+    return resolveImmediately(this.adapter.createDescs(_id, id, selectedSubTypes)).then((descs) => {
       if (descs.length <= 0) {
         return [];
       }

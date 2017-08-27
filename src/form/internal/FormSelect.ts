@@ -6,6 +6,7 @@ import * as d3 from 'd3';
 import * as session from 'phovea_core/src/session';
 import AFormElement from './AFormElement';
 import {IFormElementDesc, IFormParent, IFormElement} from '../interfaces';
+import {resolveImmediately} from 'phovea_core/src';
 
 
 export interface IFormSelectOption {
@@ -109,7 +110,12 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
 
     data(values).then((items) => {
       this.updateOptionElements(items);
-      this.$select.property('selectedIndex', options.selectedIndex !== undefined ? options.selectedIndex : defaultSelectedIndex);
+      const index = options.selectedIndex !== undefined ? options.selectedIndex : defaultSelectedIndex;
+      this.$select.property('selectedIndex', index);
+      if (index === 0) {
+        // corner case since the default value is also 0
+        this.fire(FormSelect.EVENT_CHANGE, this.value, this.$select);
+      }
     });
   }
 
@@ -181,16 +187,25 @@ function toOption(d: string|IFormSelectOption): IFormSelectOption {
   return d;
 }
 
-export function resolveData(data?: ISelectOptions|((dependents: any[]) => ISelectOptions)): ((dependents: any[]) => Promise<IFormSelectOption[]>) {
+export function resolveData(data?: ISelectOptions|((dependents: any[]) => ISelectOptions)): ((dependents: any[]) => PromiseLike<IFormSelectOption[]>) {
   if (data === undefined) {
-    return () => Promise.resolve([]);
+    return () => resolveImmediately([]);
   }
   if (Array.isArray(data)) {
-    return () => Promise.resolve(data.map(toOption));
+    return () => resolveImmediately(data.map(toOption));
   }
   if (data instanceof Promise) {
     return () => data.then((r) => r.map(toOption));
   }
   //assume it is a function
-  return (dependents: any[]) => Promise.resolve(data(dependents)).then((r) => r.map(toOption));
+  return (dependents: any[]) => {
+    const r = data(dependents);
+    if (r instanceof Promise) {
+      return r.then((r) => r.map(toOption));
+    }
+    if (Array.isArray(r)) {
+      return resolveImmediately(r.map(toOption));
+    }
+    return resolveImmediately(r);
+  };
 }

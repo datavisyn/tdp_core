@@ -347,7 +347,7 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
   addTrackedScoreColumn(score: IScore<any>) {
-    return this.withoutTracking(() => this.addScoreColumn(score));
+    return this.built.then(() => this.withoutTracking(() => this.addScoreColumn(score)));
   }
 
   private pushTrackedScoreColumn(scoreId: string, params: any) {
@@ -360,10 +360,10 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<boolean>}
    */
   removeTrackedScoreColumn(columnId: string) {
-    return this.withoutTracking((lineup) => {
+    return this.built.then(() => this.withoutTracking((lineup) => {
       const column = lineup.data.find(columnId);
       return column.removeMe();
-    });
+    }));
   }
 
   /**
