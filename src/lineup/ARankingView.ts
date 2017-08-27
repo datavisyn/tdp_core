@@ -420,12 +420,16 @@ export abstract class ARankingView extends AView {
       const rows: IRow[] = r[1];
 
       this.setLineUpData(rows);
-      createInitialRanking(this.lineup);
+      this.createInitialRanking(this.lineup);
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
     }).catch(() => {
       this.setBusy(false);
     });
+  }
+
+  protected createInitialRanking(lineup: LineUp) {
+    createInitialRanking(this.lineup);
   }
 
   private setLineUpData(rows: IRow[]) {

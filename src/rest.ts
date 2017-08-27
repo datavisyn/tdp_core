@@ -1,4 +1,4 @@
-import {api2absURL, getAPIJSON} from 'phovea_core/src/ajax';
+import {api2absURL, getAPIData, getAPIJSON} from 'phovea_core/src/ajax';
 import {IScoreRow} from './lineup';
 
 export const REST_NAMESPACE = '/tdp';
@@ -48,6 +48,10 @@ export function getTDPViews(database: string): Promise<Readonly<IViewDesc>[]> {
  */
 export function getProxyUrl(proxy: string, args: any) {
   return api2absURL(`${REST_NAMESPACE}/proxy/${proxy}`, args);
+}
+
+export function getTDPProxyData(proxy: string, args: any, type: string = 'json') {
+  return getAPIData(`${REST_NAMESPACE}/proxy/${proxy}`, args, type);
 }
 
 export interface IParams {

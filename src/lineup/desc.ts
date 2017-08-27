@@ -42,7 +42,7 @@ export interface IColumnOptions {
   selectedSubtype: string;
 }
 
-function baseColumn(column: string, options: Partial<IColumnOptions>): IAdditionalColumnDesc {
+function baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign({
     type: 'string',
     column,
@@ -55,7 +55,7 @@ function baseColumn(column: string, options: Partial<IColumnOptions>): IAddition
   }, options);
 }
 
-export function numberColFromArray(column: string, rows: any[], options: Partial<IColumnOptions>): IAdditionalColumnDesc {
+export function numberColFromArray(column: string, rows: any[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {
     type: 'number',
     domain: extent(rows, (d) => d[column])
@@ -70,7 +70,7 @@ export function numberColFromArray(column: string, rows: any[], options: Partial
  * @param {Partial<IColumnOptions>} options
  * @returns {IAdditionalColumnDesc}
  */
-export function numberCol(column: string, min: number, max: number, options: Partial<IColumnOptions>): IAdditionalColumnDesc {
+export function numberCol(column: string, min: number, max: number, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {
     type: 'number',
     domain: [min, max],
@@ -84,7 +84,7 @@ export function numberCol(column: string, min: number, max: number, options: Par
  * @param {Partial<IColumnOptions>} options
  * @returns {IAdditionalColumnDesc}
  */
-export function categoricalCol(column: string, categories: (string|ICategory)[], options: Partial<IColumnOptions>): IAdditionalColumnDesc {
+export function categoricalCol(column: string, categories: (string|ICategory)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {
     type: 'categorical',
     categories
@@ -96,7 +96,7 @@ export function categoricalCol(column: string, categories: (string|ICategory)[],
  * @param {Partial<IColumnOptions>} options
  * @returns {IAdditionalColumnDesc}
  */
-export function stringCol(column: string, options: Partial<IColumnOptions>): IAdditionalColumnDesc {
+export function stringCol(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {});
 }
 
@@ -106,7 +106,7 @@ export function stringCol(column: string, options: Partial<IColumnOptions>): IAd
  * @param {Partial<IColumnOptions>} options
  * @returns {IAdditionalColumnDesc}
  */
-export function booleanCol(column: string, options: Partial<IColumnOptions>): IAdditionalColumnDesc {
+export function booleanCol(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {
     type: 'boolean'
   });
