@@ -137,6 +137,8 @@ export default class LineUpSelectionHelper extends EventHandler {
       return;
     }
 
+    const old = this.lineup.data.getSelection().sort((a,b) => a-b);
+
     const indices: number[] = [];
     sel.range.dim(0).forEach((uid) => {
       const index = this.uid2index.get(uid);
@@ -144,6 +146,11 @@ export default class LineUpSelectionHelper extends EventHandler {
         indices.push(index);
       }
     });
+    indices.sort((a,b) => a-b);
+
+    if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
+      return; // no change
+    }
 
     this.removeEventListener();
     this.lineup.data.setSelection(indices);

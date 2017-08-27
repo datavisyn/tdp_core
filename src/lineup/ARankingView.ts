@@ -27,7 +27,6 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
-import {showErrorModalDialog} from '../dialogs';
 
 export interface IARankingViewOptions {
   /**
@@ -138,7 +137,6 @@ export abstract class ARankingView extends AView {
     this.selectionHelper = new LineUpSelectionHelper(this.lineup, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
       this.setItemSelection(selection);
-      this.updateLineUpStats();
     });
     this.selectionAdapter = this.createSelectionAdapter();
   }
@@ -185,6 +183,7 @@ export abstract class ARankingView extends AView {
 
   protected itemSelectionChanged() {
     this.selectionHelper.setItemSelection(this.getItemSelection());
+    this.updateLineUpStats();
     super.itemSelectionChanged();
   }
 
@@ -466,8 +465,8 @@ export abstract class ARankingView extends AView {
    */
   private updateLineUpStats() {
     const showStats = (total: number, selected = 0, shown = 0) => {
-      const name = selected === 1 ? this.options.itemName : this.options.itemNamePlural;
-      return `Showing ${shown} ${total > 0 ? `of ${total}` : ''}${selected > 0 ? `; ${selected} ${typeof name === 'function' ? name() : name} 1` : ''}`;
+      const name = shown === 1 ? this.options.itemName : this.options.itemNamePlural;
+      return `Showing ${shown} ${total > 0 ? `of ${total}` : ''} ${typeof name === 'function' ? name() : name} ${selected > 0 ? `; ${selected} selected` : ''}`;
     };
 
     const selected = this.provider.getSelection().length;

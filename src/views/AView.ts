@@ -161,6 +161,8 @@ export abstract class AView extends EventHandler implements IView {
     if (isSameSelection(this.itemSelection, selection)) {
       return;
     }
+    const bak = this.itemSelection;
+    this.itemSelection = selection;
     // propagate
     if (selection.idtype) {
       if (selection.range.isNone) {
@@ -170,7 +172,7 @@ export abstract class AView extends EventHandler implements IView {
       }
     }
     this.itemSelectionChanged();
-    this.fire(AView.EVENT_ITEM_SELECT, this.itemSelection, this.itemSelection = selection);
+    this.fire(AView.EVENT_ITEM_SELECT, bak, selection);
   }
 
   /**
