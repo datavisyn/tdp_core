@@ -27,6 +27,7 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
+import {showErrorModalDialog} from '../dialogs';
 
 export interface IARankingViewOptions {
   /**
@@ -417,7 +418,10 @@ export abstract class ARankingView extends AView {
       this.createInitialRanking(this.lineup);
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
-    }).catch(() => {
+      this.setBusy(false);
+    }).catch(showErrorModalDialog)
+      .catch((error) => {
+      console.error(error);
       this.setBusy(false);
     });
   }

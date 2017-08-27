@@ -149,7 +149,7 @@ export function createInitialRanking(lineup: LineUp) {
   ranking.push(provider.create(createSelectionDesc()));
 
   lineup.data.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
-    const col = this.provider.create(d);
+    const col = provider.create(d);
     // set initial column width
     if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {
       col.setWidth((<any>d).width);

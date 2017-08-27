@@ -61,7 +61,12 @@ export default class LineUpSelectionHelper extends EventHandler {
       this.uid2index.set(row._id, i);
     });
     // fill up id cache for faster mapping
-    this.idType().fillMapCache(this._rows.map((r) => r._id), this._rows.map((r) => r.id));
+    const idType = this.idType();
+    if (!idType) {
+      console.error('no idType defined for this view');
+      return;
+    }
+    idType.fillMapCache(this._rows.map((r) => r._id), this._rows.map((r) => r.id));
   }
 
   private addEventListener() {
@@ -93,6 +98,11 @@ export default class LineUpSelectionHelper extends EventHandler {
     const uids = rlist(this.orderedSelectedIndices.map((i) => this._rows[i]._id));
     //console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
 
+    const idType = this.idType();
+    if (!idType) {
+      console.warn('no idType defined for this ranking view');
+      return;
+    }
     const selection: ISelection = {idtype: this.idType(), range: uids};
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
