@@ -126,7 +126,7 @@ export abstract class ARankingView extends AView {
     subType: {key: '', value: ''}
   };
 
-  private readonly selectionAdapter: ISelectionAdapter;
+  private readonly selectionAdapter: ISelectionAdapter|null;
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
@@ -154,11 +154,12 @@ export abstract class ARankingView extends AView {
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
-    // inject stats
-    params.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
-    params.lastElementChild!.appendChild(this.stats);
-
     super.init(params, onParameterChange);
+
+    // inject stats
+    const base = <HTMLElement>params.querySelector('form') || params;
+    base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+    base.lastElementChild!.appendChild(this.stats);
   }
 
   /**
@@ -167,7 +168,7 @@ export abstract class ARankingView extends AView {
    * @returns {ISelectionAdapter}
    */
   protected createSelectionAdapter(): ISelectionAdapter {
-    return none();
+    return null;
   }
 
   /**
@@ -430,6 +431,12 @@ export abstract class ARankingView extends AView {
       this.setLineUpData(rows);
       this.createInitialRanking(this.lineup);
       this.colors.init(this.lineup.data.getLastRanking());
+
+      if (this.selectionAdapter) {
+        // init first time
+        this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
+      }
+
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
@@ -463,8 +470,7 @@ export abstract class ARankingView extends AView {
   }
 
   private rebuildImpl() {
-    this.clear();
-    return this.built = this.build();
+    return this.clear().then(() => this.built = this.build());
   }
 
   /**
@@ -489,11 +495,12 @@ export abstract class ARankingView extends AView {
    */
   protected clear() {
     //reset
-    untrack(this.context.ref);
-    this.provider.clearRankings();
-    this.provider.clearSelection();
-    this.provider.clearData();
-    this.provider.clearColumns();
+    return untrack(this.context.ref).then(() => {
+      this.provider.clearRankings();
+      this.provider.clearSelection();
+      this.provider.clearData();
+      this.provider.clearColumns();
+    });
   }
 
 }
