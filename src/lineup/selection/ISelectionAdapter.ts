@@ -48,11 +48,11 @@ export interface ISelectionAdapter {
    * called when a parameter has changed
    * @param {IContext} context
    */
-  parameterChanged(context: IContext): void;
+  parameterChanged(waitForIt: Promise<any>|null, context: () => IContext): void;
 
   /**
    * called when the input selection has changed
    * @param {IContext} context
    */
-  selectionChanged(context: IContext): void;
+  selectionChanged(waitForIt: Promise<any>|null, context: () =>IContext): void;
 }

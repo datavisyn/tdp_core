@@ -38,7 +38,8 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
   constructor(private readonly adapter: IMultiSelectionAdapter) {
     super();
   }
-  parameterChanged(context: IContext) {
+
+  protected parameterChangedImpl(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
     this.removePartialDynamicColumns(context, selectedIds);
     context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));

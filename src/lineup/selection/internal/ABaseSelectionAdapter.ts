@@ -4,6 +4,7 @@
 import {IAdditionalColumnDesc} from '../../desc';
 import {array_diff} from '../../internal/LineUpSelectionHelper';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
+import {resolveImmediately} from 'phovea_core/src/internal/promise';
 
 export function patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
   desc.selectedId = selectedId;
@@ -26,7 +27,37 @@ export abstract class ABaseSelectionAdapter {
     })));
   }
 
-  selectionChanged(context: IContext) {
+  private selectionChangedTimer = -1;
+  private parameterChangedTimer = -1;
+
+  selectionChanged(waitForIt: PromiseLike<any>|null, context: () => IContext) {
+    // wait for the promise and then a debounce logic
+    resolveImmediately(waitForIt).then(() => {
+      if (this.selectionChangedTimer >= 0) {
+        clearTimeout(this.selectionChangedTimer);
+        this.selectionChangedTimer = -1;
+      }
+      this.selectionChangedTimer = <any>setTimeout(() => {
+        this.selectionChangedImpl(context());
+      }, 100);
+    });
+  }
+
+  parameterChanged(waitForIt: PromiseLike<any>|null, context: () => IContext) {
+    resolveImmediately(waitForIt).then(() => {
+      if (this.parameterChangedTimer >= 0) {
+        clearTimeout(this.parameterChangedTimer);
+        this.parameterChangedTimer = -1;
+      }
+      this.parameterChangedTimer = <any>setTimeout(() => {
+        this.parameterChangedImpl(context());
+      }, 100);
+    });
+  }
+
+  protected abstract parameterChangedImpl(context: IContext): void;
+
+  protected selectionChangedImpl(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1);
     const lineupColIds = usedCols

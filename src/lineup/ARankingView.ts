@@ -177,7 +177,7 @@ export abstract class ARankingView extends AView {
   protected parameterChanged(name: string) {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
-      this.selectionAdapter.parameterChanged(this.createContext());
+      this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
     }
   }
 
@@ -189,13 +189,15 @@ export abstract class ARankingView extends AView {
 
   protected selectionChanged() {
     if (this.selectionAdapter) {
-      this.selectionAdapter.selectionChanged(this.createContext());
+      this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
     }
   }
 
   private createContext(): IContext {
+    const ranking = this.provider.getLastRanking();
+    const columns = ranking ? ranking.flatColumns : [];
     return {
-      columns: this.provider.getLastRanking().flatColumns,
+      columns,
       selection: this.selection,
       freeColor: (id: number) => this.colors.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => this.withoutTracking(() => {
@@ -338,7 +340,7 @@ export abstract class ARankingView extends AView {
   }
 
   private async withoutTracking<T>(f: (lineup: any) => T): Promise<T> {
-    return withoutTracking(this.context.ref, () => f(this.lineup));
+    return this.built.then(() => withoutTracking(this.context.ref, () => f(this.lineup)));
   }
 
   /**
@@ -347,7 +349,7 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
   addTrackedScoreColumn(score: IScore<any>) {
-    return this.built.then(() => this.withoutTracking(() => this.addScoreColumn(score)));
+    return this.withoutTracking(() => this.addScoreColumn(score));
   }
 
   private pushTrackedScoreColumn(scoreId: string, params: any) {
@@ -360,10 +362,10 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<boolean>}
    */
   removeTrackedScoreColumn(columnId: string) {
-    return this.built.then(() => this.withoutTracking((lineup) => {
+    return this.withoutTracking((lineup) => {
       const column = lineup.data.find(columnId);
       return column.removeMe();
-    }));
+    });
   }
 
   /**

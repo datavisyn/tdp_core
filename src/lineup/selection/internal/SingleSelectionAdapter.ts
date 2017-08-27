@@ -29,7 +29,7 @@ export default class SingleSelectionAdapter extends ABaseSelectionAdapter implem
   constructor(private readonly adapter: ISingleSelectionAdapter) {
     super();
   }
-  parameterChanged() {
+  protected parameterChangedImpl() {
     // dummy
   }
 
