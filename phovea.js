@@ -68,7 +68,7 @@ module.exports = function (registry) {
   registry.push('actionFunction', 'lineupSetColumn', function () { return import('./src/lineup/internal/cmds') }, {
     'factory': 'setColumnImpl'
   });
-  registry.push('actionFunction', 'lineupAddRanking', function () { return import('./src/lineup/internal/cmds') }, {
+  registry.push('actionFunction', 'lineupAddColumn', function () { return import('./src/lineup/internal/cmds') }, {
     'factory': 'addColumnImpl'
   });
 
