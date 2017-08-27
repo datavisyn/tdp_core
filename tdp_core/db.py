@@ -41,14 +41,15 @@ configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definitio
 
 
 def resolve(database):
+  if database not in configs:
+    abort(404)
   r = configs[database]
-  if r:
-    # derive needed columns
-    connector, engine = r
-    for view in connector.views.values():
-      if view.needs_to_fill_up_columns():
-        view.columns_filled_up = True
-        _fill_up_columns(view, engine)
+  # derive needed columns
+  connector, engine = r
+  for view in connector.views.values():
+    if view.needs_to_fill_up_columns():
+      view.columns_filled_up = True
+      _fill_up_columns(view, engine)
   return r
 
 
@@ -229,6 +230,8 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   :return: (r, view) tuple of the resulting rows and the resolved view
   """
   config, engine = resolve(database)
+  if view_name not in config.views:
+    abort(404)
   view = config.views[view_name]
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
@@ -252,6 +255,8 @@ def get_count(database, view_name, replacements=None, arguments=None, extra_sql_
   :return: the count of results
   """
   config, engine = resolve(database)
+  if view_name not in config.views:
+    abort(404)
   view = config.views[view_name]
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)

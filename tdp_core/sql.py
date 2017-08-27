@@ -1,4 +1,4 @@
-from phovea_server.ns import Namespace, request
+from phovea_server.ns import Namespace, request, abort
 from . import db
 from .utils import map_scores
 from phovea_server.util import jsonify
@@ -184,6 +184,8 @@ def get_filtered_data(database, view_name):
   :return:
   """
   config, _ = db.resolve(database)
+  if view_name not in config.views:
+    abort(404)
   # convert to index lookup
   # row id start with 1
   view = config.views[view_name]
@@ -208,6 +210,9 @@ def get_score_data(database, view_name):
   config, _ = db.resolve(database)
   # convert to index lookup
   # row id start with 1
+  if view_name not in config.views:
+    abort(404)
+
   view = config.views[view_name]
   replacements, processed_args, extra_args = _filter_logic(view)
 
@@ -236,6 +241,9 @@ def get_count_data(database, view_name):
   :return:
   """
   config, _ = db.resolve(database)
+  if view_name not in config.views:
+    abort(404)
+
   # convert to index lookup
   view = config.views[view_name]
   replacements, processed_args, extra_args = _filter_logic(view)
@@ -251,6 +259,9 @@ def get_desc(database, view_name):
   config, engine = db.resolve(database)
   # convert to index lookup
   # row id start with 1
+  if view_name not in config.views:
+    abort(404)
+
   view = config.views[view_name]
 
   return jsonify(dict(idType=view.idtype, columns=view.columns.values()))
@@ -264,6 +275,9 @@ def lookup(database, view_name):
   This function is used in conjunction with Select2 form elements
   """
   config, engine = db.resolve(database)
+  if view_name not in config.views:
+    abort(404)
+
   view = config.views[view_name]
 
   if view.query is None:
