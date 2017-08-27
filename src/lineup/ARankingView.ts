@@ -21,7 +21,7 @@ import {IScore, IScoreRow} from '../extensions';
 import {createAccessor} from './internal/utils';
 import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol} from './desc';
 import {pushScoreAsync} from './internal/scorecmds';
-import {mixin} from 'phovea_core/src';
+import {debounce, mixin} from 'phovea_core/src';
 import {extent} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
@@ -96,6 +96,18 @@ export abstract class ARankingView extends AView {
   private readonly provider = new LocalDataProvider([], []);
   private readonly lineup: LineUp;
   private readonly selectionHelper: LineUpSelectionHelper;
+
+  /**
+   * clears and rebuilds this lineup instance from scratch
+   * @returns {Promise<any[]>} promise when done
+   */
+  protected rebuild = debounce(() => this.rebuildImpl(), 100);
+
+  /**
+   * similar to rebuild but just loads new data and keep the columns
+   * @returns {Promise<any[]>} promise when done
+   */
+  protected reloadData = debounce(() => this.reloadDataImpl(), 100);
 
   /**
    * promise resolved when everything is built
@@ -443,22 +455,14 @@ export abstract class ARankingView extends AView {
     this.selectionHelper.setItemSelection(this.getItemSelection());
   }
 
-  /**
-   * similar to rebuild but just loads new data and keep the columns
-   * @returns {Promise<any[]>} promise when done
-   */
-  protected reloadData() {
+  private reloadDataImpl() {
     return this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
       const rows: IRow[] = r[1];
       this.setLineUpData(rows);
     });
   }
 
-  /**
-   * clears and rebuilds this lineup instance from scratch
-   * @returns {Promise<any[]>} promise when done
-   */
-  protected rebuild() {
+  private rebuildImpl() {
     this.clear();
     return this.built = this.build();
   }

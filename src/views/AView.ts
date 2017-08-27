@@ -10,6 +10,7 @@ import {IFormElementDesc} from '../form';
 import FormBuilder from '../form/FormBuilder';
 import {select} from 'd3';
 import {resolveIds} from './resolve';
+import {toData} from 'tdp_core/src/form/internal/AFormElement';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -108,6 +109,11 @@ export abstract class AView extends EventHandler implements IView {
     const v = elem.value;
 
     return v === null ? '' : v;
+  }
+
+  protected getParameterData(name: string): any {
+    const value = this.getParameter(name);
+    return toData(value);
   }
 
   /*final*/ setParameter(name: string, value: any) {
