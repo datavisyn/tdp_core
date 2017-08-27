@@ -13,7 +13,7 @@ export {resolveIds, resolveId, resolveIdToNames} from './AView';
  * @deprecated
  */
 export abstract class AD3View extends AView {
-  protected $node: Selection<this>;
+  protected readonly $node: Selection<this>;
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement) {
     super(context, selection, parent);
