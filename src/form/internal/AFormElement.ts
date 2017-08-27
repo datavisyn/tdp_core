@@ -117,7 +117,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
     const showIf = this.desc.showIf;
 
-    const dependElements = this.desc.dependsOn.map((depOn) => this.parent.getElementById(depOn));
+    const dependElements = (this.desc.dependsOn || []).map((depOn) => this.parent.getElementById(depOn));
 
     dependElements.forEach((depElem) => {
       depElem.on(AFormElement.EVENT_CHANGE, () => {

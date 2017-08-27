@@ -28,6 +28,7 @@ export default class NamedSetList {
 
   constructor(private readonly idType: IDType, private readonly sessionCreator: (namedSet: INamedSet) => void, doc = document) {
     this.node = doc.createElement('div');
+    this.node.classList.add('named-sets-wrapper');
     this.build();
   }
 
