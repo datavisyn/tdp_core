@@ -415,6 +415,7 @@ export abstract class ARankingView extends AView {
 
       this.setLineUpData(rows);
       this.createInitialRanking(this.lineup);
+      this.colors.init(this.lineup.data.getLastRanking());
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
