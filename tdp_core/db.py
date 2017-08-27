@@ -37,7 +37,7 @@ def _to_config(p):
   return connector, engine
 
 
-configs = {p.id: _to_config(p) for p in list_plugins('targid-sql-database-definition')}
+configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definition')}
 
 
 def resolve(database):
