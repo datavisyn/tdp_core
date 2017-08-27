@@ -31,6 +31,10 @@ export default class NamedSetList {
     this.build();
   }
 
+  get(index: number) {
+    return this.data[index];
+  }
+
   private async build() {
     this.node.innerHTML = `
       <section class="predefined-named-sets"><header>Predefined Sets</header><ul></ul></section>
