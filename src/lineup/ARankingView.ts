@@ -69,7 +69,7 @@ export abstract class ARankingView extends AView {
     },
     header: {
       rankingButtons: ($node: d3.Selection<Ranking>) => {
-        const rb = new LineUpRankingButtons(this.provider, $node, this.itemIDType, this.options.additionalScoreParameter);
+        const rb = new LineUpRankingButtons(this.provider, $node, () => this.itemIDType, this.options.additionalScoreParameter);
         rb.on(LineUpRankingButtons.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
           this.saveNamedSet(order, name, description, isPublic);
         });

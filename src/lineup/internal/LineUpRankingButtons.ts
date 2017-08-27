@@ -53,7 +53,7 @@ export default class LineUpRankingButtons extends EventHandler {
 
   private readonly $ul: d3.Selection<HTMLUListElement>;
 
-  constructor(private readonly provider: ADataProvider, private readonly $node: d3.Selection<any>, private readonly idType: IDType, private readonly extraArgs: object|(() => object)) {
+  constructor(private readonly provider: ADataProvider, private readonly $node: d3.Selection<any>, private readonly idType: () => IDType, private readonly extraArgs: object|(() => object)) {
     super();
 
     this.$ul = this.$node.append('ul').classed('tdp-button-group', true);
@@ -112,6 +112,9 @@ export default class LineUpRankingButtons extends EventHandler {
   }
 
   static findMappablePlugins(target: IDType, all: IPluginDesc[]) {
+    if (!target) {
+      return [];
+    }
     const idTypes = Array.from(new Set<string>(all.map((d) => d.idtype)));
 
     function canBeMappedTo(idtype: string) {
@@ -143,8 +146,9 @@ export default class LineUpRankingButtons extends EventHandler {
     const builder = new FormBuilder($selectWrapper);
 
     // load plugins, which need to be checked if the IDTypes are mappable
-    const ordinoScores: IPluginDesc[] = await LineUpRankingButtons.findMappablePlugins(this.idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
-    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await LineUpRankingButtons.findMappablePlugins(this.idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
+    const idType = this.idType();
+    const ordinoScores: IPluginDesc[] = await LineUpRankingButtons.findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
+    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await LineUpRankingButtons.findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
     const metaDataPluginPromises: Promise<IColumnWrapper<IScoreLoader>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
@@ -277,7 +281,7 @@ export default class LineUpRankingButtons extends EventHandler {
   private scoreColumnDialog(scorePlugin: IRankingButtonExtension) {
     //TODO clueify
     // pass dataSource into InvertedAggregatedScore factory method
-    Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType, this.resolveArgs())) // open modal dialog
+    Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType(), this.resolveArgs())) // open modal dialog
       .then((scoreImpl) => { // modal dialog is closed and score created
         if(Array.isArray(scoreImpl)) {
           scoreImpl.forEach((impl) => this.fire(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, impl, scorePlugin));
