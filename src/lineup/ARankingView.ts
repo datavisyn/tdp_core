@@ -176,7 +176,7 @@ export abstract class ARankingView extends AView {
    */
   protected initImpl() {
     super.initImpl();
-    this.built = this.build();
+    return this.built = this.build();
   }
 
   /**

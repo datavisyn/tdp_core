@@ -49,8 +49,9 @@ export default class ProxyView extends AD3View {
   }
 
   protected initImpl() {
+    super.initImpl();
     // update the selection first, then update the proxy view
-    this.updateSelectedItemSelect()
+    return this.updateSelectedItemSelect()
       .then(() => {
         this.updateProxyView();
       });

@@ -53,7 +53,7 @@ export abstract class AView extends EventHandler implements IView {
 
   /*final*/ init(params: HTMLElement, onParameterChange: (name: string, value: any)=>Promise<any>) {
     this.params = this.buildParameterForm(params, onParameterChange);
-    this.initImpl();
+    return this.initImpl();
   }
 
   /**
@@ -61,6 +61,7 @@ export abstract class AView extends EventHandler implements IView {
    */
   protected initImpl() {
     // hook
+    return null;
   }
 
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any)=>Promise<any>) {

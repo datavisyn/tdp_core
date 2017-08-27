@@ -39,6 +39,9 @@ export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, gra
   const name = parameter.name;
   const value = parameter.value;
 
+  if (!view) {
+    debugger;
+  }
   const bak = view.getParameter(name);
   view.setParameterImpl(name, value);
   return {
