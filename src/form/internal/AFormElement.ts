@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import * as d3 from 'd3';
+import {Selection} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
 import {IFormElementDesc, IFormParent, IFormElement} from '../interfaces';
 import * as session from 'phovea_core/src/session';
@@ -15,7 +15,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
   readonly id: string;
 
-  protected $node: d3.Selection<any>;
+  protected $node: Selection<any>;
 
   /**
    * Constructor
@@ -96,7 +96,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * @param $node
    * @param attributes Plain JS object with key as attribute name and the value as attribute value
    */
-  protected setAttributes($node: d3.Selection<any>, attributes: {[key: string]: any}) {
+  protected setAttributes($node: Selection<any>, attributes: {[key: string]: any}) {
     if (!attributes) {
       return;
     }
@@ -122,7 +122,9 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     dependElements.forEach((depElem) => {
       depElem.on(AFormElement.EVENT_CHANGE, () => {
         const values = dependElements.map((d) => d.value);
-        onDependentChange(values);
+        if(onDependentChange) {
+          onDependentChange(values);
+        }
         if (showIf) {
           this.$node.classed('hidden', !showIf(values));
         }

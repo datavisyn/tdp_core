@@ -95,7 +95,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
       this.fire(FormSelect.EVENT_CHANGE, this.value, this.$select);
     });
 
-    const data = resolveData();
+    const data = resolveData(options.optionsData);
 
     const values = this.handleDependent((values) => {
       data(values).then((items) => {
