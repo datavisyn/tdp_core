@@ -211,25 +211,25 @@ export default class LineUpRankingButtons extends EventHandler {
           return {
             text: category.text,
             children: category.plugins.map((entry) => {
-              return { text: entry.text, id: `${category.text}-${entry.id}` };
+              return {text: entry.text, id: `${category.text}-${entry.id}`};
             })
           };
         }),
-        onChange: () => {
-          const select = builder.getElementById(FORM_ID_ADDITIONAL_COLUMN);
-          const result = select.value;
+      },
+      onChange: () => {
+        const select = builder.getElementById(FORM_ID_ADDITIONAL_COLUMN);
+        const result = select.value;
 
-          select.value = null;
-          const [category, scoreID] = result.id.split('-');
-          const chosenCategory = columnsWrapper.find((cat) => cat.text === category);
+        select.value = null;
+        const [category, scoreID] = result.id.split('-');
+        const chosenCategory = columnsWrapper.find((cat) => cat.text === category);
 
-          const plugin = chosenCategory.plugins.find((child) => child.id === scoreID);
+        const plugin = chosenCategory.plugins.find((child) => child.id === scoreID);
 
-          chosenCategory.action(plugin);
+        chosenCategory.action(plugin);
 
-          // close dropdown after selection
-          $($dropdownLi.select('.dropdown-toggle').node()).dropdown('toggle');
-        }
+        // close dropdown after selection
+        $($dropdownLi.select('.dropdown-toggle').node()).dropdown('toggle');
       }
     }];
 
