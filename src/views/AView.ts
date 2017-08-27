@@ -10,7 +10,7 @@ import {IFormElementDesc} from '../form';
 import FormBuilder from '../form/FormBuilder';
 import {select} from 'd3';
 import {resolveIds} from './resolve';
-import {toData} from 'tdp_core/src/form/internal/AFormElement';
+import {toData} from '../form/internal/AFormElement';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
