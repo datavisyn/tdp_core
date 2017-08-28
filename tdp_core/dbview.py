@@ -366,11 +366,11 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
   queries[prefix + '_items'] = DBViewBuilder().idtype(idtype).table(table).query("""
         SELECT {id}, {{column}} AS text
         FROM {table} WHERE LOWER({{column}}) LIKE :query
-        ORDER BY {{column}} ASC""".format(id=id_query, table=table)).replace('column', columns).call(call_function).call(limit_offset).arg('query').build()
+        ORDER BY {{column}} ASC""".format(id=id_query, table=table)).replace('column', columns).assign_ids().call(call_function).call(limit_offset).arg('query').build()
 
   queries[prefix + '_items_verify'] = DBViewBuilder().idtype(idtype).table(table).query("""
         SELECT {id}, {name} AS text
-        FROM {table}""".format(id=id_query, table=table, name=name_column)).call(call_function).call(inject_where).build()
+        FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).build()
 
   queries[prefix + '_unique'] = DBViewBuilder().query("""
         SELECT d as id, d as text
