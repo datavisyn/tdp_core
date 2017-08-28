@@ -28,6 +28,7 @@ class DBView(object):
     self.arguments = []
     self.filters = {}
     self.table = None
+    self.assign_ids = False
 
   def needs_to_fill_up_columns(self):
     return self.columns_filled_up is False
@@ -115,6 +116,14 @@ class DBViewBuilder(object):
     :return: self
     """
     self.v.description = desc
+    return self
+
+  def assign_ids(self):
+    """
+    defines that before results of this view are returned the unique ids should be assigned based on the contained 'id' field
+    :return: self
+    """
+    self.v.assign_ids = True
     return self
 
   def idtype(self, idtype):

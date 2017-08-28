@@ -34,7 +34,7 @@ paths:
               $ref: '#/definitions/database'
         '403':
           $ref: '#/responses/notAllowed'
-  db/{database}:
+  db/{database}/:
     parameters:
       - $ref: '#/parameters/database'
     get:

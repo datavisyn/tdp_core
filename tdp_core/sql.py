@@ -27,7 +27,7 @@ def list_database():
   return jsonify([v[0].dump(k) for k, v in db.configs.items()])
 
 
-@app.route('/<database>')
+@app.route('/<database>/')
 @login_required
 def list_view(database):
   config_engine = db.resolve(database)
@@ -36,12 +36,15 @@ def list_view(database):
   return jsonify([v.dump(k) for k, v in config_engine[0].views.items()])
 
 
+def _assign_ids(r, view):
+  return r and (request.args.get('_assignids', False) or (view.assign_ids and '_id' not in r[0]))
+
 @app.route('/<database>/<view_name>')
 @login_required
 def get_data_api(database, view_name):
   r, view = _get_data(database, view_name)
 
-  if request.args.get('_assignids', False):
+  if _assign_ids(r, view):
     r = db.assign_ids(r, view.idtype)
   return jsonify(r)
 
@@ -193,7 +196,7 @@ def get_filtered_data(database, view_name):
 
   r, view = db.get_data(database, view_name, replacements, processed_args, extra_args)
 
-  if request.args.get('_assignids', False):
+  if _assign_ids(r, view):
     r = db.assign_ids(r, view.idtype)
   return jsonify(r)
 
@@ -226,7 +229,7 @@ def get_score_data(database, view_name):
   else:
     mapped_scores = r
 
-  if request.args.get('_assignids', False):
+  if _assign_ids(mapped_scores, view):
     mapped_scores = db.assign_ids(mapped_scores, target_idtype)
   return jsonify(mapped_scores)
 
@@ -302,7 +305,7 @@ def lookup(database, view_name):
   if more:
     # hit the boundary of more remove the artificial one
     del r_items[-1]
-  if request.args.get('_assignids', False):
+  if _assign_ids(r_items, view):
     r_items = db.assign_ids(r_items, view.idtype)
   return jsonify(dict(items=r_items, more=more))
 
