@@ -36,7 +36,11 @@ export abstract class AView extends EventHandler implements IView {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
     parent.appendChild(this.node);
-    this.idType = resolve(context.desc.idtype);
+    if (isRegex(context.desc.idtype)) {
+      this.idType = selection.idtype;
+    } else {
+      this.idType = resolve(context.desc.idtype);
+    }
   }
 
   /**
@@ -203,3 +207,8 @@ export abstract class AView extends EventHandler implements IView {
 }
 
 export default AView;
+
+function isRegex(v: string) {
+  // cheap test for regex
+  return v.includes('*') || v.includes('.') || v.includes('|');
+}
