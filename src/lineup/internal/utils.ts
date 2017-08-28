@@ -16,11 +16,11 @@ export class AScoreAccessorProxy<T> {
   }
 
   set rows(rows: IScoreRow<T>[]) {
-    rows.forEach(({id, score}) => this.scores.set(id, score));
+    rows.forEach(({id, score}) => this.scores.set(String(id), score));
   }
 
   protected access(row: IRow) {
-    const rowId = row.id;
+    const rowId = String(row.id);
     if (this.scores === null || !this.scores.has(rowId)) {
       return this.missingValue;
     }

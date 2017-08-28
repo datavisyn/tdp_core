@@ -27,10 +27,10 @@ export function array_diff<T>(array1: T[], array2: T[]) {
  * @param set2
  * @returns Set<T>
  */
-export function set_diff<T>(set1: Set<T>, set2: Set<T>) : Set<T> {
+export function set_diff<T>(set1: Set<T>, set2: Set<T>): Set<T> {
   const diff = new Set<T>();
   set1.forEach((elem) => {
-    if(!set2.has(elem)) {
+    if (!set2.has(elem)) {
       diff.add(elem);
     }
   });
@@ -66,7 +66,7 @@ export default class LineUpSelectionHelper extends EventHandler {
       console.error('no idType defined for this view');
       return;
     }
-    idType.fillMapCache(this._rows.map((r) => r._id), this._rows.map((r) => r.id));
+    idType.fillMapCache(this._rows.map((r) => r._id), this._rows.map((r) => String(r.id)));
   }
 
   private addEventListener() {
@@ -137,7 +137,7 @@ export default class LineUpSelectionHelper extends EventHandler {
       return;
     }
 
-    const old = this.lineup.data.getSelection().sort((a,b) => a-b);
+    const old = this.lineup.data.getSelection().sort((a, b) => a - b);
 
     const indices: number[] = [];
     sel.range.dim(0).forEach((uid) => {
@@ -146,7 +146,7 @@ export default class LineUpSelectionHelper extends EventHandler {
         indices.push(index);
       }
     });
-    indices.sort((a,b) => a-b);
+    indices.sort((a, b) => a - b);
 
     if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
       return; // no change
