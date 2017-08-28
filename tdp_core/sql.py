@@ -39,6 +39,7 @@ def list_view(database):
 def _assign_ids(r, view):
   return r and (request.args.get('_assignids', False) or (view.assign_ids and '_id' not in r[0]))
 
+
 @app.route('/<database>/<view_name>')
 @login_required
 def get_data_api(database, view_name):
