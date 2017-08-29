@@ -40,6 +40,10 @@ def _to_config(p):
 configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definition')}
 
 
+def _supports_sql_parameters(dialect):
+  return dialect.lower() != 'sqlite'  # sqlite doesn't support array parameters, postgres does
+
+
 def resolve(database):
   if database not in configs:
     abort(404)
@@ -68,7 +72,28 @@ def assign_ids(rows, idtype):
   return rows
 
 
-def to_query(q):
+def to_query(q, supports_array_parameter, parameters):
+  """
+  converts to the native SQL query using sqlalchemy + handling of array parameters
+  :param q: the SQL query
+  :param supports_array_parameter: whether array parameters are supported
+  :param parameters: dictionary of parameters that are going to be applied
+  :return: the transformed query and call by reference updated parameters
+  """
+  if supports_array_parameter:
+    return sqlalchemy.sql.text(q)
+
+  # need to suffix all array parameter and wrap with ()
+  for k,v in parameters.items():
+    if not isinstance(v, list) and not instanceof(v, tuple):
+      continue
+    # sounds like an array
+    # convert from :ids to (:ids0, :ids1, :ids2)
+    subparameters = {(k + str(i)): vi for i, vi in enumerate(v)}
+    q = q.replace(':' + k, '({ids})'.format(ids=', '.join(':' + p for p in subparameters.keys())))
+    del parameters[k]  # delete single
+    parameters.update(subparameters)  # add sub
+
   return sqlalchemy.sql.text(q)
 
 
@@ -81,6 +106,7 @@ class WrappedSession(object):
     from sqlalchemy.orm import sessionmaker, scoped_session
     _log.info('creating session')
     self._session = scoped_session(sessionmaker(bind=engine))()
+    self._supports_array_parameter = _supports_sql_parameters(engine.name)
 
   def execute(self, query, **kwargs):
     """
@@ -89,19 +115,21 @@ class WrappedSession(object):
     :param kwargs: additional args to replace
     :return: the session result
     """
-    sql = to_query(query)
+    sql = to_query(query, self._supports_array_parameter, kwargs)
     _log.info(sql)
+    _log.info(kwargs)
     return self._session.execute(sql, kwargs)
 
-  def run(self, sql, **kwargs):
+  def run(self, query, **kwargs):
     """
     runs the given sql statement, in contrast to execute the result will be converted to a list of dicts
-    :param sql: the sql query to execute
+    :param query: the sql query to execute
     :param kwargs: args for this query
     :return: list of dicts
     """
-    sql = to_query(sql)
+    sql = to_query(query, self._supports_array_parameter, kwargs)
     _log.info(sql)
+    _log.info(kwargs)
     result = self._session.execute(sql, kwargs)
     columns = result.keys()
     return [{c: r[c] for c in columns} for r in result]
