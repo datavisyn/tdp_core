@@ -84,8 +84,8 @@ def to_query(q, supports_array_parameter, parameters):
     return sqlalchemy.sql.text(q)
 
   # need to suffix all array parameter and wrap with ()
-  for k,v in parameters.items():
-    if not isinstance(v, list) and not instanceof(v, tuple):
+  for k, v in parameters.items():
+    if not isinstance(v, list) and not isinstance(v, tuple):
       continue
     # sounds like an array
     # convert from :ids to (:ids0, :ids1, :ids2)
