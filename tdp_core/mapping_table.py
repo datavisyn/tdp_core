@@ -13,12 +13,15 @@ class SQLMappingTable(object):
     self._query = mapping.query
 
   def __call__(self, ids):
+    # ensure strings
+    ids = [unicode(i) for i in ids]
+
     with db.session(self._engine) as session:
       mapped = session.execute(self._query, ids=ids)
 
       # handle multi mappings
       data = sorted(mapped, key=lambda x: x['f'])
-      grouped = {k: list(g) for k, g in itertools.groupby(data, lambda x: x['f'])}
+      grouped = {k: [r['t'] for r in g] for k, g in itertools.groupby(data, lambda x: x['f'])}
       return [grouped.get(id, []) for id in ids]
 
 
