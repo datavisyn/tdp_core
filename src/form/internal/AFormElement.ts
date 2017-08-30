@@ -158,7 +158,7 @@ export function toData(value: any) {
   if (Array.isArray(value)) {
     return value.map(toData);
   }
-  return (value !== null && value.data !== undefined) ? value.data : value;
+  return (value != null && value.data !== undefined) ? value.data : value;
 }
 
 export default AFormElement;

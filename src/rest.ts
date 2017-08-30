@@ -96,6 +96,10 @@ function prefixFilter(filters: IParams) {
   return r;
 }
 
+export function mergeParamAndFilters(params: IParams, filters: IParams) {
+  return Object.assign({}, params, prefixFilter(filters));
+}
+
 /**
  * query the TDP rest api to read data with additional given filters
  * @param {string} database the database connector key
@@ -106,7 +110,7 @@ function prefixFilter(filters: IParams) {
  * @returns {Promise<IRow[]>}
  */
 export function getTDPFilteredRows(database: string, view: string, params: IParams, filters: IParams, assignIds: boolean = false): Promise<IRow[]> {
-  return getTDPDataImpl(database, view, 'filter', Object.assign({}, params, prefixFilter(filters), assignIds), assignIds);
+  return getTDPDataImpl(database, view, 'filter', mergeParamAndFilters(params, filters), assignIds);
 }
 
 /**
@@ -126,10 +130,11 @@ export function getTDPScore<T>(database: string, view: string, params: IParams =
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
+ * @param {IParams} filters filters to use
  * @returns {Promise<number>}
  */
-export function getTDPCount(database: string, view: string, params: IParams = {}): Promise<number> {
-  return getTDPDataImpl(database, view, 'count', params);
+export function getTDPCount(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<number> {
+  return getTDPDataImpl(database, view, 'count', Object.assign({}, params, prefixFilter(filters)));
 }
 
 export interface ILookupItem {

@@ -2,6 +2,9 @@
  * Created by sam on 13.02.2017.
  */
 import {IRow, IScoreRow} from '../';
+import {getTDPCount, IParams} from 'tdp_core/src/rest';
+import {convertRow2MultiMap, IFormMultiMap, IFormRow} from 'tdp_core/src/form/internal/FormMap';
+import {encodeParams} from 'phovea_core/src/ajax';
 
 export class AScoreAccessorProxy<T> {
   /**
@@ -50,3 +53,81 @@ export function createAccessor(colDesc: any) {
   colDesc.accessor = accessor.accessor;
   return accessor;
 }
+
+
+/**
+ * converts the given filter object to request params
+ * @param filter input filter
+ */
+export function toFilter(filter: IFormMultiMap|IFormRow[]): IParams {
+  if (Array.isArray(filter)) {
+    //map first
+    return toFilter(convertRow2MultiMap(filter));
+  }
+  const clean = (v: any) => {
+    if (Array.isArray(v)) {
+      return v.map(clean);
+    }
+    if (typeof v === 'object' && v.id !== undefined && v.text !== undefined) {
+      return v.id;
+    }
+    return v;
+  };
+  const param: IParams = {};
+  Object.keys(filter).forEach((k) => {
+    param[k] = clean(filter[k]);
+  });
+  return param;
+}
+
+export function toFilterString(filter: IFormMultiMap, key2name?: Map<string, string>) {
+  const keys = Object.keys(filter);
+  if (keys.length === 0) {
+    return '<None>';
+  }
+  const toString = (v: any) => {
+    if (typeof v === 'object' && v.id !== undefined && v.text !== undefined) {
+      return v.text;
+    }
+    return v.toString();
+  };
+  return keys.map((d) => {
+    const v = filter[d];
+    const label = key2name && key2name.has(d) ? key2name.get(d) : d;
+    const vn = Array.isArray(v) ? '["' + v.map(toString).join('","') + '"]' : '"' + toString(v) + '"';
+    return `${label}=${vn}`;
+  }).join(' & ');}
+
+/**
+ * generator for a FormMap compatible badgeProvider based on the given database url
+ */
+export function previewFilterHint(database: string, view: string, extraParams?: ()=>any): (rows: IFormRow[])=>Promise<string> {
+  let total: Promise<number> = null;
+  const cache = new Map<string, Promise<number>>();
+
+  return (rows: IFormRow[]) => {
+    if (total === null) { // compute all by no setting any filter
+      total = getTDPCount(database, view, (extraParams ? extraParams() : {}));
+    }
+    if (!rows) { //if no filter is set return all
+      return total.then((count: number) => `${count} / ${count}`);
+    }
+    //compute filtered ones
+    const filter = toFilter(rows);
+    const param: IParams = {};
+    if (extraParams) {
+      Object.assign(param, extraParams());
+    }
+    const key = `${encodeParams(param)}@${encodeParams(filter)}`;
+    if (!cache.has(key)) {
+      cache.set(key, getTDPCount(database, view, param, filter));
+    }
+    return Promise.all([total, cache.get(key)]).then((results: number[]) => {
+      return `${results[1]} / ${results[0]}`;
+    }, () => {
+      // ignore error and return dunno
+      return `? / ?`;
+    });
+  };
+}
+

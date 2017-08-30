@@ -65,7 +65,7 @@ export interface IFormMapDesc extends IFormElementDesc {
   };
 }
 
-interface IFormRow {
+export interface IFormRow {
   key: string;
   value: any;
 }
@@ -415,7 +415,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
    */
   get value() {
     // just rows with a valid key and value
-    return this.rows.filter((d) => d.key && d.value);
+    return this.rows.filter((d) => d.key && d.value !== null);
   }
 
   hasValue() {
@@ -451,7 +451,9 @@ function isEqual(a: IFormRow[], b: IFormRow[]) {
   });
 }
 
-export function convertRow2MultiMap(rows: IFormRow[]) {
+export declare type IFormMultiMap = { [key: string]: any | any[] };
+
+export function convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap {
   if (!rows) {
     return {};
   }
@@ -467,7 +469,7 @@ export function convertRow2MultiMap(rows: IFormRow[]) {
       v.push(row.value);
     }
   });
-  const r: {[key: string]: any|any[]} = {};
+  const r: IFormMultiMap = {};
   map.forEach((v, k) => {
     if (v.length === 1) {
       r[k] = v[0];
