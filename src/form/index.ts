@@ -10,3 +10,4 @@ export {IFormSelect2, ISelect2Option} from './internal/FormSelect2';
 export {IFormMapDesc, convertRow2MultiMap, IFormMultiMap, IFormRow} from './internal/FormMap';
 export {IButtonElementDesc} from './internal/FormButton';
 export {default as FormDialog} from './FormDialog';
+export {nameLookupDesc} from './internal/builder';
