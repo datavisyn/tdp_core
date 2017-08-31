@@ -76,8 +76,8 @@ export abstract class ARankingView extends AView {
         rb.on(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
           this.addScoreColumn(scoreImpl);
         });
-        rb.on(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreId: string, params: any) => {
-          this.pushTrackedScoreColumn(scoreId, params);
+        rb.on(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
+          this.pushTrackedScoreColumn(scoreName, scoreId, params);
         });
       }
     }
@@ -358,8 +358,8 @@ export abstract class ARankingView extends AView {
     return this.withoutTracking(() => this.addScoreColumn(score));
   }
 
-  private pushTrackedScoreColumn(scoreId: string, params: any) {
-    return pushScoreAsync(this.context.graph, this.context.ref, scoreId, params);
+  private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
+    return pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
   }
 
   /**

@@ -53,7 +53,7 @@ export default class LineUpRankingButtons extends EventHandler {
    */
   static readonly EVENT_ADD_SCORE_COLUMN = 'addScoreColumn';
   /**
-   * (scoreId: string, params: object) => void
+   * (scoreName: string, scoreId: string, params: object) => void
    * @type {string}
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
@@ -199,7 +199,7 @@ export default class LineUpRankingButtons extends EventHandler {
           const amountOfRows: number = this.provider.getLastRanking().getOrder().length;
 
           // the factory function call executes the score's implementation
-          scorePlugin.factory(this.resolveArgs(), amountOfRows).then((params) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.id, params));
+          scorePlugin.factory(this.resolveArgs(), amountOfRows).then((params) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.text, scorePlugin.id, params));
         }
       },
       {
@@ -290,7 +290,7 @@ export default class LineUpRankingButtons extends EventHandler {
     Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType(), this.resolveArgs())) // open modal dialog
       .then((params) => { // modal dialog is closed and score created
         if(Array.isArray(params)) {
-          params.forEach((param) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, param));
+          params.forEach((param) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.name, scorePlugin.desc.id, param));
         } else {
           this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
         }

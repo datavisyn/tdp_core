@@ -54,7 +54,7 @@ export function editNamedSet(id: string, data: { [key: string]: any }) {
  * @returns {Promise<object>} the data
  */
 export function getAttachment(id: string): Promise<object> {
-  return getAPIJSON(`${REST_NAMESPACE}/attachments/${id}`);
+  return getAPIJSON(`${REST_NAMESPACE}/attachment/${id}`);
 }
 
 /**
@@ -63,5 +63,5 @@ export function getAttachment(id: string): Promise<object> {
  * @returns {Promise<string>} a promise with the attachment id
  */
 export function addAttachment(data: object): Promise<string> {
-  return sendAPI(`${REST_NAMESPACE}/attachments`, {data}, 'POST');
+  return sendAPI(`${REST_NAMESPACE}/attachment`, {data}, 'POST');
 }
