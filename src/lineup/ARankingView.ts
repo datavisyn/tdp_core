@@ -6,7 +6,6 @@ import LineUp, {ILineUpConfig} from 'lineupjs/src/lineup';
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/';
 import {ScaleMappingFunction, Ranking} from 'lineupjs/src/model';
-import CompositeColumn from 'lineupjs/src/model/CompositeColumn';
 import ValueColumn from 'lineupjs/src/model/ValueColumn';
 import NumberColumn from 'lineupjs/src/model/NumberColumn';
 import {IBoxPlotData} from 'lineupjs/src/model/BoxPlotColumn';
@@ -22,7 +21,7 @@ import {createAccessor} from './internal/utils';
 import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol} from './desc';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin} from 'phovea_core/src';
-import {extent} from 'd3';
+import {extent, Selection, selection as d3base, select} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
@@ -68,7 +67,8 @@ export abstract class ARankingView extends AView {
       histograms: true
     },
     header: {
-      rankingButtons: ($node: d3.Selection<Ranking>) => {
+      rankingButtons: (node: Selection<Ranking>|HTMLElement) => {
+        const $node = node instanceof d3base ? <Selection<Ranking>>node : select(<HTMLElement>node);
         const rb = new LineUpRankingButtons(this.provider, $node, () => this.itemIDType, this.options.additionalScoreParameter);
         rb.on(LineUpRankingButtons.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
           this.saveNamedSet(order, name, description, isPublic);
