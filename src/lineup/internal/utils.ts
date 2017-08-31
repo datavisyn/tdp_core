@@ -2,8 +2,8 @@
  * Created by sam on 13.02.2017.
  */
 import {IRow, IScoreRow} from '../';
-import {getTDPCount, IParams} from 'tdp_core/src/rest';
-import {convertRow2MultiMap, IFormMultiMap, IFormRow} from 'tdp_core/src/form/internal/FormMap';
+import {getTDPCount, IParams} from '../../rest';
+import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form';
 import {encodeParams} from 'phovea_core/src/ajax';
 
 export class AScoreAccessorProxy<T> {
