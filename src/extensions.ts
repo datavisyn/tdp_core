@@ -90,7 +90,7 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
 
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;
-  factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScore<any>>;
+  factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
 }
 
 export interface IRankingButtonExtensionDesc extends IPluginDesc {

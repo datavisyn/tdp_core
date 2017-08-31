@@ -8,6 +8,7 @@ import {get as getPlugin} from 'phovea_core/src/plugin';
 import Column from 'lineupjs/src/model/Column';
 import {IScore} from '../';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../extensions';
+import {externalize, resolveExternalized} from '../../storage';
 
 export const CMD_ADD_SCORE = 'tdpAddScore';
 export const CMD_REMOVE_SCORE = 'tdpRemoveScore';
@@ -25,14 +26,15 @@ async function addScoreLogic(waitForScore: boolean, inputs: IObjectRef<IViewProv
   const pluginDesc = getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
   const plugin = await pluginDesc.load();
   const view = await inputs[0].v.then((vi) => vi.getInstance());
-  const score: IScore<any> | IScore<any>[] = plugin.factory(parameter.params, pluginDesc);
+  const params = await resolveExternalized(parameter.params);
+  const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
   const scores = Array.isArray(score) ? score : [score];
 
   const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
   const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
 
   return {
-    inverse: removeScore(inputs[0], scoreId, parameter.params, col.map((c) => c.id))
+    inverse: removeScore(inputs[0], scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id))
   };
 }
 
@@ -64,9 +66,11 @@ export function addScore(provider: IObjectRef<IViewProvider>, scoreId: string, p
 }
 
 export async function pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreId: string, params: any) {
-  const actionParams = {id: scoreId, params};
-  const result = await addScoreAsync([provider], actionParams);
-  return graph.pushWithResult(action(meta('Add Score', cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], actionParams), result);
+  const storedParams = await externalize(params);
+  const currentParams = {id: scoreId, params, storedParams};
+  const result = await addScoreAsync([provider], currentParams);
+  const toStoreParams = {id: scoreId, params: storedParams};
+  return graph.pushWithResult(action(meta('Add Score', cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], toStoreParams), result);
 }
 
 export function removeScore(provider: IObjectRef<IViewProvider>, scoreId: string, params: any, columnId: string | string[]) {

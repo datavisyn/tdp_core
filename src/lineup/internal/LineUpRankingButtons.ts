@@ -48,7 +48,14 @@ export function wrap(score: IPluginDesc): IScoreLoader {
 
 export default class LineUpRankingButtons extends EventHandler {
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
+  /**
+   * @deprecated
+   */
   static readonly EVENT_ADD_SCORE_COLUMN = 'addScoreColumn';
+  /**
+   * (scoreId: string, params: object) => void
+   * @type {string}
+   */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
 
   private readonly $ul: d3.Selection<HTMLUListElement>;
@@ -279,14 +286,13 @@ export default class LineUpRankingButtons extends EventHandler {
   }
 
   private scoreColumnDialog(scorePlugin: IRankingButtonExtension) {
-    //TODO clueify
     // pass dataSource into InvertedAggregatedScore factory method
     Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType(), this.resolveArgs())) // open modal dialog
-      .then((scoreImpl) => { // modal dialog is closed and score created
-        if(Array.isArray(scoreImpl)) {
-          scoreImpl.forEach((impl) => this.fire(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, impl, scorePlugin));
+      .then((params) => { // modal dialog is closed and score created
+        if(Array.isArray(params)) {
+          params.forEach((param) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, param));
         } else {
-          this.fire(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, scoreImpl, scorePlugin);
+          this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
         }
       });
   }
