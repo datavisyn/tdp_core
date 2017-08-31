@@ -63,5 +63,5 @@ export function getAttachment(id: string): Promise<object> {
  * @returns {Promise<string>} a promise with the attachment id
  */
 export function addAttachment(data: object): Promise<string> {
-  return sendAPI(`${REST_NAMESPACE}/attachment`, {data}, 'POST');
+  return sendAPI(`${REST_NAMESPACE}/attachment/`, {data: JSON.stringify(data)}, 'POST', 'text');
 }
