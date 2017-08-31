@@ -98,6 +98,67 @@ def _generate_id():
   return phovea_server.util.fix_id(phovea_server.util.random_id(10))
 
 
+@app.route('/attachment/', methods=['POST'])
+@etag
+def post_attachments():
+  """
+  simple attachment management
+  :return:
+  """
+  db = MongoClient(c.host, c.port)[c.database]
+
+  id = _generate_id()
+  # keep the encoded string
+  data = request.values.get('data', None)
+  if data is None:
+    import json
+    data = json.dumps(request.values.to_dict())
+
+  creator = security.current_username()
+  permissions = security.DEFAULT_PERMISSION
+
+  entry = dict(id=id, creator=creator, permissions=permissions, data=data)
+  db.attachments.insert_one(entry)
+  return id
+
+
+@app.route('/attachment/<attachment_id>', methods=['GET', 'DELETE', 'PUT'])
+@etag
+def get_attachment(attachment_id):
+  db = MongoClient(c.host, c.port)[c.database]
+  result = list(db.attachments.find(dict(id=attachment_id), {'_id': 0}))
+  entry = result[0] if len(result) > 0 else None
+
+  if not entry:
+    abort(404)
+
+  if request.method == 'GET':
+    if not security.can_read(entry):
+      abort(403)
+    return entry['data']
+
+  if request.method == 'DELETE':
+    if not security.can_write(entry):
+      abort(404)
+    q = dict(id=attachment_id)
+    result = db.attachments.remove(q)
+    return jsonify(result['n'])  # number of deleted documents
+
+  if request.method == 'PUT':
+    if not security.can_write(entry):
+      abort(404)
+    filter = dict(id=attachment_id)
+    # keep the encoded string
+    data = request.values.get('data', None)
+    if data is None:
+      import json
+      data = json.dumps(request.values.to_dict())
+
+    query = {'$set': dict(data=data)}
+    db.attachments.find_one_and_update(filter, query)
+    return attachment_id
+
+
 # @app.route('/delete_legacy_namedsets/', methods=['GET'])
 # def delete_legacy_namedsets():
 #  db = MongoClient(c.host, c.port)[c.database]
