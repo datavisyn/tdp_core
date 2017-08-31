@@ -1,6 +1,5 @@
 import {resolveImmediately} from 'phovea_core/src';
-import {getAttachment} from '../rest';
-import {addAttachment} from 'tdp_core/src/storage/rest';
+import {getAttachment, addAttachment} from '../rest';
 
 const ATTACHMENT_PREFIX = '@attachment:';
 const MAX_INPLACE_SIZE = 10e3; // 10k
