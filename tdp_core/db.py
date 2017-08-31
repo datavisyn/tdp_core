@@ -108,29 +108,25 @@ class WrappedSession(object):
     self._session = scoped_session(sessionmaker(bind=engine))()
     self._supports_array_parameter = _supports_sql_parameters(engine.name)
 
-  def execute(self, query, **kwargs):
+  def execute(self, sql, **kwargs):
     """
     execute the given query with the given args
-    :param query: query
+    :param sql: query
     :param kwargs: additional args to replace
     :return: the session result
     """
-    sql = to_query(query, self._supports_array_parameter, kwargs)
-    _log.info(sql)
-    _log.info(kwargs)
-    return self._session.execute(sql, kwargs)
+    parsed = to_query(sql, self._supports_array_parameter, kwargs)
+    return self._session.execute(parsed, kwargs)
 
-  def run(self, query, **kwargs):
+  def run(self, sql, **kwargs):
     """
     runs the given sql statement, in contrast to execute the result will be converted to a list of dicts
     :param query: the sql query to execute
     :param kwargs: args for this query
     :return: list of dicts
     """
-    sql = to_query(query, self._supports_array_parameter, kwargs)
-    _log.info(sql)
-    _log.info(kwargs)
-    result = self._session.execute(sql, kwargs)
+    parsed = to_query(sql, self._supports_array_parameter, kwargs)
+    result = self._session.execute(parsed, kwargs)
     columns = result.keys()
     return [{c: r[c] for c in columns} for r in result]
 
