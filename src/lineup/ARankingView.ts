@@ -1,7 +1,8 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {AView, EViewMode, IViewContext, ISelection} from '../views';
+import {AView} from '../views/AView';
+import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
 import LineUp, {ILineUpConfig} from 'lineupjs/src/lineup';
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/';
