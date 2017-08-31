@@ -79,7 +79,7 @@ export default class LineUpRankingButtons extends EventHandler {
 
   private appendDownload() {
     const listener = (ranking: Ranking) => {
-      this.provider.exportTable(ranking, {separator: ';', quote: true}).then((content) => {
+      this.provider.exportTable(ranking, {separator: ';', quote: true, verboseColumnHeaders: true}).then((content) => {
         const downloadLink = document.createElement('a');
         const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
         downloadLink.href = URL.createObjectURL(blob);
