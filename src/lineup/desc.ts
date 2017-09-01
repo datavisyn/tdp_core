@@ -40,6 +40,11 @@ export interface IColumnOptions {
    * @default: undefined
    */
   selectedSubtype: string;
+
+  /**
+   * extra arguments
+   */
+  extras?: {[key: string]: any};
 }
 
 function baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
@@ -52,7 +57,7 @@ function baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdd
     width: -1,
     selectedId: -1,
     selectedSubtype: undefined
-  }, options);
+  }, options, options.extras || {});
 }
 
 export function numberColFromArray(column: string, rows: any[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {

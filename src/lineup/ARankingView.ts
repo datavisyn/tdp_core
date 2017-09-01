@@ -303,8 +303,13 @@ export abstract class ARankingView extends AView {
 
       if (colDesc.type === 'number') {
         const ncol = <NumberColumn>col;
-        if (!(colDesc.constantDomain)) { //create a dynamic range if not fixed
+        if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
           const domain = extent(rows, (d) => <number>d.score);
+          if (colDesc.constantDomain === 'min') {
+            domain[0] = colDesc.domain[0];
+          } else if (colDesc.constantDomain === 'max') {
+            domain[1] = colDesc.domain[1];
+          }
           //HACK by pass the setMapping function and set it inplace
           const ori = <ScaleMappingFunction>(<any>ncol).original;
           const current = <ScaleMappingFunction>(<any>ncol).mapping;
