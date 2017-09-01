@@ -116,16 +116,18 @@ class WrappedSession(object):
     :return: the session result
     """
     parsed = to_query(sql, self._supports_array_parameter, kwargs)
+    _log.info(parsed)
     return self._session.execute(parsed, kwargs)
 
   def run(self, sql, **kwargs):
     """
     runs the given sql statement, in contrast to execute the result will be converted to a list of dicts
-    :param query: the sql query to execute
+    :param sql: the sql query to execute
     :param kwargs: args for this query
     :return: list of dicts
     """
     parsed = to_query(sql, self._supports_array_parameter, kwargs)
+    _log.info(parsed)
     result = self._session.execute(parsed, kwargs)
     columns = result.keys()
     return [{c: r[c] for c in columns} for r in result]
