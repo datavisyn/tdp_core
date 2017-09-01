@@ -46,3 +46,22 @@ export function editNamedSet(id: string, data: { [key: string]: any }) {
     return s;
   });
 }
+
+
+/**
+ * get the content of an uploaded attachment
+ * @param {string} id the attachment id
+ * @returns {Promise<object>} the data
+ */
+export function getAttachment(id: string): Promise<object> {
+  return getAPIJSON(`${REST_NAMESPACE}/attachment/${id}`);
+}
+
+/**
+ * uploads an attachment file to the TDP server
+ * @param {Object} data
+ * @returns {Promise<string>} a promise with the attachment id
+ */
+export function addAttachment(data: object): Promise<string> {
+  return sendAPI(`${REST_NAMESPACE}/attachment/`, {data: JSON.stringify(data)}, 'POST', 'text');
+}

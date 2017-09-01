@@ -33,7 +33,7 @@ export default async function findViews(idtype: IDType, selection: Range): Promi
 
   function byType(p: any) {
     const pattern = p.idtype ? new RegExp(p.idtype) : /.*/;
-    return all.some((i) => pattern.test(i.id)) && !matchLength(p.selection, 0);
+    return all.some((i) => pattern.test(i.id)) && (p.selection === 'any' || !matchLength(p.selection, 0));
   }
 
   function bySelection(p: any) {

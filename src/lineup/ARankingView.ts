@@ -1,7 +1,8 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {AView, EViewMode, IViewContext, ISelection} from '../views';
+import {AView} from '../views/AView';
+import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
 import LineUp, {ILineUpConfig} from 'lineupjs/src/lineup';
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/';
@@ -76,8 +77,8 @@ export abstract class ARankingView extends AView {
         rb.on(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
           this.addScoreColumn(scoreImpl);
         });
-        rb.on(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreId: string, params: any) => {
-          this.pushTrackedScoreColumn(scoreId, params);
+        rb.on(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
+          this.pushTrackedScoreColumn(scoreName, scoreId, params);
         });
       }
     }
@@ -302,8 +303,13 @@ export abstract class ARankingView extends AView {
 
       if (colDesc.type === 'number') {
         const ncol = <NumberColumn>col;
-        if (!(colDesc.constantDomain)) { //create a dynamic range if not fixed
+        if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
           const domain = extent(rows, (d) => <number>d.score);
+          if (colDesc.constantDomain === 'min') {
+            domain[0] = colDesc.domain[0];
+          } else if (colDesc.constantDomain === 'max') {
+            domain[1] = colDesc.domain[1];
+          }
           //HACK by pass the setMapping function and set it inplace
           const ori = <ScaleMappingFunction>(<any>ncol).original;
           const current = <ScaleMappingFunction>(<any>ncol).mapping;
@@ -358,8 +364,8 @@ export abstract class ARankingView extends AView {
     return this.withoutTracking(() => this.addScoreColumn(score));
   }
 
-  private pushTrackedScoreColumn(scoreId: string, params: any) {
-    return pushScoreAsync(this.context.graph, this.context.ref, scoreId, params);
+  private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
+    return pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
   }
 
   /**
