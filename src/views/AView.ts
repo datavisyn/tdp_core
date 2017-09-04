@@ -11,6 +11,7 @@ import FormBuilder from '../form/FormBuilder';
 import {select} from 'd3';
 import {resolveIds} from './resolve';
 import {toData} from '../form/internal/AFormElement';
+import {mixin} from 'phovea_core/src';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -71,7 +72,9 @@ export abstract class AView extends EventHandler implements IView {
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any)=>Promise<any>) {
     const builder = new FormBuilder(select(params));
 
-    const descs = this.getParameterFormDescs();
+    //work on a local copy since we change it by adding an onChange handler
+    const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
+
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
       p.onChange = (formElement, value) => onParameterChange(formElement.id, value);
