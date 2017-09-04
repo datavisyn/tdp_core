@@ -170,7 +170,7 @@ def _filter_logic(view):
       del where_clause[key]
 
   where_default_clause = []
-  where_group_clauses = {}
+  where_group_clauses = {group: [] for group in view.filter_groups()}
   for k, v in where_clause.items():
     if len(v) <= 0:
       continue
@@ -178,8 +178,6 @@ def _filter_logic(view):
     group = view.get_filter_group(k)
     if group is None:
       where_default_clause.append(clause)
-    elif group not in where_group_clauses:
-      where_group_clauses[group] = [clause]
     else:
       where_group_clauses[group].append(clause)
 
