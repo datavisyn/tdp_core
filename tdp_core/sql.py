@@ -169,11 +169,26 @@ def _filter_logic(view):
       _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
       del where_clause[key]
 
-  where_clause = [to_clause(k, v) for k, v in where_clause.items() if len(v) > 0]
+  where_default_clause = []
+  where_group_clauses = {}
+  for k, v in where_clause.items():
+    if len(v) <= 0:
+      continue
+    clause = to_clause(k, v)
+    group = view.get_filter_group(k)
+    if group is None:
+      where_default_clause.append(clause)
+    elif group not in where_group_clauses:
+      where_group_clauses[group] = [clause]
+    else:
+      where_group_clauses[group].append(clause)
 
   replacements = dict()
-  replacements['and_where'] = (' AND ' + ' AND '.join(where_clause)) if where_clause else ''
-  replacements['where'] = (' WHERE ' + ' AND '.join(where_clause)) if where_clause else ''
+  replacements['and_where'] = (' AND ' + ' AND '.join(where_default_clause)) if where_default_clause else ''
+  replacements['where'] = (' WHERE ' + ' AND '.join(where_default_clause)) if where_default_clause else ''
+  for group, v in where_group_clauses.items():
+    replacements['and_' + group + '_where'] = (' AND ' + ' AND '.join(v)) if v else ''
+    replacements[group + '_where'] = (' WHERE ' + ' AND '.join(v)) if v else ''
 
   return replacements, processed_args, extra_args
 

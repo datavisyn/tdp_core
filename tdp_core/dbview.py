@@ -15,6 +15,12 @@ def _clean_query(query):
   return query
 
 
+class DBFilterData(object):
+  def __init__(self, group, sub_query):
+    self.group = group
+    self.sub_query = sub_query
+
+
 class DBView(object):
   def __init__(self, idtype=None, query=None):
     self.description = ''
@@ -59,11 +65,16 @@ class DBView(object):
     return not self.filters and not self.columns_filled_up
 
   def get_filter_subquery(self, key):
-    if key in self.filters and self.filters[key] is not None:
-      return self.filters[key]
+    if key in self.filters and self.filters[key].sub_query is not None:
+      return self.filters[key].sub_query
     if ('filter_' + key) in self.queries:  # compatibility
       return self.queries['filter_' + key]
     return key + ' {operator} {value}'
+
+  def get_filter_group(self, key):
+    if key in self.filters:
+      return self.filters[key].group
+    return None
 
   def is_valid_replacement(self, key, value):
     if key not in self.replacements:
@@ -158,34 +169,31 @@ class DBViewBuilder(object):
       self.v.queries[key] = query
     return self
 
-  def filters(self, *keys):
+  def filters(self, keys, group = None):
     """
     specify possible filter keys
     :param keys: the list of possible filters
     :return:
     """
     for key in keys:
-      if isinstance(key, list):
-        for kkey in key:
-          self.v.filters[kkey] = None
-      else:
-        self.v.filters[key] = None
+      self.v.filters[key] = DBFilterData(group, None)
     return self
 
-  def filter(self, key, replacement=None, alias=None, table=None):
+  def filter(self, key, replacement=None, alias=None, table=None, group=None):
     """
     add a possible filter with replacement strategy of type {key} {operator} {value}
     :param key: filter key
     :param replacement: optional the full replacement string has to inclue {operator} and {value}
     :param alias: shortcut for just specifying the left hand alias: {alias} {operator} {value}
-    :param table: shortuct for just specifying the table alias: {table}.{key} {operator} {value}
+    :param table: shortcut for just specifying the table alias: {table}.{key} {operator} {value}
+    :param group: to inject the filter in another group and_group_where
     :return: self
     """
     if table is not None:
       alias = '{}.{}'.format(table, key)
     if alias is not None:
       replacement = alias + ' {operator} {value}'
-    self.v.filters[key] = replacement
+    self.v.filters[key] = DBFilterData(group, replacement)
     return self
 
   def append(self, key, query=None):
