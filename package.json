@@ -76,10 +76,8 @@
   },
   "dependencies": {
     "@types/d3": "3.5.36",
-    "@types/jquery.scrollto": "1.4.27",
     "@types/select2": "4.0.30",
     "d3": "3.5.17",
-    "jquery.scrollto": "2.1.2",
     "lineupjs": "github:Caleydo/lineupjs#master",
     "phovea_clue": "github:phovea/phovea_clue#develop",
     "select2": "4.0.3",
