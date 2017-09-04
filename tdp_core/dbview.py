@@ -174,7 +174,7 @@ class DBViewBuilder(object):
       self.v.queries[key] = query
     return self
 
-  def filters(self, keys, group = None):
+  def filters(self, keys, group=None):
     """
     specify possible filter keys
     :param keys: the list of possible filters
