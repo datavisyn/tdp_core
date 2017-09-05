@@ -78,7 +78,8 @@ class DBView(object):
 
   def filter_groups(self):
     r = set([v.group for v in self.filters.values()])
-    r.remove(None)
+    if None in r:
+      r.remove(None)
     return r
 
   def is_valid_replacement(self, key, value):
