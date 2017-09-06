@@ -131,7 +131,7 @@ export default class ProxyView extends AD3View {
   }
 
   protected updateProxyView() {
-    this.loadProxyPage(this.getParameter(FORM_ID_SELECTED_ITEM));
+    this.loadProxyPage(this.getParameter(FORM_ID_SELECTED_ITEM).value);
   }
 
   protected loadProxyPage(selectedItemId: string) {
