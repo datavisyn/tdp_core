@@ -1,5 +1,6 @@
 from phovea_server.config import view as configview
 import itertools
+from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from phovea_server.plugin import list as list_plugins
 import sqlalchemy
@@ -280,18 +281,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   return r, view
 
 
-def get_count(database, view_name, replacements=None, arguments=None, extra_sql_argument=None, filters=None):
-  """
-  similar to get_data but returns the count of resulting rows
-  :param database: db connector name
-  :param view_name: view name
-  :param replacements: dict of replacements
-  :param arguments: dict of arguments
-  :param extra_sql_argument: additional unchecked kwargs for the query
-  :param filters: the dict of dynamically build filteres
-
-  :return: the count of results
-  """
+def get_query(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
   config, engine = resolve(database)
   if view_name not in config.views:
     abort(404)
@@ -299,17 +289,70 @@ def get_count(database, view_name, replacements=None, arguments=None, extra_sql_
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
+  query = view.query
+
+  if callable(query):
+    return dict(query='custom function', args=kwargs)
+
+  return dict(query=query.format(**replace), args=kwargs)
+
+
+def get_filtered_data(database, view_name, args):
+  config, _ = resolve(database)
+  if view_name not in config.views:
+    abort(404)
+  # convert to index lookup
+  # row id start with 1
+  view = config.views[view_name]
+  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  return get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
+
+
+def get_filtered_query(database, view_name, args):
+  config, _ = resolve(database)
+  if view_name not in config.views:
+    abort(404)
+  # convert to index lookup
+  # row id start with 1
+  view = config.views[view_name]
+  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  return get_query(database, view_name, replacements, processed_args, extra_args)
+
+
+def _get_count(database, view_name, args):
+  config, engine = resolve(database)
+  if view_name not in config.views:
+    abort(404)
+  view = config.views[view_name]
+
+  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+
+  kwargs, replace = prepare_arguments(view, config, replacements, processed_args, extra_args)
+
   if 'count' in view.queries:
     count_query = view.queries['count']
   elif view.table:
     count_query = 'SELECT count(*) FROM {table} t {{where}}'.format(table=view.table)
   else:
+    count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')
+
+  return config, view, engine, count_query, processed_args, where_clause, replace, kwargs
+
+
+def get_count(database, view_name, args):
+  """
+  similar to get_data but returns the count of resulting rows
+  :param database: db connector name
+  :param view_name: view name
+  :return: the count of results
+  """
+
+  config, engine, count_query, processed_args, where_clause, replace, kwargs = _get_count(database, view_name, args)
 
   if callable(count_query):
     # callback variant
-    return count_query(engine, arguments, filters)
-
+    return count_query(engine, processed_args, where_clause)
 
   with session(engine) as sess:
     if config.statement_timeout is not None:
@@ -319,6 +362,15 @@ def get_count(database, view_name, replacements=None, arguments=None, extra_sql_
   if r:
     return r[0]['count']
   return 0
+
+
+def get_count_query(database, view_name, args):
+  config, engine, count_query, processed_args, where_clause, replace, kwargs = _get_count(database, view_name, args)
+
+  if callable(count_query):
+    return dict(query='custom function', args=kwargs)
+
+  return dict(query=count_query.format(**replace), args=kwargs)
 
 
 def _fill_up_columns(view, engine):
@@ -337,7 +389,8 @@ def _fill_up_columns(view, engine):
       columns[name] = col
 
   # derive the missing domains and categories
-  number_columns = [k for k, col in columns.items() if col['type'] == 'number' and ('min' not in col or 'max' not in col)]
+  number_columns = [k for k, col in columns.items() if
+                    col['type'] == 'number' and ('min' not in col or 'max' not in col)]
   categorical_columns = [k for k, col in columns.items() if col['type'] == 'categorical' and 'categories' not in col]
   if number_columns or categorical_columns:
     with session(engine) as s:
