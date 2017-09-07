@@ -51,7 +51,7 @@ def resolve(database):
   # derive needed columns
   connector, engine = r
   for view in connector.views.values():
-    if view.needs_to_fill_up_columns():
+    if view.needs_to_fill_up_columns() and view.table is not None:
       view.columns_filled_up = True
       _fill_up_columns(view, engine)
   return r
@@ -131,6 +131,9 @@ class WrappedSession(object):
     result = self._session.execute(parsed, kwargs)
     columns = result.keys()
     return [{c: r[c] for c in columns} for r in result]
+
+  def __call__(self, sql, **kwargs):
+    return self.run(sql, **kwargs)
 
   def __enter__(self):
     return self
@@ -245,7 +248,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   return kwargs, replace
 
 
-def get_data(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
+def get_data(database, view_name, replacements=None, arguments=None, extra_sql_argument=None, filters=None):
   """
   executes the given view name on the given database with the given arguments
   :param database: db connector name
@@ -253,6 +256,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   :param replacements: dict of replacements
   :param arguments: dict of arguments
   :param extra_sql_argument: additional unchecked kwargs for the query
+  :param filters: the dict of dynamically build filter
   :return: (r, view) tuple of the resulting rows and the resolved view
   """
   config, engine = resolve(database)
@@ -262,15 +266,21 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
+  query = view.query
+
+  if callable(query):
+    # callback variant
+    return query(engine, arguments, filters), view
+
   with session(engine) as sess:
     if config.statement_timeout is not None:
       _log.info('set statement_timeout to {}'.format(config.statement_timeout))
       sess.execute(config.statement_timeout_query.format(config.statement_timeout))
-    r = sess.run(view.query.format(**replace), **kwargs)
+    r = sess.run(query.format(**replace), **kwargs)
   return r, view
 
 
-def get_count(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
+def get_count(database, view_name, replacements=None, arguments=None, extra_sql_argument=None, filters=None):
   """
   similar to get_data but returns the count of resulting rows
   :param database: db connector name
@@ -278,6 +288,8 @@ def get_count(database, view_name, replacements=None, arguments=None, extra_sql_
   :param replacements: dict of replacements
   :param arguments: dict of arguments
   :param extra_sql_argument: additional unchecked kwargs for the query
+  :param filters: the dict of dynamically build filteres
+
   :return: the count of results
   """
   config, engine = resolve(database)
@@ -289,8 +301,15 @@ def get_count(database, view_name, replacements=None, arguments=None, extra_sql_
 
   if 'count' in view.queries:
     count_query = view.queries['count']
-  else:
+  elif view.table:
     count_query = 'SELECT count(*) FROM {table} t {{where}}'.format(table=view.table)
+  else:
+    abort(500, 'invalid view configuration, missing count query and cannot derive it')
+
+  if callable(count_query):
+    # callback variant
+    return count_query(engine, arguments, filters)
+
 
   with session(engine) as sess:
     if config.statement_timeout is not None:

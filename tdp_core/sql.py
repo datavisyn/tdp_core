@@ -188,7 +188,7 @@ def _filter_logic(view):
     replacements['and_' + group + '_where'] = (' AND ' + ' AND '.join(v)) if v else ''
     replacements[group + '_where'] = (' WHERE ' + ' AND '.join(v)) if v else ''
 
-  return replacements, processed_args, extra_args
+  return replacements, processed_args, extra_args, where_clause
 
 
 @app.route('/<database>/<view_name>/filter')
@@ -206,9 +206,9 @@ def get_filtered_data(database, view_name):
   # convert to index lookup
   # row id start with 1
   view = config.views[view_name]
-  replacements, processed_args, extra_args = _filter_logic(view)
+  replacements, processed_args, extra_args, where_clause = _filter_logic(view)
 
-  r, view = db.get_data(database, view_name, replacements, processed_args, extra_args)
+  r, view = db.get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
   if _assign_ids(r, view):
     r = db.assign_ids(r, view.idtype)
@@ -231,9 +231,9 @@ def get_score_data(database, view_name):
     abort(404)
 
   view = config.views[view_name]
-  replacements, processed_args, extra_args = _filter_logic(view)
+  replacements, processed_args, extra_args, where_clause = _filter_logic(view)
 
-  r, view = db.get_data(database, view_name, replacements, processed_args, extra_args)
+  r, view = db.get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
   data_idtype = view.idtype
   target_idtype = request.args.get('target', data_idtype)
@@ -263,9 +263,9 @@ def get_count_data(database, view_name):
 
   # convert to index lookup
   view = config.views[view_name]
-  replacements, processed_args, extra_args = _filter_logic(view)
+  replacements, processed_args, extra_args, where_clause = _filter_logic(view)
 
-  r = db.get_count(database, view_name, replacements, processed_args, extra_args)
+  r = db.get_count(database, view_name, replacements, processed_args, extra_args, where_clause)
 
   return jsonify(r)
 
@@ -297,7 +297,7 @@ def lookup(database, view_name):
 
   view = config.views[view_name]
 
-  if view.query is None:
+  if view.query is None or callable(view.query):
     return jsonify(dict(items=[], more=False))
 
   arguments = request.args.copy()

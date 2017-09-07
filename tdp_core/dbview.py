@@ -7,6 +7,8 @@ REGEX_TYPE = type(re.compile(''))
 
 
 def _clean_query(query):
+  if callable(query):
+    return 'custom function'
   query = query.strip()
   query = query.replace('\n', '')
   # remove two spaces till there are no more
@@ -37,7 +39,7 @@ class DBView(object):
     self.assign_ids = False
 
   def needs_to_fill_up_columns(self):
-    return self.columns_filled_up is False
+    return self.columns_filled_up is False and self.table is not None
 
   def dump(self, name):
     from collections import OrderedDict
@@ -175,10 +177,25 @@ class DBViewBuilder(object):
       self.v.queries[key] = query
     return self
 
+  def callback(self, key, callback=None):
+    """
+    instead of setting an SQL query setting a callback function that returns the result similar to executing the SQL query
+    :param key: optional key
+    :param callback: (engine: SQLAlchemyEngine, arguments: dict of query arguments, filters: dict of filters) => array of dicts
+    :return:
+    """
+    if callback is None:
+      callback = key
+      self.v.query = callback
+    else:
+      self.v.queries[key] = callback
+    return self
+
   def filters(self, keys, group=None):
     """
     specify possible filter keys
     :param keys: the list of possible filters
+    :parma group: group filter entries
     :return:
     """
     for key in keys:
@@ -311,6 +328,8 @@ def inject_where_clause(builder, clause):
     :return:
     """
   query = builder.v.query
+  if callable(query):
+    return builder
   lower = query.lower()
   index = lower.find(' where ')
   if index >= 0:
@@ -337,6 +356,8 @@ def inject_where(builder):
   :return:
   """
   query = builder.v.query
+  if callable(query):
+    return builder
   lower = query.lower()
   where = lower.find(' where ')
   before = -1
