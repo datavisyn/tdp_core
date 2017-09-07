@@ -41,7 +41,7 @@ export interface ITDPOptions {
 export abstract class ATDPApplication<T> extends ACLUEWrapper {
   static readonly EVENT_OPEN_START_MENU = 'openStartMenu';
 
-  private readonly options: ITDPOptions = {
+  protected readonly options: ITDPOptions = {
     loginForm: undefined,
     name: 'Target Discovery Platform',
     prefix: 'tdp'
