@@ -195,7 +195,7 @@ class DBViewBuilder(object):
     """
     specify possible filter keys
     :param keys: the list of possible filters
-    :parma group: group filter entries
+    :param group: group filter entries
     :return:
     """
     for key in keys:
