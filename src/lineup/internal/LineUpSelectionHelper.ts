@@ -3,11 +3,11 @@
  */
 
 import {ISelection} from '../../views';
-import LineUp from 'lineupjs/src/lineup';
 import {IDType} from 'phovea_core/src/idtype';
 import {list as rlist} from 'phovea_core/src/range';
 import {EventHandler} from 'phovea_core/src/event';
 import {IRow} from '../';
+import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 
 
 /**
@@ -49,7 +49,7 @@ export default class LineUpSelectionHelper extends EventHandler {
   private readonly orderedSelectedIndices = <number[]>[];
   private uid2index = new Map<number, number>();
 
-  constructor(private readonly lineup: LineUp, private readonly idType: () => IDType) {
+  constructor(private readonly provider: ADataProvider, private readonly idType: () => IDType) {
     super();
     this.addEventListener();
   }
@@ -70,13 +70,13 @@ export default class LineUpSelectionHelper extends EventHandler {
   }
 
   private addEventListener() {
-    this.lineup.on(LineUp.EVENT_MULTISELECTION_CHANGED, (indices: number[]) => {
+    this.provider.on(ADataProvider.EVENT_SELECTION_CHANGED, (indices: number[]) => {
       this.onMultiSelectionChanged(indices);
     });
   }
 
   private removeEventListener() {
-    this.lineup.on(LineUp.EVENT_MULTISELECTION_CHANGED, null);
+    this.provider.on(ADataProvider.EVENT_SELECTION_CHANGED, null);
   }
 
   private onMultiSelectionChanged(indices: number[]) {
@@ -133,11 +133,11 @@ export default class LineUpSelectionHelper extends EventHandler {
   }
 
   setItemSelection(sel: ISelection) {
-    if (!this.lineup) {
+    if (!this.provider) {
       return;
     }
 
-    const old = this.lineup.data.getSelection().sort((a, b) => a - b);
+    const old = this.provider.getSelection().sort((a, b) => a - b);
 
     const indices: number[] = [];
     sel.range.dim(0).forEach((uid) => {
@@ -153,7 +153,7 @@ export default class LineUpSelectionHelper extends EventHandler {
     }
 
     this.removeEventListener();
-    this.lineup.data.setSelection(indices);
+    this.provider.setSelection(indices);
     this.addEventListener();
   }
 }

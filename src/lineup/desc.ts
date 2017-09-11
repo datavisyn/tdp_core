@@ -8,6 +8,7 @@ import LineUp from 'lineupjs/src/lineup';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_STRING, VALUE_TYPE_CATEGORICAL, VALUE_TYPE_REAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
+import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
@@ -148,12 +149,11 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
   return r;
 }
 
-export function createInitialRanking(lineup: LineUp) {
-  const provider = lineup.data;
+export function createInitialRanking(provider: ADataProvider) {
   const ranking = provider.pushRanking();
   ranking.push(provider.create(createSelectionDesc()));
 
-  lineup.data.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
+  provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
     const col = provider.create(d);
     // set initial column width
     if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {

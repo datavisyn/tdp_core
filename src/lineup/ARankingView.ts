@@ -3,14 +3,19 @@
  */
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
-import LineUp, {ILineUpConfig} from 'lineupjs/src/lineup';
+
+import {ILineUpConfig} from 'lineupjs/src/interfaces';
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
-import {deriveColors} from 'lineupjs/src/';
+import {deriveColors} from 'lineupjs/src/utils';
 import {ScaleMappingFunction, Ranking} from 'lineupjs/src/model';
 import ValueColumn from 'lineupjs/src/model/ValueColumn';
 import NumberColumn from 'lineupjs/src/model/NumberColumn';
-import {IBoxPlotData} from 'lineupjs/src/model/BoxPlotColumn';
+import {default as BoxPlotColumn} from 'lineupjs/src/model/BoxPlotColumn';
 import {LocalDataProvider,} from 'lineupjs/src/provider';
+import NumbersColumn from 'lineupjs/src/model/NumbersColumn';
+import SidePanel from 'lineupjs/src/ui/panel/SidePanel';
+import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
+
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
@@ -27,6 +32,8 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
+import {defaultConfig} from 'lineupjs/src/config';
+import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 
 export interface IARankingViewOptions {
   /**
@@ -63,9 +70,9 @@ export interface IARankingViewOptions {
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config: ILineUpConfig = {
+  private readonly config: ILineUpConfig = Object.assign(defaultConfig(), {
     renderingOptions: {
-      histograms: true
+      summary: true
     },
     header: {
       rankingButtons: (node: Selection<Ranking>|HTMLElement) => {
@@ -82,7 +89,7 @@ export abstract class ARankingView extends AView {
         });
       }
     }
-  };
+  });
   /**
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
@@ -95,7 +102,8 @@ export abstract class ARankingView extends AView {
   private readonly stats: HTMLElement;
 
   private readonly provider = new LocalDataProvider([], []);
-  private readonly lineup: LineUp;
+  private readonly engine: EngineRenderer;
+  private readonly panel: SidePanel;
   private readonly selectionHelper: LineUpSelectionHelper;
 
   /**
@@ -142,12 +150,15 @@ export abstract class ARankingView extends AView {
 
     this.stats = this.node.ownerDocument.createElement('p');
 
+
     // hack in for providing the data provider within the graph
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-    this.lineup = new LineUp(this.node, this.provider, this.config);
-    this.selectionHelper = new LineUpSelectionHelper(this.lineup, () => this.itemIDType);
+    this.engine = new EngineRenderer(this.provider, this.node, this.config);
+    this.panel = new SidePanel(this.engine.ctx, document);
+
+    this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
       this.setItemSelection(selection);
     });
@@ -301,8 +312,8 @@ export abstract class ARankingView extends AView {
     const loaded = data.then((rows: IScoreRow<any>[]) => {
       accessor.rows = rows;
 
-      if (colDesc.type === 'number') {
-        const ncol = <NumberColumn>col;
+      if (colDesc.type === 'number' || colDesc.type === 'boxplot' || colDesc.type === 'numbers') {
+        const ncol = <NumberColumn|BoxPlotColumn|NumbersColumn>col;
         if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
           const domain = extent(rows, (d) => <number>d.score);
           if (colDesc.constantDomain === 'min') {
@@ -317,23 +328,15 @@ export abstract class ARankingView extends AView {
           ori.domain = domain;
           current.domain = domain;
         }
-      } else if (colDesc.type === 'boxplot') {
-        //HACK we know that the domain of the description is just referenced, so we can update it by changing values!
-        if (!(colDesc.constantDomain)) { //create a dynamic range if not fixed
-          colDesc.domain[0] = Math.min(...rows.map((d) => (<IBoxPlotData>d.score).min));
-          colDesc.domain[1] = Math.max(...rows.map((d) => (<IBoxPlotData>d.score).max));
-        }
       }
 
-      if (this.lineup) {
-        // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
-        this.provider.getRankings().forEach((ranking) => {
-          const columns = ranking.flatColumns.filter((rankCol) => rankCol.desc === col.desc);
-          columns.forEach((column) => (<ValueColumn<any>>column).setLoaded(true));
-        });
+      // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
+      this.provider.getRankings().forEach((ranking) => {
+        const columns = ranking.flatColumns.filter((rankCol) => rankCol.desc === col.desc);
+        columns.forEach((column) => (<ValueColumn<any>>column).setLoaded(true));
+      });
 
-        this.lineup.update();
-      }
+      this.engine.update();
       return col;
     });
 
@@ -351,8 +354,8 @@ export abstract class ARankingView extends AView {
     return this.addColumn(colDesc, data);
   }
 
-  private async withoutTracking<T>(f: (lineup: any) => T): Promise<T> {
-    return this.built.then(() => withoutTracking(this.context.ref, () => f(this.lineup)));
+  private async withoutTracking<T>(f: () => T): Promise<T> {
+    return this.built.then(() => withoutTracking(this.context.ref, f));
   }
 
   /**
@@ -374,8 +377,8 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<boolean>}
    */
   removeTrackedScoreColumn(columnId: string) {
-    return this.withoutTracking((lineup) => {
-      const column = lineup.data.find(columnId);
+    return this.withoutTracking(() => {
+      const column = this.provider.find(columnId);
       return column.removeMe();
     });
   }
@@ -428,8 +431,8 @@ export abstract class ARankingView extends AView {
       const rows: IRow[] = r[1];
 
       this.setLineUpData(rows);
-      this.createInitialRanking(this.lineup);
-      this.colors.init(this.lineup.data.getLastRanking());
+      this.createInitialRanking(this.provider);
+      this.colors.init(this.provider.getLastRanking());
 
       if (this.selectionAdapter) {
         // init first time
@@ -446,8 +449,8 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  protected createInitialRanking(lineup: LineUp) {
-    createInitialRanking(this.lineup);
+  protected createInitialRanking(lineup: ADataProvider) {
+    createInitialRanking(this.provider);
   }
 
   private setLineUpData(rows: IRow[]) {
