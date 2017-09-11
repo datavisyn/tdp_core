@@ -15,6 +15,7 @@ import {LocalDataProvider,} from 'lineupjs/src/provider';
 import NumbersColumn from 'lineupjs/src/model/NumbersColumn';
 import SidePanel from 'lineupjs/src/ui/panel/SidePanel';
 import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
+import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
@@ -33,7 +34,7 @@ import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 import {defaultConfig} from 'lineupjs/src/config';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
+import LineUpPanelActions from './internal/LineUpPanelActions';
 
 export interface IARankingViewOptions {
   /**
@@ -101,8 +102,8 @@ export abstract class ARankingView extends AView {
 
   private readonly provider = new LocalDataProvider([], []);
   private readonly engine: EngineRenderer;
-  private readonly panel: SidePanel;
   private readonly selectionHelper: LineUpSelectionHelper;
+  private readonly panel: LineUpPanelActions;
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -145,9 +146,7 @@ export abstract class ARankingView extends AView {
 
 
     this.node.classList.add('lineup');
-    const wrapper = this.node.ownerDocument.createElement('div');
-    wrapper.classList.add('lu');
-    this.node.appendChild(wrapper);
+    this.node.insertAdjacentHTML('beforeend', `<div><div class="lu"></div></div>`);
 
     this.stats = this.node.ownerDocument.createElement('p');
 
@@ -156,8 +155,20 @@ export abstract class ARankingView extends AView {
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-    this.engine = new EngineRenderer(this.provider, wrapper, this.config);
-    this.panel = new SidePanel(this.engine.ctx, document);
+    this.engine = new EngineRenderer(this.provider, <HTMLElement>this.node.querySelector('div.lu')!, this.config);
+
+    this.panel = new LineUpPanelActions(this.provider, this.engine.ctx, () => this.itemIDType, this.options.additionalScoreParameter);
+    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
+      this.saveNamedSet(order, name, description, isPublic);
+    });
+    this.panel.on(LineUpPanelActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
+      this.addScoreColumn(scoreImpl);
+    });
+    this.panel.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
+      this.pushTrackedScoreColumn(scoreName, scoreId, params);
+    });
+
+    this.node.appendChild(this.panel.node);
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
@@ -249,6 +260,7 @@ export abstract class ARankingView extends AView {
     const ranking = this.provider.getRankings()[0];
 
     if (mode === EViewMode.FOCUS) {
+      this.panel.releaseForce();
       if (this.dump) {
         ranking.children.forEach((c) => {
           if (!this.dump.has(c.id)) {
@@ -260,6 +272,8 @@ export abstract class ARankingView extends AView {
       this.dump = null;
       return;
     }
+
+    this.panel.forceCollapse();
 
     if (this.dump !== null) {
       return;

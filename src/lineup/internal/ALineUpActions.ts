@@ -14,6 +14,7 @@ import {
   IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
 } from '../../extensions';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
+import * as $ from 'jquery';
 
 interface IColumnWrapper<T> {
   text: string;
@@ -57,7 +58,7 @@ export abstract class ALineUpActions extends EventHandler {
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
 
-  constructor(private readonly provider: ADataProvider, private readonly idType: () => IDType, private readonly extraArgs: object|(() => object)) {
+  constructor(protected readonly provider: ADataProvider, private readonly idType: () => IDType, private readonly extraArgs: object|(() => object)) {
     super();
   }
 
@@ -105,7 +106,7 @@ export abstract class ALineUpActions extends EventHandler {
     return typeof this.extraArgs === 'function' ? this.extraArgs() : this.extraArgs;
   }
 
-  protected async createChooser(node: HTMLElement, onAdded?: ()=>void) {
+  protected async createChooser(node: HTMLElement, onAdded?: ()=>void, onClosed?: ()=>void) {
 
     const builder = new FormBuilder(select(node));
 
@@ -196,11 +197,17 @@ export abstract class ALineUpActions extends EventHandler {
 
         chosenCategory.action(plugin);
 
-        onAdded();
+        if (onAdded) {
+          onAdded();
+        }
       }
     }];
 
     builder.build(elements);
+
+    if (onClosed) {
+      $('select', node).on('select2:close', onClosed);
+    }
 
     return {
       focus: () => {

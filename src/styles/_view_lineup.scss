@@ -1,0 +1,144 @@
+@import './vars';
+@import '~font-awesome/scss/variables';
+@import '~font-awesome/scss/mixins';
+
+&.lineup {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+
+  &.nodata::before {
+    margin-top: 40px;
+    content: 'No data found for selection and parameter.';
+  }
+
+  %lu-panel-button {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    cursor: pointer;
+    z-index: 1;
+    color: #000;
+
+    &:hover {
+      background-color: #eaeaea;
+    }
+  }
+
+  .lu-side-panel {
+    flex: 0 0 auto;
+    position: relative;
+
+    > section {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: flex-end;
+      margin-right: 1em;
+      flex-wrap: wrap;
+
+      button {
+        @extend %lu-panel-button;
+      }
+    }
+
+    label, input {
+      font-weight: normal;
+      margin: 0;
+    }
+
+    header > button {
+      @extend %lu-panel-button;
+
+      display: none;
+    }
+
+    > a {
+      @extend %lu-panel-button;
+
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2em;
+      height: 2em;
+
+      &::before {
+        @include fa-icon();
+        content: $fa-var-arrow-right;
+      }
+    }
+
+    &.collapsed {
+      max-width: 3em;
+      min-width: 0;
+
+      > a {
+        width: 100%;
+        &::before {
+          content: $fa-var-arrow-left;
+        }
+      }
+
+      > section {
+        flex-direction: column;
+        margin-top: 2em;
+        margin-right: 0;
+      }
+
+      > header {
+        padding: 0;
+
+        &:not(.once) form {
+          display: none;
+        }
+
+        > button {
+          display: block;
+        }
+
+        &.once form {
+          position: absolute;
+          left: -15.4em;
+        }
+      }
+
+      > div {
+        display: none;
+      }
+    }
+  }
+
+  > div {
+    flex: 1 1 auto;
+    position: relative;
+  }
+}
+
+div.lu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+
+  .row.selected rect.bg {
+    stroke: $select-data-color;
+    stroke-width: 1;
+  }
+  .row.hover rect.bg {
+    stroke: $hover-data-color;
+    stroke-width: 1;
+  }
+
+  .rankingbuttons .dropdown-menu {
+    padding: 0;
+
+    .form-group {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@at-root {
+  @import "~lineupjs/src/styles/engine";
+}
