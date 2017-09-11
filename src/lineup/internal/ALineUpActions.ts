@@ -3,7 +3,7 @@
  */
 
 import {createStackDesc, IColumnDesc, createScriptDesc, Ranking} from 'lineupjs/src/model';
-import * as d3 from 'd3';
+import {select} from 'd3';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -14,7 +14,6 @@ import {
   IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
 } from '../../extensions';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-import * as $ from 'jquery';
 
 interface IColumnWrapper<T> {
   text: string;
@@ -46,7 +45,7 @@ export function wrap(score: IPluginDesc): IScoreLoader {
   };
 }
 
-export default class LineUpRankingButtons extends EventHandler {
+export abstract class ALineUpActions extends EventHandler {
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
   /**
    * @deprecated
@@ -58,63 +57,27 @@ export default class LineUpRankingButtons extends EventHandler {
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
 
-  private readonly $ul: d3.Selection<HTMLUListElement>;
-
-  constructor(private readonly provider: ADataProvider, private readonly $node: d3.Selection<any>, private readonly idType: () => IDType, private readonly extraArgs: object|(() => object)) {
+  constructor(private readonly provider: ADataProvider, private readonly idType: () => IDType, private readonly extraArgs: object|(() => object)) {
     super();
-
-    this.$ul = this.$node.append('ul').classed('tdp-button-group', true);
-
-    this.appendDownload();
-    this.appendSaveRanking();
-    this.appendMoreColumns();
-    this.appendExtraButtons();
   }
 
-  private createMarkup(title: string, linkClass: string = '', linkListener: (param: any) => void | null, liClass: string = '') {
-    const $li = this.$ul.append('li')
-      .classed(liClass, liClass.length > 0);
+  protected exportRanking(ranking: Ranking) {
+    this.provider.exportTable(ranking, {separator: ';', quote: true, verboseColumnHeaders: true}).then((content) => {
+      const downloadLink = document.createElement('a');
+      const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
+      downloadLink.href = URL.createObjectURL(blob);
+      (<any>downloadLink).download = 'export.csv';
 
-    $li.append('a')
-      .attr('title', title)
-      .attr('href', '#')
-      .classed(linkClass, linkClass .length > 0)
-      .on('click', linkListener);
-
-    return $li;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    });
   }
 
-  private appendDownload() {
-    const listener = (ranking: Ranking) => {
-      this.provider.exportTable(ranking, {separator: ';', quote: true, verboseColumnHeaders: true}).then((content) => {
-        const downloadLink = document.createElement('a');
-        const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
-        downloadLink.href = URL.createObjectURL(blob);
-        (<any>downloadLink).download = 'export.csv';
 
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-      });
-    };
-
-    this.createMarkup('Export Data', 'fa fa-download', listener);
-  }
-
-  private appendSaveRanking() {
-    const listener = (ranking: Ranking) => {
-      (<Event>d3.event).preventDefault();
-      (<Event>d3.event).stopPropagation();
-
-      this.saveRankingDialog(ranking.getOrder());
-    };
-
-    this.createMarkup('Save Named Set', 'fa fa-save', listener);
-  }
-
-  private saveRankingDialog(order: number[]) {
+  protected saveRankingDialog(order: number[]) {
     editDialog(null, (name, description, isPublic) => {
-      this.fire(LineUpRankingButtons.EVENT_SAVE_NAMED_SET, order, name, description, isPublic);
+      this.fire(ALineUpActions.EVENT_SAVE_NAMED_SET, order, name, description, isPublic);
     });
   }
 
@@ -142,20 +105,14 @@ export default class LineUpRankingButtons extends EventHandler {
     return typeof this.extraArgs === 'function' ? this.extraArgs() : this.extraArgs;
   }
 
-  private async appendMoreColumns() {
-    const $dropdownLi = this.createMarkup('Add Column', 'fa fa-plus dropdown-toggle', null, 'dropdown');
+  protected async createChooser(node: HTMLElement, onAdded?: ()=>void) {
 
-    $dropdownLi.select('a')
-      .attr('data-toggle', 'dropdown');
-
-    const $selectWrapper = $dropdownLi.append('div').attr('class', 'dropdown-menu');
-
-    const builder = new FormBuilder($selectWrapper);
+    const builder = new FormBuilder(select(node));
 
     // load plugins, which need to be checked if the IDTypes are mappable
     const idType = this.idType();
-    const ordinoScores: IPluginDesc[] = await LineUpRankingButtons.findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
-    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await LineUpRankingButtons.findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
+    const ordinoScores: IPluginDesc[] = await ALineUpActions.findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
+    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await ALineUpActions.findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
     const metaDataPluginPromises: Promise<IColumnWrapper<IScoreLoader>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
@@ -199,7 +156,7 @@ export default class LineUpRankingButtons extends EventHandler {
           const amountOfRows: number = this.provider.getLastRanking().getOrder().length;
 
           // the factory function call executes the score's implementation
-          scorePlugin.factory(this.resolveArgs(), amountOfRows).then((params) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.text, scorePlugin.id, params));
+          scorePlugin.factory(this.resolveArgs(), amountOfRows).then((params) => this.fire(ALineUpActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.text, scorePlugin.id, params));
         }
       },
       {
@@ -239,39 +196,21 @@ export default class LineUpRankingButtons extends EventHandler {
 
         chosenCategory.action(plugin);
 
-        // close dropdown after selection
-        $($dropdownLi.select('.dropdown-toggle').node()).dropdown('toggle');
+        onAdded();
       }
     }];
 
     builder.build(elements);
 
-    // HACK: don't close the dropdown when the dropdown itself or Select2 is clicked
-    $selectWrapper.on('click', () => (<Event>d3.event).stopPropagation());
-
-    $($dropdownLi.node()).on('shown.bs.dropdown', () => {
-      // show Select2 options by default when the dropdown is visible to have Select2 calculate the correct position
-      builder.getElementById(FORM_ID_ADDITIONAL_COLUMN).focus();
-
-      // HACK: keep dropdown open even when the input element inside Select2 is clicked
-      // this EventListener can only be applied when the dropdown is shown, because otherwise the element does not exist
-      $('.select2-search__field').on('click', (e) => e.stopPropagation());
-    });
+    return {
+      focus: () => {
+        // show Select2 options by default when the dropdown is visible to have Select2 calculate the correct position
+        builder.getElementById(FORM_ID_ADDITIONAL_COLUMN).focus();
+      }
+    }
   }
 
-  private appendExtraButtons() {
-    const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_RANKING_BUTTON);
-    buttons.forEach((button) => {
-      const listener = () => {
-        (<Event>d3.event).preventDefault();
-        (<Event>d3.event).stopPropagation();
-        button.load().then((p) => this.scoreColumnDialog(p));
-      };
-      this.createMarkup(button.name,'fa ' + button.cssClass, listener);
-    });
-  }
-
-  private buildMetaDataDescriptions(desc: IScoreLoaderExtensionDesc, columns: IScoreLoader[]) {
+  protected buildMetaDataDescriptions(desc: IScoreLoaderExtensionDesc, columns: IScoreLoader[]) {
     return {
       text: desc.name,
       plugins: columns,
@@ -280,19 +219,19 @@ export default class LineUpRankingButtons extends EventHandler {
         const amountOfRows: number = this.provider.getLastRanking().getOrder().length;
 
         const params = plugin.factory(this.resolveArgs(), amountOfRows);
-        this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, plugin.scoreId, params);
+        this.fire(ALineUpActions.EVENT_ADD_TRACKED_SCORE_COLUMN, plugin.scoreId, params);
       }
     };
   }
 
-  private scoreColumnDialog(scorePlugin: IRankingButtonExtension) {
+  protected scoreColumnDialog(scorePlugin: IRankingButtonExtension) {
     // pass dataSource into InvertedAggregatedScore factory method
     Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType(), this.resolveArgs())) // open modal dialog
       .then((params) => { // modal dialog is closed and score created
         if(Array.isArray(params)) {
-          params.forEach((param) => this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.name, scorePlugin.desc.id, param));
+          params.forEach((param) => this.fire(ALineUpActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.name, scorePlugin.desc.id, param));
         } else {
-          this.fire(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
+          this.fire(ALineUpActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
         }
       });
   }

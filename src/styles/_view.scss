@@ -86,3 +86,7 @@ svg {
     }
   }
 }
+
+@at-root {
+  @import "~lineupjs/src/styles/engine";
+}

@@ -20,7 +20,7 @@ import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
-import LineUpRankingButtons from './internal/LineUpRankingButtons';
+import LineUpButtonActions from './internal/LineUpButtonActions';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
 import {createAccessor} from './internal/utils';
@@ -70,21 +70,19 @@ export interface IARankingViewOptions {
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config: ILineUpConfig = Object.assign(defaultConfig(), {
-    renderingOptions: {
-      summary: true
-    },
+  private readonly config: ILineUpConfig = mixin(defaultConfig(), {
     header: {
+      summary: true,
       rankingButtons: (node: Selection<Ranking>|HTMLElement) => {
         const $node = node instanceof d3base ? <Selection<Ranking>>node : select(<HTMLElement>node);
-        const rb = new LineUpRankingButtons(this.provider, $node, () => this.itemIDType, this.options.additionalScoreParameter);
-        rb.on(LineUpRankingButtons.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
+        const rb = new LineUpButtonActions(this.provider, $node, () => this.itemIDType, this.options.additionalScoreParameter);
+        rb.on(LineUpButtonActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
           this.saveNamedSet(order, name, description, isPublic);
         });
-        rb.on(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
+        rb.on(LineUpButtonActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
           this.addScoreColumn(scoreImpl);
         });
-        rb.on(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
+        rb.on(LineUpButtonActions.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
           this.pushTrackedScoreColumn(scoreName, scoreId, params);
         });
       }
@@ -147,6 +145,9 @@ export abstract class ARankingView extends AView {
 
 
     this.node.classList.add('lineup');
+    const wrapper = this.node.ownerDocument.createElement('div');
+    wrapper.classList.add('lu');
+    this.node.appendChild(wrapper);
 
     this.stats = this.node.ownerDocument.createElement('p');
 
@@ -155,7 +156,7 @@ export abstract class ARankingView extends AView {
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-    this.engine = new EngineRenderer(this.provider, this.node, this.config);
+    this.engine = new EngineRenderer(this.provider, wrapper, this.config);
     this.panel = new SidePanel(this.engine.ctx, document);
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
