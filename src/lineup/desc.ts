@@ -8,7 +8,7 @@ import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-import {IServerColumn} from 'tdp_core/src/rest';
+import {IServerColumn} from '../rest';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;

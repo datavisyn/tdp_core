@@ -28,7 +28,7 @@ import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 import {defaultConfig} from 'lineupjs/src/config';
 import LineUpPanelActions from './internal/LineUpPanelActions';
-import {addLazyColumn} from 'tdp_core/src/lineup/internal/column';
+import {addLazyColumn} from './internal/column';
 
 export interface IARankingViewOptions {
   /**
