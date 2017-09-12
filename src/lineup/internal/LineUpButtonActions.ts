@@ -41,7 +41,7 @@ export default class LineUpButtonActions extends ALineUpActions {
 
   private appendDownload() {
     const listener = (ranking: Ranking) => {
-      this.exportRanking(ranking);
+      this.exportRanking(ranking, <ADataProvider>this.provider);
     };
 
     this.createMarkup('Export Data', 'fa fa-download', listener);

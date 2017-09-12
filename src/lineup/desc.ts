@@ -2,13 +2,13 @@
  * Created by sam on 13.02.2017.
  */
 
-import {IColumnDesc, createSelectionDesc} from 'lineupjs/src/model';
+import {createSelectionDesc, IColumnDesc} from 'lineupjs/src/model';
 import {ICategory} from 'lineupjs/src/model/CategoricalColumn';
-import LineUp from 'lineupjs/src/lineup';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
-import {VALUE_TYPE_STRING, VALUE_TYPE_CATEGORICAL, VALUE_TYPE_REAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
+import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
+import {IServerColumn} from 'tdp_core/src/rest';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
@@ -160,5 +160,19 @@ export function createInitialRanking(provider: ADataProvider) {
       col.setWidth((<any>d).width);
     }
     ranking.push(col);
+  });
+}
+
+export function deriveColumns(columns: IServerColumn[]) {
+  const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
+  return columns.map((col) => {
+    switch (col.type) {
+      case 'categorical':
+        return categoricalCol(col.column, col.categories, {label: niceName(col.label)});
+      case 'number':
+        return numberCol(col.column, col.min, col.max, {label: niceName(col.label)});
+      case 'string':
+        return stringCol(col.column, {label: niceName(col.label)});
+    }
   });
 }

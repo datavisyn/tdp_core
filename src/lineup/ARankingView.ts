@@ -7,15 +7,10 @@ import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
 import {ILineUpConfig} from 'lineupjs/src/interfaces';
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/utils';
-import {ScaleMappingFunction, Ranking} from 'lineupjs/src/model';
-import ValueColumn from 'lineupjs/src/model/ValueColumn';
-import NumberColumn from 'lineupjs/src/model/NumberColumn';
-import {default as BoxPlotColumn} from 'lineupjs/src/model/BoxPlotColumn';
-import {LocalDataProvider,} from 'lineupjs/src/provider';
-import NumbersColumn from 'lineupjs/src/model/NumbersColumn';
+import {Ranking} from 'lineupjs/src/model';
+import {LocalDataProvider} from 'lineupjs/src/provider';
 import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
@@ -23,17 +18,17 @@ import {showErrorModalDialog} from '../dialogs';
 import LineUpButtonActions from './internal/LineUpButtonActions';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
-import {createAccessor} from './internal/utils';
-import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol} from './desc';
+import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol, deriveColumns} from './desc';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin} from 'phovea_core/src';
-import {extent, Selection, selection as d3base, select} from 'd3';
+import {Selection, selection as d3base, select} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 import {defaultConfig} from 'lineupjs/src/config';
 import LineUpPanelActions from './internal/LineUpPanelActions';
+import {addLazyColumn} from 'tdp_core/src/lineup/internal/column';
 
 export interface IARankingViewOptions {
   /**
@@ -168,6 +163,8 @@ export abstract class ARankingView extends AView {
     });
 
     this.node.appendChild(this.panel.node);
+    this.engine.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
@@ -305,56 +302,8 @@ export abstract class ARankingView extends AView {
   }
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column> } {
-    const ranking = this.provider.getLastRanking();
-
-    //mark as lazy loaded
-    (<any>colDesc).lazyLoaded = true;
     colDesc.color = this.colors.getColumnColor(id);
-    const accessor = createAccessor(colDesc);
-
-    this.provider.pushDesc(colDesc);
-    const col = this.provider.push(ranking, colDesc);
-
-    // error handling
-    data
-      .catch(showErrorModalDialog)
-      .catch(() => {
-        ranking.remove(col);
-      });
-
-    // success
-    const loaded = data.then((rows: IScoreRow<any>[]) => {
-      accessor.rows = rows;
-
-      if (colDesc.type === 'number' || colDesc.type === 'boxplot' || colDesc.type === 'numbers') {
-        const ncol = <NumberColumn|BoxPlotColumn|NumbersColumn>col;
-        if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
-          const domain = extent(rows, (d) => <number>d.score);
-          if (colDesc.constantDomain === 'min') {
-            domain[0] = colDesc.domain[0];
-          } else if (colDesc.constantDomain === 'max') {
-            domain[1] = colDesc.domain[1];
-          }
-          //HACK by pass the setMapping function and set it inplace
-          const ori = <ScaleMappingFunction>(<any>ncol).original;
-          const current = <ScaleMappingFunction>(<any>ncol).mapping;
-          colDesc.domain = domain;
-          ori.domain = domain;
-          current.domain = domain;
-        }
-      }
-
-      // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
-      this.provider.getRankings().forEach((ranking) => {
-        const columns = ranking.flatColumns.filter((rankCol) => rankCol.desc === col.desc);
-        columns.forEach((column) => (<ValueColumn<any>>column).setLoaded(true));
-      });
-
-      this.engine.update();
-      return col;
-    });
-
-    return {col, loaded};
+    return addLazyColumn(colDesc, data, this.provider, () => this.engine.update());
   }
 
   private addScoreColumn(score: IScore<any>) {
@@ -415,18 +364,7 @@ export abstract class ARankingView extends AView {
    * @returns {IAdditionalColumnDesc[]}
    */
   protected getColumnDescs(columns: IServerColumn[]): IAdditionalColumnDesc[] {
-    const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
-
-    return columns.map((col) => {
-      switch (col.type) {
-        case 'categorical':
-          return categoricalCol(col.column, col.categories, {label: niceName(col.label)});
-        case 'number':
-          return numberCol(col.column, col.min, col.max, {label: niceName(col.label)});
-        case 'string':
-          return stringCol(col.column, {label: niceName(col.label)});
-      }
-    });
+    return deriveColumns(columns);
   }
 
   private getColumns(): Promise<IAdditionalColumnDesc[]> {

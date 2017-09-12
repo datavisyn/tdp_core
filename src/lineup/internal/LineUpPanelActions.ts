@@ -10,7 +10,7 @@ import Ranking from 'lineupjs/src/model/Ranking';
 
 export default class LineUpPanelActions extends ALineUpActions {
 
-  private readonly panel: SidePanel;
+  readonly panel: SidePanel;
   private wasCollapsed = false;
 
   constructor(provider: ADataProvider, ctx: IRankingHeaderContext, idType: () => IDType, extraArgs: object|(() => object), doc = document) {
@@ -96,7 +96,7 @@ export default class LineUpPanelActions extends ALineUpActions {
 
   private appendDownload() {
     const listener = (ranking: Ranking) => {
-      this.exportRanking(ranking);
+      this.exportRanking(ranking, <ADataProvider>this.provider);
     };
 
     return this.createMarkup('Export Data', 'fa fa-download', listener);

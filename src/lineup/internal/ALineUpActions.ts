@@ -11,9 +11,10 @@ import {EventHandler} from 'phovea_core/src/event';
 import {FormElementType, IFormElementDesc, FormBuilder} from '../../form';
 import {
   IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
-  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
+  IScoreLoaderExtensionDesc, IRankingButtonExtension
 } from '../../extensions';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
+import ADataProvider, {IDataProvider} from 'lineupjs/src/provider/ADataProvider';
+import {exportRanking} from 'lineupjs/src/provider/utils';
 import * as $ from 'jquery';
 
 interface IColumnWrapper<T> {
@@ -58,21 +59,24 @@ export abstract class ALineUpActions extends EventHandler {
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
 
-  constructor(protected readonly provider: ADataProvider, private readonly idType: () => IDType, private readonly extraArgs: object|(() => object)) {
+  constructor(protected readonly provider: IDataProvider, private readonly idType: () => IDType, private readonly extraArgs: object|(() => object)) {
     super();
   }
 
-  protected exportRanking(ranking: Ranking) {
-    this.provider.exportTable(ranking, {separator: ';', quote: true, verboseColumnHeaders: true}).then((content) => {
-      const downloadLink = document.createElement('a');
-      const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
-      downloadLink.href = URL.createObjectURL(blob);
-      (<any>downloadLink).download = 'export.csv';
+  protected exportRanking(ranking: Ranking, provider: ADataProvider) {
+    Promise.resolve(provider.view(ranking.getOrder())).then((data) => this.exportRankingImpl(ranking, data));
+  }
 
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    });
+  protected exportRankingImpl(ranking: Ranking, data: any[]) {
+    const content = exportRanking(ranking, data, {separator: ';', quote: true, verboseColumnHeaders: true});
+    const downloadLink = document.createElement('a');
+    const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
+    downloadLink.href = URL.createObjectURL(blob);
+    (<any>downloadLink).download = 'export.csv';
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   }
 
 
@@ -140,7 +144,7 @@ export abstract class ALineUpActions extends EventHandler {
 
     const lineUpAction: (wrappedColumn: IWrappedColumnDesc) => void = (wrappedColumn: IWrappedColumnDesc) => {
       const ranking = this.provider.getLastRanking();
-      this.provider.push(ranking, wrappedColumn.column);
+      ranking.push(this.provider.create(wrappedColumn.column));
     };
 
     const columnsWrapper: IColumnWrapper<IScoreLoader|IWrappedColumnDesc>[] = [
@@ -214,7 +218,7 @@ export abstract class ALineUpActions extends EventHandler {
         // show Select2 options by default when the dropdown is visible to have Select2 calculate the correct position
         builder.getElementById(FORM_ID_ADDITIONAL_COLUMN).focus();
       }
-    }
+    };
   }
 
   protected buildMetaDataDescriptions(desc: IScoreLoaderExtensionDesc, columns: IScoreLoader[]) {
