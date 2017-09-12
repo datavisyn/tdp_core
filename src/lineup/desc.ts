@@ -2,7 +2,7 @@
  * Created by sam on 13.02.2017.
  */
 
-import {createSelectionDesc, IColumnDesc} from 'lineupjs/src/model';
+import {createSelectionDesc, createAggregateDesc, IColumnDesc} from 'lineupjs/src/model';
 import {ICategory} from 'lineupjs/src/model/CategoricalColumn';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
@@ -151,6 +151,7 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
 
 export function createInitialRanking(provider: ADataProvider) {
   const ranking = provider.pushRanking();
+  ranking.push(provider.create(createAggregateDesc()));
   ranking.push(provider.create(createSelectionDesc()));
 
   provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {

@@ -9,6 +9,8 @@ import {IRankingButtonExtensionDesc, EXTENSION_POINT_TDP_RANKING_BUTTON} from '.
 import Ranking from 'lineupjs/src/model/Ranking';
 
 export default class LineUpPanelActions extends ALineUpActions {
+  static readonly EVENT_ZOOM_OUT = 'zoomOut';
+  static readonly EVENT_ZOOM_IN = 'zoomIn';
 
   readonly panel: SidePanel;
   private wasCollapsed = false;
@@ -60,6 +62,8 @@ export default class LineUpPanelActions extends ALineUpActions {
     });
 
     const buttons = this.node.querySelector('section');
+    buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
+    buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
     buttons.appendChild(this.appendDownload());
     buttons.appendChild(this.appendSaveRanking());
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
@@ -98,7 +102,6 @@ export default class LineUpPanelActions extends ALineUpActions {
     const listener = (ranking: Ranking) => {
       this.exportRanking(ranking, <ADataProvider>this.provider);
     };
-
     return this.createMarkup('Export Data', 'fa fa-download', listener);
   }
 

@@ -7,7 +7,6 @@ import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
 import {ILineUpConfig} from 'lineupjs/src/interfaces';
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/utils';
-import {Ranking} from 'lineupjs/src/model';
 import {LocalDataProvider} from 'lineupjs/src/provider';
 import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
@@ -15,16 +14,14 @@ import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
-import LineUpButtonActions from './internal/LineUpButtonActions';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
-import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol, deriveColumns} from './desc';
+import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin} from 'phovea_core/src';
-import {Selection, selection as d3base, select} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
-import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
+import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 import {defaultConfig} from 'lineupjs/src/config';
 import LineUpPanelActions from './internal/LineUpPanelActions';
@@ -67,20 +64,7 @@ export abstract class ARankingView extends AView {
 
   private readonly config: ILineUpConfig = mixin(defaultConfig(), {
     header: {
-      summary: true,
-      rankingButtons: (node: Selection<Ranking>|HTMLElement) => {
-        const $node = node instanceof d3base ? <Selection<Ranking>>node : select(<HTMLElement>node);
-        const rb = new LineUpButtonActions(this.provider, $node, () => this.itemIDType, this.options.additionalScoreParameter);
-        rb.on(LineUpButtonActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
-          this.saveNamedSet(order, name, description, isPublic);
-        });
-        rb.on(LineUpButtonActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
-          this.addScoreColumn(scoreImpl);
-        });
-        rb.on(LineUpButtonActions.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
-          this.pushTrackedScoreColumn(scoreName, scoreId, params);
-        });
-      }
+      summary: true
     }
   });
   /**
@@ -164,6 +148,13 @@ export abstract class ARankingView extends AView {
     this.panel.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
       this.pushTrackedScoreColumn(scoreName, scoreId, params);
     });
+    this.panel.on(LineUpPanelActions.EVENT_ZOOM_OUT, () => {
+      this.engine.zoomOut();
+    });
+    this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
+      this.engine.zoomIn();
+    });
+
 
     this.node.appendChild(this.panel.node);
     this.engine.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
