@@ -13,7 +13,6 @@ import NumberColumn from 'lineupjs/src/model/NumberColumn';
 import {default as BoxPlotColumn} from 'lineupjs/src/model/BoxPlotColumn';
 import {LocalDataProvider,} from 'lineupjs/src/provider';
 import NumbersColumn from 'lineupjs/src/model/NumbersColumn';
-import SidePanel from 'lineupjs/src/ui/panel/SidePanel';
 import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 
