@@ -337,7 +337,7 @@ def _get_count(database, view_name, args):
     count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')
 
-  return config, view, engine, count_query, processed_args, where_clause, replace, kwargs
+  return config, engine, count_query, processed_args, where_clause, replace, kwargs
 
 
 def get_count(database, view_name, args):
