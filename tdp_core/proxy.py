@@ -9,7 +9,7 @@ app = Namespace(__name__)
 def _to_site_url(site):
   import phovea_server.plugin
 
-  proxy_defs = phovea_server.plugin.list('targid_proxy')
+  proxy_defs = phovea_server.plugin.list('tdp_proxy')
   for p in proxy_defs:
     if p.id == site:
       return p.url.format(**request.args.to_dict())
