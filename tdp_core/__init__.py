@@ -21,7 +21,7 @@ def phovea(registry):
                       'namespace': '/api/tdp/db'
                   })
 
-  registry.append('namespace', 'targid_storage', 'tdp_core.storage',
+  registry.append('namespace', 'tdp_storage', 'tdp_core.storage',
                   {
                       'namespace': '/api/tdp/storage'
                   })

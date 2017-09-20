@@ -46,6 +46,7 @@ export default class NamedSetList {
     const data = await this.list();
     //store
     this.data.push(...data);
+    this.update();
   }
 
   private edit(namedSet: IStoredNamedSet) {
