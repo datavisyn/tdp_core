@@ -172,7 +172,7 @@ export function deriveColumns(columns: IServerColumn[]) {
         return categoricalCol(col.column, col.categories, {label: niceName(col.label)});
       case 'number':
         return numberCol(col.column, col.min, col.max, {label: niceName(col.label)});
-      case 'string':
+      default:
         return stringCol(col.column, {label: niceName(col.label)});
     }
   });
