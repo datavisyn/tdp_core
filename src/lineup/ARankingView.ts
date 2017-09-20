@@ -292,13 +292,12 @@ export abstract class ARankingView extends AView {
 
     this.provider.pushDesc(colDesc);
 
-    let col: Column;
+    const col: Column = this.provider.create(colDesc);
     if(lastIndex === -1) {
       // insert the column at the end of the ranking
-      col = this.provider.push(ranking, colDesc);
+      ranking.push(col);
     } else {
       // insert the column after the last occurrence of the current selected ID
-      col = this.provider.create(colDesc);
       const prevColumn = ranking.flatColumns[lastIndex];
       prevColumn.insertAfterMe(col);
     }
