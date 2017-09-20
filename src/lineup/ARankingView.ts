@@ -287,8 +287,21 @@ export abstract class ARankingView extends AView {
     colDesc.color = this.colors.getColumnColor(id);
     const accessor = createAccessor(colDesc);
 
+    // find last index of the current selected ID
+    const lastIndex = ranking.flatColumns.map((col) => (<any>col.desc).selectedId).lastIndexOf(id);
+
     this.provider.pushDesc(colDesc);
-    const col = this.provider.push(ranking, colDesc);
+
+    let col: Column;
+    if(lastIndex === -1) {
+      // insert the column at the end of the ranking
+      col = this.provider.push(ranking, colDesc);
+    } else {
+      // insert the column after the last occurrence of the current selected ID
+      col = this.provider.create(colDesc);
+      const prevColumn = ranking.flatColumns[lastIndex];
+      prevColumn.insertAfterMe(col);
+    }
 
     // error handling
     data
