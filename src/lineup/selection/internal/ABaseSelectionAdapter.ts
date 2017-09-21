@@ -14,7 +14,7 @@ export function patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
 export abstract class ABaseSelectionAdapter {
 
   protected addDynamicColumns(context: IContext, _ids: number[], ids: string[]): void {
-    Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i]))).then((columns) => {
+    Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i], i))).then((columns) => {
       context.add([].concat(...columns));
     });
   }
@@ -80,7 +80,7 @@ export abstract class ABaseSelectionAdapter {
     }
   }
 
-  protected abstract createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<ISelectionColumn[]>;
+  protected abstract createColumnsFor(context: IContext, _id: number, id: string, offset: number): PromiseLike<ISelectionColumn[]>;
 }
 
 export default ABaseSelectionAdapter;

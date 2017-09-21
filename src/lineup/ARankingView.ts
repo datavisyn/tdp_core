@@ -215,7 +215,7 @@ export abstract class ARankingView extends AView {
       selection: this.selection,
       freeColor: (id: number) => this.colors.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => this.withoutTracking(() => {
-        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id));
+        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
       }),
       remove: (columns: Column[]) => this.withoutTracking(() => {
         columns.forEach((c) => c.removeMe());
@@ -279,7 +279,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column> } {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position = -1): { col: Column, loaded: Promise<Column> } {
     const ranking = this.provider.getLastRanking();
 
     //mark as lazy loaded
@@ -287,18 +287,15 @@ export abstract class ARankingView extends AView {
     colDesc.color = this.colors.getColumnColor(id);
     const accessor = createAccessor(colDesc);
 
-    // find last index of the current selected ID
-    const lastIndex = ranking.flatColumns.map((col) => (<any>col.desc).selectedId).lastIndexOf(id);
-
     this.provider.pushDesc(colDesc);
 
     const col: Column = this.provider.create(colDesc);
-    if(lastIndex === -1) {
+    if(position === -1) {
       // insert the column at the end of the ranking
       ranking.push(col);
     } else {
       // insert the column after the last occurrence of the current selected ID
-      const prevColumn = ranking.flatColumns[lastIndex];
+      const prevColumn = ranking.flatColumns[position];
       prevColumn.insertAfterMe(col);
     }
 
