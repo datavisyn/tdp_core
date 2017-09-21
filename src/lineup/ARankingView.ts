@@ -294,9 +294,7 @@ export abstract class ARankingView extends AView {
       // insert the column at the end of the ranking
       ranking.push(col);
     } else {
-      // insert the column after the last occurrence of the current selected ID
-      const prevColumn = ranking.flatColumns[position];
-      prevColumn.insertAfterMe(col);
+      ranking.insert(col, position);
     }
 
     // error handling

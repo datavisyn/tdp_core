@@ -101,6 +101,6 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
 
     // find last index of current ID + consider how many columns have been added so far (offset), since context.columns is not yet updated
     const lastIndex = ids.lastIndexOf(id);
-    return  lastIndex === -1? lastIndex : lastIndex + offset;
+    return  lastIndex === -1? lastIndex : lastIndex + offset + 1;
   }
 }
