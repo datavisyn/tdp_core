@@ -62,7 +62,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
       const addedParameters = set_diff(selectedElements, dynamicColumnIDs);
 
       if (addedParameters.size <= 0) {
-        return;
+        return [];
       }
       // Filter the descriptions to only leave the new columns and load them
       const columnsToBeAdded = descs.filter((desc) => addedParameters.has(`${_id}_${desc.selectedSubtype}`));

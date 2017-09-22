@@ -81,6 +81,7 @@ def to_query(q, supports_array_parameter, parameters):
   :param parameters: dictionary of parameters that are going to be applied
   :return: the transformed query and call by reference updated parameters
   """
+  q = q.replace('\n', ' ')
   if supports_array_parameter:
     return sqlalchemy.sql.text(q)
 
@@ -332,7 +333,7 @@ def _get_count(database, view_name, args):
   if 'count' in view.queries:
     count_query = view.queries['count']
   elif view.table:
-    count_query = 'SELECT count(*) FROM {table} t {{where}}'.format(table=view.table)
+    count_query = 'SELECT count(*) as count FROM {table} t {{where}}'.format(table=view.table)
   else:
     count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')
