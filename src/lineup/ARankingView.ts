@@ -279,7 +279,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position = -1): { col: Column, loaded: Promise<Column> } {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position): { col: Column, loaded: Promise<Column> } {
     const ranking = this.provider.getLastRanking();
 
     //mark as lazy loaded
@@ -290,8 +290,7 @@ export abstract class ARankingView extends AView {
     this.provider.pushDesc(colDesc);
 
     const col: Column = this.provider.create(colDesc);
-    if(position === -1) {
-      // insert the column at the end of the ranking
+    if(position === undefined || position === null) {
       ranking.push(col);
     } else {
       ranking.insert(col, position);

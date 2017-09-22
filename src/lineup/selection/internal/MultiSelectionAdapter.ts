@@ -45,7 +45,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
     context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
   }
 
-  protected createColumnsFor(context: IContext, _id: number, id: string, offset: number) {
+  protected createColumnsFor(context: IContext, _id: number, id: string) {
     const selectedSubTypes = this.adapter.getSelectedSubTypes();
     return resolveImmediately(this.adapter.createDescs(_id, id, selectedSubTypes)).then((descs) => {
       if (descs.length <= 0) {
@@ -68,7 +68,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
       const columnsToBeAdded = descs.filter((desc) => addedParameters.has(`${_id}_${desc.selectedSubtype}`));
       const data = this.adapter.loadData(_id, id, columnsToBeAdded);
 
-      const position = this.computePositionToInsert(context, _id, offset);
+      const position = this.computePositionToInsert(context, _id);
 
       return columnsToBeAdded.map((desc, i) => ({desc, data: data[i], id: _id, position}));
     });
@@ -96,11 +96,11 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
     })));
   }
 
-  private computePositionToInsert(context: IContext, id: number, offset: number) {
+  private computePositionToInsert(context: IContext, id: number) {
     const ids = context.columns.map((col) => (<IAdditionalColumnDesc>col.desc).selectedId);
 
     // find last index of current ID + consider how many columns have been added so far (offset), since context.columns is not yet updated
     const lastIndex = ids.lastIndexOf(id);
-    return  lastIndex === -1? lastIndex : lastIndex + offset + 1;
+    return  lastIndex === -1? context.columns.length : lastIndex + 1;
   }
 }
