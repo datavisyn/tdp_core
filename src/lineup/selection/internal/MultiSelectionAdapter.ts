@@ -22,7 +22,7 @@ export interface IMultiSelectionAdapter {
    * @param {string[]} subTypes the currently selected sub types
    * @returns {Promise<IAdditionalColumnDesc[]>} the created descriptions
    */
-  createDescs(_id: number, id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]>|IAdditionalColumnDesc[];
+  createDescs(_id: number, id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]> | IAdditionalColumnDesc[];
 
   /**
    * load the data for the given selection and the selected descriptions
@@ -42,7 +42,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
   protected parameterChangedImpl(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
     this.removePartialDynamicColumns(context, selectedIds);
-    context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
+    return context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
   }
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
@@ -101,6 +101,6 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
 
     // find last index of current ID + consider how many columns have been added so far (offset), since context.columns is not yet updated
     const lastIndex = ids.lastIndexOf(id);
-    return  lastIndex === -1? context.columns.length : lastIndex + 1;
+    return lastIndex === -1 ? context.columns.length : lastIndex + 1;
   }
 }
