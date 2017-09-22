@@ -127,7 +127,7 @@ export abstract class ARankingView extends AView {
 
 
     this.node.classList.add('lineup');
-    this.node.insertAdjacentHTML('beforeend', `<div><div class="lu"></div></div>`);
+    this.node.insertAdjacentHTML('beforeend', `<div></div>`);
 
     this.stats = this.node.ownerDocument.createElement('p');
 
@@ -136,7 +136,7 @@ export abstract class ARankingView extends AView {
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-    this.engine = new EngineRenderer(this.provider, <HTMLElement>this.node.querySelector('div.lu')!, this.config);
+    this.engine = new EngineRenderer(this.provider, this.node.firstElementChild!, this.config);
 
     this.panel = new LineUpPanelActions(this.provider, this.engine.ctx, () => this.itemIDType, this.options.additionalScoreParameter);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
