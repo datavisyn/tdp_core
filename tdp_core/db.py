@@ -53,7 +53,6 @@ def resolve(database):
   connector, engine = r
   for view in connector.views.values():
     if view.needs_to_fill_up_columns() and view.table is not None:
-      view.columns_filled_up = True
       _fill_up_columns(view, engine)
   return r
 
