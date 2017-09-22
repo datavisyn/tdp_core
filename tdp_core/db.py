@@ -81,7 +81,7 @@ def to_query(q, supports_array_parameter, parameters):
   :param parameters: dictionary of parameters that are going to be applied
   :return: the transformed query and call by reference updated parameters
   """
-  q = q.replace('\n',' ')
+  q = q.replace('\n', ' ')
   if supports_array_parameter:
     return sqlalchemy.sql.text(q)
 
