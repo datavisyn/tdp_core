@@ -25,11 +25,6 @@ def phovea(registry):
                   {
                       'namespace': '/api/tdp/storage'
                   })
-
-  registry.append('namespace', 'processing', 'tdp_core.processing',
-                  {
-                      'namespace': '/api/tdp/processing'
-                  })
   registry.append('mapping_provider', 'tdp_core', 'tdp_core.mapping_table')
   # generator-phovea:end
   pass
