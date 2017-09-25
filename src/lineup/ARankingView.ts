@@ -469,7 +469,7 @@ export abstract class ARankingView extends AView {
   }
 
   private rebuildImpl() {
-    return this.clear().then(() => this.built = this.build());
+    return this.built = this.built.then(() => this.clear().then(() => this.build()));
   }
 
   /**
