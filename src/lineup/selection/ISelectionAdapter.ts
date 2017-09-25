@@ -6,6 +6,7 @@ export interface ISelectionColumn {
   readonly id: number;
   readonly desc: IColumnDesc;
   readonly data: Promise<IScoreRow<any>[]>;
+  readonly position?: number;
 }
 
 /**

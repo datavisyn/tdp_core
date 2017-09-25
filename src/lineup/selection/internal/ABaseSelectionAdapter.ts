@@ -13,13 +13,21 @@ export function patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
 
 export abstract class ABaseSelectionAdapter {
 
-  protected addDynamicColumns(context: IContext, _ids: number[], ids: string[]): void {
-    Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i]))).then((columns) => {
-      context.add([].concat(...columns));
+  protected addDynamicColumns(context: IContext, _ids: number[], ids: string[]) {
+    return Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i]))).then((columns) => {
+      // sort new columns to insert them in the correct order
+      const flattenedColumns = [].concat(...columns).map((d, i) => ({d, i}));
+      flattenedColumns.sort(({d: a, i: ai}, {d: b, i: bi}) => {
+        if (a.position === b.position) { // equal position, sort latter element of original array to lower position in sorted array
+          return bi - ai; // the latter in the array the better
+        }
+        return b.position - a.position; // sort descending by default
+      });
+      context.add(flattenedColumns.map((d) => d.d));
     });
   }
 
-  private removeDynamicColumns(context: IContext, _ids: number[]): void {
+  protected removeDynamicColumns(context: IContext, _ids: number[]): void {
     const columns = context.columns;
     context.remove([].concat(..._ids.map((_id) => {
       context.freeColor(_id);
@@ -27,42 +35,35 @@ export abstract class ABaseSelectionAdapter {
     })));
   }
 
-  private selectionChangedTimer = -1;
-  private parameterChangedTimer = -1;
+  private waitingForSelection = false;
+  private waitingForParameter = false;
 
-  selectionChanged(waitForIt: PromiseLike<any>|null, context: () => IContext) {
-    // wait for the promise and then a debounce logic
-    resolveImmediately(waitForIt).then(() => {
-      if (this.selectionChangedTimer >= 0) {
-        clearTimeout(this.selectionChangedTimer);
-        this.selectionChangedTimer = -1;
-      }
-      this.selectionChangedTimer = <any>setTimeout(() => {
-        this.selectionChangedImpl(context());
-      }, 100);
+  selectionChanged(waitForIt: PromiseLike<any> | null, context: () => IContext) {
+    if (this.waitingForSelection) {
+      return;
+    }
+    this.waitingForSelection = true;
+    resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
+      this.waitingForSelection = false;
     });
   }
 
-  parameterChanged(waitForIt: PromiseLike<any>|null, context: () => IContext) {
-    resolveImmediately(waitForIt).then(() => {
-      if (this.parameterChangedTimer >= 0) {
-        clearTimeout(this.parameterChangedTimer);
-        this.parameterChangedTimer = -1;
-      }
-      this.parameterChangedTimer = <any>setTimeout(() => {
-        this.parameterChangedImpl(context());
-      }, 100);
+  parameterChanged(waitForIt: PromiseLike<any> | null, context: () => IContext) {
+    if (this.waitingForSelection || this.waitingForParameter) {
+      return;
+    }
+    this.waitingForParameter = true;
+    resolveImmediately(waitForIt).then(() => this.parameterChangedImpl(context())).then(() => {
+      this.waitingForParameter = false;
     });
   }
 
-  protected abstract parameterChangedImpl(context: IContext): void;
+  protected abstract parameterChangedImpl(context: IContext): PromiseLike<any>;
 
   protected selectionChangedImpl(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
-    const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1);
-    const lineupColIds = usedCols
-      .map((d) => (<IAdditionalColumnDesc>d.desc).selectedId)
-      .filter((d) => d !== undefined);
+    const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1 && (<IAdditionalColumnDesc>d.desc).selectedId !== undefined);
+    const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
     // compute the difference
     const diffAdded = array_diff(selectedIds, lineupColIds);
@@ -74,10 +75,11 @@ export abstract class ABaseSelectionAdapter {
       this.removeDynamicColumns(context, diffRemoved);
     }
     // add new columns to the end
-    if (diffAdded.length > 0) {
-      //console.log('add columns', diffAdded);
-      context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
+    if (diffAdded.length <= 0) {
+      return null;
     }
+    //console.log('add columns', diffAdded);
+    return context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
   }
 
   protected abstract createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<ISelectionColumn[]>;

@@ -215,7 +215,7 @@ export abstract class ARankingView extends AView {
       selection: this.selection,
       freeColor: (id: number) => this.colors.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => this.withoutTracking(() => {
-        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id));
+        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
       }),
       remove: (columns: Column[]) => this.withoutTracking(() => {
         columns.forEach((c) => c.removeMe());
@@ -279,7 +279,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column> } {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
     const ranking = this.provider.getLastRanking();
 
     //mark as lazy loaded
@@ -288,7 +288,13 @@ export abstract class ARankingView extends AView {
     const accessor = createAccessor(colDesc);
 
     this.provider.pushDesc(colDesc);
-    const col = this.provider.push(ranking, colDesc);
+
+    const col: Column = this.provider.create(colDesc);
+    if(position === undefined || position === null) {
+      ranking.push(col);
+    } else {
+      ranking.insert(col, position);
+    }
 
     // error handling
     data
