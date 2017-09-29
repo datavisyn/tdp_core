@@ -148,9 +148,9 @@ export interface IView extends IEventHandler {
   /**
    * initialized this view
    * @param {HTMLElement} params place to put parameter forms
-   * @param {(name: string, value: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes
+   * @param {(name: string, value: any, previousValue: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes
    */
-  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>): Promise<any>|undefined;
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any>|undefined;
 
   /**
    * changes the input selection as given to the constructor of this class

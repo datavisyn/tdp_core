@@ -39,22 +39,20 @@ export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, gra
   const view: IParameterAble = await inputs[0].v;
   const name = parameter.name;
   const value = parameter.value;
+  const previousValue = parameter.previousValue === undefined ? view.getParameter(name) : parameter.previousValue;
 
-  if (!view) {
-    debugger;
-  }
-  const bak = view.getParameter(name);
   view.setParameterImpl(name, value);
   return {
-    inverse: setParameter(inputs[0], name, bak)
+    inverse: setParameter(inputs[0], name, previousValue, value)
   };
 }
 
-export function setParameter(view: IObjectRef<IParameterAble>, name: string, value: any) {
+export function setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any) {
   //assert view
   return action(meta(`Set Parameter "${name}"`, cat.visual, op.update), CMD_SET_PARAMETER, setParameterImpl, [view], {
     name,
-    value
+    value,
+    previousValue
   });
 }
 
