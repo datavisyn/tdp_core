@@ -408,3 +408,49 @@ def _fill_up_columns(view, engine):
         columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
 
   view.columns_filled_up = True
+
+
+def _lookup(database, view, query, page, limit, args):
+  config, engine = resolve(database)
+  if view_name not in config.views:
+    abort(404)
+  view = config.views[view_name]
+
+  arguments = args.copy()
+  offset = page * limit
+  # replace with wildcard version
+  arguments['query'] = '%{}%'.format(query)
+  # add 1 for checking if we have more
+  replacements = dict(limit=limit + 1, offset=offset)
+
+  kwargs, replace = db.prepare_arguments(view, config, replacements, arguments)
+
+  return engine, view.query, replace, kwargs
+
+
+def lookup_query(database, view, query, page, limit, args):
+  engine, sql, replace, kwargs = _lookup(database, view, query, page, limit, args)
+
+  if callable(sql):
+    return dict(query='custom function', args=kwargs)
+
+  return dict(query=sql.format(**replace), args=kwargs)
+
+
+def lookup(database, view, query, page, limit, args):
+  engine, sql, replace, kwargs = _lookup(database, view, query, page, limit, args)
+
+  if callable(sql):
+    kwargs.update(replace)
+    # callback variant
+    return sql(engine, kwargs, None)
+
+  with session(engine) as sess:
+    r_items = sess.run(sql.format(**replace), **kwargs)
+
+  more = len(r_items) > limit
+  if more:
+    # hit the boundary of more remove the artificial one
+    del r_items[-1]
+
+  return r_items, more

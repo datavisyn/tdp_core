@@ -119,7 +119,7 @@ def get_count_data(database, view_name):
 @app.route('/<database>/<view_name>/desc')
 @login_required
 def get_desc(database, view_name):
-  config, engine = db.resolve(database)
+  config, _ = db.resolve(database)
   # convert to index lookup
   # row id start with 1
   if view_name not in config.views:
@@ -137,37 +137,16 @@ def lookup(database, view_name):
   Does the same job as search, but paginates the result set
   This function is used in conjunction with Select2 form elements
   """
-  config, engine = db.resolve(database)
-  if view_name not in config.views:
-    abort(404)
-
-  view = config.views[view_name]
-
-  if view.query is None or callable(view.query):
-    return jsonify(dict(items=[], more=False))
-
   arguments = request.args.copy()
-  # replace with wildcard version
-  arguments['query'] = '%{}%'.format(str(request.args.get('query', '')).lower())
-
+  query = str(request.args.get('query', '')).lower()
   page = int(request.args.get('page', 0))  # zero based
   limit = int(request.args.get('limit', 30))  # or 'all'
-  offset = page * limit
-  # add 1 for checking if we have more
-  replacements = dict(limit=limit + 1, offset=offset)
-
-  kwargs, replace = db.prepare_arguments(view, config, replacements, arguments)
 
   if _return_query():
-    return jsonify(dict(query=view.query.format(**replace), args=kwargs))
+    return db.lookup_query(database, view_name, query, page, limit, request.args)
 
-  with db.session(engine) as session:
-    r_items = session.run(view.query.format(**replace), **kwargs)
+  r_items, more = db.lookup(database, view_name, query, page, limit, request.args)
 
-  more = len(r_items) > limit
-  if more:
-    # hit the boundary of more remove the artificial one
-    del r_items[-1]
   if _assign_ids(r_items, view):
     r_items = db.assign_ids(r_items, view.idtype)
   return jsonify(dict(items=r_items, more=more))
