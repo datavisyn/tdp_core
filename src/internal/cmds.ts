@@ -18,6 +18,7 @@ export interface IParameterAble {
 
 export function initSessionImpl(_inputs: IObjectRef<any>[], parameters: object) {
   const old = {};
+  // clear the session as part of it?
   Object.keys(parameters).forEach((key) => {
     old[key] = session.retrieve(key, null);
     const value = parameters[key];
