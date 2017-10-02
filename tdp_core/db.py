@@ -410,7 +410,7 @@ def _fill_up_columns(view, engine):
   view.columns_filled_up = True
 
 
-def _lookup(database, view, query, page, limit, args):
+def _lookup(database, view_name, query, page, limit, args):
   config, engine = resolve(database)
   if view_name not in config.views:
     abort(404)
@@ -423,7 +423,7 @@ def _lookup(database, view, query, page, limit, args):
   # add 1 for checking if we have more
   replacements = dict(limit=limit + 1, offset=offset)
 
-  kwargs, replace = db.prepare_arguments(view, config, replacements, arguments)
+  kwargs, replace = prepare_arguments(view, config, replacements, arguments)
 
   return engine, view.query, replace, kwargs
 
@@ -453,4 +453,4 @@ def lookup(database, view, query, page, limit, args):
     # hit the boundary of more remove the artificial one
     del r_items[-1]
 
-  return r_items, more
+  return r_items, more, view

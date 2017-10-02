@@ -137,7 +137,6 @@ def lookup(database, view_name):
   Does the same job as search, but paginates the result set
   This function is used in conjunction with Select2 form elements
   """
-  arguments = request.args.copy()
   query = str(request.args.get('query', '')).lower()
   page = int(request.args.get('page', 0))  # zero based
   limit = int(request.args.get('limit', 30))  # or 'all'
@@ -145,7 +144,7 @@ def lookup(database, view_name):
   if _return_query():
     return db.lookup_query(database, view_name, query, page, limit, request.args)
 
-  r_items, more = db.lookup(database, view_name, query, page, limit, request.args)
+  r_items, more, view = db.lookup(database, view_name, query, page, limit, request.args)
 
   if _assign_ids(r_items, view):
     r_items = db.assign_ids(r_items, view.idtype)
