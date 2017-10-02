@@ -425,11 +425,11 @@ def _lookup(database, view_name, query, page, limit, args):
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments)
 
-  return engine, view.query, replace, kwargs
+  return engine, view, view.query, replace, kwargs
 
 
-def lookup_query(database, view, query, page, limit, args):
-  engine, sql, replace, kwargs = _lookup(database, view, query, page, limit, args)
+def lookup_query(database, view_name, query, page, limit, args):
+  engine, _, sql, replace, kwargs = _lookup(database, view_name, query, page, limit, args)
 
   if callable(sql):
     return dict(query='custom function', args=kwargs)
@@ -437,8 +437,8 @@ def lookup_query(database, view, query, page, limit, args):
   return dict(query=sql.format(**replace), args=kwargs)
 
 
-def lookup(database, view, query, page, limit, args):
-  engine, sql, replace, kwargs = _lookup(database, view, query, page, limit, args)
+def lookup(database, view_name, query, page, limit, args):
+  engine, view, sql, replace, kwargs = _lookup(database, view_name, query, page, limit, args)
 
   if callable(sql):
     kwargs.update(replace)
