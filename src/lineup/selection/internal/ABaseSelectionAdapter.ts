@@ -53,7 +53,12 @@ export abstract class ABaseSelectionAdapter {
       return;
     }
     this.waitingForParameter = true;
-    resolveImmediately(waitForIt).then(() => this.parameterChangedImpl(context())).then(() => {
+    resolveImmediately(waitForIt).then(() => {
+      if (this.waitingForSelection) {
+        return; // abort selection more important
+      }
+      return this.parameterChangedImpl(context());
+    }).then(() => {
       this.waitingForParameter = false;
     });
   }

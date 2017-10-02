@@ -17,6 +17,8 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
   protected $node: Selection<any>;
 
+  protected previousValue: any = null;
+
   /**
    * Constructor
    * @param parent
@@ -76,7 +78,9 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
         this.updateStoredValue();
         if (this.desc.onChange) {
           const value = this.value;
-          this.desc.onChange(this, value, toData(value));
+          const old = this.previousValue;
+          this.previousValue = value;
+          this.desc.onChange(this, value, toData(value), old);
         }
       });
     }

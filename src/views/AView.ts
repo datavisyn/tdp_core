@@ -56,7 +56,7 @@ export abstract class AView extends EventHandler implements IView {
     }
   }
 
-  /*final*/ init(params: HTMLElement, onParameterChange: (name: string, value: any)=>Promise<any>) {
+  /*final*/ init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
     this.params = this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
   }
@@ -69,7 +69,7 @@ export abstract class AView extends EventHandler implements IView {
     return null;
   }
 
-  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any)=>Promise<any>) {
+  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
     const builder = new FormBuilder(select(params));
 
     //work on a local copy since we change it by adding an onChange handler
@@ -77,7 +77,7 @@ export abstract class AView extends EventHandler implements IView {
 
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
-      p.onChange = (formElement, value) => onParameterChange(formElement.id, value);
+      p.onChange = (formElement, value, data, previousValue) => onParameterChange(formElement.id, value, previousValue);
     });
 
     builder.build(descs);

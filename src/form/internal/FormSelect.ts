@@ -111,6 +111,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     data(values).then((items) => {
       this.updateOptionElements(items);
       const index = options.selectedIndex !== undefined ? options.selectedIndex : defaultSelectedIndex;
+      this.previousValue = items[index];
       this.$select.property('selectedIndex', index);
     });
   }
@@ -157,12 +158,14 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     // if value is undefined or null, set to first index
     if (!v) {
       this.$select.property('selectedIndex', 0);
+      this.previousValue = null;
       return;
     }
 
     this.$select.selectAll('option').data().forEach((d, i) => {
       if ((v.value && d.value === v.value) || d.value === v || d === v) {
         this.$select.property('selectedIndex', i);
+        this.previousValue = d; // force value update
       }
     });
   }
