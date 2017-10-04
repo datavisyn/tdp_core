@@ -9,6 +9,7 @@ import {deriveColors} from 'lineupjs/src/';
 import {ScaleMappingFunction, Ranking} from 'lineupjs/src/model';
 import ValueColumn from 'lineupjs/src/model/ValueColumn';
 import NumberColumn from 'lineupjs/src/model/NumberColumn';
+import StackColumn from 'lineupjs/src/model/StackColumn';
 import {IBoxPlotData} from 'lineupjs/src/model/BoxPlotColumn';
 import {LocalDataProvider,} from 'lineupjs/src/provider';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
@@ -87,7 +88,7 @@ export abstract class ARankingView extends AView {
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
    */
-  private dump: Map<string, number | boolean> = null;
+  private dump: Map<string, number | boolean | number[]> = null;
 
   /**
    * DOM element for LineUp stats in parameter UI
@@ -235,6 +236,7 @@ export abstract class ARankingView extends AView {
       return;
     }
     const ranking = this.provider.getRankings()[0];
+    const weightsSuffix = '_weights';
 
     if (mode === EViewMode.FOCUS) {
       if (this.dump) {
@@ -242,7 +244,11 @@ export abstract class ARankingView extends AView {
           if (!this.dump.has(c.id)) {
             return;
           }
+
           c.setWidth(<number>this.dump.get(c.id));
+          if(this.dump.has(c.id + weightsSuffix)) {
+            (<StackColumn>c).setWeights(<number[]>this.dump.get(c.id + weightsSuffix));
+          }
         });
       }
       this.dump = null;
@@ -256,7 +262,7 @@ export abstract class ARankingView extends AView {
     const s = ranking.getSortCriteria();
     const labelColumn = ranking.children.filter((c) => c.desc.type === 'string')[0];
 
-    this.dump = new Map<string, number | boolean>();
+    this.dump = new Map<string, number | boolean | number[]>();
     ranking.children.forEach((c) => {
       if (c === labelColumn ||
         c === s.col ||
@@ -266,6 +272,9 @@ export abstract class ARankingView extends AView {
       ) {
         // keep these columns
       } else {
+        if(c instanceof StackColumn) {
+          this.dump.set(c.id + weightsSuffix, (<StackColumn>c).getWeights());
+        }
         this.dump.set(c.id, c.getWidth());
         c.hide();
       }
