@@ -14,14 +14,18 @@ import Column from 'lineupjs/src/model/Column';
 import {extent} from 'd3';
 
 
-export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & { pushDesc(col: IColumnDesc): void }, done?: () => void): { col: Column, loaded: Promise<Column> } {
+export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & { pushDesc(col: IColumnDesc): void }, position: number, done?: () => void): { col: Column, loaded: Promise<Column> } {
   const ranking = provider.getLastRanking();
   const accessor = createAccessor(colDesc);
   provider.pushDesc(colDesc);
   //mark as lazy loaded
   (<any>colDesc).lazyLoaded = true;
   const col = provider.create(colDesc);
-  ranking.push(col);
+  if(position === undefined || position === null) {
+    ranking.push(col);
+  } else {
+    ranking.insert(col, position);
+  }
 
   // error handling
   data
