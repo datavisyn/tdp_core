@@ -245,10 +245,10 @@ export abstract class ARankingView extends AView {
             return;
           }
 
+          c.setWidth(<number>this.dump.get(c.id));
           if(this.dump.has(c.id + weightsSuffix)) {
             (<StackColumn>c).setWeights(<number[]>this.dump.get(c.id + weightsSuffix));
           }
-          c.setWidth(<number>this.dump.get(c.id));
         });
       }
       this.dump = null;
