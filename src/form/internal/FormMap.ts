@@ -86,7 +86,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   private rows: IFormRow[] = [];
   private readonly inline: boolean;
 
-  private readonly inlineOnChange: (formElement: IFormElement, value: any, data: any)=>void;
+  private readonly inlineOnChange: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
 
   /**
    * Constructor
@@ -185,6 +185,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     // adapt default settings
     this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-group-sm', true);
     this.rows = this.getStoredValue([]);
+    this.previousValue = this.value;
 
     if (this.desc.options.badgeProvider) {
       this.updateBadge();
@@ -204,18 +205,15 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.buildMap();
 
     if (this.inline && this.inlineOnChange) {
-      //special handling for inline case
-      let changed = false;
-      this.on('change', () => {
-        changed = true;
-      });
       // trigger change on onChange listener just when the dialog is closed
       $(this.$node.node()).on('hidden.bs.dropdown', () => {
-        if (changed) {
-          const v = this.value;
-          this.inlineOnChange(this, v, toData(v));
+        const v = this.value;
+        const previous = this.previousValue;
+        if (isEqual(v, previous)) {
+          return;
         }
-        changed = false;
+        this.previousValue = v;
+        this.inlineOnChange(this, v, toData(v), previous);
       });
     }
   }
@@ -431,7 +429,9 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       return;
     }
     this.rows = v;
+    this.previousValue = this.value; // force update
     this.buildMap();
+    this.updateBadge();
   }
 
   focus() {

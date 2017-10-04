@@ -228,7 +228,7 @@ export abstract class ARankingView extends AView {
       selection: this.selection,
       freeColor: (id: number) => this.colors.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => this.withoutTracking(() => {
-        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id));
+        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
       }),
       remove: (columns: Column[]) => this.withoutTracking(() => {
         columns.forEach((c) => c.removeMe());
@@ -295,9 +295,9 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1): { col: Column, loaded: Promise<Column> } {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
     colDesc.color = this.colors.getColumnColor(id);
-    return addLazyColumn(colDesc, data, this.provider, () => this.engine.update());
+    return addLazyColumn(colDesc, data, this.provider, position, () => this.engine.update());
   }
 
   private addScoreColumn(score: IScore<any>) {
@@ -418,7 +418,7 @@ export abstract class ARankingView extends AView {
   }
 
   private rebuildImpl() {
-    return this.clear().then(() => this.built = this.build());
+    return this.built = this.built.then(() => this.clear().then(() => this.build()));
   }
 
   /**

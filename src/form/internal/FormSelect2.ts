@@ -149,7 +149,20 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     }
     mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
 
-    return (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
+    const $s = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
+    // force the old value from initial
+    this.previousValue = this.resolveValue($s.select2('data'));
+    return $s;
+  }
+
+  private resolveValue(items: ISelect2Option[]) {
+    const returnValue = this.desc.options.return;
+    const returnF = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
+    if (!items || items.length === 0) {
+      return this.multiple ?  [] : returnF({id: '', text: ''});
+    }
+    const data = items.map((d) => ({id: d.id, text: d.text, data: d.data? d.data : undefined})).map(returnF);
+    return this.multiple ? data : data[0];
   }
 
   /**
@@ -157,16 +170,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
    * @returns {string|{name: string, value: string, data: any}|null}
    */
   get value(): (ISelect2Option|string)|(ISelect2Option|string)[] {
-    const returnValue = this.desc.options.return;
-    const returnF = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
-    const data = this.$select.select2('data').map((d) => ({id: d.id, text: d.text, data: d.data? d.data : undefined})).map(returnF);
-    if (this.multiple) {
-      return data;
-    } else if (data.length === 0) {
-      return returnF({id: '', text: ''});
-    } else {
-      return data[0];
-    }
+    return this.resolveValue(this.$select.select2('data'));
   }
 
   hasValue() {
@@ -189,33 +193,35 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
       // if value is undefined or null, clear
       if (!v) {
         this.$select.val([]).trigger('change');
+        this.previousValue = this.multiple ? [] : null;
         return;
       }
-      let r: any = null;
+      let r: string|string[] = null;
 
       if (this.multiple) {
         const values = Array.isArray(v) ? v : [v];
-        r = values.map((d: any) => ({id: d.value || d.id, text: d.name || d.text}));
+        r = values.map((d: any) => d.value || d.id);
         const old = <ISelect2Option[]>this.value;
-        if (sameValues(old, r)) {
+        if (sameIds(old.map((d) => d.id), r)) {
           return;
         }
       } else {
         const vi: any = Array.isArray(v) ? v[0] : v;
-        r = {id: vi, text: vi};
+        r = vi;
 
-        if ((vi.name || vi.text) && (vi.value || vi.id)) {
-          r.id = vi.value || vi.id;
-          r.text = vi.name || vi.text;
+        if (vi.value || vi.id) {
+          r = vi.value || vi.id;
         }
 
         const old = <ISelect2Option>this.value;
-        if (old.id === r.id) { // no change
+        if (old.id === r) { // no change
           return;
         }
       }
-
+      // need to select just the ids
+      // TODO doesn't work for AJAX based solutions
       this.$select.val(r).trigger('change');
+      this.previousValue = this.value; // force set
     } finally {
       this.$select.on('change.propagate', this.listener);
     }
@@ -233,15 +239,11 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
  * @param b
  * @returns {boolean}
  */
-function sameValues(a: ISelect2Option[], b: ISelect2Option[]) {
+function sameIds(a: string[], b: string[]) {
   if (a.length !== b.length) {
     return false;
   }
-  const aids = new Set(a.map((d) => d.id));
-  const bids = new Set(b.map((d) => d.id));
-  if (aids.size !== bids.size) {
-    return false;
-  }
+  const bids = new Set(b);
   // all of a contained in b
-  return Array.from(aids.values()).every((d) => bids.has(d));
+  return a.every((d) => bids.has(d));
 }

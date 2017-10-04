@@ -53,7 +53,6 @@ def resolve(database):
   connector, engine = r
   for view in connector.views.values():
     if view.needs_to_fill_up_columns() and view.table is not None:
-      view.columns_filled_up = True
       _fill_up_columns(view, engine)
   return r
 
@@ -81,6 +80,7 @@ def to_query(q, supports_array_parameter, parameters):
   :param parameters: dictionary of parameters that are going to be applied
   :return: the transformed query and call by reference updated parameters
   """
+  q = q.replace('\n', ' ')
   if supports_array_parameter:
     return sqlalchemy.sql.text(q)
 
@@ -332,7 +332,7 @@ def _get_count(database, view_name, args):
   if 'count' in view.queries:
     count_query = view.queries['count']
   elif view.table:
-    count_query = 'SELECT count(*) FROM {table} t {{where}}'.format(table=view.table)
+    count_query = 'SELECT count(*) as count FROM {table} d {{where}}'.format(table=view.table)
   else:
     count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')

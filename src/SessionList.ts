@@ -141,7 +141,11 @@ export class TemporarySessionList extends ASessionList {
     const workspaces = await this.getData(manager);
 
     //replace loading
-    const $table = $parent.html(`<table class="table table-striped table-hover table-bordered table-condensed">
+    const $table = $parent.html(`<p>
+      A temporary session will only be stored in your local browser cache. 
+      It is not possible to share a link to states of this session with others. 
+      Only the ${KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} most recent sessions will be stored.
+    </p><div><table class="table table-striped table-hover table-bordered table-condensed">
     <thead>
       <tr>
         <th>Name</th>
@@ -152,7 +156,7 @@ export class TemporarySessionList extends ASessionList {
     <tbody>
 
     </tbody>
-  </table>`);
+  </table></div>`);
 
     const update = (data: IProvenanceGraphDataDescription[]) => {
       const $tr = $table.select('tbody').selectAll('tr').data(data);
@@ -193,7 +197,11 @@ export class PersistentSessionList extends ASessionList {
     //select and sort by date desc
     const workspaces = await this.getData(manager);
 
-    $parent.html(`
+    $parent.html(`<p>
+     The persistent session will be stored on the server. 
+     By default, sessions are private, meaning that only the creator has access to it. 
+     If the status is set to public, others can also see the session and access certain states by opening a shared link.
+    </p>
         <ul class="nav nav-tabs" role="tablist">
           <li class="active" role="presentation"><a href="#session_mine" class="active"><i class="fa fa-user"></i> My Sessions</a></li>
           <li role="presentation"><a href="#session_others"><i class="fa fa-users"></i> Other Sessions</a></li>

@@ -38,15 +38,15 @@ export default class NamedSetList {
 
   private async build() {
     this.node.innerHTML = `
-      <section class="predefined-named-sets"><header>Predefined Sets</header><ul></ul></section>
-      <section class="custom-named-sets"><header>My Sets</header><ul></ul></section>
-      <section class="other-named-sets"><header>Public Sets</header><ul></ul></section>`;
+      <section class="predefined-named-sets"><header>Predefined Sets</header><ul class="loading"></ul></section>
+      <section class="custom-named-sets"><header>My Sets</header><ul class="loading"></ul></section>
+      <section class="other-named-sets"><header>Public Sets</header><ul class="loading"></ul></section>`;
 
     this.filter = await this.findFilters();
     const data = await this.list();
     //store
     this.data.push(...data);
-    this.update();
+    this.update(true);
   }
 
   private edit(namedSet: IStoredNamedSet) {
@@ -65,7 +65,7 @@ export default class NamedSetList {
     });
   };
 
-  update() {
+  update(loaded = false) {
     const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
 
     const predefinedNamedSets = data.filter((d) => d.type !== ENamedSetType.NAMEDSET);
@@ -76,13 +76,13 @@ export default class NamedSetList {
     const $node = select(this.node);
 
     // append the list items
-    this.updateGroup($node.select('.predefined-named-sets ul'), predefinedNamedSets);
-    this.updateGroup($node.select('.custom-named-sets ul'), customNamedSets);
-    this.updateGroup($node.select('.other-named-sets ul'), otherNamedSets);
+    this.updateGroup($node.select('.predefined-named-sets ul'), predefinedNamedSets, loaded);
+    this.updateGroup($node.select('.custom-named-sets ul'), customNamedSets, loaded);
+    this.updateGroup($node.select('.other-named-sets ul'), otherNamedSets, loaded);
   }
 
-  private updateGroup($base: Selection<any>, data: INamedSet[]) {
-    const $options = $base.selectAll('li').data(data);
+  private updateGroup($base: Selection<any>, data: INamedSet[], loaded = false) {
+    const $options = $base.classed('loading', data.length === 0 && !loaded).selectAll('li').data(data);
     const $enter = $options.enter()
       .append('li').classed('namedset', (d) => d.type === ENamedSetType.NAMEDSET);
 
