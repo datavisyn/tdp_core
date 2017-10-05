@@ -43,7 +43,7 @@ configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definitio
 
 
 def _supports_sql_parameters(dialect):
-  return dialect.lower() != 'sqlite'  # sqlite doesn't support array parameters, postgres does
+  return dialect.lower() != 'sqlite' and dialect.lower() != 'oracle'  # sqlite doesn't support array parameters, postgres does
 
 
 def resolve(database):
