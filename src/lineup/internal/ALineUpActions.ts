@@ -217,7 +217,8 @@ export abstract class ALineUpActions extends EventHandler {
       focus: () => {
         // show Select2 options by default when the dropdown is visible to have Select2 calculate the correct position
         builder.getElementById(FORM_ID_ADDITIONAL_COLUMN).focus();
-      }
+      },
+
     };
   }
 
