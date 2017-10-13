@@ -381,6 +381,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           children.splice(0, children.length - 1).forEach((d) => d.remove());
           updateOptions();
         }
+        this.updateStoredValue();
         that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
       });
       row.querySelector('select').addEventListener('change', function (this: HTMLSelectElement) {
