@@ -208,7 +208,6 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       // trigger change on onChange listener just when the dialog is closed
       $(this.$node.node()).on('hidden.bs.dropdown', () => {
         const v = this.value;
-        this.updateStoredValue();
         const previous = this.previousValue;
         if (isEqual(v, previous)) {
           return;
@@ -238,6 +237,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         // register on change listener
         parent.firstElementChild.addEventListener('change', function (this: HTMLSelectElement) {
           row.value = this.value;
+          that.updateStoredValue();
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
         });
         resolveData(desc.optionsData)([]).then((values) => {
@@ -295,6 +295,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
                 row.value = row.value[0];
               }
             }
+            that.updateStoredValue();
             that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
           });
         });
