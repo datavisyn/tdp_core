@@ -208,6 +208,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       // trigger change on onChange listener just when the dialog is closed
       $(this.$node.node()).on('hidden.bs.dropdown', () => {
         const v = this.value;
+        this.updateStoredValue();
         const previous = this.previousValue;
         if (isEqual(v, previous)) {
           return;
