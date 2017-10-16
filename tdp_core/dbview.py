@@ -197,15 +197,18 @@ class DBViewBuilder(object):
       self.v.queries[key] = callback
     return self
 
-  def filters(self, keys, group=None):
+  def filters(self, keys, alias=None, table=None, group=None, join=None):
     """
     specify possible filter keys
     :param keys: the list of possible filters
-    :param group: group filter entries
+    :param alias: shortcut for just specifying the left hand alias: {alias} {operator} {value}
+    :param table: shortcut for just specifying the table alias: {table}.{key} {operator} {value}
+    :param group: to inject the filter in another group and_group_where
+    :param join: additional join to inject
     :return:
     """
     for key in keys:
-      self.v.filters[key] = DBFilterData(group, None, None)
+      self.filter(key, alias=alias, table=table, group=group, join=join)
     return self
 
   def filter(self, key, replacement=None, alias=None, table=None, group=None, join=None):
