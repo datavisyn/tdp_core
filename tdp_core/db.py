@@ -218,7 +218,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   replacements = replacements or {}
   arguments = arguments or {}
   replacements = _handle_aggregated_score(config, replacements, arguments)
-  secure_replacements = ['where', 'and_where', 'agg_score']  # has to be part of the computed replacements
+  secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
   # convert to index lookup
   kwargs = {}
