@@ -332,7 +332,7 @@ def _get_count(database, view_name, args):
   if 'count' in view.queries:
     count_query = view.queries['count']
   elif view.table:
-    count_query = 'SELECT count(*) as count FROM {table} d {{where}}'.format(table=view.table)
+    count_query = 'SELECT count(d.*) as count FROM {table} d {{joins}} {{where}}'.format(table=view.table)
   else:
     count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')
