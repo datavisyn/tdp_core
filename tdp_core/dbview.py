@@ -419,7 +419,7 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
 
   queries[prefix + '_items_verify'] = DBViewBuilder().idtype(idtype).table(table).query("""
         SELECT {id}, {name} AS text
-        FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).filter(name_column,'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
+        FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).filter(name_column, 'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
 
   queries[prefix + '_unique'] = DBViewBuilder().query("""
         SELECT d as id, d as text

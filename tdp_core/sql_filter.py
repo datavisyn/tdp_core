@@ -135,8 +135,7 @@ def filter_logic(view, args):
       where_group_clauses[group].append((clause, join))
 
   replacements = dict()
-  replacements['and_where'] = (
-  ' AND ' + ' AND '.join(c for c, _ in where_default_clause)) if where_default_clause else ''
+  replacements['and_where'] = (' AND ' + ' AND '.join(c for c, _ in where_default_clause)) if where_default_clause else ''
   replacements['where'] = (' WHERE ' + ' AND '.join(c for c, _ in where_default_clause)) if where_default_clause else ''
   # unique joins
   replacements['joins'] = ' '.join(set(j for _, j in where_default_clause if j is not None))
