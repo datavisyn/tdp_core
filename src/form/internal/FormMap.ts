@@ -138,6 +138,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
    * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
+    super.build();
     if (this.desc.visible === false) {
       this.$node.classed('hidden', true);
     }
@@ -237,7 +238,6 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         // register on change listener
         parent.firstElementChild.addEventListener('change', function (this: HTMLSelectElement) {
           row.value = this.value;
-          that.updateStoredValue();
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
         });
         resolveData(desc.optionsData)([]).then((values) => {
@@ -295,7 +295,6 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
                 row.value = row.value[0];
               }
             }
-            that.updateStoredValue();
             that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
           });
         });
@@ -381,7 +380,6 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           children.splice(0, children.length - 1).forEach((d) => d.remove());
           updateOptions();
         }
-        this.updateStoredValue();
         that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
       });
       row.querySelector('select').addEventListener('change', function (this: HTMLSelectElement) {
