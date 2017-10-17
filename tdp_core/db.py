@@ -26,7 +26,8 @@ def _to_config(p):
     connector.statement_timeout_query = config.get('statement_timeout_query', default=None)
 
   _log.info(connector.dburl)
-  engine = sqlalchemy.create_engine(connector.dburl)
+  engine_options = config.get('engine', default={})
+  engine = sqlalchemy.create_engine(connector.dburl, **engine_options)
   # Assuming that gevent monkey patched the builtin
   # threading library, we're likely good to use
   # SQLAlchemy's QueuePool, which is the default
@@ -42,7 +43,7 @@ configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definitio
 
 
 def _supports_sql_parameters(dialect):
-  return dialect.lower() != 'sqlite'  # sqlite doesn't support array parameters, postgres does
+  return dialect.lower() != 'sqlite' and dialect.lower() != 'oracle'  # sqlite doesn't support array parameters, postgres does
 
 
 def resolve(database):
@@ -80,7 +81,7 @@ def to_query(q, supports_array_parameter, parameters):
   :param parameters: dictionary of parameters that are going to be applied
   :return: the transformed query and call by reference updated parameters
   """
-  q = q.replace('\n', ' ')
+  q = q.replace('\n', ' ').replace('\r', ' ')
   if supports_array_parameter:
     return sqlalchemy.sql.text(q)
 

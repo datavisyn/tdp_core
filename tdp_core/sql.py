@@ -154,7 +154,7 @@ def lookup(database, view_name):
   limit = int(request.args.get('limit', 30))  # or 'all'
   offset = page * limit
   # add 1 for checking if we have more
-  replacements = dict(limit=limit + 1, offset=offset)
+  replacements = dict(limit=limit + 1, offset=offset, offset2=(offset + limit + 1))
 
   kwargs, replace = db.prepare_arguments(view, config, replacements, arguments)
 
