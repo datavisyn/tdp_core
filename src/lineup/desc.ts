@@ -9,6 +9,7 @@ import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {IServerColumn} from '../rest';
+import {deriveHierarchy, ICategoryNode, isHierarchical} from 'lineupjs/src/model/HierarchyColumn';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
@@ -83,6 +84,7 @@ export function numberCol(column: string, min: number, max: number, options: Par
   });
 }
 
+
 /**
  * creates a new LineUp description for a categorical column
  * @param {string} column the column name to use
@@ -91,9 +93,19 @@ export function numberCol(column: string, min: number, max: number, options: Par
  * @returns {IAdditionalColumnDesc}
  */
 export function categoricalCol(column: string, categories: (string|ICategory)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  if (isHierarchical(categories)) {
+    return hierarchicalCol(column, deriveHierarchy(<any[]>categories), options);
+  }
   return Object.assign(baseColumn(column, options), {
     type: 'categorical',
     categories
+  });
+}
+
+export function hierarchicalCol(column: string, hierarchy: ICategoryNode, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  return Object.assign(baseColumn(column, options), {
+    type: 'hierarchy',
+    hierarchy
   });
 }
 /**
