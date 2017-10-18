@@ -25,6 +25,7 @@ export default class NamedSetList {
 
   private data: INamedSet[] = [];
   private filter: (metaData: object) => boolean = () => true;
+  private loaded = false;
 
   constructor(private readonly idType: IDType, private readonly sessionCreator: (namedSet: INamedSet) => void, doc = document) {
     this.node = doc.createElement('div');
@@ -47,7 +48,8 @@ export default class NamedSetList {
 
     //store
     this.data.push(...data);
-    this.update(true);
+    this.loaded = true;
+    this.update();
   }
 
   private edit(namedSet: IStoredNamedSet) {
@@ -66,7 +68,7 @@ export default class NamedSetList {
     });
   };
 
-  update(loaded = false) {
+  update() {
     const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
     const predefinedNamedSets = data.filter((d) => d.type !== ENamedSetType.NAMEDSET);
     const me = currentUserNameOrAnonymous();
@@ -76,13 +78,13 @@ export default class NamedSetList {
     const $node = select(this.node);
 
     // append the list items
-    this.updateGroup($node.select('.predefined-named-sets ul'), predefinedNamedSets, loaded);
-    this.updateGroup($node.select('.custom-named-sets ul'), customNamedSets, loaded);
-    this.updateGroup($node.select('.other-named-sets ul'), otherNamedSets, loaded);
+    this.updateGroup($node.select('.predefined-named-sets ul'), predefinedNamedSets);
+    this.updateGroup($node.select('.custom-named-sets ul'), customNamedSets);
+    this.updateGroup($node.select('.other-named-sets ul'), otherNamedSets);
   }
 
-  private updateGroup($base: Selection<any>, data: INamedSet[], loaded = false) {
-    const $options = $base.classed('loading', data.length === 0 && !loaded).selectAll('li').data(data);
+  private updateGroup($base: Selection<any>, data: INamedSet[]) {
+    const $options = $base.classed('loading', data.length === 0 && !this.loaded).selectAll('li').data(data);
     const $enter = $options.enter()
       .append('li').classed('namedset', (d) => d.type === ENamedSetType.NAMEDSET);
 
@@ -155,17 +157,17 @@ export default class NamedSetList {
 
   push(...namedSet: INamedSet[]) {
     this.data.push(...namedSet);
-    this.update(true);
+    this.update();
   }
 
   remove(namedSet: INamedSet) {
     this.data.splice(this.data.indexOf(namedSet), 1);
-    this.update(true);
+    this.update();
   }
 
   replace(oldNamedSet: INamedSet, newNamedSet: INamedSet) {
     this.data.splice(this.data.indexOf(oldNamedSet), 1, newNamedSet);
-    this.update(true);
+    this.update();
   }
 
   protected findFilters() {
