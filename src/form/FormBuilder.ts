@@ -5,7 +5,7 @@
 import 'select2';
 import * as d3 from 'd3';
 import {randomId} from 'phovea_core/src/index';
-import {IFormElement, IFormElementDesc} from './interfaces';
+import {IFormElement, IFormElementDesc, IFormSerializedElement, IFormSerializedValues} from './interfaces';
 import {create} from './internal';
 
 /**
@@ -26,7 +26,7 @@ export default class FormBuilder {
   /**
    * Constructor
    * @param $parent Node that the form should be attached to
-   * @param formId unique form id
+   * @param formId unique identifier for this form
    */
   constructor($parent: d3.Selection<any>, private readonly formId = randomId()) {
     this.$node = $parent.append('form').attr('id', this.formId);
@@ -89,9 +89,13 @@ export default class FormBuilder {
     const r: { [key: string]: any } = {};
     this.elements.forEach((el, key) => {
       const value = el.value;
-      r[key] = value.value || value;
+      r[key] = (value && value.value) ? value.value : value;
     });
     return r;
+  }
+
+  getSerializedElements(): IFormSerializedElement[] {
+    return Array.from(this.elements.values()).map((e) => e.serialize());
   }
 
   /**

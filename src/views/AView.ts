@@ -12,6 +12,7 @@ import {select} from 'd3';
 import {resolveIds} from './resolve';
 import {toData} from '../form/internal/AFormElement';
 import {mixin} from 'phovea_core/src';
+import {IFormSerializedElement} from '../form/interfaces';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -142,6 +143,11 @@ export abstract class AView extends EventHandler implements IView {
    */
   protected parameterChanged(_name: string) {
     // hook
+  }
+
+  getAllParameters():IFormSerializedElement[] {
+    // hook
+    return [];
   }
 
   setInputSelection(selection:ISelection) {

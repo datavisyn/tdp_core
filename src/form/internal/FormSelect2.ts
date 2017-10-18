@@ -8,7 +8,7 @@ import * as $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
 import {api2absURL} from 'phovea_core/src/ajax';
 import AFormElement from './AFormElement';
-import {IFormParent} from '../interfaces';
+import {IFormParent, IFormSerializedValues} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
 
 declare type IFormSelect2Options = Select2Options & {
@@ -225,6 +225,10 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     } finally {
       this.$select.on('change.propagate', this.listener);
     }
+  }
+
+  get serializedValue():IFormSerializedValues[] {
+    return this.$select.select2('data').map((d) => ({key: d.id, value: d.text}));
   }
 
   focus() {

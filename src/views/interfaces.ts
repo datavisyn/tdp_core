@@ -4,6 +4,7 @@ import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {IObjectRef} from 'phovea_core/src/provenance';
 import {IEventHandler} from 'phovea_core/src/event';
 import Range from 'phovea_core/src/range/Range';
+import {IFormSerializedElement} from '../form/interfaces';
 
 /**
  * mode of the view depending on the view state
@@ -183,6 +184,12 @@ export interface IView extends IEventHandler {
    * @param value
    */
   setParameter(name: string, value: any): void;
+
+  /**
+   * Get the serialized data of all parameters
+   * @returns {IFormSerializedElement[]}
+   */
+  getAllParameters(): IFormSerializedElement[];
 
   /**
    * notify the view that its view mode has changed

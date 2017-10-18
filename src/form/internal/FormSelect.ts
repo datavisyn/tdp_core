@@ -5,7 +5,7 @@
 import * as d3 from 'd3';
 import * as session from 'phovea_core/src/session';
 import AFormElement from './AFormElement';
-import {IFormElementDesc, IFormParent, IFormElement} from '../interfaces';
+import {IFormElementDesc, IFormParent, IFormElement, IFormSerializedValues} from '../interfaces';
 import {resolveImmediately} from 'phovea_core/src';
 
 
@@ -172,6 +172,24 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
 
   hasValue() {
     return this.value !== null;
+  }
+
+  get serializedValue():IFormSerializedValues[] {
+    if(!this.value) { // null
+      return [];
+
+    } else if(this.value.value) { // object
+      return [{
+        key: this.value.value,
+        value: this.value.name
+      }];
+
+    }
+    // string
+    return [{
+      key: this.id,
+      value: this.value
+    }];
   }
 
   focus() {

@@ -4,7 +4,7 @@
 
 import {Selection} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
-import {IFormElementDesc, IFormParent, IFormElement} from '../interfaces';
+import {IFormElementDesc, IFormParent, IFormElement, IFormSerializedValues, IFormSerializedElement} from '../interfaces';
 import * as session from 'phovea_core/src/session';
 
 /**
@@ -156,7 +156,20 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    */
   abstract set value(v: any);
 
+  abstract get serializedValue():IFormSerializedValues[];
+
   abstract focus();
+
+  /**
+   * Serialize the element to plain object data structure
+   * @returns {IFormSerializedElement}
+   */
+  serialize():IFormSerializedElement {
+    return {
+      id: this.id,
+      values: this.serializedValue
+    };
+  }
 }
 
 export function toData(value: any) {

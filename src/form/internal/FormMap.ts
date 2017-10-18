@@ -6,7 +6,7 @@ import 'select2';
 import {event as d3event} from 'd3';
 import * as $ from 'jquery';
 import AFormElement, {toData} from './AFormElement';
-import {IFormElementDesc, IFormParent, FormElementType} from '../interfaces';
+import {IFormElementDesc, IFormParent, FormElementType, IFormSerializedValues} from '../interfaces';
 import {ISelectOptions, resolveData} from './FormSelect';
 import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
 import {mixin} from 'phovea_core/src';
@@ -435,6 +435,10 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.previousValue = this.value; // force update
     this.buildMap();
     this.updateBadge();
+  }
+
+  get serializedValue(): IFormSerializedValues[] {
+    return this.value.map((v) => ({key: v.key, value: v.value}));
   }
 
   focus() {

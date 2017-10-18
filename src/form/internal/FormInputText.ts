@@ -4,7 +4,7 @@
 
 import * as d3 from 'd3';
 import AFormElement from './AFormElement';
-import {IFormElementDesc, IFormParent} from '../interfaces';
+import {IFormElementDesc, IFormParent, IFormSerializedValues} from '../interfaces';
 
 
 /**
@@ -78,6 +78,13 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
   set value(v: string) {
     this.$input.property('value', v);
     this.previousValue = v; // force old value change
+  }
+
+  get serializedValue():IFormSerializedValues[] {
+    return [{
+      key: this.id,
+      value: this.value
+    }];
   }
 
   focus() {

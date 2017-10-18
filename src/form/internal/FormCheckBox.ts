@@ -1,4 +1,4 @@
-import {IFormElementDesc, IFormParent} from '../interfaces';
+import {IFormElementDesc, IFormSerializedValues, IFormParent} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 
@@ -78,6 +78,13 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     const options = this.desc.options;
     this.$input.property('value', v === options.checked);
     this.previousValue = v === options.checked; // force old value change
+  }
+
+  get serializedValue():IFormSerializedValues[] {
+    return [{
+      key: this.id,
+      value: this.value
+    }];
   }
 
   focus() {
