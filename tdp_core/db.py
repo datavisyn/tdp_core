@@ -219,7 +219,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   replacements = replacements or {}
   arguments = arguments or {}
   replacements = _handle_aggregated_score(config, replacements, arguments)
-  secure_replacements = ['where', 'and_where', 'agg_score']  # has to be part of the computed replacements
+  secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
   # convert to index lookup
   kwargs = {}
@@ -333,7 +333,7 @@ def _get_count(database, view_name, args):
   if 'count' in view.queries:
     count_query = view.queries['count']
   elif view.table:
-    count_query = 'SELECT count(*) as count FROM {table} d {{where}}'.format(table=view.table)
+    count_query = 'SELECT count(d.*) as count FROM {table} d {{joins}} {{where}}'.format(table=view.table)
   else:
     count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')
@@ -409,3 +409,49 @@ def _fill_up_columns(view, engine):
         columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
 
   view.columns_filled_up = True
+
+
+def _lookup(database, view_name, query, page, limit, args):
+  config, engine = resolve(database)
+  if view_name not in config.views:
+    abort(404)
+  view = config.views[view_name]
+
+  arguments = args.copy()
+  offset = page * limit
+  # replace with wildcard version
+  arguments['query'] = '%{}%'.format(query)
+  # add 1 for checking if we have more
+  replacements = dict(limit=limit + 1, offset=offset, offset2=(offset + limit + 1))
+
+  kwargs, replace = prepare_arguments(view, config, replacements, arguments)
+
+  return engine, view, view.query, replace, kwargs
+
+
+def lookup_query(database, view_name, query, page, limit, args):
+  engine, _, sql, replace, kwargs = _lookup(database, view_name, query, page, limit, args)
+
+  if callable(sql):
+    return dict(query='custom function', args=kwargs)
+
+  return dict(query=sql.format(**replace), args=kwargs)
+
+
+def lookup(database, view_name, query, page, limit, args):
+  engine, view, sql, replace, kwargs = _lookup(database, view_name, query, page, limit, args)
+
+  if callable(sql):
+    kwargs.update(replace)
+    # callback variant
+    return sql(engine, kwargs, None)
+
+  with session(engine) as sess:
+    r_items = sess.run(sql.format(**replace), **kwargs)
+
+  more = len(r_items) > limit
+  if more:
+    # hit the boundary of more remove the artificial one
+    del r_items[-1]
+
+  return r_items, more, view
