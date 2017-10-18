@@ -44,6 +44,7 @@ export default class NamedSetList {
 
     this.filter = await this.findFilters();
     const data = await this.list();
+
     //store
     this.data.push(...data);
     this.update(true);
@@ -67,7 +68,6 @@ export default class NamedSetList {
 
   update(loaded = false) {
     const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
-
     const predefinedNamedSets = data.filter((d) => d.type !== ENamedSetType.NAMEDSET);
     const me = currentUserNameOrAnonymous();
     const customNamedSets = data.filter((d) => d.type === ENamedSetType.NAMEDSET && d.creator === me);
@@ -155,17 +155,17 @@ export default class NamedSetList {
 
   push(...namedSet: INamedSet[]) {
     this.data.push(...namedSet);
-    this.update();
+    this.update(true);
   }
 
   remove(namedSet: INamedSet) {
     this.data.splice(this.data.indexOf(namedSet), 1);
-    this.update();
+    this.update(true);
   }
 
   replace(oldNamedSet: INamedSet, newNamedSet: INamedSet) {
     this.data.splice(this.data.indexOf(oldNamedSet), 1, newNamedSet);
-    this.update();
+    this.update(true);
   }
 
   protected findFilters() {
