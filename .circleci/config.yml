@@ -24,7 +24,9 @@ jobs:
           - ./node_modules
       - run: #install all dependencies
           name: install-npm-wee2
-          command: npm install
+          command: |
+            npm install
+            npm run dedupe
       - restore_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
       - run:
