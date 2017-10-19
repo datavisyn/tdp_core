@@ -116,12 +116,12 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
     });
 
     const storyVis = graph.then((graph) => {
-      createProvVis(graph, body.querySelector('div.content'), {
+      createProvVis(graph, body.querySelector('div.asides'), {
         thumbnails: false,
         provVisCollapsed: false,
         hideCLUEButtonsOnCollapse: true
       });
-      return createStoryVis(graph, <HTMLElement>body.querySelector('div.content'), main, {
+      return createStoryVis(graph, <HTMLElement>body.querySelector('div.asides'), main, {
         thumbnails: false
       });
     });
@@ -129,7 +129,7 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
     this.app = graph.then((graph) => this.createApp(graph, clueManager, main));
 
     Promise.all([graph, this.app]).then((args) => {
-      createProvRetrievalPanel(args[0], body.querySelector('div.content'), {
+      createProvRetrievalPanel(args[0], body.querySelector('div.asides'), {
         app: args[1],
         captureNonPersistedStates: false
       });
