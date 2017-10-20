@@ -66,6 +66,12 @@ export abstract class ARankingView extends AView {
   private readonly config = mixin(defaultConfig(), {
     header: {
       summary: true
+    },
+    body: {
+      rowHeight: 20,
+      groupHeight: 70,
+      groupPadding: 5,
+      rowPadding: 0
     }
   });
   /**
