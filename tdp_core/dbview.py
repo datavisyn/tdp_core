@@ -18,9 +18,10 @@ def _clean_query(query):
 
 
 class DBFilterData(object):
-  def __init__(self, group, sub_query):
+  def __init__(self, group, sub_query, join):
     self.group = group
     self.sub_query = sub_query
+    self.join = join
 
 
 class DBView(object):
@@ -76,6 +77,11 @@ class DBView(object):
   def get_filter_group(self, key):
     if key in self.filters:
       return self.filters[key].group
+    return None
+
+  def get_filter_subjoin(self, key):
+    if key in self.filters:
+      return self.filters[key].join
     return None
 
   def filter_groups(self):
@@ -191,18 +197,21 @@ class DBViewBuilder(object):
       self.v.queries[key] = callback
     return self
 
-  def filters(self, keys, group=None):
+  def filters(self, keys, alias=None, table=None, group=None, join=None):
     """
     specify possible filter keys
     :param keys: the list of possible filters
-    :param group: group filter entries
+    :param alias: shortcut for just specifying the left hand alias: {alias} {operator} {value}
+    :param table: shortcut for just specifying the table alias: {table}.{key} {operator} {value}
+    :param group: to inject the filter in another group and_group_where
+    :param join: additional join to inject
     :return:
     """
     for key in keys:
-      self.v.filters[key] = DBFilterData(group, None)
+      self.filter(key, alias=alias, table=table, group=group, join=join)
     return self
 
-  def filter(self, key, replacement=None, alias=None, table=None, group=None):
+  def filter(self, key, replacement=None, alias=None, table=None, group=None, join=None):
     """
     add a possible filter with replacement strategy of type {key} {operator} {value}
     :param key: filter key
@@ -210,13 +219,14 @@ class DBViewBuilder(object):
     :param alias: shortcut for just specifying the left hand alias: {alias} {operator} {value}
     :param table: shortcut for just specifying the table alias: {table}.{key} {operator} {value}
     :param group: to inject the filter in another group and_group_where
+    :param join: additional join to inject
     :return: self
     """
     if table is not None:
       alias = '{}.{}'.format(table, key)
     if alias is not None:
       replacement = alias + ' {operator} {value}'
-    self.v.filters[key] = DBFilterData(group, replacement)
+    self.v.filters[key] = DBFilterData(group, replacement, join)
     return self
 
   def append(self, key, query=None):
@@ -372,12 +382,16 @@ def inject_where(builder):
     else:
       builder.query('{} {{and_where}} {}'.format(query[:before], query[before:]))
     builder.replace('and_where')
+    query = builder.v.query
+    builder.query('{} {{joins}} {}'.format(query[:where], query[where:]))
+    builder.replace('joins')
   else:
     if before < 0:
-      builder.append(' {where}')
+      builder.append('{joins} {where}')
     else:
-      builder.query('{} {{where}} {}'.format(query[:before], query[before:]))
+      builder.query('{} {{joins}} {{where}} {}'.format(query[:before], query[before:]))
     builder.replace('where')
+    builder.replace('joins')
   return builder
 
 
@@ -405,7 +419,7 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
 
   queries[prefix + '_items_verify'] = DBViewBuilder().idtype(idtype).table(table).query("""
         SELECT {id}, {name} AS text
-        FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).build()
+        FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).filter(name_column, 'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
 
   queries[prefix + '_unique'] = DBViewBuilder().query("""
         SELECT d as id, d as text

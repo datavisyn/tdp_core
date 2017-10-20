@@ -138,6 +138,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
    * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
+    this.addChangeListener();
     if (this.desc.visible === false) {
       this.$node.classed('hidden', true);
     }
