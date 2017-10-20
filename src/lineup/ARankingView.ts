@@ -63,7 +63,7 @@ export interface IARankingViewOptions {
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config: ILineUpConfig = mixin(defaultConfig(), {
+  private readonly config = mixin(defaultConfig(), {
     header: {
       summary: true
     }
