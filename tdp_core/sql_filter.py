@@ -128,16 +128,20 @@ def filter_logic(view, args):
       continue
     clause = to_clause(k, v)
     group = view.get_filter_group(k)
+    join = view.get_filter_subjoin(k)
     if group is None:
-      where_default_clause.append(clause)
+      where_default_clause.append((clause, join))
     else:
-      where_group_clauses[group].append(clause)
+      where_group_clauses[group].append((clause, join))
 
   replacements = dict()
-  replacements['and_where'] = (' AND ' + ' AND '.join(where_default_clause)) if where_default_clause else ''
-  replacements['where'] = (' WHERE ' + ' AND '.join(where_default_clause)) if where_default_clause else ''
+  replacements['and_where'] = (' AND ' + ' AND '.join(c for c, _ in where_default_clause)) if where_default_clause else ''
+  replacements['where'] = (' WHERE ' + ' AND '.join(c for c, _ in where_default_clause)) if where_default_clause else ''
+  # unique joins
+  replacements['joins'] = ' '.join(set(j for _, j in where_default_clause if j is not None))
   for group, v in where_group_clauses.items():
-    replacements['and_' + group + '_where'] = (' AND ' + ' AND '.join(v)) if v else ''
-    replacements[group + '_where'] = (' WHERE ' + ' AND '.join(v)) if v else ''
+    replacements['and_' + group + '_where'] = (' AND ' + ' AND '.join(c for c, _ in v)) if v else ''
+    replacements[group + '_where'] = (' WHERE ' + ' AND '.join(c for c, _ in v)) if v else ''
+    replacements[group + '_joins'] = ' '.join(set(j for _, j in v if j is not None))
 
   return replacements, processed_args, extra_args, where_clause

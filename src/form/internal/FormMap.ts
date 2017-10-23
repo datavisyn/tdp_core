@@ -138,6 +138,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
    * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
+    this.addChangeListener();
     if (this.desc.visible === false) {
       this.$node.classed('hidden', true);
     }
@@ -413,7 +414,10 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
    */
   get value() {
     // just rows with a valid key and value
-    return this.rows.filter((d) => d.key && d.value !== null);
+    const validRows = this.rows.filter((d) => d.key && d.value !== null);
+
+    // create copies from each row, such that the previous values don't reference to this.value
+    return validRows.map((row) => Object.assign({}, row));
   }
 
   hasValue() {

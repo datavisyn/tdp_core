@@ -99,7 +99,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
   private computePositionToInsert(context: IContext, id: number) {
     const ids = context.columns.map((col) => (<IAdditionalColumnDesc>col.desc).selectedId);
 
-    // find last index of current ID + consider how many columns have been added so far (offset), since context.columns is not yet updated
+    // find index to insert the column or append it at the end
     const lastIndex = ids.lastIndexOf(id);
     return lastIndex === -1 ? context.columns.length : lastIndex + 1;
   }
