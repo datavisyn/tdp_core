@@ -4,11 +4,9 @@
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
 
-import {ILineUpConfig} from 'lineupjs/src/interfaces';
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/utils';
 import {LocalDataProvider} from 'lineupjs/src/provider';
-import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
@@ -23,10 +21,11 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
-import {defaultConfig} from 'lineupjs/src/config';
 import LineUpPanelActions from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
 import StackColumn from 'lineupjs/src/model/StackColumn';
+import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
+import {IRule} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
 
 export interface IARankingViewOptions {
   /**
@@ -63,17 +62,9 @@ export interface IARankingViewOptions {
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config = mixin(defaultConfig(), {
-    header: {
-      summary: true
-    },
-    body: {
-      rowHeight: 20,
-      groupHeight: 70,
-      groupPadding: 5,
-      rowPadding: 0
-    }
-  });
+  private readonly config = {
+    violationChanged: (_rule, violation?: string) => this.panel.setViolation(violation)
+  };
   /**
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
@@ -89,7 +80,8 @@ export abstract class ARankingView extends AView {
     maxNestedSortingCriteria: 2,
     grouping: true
   });
-  private readonly engine: EngineRenderer;
+  private readonly taggle: TaggleRenderer;
+  private readonly spaceFilling: HTMLElement;
   private readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
 
@@ -133,8 +125,14 @@ export abstract class ARankingView extends AView {
     mixin(this.options, idTypeNames, names, options);
 
 
-    this.node.classList.add('lineup');
-    this.node.insertAdjacentHTML('beforeend', `<div></div>`);
+    this.node.classList.add('lineup', 'lu-taggle');
+    this.node.insertAdjacentHTML('beforeend', `<aside class="panel">
+        <div class="lu-rule-button-chooser">
+            <div><span>Overview</span>
+              <code></code>
+            </div>
+        </div>
+    </aside><div></div>`);
 
     this.stats = this.node.ownerDocument.createElement('p');
 
@@ -143,9 +141,10 @@ export abstract class ARankingView extends AView {
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-    this.engine = new EngineRenderer(this.provider, this.node.firstElementChild!, this.config);
 
-    this.panel = new LineUpPanelActions(this.provider, this.engine.ctx, () => this.itemIDType, this.options.additionalScoreParameter);
+    this.taggle = new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, this.config);
+
+    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, () => this.itemIDType, this.options.additionalScoreParameter);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
@@ -156,15 +155,18 @@ export abstract class ARankingView extends AView {
       this.pushTrackedScoreColumn(scoreName, scoreId, params);
     });
     this.panel.on(LineUpPanelActions.EVENT_ZOOM_OUT, () => {
-      this.engine.zoomOut();
+      this.taggle.zoomOut();
     });
     this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
-      this.engine.zoomIn();
+      this.taggle.zoomIn();
+    });
+    this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
+      this.taggle.switchRule(rule);
     });
 
 
     this.node.appendChild(this.panel.node);
-    this.engine.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+    this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
 
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
@@ -312,7 +314,7 @@ export abstract class ARankingView extends AView {
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
     colDesc.color = this.colors.getColumnColor(id);
-    return addLazyColumn(colDesc, data, this.provider, position, () => this.engine.update());
+    return addLazyColumn(colDesc, data, this.provider, position, () => this.taggle.update());
   }
 
   private addScoreColumn(score: IScore<any>) {
