@@ -163,7 +163,7 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
 
 export function createInitialRanking(provider: ADataProvider) {
   const ranking = provider.pushRanking();
-  ranking.push(provider.create(createAggregateDesc()));
+  ranking.insert(provider.create(createAggregateDesc()), 0);
   ranking.push(provider.create(createSelectionDesc()));
 
   provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {

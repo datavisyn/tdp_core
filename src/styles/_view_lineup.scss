@@ -116,6 +116,10 @@
     flex: 1 1 auto;
     position: relative;
   }
+
+  .lu-rule-button-chooser {
+    flex: 0 0 auto;
+  }
 }
 
 .lineup-engine {
@@ -128,5 +132,5 @@
 }
 
 @at-root {
-  @import "~lineupjs/src/styles/taggle";
+  @import '~lineupjs/src/styles/taggle';
 }
