@@ -81,7 +81,6 @@ export abstract class ARankingView extends AView {
     grouping: true
   });
   private readonly taggle: TaggleRenderer;
-  private readonly spaceFilling: HTMLElement;
   private readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
 
@@ -126,13 +125,7 @@ export abstract class ARankingView extends AView {
 
 
     this.node.classList.add('lineup', 'lu-taggle');
-    this.node.insertAdjacentHTML('beforeend', `<aside class="panel">
-        <div class="lu-rule-button-chooser">
-            <div><span>Overview</span>
-              <code></code>
-            </div>
-        </div>
-    </aside><div></div>`);
+    this.node.insertAdjacentHTML('beforeend', `<div></div>`);
 
     this.stats = this.node.ownerDocument.createElement('p');
 

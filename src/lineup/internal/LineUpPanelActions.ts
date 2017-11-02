@@ -86,7 +86,7 @@ export default class LineUpPanelActions extends ALineUpActions {
     });
 
     {
-      this.node.insertAdjacentHTML('beforend', `<div class="lu-rule-button-chooser">
+      this.node.insertAdjacentHTML('beforeend', `<div class="lu-rule-button-chooser">
             <div><span>Overview</span>
               <code></code>
             </div>
