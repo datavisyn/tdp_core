@@ -11,6 +11,7 @@ export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
 // filter extensions
 export const EXTENSION_POINT_TDP_LIST_FILTERS = 'tdpListFilters';
+export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
 
 /**
  * a score item
@@ -97,4 +98,22 @@ export interface IRankingButtonExtensionDesc extends IPluginDesc {
   cssClass: string;
 
   load(): Promise<IPlugin & IRankingButtonExtension>;
+}
+
+/**
+ * additional meta data about
+ */
+export interface IGroupData {
+  name: string;
+  label?: string;
+  description?: string;
+  collapsed?: boolean;
+  order: number;
+}
+
+/**
+ * helper extension point for grouping views and provide meta data
+ */
+export interface IViewGroupExtensionDesc extends IPluginDesc {
+  groups: IGroupData[];
 }
