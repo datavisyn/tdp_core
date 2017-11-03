@@ -3,7 +3,7 @@
  */
 
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
-import {create as createHeader, AppHeaderLink} from 'phovea_ui/src/header';
+import {create as createHeader, AppHeaderLink, AppHeader} from 'phovea_ui/src/header';
 import {MixedStorageProvenanceGraphManager} from 'phovea_core/src/provenance';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {VerticalStoryVis} from 'phovea_clue/src/storyvis';
@@ -48,6 +48,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   };
 
   protected app: Promise<T> = null;
+  protected header: AppHeader;
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
@@ -65,12 +66,12 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
         return false;
       })
     };
-    const header = createHeader(<HTMLElement>body.querySelector('div.box'), headerOptions);
+    this.header = createHeader(<HTMLElement>body.querySelector('div.box'), headerOptions);
 
-    const aboutDialogBody = header.aboutDialog;
+    const aboutDialogBody = this.header.aboutDialog;
     aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
 
-    this.on('jumped_to,loaded_graph', () => header.ready());
+    this.on('jumped_to,loaded_graph', () => this.header.ready());
     //load all available provenance graphs
     const manager = new MixedStorageProvenanceGraphManager({
       prefix: this.options.prefix,
@@ -79,9 +80,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     });
     const clueManager = new CLUEGraphManager(manager);
 
-    header.wait();
+    this.header.wait();
 
-    const loginMenu = new LoginMenu(header, {
+    const loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
       loginForm: this.options.loginForm
     });
@@ -90,7 +91,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       loginMenu.forceShowDialog();
     });
 
-    const provenanceMenu = new EditProvenanceGraphMenu(clueManager, header.rightMenu);
+    const provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
 
     const modeSelector = body.querySelector('header');
     modeSelector.className += 'clue-modeselector collapsed';

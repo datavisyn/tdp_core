@@ -26,8 +26,13 @@
     border-color: $color;
   }
 
-  .nav-pills > li[data-idtype="#{$idType}"] > a {
-    border: 1px solid $color;
+  .view-chooser li[data-idtype="#{$idType}"] {
+    border: 1px solid $color !important;
+
+    &:active,
+    &:hover {
+      box-shadow: 0 8px 17px 0 rgba($color, 0.2), 0 6px 20px 0 rgba($color, 0.2) !important;
+    }
   }
 
   .nav-tabs > li[data-idtype="#{$idType}"] {
