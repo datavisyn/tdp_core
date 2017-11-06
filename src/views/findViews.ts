@@ -11,7 +11,7 @@ import IDType from 'phovea_core/src/idtype/IDType';
 import {IViewPluginDesc, matchLength, showAsSmallMultiple, toViewPluginDesc} from './interfaces';
 import {
   EXTENSION_POINT_TDP_LIST_FILTERS,
-  EXTENSION_POINT_TDP_VIEW
+  EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, IGroupData, IViewGroupExtensionDesc
 } from '../extensions';
 import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import Range from 'phovea_core/src/range/Range';
@@ -54,4 +54,68 @@ export default async function findViews(idtype: IDType, selection: Range): Promi
     .map((v) => ({enabled: bySelection(v), v: toViewPluginDesc(v)}));
 }
 
+function caseInsensitiveCompare(a: string, b: string) {
+  return a.toLowerCase().localeCompare(b.toLowerCase());
+}
 
+function resolveGroupData() {
+  const plugins = <IViewGroupExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_VIEW_GROUPS);
+  const r = new Map<string, IGroupData>();
+  plugins.forEach((plugin) => {
+    (plugin.groups || []).forEach((g) => {
+      g.label = g.label || g.name;
+      g.description = g.description || '';
+      r.set(g.name, g);
+    });
+  });
+  return r;
+}
+
+export interface IGroupedViews<T extends {v: IViewPluginDesc}> extends IGroupData {
+  views: T[];
+}
+
+/**
+ * groups the given views
+ * @param {T[]} views
+ * @returns {IGroupedViews[]}
+ */
+export function groupByCategory<T extends {v: IViewPluginDesc}>(views: T[]): IGroupedViews<T>[] {
+  const grouped = new Map<string, T[]>();
+  views.forEach((elem) => {
+    if(!grouped.has(elem.v.group.name)) {
+      grouped.set(elem.v.group.name, [elem]);
+    } else {
+      grouped.get(elem.v.group.name).push(elem);
+    }
+  });
+
+  const sortView = (a: {v: IViewPluginDesc}, b: {v: IViewPluginDesc}) => {
+    const orderA = a.v.group.order;
+    const orderB = b.v.group.order;
+    if (orderA === orderB) {
+      return caseInsensitiveCompare(a.v.name, b.v.name);
+    }
+    return orderA - orderB;
+  };
+
+  const sortGroup = (a: {name: string, order: number}, b: {name: string, order: number}) => {
+    const orderA = a.order;
+    const orderB = b.order;
+    if (orderA === orderB) {
+      return caseInsensitiveCompare(a.name, b.name);
+    }
+    return orderA - orderB;
+  };
+
+  const groupData = resolveGroupData();
+
+  const groups = Array.from(grouped).map(([name, views]) => {
+    let base = groupData.get(name);
+    if (!base) {
+      base = {name, label: name, description: '', order: 900};
+    }
+    return Object.assign(base, {views: views.sort(sortView)});
+  });
+  return groups.sort(sortGroup);
+}

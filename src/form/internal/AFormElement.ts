@@ -72,7 +72,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     this.$node.classed('hidden', !visible);
   }
 
-  protected build() {
+  protected addChangeListener() {
     if (this.desc.useSession || this.desc.onChange) {
       this.on(AFormElement.EVENT_CHANGE, () => {
         this.updateStoredValue();
@@ -84,6 +84,10 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
         }
       });
     }
+  }
+
+  protected build() {
+    this.addChangeListener();
 
     if (this.desc.visible === false) {
       this.$node.classed('hidden', true);

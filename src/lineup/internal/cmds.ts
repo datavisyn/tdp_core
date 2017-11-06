@@ -282,7 +282,7 @@ function untrackColumn(col: Column) {
   col.on(['metaDataChanged.filter', 'filterChanged.track', 'widthChanged.track'], null);
 
   if (col instanceof CompositeColumn) {
-    col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `CompositeColumn.EVENT_REMOVE_COLUMN}.track`], null);
+    col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`], null);
     col.children.forEach(untrackColumn);
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);

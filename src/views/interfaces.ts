@@ -24,6 +24,11 @@ export interface IViewPluginDesc extends IPluginDesc {
   idtype?: string;
 
   load(): Promise<IViewPlugin>;
+
+  /**
+   * view group hint
+   */
+  group: {name: string, order: number};
 }
 
 export interface IViewPlugin {
@@ -43,6 +48,7 @@ export interface IViewPlugin {
 export function toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
   const r: any = p;
   r.selection = r.selection || 'none';
+  r.group = Object.assign({name: 'Other', order: 99}, r.group);
   return r;
 }
 
