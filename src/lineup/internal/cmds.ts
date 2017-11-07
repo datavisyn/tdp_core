@@ -370,7 +370,7 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
     trackRanking(p, lineup, graph, ranking);
   });
   p.on(`${ADataProvider.EVENT_REMOVE_RANKING}.track`, (ranking, index: number) => {
-    if (ignoreNext === ADataProvider.EVENT_ADD_RANKING) {
+    if (ignoreNext === ADataProvider.EVENT_REMOVE_RANKING) {
       ignoreNext = null;
       return;
     }
