@@ -1,0 +1,28 @@
+@import '~phovea_ui/src/fonts/monda';
+
+$datavisyn_css_prefix: 'datavisyn' !default;
+$datavisyn_font_size_base: 14px !default;
+$datavisyn_line_height_base: 1 !default;
+$dataviyn_font: Monda !default;
+
+@mixin datavisyn-font() {
+  font: normal normal normal #{$datavisyn_font_size_base}/#{$datavisyn_line_height_base} $dataviyn_font; // shortening font declaration
+  font-size: inherit; // can't have font-size inherit on line above, so need to override
+  text-rendering: auto; // optimizelegibility throws things off #1094
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+.#{$datavisyn_css_prefix}-font {
+  @include datavisyn-font();
+
+  &[data-style=black] {
+    background: black;
+    border-radius: 2px;
+    padding: 0.1em 0.2em;
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+    color: white;
+  }
+}
