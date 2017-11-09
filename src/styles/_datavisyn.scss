@@ -1,0 +1,70 @@
+@import '~phovea_ui/src/fonts/monda';
+@import '~font-awesome/scss/variables';
+@import '~font-awesome/scss/mixins';
+
+$datavisyn_css_prefix: 'datavisyn' !default;
+$datavisyn_font_size_base: 14px !default;
+$datavisyn_line_height_base: 1 !default;
+$dataviyn_font: Monda !default;
+
+@mixin datavisyn-font() {
+  font: normal normal normal #{$datavisyn_font_size_base}/#{$datavisyn_line_height_base} $dataviyn_font; // shortening font declaration
+  font-size: inherit; // can't have font-size inherit on line above, so need to override
+  text-rendering: auto; // optimizelegibility throws things off #1094
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+@-webkit-keyframes #{$datavisyn_css_prefix}-pulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+nav.navbar,
+nav.navbar-inverse {
+  .navbar-brand.caleydo_app {
+    background: none;
+    padding-left: 0;
+
+    &:before {
+      @include datavisyn-font();
+      content: 'd';
+      background: black;
+      border-radius: 5px;
+      padding: 0.2em 0.3em;
+      margin-left: 0.2em;
+      margin-right: 0.2em;
+      color: white;
+    }
+  }
+}
+
+.#{$datavisyn_css_prefix}-font {
+  @include datavisyn-font();
+
+  &[data-style=black] {
+    background: black;
+    border-radius: 2px;
+    padding: 0.1em 0.2em;
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+    color: white;
+  }
+}
+
+/*
+article.view > main .tdp-view.busy::before {
+  @include datavisyn-font();
+  content: 'd';
+  background: none !important;
+  animation: #{$datavisyn_css_prefix}-pulse 1s infinite linear;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+*/

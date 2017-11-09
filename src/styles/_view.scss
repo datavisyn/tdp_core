@@ -46,6 +46,11 @@ svg {
     bottom: 0;
     left: 0;
 
+    p {
+      flex: 0 0 auto;
+      margin: 0.5em;
+    }
+
     iframe {
       border: 0;
       width: 100%;

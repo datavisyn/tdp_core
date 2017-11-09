@@ -17,6 +17,10 @@ import {extent} from 'd3';
 export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & { pushDesc(col: IColumnDesc): void }, position: number, done?: () => void): { col: Column, loaded: Promise<Column> } {
   const ranking = provider.getLastRanking();
   const accessor = createAccessor(colDesc);
+
+  // generate a unique column
+  (<any>colDesc).column = `dC${colDesc.label.replace(/\s+/,'')}`;
+
   provider.pushDesc(colDesc);
   //mark as lazy loaded
   (<any>colDesc).lazyLoaded = true;
