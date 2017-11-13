@@ -91,7 +91,7 @@
         position: relative;
         border: none;
 
-        &:not(.once) form {
+        &:not(.once) .lu-search {
           display: none;
         }
 
@@ -99,10 +99,11 @@
           display: block;
         }
 
-        &.once form {
+        &.once .lu-search {
           position: absolute;
           top: 2em;
-          left: -15.4em;
+          width: 17.5em;
+          left: -15em;
         }
       }
 

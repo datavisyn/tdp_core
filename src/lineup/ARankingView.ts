@@ -137,7 +137,7 @@ export abstract class ARankingView extends AView {
 
     this.taggle = new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, this.config);
 
-    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, () => this.itemIDType, this.options.additionalScoreParameter);
+    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options.additionalScoreParameter);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
@@ -384,6 +384,9 @@ export abstract class ARankingView extends AView {
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];
       columns.forEach((c) => this.provider.pushDesc(c));
+
+      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
+
       const rows: IRow[] = r[1];
 
       this.setLineUpData(rows);
