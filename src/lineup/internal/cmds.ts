@@ -33,6 +33,15 @@ let ignoreNext: string = null;
  */
 const temporaryUntracked = new Set<string>();
 
+
+function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
+  if (ignoreNext === event) {
+    ignoreNext = null;
+    return true;
+  }
+  return temporaryUntracked.has(lineup.hash);
+}
+
 export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
   const index: number = parameter.index;
@@ -259,14 +268,6 @@ function rankingId(provider: ADataProvider, ranking: Ranking) {
   return provider.getRankings().indexOf(ranking);
 }
 
-function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
-  if (ignoreNext === Ranking.EVENT_SORT_CRITERIAS_CHANGED) {
-    ignoreNext = null;
-    return true;
-  }
-  return temporaryUntracked.has(lineup.hash);
-}
-
 
 function recordPropertyChange(source: Column | Ranking, provider: ADataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1) {
   const f = (old: any, newValue: any) => {
@@ -297,9 +298,8 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
   recordPropertyChange(col, provider, lineup, graph, 'metaData');
   recordPropertyChange(col, provider, lineup, graph, 'filter');
   recordPropertyChange(col, provider, lineup, graph, 'rendererType');
-  recordPropertyChange(col, provider, lineup, graph, 'groupRendererType');
+  recordPropertyChange(col, provider, lineup, graph, 'groupRenderer');
   recordPropertyChange(col, provider, lineup, graph, 'sortMethod');
-  recordPropertyChange(col, provider, lineup, graph, 'grouping');
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
   if (col instanceof CompositeColumn) {
@@ -369,7 +369,7 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
 
 
 function untrackColumn(col: Column) {
-  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'sortMethod', 'grouping'), null);
+  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'sortMethod'), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
