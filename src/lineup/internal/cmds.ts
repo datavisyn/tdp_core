@@ -297,6 +297,7 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
   recordPropertyChange(col, provider, lineup, graph, 'metaData');
   recordPropertyChange(col, provider, lineup, graph, 'filter');
   recordPropertyChange(col, provider, lineup, graph, 'rendererType');
+  recordPropertyChange(col, provider, lineup, graph, 'groupRendererType');
   recordPropertyChange(col, provider, lineup, graph, 'sortMethod');
   recordPropertyChange(col, provider, lineup, graph, 'grouping');
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
