@@ -311,7 +311,10 @@ export abstract class ARankingView extends AView {
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
     colDesc.color = this.colors.getColumnColor(id);
-    return addLazyColumn(colDesc, data, this.provider, position, () => this.taggle.update());
+    return addLazyColumn(colDesc, data, this.provider, position, () => {
+      this.taggle.update();
+      this.panel.updateChooser(this.idType, this.provider.getColumns());
+    });
   }
 
   private addScoreColumn(score: IScore<any>) {

@@ -66,6 +66,11 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
       columns.forEach((column) => (<ValueColumn<any>>column).setLoaded(true));
     });
 
+    // mark the description as loaded true
+
+    //mark as lazy loaded
+    (<any>colDesc).lazyLoaded = false;
+
     if (done) {
       done();
     }

@@ -223,9 +223,9 @@ export default class LineUpPanelActions extends EventHandler {
     return typeof this.extraArgs === 'function' ? this.extraArgs() : this.extraArgs;
   }
 
-  private getColumnDescription(descs: IColumnDesc[]) {
+  private getColumnDescription(descs: IColumnDesc[], addScores: boolean) {
     return descs
-      .filter((d) => !(<any>d)._score)
+      .filter((d) => Boolean((<any>d)._score) === addScores)
       .map((d) => ({ text: d.label, id: (<any>d).column, action: () => this.addColumn(d)}))
       .sort((a, b) => a.text.localeCompare(b.text));
   }
@@ -261,7 +261,11 @@ export default class LineUpPanelActions extends EventHandler {
     this.search.data = [
       {
         text: 'Database Columns',
-        children: this.getColumnDescription(descs)
+        children: this.getColumnDescription(descs, false)
+      },
+      {
+        text: 'Computed Scores',
+        children: this.getColumnDescription(descs, true)
       },
       {
         text: 'Parameterized Scores',
