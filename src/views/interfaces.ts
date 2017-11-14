@@ -28,6 +28,12 @@ export interface IViewPluginDesc extends IPluginDesc {
    * view group hint
    */
   group: {name: string, order: number};
+
+  /**
+   * optional preview callback function returning a url promise, the preview image should have 320x180 px
+   * @returns {Promise<string>}
+   */
+  preview?(): Promise<string>;
 }
 
 export interface IViewPlugin {
