@@ -102,7 +102,7 @@ class DBView(object):
       return type(value) == v
     if isinstance(v, REGEX_TYPE):
       return v.match(value)
-    _log.info('unknown %s %s %s', key, value, v)
+    _log.info(u'unknown %s %s %s', key, value, v)
     return True
 
   def is_valid_argument(self, key):
@@ -223,7 +223,7 @@ class DBViewBuilder(object):
     :return: self
     """
     if table is not None:
-      alias = '{}.{}'.format(table, key)
+      alias = u'{}.{}'.format(table, key)
     if alias is not None:
       replacement = alias + ' {operator} {value}'
     self.v.filters[key] = DBFilterData(group, replacement, join)
@@ -344,7 +344,7 @@ def inject_where_clause(builder, clause):
   index = lower.find(' where ')
   if index >= 0:
     index += len(' where ')  # get the end
-    builder.query('{} ({}) AND {}'.format(query[:index], clause, query[index:]))
+    builder.query(u'{} ({}) AND {}'.format(query[:index], clause, query[index:]))
   else:
     before = -1
     for before_q in [' order by', ' group by', ' limit', ' offset']:
@@ -355,7 +355,7 @@ def inject_where_clause(builder, clause):
       # append
       builder.append(' WHERE ').append(clause)
     else:
-      builder.query('{} WHERE {} {}'.format(query[:index], clause, query[index:]))
+      builder.query(u'{} WHERE {} {}'.format(query[:index], clause, query[index:]))
   return builder
 
 
@@ -378,18 +378,18 @@ def inject_where(builder):
 
   if where >= 0:
     if before < 0:
-      builder.append(' {and_where}')
+      builder.append(u' {and_where}')
     else:
-      builder.query('{} {{and_where}} {}'.format(query[:before], query[before:]))
+      builder.query(u'{} {{and_where}} {}'.format(query[:before], query[before:]))
     builder.replace('and_where')
     query = builder.v.query
-    builder.query('{} {{joins}} {}'.format(query[:where], query[where:]))
+    builder.query(u'{} {{joins}} {}'.format(query[:where], query[where:]))
     builder.replace('joins')
   else:
     if before < 0:
       builder.append('{joins} {where}')
     else:
-      builder.query('{} {{joins}} {{where}} {}'.format(query[:before], query[before:]))
+      builder.query(u'{} {{joins}} {{where}} {}'.format(query[:before], query[before:]))
     builder.replace('where')
     builder.replace('joins')
   return builder
@@ -412,16 +412,16 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
   if prefix is None:
     prefix = table
 
-  queries[prefix + '_items'] = DBViewBuilder().idtype(idtype).table(table).query("""
+  queries[prefix + '_items'] = DBViewBuilder().idtype(idtype).table(table).query(u"""
         SELECT {id}, {{column}} AS text
         FROM {table} WHERE LOWER({{column}}) LIKE :query
         ORDER BY {{column}} ASC""".format(id=id_query, table=table)).replace('column', columns).assign_ids().call(call_function).call(limit_offset).arg('query').build()
 
-  queries[prefix + '_items_verify'] = DBViewBuilder().idtype(idtype).table(table).query("""
+  queries[prefix + '_items_verify'] = DBViewBuilder().idtype(idtype).table(table).query(u"""
         SELECT {id}, {name} AS text
         FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).filter(name_column, 'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
 
-  queries[prefix + '_unique'] = DBViewBuilder().query("""
+  queries[prefix + '_unique'] = DBViewBuilder().query(u"""
         SELECT d as id, d as text
         FROM (
           SELECT distinct {{column}} AS d
@@ -429,7 +429,7 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
           ) as t
         ORDER BY d ASC""".format(table=table)).replace('column', columns).call(limit_offset).arg('query').build()
 
-  queries[prefix + '_unique_all'] = DBViewBuilder().query("""
+  queries[prefix + '_unique_all'] = DBViewBuilder().query(u"""
         SELECT distinct {{column}} AS text
         FROM {table} ORDER BY {{column}} ASC """.format(table=table)).replace('column', columns).build()
 

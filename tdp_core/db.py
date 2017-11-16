@@ -226,8 +226,8 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   if view.arguments is not None:
     for arg in view.arguments:
       if arg not in arguments:
-        _log.warn('missing argument "%s": "%s"', view.query, arg)
-        abort(400, 'missing argument: ' + arg)
+        _log.warn(u'missing argument "%s": "%s"', view.query, arg)
+        abort(400, u'missing argument: ' + arg)
       kwargs[arg] = arguments[arg]
 
   if extra_sql_argument is not None:
@@ -242,8 +242,8 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       else:
         value = replacements.get(arg, fallback)  # if not a secure one fallback with an argument
       if not view.is_valid_replacement(arg, value):
-        _log.warn('invalid replacement value detected "%s": "%s"="%s"', view.query, arg, value)
-        abort(400, 'the given parameter "%s" is invalid' % arg)
+        _log.warn(u'invalid replacement value detected "%s": "%s"="%s"', view.query, arg, value)
+        abort(400, u'the given parameter "%s" is invalid' % arg)
       else:
         replace[arg] = value
 
@@ -276,7 +276,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
 
   with session(engine) as sess:
     if config.statement_timeout is not None:
-      _log.info('set statement_timeout to {}'.format(config.statement_timeout))
+      _log.info(u'set statement_timeout to {}'.format(config.statement_timeout))
       sess.execute(config.statement_timeout_query.format(config.statement_timeout))
     r = sess.run(query.format(**replace), **kwargs)
   return r, view
@@ -333,7 +333,7 @@ def _get_count(database, view_name, args):
   if 'count' in view.queries:
     count_query = view.queries['count']
   elif view.table:
-    count_query = 'SELECT count(d.*) as count FROM {table} d {{joins}} {{where}}'.format(table=view.table)
+    count_query = u'SELECT count(d.*) as count FROM {table} d {{joins}} {{where}}'.format(table=view.table)
   else:
     count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')
@@ -357,7 +357,7 @@ def get_count(database, view_name, args):
 
   with session(engine) as sess:
     if config.statement_timeout is not None:
-      _log.info('set statement_timeout to {}'.format(config.statement_timeout))
+      _log.info(u'set statement_timeout to {}'.format(config.statement_timeout))
       sess.execute(config.statement_timeout_query.format(config.statement_timeout))
     r = sess.run(count_query.format(**replace), **kwargs)
   if r:
@@ -397,14 +397,14 @@ def _fill_up_columns(view, engine):
     with session(engine) as s:
       table = view.table
       if number_columns:
-        template = 'min({col}) as {col}_min, max({col}) as {col}_max'
+        template = u'min({col}) as {col}_min, max({col}) as {col}_max'
         minmax = ', '.join(template.format(col=col) for col in number_columns)
-        row = next(iter(s.execute("""SELECT {minmax} FROM {table}""".format(table=table, minmax=minmax))))
+        row = next(iter(s.execute(u"""SELECT {minmax} FROM {table}""".format(table=table, minmax=minmax))))
         for num_col in number_columns:
           columns[num_col]['min'] = row[num_col + '_min']
           columns[num_col]['max'] = row[num_col + '_max']
       for col in categorical_columns:
-        template = """SELECT distinct {col} as cat FROM {table} WHERE {col} <> '' and {col} is not NULL"""
+        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} <> '' and {col} is not NULL"""
         cats = s.execute(template.format(col=col, table=table))
         columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
 
@@ -420,7 +420,7 @@ def _lookup(database, view_name, query, page, limit, args):
   arguments = args.copy()
   offset = page * limit
   # replace with wildcard version
-  arguments['query'] = '%{}%'.format(query)
+  arguments['query'] = u'%{}%'.format(query)
   # add 1 for checking if we have more
   replacements = dict(limit=limit + 1, offset=offset, offset2=(offset + limit + 1))
 
