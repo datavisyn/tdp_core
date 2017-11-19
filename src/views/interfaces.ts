@@ -54,6 +54,11 @@ export function toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
   const r: any = p;
   r.selection = r.selection || 'none';
   r.group = Object.assign({name: 'Other', order: 99}, r.group);
+
+  // common typo
+  if (r.idType !== undefined) {
+    r.idtype = r.idType;
+  }
   return r;
 }
 
