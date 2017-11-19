@@ -67,6 +67,39 @@
       }
     }
 
+    button[data-violation] {
+      position: relative;
+      color: #FFD700;
+
+      &::before {
+        content: $fa-var-exclamation-triangle;
+      }
+
+      &::after {
+        content: attr(data-violation);
+        color: black;
+        text-align: left;
+        background: lighten(#FFD700, 45%);
+        hyphens: manual;
+        padding: 5px;
+        width: 12em;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 100;
+        pointer-events: none;
+        opacity: 0;
+        display: none;
+        transition: visibility 0s ease 0.3s, opacity 0.3s ease 0s;
+      }
+
+      &:hover::after {
+        opacity: 1;
+        display: block;
+        transition-delay: 0s, 0.3s;
+      }
+    }
+
     &.collapsed {
       max-width: 3em;
       min-width: 0;
@@ -116,10 +149,6 @@
   > div {
     flex: 1 1 auto;
     position: relative;
-  }
-
-  .lu-rule-button-chooser {
-    flex: 0 0 auto;
   }
 }
 

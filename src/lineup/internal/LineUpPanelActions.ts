@@ -57,7 +57,7 @@ export default class LineUpPanelActions extends EventHandler {
   private readonly search: SearchBox<ISearchOption>;
 
   readonly panel: SidePanel;
-  private spaceFilling: HTMLElement;
+  private overview: HTMLElement;
   private wasCollapsed = false;
 
   constructor(protected readonly provider: ADataProvider, ctx: IRankingHeaderContext, protected readonly extraArgs: object|(() => object), doc = document) {
@@ -119,6 +119,7 @@ export default class LineUpPanelActions extends EventHandler {
     buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
     buttons.appendChild(this.appendDownload());
     buttons.appendChild(this.appendSaveRanking());
+    buttons.appendChild(this.appendOverviewButton());
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
 
     const header = this.node.querySelector('header')!;
@@ -135,26 +136,6 @@ export default class LineUpPanelActions extends EventHandler {
       this.search.node.focus();
       this.search.focus();
     });
-
-    {
-      this.node.insertAdjacentHTML('beforeend', `<div class="lu-rule-button-chooser">
-            <div><span>Overview</span>
-              <code></code>
-            </div>
-        </div>`);
-      this.spaceFilling = <HTMLElement>this.node.querySelector('.lu-rule-button-chooser :first-child')!;
-      this.spaceFilling.addEventListener('click', () => {
-        const selected = this.spaceFilling.classList.toggle('chosen');
-        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spacefilling : regular);
-      });
-    }
-
-  }
-
-  setViolation(violation?: string) {
-    violation = violation || '';
-    this.spaceFilling.classList.toggle('violated', Boolean(violation));
-    this.spaceFilling.lastElementChild!.textContent = violation.replace(/\n/g, '<br>');
   }
 
   private createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
@@ -170,6 +151,23 @@ export default class LineUpPanelActions extends EventHandler {
       }
     });
     return b;
+  }
+
+  private appendOverviewButton() {
+    const listener = () => {
+      const selected = this.overview.classList.toggle('fa-th-list');
+      this.overview.classList.toggle('fa-list');
+      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spacefilling : regular);
+    };
+    return this.overview =  this.createMarkup('En/Disable Overview', 'fa fa-list', listener);
+  }
+
+  setViolation(violation?: string) {
+    if (violation) {
+      this.overview.dataset.violation = violation;
+    } else {
+      delete this.overview.dataset.violation;
+    }
   }
 
   private appendDownload() {
