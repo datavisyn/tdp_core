@@ -77,7 +77,9 @@ export abstract class ARankingView extends AView {
   private readonly stats: HTMLElement;
 
   private readonly provider = new LocalDataProvider([], [], {
-    maxNestedSortingCriteria: 2,
+    maxNestedSortingCriteria: Infinity,
+    maxGroupColumns: Infinity,
+    filterGlobally: true,
     grouping: true
   });
   private readonly taggle: TaggleRenderer;
