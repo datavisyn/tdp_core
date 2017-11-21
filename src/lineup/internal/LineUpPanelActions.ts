@@ -14,6 +14,7 @@ import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {exportRanking} from 'lineupjs/src/provider/utils';
 import SearchBox from 'lineupjs/src/ui/panel/SearchBox';
 import {EventHandler} from 'phovea_core/src/event';
+import {IARankingViewOptions} from '../ARankingView';
 
 export interface ISearchOption {
   text: string;
@@ -60,7 +61,7 @@ export default class LineUpPanelActions extends EventHandler {
   private overview: HTMLElement;
   private wasCollapsed = false;
 
-  constructor(protected readonly provider: ADataProvider, ctx: IRankingHeaderContext, protected readonly extraArgs: object|(() => object), doc = document) {
+  constructor(protected readonly provider: ADataProvider, ctx: IRankingHeaderContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
 
     this.search = new SearchBox<ISearchOption>({
@@ -115,11 +116,15 @@ export default class LineUpPanelActions extends EventHandler {
     });
 
     const buttons = this.node.querySelector('section');
-    buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
-    buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
+    if (this.options.enableZoom) {
+      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
+      buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
+    }
     buttons.appendChild(this.appendDownload());
     buttons.appendChild(this.appendSaveRanking());
-    buttons.appendChild(this.appendOverviewButton());
+    if (this.options.enableOverviewMode) {
+      buttons.appendChild(this.appendOverviewButton());
+    }
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
 
     const header = this.node.querySelector('header')!;
@@ -218,7 +223,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private resolveArgs() {
-    return typeof this.extraArgs === 'function' ? this.extraArgs() : this.extraArgs;
+    return typeof this.options.additionalScoreParameter === 'function' ? this.options.additionalScoreParameter() : this.options.additionalScoreParameter;
   }
 
   private getColumnDescription(descs: IColumnDesc[], addScores: boolean) {

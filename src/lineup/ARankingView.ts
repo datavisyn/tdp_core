@@ -55,6 +55,17 @@ export interface IARankingViewOptions {
    * additional attributes for stored named sets
    */
   subType: { key: string, value: string };
+
+  /**
+   * enable taggle overview mode switcher
+   * @default true
+   */
+  enableOverviewMode: boolean;
+  /**
+   * enable zoom button
+   * @default true
+   */
+  enableZoom: boolean;
 }
 
 /**
@@ -112,7 +123,9 @@ export abstract class ARankingView extends AView {
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
-    subType: {key: '', value: ''}
+    subType: {key: '', value: ''},
+    enableOverviewMode: true,
+    enableZoom: true
   };
 
   private readonly selectionAdapter: ISelectionAdapter|null;
@@ -139,7 +152,7 @@ export abstract class ARankingView extends AView {
 
     this.taggle = new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, this.config);
 
-    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options.additionalScoreParameter);
+    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
