@@ -57,7 +57,6 @@ for p in list_plugins('tdp-sql-database-extension'):
   configs[p.id] = (connector, engine)
 
 
-
 def _supports_sql_parameters(dialect):
   return dialect.lower() != 'sqlite' and dialect.lower() != 'oracle'  # sqlite doesn't support array parameters, postgres does
 
