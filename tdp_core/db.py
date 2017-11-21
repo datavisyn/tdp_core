@@ -41,6 +41,22 @@ def _to_config(p):
 
 configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definition')}
 
+# another type of database definition which reuses the engine of an existing one
+for p in list_plugins('tdp-sql-database-extension'):
+  base = configs.get(p.base, None)
+  if not base:
+    _log.warn('invalid database extension no base found: %s base: %s', p.id, p.base)
+    continue
+  base_connector, engine = base
+  connector = p.load().factory()
+  if not connector.statement_timeout:
+    connector.statement_timeout = base_connector.statement_timeout
+  if not connector.statement_timeout_query:
+    connector.statement_timeout_query = base_connector.statement_timeout_query
+
+  configs[p.id] = (connector, engine)
+
+
 
 def _supports_sql_parameters(dialect):
   return dialect.lower() != 'sqlite' and dialect.lower() != 'oracle'  # sqlite doesn't support array parameters, postgres does
