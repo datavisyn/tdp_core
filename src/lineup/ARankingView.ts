@@ -296,6 +296,8 @@ export abstract class ARankingView extends AView {
     colDesc.color = this.colors.getColumnColor(id);
     const accessor = createAccessor(colDesc);
 
+    // generate a unique column
+    (<any>colDesc).column = `dC${colDesc.label.replace(/\s+/,'')}`;
     this.provider.pushDesc(colDesc);
 
     const col: Column = this.provider.create(colDesc);
@@ -303,6 +305,10 @@ export abstract class ARankingView extends AView {
       ranking.push(col);
     } else {
       ranking.insert(col, position);
+    }
+
+    if (colDesc.sortedByMe) {
+      col.sortByMe(colDesc.sortedByMe !== false);
     }
 
     // error handling

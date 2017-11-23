@@ -103,7 +103,7 @@ export default class LineUpSelectionHelper extends EventHandler {
       console.warn('no idType defined for this ranking view');
       return;
     }
-    const selection: ISelection = {idtype: this.idType(), range: uids};
+    const selection: ISelection = {idtype: idType, range: uids};
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }

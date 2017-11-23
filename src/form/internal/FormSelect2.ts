@@ -56,7 +56,7 @@ export const DEFAULT_AJAX_OPTIONS = Object.assign({
       };
     },
     processResults: (data, params) => {
-      params.page = params.page || 1;
+      params.page = params.page === undefined ? 0: params.page;
       return {
         results: data.items,
         pagination: { // indicate infinite scrolling

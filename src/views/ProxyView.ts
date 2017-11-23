@@ -42,10 +42,23 @@ export default class ProxyView extends AD3View {
     extra: {}
   };
 
+  private readonly openExternally: HTMLElement;
+
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
     super(context, selection, parent);
     mixin(this.options, context.desc, options);
     this.$node.classed('proxy_view', true);
+
+    this.openExternally = parent.ownerDocument.createElement('p');
+  }
+
+  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
+    super.init(params, onParameterChange);
+
+    // inject stats
+    const base = <HTMLElement>params.querySelector('form') || params;
+    base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+    base.lastElementChild!.appendChild(this.openExternally);
   }
 
   protected initImpl() {
@@ -141,6 +154,7 @@ export default class ProxyView extends AD3View {
     }
 
     //remove old mapping error notice if any exists
+    this.openExternally.innerHTML = '';
     this.$node.selectAll('p').remove();
     this.$node.selectAll('iframe').remove();
 
@@ -153,6 +167,8 @@ export default class ProxyView extends AD3View {
       this.showNoHttpsMessage(url);
       return;
     }
+
+    this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank"><i class="fa fa-external-link"></i>${url}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
     this.$node.append('iframe')
@@ -181,7 +197,7 @@ export default class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-        <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em"><strong>Security Information: </strong>The Target Discovery Platform uses HTTPS to secure your communication with our server.
+        <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em"><strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.
             However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.
             Please use the following <a href="${url}" target="_blank" class="alert-link">link</a> to open the website in a separate window:
             <br><br><a href="${url}" target="_blank" class="alert-link">${url}</a>
