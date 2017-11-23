@@ -171,6 +171,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   serialize():IFormSerializedElement {
     return {
       id: this.id,
+      label: this.desc.label,
       values: this.serializedValue
     };
   }

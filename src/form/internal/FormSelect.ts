@@ -175,7 +175,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   }
 
   get serializedValue():IFormSerializedValues[] {
-    if(!this.value) { // null
+    if(!this.value || this.value.name === '' || this.value.value === '') { // null
       return [];
 
     } else if(this.value.value) { // object

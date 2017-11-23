@@ -439,7 +439,24 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   }
 
   get serializedValue(): IFormSerializedValues[] {
-    return this.value.map((v) => ({key: v.key, value: v.value}));
+    let r = [];
+    this.value.forEach((v) => {
+      if (Array.isArray(v.value)) {
+        r = [
+          ...r,
+          ...v.value.map((value) => {
+            return (value.id) ? {key: v.key, value: value.id} : {key: v.key, value};
+          })
+        ];
+
+      } else if(v.value.id) {
+        r = [...r, {key: v.key, value: v.value.id}];
+
+      } else {
+        r = [...r, {key: v.key, value: v.value}];
+      }
+    });
+    return r;
   }
 
   focus() {

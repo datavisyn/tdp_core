@@ -75,6 +75,7 @@ export default class FormButton extends EventHandler implements IFormElement {
   serialize():IFormSerializedElement {
     return {
       id: this.id,
+      label: this.desc.label,
       values: this.serializedValue
     };
   }

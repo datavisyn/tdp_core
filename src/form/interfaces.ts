@@ -130,6 +130,7 @@ export interface IFormElementDesc {
 
 export interface IFormSerializedElement {
   id: string;
+  label: string;
   values: IFormSerializedValues[];
 }
 

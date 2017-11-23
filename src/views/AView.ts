@@ -147,7 +147,7 @@ export abstract class AView extends EventHandler implements IView {
 
   getAllParameters():IFormSerializedElement[] {
     // hook
-    return [];
+    return this.params.getSerializedElements();
   }
 
   setInputSelection(selection:ISelection) {
