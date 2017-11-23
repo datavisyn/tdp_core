@@ -40,7 +40,7 @@ def _return_query():
   return request.args.get('_return_query', False)
 
 
-def _formatCsv(array_of_dicts):
+def _format_csv(array_of_dicts):
   import pandas as pd
   import io
 
@@ -49,13 +49,13 @@ def _formatCsv(array_of_dicts):
 
   out = io.BytesIO()
   d = pd.DataFrame.from_records(array_of_dicts)
-  d.to_csv(out, sep='\t', encoding='utf-8', index = False)
+  d.to_csv(out, sep='\t', encoding='utf-8', index=False)
   return Response(out.getvalue(), mimetype='text/csv')
 
 
 def _formatter(view_name):
   if view_name.endswith('.csv'):
-    return view_name[:-4], _formatCsv
+    return view_name[:-4], _format_csv
   return view_name, jsonify
 
 
