@@ -436,6 +436,9 @@ def _lookup(database, view_name, query, page, limit, args):
   offset = page * limit
   # replace with wildcard version
   arguments['query'] = '%{}%'.format(query)
+  arguments['query_end'] = '%{}'.format(query)
+  arguments['query_start'] = '{}%'.format(query)
+  arguments['query_match'] = '{}'.format(query)
   # add 1 for checking if we have more
   replacements = dict(limit=limit + 1, offset=offset, offset2=(offset + limit + 1))
 
