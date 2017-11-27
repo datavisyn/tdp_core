@@ -87,7 +87,7 @@ export abstract class ARankingView extends AView {
    */
   private readonly stats: HTMLElement;
 
-  protected readonly provider = new LocalDataProvider([], [], {
+  private readonly provider = new LocalDataProvider([], [], {
     maxNestedSortingCriteria: Infinity,
     maxGroupColumns: Infinity,
     filterGlobally: true,
@@ -422,12 +422,18 @@ export abstract class ARankingView extends AView {
 
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
+
+      this.builtLineUp(this.provider);
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
       console.error(error);
       this.setBusy(false);
     });
+  }
+
+  protected builtLineUp(lineup: ADataProvider) {
+    // hook
   }
 
   protected createInitialRanking(lineup: ADataProvider) {
@@ -441,6 +447,7 @@ export abstract class ARankingView extends AView {
       this.node.classList.add('nodata');
     }
     this.provider.setData(rows);
+    this.provider.on(ADataProvider.EVENT_ORDER_CHANGED)
     this.selectionHelper.rows = rows;
     this.selectionHelper.setItemSelection(this.getItemSelection());
   }
