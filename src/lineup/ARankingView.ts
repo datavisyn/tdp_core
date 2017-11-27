@@ -87,7 +87,7 @@ export abstract class ARankingView extends AView {
    */
   private readonly stats: HTMLElement;
 
-  private readonly provider = new LocalDataProvider([], [], {
+  protected readonly provider = new LocalDataProvider([], [], {
     maxNestedSortingCriteria: Infinity,
     maxGroupColumns: Infinity,
     filterGlobally: true,

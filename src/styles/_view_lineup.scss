@@ -150,6 +150,22 @@
     flex: 1 1 auto;
     position: relative;
   }
+
+  &.overview-detail {
+    > div {
+      display: flex;
+      flex-direction: column;
+
+      > header {
+        flex: 0 0 auto;
+      }
+
+      > div {
+        flex: 1 1 auto;
+        position: relative;
+      }
+    }
+  }
 }
 
 .lineup-engine {
