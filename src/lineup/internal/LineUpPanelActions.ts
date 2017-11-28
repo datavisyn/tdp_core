@@ -2,7 +2,7 @@
 import SidePanel from 'lineupjs/src/ui/panel/SidePanel';
 import {IRankingHeaderContext} from 'lineupjs/src/ui/engine/interfaces';
 import {regular, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
-import {createStackDesc, IColumnDesc, createScriptDesc, Ranking} from 'lineupjs/src/model';
+import {createStackDesc, IColumnDesc, createScriptDesc, Ranking, createImpositionDesc, createMinDesc, createMaxDesc, createMeanDesc, createNestedDesc} from 'lineupjs/src/model';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -290,7 +290,12 @@ export default class LineUpPanelActions extends EventHandler {
         text: 'Combining Columns',
         children: [
           { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
-          { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) }
+          { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
+          { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
+          { text: 'Max Combination', id: 'max', action: () => this.addColumn(createMaxDesc()) },
+          { text: 'Min Combination', id: 'min', action: () => this.addColumn(createMinDesc()) },
+          { text: 'Mean Combination', id: 'mean', action: () => this.addColumn(createMeanDesc()) },
+          { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
         ]
       },
       ...metaDataOptions
