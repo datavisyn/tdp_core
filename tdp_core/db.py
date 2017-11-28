@@ -195,7 +195,7 @@ def get_columns(engine, table_name):
   return map(_normalize_columns, columns)
 
 
-def _handle_aggregated_score(config, replacements, args):
+def _handle_aggregated_score(base_view, config, replacements, args):
   """
   Handle aggregation for aggregated (and inverted aggregated) score queries
   :param replacements:
@@ -204,12 +204,21 @@ def _handle_aggregated_score(config, replacements, args):
   view = config.agg_score
   agg = args.get('agg', '')
 
-  if agg == '' or view.query is None:
+  if agg == '':
     return replacements
 
   query = view.query
+
+  # generic specific variant
   if agg in view.queries:
     query = view.queries[agg]
+
+  # view specific variant
+  if ('agg_score_' + agg) in base_view.queries:
+    query = base_view.queries['agg_score_' + agg]
+
+  if query is None:
+    return replacements
 
   replace = {}
   if view.replacements is not None:
@@ -233,7 +242,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   """
   replacements = replacements or {}
   arguments = arguments or {}
-  replacements = _handle_aggregated_score(config, replacements, arguments)
+  replacements = _handle_aggregated_score(view, config, replacements, arguments)
   secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
   # convert to index lookup

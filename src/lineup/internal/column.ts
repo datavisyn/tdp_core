@@ -11,8 +11,19 @@ import NumberColumn from 'lineupjs/src/model/NumberColumn';
 import {default as BoxPlotColumn} from 'lineupjs/src/model/BoxPlotColumn';
 import NumbersColumn from 'lineupjs/src/model/NumbersColumn';
 import Column from 'lineupjs/src/model/Column';
-import {extent} from 'd3';
+import {extent, min, max} from 'd3';
 
+
+function extentByType(type: string, rows: any, acc: (d: any) => any): [number, number] {
+  switch(type) {
+    case 'numbers':
+      return [min(rows, (d) => min(acc(d))), max(rows, (d) => max(acc(d)))];
+    case 'boxplot':
+      return [min(rows, (d) => acc(d).min), max(rows, (d) => acc(d).max)];
+    default:
+      return extent(rows, acc);
+  }
+}
 
 export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & { pushDesc(col: IColumnDesc): void }, position: number, done?: () => void): { col: Column, loaded: Promise<Column> } {
   const ranking = provider.getLastRanking();
@@ -49,7 +60,7 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
     if (colDesc.type === 'number' || colDesc.type === 'boxplot' || colDesc.type === 'numbers') {
       const ncol = <NumberColumn | BoxPlotColumn | NumbersColumn>col;
       if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
-        const domain = extent(rows, (d) => <number>d.score);
+        const domain = extentByType(colDesc.type, rows, (d) => d.score);
         if (colDesc.constantDomain === 'min') {
           domain[0] = colDesc.domain[0];
         } else if (colDesc.constantDomain === 'max') {
@@ -62,6 +73,13 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
         ori.domain = domain;
         current.domain = domain;
       }
+    }
+
+    if (colDesc.type === 'numbers' && rows.length > 0) {
+      // hack in the data length
+      const ncol = <NumbersColumn>col;
+      (<any>colDesc).dataLength = rows[0].score.length;
+      ncol.setSplicer({length: rows[0].score.length, splice: (d) => d});
     }
 
     // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
