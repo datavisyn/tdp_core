@@ -18,6 +18,7 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
 
     this.node.classList.add('overview-detail');
     this.overview = this.node.ownerDocument.createElement('header');
+    this.overview.classList.add('overview');
 
     const root = this.wrapTable();
     this.split = <ISplitLayoutContainer>root.root;
@@ -65,6 +66,9 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
   }
 
   private triggerOverviewUpdate() {
+    if (this.split.ratios[0] <= 0.01) {
+      return; // hidden overview
+    }
     const r = this.lineup.getRankings()[0];
     const order = r.getOrder();
     const currentRows = <IRow[]>this.lineup.view(order);
