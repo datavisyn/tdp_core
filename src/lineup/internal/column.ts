@@ -31,6 +31,10 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
     ranking.insert(col, position);
   }
 
+  if (colDesc.sortedByMe) {
+    col.sortByMe(colDesc.sortedByMe === true || colDesc.sortedByMe === 'asc');
+  }
+
   // error handling
   data
     .catch(showErrorModalDialog)
