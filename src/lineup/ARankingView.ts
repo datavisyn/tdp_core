@@ -420,10 +420,10 @@ export abstract class ARankingView extends AView {
         this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
       }
 
+      this.builtLineUp(this.provider);
+
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
-
-      this.builtLineUp(this.provider);
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
@@ -432,7 +432,7 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  protected builtLineUp(lineup: ADataProvider) {
+  protected builtLineUp(lineup: LocalDataProvider) {
     // hook
   }
 
@@ -447,7 +447,6 @@ export abstract class ARankingView extends AView {
       this.node.classList.add('nodata');
     }
     this.provider.setData(rows);
-    this.provider.on(ADataProvider.EVENT_ORDER_CHANGED)
     this.selectionHelper.rows = rows;
     this.selectionHelper.setItemSelection(this.getItemSelection());
   }

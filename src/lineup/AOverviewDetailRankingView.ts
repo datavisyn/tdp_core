@@ -5,13 +5,19 @@ import {ISelection, IViewContext} from '../views';
 import {ISplitLayoutContainer, root, verticalSplit, view} from 'phovea_ui/src/layout';
 import {IRow} from '../rest';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
+import {debounce} from 'phovea_core/src';
+import LocalDataProvider from 'lineupjs/src/provider/LocalDataProvider';
+import OverviewColumn from './internal/OverviewColumn';
 
 export abstract class AOverviewDetailRankingView extends ARankingView {
 
   protected readonly overview: HTMLElement;
   private readonly split: ISplitLayoutContainer;
 
-  private lineup: ADataProvider;
+  private lineup: LocalDataProvider;
+  private overviewColumn: OverviewColumn;
+
+  protected readonly triggerOverviewUpdateDelayed = debounce(() => this.triggerOverviewUpdate(), 50);
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent, options);
@@ -26,6 +32,14 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
 
   protected initImpl() {
     return <Promise<any>>Promise.all([super.initImpl(), this.buildOverview()]);
+  }
+
+  protected showDetailRanking(showRanking = true) {
+    const r = this.split.ratios[1];
+    if ((r > 0.1) === showRanking) {
+      return;
+    }
+    this.setRatio(showRanking ? 0.5 : 1);
   }
 
   protected setRatio(ratio = 0.5) {
@@ -46,48 +60,82 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
       visible: false,
       resized: () => this.update()
     };
+    const overviewView = {
+      node: this.overview,
+      destroy: () => undefined,
+      dumpReference: () => -1,
+      visible: true,
+      resized: () => this.triggerOverviewUpdateDelayed()
+    };
 
     const r = root(verticalSplit(1,
-      view(this.overview).name('Overview').hideHeader(),
+      view(overviewView).name('Overview').hideHeader(),
       view(lineupView).name('Detail Table').hideHeader()));
     this.node.insertAdjacentElement('afterbegin', r.node);
 
     return r;
   }
 
-  protected builtLineUp(lineup: ADataProvider) {
+  protected builtLineUp(lineup: LocalDataProvider) {
     super.builtLineUp(lineup);
 
     this.lineup = lineup;
     this.lineup.on(`${ADataProvider.EVENT_ORDER_CHANGED}.overview`, () => {
-      this.triggerOverviewUpdate();
+      this.triggerOverviewUpdateDelayed();
     });
+
+    // add an artificial hidden overview column to split overview and detail
+    this.lineup.columnTypes.overview = OverviewColumn;
+    this.overviewColumn = <OverviewColumn>this.lineup.create({
+      type: 'overview',
+      label: ''
+    });
+    // add our helper column at the beginning
+    this.lineup.getRankings()[0].insert(this.overviewColumn, 2);
+    // aggregate the rest overview group by default
+    this.lineup.setAggregated(lineup.getRankings()[0], OverviewColumn.GROUP_FALSE, true);
+
+    this.overviewColumn.groupSortByMe(false);
+    this.overviewColumn.groupByMe();
+
     this.triggerOverviewUpdate();
   }
 
-  private triggerOverviewUpdate() {
-    if (this.split.ratios[0] <= 0.01) {
+  protected triggerOverviewUpdate() {
+    if (this.split.ratios[0] <= 0.01 || !this.lineup) {
       return; // hidden overview
     }
     const r = this.lineup.getRankings()[0];
     const order = r.getOrder();
     const currentRows = <IRow[]>this.lineup.view(order);
-    this.updateOverview(currentRows);
+    let {width, height} = this.overview.getBoundingClientRect();
+    // some padding
+    width -= 20;
+    height -= 20;
+    this.updateOverview(currentRows, width, height, this.overviewColumn.getOverview());
   }
 
-  protected setRowSelection(indices: number[]) {
-    if (this.lineup) {
-      this.lineup.setSelection(indices);
+  protected setRowSelection(rows: IRow[]) {
+    if (!this.lineup) {
+      return;
     }
+    this.lineup.setSelection(rows.map((r) => this.lineup.data.indexOf(r)));
   }
 
   protected getRowSelection() {
     if (!this.lineup) {
-      return new Set<number>();
+      return new Set<IRow>();
     }
-    return new Set(this.lineup.getSelection());
+    return new Set(<IRow[]>this.lineup.selectedRows());
+  }
+
+  protected focusOn(rows?: IRow[], name = 'focus') {
+    if (!this.lineup || !this.overviewColumn) {
+      return;
+    }
+    this.overviewColumn.setOverview(rows, name);
   }
 
   protected abstract buildOverview(): Promise<any>|void;
-  protected abstract updateOverview(rows: IRow[]): void;
+  protected abstract updateOverview(rows: IRow[], width: number, height: number, focus?: {name: string, rows: IRow[]}): void;
 }
