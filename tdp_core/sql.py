@@ -1,4 +1,4 @@
-from phovea_server.ns import Namespace, request, abort
+from phovea_server.ns import Namespace, request, abort, Response
 from . import db
 from .utils import map_scores
 from phovea_server.util import jsonify
@@ -40,9 +40,29 @@ def _return_query():
   return request.args.get('_return_query', False)
 
 
+def _format_csv(array_of_dicts):
+  import pandas as pd
+  import io
+
+  if not array_of_dicts:
+    return Response('', mimetype='text/csv')
+
+  out = io.BytesIO()
+  d = pd.DataFrame.from_records(array_of_dicts)
+  d.to_csv(out, sep='\t', encoding='utf-8', index=False)
+  return Response(out.getvalue(), mimetype='text/csv')
+
+
+def _formatter(view_name):
+  if view_name.endswith('.csv'):
+    return view_name[:-4], _format_csv
+  return view_name, jsonify
+
+
 @app.route('/<database>/<view_name>')
 @login_required
 def get_data_api(database, view_name):
+  view_name, format = _formatter(view_name)
   if _return_query():
     return jsonify(db.get_query(database, view_name, None, request.args))
 
@@ -50,7 +70,7 @@ def get_data_api(database, view_name):
 
   if _assign_ids(r, view):
     r = db.assign_ids(r, view.idtype)
-  return jsonify(r)
+  return format(r)
 
 
 @app.route('/<database>/<view_name>/filter')
@@ -62,6 +82,7 @@ def get_filtered_data(database, view_name):
   :param view_name:
   :return:
   """
+  view_name, format = _formatter(view_name)
   if _return_query():
     return jsonify(db.get_filtered_query(database, view_name, request.args))
 
@@ -69,7 +90,7 @@ def get_filtered_data(database, view_name):
 
   if _assign_ids(r, view):
     r = db.assign_ids(r, view.idtype)
-  return jsonify(r)
+  return format(r)
 
 
 @app.route('/<database>/<view_name>/score')
@@ -81,6 +102,7 @@ def get_score_data(database, view_name):
   :param view_name:
   :return:
   """
+  view_name, format = _formatter(view_name)
   if _return_query():
     return jsonify(db.get_filtered_query(database, view_name, request.args))
 
@@ -96,7 +118,7 @@ def get_score_data(database, view_name):
 
   if _assign_ids(mapped_scores, view):
     mapped_scores = db.assign_ids(mapped_scores, target_idtype)
-  return jsonify(mapped_scores)
+  return format(mapped_scores)
 
 
 @app.route('/<database>/<view_name>/count')
@@ -108,6 +130,7 @@ def get_count_data(database, view_name):
   :param view_name:
   :return:
   """
+  view_name, _ = _formatter(view_name)
   if _return_query():
     return jsonify(db.get_count_query(database, view_name, request.args))
 
@@ -119,6 +142,7 @@ def get_count_data(database, view_name):
 @app.route('/<database>/<view_name>/desc')
 @login_required
 def get_desc(database, view_name):
+  view_name, _ = _formatter(view_name)
   config, _ = db.resolve(database)
   # convert to index lookup
   # row id start with 1
@@ -137,6 +161,7 @@ def lookup(database, view_name):
   Does the same job as search, but paginates the result set
   This function is used in conjunction with Select2 form elements
   """
+  view_name, _ = _formatter(view_name)
   query = request.args.get('query', '').lower()
   page = int(request.args.get('page', 0))  # zero based
   limit = int(request.args.get('limit', 30))  # or 'all'
