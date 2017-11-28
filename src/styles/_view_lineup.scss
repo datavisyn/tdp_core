@@ -132,11 +132,24 @@
           display: block;
         }
 
+        &.once::before {
+          content: '';
+          top: -10px;
+          left: -15em;
+          right: 0;
+          bottom: -10px;
+          position: absolute;
+        }
+
         &.once .lu-search {
           position: absolute;
           top: 2em;
           width: 17.5em;
           left: -15em;
+
+          > ul {
+            max-height: 50vh;
+          }
         }
       }
 

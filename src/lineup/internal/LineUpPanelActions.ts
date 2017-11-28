@@ -127,7 +127,11 @@ export default class LineUpPanelActions extends EventHandler {
     }
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
 
-    const header = this.node.querySelector('header')!;
+    const header = <HTMLElement>this.node.querySelector('header')!;
+
+    header.addEventListener('mouseleave', () => {
+      header.classList.remove('once');
+    });
 
     header.appendChild(this.search.node);
 
