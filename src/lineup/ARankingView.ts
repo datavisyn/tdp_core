@@ -420,6 +420,8 @@ export abstract class ARankingView extends AView {
         this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
       }
 
+      this.builtLineUp(this.provider);
+
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
@@ -428,6 +430,10 @@ export abstract class ARankingView extends AView {
       console.error(error);
       this.setBusy(false);
     });
+  }
+
+  protected builtLineUp(lineup: LocalDataProvider) {
+    // hook
   }
 
   protected createInitialRanking(lineup: ADataProvider) {
