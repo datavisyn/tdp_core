@@ -371,7 +371,7 @@ def inject_where(builder):
   lower = query.lower()
   where = lower.find(' where ')
   before = -1
-  for before_q in [' order by', ' group by', ' limit', ' offset']:
+  for before_q in [' group by', ' order by', ' limit', ' offset']:
     before = lower.find(before_q)
     if before >= 0:
       break
