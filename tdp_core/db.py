@@ -428,7 +428,7 @@ def _fill_up_columns(view, engine):
           columns[num_col]['min'] = row[num_col + '_min']
           columns[num_col]['max'] = row[num_col + '_max']
       for col in categorical_columns:
-        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} <> '' and {col} is not NULL"""
+        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} <> '' and {col} is not NULL ORDER BY {col} ASC"""
         cats = s.execute(template.format(col=col, table=table))
         columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
 
