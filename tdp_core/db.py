@@ -25,6 +25,10 @@ def _to_config(p):
   if not connector.statement_timeout_query:
     connector.statement_timeout_query = config.get('statement_timeout_query', default=None)
 
+  if not connector.dburl:
+    _log.critical('no db url connector defined for %s at config key %s - is your configuration uptodate?', p.id, p.configKey)
+    raise NotImplementedError('missing db connector url')
+
   _log.info('%s -> %s', p.id, connector.dburl)
   engine_options = config.get('engine', default={})
   engine = sqlalchemy.create_engine(connector.dburl, **engine_options)
