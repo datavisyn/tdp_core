@@ -4,6 +4,7 @@ import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {IObjectRef} from 'phovea_core/src/provenance';
 import {IEventHandler} from 'phovea_core/src/event';
 import Range from 'phovea_core/src/range/Range';
+import {IUser} from 'phovea_core/src/security';
 
 /**
  * mode of the view depending on the view state
@@ -34,6 +35,11 @@ export interface IViewPluginDesc extends IPluginDesc {
    * @returns {Promise<string>}
    */
   preview?(): Promise<string>;
+
+  /**
+   * optional security check to show only certain views
+   */
+  security?: string|((user: IUser)=>boolean);
 }
 
 export interface IViewPlugin {
