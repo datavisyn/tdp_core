@@ -2,7 +2,7 @@
  * Created by sam on 13.02.2017.
  */
 
-import {createSelectionDesc, createAggregateDesc, IColumnDesc} from 'lineupjs/src/model';
+import {createSelectionDesc, createAggregateDesc, IColumnDesc, createGroupDesc} from 'lineupjs/src/model';
 import {ICategory} from 'lineupjs/src/model/CategoricalColumn';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
@@ -165,6 +165,7 @@ export function createInitialRanking(provider: ADataProvider) {
   const ranking = provider.pushRanking();
   ranking.insert(provider.create(createAggregateDesc()), 0);
   ranking.push(provider.create(createSelectionDesc()));
+  ranking.push(provider.create(createGroupDesc()));
 
   provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
     const col = provider.create(d);
