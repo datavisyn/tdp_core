@@ -3,7 +3,7 @@
  */
 
 import {createSelectionDesc, createAggregateDesc, IColumnDesc, createGroupDesc} from 'lineupjs/src/model';
-import {ICategory} from 'lineupjs/src/model/CategoricalColumn';
+import {ICategory} from 'lineupjs/src/model/ICategoricalColumn';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
