@@ -26,7 +26,7 @@ def _to_config(p):
     connector.statement_timeout_query = config.get('statement_timeout_query', default=None)
 
   if not connector.dburl:
-    _log.critical('no db url connector defined for %s at config key %s - is your configuration uptodate?', p.id, p.configKey)
+    _log.critical('no db url connector defined for %s at config key %s - is your configuration up to date?', p.id, p.configKey)
     raise NotImplementedError('missing db connector url')
 
   _log.info('%s -> %s', p.id, connector.dburl)
