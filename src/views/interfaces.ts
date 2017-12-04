@@ -4,6 +4,7 @@ import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {IObjectRef} from 'phovea_core/src/provenance';
 import {IEventHandler} from 'phovea_core/src/event';
 import Range from 'phovea_core/src/range/Range';
+import {IUser} from 'phovea_core/src/security';
 
 /**
  * mode of the view depending on the view state
@@ -28,6 +29,17 @@ export interface IViewPluginDesc extends IPluginDesc {
    * view group hint
    */
   group: {name: string, order: number};
+
+  /**
+   * optional preview callback function returning a url promise, the preview image should have 320x180 px
+   * @returns {Promise<string>}
+   */
+  preview?(): Promise<string>;
+
+  /**
+   * optional security check to show only certain views
+   */
+  security?: string|((user: IUser)=>boolean);
 }
 
 export interface IViewPlugin {
@@ -48,6 +60,11 @@ export function toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
   const r: any = p;
   r.selection = r.selection || 'none';
   r.group = Object.assign({name: 'Other', order: 99}, r.group);
+
+  // common typo
+  if (r.idType !== undefined) {
+    r.idtype = r.idType;
+  }
   return r;
 }
 

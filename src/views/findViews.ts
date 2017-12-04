@@ -15,6 +15,7 @@ import {
 } from '../extensions';
 import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import Range from 'phovea_core/src/range/Range';
+import {currentUser} from 'phovea_core/src/security';
 
 /**
  * finds for the given IDType and selection matching views
@@ -40,6 +41,25 @@ export default async function findViews(idtype: IDType, selection: Range): Promi
     return (matchLength(p.selection, selectionLength) || (showAsSmallMultiple(p) && selectionLength > 1));
   }
 
+  function canAccess(p: IPluginDesc) {
+    let security = p.security;
+    if (security === undefined) {
+      return true;
+    }
+    if (typeof security === 'string') {
+      const role = security;
+      security = (user) => user.roles.indexOf(role) >= 0;
+    }
+    if (typeof security === 'function') {
+      const user = currentUser();
+      if (!user) {
+        return false;
+      }
+      return security(user);
+    }
+    return true;
+  }
+
   // execute extension filters
   const filters = await Promise.all(listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load()));
 
@@ -49,7 +69,7 @@ export default async function findViews(idtype: IDType, selection: Range): Promi
   }
 
   return listPlugins(EXTENSION_POINT_TDP_VIEW)
-    .filter((p) => byType(p) && extensionFilters(p))
+    .filter((p) => byType(p) && extensionFilters(p) && canAccess(p))
     .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
     .map((v) => ({enabled: bySelection(v), v: toViewPluginDesc(v)}));
 }

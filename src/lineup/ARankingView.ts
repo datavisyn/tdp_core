@@ -307,6 +307,10 @@ export abstract class ARankingView extends AView {
       ranking.insert(col, position);
     }
 
+    if (colDesc.sortedByMe) {
+      col.sortByMe(colDesc.sortedByMe === true || colDesc.sortedByMe === 'asc');
+    }
+
     // error handling
     data
       .catch(showErrorModalDialog)
