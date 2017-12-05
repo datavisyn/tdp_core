@@ -189,9 +189,9 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
 
-  protected parameterChanged(name: string) {
+  protected parameterChanged(name: string, callSelectionAdapter: boolean = true) {
     super.parameterChanged(name);
-    if (this.selectionAdapter) {
+    if (this.selectionAdapter && callSelectionAdapter) {
       this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
     }
   }
