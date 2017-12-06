@@ -55,6 +55,14 @@ function _main() {
     repository: (pkg.repository || {}).url
   };
 
+  const l = ('build/source/' + name).split('/');
+  l.forEach((_, i) => {
+    const path = l.slice(0, i + 1).join('/');
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+    }
+  });
+
   fs.writeFileSync('build/source/' + name + '/buildInfo.json', JSON.stringify(buildInfo, null, ' '));
 }
 

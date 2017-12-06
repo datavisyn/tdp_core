@@ -68,7 +68,7 @@
     "docker": "docker build -t tdp_core -f deploy/Dockerfile .",
     "docs:web": "typedoc --options typedoc.json src/**.ts",
     "docs:python": "sphinx-apidoc -o docs -f ./tdp_core && sphinx-build ./docs build/docs",
-    "build:python": "rm -rf build/source && find . -name '*.pyc' -delete && mkdir -p build/source && cp -r ./tdp_core build/source/ && node buildPython.js",
+    "build:python": "rm -rf build/source && find . -name '*.pyc' -delete && node buildPython.js && cp -r ./tdp_core build/source/",
     "build:web": "webpack --env prod",
     "predist:python": "npm run build:python && npm run docs:python",
     "prebuild:python": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test:python",
