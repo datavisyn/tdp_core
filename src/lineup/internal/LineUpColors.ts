@@ -1,11 +1,12 @@
 import Ranking from 'lineupjs/src/model/Ranking';
 import {scale} from 'd3';
+import {array_diff} from './LineUpSelectionHelper';
 
 export default class LineUpColors {
   /**
    * Map that assigns each selection ID a color, which is used as color for columns
    */
-  private readonly colorMap = new Map<number, string>();
+  private readonly colorMap = new Map<number, {color: string, items: number}>();
   private colors: string[] = scale.category10().range().slice();
 
   init(ranking: Ranking) {
@@ -24,22 +25,31 @@ export default class LineUpColors {
     if (id < 0) {
       id = this.colorMap.size;
     }
+
     let color = '';
     if (!this.colorMap.has(id)) {
-      color = this.colors.shift();
-      this.colorMap.set(id, color);
+      const usedColors = Array.from(this.colorMap.values()).map((item) => item.color);
+      color = array_diff(this.colors, usedColors)[0];
+      this.colorMap.set(id, {color, items: 1});
     } else {
-      color = this.colorMap.get(id);
+      const value = this.colorMap.get(id);
+      color = value.color;
+      value.items++;
+      this.colorMap.set(id, value);
     }
     return color;
   }
 
   freeColumnColor(id: number): void {
-    const color = this.colorMap.get(id);
+    const {color} = this.colorMap.get(id);
+    let {items} = this.colorMap.get(id);
+
     if (color) {
-      this.colorMap.delete(id);
-      if (this.colors.indexOf(color) === -1) {
-        this.colors.push(color);
+      items--;
+      if (items === 0) {
+        this.colorMap.delete(id);
+      } else {
+        this.colorMap.set(id, {color, items});
       }
     }
   }
