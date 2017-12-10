@@ -25,6 +25,10 @@ def _to_config(p):
   if not connector.statement_timeout_query:
     connector.statement_timeout_query = config.get('statement_timeout_query', default=None)
 
+  if not connector.dburl:
+    _log.critical('no db url connector defined for %s at config key %s - is your configuration up to date?', p.id, p.configKey)
+    raise NotImplementedError('missing db connector url')
+
   _log.info('%s -> %s', p.id, connector.dburl)
   engine_options = config.get('engine', default={})
   engine = sqlalchemy.create_engine(connector.dburl, **engine_options)
@@ -71,15 +75,6 @@ def resolve(database):
     if view.needs_to_fill_up_columns() and view.table is not None:
       _fill_up_columns(view, engine)
   return r
-
-
-def resolve_view(config, view_name):
-  if view_name not in config.views:
-    abort(404)
-  view = config.views[view_name]
-  if not view.can_access():
-    abort(401)
-  return view
 
 
 def assign_ids(rows, idtype):
@@ -295,7 +290,9 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   :return: (r, view) tuple of the resulting rows and the resolved view
   """
   config, engine = resolve(database)
-  view = resolve_view(config, view_name)
+  if view_name not in config.views:
+    abort(404)
+  view = config.views[view_name]
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
@@ -315,7 +312,9 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
 
 def get_query(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
   config, engine = resolve(database)
-  view = resolve_view(config, view_name)
+  if view_name not in config.views:
+    abort(404)
+  view = config.views[view_name]
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
@@ -329,25 +328,31 @@ def get_query(database, view_name, replacements=None, arguments=None, extra_sql_
 
 def get_filtered_data(database, view_name, args):
   config, _ = resolve(database)
-  view = resolve_view(config, view_name)
+  if view_name not in config.views:
+    abort(404)
   # convert to index lookup
   # row id start with 1
+  view = config.views[view_name]
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   return get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
 
 def get_filtered_query(database, view_name, args):
   config, _ = resolve(database)
-  view = resolve_view(config, view_name)
+  if view_name not in config.views:
+    abort(404)
   # convert to index lookup
   # row id start with 1
+  view = config.views[view_name]
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   return get_query(database, view_name, replacements, processed_args, extra_args)
 
 
 def _get_count(database, view_name, args):
   config, engine = resolve(database)
-  view = resolve_view(config, view_name)
+  if view_name not in config.views:
+    abort(404)
+  view = config.views[view_name]
 
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
 
@@ -436,7 +441,9 @@ def _fill_up_columns(view, engine):
 
 def _lookup(database, view_name, query, page, limit, args):
   config, engine = resolve(database)
-  view = resolve_view(config, view_name)
+  if view_name not in config.views:
+    abort(404)
+  view = config.views[view_name]
 
   arguments = args.copy()
   offset = page * limit
