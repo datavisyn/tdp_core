@@ -94,10 +94,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
 
     const modeSelector = body.querySelector('header');
-    modeSelector.className += 'clue-modeselector collapsed';
-    cmode.createButton(modeSelector, {
-      size: 'sm'
-    });
+    modeSelector.classList.add('collapsed');
+    modeSelector.classList.add('clue-modeselector');
 
 
     const main = <HTMLElement>document.body.querySelector('main');
@@ -111,6 +109,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     });
 
     graph.then((graph) => {
+      cmode.createButton(modeSelector, {
+        size: 'sm'
+      });
       provenanceMenu.setGraph(graph);
     });
 
