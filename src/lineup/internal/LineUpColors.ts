@@ -7,10 +7,10 @@ export default class LineUpColors {
    * Map that assigns each selection ID a color, which is used as color for columns
    */
   private readonly colorMap = new Map<number, {color: string, items: number}>();
-  private colors: string[] = scale.category10().range().slice();
+  private colors: string[];
 
   init(ranking: Ranking) {
-    const colors = scale.category10().range().slice();
+    const colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));;
     // remove colors that are already in use from the list
     ranking.flatColumns.forEach((d) => {
       const i = colors.indexOf(d.color);
