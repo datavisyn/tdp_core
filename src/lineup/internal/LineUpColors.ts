@@ -41,15 +41,14 @@ export default class LineUpColors {
   }
 
   freeColumnColor(id: number): void {
-    const {color} = this.colorMap.get(id);
-    let {items} = this.colorMap.get(id);
+    const value = this.colorMap.get(id);
 
-    if (color) {
-      items--;
-      if (items === 0) {
+    if (value.color) {
+      value.items--;
+      if (value.items === 0) {
         this.colorMap.delete(id);
       } else {
-        this.colorMap.set(id, {color, items});
+        this.colorMap.set(id, value);
       }
     }
   }
