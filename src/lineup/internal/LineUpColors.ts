@@ -10,7 +10,7 @@ export default class LineUpColors {
   private colors: string[];
 
   init(ranking: Ranking) {
-    const colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));;
+    const colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));
     // remove colors that are already in use from the list
     ranking.flatColumns.forEach((d) => {
       const i = colors.indexOf(d.color);
@@ -35,7 +35,6 @@ export default class LineUpColors {
       const value = this.colorMap.get(id);
       color = value.color;
       value.items++;
-      this.colorMap.set(id, value);
     }
     return color;
   }
@@ -45,10 +44,9 @@ export default class LineUpColors {
 
     if (value.color) {
       value.items--;
+
       if (value.items === 0) {
         this.colorMap.delete(id);
-      } else {
-        this.colorMap.set(id, value);
       }
     }
   }
