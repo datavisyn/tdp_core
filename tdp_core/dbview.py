@@ -1,5 +1,6 @@
 import logging
 import re
+from collections import OrderedDict
 from phovea_server.security import current_user
 
 __author__ = 'Samuel Gratzl'
@@ -31,7 +32,7 @@ class DBView(object):
     self.idtype = idtype
     self.query = query
     self.queries = {}
-    self.columns = {}
+    self.columns = OrderedDict()
     self.columns_filled_up = None
     self.replacements = []
     self.valid_replacements = {}
