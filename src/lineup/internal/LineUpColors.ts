@@ -50,4 +50,8 @@ export default class LineUpColors {
       }
     }
   }
+
+  clear() {
+    this.colorMap.clear();
+  }
 }
