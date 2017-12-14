@@ -17,7 +17,8 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
   private lineup: LocalDataProvider;
   private overviewColumn: OverviewColumn;
 
-  protected readonly triggerOverviewUpdateDelayed = debounce(() => this.triggerOverviewUpdate(), 50);
+  protected readonly triggerOverviewUpdateDelayed = debounce(() => this.triggerOverviewUpdate(), 100);
+  protected readonly triggerUpdateDelayed = debounce(() => this.update(), 100);
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent, options);
@@ -58,7 +59,7 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
       destroy: () => undefined,
       dumpReference: () => -1,
       visible: false,
-      resized: () => this.update()
+      resized: () => this.triggerUpdateDelayed()
     };
     const overviewView = {
       node: this.overview,
