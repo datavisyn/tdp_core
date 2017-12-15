@@ -12,8 +12,8 @@ def make_psycopg_green():
   """Configure Psycopg to be used with gevent in non-blocking way."""
   if not hasattr(extensions, 'set_wait_callback'):
     raise ImportError(
-        'support for coroutines not available in this Psycopg version (%s)'
-        % psycopg2.__version__)
+      'support for coroutines not available in this Psycopg version (%s)'
+      % psycopg2.__version__)
 
   extensions.set_wait_callback(gevent_wait_callback)
 
@@ -32,14 +32,17 @@ def gevent_wait_callback(conn, timeout=None):
       raise psycopg2.OperationalError('Bad result from poll: %r' % state)
 
 
+try:
+  import psycopg2
+  from psycopg2 import extensions
+
+  from gevent.socket import wait_read, wait_write
+
+  _log.info('patching psycopg2 to be green')
+  make_psycopg_green()
+except ImportError:
+  pass  # nothing to do
+
+
 def create():
-  try:
-    import psycopg2
-    from psycopg2 import extensions
-
-    from gevent.socket import wait_read, wait_write
-
-    _log.info('patching psycopg2 to be green')
-    make_psycopg_green()
-  except ImportError:
-    pass  # nothing to do
+  pass
