@@ -32,13 +32,14 @@ def gevent_wait_callback(conn, timeout=None):
       raise psycopg2.OperationalError('Bad result from poll: %r' % state)
 
 
-try:
-  import psycopg2
-  from psycopg2 import extensions
+def create():
+  try:
+    import psycopg2
+    from psycopg2 import extensions
 
-  from gevent.socket import wait_read, wait_write
+    from gevent.socket import wait_read, wait_write
 
-  _log.info('patching psycopg2 to be green')
-  make_psycopg_green()
-except ImportError:
-  pass  # nothing to do
+    _log.info('patching psycopg2 to be green')
+    make_psycopg_green()
+  except ImportError:
+    pass  # nothing to do

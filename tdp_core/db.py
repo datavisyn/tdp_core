@@ -4,8 +4,6 @@ from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from phovea_server.plugin import list as list_plugins
 import sqlalchemy
-# import such that it the sql driver uses gevent
-import sql_use_gevent  # noqa
 import logging
 import phovea_server.config
 
@@ -42,6 +40,14 @@ def _to_config(p):
 
   return connector, engine
 
+
+def _greenify():
+  for p in list_plugins('greenifier'):
+    _log.info('run greenifier: %s', p.id)
+    p.load().factory()
+
+# run greenifiers before creating engines
+_greenify()
 
 configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definition')}
 
