@@ -116,8 +116,8 @@ export function willShowChooser(desc: any) {
  * @returns {boolean}
  */
 export function isSameSelection(a: ISelection, b: ISelection): boolean {
-  const aNull = (a === null || a.idtype === null);
-  const bNull = (b === null || b.idtype === null);
+  const aNull = (a == null || a.idtype == null);
+  const bNull = (b == null || b.idtype == null);
   if (aNull || bNull) {
     return aNull === bNull;
   }
