@@ -10,11 +10,11 @@ import * as cmode from 'phovea_clue/src/mode';
 import LoginMenu from 'phovea_clue/src/menu/LoginMenu';
 import {isLoggedIn} from 'phovea_core/src/security';
 import ACLUEWrapper from 'phovea_clue/src/ACLUEWrapper';
-import {loadProvenanceGraphVis, loadStoryVis} from '../../phovea_clue/src/vis_loader';
+import {loadProvenanceGraphVis, loadStoryVis} from 'phovea_clue/src/vis_loader';
 import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
-import 'phovea_ui/src/_bootstrap';
+import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
 import 'phovea_ui/src/_font-awesome';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
@@ -80,6 +80,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const clueManager = new CLUEGraphManager(manager);
 
     this.header.wait();
+
+    // trigger bootstrap loading
+    lazyBootstrap();
 
     const loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
