@@ -130,9 +130,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     const initSession = () => {
       //logged in, so we can resolve the graph for real
-      graphResolver(clueManager.list().then((graphs) => {
-        return clueManager.choose(graphs, true);
-      }));
+      graphResolver(clueManager.chooseLazy(true));
 
       this.app.then((appInstance) => this.initSessionImpl(appInstance));
     };
