@@ -5,7 +5,7 @@
 import {IDType, resolve, defaultSelectionType} from 'phovea_core/src/idtype';
 import {none} from 'phovea_core/src/range';
 import {EventHandler} from 'phovea_core/src/event';
-import {EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT} from './interfaces';
+import {EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT, VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT} from './interfaces';
 import {IFormElementDesc} from '../form';
 import FormBuilder from '../form/FormBuilder';
 import {select} from 'd3';
@@ -22,9 +22,8 @@ export {resolveIds, resolveId, resolveIdToNames} from './resolve';
 export abstract class AView extends EventHandler implements IView {
 
   static readonly EVENT_ITEM_SELECT = VIEW_EVENT_ITEM_SELECT;
-  static readonly EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
-
-  static readonly EVENT_LOADING_FINISHED = 'loadingFinished';
+  static readonly EVENT_UPDATE_ENTRY_POINT = VIEW_EVENT_UPDATE_ENTRY_POINT;
+  static readonly EVENT_LOADING_FINISHED = VIEW_EVENT_LOADING_FINISHED;
 
   readonly idType: IDType;
   readonly node: HTMLElement;

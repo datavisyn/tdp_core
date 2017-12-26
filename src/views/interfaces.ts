@@ -153,6 +153,8 @@ export interface IViewClass {
  * @argument selection {ISelection}
  */
 export const VIEW_EVENT_ITEM_SELECT = 'select';
+export const VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
+export const VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
 
 export interface IView extends IEventHandler {
   /**
