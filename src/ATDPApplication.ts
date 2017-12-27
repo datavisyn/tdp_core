@@ -6,16 +6,15 @@ import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {create as createHeader, AppHeaderLink, AppHeader} from 'phovea_ui/src/header';
 import {MixedStorageProvenanceGraphManager} from 'phovea_core/src/provenance';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import {VerticalStoryVis} from 'phovea_clue/src/storyvis';
 import * as cmode from 'phovea_clue/src/mode';
-import {create as createProvVis} from 'phovea_clue/src/provvis';
 import LoginMenu from 'phovea_clue/src/menu/LoginMenu';
 import {isLoggedIn} from 'phovea_core/src/security';
-import ACLUEWrapper, {createStoryVis} from 'phovea_clue/src/ACLUEWrapper';
+import ACLUEWrapper from 'phovea_clue/src/ACLUEWrapper';
+import {loadProvenanceGraphVis, loadStoryVis} from 'phovea_clue/src/vis_loader';
 import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
-import 'phovea_ui/src/_bootstrap';
+import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
 import 'phovea_ui/src/_font-awesome';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
@@ -56,7 +55,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.build(document.body, {replaceBody: false});
   }
 
-  protected buildImpl(body: HTMLElement): { graph: Promise<ProvenanceGraph>, storyVis: Promise<VerticalStoryVis>, manager: CLUEGraphManager } {
+  protected buildImpl(body: HTMLElement) {
     //create the common header
     const headerOptions = {
       showOptionsLink: true, // always activate options
@@ -81,6 +80,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const clueManager = new CLUEGraphManager(manager);
 
     this.header.wait();
+
+    // trigger bootstrap loading
+    lazyBootstrap();
 
     const loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
@@ -115,24 +117,20 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu.setGraph(graph);
     });
 
-    const storyVis = graph.then((graph) => {
-      createProvVis(graph, body.querySelector('div.content'), {
-        thumbnails: false,
+    const provVis = loadProvenanceGraphVis(graph, body.querySelector('div.content'), {
+      thumbnails: false,
         provVisCollapsed: true,
         hideCLUEButtonsOnCollapse: true
-      });
-      return createStoryVis(graph, <HTMLElement>body.querySelector('div.content'), main, {
-        thumbnails: false
-      });
+    });
+    const storyVis = loadStoryVis(graph, <HTMLElement>body.querySelector('div.content'), main, {
+      thumbnails: false
     });
 
     this.app = graph.then((graph) => this.createApp(graph, clueManager, main));
 
     const initSession = () => {
       //logged in, so we can resolve the graph for real
-      graphResolver(clueManager.list().then((graphs) => {
-        return clueManager.choose(graphs, true);
-      }));
+      graphResolver(clueManager.chooseLazy(true));
 
       this.app.then((appInstance) => this.initSessionImpl(appInstance));
     };
@@ -150,7 +148,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       initSession();
     }
 
-    return {graph, manager: clueManager, storyVis};
+    return {graph, manager: clueManager, storyVis, provVis};
   }
 
   /**
