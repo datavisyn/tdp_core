@@ -1,3 +1,4 @@
+import {spacefilling} from '../../../lineupjs/src/ui/taggle/LineUpRuleSet';
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
@@ -60,12 +61,16 @@ export interface IARankingViewOptions {
    * enable taggle overview mode switcher
    * @default true
    */
-  enableOverviewMode: boolean;
+  enableOverviewMode: boolean|'active';
   /**
    * enable zoom button
    * @default true
    */
   enableZoom: boolean;
+
+  enableSidePanel: boolean|'collapsed';
+
+  enableAddingColumns: boolean;
 }
 
 /**
@@ -125,7 +130,9 @@ export abstract class ARankingView extends AView {
     additionalComputeScoreParameter: null,
     subType: {key: '', value: ''},
     enableOverviewMode: true,
-    enableZoom: true
+    enableZoom: true,
+    enableAddingColumns: true,
+    enableSidePanel: true
   };
 
   private readonly selectionAdapter: ISelectionAdapter|null;
@@ -171,11 +178,14 @@ export abstract class ARankingView extends AView {
     this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
       this.taggle.switchRule(rule);
     });
+    if (this.options.enableOverviewMode === 'active') {
+      this.taggle.switchRule(spacefilling);
+    }
 
-
-    this.node.appendChild(this.panel.node);
-    this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
-
+    if (this.options.enableSidePanel) {
+      this.node.appendChild(this.panel.node);
+      this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+    }
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {

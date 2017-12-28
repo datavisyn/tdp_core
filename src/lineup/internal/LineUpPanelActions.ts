@@ -55,7 +55,7 @@ export default class LineUpPanelActions extends EventHandler {
 
   private idType: IDType|null = null;
 
-  private readonly search: SearchBox<ISearchOption>;
+  private readonly search: SearchBox<ISearchOption>|null;
 
   readonly panel: SidePanel;
   private overview: HTMLElement;
@@ -64,13 +64,19 @@ export default class LineUpPanelActions extends EventHandler {
   constructor(protected readonly provider: ADataProvider, ctx: IRankingHeaderContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
 
-    this.search = new SearchBox<ISearchOption>({
-      placeholder: 'Add Column...'
-    });
-    this.search.on(SearchBox.EVENT_SELECT, (item) => {
-      this.node.querySelector('header')!.classList.remove('once');
-      item.action();
-    });
+    if (options.enableAddingColumns) {
+      this.search = new SearchBox<ISearchOption>({
+        placeholder: 'Add Column...'
+      });
+      this.search.on(SearchBox.EVENT_SELECT, (item) => {
+        this.node.querySelector('header')!.classList.remove('once');
+        item.action();
+      });
+    }
+
+    if (options.enableSidePanel === 'collapsed') {
+      this.collapse = true;
+    }
 
     this.panel = new SidePanel(ctx, doc, {
       chooser: false
@@ -133,18 +139,20 @@ export default class LineUpPanelActions extends EventHandler {
       header.classList.remove('once');
     });
 
-    header.appendChild(this.search.node);
+    if (this.search) {
+      header.appendChild(this.search.node);
 
-    this.node.querySelector('header button')!.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      evt.stopPropagation();
-      if (!this.collapse) {
-        return;
-      }
-      header.classList.add('once');
-      this.search.node.focus();
-      this.search.focus();
-    });
+      this.node.querySelector('header button')!.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        if (!this.collapse) {
+          return;
+        }
+        header.classList.add('once');
+        this.search.node.focus();
+        this.search.focus();
+      });
+    }
   }
 
   private createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
@@ -168,7 +176,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.overview.classList.toggle('fa-list');
       this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spacefilling : regular);
     };
-    return this.overview =  this.createMarkup('En/Disable Overview', 'fa fa-list', listener);
+    return this.overview =  this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa-th-list': 'fa-list', listener);
   }
 
   setViolation(violation?: string) {
@@ -263,6 +271,10 @@ export default class LineUpPanelActions extends EventHandler {
 
   async updateChooser(idType: IDType, descs: IColumnDesc[]) {
     this.idType = idType;
+
+    if (!this.search) {
+      return;
+    }
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
     this.search.data = [
