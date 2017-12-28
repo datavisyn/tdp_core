@@ -1,5 +1,6 @@
 
 
+import {LayoutContainerEvents} from 'phovea_ui/src/layout';
 import ARankingView, {IARankingViewOptions} from './ARankingView';
 import {ISelection, IViewContext} from '../views';
 import {ISplitLayoutContainer, root, verticalSplit, view} from 'phovea_ui/src/layout';
@@ -58,21 +59,25 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
       node: lineup,
       destroy: () => undefined,
       dumpReference: () => -1,
-      visible: false,
-      resized: () => this.triggerUpdateDelayed()
+      visible: false
     };
     const overviewView = {
       node: this.overview,
       destroy: () => undefined,
       dumpReference: () => -1,
-      visible: true,
-      resized: () => this.triggerOverviewUpdateDelayed()
+      visible: true
     };
 
     const r = root(verticalSplit(1,
       view(overviewView).name('Overview').hideHeader(),
       view(lineupView).name('Detail Table').hideHeader()));
     this.node.insertAdjacentElement('afterbegin', r.node);
+
+    r.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, () => {
+      console.log('layout changed');
+      this.triggerOverviewUpdateDelayed();
+      this.triggerUpdateDelayed();
+    });
 
     return r;
   }
