@@ -176,7 +176,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.overview.classList.toggle('fa-list');
       this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spacefilling : regular);
     };
-    return this.overview =  this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa-th-list': 'fa-list', listener);
+    return this.overview =  this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list': 'fa fa-list', listener);
   }
 
   setViolation(violation?: string) {
