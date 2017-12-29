@@ -1,4 +1,4 @@
-import {spacefilling} from '../../../lineupjs/src/ui/taggle/LineUpRuleSet';
+
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
@@ -26,7 +26,7 @@ import LineUpPanelActions from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
 import StackColumn from 'lineupjs/src/model/StackColumn';
 import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
-import {IRule} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
+import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
 
 export interface IARankingViewOptions {
   /**
