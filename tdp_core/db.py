@@ -199,7 +199,7 @@ def get_columns(engine, table_name):
       r['type'] = 'number'
     elif isinstance(t, types.Enum):
       r['type'] = 'categorical'
-      r['categories'] = sorted(t.enums)
+      r['categories'] = sorted(t.enums, key=lambda s: s.lower())
     return r
 
   return map(_normalize_columns, columns)
