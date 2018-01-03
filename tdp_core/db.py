@@ -1,70 +1,15 @@
-from phovea_server.config import view as configview
 import itertools
-from .sql_filter import filter_logic
-from phovea_server.ns import abort
-from phovea_server.plugin import list as list_plugins
 import sqlalchemy
 import logging
 import phovea_server.config
+from .sql_filter import filter_logic
+from phovea_server.ns import abort
+from .dbmanager import DBManager
 
 __author__ = 'Samuel Gratzl'
-
 _log = logging.getLogger(__name__)
 c = phovea_server.config.view('tdp_core')
-
-
-def _to_config(p):
-  config = configview(p.configKey)
-  connector = p.load().factory()
-  if not connector.dburl:
-    connector.dburl = config['dburl']
-  if not connector.statement_timeout:
-    connector.statement_timeout = config.get('statement_timeout', default=None)
-  if not connector.statement_timeout_query:
-    connector.statement_timeout_query = config.get('statement_timeout_query', default=None)
-
-  if not connector.dburl:
-    _log.critical('no db url connector defined for %s at config key %s - is your configuration up to date?', p.id, p.configKey)
-    raise NotImplementedError('missing db connector url')
-
-  _log.info('%s -> %s', p.id, connector.dburl)
-  engine_options = config.get('engine', default={})
-  engine = sqlalchemy.create_engine(connector.dburl, **engine_options)
-  # Assuming that gevent monkey patched the builtin
-  # threading library, we're likely good to use
-  # SQLAlchemy's QueuePool, which is the default
-  # pool class.  However, we need to make it use
-  # threadlocal connections
-  # https://github.com/kljensen/async-flask-sqlalchemy-example/blob/master/server.py
-  engine.pool._use_threadlocal = True
-
-  return connector, engine
-
-
-def _greenify():
-  for p in list_plugins('greenifier'):
-    _log.info('run greenifier: %s', p.id)
-    p.load().factory()
-
-# run greenifiers before creating engines
-_greenify()
-
-configs = {p.id: _to_config(p) for p in list_plugins('tdp-sql-database-definition')}
-
-# another type of database definition which reuses the engine of an existing one
-for p in list_plugins('tdp-sql-database-extension'):
-  base = configs.get(p.base, None)
-  if not base:
-    _log.warn('invalid database extension no base found: %s base: %s', p.id, p.base)
-    continue
-  base_connector, engine = base
-  connector = p.load().factory()
-  if not connector.statement_timeout:
-    connector.statement_timeout = base_connector.statement_timeout
-  if not connector.statement_timeout_query:
-    connector.statement_timeout_query = base_connector.statement_timeout_query
-
-  configs[p.id] = (connector, engine)
+configs = DBManager()
 
 
 def _supports_sql_parameters(dialect):
