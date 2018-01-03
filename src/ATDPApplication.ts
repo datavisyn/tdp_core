@@ -16,6 +16,8 @@ import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
 import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
 import 'phovea_ui/src/_font-awesome';
+import {create as createProvRetrievalPanel} from 'phovea_clue/src/provenance_retrieval/ProvRetrievalPanel';
+import {IVisStateApp} from 'phovea_clue/src/provenance_retrieval/IVisState';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -41,7 +43,7 @@ export interface ITDPOptions {
 /**
  * base class for TDP based applications
  */
-export abstract class ATDPApplication<T> extends ACLUEWrapper {
+export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapper {
   static readonly EVENT_OPEN_START_MENU = 'openStartMenu';
 
   protected readonly options: ITDPOptions = {
@@ -123,16 +125,23 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu.setGraph(graph);
     });
 
-    const provVis = loadProvenanceGraphVis(graph, body.querySelector('div.content'), {
+    const provVis = loadProvenanceGraphVis(graph, body.querySelector('div.asides'), {
       thumbnails: false,
-        provVisCollapsed: true,
-        hideCLUEButtonsOnCollapse: true
+      provVisCollapsed: false,
+      hideCLUEButtonsOnCollapse: true
     });
-    const storyVis = loadStoryVis(graph, <HTMLElement>body.querySelector('div.content'), main, {
+    const storyVis = loadStoryVis(graph, <HTMLElement>body.querySelector('div.asides'), main, {
       thumbnails: false
     });
 
     this.app = graph.then((graph) => this.createApp(graph, clueManager, main));
+
+    Promise.all([graph, this.app]).then((args) => {
+      createProvRetrievalPanel(args[0], body.querySelector('div.asides'), {
+        app: args[1],
+        captureNonPersistedStates: false
+      });
+    });
 
     const initSession = () => {
       //logged in, so we can resolve the graph for real
