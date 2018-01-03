@@ -1,5 +1,4 @@
 import itertools
-import sqlalchemy
 import logging
 import phovea_server.config
 from .sql_filter import filter_logic
@@ -51,6 +50,8 @@ def to_query(q, supports_array_parameter, parameters):
   :param parameters: dictionary of parameters that are going to be applied
   :return: the transformed query and call by reference updated parameters
   """
+  import sqlalchemy
+
   q = q.replace('\n', ' ').replace('\r', ' ')
   if supports_array_parameter:
     return sqlalchemy.sql.text(q)
@@ -127,6 +128,8 @@ def get_columns(engine, table_name):
   :param table_name: table name which may include a schema prefix
   :return: the list of columns
   """
+  import sqlalchemy
+
   schema = None
   if '.' in table_name:
     splitted = table_name.split('.')

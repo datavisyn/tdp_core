@@ -1,5 +1,4 @@
 import logging
-import sqlalchemy
 from phovea_server.config import view as configview
 from phovea_server.plugin import list as list_plugins
 
@@ -40,6 +39,7 @@ class DBManager(object):
 
     _log.info('%s -> %s', p.id, connector.dburl)
     engine_options = config.get('engine', default={})
+    import sqlalchemy
     engine = sqlalchemy.create_engine(connector.dburl, **engine_options)
     # Assuming that gevent monkey patched the builtin
     # threading library, we're likely good to use
