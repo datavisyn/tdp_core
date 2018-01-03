@@ -32,6 +32,10 @@ export interface ITDPOptions {
    * prefix used for provenance graphs and used to identify matching provenance graphs
    */
   prefix: string;
+  /**
+   * Show/hide the EU cookie disclaimer bar from `cookie-bar.eu`
+   */
+  showCookieDisclaimer: boolean;
 }
 
 /**
@@ -43,7 +47,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   protected readonly options: ITDPOptions = {
     loginForm: undefined,
     name: 'Target Discovery Platform',
-    prefix: 'tdp'
+    prefix: 'tdp',
+    showCookieDisclaimer: false
   };
 
   protected app: Promise<T> = null;
@@ -58,6 +63,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   protected buildImpl(body: HTMLElement) {
     //create the common header
     const headerOptions = {
+      showCookieDisclaimer: this.options.showCookieDisclaimer,
       showOptionsLink: true, // always activate options
       appLink: new AppHeaderLink(this.options.name, (event) => {
         event.preventDefault();
