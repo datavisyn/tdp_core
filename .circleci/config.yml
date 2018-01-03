@@ -4,6 +4,8 @@ jobs:
     working_directory: ~/phovea
     docker:
       - image: caleydo/phovea_circleci_python:v1.0
+    tags:
+      - /v\d+.\d+.\d+.*/
     steps:
       - checkout
       - run:

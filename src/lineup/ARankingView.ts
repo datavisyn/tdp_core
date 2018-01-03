@@ -308,7 +308,7 @@ export abstract class ARankingView extends AView {
     }
 
     if (colDesc.sortedByMe) {
-      col.sortByMe(colDesc.sortedByMe !== false);
+      col.sortByMe(colDesc.sortedByMe === true || colDesc.sortedByMe === 'asc');
     }
 
     // error handling

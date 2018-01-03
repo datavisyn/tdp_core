@@ -15,6 +15,10 @@ header.clue-modeselector {
   top: 1px;
 }
 
+[data-clue=E] header.clue-modeselector.collapsed {
+  transition: none;
+}
+
 // overrides caleydo_clue/styles/base
 aside {
   border: 0;

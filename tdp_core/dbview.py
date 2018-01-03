@@ -1,5 +1,6 @@
 import logging
 import re
+from phovea_server.security import current_user
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class DBView(object):
     self.arguments = []
     self.filters = {}
     self.table = None
+    self.security = None
     self.assign_ids = False
 
   def needs_to_fill_up_columns(self):
@@ -108,6 +110,14 @@ class DBView(object):
   def is_valid_argument(self, key):
     return key in self.arguments
 
+  def can_access(self):
+    if self.security is None:
+      return True
+    if callable(self.security):
+      return self.security(current_user())
+    role = unicode(self.security)
+    return current_user().has_role(role)
+
 
 class DBViewBuilder(object):
   """
@@ -132,6 +142,7 @@ class DBViewBuilder(object):
     self.v.arguments = list(view.arguments)
     self.v.filters = view.filters.copy()
     self.v.valid_replacements = view.valid_replacements.copy()
+    self.v.security = view.security
     return self
 
   def description(self, desc):
@@ -313,6 +324,15 @@ class DBViewBuilder(object):
       f(self)
     return self
 
+  def security(self, security_check):
+    """
+    adds a security check for this view
+    :param security_check: either a string = role_name or a function that will get the user as first argument
+    :return: self
+    """
+    self.v.security = security_check
+    return self
+
   def build(self):
     """
     builds the query and end this builder
@@ -371,7 +391,7 @@ def inject_where(builder):
   lower = query.lower()
   where = lower.find(' where ')
   before = -1
-  for before_q in [' order by', ' group by', ' limit', ' offset']:
+  for before_q in [' group by', ' order by', ' limit', ' offset']:
     before = lower.find(before_q)
     if before >= 0:
       break

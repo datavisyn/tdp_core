@@ -29,7 +29,7 @@ def list_view(database):
   config_engine = db.resolve(database)
   if not config_engine:
     return 404, 'Not Found'
-  return jsonify([v.dump(k) for k, v in config_engine[0].views.items()])
+  return jsonify([v.dump(k) for k, v in config_engine[0].views.items() if v.can_access()])
 
 
 def _assign_ids(r, view):
