@@ -299,7 +299,7 @@ export abstract class ARankingView extends AView {
       return;
     }
 
-    this.panel.forceCollapse();
+    this.panel.hide();
 
     if (this.dump !== null) {
       return;
