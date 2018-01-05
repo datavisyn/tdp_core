@@ -74,13 +74,13 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
 
-    if (options.enableSidePanel === 'collapsed') {
-      this.collapse = true;
-    }
-
     this.panel = new SidePanel(ctx, doc, {
       chooser: false
     });
+
+    if (options.enableSidePanel === 'collapsed') {
+      this.collapse = true;
+    }
 
     this.init();
   }
