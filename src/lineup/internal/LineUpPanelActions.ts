@@ -74,13 +74,13 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
 
-    if (options.enableSidePanel === 'collapsed') {
-      this.collapse = true;
-    }
-
     this.panel = new SidePanel(ctx, doc, {
       chooser: false
     });
+
+    if (options.enableSidePanel === 'collapsed') {
+      this.collapse = true;
+    }
 
     this.init();
   }
@@ -94,6 +94,10 @@ export default class LineUpPanelActions extends EventHandler {
     if (!this.wasCollapsed) {
       this.collapse = false;
     }
+
+    if(this.wasHidden) {
+      this.show();
+    }
   }
 
   get collapse() {
@@ -102,6 +106,18 @@ export default class LineUpPanelActions extends EventHandler {
 
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
+  }
+
+  hide() {
+    this.node.style.display = 'none';
+  }
+
+  show() {
+    this.node.style.display = 'flex';
+  }
+
+  get wasHidden() {
+    return this.node.style.display === 'none';
   }
 
   get node() {
