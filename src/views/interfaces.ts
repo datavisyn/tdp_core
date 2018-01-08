@@ -171,6 +171,11 @@ export interface IView extends IEventHandler {
   readonly itemIDType: IDType | null;
 
   /**
+   * optional natural size used when stacking the view on top of each other
+   */
+  readonly naturalSize?: [number, number]|'auto';
+
+  /**
    * initialized this view
    * @param {HTMLElement} params place to put parameter forms
    * @param {(name: string, value: any, previousValue: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes

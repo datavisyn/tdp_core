@@ -99,6 +99,8 @@ export abstract class ARankingView extends AView {
    */
   private dump: Map<string, number | boolean | number[]> = null;
 
+  readonly naturalSize = [800, 500];
+
   /**
    * DOM element for LineUp stats in parameter UI
    */
