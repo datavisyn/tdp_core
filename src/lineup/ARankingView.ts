@@ -1,9 +1,9 @@
 
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
+import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
+import {defaultConfig} from 'lineupjs/src/config';
+import {ILineUpConfig} from 'lineupjs/src/interfaces';
 import {AView} from '../views/AView';
-import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
+import {EViewMode, IViewContext, ISelection} from '../views';
 
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
 import {deriveColors} from 'lineupjs/src/utils';
@@ -16,6 +16,7 @@ import {showErrorModalDialog} from '../dialogs';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
 import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
+import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
@@ -27,6 +28,8 @@ import {addLazyColumn} from './internal/column';
 import StackColumn from 'lineupjs/src/model/StackColumn';
 import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
 import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
+
+export {IRankingWrapper} from './internal/ranking';
 
 export interface IARankingViewOptions {
   /**
@@ -71,6 +74,8 @@ export interface IARankingViewOptions {
   enableSidePanel: boolean|'collapsed';
 
   enableAddingColumns: boolean;
+
+  customOptions: Partial<ILineUpConfig>;
 }
 
 /**
@@ -98,7 +103,7 @@ export abstract class ARankingView extends AView {
     filterGlobally: true,
     grouping: true
   });
-  private readonly taggle: TaggleRenderer;
+  private readonly taggle: EngineRenderer|TaggleRenderer;
   private readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
 
@@ -132,7 +137,8 @@ export abstract class ARankingView extends AView {
     enableOverviewMode: true,
     enableZoom: true,
     enableAddingColumns: true,
-    enableSidePanel: true
+    enableSidePanel: true,
+    customOptions: {}
   };
 
   private readonly selectionAdapter: ISelectionAdapter|null;
@@ -157,7 +163,9 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    this.taggle = new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, this.config);
+    const config = Object.assign(this.config, options.customOptions);
+
+    this.taggle = !this.options.enableOverviewMode? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
@@ -175,11 +183,13 @@ export abstract class ARankingView extends AView {
     this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
       this.taggle.zoomIn();
     });
-    this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
-      this.taggle.switchRule(rule);
-    });
-    if (this.options.enableOverviewMode === 'active') {
-      this.taggle.switchRule(spacefilling);
+    if (this.options.enableOverviewMode) {
+      this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
+        (<TaggleRenderer>this.taggle).switchRule(rule);
+      });
+      if (this.options.enableOverviewMode === 'active') {
+        (<TaggleRenderer>this.taggle).switchRule(spacefilling);
+      }
     }
 
     if (this.options.enableSidePanel) {
@@ -423,7 +433,9 @@ export abstract class ARankingView extends AView {
 
       this.setLineUpData(rows);
       this.createInitialRanking(this.provider);
-      this.colors.init(this.provider.getLastRanking());
+      const ranking = this.provider.getLastRanking();
+      this.customizeRanking(wrapRanking(this.provider, ranking));
+      this.colors.init(ranking);
 
       if (this.selectionAdapter) {
         // init first time
@@ -448,6 +460,10 @@ export abstract class ARankingView extends AView {
 
   protected createInitialRanking(lineup: ADataProvider) {
     createInitialRanking(this.provider);
+  }
+
+  protected customizeRanking(ranking: IRankingWrapper) {
+    // hook
   }
 
   private setLineUpData(rows: IRow[]) {
