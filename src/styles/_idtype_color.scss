@@ -26,12 +26,14 @@
     border-color: $color;
   }
 
-  .view-chooser li[data-idtype="#{$idType}"] {
-    border: 1px solid $color !important;
+  .view-chooser, .dashboard-chooser {
+    li[data-idtype="#{$idType}"] {
+      border: 1px solid $color !important;
 
-    &:active,
-    &:hover {
-      box-shadow: 0 8px 17px 0 rgba($color, 0.2), 0 6px 20px 0 rgba($color, 0.2) !important;
+      &:active,
+      &:hover {
+        box-shadow: 0 8px 17px 0 rgba($color, 0.2), 0 6px 20px 0 rgba($color, 0.2) !important;
+      }
     }
   }
 
