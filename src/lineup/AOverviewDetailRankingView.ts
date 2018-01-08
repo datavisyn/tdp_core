@@ -74,7 +74,6 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
     this.node.insertAdjacentElement('afterbegin', r.node);
 
     r.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, () => {
-      console.log('layout changed');
       this.triggerOverviewUpdateDelayed();
       this.triggerUpdateDelayed();
     });
