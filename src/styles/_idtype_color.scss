@@ -26,7 +26,7 @@
     border-color: $color;
   }
 
-  .view-chooser, .dashboard-chooser {
+  .view-chooser {
     li[data-idtype="#{$idType}"] {
       border: 1px solid $color !important;
 
