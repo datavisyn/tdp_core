@@ -84,7 +84,14 @@ export interface IARankingViewOptions {
 export abstract class ARankingView extends AView {
 
   private readonly config = {
-    violationChanged: (_rule, violation?: string) => this.panel.setViolation(violation)
+    violationChanged: (_rule, violation?: string) => this.panel.setViolation(violation),
+    header: {
+      summary: true
+    },
+    body: {
+      animation: true,
+      rowPadding: 0, //since padding is used
+    }
   };
   /**
    * Stores the ranking data when collapsing columns on modeChange()
