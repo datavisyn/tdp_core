@@ -357,7 +357,7 @@ export abstract class ARankingView extends AView {
     colDesc.color = this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
-      this.panel.updateChooser(this.idType, this.provider.getColumns());
+      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
     });
   }
 
