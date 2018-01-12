@@ -2,7 +2,7 @@
  * Created by sam on 13.02.2017.
  */
 
-import {createSelectionDesc, createAggregateDesc, IColumnDesc, createGroupDesc} from 'lineupjs/src/model';
+import {createSelectionDesc, createAggregateDesc, IColumnDesc} from 'lineupjs/src/model';
 import {ICategory} from 'lineupjs/src/model/ICategoricalColumn';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
