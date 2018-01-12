@@ -372,7 +372,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.overview.style.cursor = 'not-allowed';
     } else {
       this.overview.title = `En/Disable Overview`;
-      this.overview.style.cursor = null;
+      this.overview.style.cursor = null; // remove style on element to use default style from stylesheet instead
     }
   }
 }
