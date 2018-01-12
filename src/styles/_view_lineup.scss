@@ -106,23 +106,26 @@
 
       > a {
         width: 100%;
+        order: 1;
         &::before {
           content: $fa-var-arrow-left;
         }
       }
 
       > section {
+        order: 3;
         flex-direction: column;
-        margin-top: 2em;
         margin-right: 0;
       }
 
       > header {
+        order: 2;
         padding: 0;
         display: flex;
         flex-direction: column;
         position: relative;
         border: none;
+        margin-top: 2em;
 
         &:not(.once) .lu-search {
           display: none;
@@ -143,9 +146,10 @@
 
         &.once .lu-search {
           position: absolute;
-          top: 2em;
+          top: 1.8em;
           width: 17.5em;
           left: -15em;
+          z-index: 2;
 
           > ul {
             max-height: 50vh;
