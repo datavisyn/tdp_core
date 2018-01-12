@@ -14,7 +14,7 @@ import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {exportRanking} from 'lineupjs/src/provider/utils';
 import SearchBox from 'lineupjs/src/ui/panel/SearchBox';
 import {EventHandler} from 'phovea_core/src/event';
-import {IARankingViewOptions} from '../ARankingView';
+import {IARankingViewOptions, MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} from '../ARankingView';
 
 export interface ISearchOption {
   text: string;
@@ -363,6 +363,18 @@ export default class LineUpPanelActions extends EventHandler {
           this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
         }
       });
+  }
+
+  toggleDisableOverviewButton(disable: boolean = false) {
+    debugger;
+    (<HTMLButtonElement>this.overview).disabled = disable;
+    if(disable) {
+      (<HTMLButtonElement>this.overview).title = `Overview disabled due to too many items in the table. Please filter the table below the threshold of ${MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} items to enable the overview mode.`;
+      this.overview.style.cursor = 'not-allowed';
+    } else {
+      (<HTMLButtonElement>this.overview).title = `En/Disable Overview`;
+      this.overview.style.cursor = 'pointer';
+    }
   }
 }
 
