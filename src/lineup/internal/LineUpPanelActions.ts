@@ -366,14 +366,13 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   toggleDisableOverviewButton(disable: boolean = false) {
-    debugger;
     (<HTMLButtonElement>this.overview).disabled = disable;
     if(disable) {
-      (<HTMLButtonElement>this.overview).title = `Overview disabled due to too many items in the table. Please filter the table below the threshold of ${MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} items to enable the overview mode.`;
+      this.overview.title = `Overview disabled due to too many items in the table. Please filter the table below the threshold of ${MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} items to enable the overview mode.`;
       this.overview.style.cursor = 'not-allowed';
     } else {
-      (<HTMLButtonElement>this.overview).title = `En/Disable Overview`;
-      this.overview.style.cursor = 'pointer';
+      this.overview.title = `En/Disable Overview`;
+      this.overview.style.cursor = null;
     }
   }
 }
