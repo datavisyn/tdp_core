@@ -165,7 +165,6 @@ export function createInitialRanking(provider: ADataProvider) {
   const ranking = provider.pushRanking();
   ranking.insert(provider.create(createAggregateDesc()), 0);
   ranking.push(provider.create(createSelectionDesc()));
-  ranking.push(provider.create(createGroupDesc()));
 
   provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
     const col = provider.create(d);
