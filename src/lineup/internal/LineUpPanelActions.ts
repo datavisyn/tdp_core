@@ -128,7 +128,7 @@ export default class LineUpPanelActions extends EventHandler {
     this.node.insertAdjacentHTML('afterbegin', `
       <a href="#" title="(Un)Collapse"></a>
       <section></section>
-      <header><button class="fa fa-plus"></button>
+      <header><button class="fa fa-plus" title="Add Column"></button>
       </header>`);
 
     this.node.querySelector('a')!.addEventListener('click', (evt) => {
@@ -224,7 +224,7 @@ export default class LineUpPanelActions extends EventHandler {
       const listener = () => {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
-      return this.createMarkup(button.name,'fa ' + button.cssClass, listener);
+      return this.createMarkup(button.title,'fa ' + button.cssClass, listener);
     });
   }
 
