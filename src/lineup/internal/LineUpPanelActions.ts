@@ -138,16 +138,16 @@ export default class LineUpPanelActions extends EventHandler {
     });
 
     const buttons = this.node.querySelector('section');
+    this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
+    buttons.appendChild(this.appendSaveRanking());
+    buttons.appendChild(this.appendDownload());
     if (this.options.enableZoom) {
       buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
       buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
     }
-    buttons.appendChild(this.appendDownload());
-    buttons.appendChild(this.appendSaveRanking());
     if (this.options.enableOverviewMode) {
       buttons.appendChild(this.appendOverviewButton());
     }
-    this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
 
     const header = <HTMLElement>this.node.querySelector('header')!;
 
