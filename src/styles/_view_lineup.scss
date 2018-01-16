@@ -125,7 +125,7 @@
         flex-direction: column;
         position: relative;
         border: none;
-        margin-top: 2em;
+        margin-top: 3em;
 
         &:not(.once) .lu-search {
           display: none;
@@ -159,6 +159,10 @@
 
       > div {
         display: none;
+      }
+
+      .gap {
+        margin-top: 1em;
       }
     }
   }

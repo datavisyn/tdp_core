@@ -142,7 +142,7 @@ export default class LineUpPanelActions extends EventHandler {
     buttons.appendChild(this.appendSaveRanking());
     buttons.appendChild(this.appendDownload());
     if (this.options.enableZoom) {
-      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
+      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
       buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
     }
     if (this.options.enableOverviewMode) {
