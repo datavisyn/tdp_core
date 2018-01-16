@@ -78,6 +78,8 @@ export interface IARankingViewOptions {
   customOptions: Partial<ILineUpConfig>;
 }
 
+export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
+
 /**
  * base class for views based on LineUp
  */
@@ -146,7 +148,7 @@ export abstract class ARankingView extends AView {
     enableOverviewMode: true,
     enableZoom: true,
     enableAddingColumns: true,
-    enableSidePanel: true,
+    enableSidePanel: 'collapsed',
     customOptions: {}
   };
 
@@ -301,7 +303,7 @@ export abstract class ARankingView extends AView {
     const weightsSuffix = '_weights';
 
     if (mode === EViewMode.FOCUS) {
-      this.panel.releaseForce();
+      this.panel.show();
       if (this.dump) {
         ranking.children.forEach((c) => {
           if (!this.dump.has(c.id)) {
@@ -512,6 +514,7 @@ export abstract class ARankingView extends AView {
     const r = this.provider.getRankings()[0];
     const shown = r && r.getOrder() ? r.getOrder().length : 0;
     this.stats.textContent = showStats(total, selected, shown);
+    this.panel.toggleDisableOverviewButton(shown > MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW);
   }
 
   /**
