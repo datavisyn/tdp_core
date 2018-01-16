@@ -75,6 +75,8 @@ export interface IARankingViewOptions {
 
   enableAddingColumns: boolean;
 
+  enableHeaderSummary: boolean;
+
   customOptions: Partial<ILineUpConfig>;
 }
 
@@ -149,6 +151,7 @@ export abstract class ARankingView extends AView {
     enableZoom: true,
     enableAddingColumns: true,
     enableSidePanel: 'collapsed',
+    enableHeaderSummary: true,
     customOptions: {}
   };
 
@@ -174,7 +177,11 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config = Object.assign(this.config, options.customOptions);
+    const config = mixin(this.config, {
+      header: {
+        summary: this.options.enableHeaderSummary
+      }
+    }, options.customOptions);
 
     this.taggle = !this.options.enableOverviewMode? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
 
