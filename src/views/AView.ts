@@ -2,16 +2,18 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 
-import {IDType, resolve, defaultSelectionType} from 'phovea_core/src/idtype';
-import {none} from 'phovea_core/src/range';
+import {select} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
-import {EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT, VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT} from './interfaces';
+import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
+import {none} from 'phovea_core/src/range';
 import {IFormElementDesc} from '../form';
 import FormBuilder from '../form/FormBuilder';
-import {select} from 'd3';
-import {resolveIds} from './resolve';
 import {toData} from '../form/internal/AFormElement';
-import {mixin} from 'phovea_core/src';
+import {
+  EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
+  VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT
+} from './interfaces';
+import {resolveIds} from './resolve';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -29,7 +31,8 @@ export abstract class AView extends EventHandler implements IView {
   readonly node: HTMLElement;
 
   private params: FormBuilder;
-  private itemSelection: ISelection = { idtype: null, range: none() };
+  private paramsFallback = new Map<string, any>();
+  private itemSelection: ISelection = {idtype: null, range: none()};
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
@@ -55,7 +58,8 @@ export abstract class AView extends EventHandler implements IView {
     }
   }
 
-  /*final*/ init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
+  /*final*/
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     this.params = this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
   }
@@ -68,7 +72,7 @@ export abstract class AView extends EventHandler implements IView {
     return null;
   }
 
-  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
+  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     const builder = new FormBuilder(select(params));
 
     //work on a local copy since we change it by adding an onChange handler
@@ -105,13 +109,15 @@ export abstract class AView extends EventHandler implements IView {
   /**
    * returns the value of the given parameter
    */
-  /*final*/ getParameter(name: string): any {
+
+  /*final*/
+  getParameter(name: string): any {
     const elem = this.getParameterElement(name);
     if (!elem) {
       if (__DEBUG__) {
-        console.warn('invalid parameter detected', name, this.context.desc);
+        console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
-      return null;
+      return this.paramsFallback.has(name) ? this.paramsFallback.get(name) : null;
     }
     const v = elem.value;
 
@@ -123,15 +129,17 @@ export abstract class AView extends EventHandler implements IView {
     return toData(value);
   }
 
-  /*final*/ setParameter(name: string, value: any) {
+  /*final*/
+  setParameter(name: string, value: any) {
     const elem = this.getParameterElement(name);
     if (!elem) {
       if (__DEBUG__) {
-        console.warn('invalid parameter detected', name, this.context.desc);
+        console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
-      return;
+      this.paramsFallback.set(name, value);
+    } else {
+      elem.value = value;
     }
-    elem.value = value;
     this.parameterChanged(name);
   }
 
@@ -143,7 +151,7 @@ export abstract class AView extends EventHandler implements IView {
     // hook
   }
 
-  setInputSelection(selection:ISelection) {
+  setInputSelection(selection: ISelection) {
     if (isSameSelection(this.selection, selection)) {
       return;
     }
@@ -199,7 +207,7 @@ export abstract class AView extends EventHandler implements IView {
     return this.itemSelection;
   }
 
-  modeChanged(mode:EViewMode) {
+  modeChanged(mode: EViewMode) {
     // hook
   }
 
