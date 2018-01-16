@@ -1,7 +1,8 @@
 import {ISplitLayoutContainer} from 'phovea_ui/src/layout';
-import {EventHandler} from '../../../phovea_core/src/event';
-import {defaultSelectionType, IDType, resolve} from '../../../phovea_core/src/idtype';
-import {none} from '../../../phovea_core/src/range';
+import {EventHandler} from 'phovea_core/src/event';
+import {IDType, resolve} from 'phovea_core/src/idtype';
+import {none} from 'phovea_core/src/range';
+import {debounce} from 'lineupjs/src/utils';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewClass, IViewContext} from './interfaces';
 
@@ -37,7 +38,7 @@ function prefix(key: string, rest: string) {
 function unprefix(name: string) {
   const index = name.indexOf('.');
   if (index < 0) {
-    return { key: '', rest: name};
+    return {key: '', rest: name};
   }
   return {
     key: name.slice(0, index),
@@ -54,9 +55,12 @@ export abstract class ACompositeView extends EventHandler implements IView {
   readonly node: HTMLElement;
 
   private readonly setup: ICompositeSetup;
-  private readonly children: {key: string, instance: IView}[];
+  private readonly children: { key: string, instance: IView }[];
   private readonly childrenLookup = new Map<string, IView>();
   private readonly sharedParameters: Set<string>;
+
+  private readonly debounceItemSelection = debounce((...args) => this.fire(AView.EVENT_ITEM_SELECT, ...args.slice(1)));
+  private readonly debounceUpdateEntryPoint = debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement, options: Partial<IACompositeViewOptions> = {}) {
     super();
@@ -76,29 +80,40 @@ export abstract class ACompositeView extends EventHandler implements IView {
 
     this.children = this.setup.elements.map((d) => {
       const instance = new d.clazz(context, selection, this.node, d.options);
-      this.propagate(instance, AView.EVENT_ITEM_SELECT, AView.EVENT_UPDATE_ENTRY_POINT);
+      instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
+      instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
       this.childrenLookup.set(d.key, instance);
       return {key: d.key, instance};
     });
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return Promise.all(this.initChildren(params, onParameterChange));
   }
 
-  private initChildren(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
+  private initChildren(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return this.children.map(({key, instance}) => {
       // forward prefixed
       const onChildChanged = (name, value, previousValue) => {
-        if (this.sharedParameters.has(name)) {
-          if (this.setup.tracked) { // tracked shared parameters
-            return onParameterChange(name, value, previousValue);
-          }
+        if (!this.sharedParameters.has(name)) {
+          return onParameterChange(prefix(key, name), value, previousValue);
         }
-        return onParameterChange(prefix(key, name), value, previousValue);
+        this.children.forEach((child) => {
+          if (child.key !== key) {
+            child.instance.setParameter(name, value);
+          }
+        });
+        if (this.setup.tracked) { // tracked shared parameters
+          return onParameterChange(name, value, previousValue);
+        }
       };
       return instance.init(params, onChildChanged);
     });
+  }
+
+  get itemIDType() {
+    // last view by default
+    return this.children[this.children.length - 1].instance.itemIDType;
   }
 
   getParameter(name: string) {
@@ -133,7 +148,7 @@ export abstract class ACompositeView extends EventHandler implements IView {
     }
   }
 
-  setInputSelection(selection:ISelection) {
+  setInputSelection(selection: ISelection) {
     if (isSameSelection(this.selection, selection)) {
       return;
     }
@@ -142,23 +157,26 @@ export abstract class ACompositeView extends EventHandler implements IView {
   }
 
   setItemSelection(selection: ISelection) {
-    if (isSameSelection(this.itemSelection, selection)) {
-      return;
-    }
-    const bak = this.itemSelection;
-    this.itemSelection = selection;
-    this.fire(AView.EVENT_ITEM_SELECT, bak, selection);
+    const itemIDType = this.itemIDType;
+    this.children.forEach(({instance}) => {
+      if (instance.itemIDType === itemIDType) {
+        instance.setItemSelection(selection);
+      }
+    });
   }
 
   getItemSelection() {
-    return this.itemSelection;
+    const itemIDType = this.itemIDType;
+    const child = this.children.find(({instance}) => instance.itemIDType === itemIDType);
+    return child ? child.instance.getItemSelection() : {idtype: this.itemIDType, range: none()};
   }
 
-  modeChanged(mode:EViewMode) {
-    // hook
+  modeChanged(mode: EViewMode) {
+    this.children.forEach(({instance}) => instance.modeChanged(mode));
   }
 
   destroy() {
+    this.children.forEach(({instance}) => instance.destroy());
     this.node.remove();
   }
 

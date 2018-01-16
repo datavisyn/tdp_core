@@ -64,13 +64,13 @@ export abstract class ATableView<T extends IRow> extends AView {
    * load the rows of LineUp
    * @returns {Promise<IRow[]>} the rows at least containing the represented ids
    */
-  protected abstract loadRows(): Promise<T[]>;
+  protected abstract loadRows(): Promise<T[]>|T[];
 
 
   private build() {
     this.setBusy(true);
-    return this.loadRows().then((rows) => {
-      const header = <HTMLTableRowElement>this.node.querySelector('thread tr');
+    return Promise.resolve(this.loadRows()).then((rows) => {
+      const header = <HTMLTableRowElement>this.node.querySelector('thead tr');
       header.innerHTML = '';
       this.renderHeader(header, rows);
       const body = <HTMLTableSectionElement>this.node.querySelector('tbody');

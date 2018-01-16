@@ -32,6 +32,7 @@ export abstract class AView extends EventHandler implements IView {
 
   private params: FormBuilder;
   private paramsFallback = new Map<string, any>();
+  private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
   private itemSelection: ISelection = {idtype: null, range: none()};
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
@@ -82,6 +83,7 @@ export abstract class AView extends EventHandler implements IView {
     descs.forEach((p) => {
       p.onChange = (formElement, value, data, previousValue) => onParameterChange(formElement.id, value, previousValue);
     });
+    this.paramsChangeListener = onParameterChange;
 
     builder.build(descs);
 
@@ -114,7 +116,7 @@ export abstract class AView extends EventHandler implements IView {
   getParameter(name: string): any {
     const elem = this.getParameterElement(name);
     if (!elem) {
-      if (__DEBUG__) {
+      if (__DEBUG__ && this.params.length > 0) {
         console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
       return this.paramsFallback.has(name) ? this.paramsFallback.get(name) : null;
@@ -129,11 +131,20 @@ export abstract class AView extends EventHandler implements IView {
     return toData(value);
   }
 
+  protected async changeParameter(name: string, value: any) {
+    const old = this.getParameter(name);
+    if (old === value) {
+      return;
+    }
+    await this.paramsChangeListener(name, value, old);
+    await this.setParameter(name, value;
+  }
+
   /*final*/
   setParameter(name: string, value: any) {
     const elem = this.getParameterElement(name);
     if (!elem) {
-      if (__DEBUG__) {
+      if (__DEBUG__ && this.params.length > 0) {
         console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
       this.paramsFallback.set(name, value);
