@@ -128,7 +128,7 @@ export default class LineUpPanelActions extends EventHandler {
     this.node.insertAdjacentHTML('afterbegin', `
       <a href="#" title="(Un)Collapse"></a>
       <section></section>
-      <header><button class="fa fa-plus"></button>
+      <header><button class="fa fa-plus" title="Add Column"></button>
       </header>`);
 
     this.node.querySelector('a')!.addEventListener('click', (evt) => {
@@ -138,16 +138,16 @@ export default class LineUpPanelActions extends EventHandler {
     });
 
     const buttons = this.node.querySelector('section');
+    this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
+    buttons.appendChild(this.appendSaveRanking());
+    buttons.appendChild(this.appendDownload());
     if (this.options.enableZoom) {
-      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
+      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
       buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
     }
-    buttons.appendChild(this.appendDownload());
-    buttons.appendChild(this.appendSaveRanking());
     if (this.options.enableOverviewMode) {
       buttons.appendChild(this.appendOverviewButton());
     }
-    this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
 
     const header = <HTMLElement>this.node.querySelector('header')!;
 
@@ -224,7 +224,7 @@ export default class LineUpPanelActions extends EventHandler {
       const listener = () => {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
-      return this.createMarkup(button.name,'fa ' + button.cssClass, listener);
+      return this.createMarkup(button.title,'fa ' + button.cssClass, listener);
     });
   }
 
