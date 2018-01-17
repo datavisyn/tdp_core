@@ -7,10 +7,7 @@ import {
   horizontalSplit, IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
   view
 } from 'phovea_ui/src/layout';
-import {
-  horizontalStackedLineUp, IBuildAbleOrViewLike,
-  verticalStackedLineUp
-} from 'phovea_ui/src/layout/builder';
+import {horizontalStackedLineUp, IBuildAbleOrViewLike, verticalStackedLineUp} from 'phovea_ui/src/layout/builder';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 
@@ -22,7 +19,7 @@ interface IElementDesc {
 }
 
 export interface ICompositeLayout {
-  type: 'vsplit'|'hsplit'|'hstack'|'vstack',
+  type: 'vsplit' | 'hsplit' | 'hstack' | 'vstack';
   keys: string[];
   ratios?: number[];
 }
@@ -44,7 +41,9 @@ export const VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
 
 export interface ICompositeInfo {
   key: string;
+
   create(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
+
   options?: any;
 }
 
@@ -155,8 +154,8 @@ export default class CompositeView extends EventHandler implements IView {
       }
       let b: IBuildAbleOrViewLike;
       const ratio = this.setup.layout && this.setup.layout.ratios ? this.setup.layout.ratios[0] : 0.5;
-      const type = this.setup.layout ? this.setup.layout.type : 'vsplit';
-      switch(type) {
+      const type = this.setup.layout ? this.setup.layout.type || 'vsplit' : 'vsplit';
+      switch (type) {
         case 'vsplit':
           b = verticalSplit(ratio, views[0], views[1]).fixed();
           break;
@@ -260,7 +259,7 @@ export default class CompositeView extends EventHandler implements IView {
       return Promise.resolve(desc.loader()).then((instance) => (<ICompositeInfo>{
         key: desc.key,
         options: desc.options,
-        create: getFactoryMethod(instance, desc.factory)
+        create: getFactoryMethod(instance, desc.factory || 'create')
       }));
     };
 

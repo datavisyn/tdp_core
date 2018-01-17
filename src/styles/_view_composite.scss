@@ -1,0 +1,21 @@
+@import './vars';
+@import '~font-awesome/scss/variables';
+@import '~font-awesome/scss/mixins';
+
+&.composite-view {
+  [data-layout=split] {
+    [data-layout=view] {
+      overflow: auto;
+      position: relative;
+
+      > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+}
