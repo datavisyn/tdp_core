@@ -162,7 +162,7 @@ def lookup(database, view_name):
   This function is used in conjunction with Select2 form elements
   """
   view_name, _ = _formatter(view_name)
-  query = str(request.args.get('query', '')).lower()
+  query = request.args.get('query', '').lower()
   page = int(request.args.get('page', 0))  # zero based
   limit = int(request.args.get('limit', 30))  # or 'all'
 

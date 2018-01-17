@@ -154,6 +154,7 @@ export interface IViewClass {
  */
 export const VIEW_EVENT_ITEM_SELECT = 'select';
 export const VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
+export const VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
 
 export interface IView extends IEventHandler {
   /**
@@ -168,6 +169,11 @@ export interface IView extends IEventHandler {
    * the id type of the shown items
    */
   readonly itemIDType: IDType | null;
+
+  /**
+   * optional natural size used when stacking the view on top of each other
+   */
+  readonly naturalSize?: [number, number]|'auto';
 
   /**
    * initialized this view

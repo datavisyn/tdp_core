@@ -1,33 +1,35 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
+
+import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
+import {defaultConfig} from 'lineupjs/src/config';
+import {ILineUpConfig} from 'lineupjs/src/interfaces';
 import {AView} from '../views/AView';
-import {EViewMode, IViewContext, ISelection} from '../views/interfaces';
-import LineUp, {ILineUpConfig} from 'lineupjs/src/lineup';
+import {EViewMode, IViewContext, ISelection} from '../views';
+
 import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
-import {deriveColors} from 'lineupjs/src/';
-import {ScaleMappingFunction, Ranking} from 'lineupjs/src/model';
-import ValueColumn from 'lineupjs/src/model/ValueColumn';
-import NumberColumn from 'lineupjs/src/model/NumberColumn';
-import StackColumn from 'lineupjs/src/model/StackColumn';
-import {IBoxPlotData} from 'lineupjs/src/model/BoxPlotColumn';
-import {LocalDataProvider,} from 'lineupjs/src/provider';
+import {deriveColors} from 'lineupjs/src/utils';
+import {LocalDataProvider} from 'lineupjs/src/provider';
+import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
-import LineUpRankingButtons from './internal/LineUpRankingButtons';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
-import {createAccessor} from './internal/utils';
-import {stringCol, createInitialRanking, IAdditionalColumnDesc, categoricalCol, numberCol} from './desc';
+import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
+import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin} from 'phovea_core/src';
-import {extent, Selection, selection as d3base, select} from 'd3';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
-import {IContext, ISelectionAdapter, ISelectionColumn, none} from './selection';
+import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
+import LineUpPanelActions from './internal/LineUpPanelActions';
+import {addLazyColumn} from './internal/column';
+import StackColumn from 'lineupjs/src/model/StackColumn';
+import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
+import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
+
+export {IRankingWrapper} from './internal/ranking';
 
 export interface IARankingViewOptions {
   /**
@@ -57,31 +59,40 @@ export interface IARankingViewOptions {
    * additional attributes for stored named sets
    */
   subType: { key: string, value: string };
+
+  /**
+   * enable taggle overview mode switcher
+   * @default true
+   */
+  enableOverviewMode: boolean|'active';
+  /**
+   * enable zoom button
+   * @default true
+   */
+  enableZoom: boolean;
+
+  enableSidePanel: boolean|'collapsed';
+
+  enableAddingColumns: boolean;
+
+  customOptions: Partial<ILineUpConfig>;
 }
+
+export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
 
 /**
  * base class for views based on LineUp
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config: ILineUpConfig = {
-    renderingOptions: {
-      histograms: true
-    },
+  private readonly config = {
+    violationChanged: (_rule, violation?: string) => this.panel.setViolation(violation),
     header: {
-      rankingButtons: (node: Selection<Ranking>|HTMLElement) => {
-        const $node = node instanceof d3base ? <Selection<Ranking>>node : select(<HTMLElement>node);
-        const rb = new LineUpRankingButtons(this.provider, $node, () => this.itemIDType, this.options.additionalScoreParameter);
-        rb.on(LineUpRankingButtons.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
-          this.saveNamedSet(order, name, description, isPublic);
-        });
-        rb.on(LineUpRankingButtons.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
-          this.addScoreColumn(scoreImpl);
-        });
-        rb.on(LineUpRankingButtons.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
-          this.pushTrackedScoreColumn(scoreName, scoreId, params);
-        });
-      }
+      summary: true
+    },
+    body: {
+      animation: true,
+      rowPadding: 0, //since padding is used
     }
   };
   /**
@@ -90,14 +101,22 @@ export abstract class ARankingView extends AView {
    */
   private dump: Map<string, number | boolean | number[]> = null;
 
+  readonly naturalSize = [800, 500];
+
   /**
    * DOM element for LineUp stats in parameter UI
    */
   private readonly stats: HTMLElement;
 
-  private readonly provider = new LocalDataProvider([], []);
-  private readonly lineup: LineUp;
+  private readonly provider = new LocalDataProvider([], [], {
+    maxNestedSortingCriteria: Infinity,
+    maxGroupColumns: Infinity,
+    filterGlobally: true,
+    grouping: true
+  });
+  private readonly taggle: EngineRenderer|TaggleRenderer;
   private readonly selectionHelper: LineUpSelectionHelper;
+  private readonly panel: LineUpPanelActions;
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -125,7 +144,12 @@ export abstract class ARankingView extends AView {
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
-    subType: {key: '', value: ''}
+    subType: {key: '', value: ''},
+    enableOverviewMode: true,
+    enableZoom: true,
+    enableAddingColumns: true,
+    enableSidePanel: 'collapsed',
+    customOptions: {}
   };
 
   private readonly selectionAdapter: ISelectionAdapter|null;
@@ -139,16 +163,52 @@ export abstract class ARankingView extends AView {
     mixin(this.options, idTypeNames, names, options);
 
 
-    this.node.classList.add('lineup');
+    this.node.classList.add('lineup', 'lu-taggle');
+    this.node.insertAdjacentHTML('beforeend', `<div></div>`);
 
     this.stats = this.node.ownerDocument.createElement('p');
+
 
     // hack in for providing the data provider within the graph
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-    this.lineup = new LineUp(this.node, this.provider, this.config);
-    this.selectionHelper = new LineUpSelectionHelper(this.lineup, () => this.itemIDType);
+
+    const config = Object.assign(this.config, options.customOptions);
+
+    this.taggle = !this.options.enableOverviewMode? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
+
+    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
+    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
+      this.saveNamedSet(order, name, description, isPublic);
+    });
+    this.panel.on(LineUpPanelActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
+      this.addScoreColumn(scoreImpl);
+    });
+    this.panel.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, (_event, scoreName: string, scoreId: string, params: any) => {
+      this.pushTrackedScoreColumn(scoreName, scoreId, params);
+    });
+    this.panel.on(LineUpPanelActions.EVENT_ZOOM_OUT, () => {
+      this.taggle.zoomOut();
+    });
+    this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
+      this.taggle.zoomIn();
+    });
+    if (this.options.enableOverviewMode) {
+      this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
+        (<TaggleRenderer>this.taggle).switchRule(rule);
+      });
+      if (this.options.enableOverviewMode === 'active') {
+        (<TaggleRenderer>this.taggle).switchRule(spacefilling);
+      }
+    }
+
+    if (this.options.enableSidePanel) {
+      this.node.appendChild(this.panel.node);
+      this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+    }
+
+    this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
       this.setItemSelection(selection);
     });
@@ -162,6 +222,10 @@ export abstract class ARankingView extends AView {
     const base = <HTMLElement>params.querySelector('form') || params;
     base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
     base.lastElementChild!.appendChild(this.stats);
+  }
+
+  update() {
+    this.taggle.update();
   }
 
   /**
@@ -239,6 +303,7 @@ export abstract class ARankingView extends AView {
     const weightsSuffix = '_weights';
 
     if (mode === EViewMode.FOCUS) {
+      this.panel.show();
       if (this.dump) {
         ranking.children.forEach((c) => {
           if (!this.dump.has(c.id)) {
@@ -254,6 +319,8 @@ export abstract class ARankingView extends AView {
       this.dump = null;
       return;
     }
+
+    this.panel.hide();
 
     if (this.dump !== null) {
       return;
@@ -289,76 +356,11 @@ export abstract class ARankingView extends AView {
   }
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
-    const ranking = this.provider.getLastRanking();
-
-    //mark as lazy loaded
-    (<any>colDesc).lazyLoaded = true;
     colDesc.color = this.colors.getColumnColor(id);
-    const accessor = createAccessor(colDesc);
-
-    // generate a unique column
-    (<any>colDesc).column = `dC${colDesc.label.replace(/\s+/,'')}`;
-    this.provider.pushDesc(colDesc);
-
-    const col: Column = this.provider.create(colDesc);
-    if(position === undefined || position === null) {
-      ranking.push(col);
-    } else {
-      ranking.insert(col, position);
-    }
-
-    if (colDesc.sortedByMe) {
-      col.sortByMe(colDesc.sortedByMe === true || colDesc.sortedByMe === 'asc');
-    }
-
-    // error handling
-    data
-      .catch(showErrorModalDialog)
-      .catch(() => {
-        ranking.remove(col);
-      });
-
-    // success
-    const loaded = data.then((rows: IScoreRow<any>[]) => {
-      accessor.rows = rows;
-
-      if (colDesc.type === 'number') {
-        const ncol = <NumberColumn>col;
-        if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
-          const domain = extent(rows, (d) => <number>d.score);
-          if (colDesc.constantDomain === 'min') {
-            domain[0] = colDesc.domain[0];
-          } else if (colDesc.constantDomain === 'max') {
-            domain[1] = colDesc.domain[1];
-          }
-          //HACK by pass the setMapping function and set it inplace
-          const ori = <ScaleMappingFunction>(<any>ncol).original;
-          const current = <ScaleMappingFunction>(<any>ncol).mapping;
-          colDesc.domain = domain;
-          ori.domain = domain;
-          current.domain = domain;
-        }
-      } else if (colDesc.type === 'boxplot') {
-        //HACK we know that the domain of the description is just referenced, so we can update it by changing values!
-        if (!(colDesc.constantDomain)) { //create a dynamic range if not fixed
-          colDesc.domain[0] = Math.min(...rows.map((d) => (<IBoxPlotData>d.score).min));
-          colDesc.domain[1] = Math.max(...rows.map((d) => (<IBoxPlotData>d.score).max));
-        }
-      }
-
-      if (this.lineup) {
-        // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
-        this.provider.getRankings().forEach((ranking) => {
-          const columns = ranking.flatColumns.filter((rankCol) => rankCol.desc === col.desc);
-          columns.forEach((column) => (<ValueColumn<any>>column).setLoaded(true));
-        });
-
-        this.lineup.update();
-      }
-      return col;
+    return addLazyColumn(colDesc, data, this.provider, position, () => {
+      this.taggle.update();
+      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
     });
-
-    return {col, loaded};
   }
 
   private addScoreColumn(score: IScore<any>) {
@@ -372,8 +374,8 @@ export abstract class ARankingView extends AView {
     return this.addColumn(colDesc, data);
   }
 
-  private async withoutTracking<T>(f: (lineup: any) => T): Promise<T> {
-    return this.built.then(() => withoutTracking(this.context.ref, () => f(this.lineup)));
+  private async withoutTracking<T>(f: () => T): Promise<T> {
+    return this.built.then(() => withoutTracking(this.context.ref, f));
   }
 
   /**
@@ -395,8 +397,8 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<boolean>}
    */
   removeTrackedScoreColumn(columnId: string) {
-    return this.withoutTracking((lineup) => {
-      const column = lineup.data.find(columnId);
+    return this.withoutTracking(() => {
+      const column = this.provider.find(columnId);
       return column.removeMe();
     });
   }
@@ -419,18 +421,7 @@ export abstract class ARankingView extends AView {
    * @returns {IAdditionalColumnDesc[]}
    */
   protected getColumnDescs(columns: IServerColumn[]): IAdditionalColumnDesc[] {
-    const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
-
-    return columns.map((col) => {
-      switch (col.type) {
-        case 'categorical':
-          return categoricalCol(col.column, col.categories, {label: niceName(col.label)});
-        case 'number':
-          return numberCol(col.column, col.min, col.max, {label: niceName(col.label)});
-        case 'string':
-          return stringCol(col.column, {label: niceName(col.label)});
-      }
-    });
+    return deriveColumns(columns);
   }
 
   private getColumns(): Promise<IAdditionalColumnDesc[]> {
@@ -446,16 +437,23 @@ export abstract class ARankingView extends AView {
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];
       columns.forEach((c) => this.provider.pushDesc(c));
+
+      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
+
       const rows: IRow[] = r[1];
 
       this.setLineUpData(rows);
-      this.createInitialRanking(this.lineup);
-      this.colors.init(this.lineup.data.getLastRanking());
+      this.createInitialRanking(this.provider);
+      const ranking = this.provider.getLastRanking();
+      this.customizeRanking(wrapRanking(this.provider, ranking));
+      this.colors.init(ranking);
 
       if (this.selectionAdapter) {
         // init first time
         this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
       }
+
+      this.builtLineUp(this.provider);
 
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
@@ -467,8 +465,16 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  protected createInitialRanking(lineup: LineUp) {
-    createInitialRanking(this.lineup);
+  protected builtLineUp(lineup: LocalDataProvider) {
+    // hook
+  }
+
+  protected createInitialRanking(lineup: ADataProvider) {
+    createInitialRanking(this.provider);
+  }
+
+  protected customizeRanking(ranking: IRankingWrapper) {
+    // hook
   }
 
   private setLineUpData(rows: IRow[]) {
@@ -508,6 +514,7 @@ export abstract class ARankingView extends AView {
     const r = this.provider.getRankings()[0];
     const shown = r && r.getOrder() ? r.getOrder().length : 0;
     this.stats.textContent = showStats(total, selected, shown);
+    this.panel.toggleDisableOverviewButton(shown > MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW);
   }
 
   /**

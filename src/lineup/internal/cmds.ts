@@ -11,14 +11,18 @@ import ScriptColumn from 'lineupjs/src/model/ScriptColumn';
 import LinkColumn from 'lineupjs/src/model/LinkColumn';
 import CategoricalNumberColumn from 'lineupjs/src/model/CategoricalNumberColumn';
 import CompositeColumn from 'lineupjs/src/model/CompositeColumn';
-import Ranking from 'lineupjs/src/model/Ranking';
+import Ranking, {ISortCriteria} from 'lineupjs/src/model/Ranking';
 import Column from 'lineupjs/src/model/Column';
+import {suffix} from 'lineupjs/src/utils';
 
 
 const CMD_SET_SORTING_CRITERIA = 'lineupSetRankingSortCriteria';
+const CMD_SET_SORTING_CRITERIAS = 'lineupSetSortCriteria';
+const CMD_SET_GROUP_CRITERIA = 'lineupSetGroupCriteria';
 const CMD_ADD_RANKING = 'lineupAddRanking';
 const CMD_SET_COLUMN = 'lineupSetColumn';
 const CMD_ADD_COLUMN = 'lineupAddColumn';
+const CMD_MOVE_COLUMN = 'lineupMoveColumn';
 
 //TODO better solution
 let ignoreNext: string = null;
@@ -28,6 +32,15 @@ let ignoreNext: string = null;
  * @type {Set<ADataProvider>}
  */
 const temporaryUntracked = new Set<string>();
+
+
+function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
+  if (ignoreNext === event) {
+    ignoreNext = null;
+    return true;
+  }
+  return temporaryUntracked.has(lineup.hash);
+}
 
 export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
@@ -75,6 +88,54 @@ export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, v
   return action(meta('Change Sort Criteria', cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
     rid,
     value
+  });
+}
+
+export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
+  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const ranking = p.getRankings()[parameter.rid];
+
+  let current: ISortCriteria[];
+  const columns: ISortCriteria[] = parameter.columns.map((c) => ({col: ranking.findByPath(c.col), asc: c.asc}));
+  if (parameter.isSorting) {
+    current = ranking.getSortCriterias();
+    ignoreNext = Ranking.EVENT_SORT_CRITERIAS_CHANGED;
+    ranking.setSortCriteria(columns);
+  } else {
+    const current = ranking.getGroupSortCriteria();
+    ignoreNext = Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED;
+    ranking.setGroupSortCriteria(columns);
+  }
+  return {
+    inverse: setSortCriteria(inputs[0], parameter.rid, current.map(toSortObject), parameter.isSorting)
+  };
+}
+
+
+export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true) {
+  return action(meta('Change Sort Criteria', cat.layout, op.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
+    rid,
+    columns,
+    isSorting
+  });
+}
+
+export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
+  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const ranking = p.getRankings()[parameter.rid];
+  const current = ranking.getGroupCriteria().map((d) => d.fqpath);
+  const columns = parameter.columns.map((p) => ranking.findByPath(p));
+  ignoreNext = Ranking.EVENT_GROUP_CRITERIA_CHANGED;
+  ranking.setGroupCriteria(columns);
+  return {
+    inverse: setGroupCriteria(inputs[0], parameter.rid, current)
+  };
+}
+
+export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
+  return action(meta('Change Group Criteria', cat.layout, op.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
+    rid,
+    columns
   });
 }
 
@@ -143,12 +204,42 @@ export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], paramet
   };
 }
 
+export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
+  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  let ranking: Ranking | CompositeColumn = p.getRankings()[parameter.rid];
+
+  const index: number = parameter.index;
+  const target: number = parameter.moveTo;
+  let bak = null;
+  if (parameter.path) {
+    ranking = <CompositeColumn>ranking.findByPath(parameter.path);
+  }
+  if (ranking) {
+    bak = ranking.at(index);
+    ignoreNext = Ranking.EVENT_MOVE_COLUMN;
+    ranking.move(bak, target);
+  }
+  return {
+    //shift since indices shifted
+    inverse: moveColumn(inputs[0], parameter.rid, parameter.path, target, index > target ? index + 1 : target)
+  };
+}
+
 export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, dump: any) {
   return action(meta(dump ? 'Add Column' : 'Remove Column', cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
     rid,
     path,
     index,
     dump
+  });
+}
+
+export function moveColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, moveTo: number) {
+  return action(meta('Move Column', cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
+    rid,
+    path,
+    index,
+    moveTo
   });
 }
 
@@ -180,11 +271,7 @@ function rankingId(provider: ADataProvider, ranking: Ranking) {
 
 function recordPropertyChange(source: Column | Ranking, provider: ADataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1) {
   const f = (old: any, newValue: any) => {
-    if (ignoreNext === `${property}Changed`) {
-      ignoreNext = null;
-      return;
-    }
-    if (temporaryUntracked.has(lineupViewWrapper.hash)) {
+    if (ignore(`${property}Changed`, lineupViewWrapper)) {
       return;
     }
     // console.log(source, property, old, newValue);
@@ -210,16 +297,15 @@ function recordPropertyChange(source: Column | Ranking, provider: ADataProvider,
 function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
   recordPropertyChange(col, provider, lineup, graph, 'metaData');
   recordPropertyChange(col, provider, lineup, graph, 'filter');
+  recordPropertyChange(col, provider, lineup, graph, 'rendererType');
+  recordPropertyChange(col, provider, lineup, graph, 'groupRenderer');
+  recordPropertyChange(col, provider, lineup, graph, 'sortMethod');
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
   if (col instanceof CompositeColumn) {
     col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
       trackColumn(provider, lineup, graph, column);
-      if (ignoreNext === CompositeColumn.EVENT_ADD_COLUMN) {
-        ignoreNext = null;
-        return;
-      }
-      if (temporaryUntracked.has(lineup.hash)) {
+      if (ignore(CompositeColumn.EVENT_ADD_COLUMN, lineup)) {
         return;
       }
       // console.log(col.fqpath, 'addColumn', column, index);
@@ -232,11 +318,7 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
     });
     col.on(`${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, (column, index: number) => {
       untrackColumn(column);
-      if (ignoreNext === CompositeColumn.EVENT_REMOVE_COLUMN) {
-        ignoreNext = null;
-        return;
-      }
-      if (temporaryUntracked.has(lineup.hash)) {
+      if (ignore(CompositeColumn.EVENT_REMOVE_COLUMN, lineup)) {
         return;
       }
       // console.log(col.fqpath, 'addColumn', column, index);
@@ -247,6 +329,18 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
         inverse: addColumn(lineup, rid, path, index, d)
       });
     });
+
+    col.on(`${CompositeColumn.EVENT_MOVE_COLUMN}.track`, (column, index: number, oldIndex: number) => {
+      if (ignore(CompositeColumn.EVENT_MOVE_COLUMN, lineup)) {
+        return;
+      }
+      // console.log(col.fqpath, 'addColumn', column, index);
+      const rid = rankingId(provider, col.findMyRanker());
+      const path = col.fqpath;
+      graph.pushWithResult(moveColumn(lineup, rid, path, oldIndex, index), {
+        inverse: moveColumn(lineup, rid, path, index, oldIndex > index ? oldIndex + 1 : oldIndex)
+      });
+    });
     col.children.forEach(trackColumn.bind(this, provider, lineup, graph));
 
     if (col instanceof StackColumn) {
@@ -254,11 +348,7 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
     }
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
-      if (ignoreNext === NumberColumn.EVENT_MAPPING_CHANGED) {
-        ignoreNext = null;
-        return;
-      }
-      if (temporaryUntracked.has(lineup.hash)) {
+      if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, lineup)) {
         return;
       }
       // console.log(col.fqpath, 'mapping', old.dump(), newValue.dump());
@@ -279,10 +369,10 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
 
 
 function untrackColumn(col: Column) {
-  col.on(['metaDataChanged.filter', 'filterChanged.track', 'widthChanged.track'], null);
+  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'sortMethod'), null);
 
   if (col instanceof CompositeColumn) {
-    col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`], null);
+    col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
     col.children.forEach(untrackColumn);
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);
@@ -294,27 +384,36 @@ function untrackColumn(col: Column) {
 }
 
 function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking) {
-  ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old, newValue) => {
-    if (ignoreNext === Ranking.EVENT_SORT_CRITERIA_CHANGED) {
-      ignoreNext = null;
+  ranking.on(`${Ranking.EVENT_SORT_CRITERIAS_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
+    if (ignore(Ranking.EVENT_SORT_CRITERIAS_CHANGED, lineup)) {
       return;
     }
-    if (temporaryUntracked.has(lineup.hash)) {
-      return;
-    }
-    // console.log(ranking.id, 'sortCriteriaChanged', old, newValue);
     const rid = rankingId(provider, ranking);
-    graph.pushWithResult(setRankingSortCriteria(lineup, rid, toSortObject(newValue)), {
-      inverse: setRankingSortCriteria(lineup, rid, toSortObject(old))
+    graph.pushWithResult(setSortCriteria(lineup, rid, newValue.map(toSortObject)), {
+      inverse: setSortCriteria(lineup, rid, old.map(toSortObject))
+    });
+  });
+  ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
+    if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, lineup)) {
+      return;
+    }
+    const rid = rankingId(provider, ranking);
+    graph.pushWithResult(setSortCriteria(lineup, rid, newValue.map(toSortObject), false), {
+      inverse: setSortCriteria(lineup, rid, old.map(toSortObject), false)
+    });
+  });
+  ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
+    if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, lineup)) {
+      return;
+    }
+    const rid = rankingId(provider, ranking);
+    graph.pushWithResult(setGroupCriteria(lineup, rid, newValue.map((c) => c.fqpath)), {
+      inverse: setGroupCriteria(lineup, rid, old.map((c) => c.fqpath))
     });
   });
   ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
     trackColumn(provider, lineup, graph, column);
-    if (ignoreNext === Ranking.EVENT_ADD_COLUMN) {
-      ignoreNext = null;
-      return;
-    }
-    if (temporaryUntracked.has(lineup.hash)) {
+    if (ignore(Ranking.EVENT_ADD_COLUMN, lineup)) {
       return;
     }
     // console.log(ranking, 'addColumn', column, index);
@@ -326,11 +425,7 @@ function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>
   });
   ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column, index: number) => {
     untrackColumn(column);
-    if (ignoreNext === Ranking.EVENT_REMOVE_COLUMN) {
-      ignoreNext = null;
-      return;
-    }
-    if (temporaryUntracked.has(lineup.hash)) {
+    if(ignore(Ranking.EVENT_REMOVE_COLUMN, lineup)) {
       return;
     }
     // console.log(ranking, 'removeColumn', column, index);
@@ -340,11 +435,21 @@ function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>
       inverse: addColumn(lineup, rid, null, index, d)
     });
   });
+  ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (column, index: number, oldIndex: number) => {
+    if(ignore(Ranking.EVENT_MOVE_COLUMN, lineup)) {
+      return;
+    }
+    // console.log(col.fqpath, 'addColumn', column, index);
+    const rid = rankingId(provider, ranking);
+    graph.pushWithResult(moveColumn(lineup, rid, null, oldIndex, index), {
+      inverse: moveColumn(lineup, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
+    });
+  });
   ranking.children.forEach(trackColumn.bind(this, provider, lineup, graph));
 }
 
 function untrackRanking(ranking: Ranking) {
-  ranking.on([`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, `${Ranking.EVENT_ADD_COLUMN}.track`, `${Ranking.EVENT_REMOVE_COLUMN}.track`], null);
+  ranking.on(suffix('.track', Ranking.EVENT_SORT_CRITERIAS_CHANGED, Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, Ranking.EVENT_GROUP_CRITERIA_CHANGED, Ranking.EVENT_ADD_COLUMN, Ranking.EVENT_REMOVE_COLUMN, Ranking.EVENT_MOVE_COLUMN), null);
   ranking.children.forEach(untrackColumn);
 }
 
@@ -356,11 +461,7 @@ function untrackRanking(ranking: Ranking) {
 export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph) {
   const p = await Promise.resolve((await lineup.v).data);
   p.on(`${ADataProvider.EVENT_ADD_RANKING}.track`, (ranking, index: number) => {
-    if (ignoreNext === ADataProvider.EVENT_ADD_RANKING) {
-      ignoreNext = null;
-      return;
-    }
-    if (temporaryUntracked.has(lineup.hash)) {
+    if (ignore(ADataProvider.EVENT_ADD_RANKING, lineup)) {
       return;
     }
     const d = ranking.dump(p.toDescRef);
@@ -370,11 +471,7 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
     trackRanking(p, lineup, graph, ranking);
   });
   p.on(`${ADataProvider.EVENT_REMOVE_RANKING}.track`, (ranking, index: number) => {
-    if (ignoreNext === ADataProvider.EVENT_REMOVE_RANKING) {
-      ignoreNext = null;
-      return;
-    }
-    if (temporaryUntracked.has(lineup.hash)) {
+    if (ignore(ADataProvider.EVENT_REMOVE_RANKING, lineup)) {
       return;
     }
     const d = ranking.dump(p.toDescRef);

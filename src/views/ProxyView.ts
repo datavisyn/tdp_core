@@ -43,6 +43,8 @@ export default class ProxyView extends AD3View {
   };
 
   private readonly openExternally: HTMLElement;
+  
+  readonly naturalSize = [1280, 800];
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
     super(context, selection, parent);
