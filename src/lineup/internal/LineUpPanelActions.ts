@@ -2,7 +2,7 @@
 import SidePanel from 'lineupjs/src/ui/panel/SidePanel';
 import {IRankingHeaderContext} from 'lineupjs/src/ui/engine/interfaces';
 import {regular, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
-import {createStackDesc, IColumnDesc, createScriptDesc, Ranking, createImpositionDesc, createMinDesc, createMaxDesc, createMeanDesc, createNestedDesc} from 'lineupjs/src/model';
+import {createStackDesc, IColumnDesc, createScriptDesc, createGroupDesc, Ranking, createImpositionDesc, createMinDesc, createMaxDesc, createMeanDesc, createNestedDesc} from 'lineupjs/src/model';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -328,6 +328,12 @@ export default class LineUpPanelActions extends EventHandler {
           { text: 'Min Combination', id: 'min', action: () => this.addColumn(createMinDesc()) },
           { text: 'Mean Combination', id: 'mean', action: () => this.addColumn(createMeanDesc()) },
           { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+        ]
+      },
+      {
+        text: 'Support Columns',
+        children: [
+          { text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group')) }
         ]
       },
       ...metaDataOptions
