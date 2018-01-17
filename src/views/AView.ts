@@ -11,7 +11,7 @@ import FormBuilder from '../form/FormBuilder';
 import {toData} from '../form/internal/AFormElement';
 import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
-  VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT
+  VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
 import {resolveIds} from './resolve';
 
@@ -23,15 +23,30 @@ export {resolveIds, resolveId, resolveIdToNames} from './resolve';
  */
 export abstract class AView extends EventHandler implements IView {
 
+  /**
+   * params(oldValue: ISelection, newSelection: ISelection)
+   */
   static readonly EVENT_ITEM_SELECT = VIEW_EVENT_ITEM_SELECT;
+  /**
+   * params(namedSet: INamedSet)
+   */
   static readonly EVENT_UPDATE_ENTRY_POINT = VIEW_EVENT_UPDATE_ENTRY_POINT;
+  /**
+   * params()
+   */
   static readonly EVENT_LOADING_FINISHED = VIEW_EVENT_LOADING_FINISHED;
+  /**
+   * params(name: string, oldValue: any, newValue: any)
+   */
+  static readonly EVENT_UPDATE_SHARED = VIEW_EVENT_UPDATE_SHARED;
+
 
   readonly idType: IDType;
   readonly node: HTMLElement;
 
   private params: FormBuilder;
-  private paramsFallback = new Map<string, any>();
+  private readonly paramsFallback = new Map<string, any>();
+  private readonly shared = new Map<string, any>();
   private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
   private itemSelection: ISelection = {idtype: null, range: none()};
 
@@ -137,7 +152,7 @@ export abstract class AView extends EventHandler implements IView {
       return;
     }
     await this.paramsChangeListener(name, value, old);
-    await this.setParameter(name, value;
+    await this.setParameter(name, value);
   }
 
   /*final*/
@@ -152,6 +167,24 @@ export abstract class AView extends EventHandler implements IView {
       elem.value = value;
     }
     this.parameterChanged(name);
+  }
+
+  updateShared(name: string, value: any) {
+    if (this.shared.has(name) && this.shared.get(name) === value) {
+      return;
+    }
+    const old = this.shared.get(name);
+    this.shared.set(name, value);
+    this.sharedChanged(name);
+    this.fire(AView.EVENT_UPDATE_SHARED, name, old, value);
+  }
+
+  protected sharedChanged(_name: string) {
+    // hook
+  }
+
+  protected getShared(name: string) {
+    return this.shared.get(name);
   }
 
   /**

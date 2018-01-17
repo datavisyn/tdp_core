@@ -56,9 +56,19 @@ export abstract class ATableView<T extends IRow> extends AView {
     return this.built = this.build();
   }
 
-  protected abstract renderHeader(tr: HTMLTableRowElement, rows: T[]): void;
+  protected renderHeader(tr: HTMLTableRowElement, rows: T[]) {
+    if (rows.length === 0) {
+      return [];
+    }
+    const keys = <(keyof T)[]>Object.keys(rows[0]).filter((d) => d !== 'id' && d !== '_id').sort();
+    tr.innerHTML = keys.map((key) => `<th>${key}</th>`).join('');
+    return keys;
+  };
 
-  protected abstract renderRow(tr: HTMLTableRowElement, row: T, index: number): void;
+  protected renderRow(tr: HTMLTableRowElement, row: T, index: number, keys: (keyof T)[]) {
+    tr.dataset.id = row._id.toString();
+    tr.innerHTML = keys.map((key) => `<td>${row[key]}</td>`).join('');
+  };
 
   /**
    * load the rows of LineUp
@@ -70,25 +80,7 @@ export abstract class ATableView<T extends IRow> extends AView {
   private build() {
     this.setBusy(true);
     return Promise.resolve(this.loadRows()).then((rows) => {
-      const header = <HTMLTableRowElement>this.node.querySelector('thead tr');
-      header.innerHTML = '';
-      this.renderHeader(header, rows);
-      const body = <HTMLTableSectionElement>this.node.querySelector('tbody');
-      body.innerHTML = '';
-      rows.forEach((row, i) => {
-        const tr = body.insertRow();
-        this.renderRow(tr, row, i);
-        if (this.options.selectAble && this.itemIDType) {
-          tr.onclick = (evt) => {
-            evt.preventDefault();
-            evt.stopPropagation();
-            this.setItemSelection({
-              idtype: this.itemIDType,
-              range: parse([row._id])
-            });
-          };
-        }
-      });
+      this.renderTable(rows);
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
@@ -97,15 +89,31 @@ export abstract class ATableView<T extends IRow> extends AView {
       });
   }
 
+  private renderTable(rows: T[]) {
+    const header = <HTMLTableRowElement>this.node.querySelector('thead tr');
+    header.innerHTML = '';
+    const keys = this.renderHeader(header, rows);
+    const body = <HTMLTableSectionElement>this.node.querySelector('tbody');
+    body.innerHTML = '';
+    rows.forEach((row, i) => {
+      const tr = body.insertRow();
+      this.renderRow(tr, row, i, keys);
+      if (this.options.selectAble && this.itemIDType) {
+        tr.onclick = (evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          this.setItemSelection({
+            idtype: this.itemIDType,
+            range: parse([row._id])
+          });
+        };
+      }
+    });
+  }
+
   private reloadDataImpl() {
     return this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
-      const rows: T[] = r[1];
-      const body = <HTMLTableSectionElement>this.node.querySelector('tbody');
-      body.innerHTML = '';
-      rows.forEach((row, i) => {
-        const tr = body.insertRow();
-        this.renderRow(tr, row, i);
-      });
+      this.renderTable(r[1]);
     });
   }
 

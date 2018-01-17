@@ -1,16 +1,21 @@
-import {ISplitLayoutContainer} from 'phovea_ui/src/layout';
-import {EventHandler} from 'phovea_core/src/event';
+import {debounce} from 'lineupjs/src/utils';
+import {EventHandler, IEvent} from 'phovea_core/src/event';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {none} from 'phovea_core/src/range';
-import {debounce} from 'lineupjs/src/utils';
+import {
+  IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
+  view
+} from 'phovea_ui/src/layout';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewClass, IViewContext} from './interfaces';
 
 export interface IACompositeViewOptions {
-
+  showHeaders: boolean;
 }
 
 declare const __DEBUG__: boolean;
+
+export const VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
 
 
 export interface ICompositeInfo {
@@ -21,8 +26,6 @@ export interface ICompositeInfo {
 
 export interface ICompositeSetup {
   elements: ICompositeInfo[];
-  sharedParameters?: string[];
-  tracked?: boolean;
 
   layout?: {
     type: 'vsplit',
@@ -47,17 +50,17 @@ function unprefix(name: string) {
 }
 
 export abstract class ACompositeView extends EventHandler implements IView {
-  private readonly options: Readonly<IACompositeViewOptions> = {};
+  private readonly options: Readonly<IACompositeViewOptions> = {
+    showHeaders: false
+  };
 
-  private readonly split: ISplitLayoutContainer;
+  private readonly root: IRootLayoutContainer;
 
   readonly idType: IDType;
-  readonly node: HTMLElement;
 
   private readonly setup: ICompositeSetup;
-  private readonly children: { key: string, instance: IView }[];
+  private readonly children: WrapperView[];
   private readonly childrenLookup = new Map<string, IView>();
-  private readonly sharedParameters: Set<string>;
 
   private readonly debounceItemSelection = debounce((...args) => this.fire(AView.EVENT_ITEM_SELECT, ...args.slice(1)));
   private readonly debounceUpdateEntryPoint = debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
@@ -65,9 +68,8 @@ export abstract class ACompositeView extends EventHandler implements IView {
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement, options: Partial<IACompositeViewOptions> = {}) {
     super();
     Object.assign(this.options, options);
-    this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('tdp-view', 'composite-view');
-    parent.appendChild(this.node);
+    const helper = parent.ownerDocument.createElement('div');
+
     if (isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
     } else {
@@ -76,36 +78,64 @@ export abstract class ACompositeView extends EventHandler implements IView {
 
     this.setup = this.createSetup();
 
-    this.sharedParameters = new Set(this.setup.sharedParameters);
+    const updateShared = (evt: IEvent, name: string, oldValue: any, newValue: any) => {
+      this.children.forEach(({instance}) => {
+        if (evt.currentTarget !== instance) {
+          instance.off(AView.EVENT_UPDATE_SHARED, updateShared);
+          instance.updateShared(name, newValue);
+          instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
+        }
+      });
+    };
+
+    const updateRatios = (_evt: any, ...ratios: number[]) => {
+      const s = <ISplitLayoutContainer>this.root.find((d) => d.type === 'split');
+      s.ratios = ratios;
+    };
 
     this.children = this.setup.elements.map((d) => {
-      const instance = new d.clazz(context, selection, this.node, d.options);
+      const instance = new d.clazz(context, selection, helper, d.options);
       instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
       instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
+      instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
+      instance.on(VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
       this.childrenLookup.set(d.key, instance);
-      return {key: d.key, instance};
+
+      return new WrapperView(instance, d.key);
     });
+    const views = this.children.map((d) => {
+      const v = view(d).name(d.key).fixed();
+      if (!this.options.showHeaders) {
+        v.hideHeader();
+      }
+      return v;
+    });
+
+    if (views.length === 1) {
+      this.root = root(views[0]);
+    } else {
+      this.root = root(verticalSplit(this.setup.layout.ratios[0], views[0], views[1]).fixed());
+      const split = <ISplitLayoutContainer>this.root.root;
+      views.slice(2).forEach((v) => split.push(this.root.build(v)));
+    }
+
+    this.root.node.classList.add('tdp-view', 'composite-view');
+    parent.appendChild(this.root.node);
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return Promise.all(this.initChildren(params, onParameterChange));
   }
 
+  get node() {
+    return this.root.node;
+  }
+
   private initChildren(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return this.children.map(({key, instance}) => {
       // forward prefixed
       const onChildChanged = (name, value, previousValue) => {
-        if (!this.sharedParameters.has(name)) {
-          return onParameterChange(prefix(key, name), value, previousValue);
-        }
-        this.children.forEach((child) => {
-          if (child.key !== key) {
-            child.instance.setParameter(name, value);
-          }
-        });
-        if (this.setup.tracked) { // tracked shared parameters
-          return onParameterChange(name, value, previousValue);
-        }
+        return onParameterChange(prefix(key, name), value, previousValue);
       };
       return instance.init(params, onChildChanged);
     });
@@ -116,11 +146,11 @@ export abstract class ACompositeView extends EventHandler implements IView {
     return this.children[this.children.length - 1].instance.itemIDType;
   }
 
+  updateShared(name: string, value: any) {
+    this.children.forEach(({instance}) => instance.updateShared(name, value));
+  }
+
   getParameter(name: string) {
-    if (this.sharedParameters.has(name)) {
-      // should matter which child since synced
-      return this.children[0].instance.getParameter(name);
-    }
     // check prefixed
     const {key, rest} = unprefix(name);
     const child = this.childrenLookup.get(key);
@@ -134,10 +164,6 @@ export abstract class ACompositeView extends EventHandler implements IView {
   }
 
   setParameter(name: string, value: any) {
-    if (this.sharedParameters.has(name)) {
-      // set to all children
-      this.children.map((d) => d.instance.setParameter(name, value));
-    }
     const {key, rest} = unprefix(name);
     const child = this.childrenLookup.get(key);
     if (child) {
@@ -182,6 +208,49 @@ export abstract class ACompositeView extends EventHandler implements IView {
 
   protected abstract createSetup(): ICompositeSetup;
 
+}
+
+class WrapperView implements ILayoutView {
+  private _visible = true;
+
+  constructor(public readonly instance: IView, public readonly key: string) {
+
+  }
+
+  get minSize() {
+    const given = (<any>this.instance).naturalSize;
+    if (Array.isArray(given)) {
+      return <[number, number]>given;
+    }
+    return <[number, number]>[0, 0];
+  }
+
+  get node() {
+    return this.instance.node;
+  }
+
+  destroy() {
+    this.instance.destroy();
+  }
+
+  get visible() {
+    return this._visible;
+  }
+
+  set visible(value: boolean) {
+    this._visible = value;
+    this.instance.modeChanged(value ? EViewMode.FOCUS : EViewMode.HIDDEN);
+  }
+
+  resized() {
+    if (this.visible && this.instance && typeof (<any>this.instance).update === 'function') {
+      (<any>this.instance!).update();
+    }
+  }
+
+  dumpReference() {
+    return -1;
+  }
 }
 
 function isRegex(v: string) {
