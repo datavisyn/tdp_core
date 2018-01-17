@@ -31,6 +31,10 @@ export default class FormBuilder {
     this.$node = $parent.append('form').attr('id', this.formId);
   }
 
+  get length() {
+    return this.elements.size;
+  }
+
   /**
    * Builds a form from a list of given form element descriptions
    * @param elements

@@ -155,6 +155,7 @@ export interface IViewClass {
 export const VIEW_EVENT_ITEM_SELECT = 'select';
 export const VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
 export const VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
+export const VIEW_EVENT_UPDATE_SHARED = 'updateShared';
 
 export interface IView extends IEventHandler {
   /**
@@ -213,6 +214,13 @@ export interface IView extends IEventHandler {
    * @param value
    */
   setParameter(name: string, value: any): void;
+
+  /**
+   * updates a shared value among different linked views
+   * @param {string} name
+   * @param value
+   */
+  updateShared(name: string, value: any): void;
 
   /**
    * notify the view that its view mode has changed
