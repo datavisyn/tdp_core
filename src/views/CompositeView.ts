@@ -10,7 +10,7 @@ import {
 import {
   horizontalStackedLineUp, IBuildAbleOrViewLike,
   verticalStackedLineUp
-} from '../../../phovea_ui/src/layout/builder';
+} from 'phovea_ui/src/layout/builder';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 
