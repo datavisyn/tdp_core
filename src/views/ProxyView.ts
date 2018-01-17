@@ -170,7 +170,7 @@ export default class ProxyView extends AD3View {
       return;
     }
 
-    this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank"><i class="fa fa-external-link"></i>${url}</a>`;
+    this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url: `${location.protocol}${url}`}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
     this.$node.append('iframe')
