@@ -1,13 +1,31 @@
 import {debounce} from 'lineupjs/src/utils';
 import {EventHandler, IEvent} from 'phovea_core/src/event';
 import {IDType, resolve} from 'phovea_core/src/idtype';
+import {getFactoryMethod} from 'phovea_core/src/plugin';
 import {none} from 'phovea_core/src/range';
 import {
   IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
   view
 } from 'phovea_ui/src/layout';
 import AView from './AView';
-import {EViewMode, ISelection, isSameSelection, IView, IViewClass, IViewContext} from './interfaces';
+import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
+
+interface IElementDesc {
+  key: string;
+  loader: () => any;
+  factory?: string;
+  options?: any;
+}
+
+export interface ICompositeViewPluginDesc extends IViewPluginDesc {
+  elements: IElementDesc[];
+
+  layout?: {
+    type: 'vsplit',
+    keys: string[];
+    ratios?: number[];
+  };
+}
 
 export interface IACompositeViewOptions {
   showHeaders: boolean;
@@ -20,7 +38,7 @@ export const VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
 
 export interface ICompositeInfo {
   key: string;
-  clazz: IViewClass;
+  create(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
   options?: any;
 }
 
@@ -49,7 +67,7 @@ function unprefix(name: string) {
   };
 }
 
-export abstract class ACompositeView extends EventHandler implements IView {
+export default class CompositeView extends EventHandler implements IView {
   private readonly options: Readonly<IACompositeViewOptions> = {
     showHeaders: false
   };
@@ -58,8 +76,8 @@ export abstract class ACompositeView extends EventHandler implements IView {
 
   readonly idType: IDType;
 
-  private readonly setup: ICompositeSetup;
-  private readonly children: WrapperView[];
+  private setup: ICompositeSetup;
+  private readonly children: WrapperView[] = [];
   private readonly childrenLookup = new Map<string, IView>();
 
   private readonly debounceItemSelection = debounce((...args) => this.fire(AView.EVENT_ITEM_SELECT, ...args.slice(1)));
@@ -76,8 +94,20 @@ export abstract class ACompositeView extends EventHandler implements IView {
       this.idType = resolve(context.desc.idtype);
     }
 
-    this.setup = this.createSetup();
+    this.root = root(view('No views defined'));
+    this.root.node.classList.add('tdp-view', 'composite-view');
+    parent.appendChild(this.root.node);
+  }
 
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
+    return this.build().then(() => Promise.all(this.initChildren(params, onParameterChange)));
+  }
+
+  get node() {
+    return this.root.node;
+  }
+
+  private build() {
     const updateShared = (evt: IEvent, name: string, oldValue: any, newValue: any) => {
       this.children.forEach(({instance}) => {
         if (evt.currentTarget !== instance) {
@@ -93,42 +123,39 @@ export abstract class ACompositeView extends EventHandler implements IView {
       s.ratios = ratios;
     };
 
-    this.children = this.setup.elements.map((d) => {
-      const instance = new d.clazz(context, selection, helper, d.options);
-      instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
-      instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
-      instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
-      instance.on(VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
-      this.childrenLookup.set(d.key, instance);
+    return Promise.resolve(this.createSetup()).then((setup) => {
+      this.setup = setup;
 
-      return new WrapperView(instance, d.key);
-    });
-    const views = this.children.map((d) => {
-      const v = view(d).name(d.key).fixed();
-      if (!this.options.showHeaders) {
-        v.hideHeader();
+      const helper = this.node.ownerDocument.createElement('div');
+
+      this.setup.elements.forEach((d) => {
+        const instance = d.create(this.context, this.selection, helper, d.options);
+        instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
+        instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
+        instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
+        instance.on(VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
+        this.childrenLookup.set(d.key, instance);
+
+        this.children.push(new WrapperView(instance, d.key));
+      });
+
+      const views = this.children.map((d) => {
+        const v = view(d).name(d.key).fixed();
+        if (!this.options.showHeaders) {
+          v.hideHeader();
+        }
+        return v;
+      });
+
+      if (views.length === 1) {
+        this.root.root = this.root.build(views[0]);
+      } else {
+        const ratio = this.setup.layout && this.setup.layout.ratios ? this.setup.layout.ratios[0] : 0.5;
+        this.root.root = this.root.build(verticalSplit(ratio, views[0], views[1]).fixed());
+        const split = <ISplitLayoutContainer>this.root.root;
+        views.slice(2).forEach((v) => split.push(this.root.build(v)));
       }
-      return v;
     });
-
-    if (views.length === 1) {
-      this.root = root(views[0]);
-    } else {
-      this.root = root(verticalSplit(this.setup.layout.ratios[0], views[0], views[1]).fixed());
-      const split = <ISplitLayoutContainer>this.root.root;
-      views.slice(2).forEach((v) => split.push(this.root.build(v)));
-    }
-
-    this.root.node.classList.add('tdp-view', 'composite-view');
-    parent.appendChild(this.root.node);
-  }
-
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    return Promise.all(this.initChildren(params, onParameterChange));
-  }
-
-  get node() {
-    return this.root.node;
   }
 
   private initChildren(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
@@ -206,7 +233,22 @@ export abstract class ACompositeView extends EventHandler implements IView {
     this.node.remove();
   }
 
-  protected abstract createSetup(): ICompositeSetup;
+  protected createSetup(): ICompositeSetup | Promise<ICompositeSetup> {
+    const desc = (<ICompositeViewPluginDesc>this.context.desc);
+
+    const toEntry = (desc: IElementDesc): Promise<ICompositeInfo> => {
+      return Promise.resolve(desc.loader()).then((instance) => (<ICompositeInfo>{
+        key: desc.key,
+        options: desc.options,
+        create: getFactoryMethod(instance, desc.factory)
+      }));
+    };
+
+    return Promise.all((desc.elements || []).map(toEntry)).then((elements) => ({
+      elements,
+      layout: desc.layout
+    }));
+  }
 
 }
 
@@ -257,5 +299,3 @@ function isRegex(v: string) {
   // cheap test for regex
   return v.includes('*') || v.includes('.') || v.includes('|');
 }
-
-export default ACompositeView;
