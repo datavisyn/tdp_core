@@ -4,9 +4,13 @@ import {IDType, resolve} from 'phovea_core/src/idtype';
 import {getFactoryMethod} from 'phovea_core/src/plugin';
 import {none} from 'phovea_core/src/range';
 import {
-  IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
+  horizontalSplit, IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
   view
 } from 'phovea_ui/src/layout';
+import {
+  horizontalStackedLineUp, IBuildAbleOrViewLike,
+  verticalStackedLineUp
+} from '../../../phovea_ui/src/layout/builder';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 
@@ -17,14 +21,16 @@ interface IElementDesc {
   options?: any;
 }
 
+export interface ICompositeLayout {
+  type: 'vsplit'|'hsplit'|'hstack'|'vstack',
+  keys: string[];
+  ratios?: number[];
+}
+
 export interface ICompositeViewPluginDesc extends IViewPluginDesc {
   elements: IElementDesc[];
 
-  layout?: {
-    type: 'vsplit',
-    keys: string[];
-    ratios?: number[];
-  };
+  layout?: ICompositeLayout;
 }
 
 export interface IACompositeViewOptions {
@@ -45,11 +51,7 @@ export interface ICompositeInfo {
 export interface ICompositeSetup {
   elements: ICompositeInfo[];
 
-  layout?: {
-    type: 'vsplit',
-    keys: string[];
-    ratios?: number[];
-  };
+  layout?: ICompositeLayout;
 }
 
 function prefix(key: string, rest: string) {
@@ -149,9 +151,27 @@ export default class CompositeView extends EventHandler implements IView {
 
       if (views.length === 1) {
         this.root.root = this.root.build(views[0]);
-      } else {
-        const ratio = this.setup.layout && this.setup.layout.ratios ? this.setup.layout.ratios[0] : 0.5;
-        this.root.root = this.root.build(verticalSplit(ratio, views[0], views[1]).fixed());
+        return;
+      }
+      let b: IBuildAbleOrViewLike;
+      const ratio = this.setup.layout && this.setup.layout.ratios ? this.setup.layout.ratios[0] : 0.5;
+      const type = this.setup.layout ? this.setup.layout.type : 'vsplit';
+      switch(type) {
+        case 'vsplit':
+          b = verticalSplit(ratio, views[0], views[1]).fixed();
+          break;
+        case 'hsplit':
+          b = horizontalSplit(ratio, views[0], views[1]).fixed();
+          break;
+        case 'hstack':
+          b = horizontalStackedLineUp(...views).fixed();
+          break;
+        case 'vstack':
+          b = verticalStackedLineUp(...views).fixed();
+          break;
+      }
+      this.root.root = this.root.build(b);
+      if (type.endsWith('split')) {
         const split = <ISplitLayoutContainer>this.root.root;
         views.slice(2).forEach((v) => split.push(this.root.build(v)));
       }
