@@ -165,7 +165,7 @@ export default class LineUpPanelActions extends EventHandler {
           return;
         }
         header.classList.add('once');
-        this.search.node.focus();
+        (<HTMLElement>this.search.node.querySelector('input'))!.focus();
         this.search.focus();
       });
     }
