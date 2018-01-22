@@ -9,7 +9,7 @@ _log = logging.getLogger(__name__)
 
 class DBManager(object):
   def __init__(self):
-    self._inited = False
+    self._initialized = False
 
     self.connectors = {}
     self._plugins = {}
@@ -47,8 +47,8 @@ class DBManager(object):
       self.connectors[p.id] = connector
 
   def _load_engine(self, item):
-    if not self._inited:
-      self._inited = True
+    if not self._initialized:
+      self._initialized = True
       for p in list_plugins('greenifier'):
         _log.info('run greenifier: %s', p.id)
         p.load().factory()
