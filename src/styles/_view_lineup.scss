@@ -205,6 +205,10 @@
   bottom: 0;
   left: 0;
   overflow: auto;
+
+  > header {
+    padding-bottom: 1px; // no idea otherwise scrollbar
+  }
 }
 
 $lu_use_font_awesome: true;
