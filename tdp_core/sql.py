@@ -20,7 +20,7 @@ def load_ids(idtype, mapping):
 @app.route('/')
 @login_required
 def list_database():
-  return jsonify([v[0].dump(k) for k, v in db.configs.items()])
+  return jsonify([v.dump(k) for k, v in db.configs.connectors.items()])
 
 
 @app.route('/<database>/')

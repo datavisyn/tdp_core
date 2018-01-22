@@ -26,9 +26,10 @@ class SQLMappingTable(object):
 
 
 def _discover_mappings():
-  for (connector, engine) in db.configs.values():
+  for k, connector in db.configs.connectors.items():
     if not connector.mappings:
       continue
+    engine = db.configs.engine(k)
     for mapping in connector.mappings:
       _log.info('registering %s to %s', mapping.from_idtype, mapping.to_idtype)
       yield SQLMappingTable(mapping, engine)
