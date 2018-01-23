@@ -87,7 +87,6 @@ export default class CompositeView extends EventHandler implements IView {
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement, options: Partial<IACompositeViewOptions> = {}) {
     super();
     Object.assign(this.options, options);
-    const helper = parent.ownerDocument.createElement('div');
 
     if (isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
