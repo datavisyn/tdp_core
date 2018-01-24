@@ -1,11 +1,5 @@
 @import './vars';
-@import '~font-awesome/scss/variables';
-@import '~font-awesome/scss/mixins';
 
 &.tdp-table {
- table, tr, td {
-   border: none;
-   margin: 0;
-   padding: 0;
- }
+  margin: 0.5em 1em;
 }

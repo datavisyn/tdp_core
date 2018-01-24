@@ -7,6 +7,9 @@ import {AView} from './AView';
 
 export interface IATableViewOptions {
   selectAble: boolean;
+  stripedRows: boolean;
+  bordered: boolean;
+  condensed: boolean;
 }
 
 /**
@@ -15,7 +18,10 @@ export interface IATableViewOptions {
 export abstract class ATableView<T extends IRow> extends AView {
 
   private readonly options: Readonly<IATableViewOptions> = {
-    selectAble: true
+    selectAble: true,
+    stripedRows: false,
+    bordered: false,
+    condensed: false
   };
 
   /**
@@ -38,6 +44,7 @@ export abstract class ATableView<T extends IRow> extends AView {
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IATableViewOptions> = {}) {
     super(context, selection, parent);
+    Object.assign(this.options, options);
 
     this.node.classList.add('tdp-table');
   }
@@ -48,7 +55,7 @@ export abstract class ATableView<T extends IRow> extends AView {
   protected initImpl() {
     super.initImpl();
 
-    this.node.innerHTML = `<table>
+    this.node.innerHTML = `<table class="table table-hover ${this.options.condensed ? ' table-condensed': ''}${this.options.bordered ? ' table-bordered': ''}${this.options.stripedRows ? ' table-striped': ''}">
         <thead><tr></tr></thead>
         <tbody></tbody>
     </table>`;
