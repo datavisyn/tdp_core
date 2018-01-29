@@ -7,9 +7,14 @@
   flex-direction: row;
   height: 100%;
 
-  &.nodata::before {
-    margin-top: 40px;
-    content: 'No data found for selection and parameter.';
+  &.nodata {
+    &::before {
+      margin-top: 40px;
+      content: 'No data found for selection and parameter.';
+    }
+    > div * {
+      display: none;
+    }
   }
 
   %lu-panel-button {

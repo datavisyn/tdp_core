@@ -121,7 +121,26 @@ export function isSameSelection(a: ISelection, b: ISelection): boolean {
   if (aNull || bNull) {
     return aNull === bNull;
   }
-  return a.idtype.id === b.idtype.id && a.range.eq(b.range);
+  const base = a.idtype.id === b.idtype.id && a.range.eq(b.range);
+  if (!base) {
+    return false;
+  }
+  const aAllSize = a.all ? a.all.size : 0;
+  const bAllSize = b.all ? b.all.size : 0;
+  if (aAllSize !== bAllSize) {
+    return;
+  }
+  if (aAllSize === 0) {
+    return true;
+  }
+  // same size but not empty check entries
+  return Array.from(a.all!.entries()).every(([key, value]) => {
+    const other = b.all.get(key);
+    if (!other) {
+      return false;
+    }
+    return value.eq(other);
+  });
 }
 
 export function createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IObjectRef<any>): IViewContext {
@@ -135,6 +154,11 @@ export function createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IO
 export interface ISelection {
   readonly idtype: IDType;
   readonly range: Range;
+
+  /**
+   * other selections floating around in a multi selection environment
+   */
+  readonly all?: Map<IDType, Range>;
 }
 
 export interface IViewContext {
