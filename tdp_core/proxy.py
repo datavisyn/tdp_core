@@ -12,9 +12,10 @@ def _to_site_url(site):
   proxy_defs = phovea_server.plugin.list('tdp_proxy')
   for p in proxy_defs:
     if p.id == site:
-      return p.url.format(**request.args.to_dict())
+      headers = getattr(p, 'headers') if hasattr(p, 'headers') else dict()
+      return p.url.format(**request.args.to_dict()), headers
   # none matching found
-  return None
+  return None, None
 
 
 @app.route('/<site>')
@@ -22,10 +23,10 @@ def get_details(site):
   import logging
   _log = logging.getLogger(__name__)
 
-  url = _to_site_url(site)
+  url, headers = _to_site_url(site)
   if url:
     _log.info('proxy request url: %s', url)
-    r = requests.get(url)
+    r = requests.get(url, headers=headers)
     _log.info('proxy response status code: %s', r.status_code)
     return Response(r.text, status=r.status_code, content_type=r.headers['content-type'])
   abort(404)
