@@ -18,6 +18,12 @@ interface IElementDesc {
   options?: any;
 }
 
+interface ILinkedSelection{
+  fromKey: string|'_input'|'_item';
+  toKey: string|'_item';
+  mode: 'item'|'input';
+}
+
 export interface ICompositeLayout {
   type: 'vsplit' | 'hsplit' | 'hstack' | 'vstack';
   keys: string[];
@@ -28,6 +34,8 @@ export interface ICompositeViewPluginDesc extends IViewPluginDesc {
   elements: IElementDesc[];
 
   layout?: ICompositeLayout;
+
+  linkedSelections: ILinkedSelection[];
 }
 
 export interface IACompositeViewOptions {
@@ -51,6 +59,8 @@ export interface ICompositeSetup {
   elements: ICompositeInfo[];
 
   layout?: ICompositeLayout;
+
+  linkedSelections: ILinkedSelection[];
 }
 
 function prefix(key: string, rest: string) {
@@ -81,8 +91,13 @@ export default class CompositeView extends EventHandler implements IView {
   private readonly children: WrapperView[] = [];
   private readonly childrenLookup = new Map<string, IView>();
 
-  private readonly debounceItemSelection = debounce((...args) => this.fire(AView.EVENT_ITEM_SELECT, ...args.slice(1)));
+  private readonly debounceItemSelection = debounce((evt, old, selection) => {
+    this.itemSelection = selection;
+    this.fire(AView.EVENT_ITEM_SELECT, old, selection);
+  });
   private readonly debounceUpdateEntryPoint = debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
+
+  private itemSelection: ISelection;
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement, options: Partial<IACompositeViewOptions> = {}) {
     super();
@@ -127,16 +142,43 @@ export default class CompositeView extends EventHandler implements IView {
       this.setup = setup;
 
       const helper = this.node.ownerDocument.createElement('div');
+      const links = setup.linkedSelections;
 
       this.setup.elements.forEach((d) => {
-        const instance = d.create(this.context, this.selection, helper, d.options);
-        instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
+        let s = this.selection;
+        if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
+          s = {idtype: this.selection.idtype, range: none()};
+        }
+        const instance = d.create(this.context, s, helper, d.options);
+        if (links.length === 0 || links.some((l) => l.fromKey === d.key && l.toKey === '_item')) {
+          instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
+        }
         instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
         instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
         instance.on(VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
         this.childrenLookup.set(d.key, instance);
 
         this.children.push(new WrapperView(instance, d.key));
+      });
+
+      links.forEach((l) => {
+        if (l.fromKey.startsWith('_') || l.toKey.startsWith('_')) {
+          // handled separately
+          return;
+        }
+        const from = this.childrenLookup.get(l.fromKey);
+        const to = this.childrenLookup.get(l.toKey);
+        if (!from || !to) {
+          console.warn('invalid configuration, cannot find: ', from, 'or', to, 'in this setup');
+          return;
+        }
+        from.on(AView.EVENT_ITEM_SELECT, (_, _old, selection) => {
+          if (l.mode === 'item') {
+            to.setItemSelection(selection);
+          } else {
+            to.setInputSelection(selection);
+          }
+        });
       });
 
       const views = this.children.map((d) => {
@@ -224,22 +266,54 @@ export default class CompositeView extends EventHandler implements IView {
       return;
     }
     this.selection = selection;
-    this.children.forEach(({instance}) => instance.setInputSelection(selection));
+
+    if (!this.setup) {
+      return;
+    }
+    if (this.setup.linkedSelections.length === 0) {
+      this.children.forEach(({instance}) => instance.setInputSelection(selection));
+      return;
+    }
+
+    this.setup.linkedSelections.filter((d) => d.fromKey === '_input').forEach((d) => {
+      const instance = this.childrenLookup.get(d.toKey);
+      if (!instance) {
+        return;
+      }
+      if (d.mode === 'item') {
+        instance.setItemSelection(selection);
+      } else {
+        instance.setInputSelection(selection);
+      }
+    });
   }
 
   setItemSelection(selection: ISelection) {
+    this.itemSelection = selection;
     const itemIDType = this.itemIDType;
-    this.children.forEach(({instance}) => {
-      if (instance.itemIDType === itemIDType) {
+    if (this.setup.linkedSelections.length === 0) {
+      this.children.forEach(({instance}) => {
+        if (instance.itemIDType === itemIDType) {
+          instance.setItemSelection(selection);
+        }
+      });
+      return;
+    }
+    this.setup.linkedSelections.filter((d) => d.fromKey === '_item').forEach((d) => {
+      const instance = this.childrenLookup.get(d.toKey);
+      if (!instance) {
+        return;
+      }
+      if (d.mode === 'input') {
+        instance.setInputSelection(selection);
+      } else {
         instance.setItemSelection(selection);
       }
     });
   }
 
   getItemSelection() {
-    const itemIDType = this.itemIDType;
-    const child = this.children.find(({instance}) => instance.itemIDType === itemIDType);
-    return child ? child.instance.getItemSelection() : {idtype: this.itemIDType, range: none()};
+    return this.itemSelection;
   }
 
   modeChanged(mode: EViewMode) {
@@ -264,7 +338,8 @@ export default class CompositeView extends EventHandler implements IView {
 
     return Promise.all((desc.elements || []).map(toEntry)).then((elements) => ({
       elements,
-      layout: desc.layout
+      layout: desc.layout,
+      linkedSelections: desc.linkedSelections || []
     }));
   }
 
