@@ -78,6 +78,7 @@
     "@types/d3": "3.5.36",
     "@types/select2": "4.0.41",
     "d3": "3.5.17",
+    "lineupengine": "github:sgratzl/lineupengine",
     "lineupjs": "github:Caleydo/lineupjs#develop",
     "phovea_clue": "github:phovea/phovea_clue#develop",
     "select2": "4.0.4",
