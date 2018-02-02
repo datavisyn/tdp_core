@@ -62,7 +62,7 @@ class DBManager(object):
       return engine
 
     connector = self.connectors[item]
-    _log.info('%s -> %s', p.id, connector.dburl)
+    # _log.info('%s -> %s', p.id, connector.dburl)
     config = configview(p.configKey)
     engine_options = config.get('engine', default={})
     import sqlalchemy
