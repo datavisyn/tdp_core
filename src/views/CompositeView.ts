@@ -115,14 +115,19 @@ export default class CompositeView extends EventHandler implements IView {
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    return this.build().then(() => Promise.all(this.initChildren(params, onParameterChange)));
+    return this.build().then(() => Promise.all(this.initChildren(onParameterChange)));
   }
 
   get node() {
     return this.root.node;
   }
 
+  private setBusy(busy: boolean) {
+    this.node.classList.toggle('busy', busy);
+  }
+
   private build() {
+    this.setBusy(true);
     const updateShared = (evt: IEvent, name: string, oldValue: any, newValue: any) => {
       this.children.forEach(({instance}) => {
         if (evt.currentTarget !== instance) {
@@ -182,15 +187,13 @@ export default class CompositeView extends EventHandler implements IView {
       });
 
       const views = this.children.map((d) => {
-        const v = view(d).name(d.key).fixed();
-        if (!this.options.showHeaders) {
-          v.hideHeader();
-        }
-        return v;
+        return view(d).name(d.key).fixed();
       });
+
 
       if (views.length === 1) {
         this.root.root = this.root.build(views[0]);
+        this.setBusy(false);
         return;
       }
       let b: IBuildAbleOrViewLike;
@@ -215,16 +218,17 @@ export default class CompositeView extends EventHandler implements IView {
         const split = <ISplitLayoutContainer>this.root.root;
         views.slice(2).forEach((v) => split.push(this.root.build(v)));
       }
+      this.setBusy(false);
     });
   }
 
-  private initChildren(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    return this.children.map(({key, instance}) => {
+  private initChildren(onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
+    return this.children.map((wrapper) => {
       // forward prefixed
       const onChildChanged = (name, value, previousValue) => {
-        return onParameterChange(prefix(key, name), value, previousValue);
+        return onParameterChange(prefix(wrapper.key, name), value, previousValue);
       };
-      return instance.init(params, onChildChanged);
+      return wrapper.instance.init(wrapper.createParams(!this.options.showHeaders), onChildChanged);
     });
   }
 
@@ -349,7 +353,6 @@ class WrapperView implements ILayoutView {
   private _visible = true;
 
   constructor(public readonly instance: IView, public readonly key: string) {
-
   }
 
   get minSize() {
@@ -358,6 +361,16 @@ class WrapperView implements ILayoutView {
       return <[number, number]>given;
     }
     return <[number, number]>[0, 0];
+  }
+
+  createParams(hideHeader: boolean) {
+    const parent = this.node.closest('section');
+    const header = parent.querySelector('header');
+    if (hideHeader) {
+      header.lastElementChild!.remove(); // remove the span
+    }
+    header.insertAdjacentHTML('beforeend', `<div class="parameters form-inline"></div>`);
+    return <HTMLElement>header.lastElementChild;
   }
 
   get node() {

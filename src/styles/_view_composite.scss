@@ -1,7 +1,15 @@
 @import './vars';
 
 &.composite-view {
+  div.parameters:empty {
+    display: none;
+  }
+
   [data-layout=split] {
+    > section > header {
+      background: none;
+    }
+
     [data-layout=view] {
       overflow: auto;
       position: relative;
@@ -15,5 +23,4 @@
       }
     }
   }
-
 }
