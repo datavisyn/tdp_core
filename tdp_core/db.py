@@ -203,14 +203,28 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   replacements = _handle_aggregated_score(view, config, replacements, arguments)
   secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
+  def parse_arg(arg, value):
+    arg_type = view.get_argument_type(arg)
+    if arg_type is None:
+      return value
+    if arg_type == int:
+      return int(value)
+    if arg_type == float:
+      return float(value)
+    _log.warn(u'unsupported argument type "%s" for argument "%s"', arg_type, arg)
+
   # convert to index lookup
   kwargs = {}
   if view.arguments is not None:
     for arg in view.arguments:
       if arg not in arguments:
-        _log.warn(u'missing argument "%s": "%s"', view.query, arg)
-        abort(400, u'missing argument: ' + arg)
-      kwargs[arg] = arguments[arg]
+        if (arg + u'[]') in arguments:
+          # array version
+          kwargs[arg] = [parse_arg(arg, v) for v in arguments.getlist(arg + u'[]', [])]
+        else:
+          _log.warn(u'missing argument "%s": "%s"', view.query, arg)
+          abort(400, u'missing argument: ' + arg)
+      kwargs[arg] = parse_arg(arg, arguments[arg])
 
   if extra_sql_argument is not None:
     kwargs.update(extra_sql_argument)
