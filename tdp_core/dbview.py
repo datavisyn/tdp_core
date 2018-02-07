@@ -466,10 +466,11 @@ class DBMapping(object):
   simple mapping based on a query of the form `select from_id as f, to_id as t from mapping_table where f in :ids`
   """
 
-  def __init__(self, from_idtype, to_idtype, query):
+  def __init__(self, from_idtype, to_idtype, query, integer_ids=False):
     self.from_idtype = from_idtype
     self.to_idtype = to_idtype
     self.query = query
+    self.integer_ids = integer_ids
 
 
 class DBConnector(object):

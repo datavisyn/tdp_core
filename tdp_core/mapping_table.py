@@ -11,10 +11,14 @@ class SQLMappingTable(object):
     self.to_idtype = mapping.to_idtype
     self._engine = engine
     self._query = mapping.query
+    self._integer_ids = mapping.integer_ids
 
   def __call__(self, ids):
     # ensure strings
     ids = [unicode(i) for i in ids]
+
+    if self._integer_ids: # convert to integer ids
+      ids = [int(i) for i in ids]
 
     with db.session(self._engine) as session:
       mapped = session.execute(self._query, ids=ids)
