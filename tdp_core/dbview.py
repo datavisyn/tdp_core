@@ -19,6 +19,12 @@ def _clean_query(query):
   return query
 
 
+class ArgumentInfo(object):
+  def __init__(self, type=None, as_list=False):
+    self.type = type
+    self.as_list = as_list
+
+
 class DBFilterData(object):
   def __init__(self, group, sub_query, join):
     self.group = group
@@ -37,7 +43,7 @@ class DBView(object):
     self.replacements = []
     self.valid_replacements = {}
     self.arguments = []
-    self.argument_types = {}
+    self.argument_infos = {}
     self.filters = {}
     self.table = None
     self.security = None
@@ -112,8 +118,8 @@ class DBView(object):
   def is_valid_argument(self, key):
     return key in self.arguments
 
-  def get_argument_type(self, key):
-    return self.argument_types.get(key)
+  def get_argument_info(self, key):
+    return self.argument_infos.get(key)
 
   def can_access(self):
     if self.security is None:
@@ -145,7 +151,7 @@ class DBViewBuilder(object):
     self.v.columns = view.columns.copy()
     self.v.replacements = list(view.replacements)
     self.v.arguments = list(view.arguments)
-    self.v.argument_types = view.argument_types.copy()
+    self.v.argument_infos = view.argument_infos.copy()
     self.v.filters = view.filters.copy()
     self.v.valid_replacements = view.valid_replacements.copy()
     self.v.security = view.security
@@ -311,16 +317,16 @@ class DBViewBuilder(object):
       self.v.valid_replacements[replace] = valid_replacements
     return self
 
-  def arg(self, arg, type=None):
+  def arg(self, arg, type=None, as_list=False):
     """
     adds another argument of this query (using :arg) which will be replaced within SQL
     :param arg: the argument key
     :param type: optional type of the argument, like int or float
+    :param as_list: optional whether the argument has to be a list
     :return: self
     """
     self.v.arguments.append(arg)
-    if type is not None:
-      self.v.argument_types[arg] = type
+    self.v.argument_infos[arg] = ArgumentInfo(type, as_list)
     return self
 
   def call(self, f=None):
