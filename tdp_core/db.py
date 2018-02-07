@@ -216,11 +216,14 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
           _log.warn(u'missing argument "%s": "%s"', view.query, arg)
           abort(400, u'missing argument: ' + arg)
       parser = info.type if info and info.type is not None else lambda x: x
-      if info and info.as_list:
-        value = [parser(v) for v in arguments.getlist(lookup_key)]
-      else:
-        value = parser(arguments.get(lookup_key))
-      kwargs[arg] = value
+      try:
+        if info and info.as_list:
+          value = [parser(v) for v in arguments.getlist(lookup_key)]
+        else:
+          value = parser(arguments.get(lookup_key))
+        kwargs[arg] = value
+      except ValueError as verr:
+        abort(400, u'invalid argument for: ' + arg + ' - ' + unicode(verr.message))
 
   if extra_sql_argument is not None:
     kwargs.update(extra_sql_argument)
