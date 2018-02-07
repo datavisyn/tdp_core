@@ -17,7 +17,7 @@ class SQLMappingTable(object):
     # ensure strings
     ids = [unicode(i) for i in ids]
 
-    if self._integer_ids: # convert to integer ids
+    if self._integer_ids:  # convert to integer ids
       ids = [int(i) for i in ids]
 
     with db.session(self._engine) as session:
