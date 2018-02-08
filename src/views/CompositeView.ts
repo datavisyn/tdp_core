@@ -233,6 +233,13 @@ export default class CompositeView extends EventHandler implements IView {
   }
 
   get itemIDType() {
+    if (this.children.length === 0 || !this.setup) {
+      return null;
+    }
+    const link = this.setup.linkedSelections.find((d) => d.toKey === '_item');
+    if (link) {
+      return this.childrenLookup.get(link.fromKey).itemIDType;
+    }
     // last view by default
     return this.children[this.children.length - 1].instance.itemIDType;
   }
