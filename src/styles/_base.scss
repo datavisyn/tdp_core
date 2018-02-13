@@ -45,3 +45,27 @@ li[data-header=optionsLink] {
     color: blue;
   }
 }
+
+.toast-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2000;
+  opacity: 1;
+  transition: top 0.5s ease-out;
+
+  &:empty {
+    display: none;
+  }
+
+  &.push {
+    transition: none;
+  }
+
+  > .alert {
+    margin-bottom: 2px;
+  }
+}

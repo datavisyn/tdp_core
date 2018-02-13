@@ -1,35 +1,36 @@
 
 import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
-import {defaultConfig} from 'lineupjs/src/config';
-import {ILineUpConfig} from 'lineupjs/src/interfaces';
-import {AView} from '../views/AView';
-import {EViewMode, IViewContext, ISelection} from '../views';
+import { defaultConfig } from 'lineupjs/src/config';
+import { ILineUpConfig } from 'lineupjs/src/interfaces';
+import { AView } from '../views/AView';
+import { EViewMode, IViewContext, ISelection } from '../views';
 
-import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
-import {deriveColors} from 'lineupjs/src/utils';
-import {LocalDataProvider} from 'lineupjs/src/provider';
+import Column, { IColumnDesc } from 'lineupjs/src/model/Column';
+import { deriveColors } from 'lineupjs/src/utils';
+import { LocalDataProvider } from 'lineupjs/src/provider';
 import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
-import {clueify, withoutTracking, untrack} from './internal/cmds';
-import {saveNamedSet} from '../storage';
-import {showErrorModalDialog} from '../dialogs';
+import { resolve, IDTypeLike } from 'phovea_core/src/idtype';
+import { clueify, withoutTracking, untrack } from './internal/cmds';
+import { saveNamedSet } from '../storage';
+import { showErrorModalDialog } from '../dialogs';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
-import {IScore, IScoreRow} from '../extensions';
-import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
-import {IRankingWrapper, wrapRanking} from './internal/ranking';
-import {pushScoreAsync} from './internal/scorecmds';
-import {debounce, mixin} from 'phovea_core/src';
+import { IScore, IScoreRow } from '../extensions';
+import { createInitialRanking, IAdditionalColumnDesc, deriveColumns } from './desc';
+import { IRankingWrapper, wrapRanking } from './internal/ranking';
+import { pushScoreAsync } from './internal/scorecmds';
+import { debounce, mixin } from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
-import {IRow} from '../rest';
-import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
-import {IServerColumn, IViewDescription} from '../rest';
+import { IRow } from '../rest';
+import { IContext, ISelectionAdapter, ISelectionColumn } from './selection';
+import { IServerColumn, IViewDescription } from '../rest';
 import LineUpPanelActions from './internal/LineUpPanelActions';
-import {addLazyColumn} from './internal/column';
+import { addLazyColumn } from './internal/column';
 import StackColumn from 'lineupjs/src/model/StackColumn';
 import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
-import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
+import { IRule, spacefilling } from 'lineupjs/src/ui/taggle/LineUpRuleSet';
+import { successfullySaved } from '../notifications';
 
-export {IRankingWrapper} from './internal/ranking';
+export { IRankingWrapper } from './internal/ranking';
 
 export interface IARankingViewOptions {
   /**
@@ -64,14 +65,14 @@ export interface IARankingViewOptions {
    * enable taggle overview mode switcher
    * @default true
    */
-  enableOverviewMode: boolean|'active';
+  enableOverviewMode: boolean | 'active';
   /**
    * enable zoom button
    * @default true
    */
   enableZoom: boolean;
 
-  enableSidePanel: boolean|'collapsed';
+  enableSidePanel: boolean | 'collapsed';
 
   enableAddingColumns: boolean;
 
@@ -116,7 +117,7 @@ export abstract class ARankingView extends AView {
     filterGlobally: true,
     grouping: true
   });
-  private readonly taggle: EngineRenderer|TaggleRenderer;
+  private readonly taggle: EngineRenderer | TaggleRenderer;
   private readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
 
@@ -146,7 +147,7 @@ export abstract class ARankingView extends AView {
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
-    subType: {key: '', value: ''},
+    subType: { key: '', value: '' },
     enableOverviewMode: true,
     enableZoom: true,
     enableAddingColumns: true,
@@ -155,14 +156,14 @@ export abstract class ARankingView extends AView {
     customOptions: {}
   };
 
-  private readonly selectionAdapter: ISelectionAdapter|null;
+  private readonly selectionAdapter: ISelectionAdapter | null;
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
 
     // variants for deriving the item name
-    const idTypeNames = options.itemIDType ? {itemName: resolve(options.itemIDType).name, itemNamePlural: resolve(options.itemIDType).name}: {};
-    const names = options.itemName ? {itemNamePlural: typeof options.itemName === 'function' ? () => `${(<any>options.itemName)()}s` : `${options.itemName}s`} : {};
+    const idTypeNames = options.itemIDType ? { itemName: resolve(options.itemIDType).name, itemNamePlural: resolve(options.itemIDType).name } : {};
+    const names = options.itemName ? { itemNamePlural: typeof options.itemName === 'function' ? () => `${(<any>options.itemName)()}s` : `${options.itemName}s` } : {};
     mixin(this.options, idTypeNames, names, options);
 
 
@@ -183,7 +184,7 @@ export abstract class ARankingView extends AView {
       }
     }, options.customOptions);
 
-    this.taggle = !this.options.enableOverviewMode? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
@@ -318,7 +319,7 @@ export abstract class ARankingView extends AView {
           }
 
           c.setWidth(<number>this.dump.get(c.id));
-          if(this.dump.has(c.id + weightsSuffix)) {
+          if (this.dump.has(c.id + weightsSuffix)) {
             (<StackColumn>c).setWeights(<number[]>this.dump.get(c.id + weightsSuffix));
           }
         });
@@ -346,7 +347,7 @@ export abstract class ARankingView extends AView {
       ) {
         // keep these columns
       } else {
-        if(c instanceof StackColumn) {
+        if (c instanceof StackColumn) {
           this.dump.set(c.id + weightsSuffix, (<StackColumn>c).getWeights());
         }
         this.dump.set(c.id, c.getWidth());
@@ -359,6 +360,7 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
+    successfullySaved('Named Set', name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
@@ -432,7 +434,7 @@ export abstract class ARankingView extends AView {
   }
 
   private getColumns(): Promise<IAdditionalColumnDesc[]> {
-    return this.loadColumnDesc().then(({columns}) => {
+    return this.loadColumnDesc().then(({ columns }) => {
       const cols = this.getColumnDescs(columns);
       deriveColors(cols);
       return cols;
@@ -467,9 +469,9 @@ export abstract class ARankingView extends AView {
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
-      console.error(error);
-      this.setBusy(false);
-    });
+        console.error(error);
+        this.setBusy(false);
+      });
   }
 
   protected builtLineUp(lineup: LocalDataProvider) {

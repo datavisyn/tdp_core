@@ -3,13 +3,13 @@
  */
 
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui/src/dialogs';
-export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';
+import { IAreYouSureOptions, Dialog, FormDialog } from 'phovea_ui/src/dialogs';
+export { setGlobalErrorTemplate, showErrorModalDialog } from 'phovea_ui/src/errors';
 
-export function pushNotification(level: 'success'|'info'|'warning'|'danger', msg: string, autoHideInMs = -1) {
+export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger', msg: string, autoHideInMs = -1) {
   let parent = <HTMLElement>document.body.querySelector('div.toast-container');
   if (!parent) {
-    document.body.insertAdjacentHTML('beforeend',`<div class="toast-container"></div>`);
+    document.body.insertAdjacentHTML('beforeend', `<div class="toast-container"></div>`);
     parent = <HTMLElement>document.body.lastElementChild!;
   }
 
@@ -32,9 +32,12 @@ export function pushNotification(level: 'success'|'info'|'warning'|'danger', msg
 }
 
 export function successfullySaved(type: string, name: string) {
-  pushNotification('success', `${type} "${name}" successfully saved`,3000);
+  pushNotification('success', `${type} "${name}" successfully saved`, 5000);
 }
 
+export function successfullyDeleted(type: string, name: string) {
+  pushNotification('success', `${type} "${name}" successfully deleted`, 3000);
+}
 
 export function errorAlert(error: any) {
   if (error instanceof Response || error.response instanceof Response) {
@@ -45,9 +48,11 @@ export function errorAlert(error: any) {
           The requested URL was:<br><a href="${xhr.url}" target="_blank" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
       }
       pushNotification('danger', `<strong>Error ${xhr.status} (${xhr.statusText})</strong>: ${body}`);
+      return error;
     });
   } else if (error instanceof Error) {
     pushNotification('danger', `<string>${error.name}</strong>: ${error.message}`);
   }
   pushNotification('danger', `<string>Unknown Error</strong>: ${error.toString()}`);
+  return error;
 }
