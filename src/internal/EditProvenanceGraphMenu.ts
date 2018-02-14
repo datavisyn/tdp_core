@@ -4,11 +4,12 @@
 
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import {showErrorModalDialog, lazyDialogModule} from '../dialogs';
-import {IProvenanceGraphDataDescription} from 'phovea_core/src/provenance';
-import {mixin, randomId} from 'phovea_core/src';
-import {ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem} from 'phovea_core/src/security';
-import {IEvent, fire as globalFire} from 'phovea_core/src/event';
+import { showErrorModalDialog, lazyDialogModule } from '../dialogs';
+import { IProvenanceGraphDataDescription } from 'phovea_core/src/provenance';
+import { mixin, randomId } from 'phovea_core/src';
+import { ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem } from 'phovea_core/src/security';
+import { IEvent, fire as globalFire } from 'phovea_core/src/event';
+import { TemporarySessionList, PersistentSessionList } from '../SessionList';
 
 declare const __DEBUG__;
 export const GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
@@ -69,11 +70,12 @@ export default class EditProvenanceGraphMenu {
             <li><a href="#" data-action="edit" title="Edit Details"><i class="fa fa-edit" aria-hidden="true"></i> Edit Details</a></li>
             <li><a href="#" data-action="clone" title="Clone to Temporary Session"><i class="fa fa-clone" aria-hidden="true"></i> Clone to Temporary Session</a></li>
             <li class="divider"></li>
+            <li><a href="#" data-action="open" title="Open Session"><i class="fa fa-folder-open-o" aria-hidden="true"></i> Open Existing Session</a></li>
             <li><a href="#" data-action="persist" title="Persist Session"><i class="fa fa-cloud" aria-hidden="true"></i> Persist Session</a></li>
-            <li><a href="#" data-action="delete" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>    
-            <li class="divider${__DEBUG__ ? '': ' hidden'}"></li>
-            <li class="${__DEBUG__ ? '': 'hidden'}"><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
-            <li class="${__DEBUG__ ? '': 'hidden'}"><a href="#" data-action="export" title="Export Graph"><i class="fa fa-download" aria-hidden="true"></i> Export Session</a></li>          
+            <li><a href="#" data-action="delete" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
+            <li class="divider${__DEBUG__ ? '' : ' hidden'}"></li>
+            <li class="${__DEBUG__ ? '' : 'hidden'}"><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
+            <li class="${__DEBUG__ ? '' : 'hidden'}"><a href="#" data-action="export" title="Export Graph"><i class="fa fa-download" aria-hidden="true"></i> Export Session</a></li>
           </ul>`;
 
     (<HTMLLinkElement>li.querySelector('a[data-action="edit"]')).addEventListener('click', (event) => {
@@ -82,7 +84,7 @@ export default class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      editProvenanceGraphMetaData(this.graph.desc, {permission: isPersistent(this.graph.desc)}).then((extras) => {
+      editProvenanceGraphMetaData(this.graph.desc, { permission: isPersistent(this.graph.desc) }).then((extras) => {
         if (extras !== null) {
           manager.editGraphMetaData(this.graph.desc, extras)
             .then((desc) => {
@@ -103,6 +105,37 @@ export default class EditProvenanceGraphMenu {
         return false;
       }
       this.manager.cloneLocal(this.graph.desc);
+      return false;
+    });
+
+    (<HTMLLinkElement>li.querySelector('a[data-action="open"]')).addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      lazyDialogModule()
+        .then(({ generateDialog }) => {
+          const dialog = generateDialog('Open Session', 'Open');
+          dialog.body.classList.add('tdp-session-dialog');
+          dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
+            <div role="tab" class="collapsed">
+            <h4>Temporary Sessions</h4>
+            <div role="tabpanel" data-session="t">
+            </div>
+          </div>
+          <div role="tab" class="collapsed">
+            <h4>Persistent Sessions</h4>
+            <div role="tabpanel" data-session="p">
+            </div>
+          </div>`;
+          const t = new TemporarySessionList(<HTMLElement>dialog.body.querySelector('div[data-session=t]'), manager);
+          const p = new PersistentSessionList(<HTMLElement>dialog.body.querySelector('div[data-session=p]'), manager );
+          dialog.hideOnSubmit();
+          dialog.onHide( () => {
+            t.destroy();
+            p.destroy();
+          });
+          dialog.show();
+        });
       return false;
     });
 
@@ -130,14 +163,14 @@ export default class EditProvenanceGraphMenu {
         return false;
       }
       lazyDialogModule()
-        .then(({areyousure}) => areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`))
+        .then(({ areyousure }) => areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`))
         .then((deleteIt) => {
-        if (deleteIt) {
-          this.manager.delete(this.graph.desc).then((r) => {
-            this.manager.startFromScratch();
-          }).catch(showErrorModalDialog);
-        }
-      });
+          if (deleteIt) {
+            this.manager.delete(this.graph.desc).then((r) => {
+              this.manager.startFromScratch();
+            }).catch(showErrorModalDialog);
+          }
+        });
       return false;
     });
 
@@ -154,7 +187,7 @@ export default class EditProvenanceGraphMenu {
 
       const str = JSON.stringify(r, null, '\t');
       //create blob and save it
-      const blob = new Blob([str], {type: 'application/json;charset=utf-8'});
+      const blob = new Blob([str], { type: 'application/json;charset=utf-8' });
       const a = new FileReader();
       a.onload = (e) => {
         const url = (<any>e.target).result;
@@ -174,7 +207,7 @@ export default class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
       //import dialog
-      lazyDialogModule().then(({generateDialog}) => {
+      lazyDialogModule().then(({ generateDialog }) => {
         const d = generateDialog('Select File', 'Upload');
         d.body.innerHTML = `<input type="file" placeholder="Select File to Upoad">`;
         (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
@@ -202,21 +235,21 @@ export function isPersistent(d: IProvenanceGraphDataDescription) {
 
 export function persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
   const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
-  return editProvenanceGraphMetaData(d, {title: '<i class="fa fa-cloud"></i> Persist Session', button: '<i class="fa fa-cloud"></i> Persist', name});
+  return editProvenanceGraphMetaData(d, { title: '<i class="fa fa-cloud"></i> Persist Session', button: '<i class="fa fa-cloud"></i> Persist', name });
 }
 
 export function isPublic(d: ISecureItem) {
   return hasPermission(d, EEntity.OTHERS);
 }
 
-export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
+export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: { button?: string, title?: string, permission?: boolean, name?: string } = {}) {
   args = mixin({
     button: 'Edit',
     title: '<i class="fa fa-edit" aria-hidden="true"></i> Edit Session Details',
     permission: true,
     name: d.name
   }, args);
-  return lazyDialogModule().then(({FormDialog}) => {
+  return lazyDialogModule().then(({ FormDialog }) => {
     const dialog = new FormDialog(args.title, args.button);
     const prefix = 'd' + randomId();
     dialog.form.innerHTML = `
@@ -229,12 +262,12 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
             <label for="${prefix}_desc">Description</label>
             <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
           </div>
-          <div class="checkbox" ${!args.permission ? `style="display: none"`: ''}>
+          <div class="checkbox" ${!args.permission ? `style="display: none"` : ''}>
             <label class="radio-inline">
-              <input type="radio" name="${prefix}_public" value="private" ${!isPublic(d) ? 'checked="checked"': ''}> <i class="fa fa-user"></i> Private
+              <input type="radio" name="${prefix}_public" value="private" ${!isPublic(d) ? 'checked="checked"' : ''}> <i class="fa fa-user"></i> Private
             </label>
             <label class="radio-inline">
-              <input type="radio" name="${prefix}_public" id="${prefix}_public" value="public" ${isPublic(d) ? 'checked="checked"': ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
+              <input type="radio" name="${prefix}_public" id="${prefix}_public" value="public" ${isPublic(d) ? 'checked="checked"' : ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
             </label>
             <div class="help-block">
               Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.

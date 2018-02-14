@@ -47,6 +47,8 @@ li[data-header=optionsLink] {
 }
 
 .toast-container {
+  $move_animation: 2s;
+
   position: fixed;
   top: 0;
   width: 100%;
@@ -54,8 +56,7 @@ li[data-header=optionsLink] {
   flex-direction: column;
   align-items: center;
   z-index: 2000;
-  opacity: 1;
-  transition: top 0.5s ease-out;
+  transition: top $move_animation ease-out;
 
   &:empty {
     display: none;
@@ -63,9 +64,19 @@ li[data-header=optionsLink] {
 
   &.push {
     transition: none;
+
+    > .alert:first-of-type {
+      opacity: 0;
+    }
+  }
+
+  &.pop {
+
   }
 
   > .alert {
+    transition: opacity 0.5s linear $move_animation;
+    min-width: 40%;
     margin-bottom: 2px;
   }
 }

@@ -15,16 +15,22 @@ import {
   editProvenanceGraphMetaData, isPersistent, isPublic,
   persistProvenanceGraphMetaData
 } from './internal/EditProvenanceGraphMenu';
-import { on as globalOn } from 'phovea_core/src/event';
+import { on as globalOn, off as globalOff } from 'phovea_core/src/event';
 import { fromNow } from './internal/utils';
 import { successfullyDeleted, successfullySaved } from './notifications';
 export { isPublic } from './internal/EditProvenanceGraphMenu';
 
 abstract class ASessionList {
+  private handler: ()=>void;
   constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
     this.build(graphManager).then((update) => {
-      globalOn(GLOBAL_EVENT_MANIPULATED, () => update());
+      this.handler = () => update();
+      globalOn(GLOBAL_EVENT_MANIPULATED, this.handler);
     });
+  }
+
+  destroy() {
+    globalOff(GLOBAL_EVENT_MANIPULATED, this.handler);
   }
 
   protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
