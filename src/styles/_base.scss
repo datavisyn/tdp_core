@@ -47,7 +47,7 @@ li[data-header=optionsLink] {
 }
 
 .toast-container {
-  $move_animation: 2s;
+  $move_animation: 0.5s;
 
   position: fixed;
   top: 0;
@@ -68,10 +68,6 @@ li[data-header=optionsLink] {
     > .alert:first-of-type {
       opacity: 0;
     }
-  }
-
-  &.pop {
-
   }
 
   > .alert {

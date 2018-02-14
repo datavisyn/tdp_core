@@ -2,8 +2,6 @@
  * Created by Holger Stitz on 18.08.2016.
  */
 
-import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import { IAreYouSureOptions, Dialog, FormDialog } from 'phovea_ui/src/dialogs';
 export { setGlobalErrorTemplate, showErrorModalDialog } from 'phovea_ui/src/errors';
 
 export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger', msg: string, autoHideInMs = -1) {
@@ -23,12 +21,14 @@ export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger
   Array.from(alert.querySelectorAll('a')).forEach((a: HTMLElement) => a.classList.add('alert-link'));
   // try creating a slide down animation
   parent.style.top = `-${alert.clientHeight}px`;
-  parent.classList.remove('push');
-  parent.style.top = null;
+  setTimeout(() => {
+    parent.classList.remove('push');
+    parent.style.top = null;
 
-  if (autoHideInMs > 0) {
-    setTimeout(() => alert.remove(), autoHideInMs);
-  }
+    if (autoHideInMs > 0) {
+      setTimeout(() => alert.querySelector('button').click(), autoHideInMs);
+    }
+  }, 10); // wait dom rendered
 }
 
 export function successfullySaved(type: string, name: string) {
