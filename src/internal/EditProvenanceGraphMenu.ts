@@ -9,6 +9,7 @@ import { IProvenanceGraphDataDescription } from 'phovea_core/src/provenance';
 import { mixin, randomId } from 'phovea_core/src';
 import { ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem } from 'phovea_core/src/security';
 import { IEvent, fire as globalFire } from 'phovea_core/src/event';
+import {pushNotification} from '../notifications';
 import { TemporarySessionList, PersistentSessionList } from '../SessionList';
 
 declare const __DEBUG__;
@@ -149,6 +150,7 @@ export default class EditProvenanceGraphMenu {
         if (extras !== null) {
           manager.migrateGraph(this.graph, extras).catch(showErrorModalDialog).then(() => {
             this.updateGraphMetaData(this.graph);
+            pushNotification('success', `Session "${this.graph.desc.name}" successfully persisted`);
             globalFire(GLOBAL_EVENT_MANIPULATED);
           });
         }
@@ -198,6 +200,7 @@ export default class EditProvenanceGraphMenu {
         li.appendChild(helper);
         helper.click();
         helper.remove();
+        pushNotification('success', `Session "${this.graph.desc.name}" successfully exported`);
       };
       a.readAsDataURL(blob);
       return false;
