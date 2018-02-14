@@ -20,7 +20,7 @@ import {fromNow} from './internal/utils';
 export {isPublic} from './internal/EditProvenanceGraphMenu';
 
 abstract class ASessionList {
-  constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager) {
+  constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table'|'list' = 'table') {
     this.build(graphManager).then((update) => {
       globalOn(GLOBAL_EVENT_MANIPULATED, () => update());
     });
@@ -41,13 +41,13 @@ abstract class ASessionList {
     }
   }
 
-  protected registerActionListener(manager: CLUEGraphManager, $trEnter: Selection<IProvenanceGraphDataDescription>) {
+  protected registerActionListener(manager: CLUEGraphManager, $enter: Selection<IProvenanceGraphDataDescription>) {
     const stopEvent = () => {
       (<Event>event).preventDefault();
       (<Event>event).stopPropagation();
     };
 
-    $trEnter.select('a[data-action="delete"]').on('click', async function (d) {
+    $enter.select('a[data-action="delete"]').on('click', async function (d) {
       stopEvent();
       const deleteIt = await areyousure(`Are you sure to delete session: "${d.name}"`);
       if (deleteIt) {
@@ -56,12 +56,12 @@ abstract class ASessionList {
         tr.remove();
       }
     });
-    $trEnter.select('a[data-action="clone"]').on('click', (d) => {
+    $enter.select('a[data-action="clone"]').on('click', (d) => {
       stopEvent();
       manager.cloneLocal(d);
       return false;
     });
-    $trEnter.select('a[data-action="select"]').on('click', (d) => {
+    $enter.select('a[data-action="select"]').on('click', (d) => {
       stopEvent();
       if (!canWrite(d)) {
         manager.cloneLocal(d);
@@ -70,10 +70,10 @@ abstract class ASessionList {
       }
       return false;
     });
-    $trEnter.select('a[data-action="edit"]').on('click', function (this: HTMLButtonElement, d) {
+    $enter.select('a[data-action="edit"]').on('click', function (this: HTMLButtonElement, d) {
       stopEvent();
-      const nameTd = this.parentElement.parentElement.querySelector('td');
-      const publicI = this.parentElement.parentElement.querySelector('td:nth-child(2) i');
+      const nameTd = <HTMLElement>this.parentElement.parentElement.firstElementChild;
+      const publicI = <HTMLElement>this.parentElement.parentElement.children[1].firstElementChild;
       editProvenanceGraphMetaData(d, 'Edit').then((extras) => {
         if (extras !== null) {
           manager.editGraphMetaData(d, extras)
@@ -88,7 +88,7 @@ abstract class ASessionList {
       });
       return false;
     });
-    $trEnter.select('a[data-action="persist"]').on('click', (d) => {
+    $enter.select('a[data-action="persist"]').on('click', (d) => {
       stopEvent();
       persistProvenanceGraphMetaData(d).then((extras: any) => {
         if (extras !== null) {
@@ -140,12 +140,7 @@ export class TemporarySessionList extends ASessionList {
     //select and sort by date desc
     const workspaces = await this.getData(manager);
 
-    //replace loading
-    const $table = $parent.html(`<p>
-      A temporary session will only be stored in your local browser cache. 
-      It is not possible to share a link to states of this session with others. 
-      Only the ${KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} most recent sessions will be stored.
-    </p><div><table class="table table-striped table-hover table-bordered table-condensed">
+    const table = `<table class="table table-striped table-hover table-bordered table-condensed">
     <thead>
       <tr>
         <th>Name</th>
@@ -156,9 +151,17 @@ export class TemporarySessionList extends ASessionList {
     <tbody>
 
     </tbody>
-  </table></div>`);
+  </table>`;
+    const list = ``;
 
-    const update = (data: IProvenanceGraphDataDescription[]) => {
+    //replace loading
+    const $table = $parent.html(`<p>
+      A temporary session will only be stored in your local browser cache. 
+      It is not possible to share a link to states of this session with others. 
+      Only the ${KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} most recent sessions will be stored.
+    </p><div>${this.mode === 'table' ? table : list}</div>`);
+
+    const updateTable = (data: IProvenanceGraphDataDescription[]) => {
       const $tr = $table.select('tbody').selectAll('tr').data(data);
 
       const $trEnter = $tr.enter().append('tr').html(`
@@ -174,9 +177,27 @@ export class TemporarySessionList extends ASessionList {
 
       $tr.exit().remove();
     };
-    update(workspaces);
 
-    return () => this.getData(manager).then(update);
+    const updateList = (data: IProvenanceGraphDataDescription[]) => {
+      const $tr = $table.select('div').selectAll('div').data(data);
+
+      const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html(`
+          <span></span>
+          <span></span>
+          <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</span>`);
+
+      this.registerActionListener(manager, $trEnter);
+      $tr.select('span').text((d) => d.name).attr('class', (d) => isPublic(d) ? 'public' : 'private');
+      $tr.select('span:nth-of-type(2)')
+        .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
+        .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
+
+      $tr.exit().remove();
+    };
+    const update = this.mode === 'table' ? updateTable : updateList;
+    update.call(this, workspaces);
+
+    return () => this.getData(manager).then(update.bind(this));
   }
 }
 
@@ -197,18 +218,7 @@ export class PersistentSessionList extends ASessionList {
     //select and sort by date desc
     const workspaces = await this.getData(manager);
 
-    $parent.html(`<p>
-     The persistent session will be stored on the server. 
-     By default, sessions are private, meaning that only the creator has access to it. 
-     If the status is set to public, others can also see the session and access certain states by opening a shared link.
-    </p>
-        <ul class="nav nav-tabs" role="tablist">
-          <li class="active" role="presentation"><a href="#session_mine" class="active"><i class="fa fa-user"></i> My Sessions</a></li>
-          <li role="presentation"><a href="#session_others"><i class="fa fa-users"></i> Other Sessions</a></li>
-        </ul>
-        <div class="tab-content">
-            <div id="session_mine" class="tab-pane active">
-                <table class="table table-striped table-hover table-bordered table-condensed">
+    const tableMine = `<table class="table table-striped table-hover table-bordered table-condensed">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -220,10 +230,8 @@ export class PersistentSessionList extends ASessionList {
                 <tbody>
             
                 </tbody>
-              </table>
-            </div>
-            <div id="session_others" class="tab-pane">
-                <table class="table table-striped table-hover table-bordered table-condensed">
+              </table>`;
+    const tablePublic = `<table class="table table-striped table-hover table-bordered table-condensed">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -235,7 +243,23 @@ export class PersistentSessionList extends ASessionList {
                 <tbody>
             
                 </tbody>
-              </table>
+              </table>`;
+
+    $parent.html(`<p>
+     The persistent session will be stored on the server. 
+     By default, sessions are private, meaning that only the creator has access to it. 
+     If the status is set to public, others can also see the session and access certain states by opening a shared link.
+    </p>
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active" role="presentation"><a href="#session_mine" class="active"><i class="fa fa-user"></i> My Sessions</a></li>
+          <li role="presentation"><a href="#session_others"><i class="fa fa-users"></i> Other Sessions</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="session_mine" class="tab-pane active">
+                ${this.mode === 'table' ? tableMine: ''}
+            </div>
+            <div id="session_others" class="tab-pane">
+                ${this.mode === 'table' ? tablePublic: ''}
             </div>
        </div>`);
 
@@ -249,41 +273,80 @@ export class PersistentSessionList extends ASessionList {
       const myworkspaces = data.filter((d) => d.creator === me);
       const otherworkspaces = data.filter((d) => d.creator !== me);
 
-      {
-        const $tr = $parent.select('#session_mine tbody').selectAll('tr').data(myworkspaces);
+      if (this.mode === 'table') {
+        {
+          const $tr = $parent.select('#session_mine tbody').selectAll('tr').data(myworkspaces);
 
-        const $trEnter = $tr.enter().append('tr').html(`
+          const $trEnter = $tr.enter().append('tr').html(`
             <td></td>
             <td class="text-center"><i class="fa"></i></td>
             <td></td>
             <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton('delete')}</td>`);
 
-        this.registerActionListener(manager, $trEnter);
-        $tr.select('td').text((d) => d.name);
-        $tr.select('td:nth-of-type(2) i')
-          .attr('class', (d) => isPublic(d) ? 'fa fa-users' : 'fa fa-user')
-          .attr('title', (d) => isPublic(d) ? 'Public (everyone can see it)' : 'Private');
-        $tr.select('td:nth-of-type(3)')
-          .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
-          .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
+          this.registerActionListener(manager, $trEnter);
+          $tr.select('td').text((d) => d.name);
+          $tr.select('td:nth-of-type(2) i')
+            .attr('class', (d) => isPublic(d) ? 'fa fa-users' : 'fa fa-user')
+            .attr('title', (d) => isPublic(d) ? 'Public (everyone can see it)' : 'Private');
+          $tr.select('td:nth-of-type(3)')
+            .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
+            .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
-        $tr.exit().remove();
-      }
-      {
-        const $tr = $parent.select('#session_others tbody').selectAll('tr').data(otherworkspaces);
+          $tr.exit().remove();
+        }
+        {
+          const $tr = $parent.select('#session_others tbody').selectAll('tr').data(otherworkspaces);
 
-        const $trEnter = $tr.enter().append('tr').html(`
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>${ASessionList.createButton('clone')}</td>`);
+          const $trEnter = $tr.enter().append('tr').html(`
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>${ASessionList.createButton('clone')}</td>`);
 
-        this.registerActionListener(manager, $trEnter);
-        $tr.select('td').text((d) => d.name);
-        $tr.select('td:nth-of-type(2)').text((d) => d.creator);
-        $tr.select('td:nth-of-type(3)').text((d) => d.ts ? new Date(d.ts).toUTCString() : 'Unknown');
+          this.registerActionListener(manager, $trEnter);
+          $tr.select('td').text((d) => d.name);
+          $tr.select('td:nth-of-type(2)').text((d) => d.creator);
+          $tr.select('td:nth-of-type(3)').text((d) => d.ts ? new Date(d.ts).toUTCString() : 'Unknown');
 
-        $tr.exit().remove();
+          $tr.exit().remove();
+        }
+      } else {
+         {
+          const $tr = $parent.select('#session_mine').selectAll('div').data(myworkspaces);
+
+          const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html(`
+            <span></span>
+            <span><i class="fa"></i></span>
+            <span></span>
+            <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton('delete')}</span>`);
+
+          this.registerActionListener(manager, $trEnter);
+          $tr.select('span').text((d) => d.name);
+          $tr.select('span:nth-of-type(2) i')
+            .attr('class', (d) => isPublic(d) ? 'fa fa-users' : 'fa fa-user')
+            .attr('title', (d) => isPublic(d) ? 'Public (everyone can see it)' : 'Private');
+          $tr.select('span:nth-of-type(3)')
+            .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
+            .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
+
+          $tr.exit().remove();
+        }
+        {
+          const $tr = $parent.select('#session_others').selectAll('div').data(otherworkspaces);
+
+          const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html(`
+              <span></span>
+              <span></span>
+              <span></span>
+              <span>${ASessionList.createButton('clone')}</span>`);
+
+          this.registerActionListener(manager, $trEnter);
+          $tr.select('span').text((d) => d.name);
+          $tr.select('span:nth-of-type(2)').text((d) => d.creator);
+          $tr.select('span:nth-of-type(3)').text((d) => d.ts ? new Date(d.ts).toUTCString() : 'Unknown');
+
+          $tr.exit().remove();
+        }
       }
     };
 

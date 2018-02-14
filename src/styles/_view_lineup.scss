@@ -1,0 +1,224 @@
+@import './vars';
+@import '~font-awesome/scss/variables';
+@import '~font-awesome/scss/mixins';
+
+&.lineup {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+
+  &.nodata {
+    &::before {
+      margin-top: 40px;
+      content: 'No data found for selection and parameter.';
+    }
+    > div * {
+      display: none;
+    }
+  }
+
+  %lu-panel-button {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    cursor: pointer;
+    z-index: 1;
+    color: #000;
+
+    &:hover {
+      background-color: #eaeaea;
+    }
+  }
+
+  .lu-side-panel {
+    flex: 0 0 auto;
+    position: relative;
+
+    > section {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: flex-end;
+      margin-right: 1em;
+      flex-wrap: wrap;
+
+      button {
+        @extend %lu-panel-button;
+      }
+    }
+
+    label, input {
+      font-weight: normal;
+      margin: 0;
+    }
+
+    header > button {
+      @extend %lu-panel-button;
+
+      display: none;
+    }
+
+    > a {
+      @extend %lu-panel-button;
+
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2em;
+      height: 2em;
+
+      &::before {
+        @include fa-icon();
+        content: $fa-var-arrow-right;
+      }
+    }
+
+    button[data-violation] {
+      position: relative;
+      color: #FFD700;
+
+      &::before {
+        content: $fa-var-exclamation-triangle;
+      }
+
+      &::after {
+        content: attr(data-violation);
+        color: black;
+        text-align: left;
+        background: lighten(#FFD700, 45%);
+        hyphens: manual;
+        padding: 5px;
+        width: 12em;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 100;
+        pointer-events: none;
+        opacity: 0;
+        display: none;
+        transition: visibility 0s ease 0.3s, opacity 0.3s ease 0s;
+      }
+
+      &:hover::after {
+        opacity: 1;
+        display: block;
+        transition-delay: 0s, 0.3s;
+      }
+    }
+
+    &.collapsed {
+      max-width: 3em;
+      min-width: 0;
+
+      > a {
+        width: 100%;
+        order: 1;
+        &::before {
+          content: $fa-var-arrow-left;
+        }
+      }
+
+      > section {
+        order: 3;
+        flex-direction: column;
+        margin-right: 0;
+      }
+
+      > header {
+        order: 2;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        border: none;
+        margin-top: 3em;
+
+        &:not(.once) .lu-search {
+          display: none;
+        }
+
+        > button {
+          display: block;
+        }
+
+        &.once::before {
+          content: '';
+          top: -10px;
+          left: -15em;
+          right: 0;
+          bottom: -10px;
+          position: absolute;
+        }
+
+        &.once .lu-search {
+          position: absolute;
+          top: 1.8em;
+          width: 17.5em;
+          left: -15em;
+          z-index: 2;
+
+          > ul {
+            max-height: 50vh;
+          }
+        }
+      }
+
+      > div {
+        display: none;
+      }
+
+      .gap {
+        margin-top: 1em;
+      }
+    }
+  }
+
+  > div {
+    flex: 1 1 auto;
+    position: relative;
+  }
+
+  &.overview-detail {
+    > div {
+      display: flex;
+      flex-direction: column;
+
+      > header {
+        flex: 0 0 auto;
+      }
+
+      > div {
+        flex: 1 1 auto;
+        position: relative;
+      }
+    }
+
+    header.overview {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow: auto;
+    }
+  }
+}
+
+.lineup-engine {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+
+  > header {
+    padding-bottom: 1px; // no idea otherwise scrollbar
+  }
+}
+
+$lu_use_font_awesome: true;
+$lu_assets: '~lineupjs/src/assets';
+
+@at-root {
+  @import '~lineupjs/src/styles/taggle';
+}

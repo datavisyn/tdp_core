@@ -11,10 +11,14 @@ class SQLMappingTable(object):
     self.to_idtype = mapping.to_idtype
     self._engine = engine
     self._query = mapping.query
+    self._integer_ids = mapping.integer_ids
 
   def __call__(self, ids):
     # ensure strings
     ids = [unicode(i) for i in ids]
+
+    if self._integer_ids:  # convert to integer ids
+      ids = [int(i) for i in ids]
 
     with db.session(self._engine) as session:
       mapped = session.execute(self._query, ids=ids)
@@ -26,9 +30,10 @@ class SQLMappingTable(object):
 
 
 def _discover_mappings():
-  for (connector, engine) in db.configs.values():
+  for k, connector in db.configs.connectors.items():
     if not connector.mappings:
       continue
+    engine = db.configs.engine(k)
     for mapping in connector.mappings:
       _log.info('registering %s to %s', mapping.from_idtype, mapping.to_idtype)
       yield SQLMappingTable(mapping, engine)

@@ -52,43 +52,14 @@ svg {
     }
 
     iframe {
-      border: 0;
+      margin: -1px; // to fix some corner case regarding positioning
+      border: none;
       width: 100%;
       height: 100%;
     }
   }
 
-
-  &.lineup {
-    &.nodata::before {
-      margin-top: 40px;
-      content: 'No data found for selection and parameter.';
-    }
-  }
-
-  div.lu {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: auto;
-
-    .row.selected rect.bg {
-      stroke: $select-data-color;
-      stroke-width: 1;
-    }
-    .row.hover rect.bg {
-      stroke: $hover-data-color;
-      stroke-width: 1;
-    }
-
-    .rankingbuttons .dropdown-menu {
-      padding: 0;
-
-      .form-group {
-        margin-bottom: 0;
-      }
-    }
-  }
+  @import './view_lineup';
+  @import './view_table';
+  @import './view_composite';
 }

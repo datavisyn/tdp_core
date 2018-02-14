@@ -2,12 +2,14 @@
  * Created by sam on 13.02.2017.
  */
 
-import {IColumnDesc, createSelectionDesc} from 'lineupjs/src/model';
-import {ICategory} from 'lineupjs/src/model/CategoricalColumn';
-import LineUp from 'lineupjs/src/lineup';
+import {createSelectionDesc, createAggregateDesc, IColumnDesc} from 'lineupjs/src/model';
+import {ICategory} from 'lineupjs/src/model/ICategoricalColumn';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
-import {VALUE_TYPE_STRING, VALUE_TYPE_CATEGORICAL, VALUE_TYPE_REAL, VALUE_TYPE_INT} from 'phovea_core/src/datatype';
+import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
+import ADataProvider from 'lineupjs/src/provider/ADataProvider';
+import {IServerColumn} from '../rest';
+import {deriveHierarchy, ICategoryNode, isHierarchical} from 'lineupjs/src/model/HierarchyColumn';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
@@ -82,6 +84,7 @@ export function numberCol(column: string, min: number, max: number, options: Par
   });
 }
 
+
 /**
  * creates a new LineUp description for a categorical column
  * @param {string} column the column name to use
@@ -90,9 +93,19 @@ export function numberCol(column: string, min: number, max: number, options: Par
  * @returns {IAdditionalColumnDesc}
  */
 export function categoricalCol(column: string, categories: (string|ICategory)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  if (isHierarchical(categories)) {
+    return hierarchicalCol(column, deriveHierarchy(<any[]>categories), options);
+  }
   return Object.assign(baseColumn(column, options), {
     type: 'categorical',
     categories
+  });
+}
+
+export function hierarchicalCol(column: string, hierarchy: ICategoryNode, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  return Object.assign(baseColumn(column, options), {
+    type: 'hierarchy',
+    hierarchy
   });
 }
 /**
@@ -148,17 +161,31 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
   return r;
 }
 
-export function createInitialRanking(lineup: LineUp) {
-  const provider = lineup.data;
+export function createInitialRanking(provider: ADataProvider) {
   const ranking = provider.pushRanking();
+  ranking.insert(provider.create(createAggregateDesc()), 0);
   ranking.push(provider.create(createSelectionDesc()));
 
-  lineup.data.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
+  provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
     const col = provider.create(d);
     // set initial column width
     if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {
       col.setWidth((<any>d).width);
     }
     ranking.push(col);
+  });
+}
+
+export function deriveColumns(columns: IServerColumn[]) {
+  const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
+  return columns.map((col) => {
+    switch (col.type) {
+      case 'categorical':
+        return categoricalCol(col.column, col.categories, {label: niceName(col.label)});
+      case 'number':
+        return numberCol(col.column, col.min, col.max, {label: niceName(col.label)});
+      default:
+        return stringCol(col.column, {label: niceName(col.label)});
+    }
   });
 }

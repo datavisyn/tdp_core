@@ -67,6 +67,12 @@ export default class FormDialog extends Dialog {
         }
       });
       this.show();
+      setTimeout(() => {
+        const first = <HTMLElement>this.body.querySelector('input, select, textarea');
+        if (first) {
+          first.focus();
+        }
+      }, 250); // till dialog is visible
     });
   }
 }

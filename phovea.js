@@ -65,11 +65,20 @@ module.exports = function (registry) {
   registry.push('actionFunction', 'lineupSetRankingSortCriteria', function () { return import('./src/lineup/internal/cmds') }, {
     'factory': 'setRankingSortCriteriaImpl'
   });
+  registry.push('actionFunction', 'lineupSetSortCriteria', function () { return import('./src/lineup/internal/cmds') }, {
+    'factory': 'setSortCriteriaImpl'
+  });
+  registry.push('actionFunction', 'lineupSetGroupCriteria', function () { return import('./src/lineup/internal/cmds') }, {
+    'factory': 'setGroupCriteriaImpl'
+  });
   registry.push('actionFunction', 'lineupSetColumn', function () { return import('./src/lineup/internal/cmds') }, {
     'factory': 'setColumnImpl'
   });
   registry.push('actionFunction', 'lineupAddColumn', function () { return import('./src/lineup/internal/cmds') }, {
     'factory': 'addColumnImpl'
+  });
+  registry.push('actionFunction', 'lineupMoveColumn', function () { return import('./src/lineup/internal/cmds') }, {
+    'factory': 'moveColumnImpl'
   });
 
 

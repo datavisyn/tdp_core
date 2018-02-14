@@ -3,11 +3,9 @@
  */
 
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
-import {areyousure, generateDialog} from 'phovea_ui/src/dialogs';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import {showErrorModalDialog} from '../dialogs';
+import {showErrorModalDialog, lazyDialogModule} from '../dialogs';
 import {IProvenanceGraphDataDescription} from 'phovea_core/src/provenance';
-import {FormDialog} from 'phovea_ui/src/dialogs';
 import {mixin, randomId} from 'phovea_core/src';
 import {ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem} from 'phovea_core/src/security';
 import {IEvent, fire as globalFire} from 'phovea_core/src/event';
@@ -131,7 +129,9 @@ export default class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`).then((deleteIt) => {
+      lazyDialogModule()
+        .then(({areyousure}) => areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`))
+        .then((deleteIt) => {
         if (deleteIt) {
           this.manager.delete(this.graph.desc).then((r) => {
             this.manager.startFromScratch();
@@ -174,20 +174,22 @@ export default class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
       //import dialog
-      const d = generateDialog('Select File', 'Upload');
-      d.body.innerHTML = `<input type="file" placeholder="Select File to Upoad">`;
-      (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
-        const file = (<HTMLInputElement>evt.target).files[0];
-        const reader = new FileReader();
-        reader.onload = function (e: any) {
-          const dataS = e.target.result;
-          const dump = JSON.parse(dataS);
-          manager.importGraph(dump);
-        };
-        // Read in the image file as a data URL.
-        reader.readAsText(file);
+      lazyDialogModule().then(({generateDialog}) => {
+        const d = generateDialog('Select File', 'Upload');
+        d.body.innerHTML = `<input type="file" placeholder="Select File to Upoad">`;
+        (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
+          const file = (<HTMLInputElement>evt.target).files[0];
+          const reader = new FileReader();
+          reader.onload = function (e: any) {
+            const dataS = e.target.result;
+            const dump = JSON.parse(dataS);
+            manager.importGraph(dump);
+          };
+          // Read in the image file as a data URL.
+          reader.readAsText(file);
+        });
+        d.show();
       });
-      d.show();
     });
 
     return li;
@@ -214,45 +216,47 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
     permission: true,
     name: d.name
   }, args);
-  const dialog = new FormDialog(args.title, args.button);
-  const prefix = 'd' + randomId();
-  dialog.form.innerHTML = `
-    <form>
-        <div class="form-group">
-          <label for="${prefix}_name">Name</label>
-          <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
-        </div>
-        <div class="form-group">
-          <label for="${prefix}_desc">Description</label>
-          <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
-        </div>
-        <div class="checkbox" ${!args.permission ? `style="display: none"`: ''}>
-          <label class="radio-inline">
-            <input type="radio" name="${prefix}_public" value="private" ${!isPublic(d) ? 'checked="checked"': ''}> <i class="fa fa-user"></i> Private
-          </label>
-          <label class="radio-inline">
-            <input type="radio" name="${prefix}_public" id="${prefix}_public" value="public" ${isPublic(d) ? 'checked="checked"': ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
-          </label>
-          <div class="help-block">
-            Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.
+  return lazyDialogModule().then(({FormDialog}) => {
+    const dialog = new FormDialog(args.title, args.button);
+    const prefix = 'd' + randomId();
+    dialog.form.innerHTML = `
+      <form>
+          <div class="form-group">
+            <label for="${prefix}_name">Name</label>
+            <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
           </div>
-        </div>
-    </form>
-  `;
-  return new Promise((resolve) => {
-    dialog.onHide(() => {
-      resolve(null);
+          <div class="form-group">
+            <label for="${prefix}_desc">Description</label>
+            <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
+          </div>
+          <div class="checkbox" ${!args.permission ? `style="display: none"`: ''}>
+            <label class="radio-inline">
+              <input type="radio" name="${prefix}_public" value="private" ${!isPublic(d) ? 'checked="checked"': ''}> <i class="fa fa-user"></i> Private
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="${prefix}_public" id="${prefix}_public" value="public" ${isPublic(d) ? 'checked="checked"': ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
+            </label>
+            <div class="help-block">
+              Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.
+            </div>
+          </div>
+      </form>
+    `;
+    return new Promise((resolve) => {
+      dialog.onHide(() => {
+        resolve(null);
+      });
+      dialog.onSubmit(() => {
+        const extras = {
+          name: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_name`)).value,
+          description: (<HTMLTextAreaElement>dialog.body.querySelector(`#${prefix}_desc`)).value,
+          permissions: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_public`)).checked ? ALL_READ_READ : ALL_READ_NONE
+        };
+        resolve(extras);
+        dialog.hide();
+        return false;
+      });
+      dialog.show();
     });
-    dialog.onSubmit(() => {
-      const extras = {
-        name: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_name`)).value,
-        description: (<HTMLTextAreaElement>dialog.body.querySelector(`#${prefix}_desc`)).value,
-        permissions: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_public`)).checked ? ALL_READ_READ : ALL_READ_NONE
-      };
-      resolve(extras);
-      dialog.hide();
-      return false;
-    });
-    dialog.show();
   });
 }

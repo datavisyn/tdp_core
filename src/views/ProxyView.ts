@@ -43,6 +43,8 @@ export default class ProxyView extends AD3View {
   };
 
   private readonly openExternally: HTMLElement;
+  
+  readonly naturalSize = [1280, 800];
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
     super(context, selection, parent);
@@ -168,7 +170,7 @@ export default class ProxyView extends AD3View {
       return;
     }
 
-    this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank"><i class="fa fa-external-link"></i>${url}</a>`;
+    this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url: `${location.protocol}${url}`}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
     this.$node.append('iframe')
@@ -183,6 +185,7 @@ export default class ProxyView extends AD3View {
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
     this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${this.options.idtype}</i>.</p>`);
+    this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
 
@@ -202,6 +205,7 @@ export default class ProxyView extends AD3View {
             Please use the following <a href="${url}" target="_blank" class="alert-link">link</a> to open the website in a separate window:
             <br><br><a href="${url}" target="_blank" class="alert-link">${url}</a>
         </div></p><p></p>`);
+    this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
 }

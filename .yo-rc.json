@@ -31,15 +31,13 @@
       "app": "./src/index.ts"
     },
     "libraryAliases": {
-      "d3": "d3/d3",
-      "scrollTo": "jquery.scrollto/jquery.scrollTo.js"
+      "d3": "d3/d3"
     },
     "libraryExternals": [
       "d3",
       "jquery",
       "lineupjs",
       "select2",
-      "scrollTo",
       "mongodb",
       "marked"
     ],
