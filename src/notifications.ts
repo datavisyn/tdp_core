@@ -2,7 +2,7 @@
  * Created by Holger Stitz on 18.08.2016.
  */
 
-export { setGlobalErrorTemplate, showErrorModalDialog } from 'phovea_ui/src/errors';
+export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';
 
 export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger', msg: string, autoHideInMs = -1) {
   let parent = <HTMLElement>document.body.querySelector('div.toast-container');

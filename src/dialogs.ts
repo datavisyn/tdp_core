@@ -4,6 +4,7 @@
 
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui/src/dialogs';
+
 export {setGlobalErrorTemplate} from 'phovea_ui/src/errors';
 
 export {errorAlert as showErrorModalDialog} from './notifications';
