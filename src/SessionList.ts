@@ -2,26 +2,28 @@
  * Created by Holger Stitz on 27.07.2016.
  */
 
-import { areyousure } from 'phovea_ui/src/dialogs';
-import { select, Selection, event } from 'd3';
+import {areyousure} from 'phovea_ui/src/dialogs';
+import {select, Selection, event} from 'd3';
 import * as $ from 'jquery';
-import { currentUserNameOrAnonymous, canWrite } from 'phovea_core/src/security';
+import {currentUserNameOrAnonymous, canWrite} from 'phovea_core/src/security';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import { IProvenanceGraphDataDescription, op } from 'phovea_core/src/provenance';
-import { KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES } from './constants';
-import { showErrorModalDialog } from './dialogs';
+import {IProvenanceGraphDataDescription, op} from 'phovea_core/src/provenance';
+import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
+import {showErrorModalDialog} from './dialogs';
 import {
   GLOBAL_EVENT_MANIPULATED,
   editProvenanceGraphMetaData, isPersistent, isPublic,
   persistProvenanceGraphMetaData
 } from './internal/EditProvenanceGraphMenu';
-import { on as globalOn, off as globalOff } from 'phovea_core/src/event';
-import { fromNow } from './internal/utils';
-import { successfullyDeleted, successfullySaved } from './notifications';
-export { isPublic } from './internal/EditProvenanceGraphMenu';
+import {on as globalOn, off as globalOff} from 'phovea_core/src/event';
+import {fromNow} from './internal/utils';
+import {successfullyDeleted, successfullySaved} from './notifications';
+
+export {isPublic} from './internal/EditProvenanceGraphMenu';
 
 abstract class ASessionList {
-  private handler: ()=>void;
+  private handler: () => void;
+
   constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
     this.build(graphManager).then((update) => {
       this.handler = () => update();
