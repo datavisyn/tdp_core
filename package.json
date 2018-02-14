@@ -2,7 +2,7 @@
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
   "homepage": "https://phovea.caleydo.org",
-  "version": "4.0.0",
+  "version": "4.0.1-SNAPSHOT",
   "author": {
     "name": "datavisyn",
     "email": "contact@caleydo.org",
