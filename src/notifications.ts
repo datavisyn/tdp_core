@@ -2,9 +2,9 @@
  * Created by Holger Stitz on 18.08.2016.
  */
 
-export { setGlobalErrorTemplate, showErrorModalDialog } from 'phovea_ui/src/errors';
+export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';
 
-export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger', msg: string, autoHideInMs = -1) {
+export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger' | 'error', msg: string, autoHideInMs = -1) {
   let parent = <HTMLElement>document.body.querySelector('div.toast-container');
   if (!parent) {
     document.body.insertAdjacentHTML('beforeend', `<div class="toast-container"></div>`);
@@ -12,7 +12,7 @@ export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger
   }
 
   parent.classList.add('push');
-  parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level} alert-dismissible" role="alert">
+  parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
   ${msg}</div>`);
 
