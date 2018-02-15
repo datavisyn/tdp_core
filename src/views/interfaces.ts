@@ -40,6 +40,20 @@ export interface IViewPluginDesc extends IPluginDesc {
    * optional security check to show only certain views
    */
   security?: string|((user: IUser)=>boolean);
+
+  /**
+   * a lot of topics/tags describing this view
+   */
+  topics?: string[];
+
+  /**
+   * a link to an external help page
+   */
+  helpUrl?: string;
+  /**
+   * as an alternative an help text shown as pop up
+   */
+  helpText?: string;
 }
 
 export interface IViewPlugin {
