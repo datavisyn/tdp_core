@@ -67,7 +67,7 @@ export default class SelectionChooser {
     }
 
     const names = await this.target.unmap(targetIds);
-    const labels = this.readAble ? await this.target.mapToFirstName(targetIds, this.readAble) : null;
+    const labels = this.readAble && this.target !== this.readAble ? await this.target.mapToFirstName(targetIds, this.readAble) : null;
 
     return this.updateItems(targetIds.map((id, i) => ({
       id,
@@ -77,7 +77,7 @@ export default class SelectionChooser {
   }
 
   private updateItems(items: { label: string, id: number, name: string }[], reuseOld: boolean) {
-    const options = items.map(({label, id, name}) => ({value: id.toString(), name, data: {id, name}}));
+    const options = items.map(({label, id, name}) => ({value: id.toString(), name: label, data: {id, name}}));
     const element = <IFormSelectElement>this.accessor(this.formID);
 
     // backup entry and restore the selectedIndex by value afterwards again,
