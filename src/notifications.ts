@@ -1,5 +1,5 @@
 /**
- * Created by Holger Stitz on 18.08.2016.
+ * Created by Samuel Gratzl
  */
 
 export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';

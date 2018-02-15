@@ -2,15 +2,15 @@
  * Created by Holger Stitz on 27.07.2016.
  */
 
-import { IDType } from 'phovea_core/src/idtype';
-import { areyousure } from 'phovea_ui/src/dialogs';
+import {IDType} from 'phovea_core/src/idtype';
+import {areyousure} from 'phovea_ui/src/dialogs';
 import editDialog from './editDialog';
-import { listNamedSets, deleteNamedSet, editNamedSet } from './rest';
-import { INamedSet, IStoredNamedSet, ENamedSetType } from './interfaces';
-import { list as listPlugins } from 'phovea_core/src/plugin';
-import { showErrorModalDialog } from '../dialogs';
-import { EXTENSION_POINT_TDP_LIST_FILTERS } from '../extensions';
-import { Selection, select, event as d3event } from 'd3';
+import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
+import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
+import {list as listPlugins} from 'phovea_core/src/plugin';
+import {showErrorModalDialog} from '../dialogs';
+import {EXTENSION_POINT_TDP_LIST_FILTERS} from '../extensions';
+import {Selection, select, event as d3event} from 'd3';
 import {
   ALL_NONE_NONE,
   ALL_READ_READ,
@@ -19,7 +19,7 @@ import {
   EEntity,
   hasPermission
 } from 'phovea_core/src/security';
-import { successfullySaved, successfullyDeleted } from '../notifications';
+import {successfullySaved, successfullyDeleted} from '../notifications';
 
 export default class NamedSetList {
   readonly node: HTMLElement;
@@ -71,7 +71,7 @@ export default class NamedSetList {
   };
 
   update() {
-    const data = this.data.filter((datum) => this.filter({ [datum.subTypeKey]: datum.subTypeValue }));
+    const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
     const predefinedNamedSets = data.filter((d) => d.type !== ENamedSetType.NAMEDSET);
     const me = currentUserNameOrAnonymous();
     const customNamedSets = data.filter((d) => d.type === ENamedSetType.NAMEDSET && d.creator === me);
@@ -134,7 +134,7 @@ export default class NamedSetList {
         }
 
         const deleteIt = await areyousure(`The named set <i>${namedSet.name}</i> will be deleted and cannot be restored. Continue?`,
-          { title: `Delete named set` }
+          {title: `Delete named set`}
         );
         if (deleteIt) {
           await deleteNamedSet(namedSet.id);

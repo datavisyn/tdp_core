@@ -4,13 +4,13 @@
 
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import { showErrorModalDialog, lazyDialogModule } from '../dialogs';
-import { IProvenanceGraphDataDescription } from 'phovea_core/src/provenance';
-import { mixin, randomId } from 'phovea_core/src';
-import { ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem } from 'phovea_core/src/security';
-import { IEvent, fire as globalFire } from 'phovea_core/src/event';
+import {showErrorModalDialog, lazyDialogModule} from '../dialogs';
+import {IProvenanceGraphDataDescription} from 'phovea_core/src/provenance';
+import {mixin, randomId} from 'phovea_core/src';
+import {ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem} from 'phovea_core/src/security';
+import {IEvent, fire as globalFire} from 'phovea_core/src/event';
 import {pushNotification} from '../notifications';
-import { TemporarySessionList, PersistentSessionList } from '../SessionList';
+import {TemporarySessionList, PersistentSessionList} from '../SessionList';
 
 declare const __DEBUG__;
 export const GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
@@ -85,7 +85,7 @@ export default class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      editProvenanceGraphMetaData(this.graph.desc, { permission: isPersistent(this.graph.desc) }).then((extras) => {
+      editProvenanceGraphMetaData(this.graph.desc, {permission: isPersistent(this.graph.desc)}).then((extras) => {
         if (extras !== null) {
           manager.editGraphMetaData(this.graph.desc, extras)
             .then((desc) => {
@@ -114,7 +114,7 @@ export default class EditProvenanceGraphMenu {
       event.stopPropagation();
 
       lazyDialogModule()
-        .then(({ generateDialog }) => {
+        .then(({generateDialog}) => {
           const dialog = generateDialog('Open Session', 'Open');
           dialog.body.classList.add('tdp-session-dialog');
           dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
@@ -129,9 +129,9 @@ export default class EditProvenanceGraphMenu {
             </div>
           </div>`;
           const t = new TemporarySessionList(<HTMLElement>dialog.body.querySelector('div[data-session=t]'), manager);
-          const p = new PersistentSessionList(<HTMLElement>dialog.body.querySelector('div[data-session=p]'), manager );
+          const p = new PersistentSessionList(<HTMLElement>dialog.body.querySelector('div[data-session=p]'), manager);
           dialog.hideOnSubmit();
-          dialog.onHide( () => {
+          dialog.onHide(() => {
             t.destroy();
             p.destroy();
           });
@@ -165,7 +165,7 @@ export default class EditProvenanceGraphMenu {
         return false;
       }
       lazyDialogModule()
-        .then(({ areyousure }) => areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`))
+        .then(({areyousure}) => areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`))
         .then((deleteIt) => {
           if (deleteIt) {
             this.manager.delete(this.graph.desc).then((r) => {
@@ -189,7 +189,7 @@ export default class EditProvenanceGraphMenu {
 
       const str = JSON.stringify(r, null, '\t');
       //create blob and save it
-      const blob = new Blob([str], { type: 'application/json;charset=utf-8' });
+      const blob = new Blob([str], {type: 'application/json;charset=utf-8'});
       const a = new FileReader();
       a.onload = (e) => {
         const url = (<any>e.target).result;
@@ -210,7 +210,7 @@ export default class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
       //import dialog
-      lazyDialogModule().then(({ generateDialog }) => {
+      lazyDialogModule().then(({generateDialog}) => {
         const d = generateDialog('Select File', 'Upload');
         d.body.innerHTML = `<input type="file" placeholder="Select File to Upoad">`;
         (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
@@ -238,7 +238,11 @@ export function isPersistent(d: IProvenanceGraphDataDescription) {
 
 export function persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
   const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
-  return editProvenanceGraphMetaData(d, { title: '<i class="fa fa-cloud"></i> Persist Session', button: '<i class="fa fa-cloud"></i> Persist', name });
+  return editProvenanceGraphMetaData(d, {
+    title: '<i class="fa fa-cloud"></i> Persist Session',
+    button: '<i class="fa fa-cloud"></i> Persist',
+    name
+  });
 }
 
 export function isPublic(d: ISecureItem) {
@@ -252,7 +256,7 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
     permission: true,
     name: d.name
   }, args);
-  return lazyDialogModule().then(({ FormDialog }) => {
+  return lazyDialogModule().then(({FormDialog}) => {
     const dialog = new FormDialog(args.title, args.button);
     const prefix = 'd' + randomId();
     dialog.form.innerHTML = `
