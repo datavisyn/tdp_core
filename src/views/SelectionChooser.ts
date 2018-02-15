@@ -57,19 +57,19 @@ export default class SelectionChooser {
   }
 
   private async updateImpl(selection: ISelection, reuseOld: boolean): Promise<boolean> {
-    const ids = selection.range.dim(0).asList();
-    if (this.target == null && this.readAble == null) {
-      const names = await selection.idtype.unmap(selection.range);
-      return this.updateItems(ids.map((id, i) => ({id, label: names[i], name: names[i]})), reuseOld);
+    let targetIds: number[];
+
+    if (this.target == null || this.target === selection.idtype) {
+      targetIds = selection.range.dim(0).asList();
+    } else {
+      const mapped = await selection.idtype.mapToID(selection.range, this.target);
+      targetIds = (<number[]>[]).concat(...mapped);
     }
-    const mapped = await selection.idtype.mapToID(selection.range, this.target);
 
+    const names = await this.target.unmap(targetIds);
+    const labels = this.readAble ? await this.target.mapToFirstName(targetIds, this.readAble) : null;
 
-    const flatIds = (<number[]>[]).concat(...mapped);
-    const names = await this.target.unmap(flatIds);
-    const labels = this.readAble ? await this.target.mapToFirstName(flatIds, this.readAble) : null;
-
-    return this.updateItems(flatIds.map((id, i) => ({
+    return this.updateItems(targetIds.map((id, i) => ({
       id,
       name: names[i],
       label: labels ? (this.appendOriginalLabel ? `${labels[i]} (${names[i]})` : labels[i]) : names[i]
