@@ -299,7 +299,7 @@ export default class LineUpPanelActions extends EventHandler {
         children: this.getColumnDescription(descs, false)
       },
       {
-        text: 'Computed Scores',
+        text: 'Previously Added Columns',
         children: this.getColumnDescription(descs, true)
       },
       {
