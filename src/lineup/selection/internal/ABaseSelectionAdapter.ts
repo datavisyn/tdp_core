@@ -35,31 +35,32 @@ export abstract class ABaseSelectionAdapter {
     })));
   }
 
-  private waitingForSelection = false;
-  private waitingForParameter = false;
+  private waitingForSelection: PromiseLike<any>|null = null;
+  private waitingForParameter: PromiseLike<any>|null = null;
 
   selectionChanged(waitForIt: PromiseLike<any> | null, context: () => IContext) {
     if (this.waitingForSelection) {
-      return;
+      return this.waitingForSelection;
     }
-    this.waitingForSelection = true;
-    resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
-      this.waitingForSelection = false;
+    return this.waitingForSelection = resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
+      this.waitingForSelection = null;
     });
   }
 
   parameterChanged(waitForIt: PromiseLike<any> | null, context: () => IContext) {
-    if (this.waitingForSelection || this.waitingForParameter) {
-      return;
+    if (this.waitingForSelection) {
+      return this.waitingForSelection;
     }
-    this.waitingForParameter = true;
-    resolveImmediately(waitForIt).then(() => {
+    if (this.waitingForParameter) {
+      return this.waitingForParameter;
+    }
+    return this.waitingForParameter = resolveImmediately(waitForIt).then(() => {
       if (this.waitingForSelection) {
         return; // abort selection more important
       }
       return this.parameterChangedImpl(context());
     }).then(() => {
-      this.waitingForParameter = false;
+      this.waitingForParameter = null;
     });
   }
 
