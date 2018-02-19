@@ -260,20 +260,20 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
 
-  protected parameterChanged(name: string) {
+  protected parameterChanged(name: string): PromiseLike<any>|void {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
       return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
     }
   }
 
-  protected itemSelectionChanged() {
+  protected itemSelectionChanged(): PromiseLike<any>|void {
     this.selectionHelper.setItemSelection(this.getItemSelection());
     this.updateLineUpStats();
     super.itemSelectionChanged();
   }
 
-  protected selectionChanged() {
+  protected selectionChanged(): PromiseLike<any>|void {
     if (this.selectionAdapter) {
       return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
     }
