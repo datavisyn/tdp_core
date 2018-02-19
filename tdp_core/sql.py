@@ -20,7 +20,7 @@ def load_ids(idtype, mapping):
 @app.route('/')
 @login_required
 def list_database():
-  return jsonify([v[0].dump(k) for k, v in db.configs.items()])
+  return jsonify([v.dump(k) for k, v in db.configs.connectors.items()])
 
 
 @app.route('/<database>/')
@@ -162,7 +162,7 @@ def lookup(database, view_name):
   This function is used in conjunction with Select2 form elements
   """
   view_name, _ = _formatter(view_name)
-  query = str(request.args.get('query', '')).lower()
+  query = request.args.get('query', '').lower()
   page = int(request.args.get('page', 0))  # zero based
   limit = int(request.args.get('limit', 30))  # or 'all'
 

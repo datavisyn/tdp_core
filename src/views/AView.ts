@@ -2,16 +2,18 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 
-import {IDType, resolve, defaultSelectionType} from 'phovea_core/src/idtype';
-import {none} from 'phovea_core/src/range';
+import {select} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
-import {EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT} from './interfaces';
+import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
+import {none} from 'phovea_core/src/range';
 import {IFormElementDesc} from '../form';
 import FormBuilder from '../form/FormBuilder';
-import {select} from 'd3';
-import {resolveIds} from './resolve';
 import {toData} from '../form/internal/AFormElement';
-import {mixin} from 'phovea_core/src';
+import {
+  EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
+  VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
+} from './interfaces';
+import {resolveIds} from './resolve';
 import {IFormSerializedElement} from '../form/interfaces';
 
 declare const __DEBUG__;
@@ -22,16 +24,32 @@ export {resolveIds, resolveId, resolveIdToNames} from './resolve';
  */
 export abstract class AView extends EventHandler implements IView {
 
+  /**
+   * params(oldValue: ISelection, newSelection: ISelection)
+   */
   static readonly EVENT_ITEM_SELECT = VIEW_EVENT_ITEM_SELECT;
-  static readonly EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
+  /**
+   * params(namedSet: INamedSet)
+   */
+  static readonly EVENT_UPDATE_ENTRY_POINT = VIEW_EVENT_UPDATE_ENTRY_POINT;
+  /**
+   * params()
+   */
+  static readonly EVENT_LOADING_FINISHED = VIEW_EVENT_LOADING_FINISHED;
+  /**
+   * params(name: string, oldValue: any, newValue: any)
+   */
+  static readonly EVENT_UPDATE_SHARED = VIEW_EVENT_UPDATE_SHARED;
 
-  static readonly EVENT_LOADING_FINISHED = 'loadingFinished';
 
   readonly idType: IDType;
   readonly node: HTMLElement;
 
   private params: FormBuilder;
-  private itemSelection: ISelection = { idtype: null, range: none() };
+  private readonly paramsFallback = new Map<string, any>();
+  private readonly shared = new Map<string, any>();
+  private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
+  private itemSelection: ISelection = {idtype: null, range: none()};
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
@@ -57,7 +75,8 @@ export abstract class AView extends EventHandler implements IView {
     }
   }
 
-  /*final*/ init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
+  /*final*/
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     this.params = this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
   }
@@ -70,7 +89,7 @@ export abstract class AView extends EventHandler implements IView {
     return null;
   }
 
-  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any)=>Promise<any>) {
+  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     const builder = new FormBuilder(select(params));
 
     //work on a local copy since we change it by adding an onChange handler
@@ -80,6 +99,7 @@ export abstract class AView extends EventHandler implements IView {
     descs.forEach((p) => {
       p.onChange = (formElement, value, data, previousValue) => onParameterChange(formElement.id, value, previousValue);
     });
+    this.paramsChangeListener = onParameterChange;
 
     builder.build(descs);
 
@@ -107,13 +127,15 @@ export abstract class AView extends EventHandler implements IView {
   /**
    * returns the value of the given parameter
    */
-  /*final*/ getParameter(name: string): any {
+
+  /*final*/
+  getParameter(name: string): any {
     const elem = this.getParameterElement(name);
     if (!elem) {
-      if (__DEBUG__) {
-        console.warn('invalid parameter detected', name, this.context.desc);
+      if (__DEBUG__ && this.params.length > 0) {
+        console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
-      return null;
+      return this.paramsFallback.has(name) ? this.paramsFallback.get(name) : null;
     }
     const v = elem.value;
 
@@ -125,16 +147,45 @@ export abstract class AView extends EventHandler implements IView {
     return toData(value);
   }
 
-  /*final*/ setParameter(name: string, value: any) {
-    const elem = this.getParameterElement(name);
-    if (!elem) {
-      if (__DEBUG__) {
-        console.warn('invalid parameter detected', name, this.context.desc);
-      }
+  protected async changeParameter(name: string, value: any) {
+    const old = this.getParameter(name);
+    if (old === value) {
       return;
     }
-    elem.value = value;
+    await this.paramsChangeListener(name, value, old);
+    await this.setParameter(name, value);
+  }
+
+  /*final*/
+  setParameter(name: string, value: any) {
+    const elem = this.getParameterElement(name);
+    if (!elem) {
+      if (__DEBUG__ && this.params.length > 0) {
+        console.warn('invalid parameter detected use fallback', name, this.context.desc);
+      }
+      this.paramsFallback.set(name, value);
+    } else {
+      elem.value = value;
+    }
     this.parameterChanged(name);
+  }
+
+  updateShared(name: string, value: any) {
+    if (this.shared.has(name) && this.shared.get(name) === value) {
+      return;
+    }
+    const old = this.shared.get(name);
+    this.shared.set(name, value);
+    this.sharedChanged(name);
+    this.fire(AView.EVENT_UPDATE_SHARED, name, old, value);
+  }
+
+  protected sharedChanged(_name: string) {
+    // hook
+  }
+
+  protected getShared(name: string) {
+    return this.shared.get(name);
   }
 
   /**
@@ -150,7 +201,7 @@ export abstract class AView extends EventHandler implements IView {
     return this.params.getSerializedElements();
   }
 
-  setInputSelection(selection:ISelection) {
+  setInputSelection(selection: ISelection) {
     if (isSameSelection(this.selection, selection)) {
       return;
     }
@@ -206,7 +257,7 @@ export abstract class AView extends EventHandler implements IView {
     return this.itemSelection;
   }
 
-  modeChanged(mode:EViewMode) {
+  modeChanged(mode: EViewMode) {
     // hook
   }
 

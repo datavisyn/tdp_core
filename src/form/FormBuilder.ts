@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import 'select2';
 import * as d3 from 'd3';
 import {randomId} from 'phovea_core/src/index';
 import {IFormElement, IFormElementDesc, IFormSerializedElement, IFormSerializedValues} from './interfaces';
@@ -30,6 +29,10 @@ export default class FormBuilder {
    */
   constructor($parent: d3.Selection<any>, private readonly formId = randomId()) {
     this.$node = $parent.append('form').attr('id', this.formId);
+  }
+
+  get length() {
+    return this.elements.size;
   }
 
   /**

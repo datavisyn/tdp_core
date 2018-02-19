@@ -1,0 +1,11 @@
+@import './vars';
+
+&.tdp-table {
+  margin: 0.5em 1em;
+
+  thead th {
+    position: sticky;
+    top: -1px;
+    background: white;
+  }
+}

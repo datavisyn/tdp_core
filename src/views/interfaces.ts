@@ -41,6 +41,20 @@ export interface IViewPluginDesc extends IPluginDesc {
    * optional security check to show only certain views
    */
   security?: string|((user: IUser)=>boolean);
+
+  /**
+   * a lot of topics/tags describing this view
+   */
+  topics?: string[];
+
+  /**
+   * a link to an external help page
+   */
+  helpUrl?: string;
+  /**
+   * as an alternative an help text shown as pop up
+   */
+  helpText?: string;
 }
 
 export interface IViewPlugin {
@@ -122,7 +136,26 @@ export function isSameSelection(a: ISelection, b: ISelection): boolean {
   if (aNull || bNull) {
     return aNull === bNull;
   }
-  return a.idtype.id === b.idtype.id && a.range.eq(b.range);
+  const base = a.idtype.id === b.idtype.id && a.range.eq(b.range);
+  if (!base) {
+    return false;
+  }
+  const aAllSize = a.all ? a.all.size : 0;
+  const bAllSize = b.all ? b.all.size : 0;
+  if (aAllSize !== bAllSize) {
+    return;
+  }
+  if (aAllSize === 0) {
+    return true;
+  }
+  // same size but not empty check entries
+  return Array.from(a.all!.entries()).every(([key, value]) => {
+    const other = b.all.get(key);
+    if (!other) {
+      return false;
+    }
+    return value.eq(other);
+  });
 }
 
 export function createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IObjectRef<any>): IViewContext {
@@ -136,6 +169,11 @@ export function createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IO
 export interface ISelection {
   readonly idtype: IDType;
   readonly range: Range;
+
+  /**
+   * other selections floating around in a multi selection environment
+   */
+  readonly all?: Map<IDType, Range>;
 }
 
 export interface IViewContext {
@@ -155,6 +193,8 @@ export interface IViewClass {
  */
 export const VIEW_EVENT_ITEM_SELECT = 'select';
 export const VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
+export const VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
+export const VIEW_EVENT_UPDATE_SHARED = 'updateShared';
 
 export interface IView extends IEventHandler {
   /**
@@ -169,6 +209,11 @@ export interface IView extends IEventHandler {
    * the id type of the shown items
    */
   readonly itemIDType: IDType | null;
+
+  /**
+   * optional natural size used when stacking the view on top of each other
+   */
+  readonly naturalSize?: [number, number]|'auto';
 
   /**
    * initialized this view
@@ -208,6 +253,13 @@ export interface IView extends IEventHandler {
    * @param value
    */
   setParameter(name: string, value: any): void;
+
+  /**
+   * updates a shared value among different linked views
+   * @param {string} name
+   * @param value
+   */
+  updateShared(name: string, value: any): void;
 
   /**
    * Get the serialized data of all parameters
