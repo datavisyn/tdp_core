@@ -109,7 +109,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const main = <HTMLElement>document.body.querySelector('main');
 
     //wrapper around to better control when the graph will be resolved
-    let graphResolver: (graph: Promise<ProvenanceGraph>) => void;
+    let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
     graph.catch((error: { graph: string }) => {
@@ -162,9 +162,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    * @param {ProvenanceGraph} graph the resolved current provenance graph
    * @param {CLUEGraphManager} manager its manager
    * @param {HTMLElement} main root dom element
-   * @returns {Promise<T> | T}
+   * @returns {PromiseLike<T> | T}
    */
-  protected abstract createApp(graph: ProvenanceGraph, manager: CLUEGraphManager, main: HTMLElement): Promise<T> | T;
+  protected abstract createApp(graph: ProvenanceGraph, manager: CLUEGraphManager, main: HTMLElement): PromiseLike<T> | T;
 
   /**
    * triggered after the user is logged in and the session can be started or continued

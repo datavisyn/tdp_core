@@ -18,7 +18,7 @@ import {IScore, IScoreRow} from '../extensions';
 import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
-import {debounce, mixin} from 'phovea_core/src';
+import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
@@ -223,12 +223,12 @@ export abstract class ARankingView extends AView {
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
-    super.init(params, onParameterChange);
-
-    // inject stats
-    const base = <HTMLElement>params.querySelector('form') || params;
-    base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
-    base.lastElementChild!.appendChild(this.stats);
+    return resolveImmediately(super.init(params, onParameterChange)).then(() => {
+      // inject stats
+      const base = <HTMLElement>params.querySelector('form') || params;
+      base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+      base.lastElementChild!.appendChild(this.stats);
+    });
   }
 
   update() {
