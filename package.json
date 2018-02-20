@@ -80,7 +80,7 @@
     "d3": "3.5.17",
     "lineupengine": "github:sgratzl/lineupengine",
     "lineupjs": "github:Caleydo/lineupjs#develop",
-    "phovea_clue": "github:phovea/phovea_clue#resolveImmediately",
+    "phovea_clue": "github:phovea/phovea_clue#develop",
     "select2": "4.0.4",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "@types/jquery": "2.0.33",
