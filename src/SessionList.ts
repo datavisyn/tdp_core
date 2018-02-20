@@ -76,7 +76,7 @@ abstract class ASessionList {
       const publicI = <HTMLElement>this.parentElement.parentElement.children[1].firstElementChild;
       editProvenanceGraphMetaData(d, 'Edit').then((extras) => {
         if (extras !== null) {
-          manager.editGraphMetaData(d, extras)
+          Promise.resolve(manager.editGraphMetaData(d, extras))
             .then((desc) => {
               //update the name
               nameTd.innerText = desc.name;

@@ -166,7 +166,7 @@ export abstract class AView extends EventHandler implements IView {
     } else {
       elem.value = value;
     }
-    this.parameterChanged(name);
+    return this.parameterChanged(name);
   }
 
   updateShared(name: string, value: any) {
@@ -200,7 +200,7 @@ export abstract class AView extends EventHandler implements IView {
       return;
     }
     this.selection = selection;
-    this.selectionChanged();
+    return this.selectionChanged();
   }
 
   /**

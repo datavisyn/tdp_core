@@ -84,7 +84,7 @@ export default class EditProvenanceGraphMenu {
       }
       editProvenanceGraphMetaData(this.graph.desc, {permission: isPersistent(this.graph.desc)}).then((extras) => {
         if (extras !== null) {
-          manager.editGraphMetaData(this.graph.desc, extras)
+          Promise.resolve(manager.editGraphMetaData(this.graph.desc, extras))
             .then((desc) => {
               //update the name
               this.node.querySelector('a span').innerHTML = desc.name;
@@ -114,7 +114,7 @@ export default class EditProvenanceGraphMenu {
       }
       persistProvenanceGraphMetaData(this.graph.desc).then((extras: any) => {
         if (extras !== null) {
-          manager.migrateGraph(this.graph, extras).catch(showErrorModalDialog).then(() => {
+          Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(showErrorModalDialog).then(() => {
             this.updateGraphMetaData(this.graph);
             globalFire(GLOBAL_EVENT_MANIPULATED);
           });
@@ -132,12 +132,12 @@ export default class EditProvenanceGraphMenu {
       lazyDialogModule()
         .then(({areyousure}) => areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`))
         .then((deleteIt) => {
-        if (deleteIt) {
-          this.manager.delete(this.graph.desc).then((r) => {
-            this.manager.startFromScratch();
-          }).catch(showErrorModalDialog);
-        }
-      });
+          if (deleteIt) {
+            Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
+              this.manager.startFromScratch();
+            }).catch(showErrorModalDialog);
+          }
+        });
       return false;
     });
 
