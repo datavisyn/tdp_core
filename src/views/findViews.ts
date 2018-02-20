@@ -16,6 +16,7 @@ import {
 import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import Range from 'phovea_core/src/range/Range';
 import {currentUser} from 'phovea_core/src/security';
+import {resolveImmediately} from 'phovea_core/src';
 
 /**
  * finds for the given IDType and selection matching views
@@ -25,7 +26,7 @@ import {currentUser} from 'phovea_core/src/security';
  */
 export default async function findViews(idtype: IDType, selection: Range): Promise<{ enabled: boolean, v: IViewPluginDesc }[]> {
   if (idtype === null) {
-    return Promise.resolve([]);
+    return resolveImmediately([]);
   }
   const selectionLength = selection.isNone ? 0 : selection.dim(0).length;
 

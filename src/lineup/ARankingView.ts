@@ -17,7 +17,7 @@ import {IScore, IScoreRow} from '../extensions';
 import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
-import {debounce, mixin} from 'phovea_core/src';
+import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
@@ -226,12 +226,12 @@ export abstract class ARankingView extends AView {
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
-    super.init(params, onParameterChange);
-
-    // inject stats
-    const base = <HTMLElement>params.querySelector('form') || params;
-    base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
-    base.lastElementChild!.appendChild(this.stats);
+    return resolveImmediately(super.init(params, onParameterChange)).then(() => {
+      // inject stats
+      const base = <HTMLElement>params.querySelector('form') || params;
+      base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+      base.lastElementChild!.appendChild(this.stats);
+    });
   }
 
   update() {
@@ -263,22 +263,22 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
 
-  protected parameterChanged(name: string) {
+  protected parameterChanged(name: string): PromiseLike<any>|void {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
-      this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
+      return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
     }
   }
 
-  protected itemSelectionChanged() {
+  protected itemSelectionChanged(): PromiseLike<any>|void {
     this.selectionHelper.setItemSelection(this.getItemSelection());
     this.updateLineUpStats();
     super.itemSelectionChanged();
   }
 
-  protected selectionChanged() {
+  protected selectionChanged(): PromiseLike<any>|void {
     if (this.selectionAdapter) {
-      this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
+      return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
     }
   }
 
@@ -458,12 +458,12 @@ export abstract class ARankingView extends AView {
       const ranking = this.provider.getLastRanking();
       this.customizeRanking(wrapRanking(this.provider, ranking));
       this.colors.init(ranking);
-
+    }).then(() => {
       if (this.selectionAdapter) {
         // init first time
-        this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
+        return this.selectionAdapter.selectionChanged(null, () => this.createContext());
       }
-
+    }).then(() => {
       this.builtLineUp(this.provider);
 
       //record after the initial one
