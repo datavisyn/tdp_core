@@ -299,10 +299,6 @@ export default class LineUpPanelActions extends EventHandler {
         children: this.getColumnDescription(descs, false)
       },
       {
-        text: 'Computed Scores',
-        children: this.getColumnDescription(descs, true)
-      },
-      {
         text: 'Parameterized Scores',
         children: loadedScorePlugins.map((score) => {
           return {
@@ -317,6 +313,10 @@ export default class LineUpPanelActions extends EventHandler {
             }
           };
         })
+      },
+      {
+        text: 'Previously Added Columns',
+        children: this.getColumnDescription(descs, true)
       },
       {
         text: 'Combining Columns',
