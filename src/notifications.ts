@@ -36,7 +36,7 @@ export function successfullySaved(type: string, name: string) {
 }
 
 export function successfullyDeleted(type: string, name: string) {
-  pushNotification('success', `${type} "${name}" successfully deleted`, 3000);
+  pushNotification('success', `${type} "${name}" successfully deleted`, 5000);
 }
 
 export function errorAlert(error: any) {

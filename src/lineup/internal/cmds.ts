@@ -14,6 +14,7 @@ import CompositeColumn from 'lineupjs/src/model/CompositeColumn';
 import Ranking, {ISortCriteria} from 'lineupjs/src/model/Ranking';
 import Column from 'lineupjs/src/model/Column';
 import {suffix} from 'lineupjs/src/utils';
+import {resolveImmediately} from 'phovea_core/src';
 
 
 const CMD_SET_SORTING_CRITERIA = 'lineupSetRankingSortCriteria';
@@ -43,7 +44,7 @@ function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
 }
 
 export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
   const index: number = parameter.index;
   let ranking: Ranking;
   if (parameter.dump) { //add
@@ -71,7 +72,7 @@ function toSortObject(v) {
 }
 
 export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const bak = toSortObject(ranking.getSortCriteria());
   ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
@@ -92,7 +93,7 @@ export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, v
 }
 
 export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
 
   let current: ISortCriteria[];
@@ -121,7 +122,7 @@ export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns:
 }
 
 export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const current = ranking.getGroupCriteria().map((d) => d.fqpath);
   const columns = parameter.columns.map((p) => ranking.findByPath(p));
@@ -140,7 +141,7 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
 }
 
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
 
@@ -181,7 +182,7 @@ export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path
 }
 
 export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
-  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
   let ranking: Ranking | CompositeColumn = p.getRankings()[parameter.rid];
 
   const index: number = parameter.index;
@@ -205,7 +206,7 @@ export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], paramet
 }
 
 export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
-  const p: ADataProvider = await Promise.resolve((await inputs[0].v).data);
+  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
   let ranking: Ranking | CompositeColumn = p.getRankings()[parameter.rid];
 
   const index: number = parameter.index;
@@ -459,7 +460,7 @@ function untrackRanking(ranking: Ranking) {
  * @param graph
  */
 export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph) {
-  const p = await Promise.resolve((await lineup.v).data);
+  const p = await resolveImmediately((await lineup.v).data);
   p.on(`${ADataProvider.EVENT_ADD_RANKING}.track`, (ranking, index: number) => {
     if (ignore(ADataProvider.EVENT_ADD_RANKING, lineup)) {
       return;
@@ -484,13 +485,13 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
 }
 
 export async function untrack(lineup: IObjectRef<IViewProvider>) {
-  const p = await Promise.resolve((await lineup.v).data);
+  const p = await resolveImmediately((await lineup.v).data);
   p.on([`${ADataProvider.EVENT_ADD_RANKING}.track`, `${ADataProvider.EVENT_REMOVE_RANKING}.track`], null);
   p.getRankings().forEach(untrackRanking);
 }
 
-export function withoutTracking<T>(lineup: IObjectRef<IViewProvider>, fun: () => T): Promise<T> {
-  return lineup.v.then((d) => Promise.resolve(d.data)).then((p) => {
+export function withoutTracking<T>(lineup: IObjectRef<IViewProvider>, fun: () => T): PromiseLike<T> {
+  return lineup.v.then((d) => resolveImmediately(d.data)).then((p) => {
     temporaryUntracked.add(lineup.hash);
     const r = fun();
     temporaryUntracked.delete(lineup.hash);
