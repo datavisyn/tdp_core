@@ -50,23 +50,23 @@ def get_namedset(namedset_id):
   entry = result[0] if len(result) > 0 else None
 
   if not entry:
-    abort(404)
+    abort(404, u'Namedset with id "{}" cannot be found'.format(namedset_id))
 
   if request.method == 'GET':
     if not security.can_read(entry):
-      abort(403)
+      abort(403, u'Namedset with id "{}" is protected'.format(namedset_id))
     return jsonify(entry)
 
   if request.method == 'DELETE':
     if not security.can_write(entry):
-      abort(404)
+      abort(403, u'Namedset with id "{}" is write protected'.format(namedset_id))
     q = dict(id=namedset_id)
     result = db.namedsets.remove(q)
     return jsonify(result['n'])  # number of deleted documents
 
   if request.method == 'PUT':
     if not security.can_write(entry):
-      abort(404)
+      abort(403, u'Namedset with id "{}" is write protected'.format(namedset_id))
     filter = dict(id=namedset_id)
     values = dict()
     for key in ['name', 'idType', 'description', 'subTypeKey', 'subTypeValue']:
@@ -87,10 +87,12 @@ def get_namedset_by_id(namedset_id):
   db = MongoClient(c.host, c.port)[c.database]
   q = dict(id=namedset_id)
   result = list(db.namedsets.find(q, {'_id': 0}))
-  if len(result) == 0 or not security.can_read(result[0]):
-    return {}
-  else:
-    return result[0]
+  if not result:
+    abort(404, u'Namedset with id "{}" cannot be found'.format(namedset_id))
+  if not security.can_read(result[0]):
+    abort(403, u'Namedset with id "{}" is protected'.format(namedset_id))
+
+  return result[0]
 
 
 def _generate_id():
@@ -130,23 +132,23 @@ def get_attachment(attachment_id):
   entry = result[0] if len(result) > 0 else None
 
   if not entry:
-    abort(404)
+    abort(404, u'Attachment with id "{}" cannot be found'.format(attachment_id))
 
   if request.method == 'GET':
     if not security.can_read(entry):
-      abort(403)
+      abort(403, u'Attachment with id "{}" is protected'.format(attachment_id))
     return entry['data']
 
   if request.method == 'DELETE':
     if not security.can_write(entry):
-      abort(404)
+      abort(403, u'Attachment with id "{}" is write protected'.format(attachment_id))
     q = dict(id=attachment_id)
     result = db.attachments.remove(q)
     return jsonify(result['n'])  # number of deleted documents
 
   if request.method == 'PUT':
     if not security.can_write(entry):
-      abort(404)
+      abort(403, u'Attachment with id "{}" is write protected'.format(attachment_id))
     filter = dict(id=attachment_id)
     # keep the encoded string
     data = request.values.get('data', None)
