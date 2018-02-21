@@ -23,7 +23,7 @@ export interface ITDPOptions {
   /**
    * alternative login formular
    */
-  loginForm: string|undefined;
+  loginForm: string | undefined;
   /**
    * name of this application
    */
@@ -36,6 +36,8 @@ export interface ITDPOptions {
    * Show/hide the EU cookie disclaimer bar from `cookie-bar.eu`
    */
   showCookieDisclaimer: boolean;
+
+  showResearchDisclaimer: boolean;
 }
 
 /**
@@ -48,7 +50,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     loginForm: undefined,
     name: 'Target Discovery Platform',
     prefix: 'tdp',
-    showCookieDisclaimer: false
+    showCookieDisclaimer: false,
+    showResearchDisclaimer: true
   };
 
   protected app: Promise<T> = null;
@@ -74,7 +77,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.header = createHeader(<HTMLElement>body.querySelector('div.box'), headerOptions);
 
     const aboutDialogBody = this.header.aboutDialog;
-    aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+    if (this.options.showResearchDisclaimer) {
+      aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+    }
 
     this.on('jumped_to,loaded_graph', () => this.header.ready());
     //load all available provenance graphs
@@ -112,7 +117,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
-    graph.catch((error: { graph: string }) => {
+    graph.catch((error: {graph: string}) => {
       showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
@@ -125,8 +130,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     const provVis = loadProvenanceGraphVis(graph, body.querySelector('div.content'), {
       thumbnails: false,
-        provVisCollapsed: true,
-        hideCLUEButtonsOnCollapse: true
+      provVisCollapsed: true,
+      hideCLUEButtonsOnCollapse: true
     });
     const storyVis = loadStoryVis(graph, <HTMLElement>body.querySelector('div.content'), main, {
       thumbnails: false
