@@ -50,9 +50,17 @@ export function errorAlert(error: any) {
       pushNotification('danger', `<strong>Error ${xhr.status} (${xhr.statusText})</strong>: ${body}`);
       return error;
     });
-  } else if (error instanceof Error) {
-    pushNotification('danger', `<string>${error.name}</strong>: ${error.message}`);
   }
-  pushNotification('danger', `<string>Unknown Error</strong>: ${error.toString()}`);
+  pushNotification('danger', errorMessage(error));
   return error;
+}
+
+export function errorMessage(error: any) {
+  if (error instanceof Response || error.response instanceof Response) {
+    const xhr: Response = error instanceof Response ? error : error.response;
+    return `<strong>Error ${xhr.status} (${xhr.statusText})</strong>`;
+  } else if (error instanceof Error) {
+    return `<strong>${error.name}</strong>: ${error.message}`;
+  }
+  return`<strong>Unknown Error</strong>: ${error.toString()}`;
 }
