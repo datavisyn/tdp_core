@@ -25,7 +25,7 @@ export interface ITDPOptions {
   /**
    * alternative login formular
    */
-  loginForm: string|undefined;
+  loginForm: string | undefined;
   /**
    * name of this application
    */
@@ -38,6 +38,8 @@ export interface ITDPOptions {
    * Show/hide the EU cookie disclaimer bar from `cookie-bar.eu`
    */
   showCookieDisclaimer: boolean;
+
+  showResearchDisclaimer: boolean;
 }
 
 /**
@@ -50,7 +52,8 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
     loginForm: undefined,
     name: 'Target Discovery Platform',
     prefix: 'tdp',
-    showCookieDisclaimer: false
+    showCookieDisclaimer: false,
+    showResearchDisclaimer: true
   };
 
   protected app: Promise<T> = null;
@@ -76,7 +79,9 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
     this.header = createHeader(<HTMLElement>body.querySelector('div.box'), headerOptions);
 
     const aboutDialogBody = this.header.aboutDialog;
-    aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+    if (this.options.showResearchDisclaimer) {
+      aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+    }
 
     this.on('jumped_to,loaded_graph', () => this.header.ready());
     //load all available provenance graphs
@@ -111,10 +116,10 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
     const main = <HTMLElement>document.body.querySelector('main');
 
     //wrapper around to better control when the graph will be resolved
-    let graphResolver: (graph: Promise<ProvenanceGraph>) => void;
+    let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
-    graph.catch((error: { graph: string }) => {
+    graph.catch((error: {graph: string}) => {
       showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
@@ -171,9 +176,9 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
    * @param {ProvenanceGraph} graph the resolved current provenance graph
    * @param {CLUEGraphManager} manager its manager
    * @param {HTMLElement} main root dom element
-   * @returns {Promise<T> | T}
+   * @returns {PromiseLike<T> | T}
    */
-  protected abstract createApp(graph: ProvenanceGraph, manager: CLUEGraphManager, main: HTMLElement): Promise<T> | T;
+  protected abstract createApp(graph: ProvenanceGraph, manager: CLUEGraphManager, main: HTMLElement): PromiseLike<T> | T;
 
   /**
    * triggered after the user is logged in and the session can be started or continued
