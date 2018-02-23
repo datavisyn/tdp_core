@@ -286,12 +286,20 @@ export interface IInstantView {
   readonly node: HTMLElement;
 }
 
+export interface IInstantViewOptions {
+  document: Document;
+}
+
 export interface IInstanceViewExtension {
   desc: IInstanceViewExtensionDesc;
-  factory(selection: ISelection): Promise<IInstantView>;
+  factory(selection: ISelection, options: Readonly<IInstantViewOptions>): IInstantView;
 }
 
 export interface IInstanceViewExtensionDesc extends IPluginDesc {
+/**
+   * idType regex that is required by this view
+   */
+  idtype?: string;
 
   load(): Promise<IPlugin & IInstanceViewExtension>;
 }
