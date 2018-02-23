@@ -1,4 +1,5 @@
 @import '~phovea_ui/src/fonts/yantramanav';
+@import './vars';
 
 body, html {
   font-family: Yantramanav, 'Helvetica Neue', Helvetica, sans-serif;
@@ -73,5 +74,22 @@ li[data-header=optionsLink] {
     transition: opacity 0.5s linear $move_animation;
     min-width: 40%;
     margin-bottom: 2px;
+  }
+}
+
+&.#{$tdp-css-prefix}-busy {
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.26) url('~phovea_ui/src/assets/caleydo_c_anim.svg') no-repeat center center;
+    z-index: 9;
+  }
+
+  > * {
+    display: none;
   }
 }
