@@ -2,6 +2,7 @@ import {debounce} from 'lineupjs/src/utils';
 import {EventHandler, IEvent} from 'phovea_core/src/event';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {getFactoryMethod} from 'phovea_core/src/plugin';
+import {resolveImmediately} from 'phovea_core/src';
 import {none} from 'phovea_core/src/range';
 import {
   horizontalSplit, IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
@@ -143,7 +144,7 @@ export default class CompositeView extends EventHandler implements IView {
       s.ratios = ratios;
     };
 
-    return Promise.resolve(this.createSetup()).then((setup) => {
+    return resolveImmediately(this.createSetup()).then((setup) => {
       this.setup = setup;
 
       const helper = this.node.ownerDocument.createElement('div');

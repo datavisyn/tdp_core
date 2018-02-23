@@ -17,7 +17,7 @@ def _supports_sql_parameters(dialect):
 
 def resolve(database):
   if database not in configs:
-    abort(404)
+    abort(404, u'Database with id "{}" cannot be found'.format(database))
   r = configs[database]
   # derive needed columns
   connector, engine = r
@@ -258,7 +258,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   """
   config, engine = resolve(database)
   if view_name not in config.views:
-    abort(404)
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   view = config.views[view_name]
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
@@ -280,7 +280,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
 def get_query(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
   config, engine = resolve(database)
   if view_name not in config.views:
-    abort(404)
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   view = config.views[view_name]
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
@@ -296,7 +296,7 @@ def get_query(database, view_name, replacements=None, arguments=None, extra_sql_
 def get_filtered_data(database, view_name, args):
   config, _ = resolve(database)
   if view_name not in config.views:
-    abort(404)
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   # convert to index lookup
   # row id start with 1
   view = config.views[view_name]
@@ -307,7 +307,7 @@ def get_filtered_data(database, view_name, args):
 def get_filtered_query(database, view_name, args):
   config, _ = resolve(database)
   if view_name not in config.views:
-    abort(404)
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   # convert to index lookup
   # row id start with 1
   view = config.views[view_name]
@@ -318,7 +318,7 @@ def get_filtered_query(database, view_name, args):
 def _get_count(database, view_name, args):
   config, engine = resolve(database)
   if view_name not in config.views:
-    abort(404)
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   view = config.views[view_name]
 
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
@@ -409,7 +409,7 @@ def _fill_up_columns(view, engine):
 def _lookup(database, view_name, query, page, limit, args):
   config, engine = resolve(database)
   if view_name not in config.views:
-    abort(404)
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   view = config.views[view_name]
 
   arguments = args.copy()

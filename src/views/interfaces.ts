@@ -40,6 +40,20 @@ export interface IViewPluginDesc extends IPluginDesc {
    * optional security check to show only certain views
    */
   security?: string|((user: IUser)=>boolean);
+
+  /**
+   * a lot of topics/tags describing this view
+   */
+  topics?: string[];
+
+  /**
+   * a link to an external help page
+   */
+  helpUrl?: string;
+  /**
+   * as an alternative an help text shown as pop up
+   */
+  helpText?: string;
 }
 
 export interface IViewPlugin {
@@ -205,7 +219,7 @@ export interface IView extends IEventHandler {
    * @param {HTMLElement} params place to put parameter forms
    * @param {(name: string, value: any, previousValue: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes
    */
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any>|undefined;
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => PromiseLike<any>): PromiseLike<any>|undefined;
 
   /**
    * changes the input selection as given to the constructor of this class
