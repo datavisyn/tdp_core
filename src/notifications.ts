@@ -4,6 +4,9 @@
 
 export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';
 
+export const DEFAULT_SUCCESS_AUTO_HIDE = 5000;
+export const DEFAULT_ERROR_AUTO_HIDE = -1; // not
+
 export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger' | 'error', msg: string, autoHideInMs = -1) {
   let parent = <HTMLElement>document.body.querySelector('div.toast-container');
   if (!parent) {
@@ -32,11 +35,11 @@ export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger
 }
 
 export function successfullySaved(type: string, name: string) {
-  pushNotification('success', `${type} "${name}" successfully saved`, 5000);
+  pushNotification('success', `${type} "${name}" successfully saved`, DEFAULT_SUCCESS_AUTO_HIDE);
 }
 
 export function successfullyDeleted(type: string, name: string) {
-  pushNotification('success', `${type} "${name}" successfully deleted`, 5000);
+  pushNotification('success', `${type} "${name}" successfully deleted`, DEFAULT_SUCCESS_AUTO_HIDE);
 }
 
 export function errorAlert(error: any) {
@@ -51,7 +54,7 @@ export function errorAlert(error: any) {
       return error;
     });
   }
-  pushNotification('danger', errorMessage(error));
+  pushNotification('danger', errorMessage(error), DEFAULT_ERROR_AUTO_HIDE);
   return error;
 }
 
