@@ -67,11 +67,7 @@ export abstract class AView extends EventHandler implements IView {
    * @param {boolean} busy
    */
   protected setBusy(busy: boolean) {
-    if (busy) {
-      this.node.classList.add('busy');
-    } else {
-      this.node.classList.remove('busy');
-    }
+    this.node.classList.toggle('tdp-busy', busy);
   }
 
   /*final*/

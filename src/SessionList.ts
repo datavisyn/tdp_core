@@ -15,15 +15,24 @@ import {
   editProvenanceGraphMetaData, isPersistent, isPublic,
   persistProvenanceGraphMetaData
 } from './internal/EditProvenanceGraphMenu';
-import {on as globalOn} from 'phovea_core/src/event';
+import {on as globalOn, off as globalOff} from 'phovea_core/src/event';
 import {fromNow} from './internal/utils';
+import {successfullyDeleted, successfullySaved} from './notifications';
+
 export {isPublic} from './internal/EditProvenanceGraphMenu';
 
 abstract class ASessionList {
-  constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table'|'list' = 'table') {
+  private handler: () => void;
+
+  constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
     this.build(graphManager).then((update) => {
-      globalOn(GLOBAL_EVENT_MANIPULATED, () => update());
+      this.handler = () => update();
+      globalOn(GLOBAL_EVENT_MANIPULATED, this.handler);
     });
+  }
+
+  destroy() {
+    globalOff(GLOBAL_EVENT_MANIPULATED, this.handler);
   }
 
   protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
@@ -52,6 +61,7 @@ abstract class ASessionList {
       const deleteIt = await areyousure(`Are you sure to delete session: "${d.name}"`);
       if (deleteIt) {
         await manager.delete(d);
+        successfullyDeleted('Session', d.name);
         const tr = this.parentElement.parentElement;
         tr.remove();
       }
@@ -80,6 +90,7 @@ abstract class ASessionList {
             .then((desc) => {
               //update the name
               nameTd.innerText = desc.name;
+              successfullySaved('Session', desc.name);
               publicI.className = isPublic(desc) ? 'fa fa-users' : 'fa fa-user';
               publicI.setAttribute('title', isPublic(d) ? 'Public (everyone can see it)' : 'Private');
             })
@@ -156,8 +167,8 @@ export class TemporarySessionList extends ASessionList {
 
     //replace loading
     const $table = $parent.html(`<p>
-      A temporary session will only be stored in your local browser cache. 
-      It is not possible to share a link to states of this session with others. 
+      A temporary session will only be stored in your local browser cache.
+      It is not possible to share a link to states of this session with others.
       Only the ${KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} most recent sessions will be stored.
     </p><div>${this.mode === 'table' ? table : list}</div>`);
 
@@ -228,7 +239,7 @@ export class PersistentSessionList extends ASessionList {
                   </tr>
                 </thead>
                 <tbody>
-            
+
                 </tbody>
               </table>`;
     const tablePublic = `<table class="table table-striped table-hover table-bordered table-condensed">
@@ -241,13 +252,13 @@ export class PersistentSessionList extends ASessionList {
                   </tr>
                 </thead>
                 <tbody>
-            
+
                 </tbody>
               </table>`;
 
     $parent.html(`<p>
-     The persistent session will be stored on the server. 
-     By default, sessions are private, meaning that only the creator has access to it. 
+     The persistent session will be stored on the server.
+     By default, sessions are private, meaning that only the creator has access to it.
      If the status is set to public, others can also see the session and access certain states by opening a shared link.
     </p>
         <ul class="nav nav-tabs" role="tablist">
@@ -256,10 +267,10 @@ export class PersistentSessionList extends ASessionList {
         </ul>
         <div class="tab-content">
             <div id="session_mine" class="tab-pane active">
-                ${this.mode === 'table' ? tableMine: ''}
+                ${this.mode === 'table' ? tableMine : ''}
             </div>
             <div id="session_others" class="tab-pane">
-                ${this.mode === 'table' ? tablePublic: ''}
+                ${this.mode === 'table' ? tablePublic : ''}
             </div>
        </div>`);
 
@@ -311,7 +322,7 @@ export class PersistentSessionList extends ASessionList {
           $tr.exit().remove();
         }
       } else {
-         {
+        {
           const $tr = $parent.select('#session_mine').selectAll('div').data(myworkspaces);
 
           const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html(`
