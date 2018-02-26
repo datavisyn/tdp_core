@@ -292,9 +292,13 @@ export interface IInstantViewOptions {
   document: Document;
 }
 
+export interface IItemSelection extends ISelection {
+  readonly items: {_id: number, id: string, text: string}[];
+}
+
 export interface IInstanceViewExtension {
   desc: IInstanceViewExtensionDesc;
-  factory(selection: ISelection, options: Readonly<IInstantViewOptions>): IInstantView;
+  factory(selection: IItemSelection, options: Readonly<IInstantViewOptions>): IInstantView;
 }
 
 export interface IInstanceViewExtensionDesc extends IPluginDesc {
