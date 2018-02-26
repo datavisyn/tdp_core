@@ -302,7 +302,7 @@ export interface IInstanceViewExtension {
 }
 
 export interface IInstanceViewExtensionDesc extends IPluginDesc {
-/**
+  /**
    * idType regex that is required by this view
    */
   idtype?: string;
