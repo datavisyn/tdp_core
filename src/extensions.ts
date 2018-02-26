@@ -284,6 +284,8 @@ export interface IViewPlugin {
 
 export interface IInstantView {
   readonly node: HTMLElement;
+
+  destroy(): void;
 }
 
 export interface IInstantViewOptions {

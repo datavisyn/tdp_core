@@ -57,9 +57,8 @@ export default class SelectionChooser {
   }
 
   private async updateImpl(selection: ISelection, reuseOld: boolean): Promise<boolean> {
-    let targetIds: number[];
-
     const target: IDType = this.target || selection.idtype;
+    let targetIds: number[];
 
     if (target === selection.idtype) {
       targetIds = selection.range.dim(0).asList();
