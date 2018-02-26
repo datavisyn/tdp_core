@@ -51,7 +51,8 @@ li[data-header=optionsLink] {
 
   position: fixed;
   top: 0;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
