@@ -10,8 +10,9 @@
 import IDType from 'phovea_core/src/idtype/IDType';
 import {IViewPluginDesc, matchLength, showAsSmallMultiple, toViewPluginDesc} from './interfaces';
 import {
-  EXTENSION_POINT_TDP_LIST_FILTERS,
-  EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, IGroupData, IViewGroupExtensionDesc
+  EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW,
+  EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, IGroupData, IInstanceViewExtensionDesc,
+  IViewGroupExtensionDesc
 } from '../extensions';
 import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import Range from 'phovea_core/src/range/Range';
@@ -20,27 +21,39 @@ import {resolveImmediately} from 'phovea_core/src';
 
 /**
  * finds for the given IDType and selection matching views
- * @param {IDType} idtype the idtype to lookfor
+ * @param {IDType} idType the idtype to lookfor
  * @param {Range} selection the current input selection
  * @returns {Promise<{enabled: boolean; v: IViewPluginDesc}[]>} list of views and whether the current selection count matches their requirements
  */
-export default async function findViews(idtype: IDType, selection: Range): Promise<{ enabled: boolean, v: IViewPluginDesc }[]> {
-  if (idtype === null) {
-    return resolveImmediately([]);
-  }
+export default function findViews(idType: IDType, selection: Range): Promise<{enabled: boolean, v: IViewPluginDesc}[]> {
   const selectionLength = selection.isNone ? 0 : selection.dim(0).length;
-
-  const mappedTypes = await idtype.getCanBeMappedTo();
-  const all = [idtype].concat(mappedTypes);
-
-  function byType(p: any) {
-    const pattern = p.idtype ? new RegExp(p.idtype) : /.*/;
-    return all.some((i) => pattern.test(i.id)) && (p.selection === 'any' || !matchLength(p.selection, 0));
-  }
 
   function bySelection(p: any) {
     return (matchLength(p.selection, selectionLength) || (showAsSmallMultiple(p) && selectionLength > 1));
   }
+
+  return findViewBase(idType, listPlugins(EXTENSION_POINT_TDP_VIEW), true)
+    .then((r) => r.map((v) => ({enabled: bySelection(v), v: toViewPluginDesc(v)})));
+}
+
+export function findAllViews(): Promise<IViewPluginDesc[]> {
+  return findViewBase(null, listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((m) => m.map(toViewPluginDesc));
+}
+
+async function findViewBase(idType: IDType | null, views: IPluginDesc[], hasSelection: boolean) {
+
+  const byTypeChecker = async () => {
+    const mappedTypes = await idType.getCanBeMappedTo();
+    const all = [idType].concat(mappedTypes);
+
+    return (p: any) => {
+      const idType = p.idType !== undefined ? p.idType : p.idtype;
+      const pattern = idType ? new RegExp(idType) : /.*/;
+      return all.some((i) => pattern.test(i.id)) && (!hasSelection || (p.selection === 'any' || !matchLength(p.selection, 0)));
+    };
+  }
+
+  const byType = idType ? await byTypeChecker() : () => true;
 
   function canAccess(p: IPluginDesc) {
     let security = p.security;
@@ -69,17 +82,20 @@ export default async function findViews(idtype: IDType, selection: Range): Promi
     return filters.every((filter) => filter.factory(f));
   }
 
-  return listPlugins(EXTENSION_POINT_TDP_VIEW)
+  return views
     .filter((p) => byType(p) && extensionFilters(p) && canAccess(p))
-    .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
-    .map((v) => ({enabled: bySelection(v), v: toViewPluginDesc(v)}));
+    .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+}
+
+export function findInstantViews(idType: IDType): Promise<IInstanceViewExtensionDesc[]> {
+  return findViewBase(idType, listPlugins(EXTENSION_POINT_TDP_INSTANT_VIEW), false);
 }
 
 function caseInsensitiveCompare(a: string, b: string) {
   return a.toLowerCase().localeCompare(b.toLowerCase());
 }
 
-function resolveGroupData() {
+export function resolveGroupData() {
   const plugins = <IViewGroupExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_VIEW_GROUPS);
   const r = new Map<string, IGroupData>();
   plugins.forEach((plugin) => {
@@ -104,7 +120,7 @@ export interface IGroupedViews<T extends {v: IViewPluginDesc}> extends IGroupDat
 export function groupByCategory<T extends {v: IViewPluginDesc}>(views: T[]): IGroupedViews<T>[] {
   const grouped = new Map<string, T[]>();
   views.forEach((elem) => {
-    if(!grouped.has(elem.v.group.name)) {
+    if (!grouped.has(elem.v.group.name)) {
       grouped.set(elem.v.group.name, [elem]);
     } else {
       grouped.get(elem.v.group.name).push(elem);
