@@ -42,7 +42,7 @@ export function findAllViews(): Promise<IViewPluginDesc[]> {
 
 async function findViewBase(idType: IDType | null, views: IPluginDesc[], hasSelection: boolean) {
 
-  const byTypeChecker = () => {
+  const byTypeChecker = async () => {
     const mappedTypes = await idType.getCanBeMappedTo();
     const all = [idType].concat(mappedTypes);
 
@@ -53,7 +53,7 @@ async function findViewBase(idType: IDType | null, views: IPluginDesc[], hasSele
     };
   }
 
-  const byType = idType ? byTypeChecker() : () => true;
+  const byType = idType ? await byTypeChecker() : () => true;
 
   function canAccess(p: IPluginDesc) {
     let security = p.security;
