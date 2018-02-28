@@ -95,7 +95,7 @@ function caseInsensitiveCompare(a: string, b: string) {
   return a.toLowerCase().localeCompare(b.toLowerCase());
 }
 
-function resolveGroupData() {
+export function resolveGroupData() {
   const plugins = <IViewGroupExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_VIEW_GROUPS);
   const r = new Map<string, IGroupData>();
   plugins.forEach((plugin) => {
