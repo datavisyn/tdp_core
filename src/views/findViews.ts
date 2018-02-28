@@ -36,19 +36,24 @@ export default function findViews(idType: IDType, selection: Range): Promise<{en
     .then((r) => r.map((v) => ({enabled: bySelection(v), v: toViewPluginDesc(v)})));
 }
 
-async function findViewBase(idType: IDType, views: IPluginDesc[], hasSelection: boolean) {
-  if (idType === null) {
-    return resolveImmediately([]);
+export function findAllViews(): Promise<IViewPluginDesc[]> {
+  return findViewBase(null, listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((m) => m.map(toViewPluginDesc));
+}
+
+async function findViewBase(idType: IDType | null, views: IPluginDesc[], hasSelection: boolean) {
+
+  const byTypeChecker = () => {
+    const mappedTypes = await idType.getCanBeMappedTo();
+    const all = [idType].concat(mappedTypes);
+
+    return (p: any) => {
+      const idType = p.idType !== undefined ? p.idType : p.idtype;
+      const pattern = idType ? new RegExp(idType) : /.*/;
+      return all.some((i) => pattern.test(i.id)) && (!hasSelection || (p.selection === 'any' || !matchLength(p.selection, 0)));
+    };
   }
 
-  const mappedTypes = await idType.getCanBeMappedTo();
-  const all = [idType].concat(mappedTypes);
-
-  function byType(p: any) {
-    const idType = p.idType !== undefined ? p.idType : p.idtype;
-    const pattern = idType ? new RegExp(idType) : /.*/;
-    return all.some((i) => pattern.test(i.id)) && (!hasSelection || (p.selection === 'any' || !matchLength(p.selection, 0)));
-  }
+  const byType = idType ? byTypeChecker() : () => true;
 
   function canAccess(p: IPluginDesc) {
     let security = p.security;
@@ -79,7 +84,7 @@ async function findViewBase(idType: IDType, views: IPluginDesc[], hasSelection: 
 
   return views
     .filter((p) => byType(p) && extensionFilters(p) && canAccess(p))
-    .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+    .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 }
 
 export function findInstantViews(idType: IDType): Promise<IInstanceViewExtensionDesc[]> {
