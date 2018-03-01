@@ -202,16 +202,16 @@ export default class CompositeView extends EventHandler implements IView {
       const type = this.setup.layout ? this.setup.layout.type || 'vsplit' : 'vsplit';
       switch (type) {
         case 'vsplit':
-          b = verticalSplit(ratio, views[0], views[1]).fixed();
+          b = verticalSplit(ratio, views[0], views[1]).fixedLayout();
           break;
         case 'hsplit':
-          b = horizontalSplit(ratio, views[0], views[1]).fixed();
+          b = horizontalSplit(ratio, views[0], views[1]).fixedLayout();
           break;
         case 'hstack':
-          b = horizontalStackedLineUp(...views).fixed();
+          b = horizontalStackedLineUp(...views).fixedLayout();
           break;
         case 'vstack':
-          b = verticalStackedLineUp(...views).fixed();
+          b = verticalStackedLineUp(...views).fixedLayout();
           break;
       }
       this.root.root = this.root.build(b);

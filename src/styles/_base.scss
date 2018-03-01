@@ -78,7 +78,7 @@ li[data-header=optionsLink] {
   }
 }
 
-&.#{$tdp-css-prefix}-busy {
+.#{$tdp-css-prefix}-busy {
   &::before {
     position: absolute;
     top: 0;
@@ -91,6 +91,6 @@ li[data-header=optionsLink] {
   }
 
   > * {
-    display: none;
+    display: none !important;
   }
 }
