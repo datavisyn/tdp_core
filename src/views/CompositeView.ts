@@ -1,18 +1,26 @@
 import {debounce} from 'lineupjs/src/utils';
+import {resolveImmediately} from 'phovea_core/src';
 import {EventHandler, IEvent} from 'phovea_core/src/event';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {getFactoryMethod} from 'phovea_core/src/plugin';
-import {resolveImmediately} from 'phovea_core/src';
 import {none} from 'phovea_core/src/range';
 import {
-  horizontalSplit, IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
-  view
+  IRootLayoutContainer,
+  ISplitLayoutContainer,
+  ITabbingLayoutContainer,
+  IView as ILayoutView,
+  IViewLayoutContainer
 } from 'phovea_ui/src/layout';
 import {
-  horizontalStackedLineUp, IBuildAbleOrViewLike, tabbing, verticalStackedLineUp,
-  ViewBuilder
+  horizontalSplit,
+  horizontalStackedLineUp,
+  IBuildAbleOrViewLike,
+  root,
+  tabbing,
+  verticalSplit,
+  verticalStackedLineUp,
+  view, ViewBuilder
 } from 'phovea_ui/src/layout/builder';
-import {ITabbingLayoutContainer, IViewLayoutContainer} from '../../../phovea_ui/src/layout/interfaces';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 
