@@ -25,6 +25,14 @@ export enum FormElementType {
      */
   SELECT2_MULTIPLE,
     /**
+     * SELECT2 with additional functionality such as validation, tokenize and file drag
+     */
+  SELECT3,
+    /**
+     * similar to SELECT3 but with multiple selections allowed
+     */
+  SELECT3_MULTIPLE,
+    /**
      * a text field
      * @see IFormInputTextDesc
      */

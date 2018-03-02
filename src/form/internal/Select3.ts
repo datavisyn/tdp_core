@@ -3,6 +3,11 @@ import {debounce} from 'phovea_core/src';
 import {EventHandler} from 'phovea_core/src/event';
 import 'select2';
 
+// TODO: fix overflowing of multiple items
+// TODO: on focus, don't highlight with empty search term ' '
+// TODO: pasting ids
+// TODO: dragover
+
 export interface IdTextPair {
   id: string;
   text: string;
@@ -25,7 +30,6 @@ export interface ISelect3Item<T extends Readonly<IdTextPair>> {
   verified: 'verified' | 'processing' | 'invalid';
 }
 
-
 export interface ISelect3Group<T extends Readonly<IdTextPair>> {
   readonly text: string;
   readonly children: ISelect3Item<T>[];
@@ -42,8 +46,6 @@ interface ISearchResult<T extends Readonly<IdTextPair>> {
     more: boolean;
   };
 }
-
-// TODO: add to formselect 2 and to tdp_gene
 
 export interface ISelect3Options<T extends Readonly<IdTextPair>> {
   document: Document;
@@ -143,13 +145,13 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     width: '100%',
     required: false,
     pageSize: 30,
-    minimumInputLength: 3,
+    minimumInputLength: 0,
     multiple: false,
-    dropable: true, // new
+    dropable: true,
     placeholder: 'Search...',
-    validate: null, // new
-    search: () => Promise.resolve({more: false, items: []}), // new
-    group: (items) => items, // new
+    validate: null,
+    search: () => Promise.resolve({more: false, items: []}),
+    group: (items) => items,
     format: (item: ISelect3Item<T>, node: HTMLElement, mode: 'result' | 'selection', currentSearchQuery?: RegExp) => {
       if (mode === 'result' && currentSearchQuery) {
         //highlight match
@@ -164,7 +166,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
       }
       return group.text;
     }, // now separate
-    equalValues: equalArrays, // new
+    equalValues: equalArrays,
     cacheResults: true
   };
 
