@@ -8,7 +8,11 @@ import {
   horizontalSplit, IRootLayoutContainer, ISplitLayoutContainer, IView as ILayoutView, root, verticalSplit,
   view
 } from 'phovea_ui/src/layout';
-import {horizontalStackedLineUp, IBuildAbleOrViewLike, verticalStackedLineUp} from 'phovea_ui/src/layout/builder';
+import {
+  horizontalStackedLineUp, IBuildAbleOrViewLike, tabbing, verticalStackedLineUp,
+  ViewBuilder
+} from 'phovea_ui/src/layout/builder';
+import {ITabbingLayoutContainer, IViewLayoutContainer} from '../../../phovea_ui/src/layout/interfaces';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 
@@ -26,8 +30,8 @@ interface ILinkedSelection{
 }
 
 export interface ICompositeLayout {
-  type: 'vsplit' | 'hsplit' | 'hstack' | 'vstack';
-  keys: string[];
+  type: 'vsplit' | 'hsplit' | 'hstack' | 'vstack' | 'tabbing';
+  keys: (string | ICompositeLayout)[];
   ratios?: number[];
 }
 
@@ -46,6 +50,7 @@ export interface IACompositeViewOptions {
 declare const __DEBUG__: boolean;
 
 export const VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
+export const VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB = 'setActiveTab';
 
 
 export interface ICompositeInfo {
@@ -139,9 +144,27 @@ export default class CompositeView extends EventHandler implements IView {
       });
     };
 
-    const updateRatios = (_evt: any, ...ratios: number[]) => {
-      const s = <ISplitLayoutContainer>this.root.find((d) => d.type === 'split');
-      s.ratios = ratios;
+    const toParentElement = (evt: IEvent) => {
+      const source = evt.currentTarget;
+      const view = this.children.find(({instance}) => instance === source);
+      const layout = this.root.find((d) => d.type === 'view' && (<IViewLayoutContainer>d).view === view);
+      return layout.parent;
+    };
+
+    const updateRatios = (evt: IEvent, ...ratios: number[]) => {
+      const parent = toParentElement(evt);
+      if (parent && parent.type === 'split') {
+        (<ISplitLayoutContainer>parent).ratios = ratios;
+      }
+    };
+
+    const setActiveTab = (evt: IEvent, tabKey: string) => {
+      const parent = toParentElement(evt);
+      const view = this.children.find(({key}) => key === tabKey);
+      const layout = this.root.find((d) => d.type === 'view' && (<IViewLayoutContainer>d).view === view);
+      if (parent && parent.type === 'tabbing' && layout) {
+        (<ITabbingLayoutContainer>parent).active = layout;
+      }
     };
 
     return resolveImmediately(this.createSetup()).then((setup) => {
@@ -162,6 +185,7 @@ export default class CompositeView extends EventHandler implements IView {
         instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
         instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
         instance.on(VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
+        instance.on(VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB, setActiveTab);
         this.childrenLookup.set(d.key, instance);
 
         this.children.push(new WrapperView(instance, d.key));
@@ -187,40 +211,58 @@ export default class CompositeView extends EventHandler implements IView {
         });
       });
 
-      const views = this.children.map((d) => {
-        return view(d).name(d.key).fixed();
-      });
-
-
-      if (views.length === 1) {
-        this.root.root = this.root.build(views[0]);
+      if (this.children.length === 1) {
+        const first = this.children[0];
+        this.root.root = this.root.build(view(first).name(first.key).fixed());
         this.setBusy(false);
         return;
       }
-      let b: IBuildAbleOrViewLike;
-      const ratio = this.setup.layout && this.setup.layout.ratios ? this.setup.layout.ratios[0] : 0.5;
-      const type = this.setup.layout ? this.setup.layout.type || 'vsplit' : 'vsplit';
-      switch (type) {
-        case 'vsplit':
-          b = verticalSplit(ratio, views[0], views[1]).fixedLayout();
-          break;
-        case 'hsplit':
-          b = horizontalSplit(ratio, views[0], views[1]).fixedLayout();
-          break;
-        case 'hstack':
-          b = horizontalStackedLineUp(...views).fixedLayout();
-          break;
-        case 'vstack':
-          b = verticalStackedLineUp(...views).fixedLayout();
-          break;
-      }
-      this.root.root = this.root.build(b);
-      if (type.endsWith('split')) {
-        const split = <ISplitLayoutContainer>this.root.root;
-        views.slice(2).forEach((v) => split.push(this.root.build(v)));
-      }
+
+      const views = new Map(this.children.map((d) => <[string, ViewBuilder]>[d.key, view(d).name(d.key).fixed()]));
+      this.buildLayout(views, this.children.map((d) => d.key));
       this.setBusy(false);
     });
+  }
+
+  private buildLayout(views: Map<string, ViewBuilder>, keys: string[]) {
+
+    const buildImpl = (layout: string|ICompositeLayout) => {
+      const l: string|ICompositeLayout = typeof layout === 'string' ? layout : Object.assign({
+        type: <'vsplit'>'vsplit',
+        ratios: keys.map(() => 1 / keys.length),
+        keys
+      }, layout || {});
+
+      let b: IBuildAbleOrViewLike;
+      if (typeof l === 'string') {
+        return views.get(l);
+      }
+      if (l.keys.length === 1) {
+        return buildImpl(l.keys[0]);
+      }
+      const ratio = l.ratios;
+      switch (l.type) {
+        case 'hsplit': {
+          const first = buildImpl(l.keys[0]);
+          const second = buildImpl(l.keys[1]);
+          return horizontalSplit(ratio[0], first, second).fixedLayout();
+        }
+        case 'hstack':
+          return horizontalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
+        case 'vstack':
+          return verticalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
+        case 'tabbing':
+          return tabbing(...l.keys.map(buildImpl)).fixedLayout();
+        case 'vsplit':
+        default: {
+          const first = buildImpl(l.keys[0]);
+          const second = buildImpl(l.keys[1]);
+          return verticalSplit(ratio[0], first, second).fixedLayout();
+        }
+      }
+    };
+
+    this.root.root = this.root.build(buildImpl(this.setup.layout));
   }
 
   private initChildren(onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
