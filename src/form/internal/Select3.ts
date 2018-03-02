@@ -132,6 +132,18 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
 
 const SEPARATORS = /[\s;,]+/mg;
 
+/**
+ * Replacer function that styles the found match, offset 0 means no match
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+ * @param match The matched substring
+ * @param p1 The nth parenthesized submatch string
+ * @param offset The offset of the matched substring
+ * @returns {string} The replacement string
+ */
+function highlightMatch(match, p1, offset) {
+  return offset !== 0 ? `<mark>${p1}</mark>` : '';
+}
+
 export default class Select3<T extends IdTextPair> extends EventHandler {
   /**
    * event fired when the selection changes the argument is an array of ISelection objects
@@ -155,14 +167,14 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     format: (item: ISelect3Item<T>, node: HTMLElement, mode: 'result' | 'selection', currentSearchQuery?: RegExp) => {
       if (mode === 'result' && currentSearchQuery) {
         //highlight match
-        return item.text.replace(currentSearchQuery!, '<mark>$1</mark>');
+        return item.text.replace(currentSearchQuery!, highlightMatch);
       }
       return item.text;
     }, // newly typed
     formatGroup: (group: ISelect3Group<T>, node: HTMLElement, currentSearchQuery?: RegExp) => {
       if (currentSearchQuery) {
         // highlight match
-        return group.text.replace(currentSearchQuery!, '<mark>$1</mark>');
+        return group.text.replace(currentSearchQuery!, highlightMatch);
       }
       return group.text;
     }, // now separate
