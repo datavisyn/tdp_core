@@ -128,7 +128,7 @@ export default class LineUpPanelActions extends EventHandler {
     this.node.insertAdjacentHTML('afterbegin', `
       <a href="#" title="(Un)Collapse"></a>
       <section></section>
-      <header><button class="fa fa-plus" title="Add Column"></button>
+      <header>${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
       </header>`);
 
     this.node.querySelector('a')!.addEventListener('click', (evt) => {
