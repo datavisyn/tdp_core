@@ -12,7 +12,7 @@ export interface IRankingWrapper {
 }
 
 export function wrapRanking(data: ADataProvider, ranking: Ranking) {
-  const findColumn = (column: string) => ranking.find((d) => (<any>d.desc).column === column);
+  const findColumn = (column: string) => ranking.find((d) => (<any>d.desc).column === column || d.desc.label === column);
   return <IRankingWrapper> {
     findColumn,
     sortBy: (column: string, asc = true) => {

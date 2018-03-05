@@ -77,6 +77,12 @@ export interface IARankingViewOptions {
 
   enableHeaderSummary: boolean;
 
+  /**
+   * enable alternating pattern background
+   * @default false
+   */
+  enableStripedBackground: boolean;
+
   customOptions: Partial<ILineUpConfig>;
 }
 
@@ -152,6 +158,7 @@ export abstract class ARankingView extends AView {
     enableAddingColumns: true,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
+    enableStripedBackground: false,
     customOptions: {}
   };
 
@@ -183,6 +190,9 @@ export abstract class ARankingView extends AView {
     const config = mixin(this.config, {
       header: {
         summary: this.options.enableHeaderSummary
+      },
+      body: {
+        striped: this.options.enableStripedBackground
       }
     }, options.customOptions);
 
@@ -481,7 +491,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected createInitialRanking(lineup: ADataProvider) {
-    createInitialRanking(this.provider);
+    createInitialRanking(lineup);
   }
 
   protected customizeRanking(ranking: IRankingWrapper) {

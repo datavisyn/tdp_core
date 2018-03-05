@@ -161,10 +161,32 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
   return r;
 }
 
-export function createInitialRanking(provider: ADataProvider) {
+export interface IInitialRankingOptions {
+  aggregate: boolean;
+  selection: boolean;
+  rank: boolean;
+}
+
+export function createInitialRanking(provider: ADataProvider, options: Partial<IInitialRankingOptions> = {}) {
+  const o: Readonly<IInitialRankingOptions> = Object.assign({
+    aggregate: true,
+    selection: true,
+    rank: true
+  }, options);
+
   const ranking = provider.pushRanking();
-  ranking.insert(provider.create(createAggregateDesc()), 0);
-  ranking.push(provider.create(createSelectionDesc()));
+  if (!o.rank) {
+    const r = ranking.find((d) => d.desc.type === 'rank');
+    if (r) {
+      r.removeMe();
+    }
+  }
+  if (o.aggregate) {
+    ranking.insert(provider.create(createAggregateDesc()), 0);
+  }
+  if (o.selection) {
+    ranking.push(provider.create(createSelectionDesc()));
+  }
 
   provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
     const col = provider.create(d);
