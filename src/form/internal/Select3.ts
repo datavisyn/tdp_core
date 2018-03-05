@@ -3,11 +3,6 @@ import {debounce} from 'phovea_core/src';
 import {EventHandler} from 'phovea_core/src/event';
 import 'select2';
 
-// TODO: fix overflowing of multiple items
-// TODO: on focus, don't highlight with empty search term ' '
-// TODO: pasting ids
-// TODO: dragover
-
 export interface IdTextPair {
   id: string;
   text: string;
