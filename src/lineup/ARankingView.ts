@@ -1,6 +1,7 @@
 import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
 import {defaultConfig} from 'lineupjs/src/config';
 import {ILineUpConfig} from 'lineupjs/src/interfaces';
+import {IGroupData, IGroupItem, isGroup} from '../../../lineupjs/src/ui/engine/interfaces';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -84,6 +85,8 @@ export interface IARankingViewOptions {
    */
   enableStripedBackground: boolean;
 
+  itemRowHeight: number|((row: any, index: number) => number)|null;
+
   customOptions: Partial<ILineUpConfig>;
 }
 
@@ -150,6 +153,7 @@ export abstract class ARankingView extends AView {
   protected readonly options: Readonly<IARankingViewOptions> = {
     itemName: 'item',
     itemNamePlural: 'items',
+    itemRowHeight: null,
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
@@ -196,6 +200,20 @@ export abstract class ARankingView extends AView {
         striped: this.options.enableStripedBackground
       }
     }, options.customOptions);
+
+    if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
+      (<any>config.body).rowHeight = this.options.itemRowHeight;
+    } else if (typeof this.options.itemRowHeight === 'function' ) {
+      const f = this.options.itemRowHeight;
+      (<any>config.body).dynamicHeight = () => ({
+        defaultHeight: 20,
+        height: (item: IGroupItem | IGroupData) => {
+          return isGroup(item) ? 70 : f(item.v, item.dataIndex);
+        }
+      });
+    }
+
+
 
     this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
 

@@ -119,6 +119,21 @@ export function stringCol(column: string, options: Partial<IColumnOptions> = {})
 }
 
 /**
+ * creates a new LineUp description for a link column
+ * @param {string} column the column name to use
+ * @param {string} linkPattern the pattern to resolve links from values, $1 will be replaced by the current value, $2 with the URL encoded version of it
+ * @param {Partial<IColumnOptions>} options
+ * @returns {IAdditionalColumnDesc}
+ */
+export function linkCol(column: string, linkPattern: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  return Object.assign(baseColumn(column, options), {
+    type: 'link',
+    link: linkPattern
+  });
+}
+
+
+/**
  * creates a new LineUp description for a boolean column
  * @param {string} column the column name to use
  * @param {Partial<IColumnOptions>} options
