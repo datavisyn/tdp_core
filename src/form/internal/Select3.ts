@@ -136,7 +136,7 @@ const SEPARATORS = /[\s;,]+/mg;
  * @returns {string} The replacement string
  */
 function highlightMatch(match, p1, offset) {
-  return offset !== 0 ? `<mark>${p1}</mark>` : '';
+  return match !== '' ? `<mark>${p1}</mark>` : '';
 }
 
 export default class Select3<T extends IdTextPair> extends EventHandler {
