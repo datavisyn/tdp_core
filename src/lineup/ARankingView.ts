@@ -1,7 +1,7 @@
 import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
 import {defaultConfig} from 'lineupjs/src/config';
 import {ILineUpConfig} from 'lineupjs/src/interfaces';
-import {IGroupData, IGroupItem, isGroup} from '../../../lineupjs/src/ui/engine/interfaces';
+import {IGroupData, IGroupItem, isGroup} from 'lineupjs/src/ui/engine/interfaces';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
