@@ -165,13 +165,15 @@ export interface IInitialRankingOptions {
   aggregate: boolean;
   selection: boolean;
   rank: boolean;
+  order: string[];
 }
 
 export function createInitialRanking(provider: ADataProvider, options: Partial<IInitialRankingOptions> = {}) {
   const o: Readonly<IInitialRankingOptions> = Object.assign({
     aggregate: true,
     selection: true,
-    rank: true
+    rank: true,
+    order: []
   }, options);
 
   const ranking = provider.pushRanking();
@@ -188,7 +190,21 @@ export function createInitialRanking(provider: ADataProvider, options: Partial<I
     ranking.push(provider.create(createSelectionDesc()));
   }
 
-  provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
+  const resolve = () => {
+    const all = provider.getColumns();
+    const cols: IColumnDesc[] = [];
+    o.order.forEach((c) => {
+      const col = all.find((d) => (<any>d).column === c || d.label === c);
+      if (col) {
+        cols.push(col);
+      }
+    });
+    return cols;
+  };
+
+  const descs = o.order.length > 0 ? resolve() : provider.getColumns().filter((d) => (<any>d).visible !== false);
+
+  descs.forEach((d) => {
     const col = provider.create(d);
     // set initial column width
     if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {

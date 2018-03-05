@@ -14,7 +14,7 @@ import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
-import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
+import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
@@ -30,6 +30,7 @@ import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
 import {successfullySaved} from '../notifications';
 
 export {IRankingWrapper} from './internal/ranking';
+export {default as DataProvider} from 'lineupjs/src/provider/ADataProvider';
 
 export interface IARankingViewOptions {
   /**
@@ -490,8 +491,8 @@ export abstract class ARankingView extends AView {
     // hook
   }
 
-  protected createInitialRanking(lineup: ADataProvider) {
-    createInitialRanking(lineup);
+  protected createInitialRanking(lineup: ADataProvider, options: Partial<IInitialRankingOptions> = {}) {
+    createInitialRanking(lineup, options);
   }
 
   protected customizeRanking(ranking: IRankingWrapper) {
