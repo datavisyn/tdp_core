@@ -80,7 +80,7 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
           id: v.id,
           text: v.text
         };
-      });
+      }) || null;
     }
   }
 

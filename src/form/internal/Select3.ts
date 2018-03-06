@@ -135,7 +135,7 @@ const SEPARATORS = /[\s;,]+/mg;
  * @param offset The offset of the matched substring
  * @returns {string} The replacement string
  */
-function highlightMatch(match, p1, offset) {
+export function highlightMatch(match, p1, offset) {
   return match !== '' ? `<mark>${p1}</mark>` : '';
 }
 
