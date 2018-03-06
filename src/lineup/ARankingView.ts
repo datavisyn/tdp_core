@@ -79,6 +79,8 @@ export interface IARankingViewOptions {
 
   enableHeaderSummary: boolean;
 
+  enableHeaderRotation: boolean;
+
   /**
    * enable alternating pattern background
    * @default false
@@ -164,6 +166,7 @@ export abstract class ARankingView extends AView {
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
     enableStripedBackground: false,
+    enableHeaderRotation: false,
     customOptions: {}
   };
 
@@ -194,7 +197,8 @@ export abstract class ARankingView extends AView {
 
     const config = mixin(this.config, {
       header: {
-        summary: this.options.enableHeaderSummary
+        summary: this.options.enableHeaderSummary,
+        autoRotateLabels: this.options.enableHeaderRotation
       },
       body: {
         striped: this.options.enableStripedBackground
