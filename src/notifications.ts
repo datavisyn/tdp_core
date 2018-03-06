@@ -51,11 +51,11 @@ export function errorAlert(error: any) {
           The requested URL was:<br><a href="${xhr.url}" target="_blank" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
       }
       pushNotification('danger', `<strong>Error ${xhr.status} (${xhr.statusText})</strong>: ${body}`);
-      return error;
+      return Promise.reject(error);
     });
   }
   pushNotification('danger', errorMessage(error), DEFAULT_ERROR_AUTO_HIDE);
-  return error;
+  return Promise.reject(error);
 }
 
 export function errorMessage(error: any) {
