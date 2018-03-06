@@ -5,10 +5,10 @@
 import AFormElement from './AFormElement';
 import {IFormParent} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
-import Select3, {ISelect3Item} from './Select3';
+import Select3, {ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
 
-declare type IFormSelect3Options = Select2Options & {
+declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
   return?: 'text' | 'id';
   data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);
 };
@@ -69,8 +69,19 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
    * @returns {string|{name: string, value: string, data: any}|null}
    */
   get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[] {
-    // Views listen to change values of type string arrays, so map Array of IdTextPair to Array of string ids
-    return (<IdTextPair[]>this.select3.value).map((v) => v.id);
+    const value = (<IdTextPair[]>this.select3.value);
+    if (this.desc.options.return === 'text') {
+      return value.map((v) => v.text)
+    } else if (this.desc.options.return === 'id') {
+      return value.map((v) => v.id)
+    } else {
+      return value.map((v) => {
+        return <any>{
+          id: v.id,
+          text: v.text
+        };
+      });
+    }
   }
 
   hasValue() {
