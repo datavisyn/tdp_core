@@ -52,7 +52,18 @@ paths:
 
 components:
   parameters:
-    arg_{{database}}_{{view}}: [] # TODO
+    arg_{{database}}_{{view}}:
+    {%- for arg in args %}
+      - name: {{arg.name}}
+        required: true
+        in: query
+        {% if arg.as_list == false %}type: {{arg.type}}{% endif %}
+        {% if arg.as_list %}type: array
+        schema:
+          items:
+            type: {{arg.type}}
+        {%- endif %}
+    {%- endfor %}
     filter_{{database}}_{{view}}: [] # TODO
   responses:
     entries_{{database}}_{{view}}:

@@ -31,6 +31,14 @@ def _gen():
 
   tags = base['tags']
 
+  def to_type(t):
+    if t is None:
+      return 'string'
+    if t is int:
+      return 'integer'
+    if t is float:
+      return 'number'
+
   # integrate all views using the template
   for database, connector in db.configs.connectors.items():
 
@@ -38,16 +46,25 @@ def _gen():
     tags.append(dict(name=u'db_' + database, description=connector.description))
 
     for view, dbview in connector.views.items():
+
+      args = []
+      for arg in dbview.arguments:
+        info = dbview.get_argument_info(arg)
+        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list))
+
+
+
       keys = {
         'database': database,
         'view': view,
         'description': dbview.description,
-        'args': dbview.arguments
+        'args': args
       }
 
       # TODO argument types, filter
 
       view_yaml = render_template_string(template, **keys)
+      #_log.info(view_yaml)
       part = safe_load(view_yaml)
       base = data_merge(base, part)
 
