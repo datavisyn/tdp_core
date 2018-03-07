@@ -50,9 +50,17 @@ def _gen():
       args = []
       for arg in dbview.arguments:
         info = dbview.get_argument_info(arg)
-        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list))
+        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None))
 
-
+      for arg in dbview.replacements:
+        extra = dbview.valid_replacements.get(arg)
+        arg_type = 'string'
+        enum_values = None
+        if isinstance(extra, list):
+          enum_values = extra
+        if extra == int or extra == float:
+          arg_type = to_type(extra)
+        args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values))
 
       keys = {
         'database': database,

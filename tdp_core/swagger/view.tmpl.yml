@@ -63,6 +63,11 @@ components:
           items:
             type: {{arg.type}}
         {%- endif %}
+        {% if arg.enum %}
+        enum:
+          {% for e in arg.enum %}- {{e}}
+          {% endfor %}
+        {%- endif %}
     {%- endfor %}
     filter_{{database}}_{{view}}: [] # TODO
   responses:
