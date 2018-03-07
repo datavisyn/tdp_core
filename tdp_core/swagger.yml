@@ -479,6 +479,93 @@ paths:
           $ref: '#/components/responses/notAllowed'
         '404':
           $ref: '#/components/responses/notFound'
+  /storage/attachment/:
+   post:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.post_attachment
+      description: add a new attachement
+      tags:
+        - storage
+      requestBody:
+        content:
+          application/json:
+            $ref: '#/components/schemas/attachment'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                title: id of uploaded element
+                type: string
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/storage/attachment/{attachment}':
+    parameters:
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_attachment
+      description: get a dataset
+      tags:
+        - storage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/attachment'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+    delete:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_attachment_delete
+      description: deletes the given attachment
+      tags:
+        - storage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: number of removed entries
+                type: integer
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+    put:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_attachment_put
+      description: update the given attachment
+      tags:
+        - storage
+      requestBody:
+        content:
+          application/json:
+            $ref: '#/components/schemas/attachment'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                title: id of uploaded element
+                type: string
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
 components:
   parameters:
     database:
@@ -631,3 +718,6 @@ components:
         - ids
         - subTypeKey
         - subTypeValue
+    attachment:
+      type: object
+      additionalProperties: true

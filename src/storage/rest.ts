@@ -1,4 +1,4 @@
-import {getAPIJSON, sendAPI} from 'phovea_core/src/ajax';
+import {api2absURL, send, getAPIJSON, sendAPI} from 'phovea_core/src/ajax';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {parse, RangeLike} from 'phovea_core/src/range';
 import {currentUserNameOrAnonymous, ALL_READ_NONE, ALL_READ_READ} from 'phovea_core/src/security';
@@ -63,5 +63,5 @@ export function getAttachment(id: string): Promise<object> {
  * @returns {Promise<string>} a promise with the attachment id
  */
 export function addAttachment(data: object): Promise<string> {
-  return sendAPI(`${REST_NAMESPACE}/attachment/`, {data: JSON.stringify(data)}, 'POST', 'text');
+  return send(api2absURL(`${REST_NAMESPACE}/attachment/`), data, 'POST', 'text', 'json');
 }
