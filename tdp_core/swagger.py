@@ -47,7 +47,8 @@ def _gen():
     tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
-
+      #if database != u'bayer_biodb' or view != u'entrez_items_verify':
+      #  continue
       args = []
       for arg in dbview.arguments:
         info = dbview.get_argument_info(arg)
@@ -63,19 +64,19 @@ def _gen():
           arg_type = to_type(extra)
         args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values))
 
-      filters = list(dbview.filters.keys())
+      filters = set(dbview.filters.keys())
+      set.update(set(dbview.columns.keys()))
 
       keys = {
         'database': database,
         'view': view,
         'description': dbview.description or '',
         'args': args,
-        'arg_empty': not args,
-        'filters': filters,
-        'filter_empty': not filters
+        'empty': not args and not filters,
+        'filters': filters
       }
 
-      # TODO argument types, filter
+      # TODO object types
 
       view_yaml = render_template_string(template, **keys)
       # _log.info(view_yaml)
