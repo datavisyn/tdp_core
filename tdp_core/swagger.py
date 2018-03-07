@@ -15,13 +15,14 @@ app = Namespace('flask_swagger_ui',
 @app.route('/swagger.json')
 @login_required
 def _generate_swagger_file():
-  import yaml
+  from yamlreader import yaml_load
   from os import path
 
   here = path.abspath(path.dirname(__file__))
-  base = path.join(here, 'swagger.yml')
-  with open(base) as f:
-    return jsonify(yaml.load(f))
+
+  total = yaml_load([path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml', 'proxy.yml', 'storage.yml']])
+
+  return jsonify(total)
 
 
 @app.route('/')

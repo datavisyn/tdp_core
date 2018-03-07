@@ -1,0 +1,332 @@
+openapi: 3.0.0
+tags:
+  - name: storage
+    description: named set storage api
+paths:
+  /storage/namedsets/:
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.list_namedset
+      description: list or add namedsets
+      tags:
+        - storage
+      parameters:
+        - name: idType
+          in: query
+          required: false
+          description: limit list to the given idType
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: list of namedsets
+                type: array
+                items:
+                  $ref: '#/components/schemas/namedset'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+    post:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.list_namedset_post
+      description: add a new namedset
+      tags:
+        - storage
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: description
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subTypeKey
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subTypeValue
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: creator
+          in: query
+          required: false
+          schema:
+            type: string
+            default: currently logged in
+        - name: permissions
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 740
+        - name: idType
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: ids
+          in: query
+          schema:
+            type: string
+            format: range
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: list of namedsets
+                type: array
+                items:
+                  $ref: '#/components/schemas/namedset'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/storage/namedsets/{namedset}':
+    parameters:
+      - name: namedset
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_namedset
+      description: get a dataset
+      tags:
+        - storage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namedset'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+    delete:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_namedset_delete
+      description: deletes the given named set
+      tags:
+        - storage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: number of removed entries
+                type: integer
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+    put:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_namedset_put
+      description: update the given namedset
+      tags:
+        - storage
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: description
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subTypeKey
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subTypeValue
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: permissions
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 740
+        - name: idType
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: ids
+          in: query
+          schema:
+            type: string
+            format: range
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/namedset'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  /storage/attachment/:
+   post:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.post_attachment
+      description: add a new attachement
+      tags:
+        - storage
+      requestBody:
+        content:
+          application/json:
+            $ref: '#/components/schemas/attachment'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                title: id of uploaded element
+                type: string
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/storage/attachment/{attachment}':
+    parameters:
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_attachment
+      description: get a dataset
+      tags:
+        - storage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/attachment'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+    delete:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_attachment_delete
+      description: deletes the given attachment
+      tags:
+        - storage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: number of removed entries
+                type: integer
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+    put:
+      x-swagger-router-controller: tdp_core
+      operationId: storage.get_attachment_put
+      description: update the given attachment
+      tags:
+        - storage
+      requestBody:
+        content:
+          application/json:
+            $ref: '#/components/schemas/attachment'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                title: id of uploaded element
+                type: string
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+components:
+  schemas:
+    namedset:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+        type:
+          type: number
+        creator:
+          type: string
+        permissions:
+          type: integer
+        description:
+          type: string
+        idType:
+          type: string
+        ids:
+          type: array
+          items:
+            type: integer
+        subTypeKey:
+          type: string
+        subTypeValue:
+          type: string
+      required:
+        - name
+        - id
+        - type
+        - creator
+        - permissions
+        - description
+        - idType
+        - ids
+        - subTypeKey
+        - subTypeValue
+    attachment:
+      type: object
+      additionalProperties: true
