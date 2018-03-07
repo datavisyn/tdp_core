@@ -2,21 +2,11 @@ import logging
 import re
 from collections import OrderedDict
 from phovea_server.security import current_user
+from .utils import clean_query
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
 REGEX_TYPE = type(re.compile(''))
-
-
-def _clean_query(query):
-  if callable(query):
-    return 'custom function'
-  query = query.strip()
-  query = query.replace('\n', '')
-  # remove two spaces till there are no more
-  while '  ' in query:
-    query = query.replace('  ', ' ')
-  return query
 
 
 class ArgumentInfo(object):
@@ -57,7 +47,7 @@ class DBView(object):
     r = OrderedDict(name=name, description=self.description)
     if self.idtype:
       r['idType'] = self.idtype
-    r['query'] = _clean_query(self.query)
+    r['query'] = clean_query(self.query)
     args = [a for a in self.arguments]
     args.extend(self.replacements)
     r['arguments'] = args
@@ -66,7 +56,7 @@ class DBView(object):
     if self.filters:
       r['filters'] = self.filters.keys()
     if self.queries:
-      r['queries'] = {k: _clean_query(v) for k, v in self.queries.items()}
+      r['queries'] = {k: clean_query(v) for k, v in self.queries.items()}
     return r
 
   def is_valid_filter(self, key):

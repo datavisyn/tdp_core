@@ -1,0 +1,77 @@
+openapi: 3.0.0
+paths:
+  '/db/{{database}}/{{view}}':
+    get:
+      description: {{description}}
+      tags:
+        - db
+        - db_{{database}}
+      parameters:
+        - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/arg_{{database}}_{{view}}'
+      responses:
+        '200':
+          $ref: '#/components/responses/entries_{{database}}_{{view}}'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/db/{{database}}/{{view}}/filter':
+    get:
+      tags:
+        - db
+        - db_{{database}}
+      parameters:
+        - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/arg_{{database}}_{{view}}'
+        - $ref: '#/components/parameters/filter_{{database}}_{{view}}'
+      responses:
+        '200':
+          $ref: '#/components/responses/entries_{{database}}_{{view}}'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/db/{{database}}/{{view}}/count':
+    get:
+      tags:
+        - db
+        - db_{{database}}
+      parameters:
+        - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/arg_{{database}}_{{view}}'
+        - $ref: '#/components/parameters/filter_{{database}}_{{view}}'
+      responses:
+        '200':
+          $ref: '#/components/responses/queryCount'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+
+
+components:
+  parameters:
+    arg_{{database}}_{{view}}: [] # TODO
+    filter_{{database}}_{{view}}: [] # TODO
+  responses:
+    entries_{{database}}_{{view}}:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/entry_{{database}}_{{view}}'
+            #oneOf:
+            #  - $ref: '#/components/schemas/returnQuery'
+
+  schemas:
+    entry_{{database}}_{{view}}:
+      type: object
+      properties:
+        _id:
+          type: integer
+        id:
+          type: string
+      additionalProperties: true # TODO

@@ -58,18 +58,11 @@ paths:
       tags:
         - db
       parameters:
+        - $ref: '#/components/parameters/returnQuery'
         - $ref: '#/components/parameters/_assignids'
       responses:
         '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                title: ArrayOfRows
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+          $ref: '#/components/responses/entries_generic'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -85,18 +78,11 @@ paths:
       tags:
         - db
       parameters:
+        - $ref: '#/components/parameters/returnQuery'
         - $ref: '#/components/parameters/_assignids'
       responses:
         '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                title: ArrayOfRows
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+          $ref: '#/components/responses/entries_generic'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -109,11 +95,12 @@ paths:
       x-swagger-router-controller: tdp_core
       operationId: sql.get_score_data
       description: >-
-        see the base version with additional filter possiblities and score
+        see the base version with additional filter possibilities and score
         mapping
       tags:
         - db
       parameters:
+        - $ref: '#/components/parameters/returnQuery'
         - $ref: '#/components/parameters/_assignids'
         - name: target
           in: query
@@ -131,6 +118,9 @@ paths:
                 type: array
                 items:
                   type: object
+                  properties:
+                    id:
+                      type: string
                   additionalProperties: true
         '403':
           $ref: '#/components/responses/notAllowed'
@@ -148,12 +138,7 @@ paths:
         - db
       responses:
         '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                title: number of records
-                type: integer
+          $ref: '#/components/responses/queryCount'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -270,6 +255,31 @@ components:
       schema:
         type: boolean
         default: false
+    returnQuery:
+      - _return_query:
+        in: query
+        type: boolean
+        required: false
+  responses:
+    queryCount:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - title: number of records
+                type: integer
+              - $ref: '#/components/schemas/returnQuery'
+    entries_generic:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            title: ArrayOfRows
+            type: array
+            items:
+              type: object
+              additionalProperties: true
   schemas:
     database:
       type: string
@@ -333,3 +343,14 @@ components:
         - type
         - label
       additionalProperties: true
+    returnQuery:
+      type: object
+      properties:
+        query:
+          type: string
+        args:
+          type: object
+          additionalProperties: true
+      required:
+        - query
+        - args

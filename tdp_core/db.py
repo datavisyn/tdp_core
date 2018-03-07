@@ -4,6 +4,7 @@ import phovea_server.config
 from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from .dbmanager import DBManager
+from .utils import clean_query
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -277,13 +278,6 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   return r, view
 
 
-def _clean_query(q):
-  import re
-  q = q.strip()
-  q_clean = re.sub('(\s)+', ' ', q)
-  return q_clean
-
-
 def get_query(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
   config, engine = resolve(database)
   if view_name not in config.views:
@@ -297,7 +291,7 @@ def get_query(database, view_name, replacements=None, arguments=None, extra_sql_
   if callable(query):
     return dict(query='custom function', args=kwargs)
 
-  return dict(query=_clean_query(query.format(**replace)), args=kwargs)
+  return dict(query=clean_query(query.format(**replace)), args=kwargs)
 
 
 def get_filtered_data(database, view_name, args):
