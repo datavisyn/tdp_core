@@ -37,55 +37,15 @@ paths:
       description: add a new namedset
       tags:
         - storage
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: description
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: subTypeKey
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: subTypeValue
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: type
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-        - name: creator
-          in: query
-          required: false
-          schema:
-            type: string
-            default: currently logged in
-        - name: permissions
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 740
-        - name: idType
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: ids
-          in: query
-          schema:
-            type: string
-            format: range
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/namedset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/namedset'
       responses:
         '200':
           description: Successful response
@@ -148,49 +108,15 @@ paths:
       description: update the given namedset
       tags:
         - storage
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: description
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: subTypeKey
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: subTypeValue
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: type
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-        - name: permissions
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 740
-        - name: idType
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: ids
-          in: query
-          schema:
-            type: string
-            format: range
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/namedset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/namedset'
       responses:
         '200':
           description: Successful response
@@ -212,7 +138,8 @@ paths:
       requestBody:
         content:
           application/json:
-            $ref: '#/components/schemas/attachment'
+            schema:
+             $ref: '#/components/schemas/attachment'
       responses:
         '200':
           description: Successful response
@@ -276,7 +203,8 @@ paths:
       requestBody:
         content:
           application/json:
-            $ref: '#/components/schemas/attachment'
+            schema:
+              $ref: '#/components/schemas/attachment'
       responses:
         '200':
           description: Successful response

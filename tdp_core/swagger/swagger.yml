@@ -17,19 +17,21 @@ paths:
     post:
       tags:
         - _security
-      parameters:
-        - name: username
-          type: string
-          in: query
-        - name: password
-          type: string
-          format: password
-          in: query
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/userlogin'
       security: []    # no authentication
       responses:
         '200':
           description: >
             Successfully authenticated.
+          content:
+            application/json:
+             schema:
+               $ref: '#/components/schemas/user'
           headers:
             Set-Cookie:
               schema:
@@ -70,3 +72,27 @@ components:
           schema:
             title: Error
             type: string
+  schemas:
+    userlogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+      required:
+        - username
+        - password
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - roles

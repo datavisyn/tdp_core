@@ -4,7 +4,7 @@ import phovea_server.config
 from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from .dbmanager import DBManager
-from .utils import clean_query
+from .utils import clean_query, secure_replacements
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -202,7 +202,6 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   replacements = replacements or {}
   arguments = arguments or {}
   replacements = _handle_aggregated_score(view, config, replacements, arguments)
-  secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
   # convert to index lookup
   kwargs = {}

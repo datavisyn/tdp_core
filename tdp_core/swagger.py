@@ -7,6 +7,7 @@ from phovea_server.ns import Namespace, Response
 from phovea_server.security import login_required
 from phovea_server.util import jsonify
 from . import db
+from .utils import secure_replacements
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ def _gen():
   for database, connector in db.configs.connectors.items():
 
     # add database tag
-    tags.append(dict(name=u'db_' + database, description=connector.description))
+    tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
 
@@ -52,7 +53,7 @@ def _gen():
         info = dbview.get_argument_info(arg)
         args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None))
 
-      for arg in dbview.replacements:
+      for arg in (a for a in dbview.replacements if a not in secure_replacements):
         extra = dbview.valid_replacements.get(arg)
         arg_type = 'string'
         enum_values = None
@@ -62,17 +63,22 @@ def _gen():
           arg_type = to_type(extra)
         args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values))
 
+      filters = list(dbview.filters.keys())
+
       keys = {
         'database': database,
         'view': view,
-        'description': dbview.description,
-        'args': args
+        'description': dbview.description or '',
+        'args': args,
+        'arg_empty': not args,
+        'filters': filters,
+        'filter_empty': not filters
       }
 
       # TODO argument types, filter
 
       view_yaml = render_template_string(template, **keys)
-      #_log.info(view_yaml)
+      # _log.info(view_yaml)
       part = safe_load(view_yaml)
       base = data_merge(base, part)
 

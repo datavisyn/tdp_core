@@ -256,10 +256,11 @@ components:
         type: boolean
         default: false
     returnQuery:
-      - _return_query:
-        in: query
+      name: _return_query
+      in: query
+      schema:
         type: boolean
-        required: false
+      required: false
   responses:
     queryCount:
       description: Successful response
@@ -269,7 +270,7 @@ components:
             oneOf:
               - title: number of records
                 type: integer
-              - $ref: '#/components/schemas/returnQuery'
+              - $ref: '#/components/schemas/returnQueryResult'
     entries_generic:
       description: Successful response
       content:
@@ -343,7 +344,7 @@ components:
         - type
         - label
       additionalProperties: true
-    returnQuery:
+    returnQueryResult:
       type: object
       properties:
         query:

@@ -1,5 +1,7 @@
 from phovea_server.ns import abort
 
+secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
+
 
 def map_scores(scores, from_idtype, to_idtype):
   """
