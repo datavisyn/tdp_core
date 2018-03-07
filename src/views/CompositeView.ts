@@ -425,7 +425,7 @@ class WrapperView implements ILayoutView {
     const parent = this.node.closest('section');
     const header = parent.querySelector('header');
     if (hideHeader) {
-      header.lastElementChild!.remove(); // remove the span
+      header.innerHTML = '';
     }
     header.insertAdjacentHTML('beforeend', `<div class="parameters form-inline"></div>`);
     return <HTMLElement>header.lastElementChild;
