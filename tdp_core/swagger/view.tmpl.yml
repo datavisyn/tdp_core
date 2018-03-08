@@ -103,8 +103,17 @@ components:
     entry_{{database}}_{{view}}:
       type: object
       properties:
-        _id:
-          type: integer
-        id:
-          type: string
-      additionalProperties: true # TODO
+      {%- for prop in props %}
+        {{prop.name}}:
+          type: {{prop.type}}
+          {% if prop.categories %}
+          enum:
+            {% for e in prop.categories %}- {{e}}
+            {% endfor %}
+          {%- endif %}
+          {% if prop.min %}
+          minimum: {{prop.min}}
+          maximum: {{prop.max}}
+          {%- endif %}
+      {%- endfor %}
+      additionalProperties: true

@@ -43,11 +43,13 @@ def _gen():
   # integrate all views using the template
   for database, connector in db.configs.connectors.items():
 
+    db.resolve(database)  # trigger filling up columns
+
     # add database tag
     tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
-      #if database != u'bayer_biodb' or view != u'entrez_items_verify':
+      # if database != u'bayer_biodb' or view != u'entrez_items_verify':
       #  continue
       args = []
       for arg in dbview.arguments:
@@ -67,16 +69,29 @@ def _gen():
       filters = set(dbview.filters.keys())
       set.update(set(dbview.columns.keys()))
 
+      props = []
+      for k, prop in dbview.columns.items():
+        p = prop.copy()
+        p['name'] = k
+        if 'type' not in p or p['type'] == 'categorical':
+          p['type'] = 'string'
+        props.append(p)
+
+      if dbview.idtype:
+        # assume when id type given then we have ids
+        props.append(dict(name='_id', type='integer'))
+        if not any((p['name'] == 'id' for p in props)):
+          props.append(dict(name='id', type='string'))
+
       keys = {
         'database': database,
         'view': view,
         'description': dbview.description or '',
         'args': args,
         'empty': not args and not filters,
-        'filters': filters
+        'filters': filters,
+        'props': props
       }
-
-      # TODO object types
 
       view_yaml = render_template_string(template, **keys)
       # _log.info(view_yaml)

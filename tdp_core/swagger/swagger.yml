@@ -47,28 +47,28 @@ components:
     error:
       description: Internal Server Error
       content:
-        application/json:
+        text/plain:
           schema:
             title: Error
             type: string
     invalid:
       description: Invalid Request
       content:
-        application/json:
+        text/plain:
           schema:
             title: Error
             type: string
     notFound:
       description: Not Found
       content:
-        application/json:
+        text/plain:
           schema:
             title: Error
             type: string
     notAllowed:
       description: 'Not Allowed to perform the operation, are you logged in?'
       content:
-        application/json:
+        text/plain:
           schema:
             title: Error
             type: string
@@ -78,6 +78,7 @@ components:
       properties:
         username:
           type: string
+
         password:
           type: string
           format: password

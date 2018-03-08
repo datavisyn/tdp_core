@@ -260,7 +260,9 @@ components:
       in: query
       schema:
         type: boolean
+        default: false
       required: false
+      allowEmptyValue: true
   responses:
     queryCount:
       description: Successful response
