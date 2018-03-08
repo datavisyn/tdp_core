@@ -4,7 +4,6 @@ paths:
   '/db/{{database}}/{{view}}':
     get:
       tags:
-        - db
         - db_{{database}}
         - query_generic
       parameters:
@@ -27,7 +26,6 @@ paths:
   '/db/{{database}}/{{view}}.csv':
     get:
       tags:
-        - db
         - db_{{database}}
         - query_generic
       parameters:
@@ -49,7 +47,6 @@ paths:
   '/db/{{database}}/{{view}}/count':
     get:
       tags:
-        - db
         - db_{{database}}
         - query_generic
       parameters:
@@ -72,7 +69,6 @@ paths:
   '/db/{{database}}/{{view}}/desc':
     get:
       tags:
-        - db
         - db_{{database}}
         - query_generic
       responses:
@@ -87,7 +83,6 @@ paths:
   '/db/{{database}}/{{view}}/lookup':
     get:
       tags:
-        - db
         - db_{{database}}
         - query_lookup
       parameters:
@@ -106,7 +101,6 @@ paths:
   '/db/{{database}}/{{view}}/score':
     get:
       tags:
-        - db
         - db_{{database}}
         - query_score
       parameters:
