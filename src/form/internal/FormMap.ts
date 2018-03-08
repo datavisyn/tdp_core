@@ -13,6 +13,7 @@ import {mixin} from 'phovea_core/src';
 import {IFormElement} from '../';
 import * as session from 'phovea_core/src/session';
 import {resolveImmediately} from 'phovea_core/src';
+import {ISelect3Options, default as Select3} from './Select3';
 
 export interface ISubDesc {
   name: string;
@@ -37,7 +38,13 @@ export interface ISubSelect2Desc extends ISubDesc {
   ajax?: any;
 }
 
-declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc;
+export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
+  type: FormElementType.SELECT3;
+  optionsData?: ISelectOptions|(() => ISelectOptions);
+  return?: 'text'|'id';
+}
+
+declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc|ISubSelect3Desc;
 
 /**
  * Add specific options for input form elements
@@ -298,6 +305,13 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
             that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
           });
         });
+        break;
+      case FormElementType.SELECT3:
+          const select3 = new Select3(desc);
+          parent.appendChild(select3.node);
+          select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
+            this.fire(FormMap.EVENT_CHANGE, next);
+          });
         break;
       default:
         parent.insertAdjacentHTML('afterbegin', `<input class="form-control" value="${initialValue || ''}">`);
