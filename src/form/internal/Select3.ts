@@ -123,9 +123,19 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
    * cache fetched results
    */
   cacheResults: boolean;
-}
 
-const SEPARATORS = /[\s;,]+/mg;
+  /**
+   * token separators
+   * @default /[\s;,]+/mg
+   */
+  tokenSeparators?: RegExp;
+
+  /**
+   * default token separator
+   * @default ' '
+   */
+  defaultTokenSeparator: string;
+}
 
 /**
  * Replacer function that styles the found match, offset 0 means no match
@@ -161,20 +171,20 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     group: (items) => items,
     format: (item: ISelect3Item<T>, node: HTMLElement, mode: 'result' | 'selection', currentSearchQuery?: RegExp) => {
       if (mode === 'result' && currentSearchQuery) {
-        //highlight match
         return item.text.replace(currentSearchQuery!, highlightMatch);
       }
       return item.text;
-    }, // newly typed
+    },
     formatGroup: (group: ISelect3Group<T>, node: HTMLElement, currentSearchQuery?: RegExp) => {
       if (currentSearchQuery) {
-        // highlight match
         return group.text.replace(currentSearchQuery!, highlightMatch);
       }
       return group.text;
-    }, // now separate
+    },
     equalValues: equalArrays,
-    cacheResults: true
+    cacheResults: true,
+    tokenSeparators: /[\s;,]+/mg,
+    defaultTokenSeparator: ' '
   };
 
   private readonly select2Options: Select2Options = <any>{
@@ -235,8 +245,8 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
   }
 
   setSearchQuery(value: string) {
-    // add at the end another separator to add all and trigger tagging behavior
-    value = value.trim() + ' ';
+    // add at the end the default separator to add all and trigger tagging behavior
+    value = value.trim() + this.options.defaultTokenSeparator;
     $(this.node).find('input.select2-search__field').val(value).trigger('input');
   }
 
@@ -295,7 +305,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
   private loadFile(file: File) {
     const f = new FileReader();
     f.addEventListener('load', () => {
-      const data = String(f.result).replace(SEPARATORS, ' '); // normalize
+      const data = String(f.result).replace(this.options.tokenSeparators, this.options.defaultTokenSeparator); // normalize
       this.setSearchQuery(data);
     });
     f.readAsText(file, 'utf-8');
@@ -410,7 +420,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     if (term.length === 0) {
       return query;
     }
-    const arr = term.split(SEPARATORS);
+    const arr = term.split(this.options.tokenSeparators);
     const last = arr[arr.length - 1];
     //filter to valid (non empty) entries
     const valid = Array.from(new Set(arr.map((a) => a.trim().toLowerCase()).filter((a) => a.length > 0)));
