@@ -51,10 +51,8 @@ paths:
       - $ref: '#/components/parameters/view'
     get:
       x-swagger-router-controller: tdp_core
-      operationId: sql.get_data_api
-      description: >-
-        execute the view and return the data the arguments depend on the
-        definition
+      operationId: sql.get_filtered_data
+      description: see the base version with additional filter possiblities
       tags:
         - db
       parameters:
@@ -67,13 +65,13 @@ paths:
           $ref: '#/components/responses/notAllowed'
         '404':
           $ref: '#/components/responses/notFound'
-  '/db/{database}/{view}/filter':
+  '/db/{database}/{view}.csv':
     parameters:
       - $ref: '#/components/parameters/database'
       - $ref: '#/components/parameters/view'
     get:
       x-swagger-router-controller: tdp_core
-      operationId: sql.get_filtered_data
+      operationId: sql.get_filtered_data_csv
       description: see the base version with additional filter possiblities
       tags:
         - db
@@ -82,7 +80,7 @@ paths:
         - $ref: '#/components/parameters/_assignids'
       responses:
         '200':
-          $ref: '#/components/responses/entries_generic'
+          $ref: '#/components/responses/csv'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -283,6 +281,12 @@ components:
             items:
               type: object
               additionalProperties: true
+    csv:
+      description: Successful response
+      content:
+        text/csv:
+          schema:
+            type: string
   schemas:
     database:
       type: string

@@ -49,7 +49,7 @@ def _gen():
     tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
-      # if database != u'bayer_biodb' or view != u'entrez_items_verify':
+      # if database != u'dummy' or view != u'b_items_verify':
       #  continue
       args = []
       for arg in dbview.arguments:
@@ -66,8 +66,20 @@ def _gen():
           arg_type = to_type(extra)
         args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values))
 
-      filters = set(dbview.filters.keys())
-      set.update(set(dbview.columns.keys()))
+      filters = set()
+
+      if 'where' in dbview.replacements or 'and_where' in dbview.replacements:
+        # filter possible
+        for k in dbview.filters.keys():
+          filters.add(k)
+        if not filters:
+          for k in dbview.columns.keys():
+            filters.add(k)
+
+      if 'agg_score' in dbview.replacements:
+        # score query magic handling
+        agg_score = connector.agg_score
+        args.append(dict(name='agg', type='string', as_list=False, enum=agg_score.valid_replacements.get('agg')))
 
       props = []
       for k, prop in dbview.columns.items():
@@ -92,6 +104,8 @@ def _gen():
         'filters': filters,
         'props': props
       }
+
+      _log.info('%s', (keys,))
 
       view_yaml = render_template_string(template, **keys)
       # _log.info(view_yaml)
