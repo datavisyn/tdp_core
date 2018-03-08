@@ -1,4 +1,5 @@
 import logging
+from werkzeug.datastructures import MultiDict
 
 _log = logging.getLogger(__name__)
 
@@ -71,8 +72,8 @@ def filter_logic(view, args):
   :param view:
   :return:
   """
-  processed_args = dict()
-  extra_args = dict()
+  processed_args = MultiDict()
+  extra_args = MultiDict()
   where_clause = {}
   for k, v in args.lists():
     if k.endswith('[]'):
@@ -80,7 +81,7 @@ def filter_logic(view, args):
     if k.startswith('filter_'):
       where_clause[k[7:]] = v  # remove filter_
     else:
-      processed_args[k] = v[0] if len(v) == 1 else v
+      processed_args.setlist(k, v)
 
   # handle special namedset4 filter types by resolve them and and the real ids as filter
   for k, v in where_clause.items():
@@ -110,7 +111,7 @@ def filter_logic(view, args):
       extra_args[kp] = v[0]
       operator = '='
     else:
-      extra_args[kp] = tuple(v)
+      extra_args.setlist(kp, list(v))
       operator = 'IN'
     # find the sub query to replace, can be injected for more complex filter operations based on the input
     sub_query = view.get_filter_subquery(k)
