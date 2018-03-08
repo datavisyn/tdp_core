@@ -2,6 +2,12 @@ openapi: 3.0.0
 tags:
   - name: db
     description: database api
+  - name: query_generic
+    description: generic queries
+  - name: query_score
+    description: score queries
+  - name: query_lookup
+    description: lookup queries
 paths:
   /db/:
     get:
@@ -55,6 +61,7 @@ paths:
       description: see the base version with additional filter possiblities
       tags:
         - db
+        - query_generic
       parameters:
         - $ref: '#/components/parameters/returnQuery'
         - $ref: '#/components/parameters/_assignids'
@@ -75,6 +82,7 @@ paths:
       description: see the base version with additional filter possiblities
       tags:
         - db
+        - query_generic
       parameters:
         - $ref: '#/components/parameters/returnQuery'
         - $ref: '#/components/parameters/_assignids'
@@ -97,29 +105,14 @@ paths:
         mapping
       tags:
         - db
+        - query_score
       parameters:
         - $ref: '#/components/parameters/returnQuery'
         - $ref: '#/components/parameters/_assignids'
-        - name: target
-          in: query
-          required: false
-          description: target idtype to map the resulting scores to
-          schema:
-            type: string
+        - $ref: '#/components/parameters/scoreTarget'
       responses:
         '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                title: ArrayOfRows
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                  additionalProperties: true
+          $ref: '#/components/responses/queryScore'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -134,6 +127,7 @@ paths:
       description: see the base version but returns just the number of results
       tags:
         - db
+        - query_generic
       responses:
         '200':
           $ref: '#/components/responses/queryCount'
@@ -151,20 +145,10 @@ paths:
       description: returns the description information of the given view
       tags:
         - db
+        - query_generic
       responses:
         '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                title: column description
-                type: object
-                properties:
-                  idType:
-                    type: string
-                    description: the IDType of resulting rows
-                  columns:
-                    $ref: '#/components/schemas/columns'
+          $ref: '#/components/responses/queryDesc'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -179,52 +163,15 @@ paths:
       description: lookups up the given query term using this view
       tags:
         - db
+        - query_lookup
       parameters:
         - $ref: '#/components/parameters/_assignids'
-        - name: query
-          in: query
-          required: true
-          description: the search string
-          schema:
-            type: string
-        - name: page
-          in: query
-          required: false
-          description: result page
-          schema:
-            type: integer
-            default: 0
-        - name: limit
-          in: query
-          required: false
-          description: number of results per page
-          schema:
-            type: integer
-            default: 30
+        - $ref: '#/components/parameters/lookupQuery'
+        - $ref: '#/components/parameters/lookupPage'
+        - $ref: '#/components/parameters/lookupLimit'
       responses:
         '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                title: column description
-                type: object
-                properties:
-                  more:
-                    type: boolean
-                    description: whether more results exists
-                  items:
-                    type: object
-                    properties:
-                      _id:
-                        type: integer
-                        description: the system wide unique id
-                      id:
-                        type: string
-                        description: the id of the found entry
-                      text:
-                        type: string
-                        description: label that matched the given query
+          $ref: '#/components/responses/queryLookup'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -261,7 +208,73 @@ components:
         default: false
       required: false
       allowEmptyValue: true
+    lookupQuery:
+      name: query
+      in: query
+      required: true
+      description: the search string
+      schema:
+        type: string
+    lookupPage:
+      name: page
+      in: query
+      required: false
+      description: result page
+      schema:
+        type: integer
+        default: 0
+    lookupLimit:
+      name: limit
+      in: query
+      required: false
+      description: number of results per page
+      schema:
+        type: integer
+        default: 30
+    scoreTarget:
+      name: target
+      in: query
+      required: false
+      description: target idtype to map the resulting scores to
+      schema:
+        type: string
   responses:
+    queryDesc:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            title: column description
+            type: object
+            properties:
+              idType:
+                type: string
+                description: the IDType of resulting rows
+              columns:
+                $ref: '#/components/schemas/columns'
+    queryLookup:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            title: column description
+            type: object
+            properties:
+              more:
+                type: boolean
+                description: whether more results exists
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: integer
+                    description: the system wide unique id
+                  id:
+                    type: string
+                    description: the id of the found entry
+                  text:
+                    type: string
+                    description: label that matched the given query
     queryCount:
       description: Successful response
       content:
@@ -271,6 +284,19 @@ components:
               - title: number of records
                 type: integer
               - $ref: '#/components/schemas/returnQueryResult'
+    queryScore:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            title: ArrayOfRows
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+              additionalProperties: true
     entries_generic:
       description: Successful response
       content:
@@ -301,6 +327,8 @@ components:
           type: array
           items:
             type: string
+        type:
+          type: string
         query:
           type: string
         columns:

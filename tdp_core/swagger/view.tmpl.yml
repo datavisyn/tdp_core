@@ -1,10 +1,12 @@
 openapi: 3.0.0
 paths:
+  {% if features.generic %}
   '/db/{{database}}/{{view}}':
     get:
       tags:
         - db
         - db_{{database}}
+        - query_generic
       parameters:
         - $ref: '#/components/parameters/returnQuery'
         {%- for arg in args %}
@@ -20,11 +22,14 @@ paths:
           $ref: '#/components/responses/notAllowed'
         '404':
           $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.csv %}
   '/db/{{database}}/{{view}}.csv':
     get:
       tags:
         - db
         - db_{{database}}
+        - query_generic
       parameters:
         {%- for arg in args %}
         - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
@@ -39,11 +44,14 @@ paths:
           $ref: '#/components/responses/notAllowed'
         '404':
           $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.count %}
   '/db/{{database}}/{{view}}/count':
     get:
       tags:
         - db
         - db_{{database}}
+        - query_generic
       parameters:
         - $ref: '#/components/parameters/returnQuery'
         {%- for arg in args %}
@@ -59,6 +67,65 @@ paths:
           $ref: '#/components/responses/notAllowed'
         '404':
           $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.desc %}
+  '/db/{{database}}/{{view}}/desc':
+    get:
+      tags:
+        - db
+        - db_{{database}}
+        - query_generic
+      responses:
+        '200':
+          $ref: '#/components/responses/queryDesc'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.lookup %}
+  '/db/{{database}}/{{view}}/lookup':
+    get:
+      tags:
+        - db
+        - db_{{database}}
+        - query_lookup
+      parameters:
+        - $ref: '#/components/parameters/lookupQuery'
+        - $ref: '#/components/parameters/lookupPage'
+        - $ref: '#/components/parameters/lookupLimit'
+      responses:
+        '200':
+          $ref: '#/components/responses/queryLookup'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.score %}
+  '/db/{{database}}/{{view}}/score':
+    get:
+      tags:
+        - db
+        - db_{{database}}
+        - query_score
+      parameters:
+        - $ref: '#/components/parameters/scoreTarget'
+        - $ref: '#/components/parameters/returnQuery'
+        {%- for arg in args %}
+        - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
+        {%- endfor %}
+        {%- for filter in filters %}
+        - $ref: '#/components/parameters/filter_{{database}}_{{view}}_filter_{{filter}}'
+        {%- endfor %}
+      responses:
+        '200':
+          $ref: '#/components/responses/queryScore'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  {%- endif %}
 
 
 components:

@@ -95,13 +95,24 @@ def _gen():
         if not any((p['name'] == 'id' for p in props)):
           props.append(dict(name='id', type='string'))
 
+      features = {
+        'generic': dbview.query_type in ['generic', 'helper'],
+        'desc': dbview.query_type in ['generic'],
+        'lookup': dbview.query_type in ['lookup'],
+        'count': dbview.query_type in ['generic'],
+        'csv': dbview.query_type in ['generic'],
+        'score': dbview.query_type in ['score']
+      }
+
       keys = {
         'database': database,
         'view': view,
+        'type': dbview.query_type,
         'description': dbview.description or '',
         'args': args,
         'empty': not args and not filters,
         'filters': filters,
+        'features': features,
         'props': props
       }
 
