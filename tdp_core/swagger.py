@@ -4,7 +4,6 @@ import logging
 from flask import render_template_string, render_template
 
 from phovea_server.ns import Namespace, Response
-from phovea_server.security import login_required
 from phovea_server.util import jsonify
 from . import db
 from .utils import secure_replacements
@@ -127,14 +126,12 @@ def _gen():
 
 
 @app.route('/swagger.yaml')
-@login_required
 def _generate_swagger_yml():
   from yaml import dump
   return Response(dump(_gen()), mimetype='text/vnd.yaml')
 
 
 @app.route('/swagger.json')
-@login_required
 def _generate_swagger_json():
   return jsonify(_gen())
 

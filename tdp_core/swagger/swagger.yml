@@ -10,7 +10,9 @@ tags:
     description: security relevant queries
 
 security:
+  - basicAuth: []
   - cookieAuth: []
+  - apiKeyAuth: []
 
 paths:
   '/../../login':
@@ -39,6 +41,12 @@ paths:
 
 components:
   securitySchemes:
+    basicAuth:
+      type: basic
+    apiKeyAuth:
+      type: apiKey
+      in: query
+      name: api_key
     cookieAuth:
       type: apiKey
       in: cookie
