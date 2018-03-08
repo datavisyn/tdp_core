@@ -60,19 +60,6 @@ def _formatter(view_name):
 
 
 @app.route('/<database>/<view_name>')
-@login_required
-def get_data_api(database, view_name):
-  view_name, format = _formatter(view_name)
-  if _return_query():
-    return jsonify(db.get_query(database, view_name, None, request.args))
-
-  r, view = db.get_data(database, view_name, None, request.args)
-
-  if _assign_ids(r, view):
-    r = db.assign_ids(r, view.idtype)
-  return format(r)
-
-
 @app.route('/<database>/<view_name>/filter')
 @login_required
 def get_filtered_data(database, view_name):
