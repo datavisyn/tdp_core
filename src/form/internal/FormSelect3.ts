@@ -5,7 +5,7 @@
 import AFormElement from './AFormElement';
 import {IFormParent} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
-import Select3, {ISelect3Item, ISelect3Options} from './Select3';
+import Select3, {IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
 
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
@@ -66,21 +66,40 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
   /**
    * Returns the selected value or if nothing found `null`
-   * @returns {string|{name: string, value: string, data: any}|null}
+   * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
    */
   get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[] {
-    const value = (<IdTextPair[]>this.select3.value);
-    if (this.desc.options.return === 'text') {
-      return value.map((v) => v.text)
-    } else if (this.desc.options.return === 'id') {
-      return value.map((v) => v.id)
-    } else {
-      return value.map((v) => {
-        return <any>{
-          id: v.id,
-          text: v.text
-        };
-      }) || null;
+    const value = (<IdTextPair[] | IdTextPair>this.select3.value);
+
+    switch (this.desc.options.return) {
+      case 'text':
+        if (Array.isArray(value) && value.length > 0) {
+          if (!this.multiple) {
+            return value[0].text;
+          } else {
+            return value.map((v) => v.text);
+          }
+        } else {
+          return (<ISelect3Item<IdTextPair>>value).text;
+        }
+      case 'id':
+        if (Array.isArray(value) && value.length > 0) {
+          if (!this.multiple) {
+            return value[0].id;
+          } else {
+            return value.map((v) => v.id);
+          }
+        } else {
+          return (<ISelect3Item<IdTextPair>>value).id;
+        }
+      default:
+        if (Array.isArray(value) && value.length > 0) {
+          if (!this.multiple) {
+            return <ISelect3Item<IdTextPair>>value[0];
+          }
+        }
+        // return single object or primitive, or the array, or null
+        return <(ISelect3Item<IdTextPair> | ISelect3Item<IdTextPair>[])>value || null;
     }
   }
 
@@ -98,7 +117,12 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
    * @param v If string then compares to the option value property. Otherwise compares the object reference.
    */
   set value(v: (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[]) {
-    this.select3.value = <any>v;
+    if (Array.isArray(v) && v.length > 0 && !this.multiple) {
+      this.select3.value = <any>v[0];
+    } else {
+      // set single object or primitive, or the array
+      this.select3.value = <any>v;
+    }
   }
 
   focus() {

@@ -145,7 +145,7 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
  * @param offset The offset of the matched substring
  * @returns {string} The replacement string
  */
-export function highlightMatch(match, p1, offset) {
+export function highlightMatch(match: string, p1: string, offset: number): string {
   return match !== '' ? `<mark>${p1}</mark>` : '';
 }
 

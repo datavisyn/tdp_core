@@ -40,8 +40,6 @@ export interface ISubSelect2Desc extends ISubDesc {
 
 export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
   type: FormElementType.SELECT3;
-  optionsData?: ISelectOptions|(() => ISelectOptions);
-  return?: 'text'|'id';
 }
 
 declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc|ISubSelect3Desc;
