@@ -405,6 +405,17 @@ export default class CompositeView extends EventHandler implements IView {
     }));
   }
 
+  updateLineUpStats() {
+    // propagate to all view instances, i.e lineups
+    this.children.forEach((d) => {
+      const i: any = d.instance;
+      // semi hack for provenance graph
+      if (typeof i.updateLineUpStats === 'function') {
+        i.updateLineUpStats();
+      }
+    });
+  }
+
 }
 
 class WrapperView implements ILayoutView {
