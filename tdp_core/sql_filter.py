@@ -111,7 +111,7 @@ def filter_logic(view, args):
       extra_args[kp] = v[0]
       operator = '='
     else:
-      extra_args[kp] = list(v)
+      extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
       operator = 'IN'
     # find the sub query to replace, can be injected for more complex filter operations based on the input
     sub_query = view.get_filter_subquery(k)
