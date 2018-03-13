@@ -546,7 +546,7 @@ export abstract class ARankingView extends AView {
   /**
    * Writes the number of total, selected and shown items in the parameter area
    */
-  private updateLineUpStats() {
+  updateLineUpStats() {
     const showStats = (total: number, selected = 0, shown = 0) => {
       const name = shown === 1 ? this.options.itemName : this.options.itemNamePlural;
       return `Showing ${shown} ${total > 0 ? `of ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} selected` : ''}`;

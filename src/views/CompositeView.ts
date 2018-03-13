@@ -405,6 +405,17 @@ export default class CompositeView extends EventHandler implements IView {
     }));
   }
 
+  updateLineUpStats() {
+    // propagate to all view instances, i.e lineups
+    this.children.forEach((d) => {
+      const i: any = d.instance;
+      // semi hack for provenance graph
+      if (typeof i.updateLineUpStats === 'function') {
+        i.updateLineUpStats();
+      }
+    });
+  }
+
 }
 
 class WrapperView implements ILayoutView {
@@ -425,7 +436,7 @@ class WrapperView implements ILayoutView {
     const parent = this.node.closest('section');
     const header = parent.querySelector('header');
     if (hideHeader) {
-      header.lastElementChild!.remove(); // remove the span
+      header.innerHTML = '';
     }
     header.insertAdjacentHTML('beforeend', `<div class="parameters form-inline"></div>`);
     return <HTMLElement>header.lastElementChild;
