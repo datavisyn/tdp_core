@@ -61,7 +61,7 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
     this.$node.node().appendChild(this.select3.node);
     this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);
-    })
+    });
   }
 
   /**
@@ -69,38 +69,15 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
    * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
    */
   get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[] {
-    const value = (<IdTextPair[] | IdTextPair>this.select3.value);
+    const returnValue = this.desc.options.return;
+    const returnFn = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
+    const value = <IdTextPair[]>this.select3.value;
 
-    switch (this.desc.options.return) {
-      case 'text':
-        if (Array.isArray(value) && value.length > 0) {
-          if (!this.multiple) {
-            return value[0].text;
-          } else {
-            return value.map((v) => v.text);
-          }
-        } else {
-          return (<ISelect3Item<IdTextPair>>value).text;
-        }
-      case 'id':
-        if (Array.isArray(value) && value.length > 0) {
-          if (!this.multiple) {
-            return value[0].id;
-          } else {
-            return value.map((v) => v.id);
-          }
-        } else {
-          return (<ISelect3Item<IdTextPair>>value).id;
-        }
-      default:
-        if (Array.isArray(value) && value.length > 0) {
-          if (!this.multiple) {
-            return <ISelect3Item<IdTextPair>>value[0];
-          }
-        }
-        // return single object or primitive, or the array, or null
-        return <(ISelect3Item<IdTextPair> | ISelect3Item<IdTextPair>[])>value || null;
+    if (!value || value.length === 0) {
+      return this.multiple ? [] : returnFn({id: '', text: ''});
     }
+    const data = value.map((d) => ({id: d.id, text: d.text})).map(returnFn);
+    return this.multiple ? data : data[0];
   }
 
   hasValue() {
