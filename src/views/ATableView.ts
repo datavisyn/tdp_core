@@ -85,9 +85,13 @@ export abstract class ATableView<T extends IRow> extends AView {
    */
   protected abstract loadRows(): Promise<T[]> | T[];
 
+  protected buildHook() {
+    // hook
+  }
 
   private build() {
     this.setBusy(true);
+    this.buildHook();
     return Promise.resolve(this.loadRows()).then((rows) => {
       this.renderTable(rows);
       this.setBusy(false);
@@ -115,7 +119,7 @@ export abstract class ATableView<T extends IRow> extends AView {
       }
       return av - bv;
     };
-    
+
     const sorter = (th: HTMLElement, i: number, sorter = text) => {
       return () => {
         const current = th.dataset.sort;
@@ -163,7 +167,12 @@ export abstract class ATableView<T extends IRow> extends AView {
     });
   }
 
+  protected renderHook(rows: T[]) {
+    // hook
+  }
+
   private renderTable(rows: T[]) {
+    this.renderHook(rows);
     const header = <HTMLTableRowElement>this.node.querySelector('thead tr');
     header.innerHTML = '';
     const keys = this.renderHeader(header, rows);
