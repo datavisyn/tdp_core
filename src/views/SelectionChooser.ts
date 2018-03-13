@@ -7,6 +7,7 @@ export interface ISelectionChooserOptions {
   readableIDType: IDTypeLike;
   label: string;
   appendOriginalLabel: boolean;
+  selectNewestByDefault: boolean;
 }
 
 /**
@@ -18,17 +19,23 @@ export default class SelectionChooser {
   private readonly readAble: IDType | null;
   readonly desc: IFormElementDesc;
   private readonly formID: string;
-  private readonly appendOriginalLabel: boolean;
+  private readonly options : Readonly<ISelectionChooserOptions> = {
+    appendOriginalLabel: true,
+    selectNewestByDefault: true,
+    readableIDType: null,
+    label: 'Show'
+  };
+  private currentOptions: { label: string, id: number, name: string }[];
 
   constructor(private readonly accessor: (id: string) => IFormElement, targetIDType?: IDTypeLike, options: Partial<ISelectionChooserOptions> = {}) {
+    Object.assign(this.options, options);
     this.target = targetIDType ? resolve(targetIDType) : null;
     this.readAble = options.readableIDType ? resolve(options.readableIDType) : null;
-    this.appendOriginalLabel = options.appendOriginalLabel == null ? true : options.appendOriginalLabel;
 
     this.formID = `forms.chooser.select.${this.target ? this.target.id : randomId(4)}`;
     this.desc = {
       type: FormElementType.SELECT,
-      label: options.label || 'Show',
+      label: this.options.label,
       id: this.formID,
       options: {
         optionsData: [],
@@ -73,7 +80,7 @@ export default class SelectionChooser {
     return this.updateItems(targetIds.map((id, i) => ({
       id,
       name: names[i],
-      label: labels ? (this.appendOriginalLabel ? `${labels[i]} (${names[i]})` : labels[i]) : names[i]
+      label: labels ? (this.options.appendOriginalLabel ? `${labels[i]} (${names[i]})` : labels[i]) : names[i]
     })), reuseOld);
   }
 
@@ -88,13 +95,23 @@ export default class SelectionChooser {
 
     let changed = true;
     // select last item from incoming `selection.range`
-    if (!reuseOld) {
-      element.value = options.filter((d) => d.value === items[items.length - 1].id.toString())[0];
+    if (this.options.selectNewestByDefault) {
+      // find the first newest entries
+      const newOne = options.find((d) => !this.currentOptions || this.currentOptions.every((e) => e.id !== d.data.id));
+      if (newOne) {
+        element.value = newOne;
+      } else {
+        element.value = options[options.length - 1];
+      }
+    } else if (!reuseOld) {
+      element.value = options[options.length - 1];
       // otherwise try to restore the backup
     } else if (bak !== null) {
       element.value = bak;
       changed = false;
     }
+
+    this.currentOptions = items;
 
     // just show if there is more than one
     element.setVisible(options.length > 1);
