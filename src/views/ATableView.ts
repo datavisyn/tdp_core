@@ -102,70 +102,6 @@ export abstract class ATableView<T extends IRow> extends AView {
       });
   }
 
-  private enableSort(header: HTMLElement, body: HTMLElement) {
-
-    const text = (a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase());
-    const number = (a: string, b: string) => {
-      const av = parseFloat(a);
-      const bv = parseFloat(b);
-      if (isNaN(av) && isNaN(bv)) {
-        return text(a, b);
-      }
-      if (isNaN(av)) {
-        return -1;
-      }
-      if (isNaN(bv)) {
-        return +1;
-      }
-      return av - bv;
-    };
-
-    const sorter = (th: HTMLElement, i: number, sorter = text) => {
-      return () => {
-        const current = th.dataset.sort;
-        const rows = <HTMLElement[]>Array.from(body.children);
-        const next = current === 'no' ? 'asc' : (current === 'asc' ? 'desc' : 'no');
-        th.dataset.sort = next;
-        switch (next) {
-          case 'no':
-            // natural order
-            rows.sort((a, b) => parseInt(a.dataset.i, 10) - parseInt(b.dataset.i, 10));
-            break;
-          case 'desc':
-            rows.sort((a, b) => {
-              const acol = a.children[i];
-              const bcol = b.children[i];
-              return -sorter(acol ? acol.textContent : '', bcol ? bcol.textContent : '');
-            });
-            break;
-          default:
-            rows.sort((a, b) => {
-              const acol = a.children[i];
-              const bcol = b.children[i];
-              return sorter(acol ? acol.textContent : '', bcol ? bcol.textContent : '');
-            });
-        }
-        // readd in ordered sequence
-        body.innerHTML = '';
-        rows.forEach((r) => body.appendChild(r));
-      };
-    };
-
-
-    Array.from(header.children).forEach((d: HTMLElement, i) => {
-      const sort = typeof this.options.sortable === 'function' ? this.options.sortable(d, i) : this.options.sortable;
-      if (!sort) {
-        return;
-      }
-      d.dataset.sort = 'no';
-      if (sort === 'number') {
-        d.dataset.num = '';
-        d.onclick = sorter(d, i, number);
-      } else if (sort) {
-        d.onclick = sorter(d, i);
-      }
-    });
-  }
 
   protected renderHook(rows: T[]) {
     // hook
@@ -178,7 +114,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const keys = this.renderHeader(header, rows);
     const body = <HTMLTableSectionElement>this.node.querySelector('tbody');
     if (this.options.sortable) {
-      this.enableSort(header, body);
+      enableSort(header, body, this.options.sortable);
     }
     body.innerHTML = '';
     rows.forEach((row, i) => {
@@ -207,6 +143,70 @@ export abstract class ATableView<T extends IRow> extends AView {
   private rebuildImpl() {
     return this.built = this.built.then(() => this.build());
   }
+}
+
+export function enableSort(this: void, header: HTMLElement, body: HTMLElement, sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string')) {
+  const text = (a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase());
+  const number = (a: string, b: string) => {
+    const av = parseFloat(a);
+    const bv = parseFloat(b);
+    if (isNaN(av) && isNaN(bv)) {
+      return text(a, b);
+    }
+    if (isNaN(av)) {
+      return -1;
+    }
+    if (isNaN(bv)) {
+      return +1;
+    }
+    return av - bv;
+  };
+
+  const sorter = (th: HTMLElement, i: number, sorter = text) => {
+    return () => {
+      const current = th.dataset.sort;
+      const rows = <HTMLElement[]>Array.from(body.children);
+      const next = current === 'no' ? 'asc' : (current === 'asc' ? 'desc' : 'no');
+      th.dataset.sort = next;
+      switch (next) {
+        case 'no':
+          // natural order
+          rows.sort((a, b) => parseInt(a.dataset.i, 10) - parseInt(b.dataset.i, 10));
+          break;
+        case 'desc':
+          rows.sort((a, b) => {
+            const acol = a.children[i];
+            const bcol = b.children[i];
+            return -sorter(acol ? acol.textContent : '', bcol ? bcol.textContent : '');
+          });
+          break;
+        default:
+          rows.sort((a, b) => {
+            const acol = a.children[i];
+            const bcol = b.children[i];
+            return sorter(acol ? acol.textContent : '', bcol ? bcol.textContent : '');
+          });
+      }
+      // readd in ordered sequence
+      body.innerHTML = '';
+      rows.forEach((r) => body.appendChild(r));
+    };
+  };
+
+
+  Array.from(header.children).forEach((d: HTMLElement, i) => {
+    const sort = typeof sortable === 'function' ? sortable(d, i) : sortable;
+    if (!sort) {
+      return;
+    }
+    d.dataset.sort = 'no';
+    if (sort === 'number') {
+      d.dataset.num = '';
+      d.onclick = sorter(d, i, number);
+    } else if (sort) {
+      d.onclick = sorter(d, i);
+    }
+  });
 }
 
 export default ATableView;
