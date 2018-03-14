@@ -162,12 +162,13 @@ export function enableSort(this: void, header: HTMLElement, body: HTMLElement, s
     return av - bv;
   };
 
-  const sorter = (th: HTMLElement, i: number, sorter = text) => {
+  const sorter = (th: HTMLElement, i: number) => {
     return () => {
       const current = th.dataset.sort;
       const rows = <HTMLElement[]>Array.from(body.children);
       const next = current === 'no' ? 'asc' : (current === 'asc' ? 'desc' : 'no');
       th.dataset.sort = next;
+      const sorter = th.dataset.num != null ? number : text;
       switch (next) {
         case 'no':
           // natural order
@@ -202,10 +203,8 @@ export function enableSort(this: void, header: HTMLElement, body: HTMLElement, s
     d.dataset.sort = 'no';
     if (sort === 'number') {
       d.dataset.num = '';
-      d.onclick = sorter(d, i, number);
-    } else if (sort) {
-      d.onclick = sorter(d, i);
     }
+    d.onclick = sorter(d, i);
   });
 }
 
