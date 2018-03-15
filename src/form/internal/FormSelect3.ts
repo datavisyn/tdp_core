@@ -90,12 +90,13 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
    */
   set value(v: (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[]) {
     const toIdTextPair = (d) => {
-      if (!d.id && !d.text) {
-        return {id: null, text: null};
-      }
-      return {
-        id: d.id ? d.id : d.text,
-        text: d.text ? d.text : d.id
+      if (typeof d === 'string') {
+        return {id: d, text: d};
+      } else {
+        return {
+          id: d.id ? d.id : d.text,
+          text: d.text ? d.text : d.id
+        }
       }
     };
 
@@ -104,8 +105,9 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
       return;
     }
 
+    this.previousValue = this.select3.value;
     if (Array.isArray(v) && v.length > 0 && !this.multiple) { // an array of items or string (id or text)
-      this.select3.value = v.slice(0).map(toIdTextPair);
+      this.select3.value = v.slice(0, 1).map(toIdTextPair);
     } else if (Array.isArray(v) && v.length > 0 && this.multiple) {
       this.select3.value = v.map(toIdTextPair);
     } else if (!Array.isArray(v)) { // an item or string (id or text)
