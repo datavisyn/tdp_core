@@ -466,6 +466,10 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
       term: last
     };
   }
+
+  focus() {
+    this.$select.select2('open');
+  }
 }
 
 

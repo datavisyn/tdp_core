@@ -103,6 +103,6 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
   }
 
   focus() {
+    this.select3.focus();
   }
-
 }
