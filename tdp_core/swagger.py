@@ -1,8 +1,8 @@
 import json
 import logging
 
-from flask import render_template_string, render_template
-
+from flask import render_template
+from jinja2 import Template
 from phovea_server.ns import Namespace, Response
 from phovea_server.util import jsonify
 from . import db
@@ -27,7 +27,7 @@ def _gen():
   base = yaml_load(files)
 
   with io.open(path.join(here, 'swagger', 'view.tmpl.yml'), 'r', encoding='utf-8') as f:
-    template = unicode(f.read())
+    template = Template(unicode(f.read()))
 
   tags = base['tags']
 
@@ -115,9 +115,7 @@ def _gen():
         'props': props
       }
 
-      _log.info('%s', (keys,))
-
-      view_yaml = render_template_string(template, **keys)
+      view_yaml = template.render(**keys)
       # _log.info(view_yaml)
       part = safe_load(view_yaml)
       base = data_merge(base, part)

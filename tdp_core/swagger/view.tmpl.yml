@@ -126,7 +126,7 @@ components:
   parameters: {% if empty %}{}{% endif %}
     {%- for arg in args %}
     'arg_{{database}}_{{view}}_{{arg.name}}':
-      name: {{arg.name}}
+      name: '{{arg.name}}'
       required: true
       in: query
       schema:
@@ -139,7 +139,7 @@ components:
         {%- endif %}
         {% if arg.enum %}
         enum:
-          {% for e in arg.enum %}- {{e}}
+          {% for e in arg.enum %}- '{% if e.name %}{{e.name}}{% else %}{{e}}{% endif %}'
           {% endfor %}
       {%- endif %}
     {%- endfor %}
@@ -172,11 +172,11 @@ components:
       type: object
       properties:
       {%- for prop in props %}
-        {{prop.name}}:
+        '{{prop.name}}':
           type: {{prop.type}}
           {% if prop.categories %}
           enum:
-            {% for e in prop.categories %}- {{e}}
+            {% for e in prop.categories %}- '{% if e.name %}{{e.name}}{% else %}{{e}}{% endif %}'
             {% endfor %}
           {%- endif %}
           {% if prop.min %}
