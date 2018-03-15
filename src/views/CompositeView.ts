@@ -21,6 +21,7 @@ import {
   verticalStackedLineUp,
   view, ViewBuilder
 } from 'phovea_ui/src/layout/builder';
+import {LayoutContainerEvents} from '../../../phovea_ui/src/layout/interfaces';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 
@@ -219,16 +220,19 @@ export default class CompositeView extends EventHandler implements IView {
         });
       });
 
+      const resizedAfterUpdate = debounce(() => this.children.forEach((c) => c.resized()));
+
       if (this.children.length === 1) {
         const first = this.children[0];
         this.root.root = this.root.build(view(first).name(first.key).fixed());
+        this.root.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, resizedAfterUpdate);
         this.setBusy(false);
         return;
       }
 
       const views = new Map(this.children.map((d) => <[string, ViewBuilder]>[d.key, view(d).name(d.key).fixed()]));
       this.buildLayout(views, this.children.map((d) => d.key));
-      this.setBusy(false);
+      this.root.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, resizedAfterUpdate);
     });
   }
 
@@ -460,7 +464,7 @@ class WrapperView implements ILayoutView {
   }
 
   resized() {
-    if (this.visible && this.instance && typeof (<any>this.instance).update === 'function') {
+    if (this.visible && this.instance && typeof (<any>this.instance).update === 'function' && this.node.getBoundingClientRect().width > 0) {
       (<any>this.instance!).update();
     }
   }
