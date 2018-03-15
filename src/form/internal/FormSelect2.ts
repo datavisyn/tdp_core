@@ -79,7 +79,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
 
   private readonly listener = () => {
     this.fire(FormSelect2.EVENT_CHANGE, this.value, this.$select);
-  }
+  };
 
   /**
    * Constructor

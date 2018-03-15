@@ -53,7 +53,7 @@ export default class FormDialog extends Dialog {
   }
 
   /**
-   * utility to show this dialog and resolve as soon it has been been submited
+   * utility to show this dialog and resolve as soon it has been been submitted
    * @param {(builder: FormBuilder) => T} processData converter from a form builder to the output format
    * @returns {Promise<T>}
    */
