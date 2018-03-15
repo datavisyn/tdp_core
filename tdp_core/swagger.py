@@ -48,6 +48,8 @@ def _gen():
     tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
+      if not dbview.can_access():
+        continue
       # if database != u'dummy' or view != u'b_items_verify':
       #  continue
       args = []

@@ -130,14 +130,7 @@ def get_count_data(database, view_name):
 @login_required
 def get_desc(database, view_name):
   view_name, _ = _formatter(view_name)
-  config, _ = db.resolve(database)
-  # convert to index lookup
-  # row id start with 1
-  if view_name not in config.views:
-    abort(404)
-
-  view = config.views[view_name]
-
+  config, _, view = db.resolve_view(database, view_name)
   return jsonify(dict(idType=view.idtype, columns=view.columns.values()))
 
 
