@@ -207,7 +207,6 @@ components:
         type: boolean
         default: false
       required: false
-      allowEmptyValue: true
     lookupQuery:
       name: query
       in: query

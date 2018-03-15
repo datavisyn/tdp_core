@@ -37,7 +37,12 @@ def _assign_ids(r, view):
 
 
 def _return_query():
-  return request.args.get('_return_query', False)
+  # return true if the key is given and the value doesn't start with 'f' -> no value, true, True, T
+  key = '_return_query'
+  if key not in request.args:
+    return False
+  v = request.args[key]
+  return not v or v.lower()[0] != 'f'
 
 
 def _format_csv(array_of_dicts):
