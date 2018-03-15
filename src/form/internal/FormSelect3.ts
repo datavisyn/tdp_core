@@ -81,12 +81,7 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
   }
 
   hasValue() {
-    const v = this.value;
-    if (this.multiple) {
-      return (<IdTextPair[]>v).length > 0;
-    } else {
-      return v !== '' || (<any>v).id !== '';
-    }
+    return this.select3.value.length > 0;
   }
 
   /**
@@ -94,11 +89,27 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
    * @param v If string then compares to the option value property. Otherwise compares the object reference.
    */
   set value(v: (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[]) {
-    if (Array.isArray(v) && v.length > 0 && !this.multiple) {
-      this.select3.value = <any>v[0];
-    } else {
-      // set single object or primitive, or the array
-      this.select3.value = <any>v;
+    const toIdTextPair = (d) => {
+      if (!d.id && !d.text) {
+        return {};
+      }
+      return {
+        id: d.id ? d.id : d.text,
+        text: d.text ? d.text : d.id
+      }
+    };
+
+    if (!v) {
+      this.select3.value = this.previousValue = [];
+      return;
+    }
+
+    if (Array.isArray(v) && v.length > 0 && !this.multiple) { // an array of items or string (id or text)
+      this.select3.value = <any>toIdTextPair(v)
+    } else if (Array.isArray(v) && v.length > 0 && this.multiple) {
+      this.select3.value = <any>v.map(toIdTextPair);
+    } else if (!Array.isArray(v)) { // an item or string (id or text)
+      this.select3.value = <any>toIdTextPair(v);
     }
   }
 
