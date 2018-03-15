@@ -9,7 +9,8 @@ import {
   ISplitLayoutContainer,
   ITabbingLayoutContainer,
   IView as ILayoutView,
-  IViewLayoutContainer
+  IViewLayoutContainer,
+  LayoutContainerEvents
 } from 'phovea_ui/src/layout';
 import {
   horizontalSplit,
@@ -21,7 +22,6 @@ import {
   verticalStackedLineUp,
   view, ViewBuilder
 } from 'phovea_ui/src/layout/builder';
-import {LayoutContainerEvents} from '../../../phovea_ui/src/layout/interfaces';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 
