@@ -266,6 +266,12 @@ export interface IViewPluginDesc extends IPluginDesc {
    * as an alternative an help text shown as pop up
    */
   helpText?: string;
+
+  /**
+   * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
+   * @default false
+   */
+  securityNotAllowedText?: string | boolean;
 }
 
 export interface IViewPlugin {

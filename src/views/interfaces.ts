@@ -16,6 +16,7 @@ export function toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
   const r: any = p;
   r.selection = r.selection || 'none';
   r.group = Object.assign({name: 'Other', order: 99}, r.group);
+  r.securityNotAllowedText = r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
 
   // common typo
   if (r.idType !== undefined) {
