@@ -11,6 +11,8 @@ export interface IATableViewOptions {
   bordered: boolean;
   condensed: boolean;
   sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string');
+  exportable?: boolean;
+  exportSeparator?: string;
 }
 
 /**
@@ -23,7 +25,9 @@ export abstract class ATableView<T extends IRow> extends AView {
     stripedRows: false,
     bordered: false,
     condensed: false,
-    sortable: true
+    sortable: true,
+    exportable: false,
+    exportSeparator: ';'
   };
 
   /**
@@ -94,6 +98,9 @@ export abstract class ATableView<T extends IRow> extends AView {
     this.buildHook();
     return Promise.resolve(this.loadRows()).then((rows) => {
       this.renderTable(rows);
+      if (this.options.exportable) {
+        this.enableExport();
+      }
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
@@ -142,6 +149,21 @@ export abstract class ATableView<T extends IRow> extends AView {
 
   private rebuildImpl() {
     return this.built = this.built.then(() => this.build());
+  }
+
+  /**
+   * Add icon to export HTML Table content to the most right column in the table header.
+   */
+  private enableExport() {
+    const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
+    (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
+    rightTableHeader.insertAdjacentHTML('beforeend',
+      `<a href="#" title="Download Table as CSV"><i class="fa fa-download"></i></a>`);
+    (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      exportHtmlTableContent(this.node.ownerDocument, (<HTMLElement>this.node.querySelector('table')), this.options.exportSeparator, this.context.desc.name);
+    };
   }
 }
 
@@ -206,6 +228,37 @@ export function enableSort(this: void, header: HTMLElement, body: HTMLElement, s
     }
     d.onclick = sorter(d, i);
   });
+}
+
+/**
+ * Download the HTML Table content.
+ */
+function exportHtmlTableContent(document: Document, tableRoot: HTMLElement, separator: string, name: string) {
+  const content = parseHtmlTableContent(tableRoot, separator);
+  const downloadLink = document.createElement('a');
+  const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
+  downloadLink.href = URL.createObjectURL(blob);
+  (<any>downloadLink).download = `${name}.csv`;
+
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+}
+
+/**
+ * Parse HTML Table header and body content.
+ * @returns {string} The table content in csv format
+ */
+function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
+  const headerContent = Array.from(tableRoot.querySelectorAll('thead > tr > th'))
+    .map((d) => (<HTMLTableHeaderCellElement>d).innerText).join(separator);
+  const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'));
+  const bodyContent = bodyRows.map((row: HTMLTableRowElement) => {
+    return Array.from(row.children)
+      .map((d) => (<HTMLTableDataCellElement>d).innerText).join(separator);
+  }).join('\n');
+  const content = `${headerContent}\n${bodyContent}`;
+  return content;
 }
 
 export default ATableView;
