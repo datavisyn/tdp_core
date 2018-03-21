@@ -19,12 +19,12 @@
       }
     }
 
-    &:last-child {
+    &[data-export] {
       &::before {
         margin-right: 1.5em;
       }
 
-      .download {
+      a {
         position: absolute;
         right: 0.5em;
       }
