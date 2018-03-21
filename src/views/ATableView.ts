@@ -161,7 +161,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     (<HTMLElement>this.node.querySelector('.download'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
-      exportHtmlTableContent(this.node.ownerDocument, this.node, this.options.exportSeparator);
+      exportHtmlTableContent(this.node.ownerDocument, (<HTMLElement>this.node.querySelector('.table')), this.options.exportSeparator);
     };
   }
 }
@@ -249,9 +249,9 @@ function exportHtmlTableContent(document: Document, tableRoot: HTMLElement, sepa
  * @returns {string} The table content in csv format
  */
 function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
-  const headerContent = Array.from(tableRoot.querySelectorAll('.table > thead > tr > th'))
+  const headerContent = Array.from(tableRoot.querySelectorAll('thead > tr > th'))
     .map((d) => (<HTMLTableHeaderCellElement>d).innerText).join(separator);
-  const bodyRows = Array.from(tableRoot.querySelectorAll('.table > tbody > tr'));
+  const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'));
   const bodyContent = bodyRows.map((row: HTMLTableRowElement) => {
     return Array.from(row.querySelectorAll('td'))
       .map((d) => (<HTMLTableDataCellElement>d).innerText).join(separator);
