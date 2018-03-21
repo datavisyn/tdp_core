@@ -287,6 +287,12 @@ export default class CompositeView extends EventHandler implements IView {
     });
   }
 
+  update() {
+    if (this.root) {
+      this.root.resized();
+    }
+  }
+
   get itemIDType() {
     if (this.children.length === 0 || !this.setup) {
       return null;
