@@ -19,6 +19,17 @@
       }
     }
 
+    &:last-child {
+      &::before {
+        margin-right: 1.5em;
+      }
+
+      .download {
+        position: absolute;
+        right: 0.5em;
+      }
+    }
+
     &[data-sort=asc]::before {
       content: $fa-var-sort-asc;
     }
