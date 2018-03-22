@@ -64,10 +64,16 @@ export abstract class AView extends EventHandler implements IView {
 
   /**
    * helper to marks this view busy showing a loading icon
-   * @param {boolean} busy
+   * @param {boolean} value
+   * @param {boolean|string} busyMessage optional loading message hint
    */
-  protected setBusy(busy: boolean) {
-    this.node.classList.toggle('tdp-busy', busy);
+  protected setBusy(value: boolean, busyMessage?: string | boolean) {
+    this.node.classList.toggle('tdp-busy', value);
+    if (!value || !busyMessage) {
+      delete this.node.dataset.busy;
+    } else if (busyMessage) {
+      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : 'Preparing awesome stuff for you...';
+    }
   }
 
   /*final*/

@@ -90,6 +90,16 @@ li[data-header=optionsLink] {
     z-index: 9;
   }
 
+  &[data-busy]::after {
+    position: absolute;
+    top: 1em;
+    left: 1em;
+    right: 1em;
+    text-align: center;
+    content: attr(data-busy);
+    z-index: 10;
+  }
+
   > * {
     display: none !important;
   }
