@@ -57,6 +57,7 @@ def _format_csv(array_of_dicts):
   d.to_csv(out, sep='\t', encoding='utf-8', index=False)
   return Response(out.getvalue(), mimetype='text/csv')
 
+
 def _format_json(obj):
   from phovea_server.ns import Response
   import json
