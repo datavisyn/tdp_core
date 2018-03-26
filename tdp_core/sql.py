@@ -58,9 +58,9 @@ def _format_csv(array_of_dicts):
   return Response(out.getvalue(), mimetype='text/csv')
 
 def _format_json(obj):
-  from flask import Response
+  from phovea_server.ns import Response
   import json
-  return Response(json.dumps(obj), mimetype='application/json; charset=utf-8')
+  return Response(json.dumps(obj, ensure_ascii=False), mimetype='application/json; charset=utf-8')
 
 
 def _formatter(view_name):
