@@ -76,6 +76,15 @@ export abstract class AView extends EventHandler implements IView {
     }
   }
 
+  protected setHint(visible: boolean, hintMessage?: string) {
+    const defaultHintMessage = `No data found for the given ${this.selection.idtype.name}`;
+    if (!visible) {
+      delete this.node.dataset.hint;
+    } else {
+      this.node.dataset.hint = hintMessage ? hintMessage : defaultHintMessage;
+    }
+  }
+
   /*final*/
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     this.params = this.buildParameterForm(params, onParameterChange);
