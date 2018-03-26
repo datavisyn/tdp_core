@@ -271,7 +271,7 @@ export default class LineUpPanelActions extends EventHandler {
     const ordinoScores: IPluginDesc[] = await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
     const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
-    const metaDataPluginPromises: Promise<ISearchOption>[] = metaDataPluginDescs
+    const metaDataPluginPromises: Promise<{text: string, children: ISearchOption[]}>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
         .then((loadedPlugin: IPlugin) => loadedPlugin.factory(plugin))
         .then((scores: IScoreLoader[]) => {
@@ -344,7 +344,6 @@ export default class LineUpPanelActions extends EventHandler {
 
   private buildMetaDataDescriptions(desc: IScoreLoaderExtensionDesc, columns: IScoreLoader[]) {
     return {
-      id: desc.id,
       text: desc.name,
       children: columns.map((plugin) => {
         return {
