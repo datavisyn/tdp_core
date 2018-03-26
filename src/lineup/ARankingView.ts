@@ -60,7 +60,7 @@ export interface IARankingViewOptions {
   /**
    * additional attributes for stored named sets
    */
-  subType: { key: string, value: string };
+  subType: {key: string, value: string};
 
   /**
    * enable taggle overview mode switcher
@@ -87,7 +87,7 @@ export interface IARankingViewOptions {
    */
   enableStripedBackground: boolean;
 
-  itemRowHeight: number|((row: any, index: number) => number)|null;
+  itemRowHeight: number | ((row: any, index: number) => number) | null;
 
   customOptions: Partial<ILineUpConfig>;
 }
@@ -207,7 +207,7 @@ export abstract class ARankingView extends AView {
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
       (<any>config.body).rowHeight = this.options.itemRowHeight;
-    } else if (typeof this.options.itemRowHeight === 'function' ) {
+    } else if (typeof this.options.itemRowHeight === 'function') {
       const f = this.options.itemRowHeight;
       (<any>config.body).dynamicHeight = () => ({
         defaultHeight: 20,
@@ -258,7 +258,7 @@ export abstract class ARankingView extends AView {
     this.selectionAdapter = this.createSelectionAdapter();
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return resolveImmediately(super.init(params, onParameterChange)).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
@@ -296,20 +296,20 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
 
-  protected parameterChanged(name: string): PromiseLike<any>|void {
+  protected parameterChanged(name: string): PromiseLike<any> | void {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
       return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
     }
   }
 
-  protected itemSelectionChanged(): PromiseLike<any>|void {
+  protected itemSelectionChanged(): PromiseLike<any> | void {
     this.selectionHelper.setItemSelection(this.getItemSelection());
     this.updateLineUpStats();
     super.itemSelectionChanged();
   }
 
-  protected selectionChanged(): PromiseLike<any>|void {
+  protected selectionChanged(): PromiseLike<any> | void {
     if (this.selectionAdapter) {
       return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
     }
@@ -399,7 +399,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
     colDesc.color = this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();

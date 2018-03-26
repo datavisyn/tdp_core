@@ -10,7 +10,7 @@ export default class PhoveaDataAdapter {
   private readonly data: Promise<ITable>;
 
   constructor(private readonly datasetId: string) {
-    this.data = get(datasetId);
+    this.data = <any>get(datasetId);
   }
 
   async getDesc(): Promise<IViewDescription> {
