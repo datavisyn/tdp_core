@@ -57,10 +57,17 @@ def _format_csv(array_of_dicts):
   d.to_csv(out, sep='\t', encoding='utf-8', index=False)
   return Response(out.getvalue(), mimetype='text/csv')
 
+def _format_json(obj):
+  from flask import Response
+  import json
+  return Response(json.dumps(obj), mimetype='application/json; charset=utf-8')
+
 
 def _formatter(view_name):
   if view_name.endswith('.csv'):
     return view_name[:-4], _format_csv
+  elif view_name.endswith('.json'):
+    return view_name[:-5], _format_json
   return view_name, jsonify
 
 
