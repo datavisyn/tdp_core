@@ -9,6 +9,7 @@ import FormMap from './FormMap';
 import FormButton from './FormButton';
 import FormCheckBox from './FormCheckBox';
 import FormSelect3 from './FormSelect3';
+import FormRadio from './FormRadio';
 
 
 export function create(parent: IFormParent, $parent: d3.Selection<any>, desc: IFormElementDesc) {
@@ -31,6 +32,8 @@ export function create(parent: IFormParent, $parent: d3.Selection<any>, desc: IF
       return new FormButton(parent, $parent, <any>desc);
     case FormElementType.CHECKBOX:
       return new FormCheckBox(parent, $parent, <any>desc);
+    case FormElementType.RADIO:
+      return new FormRadio(parent, $parent, <any>desc);
     default:
       throw new Error('unknown form element type: ' + desc.type);
   }
