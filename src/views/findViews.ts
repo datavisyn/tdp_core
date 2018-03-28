@@ -52,8 +52,8 @@ export default function findViews(idType: IDType, selection: Range): Promise<IDi
   });
 }
 
-export function findAllViews(): Promise<IDiscoveredView[]> {
-  return findViewBase(null, listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
+export function findAllViews(idType?: IDType): Promise<IDiscoveredView[]> {
+  return findViewBase(idType || null, listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
     return r.map(toViewPluginDesc).map((v) => {
       const access = canAccess(v);
       const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
