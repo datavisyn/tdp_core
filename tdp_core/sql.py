@@ -58,17 +58,15 @@ def _format_csv(array_of_dicts):
   return Response(out.getvalue(), mimetype='text/csv')
 
 
-def _format_json(obj):
-  from phovea_server.ns import Response
-  import json
-  return Response(json.dumps(obj, ensure_ascii=False), mimetype='application/json; charset=utf-8')
+def _format_json_decimal(obj):
+  return jsonify(obj, use_decimal=True)
 
 
 def _formatter(view_name):
   if view_name.endswith('.csv'):
     return view_name[:-4], _format_csv
   elif view_name.endswith('.json'):
-    return view_name[:-5], _format_json
+    return view_name[:-5], _format_json_decimal
   return view_name, jsonify
 
 
