@@ -33,3 +33,7 @@ export function fromNow(date: Date | number) {
   }
   return 'far far away';
 }
+
+export function notAllowedText(notAllowed: boolean | string) {
+  return (typeof notAllowed === 'string' ? notAllowed : 'Not Allowed, please contact your system administrator');
+}
