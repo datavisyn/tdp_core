@@ -18,7 +18,10 @@ import {canAccess} from '../views/findViews';
 import {notAllowedText} from '../internal/utils';
 import {lazyDialogModule} from '../dialogs';
 import {createContext, isSameSelection, matchLength} from '../views/interfaces';
+import {AView} from '../views/AView';
 import {resolveImmediately} from 'phovea_core/src';
+import {none} from 'phovea_core/src/range';
+import {IDType, resolve} from 'phovea_core/src/idtype';
 import {setParameter} from '../internal/cmds';
 
 
@@ -163,12 +166,12 @@ export default class DetailView extends EventHandler implements IViewProvider {
     if (this.selection) {
       return this.selection.idtype === idType;
     }
-    const p = this.desc;
+    const p = this.plugin;
     return (p.idtype ? new RegExp(p.idtype) : /.*/).test(idType.id);
   }
 
   get idType() {
-    return this.selection && this.selection.idtype ? this.selection.idtype : guessIDType(this.desc); // TODO
+    return this.selection && this.selection.idtype ? this.selection.idtype : guessIDType(this.plugin); // TODO
   }
 
   private destroyInstance() {
@@ -284,4 +287,8 @@ function selectionText(selection: any, idType: string) {
       console.error('unknown selector: ', selection, idType);
       return `Unknown selector: ${selection}`;
   }
+}
+
+export function guessIDType(v: IViewPluginDesc): IDType | null {
+  return v.idtype.includes('*') ? null : resolve(v.idtype);
 }
