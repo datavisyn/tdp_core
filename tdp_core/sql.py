@@ -59,7 +59,7 @@ def _format_csv(array_of_dicts):
 
 
 def _format_json_decimal(obj):
-  return jsonify(obj, use_decimal=True)
+  return jsonify(obj, double_precision=15)
 
 
 def _formatter(view_name):
