@@ -5,12 +5,22 @@ import {IRow} from '../rest';
 import {ISelection, IViewContext} from '../views';
 import {AView} from './AView';
 
-export interface IATableViewOptions {
+export interface ISortItem<T> {
+  node: HTMLElement;
+  row: T;
+  index: number;
+}
+
+export interface ISorter<T> {
+  (a: ISortItem<T>, b: ISortItem<T>): number;
+}
+
+export interface IATableViewOptions<T> {
   selectAble: boolean;
   stripedRows: boolean;
   bordered: boolean;
   condensed: boolean;
-  sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string');
+  sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>);
   exportable?: boolean;
   exportSeparator?: string;
 }
@@ -20,7 +30,7 @@ export interface IATableViewOptions {
  */
 export abstract class ATableView<T extends IRow> extends AView {
 
-  private readonly options: Readonly<IATableViewOptions> = {
+  private readonly options: Readonly<IATableViewOptions<T>> = {
     selectAble: true,
     stripedRows: false,
     bordered: false,
@@ -48,7 +58,7 @@ export abstract class ATableView<T extends IRow> extends AView {
    */
   protected built: Promise<any> = null;
 
-  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IATableViewOptions> = {}) {
+  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IATableViewOptions<T>> = {}) {
     super(context, selection, parent);
     Object.assign(this.options, options);
 
@@ -76,12 +86,12 @@ export abstract class ATableView<T extends IRow> extends AView {
     const keys = <(keyof T)[]>Object.keys(rows[0]).filter((d) => d !== 'id' && d !== '_id').sort();
     tr.innerHTML = keys.map((key) => `<th>${key}</th>`).join('');
     return keys;
-  };
+  }
 
   protected renderRow(tr: HTMLTableRowElement, row: T, index: number, keys: (keyof T)[]) {
     tr.dataset.id = row._id.toString();
     tr.innerHTML = keys.map((key) => `<td>${row[key]}</td>`).join('');
-  };
+  }
 
   /**
    * load the rows of LineUp
@@ -126,6 +136,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     body.innerHTML = '';
     rows.forEach((row, i) => {
       const tr = body.insertRow();
+      (<any>tr).__data__ = row;
       tr.dataset.i = String(i);
       this.renderRow(tr, row, i, keys);
       if (this.options.selectAble && this.itemIDType) {
@@ -167,48 +178,52 @@ export abstract class ATableView<T extends IRow> extends AView {
   }
 }
 
-export function enableSort(this: void, header: HTMLElement, body: HTMLElement, sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string')) {
-  const text = (a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase());
-  const number = (a: string, b: string) => {
-    const av = parseFloat(a);
-    const bv = parseFloat(b);
+export function enableSort<T>(this: void, header: HTMLElement, body: HTMLElement, sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>)) {
+  const text: ISorter<any> = ({node: a}, {node: b}) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
+  const number: ISorter<any> = ({node: a}, {node: b}) => {
+    const av = parseFloat(a.textContent);
+    const bv = parseFloat(b.textContent);
     if (isNaN(av) && isNaN(bv)) {
-      return text(a, b);
+      return a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
     }
     if (isNaN(av)) {
-      return -1;
+      return +1;
     }
     if (isNaN(bv)) {
-      return +1;
+      return -1;
     }
     return av - bv;
   };
 
-  const sorter = (th: HTMLElement, i: number) => {
+  const sorter = (th: HTMLElement, i: number, sortFunction?: ISorter<T>) => {
     return () => {
       const current = th.dataset.sort;
       const rows = <HTMLElement[]>Array.from(body.children);
       const next = current === 'no' ? 'asc' : (current === 'asc' ? 'desc' : 'no');
       th.dataset.sort = next;
-      const sorter = th.dataset.num != null ? number : text;
+      const sorter = sortFunction ? sortFunction : (th.dataset.num != null ? number : text);
+      const sort = (a: HTMLElement, b: HTMLElement) => {
+        const acol = <HTMLElement>a.children[i];
+        const bcol = <HTMLElement>b.children[i];
+        if (!acol) {
+          return bcol ? +1 : 0;
+        }
+        if (!bcol) {
+          return -1;
+        }
+        return sorter({node: acol, row: (<any>a).__data__, index: i}, {node: bcol, row: (<any>b).__data__, index: i});
+      };
+
       switch (next) {
         case 'no':
           // natural order
           rows.sort((a, b) => parseInt(a.dataset.i, 10) - parseInt(b.dataset.i, 10));
           break;
         case 'desc':
-          rows.sort((a, b) => {
-            const acol = a.children[i];
-            const bcol = b.children[i];
-            return -sorter(acol ? acol.textContent : '', bcol ? bcol.textContent : '');
-          });
+          rows.sort((a, b) => -sort(a, b));
           break;
         default:
-          rows.sort((a, b) => {
-            const acol = a.children[i];
-            const bcol = b.children[i];
-            return sorter(acol ? acol.textContent : '', bcol ? bcol.textContent : '');
-          });
+          rows.sort(sort);
       }
       // readd in ordered sequence
       body.innerHTML = '';
@@ -226,7 +241,7 @@ export function enableSort(this: void, header: HTMLElement, body: HTMLElement, s
     if (sort === 'number') {
       d.dataset.num = '';
     }
-    d.onclick = sorter(d, i);
+    d.onclick = sorter(d, i, typeof sort === 'function' ? sort : null);
   });
 }
 
