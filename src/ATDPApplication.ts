@@ -97,7 +97,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     const loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
-      loginForm: this.options.loginForm
+      loginForm: this.options.loginForm,
+      watch: true
     });
     loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
       // reopen after logged out
