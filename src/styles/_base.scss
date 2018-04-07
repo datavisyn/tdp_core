@@ -1,7 +1,8 @@
 @import '~phovea_ui/src/fonts/yantramanav';
 @import './vars';
 
-body, html {
+body,
+html {
   font-family: Yantramanav, 'Helvetica Neue', Helvetica, sans-serif;
   font-weight: 400;
 }
@@ -29,6 +30,7 @@ b,
 /**
  * Hide options menu
  */
+
 li[data-header=optionsLink] {
   display: none;
 }
@@ -78,7 +80,8 @@ li[data-header=optionsLink] {
   }
 }
 
-.#{$tdp-css-prefix}-busy {
+.#{$tdp-css-prefix}-busy,
+.#{$tdp-css-prefix}-busy-overlay {
   &::before {
     position: absolute;
     top: 0;
@@ -99,8 +102,12 @@ li[data-header=optionsLink] {
     content: attr(data-busy);
     z-index: 10;
   }
+}
 
-  > * {
-    display: none !important;
-  }
+.#{$tdp-css-prefix}-busy > * {
+  display: none !important;
+}
+
+.#{$tdp-css-prefix}-busy-overlay > * {
+  visibility: hidden !important;
 }
