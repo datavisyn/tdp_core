@@ -19,6 +19,12 @@
   }
 }
 
+.parameters.form-inline {
+  div > label.radio-inline {
+    padding-left: 30px;
+  }
+}
+
 .select.map-selector option:disabled {
   color: darkgray;
 }

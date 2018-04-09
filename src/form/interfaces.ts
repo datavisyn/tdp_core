@@ -51,7 +51,12 @@ export enum FormElementType {
      * a checkbox
      * @see ICheckBoxElementDesc
      */
-  CHECKBOX
+  CHECKBOX,
+    /**
+     * a checkbox
+     * @see IRadioElementDesc
+     */
+  RADIO
 }
 
 /**

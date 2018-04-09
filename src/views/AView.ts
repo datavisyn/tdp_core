@@ -78,6 +78,7 @@ export abstract class AView extends EventHandler implements IView {
 
   protected setHint(visible: boolean, hintMessage?: string) {
     const defaultHintMessage = `No data found for the given ${this.selection.idtype.name}`;
+    this.node.classList.toggle('tdp-hint', visible);
     if (!visible) {
       delete this.node.dataset.hint;
     } else {
