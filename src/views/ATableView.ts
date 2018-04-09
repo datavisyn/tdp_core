@@ -248,7 +248,7 @@ export function enableSort<T>(this: void, header: HTMLElement, body: HTMLElement
 /**
  * Download the HTML Table content.
  */
-function exportHtmlTableContent(document: Document, tableRoot: HTMLElement, separator: string, name: string) {
+export function exportHtmlTableContent(document: Document, tableRoot: HTMLElement, separator: string, name: string) {
   const content = parseHtmlTableContent(tableRoot, separator);
   const downloadLink = document.createElement('a');
   const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
