@@ -108,9 +108,6 @@ export abstract class ATableView<T extends IRow> extends AView {
     this.buildHook();
     return Promise.resolve(this.loadRows()).then((rows) => {
       this.renderTable(rows);
-      if (this.options.exportable) {
-        this.enableExport();
-      }
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
@@ -132,6 +129,9 @@ export abstract class ATableView<T extends IRow> extends AView {
     const body = <HTMLTableSectionElement>this.node.querySelector('tbody');
     if (this.options.sortable) {
       enableSort(header, body, this.options.sortable);
+    }
+    if (this.options.exportable) {
+      this.enableExport();
     }
     body.innerHTML = '';
     rows.forEach((row, i) => {
