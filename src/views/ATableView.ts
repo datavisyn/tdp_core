@@ -265,12 +265,26 @@ export function exportHtmlTableContent(document: Document, tableRoot: HTMLElemen
  * @returns {string} The table content in csv format
  */
 function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
-  const headerContent = Array.from(tableRoot.querySelectorAll('thead > tr > th'))
+
+  /**
+   * has <br> tag that is parsed as \n
+   * @param {string} text
+   * @returns {RegExpMatchArray | null}
+   */
+  const hasBrTag = (text: string) => {
+    return text.match(/\n/ig);
+  };
+
+  const headerContent = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
     .map((d) => (<HTMLTableHeaderCellElement>d).innerText).join(separator);
-  const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'));
+  const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'))
+    .filter((tr) => tr.parentElement.parentElement === tableRoot); // only parse first nested level
   const bodyContent = bodyRows.map((row: HTMLTableRowElement) => {
     return Array.from(row.children)
-      .map((d) => (<HTMLTableDataCellElement>d).innerText).join(separator);
+      .map((d) => {
+        const text = (<HTMLTableDataCellElement>d).innerText;
+        return hasBrTag(text) ? `"${text}"` : text;
+      }).join(separator);
   }).join('\n');
   const content = `${headerContent}\n${bodyContent}`;
   return content;
