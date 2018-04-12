@@ -278,7 +278,7 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
   const headerContent = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
     .map((d) => (<HTMLTableHeaderCellElement>d).innerText).join(separator);
   const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'))
-    .filter((tr) => tr.parentElement.parentElement === tableRoot); // only parse first nested level
+    .filter((tr) => tr.parentElement.parentElement === tableRoot || tr.parentElement === tableRoot); // only parse first nested level
   const bodyContent = bodyRows.map((row: HTMLTableRowElement) => {
     return Array.from(row.children)
       .map((d) => {
