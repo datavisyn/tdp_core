@@ -37,7 +37,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     condensed: false,
     sortable: true,
     exportable: false,
-    exportSeparator: ';'
+    exportSeparator: '\t'
   };
 
   /**
