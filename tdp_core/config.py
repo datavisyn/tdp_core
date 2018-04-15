@@ -1,4 +1,4 @@
-from phovea_server.ns import Namespace, abort
+from phovea_server.ns import Namespace
 from phovea_server.util import jsonify
 from phovea_server.config import get as get_config
 from phovea_server.plugin import list as list_plugins
@@ -19,6 +19,7 @@ def _config(path):
 
   path[0] = plugin.configKey
   return jsonify(get_config('.'.join(path)))
+
 
 def create():
   return app
