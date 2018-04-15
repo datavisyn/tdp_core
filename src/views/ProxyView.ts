@@ -2,7 +2,8 @@
  * Created by Holger Stitz on 07.09.2016.
  */
 
-import {mixin} from 'phovea_core/src/index';
+import {mixin} from 'phovea_core/src';
+import {resolve} from 'phovea_core/src/idtype';
 import {IViewContext, ISelection} from './interfaces';
 import {FormElementType, IFormSelectElement, IFormSelectOption} from '../form';
 import AD3View from './AD3View';
@@ -43,7 +44,7 @@ export default class ProxyView extends AD3View {
   };
 
   private readonly openExternally: HTMLElement;
-  
+
   readonly naturalSize = [1280, 800];
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
@@ -184,7 +185,8 @@ export default class ProxyView extends AD3View {
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
-    this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${this.options.idtype}</i>.</p>`);
+    const to = this.options.idtype ? resolve(this.options.idtype).name : 'Unknown';
+    this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${to}</i>.</p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }

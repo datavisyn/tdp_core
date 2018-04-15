@@ -61,9 +61,9 @@ export function errorAlert(error: any) {
 export function errorMessage(error: any) {
   if (error instanceof Response || error.response instanceof Response) {
     const xhr: Response = error instanceof Response ? error : error.response;
-    return `<strong>Error ${xhr.status} (${xhr.statusText})</strong>`;
+    return `<strong>${error.message.replace('\n', '<br>')}</strong><br><small>${xhr.status} (${xhr.statusText})</small>`;
   } else if (error instanceof Error) {
-    return `<strong>${error.name}</strong>: ${error.message}`;
+    return `<strong>${error.name}</strong>: ${error.message.replace('\n', '<br>')}`;
   }
-  return`<strong>Unknown Error</strong>: ${error.toString()}`;
+  return `<strong>Unknown Error</strong>: ${error.toString().replace('\n', '<br>')}`;
 }
