@@ -58,7 +58,7 @@ let errorAlertHandler = (error: any) => {
   return Promise.reject(error);
 };
 
-export function setErrorAlertHandler(f: (error: any) => Promise<any>) {
+export function setErrorAlertHandler(f: (error: any) => Promise<never>) {
   errorAlertHandler = f;
 }
 
