@@ -1,6 +1,7 @@
 @import '~phovea_ui/src/fonts/monda';
 @import '~font-awesome/scss/variables';
 @import '~font-awesome/scss/mixins';
+@import './vars';
 
 $datavisyn_css_prefix: 'datavisyn' !default;
 $datavisyn_font_size_base: 14px !default;
@@ -58,14 +59,27 @@ nav.navbar-inverse {
   }
 }
 
+@keyframes #{$datavisyn_css_prefix}-pulse {
+  0% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 /*
-article.view > main .tdp-view.busy::before {
-  @include datavisyn-font();
-  content: 'd';
-  background: none !important;
-  animation: #{$datavisyn_css_prefix}-pulse 1s infinite linear;
-  text-align: center;
-  display: flex;
-  align-items: center;
+.#{$tdp-css-prefix}-busy {
+  &::before {
+    @include datavisyn-font();
+    animation: #{$datavisyn_css_prefix}-pulse 2s infinite alternate ease;
+    content: 'd';
+    font-size: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background: radial-gradient(circle at center, black 0%, black 10%, white 12%, white 10%);
+  }
 }
 */

@@ -119,6 +119,21 @@ export function stringCol(column: string, options: Partial<IColumnOptions> = {})
 }
 
 /**
+ * creates a new LineUp description for a link column
+ * @param {string} column the column name to use
+ * @param {string} linkPattern the pattern to resolve links from values, $1 will be replaced by the current value, $2 with the URL encoded version of it
+ * @param {Partial<IColumnOptions>} options
+ * @returns {IAdditionalColumnDesc}
+ */
+export function linkCol(column: string, linkPattern: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  return Object.assign(baseColumn(column, options), {
+    type: 'link',
+    link: linkPattern
+  });
+}
+
+
+/**
  * creates a new LineUp description for a boolean column
  * @param {string} column the column name to use
  * @param {Partial<IColumnOptions>} options
@@ -161,12 +176,50 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
   return r;
 }
 
-export function createInitialRanking(provider: ADataProvider) {
-  const ranking = provider.pushRanking();
-  ranking.insert(provider.create(createAggregateDesc()), 0);
-  ranking.push(provider.create(createSelectionDesc()));
+export interface IInitialRankingOptions {
+  aggregate: boolean;
+  selection: boolean;
+  rank: boolean;
+  order: string[];
+}
 
-  provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
+export function createInitialRanking(provider: ADataProvider, options: Partial<IInitialRankingOptions> = {}) {
+  const o: Readonly<IInitialRankingOptions> = Object.assign({
+    aggregate: true,
+    selection: true,
+    rank: true,
+    order: []
+  }, options);
+
+  const ranking = provider.pushRanking();
+  if (!o.rank) {
+    const r = ranking.find((d) => d.desc.type === 'rank');
+    if (r) {
+      r.removeMe();
+    }
+  }
+  if (o.aggregate) {
+    ranking.insert(provider.create(createAggregateDesc()), 0);
+  }
+  if (o.selection) {
+    ranking.push(provider.create(createSelectionDesc()));
+  }
+
+  const resolve = () => {
+    const all = provider.getColumns();
+    const cols: IColumnDesc[] = [];
+    o.order.forEach((c) => {
+      const col = all.find((d) => (<any>d).column === c || d.label === c);
+      if (col) {
+        cols.push(col);
+      }
+    });
+    return cols;
+  };
+
+  const descs = o.order.length > 0 ? resolve() : provider.getColumns().filter((d) => (<any>d).visible !== false);
+
+  descs.forEach((d) => {
     const col = provider.create(d);
     // set initial column width
     if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {

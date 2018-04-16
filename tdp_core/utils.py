@@ -1,5 +1,7 @@
 from phovea_server.ns import abort
 
+secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
+
 
 def map_scores(scores, from_idtype, to_idtype):
   """
@@ -29,3 +31,12 @@ def map_scores(scores, from_idtype, to_idtype):
       clone['id'] = target_id
       mapped_scores.append(clone)
   return mapped_scores
+
+
+def clean_query(query):
+  if callable(query):
+    return 'custom function'
+  import re
+  q = query.strip()
+  q_clean = re.sub('(\s)+', ' ', q)
+  return q_clean

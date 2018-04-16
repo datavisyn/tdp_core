@@ -55,7 +55,7 @@ export function getTDPProxyData(proxy: string, args: any, type: string = 'json')
 }
 
 export interface IParams {
-  [key: string]: string | number | boolean | string[];
+  [key: string]: string | number | boolean | string[] | number[] | boolean[];
 }
 
 function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}, assignIds: boolean = false) {

@@ -16,7 +16,7 @@
       color: black;
     }
 
-    .select2-results__option[data-idtype="#{$idType}"] {
+    .select2-results__option[data-idtype="#{$idType}"]:not([aria-selected=true]):not(.select2-results__option--highlighted) {
       background: lighten($color, 22%);
       color: black;
     }

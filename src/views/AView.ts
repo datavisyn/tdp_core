@@ -65,13 +65,25 @@ export abstract class AView extends EventHandler implements IView {
 
   /**
    * helper to marks this view busy showing a loading icon
-   * @param {boolean} busy
+   * @param {boolean} value
+   * @param {boolean|string} busyMessage optional loading message hint
    */
-  protected setBusy(busy: boolean) {
-    if (busy) {
-      this.node.classList.add('busy');
+  protected setBusy(value: boolean, busyMessage?: string | boolean) {
+    this.node.classList.toggle('tdp-busy', value);
+    if (!value || !busyMessage) {
+      delete this.node.dataset.busy;
+    } else if (busyMessage) {
+      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : 'Preparing awesome stuff for you...';
+    }
+  }
+
+  protected setHint(visible: boolean, hintMessage?: string) {
+    const defaultHintMessage = `No data found for the given ${this.selection.idtype.name}`;
+    this.node.classList.toggle('tdp-hint', visible);
+    if (!visible) {
+      delete this.node.dataset.hint;
     } else {
-      this.node.classList.remove('busy');
+      this.node.dataset.hint = hintMessage ? hintMessage : defaultHintMessage;
     }
   }
 

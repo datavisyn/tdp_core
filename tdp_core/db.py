@@ -4,6 +4,7 @@ import phovea_server.config
 from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from .dbmanager import DBManager
+from .utils import clean_query, secure_replacements
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -25,6 +26,16 @@ def resolve(database):
     if view.needs_to_fill_up_columns() and view.table is not None:
       _fill_up_columns(view, engine)
   return r
+
+
+def resolve_view(database, view_name):
+  connector, engine = resolve(database)
+  if view_name not in connector.views:
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
+  view = connector.views[view_name]
+  if not view.can_access():
+    abort(403)
+  return connector, engine, view
 
 
 def assign_ids(rows, idtype):
@@ -201,7 +212,6 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   replacements = replacements or {}
   arguments = arguments or {}
   replacements = _handle_aggregated_score(view, config, replacements, arguments)
-  secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
   # convert to index lookup
   kwargs = {}
@@ -218,7 +228,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       parser = info.type if info and info.type is not None else lambda x: x
       try:
         if info and info.as_list:
-          value = [parser(v) for v in arguments.getlist(lookup_key)]
+          value = tuple([parser(v) for v in arguments.getlist(lookup_key)])  # multi values need to be a tuple not a list
         else:
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
@@ -256,10 +266,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   :param filters: the dict of dynamically build filter
   :return: (r, view) tuple of the resulting rows and the resolved view
   """
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
@@ -278,10 +285,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
 
 
 def get_query(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
@@ -290,36 +294,27 @@ def get_query(database, view_name, replacements=None, arguments=None, extra_sql_
   if callable(query):
     return dict(query='custom function', args=kwargs)
 
-  return dict(query=query.format(**replace), args=kwargs)
+  return dict(query=clean_query(query.format(**replace)), args=kwargs)
 
 
 def get_filtered_data(database, view_name, args):
-  config, _ = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
+  config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  view = config.views[view_name]
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   return get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
 
 def get_filtered_query(database, view_name, args):
-  config, _ = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
+  config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  view = config.views[view_name]
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   return get_query(database, view_name, replacements, processed_args, extra_args)
 
 
 def _get_count(database, view_name, args):
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
 
@@ -407,10 +402,7 @@ def _fill_up_columns(view, engine):
 
 
 def _lookup(database, view_name, query, page, limit, args):
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
   arguments = args.copy()
   offset = page * limit

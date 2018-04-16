@@ -13,6 +13,7 @@ import {mixin} from 'phovea_core/src';
 import {IFormElement} from '../';
 import * as session from 'phovea_core/src/session';
 import {resolveImmediately} from 'phovea_core/src';
+import {ISelect3Options, default as Select3, IdTextPair} from './Select3';
 
 export interface ISubDesc {
   name: string;
@@ -37,7 +38,12 @@ export interface ISubSelect2Desc extends ISubDesc {
   ajax?: any;
 }
 
-declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc;
+export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
+  type: FormElementType.SELECT3;
+  return?: 'text'|'id';
+}
+
+declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc|ISubSelect3Desc;
 
 /**
  * Add specific options for input form elements
@@ -297,6 +303,20 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
             }
             that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
           });
+        });
+        break;
+      case FormElementType.SELECT3:
+        const select3 = new Select3(desc);
+        parent.appendChild(select3.node);
+        if (initialValue) {
+          select3.value = Array.isArray(initialValue) ? initialValue : [initialValue];
+        } else if (!defaultSelection && that.desc.options.uniqueKeys) {
+          select3.value = [];
+        }
+        that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+        select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
+          row.value = next;
+          this.fire(FormMap.EVENT_CHANGE, next);
         });
         break;
       default:

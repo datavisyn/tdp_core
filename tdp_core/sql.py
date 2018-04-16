@@ -37,7 +37,12 @@ def _assign_ids(r, view):
 
 
 def _return_query():
-  return request.args.get('_return_query', False)
+  # return true if the key is given and the value doesn't start with 'f' -> no value, true, True, T
+  key = '_return_query'
+  if key not in request.args:
+    return False
+  v = request.args[key]
+  return not v or v.lower()[0] != 'f'
 
 
 def _format_csv(array_of_dicts):
@@ -53,26 +58,19 @@ def _format_csv(array_of_dicts):
   return Response(out.getvalue(), mimetype='text/csv')
 
 
+def _format_json_decimal(obj):
+  return jsonify(obj, double_precision=15)
+
+
 def _formatter(view_name):
   if view_name.endswith('.csv'):
     return view_name[:-4], _format_csv
+  elif view_name.endswith('.json'):
+    return view_name[:-5], _format_json_decimal
   return view_name, jsonify
 
 
 @app.route('/<database>/<view_name>')
-@login_required
-def get_data_api(database, view_name):
-  view_name, format = _formatter(view_name)
-  if _return_query():
-    return jsonify(db.get_query(database, view_name, None, request.args))
-
-  r, view = db.get_data(database, view_name, None, request.args)
-
-  if _assign_ids(r, view):
-    r = db.assign_ids(r, view.idtype)
-  return format(r)
-
-
 @app.route('/<database>/<view_name>/filter')
 @login_required
 def get_filtered_data(database, view_name):
@@ -143,14 +141,7 @@ def get_count_data(database, view_name):
 @login_required
 def get_desc(database, view_name):
   view_name, _ = _formatter(view_name)
-  config, _ = db.resolve(database)
-  # convert to index lookup
-  # row id start with 1
-  if view_name not in config.views:
-    abort(404)
-
-  view = config.views[view_name]
-
+  config, _, view = db.resolve_view(database, view_name)
   return jsonify(dict(idType=view.idtype, columns=view.columns.values()))
 
 

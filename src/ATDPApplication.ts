@@ -15,6 +15,7 @@ import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
 import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
+import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import 'phovea_ui/src/_font-awesome';
 import {create as createProvRetrievalPanel} from 'phovea_clue/src/provenance_retrieval/ProvRetrievalPanel';
 import {IVisStateApp} from 'phovea_clue/src/provenance_retrieval/IVisState';
@@ -90,6 +91,9 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
       storage: localStorage,
       application: this.options.prefix
     });
+
+    this.cleanUpOld(manager);
+
     const clueManager = new CLUEGraphManager(manager);
 
     this.header.wait();
@@ -99,7 +103,8 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
 
     const loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
-      loginForm: this.options.loginForm
+      loginForm: this.options.loginForm,
+      watch: true
     });
     loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
       // reopen after logged out
@@ -169,6 +174,17 @@ export abstract class ATDPApplication<T extends IVisStateApp> extends ACLUEWrapp
     }
 
     return {graph, manager: clueManager, storyVis, provVis};
+  }
+
+  private cleanUpOld(manager: MixedStorageProvenanceGraphManager) {
+    const workspaces = manager.listLocalSync().sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
+    // cleanup up temporary ones
+    if (workspaces.length > KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
+      const toDelete = workspaces.slice(KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
+      Promise.all(toDelete.map((d) => manager.delete(d))).catch((error) => {
+        console.warn('cannot delete old graphs:', error);
+      });
+    }
   }
 
   /**

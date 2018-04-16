@@ -1,11 +1,50 @@
 @import './vars';
+@import '~font-awesome/scss/variables';
+@import '~font-awesome/scss/mixins';
 
 &.tdp-table {
-  margin: 0.5em 1em;
-
   thead th {
     position: sticky;
     top: -1px;
     background: white;
+    vertical-align: top;
+
+    &[data-sort] {
+      cursor: pointer;
+
+      &::before {
+        @include fa-icon();
+        float: right;
+        content: $fa-var-sort;
+      }
+    }
+
+    &[data-export] {
+      &::before {
+        margin-right: 1.5em;
+      }
+
+      a {
+        position: absolute;
+        right: 0.5em;
+        top: 0.5em;
+      }
+    }
+
+    &[data-sort=asc]::before {
+      content: $fa-var-sort-asc;
+    }
+
+    &[data-sort=asc][data-num]::before {
+      content: $fa-var-sort-numeric-asc;
+    }
+
+    &[data-sort=desc]::before {
+      content: $fa-var-sort-desc;
+    }
+
+    &[data-sort=desc][data-num]::before {
+      content: $fa-var-sort-numeric-desc;
+    }
   }
 }

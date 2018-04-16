@@ -1,4 +1,6 @@
 @import './vars';
+@import '~font-awesome/scss/variables';
+@import '~font-awesome/scss/mixins';
 
 svg {
   // generic axes styles
@@ -23,22 +25,6 @@ svg {
     flex-direction: row;
   }
 
-  &.busy {
-    &::before {
-      position: absolute;
-      top: 0;
-      left: 0;
-      content: '';
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.26) url('~phovea_ui/src/assets/caleydo_c_anim.svg') no-repeat center center;
-      z-index: 9;
-    }
-    > * {
-      display: none;
-    }
-  }
-
   &.proxy_view {
     position: absolute;
     top: 0;
@@ -56,6 +42,35 @@ svg {
       border: none;
       width: 100%;
       height: 100%;
+    }
+  }
+
+  &.tdp-hint {
+    &::before {
+      @include fa-icon();
+      $nothing: 50pt;
+      position: absolute;
+      content: $fa-var-eye-slash;
+      top: 50%;
+      left: 50%;
+      margin-left: -$nothing/2;
+      margin-top: -$nothing/2;
+      font-size: $nothing;
+      z-index: 9;
+    }
+
+    &[data-hint]::after {
+      position: absolute;
+      top: 1em;
+      left: 1em;
+      right: 1em;
+      text-align: center;
+      content: attr(data-hint);
+      z-index: 10;
+    }
+
+    > * {
+      display: none !important;
     }
   }
 
