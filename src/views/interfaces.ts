@@ -2,8 +2,8 @@ import {IPluginDesc} from 'phovea_core/src/plugin';
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {IObjectRef} from 'phovea_core/src/provenance';
 import {IViewPlugin, IViewPluginDesc, IView, IViewClass, IViewContext, ISelection} from '../extensions';
+
 export {IViewPlugin, IViewPluginDesc, IView, IViewClass, IViewContext, ISelection} from '../extensions';
-import {IFormSerializedElement} from '../form/interfaces';
 
 /**
  * mode of the view depending on the view state
@@ -118,10 +118,3 @@ export const VIEW_EVENT_ITEM_SELECT = 'select';
 export const VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
 export const VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
 export const VIEW_EVENT_UPDATE_SHARED = 'updateShared';
-
-
-  /**
-   * Get the serialized data of all parameters
-   * @returns {IFormSerializedElement[]}
-   */
-  getAllParameters(): IFormSerializedElement[];

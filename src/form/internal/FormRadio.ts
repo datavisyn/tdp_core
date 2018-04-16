@@ -1,4 +1,4 @@
-import {IFormElementDesc, IFormParent} from '../interfaces';
+import {IFormElementDesc, IFormParent, IFormSerializedValues} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 import {IFormSelectOption} from './FormSelect';
@@ -18,7 +18,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
    * @param desc
    */
   constructor(parent: IFormParent, $parent: d3.Selection<any>, desc: IRadioElementDesc) {
-    super(parent, Object.assign({options: { buttons: [] }}, desc));
+    super(parent, Object.assign({options: {buttons: []}}, desc));
 
     this.$node = $parent.append('div');
 
@@ -69,5 +69,12 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
 
   focus() {
     (<HTMLInputElement>this.$node.select('input').node()).focus();
+  }
+
+  get serializedValue(): IFormSerializedValues[] {
+    return [{
+      key: this.id,
+      value: this.value
+    }];
   }
 }

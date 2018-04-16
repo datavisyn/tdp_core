@@ -8,6 +8,7 @@ import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
 import {IColumnDesc} from 'lineupjs/src/model';
 import {EViewMode} from './views/interfaces';
+import {IFormSerializedElement} from './form/interfaces';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
@@ -43,7 +44,7 @@ export interface IScore<T> {
    * creates the LineUp column description
    * @returns {IColumnDesc & {[p: string]: any}}
    */
-  createDesc(): IColumnDesc & {[key: string]: any};
+  createDesc(): IColumnDesc & { [key: string]: any };
 
 
   /**
@@ -97,6 +98,7 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
 
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;
+
   factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
 }
 
@@ -160,14 +162,14 @@ export interface IView extends IEventHandler {
   /**
    * optional natural size used when stacking the view on top of each other
    */
-  readonly naturalSize?: [number, number]|'auto';
+  readonly naturalSize?: [number, number] | 'auto';
 
   /**
    * initialized this view
    * @param {HTMLElement} params place to put parameter forms
    * @param {(name: string, value: any, previousValue: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes
    */
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => PromiseLike<any>): PromiseLike<any>|undefined;
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => PromiseLike<any>): PromiseLike<any> | undefined;
 
   /**
    * changes the input selection as given to the constructor of this class
@@ -218,6 +220,13 @@ export interface IView extends IEventHandler {
    * destroys this view
    */
   destroy(): void;
+
+  /**
+   * Get the serialized data of all parameters
+   * @returns {IFormSerializedElement[]}
+   */
+  getAllParameters(): IFormSerializedElement[];
+
 }
 
 
@@ -240,7 +249,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * view group hint
    */
-  group: {name: string, order: number};
+  group: { name: string, order: number };
 
   /**
    * optional preview callback function returning a url promise, the preview image should have 320x180 px
@@ -251,7 +260,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * optional security check to show only certain views
    */
-  security?: string|((user: IUser)=>boolean);
+  security?: string | ((user: IUser) => boolean);
 
   /**
    * a lot of topics/tags describing this view
@@ -299,11 +308,12 @@ export interface IInstantViewOptions {
 }
 
 export interface IItemSelection extends ISelection {
-  readonly items: {_id: number, id: string, text: string}[];
+  readonly items: { _id: number, id: string, text: string }[];
 }
 
 export interface IInstanceViewExtension {
   desc: IInstanceViewExtensionDesc;
+
   factory(selection: IItemSelection, options: Readonly<IInstantViewOptions>): IInstantView;
 }
 

@@ -3,7 +3,7 @@
  */
 
 import AFormElement from './AFormElement';
-import {IFormParent} from '../interfaces';
+import {IFormParent, IFormSerializedValues} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
 import Select3, {IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
@@ -96,7 +96,7 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
         return {
           id: d.id ? d.id : d.text,
           text: d.text ? d.text : d.id
-        }
+        };
       }
     };
 
@@ -117,5 +117,13 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
   focus() {
     this.select3.focus();
+  }
+
+  get serializedValue(): IFormSerializedValues[] {
+    if (!this.select3.value || this.select3.value.length === 0) {
+      return [];
+    }
+
+    return this.select3.value.map((v) => ({key: v.id, value: v.text}));
   }
 }
