@@ -26,6 +26,8 @@ import {setParameter} from '../internal/cmds';
 
 
 export default class ViewWrapper extends EventHandler implements IViewProvider {
+  static readonly EVENT_VIEW_INITIALIZED = 'viewInitialized';
+  static readonly EVENT_VIEW_CREATED = 'viewCreated';
 
   private instance: IView = null; //lazy
   private allowed: boolean;
@@ -128,13 +130,14 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     if (!this.allowed) {
       return;
     }
-    // create provenance reference
-    this.context = createContext(this.graph, this.plugin, this.ref);
     return this.plugin.load().then((p) => {
       if (this.instance) {
-        return; // alreadey built race condition
+        return; // already built race condition
       }
+      // create provenance reference
+      this.context = createContext(this.graph, this.plugin, this.ref);
       this.instance = p.factory(this.context, selection, this.content, {});
+      this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
       return resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
         const idType = this.instance.itemIDType;
         if (idType) {
@@ -153,9 +156,10 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
           this.instance.setParameter(key, value);
         });
         this.preInstanceParameter.clear();
+
+        this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance);
       });
     });
-
   }
 
   destroy() {
@@ -221,7 +225,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       } else {
         this.destroyInstance();
       }
-    } else if (matches) {
+    } else if (matches && this.visible) {
       return this.createView(selection);
     }
   }
