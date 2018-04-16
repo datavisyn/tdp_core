@@ -42,7 +42,7 @@ export function successfullyDeleted(type: string, name: string) {
   pushNotification('success', `${type} "${name}" successfully deleted`, DEFAULT_SUCCESS_AUTO_HIDE);
 }
 
-export function errorAlert(error: any) {
+let errorAlertHandler = (error: any) => {
   if (error instanceof Response || error.response instanceof Response) {
     const xhr: Response = error instanceof Response ? error : error.response;
     return xhr.text().then((body: string) => {
@@ -50,12 +50,20 @@ export function errorAlert(error: any) {
         body = `${body}<hr>
           The requested URL was:<br><a href="${xhr.url}" target="_blank" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
       }
-      pushNotification('danger', `<strong>Error ${xhr.status} (${xhr.statusText})</strong>: ${body}`);
+      pushNotification('danger', `<strong>Error ${xhr.status} (${xhr.statusText})</strong>: ${body}`, DEFAULT_ERROR_AUTO_HIDE);
       return Promise.reject(error);
     });
   }
   pushNotification('danger', errorMessage(error), DEFAULT_ERROR_AUTO_HIDE);
   return Promise.reject(error);
+};
+
+export function setErrorAlertHandler(f: (error: any) => Promise<any>) {
+  errorAlertHandler = f;
+}
+
+export function errorAlert(error: any) {
+  return errorAlertHandler(error);
 }
 
 export function errorMessage(error: any) {
