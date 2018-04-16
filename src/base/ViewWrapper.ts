@@ -25,7 +25,7 @@ import {IDType, resolve} from 'phovea_core/src/idtype';
 import {setParameter} from '../internal/cmds';
 
 
-export default class DetailView extends EventHandler implements IViewProvider {
+export default class ViewWrapper extends EventHandler implements IViewProvider {
 
   private instance: IView = null; //lazy
   private allowed: boolean;
@@ -35,7 +35,7 @@ export default class DetailView extends EventHandler implements IViewProvider {
   /**
    * Provenance graph reference of this object
    */
-  readonly ref: ObjectNode<DetailView>;
+  readonly ref: ObjectNode<ViewWrapper>;
 
   /**
    * Provenance graph context
@@ -96,7 +96,7 @@ export default class DetailView extends EventHandler implements IViewProvider {
   }
 
   set visible(visible: boolean) {
-    if (visible && this.instance === null && this.selection && this.match(this.selection)) {
+    if (visible && this.instance == null && this.selection && this.match(this.selection)) {
       //lazy init
       this.createView(this.selection);
     }
@@ -131,6 +131,9 @@ export default class DetailView extends EventHandler implements IViewProvider {
     // create provenance reference
     this.context = createContext(this.graph, this.plugin, this.ref);
     return this.plugin.load().then((p) => {
+      if (this.instance) {
+        return; // alreadey built race condition
+      }
       this.instance = p.factory(this.context, selection, this.content, {});
       return resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
         const idType = this.instance.itemIDType;
