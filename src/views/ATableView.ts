@@ -169,7 +169,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
     (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
     rightTableHeader.insertAdjacentHTML('beforeend',
-      `<a href="#" title="Download Table as TSV"><i class="fa fa-download"></i></a>`);
+      `<a href="#" title="Download Table as Spreadsheet"><i class="fa fa-download"></i></a>`);
     (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
