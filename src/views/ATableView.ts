@@ -22,7 +22,7 @@ export interface IATableViewOptions<T> {
   condensed: boolean;
   sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>);
   exportable?: boolean;
-  exportSeparator?: string;
+  exportSeparator?: ',' | ';' | '\t';
 }
 
 /**
@@ -169,7 +169,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
     (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
     rightTableHeader.insertAdjacentHTML('beforeend',
-      `<a href="#" title="Download Table as CSV"><i class="fa fa-download"></i></a>`);
+      `<a href="#" title="Download Table as Spreadsheet"><i class="fa fa-download"></i></a>`);
     (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
@@ -251,9 +251,9 @@ export function enableSort<T>(this: void, header: HTMLElement, body: HTMLElement
 export function exportHtmlTableContent(document: Document, tableRoot: HTMLElement, separator: string, name: string) {
   const content = parseHtmlTableContent(tableRoot, separator);
   const downloadLink = document.createElement('a');
-  const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
+  const blob = new Blob([content], {type: `${deriveMediaType(separator)};charset=utf-8`});
   downloadLink.href = URL.createObjectURL(blob);
-  (<any>downloadLink).download = `${name}.csv`;
+  (<any>downloadLink).download = `${name}.${deriveFileExtension(separator)}`;
 
   document.body.appendChild(downloadLink);
   downloadLink.click();
@@ -271,8 +271,17 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
    * @param {string} text
    * @returns {RegExpMatchArray | null}
    */
-  const hasBrTag = (text: string) => {
-    return text.match(/\n/ig);
+  const hasCRLF = (text: string) => {
+    return text.match(/\n/g);
+  };
+
+  /**
+   * remove LF to allow linebreaks within a single cell
+   * @param {string} text
+   * @returns {string}
+   */
+  const removeLF = (text: string) => {
+    return text.replace(/\n/g, '\r');
   };
 
   const headerContent = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
@@ -283,11 +292,45 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
     return Array.from(row.children)
       .map((d) => {
         const text = (<HTMLTableDataCellElement>d).innerText;
-        return hasBrTag(text) ? `"${text}"` : text;
+        return hasCRLF(text) ? `"${removeLF(text)}"` : text;
       }).join(separator);
   }).join('\n');
   const content = `${headerContent}\n${bodyContent}`;
   return content;
+}
+
+/**
+ * media type by separator
+ * @param {string} separator
+ * @returns {string}
+ */
+function deriveMediaType(separator: string) {
+  switch (separator) {
+    case ',':
+    case ';':
+      return 'text/csv';
+    case '\t':
+      return 'text/tab-separated-values';
+    default:
+      return 'text/plain';
+  }
+}
+
+/**
+ * file extension by separator
+ * @param {string} separator
+ * @returns {string}
+ */
+function deriveFileExtension(separator: string) {
+  switch (separator) {
+    case ',':
+    case ';':
+      return 'csv';
+    case '\t':
+      return 'tsv';
+    default:
+      return 'txt';
+  }
 }
 
 export default ATableView;
