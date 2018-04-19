@@ -22,7 +22,7 @@ export interface IATableViewOptions<T> {
   condensed: boolean;
   sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>);
   exportable?: boolean;
-  exportSeparator?: ',' | ';' | '\t';
+  exportSeparator?: ','; // multiline cells wont work with semicolon or tab separation
 }
 
 /**
@@ -37,7 +37,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     condensed: false,
     sortable: true,
     exportable: false,
-    exportSeparator: '\t'
+    exportSeparator: ','
   };
 
   /**
@@ -251,9 +251,9 @@ export function enableSort<T>(this: void, header: HTMLElement, body: HTMLElement
 export function exportHtmlTableContent(document: Document, tableRoot: HTMLElement, separator: string, name: string) {
   const content = parseHtmlTableContent(tableRoot, separator);
   const downloadLink = document.createElement('a');
-  const blob = new Blob([content], {type: `${deriveMediaType(separator)};charset=utf-8`});
+  const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
   downloadLink.href = URL.createObjectURL(blob);
-  (<any>downloadLink).download = `${name}.${deriveFileExtension(separator)}`;
+  (<any>downloadLink).download = `${name}.csv`;
 
   document.body.appendChild(downloadLink);
   downloadLink.click();
@@ -271,17 +271,8 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
    * @param {string} text
    * @returns {RegExpMatchArray | null}
    */
-  const hasCRLF = (text: string) => {
+  const hasMultilines = (text: string) => {
     return text.match(/\n/g);
-  };
-
-  /**
-   * remove LF to allow linebreaks within a single cell
-   * @param {string} text
-   * @returns {string}
-   */
-  const removeLF = (text: string) => {
-    return text.replace(/\n/g, '\r');
   };
 
   const headerContent = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
@@ -292,45 +283,11 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
     return Array.from(row.children)
       .map((d) => {
         const text = (<HTMLTableDataCellElement>d).innerText;
-        return hasCRLF(text) ? `"${removeLF(text)}"` : text;
+        return hasMultilines(text) ? `"${text.replace(/\t/g,':')}"` : text;
       }).join(separator);
   }).join('\n');
   const content = `${headerContent}\n${bodyContent}`;
   return content;
-}
-
-/**
- * media type by separator
- * @param {string} separator
- * @returns {string}
- */
-function deriveMediaType(separator: string) {
-  switch (separator) {
-    case ',':
-    case ';':
-      return 'text/csv';
-    case '\t':
-      return 'text/tab-separated-values';
-    default:
-      return 'text/plain';
-  }
-}
-
-/**
- * file extension by separator
- * @param {string} separator
- * @returns {string}
- */
-function deriveFileExtension(separator: string) {
-  switch (separator) {
-    case ',':
-    case ';':
-      return 'csv';
-    case '\t':
-      return 'tsv';
-    default:
-      return 'txt';
-  }
 }
 
 export default ATableView;
