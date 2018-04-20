@@ -115,6 +115,7 @@ export interface IGroupData {
   description?: string;
   collapsed?: boolean;
   order: number;
+  members?: string[];
 }
 
 
