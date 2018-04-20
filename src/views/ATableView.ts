@@ -22,7 +22,7 @@ export interface IATableViewOptions<T> {
   condensed: boolean;
   sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>);
   exportable?: boolean;
-  exportSeparator?: ','; // multiline cells wont work with semicolon or tab separation
+  exportSeparator?: ',' | ';'; // multiline cells wont work with semicolon or tab separation
 }
 
 /**
