@@ -450,6 +450,12 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
             // remove key
             validated.delete(i.text.toLowerCase());
             Object.assign(i, valid);
+            const o = <HTMLOptionElement>(<any>i).element;
+            if (o) {
+              // sync option
+              o.value = i.id;
+              o.textContent = i.text;
+            }
           }
           if (dom) {
             dom.innerHTML = (<HTMLElement>dom.firstElementChild!).outerHTML + this.formatItem('selection', i, dom);
