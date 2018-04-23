@@ -38,7 +38,27 @@ export interface ITDPOptions {
    */
   showCookieDisclaimer: boolean;
 
-  showResearchDisclaimer: boolean;
+  showResearchDisclaimer: boolean | ((content: HTMLElement)=>void);
+
+  showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement)=>void)
+
+  /**
+   * show/hide the options link
+   * default: false
+   */
+  showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement)=>void);
+
+  /**
+   * show/hide the bug report link
+   * default: true
+   */
+  showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement)=>void);
+
+  /**
+   * show help link true or the url to link
+   * default: false
+   */
+  showHelpLink: boolean | string;
 }
 
 /**
@@ -52,7 +72,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     name: 'Target Discovery Platform',
     prefix: 'tdp',
     showCookieDisclaimer: false,
-    showResearchDisclaimer: true
+    showResearchDisclaimer: true,
+    showAboutLink: true,
+    showHelpLink: false,
+    showOptionsLink: false,
+    showReportBugLink: true
   };
 
   protected app: Promise<T> = null;
@@ -64,23 +88,35 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.build(document.body, {replaceBody: false});
   }
 
-  protected buildImpl(body: HTMLElement) {
+  protected createHeader(parent: HTMLElement) {
     //create the common header
-    const headerOptions = {
+    const header = createHeader(parent, {
       showCookieDisclaimer: this.options.showCookieDisclaimer,
-      showOptionsLink: true, // always activate options
+      showAboutLink: this.options.showAboutLink,
+      showHelpLink: this.options.showHelpLink,
+      showReportBugLink: this.options.showReportBugLink,
+      showOptionsLink: this.options.showOptionsLink,
       appLink: new AppHeaderLink(this.options.name, (event) => {
         event.preventDefault();
         this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
         return false;
       })
-    };
-    this.header = createHeader(<HTMLElement>body.querySelector('div.box'), headerOptions);
+    });
 
-    const aboutDialogBody = this.header.aboutDialog;
     if (this.options.showResearchDisclaimer) {
-      aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+      const aboutDialogBody = header.aboutDialog;
+      if (typeof this.options.showResearchDisclaimer === 'function'){
+        this.options.showResearchDisclaimer(aboutDialogBody);
+      } else {
+        aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+      }
     }
+
+    return header;
+  }
+
+  protected buildImpl(body: HTMLElement) {
+    this.header = this.createHeader(<HTMLElement>body.querySelector('div.box'));
 
     this.on('jumped_to,loaded_graph', () => this.header.ready());
     //load all available provenance graphs
