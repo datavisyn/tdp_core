@@ -38,21 +38,21 @@ export interface ITDPOptions {
    */
   showCookieDisclaimer: boolean;
 
-  showResearchDisclaimer: boolean | ((content: HTMLElement)=>void);
+  showResearchDisclaimer: boolean | ((content: HTMLElement) => void);
 
-  showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement)=>void)
+  showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
    * show/hide the options link
    * default: false
    */
-  showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement)=>void);
+  showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
    * show/hide the bug report link
    * default: true
    */
-  showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement)=>void);
+  showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
    * show help link true or the url to link
@@ -105,7 +105,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     if (this.options.showResearchDisclaimer) {
       const aboutDialogBody = header.aboutDialog;
-      if (typeof this.options.showResearchDisclaimer === 'function'){
+      if (typeof this.options.showResearchDisclaimer === 'function') {
         this.options.showResearchDisclaimer(aboutDialogBody);
       } else {
         aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
@@ -158,7 +158,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
-    graph.catch((error: {graph: string}) => {
+    graph.catch((error: { graph: string }) => {
       showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
