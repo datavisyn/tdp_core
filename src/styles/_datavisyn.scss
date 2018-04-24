@@ -48,6 +48,7 @@ nav.navbar-inverse {
 
 .#{$datavisyn_css_prefix}-font {
   @include datavisyn-font();
+  line-height: 1.42857;
 
   &[data-style=black] {
     background: black;
