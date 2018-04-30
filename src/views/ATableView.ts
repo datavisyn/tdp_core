@@ -22,7 +22,7 @@ export interface IATableViewOptions<T> {
   condensed: boolean;
   sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>);
   exportable?: boolean;
-  exportSeparator?: string;
+  exportSeparator?: ',' | ';'; // multiline cells wont work with semicolon or tab separation
 }
 
 /**
@@ -37,7 +37,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     condensed: false,
     sortable: true,
     exportable: false,
-    exportSeparator: '\t'
+    exportSeparator: ','
   };
 
   /**
@@ -169,7 +169,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
     (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
     rightTableHeader.insertAdjacentHTML('beforeend',
-      `<a href="#" title="Download Table as CSV"><i class="fa fa-download"></i></a>`);
+      `<a href="#" title="Download Table as Spreadsheet"><i class="fa fa-download"></i></a>`);
     (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
@@ -271,8 +271,8 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
    * @param {string} text
    * @returns {RegExpMatchArray | null}
    */
-  const hasBrTag = (text: string) => {
-    return text.match(/\n/ig);
+  const hasMultilines = (text: string) => {
+    return text.match(/\n/g);
   };
 
   const headerContent = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
@@ -283,7 +283,7 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
     return Array.from(row.children)
       .map((d) => {
         const text = (<HTMLTableDataCellElement>d).innerText;
-        return hasBrTag(text) ? `"${text}"` : text;
+        return hasMultilines(text) ? `"${text.replace(/\t/g,':')}"` : text;
       }).join(separator);
   }).join('\n');
   const content = `${headerContent}\n${bodyContent}`;

@@ -153,7 +153,22 @@ export function groupByCategory<T extends {v: IViewPluginDesc}>(views: T[]): IGr
     }
   });
 
-  const sortView = (a: {v: IViewPluginDesc}, b: {v: IViewPluginDesc}) => {
+  const sortView = (a: {v: IViewPluginDesc}, b: {v: IViewPluginDesc}, members?: string[]) => {
+    // members attribute has priority
+    if (members) {
+      const indexA = members.indexOf(a.v.name);
+      const indexB = members.indexOf(b.v.name);
+      if (indexA >= 0 && indexB >= 0) {
+        return indexA - indexB;
+      }
+      if (indexA >= 0) {
+        return -1;
+      }
+      if (indexB >= 0) {
+        return 1;
+      }
+    }
+
     const orderA = a.v.group.order;
     const orderB = b.v.group.order;
     if (orderA === orderB) {
@@ -178,7 +193,9 @@ export function groupByCategory<T extends {v: IViewPluginDesc}>(views: T[]): IGr
     if (!base) {
       base = {name, label: name, description: '', order: 900};
     }
-    return Object.assign(base, {views: views.sort(sortView)});
+
+    const sortedViews = views.sort((a,b) => sortView(a, b, base.members));
+    return Object.assign(base, {views: sortedViews});
   });
   return groups.sort(sortGroup);
 }

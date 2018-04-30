@@ -74,6 +74,10 @@ export default class SelectionChooser {
       targetIds = (<number[]>[]).concat(...mapped);
     }
 
+    if (targetIds.length === 0) {
+      return this.updateItems([], reuseOld);
+    }
+
     const names = await target.unmap(targetIds);
     const labels = this.readAble && target !== this.readAble ? await target.mapToFirstName(targetIds, this.readAble) : null;
 
