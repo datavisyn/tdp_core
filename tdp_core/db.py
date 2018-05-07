@@ -100,7 +100,7 @@ class WrappedSession(object):
     :return: the session result
     """
     parsed = to_query(sql, self._supports_array_parameter, kwargs)
-    _log.info(parsed)
+    _log.info('%s (%s)', parsed, kwargs)
     return self._session.execute(parsed, kwargs)
 
   def run(self, sql, **kwargs):
@@ -111,7 +111,7 @@ class WrappedSession(object):
     :return: list of dicts
     """
     parsed = to_query(sql, self._supports_array_parameter, kwargs)
-    _log.info(parsed)
+    _log.info('%s (%s)', parsed, kwargs)
     result = self._session.execute(parsed, kwargs)
     columns = result.keys()
     return [{c: r[c] for c in columns} for r in result]
