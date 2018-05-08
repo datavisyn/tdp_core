@@ -1,8 +1,7 @@
 /**
  * a string column with optional alignment
  */
-import BooleanColumn, {IBooleanColumnDesc} from 'lineupjs/src/model/BooleanColumn';
-import Column from 'lineupjs/src/model/Column';
+import {Column, IDataRow, BooleanColumn, IBooleanColumnDesc} from 'lineupjs';
 
 /**
  * extra column for highlighting and filtering
@@ -23,8 +22,8 @@ export default class OverviewColumn extends BooleanColumn {
     this.setWidthImpl(0); // hide
   }
 
-  getValue(row: any, index: number) {
-    return this.overviewSelection.has(row);
+  getValue(row: IDataRow) {
+    return this.overviewSelection.has(row.v);
   }
 
   setOverview(rows?: any[], name = 'Focus') {
@@ -44,8 +43,8 @@ export default class OverviewColumn extends BooleanColumn {
     return ['#EEEEEE', '#AAAAAA'];
   }
 
-  group(row: any, index: number) {
-    const enabled = this.getValue(row, index);
+  group(row: IDataRow) {
+    const enabled = this.getValue(row);
     return enabled ? OverviewColumn.GROUP_TRUE : OverviewColumn.GROUP_FALSE;
   }
 }

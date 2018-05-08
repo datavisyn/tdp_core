@@ -1,8 +1,5 @@
 
-import SidePanel from 'lineupjs/src/ui/panel/SidePanel';
-import {IRankingHeaderContext} from 'lineupjs/src/ui/engine/interfaces';
-import {regular, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
-import {createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createMinDesc, createMaxDesc, createMeanDesc, createNestedDesc} from 'lineupjs/src/model';
+import {SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc} from 'lineupjs';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -10,9 +7,6 @@ import {
   IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
 } from '../../extensions';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-import {exportRanking} from 'lineupjs/src/provider/utils';
-import SearchBox from 'lineupjs/src/ui/panel/SearchBox';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions, MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} from '../ARankingView';
 
@@ -61,7 +55,7 @@ export default class LineUpPanelActions extends EventHandler {
   private overview: HTMLElement;
   private wasCollapsed = false;
 
-  constructor(protected readonly provider: ADataProvider, ctx: IRankingHeaderContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
+  constructor(protected readonly provider: LocalDataProvider, ctx: any, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
 
     if (options.enableAddingColumns) {
@@ -190,7 +184,7 @@ export default class LineUpPanelActions extends EventHandler {
     const listener = () => {
       const selected = this.overview.classList.toggle('fa-th-list');
       this.overview.classList.toggle('fa-list');
-      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spacefilling : regular);
+      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spaceFillingRule : null);
     };
     return this.overview =  this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list': 'fa fa-list', listener);
   }
@@ -205,7 +199,7 @@ export default class LineUpPanelActions extends EventHandler {
 
   private appendDownload() {
     const listener = (ranking: Ranking) => {
-      this.exportRanking(ranking, <ADataProvider>this.provider);
+      this.exportRanking(ranking, <LocalDataProvider>this.provider);
     };
     return this.createMarkup('Export Data', 'fa fa-download', listener);
   }
@@ -228,7 +222,7 @@ export default class LineUpPanelActions extends EventHandler {
     });
   }
 
-  protected exportRanking(ranking: Ranking, provider: ADataProvider) {
+  protected exportRanking(ranking: Ranking, provider: LocalDataProvider) {
     Promise.resolve(provider.view(ranking.getOrder())).then((data) => this.exportRankingImpl(ranking, data));
   }
 
@@ -271,7 +265,7 @@ export default class LineUpPanelActions extends EventHandler {
     const ordinoScores: IPluginDesc[] = await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
     const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
-    const metaDataPluginPromises: Promise<ISearchOption>[] = metaDataPluginDescs
+    const metaDataPluginPromises: Promise<IGroupSearchItem<any>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
         .then((loadedPlugin: IPlugin) => loadedPlugin.factory(plugin))
         .then((scores: IScoreLoader[]) => {
@@ -324,9 +318,7 @@ export default class LineUpPanelActions extends EventHandler {
           { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
           { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
           { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-          { text: 'Max Combination', id: 'max', action: () => this.addColumn(createMaxDesc()) },
-          { text: 'Min Combination', id: 'min', action: () => this.addColumn(createMinDesc()) },
-          { text: 'Mean Combination', id: 'mean', action: () => this.addColumn(createMeanDesc()) },
+          { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
           { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
         ]
       },

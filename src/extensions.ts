@@ -6,7 +6,7 @@ import {IEventHandler} from 'phovea_core/src/event';
 import {IScore} from './lineup';
 import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
-import {IColumnDesc} from 'lineupjs/src/model';
+import {IColumnDesc} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';

@@ -1,4 +1,4 @@
-import {Column, IColumnDesc} from 'lineupjs/src/model';
+import {Column, IColumnDesc} from 'lineupjs';
 import {ISelection} from '../../views';
 import {IScoreRow} from '../../extensions';
 

@@ -2,14 +2,11 @@
  * Created by sam on 13.02.2017.
  */
 
-import {createSelectionDesc, createAggregateDesc, IColumnDesc} from 'lineupjs/src/model';
-import {ICategory} from 'lineupjs/src/model/ICategoricalColumn';
+import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, deriveHierarchy, ICategoryNode, isHierarchical} from 'lineupjs';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {IServerColumn} from '../rest';
-import {deriveHierarchy, ICategoryNode, isHierarchical} from 'lineupjs/src/model/HierarchyColumn';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
@@ -183,7 +180,7 @@ export interface IInitialRankingOptions {
   order: string[];
 }
 
-export function createInitialRanking(provider: ADataProvider, options: Partial<IInitialRankingOptions> = {}) {
+export function createInitialRanking(provider: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
   const o: Readonly<IInitialRankingOptions> = Object.assign({
     aggregate: true,
     selection: true,

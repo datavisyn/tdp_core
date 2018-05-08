@@ -1,14 +1,7 @@
-import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
-import {defaultConfig} from 'lineupjs/src/config';
-import {ILineUpConfig} from 'lineupjs/src/interfaces';
-import {IGroupData, IGroupItem, isGroup} from 'lineupjs/src/ui/engine/interfaces';
+import {EngineRenderer, spaceFillingRule, defaultConfig, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
-import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
-import {deriveColors} from 'lineupjs/src/utils';
-import {LocalDataProvider} from 'lineupjs/src/provider';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
@@ -25,13 +18,10 @@ import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 import LineUpPanelActions from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
-import StackColumn from 'lineupjs/src/model/StackColumn';
-import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
-import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
 import {successfullySaved} from '../notifications';
 
 export {IRankingWrapper} from './internal/ranking';
-export {default as DataProvider} from 'lineupjs/src/provider/ADataProvider';
+export {LocalDataProvider as DataProvider} from 'lineupjs';
 
 export interface IARankingViewOptions {
   /**
@@ -89,7 +79,7 @@ export interface IARankingViewOptions {
 
   itemRowHeight: number|((row: any, index: number) => number)|null;
 
-  customOptions: Partial<ILineUpConfig>;
+  customOptions: Partial<ITaggleOptions>;
 }
 
 export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
@@ -99,16 +89,6 @@ export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config = {
-    violationChanged: (_rule, violation?: string) => this.panel.setViolation(violation),
-    header: {
-      summary: true
-    },
-    body: {
-      animation: true,
-      rowPadding: 0, //since padding is used
-    }
-  };
   /**
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
@@ -125,8 +105,7 @@ export abstract class ARankingView extends AView {
   private readonly provider = new LocalDataProvider([], [], {
     maxNestedSortingCriteria: Infinity,
     maxGroupColumns: Infinity,
-    filterGlobally: true,
-    grouping: true
+    filterGlobally: true
   });
   private readonly taggle: EngineRenderer | TaggleRenderer;
   private readonly selectionHelper: LineUpSelectionHelper;
@@ -195,31 +174,30 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config = mixin(this.config, {
-      header: {
-        summary: this.options.enableHeaderSummary,
-        autoRotateLabels: this.options.enableHeaderRotation
-      },
-      body: {
-        striped: this.options.enableStripedBackground
-      }
+    const config: ITaggleOptions = mixin(defaultConfig(), <Partial<ITaggleOptions>>{
+      summaryHeader: this.options.enableHeaderSummary,
+      labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
-      (<any>config.body).rowHeight = this.options.itemRowHeight;
+      config.rowHeight = this.options.itemRowHeight;
     } else if (typeof this.options.itemRowHeight === 'function' ) {
       const f = this.options.itemRowHeight;
-      (<any>config.body).dynamicHeight = () => ({
+      config.dynamicHeight = () => ({
         defaultHeight: 20,
+        padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? 70 : f(item.v, item.dataIndex);
+          return isGroup(item) ? 70 : f(item.v, item.i);
         }
       });
     }
 
 
 
-    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
+    const lineupParent = <HTMLElement>this.node.firstElementChild!;
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, mixin(defaultConfig(), config)) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+      violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
+    }));
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
@@ -242,7 +220,7 @@ export abstract class ARankingView extends AView {
         (<TaggleRenderer>this.taggle).switchRule(rule);
       });
       if (this.options.enableOverviewMode === 'active') {
-        (<TaggleRenderer>this.taggle).switchRule(spacefilling);
+        (<TaggleRenderer>this.taggle).switchRule(spaceFillingRule);
       }
     }
 
@@ -258,7 +236,7 @@ export abstract class ARankingView extends AView {
     this.selectionAdapter = this.createSelectionAdapter();
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return resolveImmediately(super.init(params, onParameterChange)).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
@@ -369,13 +347,13 @@ export abstract class ARankingView extends AView {
       return;
     }
 
-    const s = ranking.getSortCriteria();
+    const s = ranking.getPrimarySortCriteria();
     const labelColumn = ranking.children.filter((c) => c.desc.type === 'string')[0];
 
     this.dump = new Map<string, number | boolean | number[]>();
     ranking.children.forEach((c) => {
       if (c === labelColumn ||
-        c === s.col ||
+        (s && c === s.col) ||
         c.desc.type === 'rank' ||
         c.desc.type === 'selection' ||
         (<any>c.desc).column === 'id' // = Ensembl column
@@ -513,7 +491,7 @@ export abstract class ARankingView extends AView {
     // hook
   }
 
-  protected createInitialRanking(lineup: ADataProvider, options: Partial<IInitialRankingOptions> = {}) {
+  protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
     createInitialRanking(lineup, options);
   }
 

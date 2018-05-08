@@ -1,4 +1,4 @@
-import {debounce} from 'lineupjs/src/utils';
+import {debounce} from 'phovea_core/src';
 import {resolveImmediately} from 'phovea_core/src';
 import {EventHandler, IEvent} from 'phovea_core/src/event';
 import {IDType, resolve} from 'phovea_core/src/idtype';
