@@ -15,4 +15,4 @@ describe('cached', () => {
       expect(cachedLazy('testLazy', () => 10)()).toBe(5);
     });
   });
-})
+});
