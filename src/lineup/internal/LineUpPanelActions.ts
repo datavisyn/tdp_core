@@ -16,6 +16,12 @@ export interface ISearchOption {
   action(): void;
 }
 
+export const rule = spaceFillingRule({
+  groupHeight: 70,
+  rowHeight: 20,
+  groupPadding: 5
+});
+
 /**
  * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
  * @param score
@@ -184,7 +190,7 @@ export default class LineUpPanelActions extends EventHandler {
     const listener = () => {
       const selected = this.overview.classList.toggle('fa-th-list');
       this.overview.classList.toggle('fa-list');
-      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spaceFillingRule : null);
+      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
     };
     return this.overview = this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
   }

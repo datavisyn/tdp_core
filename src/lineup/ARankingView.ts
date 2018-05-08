@@ -1,4 +1,4 @@
-import {EngineRenderer, spaceFillingRule, defaultConfig, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions } from 'lineupjs';
+import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -16,7 +16,7 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
-import LineUpPanelActions from './internal/LineUpPanelActions';
+import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 
@@ -174,7 +174,7 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config: ITaggleOptions = mixin(defaultConfig(), <Partial<ITaggleOptions>>{
+    const config: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
       labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
@@ -195,7 +195,7 @@ export abstract class ARankingView extends AView {
 
 
     const lineupParent = <HTMLElement>this.node.firstElementChild!;
-    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, mixin(defaultConfig(), config)) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, config) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
@@ -220,7 +220,7 @@ export abstract class ARankingView extends AView {
         (<TaggleRenderer>this.taggle).switchRule(rule);
       });
       if (this.options.enableOverviewMode === 'active') {
-        (<TaggleRenderer>this.taggle).switchRule(spaceFillingRule);
+        (<TaggleRenderer>this.taggle).switchRule(rule);
       }
     }
 

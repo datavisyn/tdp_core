@@ -106,10 +106,6 @@ export default class CompositeView extends EventHandler implements IView {
   private readonly children: WrapperView[] = [];
   private readonly childrenLookup = new Map<string, IView>();
 
-  private readonly debounceItemSelection = debounce((evt, old, selection) => {
-    this.itemSelection = selection;
-    this.fire(AView.EVENT_ITEM_SELECT, old, selection);
-  });
   private readonly debounceUpdateEntryPoint = debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
 
   private itemSelection: ISelection;
@@ -182,6 +178,27 @@ export default class CompositeView extends EventHandler implements IView {
       const helper = this.node.ownerDocument.createElement('div');
       const links = setup.linkedSelections;
 
+      let debounceItemSelection: (...args: any[])=>void;
+      {
+        let selection: ISelection;
+        let old: ISelection;
+
+        const debounced = debounce(() => {
+          this.itemSelection = selection;
+          const oo = old;
+          old = null;
+          this.fire(AView.EVENT_ITEM_SELECT, oo, selection);
+        });
+
+        debounceItemSelection = (_evt, previous, act) => {
+          selection = act;
+          if (!old) {
+            old = previous;
+          }
+          debounced();
+        };
+      }
+
       this.setup.elements.forEach((d) => {
         let s = this.selection;
         if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
@@ -189,7 +206,7 @@ export default class CompositeView extends EventHandler implements IView {
         }
         const instance = d.create(this.context, s, helper, d.options);
         if (links.length === 0 || links.some((l) => l.fromKey === d.key && l.toKey === '_item')) {
-          instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
+          instance.on(AView.EVENT_ITEM_SELECT, debounceItemSelection);
         }
         instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
         instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
