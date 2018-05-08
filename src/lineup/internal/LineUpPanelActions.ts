@@ -47,9 +47,9 @@ export default class LineUpPanelActions extends EventHandler {
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
 
-  private idType: IDType|null = null;
+  private idType: IDType | null = null;
 
-  private readonly search: SearchBox<ISearchOption>|null;
+  private readonly search: SearchBox<ISearchOption> | null;
 
   readonly panel: SidePanel;
   private overview: HTMLElement;
@@ -89,7 +89,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.collapse = false;
     }
 
-    if(this.wasHidden) {
+    if (this.wasHidden) {
       this.show();
     }
   }
@@ -186,7 +186,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.overview.classList.toggle('fa-list');
       this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spaceFillingRule : null);
     };
-    return this.overview =  this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list': 'fa fa-list', listener);
+    return this.overview = this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
   }
 
   setViolation(violation?: string) {
@@ -218,7 +218,7 @@ export default class LineUpPanelActions extends EventHandler {
       const listener = () => {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
-      return this.createMarkup(button.title,'fa ' + button.cssClass, listener);
+      return this.createMarkup(button.title, 'fa ' + button.cssClass, listener);
     });
   }
 
@@ -251,7 +251,7 @@ export default class LineUpPanelActions extends EventHandler {
   private getColumnDescription(descs: IColumnDesc[], addScores: boolean) {
     return descs
       .filter((d) => Boolean((<any>d)._score) === addScores)
-      .map((d) => ({ text: d.label, id: (<any>d).column, action: () => this.addColumn(d)}))
+      .map((d) => ({text: d.label, id: (<any>d).column, action: () => this.addColumn(d)}))
       .sort((a, b) => a.text.localeCompare(b.text));
   }
 
@@ -325,9 +325,9 @@ export default class LineUpPanelActions extends EventHandler {
       {
         text: 'Support Columns',
         children: [
-          { text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group')) },
-          { text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc()) },
-          { text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc()) }
+          {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
+          {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+          {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
         ]
       },
       ...metaDataOptions
@@ -357,7 +357,7 @@ export default class LineUpPanelActions extends EventHandler {
     // pass dataSource into InvertedAggregatedScore factory method
     Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType!, this.resolveArgs())) // open modal dialog
       .then((params) => { // modal dialog is closed and score created
-        if(Array.isArray(params)) {
+        if (Array.isArray(params)) {
           params.forEach((param) => this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.name, scorePlugin.desc.id, param));
         } else {
           this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
@@ -366,12 +366,12 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   toggleDisableOverviewButton(disable: boolean = false) {
-    if(!this.options.enableOverviewMode) {
+    if (!this.options.enableOverviewMode) {
       return;
     }
 
     (<HTMLButtonElement>this.overview).disabled = disable;
-    if(disable) {
+    if (disable) {
       this.overview.title = `Overview disabled due to too many items in the table. Please filter the table below the threshold of ${MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} items to enable the overview mode.`;
       this.overview.style.cursor = 'not-allowed';
     } else {
