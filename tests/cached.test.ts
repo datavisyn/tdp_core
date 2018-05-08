@@ -5,7 +5,7 @@ describe('cached', () => {
   describe('cached', () => {
     it('value', () => {
       expect(cached('test', () => 5)).toBe(5);
-      expect(cached('test', () => 10)).toBe(10, 'not using cached value');
+      expect(cached('test', () => 10)).toBe(5, 'using cached value');
     });
   });
   describe('cachedLazy', () => {
