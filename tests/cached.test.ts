@@ -9,8 +9,10 @@ describe('cached', () => {
     });
   });
   describe('cachedLazy', () => {
-    expect(typeof cachedLazy('testLazy', () => 5)).toBe('function');
-    expect(cachedLazy('testLazy', () => 5)()).toBe(5);
-    expect(cachedLazy('testLazy', () => 10)()).toBe(5);
+    it('value', () => {
+      expect(typeof cachedLazy('testLazy', () => 5)).toBe('function');
+      expect(cachedLazy('testLazy', () => 5)()).toBe(5);
+      expect(cachedLazy('testLazy', () => 10)()).toBe(5);
+    });
   });
 })
