@@ -17,6 +17,10 @@
     }
   }
 
+  .lu-row {
+    line-height: 1;
+  }
+
   %lu-panel-button {
     background: #fff;
     border: 1px solid #ddd;
@@ -162,7 +166,7 @@
         }
       }
 
-      > div {
+      > div, > .lu-stats {
         display: none;
       }
 
@@ -216,7 +220,6 @@
   }
 }
 
-$lu_use_font_awesome: true;
 $lu_assets: '~lineupjs/src/assets';
 
 @at-root {

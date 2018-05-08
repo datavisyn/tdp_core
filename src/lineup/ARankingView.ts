@@ -163,9 +163,8 @@ export abstract class ARankingView extends AView {
     mixin(this.options, idTypeNames, names, options);
 
 
-    this.node.classList.add('lineup', 'lu-taggle');
+    this.node.classList.add('lineup', 'lu-taggle', 'lu');
     this.node.insertAdjacentHTML('beforeend', `<div></div>`);
-
     this.stats = this.node.ownerDocument.createElement('p');
 
 
