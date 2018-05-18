@@ -207,6 +207,20 @@
   }
 }
 
+.lu-dialog {
+  label: {
+    margin: 0;
+  }
+
+  &.lu-filter-table > div:first-of-type > * {
+    flex: 0 0 auto;
+  }
+}
+
+.lu-collapser {
+  display: none;
+}
+
 .lineup-engine {
   position: absolute;
   top: 0;
