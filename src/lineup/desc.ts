@@ -85,11 +85,11 @@ export function numberCol(column: string, min: number, max: number, options: Par
 /**
  * creates a new LineUp description for a categorical column
  * @param {string} column the column name to use
- * @param {(string | ICategory)[]} categories description of the categories
+ * @param {(string | Partial<ICategory>)[]} categories description of the categories
  * @param {Partial<IColumnOptions>} options
  * @returns {IAdditionalColumnDesc}
  */
-export function categoricalCol(column: string, categories: (string|ICategory)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+export function categoricalCol(column: string, categories: (string|Partial<ICategory>)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   if (isHierarchical(categories)) {
     return hierarchicalCol(column, deriveHierarchy(<any[]>categories), options);
   }
