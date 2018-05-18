@@ -183,7 +183,7 @@ export abstract class ARankingView extends AView {
     } else if (typeof this.options.itemRowHeight === 'function') {
       const f = this.options.itemRowHeight;
       config.dynamicHeight = () => ({
-        defaultHeight: 20,
+        defaultHeight: 18,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
           return isGroup(item) ? 70 : f(item.v, item.i);

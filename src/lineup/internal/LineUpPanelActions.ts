@@ -18,7 +18,7 @@ export interface ISearchOption {
 
 export const rule = spaceFillingRule({
   groupHeight: 70,
-  rowHeight: 20,
+  rowHeight: 18,
   groupPadding: 5
 });
 
