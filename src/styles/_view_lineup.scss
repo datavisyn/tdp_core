@@ -232,6 +232,10 @@
   > header {
     padding-bottom: 1px; // no idea otherwise scrollbar
   }
+  
+  footer {
+    display: block !important;
+  }
 }
 
 $lu_assets: '~lineupjs/src/assets';
