@@ -280,6 +280,12 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
               Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.
             </div>
           </div>
+          <div class="checkbox">
+            <label>
+              <input type="radio" name="${prefix}_agree" required="required"> I agree that provenance graph will be stored permanently.
+              Note that you can delete this provenance graph as part of the <strong>Open Existing Session</strong> dialog.
+            </label>
+          </div>
       </form>
     `;
     return new Promise((resolve) => {
