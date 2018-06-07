@@ -421,55 +421,58 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
       return query;
     }
     const arr = term.split(this.options.tokenSeparators);
-    const last = arr[arr.length - 1];
     //filter to valid (non empty) entries
     const valid = Array.from(new Set(arr.map((a) => a.trim().toLowerCase()).filter((a) => a.length > 0)));
-    if (valid.length > 1 || last === '') { // more than one or the last one is a dummy
-      //validate entries using search providers
-      this.setBusy(true);
-      valid.forEach((text) => {
-        const item: ISelect3Item<T> = {
-          id: text,
-          text,
-          data: null,
-          verified: 'processing'
-        };
-        addSelection(item);
-      });
-      this.validate(valid).then((valid) => {
-        const validated = new Map((valid.map((i) => <[string, ISelect3Item<T>]>[i.text.toLowerCase(), i])));
-        const processing = Array.from(this.node.querySelectorAll('.select2-selection__choice[data-verified=processing]'));
-        const items = <ISelect3Item<T>[]>this.$select.select2('data');
-        items.forEach((i) => {
-          const original = i.text;
-          const valid = validated.get(original.toLowerCase());
-          const dom = <HTMLElement>processing.find((d) => d.textContent.endsWith(original));
-          if (!valid) {
-            i.verified = 'invalid';
-          } else {
-            // remove key
-            validated.delete(i.text.toLowerCase());
-            Object.assign(i, valid);
-            const o = <HTMLOptionElement>(<any>i).element;
-            if (o) {
-              // sync option
-              o.value = i.id;
-              o.textContent = i.text;
-            }
-          }
-          if (dom) {
-            dom.innerHTML = (<HTMLElement>dom.firstElementChild!).outerHTML + this.formatItem('selection', i, dom);
-          }
-        });
-        // add remaining
-        validated.forEach((i) => addSelection(i));
-        this.onChange(); // since the processing thus value changed
-        this.setBusy(false);
-      });
+
+    if (arr.length <= 1) {
+      return query; // single term
     }
-    //return the last term entered for continuing the input
+
+    //multiple terms validate all and return empty string
+
+    this.setBusy(true);
+    valid.forEach((text) => {
+      const item: ISelect3Item<T> = {
+        id: text,
+        text,
+        data: null,
+        verified: 'processing'
+      };
+      addSelection(item);
+    });
+    this.validate(valid).then((valid) => {
+      const validated = new Map((valid.map((i) => <[string, ISelect3Item<T>]>[i.text.toLowerCase(), i])));
+      const processing = Array.from(this.node.querySelectorAll('.select2-selection__choice[data-verified=processing]'));
+      const items = <ISelect3Item<T>[]>this.$select.select2('data');
+      items.forEach((i) => {
+        const original = i.text;
+        const valid = validated.get(original.toLowerCase());
+        const dom = <HTMLElement>processing.find((d) => d.textContent.endsWith(original));
+        if (!valid) {
+          i.verified = 'invalid';
+        } else {
+          // remove key
+          validated.delete(i.text.toLowerCase());
+          Object.assign(i, valid);
+          const o = <HTMLOptionElement>(<any>i).element;
+          if (o) {
+            // sync option
+            o.value = i.id;
+            o.textContent = i.text;
+          }
+        }
+        if (dom) {
+          dom.innerHTML = (<HTMLElement>dom.firstElementChild!).outerHTML + this.formatItem('selection', i, dom);
+        }
+      });
+      // add remaining
+      validated.forEach((i) => addSelection(i));
+      this.onChange(); // since the processing thus value changed
+      this.setBusy(false);
+    });
+
     return {
-      term: last
+      term: ''
     };
   }
 
