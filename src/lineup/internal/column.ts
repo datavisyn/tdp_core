@@ -72,7 +72,13 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
     if (colDesc.type === 'numbers' && rows.length > 0) {
       // hack in the data length
       const ncol = <NumbersColumn>col;
-      (<any>colDesc).dataLength = rows[0].score.length;
+      const columns = (<any>rows)._columns;
+      // inject labels
+      if (columns) {
+        (<any>ncol).originalLabels = (<any>colDesc).labels = columns;
+      }
+      (<any>ncol)._dataLength = (<any>colDesc).dataLength = rows[0].score.length;
+
       ncol.setSplicer({length: rows[0].score.length, splice: (d) => d});
     }
 
