@@ -152,6 +152,10 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     const $s = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial
     this.previousValue = this.resolveValue($s.select2('data'));
+
+    if (defaultVal) {
+      this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value);
+    }
     return $s;
   }
 

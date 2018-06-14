@@ -52,6 +52,9 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     const defaultValue = this.getStoredValue(options.unchecked) === options.checked;
     this.previousValue = defaultValue;
     this.$input.property('checked', defaultValue);
+    if (defaultValue !== options.unchecked) {
+      this.fire(FormCheckBox.EVENT_INITIAL_VALUE, defaultValue);
+    }
 
     this.handleDependent();
 

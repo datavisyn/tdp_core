@@ -163,7 +163,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           <div class="dropdown-menu" aria-labelledby="${this.desc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="btn btn-default btn-sm right">Apply</button>      
+                <button class="btn btn-default btn-sm right">Apply</button>
             </div>
           </div>
       `);
@@ -222,6 +222,10 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         this.previousValue = v;
         this.inlineOnChange(this, v, toData(v), previous);
       });
+    }
+
+    if (this.rows.length > 0) {
+      this.fire(FormMap.EVENT_INITIAL_VALUE, this.value);
     }
   }
 

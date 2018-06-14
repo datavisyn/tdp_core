@@ -12,6 +12,7 @@ import * as session from 'phovea_core/src/session';
  */
 export abstract class AFormElement<T extends IFormElementDesc> extends EventHandler implements IFormElement {
   static readonly EVENT_CHANGE = 'change';
+  static readonly EVENT_INITIAL_VALUE = 'initial';
 
   readonly id: string;
 
@@ -76,14 +77,19 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     if (this.desc.useSession || this.desc.onChange) {
       this.on(AFormElement.EVENT_CHANGE, () => {
         this.updateStoredValue();
-        if (this.desc.onChange) {
-          const value = this.value;
-          const old = this.previousValue;
-          this.previousValue = value;
-          this.desc.onChange(this, value, toData(value), old);
-        }
+        this.triggerValueChanged();
       });
     }
+  }
+
+  protected triggerValueChanged() {
+    if (!this.desc.onChange) {
+      return;
+    }
+    const value = this.value;
+    const old = this.previousValue;
+    this.previousValue = value;
+    this.desc.onChange(this, value, toData(value), old);
   }
 
   protected build() {
