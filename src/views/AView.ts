@@ -108,7 +108,9 @@ export abstract class AView extends EventHandler implements IView {
 
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
-      p.onChange = (formElement, value, data, previousValue) => onParameterChange(formElement.id, value, previousValue);
+      p.onChange = (formElement, value, _data, previousValue) => onParameterChange(formElement.id, value, previousValue);
+      // any to keep the typings
+      p.onInit = (formElement, value, _data, previousValue) => (<any>onParameterChange)(formElement.id, value, previousValue, true);
     });
     this.paramsChangeListener = onParameterChange;
 

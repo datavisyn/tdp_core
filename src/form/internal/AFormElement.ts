@@ -28,6 +28,12 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   constructor(protected readonly parent: IFormParent, protected readonly desc: T) {
     super();
     this.id = desc.id;
+
+    if (desc.onInit) {
+      this.on(AFormElement.EVENT_INITIAL_VALUE, (_evt, value: any, previousValue: any) => {
+        desc.onInit(this, value, toData(value), previousValue);
+      });
+    }
   }
 
   protected updateStoredValue() {

@@ -224,8 +224,11 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       });
     }
 
-    if (this.rows.length > 0) {
-      this.fire(FormMap.EVENT_INITIAL_VALUE, this.value);
+    {
+      const v = this.value;
+      if (v.length > 0) {
+        this.fire(FormMap.EVENT_INITIAL_VALUE, v, []);
+      }
     }
   }
 

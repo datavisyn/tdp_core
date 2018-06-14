@@ -154,7 +154,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     this.previousValue = this.resolveValue($s.select2('data'));
 
     if (defaultVal) {
-      this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value);
+      this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
     }
     return $s;
   }

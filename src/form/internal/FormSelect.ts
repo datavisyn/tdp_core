@@ -115,7 +115,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
       this.$select.property('selectedIndex', index);
 
       if (options.selectedIndex === undefined && defaultSelectedIndex > 0) {
-        this.fire(FormSelect.EVENT_INITIAL_VALUE, this.value);
+        this.fire(FormSelect.EVENT_INITIAL_VALUE, this.value, items[0]);
       }
     });
   }

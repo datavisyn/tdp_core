@@ -55,7 +55,7 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
     this.previousValue = defaultText;
     this.$input.property('value', defaultText);
     if (defaultText !== defaultValue) {
-      this.fire(FormInputText.EVENT_INITIAL_VALUE, defaultText);
+      this.fire(FormInputText.EVENT_INITIAL_VALUE, defaultText, defaultValue);
     }
 
     this.handleDependent();
