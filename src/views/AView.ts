@@ -106,11 +106,16 @@ export abstract class AView extends EventHandler implements IView {
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
 
+
+    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean)=>void = <any>onParameterChange;
+
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
       p.onChange = (formElement, value, _data, previousValue) => onParameterChange(formElement.id, value, previousValue);
-      // any to keep the typings
-      p.onInit = (formElement, value, _data, previousValue) => (<any>onParameterChange)(formElement.id, value, previousValue, true);
+
+      if (onInit) {
+        p.onInit = (formElement, value, _data, previousValue) => onInit(formElement.id, value, previousValue, true);
+      }
     });
     this.paramsChangeListener = onParameterChange;
 

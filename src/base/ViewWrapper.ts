@@ -44,7 +44,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
    */
   private context: IViewContext;
 
-  private listenerItemSelect = (event: any, oldSelection: ISelection, newSelection: ISelection) => {
+  private listenerItemSelect = (_event: any, oldSelection: ISelection, newSelection: ISelection) => {
     this.fire(AView.EVENT_ITEM_SELECT, oldSelection, newSelection);
   }
 
@@ -189,8 +189,12 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     this.instance = null;
   }
 
-  private onParameterChange(name: string, value: any, previousValue: any, pushWithResult: boolean) {
-    if (pushWithResult) {
+  private onParameterChange(name: string, value: any, previousValue: any, isInitialization: boolean) {
+    if (isInitialization) {
+      if (this.ref.createdBy) {
+        // executing during replay
+        return;
+      }
       return this.context.graph.pushWithResult(setParameter(this.ref, name, value, previousValue), {
         inverse: setParameter(this.ref, name, previousValue, value)
       });
