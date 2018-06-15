@@ -110,11 +110,11 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
 
     data(values).then((items) => {
       this.updateOptionElements(items);
-      const index = options.selectedIndex !== undefined ? options.selectedIndex : defaultSelectedIndex;
+      const index = options.selectedIndex !== undefined ? options.selectedIndex : Math.min(items.length -1, defaultSelectedIndex);
       this.previousValue = items[index];
       this.$select.property('selectedIndex', index);
 
-      if (options.selectedIndex === undefined && defaultSelectedIndex > 0) {
+      if (options.selectedIndex === undefined && index > 0) {
         this.fire(FormSelect.EVENT_INITIAL_VALUE, this.value, items[0]);
       }
     });
