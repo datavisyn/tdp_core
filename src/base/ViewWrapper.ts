@@ -30,6 +30,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   static readonly EVENT_VIEW_CREATED = 'viewCreated';
 
   private instance: IView = null; //lazy
+  private instancePromise: PromiseLike<IView> = null;
   private allowed: boolean;
   readonly node: HTMLElement;
   readonly content: HTMLElement;
@@ -138,7 +139,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       this.context = createContext(this.graph, this.plugin, this.ref);
       this.instance = p.factory(this.context, selection, this.content, {});
       this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
-      return resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
+      return this.instancePromise = resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
         const idType = this.instance.itemIDType;
         if (idType) {
           if (this.preInstanceItemSelection.idtype) {
@@ -158,6 +159,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
         this.preInstanceParameter.clear();
 
         this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance);
+        return this.instance;
       });
     });
   }
@@ -187,6 +189,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     (<HTMLElement>this.node.querySelector('header div.parameters')).innerHTML = '';
     this.instance.off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
     this.instance = null;
+    this.instancePromise = null;
   }
 
   private onParameterChange(name: string, value: any, previousValue: any, isInitialization: boolean) {
@@ -211,7 +214,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
   setParameterImpl(name: string, value: any) {
     if (this.instance) {
-      return this.instance.setParameter(name, value);
+      return this.instancePromise.then((v) => v.setParameter(name, value));
     }
     this.preInstanceParameter.set(name, value);
     return null;
@@ -230,7 +233,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
     if (this.instance) {
       if (matches) {
-        return this.instance.setInputSelection(selection);
+        return this.instancePromise.then((v) => v.setInputSelection(selection));
       } else {
         this.destroyInstance();
       }
@@ -260,9 +263,11 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
   setItemSelection(sel: ISelection) {
     if (this.instance) {
-      this.instance.off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
-      this.instance.setItemSelection(sel);
-      this.instance.on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
+      this.instancePromise.then((v) => {
+        v.off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
+        v.setItemSelection(sel);
+        v.on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
+      });
       return;
     }
     this.preInstanceItemSelection = sel;
