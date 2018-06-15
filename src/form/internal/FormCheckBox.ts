@@ -81,6 +81,7 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     const options = this.desc.options;
     this.$input.property('value', v === options.checked);
     this.previousValue = v === options.checked; // force old value change
+    this.updateStoredValue();
   }
 
   focus() {

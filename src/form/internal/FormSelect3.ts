@@ -102,6 +102,7 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
     if (!v) {
       this.select3.value = this.previousValue = [];
+      this.updateStoredValue();
       return;
     }
 
@@ -113,6 +114,7 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
     } else if (!Array.isArray(v)) { // an item or string (id or text)
       this.select3.value = [toIdTextPair(v)];
     }
+    this.updateStoredValue();
   }
 
   focus() {

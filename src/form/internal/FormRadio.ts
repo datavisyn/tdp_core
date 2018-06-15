@@ -70,6 +70,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
   set value(v: any) {
     this.$node.selectAll('input').property('checked', (d) => d === v || d.data === v);
     this.previousValue = v; // force old value change
+    this.updateStoredValue();
   }
 
   focus() {

@@ -81,6 +81,7 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
   set value(v: string) {
     this.$input.property('value', v);
     this.previousValue = v; // force old value change
+    this.updateStoredValue();
   }
 
   focus() {

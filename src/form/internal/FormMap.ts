@@ -463,6 +463,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.previousValue = this.value; // force update
     this.buildMap();
     this.updateBadge();
+    this.updateStoredValue();
   }
 
   focus() {

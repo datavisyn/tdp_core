@@ -226,6 +226,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
       // TODO doesn't work for AJAX based solutions
       this.$select.val(r).trigger('change');
       this.previousValue = this.value; // force set
+      this.updateStoredValue();
     } finally {
       this.$select.on('change.propagate', this.listener);
     }

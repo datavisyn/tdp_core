@@ -169,6 +169,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     this.$select.selectAll('option').data().forEach((d, i) => {
       if ((v.value && d.value === v.value) || d.value === v || d === v) {
         this.$select.property('selectedIndex', i);
+        this.updateStoredValue();
         this.previousValue = d; // force value update
       }
     });
