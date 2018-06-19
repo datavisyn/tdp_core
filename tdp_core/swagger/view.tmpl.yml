@@ -106,6 +106,7 @@ components:
       description: '{{arg.description}}'
       required: true
       in: query
+      {% if arg.example %}example: {{arg.example}}{% endif %}
       schema:
         {% if arg.as_list == false %}type: {{arg.type}}{% endif %}
         {% if arg.as_list %}type: array

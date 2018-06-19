@@ -10,9 +10,10 @@ REGEX_TYPE = type(re.compile(''))
 
 
 class ArgumentInfo(object):
-  def __init__(self, type=None, description='', as_list=False, is_id=None):
+  def __init__(self, type=None, description='', example=None, as_list=False, is_id=None):
     self.type = type
     self.description = description
+    self.example = example
     self.as_list = as_list
     self.id_id = id_id
 
@@ -317,18 +318,19 @@ class DBViewBuilder(object):
       self.v.valid_replacements[replace] = valid_replacements
     return self
 
-  def arg(self, arg, type=None, descriptions='', as_list=False, is_id=None):
+  def arg(self, arg, type=None, descriptions='', eexample=None, as_list=False, is_id=None):
     """
     adds another argument of this query (using :arg) which will be replaced within SQL
     :param arg: the argument key
     :param type: optional type of the argument, like int or float
     :param description: optional argument description
+    :param example: optional argument example
     :param as_list: optional whether the argument has to be a list
     :param is_id: optional whether the argument is an id argument, the value is the idtype required
     :return: self
     """
     self.v.arguments.append(arg)
-    self.v.argument_infos[arg] = ArgumentInfo(type, description, as_list, is_id)
+    self.v.argument_infos[arg] = ArgumentInfo(type, description, example, as_list, is_id)
     return self
 
   def call(self, f=None):
