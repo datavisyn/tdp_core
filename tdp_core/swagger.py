@@ -48,14 +48,19 @@ def _gen():
     tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
-      if not dbview.can_access():
+      if not dbview.can_access() or dbview.query_type = 'private':
         continue
       # if database != u'dummy' or view != u'b_items_verify':
       #  continue
+
+      for tag in dbview.tags:
+        if tag not in tags:
+          tags.append(tag)
+
       args = []
       for arg in dbview.arguments:
         info = dbview.get_argument_info(arg)
-        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None))
+        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None, description=info.description))
 
       for arg in (a for a in dbview.replacements if a not in secure_replacements):
         extra = dbview.valid_replacements.get(arg)
@@ -65,7 +70,7 @@ def _gen():
           enum_values = extra
         if extra == int or extra == float:
           arg_type = to_type(extra)
-        args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values))
+        args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values, description=''))
 
       filters = set()
 
@@ -97,11 +102,9 @@ def _gen():
           props.append(dict(name='id', type='string'))
 
       features = {
-        'generic': dbview.query_type in ['generic', 'helper'],
-        'desc': dbview.query_type in ['generic'],
+        'generic': dbview.query_type in ['generic', 'helper', 'table'],
+        'desc': dbview.query_type in ['table'],
         'lookup': dbview.query_type in ['lookup'],
-        'count': dbview.query_type in ['generic'],
-        'csv': dbview.query_type in ['generic'],
         'score': dbview.query_type in ['score']
       }
 
@@ -114,6 +117,7 @@ def _gen():
         'empty': not args and not filters,
         'filters': filters,
         'features': features,
+        'tags': dbview.tags or []
         'props': props
       }
 
