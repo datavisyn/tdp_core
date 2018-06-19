@@ -10,7 +10,6 @@ paths:
         {%- for tag in tags %}
         - {{tag}}
         {%- endfor %}
-      de
       parameters:
         - $ref: '#/components/parameters/returnQuery'
         - $ref: '#/components/parameters/format'
@@ -49,7 +48,7 @@ paths:
   {% if features.lookup %}
   '/db/{{database}}/{{view}}/lookup':
     get:
-      description: '{{description}}''
+      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_lookup

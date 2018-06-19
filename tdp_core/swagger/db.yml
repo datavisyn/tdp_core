@@ -64,7 +64,6 @@ paths:
         - query_generic
       parameters:
         - $ref: '#/components/parameters/returnQuery'
-        - $ref: '#/components/parameters/_assignids'
       responses:
         '200':
           $ref: '#/components/responses/entries_generic'
@@ -144,7 +143,6 @@ paths:
         - db
         - query_lookup
       parameters:
-        - $ref: '#/components/parameters/_assignids'
         - $ref: '#/components/parameters/lookupQuery'
         - $ref: '#/components/parameters/lookupPage'
         - $ref: '#/components/parameters/lookupLimit'

@@ -1,10 +1,11 @@
 import json
 import logging
+import json
 
+from collections import OrderedDict
 from flask import render_template
 from jinja2 import Template
 from phovea_server.ns import Namespace, Response
-from phovea_server.util import jsonify
 from . import db
 from .utils import secure_replacements
 
@@ -23,8 +24,9 @@ def _gen():
 
   here = path.abspath(path.dirname(__file__))
 
-  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml']  #, 'proxy.yml', 'storage.yml']]
+  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml']]  #, 'proxy.yml', 'storage.yml']]
   base = yaml_load(files)
+  base['paths'] = OrderedDict(sorted(base['paths'].items(), key=lambda t: t[0]))
 
   with io.open(path.join(here, 'swagger', 'view.tmpl.yml'), 'r', encoding='utf-8') as f:
     template = Template(unicode(f.read()))
@@ -48,7 +50,7 @@ def _gen():
     tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
-      if not dbview.can_access() or dbview.query_type = 'private':
+      if not dbview.can_access() or dbview.query_type == 'private':
         continue
       # if database != u'dummy' or view != u'b_items_verify':
       #  continue
@@ -60,7 +62,7 @@ def _gen():
       args = []
       for arg in dbview.arguments:
         info = dbview.get_argument_info(arg)
-        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None, description=info.description, example=info.example)
+        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None, description=info.description, example=info.example))
 
       for arg in (a for a in dbview.replacements if a not in secure_replacements):
         extra = dbview.valid_replacements.get(arg)
@@ -117,7 +119,7 @@ def _gen():
         'empty': not args and not filters,
         'filters': filters,
         'features': features,
-        'tags': dbview.tags or []
+        'tags': dbview.tags or [],
         'props': props
       }
 
@@ -125,6 +127,7 @@ def _gen():
       # _log.info(view_yaml)
       part = safe_load(view_yaml)
       base = data_merge(base, part)
+
 
   return base
 
@@ -137,7 +140,7 @@ def _generate_swagger_yml():
 
 @app.route('/swagger.json')
 def _generate_swagger_json():
-  return jsonify(_gen())
+  return Response(json.dumps(_gen()), mimetype='application/json')
 
 
 @app.route('/')

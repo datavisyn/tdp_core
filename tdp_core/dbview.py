@@ -15,7 +15,7 @@ class ArgumentInfo(object):
     self.description = description
     self.example = example
     self.as_list = as_list
-    self.id_id = id_id
+    self.is_id = is_id
 
 
 class DBFilterData(object):
@@ -318,7 +318,7 @@ class DBViewBuilder(object):
       self.v.valid_replacements[replace] = valid_replacements
     return self
 
-  def arg(self, arg, type=None, descriptions='', eexample=None, as_list=False, is_id=None):
+  def arg(self, arg, type=None, description='', example=None, as_list=False, is_id=None):
     """
     adds another argument of this query (using :arg) which will be replaced within SQL
     :param arg: the argument key

@@ -251,7 +251,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       try:
         if info and info.as_list:
           vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
-          value = tuple([parser(v) for v in ])  # multi values need to be a tuple not a list
+          value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
         else:
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
