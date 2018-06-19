@@ -41,7 +41,7 @@ def resolve_engine(database):
   """
   if database not in configs:
     abort(404, u'Database with id "{}" cannot be found'.format(database))
-  return configs.engine(r)
+  return configs.engine(database)
 
 
 def resolve_view(database, view_name):

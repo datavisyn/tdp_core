@@ -1,6 +1,5 @@
 import json
 import logging
-import json
 
 from collections import OrderedDict
 from flask import render_template
@@ -24,7 +23,7 @@ def _gen():
 
   here = path.abspath(path.dirname(__file__))
 
-  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml']]  #, 'proxy.yml', 'storage.yml']]
+  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml']]  # , 'proxy.yml', 'storage.yml']]
   base = yaml_load(files)
   base['paths'] = OrderedDict(sorted(base['paths'].items(), key=lambda t: t[0]))
 
@@ -127,7 +126,6 @@ def _gen():
       # _log.info(view_yaml)
       part = safe_load(view_yaml)
       base = data_merge(base, part)
-
 
   return base
 
