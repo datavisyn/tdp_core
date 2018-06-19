@@ -23,7 +23,7 @@ def _gen():
 
   here = path.abspath(path.dirname(__file__))
 
-  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml', 'proxy.yml', 'storage.yml']]
+  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml']  #, 'proxy.yml', 'storage.yml']]
   base = yaml_load(files)
 
   with io.open(path.join(here, 'swagger', 'view.tmpl.yml'), 'r', encoding='utf-8') as f:
