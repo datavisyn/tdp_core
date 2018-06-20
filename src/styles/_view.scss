@@ -75,7 +75,7 @@ svg {
   }
 
   &.tdp-hint-mapping::before {
-    content: $va-var-chain-broken;
+    content: $fa-var-chain-broken;
   }
 
   @import './view_lineup';
