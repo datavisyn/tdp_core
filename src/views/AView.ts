@@ -76,14 +76,18 @@ export abstract class AView extends EventHandler implements IView {
     }
   }
 
-  protected setHint(visible: boolean, hintMessage?: string) {
+  protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
     const defaultHintMessage = `No data found for the given ${this.selection.idtype.name}`;
-    this.node.classList.toggle('tdp-hint', visible);
+    this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;
     } else {
       this.node.dataset.hint = hintMessage ? hintMessage : defaultHintMessage;
     }
+  }
+
+  protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
+    return this.setHint(visible, hintMessage || `No mapping found for the given ${this.selection.idtype.name} to ${this.idType ? this.idType.name : ''}`, 'hint-mapping');
   }
 
   /*final*/
