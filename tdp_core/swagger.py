@@ -119,7 +119,8 @@ def _gen():
         'filters': filters,
         'features': features,
         'tags': dbview.tags or [],
-        'props': props
+        'props': props,
+        'propsempty': not props
       }
 
       view_yaml = template.render(**keys)

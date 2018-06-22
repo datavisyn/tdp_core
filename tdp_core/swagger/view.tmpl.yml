@@ -150,7 +150,7 @@ components:
   schemas:
     entry_{{database}}_{{view}}:
       type: object
-      properties:
+      properties: {% if propsempty %}{}{% endif %}
       {%- for prop in props %}
         '{{prop.name}}':
           type: {{prop.type}}
