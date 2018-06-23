@@ -19,6 +19,7 @@ def _gen():
   from yamlreader import yaml_load, data_merge
   from yaml import safe_load
   from os import path
+  from phovea_server import plugin
   import io
 
   here = path.abspath(path.dirname(__file__))
@@ -127,6 +128,11 @@ def _gen():
       # _log.info(view_yaml)
       part = safe_load(view_yaml)
       base = data_merge(base, part)
+
+
+  # post process using extensions
+  for p in plugin.list('tdp-swagger-postprocessor'):
+    base = p.load().factory(base)
 
   return base
 
