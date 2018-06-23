@@ -1,6 +1,6 @@
 import {randomId} from 'phovea_core/src';
 import {IDType, IDTypeLike, resolve} from 'phovea_core/src/idtype';
-import {FormElementType, IFormElement, IFormElementDesc, IFormSelectElement} from '../form';
+import {FormElementType, IFormElement, IFormElementDesc, IFormSelectElement, IFormSelectOptionGroup,  IFormSelectOption} from '../form';
 import {ISelection} from './interfaces';
 
 export interface ISelectionChooserOptions {
@@ -15,6 +15,11 @@ export interface ISelectionChooserOptions {
  */
 export default class SelectionChooser {
 
+  private static readonly INVALID_MAPPING = {
+    name: 'Invalid',
+    id: -1
+  };
+
   private readonly target: IDType | null;
   private readonly readAble: IDType | null;
   readonly desc: IFormElementDesc;
@@ -25,7 +30,7 @@ export default class SelectionChooser {
     readableIDType: null,
     label: 'Show'
   };
-  private currentOptions: { label: string, id: number, name: string }[];
+  private currentOptions: IFormSelectOption[];
 
   constructor(private readonly accessor: (id: string) => IFormElement, targetIDType?: IDTypeLike, options: Partial<ISelectionChooserOptions> = {}) {
     Object.assign(this.options, options);
@@ -54,7 +59,7 @@ export default class SelectionChooser {
 
   chosen(): { id: number, name: string } | null {
     const s = this.accessor(this.formID).value;
-    if (!s) {
+    if (!s || s.data === SelectionChooser.INVALID_MAPPING) {
       return null;
     }
     if (s.data) {
@@ -63,59 +68,100 @@ export default class SelectionChooser {
     return {id: parseInt(s.id, 10), name: s.name};
   }
 
-  private async updateImpl(selection: ISelection, reuseOld: boolean): Promise<boolean> {
-    const target: IDType = this.target || selection.idtype;
-    let targetIds: number[];
+  private async toItems(selection: ISelection): Promise<(IFormSelectOption|IFormSelectOptionGroup)[]> {
+    const source = selection.idtype;
+    const sourceIds = selection.range.dim(0).asList();
+    const sourceNames = await source.unmap(sourceIds);
 
-    if (target === selection.idtype) {
-      targetIds = selection.range.dim(0).asList();
-    } else {
-      const mapped = await selection.idtype.mapToID(selection.range, target);
-      targetIds = (<number[]>[]).concat(...mapped);
+    const readAble = this.readAble || null;
+    const readAbleNames = !readAble || readAble === source ? null : await source.mapToFirstName(sourceIds, readAble);
+    const labels = readAbleNames ? (this.options.appendOriginalLabel ? readAbleNames.map((d, i) => `${d} (${sourceNames[i]})`) : readAbleNames) : sourceNames;
+
+    const target = this.target || source;
+    if (target === source) {
+      return sourceIds.map((d, i) => ({
+        value: String(d),
+        name: labels[i],
+        data: {id: d, name: labels[i]}
+      }));
     }
 
-    if (targetIds.length === 0) {
-      return this.updateItems([], reuseOld);
-    }
+    const targetIds = await source.mapToID(sourceIds, target);
+    const targetIdsFlat =  (<number[]>[]).concat(...targetIds);
+    const targetNames = await target.unmap(targetIdsFlat);
 
-    const names = await target.unmap(targetIds);
-    const labels = this.readAble && target !== this.readAble ? await target.mapToFirstName(targetIds, this.readAble) : null;
+    let acc = 0;
+    const base = labels.map((name, i) => {
+      const group = targetIds[i];
+      const groupNames = targetNames.slice(acc, acc + group.length);
+      acc += group.length;
 
-    return this.updateItems(targetIds.map((id, i) => ({
-      id,
-      name: names[i],
-      label: labels ? (this.options.appendOriginalLabel ? `${labels[i]} (${names[i]})` : labels[i]) : names[i]
-    })), reuseOld);
+      if (group.length === 0) {
+        // fake option with null value
+        return <IFormSelectOptionGroup>{
+          name,
+          children: [{
+            name: 'No Mapping found',
+            value: '',
+            data: SelectionChooser.INVALID_MAPPING
+          }]
+        };
+      }
+      return <IFormSelectOptionGroup>{
+        name,
+        children: group.map((d, j) => ({
+          name: groupNames[j],
+          value: String(d),
+          data: {
+            id: d,
+            name: groupNames[j]
+          }
+        }))
+      };
+    });
+    return base.length === 1 ? base[0].children : base;
   }
 
-  private updateItems(items: { label: string, id: number, name: string }[], reuseOld: boolean) {
-    const options = items.map(({label, id, name}) => ({value: id.toString(), name: label, data: {id, name}}));
+  private updateImpl(selection: ISelection, reuseOld: boolean): Promise<boolean> {
+    return this.toItems(selection).then((r) => this.updateItems(r, reuseOld));
+  }
+
+  private updateItems(options: (IFormSelectOption|IFormSelectOptionGroup)[], reuseOld: boolean) {
     const element = <IFormSelectElement>this.accessor(this.formID);
+
+    const flatOptions = options.reduce((acc, d) => {
+      if ((<any>d).children) {
+        acc.push(...(<IFormSelectOptionGroup>d).children);
+      } else {
+        acc.push(<IFormSelectOption>d);
+      }
+      return acc;
+    }, <IFormSelectOption[]>[]);
 
     // backup entry and restore the selectedIndex by value afterwards again,
     // because the position of the selected element might change
-    const bak = element.value || options[element.getSelectedIndex()];
+    const bak = element.value || flatOptions[element.getSelectedIndex()];
     element.updateOptionElements(options);
 
     let changed = true;
     // select last item from incoming `selection.range`
     if (this.options.selectNewestByDefault) {
       // find the first newest entries
-      const newOne = options.find((d) => !this.currentOptions || this.currentOptions.every((e) => e.id !== d.data.id));
+      const newOne = flatOptions.find((d) => !this.currentOptions || this.currentOptions.every((e) => e.value !== d.value));
       if (newOne) {
         element.value = newOne;
       } else {
-        element.value = options[options.length - 1];
+        element.value = flatOptions[flatOptions.length - 1];
       }
     } else if (!reuseOld) {
-      element.value = options[options.length - 1];
+      element.value = flatOptions[flatOptions.length - 1];
       // otherwise try to restore the backup
     } else if (bak !== null) {
       element.value = bak;
       changed = false;
     }
 
-    this.currentOptions = items;
+    this.currentOptions = flatOptions;
 
     // just show if there is more than one
     element.setVisible(options.length > 1);
