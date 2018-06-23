@@ -129,7 +129,6 @@ def _gen():
       part = safe_load(view_yaml)
       base = data_merge(base, part)
 
-
   # post process using extensions
   for p in plugin.list('tdp-swagger-postprocessor'):
     base = p.load().factory(base)
