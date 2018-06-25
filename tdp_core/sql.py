@@ -65,8 +65,12 @@ def _format_json_decimal(obj):
 def _formatter(view_name):
   if view_name.endswith('.csv'):
     return view_name[:-4], _format_csv
+  elif request.args.get('_format') == 'csv':
+    return view_name, _format_csv
   elif view_name.endswith('.json'):
     return view_name[:-5], _format_json_decimal
+  elif request.args.get('_format') == 'json':
+    return view_name, _format_json_decimal
   return view_name, jsonify
 
 

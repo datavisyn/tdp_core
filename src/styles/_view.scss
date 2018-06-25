@@ -45,7 +45,7 @@ svg {
     }
   }
 
-  &.tdp-hint {
+  &.tdp-hint, &.tdp-hint-mapping {
     &::before {
       @include fa-icon();
       $nothing: 50pt;
@@ -72,6 +72,10 @@ svg {
     > * {
       display: none !important;
     }
+  }
+
+  &.tdp-hint-mapping::before {
+    content: $fa-var-chain-broken;
   }
 
   @import './view_lineup';
