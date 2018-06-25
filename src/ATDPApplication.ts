@@ -59,6 +59,11 @@ export interface ITDPOptions {
    * default: false
    */
   showHelpLink: boolean | string;
+
+  /**
+   * default: true
+   */
+  enableProvenanceUrlTracking?: boolean;
 }
 
 /**
@@ -76,7 +81,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showAboutLink: true,
     showHelpLink: false,
     showOptionsLink: false,
-    showReportBugLink: true
+    showReportBugLink: true,
+    enableProvenanceUrlTracking: true
   };
 
   protected app: Promise<T> = null;
@@ -128,7 +134,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     this.cleanUpOld(manager);
 
-    const clueManager = new CLUEGraphManager(manager);
+    const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
 
     this.header.wait();
 
