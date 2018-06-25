@@ -3,11 +3,16 @@ paths:
   {% if features.generic %}
   '/db/{{database}}/{{view}}':
     get:
+      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_generic
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
       parameters:
         - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/format'
         {%- for arg in args %}
         - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
         {%- endfor %}
@@ -22,55 +27,16 @@ paths:
         '404':
           $ref: '#/components/responses/notFound'
   {%- endif %}
-  {% if features.csv %}
-  '/db/{{database}}/{{view}}.csv':
-    get:
-      tags:
-        - db_{{database}}
-        - query_generic
-      parameters:
-        {%- for arg in args %}
-        - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
-        {%- endfor %}
-        {%- for filter in filters %}
-        - $ref: '#/components/parameters/filter_{{database}}_{{view}}_filter_{{filter}}'
-        {%- endfor %}
-      responses:
-        '200':
-          $ref: '#/components/responses/csv'
-        '403':
-          $ref: '#/components/responses/notAllowed'
-        '404':
-          $ref: '#/components/responses/notFound'
-  {%- endif %}
-  {% if features.count %}
-  '/db/{{database}}/{{view}}/count':
-    get:
-      tags:
-        - db_{{database}}
-        - query_generic
-      parameters:
-        - $ref: '#/components/parameters/returnQuery'
-        {%- for arg in args %}
-        - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
-        {%- endfor %}
-        {%- for filter in filters %}
-        - $ref: '#/components/parameters/filter_{{database}}_{{view}}_filter_{{filter}}'
-        {%- endfor %}
-      responses:
-        '200':
-          $ref: '#/components/responses/queryCount'
-        '403':
-          $ref: '#/components/responses/notAllowed'
-        '404':
-          $ref: '#/components/responses/notFound'
-  {%- endif %}
   {% if features.desc %}
   '/db/{{database}}/{{view}}/desc':
     get:
+      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_generic
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
       responses:
         '200':
           $ref: '#/components/responses/queryDesc'
@@ -82,9 +48,13 @@ paths:
   {% if features.lookup %}
   '/db/{{database}}/{{view}}/lookup':
     get:
+      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_lookup
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
       parameters:
         - $ref: '#/components/parameters/lookupQuery'
         - $ref: '#/components/parameters/lookupPage'
@@ -100,12 +70,17 @@ paths:
   {% if features.score %}
   '/db/{{database}}/{{view}}/score':
     get:
+      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_score
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
       parameters:
         - $ref: '#/components/parameters/scoreTarget'
         - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/format'
         {%- for arg in args %}
         - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
         {%- endfor %}
@@ -127,8 +102,10 @@ components:
     {%- for arg in args %}
     'arg_{{database}}_{{view}}_{{arg.name}}':
       name: '{{arg.name}}'
+      description: '{{arg.description}}'
       required: true
       in: query
+      {% if arg.example %}example: {{arg.example}}{% endif %}
       schema:
         {% if arg.as_list == false %}type: {{arg.type}}{% endif %}
         {% if arg.as_list %}type: array
@@ -159,6 +136,9 @@ components:
     entries_{{database}}_{{view}}:
       description: Successful response
       content:
+        text/csv:
+          schema:
+            type: string
         application/json:
           schema:
             type: array
@@ -170,7 +150,7 @@ components:
   schemas:
     entry_{{database}}_{{view}}:
       type: object
-      properties:
+      properties: {% if propsempty %}{}{% endif %}
       {%- for prop in props %}
         '{{prop.name}}':
           type: {{prop.type}}
