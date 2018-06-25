@@ -149,9 +149,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     if (!anyGroups) {
       const $options = this.$select.selectAll('option').data(<IFormSelectOption[]>options);
       $options.enter().append('option');
-
       $options.attr('value', (d) => d.value).html((d) => d.name);
-
       $options.exit().remove();
       return;
     }
