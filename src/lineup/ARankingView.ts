@@ -498,12 +498,8 @@ export abstract class ARankingView extends AView {
     // hook
   }
 
-  private setLineUpData(rows: IRow[]) {
-    if (rows.length > 0) {
-      this.node.classList.remove('nodata');
-    } else {
-      this.node.classList.add('nodata');
-    }
+  protected setLineUpData(rows: IRow[]) {
+    this.setHint(rows.length === 0, 'No data found for selection and parameter.');
     this.provider.setData(rows);
     this.selectionHelper.rows = rows;
     this.selectionHelper.setItemSelection(this.getItemSelection());

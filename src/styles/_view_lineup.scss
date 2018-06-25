@@ -7,16 +7,6 @@
   flex-direction: row;
   height: 100%;
 
-  &.nodata {
-    &::before {
-      margin-top: 40px;
-      content: 'No data found for selection and parameter.';
-    }
-    > div * {
-      display: none;
-    }
-  }
-
   .lu-row {
     line-height: 1;
   }
@@ -232,7 +222,7 @@
   > header {
     padding-bottom: 1px; // no idea otherwise scrollbar
   }
-  
+
   footer {
     display: block !important;
   }
