@@ -42,7 +42,8 @@ paths:
 components:
   securitySchemes:
     basicAuth:
-      type: basic
+      type: http
+      scheme: basic
     apiKeyAuth:
       type: apiKey
       in: query
