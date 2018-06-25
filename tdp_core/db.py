@@ -17,6 +17,11 @@ def _supports_sql_parameters(dialect):
 
 
 def resolve(database):
+  """
+  finds and return the connector and engine for the given database
+  :param database: database key to lookup
+  :return: (connector, engine)
+  """
   if database not in configs:
     abort(404, u'Database with id "{}" cannot be found'.format(database))
   r = configs[database]
@@ -28,7 +33,24 @@ def resolve(database):
   return r
 
 
+def resolve_engine(database):
+  """
+  finds and return the engine for the given database
+  :param database: database key to lookup
+  :return: engine
+  """
+  if database not in configs:
+    abort(404, u'Database with id "{}" cannot be found'.format(database))
+  return configs.engine(database)
+
+
 def resolve_view(database, view_name):
+  """
+  finds and return the connector, engine, and view for the given database and view_name
+  :param database: database key to lookup
+  :param view_name: view name to lookup
+  :return: (connector, engine, view)
+  """
   connector, engine = resolve(database)
   if view_name not in connector.views:
     abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
@@ -228,7 +250,8 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       parser = info.type if info and info.type is not None else lambda x: x
       try:
         if info and info.as_list:
-          value = tuple([parser(v) for v in arguments.getlist(lookup_key)])  # multi values need to be a tuple not a list
+          vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
+          value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
         else:
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value

@@ -64,31 +64,9 @@ paths:
         - query_generic
       parameters:
         - $ref: '#/components/parameters/returnQuery'
-        - $ref: '#/components/parameters/_assignids'
       responses:
         '200':
           $ref: '#/components/responses/entries_generic'
-        '403':
-          $ref: '#/components/responses/notAllowed'
-        '404':
-          $ref: '#/components/responses/notFound'
-  '/db/{database}/{view}.csv':
-    parameters:
-      - $ref: '#/components/parameters/database'
-      - $ref: '#/components/parameters/view'
-    get:
-      x-swagger-router-controller: tdp_core
-      operationId: sql.get_filtered_data_csv
-      description: see the base version with additional filter possiblities
-      tags:
-        - db
-        - query_generic
-      parameters:
-        - $ref: '#/components/parameters/returnQuery'
-        - $ref: '#/components/parameters/_assignids'
-      responses:
-        '200':
-          $ref: '#/components/responses/csv'
         '403':
           $ref: '#/components/responses/notAllowed'
         '404':
@@ -108,7 +86,7 @@ paths:
         - query_score
       parameters:
         - $ref: '#/components/parameters/returnQuery'
-        - $ref: '#/components/parameters/_assignids'
+        - $ref: '#/components/parameters/format'
         - $ref: '#/components/parameters/scoreTarget'
       responses:
         '200':
@@ -165,7 +143,6 @@ paths:
         - db
         - query_lookup
       parameters:
-        - $ref: '#/components/parameters/_assignids'
         - $ref: '#/components/parameters/lookupQuery'
         - $ref: '#/components/parameters/lookupPage'
         - $ref: '#/components/parameters/lookupLimit'
@@ -192,20 +169,21 @@ components:
       required: true
       schema:
         type: string
-    _assignids:
-      name: _assignids
-      in: query
-      description: whether the unique ids should be automatically injected in the results
-      required: false
-      schema:
-        type: boolean
-        default: false
     returnQuery:
       name: _return_query
       in: query
       schema:
         type: boolean
         default: false
+      required: false
+    format:
+      name: _format
+      in: query
+      schema:
+        type: string
+        enum:
+          - json
+          - csv
       required: false
     lookupQuery:
       name: query
@@ -286,6 +264,9 @@ components:
     queryScore:
       description: Successful response
       content:
+        text/csv:
+          schema:
+            type: string
         application/json:
           schema:
             title: ArrayOfRows
@@ -299,6 +280,9 @@ components:
     entries_generic:
       description: Successful response
       content:
+        text/csv:
+          schema:
+            type: string
         application/json:
           schema:
             title: ArrayOfRows
@@ -306,12 +290,6 @@ components:
             items:
               type: object
               additionalProperties: true
-    csv:
-      description: Successful response
-      content:
-        text/csv:
-          schema:
-            type: string
   schemas:
     database:
       type: string
