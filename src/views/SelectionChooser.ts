@@ -82,7 +82,7 @@ export default class SelectionChooser {
       return sourceIds.map((d, i) => ({
         value: String(d),
         name: labels[i],
-        data: {id: d, name: labels[i]}
+        data: {id: d, name: sourceNames[i]}
       }));
     }
 
