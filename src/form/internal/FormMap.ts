@@ -7,7 +7,7 @@ import {event as d3event} from 'd3';
 import * as $ from 'jquery';
 import AFormElement, {toData} from './AFormElement';
 import {IFormElementDesc, IFormParent, FormElementType} from '../interfaces';
-import {ISelectOptions, resolveData} from './FormSelect';
+import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
 import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
 import {mixin} from 'phovea_core/src';
 import {IFormElement} from '../';
@@ -163,7 +163,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           <div class="dropdown-menu" aria-labelledby="${this.desc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="btn btn-default btn-sm right">Apply</button>      
+                <button class="btn btn-default btn-sm right">Apply</button>
             </div>
           </div>
       `);
@@ -246,7 +246,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           row.value = this.value;
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
         });
-        resolveData(desc.optionsData)([]).then((values) => {
+        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">Select me...</option>` : '') + values.map(mapOptions).join('');
           if (initialValue) {
             (<HTMLSelectElement>parent.firstElementChild).selectedIndex = values.map((d) => typeof d === 'string' ? d : d.value).indexOf(initialValue);
@@ -260,7 +260,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       case FormElementType.SELECT2:
         parent.insertAdjacentHTML('afterbegin', `<select class="form-control" style="width: 100%"></select>`);
 
-        resolveData(desc.optionsData)([]).then((values) => {
+        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
           // in case of ajax but have default value
           if (desc.ajax && values.length === 0 && initialValue) {
