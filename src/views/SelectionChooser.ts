@@ -90,6 +90,15 @@ export default class SelectionChooser {
     const targetIdsFlat =  (<number[]>[]).concat(...targetIds);
     const targetNames = await target.unmap(targetIdsFlat);
 
+    if (target === readAble && targetIds.every((d) => d.length === 1)) {
+      // keep it simple target = readable and single hit - so just show flat
+      return targetIds.map((d, i) => ({
+        value: String(d[0]),
+        name: labels[i],
+        data: {id: d[0], name: targetNames[i]}
+      }));
+    }
+
     let acc = 0;
     const base = labels.map((name, i) => {
       const group = targetIds[i];
