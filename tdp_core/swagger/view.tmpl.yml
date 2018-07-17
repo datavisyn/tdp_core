@@ -3,6 +3,7 @@ paths:
   {% if features.generic %}
   '/db/{{database}}/{{view}}':
     get:
+      summary: '{{summary}}'
       description: '{{description}}'
       tags:
         - db_{{database}}
@@ -30,6 +31,7 @@ paths:
   {% if features.desc %}
   '/db/{{database}}/{{view}}/desc':
     get:
+      summary: '{{summary}}'
       description: '{{description}}'
       tags:
         - db_{{database}}
@@ -48,6 +50,7 @@ paths:
   {% if features.lookup %}
   '/db/{{database}}/{{view}}/lookup':
     get:
+      summary: '{{summary}}'
       description: '{{description}}'
       tags:
         - db_{{database}}
@@ -70,6 +73,7 @@ paths:
   {% if features.score %}
   '/db/{{database}}/{{view}}/score':
     get:
+      summary: '{{summary}}'
       description: '{{description}}'
       tags:
         - db_{{database}}
