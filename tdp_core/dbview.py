@@ -168,7 +168,7 @@ class DBViewBuilder(object):
     :return: self
     """
     self.v.description = desc
-    self.v.summary = summary or (desc if len(desc) < 20 else desc[0:20] + '...'
+    self.v.summary = summary or (desc if len(desc) < 20 else desc[0:20] + '...')
     return self
 
   def assign_ids(self):
