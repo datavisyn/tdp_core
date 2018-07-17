@@ -15,8 +15,10 @@ configs = DBManager()
 def _supports_sql_parameters(dialect):
   return dialect.lower() != 'sqlite' and dialect.lower() != 'oracle'  # sqlite doesn't support array parameters, postgres does
 
+
 def _differentiates_empty_string_and_null(dialect):
   return dialect.lower() != 'oracle'  # for Oracle, an empty string is the same as a null string
+
 
 def resolve(database):
   """
