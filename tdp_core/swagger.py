@@ -115,6 +115,7 @@ def _gen():
         'view': view,
         'type': dbview.query_type,
         'description': dbview.description or '',
+        'summary': dbview.summary or '',
         'args': args,
         'empty': not args and not filters,
         'filters': filters,

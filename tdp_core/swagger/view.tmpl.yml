@@ -2,8 +2,9 @@ openapi: 3.0.0
 paths:
   {% if features.generic %}
   '/db/{{database}}/{{view}}':
+    summary: '{{summary}}'
+    description: '{{description}}'
     get:
-      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_generic
@@ -29,8 +30,9 @@ paths:
   {%- endif %}
   {% if features.desc %}
   '/db/{{database}}/{{view}}/desc':
+    summary: '{{summary}}'
+    description: '{{description}}'
     get:
-      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_generic
@@ -47,8 +49,9 @@ paths:
   {%- endif %}
   {% if features.lookup %}
   '/db/{{database}}/{{view}}/lookup':
+    summary: '{{summary}}'
+    description: '{{description}}'
     get:
-      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_lookup
@@ -69,8 +72,9 @@ paths:
   {%- endif %}
   {% if features.score %}
   '/db/{{database}}/{{view}}/score':
+    summary: '{{summary}}'
+    description: '{{description}}'
     get:
-      description: '{{description}}'
       tags:
         - db_{{database}}
         - query_score

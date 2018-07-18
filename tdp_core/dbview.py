@@ -28,6 +28,7 @@ class DBFilterData(object):
 class DBView(object):
   def __init__(self, idtype=None, query=None):
     self.description = ''
+    self.summary = ''
     self.query_type = 'generic'
     self.tags = []
     self.idtype = idtype
@@ -147,6 +148,7 @@ class DBViewBuilder(object):
     self.v.query_type = view.query_type
     self.v.idtype = view.idtype
     self.v.description = view.description
+    self.v.summary = view.summary
     self.v.query = view.query
     self.v.queries = view.queries.copy()
     self.v.columns = view.columns.copy()
@@ -158,13 +160,15 @@ class DBViewBuilder(object):
     self.v.security = view.security
     return self
 
-  def description(self, desc):
+  def description(self, desc, summary=None):
     """
     optional description of this query
     :param desc: the description text
+    :param summary: optional shorter summary text
     :return: self
     """
     self.v.description = desc
+    self.v.summary = summary or (desc if len(desc) < 20 else desc[0:20] + '...')
     return self
 
   def assign_ids(self):
