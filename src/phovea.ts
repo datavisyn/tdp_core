@@ -6,11 +6,6 @@
 import {IRegistry} from 'phovea_core/src/plugin';
 
 export default function (registry: IRegistry) {
-  /// #if include('extension-type', 'extension-id')
-  //registry.push('extension-type', 'extension-id', function() { return import('./extension_impl'); }, {});
-  /// #endif
-  // generator-phovea:begin
-
   function actionFunction(id: string, factory: string, loader: () => any) {
     registry.push('actionFunction', id, loader, { factory });
   }
@@ -45,6 +40,4 @@ export default function (registry: IRegistry) {
   actionFunction('lineupSetColumn', 'setColumnImpl', () => System.import('./lineup/internal/cmds'));
   actionFunction('lineupAddColumn', 'addColumnImpl', () => System.import('./lineup/internal/cmds'));
   actionFunction('lineupMoveColumn', 'moveColumnImpl', () => System.import('./lineup/internal/cmds'));
-
-  // generator-phovea:end
 };
