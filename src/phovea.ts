@@ -40,4 +40,4 @@ export default function (registry: IRegistry) {
   actionFunction('lineupSetColumn', 'setColumnImpl', () => System.import('./lineup/internal/cmds'));
   actionFunction('lineupAddColumn', 'addColumnImpl', () => System.import('./lineup/internal/cmds'));
   actionFunction('lineupMoveColumn', 'moveColumnImpl', () => System.import('./lineup/internal/cmds'));
-};
+}
