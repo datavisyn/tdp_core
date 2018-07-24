@@ -15,13 +15,19 @@ export interface IFormSelectOption {
   data: any;
 }
 
+export interface IFormSelectOptionGroup {
+  name: string;
+  children: IFormSelectOption[];
+}
+
 export declare type ISelectOptions = ((string|IFormSelectOption)[]|Promise<(string|IFormSelectOption)[]>);
+export declare type IHierarchicalSelectOptions = ((string|IFormSelectOption|IFormSelectOptionGroup)[]|Promise<(string|IFormSelectOption|IFormSelectOptionGroup)[]>);
 
 export interface IFormSelectOptions {
   /**
    * Data for the options elements of the select
    */
-  optionsData?: ISelectOptions|((dependents: any[]) => ISelectOptions);
+  optionsData?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions);
   /**
    * Index of the selected option; this option overrides the selected index from the `useSession` property
    */
@@ -41,7 +47,7 @@ export interface IFormSelectDesc extends IFormElementDesc {
 export interface IFormSelectElement extends IFormElement {
   getSelectedIndex(): number;
 
-  updateOptionElements(data: (string|IFormSelectOption)[]): void;
+  updateOptionElements(data: (string|IFormSelectOption|IFormSelectOptionGroup)[]): void;
 }
 
 /**
@@ -134,13 +140,38 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
    * Update the options of a select form element using the given data array
    * @param data
    */
-  updateOptionElements(data: (string|IFormSelectOption)[]) {
+  updateOptionElements(data: (string|IFormSelectOption|IFormSelectOptionGroup)[]) {
     const options = data.map(toOption);
 
-    const $options = this.$select.selectAll('option').data(options);
-    $options.enter().append('option');
+    const isGroup = (d: IFormSelectOption|IFormSelectOptionGroup): d is IFormSelectOptionGroup => {
+      return Array.isArray((<any>d).children);
+    };
+    const anyGroups = data.some(isGroup);
 
-    $options.attr('value', (d) => d.value).html((d) => d.name);
+    this.$select.selectAll('option, optgroup').remove();
+
+    if (!anyGroups) {
+      const $options = this.$select.selectAll('option').data(<IFormSelectOption[]>options);
+      $options.enter().append('option');
+      $options.attr('value', (d) => d.value).html((d) => d.name);
+      $options.exit().remove();
+      return;
+    }
+    const node = <HTMLSelectElement>this.$select.node();
+    const $options = this.$select.selectAll(() => node.children).data(options);
+    $options.enter()
+      .append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
+
+    const $sub = $options.filter(isGroup)
+      .attr('label', (d) => d.name)
+      .selectAll('option').data((d) => (<IFormSelectOptionGroup>d).children);
+    $sub.enter().append('option');
+    $sub.attr('value', (d) => d.value).html((d) => d.name);
+    $sub.exit().remove();
+
+    $options.filter((d) => !isGroup)
+      .attr('value', (d) => ((<IFormSelectOption>d).value))
+      .html((d) => d.name);
 
     $options.exit().remove();
   }
@@ -184,14 +215,14 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   }
 }
 
-function toOption(d: string|IFormSelectOption): IFormSelectOption {
+function toOption(d: string|IFormSelectOption|IFormSelectOptionGroup): IFormSelectOption|IFormSelectOptionGroup {
   if (typeof d === 'string') {
     return {name: d, value: d, data: d};
   }
   return d;
 }
 
-export function resolveData(data?: ISelectOptions|((dependents: any[]) => ISelectOptions)): ((dependents: any[]) => PromiseLike<IFormSelectOption[]>) {
+export function resolveData(data?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption|IFormSelectOptionGroup)[]>) {
   if (data === undefined) {
     return () => resolveImmediately([]);
   }

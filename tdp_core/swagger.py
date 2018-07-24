@@ -1,10 +1,10 @@
 import json
 import logging
 
+from collections import OrderedDict
 from flask import render_template
 from jinja2 import Template
 from phovea_server.ns import Namespace, Response
-from phovea_server.util import jsonify
 from . import db
 from .utils import secure_replacements
 
@@ -19,12 +19,14 @@ def _gen():
   from yamlreader import yaml_load, data_merge
   from yaml import safe_load
   from os import path
+  from phovea_server import plugin
   import io
 
   here = path.abspath(path.dirname(__file__))
 
-  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml', 'proxy.yml', 'storage.yml']]
+  files = [path.join(here, 'swagger', p) for p in ['swagger.yml', 'db.yml']]  # , 'proxy.yml', 'storage.yml']]
   base = yaml_load(files)
+  base['paths'] = OrderedDict(sorted(base['paths'].items(), key=lambda t: t[0]))
 
   with io.open(path.join(here, 'swagger', 'view.tmpl.yml'), 'r', encoding='utf-8') as f:
     template = Template(unicode(f.read()))
@@ -48,14 +50,19 @@ def _gen():
     tags.append(dict(name=u'db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
-      if not dbview.can_access():
+      if not dbview.can_access() or dbview.query_type == 'private':
         continue
       # if database != u'dummy' or view != u'b_items_verify':
       #  continue
+
+      for tag in dbview.tags:
+        if tag not in tags:
+          tags.append(tag)
+
       args = []
       for arg in dbview.arguments:
         info = dbview.get_argument_info(arg)
-        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None))
+        args.append(dict(name=arg, type=to_type(info.type), as_list=info.as_list, enum_values=None, description=info.description, example=info.example))
 
       for arg in (a for a in dbview.replacements if a not in secure_replacements):
         extra = dbview.valid_replacements.get(arg)
@@ -65,7 +72,7 @@ def _gen():
           enum_values = extra
         if extra == int or extra == float:
           arg_type = to_type(extra)
-        args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values))
+        args.append(dict(name=arg, type=arg_type, as_list=False, enum=enum_values, description=''))
 
       filters = set()
 
@@ -97,11 +104,9 @@ def _gen():
           props.append(dict(name='id', type='string'))
 
       features = {
-        'generic': dbview.query_type in ['generic', 'helper'],
-        'desc': dbview.query_type in ['generic'],
+        'generic': dbview.query_type in ['generic', 'helper', 'table'],
+        'desc': dbview.query_type in ['table'],
         'lookup': dbview.query_type in ['lookup'],
-        'count': dbview.query_type in ['generic'],
-        'csv': dbview.query_type in ['generic'],
         'score': dbview.query_type in ['score']
       }
 
@@ -110,17 +115,24 @@ def _gen():
         'view': view,
         'type': dbview.query_type,
         'description': dbview.description or '',
+        'summary': dbview.summary or '',
         'args': args,
         'empty': not args and not filters,
         'filters': filters,
         'features': features,
-        'props': props
+        'tags': dbview.tags or [],
+        'props': props,
+        'propsempty': not props
       }
 
       view_yaml = template.render(**keys)
       # _log.info(view_yaml)
       part = safe_load(view_yaml)
       base = data_merge(base, part)
+
+  # post process using extensions
+  for p in plugin.list('tdp-swagger-postprocessor'):
+    base = p.load().factory(base)
 
   return base
 
@@ -133,7 +145,7 @@ def _generate_swagger_yml():
 
 @app.route('/swagger.json')
 def _generate_swagger_json():
-  return jsonify(_gen())
+  return Response(json.dumps(_gen()), mimetype='application/json')
 
 
 @app.route('/')

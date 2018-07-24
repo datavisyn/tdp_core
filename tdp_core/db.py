@@ -16,7 +16,16 @@ def _supports_sql_parameters(dialect):
   return dialect.lower() != 'sqlite' and dialect.lower() != 'oracle'  # sqlite doesn't support array parameters, postgres does
 
 
+def _differentiates_empty_string_and_null(dialect):
+  return dialect.lower() != 'oracle'  # for Oracle, an empty string is the same as a null string
+
+
 def resolve(database):
+  """
+  finds and return the connector and engine for the given database
+  :param database: database key to lookup
+  :return: (connector, engine)
+  """
   if database not in configs:
     abort(404, u'Database with id "{}" cannot be found'.format(database))
   r = configs[database]
@@ -28,7 +37,24 @@ def resolve(database):
   return r
 
 
+def resolve_engine(database):
+  """
+  finds and return the engine for the given database
+  :param database: database key to lookup
+  :return: engine
+  """
+  if database not in configs:
+    abort(404, u'Database with id "{}" cannot be found'.format(database))
+  return configs.engine(database)
+
+
 def resolve_view(database, view_name):
+  """
+  finds and return the connector, engine, and view for the given database and view_name
+  :param database: database key to lookup
+  :param view_name: view name to lookup
+  :return: (connector, engine, view)
+  """
   connector, engine = resolve(database)
   if view_name not in connector.views:
     abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
@@ -228,7 +254,8 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       parser = info.type if info and info.type is not None else lambda x: x
       try:
         if info and info.as_list:
-          value = tuple([parser(v) for v in arguments.getlist(lookup_key)])  # multi values need to be a tuple not a list
+          vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
+          value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
         else:
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
@@ -394,7 +421,10 @@ def _fill_up_columns(view, engine):
           columns[num_col]['min'] = row[num_col + '_min']
           columns[num_col]['max'] = row[num_col + '_max']
       for col in categorical_columns:
-        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} <> '' and {col} is not NULL ORDER BY {col} ASC"""
+        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} is not NULL"""
+        if _differentiates_empty_string_and_null(engine.name):
+          template += u""" AND {col} <> ''"""
+        template += u""" ORDER BY {col} ASC"""
         cats = s.execute(template.format(col=col, table=table))
         columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
 

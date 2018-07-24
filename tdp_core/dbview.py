@@ -10,9 +10,12 @@ REGEX_TYPE = type(re.compile(''))
 
 
 class ArgumentInfo(object):
-  def __init__(self, type=None, as_list=False):
+  def __init__(self, type=None, description='', example=None, as_list=False, is_id=None):
     self.type = type
+    self.description = description
+    self.example = example
     self.as_list = as_list
+    self.is_id = is_id
 
 
 class DBFilterData(object):
@@ -25,7 +28,9 @@ class DBFilterData(object):
 class DBView(object):
   def __init__(self, idtype=None, query=None):
     self.description = ''
+    self.summary = ''
     self.query_type = 'generic'
+    self.tags = []
     self.idtype = idtype
     self.query = query
     self.queries = {}
@@ -126,9 +131,13 @@ class DBViewBuilder(object):
   db view builder pattern implementation
   """
 
-  def __init__(self, query_type='generic'):
+  def __init__(self, query_type='generic', tags=None):
+    """
+    :param query_type:
+    """
     self.v = DBView()
     self.v.query_type = query_type
+    self.v.tags = tags or []
 
   def clone(self, view):
     """
@@ -139,6 +148,7 @@ class DBViewBuilder(object):
     self.v.query_type = view.query_type
     self.v.idtype = view.idtype
     self.v.description = view.description
+    self.v.summary = view.summary
     self.v.query = view.query
     self.v.queries = view.queries.copy()
     self.v.columns = view.columns.copy()
@@ -150,13 +160,15 @@ class DBViewBuilder(object):
     self.v.security = view.security
     return self
 
-  def description(self, desc):
+  def description(self, desc, summary=None):
     """
     optional description of this query
     :param desc: the description text
+    :param summary: optional shorter summary text
     :return: self
     """
     self.v.description = desc
+    self.v.summary = summary or (desc if len(desc) < 20 else desc[0:20] + '...')
     return self
 
   def assign_ids(self):
@@ -310,16 +322,19 @@ class DBViewBuilder(object):
       self.v.valid_replacements[replace] = valid_replacements
     return self
 
-  def arg(self, arg, type=None, as_list=False):
+  def arg(self, arg, type=None, description='', example=None, as_list=False, is_id=None):
     """
     adds another argument of this query (using :arg) which will be replaced within SQL
     :param arg: the argument key
     :param type: optional type of the argument, like int or float
+    :param description: optional argument description
+    :param example: optional argument example
     :param as_list: optional whether the argument has to be a list
+    :param is_id: optional whether the argument is an id argument, the value is the idtype required
     :return: self
     """
     self.v.arguments.append(arg)
-    self.v.argument_infos[arg] = ArgumentInfo(type, as_list)
+    self.v.argument_infos[arg] = ArgumentInfo(type, description, example, as_list, is_id)
     return self
 
   def call(self, f=None):
