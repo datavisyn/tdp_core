@@ -4,6 +4,7 @@
 
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
+import {PropertyHandler} from 'phovea_core/src';
 import {showErrorModalDialog, lazyDialogModule} from '../dialogs';
 import {IProvenanceGraphDataDescription} from 'phovea_core/src/provenance';
 import {mixin, randomId} from 'phovea_core/src';
@@ -143,14 +144,24 @@ export default class EditProvenanceGraphMenu {
     (<HTMLLinkElement>li.querySelector('a[data-action="persist"]')).addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
-      if (!this.graph) {
+      if (!this.graph || isPersistent(this.graph.desc)) {
         return false;
       }
       persistProvenanceGraphMetaData(this.graph.desc).then((extras: any) => {
         if (extras !== null) {
           Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(showErrorModalDialog).then(() => {
             this.updateGraphMetaData(this.graph);
-            pushNotification('success', `Session "${this.graph.desc.name}" successfully persisted`, DEFAULT_SUCCESS_AUTO_HIDE);
+            const p = new PropertyHandler(location.hash);
+            const hash = new Map<string, string>();
+            p.forEach((key, value) => {
+              hash.set(key, `${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+            });
+            hash.set('clue_graph', `clue_graph=${encodeURIComponent(this.graph.desc.id)}`);
+            hash.set('clue_state', `clue_state=${this.graph.act.id}`);
+            const url = `${location.href.replace(location.hash, '')}#${Array.from(hash.values()).join('&')}`;
+            pushNotification('success', `Session "${this.graph.desc.name}" successfully persisted.
+            <br>URL to share: <br>
+            <a href="${url}" title="Current persistent session link">${url}</a>`, -1);
             globalFire(GLOBAL_EVENT_MANIPULATED);
           });
         }
@@ -281,8 +292,8 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
             </div>
           </div>
           <div class="checkbox">
-            <label>
-              <input type="radio" name="${prefix}_agree" required="required"> I agree that provenance graph will be stored permanently.
+            <label class="radio-inline">
+              <input type="checkbox" name="${prefix}_agree" required="required"> I agree that provenance graph will be stored permanently.
               Note that you can delete this provenance graph as part of the <strong>Open Existing Session</strong> dialog.
             </label>
           </div>

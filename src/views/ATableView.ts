@@ -2,7 +2,7 @@ import {debounce} from 'phovea_core/src';
 import {parse} from 'phovea_core/src/range';
 import {showErrorModalDialog} from '../dialogs';
 import {IRow} from '../rest';
-import {ISelection, IViewContext} from '../views';
+import {ISelection, IViewContext} from './';
 import {AView} from './AView';
 
 export interface ISortItem<T> {
