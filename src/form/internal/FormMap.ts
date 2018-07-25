@@ -223,6 +223,13 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         this.inlineOnChange(this, v, toData(v), previous);
       });
     }
+
+    {
+      const v = this.value;
+      if (v.length > 0) {
+        this.fire(FormMap.EVENT_INITIAL_VALUE, v, []);
+      }
+    }
   }
 
   private addValueEditor(row: IFormRow, parent: Element, entries: ISubDescs[]) {
@@ -456,6 +463,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.previousValue = this.value; // force update
     this.buildMap();
     this.updateBadge();
+    this.updateStoredValue();
   }
 
   focus() {

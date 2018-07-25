@@ -42,9 +42,14 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
       this.fire(FormRadio.EVENT_CHANGE, d, $buttons);
     });
 
-    const defaultValue = this.getStoredValue(options.buttons[0].data);
+    const defaultOption = options.buttons[0].data;
+    const defaultValue = this.getStoredValue(defaultOption);
     this.value = defaultValue;
     this.previousValue = defaultValue;
+
+    if (defaultValue !== defaultOption) {
+      this.fire(FormRadio.EVENT_INITIAL_VALUE, this.value, defaultOption);
+    }
 
     this.handleDependent();
   }
@@ -65,6 +70,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
   set value(v: any) {
     this.$node.selectAll('input').property('checked', (d) => d === v || d.data === v);
     this.previousValue = v; // force old value change
+    this.updateStoredValue();
   }
 
   focus() {
