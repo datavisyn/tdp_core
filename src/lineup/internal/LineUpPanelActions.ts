@@ -128,8 +128,8 @@ export default class LineUpPanelActions extends EventHandler {
     this.node.insertAdjacentHTML('afterbegin', `
       <a href="#" title="(Un)Collapse"></a>
       <section></section>
-      <header>${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
-      </header>`);
+      <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
+      </div>`);
 
     this.node.querySelector('a')!.addEventListener('click', (evt) => {
       evt.preventDefault();
@@ -149,7 +149,7 @@ export default class LineUpPanelActions extends EventHandler {
       buttons.appendChild(this.appendOverviewButton());
     }
 
-    const header = <HTMLElement>this.node.querySelector('header')!;
+    const header = <HTMLElement>this.node.querySelector('.lu-adder')!;
 
     header.addEventListener('mouseleave', () => {
       header.classList.remove('once');
@@ -158,7 +158,7 @@ export default class LineUpPanelActions extends EventHandler {
     if (this.search) {
       header.appendChild(this.search.node);
 
-      this.node.querySelector('header button')!.addEventListener('click', (evt) => {
+      this.node.querySelector('.lu-adder button')!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
         if (!this.collapse) {
