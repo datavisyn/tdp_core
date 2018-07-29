@@ -403,7 +403,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: setGroupCriteria(lineup, rid, old.map((c) => c.fqpath))
     });
   });
-  ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
+  ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
     trackColumn(provider, lineup, graph, column);
     if (ignore(Ranking.EVENT_ADD_COLUMN, lineup)) {
       return;
@@ -415,7 +415,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: addColumn(lineup, rid, null, index, null)
     });
   });
-  ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column, index: number) => {
+  ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column: Column, index: number) => {
     untrackColumn(column);
     if(ignore(Ranking.EVENT_REMOVE_COLUMN, lineup)) {
       return;
@@ -427,7 +427,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: addColumn(lineup, rid, null, index, d)
     });
   });
-  ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (column, index: number, oldIndex: number) => {
+  ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (_, index: number, oldIndex: number) => {
     if(ignore(Ranking.EVENT_MOVE_COLUMN, lineup)) {
       return;
     }
@@ -452,7 +452,7 @@ function untrackRanking(ranking: Ranking) {
  */
 export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph) {
   const p = await resolveImmediately((await lineup.v).data);
-  p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking, index: number) => {
+  p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_ADD_RANKING, lineup)) {
       return;
     }
@@ -462,7 +462,7 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
     });
     trackRanking(p, lineup, graph, ranking);
   });
-  p.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}.track`, (ranking, index: number) => {
+  p.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_REMOVE_RANKING, lineup)) {
       return;
     }
