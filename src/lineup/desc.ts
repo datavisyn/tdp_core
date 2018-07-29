@@ -2,7 +2,7 @@
  * Created by sam on 13.02.2017.
  */
 
-import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, deriveHierarchy, ICategoryNode, isHierarchical} from 'lineupjs';
+import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column} from 'lineupjs';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
@@ -238,4 +238,41 @@ export function deriveColumns(columns: IServerColumn[]) {
         return stringCol(col.column, {label: niceName(col.label)});
     }
   });
+}
+
+
+function isHierarchical(categories: (string | Partial<ICategory>)[]) {
+  if (categories.length === 0 || typeof categories[0] === 'string') {
+    return false;
+  }
+  // check if any has a given parent name
+  return categories.some((c) => (<any>c).parent != null);
+}
+
+function deriveHierarchy(categories: (Partial<ICategory> & { parent: string | null })[]) {
+  const lookup = new Map<string, ICategoryNode>();
+  categories.forEach((c) => {
+    const p = c.parent || '';
+    // set and fill up proxy
+    const item = Object.assign(<ICategoryNode>{
+      children: [],
+      label: c.name!,
+      name: c.name!,
+      color: Column.DEFAULT_COLOR,
+      value: 0
+    }, lookup.get(c.name!) || {}, c);
+    lookup.set(c.name!, item);
+
+    if (!lookup.has(p)) {
+      // create proxy
+      lookup.set(p, {name: p, children: [], label: p, value: 0, color: Column.DEFAULT_COLOR});
+    }
+    lookup.get(p)!.children.push(item);
+  });
+  const root = lookup.get('')!;
+  console.assert(root !== undefined, 'hierarchy with no root');
+  if (root.children.length === 1) {
+    return root.children[0];
+  }
+  return root;
 }
