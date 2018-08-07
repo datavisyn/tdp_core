@@ -395,7 +395,7 @@ export abstract class ARankingView extends AView {
     return this.addColumn(colDesc, data);
   }
 
-  private async withoutTracking<T>(f: () => T): Promise<T> {
+  protected async withoutTracking<T>(f: () => T): Promise<T> {
     return this.built.then(() => withoutTracking(this.context.ref, f));
   }
 

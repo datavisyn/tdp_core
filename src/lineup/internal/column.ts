@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 12.09.2017.
  */
-import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column} from 'lineupjs';
+import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, CategoricalColumn, toCategories} from 'lineupjs';
 import {createAccessor} from './utils';
 import {IScoreRow} from '../../extensions';
 import {showErrorModalDialog} from '../../dialogs';
@@ -38,6 +38,9 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
 
   if (colDesc.sortedByMe) {
     col.sortByMe(colDesc.sortedByMe === true || colDesc.sortedByMe === 'asc');
+  }
+  if (colDesc.groupByMe) {
+    col.groupByMe();
   }
 
   // error handling
@@ -80,6 +83,15 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
       (<any>ncol)._dataLength = (<any>colDesc).dataLength = rows[0].score.length;
 
       ncol.setSplicer({length: rows[0].score.length, splice: (d) => d});
+    }
+
+    if (colDesc.type === 'categorical') {
+      const ccol = <any>col;
+      colDesc.categories = (<any>rows)._categories;
+      const categories = toCategories(colDesc);
+      ccol.categories = categories;
+      ccol.lookup.clear();
+      categories.forEach((c) => ccol.lookup.set(c.name, c));
     }
 
     // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
