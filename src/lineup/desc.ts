@@ -123,9 +123,9 @@ export function stringCol(column: string, options: Partial<IColumnOptions> = {})
  * @returns {IAdditionalColumnDesc}
  */
 export function linkCol(column: string, linkPattern: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
-  return Object.assign(baseColumn(column, options), {
-    type: 'link',
-    link: linkPattern
+  return Object.assign(stringCol(column, options), {
+    pattern: linkPattern,
+    renderer: 'link'
   });
 }
 
