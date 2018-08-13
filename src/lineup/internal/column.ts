@@ -85,7 +85,7 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
       ncol.setSplicer({length: rows[0].score.length, splice: (d) => d});
     }
 
-    if (colDesc.type === 'categorical') {
+    if (colDesc.type === 'categorical' && (<any>rows)._categories) {
       const ccol = <any>col;
       colDesc.categories = (<any>rows)._categories;
       const categories = toCategories(colDesc);
