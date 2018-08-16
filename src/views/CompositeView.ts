@@ -32,7 +32,7 @@ interface IElementDesc {
   options?: any;
 }
 
-interface ILinkedSelection{
+interface ILinkedSelection {
   fromKey: string|'_input'|'_item';
   toKey: string|'_item';
   mode: 'item'|'input';
@@ -262,7 +262,6 @@ export default class CompositeView extends EventHandler implements IView {
         keys
       }, layout || {});
 
-      let b: IBuildAbleOrViewLike;
       if (typeof l === 'string') {
         return views.get(l);
       }
@@ -271,22 +270,21 @@ export default class CompositeView extends EventHandler implements IView {
       }
       const ratio = l.ratios;
       switch (l.type) {
-        case 'hsplit': {
-          const first = buildImpl(l.keys[0]);
-          const second = buildImpl(l.keys[1]);
-          return horizontalSplit(ratio[0], first, second).fixedLayout();
-        }
+        case 'hsplit':
+          const firstH = buildImpl(l.keys[0]);
+          const secondH = buildImpl(l.keys[1]);
+          return horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
         case 'hstack':
           return horizontalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
         case 'vstack':
           return verticalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
         case 'tabbing':
           return tabbing(...l.keys.map(buildImpl)).fixedLayout();
-        case 'vsplit':
+        // case 'vsplit':
         default: {
-          const first = buildImpl(l.keys[0]);
-          const second = buildImpl(l.keys[1]);
-          return verticalSplit(ratio[0], first, second).fixedLayout();
+          const firstV = buildImpl(l.keys[0]);
+          const secondV = buildImpl(l.keys[1]);
+          return verticalSplit(ratio[0], firstV, secondV).fixedLayout();
         }
       }
     };

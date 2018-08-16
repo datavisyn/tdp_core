@@ -26,7 +26,7 @@ export default class InstantViewWrapper {
     this.node.innerHTML = `<!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
     </ul>
-  
+
     <!-- Tab panes -->
     <div class="tab-content">
     </div>`;

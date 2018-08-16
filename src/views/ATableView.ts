@@ -180,7 +180,7 @@ export abstract class ATableView<T extends IRow> extends AView {
 
 export function enableSort<T>(this: void, header: HTMLElement, body: HTMLElement, sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>)) {
   const text: ISorter<any> = ({node: a}, {node: b}) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
-  const number: ISorter<any> = ({node: a}, {node: b}) => {
+  const numeric: ISorter<any> = ({node: a}, {node: b}) => {
     const av = parseFloat(a.textContent);
     const bv = parseFloat(b.textContent);
     if (isNaN(av) && isNaN(bv)) {
@@ -201,7 +201,7 @@ export function enableSort<T>(this: void, header: HTMLElement, body: HTMLElement
       const rows = <HTMLElement[]>Array.from(body.children);
       const next = current === 'no' ? 'asc' : (current === 'asc' ? 'desc' : 'no');
       th.dataset.sort = next;
-      const sorter = sortFunction ? sortFunction : (th.dataset.num != null ? number : text);
+      const sorter = sortFunction ? sortFunction : (th.dataset.num != null ? numeric : text);
       const sort = (a: HTMLElement, b: HTMLElement) => {
         const acol = <HTMLElement>a.children[i];
         const bcol = <HTMLElement>b.children[i];
