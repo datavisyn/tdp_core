@@ -17,6 +17,8 @@ import {mixin} from 'phovea_core/src';
 import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
 import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import 'phovea_ui/src/_font-awesome';
+import {list as listPlugins} from 'phovea_core/src/plugin';
+import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -159,6 +161,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
 
     const main = <HTMLElement>document.body.querySelector('main');
+    const content = <HTMLElement>body.querySelector('div.content');
 
     //wrapper around to better control when the graph will be resolved
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
@@ -175,12 +178,12 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu.setGraph(graph);
     });
 
-    const provVis = loadProvenanceGraphVis(graph, body.querySelector('div.content'), {
+    const provVis = loadProvenanceGraphVis(graph, content, {
       thumbnails: false,
       provVisCollapsed: true,
       hideCLUEButtonsOnCollapse: true
     });
-    const storyVis = loadStoryVis(graph, <HTMLElement>body.querySelector('div.content'), main, {
+    const storyVis = loadStoryVis(graph, content, main, {
       thumbnails: false
     });
 
@@ -191,6 +194,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       graphResolver(clueManager.chooseLazy(true));
 
       this.app.then((appInstance) => this.initSessionImpl(appInstance));
+      this.customizeApp(content, main);
     };
 
     let forceShowLoginDialogTimeout: any = -1;
@@ -207,6 +211,29 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     }
 
     return {graph, manager: clueManager, storyVis, provVis};
+  }
+
+  /**
+   * customize the using extension point
+   */
+  private customizeApp(content: HTMLElement, main: HTMLElement) {
+    const plugins = listPlugins(EXTENSION_POINT_TDP_APP_EXTENSION);
+    if (plugins.length === 0) {
+      return;
+    }
+    Promise.all([<any>this.app, ...plugins.map((d) => d.load())]).then((args) => {
+      const appInstance = args[0];
+      const plugins: IAppExtensionExtension[] = args.slice(1);
+
+      for (const plugin of plugins) {
+        plugin.factory({
+          header: this.header,
+          content,
+          main,
+          app: appInstance
+        })
+      }
+    });
   }
 
   private cleanUpOld(manager: MixedStorageProvenanceGraphManager) {

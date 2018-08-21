@@ -8,6 +8,7 @@ import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
 import {IColumnDesc} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
+import {AppHeader} from 'phovea_ui/src/header';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
@@ -15,6 +16,7 @@ export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
 export const EXTENSION_POINT_TDP_INSTANT_VIEW = 'tdpInstantView';
+export const EXTENSION_POINT_TDP_APP_EXTENSION = 'tdpAppExtension';
 // filter extensions
 export const EXTENSION_POINT_TDP_LIST_FILTERS = 'tdpListFilters';
 export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
@@ -317,3 +319,22 @@ export interface IInstanceViewExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IInstanceViewExtension>;
 }
 
+export interface IAppExtensionContext {
+  header: AppHeader;
+  content: HTMLElement;
+  main: HTMLElement;
+  /**
+   * the tdp app itself, any since no common subset is available
+   */
+  app: any;
+}
+
+export interface IAppExtensionExtension {
+  desc: IAppExtensionExtensionDesc;
+  factory(context: IAppExtensionContext): void;
+}
+
+export interface IAppExtensionExtensionDesc extends IPluginDesc {
+
+  load(): Promise<IPlugin & IAppExtensionExtension>;
+}
