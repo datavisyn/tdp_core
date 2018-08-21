@@ -1,4 +1,4 @@
-import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions } from 'lineupjs';
+import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -80,7 +80,7 @@ export interface IARankingViewOptions {
   itemRowHeight: number | ((row: any, index: number) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
-  customProviderOptions: Partial<ILocalDataProviderOptions>;
+  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
 }
 
 export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
