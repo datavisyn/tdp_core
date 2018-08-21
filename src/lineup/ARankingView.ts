@@ -1,4 +1,4 @@
-import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions } from 'lineupjs';
+import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -80,6 +80,7 @@ export interface IARankingViewOptions {
   itemRowHeight: number | ((row: any, index: number) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
+  customProviderOptions: Partial<ILocalDataProviderOptions>;
 }
 
 export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
@@ -102,11 +103,7 @@ export abstract class ARankingView extends AView {
    */
   private readonly stats: HTMLElement;
 
-  private readonly provider = new LocalDataProvider([], [], {
-    maxNestedSortingCriteria: Infinity,
-    maxGroupColumns: Infinity,
-    filterGlobally: true
-  });
+  private readonly provider: LocalDataProvider;
   private readonly taggle: EngineRenderer | TaggleRenderer;
   private readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
@@ -146,7 +143,12 @@ export abstract class ARankingView extends AView {
     enableHeaderSummary: true,
     enableStripedBackground: false,
     enableHeaderRotation: false,
-    customOptions: {}
+    customOptions: {},
+    customProviderOptions: {
+      maxNestedSortingCriteria: Infinity,
+      maxGroupColumns: Infinity,
+      filterGlobally: true
+    }
   };
 
   private readonly selectionAdapter: ISelectionAdapter | null;
@@ -168,6 +170,7 @@ export abstract class ARankingView extends AView {
     this.stats = this.node.ownerDocument.createElement('p');
 
 
+    this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
     this.context.ref.value.data = this.provider;
 
