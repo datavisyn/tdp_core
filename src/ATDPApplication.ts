@@ -231,7 +231,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
           content,
           main,
           app: appInstance
-        })
+        });
       }
     });
   }
