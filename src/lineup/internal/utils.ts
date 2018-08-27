@@ -3,6 +3,7 @@
  */
 import {IRow, IScoreRow} from '../';
 import {getTDPCount, IParams} from '../../rest';
+import {IDataRow} from 'lineupjs';
 import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form';
 import {encodeParams} from 'phovea_core/src/ajax';
 
@@ -11,7 +12,7 @@ export class AScoreAccessorProxy<T> {
    * the accessor for the score column
    * @param row
    */
-  readonly accessor = (row: IRow) => this.access(row);
+  readonly accessor = (row: IDataRow) => this.access(row.v);
   private readonly scores = new Map<string, T>();
 
   constructor(private readonly missingValue: T = null) {

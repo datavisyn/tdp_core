@@ -139,6 +139,8 @@ export interface IFormElementDesc {
    * @param previousValue the previous value
    */
   onChange?: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
+
+  onInit?: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
 }
 
 

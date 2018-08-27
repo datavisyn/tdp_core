@@ -5,7 +5,7 @@
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ActionNode} from 'phovea_core/src/provenance';
 import {get as getPlugin} from 'phovea_core/src/plugin';
-import Column from 'lineupjs/src/model/Column';
+import {Column} from 'lineupjs';
 import {IScore} from '../';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../extensions';
 import {externalize, resolveExternalized} from '../../storage';

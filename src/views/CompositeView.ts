@@ -1,4 +1,4 @@
-import {debounce} from 'lineupjs/src/utils';
+import {debounce} from 'phovea_core/src';
 import {resolveImmediately} from 'phovea_core/src';
 import {EventHandler, IEvent} from 'phovea_core/src/event';
 import {IDType, resolve} from 'phovea_core/src/idtype';
@@ -32,7 +32,7 @@ interface IElementDesc {
   options?: any;
 }
 
-interface ILinkedSelection{
+interface ILinkedSelection {
   fromKey: string|'_input'|'_item';
   toKey: string|'_item';
   mode: 'item'|'input';
@@ -106,10 +106,6 @@ export default class CompositeView extends EventHandler implements IView {
   private readonly children: WrapperView[] = [];
   private readonly childrenLookup = new Map<string, IView>();
 
-  private readonly debounceItemSelection = debounce((evt, old, selection) => {
-    this.itemSelection = selection;
-    this.fire(AView.EVENT_ITEM_SELECT, old, selection);
-  });
   private readonly debounceUpdateEntryPoint = debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
 
   private itemSelection: ISelection;
@@ -182,6 +178,27 @@ export default class CompositeView extends EventHandler implements IView {
       const helper = this.node.ownerDocument.createElement('div');
       const links = setup.linkedSelections;
 
+      let debounceItemSelection: (...args: any[])=>void;
+      {
+        let selection: ISelection;
+        let old: ISelection;
+
+        const debounced = debounce(() => {
+          this.itemSelection = selection;
+          const oo = old;
+          old = null;
+          this.fire(AView.EVENT_ITEM_SELECT, oo, selection);
+        });
+
+        debounceItemSelection = (_evt, previous, act) => {
+          selection = act;
+          if (!old) {
+            old = previous;
+          }
+          debounced();
+        };
+      }
+
       this.setup.elements.forEach((d) => {
         let s = this.selection;
         if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
@@ -189,7 +206,7 @@ export default class CompositeView extends EventHandler implements IView {
         }
         const instance = d.create(this.context, s, helper, d.options);
         if (links.length === 0 || links.some((l) => l.fromKey === d.key && l.toKey === '_item')) {
-          instance.on(AView.EVENT_ITEM_SELECT, this.debounceItemSelection);
+          instance.on(AView.EVENT_ITEM_SELECT, debounceItemSelection);
         }
         instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
         instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
@@ -245,7 +262,6 @@ export default class CompositeView extends EventHandler implements IView {
         keys
       }, layout || {});
 
-      let b: IBuildAbleOrViewLike;
       if (typeof l === 'string') {
         return views.get(l);
       }
@@ -254,22 +270,21 @@ export default class CompositeView extends EventHandler implements IView {
       }
       const ratio = l.ratios;
       switch (l.type) {
-        case 'hsplit': {
-          const first = buildImpl(l.keys[0]);
-          const second = buildImpl(l.keys[1]);
-          return horizontalSplit(ratio[0], first, second).fixedLayout();
-        }
+        case 'hsplit':
+          const firstH = buildImpl(l.keys[0]);
+          const secondH = buildImpl(l.keys[1]);
+          return horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
         case 'hstack':
           return horizontalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
         case 'vstack':
           return verticalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
         case 'tabbing':
           return tabbing(...l.keys.map(buildImpl)).fixedLayout();
-        case 'vsplit':
+        // case 'vsplit':
         default: {
-          const first = buildImpl(l.keys[0]);
-          const second = buildImpl(l.keys[1]);
-          return verticalSplit(ratio[0], first, second).fixedLayout();
+          const firstV = buildImpl(l.keys[0]);
+          const secondV = buildImpl(l.keys[1]);
+          return verticalSplit(ratio[0], firstV, secondV).fixedLayout();
         }
       }
     };

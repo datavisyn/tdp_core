@@ -68,7 +68,7 @@ export default class NamedSetList {
       successfullySaved('Named Set', name);
       this.replace(namedSet, editedSet);
     });
-  };
+  }
 
   update() {
     const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));

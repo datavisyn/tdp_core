@@ -14,6 +14,7 @@ class DBManager(object):
     self.connectors = {}
     self._plugins = {}
     self._engines = dict()
+    self._sessionmakers = dict()
 
     for p in list_plugins('tdp-sql-database-definition'):
       config = configview(p.configKey)
@@ -65,7 +66,10 @@ class DBManager(object):
     # _log.info('%s -> %s', p.id, connector.dburl)
     config = configview(p.configKey)
     engine_options = config.get('engine', default={})
+
     import sqlalchemy
+    from sqlalchemy.orm import sessionmaker
+
     engine = sqlalchemy.create_engine(connector.dburl, **engine_options)
     # Assuming that gevent monkey patched the builtin
     # threading library, we're likely good to use
@@ -76,6 +80,7 @@ class DBManager(object):
     engine.pool._use_threadlocal = True
 
     self._engines[item] = engine
+    self._sessionmakers[engine] = sessionmaker(bind=engine)
     return engine
 
   def __getitem__(self, item):
@@ -92,6 +97,9 @@ class DBManager(object):
     if item not in self:
       raise NotImplementedError('missing db connector: ' + item)
     return self._load_engine(item)
+
+  def create_session(self, engine):
+    return self._sessionmakers[engine]()
 
   def __contains__(self, item):
     return item in self.connectors

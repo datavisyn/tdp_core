@@ -1,14 +1,7 @@
-import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
-import {defaultConfig} from 'lineupjs/src/config';
-import {ILineUpConfig} from 'lineupjs/src/interfaces';
-import {IGroupData, IGroupItem, isGroup} from 'lineupjs/src/ui/engine/interfaces';
+import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
-import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
-import {deriveColors} from 'lineupjs/src/utils';
-import {LocalDataProvider} from 'lineupjs/src/provider';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
@@ -23,15 +16,12 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
-import LineUpPanelActions from './internal/LineUpPanelActions';
+import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
-import StackColumn from 'lineupjs/src/model/StackColumn';
-import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
-import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
 import {successfullySaved} from '../notifications';
 
 export {IRankingWrapper} from './internal/ranking';
-export {default as DataProvider} from 'lineupjs/src/provider/ADataProvider';
+export {LocalDataProvider as DataProvider} from 'lineupjs';
 
 export interface IARankingViewOptions {
   /**
@@ -60,7 +50,7 @@ export interface IARankingViewOptions {
   /**
    * additional attributes for stored named sets
    */
-  subType: { key: string, value: string };
+  subType: {key: string, value: string};
 
   /**
    * enable taggle overview mode switcher
@@ -87,9 +77,10 @@ export interface IARankingViewOptions {
    */
   enableStripedBackground: boolean;
 
-  itemRowHeight: number|((row: any, index: number) => number)|null;
+  itemRowHeight: number | ((row: any, index: number) => number) | null;
 
-  customOptions: Partial<ILineUpConfig>;
+  customOptions: Partial<ITaggleOptions>;
+  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
 }
 
 export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
@@ -99,16 +90,6 @@ export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config = {
-    violationChanged: (_rule, violation?: string) => this.panel.setViolation(violation),
-    header: {
-      summary: true
-    },
-    body: {
-      animation: true,
-      rowPadding: 0, //since padding is used
-    }
-  };
   /**
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
@@ -122,12 +103,7 @@ export abstract class ARankingView extends AView {
    */
   private readonly stats: HTMLElement;
 
-  private readonly provider = new LocalDataProvider([], [], {
-    maxNestedSortingCriteria: Infinity,
-    maxGroupColumns: Infinity,
-    filterGlobally: true,
-    grouping: true
-  });
+  private readonly provider: LocalDataProvider;
   private readonly taggle: EngineRenderer | TaggleRenderer;
   private readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
@@ -167,7 +143,12 @@ export abstract class ARankingView extends AView {
     enableHeaderSummary: true,
     enableStripedBackground: false,
     enableHeaderRotation: false,
-    customOptions: {}
+    customOptions: {},
+    customProviderOptions: {
+      maxNestedSortingCriteria: Infinity,
+      maxGroupColumns: Infinity,
+      filterGlobally: true
+    }
   };
 
   private readonly selectionAdapter: ISelectionAdapter | null;
@@ -184,42 +165,41 @@ export abstract class ARankingView extends AView {
     mixin(this.options, idTypeNames, names, options);
 
 
-    this.node.classList.add('lineup', 'lu-taggle');
+    this.node.classList.add('lineup', 'lu-taggle', 'lu');
     this.node.insertAdjacentHTML('beforeend', `<div></div>`);
-
     this.stats = this.node.ownerDocument.createElement('p');
 
 
+    this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config = mixin(this.config, {
-      header: {
-        summary: this.options.enableHeaderSummary,
-        autoRotateLabels: this.options.enableHeaderRotation
-      },
-      body: {
-        striped: this.options.enableStripedBackground
-      }
+    const config: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+      summaryHeader: this.options.enableHeaderSummary,
+      labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
-      (<any>config.body).rowHeight = this.options.itemRowHeight;
-    } else if (typeof this.options.itemRowHeight === 'function' ) {
+      config.rowHeight = this.options.itemRowHeight;
+    } else if (typeof this.options.itemRowHeight === 'function') {
       const f = this.options.itemRowHeight;
-      (<any>config.body).dynamicHeight = () => ({
-        defaultHeight: 20,
+      config.dynamicHeight = () => ({
+        defaultHeight: 18,
+        padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? 70 : f(item.v, item.dataIndex);
+          return isGroup(item) ? 70 : f(item.v, item.i);
         }
       });
     }
 
 
 
-    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
+    const lineupParent = <HTMLElement>this.node.firstElementChild!;
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, config) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+      violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
+    }));
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
@@ -242,7 +222,7 @@ export abstract class ARankingView extends AView {
         (<TaggleRenderer>this.taggle).switchRule(rule);
       });
       if (this.options.enableOverviewMode === 'active') {
-        (<TaggleRenderer>this.taggle).switchRule(spacefilling);
+        (<TaggleRenderer>this.taggle).switchRule(rule);
       }
     }
 
@@ -258,7 +238,7 @@ export abstract class ARankingView extends AView {
     this.selectionAdapter = this.createSelectionAdapter();
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return resolveImmediately(super.init(params, onParameterChange)).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
@@ -296,20 +276,20 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
 
-  protected parameterChanged(name: string): PromiseLike<any>|void {
+  protected parameterChanged(name: string): PromiseLike<any> | void {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
       return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
     }
   }
 
-  protected itemSelectionChanged(): PromiseLike<any>|void {
+  protected itemSelectionChanged(): PromiseLike<any> | void {
     this.selectionHelper.setItemSelection(this.getItemSelection());
     this.updateLineUpStats();
     super.itemSelectionChanged();
   }
 
-  protected selectionChanged(): PromiseLike<any>|void {
+  protected selectionChanged(): PromiseLike<any> | void {
     if (this.selectionAdapter) {
       return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
     }
@@ -369,13 +349,13 @@ export abstract class ARankingView extends AView {
       return;
     }
 
-    const s = ranking.getSortCriteria();
+    const s = ranking.getPrimarySortCriteria();
     const labelColumn = ranking.children.filter((c) => c.desc.type === 'string')[0];
 
     this.dump = new Map<string, number | boolean | number[]>();
     ranking.children.forEach((c) => {
       if (c === labelColumn ||
-        c === s.col ||
+        (s && c === s.col) ||
         c.desc.type === 'rank' ||
         c.desc.type === 'selection' ||
         (<any>c.desc).column === 'id' // = Ensembl column
@@ -399,7 +379,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
     colDesc.color = this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
@@ -418,7 +398,7 @@ export abstract class ARankingView extends AView {
     return this.addColumn(colDesc, data);
   }
 
-  private async withoutTracking<T>(f: () => T): Promise<T> {
+  protected async withoutTracking<T>(f: () => T): Promise<T> {
     return this.built.then(() => withoutTracking(this.context.ref, f));
   }
 
@@ -513,7 +493,7 @@ export abstract class ARankingView extends AView {
     // hook
   }
 
-  protected createInitialRanking(lineup: ADataProvider, options: Partial<IInitialRankingOptions> = {}) {
+  protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
     createInitialRanking(lineup, options);
   }
 
@@ -521,12 +501,8 @@ export abstract class ARankingView extends AView {
     // hook
   }
 
-  private setLineUpData(rows: IRow[]) {
-    if (rows.length > 0) {
-      this.node.classList.remove('nodata');
-    } else {
-      this.node.classList.add('nodata');
-    }
+  protected setLineUpData(rows: IRow[]) {
+    this.setHint(rows.length === 0, 'No data found for selection and parameter.');
     this.provider.setData(rows);
     this.selectionHelper.rows = rows;
     this.selectionHelper.setItemSelection(this.getItemSelection());

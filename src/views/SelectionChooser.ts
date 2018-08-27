@@ -150,28 +150,29 @@ export default class SelectionChooser {
     // backup entry and restore the selectedIndex by value afterwards again,
     // because the position of the selected element might change
     const bak = element.value || flatOptions[element.getSelectedIndex()];
-    element.updateOptionElements(options);
 
     let changed = true;
+    let newValue = bak;
     // select last item from incoming `selection.range`
     if (this.options.selectNewestByDefault) {
       // find the first newest entries
       const newOne = flatOptions.find((d) => !this.currentOptions || this.currentOptions.every((e) => e.value !== d.value));
       if (newOne) {
-        element.value = newOne;
+        newValue = newOne;
       } else {
-        element.value = flatOptions[flatOptions.length - 1];
+        newValue = flatOptions[flatOptions.length - 1];
       }
     } else if (!reuseOld) {
-      element.value = flatOptions[flatOptions.length - 1];
+      newValue = flatOptions[flatOptions.length - 1];
       // otherwise try to restore the backup
     } else if (bak !== null) {
-      element.value = bak;
+      newValue = bak;
       changed = false;
     }
 
     this.currentOptions = flatOptions;
-
+    element.updateOptionElements(options);
+    element.value = newValue;
     // just show if there is more than one
     element.setVisible(options.length > 1);
 

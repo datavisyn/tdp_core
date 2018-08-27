@@ -4,16 +4,7 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph} from 'phovea_core/src/provenance';
-import NumberColumn, {createMappingFunction} from 'lineupjs/src/model/NumberColumn';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-import StackColumn from 'lineupjs/src/model/StackColumn';
-import ScriptColumn from 'lineupjs/src/model/ScriptColumn';
-import LinkColumn from 'lineupjs/src/model/LinkColumn';
-import CategoricalNumberColumn from 'lineupjs/src/model/CategoricalNumberColumn';
-import CompositeColumn from 'lineupjs/src/model/CompositeColumn';
-import Ranking, {ISortCriteria} from 'lineupjs/src/model/Ranking';
-import Column from 'lineupjs/src/model/Column';
-import {suffix} from 'lineupjs/src/utils';
+import {NumberColumn, createMappingFunction, StringColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 
 
@@ -30,7 +21,7 @@ let ignoreNext: string = null;
 
 /**
  * set of data provider to ignore
- * @type {Set<ADataProvider>}
+ * @type {Set<LocalDataProvider>}
  */
 const temporaryUntracked = new Set<string>();
 
@@ -44,15 +35,15 @@ function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
 }
 
 export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const index: number = parameter.index;
   let ranking: Ranking;
   if (parameter.dump) { //add
-    ignoreNext = ADataProvider.EVENT_ADD_RANKING;
+    ignoreNext = LocalDataProvider.EVENT_ADD_RANKING;
     p.insertRanking(p.restoreRanking(parameter.dump), index);
   } else { //remove
     ranking = p.getRankings()[index];
-    ignoreNext = ADataProvider.EVENT_REMOVE_RANKING;
+    ignoreNext = LocalDataProvider.EVENT_REMOVE_RANKING;
     p.removeRanking(ranking);
   }
   return {
@@ -72,7 +63,7 @@ function toSortObject(v) {
 }
 
 export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const bak = toSortObject(ranking.getSortCriteria());
   ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
@@ -93,14 +84,14 @@ export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, v
 }
 
 export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
 
   let current: ISortCriteria[];
   const columns: ISortCriteria[] = parameter.columns.map((c) => ({col: ranking.findByPath(c.col), asc: c.asc}));
   if (parameter.isSorting) {
-    current = ranking.getSortCriterias();
-    ignoreNext = Ranking.EVENT_SORT_CRITERIAS_CHANGED;
+    current = ranking.getSortCriteria();
+    ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
     ranking.setSortCriteria(columns);
   } else {
     const current = ranking.getGroupSortCriteria();
@@ -122,7 +113,7 @@ export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns:
 }
 
 export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const current = ranking.getGroupCriteria().map((d) => d.fqpath);
   const columns = parameter.columns.map((p) => ranking.findByPath(p));
@@ -141,7 +132,7 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
 }
 
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
 
@@ -164,7 +155,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
 }
 
 export interface IViewProvider {
-  data: ADataProvider;
+  data: LocalDataProvider;
 
   getInstance(): { updateLineUpStats() };
 }
@@ -182,7 +173,7 @@ export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path
 }
 
 export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
-  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   let ranking: Ranking | CompositeColumn = p.getRankings()[parameter.rid];
 
   const index: number = parameter.index;
@@ -206,7 +197,7 @@ export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], paramet
 }
 
 export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
-  const p: ADataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   let ranking: Ranking | CompositeColumn = p.getRankings()[parameter.rid];
 
   const index: number = parameter.index;
@@ -265,12 +256,12 @@ function delayedCall(callback: (old: any, newValue: any) => void, timeToDelay = 
   };
 }
 
-function rankingId(provider: ADataProvider, ranking: Ranking) {
+function rankingId(provider: LocalDataProvider, ranking: Ranking) {
   return provider.getRankings().indexOf(ranking);
 }
 
 
-function recordPropertyChange(source: Column | Ranking, provider: ADataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1) {
+function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1) {
   const f = (old: any, newValue: any) => {
     if (ignore(`${property}Changed`, lineupViewWrapper)) {
       return;
@@ -295,7 +286,7 @@ function recordPropertyChange(source: Column | Ranking, provider: ADataProvider,
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(f, delayed) : f);
 }
 
-function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
+function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
   recordPropertyChange(col, provider, lineup, graph, 'metaData');
   recordPropertyChange(col, provider, lineup, graph, 'filter');
   recordPropertyChange(col, provider, lineup, graph, 'rendererType');
@@ -361,9 +352,9 @@ function trackColumn(provider: ADataProvider, lineup: IObjectRef<IViewProvider>,
     });
   } else if (col instanceof ScriptColumn) {
     recordPropertyChange(col, provider, lineup, graph, 'script');
-  } else if (col instanceof LinkColumn) {
-    recordPropertyChange(col, provider, lineup, graph, 'link');
-  } else if (col instanceof CategoricalNumberColumn) {
+  } else if (col instanceof StringColumn) {
+    recordPropertyChange(col, provider, lineup, graph, 'pattern');
+  } else if (col instanceof OrdinalColumn) {
     recordPropertyChange(col, provider, lineup, graph, 'mapping');
   }
 }
@@ -379,14 +370,14 @@ function untrackColumn(col: Column) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);
   } else if (col instanceof ScriptColumn) {
     col.on(`${ScriptColumn.EVENT_SCRIPT_CHANGED}.track`, null);
-  } else if (col instanceof LinkColumn) {
-    col.on(`${LinkColumn.EVENT_LINK_CHANGED}.track`, null);
+  } else if (col instanceof StringColumn) {
+    col.on(`${StringColumn.EVENT_PATTERN_CHANGED}.track`, null);
   }
 }
 
-function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking) {
-  ranking.on(`${Ranking.EVENT_SORT_CRITERIAS_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    if (ignore(Ranking.EVENT_SORT_CRITERIAS_CHANGED, lineup)) {
+function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking) {
+  ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
+    if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, lineup)) {
       return;
     }
     const rid = rankingId(provider, ranking);
@@ -412,7 +403,7 @@ function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>
       inverse: setGroupCriteria(lineup, rid, old.map((c) => c.fqpath))
     });
   });
-  ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
+  ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
     trackColumn(provider, lineup, graph, column);
     if (ignore(Ranking.EVENT_ADD_COLUMN, lineup)) {
       return;
@@ -424,7 +415,7 @@ function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>
       inverse: addColumn(lineup, rid, null, index, null)
     });
   });
-  ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column, index: number) => {
+  ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column: Column, index: number) => {
     untrackColumn(column);
     if(ignore(Ranking.EVENT_REMOVE_COLUMN, lineup)) {
       return;
@@ -436,7 +427,7 @@ function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>
       inverse: addColumn(lineup, rid, null, index, d)
     });
   });
-  ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (column, index: number, oldIndex: number) => {
+  ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (_, index: number, oldIndex: number) => {
     if(ignore(Ranking.EVENT_MOVE_COLUMN, lineup)) {
       return;
     }
@@ -450,7 +441,7 @@ function trackRanking(provider: ADataProvider, lineup: IObjectRef<IViewProvider>
 }
 
 function untrackRanking(ranking: Ranking) {
-  ranking.on(suffix('.track', Ranking.EVENT_SORT_CRITERIAS_CHANGED, Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, Ranking.EVENT_GROUP_CRITERIA_CHANGED, Ranking.EVENT_ADD_COLUMN, Ranking.EVENT_REMOVE_COLUMN, Ranking.EVENT_MOVE_COLUMN), null);
+  ranking.on(suffix('.track', Ranking.EVENT_SORT_CRITERIA_CHANGED, Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, Ranking.EVENT_GROUP_CRITERIA_CHANGED, Ranking.EVENT_ADD_COLUMN, Ranking.EVENT_REMOVE_COLUMN, Ranking.EVENT_MOVE_COLUMN), null);
   ranking.children.forEach(untrackColumn);
 }
 
@@ -461,8 +452,8 @@ function untrackRanking(ranking: Ranking) {
  */
 export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph) {
   const p = await resolveImmediately((await lineup.v).data);
-  p.on(`${ADataProvider.EVENT_ADD_RANKING}.track`, (ranking, index: number) => {
-    if (ignore(ADataProvider.EVENT_ADD_RANKING, lineup)) {
+  p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
+    if (ignore(LocalDataProvider.EVENT_ADD_RANKING, lineup)) {
       return;
     }
     const d = ranking.dump(p.toDescRef);
@@ -471,8 +462,8 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
     });
     trackRanking(p, lineup, graph, ranking);
   });
-  p.on(`${ADataProvider.EVENT_REMOVE_RANKING}.track`, (ranking, index: number) => {
-    if (ignore(ADataProvider.EVENT_REMOVE_RANKING, lineup)) {
+  p.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}.track`, (ranking: Ranking, index: number) => {
+    if (ignore(LocalDataProvider.EVENT_REMOVE_RANKING, lineup)) {
       return;
     }
     const d = ranking.dump(p.toDescRef);
@@ -486,7 +477,7 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
 
 export async function untrack(lineup: IObjectRef<IViewProvider>) {
   const p = await resolveImmediately((await lineup.v).data);
-  p.on([`${ADataProvider.EVENT_ADD_RANKING}.track`, `${ADataProvider.EVENT_REMOVE_RANKING}.track`], null);
+  p.on([`${LocalDataProvider.EVENT_ADD_RANKING}.track`, `${LocalDataProvider.EVENT_REMOVE_RANKING}.track`], null);
   p.getRankings().forEach(untrackRanking);
 }
 
@@ -498,3 +489,8 @@ export function withoutTracking<T>(lineup: IObjectRef<IViewProvider>, fun: () =>
     return r;
   });
 }
+
+function suffix(suffix: string, ...prefix: string[]) {
+  return prefix.map((p) => `${p}${suffix}`);
+}
+

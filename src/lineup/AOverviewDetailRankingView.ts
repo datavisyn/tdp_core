@@ -5,9 +5,8 @@ import ARankingView, {IARankingViewOptions} from './ARankingView';
 import {ISelection, IViewContext} from '../views';
 import {ISplitLayoutContainer, root, verticalSplit, view} from 'phovea_ui/src/layout';
 import {IRow} from '../rest';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {debounce} from 'phovea_core/src';
-import LocalDataProvider from 'lineupjs/src/provider/LocalDataProvider';
+import {LocalDataProvider} from 'lineupjs';
 import OverviewColumn from './internal/OverviewColumn';
 
 export abstract class AOverviewDetailRankingView extends ARankingView {
@@ -85,7 +84,7 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
     super.builtLineUp(lineup);
 
     this.lineup = lineup;
-    this.lineup.on(`${ADataProvider.EVENT_ORDER_CHANGED}.overview`, () => {
+    this.lineup.on(`${LocalDataProvider.EVENT_ORDER_CHANGED}.overview`, () => {
       this.triggerOverviewUpdateDelayed();
     });
 

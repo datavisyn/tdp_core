@@ -45,7 +45,7 @@ svg {
     }
   }
 
-  &.tdp-hint, &.tdp-hint-mapping {
+  &:not(.tdp-busy).tdp-hint, &:not(.tdp-busy).tdp-hint-mapping {
     &::before {
       @include fa-icon();
       $nothing: 50pt;
@@ -74,7 +74,7 @@ svg {
     }
   }
 
-  &.tdp-hint-mapping::before {
+  &:not(.tdp-busy).tdp-hint-mapping::before {
     content: $fa-var-chain-broken;
   }
 

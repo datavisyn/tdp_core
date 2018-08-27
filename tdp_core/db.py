@@ -113,9 +113,8 @@ class WrappedSession(object):
     session wrapper of sql alchemy with auto cleanup
     :param engine:
     """
-    from sqlalchemy.orm import sessionmaker, scoped_session
     _log.info('creating session')
-    self._session = scoped_session(sessionmaker(bind=engine))()
+    self._session = configs.create_session(engine)
     self._supports_array_parameter = _supports_sql_parameters(engine.name)
 
   def execute(self, sql, **kwargs):
@@ -148,10 +147,26 @@ class WrappedSession(object):
   def __enter__(self):
     return self
 
+  def commit(self):
+    self._session.commit()
+
+  def flush(self):
+    self._session.flush()
+
+  def rollback(self):
+    self._session.rollback()
+
+  def _destroy(self):
+    if self._session:
+      _log.info('removing session again')
+      self._session.close()
+      self._session = None
+
+  def __del__(self):
+    self._destroy()
+
   def __exit__(self, exc_type, exc_val, exc_tb):
-    _log.info('removing session again')
-    self._session.close()
-    self._session = None
+    self._destroy()
 
 
 def session(engine):
