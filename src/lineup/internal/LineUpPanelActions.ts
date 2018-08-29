@@ -43,6 +43,7 @@ export default class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_IN = 'zoomIn';
   static readonly EVENT_RULE_CHANGED = 'ruleChanged';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
+  static readonly EVENT_START_TOURING = 'startTouring';
   /**
    * @deprecated
    */
@@ -148,6 +149,8 @@ export default class LineUpPanelActions extends EventHandler {
     if (this.options.enableOverviewMode) {
       buttons.appendChild(this.appendOverviewButton());
     }
+
+    buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-bar-chart', () => this.fire(LineUpPanelActions.EVENT_START_TOURING)));
 
     const header = <HTMLElement>this.node.querySelector('.lu-adder')!;
 

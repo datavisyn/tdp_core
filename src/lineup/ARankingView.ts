@@ -217,6 +217,11 @@ export abstract class ARankingView extends AView {
     this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
       this.taggle.zoomIn();
     });
+    this.panel.on(LineUpPanelActions.EVENT_START_TOURING, () => {
+      console.log('Switch to touring panel.');
+      this.panel.forceCollapse();
+      //this.touring.show();
+    });
     if (this.options.enableOverviewMode) {
       this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
         (<TaggleRenderer>this.taggle).switchRule(rule);
