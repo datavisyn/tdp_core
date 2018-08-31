@@ -1,3 +1,9 @@
+const clear = Cypress.LocalStorage.clear
+
+Cypress.LocalStorage.clear = function (keys, ls, rs) {
+  // do nothing
+}
+
 describe('Ordino Touring', function() {
   before(function () {
     // log in only once before any of the tests run.
@@ -16,6 +22,7 @@ describe('Ordino Touring', function() {
   })
 
   it('loads dummy data', function () {
+    localStorage.clear(); // clear localStorage manually
     cy.visit('/')
     cy.getCookie('session').should('exist') // our auth cookie should be present
     cy.get('.homeButton').click() 
@@ -30,5 +37,10 @@ describe('Ordino Touring', function() {
       cy.reload()
     })
   })
-})
 
+  it('reloads state', function() {
+    // to reload the state, it is important to not clear the localStorage
+    // this is why the clear function was overwritten above.
+    cy.visit('/#clue_graph=ordino1&clue_state=3')
+  })
+})
