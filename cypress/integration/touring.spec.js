@@ -1,4 +1,4 @@
-describe('Ordino', function() {  
+describe('Ordino Touring', function() {
   before(function () {
     // log in only once before any of the tests run.
     // your app will likely set some sort of session cookie.
@@ -11,13 +11,10 @@ describe('Ordino', function() {
     // before each test, we can automatically preserve the
     // 'session_id' and 'remember_token' cookies. this means they
     // will not be cleared before the NEXT test starts.
-    //git s
-    // the name of your cookies will likely be different
-    // this is just a simple example
-    Cypress.Cookies.preserveOnce("session", "remember_token")
+
+    Cypress.Cookies.preserveOnce("session")
   })
 
-  
   it('loads dummy data', function () {
     cy.visit('/')
     cy.getCookie('session').should('exist') // our auth cookie should be present
