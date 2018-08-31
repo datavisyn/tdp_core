@@ -24,7 +24,13 @@ describe('Ordino', function() {
     cy.get('.homeButton').click() 
     cy.get('.targidDummyData').within(($dummy) => { // change scope to dummy data tab
       cy.get('#targidDummyDataToggle').click() // open dummy data tab
-      cy.get('.predefined-named-sets li:first').click() //click first goto link
+
+      // load dummy data
+      cy.get('.predefined-named-sets li:first').click() //click first goto link to open dummy data
+      // url changes to something like http://localhost:8080/#clue_graph=ordino2&clue_state=3 when the data has loaded
+      cy.url().should('contain', 'clue_graph').should('contain', 'clue_state')
+      cy.wait(5000) // workaround for: https://github.com/Caleydo/tdp_dummy/issues/15
+      cy.reload()
     })
   })
 })
