@@ -13,3 +13,23 @@ Cypress.Commands.add('login', () => {
   })
   cy.getCookie('session').should('exist') // our auth cookie should be present
 })
+
+
+Cypress.Commands.add('loadDummyData', () => {
+    // REQUIRES LOGIN, see above
+    cy.getCookie('session').should('exist') // our auth cookie should be present
+  
+    cy.visit('/')
+    cy.get('.homeButton').click() 
+    cy.get('.targidDummyData').within(($dummy) => { // change scope to dummy data tab
+      cy.get('#targidDummyDataToggle').click() // open dummy data tab
+
+      // load dummy data
+      cy.get('.predefined-named-sets li:first').click() //click first goto link to open dummy data
+    })
+
+    // url changes to something like http://localhost:8080/#clue_graph=ordino2&clue_state=3 when the data has loaded
+    cy.url().should('contain', 'clue_graph').should('contain', 'clue_state')
+    cy.wait(10*1000) // workaround for: https://github.com/Caleydo/tdp_dummy/issues/15
+    cy.reload()
+})
