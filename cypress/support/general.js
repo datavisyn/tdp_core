@@ -14,6 +14,10 @@ Cypress.Commands.add('login', () => {
   cy.getCookie('session').should('exist') // our auth cookie should be present
 })
 
+Cypress.Commands.add('acceptCookies', () => {
+  cy.setCookie('cookiebar', 'CookieAllowed') // Set the 'auth_key' cookie to '123key'
+})
+
 
 Cypress.Commands.add('loadDummyData', () => {
     // REQUIRES LOGIN, see above
