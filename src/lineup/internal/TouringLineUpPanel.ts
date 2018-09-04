@@ -6,7 +6,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   
   protected init() {
     super.init();
-    this.node.insertAdjacentHTML('beforeend', `<div class="touring" hidden style="background-color: coral;">
+    this.node.insertAdjacentHTML('beforeend', `<div class="touring" hidden>
     <p>Hello World</p>
     </div>`);
     this.touringElem = <HTMLElement>this.node.querySelector('.touring');
