@@ -94,7 +94,7 @@ export abstract class ARankingView extends AView {
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
    */
-  private dump: Map<string, number | boolean | number[]> = null;
+  private dump: Set<string> = null;
 
   readonly naturalSize = [800, 500];
 
@@ -323,7 +323,6 @@ export abstract class ARankingView extends AView {
       return;
     }
     const ranking = this.provider.getRankings()[0];
-    const weightsSuffix = '_weights';
 
     if (mode === EViewMode.FOCUS) {
       this.panel.show();
@@ -332,14 +331,12 @@ export abstract class ARankingView extends AView {
           if (!this.dump.has(c.id)) {
             return;
           }
-
-          c.setWidth(<number>this.dump.get(c.id));
-          if (this.dump.has(c.id + weightsSuffix)) {
-            (<StackColumn>c).setWeights(<number[]>this.dump.get(c.id + weightsSuffix));
-          }
+          c.setVisible(true);
         });
       }
       this.dump = null;
+
+      this.update();
       return;
     }
 
@@ -352,7 +349,7 @@ export abstract class ARankingView extends AView {
     const s = ranking.getPrimarySortCriteria();
     const labelColumn = ranking.children.filter((c) => c.desc.type === 'string')[0];
 
-    this.dump = new Map<string, number | boolean | number[]>();
+    this.dump = new Set<string>();
     ranking.children.forEach((c) => {
       if (c === labelColumn ||
         (s && c === s.col) ||
@@ -362,11 +359,8 @@ export abstract class ARankingView extends AView {
       ) {
         // keep these columns
       } else {
-        if (c instanceof StackColumn) {
-          this.dump.set(c.id + weightsSuffix, (<StackColumn>c).getWeights());
-        }
-        this.dump.set(c.id, c.getWidth());
-        c.hide();
+        c.setVisible(false);
+        this.dump.add(c.id);
       }
     });
   }
