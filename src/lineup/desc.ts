@@ -2,7 +2,7 @@
  * Created by sam on 13.02.2017.
  */
 
-import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column} from 'lineupjs';
+import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
@@ -189,12 +189,15 @@ export function createInitialRanking(provider: LocalDataProvider, options: Parti
   }, options);
 
   const ranking = provider.pushRanking();
-  if (!o.rank) {
-    const r = ranking.find((d) => d.desc.type === 'rank');
-    if (r) {
-      r.removeMe();
+  const r = ranking.find((d) => d.desc.type === 'rank');
+  if (o.rank) {
+    if (!r) {
+      ranking.insert(provider.create(createRankDesc()), 0);
     }
+  } else if (r) {
+    r.removeMe();
   }
+
   if (o.aggregate) {
     ranking.insert(provider.create(createAggregateDesc()), 0);
   }
@@ -214,14 +217,19 @@ export function createInitialRanking(provider: LocalDataProvider, options: Parti
     return cols;
   };
 
-  const descs = o.order.length > 0 ? resolve() : provider.getColumns().filter((d) => (<any>d).visible !== false);
+  const visibles: IColumnDesc[] = [];
+  for (const col of provider.getColumns()) {
+    // the visible is just for us to initial so delete the information otherwise the column will be hidden
+    if (col.visible === false) {
+      delete col.visible;
+      continue;
+    }
+    visibles.push(col);
+  }
+  const descs = o.order.length > 0 ? resolve() : visibles;
 
   descs.forEach((d) => {
     const col = provider.create(d);
-    // set initial column width
-    if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {
-      col.setWidth((<any>d).width);
-    }
     ranking.push(col);
   });
 }
