@@ -17,6 +17,7 @@ import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
+import TouringLineUpPanel from './internal/TouringLineUpPanel';
 import {addLazyColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 
@@ -201,7 +202,7 @@ export abstract class ARankingView extends AView {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
-    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
+    this.panel = new TouringLineUpPanel(this.provider, this.taggle.ctx, this.options);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
@@ -216,11 +217,6 @@ export abstract class ARankingView extends AView {
     });
     this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
       this.taggle.zoomIn();
-    });
-    this.panel.on(LineUpPanelActions.EVENT_START_TOURING, () => {
-      console.log('Switch to touring panel.');
-      this.panel.forceCollapse();
-      //this.touring.show();
     });
     if (this.options.enableOverviewMode) {
       this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {

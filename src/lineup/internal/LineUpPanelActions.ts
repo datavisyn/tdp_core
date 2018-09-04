@@ -43,7 +43,6 @@ export default class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_IN = 'zoomIn';
   static readonly EVENT_RULE_CHANGED = 'ruleChanged';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
-  static readonly EVENT_START_TOURING = 'startTouring';
   /**
    * @deprecated
    */
@@ -125,7 +124,7 @@ export default class LineUpPanelActions extends EventHandler {
     return this.panel.node;
   }
 
-  private init() {
+  protected init() {
     this.node.insertAdjacentHTML('afterbegin', `
       <a href="#" title="(Un)Collapse"></a>
       <section></section>
@@ -150,8 +149,6 @@ export default class LineUpPanelActions extends EventHandler {
       buttons.appendChild(this.appendOverviewButton());
     }
 
-    buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-bar-chart', () => this.fire(LineUpPanelActions.EVENT_START_TOURING)));
-
     const header = <HTMLElement>this.node.querySelector('.lu-adder')!;
 
     header.addEventListener('mouseleave', () => {
@@ -174,7 +171,7 @@ export default class LineUpPanelActions extends EventHandler {
     }
   }
 
-  private createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
+  protected createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
     const b = this.node.ownerDocument.createElement('button');
     b.className = linkClass;
     b.title = title;
