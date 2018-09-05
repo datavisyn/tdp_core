@@ -60,14 +60,17 @@ describe('Ordino Touring', function() {
       // collapse
       cy.get('a[title="(Un)Collapse"]').click()
       cy.root().should('have.class', 'collapsed')
-      // everything hidden:
-      assertLineUpPanelHidden()
+      // .lu-adder is visible still shown as + button
+      // everything else is hidden:
+      cy.get('.lu-stats').should('not.be.visible') // 'Showing x of y' hidden
+      cy.get('main').should('not.be.visible') // histograms and stuff hidden
       cy.get('div.touring').should('not.be.visible') // touring is hidden
 
       // if collapsed, click touring does restore
       cy.get('button[title="Start Touring"]').click()
       cy.root().should('not.have.class', 'collapsed')
-      assertLineUpPanelHidden() // column summaries is not visible
+      
+      assertLineUpPanelHidden()
       cy.get('div.touring').should('be.visible') // touring is visible
     })
    
