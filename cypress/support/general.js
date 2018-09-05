@@ -24,19 +24,21 @@ Cypress.Commands.add('loadDummyData', () => {
     cy.getCookie('session').should('exist') // our auth cookie should be present
   
     cy.visit('/')
-    cy.wait(1000)
     cy.get('.homeButton').click() 
-    cy.wait(1000)
     cy.get('.targidDummyData').within(($dummy) => { // change scope to dummy data tab
       cy.get('#targidDummyDataToggle').click() // open dummy data tab
-      cy.wait(2000)
-
       // load dummy data
       cy.get('.predefined-named-sets li:first').click() //click first goto link to open dummy data
     })
 
     // url changes to something like http://localhost:8080/#clue_graph=ordino2&clue_state=3 when the data has loaded
     cy.url().should('contain', 'clue_graph').should('contain', 'clue_state')
-    cy.wait(6*1000) // workaround for: https://github.com/Caleydo/tdp_dummy/issues/15
-    cy.reload()
+    
+    // workaround for: https://github.com/Caleydo/tdp_dummy/issues/15
+    cy.get('a[title="Show Provenance Graph"]').click()
+    cy.get('aside.provenance-layout-vis').within( ($provenance) => {
+        cy.get('div[data-id="0"]').click()
+        cy.get('div[data-id="3"]').click()
+        cy.get('a[title="Hide Provenance Graph"]').click()
+    })
 })
