@@ -8,7 +8,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   protected init() {
     super.init();
     this.node.insertAdjacentHTML('beforeend', `<div class="touring" hidden>
-      <p>Hello World! My name is Touring Panel and I'm from Linz, Austrria.</p>
+      <ul class="nav nav-tabs nav-justified">
+        <li class="active"><a href="#itemTouring" data-toggle="tab">Items</a></li>
+        <li><a href="#attributeTouring" data-toggle="tab">Attributes</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="itemTouring">
+          ...
+        </div>
+        <div class="tab-pane" id="attributeTouring">
+          ,,,
+        </div>
+      </div>
     </div>`);
     this.touringElem = <HTMLElement>this.node.querySelector('.touring');
     
