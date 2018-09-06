@@ -1,4 +1,4 @@
-import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
+import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -219,9 +219,11 @@ export abstract class ARankingView extends AView {
     });
     if (this.options.enableOverviewMode) {
       this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
+        updateLodRules(this.taggle.style, rule != null, config);
         (<TaggleRenderer>this.taggle).switchRule(rule);
       });
       if (this.options.enableOverviewMode === 'active') {
+        updateLodRules(this.taggle.style, true, config);
         (<TaggleRenderer>this.taggle).switchRule(rule);
       }
     }
