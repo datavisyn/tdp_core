@@ -241,8 +241,8 @@ export abstract class AView extends EventHandler implements IView {
    * resolve the name of the current input selection
    * @returns {Promise<string[]>}
    */
-  protected resolveSelection(): Promise<string[]> {
-    return resolveIds(this.selection.idtype, this.selection.range, this.idType);
+  protected resolveSelection(idType = this.idType): Promise<string[]> {
+    return resolveIds(this.selection.idtype, this.selection.range, idType);
   }
 
   setItemSelection(selection: ISelection) {
