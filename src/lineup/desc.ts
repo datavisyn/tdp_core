@@ -11,14 +11,22 @@ import {IServerColumn} from '../rest';
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
   selectedSubtype?: string;
+  initialRanking: boolean;
 }
 
 export interface IColumnOptions {
   /**
    * visible by default
    * @default true
+   * @deprecated use initialRanking
    */
-  visible: boolean;
+  visible?: boolean;
+
+  /**
+   * part of the initial ranking by default
+   * @default true
+   */
+  initialRanking: boolean;
   /**
    * custom label instead of the column name
    * @default column
@@ -52,7 +60,7 @@ function baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdd
     column,
     label: column,
     color: '',
-    visible: true,
+    initialRanking: options.visible != null ? options.visible: true,
     width: -1,
     selectedId: -1,
     selectedSubtype: undefined
@@ -217,15 +225,7 @@ export function createInitialRanking(provider: LocalDataProvider, options: Parti
     return cols;
   };
 
-  const visibles: IColumnDesc[] = [];
-  for (const col of provider.getColumns()) {
-    // the visible is just for us to initial so delete the information otherwise the column will be hidden
-    if (col.visible === false) {
-      delete col.visible;
-      continue;
-    }
-    visibles.push(col);
-  }
+  const visibles: IColumnDesc[] = provider.getColumns().filter((d: any) => (<IAdditionalColumnDesc>d).initialRanking);
   const descs = o.order.length > 0 ? resolve() : visibles;
 
   descs.forEach((d) => {
