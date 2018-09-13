@@ -54,7 +54,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   private preInstanceParameter = new Map<string, any>();
   private selection: ISelection;
 
-  constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document) {
+  constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document, private readonly viewOptionGenerator: () => any = () => ({})) {
     super();
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
@@ -137,7 +137,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       }
       // create provenance reference
       this.context = createContext(this.graph, this.plugin, this.ref);
-      this.instance = p.factory(this.context, selection, this.content, {});
+      this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
       this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
       return this.instancePromise = resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
         const idType = this.instance.itemIDType;
