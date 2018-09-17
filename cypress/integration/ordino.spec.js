@@ -20,12 +20,20 @@ describe('Ordino Login & Dummy Data', function() {
       cy.url().should('include', 'clue_graph') // we should be redirected
       cy.getCookie('session').should('exist') // our auth cookie should be present
       cy.get('#user_menu').should('contain', user) // UI should reflect this user being logged in
+
+      // wait a bit so everything is stored in the localstorage
+      cy.wait(500).then(() => {        
+        // test the local storage
+        expect(localStorage.getItem('ordino_has_seen_welcome_page')).to.eq('1')
+        expect(localStorage.getItem('ordino_provenance_graphs')).to.eq('["ordino0"]')
+        expect(localStorage.getItem('graphordino0.nodes')).to.eq('[0,1]')
+        expect(localStorage.getItem('graphordino0.edges')).to.eq('[0]')
+      })
     })
   })
 
 
   it('loads dummy data', function () {
-    localStorage.clear()
     cy.login()
     cy.loadDummyData()
 
