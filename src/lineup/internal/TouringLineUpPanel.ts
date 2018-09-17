@@ -21,6 +21,28 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       this.toggleTouring();
     }));
   }
+
+  /**
+   * Gets the currently displayed attributes in Lineup and updates the dropdowns and table accordingly
+   */
+  private update() {
+    this.updateDropdowns();
+    
+
+  }
+
+  /**
+   * If 
+   */
+  private updateDropdowns() {
+    // Compare A:
+    // Selected Rows, if there are any (otherwise hide)
+    // Stratification Groups, if there are any (otherwise hide)
+    // if there are no selected rows and no stratification groups, then display an appropriate message
+
+    // Compare B:
+    // Compare to 
+  }
   
   
   private toggleTouring(hide?: boolean) {
