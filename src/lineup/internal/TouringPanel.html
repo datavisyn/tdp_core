@@ -1,33 +1,47 @@
-  <div class="touring" hidden>
-    <ul class="nav nav-tabs nav-justified">
-      <li class="active"><a href="#itemTouring" data-toggle="tab">Items</a></li>
-      <li><a href="#attributeTouring" data-toggle="tab">Attributes</a></li>
-    </ul>
+<div class="touring" hidden>
+  <ul class="nav nav-tabs nav-justified">
+    <li class="active"><a href="#itemTouring" data-toggle="tab">Items</a></li>
+    <li><a href="#attributeTouring" data-toggle="tab">Attributes</a></li>
+  </ul>
 
-    <div class="tab-content">
-      <div class="tab-pane active" id="itemTouring">
-        <div class="form-inline">
+  <div class="tab-content">
+    <div class="tab-pane active" id="itemTouring">
+
+      <div class="form-group clearfix">
+        <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
           <label for="compareSrc1">Compare:</label>
+        </div>
+        <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
           <select class="form-control" id="compareSrc1">
-              <option>Selected Rows</option>
-              <option>A Int < 0.33 </option>
-              <option>0.33 <= A Int <= 0.66</option>
-              <option>A Int > 0.66</option>
+            <option>All Columns</option>
+            <option>All Numerical Columns</option>
+            <option>All Categorical Columns</option>
+            <option>...</option>
           </select>
         </div>
-        
-        <div class="form-inline">
+      </div>
+
+      <div class="form-group clearfix">
+        <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
           <label>With:</label>
+        </div>
+        <div class="col-sm-4" style="margin:0 !important;padding:0 !important">
           <label>
-            <input type="radio" name="cmpGroup" value="category" checked> Categories
-          </label>
-          <label>
-            <input type="radio" name="cmpGroup" value="group"> Stratification Groups
+            <input class="form-check-input" type="radio" name="cmpGroup" value="category" checked> Categories
           </label>
         </div>
-        
-        <div class="form-inline">
+        <div class="col-sm-5" style="margin:0 !important;padding:0 !important">
+          <label>
+            <input class="form-check-input" type="radio" name="cmpGroup" value="group"> Stratification
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group clearfix">
+        <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
           <label for="compareSrc2">Of:</label>
+        </div>
+        <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
           <select class="form-control" id="compareSrc2">
             <option>All displayed attributes</option>
             <option>All categorical attributes</option>
@@ -37,9 +51,13 @@
             <option>A Cat2</option>
           </select>
         </div>
-        <hr>
-        <div>
-          <h4>Jaccard Similarity</h1>
+      </div>
+
+
+
+      <hr>
+      <div>
+        <h4>Jaccard Similarity</h1>
           <div class="table-responsive">
             <table class="table table-bordered table-condensed table-hover">
               <tr>
@@ -89,10 +107,10 @@
               </tr>
             </table>
           </div>
-        </div>
-      </div>
-      <div class="tab-pane" id="attributeTouring">
-        ,,,
       </div>
     </div>
+    <div class="tab-pane" id="attributeTouring">
+      ,,,
+    </div>
   </div>
+</div>
