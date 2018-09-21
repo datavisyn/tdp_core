@@ -1,5 +1,5 @@
 
-import {SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc} from 'lineupjs';
+import {SidePanel, spaceFillingRule, IGroupSearchItem, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isSupportType, Column} from 'lineupjs';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -9,6 +9,7 @@ import {
 } from '../../extensions';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions, MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} from '../ARankingView';
+import {exportJSON, exportRanking} from './utils';
 
 export interface ISearchOption {
   text: string;
@@ -204,10 +205,47 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private appendDownload() {
-    const listener = (ranking: Ranking) => {
-      this.exportRanking(ranking, <LocalDataProvider>this.provider);
-    };
-    return this.createMarkup('Export Data', 'fa fa-download', listener);
+    const node = this.node.ownerDocument.createElement('div');
+    node.classList.add('btn-group');
+    node.innerHTML = `
+      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Export Data">
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li class="dropdown-header">Export All Rows</li>
+        <li><a href="#" data-s="a" data-t="csv">CSV (comma separated)</a></li>
+        <li><a href="#" data-s="a" data-t="tsv">TSV (tab separated)</a></li>
+        <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
+        <li><a href="#" data-s="a" data-t="json">JSON</a></li>
+        <li class="dropdown-header">Export Selected Rows Only</li>
+        <li><a href="#" data-s="s" data-t="csv">CSV (comma separated)</a></li>
+        <li><a href="#" data-s="s" data-t="tsv">TSV (tab separated)</a></li>
+        <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
+        <li><a href="#" data-s="s" data-t="json">JSON</a></li>
+        <li class="dropdown-divider"></li>
+        <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
+      </ul>
+    `;
+
+    const links = Array.from(node.querySelectorAll('a'));
+    for (const link of links) {
+      link.onclick = (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        const type = link.dataset.t;
+        const onlySelected = link.dataset.s === 's';
+        if (type === 'custom') {
+          // TODO
+        } else {
+          const ranking = this.provider.getFirstRanking();
+          const order = onlySelected ? this.provider.getSelection() : ranking!.getOrder();
+          const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
+          return this.downloadRanking(order, columns, <any>type);
+        }
+      };
+    }
+
+
+    return node;
   }
 
   private appendSaveRanking() {
@@ -228,20 +266,31 @@ export default class LineUpPanelActions extends EventHandler {
     });
   }
 
-  protected exportRanking(ranking: Ranking, provider: LocalDataProvider) {
-    Promise.resolve(provider.view(ranking.getOrder())).then((data) => this.exportRankingImpl(ranking, data));
+  protected downloadRanking(order: number[], columns: Column[], type: 'csv'|'tsv'|'ssv'|'json') {
+    const rows = this.provider.viewRawRows(order);
+
+    const separators = {csv : ',', tsv: '\t', ssv: ';'};
+    let content: string;
+    if (type in separators) {
+      content = exportRanking(columns, rows, separators[type]);
+    } else { // json
+      content = exportJSON(columns, rows);
+    }
+    const mimeTypes = {csv : 'text/csv', tsv: 'text/text/tab-separated-values', ssv: 'text/csv', json: 'application/json'};
+    const names = {csv : 'export.csv', tsv: 'export.tsv', ssv: 'export.csv', json: 'export.json'};
+    return this.downloadFile(content, mimeTypes[type], names[type]);
   }
 
-  protected exportRankingImpl(ranking: Ranking, data: any[]) {
-    const content = exportRanking(ranking, data, {separator: ';', quote: true, verboseColumnHeaders: true});
-    const downloadLink = document.createElement('a');
-    const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
+  private downloadFile(content: string, mimeType: string, name: string) {
+    const doc = this.node.ownerDocument;
+    const downloadLink = doc.createElement('a');
+    const blob = new Blob([content], {type: mimeType});
     downloadLink.href = URL.createObjectURL(blob);
-    (<any>downloadLink).download = 'export.csv';
+    (<any>downloadLink).download = name;
 
-    document.body.appendChild(downloadLink);
+    doc.body.appendChild(downloadLink);
     downloadLink.click();
-    document.body.removeChild(downloadLink);
+    downloadLink.remove();
   }
 
   protected saveRankingDialog(order: number[]) {

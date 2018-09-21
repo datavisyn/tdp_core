@@ -3,7 +3,7 @@
  */
 import {IRow, IScoreRow} from '../';
 import {getTDPCount, IParams} from '../../rest';
-import {IDataRow} from 'lineupjs';
+import {IDataRow, Ranking, isSupportType, Column, isNumberColumn} from 'lineupjs';
 import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form';
 import {encodeParams} from 'phovea_core/src/ajax';
 
@@ -132,3 +132,35 @@ export function previewFilterHint(database: string, view: string, extraParams?: 
   };
 }
 
+export function exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
+  //optionally quote not numbers
+  const escape = new RegExp(`["]`, 'g');
+
+  function quote(l: string, c?: Column) {
+    if (l == null) {
+      return '';
+    }
+    if ((l.indexOf('\n') >= 0) && (!c || !isNumberColumn(c))) {
+      return `"${l.replace(escape, '""')}"`;
+    }
+    return l;
+  }
+
+  const r: string[] = [];
+  r.push(columns.map((d) => quote(`${d.label}${d.description ? `\n${d.description}` : ''}`)).join(separator));
+  rows.forEach((row) => {
+    r.push(columns.map((c) => quote(c.getLabel(row), c)).join(separator));
+  });
+  return r.join('\n');
+}
+
+export function exportJSON(columns: Column[], rows: IDataRow[]) {
+  const converted = rows.map((row) => {
+    const r: any = {};
+    for (const col of columns) {
+      r[col.label] = col.getValue(row);
+    }
+    return r;
+  });
+  return JSON.stringify(converted, null, 2);
+}
