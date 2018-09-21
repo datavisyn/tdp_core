@@ -9,7 +9,7 @@ import {
 } from '../../extensions';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions, MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} from '../ARankingView';
-import {exportJSON, exportRanking} from './utils';
+import {exportLogic} from './export';
 
 export interface ISearchOption {
   text: string;
@@ -233,14 +233,9 @@ export default class LineUpPanelActions extends EventHandler {
         evt.stopPropagation();
         const type = link.dataset.t;
         const onlySelected = link.dataset.s === 's';
-        if (type === 'custom') {
-          // TODO
-        } else {
-          const ranking = this.provider.getFirstRanking();
-          const order = onlySelected ? this.provider.getSelection() : ranking!.getOrder();
-          const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
-          return this.downloadRanking(order, columns, <any>type);
-        }
+        exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
+          this.downloadFile(content, mimeType, name);
+        });
       };
     }
 
@@ -266,22 +261,7 @@ export default class LineUpPanelActions extends EventHandler {
     });
   }
 
-  protected downloadRanking(order: number[], columns: Column[], type: 'csv'|'tsv'|'ssv'|'json') {
-    const rows = this.provider.viewRawRows(order);
-
-    const separators = {csv : ',', tsv: '\t', ssv: ';'};
-    let content: string;
-    if (type in separators) {
-      content = exportRanking(columns, rows, separators[type]);
-    } else { // json
-      content = exportJSON(columns, rows);
-    }
-    const mimeTypes = {csv : 'text/csv', tsv: 'text/text/tab-separated-values', ssv: 'text/csv', json: 'application/json'};
-    const names = {csv : 'export.csv', tsv: 'export.tsv', ssv: 'export.csv', json: 'export.json'};
-    return this.downloadFile(content, mimeTypes[type], names[type]);
-  }
-
-  private downloadFile(content: string, mimeType: string, name: string) {
+  private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
     const doc = this.node.ownerDocument;
     const downloadLink = doc.createElement('a');
     const blob = new Blob([content], {type: mimeType});
