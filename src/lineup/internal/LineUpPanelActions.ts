@@ -221,7 +221,7 @@ export default class LineUpPanelActions extends EventHandler {
         <li><a href="#" data-s="s" data-t="tsv">TSV (tab separated)</a></li>
         <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
         <li><a href="#" data-s="s" data-t="json">JSON</a></li>
-        <li class="dropdown-divider"></li>
+        <li role="separator" class="divider"></li>
         <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
       </ul>
     `;
