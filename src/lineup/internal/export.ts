@@ -79,26 +79,28 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
 
     const id = `e${randomId(3)}`;
     const ranking = provider.getFirstRanking();
+    dialog.form.classList.add('tdp-ranking-export-form');
 
     const flat = ranking.flatColumns;
     const lookup = new Map(flat.map((d) => <[string, Column]>[d.id, d]));
 
     dialog.form.innerHTML = `
-      ${flat.map((col) => `
-        <div class="checkbox">
-        <label>
-          <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
-          ${col.label}
-        </label>
-      </div>
-      `).join('')}
       <div class="form-group">
-        <label for="rows_${id}">Exported Rows</label>
-        <select class="form-control" id="rows_${id}" name="rows" required>
-          <option value="all" selected>All rows (${ranking.getOrder().length})</option>
-          <option value="selected">Selected row only (${provider.getSelection().length})</option>
-          <option value="not">Not selected rows only (${ranking.getOrder().length - provider.getSelection().length})</option>
-        </select>
+        <label>Columns</label>
+        ${flat.map((col) => `
+          <div class="checkbox">
+          <label>
+            <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
+            ${col.label}
+          </label>
+        </div>
+        `).join('')}
+      </div>
+      <div class="form-group">
+        <label>Rows</label>
+        <div class="radio"><label><input type="radio" name="rows" value="all" checked>All rows (${ranking.getOrder().length})</label></div>
+        <div class="radio"><label><input type="radio" name="rows" value="selected">Selected row only (${provider.getSelection().length})</label></div>
+        <div class="radio"><label><input type="radio" name="rows" value="not">Not selected rows only (${ranking.getOrder().length - provider.getSelection().length})</label></div>
       </div>
       <div class="form-group">
         <label for="name_${id}">Export Name</label>

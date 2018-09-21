@@ -240,4 +240,10 @@ $lu_assets: '~lineupjs/src/assets';
 
 @at-root {
   @import '~lineupjs/src/styles/lineup';
+
+  .tdp-ranking-export-form {
+    .radio, .checkbox {
+      margin-left: 1em;
+    }
+  }
 }
