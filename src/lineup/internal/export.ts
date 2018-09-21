@@ -10,7 +10,7 @@ export function exportRanking(columns: Column[], rows: IDataRow[], separator: st
     if (l == null || l === 'null') {
       return '';
     }
-    if ((l.indexOf('\n') >= 0) && (!c || !isNumberColumn(c))) {
+    if ((l.includes('\n') || l.includes(separator)) && (!c || !isNumberColumn(c))) {
       return `"${l.replace(escape, '""')}"`;
     }
     return l;
