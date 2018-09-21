@@ -137,7 +137,7 @@ export function exportRanking(columns: Column[], rows: IDataRow[], separator: st
   const escape = new RegExp(`["]`, 'g');
 
   function quote(l: string, c?: Column) {
-    if (l == null) {
+    if (l == null || l === 'null') {
       return '';
     }
     if ((l.indexOf('\n') >= 0) && (!c || !isNumberColumn(c))) {
@@ -158,7 +158,7 @@ export function exportJSON(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[col.label] = col.getValue(row);
+      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
     }
     return r;
   });
