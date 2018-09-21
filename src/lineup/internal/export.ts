@@ -88,7 +88,8 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
       <div class="form-group">
         <label>Columns</label>
         ${flat.map((col) => `
-          <div class="checkbox">
+          <div class="checkbox tdp-ranking-export-form-handle">
+          <span class=" fa fa-sort"></span>
           <label>
             <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
             ${col.label}
@@ -116,6 +117,9 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
         </select>
       </div>
     `;
+
+    resortAble(<HTMLElement>dialog.form.firstElementChild!, '.checkbox');
+
 
     return new Promise<IExportData>((resolve) => {
       dialog.onSubmit(() => {
@@ -157,3 +161,46 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
   });
 }
 
+function resortAble(base: HTMLElement, elementSelector: string) {
+  const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
+
+  const enable = (item: HTMLElement) => {
+    item.classList.add('dragging');
+    base.classList.add('dragging');
+    let prevBB: DOMRect | ClientRect;
+    let nextBB: DOMRect | ClientRect;
+
+    const update = () => {
+      prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
+      nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
+    };
+    update();
+
+    base.onmouseup = base.onmouseleave = () => {
+      item.classList.remove('dragging');
+      base.classList.remove('dragging');
+      base.onmouseleave = base.onmouseup = base.onmousemove = null;
+    };
+    base.onmousemove = (evt) => {
+      const y = evt.clientY;
+      if (prevBB && y < (prevBB.top + prevBB.height / 2)) {
+        // move up
+        item.parentElement!.insertBefore(item, item.previousElementSibling);
+        update();
+      } else if (nextBB && y > (nextBB.top + nextBB.height / 2)) {
+        // move down
+        item.parentElement!.insertBefore(item.nextElementSibling, item);
+        update();
+      }
+      evt.preventDefault();
+      evt.stopPropagation();
+    };
+  };
+
+  for (const item of items) {
+    const handle = <HTMLElement>item.firstElementChild!;
+    handle.onmousedown = () => {
+      enable(item);
+    };
+  }
+}

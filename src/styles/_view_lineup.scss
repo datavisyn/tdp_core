@@ -242,8 +242,30 @@ $lu_assets: '~lineupjs/src/assets';
   @import '~lineupjs/src/styles/lineup';
 
   .tdp-ranking-export-form {
-    .radio, .checkbox {
+    user-select: none;
+    -moz-user-select: none;
+
+    .radio {
       margin-left: 1em;
+    }
+  }
+
+  .tdp-ranking-export-form-handle {
+    > span {
+      visibility: hidden;
+      padding: 0 0.5em 0 1em;
+      cursor: grab;
+    }
+
+    &:hover > span,
+    &.dragging > span {
+      visibility: visible;
+    }
+
+    &.dragging {
+      border: 1px solid lightgray;
+      border-radius: 3px;
+      cursor: grabbing;
     }
   }
 }
