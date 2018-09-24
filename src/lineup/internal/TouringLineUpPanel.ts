@@ -39,7 +39,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    */
   private update() {
     this.updateDropdowns();
-    
 
   }
 
