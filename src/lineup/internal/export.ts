@@ -1,0 +1,206 @@
+import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from 'lineupjs';
+import {lazyDialogModule} from '../../dialogs';
+import {randomId} from 'phovea_core/src';
+
+export function exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
+  //optionally quote not numbers
+  const escape = new RegExp(`["]`, 'g');
+
+  function quote(l: string, c?: Column) {
+    if (l == null || l === 'null') {
+      return '';
+    }
+    if ((l.includes('\n') || l.includes(separator)) && (!c || !isNumberColumn(c))) {
+      return `"${l.replace(escape, '""')}"`;
+    }
+    return l;
+  }
+
+  const r: string[] = [];
+  r.push(columns.map((d) => quote(`${d.label}${d.description ? `\n${d.description}` : ''}`)).join(separator));
+  rows.forEach((row) => {
+    r.push(columns.map((c) => quote(c.getLabel(row), c)).join(separator));
+  });
+  return r.join('\n');
+}
+
+export function exportJSON(columns: Column[], rows: IDataRow[]) {
+  const converted = rows.map((row) => {
+    const r: any = {};
+    for (const col of columns) {
+      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+    }
+    return r;
+  });
+  return JSON.stringify(converted, null, 2);
+}
+
+export declare type ExportType = 'json' | 'csv' | 'tsv' | 'ssv';
+
+export function exportLogic(type: 'custom' | ExportType, onlySelected: boolean, provider: LocalDataProvider) {
+  if (type === 'custom') {
+    return customizeDialog(provider).then((r) => convertRanking(provider, r.order, r.columns, r.type, r.name));
+  } else {
+    const ranking = provider.getFirstRanking();
+    const order = onlySelected ? provider.getSelection() : ranking!.getOrder();
+    const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
+    return Promise.resolve(convertRanking(provider, order, columns, type, ranking.getLabel()));
+  }
+}
+
+function convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportType, name: string) {
+  const rows = provider.viewRawRows(order);
+
+  const separators = {csv : ',', tsv: '\t', ssv: ';'};
+  let content: string;
+  if (type in separators) {
+    content = exportRanking(columns, rows, separators[type]);
+  } else { // json
+    content = exportJSON(columns, rows);
+  }
+  const mimeTypes = {csv : 'text/csv', tsv: 'text/text/tab-separated-values', ssv: 'text/csv', json: 'application/json'};
+  return {
+    content,
+    mimeType: mimeTypes[type],
+    name: `${name}.${type === 'ssv' ? 'csv' : type}`
+  };
+}
+
+interface IExportData {
+  type: ExportType;
+  columns: Column[];
+  order: number[];
+  name: string;
+}
+
+function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
+  return lazyDialogModule().then((dialogs) => {
+    const dialog = new dialogs.FormDialog('Export Data &hellip;', '<i class="fa fa-download"></i> Export');
+
+    const id = `e${randomId(3)}`;
+    const ranking = provider.getFirstRanking();
+    dialog.form.classList.add('tdp-ranking-export-form');
+
+    const flat = ranking.flatColumns;
+    const lookup = new Map(flat.map((d) => <[string, Column]>[d.id, d]));
+
+    dialog.form.innerHTML = `
+      <div class="form-group">
+        <label>Columns</label>
+        ${flat.map((col) => `
+          <div class="checkbox tdp-ranking-export-form-handle">
+          <span class=" fa fa-sort"></span>
+          <label>
+            <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
+            ${col.label}
+          </label>
+        </div>
+        `).join('')}
+      </div>
+      <div class="form-group">
+        <label>Rows</label>
+        <div class="radio"><label><input type="radio" name="rows" value="all" checked>All rows (${ranking.getOrder().length})</label></div>
+        <div class="radio"><label><input type="radio" name="rows" value="selected">Selected row only (${provider.getSelection().length})</label></div>
+        <div class="radio"><label><input type="radio" name="rows" value="not">Not selected rows only (${ranking.getOrder().length - provider.getSelection().length})</label></div>
+      </div>
+      <div class="form-group">
+        <label for="name_${id}">Export Name</label>
+        <input class="form-control" id="name_${id}" name="name" value="Export" placeholder="name of the exported file">
+      </div>
+      <div class="form-group">
+        <label for="type_${id}">Export Format</label>
+        <select class="form-control" id="type_${id}" name="type" required placeholder="export format">
+          <option value="csv" selected>CSV (comma separated)</option>
+          <option value="tsv">TSV (tab separated)</option>
+          <option value="ssv">CSV (semicolon separated)</option>
+          <option value="json">JSON</option>
+        </select>
+      </div>
+    `;
+
+    resortAble(<HTMLElement>dialog.form.firstElementChild!, '.checkbox');
+
+
+    return new Promise<IExportData>((resolve) => {
+      dialog.onSubmit(() => {
+        const data = new FormData(dialog.form);
+        dialog.hide();
+
+        const rows = data.get('rows').toString();
+        let order: number[];
+        switch(rows) {
+          case 'selected':
+            order = provider.getSelection();
+            break;
+          case 'not':
+            const selected = new Set(provider.getSelection());
+            order = ranking.getOrder().filter((d) => !selected.has(d));
+            break;
+          default:
+            order = ranking.getOrder();
+        }
+
+        const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
+
+        resolve({
+          type: <ExportType>data.get('type'),
+          columns,
+          order,
+          name: <string>data.get('name')
+        });
+        return false;
+      });
+      dialog.show();
+      setTimeout(() => {
+        const first = <HTMLElement>dialog.form.querySelector('input, select, textarea');
+        if (first) {
+          first.focus();
+        }
+      }, 250); // till dialog is visible
+    });
+  });
+}
+
+function resortAble(base: HTMLElement, elementSelector: string) {
+  const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
+
+  const enable = (item: HTMLElement) => {
+    item.classList.add('dragging');
+    base.classList.add('dragging');
+    let prevBB: DOMRect | ClientRect;
+    let nextBB: DOMRect | ClientRect;
+
+    const update = () => {
+      prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
+      nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
+    };
+    update();
+
+    base.onmouseup = base.onmouseleave = () => {
+      item.classList.remove('dragging');
+      base.classList.remove('dragging');
+      base.onmouseleave = base.onmouseup = base.onmousemove = null;
+    };
+    base.onmousemove = (evt) => {
+      const y = evt.clientY;
+      if (prevBB && y < (prevBB.top + prevBB.height / 2)) {
+        // move up
+        item.parentElement!.insertBefore(item, item.previousElementSibling);
+        update();
+      } else if (nextBB && y > (nextBB.top + nextBB.height / 2)) {
+        // move down
+        item.parentElement!.insertBefore(item.nextElementSibling, item);
+        update();
+      }
+      evt.preventDefault();
+      evt.stopPropagation();
+    };
+  };
+
+  for (const item of items) {
+    const handle = <HTMLElement>item.firstElementChild!;
+    handle.onmousedown = () => {
+      enable(item);
+    };
+  }
+}
