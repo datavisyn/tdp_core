@@ -1,5 +1,6 @@
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
+import {MethodManager, TYPE} from 'touring';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -19,6 +20,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const buttons = this.node.querySelector('section');
     buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-bar-chart', () => {
       this.toggleTouring();
+
+      const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
+      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: TYPE.CATEGORICAL}], descriptions);
+
+      console.log('set measures', setMeasures);
+
+      for(let [type, typeMeasures] of setMeasures) {
+        console.log('#1 '+type, typeMeasures[0]);
+
+        console.log(typeMeasures[0].calc([1,2,3], [2,4,6]))
+      }
     }));
   }
 
