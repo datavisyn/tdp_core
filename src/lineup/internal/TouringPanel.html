@@ -4,56 +4,51 @@
     <li><a href="#attributeTouring" data-toggle="tab">Attributes</a></li>
   </ul>
 
-  <div class="tab-content">
-    <div class="tab-pane active" id="itemTouring">
 
+  <div class="tab-content">
+    <!-- ITEMS -->
+    <div class="tab-pane active" id="itemTouring">
+    <!-- operation parameters -->
+      <!-- compare -->
       <div class="form-group clearfix">
         <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
-          <label for="compareSrc1">Compare:</label>
+          <label>Compare:</label>
         </div>
         <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
-          <select class="form-control" id="compareSrc1">
-            <option>All Columns</option>
-            <option>All Numerical Columns</option>
-            <option>All Categorical Columns</option>
-            <option>...</option>
+          <select class="form-control itemControls compareA">
+              <option>Selection</option>
+              <option>Stratification Groups</option>
           </select>
         </div>
       </div>
-
+      <!-- with -->
       <div class="form-group clearfix">
         <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
           <label>With:</label>
         </div>
         <div class="col-sm-4" style="margin:0 !important;padding:0 !important">
           <label>
-            <input class="form-check-input" type="radio" name="cmpGroup" value="category" checked> Categories
+            <input class="form-check-input itemControls" type="radio" name="compareGroup" value="category" checked> Categories
           </label>
         </div>
         <div class="col-sm-5" style="margin:0 !important;padding:0 !important">
           <label>
-            <input class="form-check-input" type="radio" name="cmpGroup" value="group"> Stratification
+            <input class="form-check-input itemControls" type="radio" name="compareGroup" value="group"> Stratification
           </label>
         </div>
       </div>
-
+      <!-- of -->
       <div class="form-group clearfix">
         <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
-          <label for="compareSrc2">Of:</label>
+          <label>Of:</label>
         </div>
         <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
-          <select class="form-control" id="compareSrc2">
-            <option>All displayed attributes</option>
-            <option>All categorical attributes</option>
+          <select class="form-control itemControls compareB">
+            <option>All categorical Attributes</option>
             <option>Selection</option>
-            <option>Stratification</option>
-            <option>A Cat1</option>
-            <option>A Cat2</option>
           </select>
         </div>
       </div>
-
-
 
       <hr>
       <div class="measures">
@@ -109,8 +104,44 @@
           </div>-->
       </div>
     </div>
+
+    <!-- ATTRIBUTES -->
     <div class="tab-pane" id="attributeTouring">
-      ,,,
+
+    <!-- operation parameters -->
+      <!-- compare -->
+      <div class="form-group clearfix">
+        <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
+          <label>Compare:</label>
+        </div>
+        <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
+          <select class="form-control attributeControls compareA">
+              <option value="allCol">All Columns</option>
+              <option value="allNumCol">All Numerical Columns</option>
+              <option value="allCatCol">All Categorical Columns</option>
+              <option value="rank">Rank</option>
+              <option value="selection">Selection</option>
+          </select>
+        </div>
+      </div>
+      <!-- with -->
+      <div class="form-group clearfix">
+          <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
+            <label for="compareSrc2">With:</label>
+          </div>
+          <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
+            <select class="form-control attributeControls compareB">
+              <option value="allCol">All Columns</option>
+              <option value="allNumCol">All Numerical Columns</option>
+              <option value="allCatCol">All Categorical Columns</option>
+              <option value="rank">Rank</option>
+              <option value="selection">Selection</option>
+            </select>
+          </div>
+        </div>
+
+    <!-- result -->
+
     </div>
   </div>
 </div>
