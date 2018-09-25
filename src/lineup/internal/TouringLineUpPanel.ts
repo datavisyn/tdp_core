@@ -1,6 +1,6 @@
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, TYPE} from 'touring';
+import {MethodManager, TYPE, ISImilarityMeasure} from 'touring';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -9,7 +9,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   
   protected init() {
     super.init();
-    this.node
+
     this.node.insertAdjacentHTML('beforeend', panelHTML);
     this.touringElem = <HTMLElement>this.node.querySelector('.touring');
     
@@ -29,9 +29,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let [type, typeMeasures] of setMeasures) {
         console.log('#1 '+type, typeMeasures[0]);
 
-        console.log(typeMeasures[0].calc([1,2,3], [2,4,6]))
+        this.insertMeasure(typeMeasures[0])
       }
     }));
+  }
+
+  private insertMeasure(measure: ISImilarityMeasure) {
+    const measuresDiv = <HTMLElement>this.node.querySelector('.measures')!;
+
+    // Headline
+    measuresDiv.insertAdjacentHTML('beforeend', `<h4>${measure.label}</h4>`)
+
+    // Table
+    // TODO
   }
 
   /**
