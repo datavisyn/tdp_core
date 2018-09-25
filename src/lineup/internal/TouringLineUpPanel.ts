@@ -4,6 +4,7 @@ import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html
 import * as d3 from 'd3'
 import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_core/src/datatype';
 
+import {MethodManager, TYPE} from 'touring';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -108,6 +109,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         
       }); 
       
+
+      const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
+      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: TYPE.CATEGORICAL}], descriptions);
+
+      console.log('set measures', setMeasures);
+
+      for(let [type, typeMeasures] of setMeasures) {
+        console.log('#1 '+type, typeMeasures[0]);
+
+        console.log(typeMeasures[0].calc([1,2,3], [2,4,6]))
+      }
     }));
     
 
@@ -122,8 +134,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    */
   private update() {
     this.updateDropdowns();
-     //seletion of a table was changed
-
 
   }
 
