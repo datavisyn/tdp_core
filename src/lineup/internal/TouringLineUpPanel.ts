@@ -1,7 +1,7 @@
 import {SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, TYPE, ISImilarityMeasure} from 'touring';
+import {MethodManager, Type, ISImilarityMeasure} from 'touring';
 import * as d3 from 'd3'
 import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_core/src/datatype';
 
@@ -110,7 +110,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       
 
       const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
-      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: TYPE.CATEGORICAL}], descriptions);
+      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
 
       console.log('set measures', setMeasures);
 
