@@ -114,11 +114,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       console.log('set measures', setMeasures);
 
-      for(let [type, typeMeasures] of setMeasures) {
-        console.log('#1 '+type, typeMeasures[0]);
-
+      setMeasures.forEach((typeMeasures, type) => {
+        console.log('#1 '+ type.toString(), typeMeasures[0]);
+        
         this.insertMeasure(typeMeasures[0])
-      }
+      });
     }));
     
 
