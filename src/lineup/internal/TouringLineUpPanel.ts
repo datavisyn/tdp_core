@@ -1,7 +1,7 @@
 import {SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, Type, ISImilarityMeasure} from 'touring';
+import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3'
 import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_core/src/datatype';
 
@@ -106,18 +106,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         //console.log('changed dropdown selectedOption: ',this.selectedOptions);
         that.updateTouringData();
         
-      }); 
-      
-
-      const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
-      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
-
-      console.log('set measures', setMeasures);
-
-      setMeasures.forEach((typeMeasures, type) => {
-        console.log('#1 '+ type.toString(), typeMeasures[0]);
-        
-        this.insertMeasure(typeMeasures[0])
       });
     }));
     
@@ -127,15 +115,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
   }
 
-  private insertMeasure(measure: ISImilarityMeasure) {
-    const measuresDiv = <HTMLElement>this.node.querySelector('.measures')!;
-
-    // Headline
-    measuresDiv.insertAdjacentHTML('beforeend', `<h4>${measure.label}</h4>`)
-
-    // Table
-    // TODO
-  }
 
   /**
    * Gets the currently displayed attributes in Lineup and updates the dropdowns and table accordingly
@@ -233,8 +212,51 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }else {
       currentData = this.provider.data;
     }
-    
-    //onsole.log('current data: ', currentData);
+
+    console.log('current data', currentData);
+
+    const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
+    const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
+
+    console.log('set measures for current data', setMeasures);
+    this.updateTouringTables(setMeasures, descriptions, currentData);
+  }
+
+
+  private updateTouringTables(measures: MeasureMap, currentAttributes: IColumnDesc[], currentItems: Array<any>) {
+
+    // Get the first measure for every comparison type
+    const displayedMeasures = [];
+
+    measures.forEach((typeMeasures, type) => {
+      console.log('#1 '+ type.toString(), typeMeasures[0]);
+      //displayedMeasures.push(typeMeasures[0]); //show highest ranked
+      typeMeasures.forEach((m) => displayedMeasures.push(m)); //show all
+    });
+
+    // bind the measure to the div containers
+    const containers = d3.select(this.node).select('.measures').selectAll('.measure').data(displayedMeasures, (m) => m.id); //measure id as key for the data
+
+    // enter phase
+    // Append div for each measure, containing headline, table, and visualization.
+    const containers_enter = containers.enter().append('div').attr('class', 'measure');
+
+    // Headline
+    containers_enter.append('h4').text((m) => m.label);
+    // Table
+    containers_enter.append('table').attr('class', 'table-responsive')
+                    .append('table').attr('class', 'table table-bordered table-condensed table-hover');
+
+    // TODO add visualization
+
+
+    // update phase ... entering elems implicitly included in d3 v3. (v4 needs merge)
+    const containers_update = containers;
+
+    //TODO update table content
+
+    // exit phase
+    containers.exit().remove();
   }
 
 
