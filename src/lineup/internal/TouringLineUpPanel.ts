@@ -1,7 +1,7 @@
 import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isCategoricalColumn} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, Type, ISImilarityMeasure} from 'touring';
+import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3'
 import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_core/src/datatype';
 
@@ -38,30 +38,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.itemCounter = <HTMLElement>this.node.querySelector('.lu-stats')!;
 
     
-    const that = this;
-
-    //let dropdownItemCopareA = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareA');
-    //let dropdownItemCopareB = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareB');
-
-    //column of a table was added
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN, (col, i) => {
-      //console.log('event added column', col, 'index', i)
-      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns('add',col.desc);
-        //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
-      }
-    });
-
-    //column of a table was removed
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN, (col, i) => {
-      //console.log('event removed column', col, 'index', i)
-      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns('remove',col.desc);
-        //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
-      }
-    });
-
-    
     
     const buttons = this.node.querySelector('section');
     buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
@@ -77,37 +53,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
       //console.log('provider.getFilter: ',this.provider.getFilter());
       //console.log('------------------------------------');
-
-      
-      //change radio button
-      d3.selectAll('input[name="compareGroup"]').on('change', function(){
-        //console.log('radio button value: ',this.value, ' | object: ', this);
-
-        that.updateDropdowns();
-        //that.updateDropdownDependingOnRadioButton(dropdownItemCopareB,this.value);
-      });
-
-      // change in selection 
-      this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
-        //console.log('selection changed, indices: ', indices);
-        that.updateTouringData();
-      });
-      
-      //for changes made in dropdown
-      d3.selectAll('select[class="form-control itemControls compareA"]').on('input', function(){
-        //console.log('changed dropdown value: ',this.value);
-        //console.log('changed dropdown selectedOption: ',this.selectedOptions);
-        that.updateTouringData();
-        
-      }); 
-
-      d3.selectAll('select[class="form-control itemControls compareB"]').on('input', function(){
-        console.log('changed dropdown value: ',this.value);
-        //console.log('changed dropdown selectedOption: ',this.selectedOptions);
-        that.updateTouringData();
-        
-      }); 
-      
 
       const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
       console.log('descriptions: ', descriptions);
@@ -166,12 +111,65 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
       }
     }));
-    
 
-    //this.updateDropdowns();
-    //this.initItemDropdowns(dropdownItemCopareB);
-    
+
+  
+
+
+    this.addEventListeners();
   }
+
+  private addEventListeners() {
+    // HTML ELEMENT LISTENERS
+    // -----------------------------------------------
+
+    // changes of radio button selection
+    d3.select(this.node).selectAll('input[name="compareGroup"]').on('change', () => {  
+      // using fat arrow: global scope replaces new object's scope and 'this' can be used to call class functions
+      const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
+      console.log('radio button value: ',radio.property('value'), ' | object: ', radio);
+
+      
+    
+      this.updateDropdowns();
+    });
+
+    //changes made in dropdowns
+    d3.select(this.node).selectAll('select.itemControls').on('input',() => {
+      console.log('changed dropdown value: ', d3.selectAll('select.itemControls').property("value"));
+      this.updateTouringData();
+    });
+
+
+
+    // DATA CHANGE LISTENERS
+    // -----------------------------------------------
+        // change in selection 
+        this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
+          //console.log('selection changed, indices: ', indices);
+          this.updateTouringData();
+        });
+    
+        //column of a table was added
+        this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN, (col, i) => {
+          //console.log('event added column', col, 'index', i)
+          if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
+            this.updateDropdowns('add',col.desc);
+            //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
+          }
+        });
+    
+        //column of a table was removed
+        this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN, (col, i) => {
+          //console.log('event removed column', col, 'index', i)
+          if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
+            this.updateDropdowns('remove',col.desc);
+            //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
+          }
+        });
+      }
+    
+  
 
   //generates id for the collapseable panel in the accordion with the measure type and the current time's minutes/seconds and millisec
   private getIdWithTimestamp(prefix: string)
@@ -217,17 +215,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.getAllCategoricalColumns()
     this.drawTable(collapseId);
     //this.drawImage(collapseId);
-    
-
-    
-
     //const measuresDiv = <HTMLElement>this.node.querySelector('.measures')!;
     // Headline
     //measuresDiv.insertAdjacentHTML('beforeend', `<h4>${measure.label}</h4>`)
 
-    // Table
-    // TODO
+    
   }
+    
+
 
   private getAllCategoricalColumns()
   {
@@ -463,7 +458,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.updateDropdowns();
 
   }
-
   
   /**
    * If 
@@ -552,8 +546,51 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }else {
       currentData = this.provider.data;
     }
-    
-    //onsole.log('current data: ', currentData);
+
+    console.log('current data', currentData);
+
+    const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
+    const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
+
+    console.log('set measures for current data', setMeasures);
+    this.updateTouringTables(setMeasures, descriptions, currentData);
+  }
+
+
+  private updateTouringTables(measures: MeasureMap, currentAttributes: IColumnDesc[], currentItems: Array<any>) {
+
+    // Get the first measure for every comparison type
+    const displayedMeasures = [];
+
+    measures.forEach((typeMeasures, type) => {
+      console.log('#1 '+ type.toString(), typeMeasures[0]);
+      //displayedMeasures.push(typeMeasures[0]); //show highest ranked
+      typeMeasures.forEach((m) => displayedMeasures.push(m)); //show all
+    });
+
+    // bind the measure to the div containers
+    const containers = d3.select(this.node).select('.measures').selectAll('.measure').data(displayedMeasures, (m) => m.id); //measure id as key for the data
+
+    // enter phase
+    // Append div for each measure, containing headline, table, and visualization.
+    const containers_enter = containers.enter().append('div').attr('class', 'measure');
+
+    // Headline
+    containers_enter.append('h4').text((m) => m.label);
+    // Table
+    containers_enter.append('table').attr('class', 'table-responsive')
+                    .append('table').attr('class', 'table table-bordered table-condensed table-hover');
+
+    // TODO add visualization
+
+
+    // update phase ... entering elems implicitly included in d3 v3. (v4 needs merge)
+    const containers_update = containers;
+
+    //TODO update table content
+
+    // exit phase
+    containers.exit().remove();
   }
 
 

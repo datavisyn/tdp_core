@@ -85,7 +85,8 @@
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "@types/jquery": "2.0.33",
     "jquery": "3.1.1",
-    "touring": "github:caleydo/touring#develop"
+    "touring": "github:caleydo/touring#develop",
+    "cypress": "^3.1.0"
   },
   "main": "build/tdp_core.js",
   "devDependencies": {
@@ -123,7 +124,6 @@
     "ifdef-loader": "2.0.0",
     "fork-ts-checker-webpack-plugin": "0.4.1",
     "thread-loader": "1.1.2",
-    "ts-loader": "4.0.1",
-    "cypress": "^3.1.0"
+    "ts-loader": "4.0.1"
   }
 }
