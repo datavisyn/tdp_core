@@ -54,62 +54,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //console.log('provider.getFilter: ',this.provider.getFilter());
       //console.log('------------------------------------');
 
-      const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
-      console.log('descriptions: ', descriptions);
-      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
-      
-      let measuresDivElement = d3.select('div[class="measures"]');
-      measuresDivElement.selectAll("*").remove();
-
-      if(setMeasures)
-      {
-        console.log('set measures: ', setMeasures);
-        
-        //group panel (accordion) for all acordion items
-        let accordionId = this.getIdWithTimestamp('accordion');
-        let panelGroup = measuresDivElement.append('div')
-                                            .attr('class','panel-group')
-                                            .attr('id',accordionId);
-
-        for(let [type, typeMeasures] of setMeasures) {
-          console.log('setMeasures current type: '+type);
-          console.log('setMeasures current #1 '+typeMeasures[0]);
-
-          for(let i=0; i<typeMeasures.length; i++)
-          {
-          
-            let collapseId = this.getIdWithTimestamp(typeMeasures[i].id);
-            console.log('collapse measure id: ',collapseId);
-            
-            let collapseDetails = {
-              groupId: accordionId,
-              id: collapseId,
-              label: typeMeasures[i].label
-            };
-
-            this.createAccordionItem(panelGroup,collapseDetails);
-
-            // let panel = panelGroup.append('div')
-            //                       .attr('class','panel');
-            // let panelHeading = panel.append('div')
-            //                         .attr('class','panel-heading')
-            //                         .attr('role','tab')
-            //                           .append('h4')
-            //                           .attr('class','panel-title')
-            //                           .html(`<a data-toggle="collapse" data-parent="#accordion" href="#${id}">${typeMeasures[0].label}</a>`)
-      
-            // let panelCollapse = panel.append('div')
-            //                         .attr('class','panel-collapse collapse')
-            //                         .attr('id',id)
-            //                           .append('div')
-            //                           .attr('class','panel-body');
-            
-
-
-            this.insertMeasure(typeMeasures[i], collapseId)
-          }
-        }
-      }
     }));
 
 
@@ -129,8 +73,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
       console.log('radio button value: ',radio.property('value'), ' | object: ', radio);
 
-      
-    
       this.updateDropdowns();
     });
 
@@ -146,7 +88,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // -----------------------------------------------
         // change in selection 
         this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
-          //console.log('selection changed, indices: ', indices);
+          console.log('selection changed, indices: ', indices);
           this.updateTouringData();
         });
     
@@ -170,6 +112,110 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
     
   
+  private updateTouringData() 
+  {
+    //console.log('update touring data');
+
+    // ---- selection
+    let selectedIndices = this.provider.getSelection();
+    let currentData = [];
+    if(selectedIndices && selectedIndices.length > 0) {
+      
+      for(let i=0;i<selectedIndices.length;i++)
+      {
+        currentData.push(this.provider.data[selectedIndices[i]]);
+      }
+      
+    }else {
+      currentData = this.provider.data;
+    }
+
+    console.log('current data length: ', currentData);
+
+    const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
+    const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
+    console.log('set measures for current data', setMeasures);
+
+    //this.updateTouringTables(setMeasures, descriptions, currentData);
+
+    // div element in html where the score and detail view should be added
+    let measuresDivElement = d3.select('div[class="measures"]');
+    measuresDivElement.selectAll("*").remove();
+
+    if(setMeasures)
+    {
+      console.log('set measures: ', setMeasures);
+      
+      //group panel (accordion) for all acordion items
+      let accordionId = this.getIdWithTimestamp('accordion');
+      let panelGroup = measuresDivElement.append('div')
+                                          .attr('class','panel-group')
+                                          .attr('id',accordionId);
+
+      for(let [type, typeMeasures] of setMeasures) {
+        // console.log('setMeasures current type: '+type);
+        // console.log('setMeasures current #1 '+typeMeasures[0]);
+
+        for(let i=0; i<typeMeasures.length; i++)
+        {
+        
+          let collapseId = this.getIdWithTimestamp(typeMeasures[i].id);
+          //console.log('accordion item/collapse id: ',collapseId);
+          
+          let collapseDetails = {
+            groupId: accordionId,
+            id: collapseId,
+            label: typeMeasures[i].label
+          };
+
+          //create accordion item and add it to the panel group
+          this.createAccordionItem(panelGroup,collapseDetails);
+
+          //insert the calculated score (jaccard: table) into the before created accordion item
+          this.insertMeasure(typeMeasures[i], collapseId, currentData)
+        }
+      }
+    }
+
+  }
+    
+
+ /*  private updateTouringTables(measures: MeasureMap, currentAttributes: IColumnDesc[], currentItems: Array<any>) {
+
+    // Get the first measure for every comparison type
+    const displayedMeasures = [];
+
+    measures.forEach((typeMeasures, type) => {
+      console.log('#1 '+ type.toString(), typeMeasures[0]);
+      //displayedMeasures.push(typeMeasures[0]); //show highest ranked
+      typeMeasures.forEach((m) => displayedMeasures.push(m)); //show all
+    });
+
+    // bind the measure to the div containers
+    const containers = d3.select(this.node).select('.measures').selectAll('.measure').data(displayedMeasures, (m) => m.id); //measure id as key for the data
+
+    // enter phase
+    // Append div for each measure, containing headline, table, and visualization.
+    const containers_enter = containers.enter().append('div').attr('class', 'measure');
+
+    // Headline
+    containers_enter.append('h4').text((m) => m.label);
+    // Table
+    containers_enter.append('table').attr('class', 'table-responsive')
+                    .append('table').attr('class', 'table table-bordered table-condensed table-hover');
+
+    // TODO add visualization
+
+
+    // update phase ... entering elems implicitly included in d3 v3. (v4 needs merge)
+    const containers_update = containers;
+
+    //TODO update table content
+
+    // exit phase
+    containers.exit().remove();
+  } */
+    
 
   //generates id for the collapseable panel in the accordion with the measure type and the current time's minutes/seconds and millisec
   private getIdWithTimestamp(prefix: string)
@@ -193,13 +239,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                               .attr('role','tab')
                                   .append('h4')
                                   .attr('class','panel-title')
-                                  .html(`<a data-toggle="collapse" data-parent="#${collapseDetails.groupId}" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
-                              
-                              
-                              // append('a')
-                              // .attr('data-toggle','collapse')
-                              // .attr('data-parent','#accordion')
-                              // .attr('href','#measure1');
+                                  //multiple expanded accordions
+                                  .html(`<a data-toggle="collapse" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
+                                  //single expanded accordion
+                                  //.html(`<a data-toggle="collapse" data-parent="#${collapseDetails.groupId}" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
+ 
       let panelCollapse = panel.append('div')
                               .attr('class','panel-collapse collapse')
                               .attr('id',collapseDetails.id)
@@ -209,52 +253,191 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-  private insertMeasure(measure: ISImilarityMeasure, collapseId: string) {
+  private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
     
-    console.log('measure ' ,measure);
-    this.getAllCategoricalColumns()
-    this.drawTable(collapseId);
-    //this.drawImage(collapseId);
-    //const measuresDiv = <HTMLElement>this.node.querySelector('.measures')!;
-    // Headline
-    //measuresDiv.insertAdjacentHTML('beforeend', `<h4>${measure.label}</h4>`)
-
-    
+    //console.log('measure ' ,measure);
+    if(measure && measure.id === 'jaccard')
+    {
+      this.generateJaccardTable(collapseId, currentData);
+      //this.drawImage(collapseId);
+    }else 
+    {
+      
+      this.drawTable(collapseId);
+     
+    }
   }
     
 
 
+  // get all column of type 'categorical' with their categories
   private getAllCategoricalColumns()
   {
     let allCategorical = [];
+    let referenceLabeles = [];
     let allColumns = this.provider.getRankings()[0].children;
     for(let i=0; i<allColumns.length; i++)
     {
       if(allColumns[i] && allColumns[i].getRenderer() === "categorical" && (<ICategoricalColumn>allColumns[i]).categories)
       {
-        let currCol = {
-          label: allColumns[i].label,
-          categories: (<ICategoricalColumn>allColumns[i]).categories
-        };
-        allCategorical.push(currCol);
-        
+        if(referenceLabeles.indexOf(allColumns[i].label) === -1)
+        { 
+          let currCol = {
+            label: allColumns[i].label,
+            column: allColumns[i].desc.column,
+            categories: (<ICategoricalColumn>allColumns[i]).categories
+            };
+          allCategorical.push(currCol);
+          referenceLabeles.push(allColumns[i].label);
+        }
       }
     }
-    console.log('allColumns: ', allColumns);
+    // console.log('allColumns: ', allColumns);
     console.log('allCategorical: ', allCategorical);
     return allCategorical;
 
   }
 
+  private generateJaccardTable(containerId: string, currentData: Array<any>)
+  {
+    let tableContainer = d3.select('#'+containerId).append('div')
+                                                  .attr('class','table-container');
 
 
+    let allCategorical = this.getAllCategoricalColumns();
+    // let currentData = [
+    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 1" , a_int: 87 , a_name: "A11" , a_real: -0.8596081557 , id: "11"},
+    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 3" , a_int: 11 , a_name: "A13" , a_real: -0.1981791449 , id: "13"},
+    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 5" , a_int: 97 , a_name: "A18" , a_real: 0.8045080081 , id: "18"},
+    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 3" , a_int: 8 , a_name: "A23" , a_real: -0.0165625107 , id: "23"},
+    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 1" , a_int: 32 , a_name: "A29" , a_real: 0.4855202222 , id: "29"}
+    // ];
+    let jaccardScores = this.calculateJaccardScores(currentData);
+    console.log('jaccardScores: ', jaccardScores);
+
+
+    //let columnHeaders = ['col1','col2','col3','col4'];
+    let columnHeaders = [
+      { head: 'col1', label: ''},
+      { head: 'col2', label: ''},
+      { head: 'col3', label: 'Selected'},
+      { head: 'col4', label: 'Unselected'},
+    ];
+
+
+    let table = tableContainer.append('table')
+                        .attr('class','table table-condensed');
+    let tableHeader = table.append('thead');
+    tableHeader.append('tr')
+              .selectAll('th')
+              .data(columnHeaders)
+              .enter()
+              .append('th')
+              .attr('class','text-center')
+              .text(function(d) { return d.label; });
+
+    let tableBody = table.append('tbody');
+     // create a row for each object in the data
+    var rows = tableBody.selectAll('tr')
+                      .data(jaccardScores)
+                      .enter()
+                      .append('tr');
+
+    // create a cell in each row for each column
+    // At this point, the rows have data associated.
+    // So the data function accesses it.
+    var cells = rows.selectAll('td')
+                    .data(function(row) {
+                      // he does it this way to guarantee you only use the
+                      // values for the columns you provide.
+                      return columnHeaders.map(function(column) {
+                          // return a new object with a value set to the row's column value.
+                          return {value: row[column.head]};
+                      });
+                    })
+                    .enter()
+                    .append('td')
+                    .attr('class','text-center')
+                    .text(function(d) { return d.value; });
+  }
+
+
+  // calculated jaccard score
+  private calculateJaccardScores(currentItems: Array<any>)
+  {
+    let allData = this.provider.data;
+    let allCategoricalCol = this.getAllCategoricalColumns();
+
+    let jaccardScores = [];
+
+    for(let i=0; i<allCategoricalCol.length; i++)
+    {
+      let currCol = allCategoricalCol[i];
+      
+      for(let cnt=0; cnt < currCol.categories.length; cnt++)
+      {
+        let currCategory = currCol.categories[cnt];
+        let scoreSelected = this.getElementsByPropertyValue(currentItems,currCol.column,currCategory.label).length / 
+                            this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length;
+        scoreSelected = Math.round(scoreSelected*1000)/1000;
+
+        let scoreDeselected = (this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length - 
+                                    this.getElementsByPropertyValue(currentItems,currCol.column,currCategory.label).length) / 
+                              this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length;    
+        scoreDeselected = Math.round(scoreDeselected*1000)/1000;
+
+        let resultObj = {
+          col1: currCol.label,
+          col2: currCategory.label,
+          col3: scoreSelected,
+          col4: scoreDeselected
+        };
+
+        jaccardScores.push(resultObj);
+      }
+
+    }
+
+    return jaccardScores;
+    
+  }
+  
+  private getElementsByPropertyValue(elements: Array<any>, property: string, value: string | number)
+  {
+    return elements.filter(row => row[property] === value);
+  }
+
+  
+
+  /* https://stackoverflow.com/questions/32999179/d3-table-with-rowspan
+  nested_data.forEach(function (d) {
+    var rowspan = d.values.length;
+    d.values.forEach(function (val, index) {
+        var tr = thead.append("tr");
+        if (index == 0) { //rowspan only for first element
+            tr.append("td")
+                .attr("rowspan", rowspan)
+                .text(val.Year);
+        }
+        tr.append("td")
+            .text(val.Month);
+        tr.append("td")
+            .text(val.Team);
+        tr.append("td")
+            .text(val.Sales);
+
+    });
+}); */
+
+
+
+  // draw table
   private drawTable(containerId: string) {
     // let measuresDivElement = d3.select('div[class="measures"]');
     let tableContainer = d3.select('#'+containerId).append('div')
                                                   .attr('class','table-container');
 
-    console.log('tableContainer element: ', tableContainer);
-     
+         
     // let columnHeaders = [
     //   { head: 'One', cl: ''},
     //   { head: 'Two', cl: ''},
@@ -529,69 +712,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return buttonValue;
   }
 
-  private updateTouringData() 
-  {
-    //console.log('update touring data');
-
-    // ---- selection
-    let selectedIndices = this.provider.getSelection();
-    let currentData = [];
-    if(selectedIndices && selectedIndices.length > 0) {
-      
-      for(let i=0;i<selectedIndices.length;i++)
-      {
-        currentData.push(this.provider.data[selectedIndices[i]]);
-      }
-      
-    }else {
-      currentData = this.provider.data;
-    }
-
-    console.log('current data', currentData);
-
-    const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
-    const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
-
-    console.log('set measures for current data', setMeasures);
-    this.updateTouringTables(setMeasures, descriptions, currentData);
-  }
-
-
-  private updateTouringTables(measures: MeasureMap, currentAttributes: IColumnDesc[], currentItems: Array<any>) {
-
-    // Get the first measure for every comparison type
-    const displayedMeasures = [];
-
-    measures.forEach((typeMeasures, type) => {
-      console.log('#1 '+ type.toString(), typeMeasures[0]);
-      //displayedMeasures.push(typeMeasures[0]); //show highest ranked
-      typeMeasures.forEach((m) => displayedMeasures.push(m)); //show all
-    });
-
-    // bind the measure to the div containers
-    const containers = d3.select(this.node).select('.measures').selectAll('.measure').data(displayedMeasures, (m) => m.id); //measure id as key for the data
-
-    // enter phase
-    // Append div for each measure, containing headline, table, and visualization.
-    const containers_enter = containers.enter().append('div').attr('class', 'measure');
-
-    // Headline
-    containers_enter.append('h4').text((m) => m.label);
-    // Table
-    containers_enter.append('table').attr('class', 'table-responsive')
-                    .append('table').attr('class', 'table table-bordered table-condensed table-hover');
-
-    // TODO add visualization
-
-
-    // update phase ... entering elems implicitly included in d3 v3. (v4 needs merge)
-    const containers_update = containers;
-
-    //TODO update table content
-
-    // exit phase
-    containers.exit().remove();
-  }
 
 
   //add option to dropdown
