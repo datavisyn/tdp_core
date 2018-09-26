@@ -36,10 +36,56 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.searchbox = <HTMLElement>this.node.querySelector('.lu-adder')!;
     this.itemCounter = <HTMLElement>this.node.querySelector('.lu-stats')!;
 
-    const that = this;
+    
+    
+    const buttons = this.node.querySelector('section');
+    buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-bar-chart', () => {
+      this.toggleTouring();
+      
+      //console.log('provider',this.provider);
+      //console.log('provider.getSelection: ',this.provider.getSelection());
+      //console.log('provider.getSelection: ',this.provider.getSelection());
+      //console.log('provider.selectedRows: ',this.provider.selectedRows());
+      //console.log('provider.getColumns: ',this.provider.getColumns());
+      //console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
+      //console.log('provider.getRanking: ',this.provider.getRankings());
+      //console.log('provider.getFilter: ',this.provider.getFilter());
+      //console.log('------------------------------------');
+    }));
 
-    //let dropdownItemCopareA = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareA');
-    //let dropdownItemCopareB = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareB');
+
+    this.addEventListeners();
+  }
+
+  private addEventListeners() {
+    // HTML ELEMENT LISTENERS
+    // -----------------------------------------------
+
+    // changes of radio button selection
+    d3.select(this.node).selectAll('input[name="compareGroup"]').on('change', () => {  
+      // using fat arrow: global scope replaces new object's scope and 'this' can be used to call class functions
+      const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
+      console.log('radio button value: ',radio.property('value'), ' | object: ', radio);
+
+      this.updateDropdowns();
+    });
+
+    //changes made in dropdowns
+    d3.select(this.node).selectAll('select.itemControls').on('input',() => {
+      console.log('changed dropdown value: ', d3.selectAll('select.itemControls').property("value"));
+      this.updateTouringData();
+    });
+
+
+
+    // DATA CHANGE LISTENERS
+    // -----------------------------------------------
+    
+    // change in selection 
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
+      //console.log('selection changed, indices: ', indices);
+      this.updateTouringData();
+    });
 
     //column of a table was added
     this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN, (col, i) => {
@@ -58,71 +104,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
       }
     });
-
-    
-    
-    const buttons = this.node.querySelector('section');
-    buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-bar-chart', () => {
-      this.toggleTouring();
-      
-      
-      //console.log('provider',this.provider);
-      //console.log('provider.getSelection: ',this.provider.getSelection());
-      //console.log('provider.getSelection: ',this.provider.getSelection());
-      //console.log('provider.selectedRows: ',this.provider.selectedRows());
-      //console.log('provider.getColumns: ',this.provider.getColumns());
-      //console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
-      //console.log('provider.getRanking: ',this.provider.getRankings());
-      //console.log('provider.getFilter: ',this.provider.getFilter());
-      //console.log('------------------------------------');
-
-      
-      //change radio button
-      d3.selectAll('input[name="compareGroup"]').on('change', function(){
-        //console.log('radio button value: ',this.value, ' | object: ', this);
-
-        that.updateDropdowns();
-        //that.updateDropdownDependingOnRadioButton(dropdownItemCopareB,this.value);
-      });
-
-
-      
-      // change in selection 
-      this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
-        //console.log('selection changed, indices: ', indices);
-        that.updateTouringData();
-      });
-      
-      //for changes made in dropdown
-      d3.selectAll('select[class="form-control itemControls compareA"]').on('input', function(){
-        //console.log('changed dropdown value: ',this.value);
-        //console.log('changed dropdown selectedOption: ',this.selectedOptions);
-        that.updateTouringData();
-        
-      }); 
-
-      d3.selectAll('select[class="form-control itemControls compareB"]').on('input', function(){
-        console.log('changed dropdown value: ',this.value);
-        //console.log('changed dropdown selectedOption: ',this.selectedOptions);
-        that.updateTouringData();
-        
-      });
-    }));
-    
-
-    //this.updateDropdowns();
-    //this.initItemDropdowns(dropdownItemCopareB);
-    
   }
 
 
-  /**
-   * Gets the currently displayed attributes in Lineup and updates the dropdowns and table accordingly
-   */
-  private update() {
-    this.updateDropdowns();
-
-  }
 
   
   /**
