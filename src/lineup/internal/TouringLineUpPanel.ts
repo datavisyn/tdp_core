@@ -1,9 +1,10 @@
-import {SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc} from 'lineupjs';
+import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isCategoricalColumn} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, TYPE, ISImilarityMeasure} from 'touring';
+import {MethodManager, Type, ISImilarityMeasure} from 'touring';
 import * as d3 from 'd3'
 import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_core/src/datatype';
+
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -36,6 +37,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.searchbox = <HTMLElement>this.node.querySelector('.lu-adder')!;
     this.itemCounter = <HTMLElement>this.node.querySelector('.lu-stats')!;
 
+    
     const that = this;
 
     //let dropdownItemCopareA = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareA');
@@ -62,17 +64,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     
     const buttons = this.node.querySelector('section');
-    buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-bar-chart', () => {
+    buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
       this.toggleTouring();
       
       
-      //console.log('provider',this.provider);
+      console.log('provider',this.provider);
       //console.log('provider.getSelection: ',this.provider.getSelection());
-      //console.log('provider.getSelection: ',this.provider.getSelection());
+      console.log('provider.getSelection: ',this.provider.getSelection());
       //console.log('provider.selectedRows: ',this.provider.selectedRows());
       //console.log('provider.getColumns: ',this.provider.getColumns());
-      //console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
-      //console.log('provider.getRanking: ',this.provider.getRankings());
+      console.log('provider.getRanking: ',this.provider.getRankings());
+      console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
       //console.log('provider.getFilter: ',this.provider.getFilter());
       //console.log('------------------------------------');
 
@@ -85,8 +87,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         //that.updateDropdownDependingOnRadioButton(dropdownItemCopareB,this.value);
       });
 
-
-      
       // change in selection 
       this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
         //console.log('selection changed, indices: ', indices);
@@ -110,14 +110,60 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       
 
       const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
-      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: TYPE.CATEGORICAL}], descriptions);
+      console.log('descriptions: ', descriptions);
+      const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
+      
+      let measuresDivElement = d3.select('div[class="measures"]');
+      measuresDivElement.selectAll("*").remove();
 
-      console.log('set measures', setMeasures);
+      if(setMeasures)
+      {
+        console.log('set measures: ', setMeasures);
+        
+        //group panel (accordion) for all acordion items
+        let accordionId = this.getIdWithTimestamp('accordion');
+        let panelGroup = measuresDivElement.append('div')
+                                            .attr('class','panel-group')
+                                            .attr('id',accordionId);
 
-      for(let [type, typeMeasures] of setMeasures) {
-        console.log('#1 '+type, typeMeasures[0]);
+        for(let [type, typeMeasures] of setMeasures) {
+          console.log('setMeasures current type: '+type);
+          console.log('setMeasures current #1 '+typeMeasures[0]);
 
-        this.insertMeasure(typeMeasures[0])
+          for(let i=0; i<typeMeasures.length; i++)
+          {
+          
+            let collapseId = this.getIdWithTimestamp(typeMeasures[i].id);
+            console.log('collapse measure id: ',collapseId);
+            
+            let collapseDetails = {
+              groupId: accordionId,
+              id: collapseId,
+              label: typeMeasures[i].label
+            };
+
+            this.createAccordionItem(panelGroup,collapseDetails);
+
+            // let panel = panelGroup.append('div')
+            //                       .attr('class','panel');
+            // let panelHeading = panel.append('div')
+            //                         .attr('class','panel-heading')
+            //                         .attr('role','tab')
+            //                           .append('h4')
+            //                           .attr('class','panel-title')
+            //                           .html(`<a data-toggle="collapse" data-parent="#accordion" href="#${id}">${typeMeasures[0].label}</a>`)
+      
+            // let panelCollapse = panel.append('div')
+            //                         .attr('class','panel-collapse collapse')
+            //                         .attr('id',id)
+            //                           .append('div')
+            //                           .attr('class','panel-body');
+            
+
+
+            this.insertMeasure(typeMeasures[i], collapseId)
+          }
+        }
       }
     }));
     
@@ -127,16 +173,289 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
   }
 
-  private insertMeasure(measure: ISImilarityMeasure) {
-    const measuresDiv = <HTMLElement>this.node.querySelector('.measures')!;
+  //generates id for the collapseable panel in the accordion with the measure type and the current time's minutes/seconds and millisec
+  private getIdWithTimestamp(prefix: string)
+  {
+    let currdate = new Date();
+    return prefix +  <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
+  }
 
+  private createAccordionItem(panelGroup: any, collapseDetails: any)
+  {
+    if(collapseDetails && collapseDetails instanceof Object && 
+      collapseDetails.groupId && typeof collapseDetails.groupId === 'string' &&
+      collapseDetails.id && typeof collapseDetails.id === 'string' &&
+      collapseDetails.label && typeof collapseDetails.label === 'string')
+    {
+      let panel = panelGroup.append('div')
+                            .attr('class','panel');
+
+      let panelHeading = panel.append('div')
+                              .attr('class','panel-heading')
+                              .attr('role','tab')
+                                  .append('h4')
+                                  .attr('class','panel-title')
+                                  .html(`<a data-toggle="collapse" data-parent="#${collapseDetails.groupId}" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
+                              
+                              
+                              // append('a')
+                              // .attr('data-toggle','collapse')
+                              // .attr('data-parent','#accordion')
+                              // .attr('href','#measure1');
+      let panelCollapse = panel.append('div')
+                              .attr('class','panel-collapse collapse')
+                              .attr('id',collapseDetails.id)
+                                  .append('div')
+                                  .attr('class','panel-body');
+      
+    }
+  }
+
+  private insertMeasure(measure: ISImilarityMeasure, collapseId: string) {
+    
+    console.log('measure ' ,measure);
+    this.getAllCategoricalColumns()
+    this.drawTable(collapseId);
+    //this.drawImage(collapseId);
+    
+
+    
+
+    //const measuresDiv = <HTMLElement>this.node.querySelector('.measures')!;
     // Headline
-    measuresDiv.insertAdjacentHTML('beforeend', `<h4>${measure.label}</h4>`)
+    //measuresDiv.insertAdjacentHTML('beforeend', `<h4>${measure.label}</h4>`)
 
     // Table
     // TODO
   }
 
+  private getAllCategoricalColumns()
+  {
+    let allCategorical = [];
+    let allColumns = this.provider.getRankings()[0].children;
+    for(let i=0; i<allColumns.length; i++)
+    {
+      if(allColumns[i] && allColumns[i].getRenderer() === "categorical" && (<ICategoricalColumn>allColumns[i]).categories)
+      {
+        let currCol = {
+          label: allColumns[i].label,
+          categories: (<ICategoricalColumn>allColumns[i]).categories
+        };
+        allCategorical.push(currCol);
+        
+      }
+    }
+    console.log('allColumns: ', allColumns);
+    console.log('allCategorical: ', allCategorical);
+    return allCategorical;
+
+  }
+
+
+
+  private drawTable(containerId: string) {
+    // let measuresDivElement = d3.select('div[class="measures"]');
+    let tableContainer = d3.select('#'+containerId).append('div')
+                                                  .attr('class','table-container');
+
+    console.log('tableContainer element: ', tableContainer);
+     
+    // let columnHeaders = [
+    //   { head: 'One', cl: ''},
+    //   { head: 'Two', cl: ''},
+    //   { head: 'Selected', cl: ''},
+    //   { head: 'Unselected', cl: ''}
+    // ];
+    let columnHeaders = ['One','Two','Selected','Unselected'];
+
+    let data = [
+      {One: 'Cat1', Two: 'A',Selected: 0.5 ,Unselected: 0.1},
+      {One: 'Cat1', Two: 'B',Selected: 0.5 ,Unselected: 0.1},
+      {One: 'Cat2', Two: 'a',Selected: 0.5 ,Unselected: 0.1},
+      {One: 'Cat2', Two: 'b',Selected: 0.5 ,Unselected: 0.1},
+      {One: 'Cat2', Two: 'c',Selected: 0.5 ,Unselected: 0.1},
+      {One: 'Cat2', Two: 'd',Selected: 0.5 ,Unselected: 0.1}
+    ];
+
+
+    let table = tableContainer.append('table')
+                        .attr('class','table table-condensed');
+    let tableHeader = table.append('thead');
+    tableHeader.append('tr')
+              .selectAll('th')
+              .data(columnHeaders)
+              .enter()
+              .append('th')
+              .text(function(d) { return d; });
+
+
+    let tableBody = table.append('tbody');
+    // create a row for each object in the data
+    var rows = tableBody.selectAll('tr')
+                    .data(data)
+                    .enter()
+                    .append('tr');
+
+    // create a cell in each row for each column
+    // At this point, the rows have data associated.
+    // So the data function accesses it.
+    var cells = rows.selectAll('td')
+                  .data(function(row) {
+                    // he does it this way to guarantee you only use the
+                    // values for the columns you provide.
+                    return columnHeaders.map(function(column) {
+                        // return a new object with a value set to the row's column value.
+                        return {value: row[column]};
+                    });
+                  })
+                  .enter()
+                  .append('td')
+                  .attr('class','text-center')
+                  .text(function(d) { return d.value; });
+  }
+
+
+  private drawImage(containerId: string) {
+    let svgContainer = d3.select('#'+containerId).append('div')
+                                                .attr('class','svg-container');
+
+    /* let svgCanvas = svgContainer.append('svg')
+                                .attr('width','100%')
+                                .attr('height','100%')
+                                .attr('shape-rendering','optimizeQuality');
+
+     let lineFunction = d3.svg.line()
+                            .x(function(d) { return d['x']; })
+                            .y(function(d) { return d['y']; })
+                            .interpolate("linear");
+
+    let rectangle1 = svgCanvas.append("rect")
+                             .attr("x", 10)
+                             .attr("y", 10)
+                             .attr("rx", 5)
+                             .attr("ry", 5)
+                             .attr("width", 40)
+                             .attr("height", 40)
+                             .attr("fill", "dodgerblue")
+                             .attr("opacity", 0.5);
+
+    let text1 = svgCanvas.append("text")
+                        .attr("x", 30)
+                        .attr("y", 34)
+                        .attr("text-anchor","middle")
+                        .text("a");
+
+    let lineSet1 = [{'x': 45, 'y': 10}, {'x': 115, 'y': 10}];
+    let lineSet2 = [{ "x": 45,  "y": 50}, { "x": 115,  "y": 50}];
+
+    var line1 = svgCanvas.append("path")
+                            .attr("d", lineFunction(lineSet1))
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 4)
+                            .attr("fill", "none");
+    
+    var line1 = svgCanvas.append("path")
+                            .attr("d", lineFunction(lineSet2))
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("fill", "none");
+
+    let rectangle2 = svgCanvas.append("rect")
+                            .attr("x", 10)
+                            .attr("y", 60)
+                            .attr("rx", 5)
+                            .attr("ry", 5)
+                            .attr("width", 40)
+                            .attr("height", 50)
+                            .attr("fill", "blueviolet")
+                            .attr("opacity", 0.5);
+
+    let text2 = svgCanvas.append("text")
+                        .attr("x", 30)
+                        .attr("y", 89)
+                        .attr("text-anchor","middle")
+                        .text("b");
+
+    let lineSet3 = [{'x': 45, 'y': 60}, {'x': 115, 'y': 80}];
+    let lineSet4 = [{ "x": 45,  "y": 110}, { "x": 110,  "y": 115}];
+
+    var line3 = svgCanvas.append("path")
+                            .attr("d", lineFunction(lineSet3))
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 4)
+                            .attr("fill", "none");
+    
+    var line4 = svgCanvas.append("path")
+                            .attr("d", lineFunction(lineSet4))
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("fill", "none");
+
+    let rectangle3 = svgCanvas.append("rect")
+                            .attr("x", 10)
+                            .attr("y", 120)
+                            .attr("rx", 5)
+                            .attr("ry", 5)
+                            .attr("width", 40)
+                            .attr("height", 25)
+                            .attr("fill", "green")
+                            .attr("opacity", 0.5);
+
+    let text3 = svgCanvas.append("text")
+                        .attr("x", 30)
+                        .attr("y", 136)
+                        .attr("text-anchor","middle")
+                        .text("c");
+
+    let lineSet5 = [{'x': 45, 'y': 120}, {'x': 110, 'y': 115}];
+    let lineSet6 = [{ "x": 45,  "y": 145}, { "x": 115,  "y": 145}];
+
+    var line5 = svgCanvas.append("path")
+                            .attr("d", lineFunction(lineSet5))
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 4)
+                            .attr("fill", "none");
+    
+    var line6 = svgCanvas.append("path")
+                            .attr("d", lineFunction(lineSet6))
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2)
+                            .attr("fill", "none");
+
+    let rectangle4 = svgCanvas.append("rect")
+                        .attr("x", 110)
+                        .attr("y", 10)
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .attr("width", 40)
+                        .attr("height", 40)
+                        .attr("fill", "dodgerblue")
+                        .attr("opacity", 0.5);
+
+    let text4 = svgCanvas.append("text")
+                      .attr("x", 130)
+                      .attr("y", 34)
+                      .attr("text-anchor","middle")
+                      .text("a");
+
+    let rectangle5 = svgCanvas.append("rect")
+                          .attr("x", 110)
+                          .attr("y", 80)
+                          .attr("rx", 5)
+                          .attr("ry", 5)
+                          .attr("width", 40)
+                          .attr("height", 65)
+                          .attr("fill", "grey")
+                          .attr("opacity", 0.5);
+
+    let text5 = svgCanvas.append("text")
+                      .attr("x", 130)
+                      .attr("y", 116)
+                      .attr("text-anchor","middle")
+                      .text("others"); */
+
+  }
+  
   /**
    * Gets the currently displayed attributes in Lineup and updates the dropdowns and table accordingly
    */
