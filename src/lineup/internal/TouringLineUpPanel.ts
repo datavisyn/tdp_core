@@ -38,8 +38,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.searchbox = <HTMLElement>this.node.querySelector('.lu-adder')!;
     this.itemCounter = <HTMLElement>this.node.querySelector('.lu-stats')!;
 
-    
-    
     const buttons = this.node.querySelector('section');
     buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
       this.toggleTouring();
@@ -89,38 +87,21 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, (indices) => {
-      console.log('selection changed, indices: ', indices);
-      this.updateTouringData();
-    });
-
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, this.updateTouringData);
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
-      //console.log('event added column', col, 'index', i)
-      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns();
-        //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
-      }
-    });
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, this.updateDropdowns);
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
-      //console.log('event removed column', col, 'index', i)
-      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns();
-        //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
-      }
-    });
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, this.updateDropdowns);
   }
     
   
-  private updateTouringData() 
-  {
+  private updateTouringData() {
     //console.log('update touring data');
 
     let chosenOptions = this.getChosenOptions();
@@ -140,7 +121,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           currentData.push(this.provider.data[selectedIndices[i]]);
         }   
       }
-    }if(chosenOptions.compareItemA === 'Stratification Groups')
+    } else if (chosenOptions.compareItemA === 'Stratification Groups')
     {
 
     }
@@ -218,7 +199,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
       }
     }
-
   }
     
 
@@ -301,10 +281,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-  private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
-    
-    
 
+  private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
     
     if(measure && measure.id === 'jaccard')
     {
