@@ -142,9 +142,28 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
 
     console.log('current data: ', currentData);
-
-    const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
-    const setMeasures : MeasureMap = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
+    const prepareInput = (desc) => {
+      let filter : Array<string>;
+      switch(desc.type) {
+        case 'collection':
+          filter = ['categorical', 'number'];
+          break;
+        case 'cat_collection':
+          filter = ['categorical'];
+          break;
+        case 'num_collection':
+          filter = ['number'];
+          break;
+        default:
+          return [desc];
+      }
+      return this.provider.getRankings()[0].children.map((col) => col.desc).filter((desc) => filter.includes(desc.type));;
+    }
+    const inputA = prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
+    const inputB = prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
+    
+    console.log('Inputs to get set measures.', 'A', inputA, 'B', inputB);
+    const setMeasures : MeasureMap = MethodManager.getSetMethods(inputA, inputB);
     console.log('set measures for current data', setMeasures);
 
     //this.updateTouringTables(setMeasures, descriptions, currentData);
