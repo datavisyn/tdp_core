@@ -72,7 +72,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
       console.log('radio button value: ',radio.property('value'), ' | object: ', radio);
 
-      this.updateDropdowns2()
+      this.updateDropdowns()
     });
 
     // changes made in dropdowns
@@ -101,7 +101,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
       //console.log('event added column', col, 'index', i)
       if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns2();
+        this.updateDropdowns();
         //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
       }
     });
@@ -112,7 +112,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
       //console.log('event removed column', col, 'index', i)
       if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns2();
+        this.updateDropdowns();
         //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
       }
     });
@@ -123,21 +123,25 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     //console.log('update touring data');
 
-    // ---- selection
-    let selectedIndices = this.provider.getSelection();
-    let currentData = [];
-    if(selectedIndices && selectedIndices.length > 0) {
-      
-      for(let i=0;i<selectedIndices.length;i++)
-      {
-        currentData.push(this.provider.data[selectedIndices[i]]);
+    let chosenOptions = this.getChosenOptions();
+    let currentData = this.provider.data;
+
+
+    // ---- Compare A : Selection -------------------
+    if(chosenOptions.compareItemA === 'Selection')
+    {
+      let selectedIndices = this.provider.getSelection();
+      currentData = [];
+      if(selectedIndices && selectedIndices.length > 0) {
+        
+        for(let i=0;i<selectedIndices.length;i++)
+        {
+          currentData.push(this.provider.data[selectedIndices[i]]);
+        }   
       }
-      
-    }else {
-      currentData = this.provider.data;
     }
 
-    console.log('current data length: ', currentData);
+    console.log('current data: ', currentData);
 
     const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
     const setMeasures : MeasureMap = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
@@ -147,7 +151,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // div element in html where the score and detail view should be added
     let measuresDivElement = d3.select('div[class="measures"]');
-    measuresDivElement.selectAll("*").remove();
+    measuresDivElement.selectAll("*").remove(); //deletes all generated content im 'measuresDivElement'
+    
+    let defaultExpanded = true; //defines if the accordion item should be expanded at the beginning
 
     if(setMeasures)
     {
@@ -172,8 +178,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           let collapseDetails = {
             groupId: accordionId,
             id: collapseId,
-            label: typeMeasures[i].label
+            label: typeMeasures[i].label,
+            default: defaultExpanded
           };
+
+          if(defaultExpanded)
+          {
+            defaultExpanded = !defaultExpanded;
+          }
 
           //create accordion item and add it to the panel group
           this.createAccordionItem(panelGroup,collapseDetails);
@@ -253,18 +265,28 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
  
       let panelCollapse = panel.append('div')
                               .attr('class','panel-collapse collapse')
-                              .attr('id',collapseDetails.id)
-                                  .append('div')
-                                  .attr('class','panel-body');
+                              .attr('id',collapseDetails.id);
       
+      if(collapseDetails.default)
+      {
+        panelCollapse.classed('in',true); //accordion item is expanded
+      }
+      
+      let panelBody = panelCollapse.append('div')
+                                    .attr('class','panel-body');
+                                  
     }
   }
 
   private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
     
-    //console.log('measure ' ,measure);
+    
+
+    
     if(measure && measure.id === 'jaccard')
     {
+     
+      let buttonValue = this.getRadioButtonValue();
       this.generateJaccardTable(collapseId, currentData);
       //this.drawImage(collapseId);
     }else 
@@ -275,7 +297,46 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
     
+  // return object with the current selected states of all the dropdowns and radio button
+  private getChosenOptions()
+  {
+    let chosenOptions = {
+      compareItemA: null,
+      compareItemB: null,
+      radioButton: this.getRadioButtonValue(),
+      compareAttributeA: null,
+      compareAttributeB: null
+    };
 
+    let dropdownItemCopareA = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareA');
+    let dropdownItemCopareB = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareB');
+    let dropdownAttributeCompareA = <HTMLSelectElement>this.getDropdownELementbyClassName('attributeControls compareA');
+    let dropdownAttributeCompareB = <HTMLSelectElement>this.getDropdownELementbyClassName('attributeControls compareB');
+
+    let compareItemA = dropdownItemCopareA.selectedOptions;
+    let compareItemB = dropdownItemCopareB.selectedOptions;
+    let compareAttrA = dropdownAttributeCompareA.selectedOptions;
+    let compareAttrB = dropdownAttributeCompareB.selectedOptions;
+
+    if(compareItemA.length === 1) {
+      chosenOptions.compareItemA = compareItemA[0].label;
+    }
+    
+    if(compareItemB.length === 1) {
+      chosenOptions.compareItemB = compareItemB[0].label;
+    }
+
+    if(compareAttrA.length === 1) {
+      chosenOptions.compareAttributeA = compareAttrA[0].label;
+    }
+    
+    if(compareAttrB.length === 1) {
+      chosenOptions.compareAttributeB = compareAttrB[0].label;
+    }
+
+    return chosenOptions;
+
+  }
 
   // get all column of type 'categorical' with their categories
   private getAllCategoricalColumns()
@@ -688,7 +749,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
 
     const dropdownB = d3.select(this.node).select('select.itemControls.compareB');
-    const mode = d3.select(this.node).select('input[name="compareGroup"]:checked').property('value');
+    const mode = this.getRadioButtonValue();
     let descriptions: IColumnDesc[] = this.provider.getRankings()[0].children.map((col) => col.desc);
     if (mode === 'category') {
       // If Categories is selected:
@@ -732,6 +793,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // update: nothing to do
     options.exit().remove(); // exit: remove columns no longer displayed
     options.order(); // order domelements as in the array
+
+    //changing the radio button or the removing columns could create a different selection in the dropdowns
+    //therefore the touring data will be updated
+    this.updateTouringData();
   }
   
   
@@ -768,5 +833,24 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
+
+  private getDropdownELementbyClassName(classNmame: string)
+  {
+    //gets all elements with the 'itemControls' and 'compare B' classes
+    let itemControls = this.node.getElementsByClassName(classNmame);
+    //console.log('itemControls',itemControls);
+    //check if only one elment exist and that it is a selection element
+    if (itemControls && itemControls.length === 1 && (itemControls[0] instanceof HTMLSelectElement))
+    {
+      return itemControls[0];
+    }
+
+    return null;
+  }
+  
+  private getRadioButtonValue()
+  {
+    return d3.select(this.node).select('input[name="compareGroup"]:checked').property('value');
+  }
 }
 
