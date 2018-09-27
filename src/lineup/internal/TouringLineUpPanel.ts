@@ -124,6 +124,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //console.log('update touring data');
 
     let chosenOptions = this.getChosenOptions();
+    //console.log('chosenOptions',chosenOptions);
     let currentData = this.provider.data;
 
 
@@ -182,7 +183,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             default: defaultExpanded
           };
 
-          if(defaultExpanded)
+          if(defaultExpanded) //after the first accordion was created -> the following ones should be collapsed
           {
             defaultExpanded = !defaultExpanded;
           }
@@ -301,41 +302,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private getChosenOptions()
   {
     let chosenOptions = {
-      compareItemA: null,
-      compareItemB: null,
+      compareItemA: d3.select(this.node).select('select.itemControls.compareA').property("value"),
+      compareItemB: d3.select(this.node).select('select.itemControls.compareB').property("value"),
       radioButton: this.getRadioButtonValue(),
-      compareAttributeA: null,
-      compareAttributeB: null
+      compareAttributeA: d3.select(this.node).select('select.attributeControls.compareA').property("value"),
+      compareAttributeB: d3.select(this.node).select('select.attributeControls.compareB').property("value")
     };
 
-    let dropdownItemCopareA = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareA');
-    let dropdownItemCopareB = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareB');
-    let dropdownAttributeCompareA = <HTMLSelectElement>this.getDropdownELementbyClassName('attributeControls compareA');
-    let dropdownAttributeCompareB = <HTMLSelectElement>this.getDropdownELementbyClassName('attributeControls compareB');
-
-    let compareItemA = dropdownItemCopareA.selectedOptions;
-    let compareItemB = dropdownItemCopareB.selectedOptions;
-    let compareAttrA = dropdownAttributeCompareA.selectedOptions;
-    let compareAttrB = dropdownAttributeCompareB.selectedOptions;
-
-    if(compareItemA.length === 1) {
-      chosenOptions.compareItemA = compareItemA[0].label;
-    }
-    
-    if(compareItemB.length === 1) {
-      chosenOptions.compareItemB = compareItemB[0].label;
-    }
-
-    if(compareAttrA.length === 1) {
-      chosenOptions.compareAttributeA = compareAttrA[0].label;
-    }
-    
-    if(compareAttrB.length === 1) {
-      chosenOptions.compareAttributeB = compareAttrB[0].label;
-    }
-
     return chosenOptions;
-
   }
 
   // get all column of type 'categorical' with their categories
@@ -373,13 +347,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     let allCategorical = this.getAllCategoricalColumns();
-    // let currentData = [
-    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 1" , a_int: 87 , a_name: "A11" , a_real: -0.8596081557 , id: "11"},
-    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 3" , a_int: 11 , a_name: "A13" , a_real: -0.1981791449 , id: "13"},
-    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 5" , a_int: 97 , a_name: "A18" , a_real: 0.8045080081 , id: "18"},
-    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 3" , a_int: 8 , a_name: "A23" , a_real: -0.0165625107 , id: "23"},
-    //   { a_cat1: "ACat 1" , a_cat2: "ACatB 1" , a_int: 32 , a_name: "A29" , a_real: 0.4855202222 , id: "29"}
-    // ];
     let jaccardScores = this.calculateJaccardScores(currentData);
     console.log('jaccardScores: ', jaccardScores);
 
