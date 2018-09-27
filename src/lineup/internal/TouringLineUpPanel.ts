@@ -140,6 +140,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           currentData.push(this.provider.data[selectedIndices[i]]);
         }   
       }
+    }if(chosenOptions.compareItemA === 'Stratification Groups')
+    {
+
     }
 
     console.log('current data: ', currentData);
@@ -361,16 +364,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private generateJaccardTable(containerId: string, currentData: Array<any>)
   {
-    let tableContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','table-container');
-
-
-    let allCategorical = this.getAllCategoricalColumns();
-    let jaccardScores = this.calculateJaccardScores(currentData);
-    console.log('jaccardScores: ', jaccardScores);
-
-
-    //let columnHeaders = ['col1','col2','col3','col4'];
+    let allCategoricalCol = this.getAllCategoricalColumns();
+    let chosenOptions = this.getChosenOptions();
+    
     let columnHeaders = [
       { head: 'col1', label: ''},
       { head: 'col2', label: ''},
@@ -378,6 +374,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       { head: 'col4', label: 'Unselected'},
     ];
 
+    let jaccardScores = this.calculateJaccardScores(currentData);
+    console.log('jaccardScores: ', jaccardScores);
+    
+    // create table with D3
+    let tableContainer = d3.select('#'+containerId).append('div')
+                                                  .attr('class','table-container');
 
     let table = tableContainer.append('table')
                         .attr('class','table table-condensed');
@@ -391,8 +393,38 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               .text(function(d) { return d.label; });
 
     let tableBody = table.append('tbody');
-     // create a row for each object in the data
-    var rows = tableBody.selectAll('tr')
+    
+    /* nested_data.forEach(function (d) {
+      var rowspan = d.values.length;
+      d.values.forEach(function (val, index) {
+          var tr = tableBody.append("tr");
+          if (index == 0) {
+              tr.append("td")
+                  .attr("rowspan", rowspan)
+                  .attr('class','text-center')
+                  .text(val.col1);
+          }
+          tr.append("td")
+              .attr('class','text-center')
+              .text(val.col2);
+          tr.append("td")
+              .attr('class','text-center')
+              .text(val.col3);
+          tr.append("td")
+              .attr('class','text-center')
+              .text(val.col4);
+
+          // Add a click handler that will return the datum instead of undefined
+          tr.on('click', function(row) {
+            console.log('Row Clicked');
+            console.log(row);
+          });    
+  
+      });
+    }); */
+    
+    // create a row for each object in the data
+    let rows = tableBody.selectAll('tr')
                       .data(jaccardScores)
                       .enter()
                       .append('tr');
@@ -400,7 +432,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // create a cell in each row for each column
     // At this point, the rows have data associated.
     // So the data function accesses it.
-    var cells = rows.selectAll('td')
+    let cells = rows.selectAll('td')
                     .data(function(row) {
                       // he does it this way to guarantee you only use the
                       // values for the columns you provide.
@@ -412,21 +444,73 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     .enter()
                     .append('td')
                     .attr('class','text-center')
-                    .text(function(d) { return d.value; });
+                    // .attr("rowspan", function(d){
+                    //   if(d.value.rowspan){
+                    //     return d.value.rowspan;
+                    //   }
+                    //   return 1;
+                    //  })
+                    .text(function(d) { return d.value.label; })
+                    .style("background-color", function(d){
+                      let color = '#ffffff';
+                      if(d.value.color){
+                        color = d.value.color
+                      }
+                      return color;
+                     });
+                    // .each(function (d, i) {
+                    //     if (d.value.rowspan) {
+                    //       // put all your operations on the second element, e.g.
+                    //       if(d.value.rowspan > 0) {
+                    //         d3.select(this).attr("rowspan", d.value.rowspan);
+                    //       }
+                    //     } 
+                    //   });
+
+    
+    const that = this;
+    cells.on('click', function(cell) {
+      that.showVisualRepresentation(cell);
+    });                  
+
   }
 
+  private showVisualRepresentation(cell: any)
+  {
+    console.log('Cell Clicked');
+    console.log('Cell: ',cell);
+  }
 
   // calculated jaccard score
   private calculateJaccardScores(currentItems: Array<any>)
   {
     let allData = this.provider.data;
     let allCategoricalCol = this.getAllCategoricalColumns();
+    let chosenOptions = this.getChosenOptions();
+    
+    let chosenColumns = [];
 
+    if(chosenOptions.compareItemB === "All categorical columns")
+    {
+      chosenColumns = allCategoricalCol;
+
+    } else if(chosenOptions.compareItemB === "Selection")
+    {
+      chosenColumns = allCategoricalCol;
+
+    } else 
+    {
+      let colIndex = allCategoricalCol.map((a) => a.label).indexOf(chosenOptions.compareItemB);
+      chosenColumns.push(allCategoricalCol[colIndex]);
+    }
+
+    console.log('allCategoricalCol: ', allCategoricalCol);
+    console.log('chosenColumns: ', chosenColumns);
     let jaccardScores = [];
 
-    for(let i=0; i<allCategoricalCol.length; i++)
+    for(let i=0; i<chosenColumns.length; i++)
     {
-      let currCol = allCategoricalCol[i];
+      let currCol = chosenColumns[i];
       
       for(let cnt=0; cnt < currCol.categories.length; cnt++)
       {
@@ -435,17 +519,34 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                             this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length;
         scoreSelected = Math.round(scoreSelected*1000)/1000;
 
-        let scoreDeselected = (this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length - 
-                                    this.getElementsByPropertyValue(currentItems,currCol.column,currCategory.label).length) / 
-                              this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length;    
-        scoreDeselected = Math.round(scoreDeselected*1000)/1000;
+        // let scoreDeselected = (this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length - 
+        //                             this.getElementsByPropertyValue(currentItems,currCol.column,currCategory.label).length) / 
+        //                       this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length;    
+        // scoreDeselected = Math.round(scoreDeselected*1000)/1000;
+
+        let scoreDeselected = 1 - scoreSelected;
 
         let resultObj = {
-          col1: currCol.label,
-          col2: currCategory.label,
-          col3: scoreSelected,
-          col4: scoreDeselected
+          col1: {
+            label: currCol.label,
+            rowspan: (cnt === 0) ? currCol.categories.length : 1                 
+          },
+          col2: {
+            label: currCategory.label,
+            color: currCategory.color
+          },
+          col3: {
+            label: scoreSelected,
+            column: currCol.column,
+            category: currCategory.label
+          },
+          col4: {
+            label: scoreDeselected,
+            column: currCol.column,
+            category: currCategory.label
+          }
         };
+
 
         jaccardScores.push(resultObj);
       }
