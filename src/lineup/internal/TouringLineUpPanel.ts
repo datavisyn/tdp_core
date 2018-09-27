@@ -4,6 +4,7 @@ import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html
 import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3'
 import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_core/src/datatype';
+import {IServerColumn} from '../../rest';
 
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
@@ -285,7 +286,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         { 
           let currCol = {
             label: allColumns[i].label,
-            column: allColumns[i].desc.column,
+            column: (<IServerColumn>allColumns[i].desc).column, //TODO wozu brauchen wir das?
             categories: (<ICategoricalColumn>allColumns[i]).categories
             };
           allCategorical.push(currCol);
@@ -774,9 +775,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       idx: []
     };
 
-    for(let i = 0; i<dropdown.length;i++)
+    for(let i = 0; i<dropdown.options.length; i++)
     {
-      if(dropdown[i].text === option.label)
+      if(dropdown.options[i].text === option.label)
       {
         optionOccurrance.exists = true;
         optionOccurrance.idx.push(i);
