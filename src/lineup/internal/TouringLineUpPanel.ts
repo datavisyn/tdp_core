@@ -3,7 +3,6 @@ import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3'
-import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_core/src/datatype';
 import {IServerColumn} from '../../rest';
 
 
@@ -45,21 +44,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
       this.toggleTouring();
       
-      
-      console.log('provider',this.provider);
-      //console.log('provider.getSelection: ',this.provider.getSelection());
-      console.log('provider.getSelection: ',this.provider.getSelection());
-      //console.log('provider.selectedRows: ',this.provider.selectedRows());
-      //console.log('provider.getColumns: ',this.provider.getColumns());
-      console.log('provider.getRanking: ',this.provider.getRankings());
-      console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
-      //console.log('provider.getFilter: ',this.provider.getFilter());
-      //console.log('------------------------------------');
-
+      // console.log('provider',this.provider);
+      // console.log('provider.getSelection: ',this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
+      // console.log('provider.selectedRows: ',this.provider.selectedRows());
+      // console.log('provider.getColumns: ',this.provider.getColumns());
+      // console.log('provider.getRanking: ',this.provider.getRankings());
+      // console.log('getGroups', this.provider.getRankings()[0].getGroups())
+      // console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
+      // console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
+      // console.log('data', this.provider.data)
+      // console.log('------------------------------------');
     }));
-
-
-  
 
 
     this.addEventListeners();
@@ -70,17 +65,20 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // -----------------------------------------------
 
     // changes of radio button selection
+    //    cause changes in the second dropdown (of)
+    //    and changes in the displayed table / scores
     d3.select(this.node).selectAll('input[name="compareGroup"]').on('change', () => {  
       // using fat arrow: global scope replaces new object's scope and 'this' can be used to call class functions
       const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
       console.log('radio button value: ',radio.property('value'), ' | object: ', radio);
 
-      this.updateDropdowns();
+      this.updateDropdowns2()
     });
 
-    //changes made in dropdowns
+    // changes made in dropdowns
+    //    cause changes  the displayed table / scores 
     d3.select(this.node).selectAll('select.itemControls').on('input',() => {
-      console.log('changed dropdown value: ', d3.selectAll('select.itemControls').property("value"));
+      console.log('changed dropdown value. A:', d3.selectAll('select.itemControls.compareA').property("value"), '\t|B: ', d3.selectAll('select.itemControls.compareB').property("value"));
       this.updateTouringData();
     });
 
@@ -88,26 +86,33 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
-    // change in selection 
+    // change in selection
+    //  might cause changes the displayed table / scores 
+    //  if no items are selected, the table should be displayed by a message
     this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, (indices) => {
       console.log('selection changed, indices: ', indices);
       this.updateTouringData();
     });
 
-    //column of a table was added
+
+    // column of a table was added
+    //  causes changes in the second item dropdown (b)
+    //  might cause changes the displayed table / scores 
     this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
       //console.log('event added column', col, 'index', i)
       if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns('add',col.desc);
+        this.updateDropdowns2();
         //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
       }
     });
 
-    //column of a table was removed
+    // column of a table was removed
+    //  causes changes in the second item dropdown (b)
+    //  might cause changes the displayed table / scores 
     this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
       //console.log('event removed column', col, 'index', i)
       if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns('remove',col.desc);
+        this.updateDropdowns2();
         //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
       }
     });
@@ -135,7 +140,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     console.log('current data length: ', currentData);
 
     const descriptions = this.provider.getRankings()[0].children.map((col) => col.desc);
-    const setMeasures = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
+    const setMeasures : MeasureMap = MethodManager.getSetMethods([{label: 'Selection', type: Type.CATEGORICAL}], descriptions);
     console.log('set measures for current data', setMeasures);
 
     //this.updateTouringTables(setMeasures, descriptions, currentData);
@@ -636,224 +641,98 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   }
   
-  /**
-   * Gets the currently displayed attributes in Lineup and updates the dropdowns and table accordingly
-   */
-  private update() {
-    this.updateDropdowns();
+  private getSelectionDesc() : ICategoricalColumnDesc {
+    const selCategories = new Array<string>();
+    const numberOfRows = this.provider.getRankings()[0].getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
+    if (this.provider.getSelection().length > 0) {
+      selCategories.push('Selected');
+    } // else: none selected
 
-  }
-  
-  /**
-   * If 
-   */
-  private updateDropdowns(mode?: string, option?: any) 
-  {
-    //console.log('update Dropdown, mode: ',mode, ' | option: ',option);
-    let dropdownItemCopareA = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareA');
-    let dropdownItemCopareB = <HTMLSelectElement>this.getDropdownELementbyClassName('itemControls compareB');
-    let dropdownAttributeCompareA = <HTMLSelectElement>this.getDropdownELementbyClassName('attributeControls compareA');
-    let dropdownAttributeCompareB = <HTMLSelectElement>this.getDropdownELementbyClassName('attributeControls compareB');
-
-    //Compare A: depending on displayed attributes
-    if(dropdownItemCopareB && mode !== undefined && option)
-    {
-      if(mode === 'add'){
-
-        this.addOptionToDropdown(dropdownAttributeCompareA,option);
-        this.addOptionToDropdown(dropdownAttributeCompareB,option);
-
-        if(option.type === 'categorical')
-        {
-          this.addOptionToDropdown(dropdownItemCopareB,option);
-        }
-
-      }else if(mode === 'remove'){
-
-        this.removeOptionFromDropdown(dropdownAttributeCompareA,option);
-        this.removeOptionFromDropdown(dropdownAttributeCompareB,option);
-
-        if(option.type === 'categorical')
-        {
-          this.removeOptionFromDropdown(dropdownItemCopareB,option);
-        }
-
-      }
-    }
-
-    //Compare B: depending on radio button option
-    if(dropdownItemCopareB){
-      let buttonValue = this.getRadioButtonValue('form-check-input itemControls');
-      this.updateDropdownDependingOnRadioButton(dropdownItemCopareB,buttonValue);
-    }
-
-    //changing the radio button or the removing columns could create a different selection in the dropdowns
-    //therefore the touring data will be updated
-    this.updateTouringData();
-
-  }
-
-
-  private getRadioButtonValue(className: string)
-  {
-    let buttonValue = null;
-    let radioButtons = this.node.getElementsByClassName(className);
-
-    if(radioButtons)
-    {
-      for(let i=0;i<radioButtons.length;i++)
-      {
-        let currButton =  (radioButtons[i] instanceof HTMLInputElement) ? <HTMLInputElement>radioButtons[i] : null;
-        if(currButton && currButton.checked)
-        {
-          buttonValue = currButton.value;
-        }
-      }
-    }
-
-    return buttonValue;
-  }
-
-
-
-  //add option to dropdown
-  private addOptionToDropdown(dropdown: HTMLSelectElement, option: any)
-  {
-    //console.log('add | option:', option, ' | to dropdown:', dropdown);
-
-    if (dropdown && option && option instanceof Object && option.label)
-    {
-      //check if the current column option is already in the dropdown options
-      if(!(this.checkOptionOccurranceInDropdown(dropdown,option).exists))
-      {
-        let htmlOptionElement = document.createElement('option');
-        //htmlOptionElement.value = option.value;
-        htmlOptionElement.text = option.label;
-
-        //add the new option element to the HTMLSelectElement
-        if (option.before){
-          //when property 'before' exits the element will be added at the specified location
-          dropdown.add(htmlOptionElement,option.before);
-        }else {
-          dropdown.add(htmlOptionElement);
-        }
-        //console.log('option elements was added');
-        
-      }
-    }
-
-  }
-
-  //remove option from dropdown
-  private removeOptionFromDropdown(dropdown: HTMLSelectElement, option: any)
-  {
-    //console.log('remove | option:', option, ' | from dropdown:', dropdown);
-
-    if (dropdown && option && option instanceof Object && option.label)
-    {
-      //check if ther is still a column from the same label displayed
-      if(!(this.checkColumnOccurance(option.label).exists))
-      {
-        let optionOccurance = this.checkOptionOccurranceInDropdown(dropdown,option);
-        if(optionOccurance && optionOccurance.exists && optionOccurance.idx.length === 1)
-        {
-          dropdown.remove(optionOccurance.idx[0]);
-
-          //console.log('option element was removed');
-        }
-      }
-    }
-
-  }
-
-  //check before method if the two parameter 'dropdown' and 'option' are valid
-  private checkOptionOccurranceInDropdown(dropdown: HTMLSelectElement, option: any)
-  {
-    let optionOccurrance = 
-    {
-      exists: false,
-      idx: []
+    if (this.provider.getSelection().length < numberOfRows) {
+      selCategories.push('Unselected')
+    } // else: all selected
+    
+    return {
+      categories: selCategories,
+      label: 'Selection',
+      type: 'categorical',
+      missingCategory: null
     };
-
-    for(let i = 0; i<dropdown.options.length; i++)
-    {
-      if(dropdown.options[i].text === option.label)
-      {
-        optionOccurrance.exists = true;
-        optionOccurrance.idx.push(i);
-      }
-    }
-
-    //console.log('option occurrence in dropbox: ',optionOccurrance);
-    return optionOccurrance;
-  }
-
-  //check before method if the two parameter 'dropdown' and 'option' are valid
-  private checkColumnOccurance(label: string)
-  {
-    let columns = this.provider.getRankings()[0].children.map(a => a.desc);
-    let columnOccurrance = 
-    {
-      exists: false,
-      idx: []
-    };
-
-    for(let i = 0; i<columns.length;i++)
-    {
-      if(columns[i].label === label)
-      {
-        columnOccurrance.exists = true;
-        columnOccurrance.idx.push(i);
-      }
-    }
-
-    //console.log('column occurrence in dropbox: ',columnOccurrance);
-    return columnOccurrance;
   }
 
 
-
+  private updateDropdowns() {
+    console.log('changed dropdown value. A:', d3.selectAll('select.itemControls').property("value"), '\t|B: ', d3.selectAll('select.itemControls.compareB').property("value"));
   
-  private updateDropdownDependingOnRadioButton(dropdown: HTMLSelectElement, radioButtonValue: string) {
-    if(radioButtonValue === 'category')
-    {
-      // console.log('remove extra options for stratification');
-      // console.log('stratification: ',this.extraStartificationOptions);
-      for(let i=0;i<this.extraStartificationOptions.length;i++)
-      {
-        this.removeOptionFromDropdown(dropdown,this.extraStartificationOptions[i]);
-      }
-      
-    }else if (radioButtonValue === 'group')
-    {
-      // console.log('add extra options for stratification');
-      // console.log('stratification: ',this.extraStartificationOptions);
-      for(let i=0;i<this.extraStartificationOptions.length;i++)
-      {
-        this.addOptionToDropdown(dropdown,this.extraStartificationOptions[i]);
-      }
+    const dropdownA = d3.select(this.node).select('select.itemControls.compareA');
+    // dropdownA ('With')
+    // We append the current data to:
+    //  the entry for the selection       (defined in the html)
+    //  the entry for the stratification  (defined in the html)
+
+    // Generate a Attribute description that represents the current selection
+    const selDesc = this.getSelectionDesc();
+    const selOption = dropdownA.select('option.selection').datum(selDesc); //bind description to option and set text
+    selOption.text((desc) => desc.label);
+
+    
+    // Generate an attribute description that represents the current stratification
+    const stratDesc: ICategoricalColumnDesc = {
+      categories: this.provider.getRankings()[0].getGroups().map((group) => group.name), // if not stratifified, there is only one group ('Default')
+      label: 'Stratification Groups',
+      type: 'categorical',
+      missingCategory: null
+    }
+    dropdownA.select('option.stratification').datum(stratDesc).text((desc) => desc.label); //bind description to option and set text
+
+    
+
+    const dropdownB = d3.select(this.node).select('select.itemControls.compareB');
+    const mode = d3.select(this.node).select('input[name="compareGroup"]:checked').property('value');
+    let descriptions: IColumnDesc[] = this.provider.getRankings()[0].children.map((col) => col.desc);
+    if (mode === 'category') {
+      // If Categories is selected:
+      //    we generate an entry for every categorical attribute
+      //    and an entry representing the selected/unselected items as a attribute with two categories
+      //    and an entry representing all these attributes
+      descriptions = descriptions.filter((desc) => (<ICategoricalColumnDesc>desc).categories);
+      descriptions.unshift(this.getSelectionDesc());
+      descriptions.unshift({ //There is always at least the selection as categorical column
+        label: 'All categorical columns',
+        type: 'cat_collection'
+      });
+    } else { //mode is 'group
+      // Stratification is selected:
+      //    we can also compare non catgegorical attribute
+      //    so we generate an entry for every attribute (categorical, numerical, string, and maybe more(?))
+      //    and an entry representing the selected/unselected items as a attribute with two categories
+      //    and an entry representing the ranked order of items as numerical attribute
+      //    and an entry representing the current stratification as categorical attribute
+      //    and an entry representing the numerical attributes (if there are any)
+      //    and an entry representing the categorical attributes (if there are any)
+      //    and an entry representing all these attributes
+      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type));
+      descriptions.unshift(this.getSelectionDesc());
+      descriptions.unshift({ //There is always at least the rank as numerical column
+        label: 'All numerical columns',
+        type: 'num_collection'
+      });
+      descriptions.unshift({ //There is always at least the selection as categorical column
+        label: 'All categorical columns',
+        type: 'cat_collection'
+      });
+      descriptions.unshift({ // at least selection & rank
+        label: 'All columns',
+        type: 'collection'
+      })
     }
 
+    const options = dropdownB.selectAll('option').data(descriptions, (desc) => desc.label); //bin data, label is key
+    options.enter().append('option').text((desc) => desc.label); //enter: add columns to dropdown, that were added by the user
+    // update: nothing to do
+    options.exit().remove(); // exit: remove columns no longer displayed
+    options.order(); // order domelements as in the array
   }
-
-
-
-  private getDropdownELementbyClassName(classNmame: string)
-  {
-    //gets all elements with the 'itemControls' and 'compare B' classes
-    let itemControls = this.node.getElementsByClassName(classNmame);
-    //console.log('itemControls',itemControls);
-
-    //check if only one elment exist and that it is a selection element
-    if (itemControls && itemControls.length === 1 && (itemControls[0] instanceof HTMLSelectElement))
-    {
-      return itemControls[0];
-    }
-
-    return null;
-  }
-
-
   
   
   private toggleTouring(hide?: boolean) {
