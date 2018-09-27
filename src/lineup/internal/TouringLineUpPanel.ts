@@ -8,6 +8,7 @@ import { DummyDataType, defineDataType } from '../../../../node_modules/phovea_c
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
+  private static EVENTTYPE = '.touring';
   private touringElem : HTMLElement;
   private columnOverview : HTMLElement; searchbox : HTMLElement; itemCounter : HTMLElement; // default sidepanel elements
   private extraStartificationOptions = [
@@ -86,30 +87,30 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
-        // change in selection 
-        this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
-          console.log('selection changed, indices: ', indices);
-          this.updateTouringData();
-        });
-    
-        //column of a table was added
-        this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN, (col, i) => {
-          //console.log('event added column', col, 'index', i)
-          if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-            this.updateDropdowns('add',col.desc);
-            //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
-          }
-        });
-    
-        //column of a table was removed
-        this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN, (col, i) => {
-          //console.log('event removed column', col, 'index', i)
-          if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-            this.updateDropdowns('remove',col.desc);
-            //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
-          }
-        });
+    // change in selection 
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, (indices) => {
+      console.log('selection changed, indices: ', indices);
+      this.updateTouringData();
+    });
+
+    //column of a table was added
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
+      //console.log('event added column', col, 'index', i)
+      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
+        this.updateDropdowns('add',col.desc);
+        //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
       }
+    });
+
+    //column of a table was removed
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
+      //console.log('event removed column', col, 'index', i)
+      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
+        this.updateDropdowns('remove',col.desc);
+        //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
+      }
+    });
+  }
     
   
   private updateTouringData() 
