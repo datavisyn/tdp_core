@@ -429,6 +429,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     //   return 1;
                     //  })
                     .text(function(d) { 
+                      if(Number(d.value.label.toString())) {
+                        return Number(d.value.label.toString()).toFixed(2);  
+                      }
+
                       return d.value.label; 
                     })
                     .style("background-color", function(d){
