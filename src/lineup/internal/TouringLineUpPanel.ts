@@ -463,45 +463,54 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       let currCategoryLabel = ''+cell.value.selected[i].label;
 
       //selected
-      let rowSelected = {};
-      rowSelected[''+columnLabel] = (cell.value.selected[i].label as string);
-      rowSelected['Selection'] = 'Selected';
-      rowSelected['value'] = (cell.value.selected[i].amount as number);
-      currData.push(rowSelected);
+      let selectedAmount = (cell.value.selected[i].amount as number);
+      if(selectedAmount > 0)
+      {
+        let rowSelected = {};
+        rowSelected[''+columnLabel] = (cell.value.selected[i].label as string);
+        rowSelected['Selection'] = 'Selected';
+        rowSelected['value'] = selectedAmount;
+        currData.push(rowSelected);
+      }
 
-      //selected
-      let rowUnselected = {};
-      rowUnselected[''+columnLabel] = (cell.value.selected[i].label as string);
-      rowUnselected['Selection'] = 'Unselected';
-      rowUnselected['value'] = (cell.value.allData[i].amount as number)-(cell.value.selected[i].amount as number);
-      currData.push(rowUnselected);
+      //unselected
+      let unselectedAmount = (cell.value.allData[i].amount as number)-(cell.value.selected[i].amount as number);
+      if(unselectedAmount > 0)
+      {
+        
+        let rowUnselected = {};
+        rowUnselected[''+columnLabel] = (cell.value.selected[i].label as string);
+        rowUnselected['Selection'] = 'Unselected';
+        rowUnselected['value'] = unselectedAmount;
+        currData.push(rowUnselected);
+      }
 
     }
 
     console.log('currentData',currData);
 
     // console.log('SVG Conatiner - width: ',width);
-    let testData = [
-      { 'A Cat1': 'Cat1', Selection: 'Selected'},
-      { 'A Cat1': 'Cat1', Selection: 'Selected'},
-      { 'A Cat1': 'Cat1', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat2', Selection: 'Selected'},
-      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat3', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat3', Selection: 'Selected'},
-      { 'A Cat1': 'Cat3', Selection: 'Selected'},
-    ];
+    // let testData = [
+    //   { 'A Cat1': 'Cat1', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat1', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat1', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat3', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat3', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat3', Selection: 'Selected'},
+    // ];
 
-    let testDataCompact = [
-      { 'A Cat1': 'Cat1', Selection: 'Selected', value: 12},
-      { 'A Cat1': 'Cat1', Selection: 'Unselected', value: 1},
-      { 'A Cat1': 'Cat2', Selection: 'Selected', value: 1},
-      { 'A Cat1': 'Cat2', Selection: 'Unselected', value: 3},
-      { 'A Cat1': 'Cat3', Selection: 'Selected', value: 2},
-      { 'A Cat1': 'Cat3', Selection: 'Unselected', value: 33},
-    ];
+    // let testDataCompact = [
+    //   { 'A Cat1': 'Cat1', Selection: 'Selected', value: 7},
+    //   { 'A Cat1': 'Cat1', Selection: 'Unselected', value: 1},
+    //   { 'A Cat1': 'Cat2', Selection: 'Selected', value: 1},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected', value: 3},
+    //   { 'A Cat1': 'Cat3', Selection: 'Selected', value: 2},
+    //   { 'A Cat1': 'Cat3', Selection: 'Unselected', value: 8},
+    // ];
 
     let chart = (<any>d3).parsets()
                         .tension(0.5) //[0 .. 1] -> 1 = straight line 
@@ -559,6 +568,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     const chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
     console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
+    
+    let selectedData = currentItems.filter((data) => {return data.selection === 'Selected'});
 
     let jaccardScores = [];
 
@@ -588,8 +599,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             category: currCategory.label,
             color: this.score2color(scoreSelected),
             action: true,
-            allData: this.getCategoryPartioning(allData,currCol),
-            selected: this.getCategoryPartioning(currentItems,currCol)
+            allData: this.getCategoryPartioning(currentItems,currCol),
+            selected: this.getCategoryPartioning(selectedData,currCol)
           },
           col4: {
             label: scoreDeselected,
@@ -598,8 +609,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             category: currCategory.label,
             color: this.score2color(scoreDeselected),
             action: true,
-            allData: this.getCategoryPartioning(allData,currCol),
-            selected: this.getCategoryPartioning(currentItems,currCol)
+            allData: this.getCategoryPartioning(currentItems,currCol),
+            selected: this.getCategoryPartioning(selectedData,currCol)
           }
         };
 
@@ -617,7 +628,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     for(let i=0; i < column.categories.length; i++)
     {
       let currCategory = column.categories[i];
-      let num = this.getElementsByPropertyValue(data,column.column,currCategory.label).length;
+      let num = data.filter(item => {return item[''+column.column] === currCategory.label}).length;
       num = (num === undefined  || num === null) ? 0 : num;
       let currCategoryPart = {
         label: currCategory.label,
