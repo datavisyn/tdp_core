@@ -54,18 +54,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('data', this.provider.data)
       // console.log('------------------------------------');
 
-      var chart = (<any>d3).parsets()
-      .dimensions(["Survived", "Sex", "Age", "Class"])
-      .width(320)
-      .height(200);
-
-      var vis = d3.select("#vis").append("svg")
-        .attr("width", chart.width())
-        .attr("height", chart.height());
-
-      d3.csv(titanic, function(error, csv) {
-        vis.datum(csv).call(chart);
-      });
+      
     }));
 
 
@@ -498,19 +487,107 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     console.log('Cell Clicked');
     console.log('Cell: ',cell);
+
     let oldSvgContainer = d3.select('div[class="svg-container"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
 
     let svgContainer = d3.select('#'+containerId).append('div')
                                                   .attr('class','svg-container');
   
-    let svgCanvas = svgContainer.append('svg')
-                                .attr('width','100%')
-                                .attr('height','100%')
-                                .attr('shape-rendering','optimizeQuality');
+    let width = svgContainer.style('width').slice(0,-2);
+
+    console.log('SVG Conatiner - width: ',width);
+    let testData = [
+      { 'A Cat1': 'Cat1', Selection: 'Selected'},
+      { 'A Cat1': 'Cat1', Selection: 'Selected'},
+      { 'A Cat1': 'Cat1', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat2', Selection: 'Selected'},
+      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat3', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat3', Selection: 'Selected'},
+      { 'A Cat1': 'Cat3', Selection: 'Selected'},
+    ];
+
+    // let newData = [
+    //   { 'A Cat1': { label: 'Cat1', value: 2},
+    //     Selection : { label: 'Selected', value: 2},
+    //   },
+    //   { 'A Cat1': { label: 'Cat1', value: 1},
+    //     Selection : { label: 'Unselected', value: 1},
+    //   },
+    //   { 'A Cat2': { label: 'Cat1', value: 1},
+    //     Selection : { label: 'Selected', value: 1},
+    //   },
+    //   { 'A Cat2': { label: 'Cat1', value: 3},
+    //     Selection : { label: 'Unselected', value: 3},
+    //   },
+    //   { 'A Cat3': { label: 'Cat1', value: 2},
+    //     Selection : { label: 'Selected', value: 2},
+    //   },
+    //   { 'A Cat3': { label: 'Cat1', value: 1},
+    //     Selection : { label: 'Unselected', value: 1},
+    //   }
+    // ];
+
+    let chart = (<any>d3).parsets()
+                        .tension(0.5)
+                        // .dimensions(["Survived", "Sex", "Age", "Class"])
+                        .dimensions(['A Cat1', 'Selection'])
+                        //.value( function (d,i) { return d.value; })
+                        .width(width)
+                        .height(175);
+
+    /*
+    Cat1 Cat1
+    Cat1 Cat1
+    Cat1 others
+    Cat2 others
+    Cat2 others
+    Cat2 others
+    Cat3 others
+    Cat3 
+    Cat3 
+    */
 
     
+
+    let svgCanvas = svgContainer.append('svg')
+                                .attr('width',chart.width())
+                                .attr('height',chart.height());
+                                // .attr('width','100%')
+                                // .attr('height','100%');
+
+    let svgFigureGroup = svgCanvas.append('g');
+
+    // let vis = d3.select("#vis").append("svg")
+    //   .attr("width", chart.width())
+    //   .attr("height", chart.height());
+
+    // d3.csv(titanic, function(error, csv) {
+    //   svgCanvas.datum(csv).call(chart);
+    // });
+
     
+    svgFigureGroup.datum(testData).call(chart);
+    
+    
+/* 
+    Class,Age,Sex,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived */
+
   }
 
 
@@ -564,6 +641,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         // scoreDeselected = Math.round(scoreDeselected*1000)/1000;
 
         let scoreDeselected = 1 - scoreSelected;
+        scoreDeselected = Math.round(scoreDeselected*1000)/1000;
 
         let resultObj = {
           col1: {
