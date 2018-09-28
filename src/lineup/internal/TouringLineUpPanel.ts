@@ -436,7 +436,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                       return d.value.label; 
                     })
                     .style("background-color", function(d){
-                      return d.value.color || '#ffffbb';
+                      return d.value.color || '#ffffff';
                      });
                     // .each(function (d, i) {
                     //     if (d.value.rowspan) {
@@ -546,7 +546,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private score2color(score:number, domain = [0, 1])
   {
-    const linScale = d3.scale.linear().domain(domain).range([255, 100]);
+    const linScale = d3.scale.linear().domain(domain).range([255, 110]);
     const brightness = linScale(score);
     const hslColor =  d3.rgb(brightness, brightness, brightness);
     return hslColor.toString();
