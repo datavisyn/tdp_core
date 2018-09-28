@@ -344,7 +344,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     let allCategoricalCol = this.getAllCategoricalColumns();
     let chosenOptions = this.getChosenOptions();
-    
+    const that = this;
+
     let columnHeaders = [
       { head: 'col1', label: ''},
       { head: 'col2', label: ''},
@@ -434,9 +435,30 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
                       return d.value.label; 
                     })
+                    .on('click', function(d) {
+                      if(d.value.action) {
+                        that.showVisualRepresentation(containerId,d);
+                      }
+                    })
                     .style("background-color", function(d){
                       return d.value.color || '#ffffff';
-                     });
+                     })
+                     .on("mouseover", function(d) {
+                        if(d.value.action) {
+                          //d3.select(this).classed('bg-primary',true);
+                          d3.select(this).style("background-color", function(d){
+                            return '#fba74d';
+                          });
+                        }
+                      })					
+                      .on("mouseout", function(d) {
+                        if(d.value.action) {
+                          //d3.select(this).classed('bg-primary',false);
+                          d3.select(this).style("background-color", function(d){
+                            return d.value.color || '#ffffff';
+                          });
+                        }
+                      });
                     // .each(function (d, i) {
                     //     if (d.value.rowspan) {
                     //       // put all your operations on the second element, e.g.
@@ -450,17 +472,31 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     //   });
 
     
-    const that = this;
-    cells.on('click', function(cell) {
-      that.showVisualRepresentation(cell);
-    });                  
+    
+    // console.log('cells',cells);
+    // cells.on('click', function(cell) {
+    //   that.showVisualRepresentation(containerId,cell);
+    // });                  
 
   }
 
-  private showVisualRepresentation(cell: any)
+  private showVisualRepresentation(containerId: string, cell: any)
   {
     console.log('Cell Clicked');
     console.log('Cell: ',cell);
+    let oldSvgContainer = d3.select('div[class="svg-container"]');
+    oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
+
+    let svgContainer = d3.select('#'+containerId).append('div')
+                                                  .attr('class','svg-container');
+  
+    let svgCanvas = svgContainer.append('svg')
+                                .attr('width','100%')
+                                .attr('height','100%')
+                                .attr('shape-rendering','optimizeQuality');
+
+    
+    
   }
 
 
@@ -528,13 +564,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             label: scoreSelected,
             column: currCol.column,
             category: currCategory.label,
-            color: this.score2color(scoreSelected)
+            color: this.score2color(scoreSelected),
+            action: true
           },
           col4: {
             label: scoreDeselected,
             column: currCol.column,
             category: currCategory.label,
-            color: this.score2color(scoreDeselected)
+            color: this.score2color(scoreDeselected),
+            action: true
           }
         };
 
