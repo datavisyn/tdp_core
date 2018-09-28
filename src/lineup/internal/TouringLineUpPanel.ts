@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isCategoricalColumn, ICategory} from 'lineupjs';
+import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isCategoricalColumn, ICategory, CategoricalColumn} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
@@ -55,18 +55,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('data', this.provider.data)
       // console.log('------------------------------------');
 
-      var chart = (<any>d3).parsets()
-      .dimensions(["Survived", "Sex", "Age", "Class"])
-      .width(320)
-      .height(200);
-
-      var vis = d3.select("#vis").append("svg")
-        .attr("width", chart.width())
-        .attr("height", chart.height());
-
-      d3.csv(titanic, function(error, csv) {
-        vis.datum(csv).call(chart);
-      });
+      
     }));
 
 
@@ -316,7 +305,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     let allCategoricalCol = this.getAllCategoricalColumns();
     let chosenOptions = this.getChosenOptions();
-    
+    const that = this;
+
     let columnHeaders = [
       { head: 'col1', label: ''},
       { head: 'col2', label: ''},
@@ -344,33 +334,32 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let tableBody = table.append('tbody');
     
-    /* nested_data.forEach(function (d) {
-      var rowspan = d.values.length;
-      d.values.forEach(function (val, index) {
+/*     jaccardScores.forEach(function (d) {
           var tr = tableBody.append("tr");
-          if (index == 0) {
+          console.log(d);
+          if (d.col1.rowspan >0) {
               tr.append("td")
-                  .attr("rowspan", rowspan)
-                  .attr('class','text-center')
-                  .text(val.col1);
+                  .attr("rowspan", d.col1.rowspan)
+                  .attr('class','text-center align-middle')
+                  .text(d.col1.label)
+                  .style("background-color", d.col1.color);
           }
           tr.append("td")
               .attr('class','text-center')
-              .text(val.col2);
+              .text(d.col2.label);
           tr.append("td")
               .attr('class','text-center')
-              .text(val.col3);
+              .text(d.col3.label);
           tr.append("td")
               .attr('class','text-center')
-              .text(val.col4);
+              .text(d.col4.label);
 
           // Add a click handler that will return the datum instead of undefined
-          tr.on('click', function(row) {
+          tr.on('click', function(tr) {
             console.log('Row Clicked');
-            console.log(row);
+            console.log(tr);
           });    
   
-      });
     }); */
     
     // create a row for each object in the data
@@ -407,30 +396,156 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
                       return d.value.label; 
                     })
+                    .on('click', function(d) {
+                      if(d.value.action) {
+                        that.showVisualRepresentation(containerId,d);
+                      }
+                    })
                     .style("background-color", function(d){
                       return d.value.color || '#ffffff';
-                     });
+                     })
+                     .on("mouseover", function(d) {
+                        if(d.value.action) {
+                          //d3.select(this).classed('bg-primary',true);
+                          d3.select(this).style("background-color", function(d){
+                            return '#fba74d';
+                          });
+                        }
+                      })					
+                      .on("mouseout", function(d) {
+                        if(d.value.action) {
+                          //d3.select(this).classed('bg-primary',false);
+                          d3.select(this).style("background-color", function(d){
+                            return d.value.color || '#ffffff';
+                          });
+                        }
+                      });
                     // .each(function (d, i) {
                     //     if (d.value.rowspan) {
                     //       // put all your operations on the second element, e.g.
                     //       if(d.value.rowspan > 0) {
                     //         d3.select(this).attr("rowspan", d.value.rowspan);
+                    //       }else
+                    //       {
+                    //         d3.select(this).classed('hide', true);
                     //       }
                     //     } 
                     //   });
 
     
-    const that = this;
-    cells.on('click', function(cell) {
-      that.showVisualRepresentation(cell);
-    });                  
+    
+    // console.log('cells',cells);
+    // cells.on('click', function(cell) {
+    //   that.showVisualRepresentation(containerId,cell);
+    // });                  
 
   }
 
-  private showVisualRepresentation(cell: any)
+  private showVisualRepresentation(containerId: string, cell: any)
   {
     console.log('Cell Clicked');
     console.log('Cell: ',cell);
+
+    let oldSvgContainer = d3.select('div[class="svg-container"]');
+    oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
+
+    let svgContainer = d3.select('#'+containerId).append('div')
+                                                  .attr('class','svg-container');
+  
+    let width = svgContainer.style('width').slice(0,-2);
+
+    console.log('SVG Conatiner - width: ',width);
+    let testData = [
+      { 'A Cat1': 'Cat1', Selection: 'Selected'},
+      { 'A Cat1': 'Cat1', Selection: 'Selected'},
+      { 'A Cat1': 'Cat1', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat2', Selection: 'Selected'},
+      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat3', Selection: 'Unselected'},
+      { 'A Cat1': 'Cat3', Selection: 'Selected'},
+      { 'A Cat1': 'Cat3', Selection: 'Selected'},
+    ];
+
+    // let newData = [
+    //   { 'A Cat1': { label: 'Cat1', value: 2},
+    //     Selection : { label: 'Selected', value: 2},
+    //   },
+    //   { 'A Cat1': { label: 'Cat1', value: 1},
+    //     Selection : { label: 'Unselected', value: 1},
+    //   },
+    //   { 'A Cat2': { label: 'Cat1', value: 1},
+    //     Selection : { label: 'Selected', value: 1},
+    //   },
+    //   { 'A Cat2': { label: 'Cat1', value: 3},
+    //     Selection : { label: 'Unselected', value: 3},
+    //   },
+    //   { 'A Cat3': { label: 'Cat1', value: 2},
+    //     Selection : { label: 'Selected', value: 2},
+    //   },
+    //   { 'A Cat3': { label: 'Cat1', value: 1},
+    //     Selection : { label: 'Unselected', value: 1},
+    //   }
+    // ];
+
+    let chart = (<any>d3).parsets()
+                        .tension(0.5)
+                        // .dimensions(["Survived", "Sex", "Age", "Class"])
+                        .dimensions(['A Cat1', 'Selection'])
+                        //.value( function (d,i) { return d.value; })
+                        .width(width)
+                        .height(175);
+
+    /*
+    Cat1 Cat1
+    Cat1 Cat1
+    Cat1 others
+    Cat2 others
+    Cat2 others
+    Cat2 others
+    Cat3 others
+    Cat3 
+    Cat3 
+    */
+
+    
+
+    let svgCanvas = svgContainer.append('svg')
+                                .attr('width',chart.width())
+                                .attr('height',chart.height());
+                                // .attr('width','100%')
+                                // .attr('height','100%');
+
+    let svgFigureGroup = svgCanvas.append('g');
+
+    // let vis = d3.select("#vis").append("svg")
+    //   .attr("width", chart.width())
+    //   .attr("height", chart.height());
+
+    // d3.csv(titanic, function(error, csv) {
+    //   svgCanvas.datum(csv).call(chart);
+    // });
+
+    
+    svgFigureGroup.datum(testData).call(chart);
+    
+    
+/* 
+    Class,Age,Sex,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived
+    Second Class,Child,Female,Survived */
+
   }
   
   private calcJaccard(items, columnA: string, categoryA: string, columnB: string, categoryB: string): number {
@@ -480,7 +595,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         let resultObj = {
           col1: {
             label: currCol.label,
-            rowspan: (cnt === 0) ? currCol.categories.length : 1                 
+            rowspan: (cnt === 0) ? currCol.categories.length : 0                
           },
           col2: {
             label: currCategory.label,
@@ -490,13 +605,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             label: scoreSelected,
             column: currCol.column,
             category: currCategory.label,
-            color: this.score2color(scoreSelected)
+            color: this.score2color(scoreSelected),
+            action: true
           },
           col4: {
             label: scoreDeselected,
             column: currCol.column,
             category: currCategory.label,
-            color: this.score2color(scoreDeselected)
+            color: this.score2color(scoreDeselected),
+            action: true
           }
         };
 
@@ -810,7 +927,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing all these attributes
       descriptions = descriptions.filter((desc) => (<ICategoricalColumnDesc>desc).categories);
       descriptions.forEach((desc) => {
-        (desc as any).categories = this.provider.getRankings()[0].children.filter((child) => child.label == desc.label)[0].categories;
+        (desc as any).categories = (this.provider.getRankings()[0].children.filter((child) => child.label == desc.label)[0] as CategoricalColumn).categories;
       });
       descriptions.unshift(this.getSelectionDesc());
       descriptions.unshift({ //There is always at least the selection as categorical column
