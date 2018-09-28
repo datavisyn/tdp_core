@@ -394,33 +394,32 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let tableBody = table.append('tbody');
     
-    /* nested_data.forEach(function (d) {
-      var rowspan = d.values.length;
-      d.values.forEach(function (val, index) {
+/*     jaccardScores.forEach(function (d) {
           var tr = tableBody.append("tr");
-          if (index == 0) {
+          console.log(d);
+          if (d.col1.rowspan >0) {
               tr.append("td")
-                  .attr("rowspan", rowspan)
-                  .attr('class','text-center')
-                  .text(val.col1);
+                  .attr("rowspan", d.col1.rowspan)
+                  .attr('class','text-center align-middle')
+                  .text(d.col1.label)
+                  .style("background-color", d.col1.color);
           }
           tr.append("td")
               .attr('class','text-center')
-              .text(val.col2);
+              .text(d.col2.label);
           tr.append("td")
               .attr('class','text-center')
-              .text(val.col3);
+              .text(d.col3.label);
           tr.append("td")
               .attr('class','text-center')
-              .text(val.col4);
+              .text(d.col4.label);
 
           // Add a click handler that will return the datum instead of undefined
-          tr.on('click', function(row) {
+          tr.on('click', function(tr) {
             console.log('Row Clicked');
-            console.log(row);
+            console.log(tr);
           });    
   
-      });
     }); */
     
     // create a row for each object in the data
@@ -463,6 +462,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     //       // put all your operations on the second element, e.g.
                     //       if(d.value.rowspan > 0) {
                     //         d3.select(this).attr("rowspan", d.value.rowspan);
+                    //       }else
+                    //       {
+                    //         d3.select(this).classed('hide', true);
                     //       }
                     //     } 
                     //   });
@@ -480,6 +482,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     console.log('Cell Clicked');
     console.log('Cell: ',cell);
   }
+
+
 
   // calculated jaccard score
   private calculateJaccardScores(currentItems: Array<any>)
@@ -529,7 +533,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         let resultObj = {
           col1: {
             label: currCol.label,
-            rowspan: (cnt === 0) ? currCol.categories.length : 1                 
+            rowspan: (cnt === 0) ? currCol.categories.length : 0                
           },
           col2: {
             label: currCategory.label,
