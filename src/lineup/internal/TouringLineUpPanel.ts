@@ -45,10 +45,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('provider',this.provider);
       // console.log('provider.getSelection: ',this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
       // console.log('provider.selectedRows: ',this.provider.selectedRows());
-      // console.log('provider.getColumns: ',this.provider.getColumns());
+      console.log('provider.getColumns: ',this.provider.getColumns());
       // console.log('provider.getRanking: ',this.provider.getRankings());
       // console.log('getGroups', this.provider.getRankings()[0].getGroups())
-      // console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
+      console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
       // console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
       // console.log('data', this.provider.data)
       // console.log('------------------------------------');
@@ -87,19 +87,36 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, this.updateTouringData);
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, this.updateDropdowns);
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, () =>this.updateDropdowns());
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, this.updateDropdowns);
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
   }
-    
+  
+  private prepareInput = (desc) => {
+    let filter : Array<string>;
+    switch(desc.type) {
+      case 'collection':
+        filter = ['categorical', 'number'];
+        break;
+      case 'cat_collection':
+        filter = ['categorical'];
+        break;
+      case 'num_collection':
+        filter = ['number'];
+        break;
+      default:
+        return [desc];
+    }
+    return this.provider.getRankings()[0].children.map((col) => col.desc).filter((desc) => filter.includes(desc.type));;
+  }
   
   private updateTouringData() {
     //console.log('update touring data');
@@ -127,25 +144,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
 
     console.log('current data: ', currentData);
-    const prepareInput = (desc) => {
-      let filter : Array<string>;
-      switch(desc.type) {
-        case 'collection':
-          filter = ['categorical', 'number'];
-          break;
-        case 'cat_collection':
-          filter = ['categorical'];
-          break;
-        case 'num_collection':
-          filter = ['number'];
-          break;
-        default:
-          return [desc];
-      }
-      return this.provider.getRankings()[0].children.map((col) => col.desc).filter((desc) => filter.includes(desc.type));;
-    }
-    const inputA = prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
-    const inputB = prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
+    const inputA = this.prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
+    const inputB = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
     
     console.log('Inputs to get set measures.', 'A', inputA, 'B', inputB);
     const setMeasures : MeasureMap = MethodManager.getSetMethods(inputA, inputB);
@@ -483,8 +483,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
 
     console.log('allCategoricalCol: ', allCategoricalCol);
+    
     console.log('chosenColumns: ', chosenColumns);
+    console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
+    //chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
+
     let jaccardScores = [];
+
 
     for(let i=0; i<chosenColumns.length; i++)
     {
@@ -837,7 +842,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing the numerical attributes (if there are any)
       //    and an entry representing the categorical attributes (if there are any)
       //    and an entry representing all these attributes
-      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type));
+      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
+      descriptions.forEach((desc) => {
+        (<ICategoricalColumnDesc>desc).categories = stratDesc.categories; // Replace real categopries with those from stratification
+        (<ICategoricalColumnDesc>desc).missingCategory = null;
+      });
       descriptions.unshift(this.getSelectionDesc());
       descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All numerical columns',
