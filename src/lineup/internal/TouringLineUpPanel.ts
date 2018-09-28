@@ -38,8 +38,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.searchbox = <HTMLElement>this.node.querySelector('.lu-adder')!;
     this.itemCounter = <HTMLElement>this.node.querySelector('.lu-stats')!;
 
-    
-    
     const buttons = this.node.querySelector('section');
     buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
       this.toggleTouring();
@@ -47,10 +45,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('provider',this.provider);
       // console.log('provider.getSelection: ',this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
       // console.log('provider.selectedRows: ',this.provider.selectedRows());
-      // console.log('provider.getColumns: ',this.provider.getColumns());
+      console.log('provider.getColumns: ',this.provider.getColumns());
       // console.log('provider.getRanking: ',this.provider.getRankings());
       // console.log('getGroups', this.provider.getRankings()[0].getGroups())
-      // console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
+      console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
       // console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
       // console.log('data', this.provider.data)
       // console.log('------------------------------------');
@@ -89,38 +87,38 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, (indices) => {
-      console.log('selection changed, indices: ', indices);
-      this.updateTouringData();
-    });
-
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
-      //console.log('event added column', col, 'index', i)
-      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns();
-        //this.addOptionToDropdown(dropdownItemCopareA,col.desc);
-      }
-    });
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, () =>this.updateDropdowns());
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, (col, i) => {
-      //console.log('event removed column', col, 'index', i)
-      if(col.desc && (col.desc.type === 'categorical' || col.desc.type === 'number' || col.desc.type === 'string')) {
-        this.updateDropdowns();
-        //this.removeOptionFromDropdown(dropdownItemCopareA,col.desc);
-      }
-    });
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
   }
-    
   
-  private updateTouringData() 
-  {
+  private prepareInput = (desc) => {
+    let filter : Array<string>;
+    switch(desc.type) {
+      case 'collection':
+        filter = ['categorical', 'number'];
+        break;
+      case 'cat_collection':
+        filter = ['categorical'];
+        break;
+      case 'num_collection':
+        filter = ['number'];
+        break;
+      default:
+        return [desc];
+    }
+    return this.provider.getRankings()[0].children.map((col) => col.desc).filter((desc) => filter.includes(desc.type));;
+  }
+  
+  private updateTouringData() {
     //console.log('update touring data');
 
     let chosenOptions = this.getChosenOptions();
@@ -140,31 +138,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           currentData.push(this.provider.data[selectedIndices[i]]);
         }   
       }
-    }if(chosenOptions.compareItemA === 'Stratification Groups')
+    } else if (chosenOptions.compareItemA === 'Stratification Groups')
     {
 
     }
 
     console.log('current data: ', currentData);
-    const prepareInput = (desc) => {
-      let filter : Array<string>;
-      switch(desc.type) {
-        case 'collection':
-          filter = ['categorical', 'number'];
-          break;
-        case 'cat_collection':
-          filter = ['categorical'];
-          break;
-        case 'num_collection':
-          filter = ['number'];
-          break;
-        default:
-          return [desc];
-      }
-      return this.provider.getRankings()[0].children.map((col) => col.desc).filter((desc) => filter.includes(desc.type));;
-    }
-    const inputA = prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
-    const inputB = prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
+    const inputA = this.prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
+    const inputB = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
     
     console.log('Inputs to get set measures.', 'A', inputA, 'B', inputB);
     const setMeasures : MeasureMap = MethodManager.getSetMethods(inputA, inputB);
@@ -218,7 +199,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
       }
     }
-
   }
     
 
@@ -301,10 +281,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-  private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
-    
-    
 
+  private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
     
     if(measure && measure.id === 'jaccard')
     {
@@ -449,13 +427,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     //   }
                     //   return 1;
                     //  })
-                    .text(function(d) { return d.value.label; })
-                    .style("background-color", function(d){
-                      let color = '#ffffff';
-                      if(d.value.color){
-                        color = d.value.color
+                    .text(function(d) { 
+                      if(Number(d.value.label.toString())) {
+                        return Number(d.value.label.toString()).toFixed(2);  
                       }
-                      return color;
+
+                      return d.value.label; 
+                    })
+                    .style("background-color", function(d){
+                      return d.value.color || '#ffffff';
                      });
                     // .each(function (d, i) {
                     //     if (d.value.rowspan) {
@@ -509,8 +489,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
 
     console.log('allCategoricalCol: ', allCategoricalCol);
+    
     console.log('chosenColumns: ', chosenColumns);
+    console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
+    //chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
+
     let jaccardScores = [];
+
 
     for(let i=0; i<chosenColumns.length; i++)
     {
@@ -542,12 +527,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           col3: {
             label: scoreSelected,
             column: currCol.column,
-            category: currCategory.label
+            category: currCategory.label,
+            color: this.score2color(scoreSelected)
           },
           col4: {
             label: scoreDeselected,
             column: currCol.column,
-            category: currCategory.label
+            category: currCategory.label,
+            color: this.score2color(scoreDeselected)
           }
         };
 
@@ -559,6 +546,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     return jaccardScores;
     
+  }
+
+  private score2color(score:number, domain = [0, 1])
+  {
+    const linScale = d3.scale.linear().domain(domain).range([255, 110]);
+    const brightness = linScale(score);
+    const hslColor =  d3.rgb(brightness, brightness, brightness);
+    return hslColor.toString();
   }
   
   private getElementsByPropertyValue(elements: Array<any>, property: string, value: string | number)
@@ -863,7 +858,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing the numerical attributes (if there are any)
       //    and an entry representing the categorical attributes (if there are any)
       //    and an entry representing all these attributes
-      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type));
+      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
+      descriptions.forEach((desc) => {
+        (<ICategoricalColumnDesc>desc).categories = stratDesc.categories; // Replace real categopries with those from stratification
+        (<ICategoricalColumnDesc>desc).missingCategory = null;
+      });
       descriptions.unshift(this.getSelectionDesc());
       descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All numerical columns',
