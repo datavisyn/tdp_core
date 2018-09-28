@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isCategoricalColumn} from 'lineupjs';
+import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isCategoricalColumn, ICategory, CategoricalColumn} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
@@ -27,6 +27,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   ];
 
+  private feelsLikeTheVeryFirstTime = true;
   
 
   protected init() {
@@ -43,9 +44,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
       this.toggleTouring();
       
-      // console.log('provider',this.provider);
-      // console.log('provider.getSelection: ',this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
-      // console.log('provider.selectedRows: ',this.provider.selectedRows());
+      console.log('provider',this.provider);
+      console.log('provider.getSelection: ',this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
+      console.log('provider.selectedRows: ',this.provider.selectedRows());
       console.log('provider.getColumns: ',this.provider.getColumns());
       // console.log('provider.getRanking: ',this.provider.getRankings());
       // console.log('getGroups', this.provider.getRankings()[0].getGroups())
@@ -90,7 +91,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData()); //fat arrow to preserve scope in called function (this)
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
@@ -118,33 +119,27 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       default:
         return [desc];
     }
-    return this.provider.getRankings()[0].children.map((col) => col.desc).filter((desc) => filter.includes(desc.type));;
+
+    return d3.select(this.node).select('select.itemControls.compareB').selectAll('option').data().filter((desc) => filter.includes(desc.type));;
   }
   
   private updateTouringData() {
-    //console.log('update touring data');
+    console.log('EVENT update touring data');
 
     let chosenOptions = this.getChosenOptions();
     //console.log('chosenOptions',chosenOptions);
-    let currentData = this.provider.data;
+    let currentData = [];
 
-
-    // ---- Compare A : Selection -------------------
-    if(chosenOptions.compareItemA === 'Selection')
-    {
-      let selectedIndices = this.provider.getSelection();
-      currentData = [];
-      if(selectedIndices && selectedIndices.length > 0) {
+    // get currently displayed data
+    this.provider.getRankings()[0].getGroups().forEach((stratGroup) => {
+      stratGroup.order.forEach((rowId) => {
         
-        for(let i=0;i<selectedIndices.length;i++)
-        {
-          currentData.push(this.provider.data[selectedIndices[i]]);
-        }   
-      }
-    } else if (chosenOptions.compareItemA === 'Stratification Groups')
-    {
-
-    }
+        // and include selection data
+        const row = this.provider.data[rowId];
+        row.selection = this.provider.getSelection().includes(rowId) ? 'Selected' : 'Unselected';
+        currentData.push(row);
+        });
+    })
 
     console.log('current data: ', currentData);
     const inputA = this.prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
@@ -203,43 +198,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
     }
   }
-    
-
- /*  private updateTouringTables(measures: MeasureMap, currentAttributes: IColumnDesc[], currentItems: Array<any>) {
-
-    // Get the first measure for every comparison type
-    const displayedMeasures = [];
-
-    measures.forEach((typeMeasures, type) => {
-      console.log('#1 '+ type.toString(), typeMeasures[0]);
-      //displayedMeasures.push(typeMeasures[0]); //show highest ranked
-      typeMeasures.forEach((m) => displayedMeasures.push(m)); //show all
-    });
-
-    // bind the measure to the div containers
-    const containers = d3.select(this.node).select('.measures').selectAll('.measure').data(displayedMeasures, (m) => m.id); //measure id as key for the data
-
-    // enter phase
-    // Append div for each measure, containing headline, table, and visualization.
-    const containers_enter = containers.enter().append('div').attr('class', 'measure');
-
-    // Headline
-    containers_enter.append('h4').text((m) => m.label);
-    // Table
-    containers_enter.append('table').attr('class', 'table-responsive')
-                    .append('table').attr('class', 'table table-bordered table-condensed table-hover');
-
-    // TODO add visualization
-
-
-    // update phase ... entering elems implicitly included in d3 v3. (v4 needs merge)
-    const containers_update = containers;
-
-    //TODO update table content
-
-    // exit phase
-    containers.exit().remove();
-  } */
     
 
   //generates id for the collapseable panel in the accordion with the measure type and the current time's minutes/seconds and millisec
@@ -432,7 +390,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     //   return 1;
                     //  })
                     .text(function(d) { 
-                      if(Number(d.value.label.toString())) {
+                      if(d.value.label && Number(d.value.label.toString())) {
                         return Number(d.value.label.toString()).toFixed(2);  
                       }
 
@@ -569,40 +527,40 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
   }
+  
+  private calcJaccard(items, columnA: string, categoryA: string, columnB: string, categoryB: string): number {
 
+    const selectionSet = items.filter(item => {
+      return item[columnA] === categoryA;
+    });
 
+    const categorySet = items.filter(item => {
+      return item[columnB] === categoryB;
+    });
+
+    const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
+
+    const unionArrays = function (a, b, equals){
+      return a.concat(b).reduce( (acc, element) => {
+          return acc.some(elt => equals(elt, element))? acc : acc.concat(element)
+      }, []);
+    }
+    const union = unionArrays(selectionSet, categorySet, (a, b) => a._id === b._id);
+
+    const score = intersection.length / union.length;
+    
+    console.log('score', score);
+
+    return score || 0;
+  }
 
   // calculated jaccard score
   private calculateJaccardScores(currentItems: Array<any>)
   {
-    let allData = this.provider.data;
-    let allCategoricalCol = this.getAllCategoricalColumns();
-    let chosenOptions = this.getChosenOptions();
-    
-    let chosenColumns = [];
-
-    if(chosenOptions.compareItemB === "All categorical columns")
-    {
-      chosenColumns = allCategoricalCol;
-
-    } else if(chosenOptions.compareItemB === "Selection")
-    {
-      chosenColumns = allCategoricalCol;
-
-    } else 
-    {
-      let colIndex = allCategoricalCol.map((a) => a.label).indexOf(chosenOptions.compareItemB);
-      chosenColumns.push(allCategoricalCol[colIndex]);
-    }
-
-    console.log('allCategoricalCol: ', allCategoricalCol);
-    
-    console.log('chosenColumns: ', chosenColumns);
+    const chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
     console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
-    // chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
 
     let jaccardScores = [];
-
 
     for(let i=0; i<chosenColumns.length; i++)
     {
@@ -611,17 +569,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let cnt=0; cnt < currCol.categories.length; cnt++)
       {
         let currCategory = currCol.categories[cnt];
-        let scoreSelected = this.getElementsByPropertyValue(currentItems,currCol.column,currCategory.label).length / 
-                            this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length;
-        scoreSelected = Math.round(scoreSelected*1000)/1000;
-
-        // let scoreDeselected = (this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length - 
-        //                             this.getElementsByPropertyValue(currentItems,currCol.column,currCategory.label).length) / 
-        //                       this.getElementsByPropertyValue(allData,currCol.column,currCategory.label).length;    
-        // scoreDeselected = Math.round(scoreDeselected*1000)/1000;
-
-        let scoreDeselected = 1 - scoreSelected;
-        scoreDeselected = Math.round(scoreDeselected*1000)/1000;
+        const scoreSelected = this.calcJaccard(currentItems, 'selection', 'Selected', currCol.column, currCategory.label);
+        const scoreDeselected = this.calcJaccard(currentItems, 'selection', 'Unselected', currCol.column, currCategory.label);
 
         let resultObj = {
           col1: {
@@ -657,11 +606,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
         jaccardScores.push(resultObj);
       }
-
     }
 
     return jaccardScores;
-    
   }
 
   private getCategoryPartioning(data: Array<any>, column: any)
@@ -685,17 +632,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private score2color(score:number, domain = [0, 1])
   {
+    score = score || 0; // fix undefined or NaN
+
     const linScale = d3.scale.linear().domain(domain).range([255, 110]);
-    const brightness = linScale(score);
-    const hslColor =  d3.rgb(brightness, brightness, brightness);
+    const darkness = linScale(score); // higher score -> darker color
+    const hslColor =  d3.rgb(darkness, darkness, darkness);
     return hslColor.toString();
   }
   
-  private getElementsByPropertyValue(elements: Array<any>, property: string, value: string | number)
-  {
-    return elements.filter(row => row[property] === value);
-  }
-
   
 
   /* https://stackoverflow.com/questions/32999179/d3-table-with-rowspan
@@ -922,29 +866,31 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                       .text("others"); */
 
   }
+
   
-  private getSelectionDesc() : ICategoricalColumnDesc {
-    const selCategories = new Array<string>();
+  private getSelectionDesc() : any {
+    const selCategories = new Array<ICategory>();
     const numberOfRows = this.provider.getRankings()[0].getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
+    console.log('Selected ', this.provider.getSelection().length , 'Total ', numberOfRows);
     if (this.provider.getSelection().length > 0) {
-      selCategories.push('Selected');
+      selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
     } // else: none selected
 
     if (this.provider.getSelection().length < numberOfRows) {
-      selCategories.push('Unselected')
+      selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
     } // else: all selected
     
     return {
       categories: selCategories,
       label: 'Selection',
       type: 'categorical',
-      missingCategory: null
+      column: 'selection'
     };
   }
 
 
   private updateDropdowns() {
-    console.log('changed dropdown value. A:', d3.selectAll('select.itemControls').property("value"), '\t|B: ', d3.selectAll('select.itemControls.compareB').property("value"));
+    console.log('EVENT changed dropdown value. A:', d3.selectAll('select.itemControls').property("value"), '\t|B: ', d3.selectAll('select.itemControls.compareB').property("value"));
   
     const dropdownA = d3.select(this.node).select('select.itemControls.compareA');
     // dropdownA ('With')
@@ -954,21 +900,28 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // Generate a Attribute description that represents the current selection
     const selDesc = this.getSelectionDesc();
+    console.log('selDesc', selDesc);
     const selOption = dropdownA.select('option.selection').datum(selDesc); //bind description to option and set text
     selOption.text((desc) => desc.label);
 
     
     // Generate an attribute description that represents the current stratification
-    const stratDesc: ICategoricalColumnDesc = {
-      categories: this.provider.getRankings()[0].getGroups().map((group) => group.name), // if not stratifified, there is only one group ('Default')
+    const stratDesc = {
+      categories: this.provider.getRankings()[0].getGroups().map(function(group) {
+        return {
+          name: group.name,
+          label: group.name
+          // TODO get colors of stratification
+          }
+      }), // if not stratifified, there is only one group ('Default')
       label: 'Stratification Groups',
       type: 'categorical',
-      missingCategory: null
+      column: 'strat_groups'
     }
     dropdownA.select('option.stratification').datum(stratDesc).text((desc) => desc.label); //bind description to option and set text
 
     
-
+    // TODO remove categories which are not displayed
     const dropdownB = d3.select(this.node).select('select.itemControls.compareB');
     const mode = this.getRadioButtonValue();
     let descriptions: IColumnDesc[] = this.provider.getRankings()[0].children.map((col) => col.desc);
@@ -978,6 +931,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing the selected/unselected items as a attribute with two categories
       //    and an entry representing all these attributes
       descriptions = descriptions.filter((desc) => (<ICategoricalColumnDesc>desc).categories);
+      descriptions.forEach((desc) => {
+        (desc as any).categories = (this.provider.getRankings()[0].children.filter((child) => child.label == desc.label)[0] as CategoricalColumn).categories;
+      });
       descriptions.unshift(this.getSelectionDesc());
       descriptions.unshift({ //There is always at least the selection as categorical column
         label: 'All categorical columns',
@@ -995,8 +951,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing all these attributes
       descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
       descriptions.forEach((desc) => {
-        (<ICategoricalColumnDesc>desc).categories = stratDesc.categories; // Replace real categopries with those from stratification
-        (<ICategoricalColumnDesc>desc).missingCategory = null;
+        (desc as any).categories = stratDesc.categories; // Replace real categopries with those from stratification
       });
       descriptions.unshift(this.getSelectionDesc());
       descriptions.unshift({ //There is always at least the rank as numerical column
@@ -1027,7 +982,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   
   private toggleTouring(hide?: boolean) {
     if(!this.touringElem)
-    return; // the elements are undefined
+      return; // the elements are undefined
     
     if (hide === undefined) {
       // if not hidden -> hide
@@ -1043,6 +998,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       console.log('start touring')
       //if touring is displayed, ensure the panel is visible
       this.collapse = false;
+
+      if (this.feelsLikeTheVeryFirstTime)
+      {
+        this.feelsLikeTheVeryFirstTime = false;
+        this.updateDropdowns(); //Update because the selection from provenenace may not be up to date 
+      }
     }
   }
 
