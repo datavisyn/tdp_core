@@ -2,9 +2,10 @@ import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, 
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
-import * as d3 from 'd3'
+import * as d3 from 'd3';
+import 'd3.parsets';
+import titanic from 'file-loader!./titanic.csv'
 import {IServerColumn} from '../../rest';
-
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -52,6 +53,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
       // console.log('data', this.provider.data)
       // console.log('------------------------------------');
+
+      var chart = (<any>d3).parsets()
+      .dimensions(["Survived", "Sex", "Age", "Class"])
+      .width(320)
+      .height(200);
+
+      var vis = d3.select("#vis").append("svg")
+        .attr("width", chart.width())
+        .attr("height", chart.height());
+
+      d3.csv(titanic, function(error, csv) {
+        vis.datum(csv).call(chart);
+      });
     }));
 
 
@@ -488,7 +502,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     console.log('chosenColumns: ', chosenColumns);
     console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
-    //chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
+    // chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
 
     let jaccardScores = [];
 
