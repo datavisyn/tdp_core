@@ -428,13 +428,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     //   }
                     //   return 1;
                     //  })
-                    .text(function(d) { return d.value.label; })
+                    .text(function(d) { 
+                      return d.value.label; 
+                    })
                     .style("background-color", function(d){
-                      let color = '#ffffff';
-                      if(d.value.color){
-                        color = d.value.color
-                      }
-                      return color;
+                      return d.value.color || '#ffffbb';
                      });
                     // .each(function (d, i) {
                     //     if (d.value.rowspan) {
@@ -521,12 +519,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           col3: {
             label: scoreSelected,
             column: currCol.column,
-            category: currCategory.label
+            category: currCategory.label,
+            color: this.score2color(scoreSelected)
           },
           col4: {
             label: scoreDeselected,
             column: currCol.column,
-            category: currCategory.label
+            category: currCategory.label,
+            color: this.score2color(scoreDeselected)
           }
         };
 
@@ -538,6 +538,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     return jaccardScores;
     
+  }
+
+  private score2color(score:number, domain = [0, 1])
+  {
+    const linScale = d3.scale.linear().domain(domain).range([255, 100]);
+    const brightness = linScale(score);
+    const hslColor =  d3.rgb(brightness, brightness, brightness);
+    return hslColor.toString();
   }
   
   private getElementsByPropertyValue(elements: Array<any>, property: string, value: string | number)
