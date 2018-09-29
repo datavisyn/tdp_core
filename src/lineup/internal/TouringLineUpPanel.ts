@@ -408,16 +408,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                         if(d.value.action) {
                           //d3.select(this).classed('bg-primary',true);
                           d3.select(this).style("background-color", function(d){
-                            return '#fba74d';
-                          });
+                                                                      return '#fba74d';
+                                                                    })
+                                        .style("font-weight", 'bolder');                                      ;
                         }
                       })					
                       .on("mouseout", function(d) {
                         if(d.value.action) {
                           //d3.select(this).classed('bg-primary',false);
                           d3.select(this).style("background-color", function(d){
-                            return d.value.color || '#ffffff';
-                          });
+                                                                      return d.value.color || '#ffffff';
+                                                                    })
+                                        .style("font-weight", 'normal'); 
                         }
                       });
                     // .each(function (d, i) {
@@ -453,63 +455,69 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                                   .attr('class','svg-container');
   
     let width = svgContainer.style('width').slice(0,-2);
+    let currData = [];
+    let columnLabel = ''+cell.value.column_label;
 
-    console.log('SVG Conatiner - width: ',width);
-    let testData = [
-      { 'A Cat1': 'Cat1', Selection: 'Selected'},
-      { 'A Cat1': 'Cat1', Selection: 'Selected'},
-      { 'A Cat1': 'Cat1', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat2', Selection: 'Selected'},
-      { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat3', Selection: 'Unselected'},
-      { 'A Cat1': 'Cat3', Selection: 'Selected'},
-      { 'A Cat1': 'Cat3', Selection: 'Selected'},
-    ];
+    for(let i = 0; i < cell.value.selected.length; i++)
+    {
+      let currCategoryLabel = ''+cell.value.selected[i].label;
 
-    // let newData = [
-    //   { 'A Cat1': { label: 'Cat1', value: 2},
-    //     Selection : { label: 'Selected', value: 2},
-    //   },
-    //   { 'A Cat1': { label: 'Cat1', value: 1},
-    //     Selection : { label: 'Unselected', value: 1},
-    //   },
-    //   { 'A Cat2': { label: 'Cat1', value: 1},
-    //     Selection : { label: 'Selected', value: 1},
-    //   },
-    //   { 'A Cat2': { label: 'Cat1', value: 3},
-    //     Selection : { label: 'Unselected', value: 3},
-    //   },
-    //   { 'A Cat3': { label: 'Cat1', value: 2},
-    //     Selection : { label: 'Selected', value: 2},
-    //   },
-    //   { 'A Cat3': { label: 'Cat1', value: 1},
-    //     Selection : { label: 'Unselected', value: 1},
-    //   }
+      //selected
+      let selectedAmount = (cell.value.selected[i].amount as number);
+      if(selectedAmount > 0)
+      {
+        let rowSelected = {};
+        rowSelected[''+columnLabel] = (cell.value.selected[i].label as string);
+        rowSelected['Selection'] = 'Selected';
+        rowSelected['value'] = selectedAmount;
+        currData.push(rowSelected);
+      }
+
+      //unselected
+      let unselectedAmount = (cell.value.allData[i].amount as number)-(cell.value.selected[i].amount as number);
+      if(unselectedAmount > 0)
+      {
+        
+        let rowUnselected = {};
+        rowUnselected[''+columnLabel] = (cell.value.selected[i].label as string);
+        rowUnselected['Selection'] = 'Unselected';
+        rowUnselected['value'] = unselectedAmount;
+        currData.push(rowUnselected);
+      }
+
+    }
+
+    console.log('currentData',currData);
+
+    // console.log('SVG Conatiner - width: ',width);
+    // let testData = [
+    //   { 'A Cat1': 'Cat1', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat1', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat1', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat3', Selection: 'Unselected'},
+    //   { 'A Cat1': 'Cat3', Selection: 'Selected'},
+    //   { 'A Cat1': 'Cat3', Selection: 'Selected'},
+    // ];
+
+    // let testDataCompact = [
+    //   { 'A Cat1': 'Cat1', Selection: 'Selected', value: 7},
+    //   { 'A Cat1': 'Cat1', Selection: 'Unselected', value: 1},
+    //   { 'A Cat1': 'Cat2', Selection: 'Selected', value: 1},
+    //   { 'A Cat1': 'Cat2', Selection: 'Unselected', value: 3},
+    //   { 'A Cat1': 'Cat3', Selection: 'Selected', value: 2},
+    //   { 'A Cat1': 'Cat3', Selection: 'Unselected', value: 8},
     // ];
 
     let chart = (<any>d3).parsets()
-                        .tension(0.5)
-                        // .dimensions(["Survived", "Sex", "Age", "Class"])
-                        .dimensions(['A Cat1', 'Selection'])
-                        //.value( function (d,i) { return d.value; })
+                        .tension(0.5) //[0 .. 1] -> 1 = straight line 
+                        .dimensions([columnLabel, 'Selection'])
+                        .value( function (d) { return d.value; })
                         .width(width)
                         .height(175);
-
-    /*
-    Cat1 Cat1
-    Cat1 Cat1
-    Cat1 others
-    Cat2 others
-    Cat2 others
-    Cat2 others
-    Cat3 others
-    Cat3 
-    Cat3 
-    */
-
-    
 
     let svgCanvas = svgContainer.append('svg')
                                 .attr('width',chart.width())
@@ -519,32 +527,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let svgFigureGroup = svgCanvas.append('g');
 
-    // let vis = d3.select("#vis").append("svg")
-    //   .attr("width", chart.width())
-    //   .attr("height", chart.height());
+    // draw parallel sets
+    svgFigureGroup.datum(currData).call(chart);
+    
 
-    // d3.csv(titanic, function(error, csv) {
-    //   svgCanvas.datum(csv).call(chart);
-    // });
+    // let svgDimensions = svgFigureGroup.selectAll('g[class=dimension]')[1];
+    // console.log('svgDimensions',svgDimensions);
 
-    
-    svgFigureGroup.datum(testData).call(chart);
-    
-    
-/* 
-    Class,Age,Sex,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived
-    Second Class,Child,Female,Survived */
 
   }
   
@@ -579,6 +568,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     const chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
     console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
+    
+    let selectedData = currentItems.filter((data) => {return data.selection === 'Selected'});
 
     let jaccardScores = [];
 
@@ -604,16 +595,22 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           col3: {
             label: scoreSelected,
             column: currCol.column,
+            column_label: currCol.label,
             category: currCategory.label,
             color: this.score2color(scoreSelected),
-            action: true
+            action: true,
+            allData: this.getCategoryPartioning(currentItems,currCol),
+            selected: this.getCategoryPartioning(selectedData,currCol)
           },
           col4: {
             label: scoreDeselected,
             column: currCol.column,
+            column_label: currCol.label,
             category: currCategory.label,
             color: this.score2color(scoreDeselected),
-            action: true
+            action: true,
+            allData: this.getCategoryPartioning(currentItems,currCol),
+            selected: this.getCategoryPartioning(selectedData,currCol)
           }
         };
 
@@ -623,6 +620,25 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
 
     return jaccardScores;
+  }
+
+  private getCategoryPartioning(data: Array<any>, column: any)
+  {
+    let categoryPartioning = [];
+    for(let i=0; i < column.categories.length; i++)
+    {
+      let currCategory = column.categories[i];
+      let num = data.filter(item => {return item[''+column.column] === currCategory.label}).length;
+      num = (num === undefined  || num === null) ? 0 : num;
+      let currCategoryPart = {
+        label: currCategory.label,
+        amount: num
+      };
+      categoryPartioning.push(currCategoryPart);
+
+    }
+
+    return categoryPartioning;
   }
 
   private score2color(score:number, domain = [0, 1])
