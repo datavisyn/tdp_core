@@ -86,14 +86,14 @@
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "@types/jquery": "2.0.33",
     "jquery": "3.1.1",
-    "touring": "github:caleydo/touring#master",
-    "cypress": "^3.1.0"
+    "touring": "github:caleydo/touring#master"
   },
   "main": "build/tdp_core.js",
   "devDependencies": {
     "@types/jasmine": "2.5.47",
     "awesome-typescript-loader": "3.1.2",
     "css-loader": "0.28.0",
+    "cypress": "^3.1.0",
     "extract-loader": "0.1.0",
     "extract-text-webpack-plugin": "2.1.0",
     "file-loader": "0.11.1",
