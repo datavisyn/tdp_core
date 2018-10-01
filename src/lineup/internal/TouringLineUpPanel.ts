@@ -530,9 +530,42 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // draw parallel sets
     svgFigureGroup.datum(currData).call(chart);
     
+    let svgRibbon = svgFigureGroup.selectAll('g[class=ribbon]');
+    console.log('svgRibon: ',svgRibbon);
 
-    // let svgDimensions = svgFigureGroup.selectAll('g[class=dimension]')[1];
+    //highlight current path
+    let svgPaths = svgRibbon.selectAll('path')
+                            .each(function(d) {
+                              d3.select(this).classed('selected',false);
+
+                              // console.log('path.parent.name: ',d.parent.name);
+                              // console.log('cell.category: ',currCategory);
+
+                              if(d.parent.name === cell.value.category){
+                                d3.select(this).classed('selected',true);
+                              }
+                              // console.log('path.this: ', d3.select(this));
+                              // console.log('path.d: ',d);
+                            });
+    console.log('svgPaths: ',svgPaths);
+
+    let svgDimensions = svgFigureGroup.selectAll('g[class=dimension]');
     // console.log('svgDimensions',svgDimensions);
+   
+    //highlight label of current path
+    svgDimensions.selectAll('g')
+                 .each(function(d) {
+                  // d3.select(this).classed('selected',false);
+                  d3.select(this).select('rect').classed('selected',false);
+                  console.log('dim.d: ',d);
+                  console.log('dim.this: ',d3.select(this));
+
+                  if(d.name === cell.value.category){
+                    d3.select(this).select('rect').classed('selected',true);
+                  }
+                  
+                });
+    
 
 
   }
