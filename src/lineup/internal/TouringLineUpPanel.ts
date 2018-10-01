@@ -167,20 +167,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                           .attr('class','panel-group')
                                           .attr('id',accordionId);
 
-      for(let [type, typeMeasures] of setMeasures) {
-        // console.log('setMeasures current type: '+type);
-        // console.log('setMeasures current #1 '+typeMeasures[0]);
-
-        for(let i=0; i<typeMeasures.length; i++)
-        {
+      setMeasures.forEach((typeMeasures, type) => {
+        console.log('forEach', type, typeMeasures);
+        typeMeasures.forEach((measure) => {
+          console.log('foreach measure', measure)
         
-          let collapseId = this.getIdWithTimestamp(typeMeasures[i].id);
+          let collapseId = this.getIdWithTimestamp(measure.id);
           //console.log('accordion item/collapse id: ',collapseId);
           
           let collapseDetails = {
             groupId: accordionId,
             id: collapseId,
-            label: typeMeasures[i].label,
+            label: measure.label,
             default: defaultExpanded
           };
 
@@ -193,9 +191,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           this.createAccordionItem(panelGroup,collapseDetails);
 
           //insert the calculated score (jaccard: table) into the before created accordion item
-          this.insertMeasure(typeMeasures[i], collapseId, currentData)
-        }
-      }
+          this.insertMeasure(measure, collapseId, currentData)
+        })
+      });
     }
   }
     
@@ -968,7 +966,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // TODO remove categories which are not displayed
     const dropdownB = d3.select(this.node).select('select.itemControls.compareB');
     const mode = this.getRadioButtonValue();
-    let descriptions: IColumnDesc[] = this.provider.getRankings()[0].children.map((col) => col.desc);
+    let descriptions: IColumnDesc[] = deepCopy(this.provider.getRankings()[0].children.map((col) => col.desc));
     if (mode === 'category') {
       // If Categories is selected:
       //    we generate an entry for every categorical attribute
@@ -1082,5 +1080,38 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     return d3.select(this.node).select('input[name="compareGroup"]:checked').property('value');
   }
+
+
 }
 
+
+
+// SOURCE: https://stackoverflow.com/a/51592360/2549748
+/**
+ * Deep copy function for TypeScript.
+ * @param T Generic type of target/copied value.
+ * @param target Target value to be copied.
+ * @see Source project, ts-deepcopy https://github.com/ykdr2017/ts-deepcopy
+ * @see Code pen https://codepen.io/erikvullings/pen/ejyBYg
+ */
+const deepCopy = <T>(target: T): T => {
+  if (target === null) {
+    return target;
+  }
+  if (target instanceof Date) {
+    return new Date(target.getTime()) as any;
+  }
+  if (target instanceof Array) {
+    const cp = [] as any[];
+    (target as any[]).forEach((v) => { cp.push(v); });
+    return cp.map((n: any) => deepCopy<any>(n)) as any;
+  }
+  if (typeof target === 'object' && target !== {}) {
+    const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
+    Object.keys(cp).forEach(k => {
+      cp[k] = deepCopy<any>(cp[k]);
+    });
+    return cp as T;
+  }
+  return target;
+};
