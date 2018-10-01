@@ -575,15 +575,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   
   private getCategoriesAfterFiltering()
   {
-    let allRemainingLabels = [];
+    let allRemainingLabels = ['Selected', 'Unselected'];
     let columns = this.provider.getRankings()[0].children;
     
     for(let i=0; i<columns.length; i++)
     {
-      if(!!(<ICategoricalColumn>columns[i]).categories){
+      if((<ICategoricalColumn>columns[i]).categories){
         let allColCategories = (<ICategoricalColumn>columns[i]).categories;
         let possibleCategries = [];
-        if(columns[i].desc.type === 'categorical' && !!(<any>columns[i]).currentFilter && (<any>columns[i]).currentFilter !== 'undefined') {
+        if(columns[i].desc.type === 'categorical' && (<any>columns[i]).currentFilter) {
           console.log('filter-labels: ',(<any>columns[i]).currentFilter.filter);
           possibleCategries = (<any>columns[i]).currentFilter.filter;
         }
