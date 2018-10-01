@@ -575,7 +575,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   
   private getCategoriesAfterFiltering()
   {
-    let allRemainingLabels = ['Selected', 'Unselected'];
+    let allRemainingLabels = ['Selected', 'Unselected', ...this.getStratificationDesc().categories.map((cat) => cat.label)];
     let columns = this.provider.getRankings()[0].children;
     
     for(let i=0; i<columns.length; i++)
@@ -681,18 +681,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     
     // Generate an attribute description that represents the current stratification
-    const stratDesc = {
-      categories: this.provider.getRankings()[0].getGroups().map(function(group) {
-        return {
-          name: group.name,
-          label: group.name
-          // TODO get colors of stratification
-          }
-      }), // if not stratifified, there is only one group ('Default')
-      label: 'Stratification Groups',
-      type: 'categorical',
-      column: 'strat_groups'
-    }
+    const stratDesc = this.getStratificationDesc();
     dropdownA.select('option.stratification').datum(stratDesc).text((desc) => desc.label); //bind description to option and set text
 
     
@@ -795,10 +784,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
 
-  private getSelectionDesc() : any {
+  private getSelectionDesc() {
     const selCategories = new Array<ICategory>();
     const numberOfRows = this.provider.getRankings()[0].getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
-    console.log('Selected ', this.provider.getSelection().length , 'Total ', numberOfRows);
+    console.log('Selected ', this.provider.getSelection().length, 'Total ', numberOfRows);
     if (this.provider.getSelection().length > 0) {
       selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
     } // else: none selected
@@ -806,7 +795,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     if (this.provider.getSelection().length < numberOfRows) {
       selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
     } // else: all selected
-    
+
     return {
       categories: selCategories,
       label: 'Selection',
@@ -814,7 +803,20 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       column: 'selection'
     };
   }
-  
+
+  private getStratificationDesc() {
+    return {
+      categories: this.provider.getRankings()[0].getGroups().map((group) => ({
+        name: group.name,
+        label: group.name
+        // TODO get colors of stratification
+      })), // if not stratifified, there is only one group ('Default')
+      label: 'Stratification Groups',
+      type: 'categorical',
+      column: 'strat_groups'
+    }
+  }
+
   private prepareInput = (desc) => {
     let filter : Array<string>;
     switch(desc.type) {
