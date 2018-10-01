@@ -1,10 +1,9 @@
-import {ICategoricalColumnDesc,ICategoricalColumn, SidePanel, spaceFillingRule, IGroupSearchItem, exportRanking, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isCategoricalColumn, ICategory, CategoricalColumn} from 'lineupjs';
+import {ICategoricalColumnDesc,ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, Type, ISImilarityMeasure, MeasureMap} from 'touring';
+import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
-import titanic from 'file-loader!./titanic.csv'
 import {IServerColumn} from '../../rest';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
@@ -54,10 +53,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
       // console.log('data', this.provider.data)
       // console.log('------------------------------------');
-
-      
     }));
-
 
     this.addEventListeners();
   }
@@ -96,7 +92,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, () =>this.updateDropdowns());
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
@@ -126,8 +122,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private updateTouringData() {
     console.log('EVENT update touring data');
 
-    let chosenOptions = this.getChosenOptions();
-    //console.log('chosenOptions',chosenOptions);
     let currentData = [];
 
     // get currently displayed data
@@ -157,21 +151,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     let defaultExpanded = true; //defines if the accordion item should be expanded at the beginning
 
-    if(setMeasures)
-    {
-      console.log('set measures: ', setMeasures);
-      
+    if(setMeasures) {
       //group panel (accordion) for all acordion items
       let accordionId = this.getIdWithTimestamp('accordion');
       let panelGroup = measuresDivElement.append('div')
-                                          .attr('class','panel-group')
-                                          .attr('id',accordionId);
+                                          .attr('class', 'panel-group')
+                                          .attr('id', accordionId);
 
       setMeasures.forEach((typeMeasures, type) => {
-        console.log('forEach', type, typeMeasures);
         typeMeasures.forEach((measure) => {
-          console.log('foreach measure', measure)
-        
           let collapseId = this.getIdWithTimestamp(measure.id);
           //console.log('accordion item/collapse id: ',collapseId);
           
@@ -205,6 +193,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return prefix +  <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
   }
 
+  
   private createAccordionItem(panelGroup: any, collapseDetails: any)
   {
     if(collapseDetails && collapseDetails instanceof Object && 
