@@ -6,6 +6,7 @@ import * as d3 from 'd3';
 import 'd3.parsets';
 import titanic from 'file-loader!./titanic.csv'
 import {IServerColumn} from '../../rest';
+import { IColumnOptions } from '../desc';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -51,8 +52,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('provider.getRanking: ',this.provider.getRankings());
       // console.log('getGroups', this.provider.getRankings()[0].getGroups())
       console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
-      // console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
-      // console.log('data', this.provider.data)
+      console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
+      // console.log('data', this.provider.data);
       // console.log('------------------------------------');
 
       
@@ -102,6 +103,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
     this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
+
+    // for filter changes
+    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
+    
   }
   
   private prepareInput = (desc) => {
@@ -250,7 +255,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
      
       let buttonValue = this.getRadioButtonValue();
       this.generateJaccardTable(collapseId, currentData);
-      //this.drawImage(collapseId);
     }else 
     {
       
@@ -290,6 +294,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             column: (<IServerColumn>allColumns[i].desc).column, //TODO wozu brauchen wir das?
             categories: (<ICategoricalColumn>allColumns[i]).categories
             };
+          
           allCategorical.push(currCol);
           referenceLabeles.push(allColumns[i].label);
         }
@@ -445,8 +450,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private showVisualRepresentation(containerId: string, cell: any)
   {
-    console.log('Cell Clicked');
-    console.log('Cell: ',cell);
+    console.log('Cell clicken: ',cell);
 
     let oldSvgContainer = d3.select('div[class="svg-container"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
@@ -490,28 +494,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     console.log('currentData',currData);
 
     // console.log('SVG Conatiner - width: ',width);
-    // let testData = [
-    //   { 'A Cat1': 'Cat1', Selection: 'Selected'},
-    //   { 'A Cat1': 'Cat1', Selection: 'Selected'},
-    //   { 'A Cat1': 'Cat1', Selection: 'Unselected'},
-    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-    //   { 'A Cat1': 'Cat2', Selection: 'Selected'},
-    //   { 'A Cat1': 'Cat2', Selection: 'Unselected'},
-    //   { 'A Cat1': 'Cat3', Selection: 'Unselected'},
-    //   { 'A Cat1': 'Cat3', Selection: 'Selected'},
-    //   { 'A Cat1': 'Cat3', Selection: 'Selected'},
-    // ];
-
-    // let testDataCompact = [
-    //   { 'A Cat1': 'Cat1', Selection: 'Selected', value: 7},
-    //   { 'A Cat1': 'Cat1', Selection: 'Unselected', value: 1},
-    //   { 'A Cat1': 'Cat2', Selection: 'Selected', value: 1},
-    //   { 'A Cat1': 'Cat2', Selection: 'Unselected', value: 3},
-    //   { 'A Cat1': 'Cat3', Selection: 'Selected', value: 2},
-    //   { 'A Cat1': 'Cat3', Selection: 'Unselected', value: 8},
-    // ];
-
     let chart = (<any>d3).parsets()
                         .tension(0.5) //[0 .. 1] -> 1 = straight line 
                         .dimensions([columnLabel, 'Selection'])
@@ -535,7 +517,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //svgFigureGroup.attr('transform','rotate(-90) translate(-'+width+',0)');
 
     let svgRibbon = svgFigureGroup.selectAll('g[class=ribbon]');
-    console.log('svgRibon: ',svgRibbon);
+    // console.log('svgRibon: ',svgRibbon);
 
     //highlight current path
     let svgPaths = svgRibbon.selectAll('path')
@@ -551,7 +533,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                               // console.log('path.this: ', d3.select(this));
                               // console.log('path.d: ',d);
                             });
-    console.log('svgPaths: ',svgPaths);
+    // console.log('svgPaths: ',svgPaths);
 
     let svgDimensions = svgFigureGroup.selectAll('g[class=dimension]');
     // console.log('svgDimensions',svgDimensions);
@@ -561,8 +543,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                  .each(function(d) {
                   // d3.select(this).classed('selected',false);
                   d3.select(this).select('rect').classed('selected',false);
-                  console.log('dim.d: ',d);
-                  console.log('dim.this: ',d3.select(this));
+                  // console.log('dim.d: ',d);
+                  // console.log('dim.this: ',d3.select(this));
 
                   if(d.name === cell.value.category){
                     d3.select(this).select('rect').classed('selected',true);
@@ -595,7 +577,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     const score = intersection.length / union.length;
     
-    console.log('score', score);
+    //console.log('score', score);
 
     return score || 0;
   }
@@ -606,6 +588,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
     console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
     
+    let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
+    console.log('remaining labels: ',showCategoriesAfterFilter);
+  
     let selectedData = currentItems.filter((data) => {return data.selection === 'Selected'});
 
     let jaccardScores = [];
@@ -617,42 +602,44 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let cnt=0; cnt < currCol.categories.length; cnt++)
       {
         let currCategory = currCol.categories[cnt];
-        const scoreSelected = this.calcJaccard(currentItems, 'selection', 'Selected', currCol.column, currCategory.label);
-        const scoreDeselected = this.calcJaccard(currentItems, 'selection', 'Unselected', currCol.column, currCategory.label);
+        if(showCategoriesAfterFilter.indexOf(currCategory.label) !== -1){
+          const scoreSelected = this.calcJaccard(currentItems, 'selection', 'Selected', currCol.column, currCategory.label);
+          const scoreDeselected = this.calcJaccard(currentItems, 'selection', 'Unselected', currCol.column, currCategory.label);
 
-        let resultObj = {
-          col1: {
-            label: currCol.label,
-            rowspan: (cnt === 0) ? currCol.categories.length : 0                
-          },
-          col2: {
-            label: currCategory.label,
-            color: currCategory.color
-          },
-          col3: {
-            label: scoreSelected,
-            column: currCol.column,
-            column_label: currCol.label,
-            category: currCategory.label,
-            color: this.score2color(scoreSelected),
-            action: true,
-            allData: this.getCategoryPartioning(currentItems,currCol),
-            selected: this.getCategoryPartioning(selectedData,currCol)
-          },
-          col4: {
-            label: scoreDeselected,
-            column: currCol.column,
-            column_label: currCol.label,
-            category: currCategory.label,
-            color: this.score2color(scoreDeselected),
-            action: true,
-            allData: this.getCategoryPartioning(currentItems,currCol),
-            selected: this.getCategoryPartioning(selectedData,currCol)
-          }
-        };
+          let resultObj = {
+            col1: {
+              label: currCol.label,
+              rowspan: (cnt === 0) ? currCol.categories.length : 0                
+            },
+            col2: {
+              label: currCategory.label,
+              color: currCategory.color
+            },
+            col3: {
+              label: scoreSelected,
+              column: currCol.column,
+              column_label: currCol.label,
+              category: currCategory.label,
+              color: this.score2color(scoreSelected),
+              action: true,
+              allData: this.getCategoryPartioning(currentItems,currCol),
+              selected: this.getCategoryPartioning(selectedData,currCol)
+            },
+            col4: {
+              label: scoreDeselected,
+              column: currCol.column,
+              column_label: currCol.label,
+              category: currCategory.label,
+              color: this.score2color(scoreDeselected),
+              action: true,
+              allData: this.getCategoryPartioning(currentItems,currCol),
+              selected: this.getCategoryPartioning(selectedData,currCol)
+            }
+          };
 
 
-        jaccardScores.push(resultObj);
+          jaccardScores.push(resultObj);
+        }
       }
     }
 
@@ -688,28 +675,35 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return hslColor.toString();
   }
   
-  
-
-  /* https://stackoverflow.com/questions/32999179/d3-table-with-rowspan
-  nested_data.forEach(function (d) {
-    var rowspan = d.values.length;
-    d.values.forEach(function (val, index) {
-        var tr = thead.append("tr");
-        if (index == 0) { //rowspan only for first element
-            tr.append("td")
-                .attr("rowspan", rowspan)
-                .text(val.Year);
+  private getCategoriesAfterFiltering()
+  {
+    let allRemainingLabels = [];
+    let columns = this.provider.getRankings()[0].children;
+    
+    for(let i=0; i<columns.length; i++)
+    {
+      if(!!(<ICategoricalColumn>columns[i]).categories){
+        let allColCategories = (<ICategoricalColumn>columns[i]).categories;
+        let possibleCategries = [];
+        if(columns[i].desc.type === 'categorical' && !!(<any>columns[i]).currentFilter && (<any>columns[i]).currentFilter !== 'undefined') {
+          console.log('filter-labels: ',(<any>columns[i]).currentFilter.filter);
+          possibleCategries = (<any>columns[i]).currentFilter.filter;
         }
-        tr.append("td")
-            .text(val.Month);
-        tr.append("td")
-            .text(val.Team);
-        tr.append("td")
-            .text(val.Sales);
 
-    });
-}); */
+        if(possibleCategries.length > 0) {
+          for(let i=0; i<allColCategories.length; i++) {
+            if(possibleCategries.indexOf(allColCategories[i].label) !== -1){
+              allRemainingLabels.push(allColCategories[i].label);
+            }
+          }
+        }else{
+          allRemainingLabels = allRemainingLabels.concat(allColCategories.map((a) => a.label));
+        }
+      }
+    }
 
+    return allRemainingLabels;
+  }
 
 
   // draw table
@@ -773,149 +767,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   .text(function(d) { return d.value; });
   }
 
-
-  private drawImage(containerId: string) {
-    let svgContainer = d3.select('#'+containerId).append('div')
-                                                .attr('class','svg-container');
-
-    /* let svgCanvas = svgContainer.append('svg')
-                                .attr('width','100%')
-                                .attr('height','100%')
-                                .attr('shape-rendering','optimizeQuality');
-
-     let lineFunction = d3.svg.line()
-                            .x(function(d) { return d['x']; })
-                            .y(function(d) { return d['y']; })
-                            .interpolate("linear");
-
-    let rectangle1 = svgCanvas.append("rect")
-                             .attr("x", 10)
-                             .attr("y", 10)
-                             .attr("rx", 5)
-                             .attr("ry", 5)
-                             .attr("width", 40)
-                             .attr("height", 40)
-                             .attr("fill", "dodgerblue")
-                             .attr("opacity", 0.5);
-
-    let text1 = svgCanvas.append("text")
-                        .attr("x", 30)
-                        .attr("y", 34)
-                        .attr("text-anchor","middle")
-                        .text("a");
-
-    let lineSet1 = [{'x': 45, 'y': 10}, {'x': 115, 'y': 10}];
-    let lineSet2 = [{ "x": 45,  "y": 50}, { "x": 115,  "y": 50}];
-
-    var line1 = svgCanvas.append("path")
-                            .attr("d", lineFunction(lineSet1))
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 4)
-                            .attr("fill", "none");
-    
-    var line1 = svgCanvas.append("path")
-                            .attr("d", lineFunction(lineSet2))
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 2)
-                            .attr("fill", "none");
-
-    let rectangle2 = svgCanvas.append("rect")
-                            .attr("x", 10)
-                            .attr("y", 60)
-                            .attr("rx", 5)
-                            .attr("ry", 5)
-                            .attr("width", 40)
-                            .attr("height", 50)
-                            .attr("fill", "blueviolet")
-                            .attr("opacity", 0.5);
-
-    let text2 = svgCanvas.append("text")
-                        .attr("x", 30)
-                        .attr("y", 89)
-                        .attr("text-anchor","middle")
-                        .text("b");
-
-    let lineSet3 = [{'x': 45, 'y': 60}, {'x': 115, 'y': 80}];
-    let lineSet4 = [{ "x": 45,  "y": 110}, { "x": 110,  "y": 115}];
-
-    var line3 = svgCanvas.append("path")
-                            .attr("d", lineFunction(lineSet3))
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 4)
-                            .attr("fill", "none");
-    
-    var line4 = svgCanvas.append("path")
-                            .attr("d", lineFunction(lineSet4))
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 2)
-                            .attr("fill", "none");
-
-    let rectangle3 = svgCanvas.append("rect")
-                            .attr("x", 10)
-                            .attr("y", 120)
-                            .attr("rx", 5)
-                            .attr("ry", 5)
-                            .attr("width", 40)
-                            .attr("height", 25)
-                            .attr("fill", "green")
-                            .attr("opacity", 0.5);
-
-    let text3 = svgCanvas.append("text")
-                        .attr("x", 30)
-                        .attr("y", 136)
-                        .attr("text-anchor","middle")
-                        .text("c");
-
-    let lineSet5 = [{'x': 45, 'y': 120}, {'x': 110, 'y': 115}];
-    let lineSet6 = [{ "x": 45,  "y": 145}, { "x": 115,  "y": 145}];
-
-    var line5 = svgCanvas.append("path")
-                            .attr("d", lineFunction(lineSet5))
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 4)
-                            .attr("fill", "none");
-    
-    var line6 = svgCanvas.append("path")
-                            .attr("d", lineFunction(lineSet6))
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 2)
-                            .attr("fill", "none");
-
-    let rectangle4 = svgCanvas.append("rect")
-                        .attr("x", 110)
-                        .attr("y", 10)
-                        .attr("rx", 5)
-                        .attr("ry", 5)
-                        .attr("width", 40)
-                        .attr("height", 40)
-                        .attr("fill", "dodgerblue")
-                        .attr("opacity", 0.5);
-
-    let text4 = svgCanvas.append("text")
-                      .attr("x", 130)
-                      .attr("y", 34)
-                      .attr("text-anchor","middle")
-                      .text("a");
-
-    let rectangle5 = svgCanvas.append("rect")
-                          .attr("x", 110)
-                          .attr("y", 80)
-                          .attr("rx", 5)
-                          .attr("ry", 5)
-                          .attr("width", 40)
-                          .attr("height", 65)
-                          .attr("fill", "grey")
-                          .attr("opacity", 0.5);
-
-    let text5 = svgCanvas.append("text")
-                      .attr("x", 130)
-                      .attr("y", 116)
-                      .attr("text-anchor","middle")
-                      .text("others"); */
-
-  }
-
-  
+ 
   private getSelectionDesc() : any {
     const selCategories = new Array<ICategory>();
     const numberOfRows = this.provider.getRankings()[0].getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
