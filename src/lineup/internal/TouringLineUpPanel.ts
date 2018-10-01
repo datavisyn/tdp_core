@@ -84,29 +84,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //  might cause changes the displayed table / scores 
     this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
 
-    // for filter changes
+    // for filter changes and stratification changes
+    //  After the number of items has changed, the score change aswell
+    // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
-    
   }
 
 
   private updateTouringData() {
     console.log('EVENT update touring data');
 
-    let currentData = [];
-
-    // get currently displayed data
-    this.provider.getRankings()[0].getGroups().forEach((stratGroup) => {
-      stratGroup.order.forEach((rowId) => {
-        
-        // and include selection data
-        const row = this.provider.data[rowId];
-        row.selection = this.provider.getSelection().includes(rowId) ? 'Selected' : 'Unselected';
-        currentData.push(row);
-        });
-    })
-
+    let currentData = this.getDisplayedData();
     console.log('current data: ', currentData);
+
     const inputA = this.prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
     const inputB = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
     
@@ -118,9 +108,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let measuresDivElement = d3.select('div[class="measures"]');
     measuresDivElement.selectAll("*").remove(); //deletes all generated content im 'measuresDivElement'
     
-    let defaultExpanded = true; //defines if the accordion item should be expanded at the beginning
+    let defaultExpanded = true; //defines if the first accordion item should be expanded at the beginning
 
-    if(setMeasures) {
+    if(setMeasures && setMeasures.size > 0) {
       //group panel (accordion) for all acordion items
       let accordionId = this.getIdWithTimestamp('accordion');
       let panelGroup = measuresDivElement.append('div')
@@ -139,18 +129,20 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             default: defaultExpanded
           };
 
-          if(defaultExpanded) //after the first accordion was created -> the following ones should be collapsed
-          {
+          //after the first accordion was created -> the following ones should be collapsed
+          if (defaultExpanded) {
             defaultExpanded = !defaultExpanded;
           }
 
           //create accordion item and add it to the panel group
-          this.createAccordionItem(panelGroup,collapseDetails);
+          this.createAccordionItem(panelGroup, collapseDetails);
 
           //insert the calculated score (jaccard: table) into the before created accordion item
           this.insertMeasure(measure, collapseId, currentData)
         })
       });
+    }  else {
+      measuresDivElement.append('p').text('Sorry, there are no appropriate measures for the selected inputs.');
     }
   }
     
@@ -789,6 +781,25 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         this.updateDropdowns(); //Update because the selection from provenenace may not be up to date 
       }
     }
+  }
+
+  private getDisplayedData() {
+    const currentData = new Array();
+
+    // get currently displayed data
+    this.provider.getRankings()[0].getGroups().forEach((stratGroup) => {
+      // order is always defined for groups
+      stratGroup.order.forEach((rowId) => { 
+        // include wether the row is selected
+        const row = this.provider.data[rowId];
+        row.selection = this.provider.getSelection().includes(rowId) ? 'Selected' : 'Unselected';
+
+        // TODO score columns are missing from this.provider.data
+        currentData.push(row);
+        });
+    })
+
+    return currentData;
   }
 
 
