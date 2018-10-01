@@ -4,28 +4,12 @@ import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
-import {IServerColumn} from '../../rest';
-import { IColumnOptions } from '../desc';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private static EVENTTYPE = '.touring';
   private touringElem : HTMLElement;
   private columnOverview : HTMLElement; searchbox : HTMLElement; itemCounter : HTMLElement; // default sidepanel elements
-  private extraStartificationOptions = [
-    {
-      label: 'All displayed Attributes',
-      before: 1
-    },
-    {
-      label: 'All numerical Attributes',
-      before: 2
-    },
-    {
-      label: 'Rank',
-      before: 3
-    }
-  ];
 
   private feelsLikeTheVeryFirstTime = true;
   
@@ -48,12 +32,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       console.log('provider.getSelection: ',this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
       console.log('provider.selectedRows: ',this.provider.selectedRows());
       console.log('provider.getColumns: ',this.provider.getColumns());
-      // console.log('provider.getRanking: ',this.provider.getRankings());
-      // console.log('getGroups', this.provider.getRankings()[0].getGroups())
+      console.log('provider.getRanking: ',this.provider.getRankings());
+      console.log('getGroups', this.provider.getRankings()[0].getGroups())
       console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
       console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
-      // console.log('data', this.provider.data);
-      // console.log('------------------------------------');
+      console.log('data', this.provider.data);
+      console.log('------------------------------------');
     }));
 
     this.addEventListeners();
@@ -104,26 +88,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
     
   }
-  
-  private prepareInput = (desc) => {
-    let filter : Array<string>;
-    switch(desc.type) {
-      case 'collection':
-        filter = ['categorical', 'number'];
-        break;
-      case 'cat_collection':
-        filter = ['categorical'];
-        break;
-      case 'num_collection':
-        filter = ['number'];
-        break;
-      default:
-        return [desc];
-    }
 
-    return d3.select(this.node).select('select.itemControls.compareB').selectAll('option').data().filter((desc) => filter.includes(desc.type));;
-  }
-  
+
   private updateTouringData() {
     console.log('EVENT update touring data');
 
@@ -147,8 +113,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     console.log('Inputs to get set measures.', 'A', inputA, 'B', inputB);
     const setMeasures : MeasureMap = MethodManager.getSetMethods(inputA, inputB);
     console.log('set measures for current data', setMeasures);
-
-    //this.updateTouringTables(setMeasures, descriptions, currentData);
 
     // div element in html where the score and detail view should be added
     let measuresDivElement = d3.select('div[class="measures"]');
@@ -249,54 +213,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
      
     }
   }
-    
-  // return object with the current selected states of all the dropdowns and radio button
-  private getChosenOptions()
-  {
-    let chosenOptions = {
-      compareItemA: d3.select(this.node).select('select.itemControls.compareA').property("value"),
-      compareItemB: d3.select(this.node).select('select.itemControls.compareB').property("value"),
-      radioButton: this.getRadioButtonValue(),
-      compareAttributeA: d3.select(this.node).select('select.attributeControls.compareA').property("value"),
-      compareAttributeB: d3.select(this.node).select('select.attributeControls.compareB').property("value")
-    };
 
-    return chosenOptions;
-  }
-
-  // get all column of type 'categorical' with their categories
-  private getAllCategoricalColumns()
-  {
-    let allCategorical = [];
-    let referenceLabeles = [];
-    let allColumns = this.provider.getRankings()[0].children;
-    for(let i=0; i<allColumns.length; i++)
-    {
-      if(allColumns[i] && allColumns[i].getRenderer() === "categorical" && (<ICategoricalColumn>allColumns[i]).categories)
-      {
-        if(referenceLabeles.indexOf(allColumns[i].label) === -1)
-        { 
-          let currCol = {
-            label: allColumns[i].label,
-            column: (<IServerColumn>allColumns[i].desc).column, //TODO wozu brauchen wir das?
-            categories: (<ICategoricalColumn>allColumns[i]).categories
-            };
-          
-          allCategorical.push(currCol);
-          referenceLabeles.push(allColumns[i].label);
-        }
-      }
-    }
-    // console.log('allColumns: ', allColumns);
-    console.log('allCategorical: ', allCategorical);
-    return allCategorical;
-
-  }
-
-  private generateJaccardTable(containerId: string, currentData: Array<any>)
-  {
-    let allCategoricalCol = this.getAllCategoricalColumns();
-    let chosenOptions = this.getChosenOptions();
+  private generateJaccardTable(containerId: string, currentData: Array<any>) {
     const that = this;
 
     let columnHeaders = [
@@ -754,27 +672,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   .text(function(d) { return d.value; });
   }
 
- 
-  private getSelectionDesc() : any {
-    const selCategories = new Array<ICategory>();
-    const numberOfRows = this.provider.getRankings()[0].getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
-    console.log('Selected ', this.provider.getSelection().length , 'Total ', numberOfRows);
-    if (this.provider.getSelection().length > 0) {
-      selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
-    } // else: none selected
-
-    if (this.provider.getSelection().length < numberOfRows) {
-      selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
-    } // else: all selected
-    
-    return {
-      categories: selCategories,
-      label: 'Selection',
-      type: 'categorical',
-      column: 'selection'
-    };
-  }
-
 
   private updateDropdowns() {
     console.log('EVENT changed dropdown value. A:', d3.selectAll('select.itemControls').property("value"), '\t|B: ', d3.selectAll('select.itemControls.compareB').property("value"));
@@ -894,6 +791,47 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
+
+  private getSelectionDesc() : any {
+    const selCategories = new Array<ICategory>();
+    const numberOfRows = this.provider.getRankings()[0].getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
+    console.log('Selected ', this.provider.getSelection().length , 'Total ', numberOfRows);
+    if (this.provider.getSelection().length > 0) {
+      selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
+    } // else: none selected
+
+    if (this.provider.getSelection().length < numberOfRows) {
+      selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
+    } // else: all selected
+    
+    return {
+      categories: selCategories,
+      label: 'Selection',
+      type: 'categorical',
+      column: 'selection'
+    };
+  }
+  
+  private prepareInput = (desc) => {
+    let filter : Array<string>;
+    switch(desc.type) {
+      case 'collection':
+        filter = ['categorical', 'number'];
+        break;
+      case 'cat_collection':
+        filter = ['categorical'];
+        break;
+      case 'num_collection':
+        filter = ['number'];
+        break;
+      default:
+        return [desc];
+    }
+
+    return d3.select(this.node).select('select.itemControls.compareB').selectAll('option').data().filter((desc) => filter.includes(desc.type));;
+  }
+  
+
   get collapse() {
     return this.node.classList.contains('collapsed');
   }
@@ -906,27 +844,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-
-  private getDropdownELementbyClassName(classNmame: string)
-  {
-    //gets all elements with the 'itemControls' and 'compare B' classes
-    let itemControls = this.node.getElementsByClassName(classNmame);
-    //console.log('itemControls',itemControls);
-    //check if only one elment exist and that it is a selection element
-    if (itemControls && itemControls.length === 1 && (itemControls[0] instanceof HTMLSelectElement))
-    {
-      return itemControls[0];
-    }
-
-    return null;
-  }
-  
-  private getRadioButtonValue()
-  {
+  private getRadioButtonValue() {
     return d3.select(this.node).select('input[name="compareGroup"]:checked').property('value');
   }
-
-
 }
 
 
