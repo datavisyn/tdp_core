@@ -93,7 +93,6 @@
     "@types/jasmine": "2.5.47",
     "awesome-typescript-loader": "3.1.2",
     "css-loader": "0.28.0",
-    "cypress": "^3.1.0",
     "extract-loader": "0.1.0",
     "extract-text-webpack-plugin": "2.1.0",
     "file-loader": "0.11.1",
