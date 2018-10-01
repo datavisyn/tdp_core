@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc,ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn} from 'lineupjs';
+import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
@@ -8,34 +8,36 @@ import 'd3.parsets';
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private static EVENTTYPE = '.touring';
-  private touringElem : HTMLElement;
-  private columnOverview : HTMLElement; searchbox : HTMLElement; itemCounter : HTMLElement; // default sidepanel elements
+  private touringElem: HTMLElement;
+  private columnOverview: HTMLElement; searchbox: HTMLElement; itemCounter: HTMLElement; // default sidepanel elements
+  private itemTab: Node; attributeTab: Node;
 
-  private feelsLikeTheVeryFirstTime = true;
-  
 
   protected init() {
     super.init();
 
     this.node.insertAdjacentHTML('beforeend', panelHTML);
     this.touringElem = <HTMLElement>this.node.querySelector('.touring');
-    
-    this.columnOverview = <HTMLElement>this.node.querySelector('main')!;
+
+    this.columnOverview = <HTMLElement>this.node.querySelector('main')!; // ! = bang operator --> can not be null
     this.searchbox = <HTMLElement>this.node.querySelector('.lu-adder')!;
     this.itemCounter = <HTMLElement>this.node.querySelector('.lu-stats')!;
+
+    this.itemTab = d3.select(this.node).select('#itemTouring').node();
+    this.attributeTab = d3.select(this.node).select('#attributeTouring').node();
 
     const buttons = this.node.querySelector('section');
     buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
       this.toggleTouring();
-      
-      console.log('provider',this.provider);
-      console.log('provider.getSelection: ',this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
-      console.log('provider.selectedRows: ',this.provider.selectedRows());
-      console.log('provider.getColumns: ',this.provider.getColumns());
-      console.log('provider.getRanking: ',this.provider.getRankings());
+
+      console.log('provider', this.provider);
+      console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
+      console.log('provider.selectedRows: ', this.provider.selectedRows());
+      console.log('provider.getColumns: ', this.provider.getColumns());
+      console.log('provider.getRanking: ', this.provider.getRankings());
       console.log('getGroups', this.provider.getRankings()[0].getGroups())
-      console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
-      console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
+      console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
+      console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
       console.log('data', this.provider.data);
       console.log('------------------------------------');
     }));
@@ -46,24 +48,20 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private addEventListeners() {
     // HTML ELEMENT LISTENERS
     // -----------------------------------------------
-
     // changes of radio button selection
     //    cause changes in the second dropdown (of)
     //    and changes in the displayed table / scores
-    d3.select(this.node).selectAll('input[name="compareGroup"]').on('change', () => {  
+    d3.select(this.node).selectAll('input[name="compareGroup"]').on('change', () => {
       // using fat arrow: global scope replaces new object's scope and 'this' can be used to call class functions
       const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
-      console.log('radio button value: ',radio.property('value'), ' | object: ', radio);
-
-      this.updateDropdowns()
+      console.log('radio button value: ', radio.property('value'), ' | object: ', radio);
+      this.updateItemTab()
     });
 
     // changes made in dropdowns
-    //    cause changes  the displayed table / scores 
-    d3.select(this.node).selectAll('select.itemControls').on('input',() => {
-      console.log('changed dropdown value. A:', d3.selectAll('select.itemControls.compareA').property("value"), '\t|B: ', d3.selectAll('select.itemControls.compareB').property("value"));
-      this.updateTouringData();
-    });
+    //    cause changes the displayed table / scores 
+    d3.select(this.node).selectAll('select').on('input', () => this.updateTouringData());
+
 
 
 
@@ -72,56 +70,66 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns()); //fat arrow to preserve scope in called function (this)
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
 
     // for filter changes and stratification changes
     //  After the number of items has changed, the score change aswell
     // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
-    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED+TouringLineUpPanel.EVENTTYPE, () => this.updateDropdowns());
+    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
   }
 
-
   private updateTouringData() {
-    console.log('EVENT update touring data');
+    if (d3.select(this.itemTab).classed('active')) {
+      this.updateItemTab();
+    } else if (d3.select(this.attributeTab).classed('active')) {
+      this.updateAttributeTab();
+    }
+  }
 
-    let currentData = this.getDisplayedData();
+  private updateItemTab() {
+    this.updateItemControls();
+    this.updateItemScores();
+  }
+
+  private updateItemScores() {
+    const currentData = this.getDisplayedData();
     console.log('current data: ', currentData);
 
-    const inputA = this.prepareInput(d3.select(this.node).select('select.itemControls.compareA').select('option:checked').datum());
-    const inputB = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
-    
+    const inputA = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum());
+    const inputB = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
+
     console.log('Inputs to get set measures.', 'A', inputA, 'B', inputB);
-    const setMeasures : MeasureMap = MethodManager.getSetMethods(inputA, inputB);
+    const setMeasures: MeasureMap = MethodManager.getSetMethods(inputA, inputB);
     console.log('set measures for current data', setMeasures);
 
     // div element in html where the score and detail view should be added
-    let measuresDivElement = d3.select('div[class="measures"]');
+    let measuresDivElement = d3.select(this.itemTab).select('div[class="measures"]');
     measuresDivElement.selectAll("*").remove(); //deletes all generated content im 'measuresDivElement'
-    
+
     let defaultExpanded = true; //defines if the first accordion item should be expanded at the beginning
 
-    if(setMeasures && setMeasures.size > 0) {
+    if (setMeasures && setMeasures.size > 0) {
       //group panel (accordion) for all acordion items
       let accordionId = this.getIdWithTimestamp('accordion');
       let panelGroup = measuresDivElement.append('div')
-                                          .attr('class', 'panel-group')
-                                          .attr('id', accordionId);
+        .attr('class', 'panel-group')
+        .attr('id', accordionId);
 
       setMeasures.forEach((typeMeasures, type) => {
         typeMeasures.forEach((measure) => {
           let collapseId = this.getIdWithTimestamp(measure.id);
           //console.log('accordion item/collapse id: ',collapseId);
-          
+
           let collapseDetails = {
             groupId: accordionId,
             id: collapseId,
@@ -141,68 +149,61 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           this.insertMeasure(measure, collapseId, currentData)
         })
       });
-    }  else {
+    } else {
       measuresDivElement.append('p').text('Sorry, there are no appropriate measures for the selected inputs.');
     }
   }
-    
 
-  //generates id for the collapseable panel in the accordion with the measure type and the current time's minutes/seconds and millisec
-  private getIdWithTimestamp(prefix: string)
-  {
-    let currdate = new Date();
-    return prefix +  <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
+
+  private updateAttributeTab() {
+    // TODO
+    // this.updateAttributeControls();
+    // this.updateAttributeScores();
   }
 
-  
-  private createAccordionItem(panelGroup: any, collapseDetails: any)
-  {
-    if(collapseDetails && collapseDetails instanceof Object && 
+
+  //generates id for the collapseable panel in the accordion with the measure type and the current time's minutes/seconds and millisec
+  private getIdWithTimestamp(prefix: string) {
+    let currdate = new Date();
+    return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
+  }
+
+
+  private createAccordionItem(panelGroup: any, collapseDetails: any) {
+    if (collapseDetails && collapseDetails instanceof Object &&
       collapseDetails.groupId && typeof collapseDetails.groupId === 'string' &&
       collapseDetails.id && typeof collapseDetails.id === 'string' &&
-      collapseDetails.label && typeof collapseDetails.label === 'string')
-    {
+      collapseDetails.label && typeof collapseDetails.label === 'string') {
       let panel = panelGroup.append('div')
-                            .attr('class','panel');
+        .attr('class', 'panel');
 
       let panelHeading = panel.append('div')
-                              .attr('class','panel-heading')
-                              .attr('role','tab')
-                                  .append('h4')
-                                  .attr('class','panel-title')
-                                  //multiple expanded accordions
-                                  .html(`<a data-toggle="collapse" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
-                                  //single expanded accordion
-                                  //.html(`<a data-toggle="collapse" data-parent="#${collapseDetails.groupId}" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
- 
+        .attr('class', 'panel-heading')
+        .attr('role', 'tab')
+        .append('h4')
+        .attr('class', 'panel-title') //multiple expanded accordions
+        .html(`<a data-toggle="collapse" href="#${collapseDetails.id}">${collapseDetails.label}</a>`) //single expanded accordion
+      //.html(`<a data-toggle="collapse" data-parent="#${collapseDetails.groupId}" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
+
       let panelCollapse = panel.append('div')
-                              .attr('class','panel-collapse collapse')
-                              .attr('id',collapseDetails.id);
-      
-      if(collapseDetails.default)
-      {
-        panelCollapse.classed('in',true); //accordion item is expanded
+        .attr('class', 'panel-collapse collapse')
+        .attr('id', collapseDetails.id);
+
+      if (collapseDetails.default) {
+        panelCollapse.classed('in', true); //accordion item is expanded
       }
-      
+
       let panelBody = panelCollapse.append('div')
-                                    .attr('class','panel-body');
-                                  
+        .attr('class', 'panel-body');
     }
   }
 
 
   private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
-    
-    if(measure && measure.id === 'jaccard')
-    {
-     
-      let buttonValue = this.getRadioButtonValue();
+    if (measure && measure.id === 'jaccard') {
       this.generateJaccardTable(collapseId, currentData);
-    }else 
-    {
-      
+    } else {
       this.drawTable(collapseId);
-     
     }
   }
 
@@ -349,7 +350,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     console.log('Cell clicken: ',cell);
 
-    let oldSvgContainer = d3.select('div[class="svg-container"]');
+    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
 
     let svgContainer = d3.select('#'+containerId).append('div')
@@ -482,8 +483,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // calculated jaccard score
   private calculateJaccardScores(currentItems: Array<any>)
   {
-    const chosenColumns = this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum());
-    console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.node).select('select.itemControls.compareB').select('option:checked').datum()));
+    const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
+    console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum()));
     
     let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
     console.log('remaining labels: ',showCategoriesAfterFilter);
@@ -665,10 +666,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
 
-  private updateDropdowns() {
-    console.log('EVENT changed dropdown value. A:', d3.selectAll('select.itemControls').property("value"), '\t|B: ', d3.selectAll('select.itemControls.compareB').property("value"));
-  
-    const dropdownA = d3.select(this.node).select('select.itemControls.compareA');
+  private updateItemControls() {
+    const dropdownA = d3.select(this.itemTab).select('select.itemControls.compareA');
     // dropdownA ('With')
     // We append the current data to:
     //  the entry for the selection       (defined in the html)
@@ -698,7 +697,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     
     // TODO remove categories which are not displayed
-    const dropdownB = d3.select(this.node).select('select.itemControls.compareB');
+    const dropdownB = d3.select(this.itemTab).select('select.itemControls.compareB');
     const mode = this.getRadioButtonValue();
     let descriptions: IColumnDesc[] = deepCopy(this.provider.getRankings()[0].children.map((col) => col.desc));
     if (mode === 'category') {
@@ -752,7 +751,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //changing the radio button or the removing columns could create a different selection in the dropdowns
     //therefore the touring data will be updated
-    this.updateTouringData();
   }
   
   
@@ -774,12 +772,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       console.log('start touring')
       //if touring is displayed, ensure the panel is visible
       this.collapse = false;
-
-      if (this.feelsLikeTheVeryFirstTime)
-      {
-        this.feelsLikeTheVeryFirstTime = false;
-        this.updateDropdowns(); //Update because the selection from provenenace may not be up to date 
-      }
     }
   }
 
@@ -839,7 +831,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         return [desc];
     }
 
-    return d3.select(this.node).select('select.itemControls.compareB').selectAll('option').data().filter((desc) => filter.includes(desc.type));;
+    return d3.select(this.itemTab).select('select.itemControls.compareB').selectAll('option').data().filter((desc) => filter.includes(desc.type));;
   }
   
 
@@ -856,7 +848,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private getRadioButtonValue() {
-    return d3.select(this.node).select('input[name="compareGroup"]:checked').property('value');
+    return d3.select(this.itemTab).select('input[name="compareGroup"]:checked').property('value');
   }
 }
 
