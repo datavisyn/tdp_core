@@ -517,19 +517,23 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                         .dimensions([columnLabel, 'Selection'])
                         .value( function (d) { return d.value; })
                         .width(width)
-                        .height(175);
+                        .height(175); //175
 
     let svgCanvas = svgContainer.append('svg')
                                 .attr('width',chart.width())
                                 .attr('height',chart.height());
+                                // .attr('height',chart.height());
                                 // .attr('width','100%')
                                 // .attr('height','100%');
 
-    let svgFigureGroup = svgCanvas.append('g');
+    let svgFigureGroup = svgCanvas.append('g').attr('class','parSets');
 
     // draw parallel sets
     svgFigureGroup.datum(currData).call(chart);
     
+    //rotation um 90 von den SVG parallel sets
+    //svgFigureGroup.attr('transform','rotate(-90) translate(-'+width+',0)');
+
     let svgRibbon = svgFigureGroup.selectAll('g[class=ribbon]');
     console.log('svgRibon: ',svgRibbon);
 
