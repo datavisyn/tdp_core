@@ -53,7 +53,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // console.log('getGroups', this.provider.getRankings()[0].getGroups())
       console.log('provider.getRankings()[0].children: ',this.provider.getRankings()[0].children);
       console.log('provider.getFilter: ',this.provider.getFilter()); //TODO use filter
-      // console.log('data', this.provider.data);
+      //console.log('data', this.provider.data);
       // console.log('------------------------------------');
 
       
@@ -448,7 +448,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private showVisualRepresentation(containerId: string, cell: any)
   {
-    console.log('Cell clicken: ',cell);
+    //console.log('Cell clicken: ',cell);
 
     let oldSvgContainer = d3.select('div[class="svg-container"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
@@ -489,7 +489,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     }
 
-    console.log('currentData',currData);
+    //console.log('currentData',currData);
 
     // console.log('SVG Conatiner - width: ',width);
     let chart = (<any>d3).parsets()
@@ -651,7 +651,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     {
       let currCategory = column.categories[i];
       let num = data.filter(item => {return item[''+column.column] === currCategory.label}).length;
-      num = (num === undefined  || num === null) ? 0 : num;
+      num = !num ? 0 : num;
       let currCategoryPart = {
         label: currCategory.label,
         amount: num
@@ -683,7 +683,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       if(!!(<ICategoricalColumn>columns[i]).categories){
         let allColCategories = (<ICategoricalColumn>columns[i]).categories;
         let possibleCategries = [];
-        if(columns[i].desc.type === 'categorical' && !!(<any>columns[i]).currentFilter && (<any>columns[i]).currentFilter !== 'undefined') {
+        if(columns[i].desc.type === 'categorical' && !!(<any>columns[i]).currentFilter) {
           console.log('filter-labels: ',(<any>columns[i]).currentFilter.filter);
           possibleCategries = (<any>columns[i]).currentFilter.filter;
         }
