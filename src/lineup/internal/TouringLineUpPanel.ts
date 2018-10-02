@@ -4,6 +4,7 @@ import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
+import { isBuffer } from 'util';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -162,7 +163,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
 
-  //generates id for the collapseable panel in the accordion with the measure type and the current time's minutes/seconds and millisec
+  //generates id for the collapseable panel in the accordion with the prefix and the current time's minutes/seconds and millisec
   private getIdWithTimestamp(prefix: string) {
     let currdate = new Date();
     return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
@@ -202,10 +203,109 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
     if (measure && measure.id === 'jaccard') {
       this.generateJaccardTable(collapseId, currentData);
+      this.generateTableLayout();
     } else {
       this.drawTable(collapseId);
     }
   }
+
+  private generateTableLayout()
+  {
+    let generatedTable = {
+      tableHead: [],
+      tableBody: []
+    };
+    
+    // TABLE HEADER
+    let tableHeaders = this.getTableHeader();
+    let tableNumbOfCol = tableHeaders.length;
+    let tableHead = [];
+    for(let i = 0; i < tableNumbOfCol; i++) {
+      let headCell = {
+        columnName: 'col'+i,
+        label: tableHeaders[i]
+      };
+      tableHead.push(headCell);
+    }
+    generatedTable.tableHead = deepCopy(tableHead);
+
+    // TABLE BODY
+    // check filter
+    let tableBody = [];
+
+    const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
+    console.log('generateTableLayout - chosenColumns: ', chosenColumns);
+    console.log('generateTableLayout - StratificationDesc: ', this.getStratificationDesc().categories.map((cat) => cat.label));
+
+    
+
+    let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
+    console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
+
+    console.log('generateTableLayout: ',generatedTable);
+    return generatedTable;
+  }
+
+  private getTableHeader()
+  {
+    // let tableHeaders = ['','','Selected','Unselected'];
+    let tableHeaders = [];
+    // TODO: create the needed table headers
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    console.log('DD1',optionDDA);
+
+    if(optionDDA === 'Selection'){
+
+      tableHeaders = [
+        { columnName: 'col1', label: '', colour: '#ffffff'},
+        { columnName: 'col2', label: '', colour: '#ffffff'},
+        { columnName: 'col3', label: 'Selected', colour: '#ffffff'},
+        { columnName: 'col4', label: 'Unselected', colour: '#ffffff'},
+      ];
+
+    }else if (optionDDA === 'Stratification Groups')
+    {
+
+    }
+
+
+    return tableHeaders;
+  }
+
+  /* 
+  
+    let resultObj = {
+    col1: {
+      label: currCol.label,
+      rowspan: (cnt === 0) ? currCol.categories.length : 0                
+    },
+    col2: {
+      label: currCategory.label,
+      color: currCategory.color
+    },
+    col3: {
+      label: scoreSelected,
+      column: currCol.column,
+      column_label: currCol.label,
+      category: currCategory.label,
+      color: this.score2color(scoreSelected),
+      action: true,
+      allData: this.getCategoryPartioning(currentItems,currCol),
+      selected: this.getCategoryPartioning(selectedData,currCol)
+    },
+    col4: {
+      label: scoreDeselected,
+      column: currCol.column,
+      column_label: currCol.label,
+      category: currCategory.label,
+      color: this.score2color(scoreDeselected),
+      action: true,
+      allData: this.getCategoryPartioning(currentItems,currCol),
+      selected: this.getCategoryPartioning(selectedData,currCol)
+    }
+  };
+
+  */
 
   private generateJaccardTable(containerId: string, currentData: Array<any>) {
     const that = this;
@@ -316,6 +416,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                         .style("font-weight", 'bolder');                                      ;
                         }
                       })					
+                      // FIXME: change colour of text depending on backgraunf (balck on black -> bad)
                       .on("mouseout", function(d) {
                         if(d.value.action) {
                           //d3.select(this).classed('bg-primary',false);
@@ -348,7 +449,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private showVisualRepresentation(containerId: string, cell: any)
   {
-    //console.log('Cell clicken: ',cell);
+    console.log('Cell clicken: ',cell);
 
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
@@ -389,7 +490,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     }
 
-    //console.log('currentData',currData);
+    console.log('currentData',currData);
+
+    const that = this;
 
     // console.log('SVG Conatiner - width: ',width);
     let chart = (<any>d3).parsets()
@@ -418,6 +521,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('svgRibon: ',svgRibbon);
 
     //highlight current path
+    //FIXME: the colour of the categories is always the same order blue,orage,green,... 
+    //       -> if 2nd category is filterd out the next category should have the colour of the next displayed one
     let svgPaths = svgRibbon.selectAll('path')
                             .each(function(d) {
                               d3.select(this).classed('selected',false);
@@ -425,11 +530,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                               // console.log('path.parent.name: ',d.parent.name);
                               // console.log('cell.category: ',currCategory);
 
-                              if(d.parent.name === cell.value.category){
+                              // d3.select(this).attr('fill',that.getColorOfCategory(d.parent.dimension,d.parent.name));
+                              // console.log('fill color: ',that.getColorOfCategory(d.parent.dimension,d.parent.name));
+                              if(d.parent.name === cell.value.category && d.name === cell.value.tableColumn){
                                 d3.select(this).classed('selected',true);
                               }
-                              // console.log('path.this: ', d3.select(this));
-                              // console.log('path.d: ',d);
+                              console.log('path.this: ', d3.select(this));
+                              console.log('path.d: ',d);
                             });
     // console.log('svgPaths: ',svgPaths);
 
@@ -449,10 +556,42 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   }
                   
                 });
+
     
 
 
   }
+
+  // private getColorOfCategory(column: string, category: string)
+  // {
+  //   // console.log('column: ',column,' ¡ category',category);
+  //   let categoryColor = '#ffffff';
+  //   let allColumns = this.provider.getRankings()[0].children;
+  //   // console.log('allColumns: ',allColumns);
+  //   let allCategories = {};
+
+  //   for(let i =0; i<allColumns.length; i++){
+
+  //     if(allColumns[i].desc.label == column)
+  //     {
+  //       // console.log('the right column: ',column);
+  //       let currColCat = (allColumns[i] as ICategoricalColumn).categories;
+  //       // console.log('currColCat: ',currColCat);
+  //       if(<any>currColCat !== 'undefined'){
+  //         for(let cnt=0; cnt < currColCat.length; cnt++)
+  //         {
+  //           if(currColCat[cnt].label === category)
+  //           {
+  //             // console.log('the right category: ',category);
+  //             return currColCat[cnt].color;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+    
+  //   return categoryColor;
+  // }
   
   private calcJaccard(items, columnA: string, categoryA: string, columnB: string, categoryB: string): number {
 
@@ -521,7 +660,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               color: this.score2color(scoreSelected),
               action: true,
               allData: this.getCategoryPartioning(currentItems,currCol),
-              selected: this.getCategoryPartioning(selectedData,currCol)
+              selected: this.getCategoryPartioning(selectedData,currCol),
+              tableColumn: 'Selected'
             },
             col4: {
               label: scoreDeselected,
@@ -531,7 +671,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               color: this.score2color(scoreDeselected),
               action: true,
               allData: this.getCategoryPartioning(currentItems,currCol),
-              selected: this.getCategoryPartioning(selectedData,currCol)
+              selected: this.getCategoryPartioning(selectedData,currCol),
+              tableColumn: 'Unselected'
             }
           };
 
