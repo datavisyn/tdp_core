@@ -17,6 +17,7 @@ export interface IProxyViewOptions {
   argument: string;
   idtype?: string;
   extra: object;
+  openExternally: boolean;
 }
 
 /**
@@ -40,7 +41,8 @@ export default class ProxyView extends AD3View {
      * idtype of the argument
      */
     idtype: null,
-    extra: {}
+    extra: {},
+    openExternally: false
   };
 
   private readonly openExternally: HTMLElement;
@@ -168,6 +170,14 @@ export default class ProxyView extends AD3View {
 
     if (ProxyView.isNoNSecurePage(url)) {
       this.showNoHttpsMessage(url);
+      return;
+    }
+
+    if (this.options.openExternally) {
+      this.setBusy(false);
+      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
+      Please <a href="${url}" class="alert-link" target="_blank" rel="noopener">click here
+      to open the external application</a> in a new browser tab.</div></p>`;
       return;
     }
 
