@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn} from 'lineupjs';
+import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
@@ -208,12 +208,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       
     } else {
       // this.drawTable(collapseId);
-      this.generateMeasureTable(collapseId,this.generateTableLayout());
+      this.generateMeasureTable(collapseId,this.generateTableLayout(currentData));
       // this.generateTableLayout();
     }
   }
 
-  private generateTableLayout()
+  private generateTableLayout(data: Array<any>)
   {
     let generatedTable = {
       tableHead: [],
@@ -234,15 +234,16 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // }
     // generatedTable.tableHead = deepCopy(tableHead);
 
-    // TABLE BODY
+    // TABLE BODY 
     // check filter
-    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead);
+    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data);
 
     
     console.log('generateTableLayout: ',generatedTable);
     return generatedTable;
   }
 
+  //generate table header depending on the dropdown A option
   private getTableHeader()
   {
     // let tableHeaders = ['','','Selected','Unselected'];
@@ -289,7 +290,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return tableHeaders;
   }
 
-  private getTableBody(tableHeader: Array<any>)
+  private getTableBody(tableHeader: Array<any>, data: Array<any>)
   {
     let tableBody = [];
 
@@ -334,12 +335,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
               }else //all the other columns
               {
+                let score = this.calcJaccardScore(data, (tableHeader[col] as any).label, currCol.column, currCategory.label);
                 tableRow[colName] = {
-                  label: 0, //TODO calculate score depending on selection / stratification group
+                  label: score, 
                   column: currCol.column,
                   column_label: currCol.label,
                   category: currCategory.label,
-                  color: '#ffffff', //this.score2color(scoreSelected) --> TODO calculate color
+                  color: this.score2color(score),
                   action: true,
                   // allData: this.getCategoryPartioning(currentItems,currCol), //TODO --> genertae Object for the detail view (parallel sets grafics)
                   // selected: this.getCategoryPartioning(selectedData,currCol)
@@ -424,31 +426,31 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     })
                     .style("background-color", function(d:any){
                       return d.value.color || '#ffffff';
-                     });
+                     })
+                    .on("mouseover", function(d:any) {
+                      if(d.value.action) {
+                        //d3.select(this).classed('bg-primary',true);
+                        d3.select(this).style("background-color", function(d){
+                                                                    return '#fba74d';
+                                                                  })
+                                      .style("font-weight", 'bolder');                                      
+                      }
+                    })					
+                    // FIXME: change colour of text depending on background (balck on black -> bad)
+                    .on("mouseout", function(d:any) {
+                      if(d.value.action) {
+                        //d3.select(this).classed('bg-primary',false);
+                        d3.select(this).style("background-color", function(d){
+                                                                    return d.value.color || '#ffffff';
+                                                                  })
+                                      .style("font-weight", 'normal'); 
+                      }
+                    });
                     // .on('click', function(d:any) {
                     //   if(d.value.action) {
                     //     that.showVisualRepresentation(containerId,d);
                     //   }
-                    // })
-                    // .on("mouseover", function(d:any) {
-                    //   if(d.value.action) {
-                    //     //d3.select(this).classed('bg-primary',true);
-                    //     d3.select(this).style("background-color", function(d){
-                    //                                                 return '#fba74d';
-                    //                                               })
-                    //                   .style("font-weight", 'bolder');                                      
-                    //   }
-                    // })					
-                    // // FIXME: change colour of text depending on background (balck on black -> bad)
-                    // .on("mouseout", function(d:any) {
-                    //   if(d.value.action) {
-                    //     //d3.select(this).classed('bg-primary',false);
-                    //     d3.select(this).style("background-color", function(d){
-                    //                                                 return d.value.color || '#ffffff';
-                    //                                               })
-                    //                   .style("font-weight", 'normal'); 
-                    //   }
-                    // });                  
+                    // });                
   }
 
   private generateJaccardTable(containerId: string, currentData: Array<any>) {
@@ -767,6 +769,79 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     return score || 0;
   }
+
+  // private calcJaccardScore(data, headerOption: string, headerCategory: string, columnB: string, categoryB: string): number 
+  // {
+  //   let score = 0;
+  //   let radioButtonValue = this.getRadioButtonValue();
+  //   if(radioButtonValue === 'Selection'){
+  //     return this.calcJaccardSelection(data, 'selection',headerCategory,columnB,categoryB);
+      
+  //   }else if(radioButtonValue === 'Stratification Group'){
+  //     return this.calcJaccardGroup(data,headerCategory,columnB,categoryB);
+
+  //   }
+
+  //   return score;
+  // }
+
+  private calcJaccardScore(data, headerCategory: string, columnB: string, categoryB: string): number {
+
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    let selectionSet = [];
+
+    if(optionDDA === 'Selection'){
+      selectionSet = data.filter(item => {
+        return item['selection'] === headerCategory;
+      });
+
+    }else if(optionDDA === 'Stratification Groups'){
+      let groups = this.provider.getRankings()[0].getGroups();
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === headerCategory)
+        {
+          selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+        }
+      }
+
+    }
+    // const selectionSet = data.filter(item => {
+    //   return item[columnA] === categoryA;
+    // });
+
+    const categorySet = data.filter(item => {
+      return item[columnB] === categoryB;
+    });
+
+    const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
+
+    const unionArrays = function (a, b, equals){
+      return a.concat(b).reduce( (acc, element) => {
+          return acc.some(elt => equals(elt, element))? acc : acc.concat(element)
+      }, []);
+    }
+    const union = unionArrays(selectionSet, categorySet, (a, b) => a._id === b._id);
+
+    const score = intersection.length / union.length;
+    
+    //console.log('score', score);
+
+    return score || 0;
+
+    // return this.calcJaccard(data, headerOption, headerCategory,columnB,categoryB);
+  }
+
+  // private calcJaccardGroup(data, headerCategory: string, columnB: string, categoryB: string) : number
+  // {
+  //   let groups = this.provider.getRankings()[0].getGroups();
+  //   for(let i=0; i<groups.length; i++){
+  //     if(groups[i].name === headerCategory)
+  //     {
+
+  //     }
+  //   }
+  //   return 0;
+  // }
 
   // calculated jaccard score
   private calculateJaccardScores(currentItems: Array<any>)
