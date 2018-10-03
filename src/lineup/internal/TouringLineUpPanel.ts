@@ -144,6 +144,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           }
 
           //create accordion item and add it to the panel group
+          //FIXME: make spaces before accordion and at the top of each collapsable smaller 
           this.createAccordionItem(panelGroup, collapseDetails);
 
           //insert the calculated score (jaccard: table) into the before created accordion item
@@ -203,9 +204,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
     if (measure && measure.id === 'jaccard') {
       this.generateJaccardTable(collapseId, currentData);
-      this.generateTableLayout();
+      
+      
     } else {
-      this.drawTable(collapseId);
+      // this.drawTable(collapseId);
+      this.generateMeasureTable(collapseId,this.generateTableLayout());
+      // this.generateTableLayout();
     }
   }
 
@@ -217,31 +221,24 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     };
     
     // TABLE HEADER
-    let tableHeaders = this.getTableHeader();
-    let tableNumbOfCol = tableHeaders.length;
-    let tableHead = [];
-    for(let i = 0; i < tableNumbOfCol; i++) {
-      let headCell = {
-        columnName: 'col'+i,
-        label: tableHeaders[i]
-      };
-      tableHead.push(headCell);
-    }
-    generatedTable.tableHead = deepCopy(tableHead);
+    generatedTable.tableHead = this.getTableHeader();
+    // let tableHeaders = this.getTableHeader();
+    // let tableNumbOfCol = tableHeaders.length;
+    // let tableHead = [];
+    // for(let i = 0; i < tableNumbOfCol; i++) {
+    //   let headCell = {
+    //     columnName: 'col'+i,
+    //     label: tableHeaders[i]
+    //   };
+    //   tableHead.push(headCell);
+    // }
+    // generatedTable.tableHead = deepCopy(tableHead);
 
     // TABLE BODY
     // check filter
-    let tableBody = [];
-
-    const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
-    console.log('generateTableLayout - chosenColumns: ', chosenColumns);
-    console.log('generateTableLayout - StratificationDesc: ', this.getStratificationDesc().categories.map((cat) => cat.label));
+    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead);
 
     
-
-    let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
-    console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
-
     console.log('generateTableLayout: ',generatedTable);
     return generatedTable;
   }
@@ -265,47 +262,194 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     }else if (optionDDA === 'Stratification Groups')
     {
+      let allStratificationGroups = this.getStratificationDesc();
+      let groups = allStratificationGroups.categories;
+      // console.log('allStratificationGroups',allStratificationGroups);  
 
+      tableHeaders = [
+        { columnName: 'col1', label: '', colour: '#ffffff'},
+        { columnName: 'col2', label: '', colour: '#ffffff'}
+      ];
+      let colOffset = 3;
+
+      for(let i=0; i<groups.length; i++){
+
+        // let oldLabel = groups[i].label;
+        // let newLabel = oldLabel.replace('∩ ','∩\n');
+
+        let tableHead = {
+          columnName: 'col'+(i+colOffset),
+          label: groups[i].label,
+          color: '#ffffff'
+        };
+        tableHeaders.push(tableHead);
+      }
     }
-
 
     return tableHeaders;
   }
 
-  /* 
-  
-    let resultObj = {
-    col1: {
-      label: currCol.label,
-      rowspan: (cnt === 0) ? currCol.categories.length : 0                
-    },
-    col2: {
-      label: currCategory.label,
-      color: currCategory.color
-    },
-    col3: {
-      label: scoreSelected,
-      column: currCol.column,
-      column_label: currCol.label,
-      category: currCategory.label,
-      color: this.score2color(scoreSelected),
-      action: true,
-      allData: this.getCategoryPartioning(currentItems,currCol),
-      selected: this.getCategoryPartioning(selectedData,currCol)
-    },
-    col4: {
-      label: scoreDeselected,
-      column: currCol.column,
-      column_label: currCol.label,
-      category: currCategory.label,
-      color: this.score2color(scoreDeselected),
-      action: true,
-      allData: this.getCategoryPartioning(currentItems,currCol),
-      selected: this.getCategoryPartioning(selectedData,currCol)
-    }
-  };
+  private getTableBody(tableHeader: Array<any>)
+  {
+    let tableBody = [];
 
-  */
+    const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
+    console.log('generateTableLayout - chosenColumns: ', chosenColumns);
+      
+
+    let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
+    console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
+
+
+    if(this.getRadioButtonValue() === 'category'){
+
+      for(let i=0; i<chosenColumns.length; i++)
+      {
+        let currCol = chosenColumns[i];
+        
+        for(let cnt=0; cnt < currCol.categories.length; cnt++)
+        {
+          let currCategory = currCol.categories[cnt];
+          if(showCategoriesAfterFilter.indexOf(currCategory.label) !== -1){
+
+            let tableRow = {};
+            
+            for(let col=0; col < tableHeader.length; col++)
+            {
+              let colName = ((tableHeader[col] as any).columnName as string);
+              
+              if(col === 0) //first column (categorical column)
+              {
+                tableRow[colName] = {
+                  label: currCol.label,
+                  rowspan: (cnt === 0) ? currCol.categories.length : 0                
+                };
+
+              }else if(col === 1)  //second column (categoroies of categircal column)
+              {
+                tableRow[colName] = {
+                  label: currCategory.label,
+                  color: currCategory.color
+                };
+
+              }else //all the other columns
+              {
+                tableRow[colName] = {
+                  label: 0, //TODO calculate score depending on selection / stratification group
+                  column: currCol.column,
+                  column_label: currCol.label,
+                  category: currCategory.label,
+                  color: '#ffffff', //this.score2color(scoreSelected) --> TODO calculate color
+                  action: true,
+                  // allData: this.getCategoryPartioning(currentItems,currCol), //TODO --> genertae Object for the detail view (parallel sets grafics)
+                  // selected: this.getCategoryPartioning(selectedData,currCol)
+                };
+              }
+            }
+            // const scoreSelected = this.calcJaccard(currentItems, 'selection', 'Selected', currCol.column, currCategory.label);
+            // const scoreDeselected = this.calcJaccard(currentItems, 'selection', 'Unselected', currCol.column, currCategory.label);
+
+            tableBody.push(tableRow);
+          }
+        }
+      }
+    }else{
+      //TODO generate table for stratificaiton option of radio button
+    }
+
+
+    return tableBody;
+  }
+
+  private generateMeasureTable(containerId: string, dataTable: any)
+  {
+    const that = this;
+
+    // create a <div> as table container with D3
+    let tableContainer = d3.select('#'+containerId).append('div')
+                                                  .attr('class','table-container');
+
+    // table                                        
+    let table = tableContainer.append('table')
+                            .attr('class','table table-condensed');
+    
+    // table header
+    let tableHeader = table.append('thead');
+    tableHeader.append('tr')
+              .selectAll('th')
+              .data(dataTable.tableHead as Array<any>)
+              .enter()
+              .append('th')
+              .attr('class','text-center')
+              .text(function(d) { return (d as any).label; });
+
+    // table body
+    let tableBody = table.append('tbody');
+
+    // table rows -> create a row for each object in the data
+    let rows = tableBody.selectAll('tr')
+                      .data(dataTable.tableBody)
+                      .enter()
+                      .append('tr');
+
+
+    // table cells
+    // create a cell in each row for each column
+    // At this point, the rows have data associated.
+    // So the data function accesses it.
+    let cells = rows.selectAll('td')
+                    .data(function(row) {
+                      // he does it this way to guarantee you only use the
+                      // values for the columns you provide.
+                      return dataTable.tableHead.map(function(column) {
+                          // return a new object with a value set to the row's column value.
+                          return {value: row[column.columnName]};
+                      });
+                    })
+                    .enter()
+                    .append('td')
+                    .attr('class','text-center')
+                    // .attr("rowspan", function(d){
+                    //   if(d.value.rowspan){
+                    //     return d.value.rowspan;
+                    //   }
+                    //   return 1;
+                    //  })
+                    .text(function(d:any) { 
+                      if(d.value.label && Number(d.value.label.toString())) {
+                        return Number(d.value.label.toString()).toFixed(2);  
+                      }
+
+                      return d.value.label; 
+                    })
+                    .style("background-color", function(d:any){
+                      return d.value.color || '#ffffff';
+                     });
+                    // .on('click', function(d:any) {
+                    //   if(d.value.action) {
+                    //     that.showVisualRepresentation(containerId,d);
+                    //   }
+                    // })
+                    // .on("mouseover", function(d:any) {
+                    //   if(d.value.action) {
+                    //     //d3.select(this).classed('bg-primary',true);
+                    //     d3.select(this).style("background-color", function(d){
+                    //                                                 return '#fba74d';
+                    //                                               })
+                    //                   .style("font-weight", 'bolder');                                      
+                    //   }
+                    // })					
+                    // // FIXME: change colour of text depending on background (balck on black -> bad)
+                    // .on("mouseout", function(d:any) {
+                    //   if(d.value.action) {
+                    //     //d3.select(this).classed('bg-primary',false);
+                    //     d3.select(this).style("background-color", function(d){
+                    //                                                 return d.value.color || '#ffffff';
+                    //                                               })
+                    //                   .style("font-weight", 'normal'); 
+                    //   }
+                    // });                  
+  }
 
   private generateJaccardTable(containerId: string, currentData: Array<any>) {
     const that = this;
@@ -333,7 +477,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               .enter()
               .append('th')
               .attr('class','text-center')
-              .text(function(d) { return d.label; });
+              .text(function(d) { return d.label; })
+              .each(function (d, i) {
+                    if (i === 0 || i === 1) {
+                      d3.select(this).classed("rowspan",true);
+                    } 
+                  });
 
     let tableBody = table.append('tbody');
     
@@ -413,7 +562,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                           d3.select(this).style("background-color", function(d){
                                                                       return '#fba74d';
                                                                     })
-                                        .style("font-weight", 'bolder');                                      ;
+                                        .style("font-weight", 'bolder');                                      
                         }
                       })					
                       // FIXME: change colour of text depending on backgraunf (balck on black -> bad)
