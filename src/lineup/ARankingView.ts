@@ -1,4 +1,4 @@
-import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -72,6 +72,12 @@ export interface IARankingViewOptions {
   enableHeaderRotation: boolean;
 
   /**
+   * enable that the regular columns are added via a choser dialog
+   * @default false
+   */
+  enableAddingColumnGrouping: boolean;
+
+  /**
    * enable alternating pattern background
    * @default false
    */
@@ -139,6 +145,7 @@ export abstract class ARankingView extends AView {
     enableOverviewMode: true,
     enableZoom: true,
     enableAddingColumns: true,
+    enableAddingColumnGrouping: false,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
     enableStripedBackground: false,
@@ -201,7 +208,7 @@ export abstract class ARankingView extends AView {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
-    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
+    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
