@@ -246,11 +246,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   //generate table header depending on the dropdown A option
   private getTableHeader()
   {
-    // let tableHeaders = ['','','Selected','Unselected'];
     let tableHeaders = [];
-    // TODO: create the needed table headers
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    console.log('DD1',optionDDA);
+    // console.log('DDA',optionDDA);
 
     if(optionDDA === 'Selection'){
 
@@ -263,6 +261,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     }else if (optionDDA === 'Stratification Groups')
     {
+      
       let allStratificationGroups = this.getStratificationDesc();
       let groups = allStratificationGroups.categories;
       // console.log('allStratificationGroups',allStratificationGroups);  
@@ -295,11 +294,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let tableBody = [];
 
     const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
-    console.log('generateTableLayout - chosenColumns: ', chosenColumns);
+    //console.log('generateTableLayout - chosenColumns: ', chosenColumns);
       
 
     let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
-    console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
+    //console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
 
 
     if(this.getRadioButtonValue() === 'category'){
@@ -326,7 +325,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   rowspan: (cnt === 0) ? currCol.categories.length : 0                
                 };
 
-              }else if(col === 1)  //second column (categoroies of categircal column)
+              }
+              // else if(col === 0 && cnt !== 0)
+              // {
+              //   delete tableRow[colName];
+                
+              // }
+              else if(col === 1)  //second column (categoroies of categircal column)
               {
                 tableRow[colName] = {
                   label: currCategory.label,
@@ -352,6 +357,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             // const scoreDeselected = this.calcJaccard(currentItems, 'selection', 'Unselected', currCol.column, currCategory.label);
 
             tableBody.push(tableRow);
+            tableRow = {};
           }
         }
       }
@@ -401,34 +407,44 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // So the data function accesses it.
     let cells = rows.selectAll('td')
                     .data(function(row) {
-                      // he does it this way to guarantee you only use the
-                      // values for the columns you provide.
-                      return dataTable.tableHead.map(function(column) {
-                          // return a new object with a value set to the row's column value.
-                          return {value: row[column.columnName]};
+                      //get all properties defined in dataTable.tableHead as an array with the data from the rows
+                      let returnValues = dataTable.tableHead.map(function(column) {
+
+                        // return an object for the column of the data row
+                        return row[column.columnName];
                       });
+                      console.log('returnValues: ',returnValues);
+
+                      //push all desired column objects into this array
+                      let allDesiredReturnValues = returnValues.filter(function(cell) {
+                          // return true if rowspan is not defiend OR rowspan exist and is bigger than 0
+                          return  (cell.rowspan === undefined) || (cell.rowspan && cell.rowspan >0);
+                        });
+
+                      console.log('allDesiredReturnValues: ',allDesiredReturnValues);
+                      return allDesiredReturnValues;
                     })
                     .enter()
                     .append('td')
-                    .attr('class','text-center')
-                    // .attr("rowspan", function(d){
-                    //   if(d.value.rowspan){
-                    //     return d.value.rowspan;
-                    //   }
-                    //   return 1;
-                    //  })
+                    .attr('class','text-center align-middle')
+                    .attr("rowspan", function(d:any){
+                      if(d.rowspan){
+                        return d.rowspan;
+                      }
+                      return 1;
+                     })
                     .text(function(d:any) { 
-                      if(d.value.label && Number(d.value.label.toString())) {
-                        return Number(d.value.label.toString()).toFixed(2);  
+                      if(d.label && Number(d.label.toString())) {
+                        return Number(d.label.toString()).toFixed(2);  
                       }
 
-                      return d.value.label; 
+                      return d.label; 
                     })
                     .style("background-color", function(d:any){
-                      return d.value.color || '#ffffff';
+                      return d.color || '#ffffff';
                      })
                     .on("mouseover", function(d:any) {
-                      if(d.value.action) {
+                      if(d.action) {
                         //d3.select(this).classed('bg-primary',true);
                         d3.select(this).style("background-color", function(d){
                                                                     return '#fba74d';
@@ -438,10 +454,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     })					
                     // FIXME: change colour of text depending on background (balck on black -> bad)
                     .on("mouseout", function(d:any) {
-                      if(d.value.action) {
+                      if(d.action) {
                         //d3.select(this).classed('bg-primary',false);
                         d3.select(this).style("background-color", function(d){
-                                                                    return d.value.color || '#ffffff';
+                                                                    return d.color || '#ffffff';
                                                                   })
                                       .style("font-weight", 'normal'); 
                       }
@@ -450,7 +466,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     //   if(d.value.action) {
                     //     that.showVisualRepresentation(containerId,d);
                     //   }
-                    // });                
+                    // }); 
+                    
+                    
   }
 
   private generateJaccardTable(containerId: string, currentData: Array<any>) {
@@ -487,35 +505,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   });
 
     let tableBody = table.append('tbody');
-    
-/*     jaccardScores.forEach(function (d) {
-          var tr = tableBody.append("tr");
-          console.log(d);
-          if (d.col1.rowspan >0) {
-              tr.append("td")
-                  .attr("rowspan", d.col1.rowspan)
-                  .attr('class','text-center align-middle')
-                  .text(d.col1.label)
-                  .style("background-color", d.col1.color);
-          }
-          tr.append("td")
-              .attr('class','text-center')
-              .text(d.col2.label);
-          tr.append("td")
-              .attr('class','text-center')
-              .text(d.col3.label);
-          tr.append("td")
-              .attr('class','text-center')
-              .text(d.col4.label);
 
-          // Add a click handler that will return the datum instead of undefined
-          tr.on('click', function(tr) {
-            console.log('Row Clicked');
-            console.log(tr);
-          });    
-  
-    }); */
-    
     // create a row for each object in the data
     let rows = tableBody.selectAll('tr')
                       .data(jaccardScores)
@@ -577,17 +567,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                         .style("font-weight", 'normal'); 
                         }
                       });
-                    // .each(function (d, i) {
-                    //     if (d.value.rowspan) {
-                    //       // put all your operations on the second element, e.g.
-                    //       if(d.value.rowspan > 0) {
-                    //         d3.select(this).attr("rowspan", d.value.rowspan);
-                    //       }else
-                    //       {
-                    //         d3.select(this).classed('hide', true);
-                    //       }
-                    //     } 
-                    //   });
 
     
     
@@ -770,20 +749,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return score || 0;
   }
 
-  // private calcJaccardScore(data, headerOption: string, headerCategory: string, columnB: string, categoryB: string): number 
-  // {
-  //   let score = 0;
-  //   let radioButtonValue = this.getRadioButtonValue();
-  //   if(radioButtonValue === 'Selection'){
-  //     return this.calcJaccardSelection(data, 'selection',headerCategory,columnB,categoryB);
-      
-  //   }else if(radioButtonValue === 'Stratification Group'){
-  //     return this.calcJaccardGroup(data,headerCategory,columnB,categoryB);
-
-  //   }
-
-  //   return score;
-  // }
 
   private calcJaccardScore(data, headerCategory: string, columnB: string, categoryB: string): number {
 
@@ -805,10 +770,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
 
     }
-    // const selectionSet = data.filter(item => {
-    //   return item[columnA] === categoryA;
-    // });
-
+ 
     const categorySet = data.filter(item => {
       return item[columnB] === categoryB;
     });
@@ -827,21 +789,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //console.log('score', score);
 
     return score || 0;
-
-    // return this.calcJaccard(data, headerOption, headerCategory,columnB,categoryB);
   }
-
-  // private calcJaccardGroup(data, headerCategory: string, columnB: string, categoryB: string) : number
-  // {
-  //   let groups = this.provider.getRankings()[0].getGroups();
-  //   for(let i=0; i<groups.length; i++){
-  //     if(groups[i].name === headerCategory)
-  //     {
-
-  //     }
-  //   }
-  //   return 0;
-  // }
 
   // calculated jaccard score
   private calculateJaccardScores(currentItems: Array<any>)
