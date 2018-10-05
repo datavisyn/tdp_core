@@ -164,12 +164,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
 
-  //generates id for the collapseable panel in the accordion with the prefix and the current time's minutes/seconds and millisec
-  private getIdWithTimestamp(prefix: string) {
-    let currdate = new Date();
-    return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
-  }
-
   //creates the accordion item (collapse) for one score
   private createAccordionItem(panelGroup: any, collapseDetails: any) {
     if (collapseDetails && collapseDetails instanceof Object &&
@@ -200,13 +194,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-
   private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
 
     this.generateMeasureTable(collapseId, measure.id , currentData);
 
   }
 
+  // --------- DATA TABLE LAYOUT ---
   //generates a object, which contains the table head and table body
   private generateTableLayout(data: Array<any>, scoreType: string)
   {
@@ -347,6 +341,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return tableBody;
   }
 
+  // --------- TABLE GENERATION D3 ---
   // create table in container and depending on dataTable with D3
   private generateMeasureTable(containerId: string, scoreType: string, currentData: Array<any>)
   {
@@ -384,6 +379,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // table cells
     if(scoreType === 'jaccard'){
       this.generateMeasureTableCellJaccard(containerId, rows,dataTable);
+    }else if(scoreType === 'overlap'){
+      this.generateMeasureTableCellOverlap(containerId, rows,dataTable);
     }
                  
                     
@@ -405,7 +402,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                         // return an object for the column of the data row
                         return row[column.columnName];
                       });
-                      console.log('returnValues: ',returnValues);
+                      // console.log('returnValues: ',returnValues);
 
                       //push all desired column objects into this array
                       let allDesiredReturnValues = returnValues.filter(function(cell) {
@@ -456,13 +453,20 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     })
                     .on('click', function(d:any) {
                       if(d.action) {
-                        that.generateVisualRepJaccard(containerId,d);
+                        that.generateVisualRepParallelSets(containerId,d);
                       }
                     }); 
   }
 
-  // creates visual representation of the jaccard score as a parallel set
-  private generateVisualRepJaccard(containerId: string, cell: any)
+  // creates table cell for overlap score with all its formating and functionality
+  private generateMeasureTableCellOverlap(containerId: string, rows: d3.Selection<any>, dataTable: any)
+  {
+    this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
+  }
+
+  // --------- VISUAL REPRESENTATION ---
+  // creates visual representation as a parallel set (for jaccard)
+  private generateVisualRepParallelSets(containerId: string, cell: any)
   {
     console.log('Cell clicken (dynamic): ',cell);
     console.log('Cell clicken (dynamic) - containerId: ',containerId);
@@ -567,18 +571,21 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                 });
 
   }
-  
+ 
+  // --------- SCORES ---
   // different kinds of score calculations
   private calcScore (data, scoreType: string ,headerCategory: string, columnB: string, categoryB: string): number {
     if(scoreType === 'jaccard')
     {
-      return this.calcJaccardScore(data, headerCategory, columnB, categoryB);
+      return this.calcJaccardCoefficient(data, headerCategory, columnB, categoryB);
+    } else if (scoreType === 'overlap'){
+      return this.calcOverlapCoeffieient(data, headerCategory, columnB, categoryB);
     }
 
   }
 
   // calculates the jaccard score
-  private calcJaccardScore(data, headerCategory: string, columnB: string, categoryB: string): number {
+  private calcJaccardCoefficient(data, headerCategory: string, columnB: string, categoryB: string): number {
 
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
     let selectionSet = [];
@@ -617,6 +624,49 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //console.log('score', score);
 
     return score || 0;
+  }
+
+  // calculates the jaccard score
+  private calcOverlapCoeffieient(data, headerCategory: string, columnB: string, categoryB: string): number {
+
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    let selectionSet = [];
+
+    if(optionDDA === 'Selection'){
+      selectionSet = data.filter(item => {
+        return item['selection'] === headerCategory;
+      });
+
+    }else if(optionDDA === 'Stratification Groups'){
+      let groups = this.provider.getRankings()[0].getGroups();
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === headerCategory)
+        {
+          selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+        }
+      }
+
+    }
+ 
+    const categorySet = data.filter(item => {
+      return item[columnB] === categoryB;
+    });
+
+    const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
+
+    const minSize = Math.min(selectionSet.length,categorySet.length);
+    const score = intersection.length / minSize;
+    
+    // console.log('score', score);
+
+    return score || 0;
+  }
+  
+  // --------- MISC ---
+  //generates id for the collapseable panel in the accordion with the prefix and the current time's minutes/seconds and millisec
+  private getIdWithTimestamp(prefix: string) {
+    let currdate = new Date();
+    return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
   }
 
   // creates data for the visual representation of the jaccard score (parallel sets)
