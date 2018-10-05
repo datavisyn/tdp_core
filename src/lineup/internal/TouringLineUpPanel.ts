@@ -5,6 +5,7 @@ import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
 import { isBuffer } from 'util';
+import { valueChanged } from '../../../../node_modules/lineupjs/src/model/AnnotateColumn';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -98,6 +99,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateItemTab() {
+    this.toggleStratificationOptions();
     this.updateItemControls();
     this.updateItemScores();
   }
@@ -279,7 +281,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
 
 
-    if(this.getRadioButtonValue() === 'category'){
+    // if(this.getRadioButtonValue() === 'category'){
 
       for(let i=0; i<chosenColumns.length; i++)
       {
@@ -333,9 +335,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
         }
       }
-    }else{
-      //TODO generate table for stratificaiton option of radio button
-    }
+    // }else{
+    //   //TODO generate table for stratificaiton option of radio button
+    // }
 
 
     return tableBody;
@@ -587,28 +589,48 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // calculates the jaccard score
   private calcJaccardCoefficient(data, headerCategory: string, columnB: string, categoryB: string): number {
 
+    // console.log('data: ',data);
+    // console.log('headerCategory: ',headerCategory);
+    // console.log('columnB: ',columnB);
+    // console.log('categoryB: ',categoryB);
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    let selectionSet = [];
+    let groups = this.provider.getRankings()[0].getGroups();
 
+    let selectionSet = [];
+    // use selection or stratification groups as header
     if(optionDDA === 'Selection'){
       selectionSet = data.filter(item => {
         return item['selection'] === headerCategory;
       });
 
     }else if(optionDDA === 'Stratification Groups'){
-      let groups = this.provider.getRankings()[0].getGroups();
+      
       for(let i=0; i<groups.length; i++){
         if(groups[i].name === headerCategory)
         {
           selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
         }
       }
-
     }
+    // console.log('selectionSet: ',selectionSet);
  
-    const categorySet = data.filter(item => {
-      return item[columnB] === categoryB;
-    });
+
+    let categorySet = [];
+    // use categories or stratification as rows
+    if(this.getRadioButtonValue() === 'category'){
+      categorySet = data.filter(item => {
+        return item[columnB] === categoryB;
+      });
+    }else {
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === categoryB)
+        {
+          categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+        }
+      }
+    }
+    // console.log('categorySet: ',categorySet);
+    
 
     const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
 
@@ -630,8 +652,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private calcOverlapCoeffieient(data, headerCategory: string, columnB: string, categoryB: string): number {
 
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    let selectionSet = [];
+    let groups = this.provider.getRankings()[0].getGroups();
 
+    let selectionSet = [];
     if(optionDDA === 'Selection'){
       selectionSet = data.filter(item => {
         return item['selection'] === headerCategory;
@@ -647,10 +670,24 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
 
     }
+    // console.log('selectionSet: ',selectionSet);
  
-    const categorySet = data.filter(item => {
-      return item[columnB] === categoryB;
-    });
+
+    let categorySet = [];
+    // use categories or stratification as rows
+    if(this.getRadioButtonValue() === 'category'){
+      categorySet = data.filter(item => {
+        return item[columnB] === categoryB;
+      });
+    }else {
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === categoryB)
+        {
+          categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+        }
+      }
+    }
+    // console.log('categorySet: ',categorySet);
 
     const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
 
@@ -672,6 +709,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates data for the visual representation of the jaccard score (parallel sets)
   private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any)
   {
+    // console.log('---- getColumnPartioning ----');
     // console.log('getColumnPartioning.data',data);
     // console.log('getColumnPartioning.tableHeader',tableHeader);
     // console.log('getColumnPartioning.column',column);
@@ -679,6 +717,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let groups = this.provider.getRankings()[0].getGroups();
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
 
+    // go through all categories of current coloumn
     for(let i=0; i < column.categories.length; i++)
     {
       let currCategory = column.categories[i];
@@ -691,7 +730,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         parts: []
       };
 
-      //TODO capare in selection mode
+      // go through all columns in header
       for(let h=0; h<tableHeader.length; h++)
       {
         
@@ -775,6 +814,29 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return allRemainingLabels;
   }
 
+  private toggleStratificationOptions()
+  {
+    // check if stratificaiton exists
+    let groupDisabled = this.provider.getRankings()[0].getGroups().length === 1;
+
+    // button in radio button group
+    let buttons = this.node.querySelectorAll('.form-check-input.itemControls')!;
+    let stratificationButton = buttons[1] as any;
+    for(let i=0; i<buttons.length; i++)
+    {
+      if((buttons[i]as any).value === 'group')
+      {
+        stratificationButton = buttons[i] as any
+      }
+    }
+
+    let OptionStratification = this.node.querySelector('option.stratification') as any;
+    // console.log('OptionStratification: ',OptionStratification);
+
+    // enable / disable options for stratification
+    stratificationButton.disabled = groupDisabled;
+    OptionStratification.disabled = groupDisabled;
+  }
 
   private updateItemControls() {
     const dropdownA = d3.select(this.itemTab).select('select.itemControls.compareA');
