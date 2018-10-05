@@ -195,26 +195,20 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         panelCollapse.classed('in', true); //accordion item is expanded
       }
 
-      let panelBody = panelCollapse.append('div')
-        .attr('class', 'panel-body');
+      // let panelBody = panelCollapse.append('div')
+      //   .attr('class', 'panel-body');
     }
   }
 
 
   private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
-    if (measure && measure.id === 'jaccard') {
-      this.generateJaccardTable(collapseId, currentData);
-      
-      
-    } else {
-      // this.drawTable(collapseId);
-      this.generateMeasureTable(collapseId,this.generateTableLayout(currentData));
-      // this.generateTableLayout();
-    }
+
+    this.generateMeasureTable(collapseId, measure.id , currentData);
+
   }
 
   //generates a object, which contains the table head and table body
-  private generateTableLayout(data: Array<any>)
+  private generateTableLayout(data: Array<any>, scoreType: string)
   {
     let generatedTable = {
       tableHead: [],
@@ -223,21 +217,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     // TABLE HEADER
     generatedTable.tableHead = this.getTableHeader();
-    // let tableHeaders = this.getTableHeader();
-    // let tableNumbOfCol = tableHeaders.length;
-    // let tableHead = [];
-    // for(let i = 0; i < tableNumbOfCol; i++) {
-    //   let headCell = {
-    //     columnName: 'col'+i,
-    //     label: tableHeaders[i]
-    //   };
-    //   tableHead.push(headCell);
-    // }
-    // generatedTable.tableHead = deepCopy(tableHead);
 
     // TABLE BODY 
-    // check filter
-    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data);
+    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data, scoreType);
 
     
     console.log('generateTableLayout: ',generatedTable);
@@ -291,7 +273,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //generate table body depending on table head and radio button option
-  private getTableBody(tableHeader: Array<any>, data: Array<any>)
+  private getTableBody(tableHeader: Array<any>, data: Array<any>, scoreType: string)
   {
     let tableBody = [];
 
@@ -308,56 +290,53 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let i=0; i<chosenColumns.length; i++)
       {
         let currCol = chosenColumns[i];
+        let currCatAfterFilter = currCol.categories.filter((item) => {return (showCategoriesAfterFilter.indexOf(item.label) !== -1);});
         
-        for(let cnt=0; cnt < currCol.categories.length; cnt++)
-        {
-          let currCategory = currCol.categories[cnt];
-          if(showCategoriesAfterFilter.indexOf(currCategory.label) !== -1){
-
-            let tableRow = {};
+        for(let cnt=0; cnt < currCatAfterFilter.length; cnt++)
+        {  
+          let currCategory = currCatAfterFilter[cnt];
+          let tableRow = {};
+          let currRowPartitioning = this.getColumnPartioningParallelSets(data, tableHeader, currCol);
+          
+          for(let col=0; col < tableHeader.length; col++)
+          {
+            let colName = ((tableHeader[col] as any).columnName as string);
             
-            for(let col=0; col < tableHeader.length; col++)
+            if(col === 0) //first column (categorical column)
             {
-              let colName = ((tableHeader[col] as any).columnName as string);
-              
-              if(col === 0) //first column (categorical column)
-              {
-                tableRow[colName] = {
-                  label: currCol.label,
-                  rowspan: (cnt === 0) ? currCol.categories.length : 0                
-                };
+              tableRow[colName] = {
+                label: currCol.label,
+                rowspan: (cnt === 0) ? currCatAfterFilter.length : 0              
+              };
 
-              }
-              else if(col === 1)  //second column (categoroies of categircal column)
-              {
-                tableRow[colName] = {
-                  label: currCategory.label,
-                  color: currCategory.color
-                };
-
-              }else //all the other columns
-              {
-                let score = this.calcJaccardScore(data, (tableHeader[col] as any).label, currCol.column, currCategory.label);
-                
-                tableRow[colName] = {
-                  label: score, 
-                  column: currCol.column,
-                  column_label: currCol.label,
-                  category: currCategory.label,
-                  color: this.score2color(score),
-                  action: true,
-                  partitioning: this.getColumnPartioningParallelSets(data, tableHeader, currCol)
-                  // allData: this.getCategoryPartioning(currentItems,currCol), //TODO --> genertae Object for the detail view (parallel sets grafics)
-                  // selected: this.getCategoryPartioning(selectedData,currCol)
-                };
-              }
             }
-            // const scoreSelected = this.calcJaccard(currentItems, 'selection', 'Selected', currCol.column, currCategory.label);
-            // const scoreDeselected = this.calcJaccard(currentItems, 'selection', 'Unselected', currCol.column, currCategory.label);
+            else if(col === 1)  //second column (categoroies of categircal column)
+            {
+              tableRow[colName] = {
+                label: currCategory.label,
+                color: currCategory.color
+              };
 
-            tableBody.push(tableRow);
-            tableRow = {};
+            }else //all the other columns
+            {
+              let score = this.calcScore(data,scoreType ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
+              
+              tableRow[colName] = {
+                label: score, 
+                column: currCol.column,
+                column_label: currCol.label,
+                category: currCategory.label,
+                color: this.score2color(score),
+                action: true,
+                tableColumn: (tableHeader[col] as any).label,
+                partitioning: currRowPartitioning
+              };
+            }
           }
+
+          tableBody.push(tableRow);
+          tableRow = {};
+
         }
       }
     }else{
@@ -369,13 +348,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   // create table in container and depending on dataTable with D3
-  private generateMeasureTable(containerId: string, dataTable: any)
+  private generateMeasureTable(containerId: string, scoreType: string, currentData: Array<any>)
   {
+    const dataTable = this.generateTableLayout(currentData, scoreType);
     const that = this;
 
     // create a <div> as table container with D3
     let tableContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','table-container');
+                                                  .attr('class','table-container table-responsive');
 
     // table                                        
     let table = tableContainer.append('table')
@@ -402,6 +382,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     // table cells
+    if(scoreType === 'jaccard'){
+      this.generateMeasureTableCellJaccard(containerId, rows,dataTable);
+    }
+                 
+                    
+  }
+
+  // creates table cell for jaccard score with all its formating and functionality
+  private generateMeasureTableCellJaccard(containerId: string, rows: d3.Selection<any>, dataTable: any)
+  {
+    const that = this;
+
     // create a cell in each row for each column
     // At this point, the rows have data associated.
     // So the data function accesses it.
@@ -413,7 +405,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                         // return an object for the column of the data row
                         return row[column.columnName];
                       });
-                      // console.log('returnValues: ',returnValues);
+                      console.log('returnValues: ',returnValues);
 
                       //push all desired column objects into this array
                       let allDesiredReturnValues = returnValues.filter(function(cell) {
@@ -467,220 +459,54 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                         that.generateVisualRepJaccard(containerId,d);
                       }
                     }); 
-                    
-                    
   }
 
-  private generateParallelSetData (containerId: string, cell)
-  {
-    // console.log('Cell clicken: ',cell);
-
-    // let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container"]');
-    // oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
-
-    // let svgContainer = d3.select('#'+containerId).append('div')
-    //                                               .attr('class','svg-container');
-  
-    // let width = svgContainer.style('width').slice(0,-2);
-    // let currData = [];
-    // let columnLabel = ''+cell.value.column_label;
-
-    // for(let i = 0; i < cell.value.selected.length; i++)
-    // {
-    //   let currCategoryLabel = ''+cell.value.selected[i].label;
-
-    //   //selected
-    //   let selectedAmount = (cell.value.selected[i].amount as number);
-    //   if(selectedAmount > 0)
-    //   {
-    //     let rowSelected = {};
-    //     rowSelected[''+columnLabel] = (cell.value.selected[i].label as string);
-    //     rowSelected['Selection'] = 'Selected';
-    //     rowSelected['value'] = selectedAmount;
-    //     currData.push(rowSelected);
-    //   }
-
-    //   //unselected
-    //   let unselectedAmount = (cell.value.allData[i].amount as number)-(cell.value.selected[i].amount as number);
-    //   if(unselectedAmount > 0)
-    //   {
-        
-    //     let rowUnselected = {};
-    //     rowUnselected[''+columnLabel] = (cell.value.selected[i].label as string);
-    //     rowUnselected['Selection'] = 'Unselected';
-    //     rowUnselected['value'] = unselectedAmount;
-    //     currData.push(rowUnselected);
-    //   }
-
-    // }
-
-    // console.log('currentData',currData);
-
-  }
-
-  private generateJaccardTable(containerId: string, currentData: Array<any>) {
-    const that = this;
-
-    let columnHeaders = [
-      { head: 'col1', label: ''},
-      { head: 'col2', label: ''},
-      { head: 'col3', label: 'Selected'},
-      { head: 'col4', label: 'Unselected'},
-    ];
-
-    let jaccardScores = this.calculateJaccardScores(currentData);
-    console.log('jaccardScores: ', jaccardScores);
-    
-    // create table with D3
-    let tableContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','table-container');
-
-    let table = tableContainer.append('table')
-                        .attr('class','table table-condensed');
-    let tableHeader = table.append('thead');
-    tableHeader.append('tr')
-              .selectAll('th')
-              .data(columnHeaders)
-              .enter()
-              .append('th')
-              .attr('class','text-center')
-              .text(function(d) { return d.label; })
-              .each(function (d, i) {
-                    if (i === 0 || i === 1) {
-                      d3.select(this).classed("rowspan",true);
-                    } 
-                  });
-
-    let tableBody = table.append('tbody');
-
-    // create a row for each object in the data
-    let rows = tableBody.selectAll('tr')
-                      .data(jaccardScores)
-                      .enter()
-                      .append('tr');
-
-    // create a cell in each row for each column
-    // At this point, the rows have data associated.
-    // So the data function accesses it.
-    let cells = rows.selectAll('td')
-                    .data(function(row) {
-                      // he does it this way to guarantee you only use the
-                      // values for the columns you provide.
-                      return columnHeaders.map(function(column) {
-                          // return a new object with a value set to the row's column value.
-                          return {value: row[column.head]};
-                      });
-                    })
-                    .enter()
-                    .append('td')
-                    .attr('class','text-center')
-                    // .attr("rowspan", function(d){
-                    //   if(d.value.rowspan){
-                    //     return d.value.rowspan;
-                    //   }
-                    //   return 1;
-                    //  })
-                    .text(function(d) { 
-                      if(d.value.label && Number(d.value.label.toString())) {
-                        return Number(d.value.label.toString()).toFixed(2);  
-                      }
-
-                      return d.value.label; 
-                    })
-                    .on('click', function(d) {
-                      if(d.value.action) {
-                        that.showVisualRepresentation(containerId,d);
-                      }
-                    })
-                    .style("background-color", function(d){
-                      return d.value.color || '#ffffff';
-                     })
-                     .on("mouseover", function(d) {
-                        if(d.value.action) {
-                          //d3.select(this).classed('bg-primary',true);
-                          d3.select(this).style("background-color", function(d){
-                                                                      return '#fba74d';
-                                                                    })
-                                        .style("font-weight", 'bolder');                                      
-                        }
-                      })					
-                      // FIXME: change colour of text depending on backgraunf (balck on black -> bad)
-                      .on("mouseout", function(d) {
-                        if(d.value.action) {
-                          //d3.select(this).classed('bg-primary',false);
-                          d3.select(this).style("background-color", function(d){
-                                                                      return d.value.color || '#ffffff';
-                                                                    })
-                                        .style("font-weight", 'normal'); 
-                        }
-                      });
-
-    
-    
-    // console.log('cells',cells);
-    // cells.on('click', function(cell) {
-    //   that.showVisualRepresentation(containerId,cell);
-    // });                  
-
-  }
-
+  // creates visual representation of the jaccard score as a parallel set
   private generateVisualRepJaccard(containerId: string, cell: any)
   {
     console.log('Cell clicken (dynamic): ',cell);
-
-  }
-  
-  private showVisualRepresentation(containerId: string, cell: any)
-  {
-    console.log('Cell clicken: ',cell);
-
-    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container"]');
+    console.log('Cell clicken (dynamic) - containerId: ',containerId);
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    
+    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
 
     let svgContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','svg-container');
+                                                  .attr('class','svg-container '+containerId);
   
     let width = svgContainer.style('width').slice(0,-2);
-    let currData = [];
-    let columnLabel = ''+cell.value.column_label;
 
-    for(let i = 0; i < cell.value.selected.length; i++)
+    //dimensions for the parallel sets
+    let dimension1 = cell.column_label;
+    let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
+    
+    let colPart = cell.partitioning;
+    let parSetData = [];
+
+    for(let i=0; i<colPart.length; i++)
     {
-      let currCategoryLabel = ''+cell.value.selected[i].label;
+      let headerPart = colPart[i].parts;
+      let categoryLabel = colPart[i].categoryLabel;
 
-      //selected
-      let selectedAmount = (cell.value.selected[i].amount as number);
-      if(selectedAmount > 0)
+      for(let p=0; p<headerPart.length; p++)
       {
-        let rowSelected = {};
-        rowSelected[''+columnLabel] = (cell.value.selected[i].label as string);
-        rowSelected['Selection'] = 'Selected';
-        rowSelected['value'] = selectedAmount;
-        currData.push(rowSelected);
+        let newData = {};
+        newData[dimension1] = categoryLabel;
+        newData[dimension2] = headerPart[p].label;
+        newData['value'] = headerPart[p].amount;
+        parSetData.push(newData);
       }
-
-      //unselected
-      let unselectedAmount = (cell.value.allData[i].amount as number)-(cell.value.selected[i].amount as number);
-      if(unselectedAmount > 0)
-      {
-        
-        let rowUnselected = {};
-        rowUnselected[''+columnLabel] = (cell.value.selected[i].label as string);
-        rowUnselected['Selection'] = 'Unselected';
-        rowUnselected['value'] = unselectedAmount;
-        currData.push(rowUnselected);
-      }
-
+       
     }
+    console.log('Cell clicken (dynamic) - data: ',parSetData);
 
-    console.log('currentData',currData);
 
     const that = this;
 
     // console.log('SVG Conatiner - width: ',width);
     let chart = (<any>d3).parsets()
                         .tension(0.5) //[0 .. 1] -> 1 = straight line 
-                        .dimensions([columnLabel, 'Selection'])
+                        .dimensions([dimension1, dimension2])
                         .value( function (d) { return d.value; })
                         .width(width)
                         .height(175); //175
@@ -695,7 +521,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgFigureGroup = svgCanvas.append('g').attr('class','parSets');
 
     // draw parallel sets
-    svgFigureGroup.datum(currData).call(chart);
+    svgFigureGroup.datum(parSetData).call(chart);
     
     //rotation um 90 von den SVG parallel sets
     //svgFigureGroup.attr('transform','rotate(-90) translate(-'+width+',0)');
@@ -715,11 +541,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
                               // d3.select(this).attr('fill',that.getColorOfCategory(d.parent.dimension,d.parent.name));
                               // console.log('fill color: ',that.getColorOfCategory(d.parent.dimension,d.parent.name));
-                              if(d.parent.name === cell.value.category && d.name === cell.value.tableColumn){
+                              if(d.parent.name === cell.category && d.name === cell.tableColumn){
                                 d3.select(this).classed('selected',true);
                               }
-                              console.log('path.this: ', d3.select(this));
-                              console.log('path.d: ',d);
+                              // console.log('path.this: ', d3.select(this));
+                              // console.log('path.d: ',d);
                             });
     // console.log('svgPaths: ',svgPaths);
 
@@ -734,75 +560,24 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   // console.log('dim.d: ',d);
                   // console.log('dim.this: ',d3.select(this));
 
-                  if(d.name === cell.value.category){
+                  if(d.name === cell.category){
                     d3.select(this).select('rect').classed('selected',true);
                   }
                   
                 });
 
-    
-
-
   }
-
-  // private getColorOfCategory(column: string, category: string)
-  // {
-  //   // console.log('column: ',column,' ¡ category',category);
-  //   let categoryColor = '#ffffff';
-  //   let allColumns = this.provider.getRankings()[0].children;
-  //   // console.log('allColumns: ',allColumns);
-  //   let allCategories = {};
-
-  //   for(let i =0; i<allColumns.length; i++){
-
-  //     if(allColumns[i].desc.label == column)
-  //     {
-  //       // console.log('the right column: ',column);
-  //       let currColCat = (allColumns[i] as ICategoricalColumn).categories;
-  //       // console.log('currColCat: ',currColCat);
-  //       if(<any>currColCat !== 'undefined'){
-  //         for(let cnt=0; cnt < currColCat.length; cnt++)
-  //         {
-  //           if(currColCat[cnt].label === category)
-  //           {
-  //             // console.log('the right category: ',category);
-  //             return currColCat[cnt].color;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-    
-  //   return categoryColor;
-  // }
   
-  private calcJaccard(items, columnA: string, categoryA: string, columnB: string, categoryB: string): number {
-
-    const selectionSet = items.filter(item => {
-      return item[columnA] === categoryA;
-    });
-
-    const categorySet = items.filter(item => {
-      return item[columnB] === categoryB;
-    });
-
-    const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
-
-    const unionArrays = function (a, b, equals){
-      return a.concat(b).reduce( (acc, element) => {
-          return acc.some(elt => equals(elt, element))? acc : acc.concat(element)
-      }, []);
+  // different kinds of score calculations
+  private calcScore (data, scoreType: string ,headerCategory: string, columnB: string, categoryB: string): number {
+    if(scoreType === 'jaccard')
+    {
+      return this.calcJaccardScore(data, headerCategory, columnB, categoryB);
     }
-    const union = unionArrays(selectionSet, categorySet, (a, b) => a._id === b._id);
 
-    const score = intersection.length / union.length;
-    
-    //console.log('score', score);
-
-    return score || 0;
   }
 
-
+  // calculates the jaccard score
   private calcJaccardScore(data, headerCategory: string, columnB: string, categoryB: string): number {
 
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
@@ -844,91 +619,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return score || 0;
   }
 
-  // calculated jaccard score
-  private calculateJaccardScores(currentItems: Array<any>)
-  {
-    const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
-    console.log('chosenColumns d3: ', this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum()));
-    
-    let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
-    console.log('remaining labels: ',showCategoriesAfterFilter);
-  
-    let selectedData = currentItems.filter((data) => {return data.selection === 'Selected'});
-
-    let jaccardScores = [];
-
-    for(let i=0; i<chosenColumns.length; i++)
-    {
-      let currCol = chosenColumns[i];
-      
-      for(let cnt=0; cnt < currCol.categories.length; cnt++)
-      {
-        let currCategory = currCol.categories[cnt];
-        if(showCategoriesAfterFilter.indexOf(currCategory.label) !== -1){
-          const scoreSelected = this.calcJaccard(currentItems, 'selection', 'Selected', currCol.column, currCategory.label);
-          const scoreDeselected = this.calcJaccard(currentItems, 'selection', 'Unselected', currCol.column, currCategory.label);
-
-          let resultObj = {
-            col1: {
-              label: currCol.label,
-              rowspan: (cnt === 0) ? currCol.categories.length : 0                
-            },
-            col2: {
-              label: currCategory.label,
-              color: currCategory.color
-            },
-            col3: {
-              label: scoreSelected,
-              column: currCol.column,
-              column_label: currCol.label,
-              category: currCategory.label,
-              color: this.score2color(scoreSelected),
-              action: true,
-              allData: this.getCategoryPartioning(currentItems,currCol),
-              selected: this.getCategoryPartioning(selectedData,currCol),
-              tableColumn: 'Selected'
-            },
-            col4: {
-              label: scoreDeselected,
-              column: currCol.column,
-              column_label: currCol.label,
-              category: currCategory.label,
-              color: this.score2color(scoreDeselected),
-              action: true,
-              allData: this.getCategoryPartioning(currentItems,currCol),
-              selected: this.getCategoryPartioning(selectedData,currCol),
-              tableColumn: 'Unselected'
-            }
-          };
-
-
-          jaccardScores.push(resultObj);
-        }
-      }
-    }
-
-    return jaccardScores;
-  }
-
-  private getCategoryPartioning(data: Array<any>, column: any)
-  {
-    let categoryPartioning = [];
-    for(let i=0; i < column.categories.length; i++)
-    {
-      let currCategory = column.categories[i];
-      let num = data.filter(item => {return item[''+column.column] === currCategory.label}).length;
-      num = !num ? 0 : num;
-      let currCategoryPart = {
-        label: currCategory.label,
-        amount: num
-      };
-      categoryPartioning.push(currCategoryPart);
-
-    }
-
-    return categoryPartioning;
-  }
-
+  // creates data for the visual representation of the jaccard score (parallel sets)
   private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any)
   {
     // console.log('getColumnPartioning.data',data);
@@ -988,10 +679,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       columnPartitioning.push(currCategoryParts);
     }
-    console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
+    // console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
     return columnPartitioning;
   }
 
+  // calculates the backgound color for the scores (0 -> white, 1 -> dark grey)
   private score2color(score:number, domain = [0, 1])
   {
     score = score || 0; // fix undefined or NaN
@@ -1002,6 +694,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return hslColor.toString();
   }
 
+  // only the display categories will be shown in table
   private getCategoriesAfterFiltering()
   {
     let allRemainingLabels = ['Selected', 'Unselected', ...this.getStratificationDesc().categories.map((cat) => cat.label)];
@@ -1031,68 +724,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     return allRemainingLabels;
   }
-
-
- /*  // draw table
-  private drawTable(containerId: string) {
-    // let measuresDivElement = d3.select('div[class="measures"]');
-    let tableContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','table-container');
-
-         
-    // let columnHeaders = [
-    //   { head: 'One', cl: ''},
-    //   { head: 'Two', cl: ''},
-    //   { head: 'Selected', cl: ''},
-    //   { head: 'Unselected', cl: ''}
-    // ];
-    let columnHeaders = ['One','Two','Selected','Unselected'];
-
-    let data = [
-      {One: 'Cat1', Two: 'A',Selected: 0.5 ,Unselected: 0.1},
-      {One: 'Cat1', Two: 'B',Selected: 0.5 ,Unselected: 0.1},
-      {One: 'Cat2', Two: 'a',Selected: 0.5 ,Unselected: 0.1},
-      {One: 'Cat2', Two: 'b',Selected: 0.5 ,Unselected: 0.1},
-      {One: 'Cat2', Two: 'c',Selected: 0.5 ,Unselected: 0.1},
-      {One: 'Cat2', Two: 'd',Selected: 0.5 ,Unselected: 0.1}
-    ];
-
-
-    let table = tableContainer.append('table')
-                        .attr('class','table table-condensed');
-    let tableHeader = table.append('thead');
-    tableHeader.append('tr')
-              .selectAll('th')
-              .data(columnHeaders)
-              .enter()
-              .append('th')
-              .text(function(d) { return d; });
-
-
-    let tableBody = table.append('tbody');
-    // create a row for each object in the data
-    var rows = tableBody.selectAll('tr')
-                    .data(data)
-                    .enter()
-                    .append('tr');
-
-    // create a cell in each row for each column
-    // At this point, the rows have data associated.
-    // So the data function accesses it.
-    var cells = rows.selectAll('td')
-                  .data(function(row) {
-                    // he does it this way to guarantee you only use the
-                    // values for the columns you provide.
-                    return columnHeaders.map(function(column) {
-                        // return a new object with a value set to the row's column value.
-                        return {value: row[column]};
-                    });
-                  })
-                  .enter()
-                  .append('td')
-                  .attr('class','text-center')
-                  .text(function(d) { return d.value; });
-  } */
 
 
   private updateItemControls() {
