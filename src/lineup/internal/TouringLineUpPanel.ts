@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc} from 'lineupjs';
+import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
@@ -170,7 +170,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
   }
 
-
+  //creates the accordion item (collapse) for one score
   private createAccordionItem(panelGroup: any, collapseDetails: any) {
     if (collapseDetails && collapseDetails instanceof Object &&
       collapseDetails.groupId && typeof collapseDetails.groupId === 'string' &&
@@ -213,6 +213,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
+  //generates a object, which contains the table head and table body
   private generateTableLayout(data: Array<any>)
   {
     let generatedTable = {
@@ -289,6 +290,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return tableHeaders;
   }
 
+  //generate table body depending on table head and radio button option
   private getTableBody(tableHeader: Array<any>, data: Array<any>)
   {
     let tableBody = [];
@@ -326,11 +328,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                 };
 
               }
-              // else if(col === 0 && cnt !== 0)
-              // {
-              //   delete tableRow[colName];
-                
-              // }
               else if(col === 1)  //second column (categoroies of categircal column)
               {
                 tableRow[colName] = {
@@ -341,6 +338,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               }else //all the other columns
               {
                 let score = this.calcJaccardScore(data, (tableHeader[col] as any).label, currCol.column, currCategory.label);
+                
                 tableRow[colName] = {
                   label: score, 
                   column: currCol.column,
@@ -348,6 +346,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   category: currCategory.label,
                   color: this.score2color(score),
                   action: true,
+                  partitioning: this.getColumnPartioningParallelSets(data, tableHeader, currCol)
                   // allData: this.getCategoryPartioning(currentItems,currCol), //TODO --> genertae Object for the detail view (parallel sets grafics)
                   // selected: this.getCategoryPartioning(selectedData,currCol)
                 };
@@ -369,6 +368,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return tableBody;
   }
 
+  // create table in container and depending on dataTable with D3
   private generateMeasureTable(containerId: string, dataTable: any)
   {
     const that = this;
@@ -413,7 +413,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                         // return an object for the column of the data row
                         return row[column.columnName];
                       });
-                      console.log('returnValues: ',returnValues);
+                      // console.log('returnValues: ',returnValues);
 
                       //push all desired column objects into this array
                       let allDesiredReturnValues = returnValues.filter(function(cell) {
@@ -421,7 +421,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                           return  (cell.rowspan === undefined) || (cell.rowspan && cell.rowspan >0);
                         });
 
-                      console.log('allDesiredReturnValues: ',allDesiredReturnValues);
+                      // console.log('allDesiredReturnValues: ',allDesiredReturnValues);
                       return allDesiredReturnValues;
                     })
                     .enter()
@@ -461,14 +461,61 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                                                   })
                                       .style("font-weight", 'normal'); 
                       }
-                    });
-                    // .on('click', function(d:any) {
-                    //   if(d.value.action) {
-                    //     that.showVisualRepresentation(containerId,d);
-                    //   }
-                    // }); 
+                    })
+                    .on('click', function(d:any) {
+                      if(d.action) {
+                        that.generateVisualRepJaccard(containerId,d);
+                      }
+                    }); 
                     
                     
+  }
+
+  private generateParallelSetData (containerId: string, cell)
+  {
+    // console.log('Cell clicken: ',cell);
+
+    // let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container"]');
+    // oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
+
+    // let svgContainer = d3.select('#'+containerId).append('div')
+    //                                               .attr('class','svg-container');
+  
+    // let width = svgContainer.style('width').slice(0,-2);
+    // let currData = [];
+    // let columnLabel = ''+cell.value.column_label;
+
+    // for(let i = 0; i < cell.value.selected.length; i++)
+    // {
+    //   let currCategoryLabel = ''+cell.value.selected[i].label;
+
+    //   //selected
+    //   let selectedAmount = (cell.value.selected[i].amount as number);
+    //   if(selectedAmount > 0)
+    //   {
+    //     let rowSelected = {};
+    //     rowSelected[''+columnLabel] = (cell.value.selected[i].label as string);
+    //     rowSelected['Selection'] = 'Selected';
+    //     rowSelected['value'] = selectedAmount;
+    //     currData.push(rowSelected);
+    //   }
+
+    //   //unselected
+    //   let unselectedAmount = (cell.value.allData[i].amount as number)-(cell.value.selected[i].amount as number);
+    //   if(unselectedAmount > 0)
+    //   {
+        
+    //     let rowUnselected = {};
+    //     rowUnselected[''+columnLabel] = (cell.value.selected[i].label as string);
+    //     rowUnselected['Selection'] = 'Unselected';
+    //     rowUnselected['value'] = unselectedAmount;
+    //     currData.push(rowUnselected);
+    //   }
+
+    // }
+
+    // console.log('currentData',currData);
+
   }
 
   private generateJaccardTable(containerId: string, currentData: Array<any>) {
@@ -577,6 +624,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   }
 
+  private generateVisualRepJaccard(containerId: string, cell: any)
+  {
+    console.log('Cell clicken (dynamic): ',cell);
+
+  }
+  
   private showVisualRepresentation(containerId: string, cell: any)
   {
     console.log('Cell clicken: ',cell);
@@ -876,6 +929,69 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return categoryPartioning;
   }
 
+  private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any)
+  {
+    // console.log('getColumnPartioning.data',data);
+    // console.log('getColumnPartioning.tableHeader',tableHeader);
+    // console.log('getColumnPartioning.column',column);
+    let columnPartitioning = [];
+    let groups = this.provider.getRankings()[0].getGroups();
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+
+    for(let i=0; i < column.categories.length; i++)
+    {
+      let currCategory = column.categories[i];
+      let dataIdCurrCategory = data.filter(item => {return item[''+column.column] === currCategory.label}).map((a) => {return a.id});
+      let num = dataIdCurrCategory.length;
+
+      let currCategoryParts = {
+        categoryLabel: currCategory.label,
+        categoryAmount: num,
+        parts: []
+      };
+
+      //TODO capare in selection mode
+      for(let h=0; h<tableHeader.length; h++)
+      {
+        
+        let currHeader = tableHeader[h];
+        
+        if(currHeader.label.length > 0){
+          // let num = data.filter(item => {return item[''+column.column] === currCategory.label}).length;
+          // num = !num ? 0 : num;
+          let dataIdCurrentHeader = []
+          if(optionDDA === 'Selection'){
+            dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label}).map((a) => {return a.id});
+          }else{
+            for(let g=0;g<groups.length;g++)
+            {
+              if(groups[g].name === currHeader.label)
+              {
+                dataIdCurrentHeader = (groups[g] as any).rows.map((a) => {return a.v.id});
+              }
+            }
+          }
+          let intersection = dataIdCurrCategory.filter(item => -1 !== dataIdCurrentHeader.indexOf(item));
+          let numHeader = intersection.length;
+
+          if(numHeader > 0){
+            let currCatForHead = {
+              label: currHeader.label,
+              amount: numHeader
+            };
+
+            currCategoryParts.parts.push(currCatForHead);
+          }
+
+        }
+      }
+
+      columnPartitioning.push(currCategoryParts);
+    }
+    console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
+    return columnPartitioning;
+  }
+
   private score2color(score:number, domain = [0, 1])
   {
     score = score || 0; // fix undefined or NaN
@@ -885,7 +1001,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const hslColor =  d3.rgb(darkness, darkness, darkness);
     return hslColor.toString();
   }
-  
+
   private getCategoriesAfterFiltering()
   {
     let allRemainingLabels = ['Selected', 'Unselected', ...this.getStratificationDesc().categories.map((cat) => cat.label)];
@@ -917,7 +1033,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
 
-  // draw table
+ /*  // draw table
   private drawTable(containerId: string) {
     // let measuresDivElement = d3.select('div[class="measures"]');
     let tableContainer = d3.select('#'+containerId).append('div')
@@ -976,7 +1092,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   .append('td')
                   .attr('class','text-center')
                   .text(function(d) { return d.value; });
-  }
+  } */
 
 
   private updateItemControls() {
