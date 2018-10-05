@@ -62,38 +62,49 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // changes made in dropdowns
     //    cause changes the displayed table / scores 
-    d3.select(this.node).selectAll('select').on('input', () => this.updateTouringData());
+    d3.select(this.node).selectAll('select').on('input', () => this.updateTouringPanel());
 
 
-
+    const self = this;
+    // tab changed
+    d3.select(this.node).selectAll('ul.nav a').on('click', function() {
+      if (this.href.indexOf('item') >= 0) {
+        self.updateItemTab();
+      } else if (this.href.indexOf('attr') >= 0) {
+        self.updateAttributeTab();
+      }
+    });
 
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData()); //fat arrow to preserve scope in called function (this)
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel());
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel());
 
     // for filter changes and stratification changes
     //  After the number of items has changed, the score change aswell
     // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
-    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
+    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel());
   }
 
-  private updateTouringData() {
+  private updateTouringPanel() {
+    // NOTE: after clicking on a tab, the class is not immidiatly correct/updated.
     if (d3.select(this.itemTab).classed('active')) {
+      console.log('item tab is active, update content...');
       this.updateItemTab();
     } else if (d3.select(this.attributeTab).classed('active')) {
+      console.log('attribtue tab is active, update content...');
       this.updateAttributeTab();
     }
   }
@@ -101,6 +112,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private updateItemTab() {
     this.toggleStratificationOptions();
     this.updateItemControls();
+    //changing the radio button or the removing columns could create a different selection in the dropdowns
+    //therefore the touring data will be updated
     this.updateItemScores();
   }
 
@@ -160,9 +173,67 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
   private updateAttributeTab() {
+    console.log('Updating attribute tab.');
+    this.updateAttributeControls();
     // TODO
-    // this.updateAttributeControls();
+    // changing the radio button or the removing columns could create a different selection in the dropdowns
+    // therefore the touring data will be updated
     // this.updateAttributeScores();
+  }
+
+  private updateAttributeControls() {
+    const dropdownA = d3.select(this.attributeTab).select('select.compareA');
+    const dropdownB = d3.select(this.attributeTab).select('select.compareB');
+    
+    
+    // TODO remove categories which are not displayed
+    let descriptions: IColumnDesc[] = deepCopy(this.provider.getRankings()[0].children.map((col) => col.desc));
+    // we generate an entry for every attribute (categorical, numerical, string, and maybe more(?))
+    // and an entry representing the selected/unselected items as a attribute with two categories
+    // and an entry representing the ranked order of items as numerical attribute
+    // and an entry representing the current stratification as categorical attribute
+    // and an entry representing the numerical attributes (if there are any)
+    // and an entry representing the categorical attributes (if there are any)
+    // and an entry representing all these attributes
+    descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
+    // descriptions.forEach((desc) => {
+      //   (desc as any).categories = (this.provider.getRankings()[0].children.filter((child) => child.label == desc.label)[0] as CategoricalColumn).categories;
+      // });
+
+    // Generate an attribute description that represents the current stratification
+    descriptions.unshift(this.getStratificationDesc());
+    descriptions.unshift(this.getRankDesc());
+    // Generate a Attribute description that represents the current selection
+    descriptions.unshift(this.getSelectionDesc());
+    // TODO Add Rank
+    descriptions.unshift({ //There is always at least the rank as numerical column
+      label: 'All numerical columns',
+      type: 'num_collection'
+    });
+    descriptions.unshift({ //There is always at least the selection as categorical column
+      label: 'All categorical columns',
+      type: 'cat_collection'
+    });
+    descriptions.unshift({ // at least selection & rank
+      label: 'All columns',
+      type: 'collection'
+    })
+
+    //bin data, label is key
+    const optionsA = dropdownA.selectAll('option').data(descriptions, (desc) => desc.label); 
+    const optionsB = dropdownB.selectAll('option').data(descriptions, (desc) => desc.label);
+    //enter: add columns to dropdown, that were added by the user
+    optionsA.enter().append('option').text((desc) => desc.label);
+    optionsB.enter().append('option').text((desc) => desc.label);
+    
+    // update: nothing to do
+
+    // exit: remove columns no longer displayed
+    optionsA.exit().remove(); 
+    optionsB.exit().remove(); 
+    // order domelements as in the array
+    optionsA.order(); 
+    optionsB.order(); 
   }
 
 
@@ -839,7 +910,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateItemControls() {
-    const dropdownA = d3.select(this.itemTab).select('select.itemControls.compareA');
+    const dropdownA = d3.select(this.itemTab).select('select.compareA');
     // dropdownA ('With')
     // We append the current data to:
     //  the entry for the selection       (defined in the html)
@@ -858,7 +929,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     
     // TODO remove categories which are not displayed
-    const dropdownB = d3.select(this.itemTab).select('select.itemControls.compareB');
+    const dropdownB = d3.select(this.itemTab).select('select.compareB');
     const mode = this.getRadioButtonValue();
     let descriptions: IColumnDesc[] = deepCopy(this.provider.getRankings()[0].children.map((col) => col.desc));
     if (mode === 'category') {
@@ -890,6 +961,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         (desc as any).categories = stratDesc.categories; // Replace real categopries with those from stratification
       });
       descriptions.unshift(this.getSelectionDesc());
+      // TODO Add Rank
       descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All numerical columns',
         type: 'num_collection'
@@ -909,9 +981,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // update: nothing to do
     options.exit().remove(); // exit: remove columns no longer displayed
     options.order(); // order domelements as in the array
-
-    //changing the radio button or the removing columns could create a different selection in the dropdowns
-    //therefore the touring data will be updated
   }
   
   
@@ -986,6 +1055,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       label: 'Stratification Groups',
       type: 'categorical',
       column: 'strat_groups'
+    }
+  }
+
+  private getRankDesc() {
+    return {
+      label: 'Rank',
+      type: 'numerical',
+      column: 'rank'
     }
   }
 
