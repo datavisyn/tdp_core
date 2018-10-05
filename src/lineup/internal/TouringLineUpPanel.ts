@@ -61,38 +61,49 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // changes made in dropdowns
     //    cause changes the displayed table / scores 
-    d3.select(this.node).selectAll('select').on('input', () => this.updateTouringData());
+    d3.select(this.node).selectAll('select').on('input', () => this.updateTouringPanel());
 
 
-
+    const self = this;
+    // tab changed
+    d3.select(this.node).selectAll('ul.nav a').on('click', function() {
+      if (this.href.indexOf('item') >= 0) {
+        self.updateItemTab();
+      } else if (this.href.indexOf('attr') >= 0) {
+        self.updateAttributeTab();
+      }
+    });
 
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData()); //fat arrow to preserve scope in called function (this)
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel());
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel());
 
     // for filter changes and stratification changes
     //  After the number of items has changed, the score change aswell
     // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
-    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringData());
+    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringLineUpPanel.EVENTTYPE, () => this.updateTouringPanel());
   }
 
-  private updateTouringData() {
+  private updateTouringPanel() {
+    // NOTE: after clicking on a tab, the class is not immidiatly correct/updated.
     if (d3.select(this.itemTab).classed('active')) {
+      console.log('item tab is active, update content...');
       this.updateItemTab();
     } else if (d3.select(this.attributeTab).classed('active')) {
+      console.log('attribtue tab is active, update content...');
       this.updateAttributeTab();
     }
   }
@@ -161,6 +172,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // TODO
     // this.updateAttributeControls();
     // this.updateAttributeScores();
+    console.log('Updating attribute tab.');
   }
 
 
