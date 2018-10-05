@@ -110,7 +110,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateItemTab() {
-    this.toggleStratificationOptions();
     this.updateItemControls();
     //changing the radio button or the removing columns could create a different selection in the dropdowns
     //therefore the touring data will be updated
@@ -679,7 +678,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let i=0; i<groups.length; i++){
         if(groups[i].name === headerCategory)
         {
-          selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+          if(groups.length ===1)
+          {
+            selectionSet = data;
+          }else{
+            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+          }        
         }
       }
     }
@@ -696,7 +700,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let i=0; i<groups.length; i++){
         if(groups[i].name === categoryB)
         {
-          categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+          if(groups.length ===1)
+          {
+            categorySet = data;
+          }else{
+            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+          }
         }
       }
     }
@@ -736,7 +745,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let i=0; i<groups.length; i++){
         if(groups[i].name === headerCategory)
         {
-          selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+          if(groups.length ===1)
+          {
+            selectionSet = data;
+          }else{
+            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+          } 
         }
       }
 
@@ -754,7 +768,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for(let i=0; i<groups.length; i++){
         if(groups[i].name === categoryB)
         {
-          categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+          if(groups.length ===1)
+          {
+            categorySet = data;
+          }else{
+            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+          }
         }
       }
     }
@@ -816,7 +835,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           }else{
             for(let g=0;g<groups.length;g++)
             {
-              if(groups[g].name === currHeader.label)
+              if(groups[g].name === currHeader.label && (groups[g] as any).rows)
               {
                 dataIdCurrentHeader = (groups[g] as any).rows.map((a) => {return a.v.id});
               }
@@ -883,30 +902,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
 
     return allRemainingLabels;
-  }
-
-  private toggleStratificationOptions()
-  {
-    // check if stratificaiton exists
-    let groupDisabled = this.provider.getRankings()[0].getGroups().length === 1;
-
-    // button in radio button group
-    let buttons = this.node.querySelectorAll('.form-check-input.itemControls')!;
-    let stratificationButton = buttons[1] as any;
-    for(let i=0; i<buttons.length; i++)
-    {
-      if((buttons[i]as any).value === 'group')
-      {
-        stratificationButton = buttons[i] as any
-      }
-    }
-
-    let OptionStratification = this.node.querySelector('option.stratification') as any;
-    // console.log('OptionStratification: ',OptionStratification);
-
-    // enable / disable options for stratification
-    stratificationButton.disabled = groupDisabled;
-    OptionStratification.disabled = groupDisabled;
   }
 
   private updateItemControls() {
