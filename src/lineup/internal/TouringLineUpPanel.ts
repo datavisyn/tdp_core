@@ -33,14 +33,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       this.toggleTouring();
 
       console.log('provider', this.provider);
-      console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
-      console.log('provider.selectedRows: ', this.provider.selectedRows());
-      console.log('provider.getColumns: ', this.provider.getColumns());
-      console.log('provider.getRanking: ', this.provider.getRankings());
+      // console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
+      // console.log('provider.selectedRows: ', this.provider.selectedRows());
+      // console.log('provider.getColumns: ', this.provider.getColumns());
+      // console.log('provider.getRanking: ', this.provider.getRankings());
       console.log('getGroups', this.provider.getRankings()[0].getGroups())
       console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
-      console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
-      console.log('data', this.provider.data);
+      // console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
+      // console.log('data', this.provider.data);
       console.log('------------------------------------');
     }));
 
@@ -553,8 +553,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let width = svgContainer.style('width').slice(0,-2);
 
     //dimensions for the parallel sets
-    let dimension1 = cell.column_label;
-    let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
+    //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
+    let dimension1 = '1.Dim: '+cell.column_label;
+    let dimension2 = (optionDDA === 'Selection') ? '2.Dim: Selection' : '2. Dim: Stratification Groups';
     
     let colPart = cell.partitioning;
     let parSetData = [];
@@ -692,7 +693,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let categorySet = [];
     // use categories or stratification as rows
-    if(this.getRadioButtonValue() === 'category'){
+    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
       categorySet = data.filter(item => {
         return item[columnB] === categoryB;
       });
@@ -760,7 +761,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let categorySet = [];
     // use categories or stratification as rows
-    if(this.getRadioButtonValue() === 'category'){
+    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
       categorySet = data.filter(item => {
         return item[columnB] === categoryB;
       });
@@ -812,6 +813,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     {
       let currCategory = column.categories[i];
       let dataIdCurrCategory = data.filter(item => {return item[''+column.column] === currCategory.label}).map((a) => {return a.id});
+
+      if(this.getRadioButtonValue() === 'group' && column.column !== 'selection') //for stratification radio button
+      {
+        let currGroups = groups.filter(item => {return item.name === currCategory.label});
+        let dataIdCurrGroups = [];
+        for(let g=0; g<currGroups.length;g++){
+          dataIdCurrGroups = ((currGroups[g] as any).rows.map((a) => {return a.v.id}));
+        }
+        dataIdCurrCategory = dataIdCurrGroups;
+      }
+
       let num = dataIdCurrCategory.length;
 
       let currCategoryParts = {
