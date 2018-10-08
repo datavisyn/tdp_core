@@ -249,7 +249,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         .attr('role', 'tab')
         .append('h4')
         .attr('class', 'panel-title') //multiple expanded accordions
-        .html(`<a data-toggle="collapse" href="#${collapseDetails.id}">${collapseDetails.label}</a>`) //single expanded accordion
+        .html(`<a data-toggle="collapse" href="#${collapseDetails.id}" aria-expanded="${collapseDetails.default.toString()}">${collapseDetails.label}</a>`) //single expanded accordion
       //.html(`<a data-toggle="collapse" data-parent="#${collapseDetails.groupId}" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
 
       let panelCollapse = panel.append('div')

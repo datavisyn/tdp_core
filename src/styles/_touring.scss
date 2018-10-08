@@ -8,6 +8,29 @@
   margin-top: 0.5em;
   overflow-y: auto;
 
+  .measures {
+    border-top: #AAA 2px solid;
+
+    a:hover, a:focus {
+        color: #1f77b4;
+        text-decoration: none;
+    }
+
+    a[aria-expanded="false"]::before {
+      content: "\f18e ";
+      font-family: FontAwesome;
+      color: #333;
+      font-size: 0.9em;
+    }
+
+    a[aria-expanded="true"]::before {
+      content: "\f01a ";
+      font-family: FontAwesome;
+      color: #333;
+      font-size: 0.9em;
+    }
+  }
+
   .table-container {
     overflow-x: auto;
   }
