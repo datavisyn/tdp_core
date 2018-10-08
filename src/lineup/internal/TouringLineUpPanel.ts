@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column} from 'lineupjs';
+import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
@@ -13,10 +13,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private touringElem: HTMLElement;
   private columnOverview: HTMLElement; searchbox: HTMLElement; itemCounter: HTMLElement; // default sidepanel elements
   private itemTab: Node; attributeTab: Node;
+  private ranking : RankingAdapter;
 
 
   protected init() {
     super.init();
+    this.ranking = new RankingAdapter(this.provider);
 
     this.node.insertAdjacentHTML('beforeend', panelHTML);
     this.touringElem = <HTMLElement>this.node.querySelector('.touring');
@@ -33,7 +35,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       this.toggleTouring();
 
       console.log('provider', this.provider);
-      // console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
+      console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
       // console.log('provider.selectedRows: ', this.provider.selectedRows());
       // console.log('provider.getColumns: ', this.provider.getColumns());
       // console.log('provider.getRanking: ', this.provider.getRankings());
@@ -117,7 +119,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateItemScores() {
-    const currentData = this.getDisplayedData();
+    const currentData = this.ranking.getItemsDisplayed();
     console.log('current data: ', currentData);
 
     const inputA = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum());
@@ -186,7 +188,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     
     // TODO remove categories which are not displayed
-    let descriptions: IColumnDesc[] = deepCopy(this.provider.getRankings()[0].children.map((col) => col.desc));
+    let descriptions: IColumnDesc[] = deepCopy(this.ranking.getDisplayedAttributes().map((col) => col.desc));
     // we generate an entry for every attribute (categorical, numerical, string, and maybe more(?))
     // and an entry representing the selected/unselected items as a attribute with two categories
     // and an entry representing the ranked order of items as numerical attribute
@@ -195,15 +197,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // and an entry representing the categorical attributes (if there are any)
     // and an entry representing all these attributes
     descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
-    // descriptions.forEach((desc) => {
-      //   (desc as any).categories = (this.provider.getRankings()[0].children.filter((child) => child.label == desc.label)[0] as CategoricalColumn).categories;
-      // });
 
     // Generate an attribute description that represents the current stratification
-    descriptions.unshift(this.getStratificationDesc());
-    descriptions.unshift(this.getRankDesc());
+    descriptions.unshift(this.ranking.getStratificationDesc());
+    descriptions.unshift(this.ranking.getRankDesc());
     // Generate a Attribute description that represents the current selection
-    descriptions.unshift(this.getSelectionDesc());
+    descriptions.unshift(this.ranking.getSelectionDesc());
     // TODO Add Rank
     descriptions.unshift({ //There is always at least the rank as numerical column
       label: 'All numerical columns',
@@ -311,7 +310,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }else if (optionDDA === 'Stratification Groups')
     {
       
-      let allStratificationGroups = this.getStratificationDesc();
+      let allStratificationGroups = this.ranking.getStratificationDesc();
       let groups = allStratificationGroups.categories;
       // console.log('allStratificationGroups',allStratificationGroups);  
 
@@ -422,7 +421,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // create a <div> as table container with D3
     let tableContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','table-container table-responsive');
+                                                  .attr('class','table-container');
 
     // table                                        
     let table = tableContainer.append('table')
@@ -690,7 +689,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('columnB: ',columnB);
     // console.log('categoryB: ',categoryB);
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    let groups = this.provider.getRankings()[0].getGroups();
+    let groups = this.ranking.getGroups();
 
     let selectionSet = [];
     // use selection or stratification groups as header
@@ -758,7 +757,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private calcOverlapCoeffieient(data, headerCategory: string, columnB: string, categoryB: string): number {
 
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    let groups = this.provider.getRankings()[0].getGroups();
+    let groups = this.ranking.getGroups();
 
     let selectionSet = [];
     if(optionDDA === 'Selection'){
@@ -767,7 +766,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       });
 
     }else if(optionDDA === 'Stratification Groups'){
-      let groups = this.provider.getRankings()[0].getGroups();
+      let groups = this.ranking.getGroups();
       for(let i=0; i<groups.length; i++){
         if(groups[i].name === headerCategory)
         {
@@ -830,7 +829,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('getColumnPartioning.tableHeader',tableHeader);
     // console.log('getColumnPartioning.column',column);
     let columnPartitioning = [];
-    let groups = this.provider.getRankings()[0].getGroups();
+    let groups = this.ranking.getGroups();
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
 
     // go through all categories of current coloumn
@@ -913,8 +912,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // only the display categories will be shown in table
   private getCategoriesAfterFiltering()
   {
-    let allRemainingLabels = ['Selected', 'Unselected', ...this.getStratificationDesc().categories.map((cat) => cat.label)];
-    let columns = this.provider.getRankings()[0].children;
+    let allRemainingLabels = ['Selected', 'Unselected', ...this.ranking.getStratificationDesc().categories.map((cat) => cat.label)];
+    let columns = this.ranking.getDisplayedAttributes();
     
     for(let i=0; i<columns.length; i++)
     {
@@ -949,21 +948,21 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //  the entry for the stratification  (defined in the html)
 
     // Generate a Attribute description that represents the current selection
-    const selDesc = this.getSelectionDesc();
+    const selDesc = this.ranking.getSelectionDesc();
     console.log('selDesc', selDesc);
     const selOption = dropdownA.select('option.selection').datum(selDesc); //bind description to option and set text
     selOption.text((desc) => desc.label);
 
     
     // Generate an attribute description that represents the current stratification
-    const stratDesc = this.getStratificationDesc();
+    const stratDesc = this.ranking.getStratificationDesc();
     dropdownA.select('option.stratification').datum(stratDesc).text((desc) => desc.label); //bind description to option and set text
 
     
     // TODO remove categories which are not displayed
     const dropdownB = d3.select(this.itemTab).select('select.compareB');
     const mode = this.getRadioButtonValue();
-    let descriptions: IColumnDesc[] = deepCopy(this.provider.getRankings()[0].children.map((col) => col.desc));
+    let descriptions: IColumnDesc[] = deepCopy(this.ranking.getDisplayedAttributes().map((col) => col.desc));
     if (mode === 'category') {
       // If Categories is selected:
       //    we generate an entry for every categorical attribute
@@ -971,9 +970,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing all these attributes
       descriptions = descriptions.filter((desc) => (<ICategoricalColumnDesc>desc).categories);
       descriptions.forEach((desc) => {
-        (desc as any).categories = (this.provider.getRankings()[0].children.filter((child) => child.label == desc.label)[0] as CategoricalColumn).categories;
+        (desc as any).categories = (this.ranking.getDisplayedAttributes().filter((child) => child.label == desc.label)[0] as CategoricalColumn).categories;
       });
-      descriptions.unshift(this.getSelectionDesc());
+      descriptions.unshift(this.ranking.getSelectionDesc());
       descriptions.unshift({ //There is always at least the selection as categorical column
         label: 'All categorical columns',
         type: 'cat_collection'
@@ -992,8 +991,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       descriptions.forEach((desc) => {
         (desc as any).categories = stratDesc.categories; // Replace real categopries with those from stratification
       });
-      descriptions.unshift(this.getSelectionDesc());
-      // TODO Add Rank
+      descriptions.unshift(this.ranking.getSelectionDesc());
+      descriptions.unshift(this.ranking.getRankDesc())
       descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All numerical columns',
         type: 'num_collection'
@@ -1034,67 +1033,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       console.log('start touring')
       //if touring is displayed, ensure the panel is visible
       this.collapse = false;
-    }
-  }
-
-  private getDisplayedData() {
-    const currentData = new Array();
-
-    // get currently displayed data
-    this.provider.getRankings()[0].getGroups().forEach((stratGroup) => {
-      // order is always defined for groups
-      stratGroup.order.forEach((rowId) => { 
-        // include wether the row is selected
-        const row = this.provider.data[rowId];
-        row.selection = this.provider.getSelection().includes(rowId) ? 'Selected' : 'Unselected';
-
-        // TODO score columns are missing from this.provider.data
-        currentData.push(row);
-        });
-    })
-
-    return currentData;
-  }
-
-
-  private getSelectionDesc() {
-    const selCategories = new Array<ICategory>();
-    const numberOfRows = this.provider.getRankings()[0].getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
-    console.log('Selected ', this.provider.getSelection().length, 'Total ', numberOfRows);
-    if (this.provider.getSelection().length > 0) {
-      selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
-    } // else: none selected
-
-    if (this.provider.getSelection().length < numberOfRows) {
-      selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
-    } // else: all selected
-
-    return {
-      categories: selCategories,
-      label: 'Selection',
-      type: 'categorical',
-      column: 'selection'
-    };
-  }
-
-  private getStratificationDesc() {
-    return {
-      categories: this.provider.getRankings()[0].getGroups().map((group) => ({
-        name: group.name,
-        label: group.name
-        // TODO get colors of stratification
-      })), // if not stratifified, there is only one group ('Default')
-      label: 'Stratification Groups',
-      type: 'categorical',
-      column: 'strat_groups'
-    }
-  }
-
-  private getRankDesc() {
-    return {
-      label: 'Rank',
-      type: 'numerical',
-      column: 'rank'
     }
   }
 
@@ -1166,3 +1104,146 @@ const deepCopy = <T>(target: T): T => {
   }
   return target;
 };
+
+
+class RankingAdapter {
+ 
+  constructor(protected readonly provider: LocalDataProvider, private rankingIndex = 0) {
+      // console.log('provider', this.provider);
+      // console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
+      // console.log('provider.selectedRows: ', this.provider.selectedRows());
+      // console.log('provider.getColumns: ', this.provider.getColumns());
+      // console.log('provider.getRanking: ', this.provider.getRankings());
+      // console.log('getGroups', this.provider.getRankings()[0].getGroups())
+      // console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
+      // console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
+      // console.log('data', this.provider.data);
+      // console.log('------------------------------------');
+  }
+
+  public getProvider() : LocalDataProvider {
+    return this.provider;
+  }
+
+  /**
+   * Beware: this does not include selection and rank data.
+   */
+  private getItems() {
+    return this.provider.data;
+  }
+
+
+  /**
+   * Return an array of displayed items, with their id and data (including selection status and rank).
+   *  Data Template:
+   *    [{
+   *      _id: 123,
+   *      rank: 0,
+   *      selection: 'Selected,
+   *      attr1: 3.14159
+   *    },
+   *    ...
+   *    ]
+   */
+  public getItemsDisplayed() {
+    const currentData = new Array();
+
+    let rank = 0;
+    // get currently displayed data
+    this.getGroups().forEach((stratGroup) => {
+      // order is always defined for groups (rows (data) only if there is an stratification)
+      stratGroup.order.forEach((rowId) => { 
+        const row = this.getItems()[rowId]; // row
+        row.rank = rank++; //set rank and increment
+        // include wether the row is selected
+        row.selection = this.getSelection().includes(rowId) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
+        // TODO score columns are missing from this.provider.data
+        currentData.push(row);
+        });
+    })
+
+    return currentData;
+  }
+
+
+  public getDisplayedAttributes() {
+    return this.getRanking().children;
+  }
+
+  /**
+   * Return an array of displayed items, with their id and rank.
+   *  Data Template:
+   *   [{
+   *     _id: 123,
+   *     rank: 0
+   *   },
+   *  ...
+   *  ]
+   */
+  public getItemRanks() {
+    
+    let i = 0;
+    let rankedItems = []
+    for(const group of this.getRanking().getGroups()) {
+      rankedItems.push(group.order.map((id) => ({_id: id, rank: i++})));
+    }
+
+    return rankedItems;
+  }
+
+  public getRanking() : Ranking {
+    return this.provider.getRankings()[this.rankingIndex];
+  }
+
+  public getGroups() {
+    return this.getRanking().getGroups();
+  }
+
+  public getSelection() {
+    return this.provider.getSelection();
+  }
+
+
+
+
+  public getSelectionDesc() {
+    const selCategories = new Array<ICategory>();
+    const numberOfRows = this.getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
+    console.log('Selected ', this.getSelection().length, 'Total ', numberOfRows);
+    if (this.getSelection().length > 0) {
+      selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
+    } // else: none selected
+
+    if (this.getSelection().length < numberOfRows) {
+      selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
+    } // else: all selected
+
+    return {
+      categories: selCategories,
+      label: 'Selection',
+      type: 'categorical',
+      column: 'selection'
+    };
+  }
+
+  public getStratificationDesc() {
+    return {
+      categories: this.getGroups().map((group) => ({
+        name: group.name,
+        label: group.name
+        // TODO get colors of stratification
+      })), // if not stratifified, there is only one group ('Default')
+      label: 'Stratification Groups',
+      type: 'categorical',
+      column: 'strat_groups'
+    }
+  }
+
+  public getRankDesc() {
+    return {
+      label: 'Rank',
+      type: 'numerical',
+      column: 'rank'
+    }
+  }
+}
