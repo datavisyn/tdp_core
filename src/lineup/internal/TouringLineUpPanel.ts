@@ -613,13 +613,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                             .each(function(d) {
                               d3.select(this).classed('selected',false);
 
-                              // console.log('path.parent.name: ',d.parent.name);
-                              // console.log('cell.category: ',currCategory);
-
-                              // d3.select(this).attr('fill',that.getColorOfCategory(d.parent.dimension,d.parent.name));
-                              // console.log('fill color: ',that.getColorOfCategory(d.parent.dimension,d.parent.name));
                               if(d.parent.name === cell.category && d.name === cell.tableColumn){
                                 d3.select(this).classed('selected',true);
+                              }
+                              
+                              let color = that.getColorOfCategory(d.parent.dimension.substring(7),d.parent.name);
+                              if(color !== null)
+                              {
+                                d3.select(this).style('fill',color);
                               }
                               // console.log('path.this: ', d3.select(this));
                               // console.log('path.d: ',d);
@@ -632,7 +633,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //highlight label of current path
     svgDimensions.selectAll('g')
                  .each(function(d) {
-                  // d3.select(this).classed('selected',false);
                   d3.select(this).select('rect').classed('selected',false);
                   // console.log('dim.d: ',d);
                   // console.log('dim.this: ',d3.select(this));
@@ -640,11 +640,36 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   if(d.name === cell.category){
                     d3.select(this).select('rect').classed('selected',true);
                   }
-                  
+
+                  let color = that.getColorOfCategory(d.dimension.name.substring(7),d.name);
+                  if(color !== null)
+                  {
+                    d3.select(this).select('rect').style('fill',color);
+                  }
+      
                 });
 
   }
  
+  private getColorOfCategory(column: string, category: string){
+    console.log('path.column: ',column);
+    console.log('path.category: ',category);
+    let currColumn = this.provider.getRankings()[0].children.filter((item) => {return item.desc.label === column;});
+    let color = null;
+    if(currColumn[0] && (currColumn[0] as ICategoricalColumn).categories)
+    {
+      let currCategories = (currColumn[0] as ICategoricalColumn).categories;
+      for(let i=0; i<currCategories.length; i++){
+        if(currCategories[i].label === category){
+          color = currCategories[i].color;
+        }
+      }
+    }
+    
+    console.log('path.color: ',color);
+    return color;
+  }
+
   // --------- SCORES ---
   // different kinds of score calculations
   private calcScore (data, scoreType: string ,headerCategory: string, columnB: string, categoryB: string): number {
