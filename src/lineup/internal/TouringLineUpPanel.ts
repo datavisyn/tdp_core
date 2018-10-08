@@ -421,7 +421,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // create a <div> as table container with D3
     let tableContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','table-container table-responsive');
+                                                  .attr('class','table-container');
 
     // table                                        
     let table = tableContainer.append('table')
@@ -967,7 +967,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         (desc as any).categories = stratDesc.categories; // Replace real categopries with those from stratification
       });
       descriptions.unshift(this.ranking.getSelectionDesc());
-      // TODO Add Rank
+      descriptions.unshift(this.ranking.getRankDesc())
       descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All numerical columns',
         type: 'num_collection'
