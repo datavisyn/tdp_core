@@ -8,6 +8,29 @@
   margin-top: 0.5em;
   overflow-y: auto;
 
+  .measures {
+    border-top: #AAA 2px solid;
+
+    a:hover, a:focus {
+        color: #1f77b4;
+        text-decoration: none;
+    }
+
+    a[aria-expanded="false"]::before {
+      content: "\f18e ";
+      font-family: FontAwesome;
+      color: #333;
+      font-size: 0.9em;
+    }
+
+    a[aria-expanded="true"]::before {
+      content: "\f01a ";
+      font-family: FontAwesome;
+      color: #333;
+      font-size: 0.9em;
+    }
+  }
+
   .table-container {
     overflow-x: auto;
   }
@@ -15,11 +38,7 @@
   .tab-pane {
     margin: 0.5em 0 0 0.5em;
 
-    //accordion
-    .panel-heading.active { background-color: #f3f3f3; }
-
-
-    //parallel sets with d3
+     //parallel sets with d3
     .dimension { cursor: ns-resize; }
     .category { cursor: ew-resize; }
     .dimension tspan.name { font-size: 1.5em; fill: #333; font-weight: bold; }

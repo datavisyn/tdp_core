@@ -260,11 +260,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       let aCollapse = panelTitle.append('a')
           .attr('data-toggle','collapse')
           .attr('href','#'+collapseDetails.id)
+          .attr('aria-expanded',collapseDetails.default.toString())
           .text(collapseDetails.label)
-          .on('click', function(d:any) {
-            
-            panelHeading.classed('active',!panelHeading.classed('active'));
-          }); 
 
 
       let panelCollapse = panel.append('div')
@@ -272,7 +269,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         .attr('id', collapseDetails.id);
 
       if (collapseDetails.default) {
-        panelHeading.classed('active',true);
         panelCollapse.classed('in', true); //accordion item is expanded
       }
 
