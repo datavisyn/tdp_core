@@ -96,7 +96,7 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
         return {
           id: d.id ? d.id : d.text,
           text: d.text ? d.text : d.id
-        }
+        };
       }
     };
 
