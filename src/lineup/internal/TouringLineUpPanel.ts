@@ -462,11 +462,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       this.generateMeasureTableCellJaccard(containerId, rows,dataTable);
     }else if(scoreType === 'overlap'){
       this.generateMeasureTableCellOverlap(containerId, rows,dataTable);
-    }else if(scoreType === 'ttest'){
+    }else if(scoreType === 'student_test'){
       this.generateMeasureTableCellTTest(containerId, rows,dataTable);
+    }else if(scoreType === 'mwu_test'){
+      this.generateMeasureTableCellMWUTest(containerId, rows,dataTable);
     }
                  
-                    
+    
   }
 
   // creates table cell for jaccard score with all its formating and functionality
@@ -552,6 +554,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
   }
+
+   // creates table cell for t-test score with all its formating and functionality
+   private generateMeasureTableCellMWUTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
+   {
+     this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
+   }
+ 
 
   // --------- VISUAL REPRESENTATION ---
   // creates visual representation as a parallel set (for jaccard)
@@ -694,7 +703,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     {
       return this.calcJaccardCoefficient(data, headerCategory, columnB, categoryB);
     } else if (scoreType === 'overlap'){
+
       return this.calcOverlapCoeffieient(data, headerCategory, columnB, categoryB);
+    } else if (scoreType === 'student_test'){
+
+      return this.calcStudentTest(data, headerCategory, columnB, categoryB);
+    }else if (scoreType === 'mwu_test'){
+      
+      return this.calcMannWhitneyUTest(data, headerCategory, columnB, categoryB);
     }
 
   }
@@ -702,7 +718,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // calculates the jaccard score
   private calcJaccardCoefficient(data, headerCategory: string, columnB: string, categoryB: string): number {
 
-    // console.log('data: ',data);
+/*     // console.log('data: ',data);
     // console.log('headerCategory: ',headerCategory);
     // console.log('columnB: ',columnB);
     // console.log('categoryB: ',categoryB);
@@ -752,8 +768,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
       }
     }
-    // console.log('categorySet: ',categorySet);
+    // console.log('categorySet: ',categorySet); */
     
+    let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+    let selectionSet = dataSets.selectionSet;
+    let categorySet = dataSets.categorySet;
 
     const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
 
@@ -774,7 +793,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // calculates the jaccard score
   private calcOverlapCoeffieient(data, headerCategory: string, columnB: string, categoryB: string): number {
 
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+/*     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
     let groups = this.ranking.getGroups();
 
     let selectionSet = [];
@@ -820,7 +839,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
       }
     }
-    // console.log('categorySet: ',categorySet);
+    // console.log('categorySet: ',categorySet); */
+
+    let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+    let selectionSet = dataSets.selectionSet;
+    let categorySet = dataSets.categorySet;
 
     const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
 
@@ -832,9 +855,193 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return score || 0;
   }
 
-  private calcTTest(data, headerCategory: string, columnB: string, categoryB: string): number 
+  private calcStudentTest(data, headerCategory: string, columnB: string, categoryB: string): number 
   {
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+/*     const optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+
+    let groups = this.ranking.getGroups();
+
+    let selectionSet = [];
+    if(optionDDA === 'Selection'){
+      selectionSet = data.filter(item => {
+        return item['selection'] === headerCategory;
+      });
+
+    }else if(optionDDA === 'Stratification Groups'){
+      let groups = this.ranking.getGroups();
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === headerCategory)
+        {
+          if(groups.length ===1)
+          {
+            selectionSet = data;
+          }else{
+            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+          } 
+        }
+      }
+
+    }
+    // console.log('selectionSet: ',selectionSet);
+ 
+
+    let categorySet = [];
+    // use categories or stratification as rows
+    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
+      categorySet = data.filter(item => {
+        return item[columnB] === categoryB;
+      });
+    }else {
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === categoryB)
+        {
+          if(groups.length ===1)
+          {
+            categorySet = data;
+          }else{
+            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+          }
+        }
+      }
+    } */
+
+    let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+    let selectionSet = dataSets.selectionSet;
+    let categorySet = dataSets.categorySet;
+
+    //slection
+    const nSelection = selectionSet.length;
+    const selectionValues = selectionSet.map((a) => {return a[columnB]});
+    const muSelection = d3.mean(selectionValues);
+    const varSelection = d3.variance(selectionValues);
+    
+    //category
+    const nCategory = categorySet.length;
+    const categoryValues = categorySet.map((a) => {return a[columnB]});
+    const muCategory = d3.mean(categoryValues);
+    const varCategory = d3.variance(categoryValues);
+    
+    let scoreP1 = Math.sqrt((nSelection * nCategory * (nSelection+nCategory-2)) / (nSelection+nCategory));
+    let scoreP2= (muSelection - muCategory)/Math.sqrt((nSelection-1)*varSelection + (nCategory-1)*varCategory);
+    let score = scoreP1 * scoreP2;
+
+
+    return score || 0;
+  }
+  
+
+
+  private calcMannWhitneyUTest(data, headerCategory: string, columnB: string, categoryB: string): number 
+  {
+
+    let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+    let selectionSet = dataSets.selectionSet;
+    let categorySet = dataSets.categorySet;
+
+    let selectionRankObj = selectionSet.map((a) => { 
+        let returnObj = {set: 'selection'};
+        returnObj[columnB] = a[columnB];
+        return returnObj; 
+      });
+
+    let categoryRankObj = categorySet.map((a) => { 
+        let returnObj = {set: 'category'};
+        returnObj[columnB] = a[columnB];
+        return returnObj; 
+      });
+
+    let collectiveRankSet = selectionRankObj.concat(categoryRankObj);
+    //sort the set
+    collectiveRankSet.sort((a,b) => { return a[columnB] - b[columnB];});
+
+    //assing rank 
+    let regionRange = [];
+    let region = false;
+    for(let i=0;i< collectiveRankSet.length; i++)
+    {
+      if(i>=1 && collectiveRankSet[i-1][columnB] === collectiveRankSet[i][columnB])
+      {
+        region = true;
+        regionRange.push(i); 
+      }
+
+      if(region && collectiveRankSet[i-1][columnB] !== collectiveRankSet[i][columnB] && regionRange.length > 1)
+      {
+        let regionRank = regionRange.reduce((a, b) => a + b, 0) / regionRange.length;
+        for(let r=0;r<regionRange.length; r++)
+        {
+          collectiveRankSet[regionRange[r]]['rank'] = regionRank;
+        }
+        regionRange = [];
+        region = false;
+      }
+
+      collectiveRankSet[i]['rank'] = i;
+      
+    }
+
+    if(region && regionRange.length > 1)
+    {
+      let regionRank = regionRange.reduce((a, b) => a + b, 0) / regionRange.length;
+      for(let r=0;r<regionRange.length; r++)
+      {
+        collectiveRankSet[regionRange[r]]['rank'] = regionRank;
+      }
+      regionRange = [];
+      region = false;
+    }
+
+
+    let selectionRanks = [];
+    let categoryRanks = [];
+
+    for(let i=0;i< collectiveRankSet.length; i++)
+    { 
+      if(collectiveRankSet[i].set === 'selection')
+      {
+        selectionRanks.push((collectiveRankSet[i] as any).rank);
+      }else
+      {
+        categoryRanks.push((collectiveRankSet[i] as any).rank);
+      }
+    }
+
+    let nSelection = selectionRanks.length;
+    let selectionRankSum = selectionRanks.reduce((a, b) => a + b, 0);
+    // let selectionU = selectionRankSum - (nSelection*(nSelection+1))/2;
+    
+
+    let nCategroy = categoryRanks.length;
+    let categoryRankSum = categoryRanks.reduce((a, b) => a + b, 0);    
+    // let categoryU = categoryRankSum - (nCategroy*(nCategroy+1))/2;
+
+
+    let selectionU = nSelection * nCategroy + ( nSelection*(nSelection+1)/2) - selectionRankSum;
+    let categoryU = nSelection * nCategroy + ( nCategroy*(nCategroy+1)/2) - categoryRankSum;
+
+    let minU = Math.min(selectionU,categoryU);
+
+    let zValue = (minU - (nSelection * nCategroy)/2) / Math.sqrt((nSelection * nCategroy * (nSelection + nCategroy +1))/12);
+    // let checkValue = Math.min(selectionU,categoryU);
+    console.log('minU: ',minU);
+    console.log('zValue: ',zValue);
+    //TODO calculate p-value
+
+    let score = zValue;
+    return score || 0;
+  }
+
+  // --------- MISC ---
+  //generates id for the collapseable panel in the accordion with the prefix and the current time's minutes/seconds and millisec
+  private getIdWithTimestamp(prefix: string) {
+    let currdate = new Date();
+    return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
+  }
+
+  //get the 2 data sets depending on the current configuraiton of the dropdowns and the radio buttons
+  private getSelectionAndCategorySets(data, headerCategory: string, columnB: string, categoryB: string)
+  {
+    const optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
     let groups = this.ranking.getGroups();
 
     let selectionSet = [];
@@ -880,29 +1087,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
       }
     }
-
-    // const muSelection = selectionSet.reduce((sum,value) => {return sum + value;},0) / selectionSet.length;
-    const nSelection = selectionSet.length;
-    const muSelection = d3.mean(selectionSet);
-    const varSelection = d3.variance(selectionSet);
     
-
-    // const muCategory = categorySet.reduce((sum,value) => {return sum + value;},0) / categorySet.length;
-    const nCategory = categorySet.length;
-    const muCategory = d3.mean(categorySet);
-    const varCategory = d3.variance(selectionSet);
+    let dataSets = {
+      selectionSet: selectionSet,
+      categorySet: categorySet
+    };
     
-    let score = Math.sqrt((nSelection * nCategory * (nSelection+nCategory-2)) / (nSelection+nCategory)) * ((muSelection - muCategory)/Math.sqrt((nSelection-1)*varSelection + (nCategory-1)*varCategory));
-
-
-    return score || 0;
-  }
-  
-  // --------- MISC ---
-  //generates id for the collapseable panel in the accordion with the prefix and the current time's minutes/seconds and millisec
-  private getIdWithTimestamp(prefix: string) {
-    let currdate = new Date();
-    return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
+    return dataSets;
   }
 
   // creates data for the visual representation of the jaccard score (parallel sets)
