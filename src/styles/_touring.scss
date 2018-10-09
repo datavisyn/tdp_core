@@ -15,6 +15,11 @@
   .tab-pane {
     margin: 0.5em 0 0 0.5em;
 
+    //accordion
+    .panel-heading.active { background-color: #f3f3f3; }
+
+
+    //parallel sets with d3
     .dimension { cursor: ns-resize; }
     .category { cursor: ew-resize; }
     .dimension tspan.name { font-size: 1.5em; fill: #333; font-weight: bold; }

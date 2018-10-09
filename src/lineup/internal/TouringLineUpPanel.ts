@@ -125,9 +125,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const inputA = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum());
     const inputB = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
 
-    console.log('Inputs to get set measures.', 'A', inputA, 'B', inputB);
+    console.log('Inputs to get set measures:');
+    console.log('A: ', inputA);
+    console.log('B: ', inputB);
     const setMeasures: MeasureMap = MethodManager.getSetMethods(inputA, inputB);
-    console.log('set measures for current data', setMeasures);
+    console.log('set measures for current data: ', setMeasures);
 
     // div element in html where the score and detail view should be added
     let measuresDivElement = d3.select(this.itemTab).select('div[class="measures"]');
@@ -244,24 +246,36 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       let panel = panelGroup.append('div')
         .attr('class', 'panel');
 
+
       let panelHeading = panel.append('div')
         .attr('class', 'panel-heading')
-        .attr('role', 'tab')
-        .append('h4')
-        .attr('class', 'panel-title') //multiple expanded accordions
-        .html(`<a data-toggle="collapse" href="#${collapseDetails.id}">${collapseDetails.label}</a>`) //single expanded accordion
-      //.html(`<a data-toggle="collapse" data-parent="#${collapseDetails.groupId}" href="#${collapseDetails.id}">${collapseDetails.label}</a>`)
+        .attr('role', 'tab');
+
+
+      let panelTitle = panelHeading.append('h4')
+        .attr('class', 'panel-title'); //multiple expanded accordions
+        // .html(`<a data-toggle="collapse" href="#${collapseDetails.id}">${collapseDetails.label}</a>`) //single expanded accordion
+        
+      
+      let aCollapse = panelTitle.append('a')
+          .attr('data-toggle','collapse')
+          .attr('href','#'+collapseDetails.id)
+          .text(collapseDetails.label)
+          .on('click', function(d:any) {
+            
+            panelHeading.classed('active',!panelHeading.classed('active'));
+          }); 
+
 
       let panelCollapse = panel.append('div')
         .attr('class', 'panel-collapse collapse')
         .attr('id', collapseDetails.id);
 
       if (collapseDetails.default) {
+        panelHeading.classed('active',true);
         panelCollapse.classed('in', true); //accordion item is expanded
       }
 
-      // let panelBody = panelCollapse.append('div')
-      //   .attr('class', 'panel-body');
     }
   }
 
@@ -452,6 +466,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       this.generateMeasureTableCellJaccard(containerId, rows,dataTable);
     }else if(scoreType === 'overlap'){
       this.generateMeasureTableCellOverlap(containerId, rows,dataTable);
+    }else if(scoreType === 'ttest'){
+      this.generateMeasureTableCellTTest(containerId, rows,dataTable);
     }
                  
                     
@@ -531,6 +547,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // creates table cell for overlap score with all its formating and functionality
   private generateMeasureTableCellOverlap(containerId: string, rows: d3.Selection<any>, dataTable: any)
+  {
+    this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
+  }
+
+  // creates table cell for t-test score with all its formating and functionality
+  private generateMeasureTableCellTTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
   {
     this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
   }
@@ -651,8 +673,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
  
   private getColorOfCategory(column: string, category: string){
-    console.log('path.column: ',column);
-    console.log('path.category: ',category);
+    // console.log('path.column: ',column);
+    // console.log('path.category: ',category);
     let currColumn = this.provider.getRankings()[0].children.filter((item) => {return item.desc.label === column;});
     let color = null;
     if(currColumn[0] && (currColumn[0] as ICategoricalColumn).categories)
@@ -665,7 +687,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
     }
     
-    console.log('path.color: ',color);
+    // console.log('path.color: ',color);
     return color;
   }
 
@@ -810,6 +832,72 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const score = intersection.length / minSize;
     
     // console.log('score', score);
+
+    return score || 0;
+  }
+
+  private calcTTest(data, headerCategory: string, columnB: string, categoryB: string): number 
+  {
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    let groups = this.ranking.getGroups();
+
+    let selectionSet = [];
+    if(optionDDA === 'Selection'){
+      selectionSet = data.filter(item => {
+        return item['selection'] === headerCategory;
+      });
+
+    }else if(optionDDA === 'Stratification Groups'){
+      let groups = this.ranking.getGroups();
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === headerCategory)
+        {
+          if(groups.length ===1)
+          {
+            selectionSet = data;
+          }else{
+            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
+          } 
+        }
+      }
+
+    }
+    // console.log('selectionSet: ',selectionSet);
+ 
+
+    let categorySet = [];
+    // use categories or stratification as rows
+    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
+      categorySet = data.filter(item => {
+        return item[columnB] === categoryB;
+      });
+    }else {
+      for(let i=0; i<groups.length; i++){
+        if(groups[i].name === categoryB)
+        {
+          if(groups.length ===1)
+          {
+            categorySet = data;
+          }else{
+            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+          }
+        }
+      }
+    }
+
+    // const muSelection = selectionSet.reduce((sum,value) => {return sum + value;},0) / selectionSet.length;
+    const nSelection = selectionSet.length;
+    const muSelection = d3.mean(selectionSet);
+    const varSelection = d3.variance(selectionSet);
+    
+
+    // const muCategory = categorySet.reduce((sum,value) => {return sum + value;},0) / categorySet.length;
+    const nCategory = categorySet.length;
+    const muCategory = d3.mean(categorySet);
+    const varCategory = d3.variance(selectionSet);
+    
+    let score = Math.sqrt((nSelection * nCategory * (nSelection+nCategory-2)) / (nSelection+nCategory)) * ((muSelection - muCategory)/Math.sqrt((nSelection-1)*varSelection + (nCategory-1)*varCategory));
+
 
     return score || 0;
   }
