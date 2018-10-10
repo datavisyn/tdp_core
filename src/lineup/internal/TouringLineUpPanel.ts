@@ -276,13 +276,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
 
-    this.generateMeasureTable(collapseId, measure.id , currentData);
+    this.generateMeasureTable(collapseId, measure , currentData);
 
   }
 
   // --------- DATA TABLE LAYOUT ---
   //generates a object, which contains the table head and table body
-  private generateTableLayout(data: Array<any>, scoreType: string)
+  private generateTableLayout(data: Array<any>, measure: ISImilarityMeasure)
   {
     let generatedTable = {
       tableHead: [],
@@ -293,7 +293,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     generatedTable.tableHead = this.getTableHeader();
 
     // TABLE BODY 
-    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data, scoreType);
+    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data, measure);
 
     
     // console.log('generateTableLayout: ',generatedTable);
@@ -347,7 +347,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //generate table body depending on table head and radio button option
-  private getTableBody(tableHeader: Array<any>, data: Array<any>, scoreType: string)
+  private getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISImilarityMeasure)
   {
     let tableBody = [];
 
@@ -393,7 +393,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
             }else //all the other columns
             {
-              let score = this.calcScore(data,scoreType ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
+              let score = this.calcScore(data, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
               
               tableRow[colName] = {
                 label: score, 
@@ -423,9 +423,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- TABLE GENERATION D3 ---
   // create table in container and depending on dataTable with D3
-  private generateMeasureTable(containerId: string, scoreType: string, currentData: Array<any>)
+  private generateMeasureTable(containerId: string, measure: ISImilarityMeasure, currentData: Array<any>)
   {
-    const dataTable = this.generateTableLayout(currentData, scoreType);
+    const dataTable = this.generateTableLayout(currentData, measure);
     const that = this;
 
     // create a <div> as table container with D3
@@ -457,13 +457,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     // table cells
-    if(scoreType === 'jaccard'){
+    if(measure.id === 'jaccard'){
       this.generateMeasureTableCellJaccard(containerId, rows,dataTable, this.generateVisualRepParallelSets);
-    }else if(scoreType === 'overlap'){
+    }else if(measure.id === 'overlap'){
       this.generateMeasureTableCellOverlap(containerId, rows,dataTable);
-    }else if(scoreType === 'student_test'){
+    }else if(measure.id === 'student_test'){
       this.generateMeasureTableCellTTest(containerId, rows,dataTable);
-    }else if(scoreType === 'mwu_test'){
+    }else if(measure.id === 'mwu_test'){
       this.generateMeasureTableCellMWUTest(containerId, rows,dataTable);
     }
                  
@@ -816,69 +816,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- SCORES ---
   // different kinds of score calculations
-  private calcScore (data, scoreType: string ,headerCategory: string, columnB: string, categoryB: string): number {
-    if(scoreType === 'jaccard')
-    {
-      return this.calcJaccardCoefficient(data, headerCategory, columnB, categoryB);
-    } else if (scoreType === 'overlap'){
-
-      return this.calcOverlapCoeffieient(data, headerCategory, columnB, categoryB);
-    } else if (scoreType === 'student_test'){
-
-      return this.calcStudentTest(data, headerCategory, columnB, categoryB);
-    }else if (scoreType === 'mwu_test'){
-      
-      return this.calcMannWhitneyUTest(data, headerCategory, columnB, categoryB);
-    }
-  }
-
-  // calculates the jaccard score
-  private calcJaccardCoefficient(data, headerCategory: string, columnB: string, categoryB: string): number {
+  private calcScore(data, measure: ISImilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
     const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
     const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
-    let intersection = [];
-    const filteredSelectionSet = selectionSet.filter((selItem) => {
-      const indexB = categorySet.findIndex((catItem) => catItem === selItem); // check if there is a corresponding entry in the second set
-      if (indexB >= 0) {
-        intersection.push(selItem);
-        categorySet.splice(indexB, 1);
-        return false; // selItem will drop out of selectionSet
-      }
-      return true;
-    });
-
-    // const intersection = selectionSet.filter(item => categorySet.indexOf(item) >= 0); // filter elements not in the second array
-    // const union = selectionSet.concat(categorySet).sort().filter((item, i, arr) => !i || item != arr[i-1]) // !i => if first elemnt, or if unqueal to previous item (item != arr[i-1]) include in arr
-
-    const score = intersection.length / (intersection.length + filteredSelectionSet.length + categorySet.length);
-
-    return score || 0;
-  }
-
-  // calculates the overlap coefficient
-  private calcOverlapCoeffieient(data, headerCategory: string, columnB: string, categoryB: string): number {
-    const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
-    const selectionSet = dataSets.selectionSet.map((item) => item[columnB]);
-    const categorySet = dataSets.categorySet.map((item) => item[columnB]);
-
-    const minSize = Math.min(selectionSet.length, categorySet.length);
-
-    let intersection = [];
-    const filteredSelectionSet = selectionSet.filter((selItem) => {
-      const indexB = categorySet.findIndex((catItem) => catItem === selItem);
-      if (indexB >= 0) {
-        intersection.push(selItem);
-        categorySet.splice(indexB, 1);
-        return false; // selItem will drop out of selectionSet
-      }
-      return true;
-    });
-
-    const score = intersection.length / minSize;
-
-    return score || 0;
+    if (measure.id === 'jaccard' || measure.id === 'overlap') {
+      return measure.calc(selectionSet, categorySet)
+    } else if (measure.id === 'student_test') {
+      return this.calcStudentTest(data, headerCategory, columnB, categoryB);
+    } else if (measure.id === 'mwu_test') {
+      return this.calcMannWhitneyUTest(data, headerCategory, columnB, categoryB);
+    }
   }
 
   private calcStudentTest(data, headerCategory: string, columnB: string, categoryB: string): number {
