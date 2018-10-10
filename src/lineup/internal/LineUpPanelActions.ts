@@ -209,15 +209,15 @@ export default class LineUpPanelActions extends EventHandler {
     const node = this.node.ownerDocument.createElement('div');
     node.classList.add('btn-group');
     node.innerHTML = `
-      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Export Data">
+      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
       </button>
       <ul class="dropdown-menu dropdown-menu-right">
-        <li class="dropdown-header">Export All Rows</li>
+        <li class="dropdown-header">Download All Rows</li>
         <li><a href="#" data-s="a" data-t="csv">CSV (comma separated)</a></li>
         <li><a href="#" data-s="a" data-t="tsv">TSV (tab separated)</a></li>
         <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
         <li><a href="#" data-s="a" data-t="json">JSON</a></li>
-        <li class="dropdown-header">Export Selected Rows Only</li>
+        <li class="dropdown-header">Download Selected Rows Only</li>
         <li><a href="#" data-s="s" data-t="csv">CSV (comma separated)</a></li>
         <li><a href="#" data-s="s" data-t="tsv">TSV (tab separated)</a></li>
         <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
@@ -249,7 +249,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.saveRankingDialog(ranking.getOrder());
     };
 
-    return this.createMarkup('Save Named Set', 'fa fa-save', listener);
+    return this.createMarkup('Save List of Entities', 'fa fa-save', listener);
   }
 
   private appendExtraButtons() {

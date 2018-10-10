@@ -268,4 +268,8 @@ $lu_assets: '~lineupjs/src/assets';
       cursor: grabbing;
     }
   }
+
+  .lu-side-panel > main > section::before {
+    content: 'Column Summaries';
+  }
 }

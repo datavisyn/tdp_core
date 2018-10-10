@@ -5,7 +5,7 @@ import {EEntity, hasPermission} from 'phovea_core/src/security';
 export default function editDialog(namedSet: IStoredNamedSet, result: (name: string, description: string, isPublic: boolean) => void) {
   const isCreate = namedSet === null;
   const title = isCreate ? 'Save' : 'Edit';
-  const dialog = new FormDialog(title + ' Named Set', title, 'namedset_form');
+  const dialog = new FormDialog(title + ' List of Entities', title, 'namedset_form');
 
   dialog.form.innerHTML = `
     <div class="form-group">
