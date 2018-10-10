@@ -551,13 +551,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates table cell for t-test score with all its formating and functionality
   private generateMeasureTableCellTTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
   {
-    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisualRepParallelSets);
+    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
   }
 
    // creates table cell for t-test score with all its formating and functionality
    private generateMeasureTableCellMWUTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
    {
-     this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisualRepParallelSets);
+     this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
    }
  
 
@@ -692,8 +692,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     let margin = {top: 30, right: 50, bottom: 70, left: 50};
-    let  width = containerWidth - margin.left - margin.right;
-    let height = 250 - margin.top - margin.bottom;
+    let  width = 800 - margin.left - margin.right;
+    let height = 400 - margin.top - margin.bottom;
 
     let data = [];
     data[0] = [];
@@ -1109,16 +1109,21 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     for(let i=0; i < column.categories.length; i++)
     {
       let currCategory = column.categories[i];
-      let dataIdCurrCategory = data.filter(item => {return item[''+column.column] === currCategory.label}).map((a) => {return a.id});
+      //gets ids for the selection column (Selected and Unselected)
+      let dataIdCurrCategory = data.filter(item => {return item[''+column.column] === currCategory.label}).map((a) => a.id);
 
-      if(this.getRadioButtonValue() === 'group' && column.column !== 'selection') //for stratification radio button
-      {
-        let currGroups = groups.filter(group => {return group.name === currCategory.label});
+      if(this.getRadioButtonValue() === 'group' && column.column !== 'selection' && currCategory.label !== 'Default') //for stratification radio button
+      { //all ids of a cateogry of a column (attribute), but not for selection column or default category group (= no stratification)
+        let currGroups = groups.filter(item => {return item.name === currCategory.label});
         let dataIdCurrGroups = [];
         for(let g=0; g<currGroups.length;g++){
+
           dataIdCurrGroups = ((currGroups[g] as any).rows.map((a) =>  a.id));
         }
         dataIdCurrCategory = dataIdCurrGroups;
+      }else if(this.getRadioButtonValue() === 'group' && currCategory.label === 'Default')
+      {//all ids of the whole data (default group) when no stratification exist
+        dataIdCurrCategory = data.map((a) => a.id);
       }
 
       let num = dataIdCurrCategory.length;
@@ -1140,13 +1145,16 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           // num = !num ? 0 : num;
           let dataIdCurrentHeader = []
           if(optionDDA === 'Selection'){
-            dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label}).map((a) => {return a.id});
+            dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label}).map((a) => a.id);
           }else{
             for(let g=0;g<groups.length;g++)
             {
               if(groups[g].name === currHeader.label && (groups[g] as any).rows)
               {
-                dataIdCurrentHeader = (groups[g] as any).rows.map((a) => {return a.v.id});
+                dataIdCurrentHeader = (groups[g] as any).rows.map((a) => a.id);
+              }else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
+              {
+                dataIdCurrentHeader = data.map((a) => a.id);
               }
             }
           }
