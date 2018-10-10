@@ -1,11 +1,10 @@
-import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking} from 'lineupjs';
+import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking, IDataRow} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
-import { isBuffer } from 'util';
-import { valueChanged } from '../../../../node_modules/lineupjs/src/model/AnnotateColumn';
+import {isProxyAccessor} from './utils';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -121,7 +120,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private updateItemScores() {
     const currentData = this.ranking.getItemsDisplayed();
     console.log('current data: ', currentData);
-
     const inputA = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum());
     const inputB = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
 
@@ -1382,21 +1380,21 @@ const deepCopy = <T>(target: T): T => {
 
 
 class RankingAdapter {
- 
+
   constructor(protected readonly provider: LocalDataProvider, private rankingIndex = 0) {
-      // console.log('provider', this.provider);
-      // console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
-      // console.log('provider.selectedRows: ', this.provider.selectedRows());
-      // console.log('provider.getColumns: ', this.provider.getColumns());
-      // console.log('provider.getRanking: ', this.provider.getRankings());
-      // console.log('getGroups', this.provider.getRankings()[0].getGroups())
-      // console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
-      // console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
-      // console.log('data', this.provider.data);
-      // console.log('------------------------------------');
+    // console.log('provider', this.provider);
+    // console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
+    // console.log('provider.selectedRows: ', this.provider.selectedRows());
+    // console.log('provider.getColumns: ', this.provider.getColumns());
+    // console.log('provider.getRanking: ', this.provider.getRankings());
+    // console.log('getGroups', this.provider.getRankings()[0].getGroups())
+    // console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
+    // console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
+    // console.log('data', this.provider.data);
+    // console.log('------------------------------------');
   }
 
-  public getProvider() : LocalDataProvider {
+  public getProvider(): LocalDataProvider {
     return this.provider;
   }
 
@@ -1405,6 +1403,10 @@ class RankingAdapter {
    */
   private getItems() {
     return this.provider.data;
+  }
+
+  private getScoreColumns() {
+    return this.getDisplayedAttributes().filter((attr) => (attr.desc as any)._score);
   }
 
 
@@ -1421,23 +1423,48 @@ class RankingAdapter {
    *    ]
    */
   public getItemsDisplayed() {
-    const currentData = new Array();
+    const databaseData = new Array();
 
     let rank = 0;
+    const scoreCols = this.getScoreColumns();
+    const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
+
+
     // get currently displayed data
-    this.getGroups().forEach((stratGroup) => {
-      // order is always defined for groups (rows (data) only if there is an stratification)
-      stratGroup.order.forEach((rowId) => { 
-        const row = this.getItems()[rowId]; // row
-        row.rank = rank++; //set rank and increment
-        // include wether the row is selected
-        row.selection = this.getSelection().includes(rowId) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
-        // TODO score columns are missing from this.provider.data
-        currentData.push(row);
-        });
-    })
+    this.getItemOrder().forEach(rowId => { // use order instead of ids for quick access on provider.data array (ids are strings)
+      const row = this.getItems()[rowId]; // row
+      row.rank = rank++; //set rank and increment
+      // include wether the row is selected
+      row.selection = this.getSelection().includes(rowId) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
+      databaseData.push(row);
+    });
+
+    // merge score and database data
+    const currentData = [...databaseData.concat(scoresData)
+      .reduce((map, curr) => {
+        map.has(curr.id) || map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
+        
+        const item = map.get(curr.id); // get stored data for this id
+
+        Object.entries(curr).forEach(([k, v]) =>
+          item[k] = v // add the content of the current array item to the data already stored in the map's entry (overwrites if there are the same properties in databaseData and scoreColumn)
+        );
+        
+        return map;
+      }, new Map()).values()]; // give map as input and return it's value
 
     return currentData;
+  }
+
+  private getItemOrder() {
+    // order is always defined for groups (rows (data) only if there is an stratification)
+    return [].concat(...this.getGroups().map((grp) => grp.order)); // Map groups to order arrays and concat those
+
+  }
+
+  public getDisplayedIds() {
+    const items = this.getItems();
+    return this.getItemOrder().map((i) => items[i].id)
   }
 
 
@@ -1456,17 +1483,17 @@ class RankingAdapter {
    *  ]
    */
   public getItemRanks() {
-    
+
     let i = 0;
     let rankedItems = []
-    for(const group of this.getRanking().getGroups()) {
+    for (let group of this.getRanking().getGroups()) {
       rankedItems.push(group.order.map((id) => ({_id: id, rank: i++})));
     }
 
     return rankedItems;
   }
 
-  public getRanking() : Ranking {
+  public getRanking(): Ranking {
     return this.provider.getRankings()[this.rankingIndex];
   }
 
@@ -1478,7 +1505,20 @@ class RankingAdapter {
     return this.provider.getSelection();
   }
 
+  public getScoreData(desc: IColumnDesc | any) {
+    const accessor = desc.accessor;
+    const ids = this.getDisplayedIds();
+    let data = [];
 
+    if (desc.column && isProxyAccessor(accessor)) {
+      for (let id of ids) {
+        let dataEntry = {id: id};
+        dataEntry[desc.column] = accessor({v: {id: id}, i: null} as IDataRow); // i is not used by the accessor function
+        data.push(dataEntry); 
+      }
+    }
+    return data;
+  }
 
 
   public getSelectionDesc() {
