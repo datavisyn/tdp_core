@@ -120,15 +120,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private updateItemScores() {
     const currentData = this.ranking.getItemsDisplayed();
-    console.log('current data: ', currentData);
+    // console.log('current data: ', currentData);
     const inputA = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum());
     const inputB = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
 
-    console.log('Inputs to get set measures:');
-    console.log('A: ', inputA);
-    console.log('B: ', inputB);
+    // console.log('Inputs to get set measures:');
+    // console.log('A: ', inputA);
+    // console.log('B: ', inputB);
     const setMeasures: MeasureMap = MethodManager.getSetMethods(inputA, inputB);
-    console.log('set measures for current data: ', setMeasures);
+    // console.log('set measures for current data: ', setMeasures);
 
     // div element in html where the score and detail view should be added
     let measuresDivElement = d3.select(this.itemTab).select('div[class="measures"]');
@@ -296,7 +296,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data, scoreType);
 
     
-    console.log('generateTableLayout: ',generatedTable);
+    // console.log('generateTableLayout: ',generatedTable);
     return generatedTable;
   }
 
@@ -830,152 +830,56 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       
       return this.calcMannWhitneyUTest(data, headerCategory, columnB, categoryB);
     }
-
   }
 
   // calculates the jaccard score
   private calcJaccardCoefficient(data, headerCategory: string, columnB: string, categoryB: string): number {
+    const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+    const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
+    const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
-/*     // console.log('data: ',data);
-    // console.log('headerCategory: ',headerCategory);
-    // console.log('columnB: ',columnB);
-    // console.log('categoryB: ',categoryB);
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    let groups = this.ranking.getGroups();
-
-    let selectionSet = [];
-    // use selection or stratification groups as header
-    if(optionDDA === 'Selection'){
-      selectionSet = data.filter(item => {
-        return item['selection'] === headerCategory;
-      });
-
-    }else if(optionDDA === 'Stratification Groups'){
-      
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === headerCategory)
-        {
-          if(groups.length ===1)
-          {
-            selectionSet = data;
-          }else{
-            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
-          }        
-        }
+    let intersection = [];
+    const filteredSelectionSet = selectionSet.filter((selItem) => {
+    const indexB = categorySet.findIndex((catItem) => catItem === selItem); // check if there is a corresponding entry in the second set
+      if(indexB >= 0) {
+        intersection.push(selItem);
+        categorySet.splice(indexB, 1);
+        return false; // selItem will drop out of selectionSet
       }
-    }
-    // console.log('selectionSet: ',selectionSet);
- 
+      return true;
+    });
 
-    let categorySet = [];
-    // use categories or stratification as rows
-    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
-      categorySet = data.filter(item => {
-        return item[columnB] === categoryB;
-      });
-    }else {
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === categoryB)
-        {
-          if(groups.length ===1)
-          {
-            categorySet = data;
-          }else{
-            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
-          }
-        }
-      }
-    }
-    // console.log('categorySet: ',categorySet); */
+    // const intersection = selectionSet.filter(item => categorySet.indexOf(item) >= 0); // filter elements not in the second array
+    // const union = selectionSet.concat(categorySet).sort().filter((item, i, arr) => !i || item != arr[i-1]) // !i => if first elemnt, or if unqueal to previous item (item != arr[i-1]) include in arr
+
+    const score = intersection.length / (intersection.length + filteredSelectionSet.length + categorySet.length);
     
-    let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
-    let selectionSet = dataSets.selectionSet;
-    let categorySet = dataSets.categorySet;
-
-    const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
-
-    const unionArrays = function (a, b, equals){
-      return a.concat(b).reduce( (acc, element) => {
-          return acc.some(elt => equals(elt, element))? acc : acc.concat(element)
-      }, []);
-    }
-    const union = unionArrays(selectionSet, categorySet, (a, b) => a._id === b._id);
-
-    const score = intersection.length / union.length;
-    
-    //console.log('score', score);
-
     return score || 0;
   }
 
-  // calculates the jaccard score
+  // calculates the overlap coefficient
   private calcOverlapCoeffieient(data, headerCategory: string, columnB: string, categoryB: string): number {
+    const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+    const selectionSet = dataSets.selectionSet.map((item) => item[columnB]);
+    const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
-/*     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    let groups = this.ranking.getGroups();
-
-    let selectionSet = [];
-    if(optionDDA === 'Selection'){
-      selectionSet = data.filter(item => {
-        return item['selection'] === headerCategory;
-      });
-
-    }else if(optionDDA === 'Stratification Groups'){
-      let groups = this.ranking.getGroups();
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === headerCategory)
-        {
-          if(groups.length ===1)
-          {
-            selectionSet = data;
-          }else{
-            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
-          } 
-        }
+    let intersection = [];
+    const filteredSelectionSet = selectionSet.filter((selItem) => {
+      const indexB = categorySet.findIndex((catItem) => catItem === selItem);
+      if(indexB >= 0) {
+        intersection.push(selItem);
+        categorySet.splice(indexB, 1);
+        return false; // selItem will drop out of selectionSet
       }
+      return true;
+    });
 
-    }
-    // console.log('selectionSet: ',selectionSet);
- 
-
-    let categorySet = [];
-    // use categories or stratification as rows
-    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
-      categorySet = data.filter(item => {
-        return item[columnB] === categoryB;
-      });
-    }else {
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === categoryB)
-        {
-          if(groups.length ===1)
-          {
-            categorySet = data;
-          }else{
-            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
-          }
-        }
-      }
-    }
-    // console.log('categorySet: ',categorySet); */
-
-    let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
-    let selectionSet = dataSets.selectionSet;
-    let categorySet = dataSets.categorySet;
-
-    const intersection = selectionSet.filter(item => -1 !== categorySet.indexOf(item));
-
-    const minSize = Math.min(selectionSet.length,categorySet.length);
-    const score = intersection.length / minSize;
+    const score = intersection.length / Math.min(selectionSet.length,categorySet.length);
     
-    // console.log('score', score);
-
     return score || 0;
   }
 
-  private calcStudentTest(data, headerCategory: string, columnB: string, categoryB: string): number 
-  {
-
+  private calcStudentTest(data, headerCategory: string, columnB: string, categoryB: string): number {
     let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
     let selectionSet = dataSets.selectionSet;
     let categorySet = dataSets.categorySet;
@@ -1142,60 +1046,51 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //get the 2 data sets depending on the current configuraiton of the dropdowns and the radio buttons
-  private getSelectionAndCategorySets(data, headerCategory: string, columnB: string, categoryB: string)
-  {
-    const optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    let groups = this.ranking.getGroups();
+  private getSelectionAndCategorySets(data, headerCategory: string, columnB: string, categoryB: string) {
+    const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
+    const groups = this.ranking.getGroupedData();
 
     let selectionSet = [];
-    if(optionDDA === 'Selection'){
-      selectionSet = data.filter(item => {
-        return item['selection'] === headerCategory;
-      });
-
-    }else if(optionDDA === 'Stratification Groups'){
-      let groups = this.ranking.getGroups();
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === headerCategory)
-        {
-          if(groups.length ===1)
-          {
+    if (optionDDA === 'Selection') {
+      selectionSet = data.filter((item) => item['selection'] === headerCategory);
+    } else if (optionDDA === 'Stratification Groups') {
+      for (let i = 0; i < groups.length; i++) {
+        if (groups[i].name === headerCategory) {
+          if (groups.length === 1) {
             selectionSet = data;
-          }else{
-            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
-          } 
-        }
-      }
-
-    }
-    // console.log('selectionSet: ',selectionSet);
- 
-
-    let categorySet = [];
-    // use categories or stratification as rows
-    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
-      categorySet = data.filter(item => {
-        return item[columnB] === categoryB;
-      });
-    }else {
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === categoryB)
-        {
-          if(groups.length ===1)
-          {
-            categorySet = data;
-          }else{
-            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
+          } else {
+            selectionSet = groups[i].rows;
           }
         }
       }
     }
-    
+    // console.log('selectionSet: ',selectionSet);
+
+
+    let categorySet = [];
+    // use categories or stratification as rows
+    if (this.getRadioButtonValue() === 'category' || columnB === 'selection') {
+      categorySet = data.filter(item => {
+        return item[columnB] === categoryB;
+      });
+    } else {
+      for (let i = 0; i < groups.length; i++) {
+        if (groups[i].name === categoryB) {
+          if (groups.length === 1) {
+            categorySet = data;
+          } else {
+            categorySet = groups[i].rows;
+          }
+        }
+      }
+    }
+    // console.log('categorySet: ',categorySet);
+
     let dataSets = {
       selectionSet: selectionSet,
       categorySet: categorySet
     };
-    
+
     return dataSets;
   }
 
@@ -1207,7 +1102,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('getColumnPartioning.tableHeader',tableHeader);
     // console.log('getColumnPartioning.column',column);
     let columnPartitioning = [];
-    let groups = this.ranking.getGroups();
+    let groups = this.ranking.getGroupedData();
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
 
     // go through all categories of current coloumn
@@ -1218,10 +1113,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       if(this.getRadioButtonValue() === 'group' && column.column !== 'selection') //for stratification radio button
       {
-        let currGroups = groups.filter(item => {return item.name === currCategory.label});
+        let currGroups = groups.filter(group => {return group.name === currCategory.label});
         let dataIdCurrGroups = [];
         for(let g=0; g<currGroups.length;g++){
-          dataIdCurrGroups = ((currGroups[g] as any).rows.map((a) => {return a.v.id}));
+          dataIdCurrGroups = ((currGroups[g] as any).rows.map((a) =>  a.id));
         }
         dataIdCurrCategory = dataIdCurrGroups;
       }
@@ -1327,7 +1222,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // Generate a Attribute description that represents the current selection
     const selDesc = this.ranking.getSelectionDesc();
-    console.log('selDesc', selDesc);
     const selOption = dropdownA.select('option.selection').datum(selDesc); //bind description to option and set text
     selOption.text((desc) => desc.label);
 
@@ -1507,7 +1401,7 @@ class RankingAdapter {
   }
 
   /**
-   * Beware: this does not include selection and rank data.
+   *  Contains no selection, rank or score data!
    */
   private getItems() {
     return this.provider.data;
@@ -1566,7 +1460,7 @@ class RankingAdapter {
 
   private getItemOrder() {
     // order is always defined for groups (rows (data) only if there is an stratification)
-    return [].concat(...this.getGroups().map((grp) => grp.order)); // Map groups to order arrays and concat those
+    return [].concat(...this.getRanking().getGroups().map((grp) => grp.order)); // Map groups to order arrays and concat those
 
   }
 
@@ -1591,22 +1485,30 @@ class RankingAdapter {
    *  ]
    */
   public getItemRanks() {
-
     let i = 0;
-    let rankedItems = []
-    for (let group of this.getRanking().getGroups()) {
-      rankedItems.push(group.order.map((id) => ({_id: id, rank: i++})));
-    }
-
-    return rankedItems;
+    return this.getItemOrder().map((id) => ({_id: id, rank: i++}));
   }
 
   public getRanking(): Ranking {
     return this.provider.getRankings()[this.rankingIndex];
   }
 
-  public getGroups() {
-    return this.getRanking().getGroups();
+  /**
+   * Contains no selection, rank or score data!
+   */
+  public getGroupedData() {
+    const data = this.getItemsDisplayed();
+
+    let groups = []
+
+    for ( let grp of this.getRanking().getGroups()) {
+      groups.push({
+        name: grp.name,
+        color: grp.color,
+        rows: grp.order.map((id) => data.find((item) => item._id === id))
+      });
+    }
+    return groups;
   }
 
   public getSelection() {
@@ -1631,8 +1533,7 @@ class RankingAdapter {
 
   public getSelectionDesc() {
     const selCategories = new Array<ICategory>();
-    const numberOfRows = this.getGroups().map((group) => group.order.length).reduce((prev, curr) => prev + curr); // get length of stratification groups and sum them up
-    console.log('Selected ', this.getSelection().length, 'Total ', numberOfRows);
+    const numberOfRows = this.getItemOrder().length; // get length of stratification groups and sum them up
     if (this.getSelection().length > 0) {
       selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
     } // else: none selected
@@ -1651,7 +1552,7 @@ class RankingAdapter {
 
   public getStratificationDesc() {
     return {
-      categories: this.getGroups().map((group) => ({
+      categories: this.getRanking().getGroups().map((group) => ({
         name: group.name,
         label: group.name
         // TODO get colors of stratification
