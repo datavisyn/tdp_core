@@ -4,6 +4,7 @@ import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html
 import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
+import 'd3-grubert-boxplot';
 import {isProxyAccessor} from './utils';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
@@ -457,7 +458,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // table cells
     if(scoreType === 'jaccard'){
-      this.generateMeasureTableCellJaccard(containerId, rows,dataTable);
+      this.generateMeasureTableCellJaccard(containerId, rows,dataTable, this.generateVisualRepParallelSets);
     }else if(scoreType === 'overlap'){
       this.generateMeasureTableCellOverlap(containerId, rows,dataTable);
     }else if(scoreType === 'student_test'){
@@ -470,7 +471,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   // creates table cell for jaccard score with all its formating and functionality
-  private generateMeasureTableCellJaccard(containerId: string, rows: d3.Selection<any>, dataTable: any)
+  private generateMeasureTableCellJaccard(containerId: string, rows: d3.Selection<any>, dataTable: any, actionFunciton: Function)
   {
     const that = this;
 
@@ -536,7 +537,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     })
                     .on('click', function(d:any) {
                       if(d.action) {
-                        that.generateVisualRepParallelSets(containerId,d);
+                        // that.generateVisualRepParallelSets(containerId,d);
+                        actionFunciton(containerId,d);
                       }
                     }); 
   }
@@ -544,19 +546,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates table cell for overlap score with all its formating and functionality
   private generateMeasureTableCellOverlap(containerId: string, rows: d3.Selection<any>, dataTable: any)
   {
-    this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
+    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisualRepParallelSets);
   }
 
   // creates table cell for t-test score with all its formating and functionality
   private generateMeasureTableCellTTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
   {
-    this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
+    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisualRepParallelSets);
   }
 
    // creates table cell for t-test score with all its formating and functionality
    private generateMeasureTableCellMWUTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
    {
-     this.generateMeasureTableCellJaccard(containerId, rows, dataTable);
+     this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisualRepParallelSets);
    }
  
 
@@ -564,8 +566,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates visual representation as a parallel set (for jaccard)
   private generateVisualRepParallelSets(containerId: string, cell: any)
   {
-    console.log('Cell clicken (dynamic): ',cell);
-    console.log('Cell clicken (dynamic) - containerId: ',containerId);
+    console.log('Cell clicken (ParSets): ',cell);
+    console.log('Cell clicken (ParSets) - containerId: ',containerId);
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
     
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
@@ -574,7 +576,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgContainer = d3.select('#'+containerId).append('div')
                                                   .attr('class','svg-container '+containerId);
   
-    let width = svgContainer.style('width').slice(0,-2);
+    let width = Number(svgContainer.style('width').slice(0,-2));
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
@@ -599,7 +601,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
        
     }
-    console.log('Cell clicken (dynamic) - data: ',parSetData);
+    console.log('Cell clicken (ParSets) - data: ',parSetData);
 
 
     const that = this;
@@ -675,6 +677,125 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   }
  
+  private generateVisulRepBoxPlot(containerId: string, cell: any) 
+  {
+    console.log('Cell clicken (BoxPlot): ',cell);
+    console.log('Cell clicken (BoxPlot) - containerId: ',containerId);
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    
+    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
+    oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
+
+    let svgContainer = d3.select('#'+containerId).append('div')
+                                                  .attr('class','svg-container '+containerId);
+  
+    let containerWidth = Number(svgContainer.style('width').slice(0,-2));
+
+
+    let margin = {top: 30, right: 50, bottom: 70, left: 50};
+    let  width = containerWidth - margin.left - margin.right;
+    let height = 250 - margin.top - margin.bottom;
+
+    let data = [];
+    data[0] = [];
+    data[1] = [];
+    data[2] = [];
+    data[3] = [];
+    data[0][0] = "Q1";
+    data[1][0] = "Q2";
+    data[2][0] = "Q3";
+    data[3][0] = "Q4";
+    data[0][1] = [20000,9879,5070,7343,91,36,7943,10546,9385,8669];
+    data[1][1] = [15000,9323,9395,8675,5354,6725,10899,9365,8238,7446];
+    data[2][1] = [8000,3294,17633,12121,4319,18712,17270,13676,16754];
+    data[3][1] = [2000,5629,5752,7557,5125,5116,5828,6014,5996,8905];
+
+
+
+    let chart = (d3 as any).box()
+          .whiskers(function(d) {
+                let q1 = d.quartiles[0],
+                    q3 = d.quartiles[2],
+                    iqr = (q3 - q1) * 1.5,
+                    i = -1,
+                    j = d.length;
+                while (d[++i] < q1 - iqr);
+                while (d[--j] > q3 + iqr);
+                return [i, j];    
+          })
+          .height(175)	
+          .domain([4000, 20000])
+          .showLabels(true);
+
+
+    let svgCanvas = svgContainer.append('svg')
+          .attr('width',width + margin.left + margin.right)
+          .attr('height',height + margin.top + margin.bottom);      
+
+    let svgFigureGroup = svgCanvas.append('g')
+                                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                                  .attr('class','box');
+
+    	// the x-axis
+    let x = d3.scale.ordinal()	   
+    .domain( data.map(function(d) { console.log(d); return d[0] } ) )	    
+    .rangeRoundBands([0 , width], 0.7, 0.3); 		
+
+    let xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+
+    // the y-axis
+    let y = d3.scale.linear()
+      .domain([4000, 20000])
+      .range([height + margin.top, 0 + margin.top]);
+
+    let yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+
+    // draw the boxplots	
+    svgFigureGroup.data(data)
+      .enter().append("g")
+      .attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + margin.top + ")"; } )
+      .call(chart.width(x.rangeBand())); 
+     
+    // add a title
+    svgFigureGroup.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 + (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "18px") 
+        //.style("text-decoration", "underline")  
+        .text("Revenue 2012");
+
+    // draw y axis
+    svgFigureGroup.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text") // and text1
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .style("font-size", "16px") 
+      .text("Revenue in €");		
+
+    // draw x axis	
+    svgFigureGroup.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + (height  + margin.top + 10) + ")")
+      .call(xAxis)
+      .append("text")             // text label for the x axis
+        .attr("x", (width / 2) )
+        .attr("y",  10 )
+      .attr("dy", ".71em")
+        .style("text-anchor", "middle")
+      .style("font-size", "16px") 
+        .text("Quarter"); 
+
+  }
+
   private getColorOfCategory(column: string, category: string){
     // console.log('path.column: ',column);
     // console.log('path.category: ',category);
@@ -855,53 +976,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   private calcStudentTest(data, headerCategory: string, columnB: string, categoryB: string): number 
   {
-/*     const optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-
-    let groups = this.ranking.getGroups();
-
-    let selectionSet = [];
-    if(optionDDA === 'Selection'){
-      selectionSet = data.filter(item => {
-        return item['selection'] === headerCategory;
-      });
-
-    }else if(optionDDA === 'Stratification Groups'){
-      let groups = this.ranking.getGroups();
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === headerCategory)
-        {
-          if(groups.length ===1)
-          {
-            selectionSet = data;
-          }else{
-            selectionSet = (groups[i] as any).rows.map((a) => {return a.v;});
-          } 
-        }
-      }
-
-    }
-    // console.log('selectionSet: ',selectionSet);
- 
-
-    let categorySet = [];
-    // use categories or stratification as rows
-    if(this.getRadioButtonValue() === 'category' || columnB === 'selection'){
-      categorySet = data.filter(item => {
-        return item[columnB] === categoryB;
-      });
-    }else {
-      for(let i=0; i<groups.length; i++){
-        if(groups[i].name === categoryB)
-        {
-          if(groups.length ===1)
-          {
-            categorySet = data;
-          }else{
-            categorySet = (groups[i] as any).rows.map((a) => {return a.v;});
-          }
-        }
-      }
-    } */
 
     let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
     let selectionSet = dataSets.selectionSet;
@@ -960,30 +1034,35 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       if(i>=1 && collectiveRankSet[i-1][columnB] === collectiveRankSet[i][columnB])
       {
         region = true;
+        regionRange.push(i-1); 
         regionRange.push(i); 
       }
 
       if(region && collectiveRankSet[i-1][columnB] !== collectiveRankSet[i][columnB] && regionRange.length > 1)
       {
-        let regionRank = regionRange.reduce((a, b) => a + b, 0) / regionRange.length;
-        for(let r=0;r<regionRange.length; r++)
+        let uniqueRegionRange = regionRange.filter((v,i) => {return regionRange.indexOf(v) === i;});
+        let regionRank = (uniqueRegionRange.reduce((a, b) => a + b, 0) + uniqueRegionRange.length) / uniqueRegionRange.length;
+
+        for(let r=0;r<uniqueRegionRange.length; r++)
         {
-          collectiveRankSet[regionRange[r]]['rank'] = regionRank;
+          collectiveRankSet[uniqueRegionRange[r]]['rank'] = regionRank;
         }
         regionRange = [];
         region = false;
       }
 
-      collectiveRankSet[i]['rank'] = i;
+      collectiveRankSet[i]['rank'] = i+1;
       
     }
 
     if(region && regionRange.length > 1)
     {
-      let regionRank = regionRange.reduce((a, b) => a + b, 0) / regionRange.length;
-      for(let r=0;r<regionRange.length; r++)
+      let uniqueRegionRange = regionRange.filter((v,i) => {return regionRange.indexOf(v) === i;});
+      let regionRank = (uniqueRegionRange.reduce((a, b) => a + b, 0) + uniqueRegionRange.length) / uniqueRegionRange.length;
+
+      for(let r=0;r<uniqueRegionRange.length; r++)
       {
-        collectiveRankSet[regionRange[r]]['rank'] = regionRank;
+        collectiveRankSet[uniqueRegionRange[r]]['rank'] = regionRank;
       }
       regionRange = [];
       region = false;
@@ -1006,23 +1085,50 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let nSelection = selectionRanks.length;
     let selectionRankSum = selectionRanks.reduce((a, b) => a + b, 0);
-    // let selectionU = selectionRankSum - (nSelection*(nSelection+1))/2;
     
-
     let nCategroy = categoryRanks.length;
     let categoryRankSum = categoryRanks.reduce((a, b) => a + b, 0);    
-    // let categoryU = categoryRankSum - (nCategroy*(nCategroy+1))/2;
 
 
+
+    // ----- alternative
+    // let sBeforeC = 0;
+    // let cBeforeS = 0;
+    // let TTselectionRanks = [];
+    // let TTcategoryRanks = [];
+    // for(let i=0;i< collectiveRankSet.length; i++)
+    // {
+    //   if(collectiveRankSet[i].set === 'selection')
+    //   { // selection
+    //     TTcategoryRanks.push(cBeforeS);
+    //     sBeforeC++;
+    //   }else
+    //   { // category
+    //     TTselectionRanks.push(sBeforeC);
+    //     cBeforeS++;
+    //   }
+    // }
+
+
+
+    // console.log('collectiveRankSet: ',collectiveRankSet);
     let selectionU = nSelection * nCategroy + ( nSelection*(nSelection+1)/2) - selectionRankSum;
     let categoryU = nSelection * nCategroy + ( nCategroy*(nCategroy+1)/2) - categoryRankSum;
 
-    let minU = Math.min(selectionU,categoryU);
 
+    // console.log('selectionU: ',selectionU,' | TTselectionRanks-score: ',TTselectionRanks.reduce((a, b) => a + b, 0),' -> array: ',TTselectionRanks);
+    // console.log('categoryU: ',categoryU,' | TTcategoryRanks-score: ',TTcategoryRanks.reduce((a, b) => a + b, 0),' -> array: ',TTcategoryRanks);
+    // console.log('sBeforeC: ',sBeforeC,' | nSelection: ',nSelection);
+    // console.log('cBeforeS: ',cBeforeS,' | nCategroy: ',nCategroy);
+    // let minU = Math.min(TTselectionRanks.reduce((a, b) => a + b, 0),TTcategoryRanks.reduce((a, b) => a + b, 0));
+
+
+    let minU = Math.min(selectionU,categoryU);
+    
     let zValue = (minU - (nSelection * nCategroy)/2) / Math.sqrt((nSelection * nCategroy * (nSelection + nCategroy +1))/12);
-    // let checkValue = Math.min(selectionU,categoryU);
-    console.log('minU: ',minU);
+    // console.log('minU: ',minU);
     console.log('zValue: ',zValue);
+    
     //TODO calculate p-value
 
     let score = zValue;
