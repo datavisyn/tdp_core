@@ -31,7 +31,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.attributeTab = d3.select(this.node).select('#attributeTouring').node();
 
     const buttons = this.node.querySelector('section');
-    buttons.appendChild(this.createMarkup('Start Touring', 'fa fa-calculator', () => {
+    buttons.appendChild(this.createMarkup('Start Touring', 'touring fa fa-calculator', () => {
       this.toggleTouring();
 
       console.log('provider', this.provider);
@@ -1412,6 +1412,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //if touring is displayed, ensure the panel is visible
       this.collapse = false;
     }
+    
+    const button = d3.select(this.node).select('.lu-side-panel button.touring')
+    button.classed('active', !hide);
   }
 
   private prepareInput = (desc) => {

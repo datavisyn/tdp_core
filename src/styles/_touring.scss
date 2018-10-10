@@ -4,7 +4,11 @@
   display: none !important;
 }
 
-.touring {
+button.touring.active::before {
+  color: #ffa500;
+}
+
+div.touring {
   margin-top: 0.5em;
   overflow-y: auto;
 
