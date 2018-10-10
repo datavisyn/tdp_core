@@ -293,7 +293,7 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
           </div>
           <div class="checkbox">
             <label class="radio-inline">
-              <input type="checkbox" name="${prefix}_agree" required="required"> 
+              <input type="checkbox" name="${prefix}_agree" required="required">
               I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the <strong>'Open Existing Session'</strong> dialog.
             </label>
           </div>
