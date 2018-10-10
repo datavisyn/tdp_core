@@ -840,8 +840,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let intersection = [];
     const filteredSelectionSet = selectionSet.filter((selItem) => {
-    const indexB = categorySet.findIndex((catItem) => catItem === selItem); // check if there is a corresponding entry in the second set
-      if(indexB >= 0) {
+      const indexB = categorySet.findIndex((catItem) => catItem === selItem); // check if there is a corresponding entry in the second set
+      if (indexB >= 0) {
         intersection.push(selItem);
         categorySet.splice(indexB, 1);
         return false; // selItem will drop out of selectionSet
@@ -853,7 +853,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // const union = selectionSet.concat(categorySet).sort().filter((item, i, arr) => !i || item != arr[i-1]) // !i => if first elemnt, or if unqueal to previous item (item != arr[i-1]) include in arr
 
     const score = intersection.length / (intersection.length + filteredSelectionSet.length + categorySet.length);
-    
+
     return score || 0;
   }
 
@@ -863,10 +863,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const selectionSet = dataSets.selectionSet.map((item) => item[columnB]);
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
+    const minSize = Math.min(selectionSet.length, categorySet.length);
+
     let intersection = [];
     const filteredSelectionSet = selectionSet.filter((selItem) => {
       const indexB = categorySet.findIndex((catItem) => catItem === selItem);
-      if(indexB >= 0) {
+      if (indexB >= 0) {
         intersection.push(selItem);
         categorySet.splice(indexB, 1);
         return false; // selItem will drop out of selectionSet
@@ -874,8 +876,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       return true;
     });
 
-    const score = intersection.length / Math.min(selectionSet.length,categorySet.length);
-    
+    const score = intersection.length / minSize;
+
     return score || 0;
   }
 
@@ -889,26 +891,23 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const selectionValues = selectionSet.map((a) => {return a[columnB]});
     const muSelection = d3.mean(selectionValues);
     const varSelection = d3.variance(selectionValues);
-    
+
     //category
     const nCategory = categorySet.length;
     const categoryValues = categorySet.map((a) => {return a[columnB]});
     const muCategory = d3.mean(categoryValues);
     const varCategory = d3.variance(categoryValues);
-    
-    let scoreP1 = Math.sqrt((nSelection * nCategory * (nSelection+nCategory-2)) / (nSelection+nCategory));
-    let scoreP2= (muSelection - muCategory)/Math.sqrt((nSelection-1)*varSelection + (nCategory-1)*varCategory);
-    let score = scoreP1 * scoreP2;
 
+    let scoreP1 = Math.sqrt((nSelection * nCategory * (nSelection + nCategory - 2)) / (nSelection + nCategory));
+    let scoreP2 = (muSelection - muCategory) / Math.sqrt((nSelection - 1) * varSelection + (nCategory - 1) * varCategory);
+    let score = scoreP1 * scoreP2;
 
     return score || 0;
   }
   
 
 
-  private calcMannWhitneyUTest(data, headerCategory: string, columnB: string, categoryB: string): number 
-  {
-
+  private calcMannWhitneyUTest(data, headerCategory: string, columnB: string, categoryB: string): number {
     let dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
     let selectionSet = dataSets.selectionSet;
     let categorySet = dataSets.categorySet;
