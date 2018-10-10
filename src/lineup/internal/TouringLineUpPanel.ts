@@ -537,8 +537,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                     })
                     .on('click', function(d:any) {
                       if(d.action) {
-                        // that.generateVisualRepParallelSets(containerId,d);
-                        actionFunciton(containerId,d);
+                        actionFunciton.bind(that)(containerId,d);
                       }
                     }); 
   }
