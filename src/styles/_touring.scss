@@ -33,16 +33,8 @@ div.touring {
       color: #333;
       font-size: 0.9em;
     }
-  }
-
-  .table-container {
-    overflow-x: auto;
-  }
-  
-  .tab-pane {
-    margin: 0.5em 0 0 0.5em;
-
-     //parallel sets with d3
+    
+    // ------ parallel sets with D3
     .dimension { cursor: ns-resize; }
     .category { cursor: ew-resize; }
     .dimension tspan.name { font-size: 1.5em; fill: #333; font-weight: bold; }
@@ -63,6 +55,7 @@ div.touring {
     .category rect.selected { fill-opacity: .3; }
     .dimension:hover > rect.selcted { fill-opacity: .3; }
 
+    // predefined colours
     .category-0 { fill: #1f77b4; stroke: #1f77b4; }
     .category-1 { fill: #ff7f0e; stroke: #ff7f0e; }
     .category-2 { fill: #2ca02c; stroke: #2ca02c; }
@@ -89,5 +82,24 @@ div.touring {
       position: absolute;
       padding: 5px;
     }
+
+    // ------ boxplot with D3
+    g.box-element {
+      rect.box {
+        stroke: black;
+        stroke-width: 1
+      }
+    }
+
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .tab-pane {
+    margin: 0.5em 0 0 0.5em;
+
+     
   }
 }
