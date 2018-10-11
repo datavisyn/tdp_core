@@ -460,11 +460,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     if(measure.id === 'jaccard'){
       this.generateMeasureTableCellJaccard(containerId, rows,dataTable, this.generateVisualRepParallelSets);
     }else if(measure.id === 'overlap'){
-      this.generateMeasureTableCellOverlap(containerId, rows,dataTable);
+      this.generateMeasureTableCellOverlap(containerId, rows,dataTable, this.generateVisualRepParallelSets);
     }else if(measure.id === 'student_test'){
-      this.generateMeasureTableCellTTest(containerId, rows,dataTable);
+      this.generateMeasureTableCellTTest(containerId, rows,dataTable, this.generateVisulRepBoxPlot);
     }else if(measure.id === 'mwu_test'){
-      this.generateMeasureTableCellMWUTest(containerId, rows,dataTable);
+      this.generateMeasureTableCellMWUTest(containerId, rows,dataTable, this.generateVisulRepBoxPlot);
     }
                  
     
@@ -473,6 +473,30 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates table cell for jaccard score with all its formating and functionality
   private generateMeasureTableCellJaccard(containerId: string, rows: d3.Selection<any>, dataTable: any, actionFunciton: Function)
   {
+    this.generateGenericMeasureTableCell(containerId, rows, dataTable, actionFunciton);
+  }
+
+  // creates table cell for overlap score with all its formating and functionality
+  private generateMeasureTableCellOverlap(containerId: string, rows: d3.Selection<any>, dataTable: any,  actionFunciton: Function)
+  {
+    this.generateGenericMeasureTableCell(containerId, rows, dataTable, actionFunciton);
+  }
+
+  // creates table cell for t-test score with all its formating and functionality
+  private generateMeasureTableCellTTest(containerId: string, rows: d3.Selection<any>, dataTable: any,  actionFunciton: Function)
+  {
+    this.generateGenericMeasureTableCell(containerId, rows, dataTable, actionFunciton);
+  }
+
+   // creates table cell for  mwu-test score with all its formating and functionality
+   private generateMeasureTableCellMWUTest(containerId: string, rows: d3.Selection<any>, dataTable: any,  actionFunciton: Function)
+   {
+     this.generateGenericMeasureTableCell(containerId, rows, dataTable, actionFunciton);
+   }
+
+   // creates the generic table cell for the table (formatting, styling, action handling)
+   private generateGenericMeasureTableCell(containerId: string, rows: d3.Selection<any>, dataTable: any,  actionFunciton: Function)
+   {
     const that = this;
 
     // create a cell in each row for each column
@@ -540,24 +564,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                         actionFunciton.bind(that)(containerId,d);
                       }
                     }); 
-  }
-
-  // creates table cell for overlap score with all its formating and functionality
-  private generateMeasureTableCellOverlap(containerId: string, rows: d3.Selection<any>, dataTable: any)
-  {
-    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisualRepParallelSets);
-  }
-
-  // creates table cell for t-test score with all its formating and functionality
-  private generateMeasureTableCellTTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
-  {
-    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
-  }
-
-   // creates table cell for t-test score with all its formating and functionality
-   private generateMeasureTableCellMWUTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
-   {
-     this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
    }
  
 
