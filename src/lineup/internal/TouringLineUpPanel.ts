@@ -557,8 +557,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
-    let dimension1 = '1.Dim: ' + cell.column_label;
-    let dimension2 = (optionDDA === 'Selection') ? '2.Dim: Selection' : '2. Dim: Stratification Groups';
+    let dimension1 = cell.column_label+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
+    let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
 
     let colPart = cell.dataVisRep;
     let parSetData = [];
