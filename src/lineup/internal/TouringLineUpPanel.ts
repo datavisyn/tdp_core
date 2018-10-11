@@ -1,7 +1,7 @@
 import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking, IDataRow} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
+import {MethodManager, ISImilarityMeasure, MeasureMap, intersection} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
@@ -58,7 +58,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     d3.select(this.node).selectAll('input[name="compareGroup"]').on('change', () => {
       // using fat arrow: global scope replaces new object's scope and 'this' can be used to call class functions
       const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
-      console.log('radio button value: ', radio.property('value'), ' | object: ', radio);
+      //console.log('radio button value: ', radio.property('value'), ' | object: ', radio);
       this.updateItemTab()
     });
 
@@ -69,7 +69,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     const self = this;
     // tab changed
-    d3.select(this.node).selectAll('ul.nav a').on('click', function() {
+    d3.select(this.node).selectAll('ul.nav a').on('click', function () {
       if (this.href.indexOf('item') >= 0) {
         self.updateItemTab();
       } else if (this.href.indexOf('attr') >= 0) {
@@ -101,13 +101,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateTouringPanel() {
-    // NOTE: after clicking on a tab, the class is not immidiatly correct/updated.
-    if (d3.select(this.itemTab).classed('active')) {
-      console.log('item tab is active, update content...');
-      this.updateItemTab();
-    } else if (d3.select(this.attributeTab).classed('active')) {
-      console.log('attribtue tab is active, update content...');
-      this.updateAttributeTab();
+    if (!this.touringElem.hidden) {
+      // NOTE: after clicking on a tab, the class is not immidiatly correct/updated.
+      if (d3.select(this.itemTab).classed('active')) {
+        console.log('item tab is active, update content...');
+        this.updateItemTab();
+      } else if (d3.select(this.attributeTab).classed('active')) {
+        console.log('attribtue tab is active, update content...');
+        this.updateAttributeTab();
+      }
+    } else {
+      console.log('Touring Panel is hidden, skip update.');
     }
   }
 
@@ -393,7 +397,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
             }else //all the other columns
             {
-              let score = this.calcScore(data, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
+              const score = this.calcScore(data, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
               
               tableRow[colName] = {
                 label: score, 
@@ -471,75 +475,61 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   // creates table cell for jaccard score with all its formating and functionality
-  private generateMeasureTableCellJaccard(containerId: string, rows: d3.Selection<any>, dataTable: any, actionFunciton: Function)
-  {
+  private generateMeasureTableCellJaccard(containerId: string, rows: d3.Selection<any>, dataTable: any, actionFunciton: Function) {
     const that = this;
 
     // create a cell in each row for each column
     // At this point, the rows have data associated.
     // So the data function accesses it.
-    let cells = rows.selectAll('td')
-                    .data(function(row) {
-                      //get all properties defined in dataTable.tableHead as an array with the data from the rows
-                      let returnValues = dataTable.tableHead.map(function(column) {
+    rows.selectAll('td')
+      .data(function (row) {
+        //get all properties defined in dataTable.tableHead as an array with the data from the rows
+        let returnValues = dataTable.tableHead.map(function (column) {
+          // return an object for the column of the data row
+          return row[column.columnName];
+        });
+        // console.log('returnValues: ',returnValues);
 
-                        // return an object for the column of the data row
-                        return row[column.columnName];
-                      });
-                      // console.log('returnValues: ',returnValues);
+        //push all desired column objects into this array
+        let allDesiredReturnValues = returnValues.filter(function (cell) {
+          // return true if rowspan is not defiend OR rowspan exist and is bigger than 0
+          return (cell.rowspan === undefined) || (cell.rowspan && cell.rowspan > 0);
+        });
 
-                      //push all desired column objects into this array
-                      let allDesiredReturnValues = returnValues.filter(function(cell) {
-                          // return true if rowspan is not defiend OR rowspan exist and is bigger than 0
-                          return  (cell.rowspan === undefined) || (cell.rowspan && cell.rowspan >0);
-                        });
-
-                      // console.log('allDesiredReturnValues: ',allDesiredReturnValues);
-                      return allDesiredReturnValues;
-                    })
-                    .enter()
-                    .append('td')
-                    .attr('class','text-center align-middle')
-                    .attr("rowspan", function(d:any){
-                      if(d.rowspan){
-                        return d.rowspan;
-                      }
-                      return 1;
-                     })
-                    .text(function(d:any) { 
-                      if(d.label && Number(d.label.toString())) {
-                        return Number(d.label.toString()).toFixed(2);  
-                      }
-
-                      return d.label; 
-                    })
-                    .style("background-color", function(d:any){
-                      return d.color || '#ffffff';
-                     })
-                    .on("mouseover", function(d:any) {
-                      if(d.action) {
-                        //d3.select(this).classed('bg-primary',true);
-                        d3.select(this).style("background-color", function(d){
-                                                                    return '#fba74d';
-                                                                  })
-                                      .style("font-weight", 'bolder');                                      
-                      }
-                    })					
-                    // FIXME: change colour of text depending on background (balck on black -> bad)
-                    .on("mouseout", function(d:any) {
-                      if(d.action) {
-                        //d3.select(this).classed('bg-primary',false);
-                        d3.select(this).style("background-color", function(d){
-                                                                    return d.color || '#ffffff';
-                                                                  })
-                                      .style("font-weight", 'normal'); 
-                      }
-                    })
-                    .on('click', function(d:any) {
-                      if(d.action) {
-                        actionFunciton.bind(that)(containerId,d);
-                      }
-                    }); 
+        // console.log('allDesiredReturnValues: ',allDesiredReturnValues);
+        return allDesiredReturnValues;
+      })
+      .enter()
+      .append('td')
+      .attr('class', 'text-center align-middle')
+      .style("background-color", (d: any) => d.color || '#ffffff')
+      .attr("rowspan", (d: any) => d.rowspan || 1)
+      .text(function (d: any) {
+        if (d.label && Number(d.label.toString())) {
+          return Number(d.label.toString()).toFixed(2);
+        }
+        return d.label;
+      })
+      .on("mouseover", function (d: any) {
+        if (d.action) {
+          //d3.select(this).classed('bg-primary',true);
+          d3.select(this).style("background-color", '#fba74d')
+            .style("font-weight", 'bolder');
+        }
+      })
+      // FIXME: change colour of text depending on background (balck on black -> bad)
+      .on("mouseout", function (d: any) {
+        if (d.action) {
+          //d3.select(this).classed('bg-primary',false);
+          d3.select(this).style("background-color", (d) => d.color || '#ffffff')
+            .style("font-weight", 'normal');
+        }
+      })
+      .on('click', function (d: any) {
+        if (d.action) {
+          actionFunciton.bind(that)(containerId, d);
+        }
+      });
   }
 
   // creates table cell for overlap score with all its formating and functionality
@@ -816,7 +806,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- SCORES ---
   // different kinds of score calculations
-  private calcScore(data, measure: ISImilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
+  private calcScore(data, measure: ISImilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number { // TODO return promise
     const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
     const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
@@ -847,7 +837,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let categorySet = [];
     // use categories or stratification as rows
-    if (this.getRadioButtonValue() === 'category' || columnB === 'selection') {
+    if (this.getRadioButtonValue() === 'category') {
       categorySet = data.filter((item) => item[columnB] === categoryB);
     } else {
       categorySet = groups.find((grp) => grp.name === categoryB).rows;
@@ -863,81 +853,70 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   // creates data for the visual representation of the jaccard score (parallel sets)
-  private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any)
-  {
+  private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any) {
     // console.log('---- getColumnPartioning ----');
     // console.log('getColumnPartioning.data',data);
     // console.log('getColumnPartioning.tableHeader',tableHeader);
     // console.log('getColumnPartioning.column',column);
     let columnPartitioning = [];
-    let groups = this.ranking.getGroupedData();
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    const groups = this.ranking.getGroupedData();
+    const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     // go through all categories of current coloumn
-    for(let i=0; i < column.categories.length; i++)
-    {
-      let currCategory = column.categories[i];
+    for (let i = 0; i < column.categories.length; i++) {
+      const currCategory = column.categories[i];
       //gets ids for the selection column (Selected and Unselected)
-      let dataIdCurrCategory = data.filter(item => {return item[''+column.column] === currCategory.label}).map((a) => a.id);
+      let dataIdCurrCategory = [];
 
-      if(this.getRadioButtonValue() === 'group' && column.column !== 'selection' && currCategory.label !== 'Default') //for stratification radio button
-      { //all ids of a cateogry of a column (attribute), but not for selection column or default category group (= no stratification)
-        let currGroups = groups.filter(item => {return item.name === currCategory.label});
-        let dataIdCurrGroups = [];
-        for(let g=0; g<currGroups.length;g++){
-
-          dataIdCurrGroups = ((currGroups[g] as any).rows.map((a) =>  a.id));
-        }
-        dataIdCurrCategory = dataIdCurrGroups;
-      }else if(this.getRadioButtonValue() === 'group' && currCategory.label === 'Default')
-      {//all ids of the whole data (default group) when no stratification exist
-        dataIdCurrCategory = data.map((a) => a.id);
+      if (this.getRadioButtonValue() === 'group') { // stratification
+        //all ids of a stratification group
+        const currGroup = groups.find(item => {return item.name === currCategory.label});
+        dataIdCurrCategory = currGroup.rows.map((a) => a.id);
+      } else { //category
+        // find all ids of the current category
+        dataIdCurrCategory = data.filter((item) => {
+          return item[column.column.toString()] === currCategory.label;
+        }).map((a) => a.id);
       }
 
-      let num = dataIdCurrCategory.length;
+      const num = dataIdCurrCategory.length;
 
-      let currCategoryParts = {
+      const currCategoryParts = {
         categoryLabel: currCategory.label,
         categoryAmount: num,
         parts: []
       };
 
       // go through all columns in header
-      for(let h=0; h<tableHeader.length; h++)
-      {
-        
-        let currHeader = tableHeader[h];
-        
-        if(currHeader.label.length > 0){
-          // let num = data.filter(item => {return item[''+column.column] === currCategory.label}).length;
-          // num = !num ? 0 : num;
+      for (let h = 0; h < tableHeader.length; h++) {
+        const currHeader = tableHeader[h];
+
+        if (currHeader.label.length > 0) {
           let dataIdCurrentHeader = []
-          if(optionDDA === 'Selection'){
+          if (optionDDA === 'Selection') {
+            // Compare categories with selected/unselected
             dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label}).map((a) => a.id);
-          }else{
-            for(let g=0;g<groups.length;g++)
-            {
-              if(groups[g].name === currHeader.label && (groups[g] as any).rows)
-              {
+          } else {
+            // Compare categories with stratification groups
+            for (let g = 0; g < groups.length; g++) {
+              if (groups[g].name === currHeader.label && (groups[g] as any).rows) {
                 dataIdCurrentHeader = (groups[g] as any).rows.map((a) => a.id);
-              }else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
-              {
+              } else if (groups[g].name === currHeader.label && currHeader.label === 'Default') {
                 dataIdCurrentHeader = data.map((a) => a.id);
               }
             }
           }
-          let intersection = dataIdCurrCategory.filter(item => -1 !== dataIdCurrentHeader.indexOf(item));
-          let numHeader = intersection.length;
+          const {intersection: intersect} = intersection(dataIdCurrCategory, dataIdCurrentHeader);
+          const numHeader = intersect.length;
 
-          if(numHeader > 0){
-            let currCatForHead = {
+          if (numHeader > 0) {
+            const currCatForHead = {
               label: currHeader.label,
               amount: numHeader
             };
 
             currCategoryParts.parts.push(currCatForHead);
           }
-
         }
       }
 
@@ -1035,12 +1014,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing the numerical attributes (if there are any)
       //    and an entry representing the categorical attributes (if there are any)
       //    and an entry representing all these attributes
+      descriptions.unshift(this.ranking.getSelectionDesc());
+      descriptions.unshift(this.ranking.getRankDesc())
       descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
       descriptions.forEach((desc) => {
         (desc as any).categories = stratDesc.categories; // Replace real categopries with those from stratification
       });
-      descriptions.unshift(this.ranking.getSelectionDesc());
-      descriptions.unshift(this.ranking.getRankDesc())
       descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All numerical columns',
         type: 'num_collection'
@@ -1078,9 +1057,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     this.touringElem.hidden = hide;
     if (!hide) {
-      console.log('start touring')
+      console.log('Open Touring Panel')
       //if touring is displayed, ensure the panel is visible
       this.collapse = false;
+      this.updateTouringPanel();
     }
     
     const button = d3.select(this.node).select('.lu-side-panel button.touring')
