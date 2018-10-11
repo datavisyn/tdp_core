@@ -1000,35 +1000,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     if (optionDDA === 'Selection') {
       selectionSet = data.filter((item) => item['selection'] === headerCategory);
     } else if (optionDDA === 'Stratification Groups') {
-      for (let i = 0; i < groups.length; i++) {
-        if (groups[i].name === headerCategory) {
-          if (groups.length === 1) {
-            selectionSet = data;
-          } else {
-            selectionSet = groups[i].rows;
-          }
-        }
-      }
+      selectionSet = groups.find((grp) => grp.name === headerCategory).rows;
     }
     // console.log('selectionSet: ',selectionSet);
 
 
     let categorySet = [];
     // use categories or stratification as rows
-    if (this.getRadioButtonValue() === 'category' || columnB === 'selection') {
-      categorySet = data.filter(item => {
-        return item[columnB] === categoryB;
-      });
+    if (this.getRadioButtonValue() === 'category') {
+      categorySet = data.filter((item) => item[columnB] === categoryB);
     } else {
-      for (let i = 0; i < groups.length; i++) {
-        if (groups[i].name === categoryB) {
-          if (groups.length === 1) {
-            categorySet = data;
-          } else {
-            categorySet = groups[i].rows;
-          }
-        }
-      }
+      categorySet = groups.find((grp) => grp.name === categoryB).rows;
     }
     // console.log('categorySet: ',categorySet);
 
