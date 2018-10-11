@@ -95,11 +95,16 @@ div.touring {
 
   .table-container {
     overflow-x: auto;
+
+    td {
+      &.action:hover, &.action:focus { // = td.action:hover
+        background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
+        font-weight: bolder;
+      }
+    }
   }
   
   .tab-pane {
     margin: 0.5em 0 0 0.5em;
-
-     
   }
 }

@@ -461,7 +461,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     // table cells
-    this.generateMeasureTableCell(measure.id, containerId, rows,dataTable)      
+    this.generateMeasureTableCell(measure.id, containerId, rows, dataTable)      
     
   }
 
@@ -514,7 +514,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       })
       .enter()
       .append('td')
-      .attr('class', 'text-center align-middle')
+      .attr('class', (d: any) => d.action ? 'text-center align-middle action' : 'text-center align-middle')
       .style("background-color", (d: any) => d.color || '#ffffff')
       .attr("rowspan", (d: any) => d.rowspan || 1)
       .text(function (d: any) {
@@ -522,21 +522,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           return Number(d.label.toString()).toFixed(2);
         }
         return d.label;
-      })
-      .on("mouseover", function (d: any) {
-        if (d.action) {
-          //d3.select(this).classed('bg-primary',true);
-          d3.select(this).style("background-color", '#fba74d')
-            .style("font-weight", 'bolder');
-        }
-      })
-      // FIXME: change colour of text depending on background (balck on black -> bad)
-      .on("mouseout", function (d: any) {
-        if (d.action) {
-          //d3.select(this).classed('bg-primary',false);
-          d3.select(this).style("background-color", (d) => d.color || '#ffffff')
-            .style("font-weight", 'normal');
-        }
       })
       .on('click', function (d: any) {
         if (d.action) {
