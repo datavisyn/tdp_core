@@ -374,7 +374,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         {  
           let currCategory = currCatAfterFilter[cnt];
           let tableRow = {};
-          let currRowPartitioning = this.getColumnPartioningParallelSets(data, tableHeader, currCol);
+          let dataVisualRep = this.getDataVisualRepresentation(measure.id, data, tableHeader, currCol, currCategory);
           
           for(let col=0; col < tableHeader.length; col++)
           {
@@ -407,7 +407,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                 color: this.score2color(score),
                 action: true,
                 tableColumn: (tableHeader[col] as any).label,
-                partitioning: currRowPartitioning
+                dataVisRep: dataVisualRep
               };
             }
           }
@@ -461,21 +461,34 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     // table cells
-    if(measure.id === 'jaccard'){
-      this.generateMeasureTableCellJaccard(containerId, rows,dataTable, this.generateVisualRepParallelSets);
-    }else if(measure.id === 'overlap'){
-      this.generateMeasureTableCellOverlap(containerId, rows,dataTable);
-    }else if(measure.id === 'student_test'){
-      this.generateMeasureTableCellTTest(containerId, rows,dataTable);
-    }else if(measure.id === 'mwu_test'){
-      this.generateMeasureTableCellMWUTest(containerId, rows,dataTable);
-    }
-                 
+    this.generateMeasureTableCell(measure.id, containerId, rows,dataTable)      
     
   }
 
-  // creates table cell for jaccard score with all its formating and functionality
-  private generateMeasureTableCellJaccard(containerId: string, rows: d3.Selection<any>, dataTable: any, actionFunciton: Function) {
+  // creates the table cell depending on their functionality
+  private generateMeasureTableCell(measureId: string, containerId: string, rows: d3.Selection<any>, dataTable: any) {
+    switch (measureId) {
+      case 'jaccard': {
+        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
+      }
+      case 'overlap': {
+        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
+      }
+      case 'student_test': {
+        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
+      }
+      case 'mwu_test': {
+        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
+      }
+      default: {
+        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
+      }
+    }
+  }
+
+
+  // creates the generic table cell for the table (formatting, styling, action handling)
+  private generateGenericMeasureTableCell(containerId: string, rows: d3.Selection<any>, dataTable: any, actionFunciton: Function) {
     const that = this;
 
     // create a cell in each row for each column
@@ -531,90 +544,78 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
       });
   }
-
-  // creates table cell for overlap score with all its formating and functionality
-  private generateMeasureTableCellOverlap(containerId: string, rows: d3.Selection<any>, dataTable: any)
-  {
-    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisualRepParallelSets);
-  }
-
-  // creates table cell for t-test score with all its formating and functionality
-  private generateMeasureTableCellTTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
-  {
-    this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
-  }
-
-   // creates table cell for t-test score with all its formating and functionality
-   private generateMeasureTableCellMWUTest(containerId: string, rows: d3.Selection<any>, dataTable: any)
-   {
-     this.generateMeasureTableCellJaccard(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
-   }
  
+  // --------- SCORES ---
+  // different kinds of score calculations
+  private calcScore(data, measure: ISImilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
+    const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+    const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
+    const categorySet = dataSets.categorySet.map((item) => item[columnB]);
+
+    return measure.calc(selectionSet, categorySet)
+  }
 
   // --------- VISUAL REPRESENTATION ---
-  // creates visual representation as a parallel set (for jaccard)
-  private generateVisualRepParallelSets(containerId: string, cell: any)
-  {
-    console.log('Cell clicken (ParSets): ',cell);
-    console.log('Cell clicken (ParSets) - containerId: ',containerId);
+  // creates parallel set visualisation (for jaccard, overlap)
+  private generateVisualRepParallelSets(containerId: string, cell: any) {
+    console.log('Cell clicken (ParSets): ', cell);
+    console.log('Cell clicken (ParSets) - containerId: ', containerId);
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    
-    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
+
+    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container ' + containerId + '"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
 
-    let svgContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','svg-container '+containerId);
-  
-    let width = Number(svgContainer.style('width').slice(0,-2));
+    let svgContainer = d3.select('#' + containerId).append('div')
+      .attr('class', 'svg-container ' + containerId);
+
+    let width = Number(svgContainer.style('width').slice(0, -2));
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
-    let dimension1 = '1.Dim: '+cell.column_label;
+    let dimension1 = '1.Dim: ' + cell.column_label;
     let dimension2 = (optionDDA === 'Selection') ? '2.Dim: Selection' : '2. Dim: Stratification Groups';
-    
-    let colPart = cell.partitioning;
+
+    let colPart = cell.dataVisRep;
     let parSetData = [];
 
-    for(let i=0; i<colPart.length; i++)
-    {
+    for (let i = 0; i < colPart.length; i++) {
       let headerPart = colPart[i].parts;
       let categoryLabel = colPart[i].categoryLabel;
 
-      for(let p=0; p<headerPart.length; p++)
-      {
+      for (let p = 0; p < headerPart.length; p++) {
         let newData = {};
         newData[dimension1] = categoryLabel;
         newData[dimension2] = headerPart[p].label;
         newData['value'] = headerPart[p].amount;
         parSetData.push(newData);
       }
-       
+
     }
-    console.log('Cell clicken (ParSets) - data: ',parSetData);
+    console.log('Cell clicken (ParSets) - data: ', parSetData);
 
 
     const that = this;
 
     // console.log('SVG Conatiner - width: ',width);
     let chart = (<any>d3).parsets()
-                        .tension(0.5) //[0 .. 1] -> 1 = straight line 
-                        .dimensions([dimension1, dimension2])
-                        .value( function (d) { return d.value; })
-                        .width(width)
-                        .height(175); //175
+      .tension(0.5) //[0 .. 1] -> 1 = straight line 
+      .dimensions([dimension1, dimension2])
+      .value(function (d) {return d.value;})
+      .width(width)
+      .height(175); //175
 
     let svgCanvas = svgContainer.append('svg')
-                                .attr('width',chart.width())
-                                .attr('height',chart.height());
-                                // .attr('height',chart.height());
-                                // .attr('width','100%')
-                                // .attr('height','100%');
+      .attr('width', chart.width())
+      .attr('height', chart.height());
+    // .attr('height',chart.height());
+    // .attr('width','100%')
+    // .attr('height','100%');
 
-    let svgFigureGroup = svgCanvas.append('g').attr('class','parSets');
+    let svgFigureGroup = svgCanvas.append('g').attr('class', 'parSets');
 
     // draw parallel sets
     svgFigureGroup.datum(parSetData).call(chart);
-    
+
     //rotation um 90 von den SVG parallel sets
     //svgFigureGroup.attr('transform','rotate(-90) translate(-'+width+',0)');
 
@@ -625,47 +626,46 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //FIXME: the colour of the categories is always the same order blue,orage,green,... 
     //       -> if 2nd category is filterd out the next category should have the colour of the next displayed one
     let svgPaths = svgRibbon.selectAll('path')
-                            .each(function(d) {
-                              d3.select(this).classed('selected',false);
+      .each(function (d) {
+        d3.select(this).classed('selected', false);
 
-                              if(d.parent.name === cell.category && d.name === cell.tableColumn){
-                                d3.select(this).classed('selected',true);
-                              }
-                              
-                              let color = that.getColorOfCategory(d.parent.dimension.substring(7),d.parent.name);
-                              if(color !== null)
-                              {
-                                d3.select(this).style('fill',color);
-                              }
-                              // console.log('path.this: ', d3.select(this));
-                              // console.log('path.d: ',d);
-                            });
+        if (d.parent.name === cell.category && d.name === cell.tableColumn) {
+          d3.select(this).classed('selected', true);
+        }
+
+        let color = that.getColorOfCategory(d.parent.dimension.substring(7), d.parent.name);
+        if (color !== null) {
+          d3.select(this).style('fill', color);
+          d3.select(this).style('stroke', color);
+        }
+        // console.log('path.this: ', d3.select(this));
+        // console.log('path.d: ',d);
+      });
     // console.log('svgPaths: ',svgPaths);
 
     let svgDimensions = svgFigureGroup.selectAll('g[class=dimension]');
     // console.log('svgDimensions',svgDimensions);
-   
+
     //highlight label of current path
     svgDimensions.selectAll('g')
-                 .each(function(d) {
-                  d3.select(this).select('rect').classed('selected',false);
-                  // console.log('dim.d: ',d);
-                  // console.log('dim.this: ',d3.select(this));
+      .each(function (d) {
+        d3.select(this).select('rect').classed('selected', false);
+        // console.log('dim.d: ',d);
+        // console.log('dim.this: ',d3.select(this));
 
-                  if(d.name === cell.category){
-                    d3.select(this).select('rect').classed('selected',true);
-                  }
+        if (d.name === cell.category) {
+          d3.select(this).select('rect').classed('selected', true);
+        }
 
-                  let color = that.getColorOfCategory(d.dimension.name.substring(7),d.name);
-                  if(color !== null)
-                  {
-                    d3.select(this).select('rect').style('fill',color);
-                  }
-      
-                });
+        let color = that.getColorOfCategory(d.dimension.name.substring(7), d.name);
+        if (color !== null) {
+          d3.select(this).select('rect').style('fill', color);
+        }
 
+      });
   }
  
+  // creates boxplot visualization (for student-test, mwu-test)
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
     console.log('Cell clicken (BoxPlot): ',cell);
@@ -678,28 +678,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgContainer = d3.select('#'+containerId).append('div')
                                                   .attr('class','svg-container '+containerId);
   
+    let data = cell.dataVisRep.data;
+    let min = cell.dataVisRep.min;
+    let max = cell.dataVisRep.max;
+    console.log('BoxPlot: ',{data,min,max});
+
+
     let containerWidth = Number(svgContainer.style('width').slice(0,-2));
 
+    let calcWidth = Math.max(containerWidth,data.length * 50 + 30);
 
-    let margin = {top: 30, right: 50, bottom: 70, left: 50};
-    let  width = 800 - margin.left - margin.right;
-    let height = 400 - margin.top - margin.bottom;
-
-    let data = [];
-    data[0] = [];
-    data[1] = [];
-    data[2] = [];
-    data[3] = [];
-    data[0][0] = "Q1";
-    data[1][0] = "Q2";
-    data[2][0] = "Q3";
-    data[3][0] = "Q4";
-    data[0][1] = [20000,9879,5070,7343,91,36,7943,10546,9385,8669];
-    data[1][1] = [15000,9323,9395,8675,5354,6725,10899,9365,8238,7446];
-    data[2][1] = [8000,3294,17633,12121,4319,18712,17270,13676,16754];
-    data[3][1] = [2000,5629,5752,7557,5125,5116,5828,6014,5996,8905];
-
-
+    let margin = {top: 5, right: 0, bottom: 50, left: 50};
+    let  width = calcWidth - margin.left - margin.right;
+    let height = 200 - margin.top - margin.bottom;
 
     let chart = (d3 as any).box()
           .whiskers(function(d) {
@@ -712,9 +703,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                 while (d[--j] > q3 + iqr);
                 return [i, j];    
           })
-          .height(175)	
-          .domain([4000, 20000])
-          .showLabels(true);
+          .height(height)	
+          .domain([min, max])
+          .showLabels(false);
 
 
     let svgCanvas = svgContainer.append('svg')
@@ -727,7 +718,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     	// the x-axis
     let x = d3.scale.ordinal()	   
-    .domain( data.map(function(d) { console.log(d); return d[0] } ) )	    
+    .domain( data.map(function(d) { console.log('domain: ',d); return d[0] } ) )	    
     .rangeRoundBands([0 , width], 0.7, 0.3); 		
 
     let xAxis = d3.svg.axis()
@@ -736,7 +727,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // the y-axis
     let y = d3.scale.linear()
-      .domain([4000, 20000])
+      .domain([min, max])
       .range([height + margin.top, 0 + margin.top]);
 
     let yAxis = d3.svg.axis()
@@ -744,115 +735,81 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .orient("left");
 
     // draw the boxplots	
-    svgFigureGroup.data(data)
+    svgFigureGroup.selectAll(".box")
+      .data(data)
       .enter().append("g")
+      .attr('class',function(d,i) {
+        let classString = 'box-element';
+        let dataLabel = `${d[0]}`;
+        let colorLabel = `category-${i}`;
+
+        return `${classString} ${dataLabel} ${colorLabel}`;
+      })
       .attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + margin.top + ")"; } )
       .call(chart.width(x.rangeBand())); 
      
     // add a title
-    svgFigureGroup.append("text")
-        .attr("x", (width / 2))             
-        .attr("y", 0 + (margin.top / 2))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "18px") 
-        //.style("text-decoration", "underline")  
-        .text("Revenue 2012");
+    // svgFigureGroup.append("text")
+    //     .attr("x", (width / 2))             
+    //     .attr("y", 0 + (margin.top / 2))
+    //     .attr("text-anchor", "middle")  
+    //     .style("font-size", "18px") 
+    //     //.style("text-decoration", "underline")  
+    //     .text("Revenue 2012");
 
     // draw y axis
     svgFigureGroup.append("g")
       .attr("class", "y axis")
-      .call(yAxis)
-      .append("text") // and text1
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .style("font-size", "16px") 
-      .text("Revenue in €");		
+      .call(yAxis);
+    //   .append("text") // and text1
+    //   .attr("transform", "rotate(-90)")
+    //   .attr("y", 6)
+    //   .attr("dy", ".71em")
+    //   .style("text-anchor", "end")
+    //   .style("font-size", "16px") 
+    //   .text("Revenue in €");		
 
     // draw x axis	
     svgFigureGroup.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + (height  + margin.top + 10) + ")")
-      .call(xAxis)
-      .append("text")             // text label for the x axis
-        .attr("x", (width / 2) )
-        .attr("y",  10 )
-      .attr("dy", ".71em")
-        .style("text-anchor", "middle")
-      .style("font-size", "16px") 
-        .text("Quarter"); 
+      .call(xAxis);
+      // .append("text")             // text label for the x axis
+      //   .attr("x", (width / 2) )
+      //   .attr("y",  10 )
+      // .attr("dy", ".71em")
+      //   .style("text-anchor", "middle")
+      // .style("font-size", "16px") 
+      //   .text("Quarter"); 
 
   }
 
-  private getColorOfCategory(column: string, category: string){
-    // console.log('path.column: ',column);
-    // console.log('path.category: ',category);
-    let currColumn = this.provider.getRankings()[0].children.filter((item) => {return item.desc.label === column;});
-    let color = null;
-    if(currColumn[0] && (currColumn[0] as ICategoricalColumn).categories)
-    {
-      let currCategories = (currColumn[0] as ICategoricalColumn).categories;
-      for(let i=0; i<currCategories.length; i++){
-        if(currCategories[i].label === category){
-          color = currCategories[i].color;
-        }
+   
+  // --------- FORMAT DATA FOR VISUAL REPRESENTATION ---
+  // gets the data needed for the different visualisations
+  private getDataVisualRepresentation(measureId: string, data: Array<any>, tableHeader: Array<any>, column: any, category: any)
+  {
+    switch(measureId) {
+      case 'jaccard': {
+        return this.getColumnPartioningParallelSets(data, tableHeader, column);
+      }
+      case 'overlap': {
+        return this.getColumnPartioningParallelSets(data, tableHeader, column);
+      }
+      case 'student_test': {
+        return this.getDataValuesBoxplit(data, tableHeader, column, category);
+      }
+      case 'mwu_test': {
+        return this.getDataValuesBoxplit(data, tableHeader, column, category);
+      }
+      default: {
+        return this.getColumnPartioningParallelSets(data, tableHeader, column);
       }
     }
-    
-    // console.log('path.color: ',color);
-    return color;
   }
 
-  // --------- SCORES ---
-  // different kinds of score calculations
-  private calcScore(data, measure: ISImilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number { // TODO return promise
-    const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
-    const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
-    const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
-    return measure.calc(selectionSet, categorySet)
-  }
-
-  // --------- MISC ---
-  //generates id for the collapseable panel in the accordion with the prefix and the current time's minutes/seconds and millisec
-  private getIdWithTimestamp(prefix: string) {
-    let currdate = new Date();
-    return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
-  }
-
-  //get the 2 data sets depending on the current configuraiton of the dropdowns and the radio buttons
-  private getSelectionAndCategorySets(data, headerCategory: string, columnB: string, categoryB: string) {
-    const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
-    const groups = this.ranking.getGroupedData();
-
-    let selectionSet = [];
-    if (optionDDA === 'Selection') {
-      selectionSet = data.filter((item) => item['selection'] === headerCategory);
-    } else if (optionDDA === 'Stratification Groups') {
-      selectionSet = groups.find((grp) => grp.name === headerCategory).rows;
-    }
-    // console.log('selectionSet: ',selectionSet);
-
-
-    let categorySet = [];
-    // use categories or stratification as rows
-    if (this.getRadioButtonValue() === 'category') {
-      categorySet = data.filter((item) => item[columnB] === categoryB);
-    } else {
-      categorySet = groups.find((grp) => grp.name === categoryB).rows;
-    }
-    // console.log('categorySet: ',categorySet);
-
-    let dataSets = {
-      selectionSet: selectionSet,
-      categorySet: categorySet
-    };
-
-    return dataSets;
-  }
-
-  // creates data for the visual representation of the jaccard score (parallel sets)
+  // creates data for the visual representation of parallel sets
   private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any) {
     // console.log('---- getColumnPartioning ----');
     // console.log('getColumnPartioning.data',data);
@@ -925,6 +882,163 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
     return columnPartitioning;
   }
+ 
+  // creates data for the visual representation of boxplots
+  private getDataValuesBoxplit(data: Array<any>, tableHeader: Array<any>, column: any, category: any)
+  {
+    // console.log('---- getColumnPartioning ----');
+    // console.log('getColumnPartioning.data',data);
+    // console.log('getColumnPartioning.tableHeader',tableHeader);
+    // console.log('getColumnPartioning.column',column);
+    // let columnPartitioning = [];
+    let groups = this.ranking.getGroupedData();
+    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+
+    let rowBoxData = [];
+    let min = Infinity;
+    let max = -Infinity;
+
+
+    let categoryBoxData = []
+    categoryBoxData.push(''+category.label);
+    // get the values of current category
+    for(let g=0;g<groups.length;g++)
+    {
+      if(groups[g].name === category.label && (groups[g] as any).rows)
+      {
+        let dataCategroy = (groups[g] as any).rows.map((a) => { return a[''+column.column]; });
+
+        categoryBoxData.push(dataCategroy);
+        min = Math.min(min,Math.min(...(<number[]> dataCategroy)));
+        max = Math.max(max,Math.max(...(<number[]> dataCategroy)));
+        
+        rowBoxData.push(categoryBoxData);
+      }
+    }
+
+
+    // go through all columns in header 
+    for(let h=0; h<tableHeader.length; h++)
+    {
+      
+      let currHeader = tableHeader[h];
+      
+      if(currHeader.label.length > 0){
+        let currBoxData = [];
+        //first element is boxplot label
+        currBoxData.push(''+currHeader.label);
+
+        let dataCurrentHeader = [];
+        if(optionDDA === 'Selection'){
+          dataCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label});
+        }else{
+          for(let g=0;g<groups.length;g++)
+          {
+            if(groups[g].name === currHeader.label && (groups[g] as any).rows)
+            {
+              dataCurrentHeader = (groups[g] as any).rows.map((a) => a);
+            }else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
+            {
+              dataCurrentHeader = data;
+            }
+          }
+        }
+
+        dataCurrentHeader = dataCurrentHeader.map((a) => { return a[''+column.column]; });  
+        min = Math.min(min,Math.min(...(<number[]> dataCurrentHeader)));
+        max = Math.max(max,Math.max(...(<number[]> dataCurrentHeader)));
+
+        // second elemnt is an array with all the values 
+        currBoxData.push(dataCurrentHeader);
+
+        // add the boxplot to all boxplots for this row
+        rowBoxData.push(currBoxData);
+      }
+    }
+ 
+
+    let boxplotData = [];
+    boxplotData[0] = [];
+    boxplotData[1] = [];
+    boxplotData[2] = [];
+    boxplotData[3] = [];
+    boxplotData[0][0] = "Q1";
+    boxplotData[1][0] = "Q2";
+    boxplotData[2][0] = "Q3";
+    boxplotData[3][0] = "Q4";
+    boxplotData[0][1] = [20000,9879,5070,7343,91,36,7943,10546,9385,8669];
+    boxplotData[1][1] = [15000,9323,9395,8675,5354,6725,10899,9365,8238,7446];
+    boxplotData[2][1] = [8000,3294,17633,12121,4319,18712,17270,13676,6587,16754];
+    boxplotData[3][1] = [2000,5629,5752,7557,5125,5116,5828,6014,5996,8905];
+
+    let rowBoxObj = {
+      data: rowBoxData,
+      min: min,
+      max: max
+    };
+
+    console.log({rowBoxData , min, max});
+
+    return rowBoxObj;
+  }
+ 
+
+
+  // --------- MISC ---
+  //generates id for the collapseable panel in the accordion with the prefix and the current time's minutes/seconds and millisec
+  private getIdWithTimestamp(prefix: string) {
+    let currdate = new Date();
+    return prefix + <string><any>currdate.getMinutes() + <string><any>currdate.getSeconds() + <string><any>currdate.getMilliseconds();
+  }
+
+  //get the 2 data sets depending on the current configuraiton of the dropdowns and the radio buttons
+  private getSelectionAndCategorySets(data, headerCategory: string, columnB: string, categoryB: string) {
+    const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
+    const groups = this.ranking.getGroupedData();
+
+    let selectionSet = [];
+    if (optionDDA === 'Selection') {
+      selectionSet = data.filter((item) => item['selection'] === headerCategory);
+    } else if (optionDDA === 'Stratification Groups') {
+      for (let i = 0; i < groups.length; i++) {
+        if (groups[i].name === headerCategory) {
+          if (groups.length === 1) {
+            selectionSet = data;
+          } else {
+            selectionSet = groups[i].rows;
+          }
+        }
+      }
+    }
+    // console.log('selectionSet: ',selectionSet);
+
+
+    let categorySet = [];
+    // use categories or stratification as rows
+    if (this.getRadioButtonValue() === 'category' || columnB === 'selection') {
+      categorySet = data.filter(item => {
+        return item[columnB] === categoryB;
+      });
+    } else {
+      for (let i = 0; i < groups.length; i++) {
+        if (groups[i].name === categoryB) {
+          if (groups.length === 1) {
+            categorySet = data;
+          } else {
+            categorySet = groups[i].rows;
+          }
+        }
+      }
+    }
+    // console.log('categorySet: ',categorySet);
+
+    let dataSets = {
+      selectionSet: selectionSet,
+      categorySet: categorySet
+    };
+
+    return dataSets;
+  }
 
   // calculates the backgound color for the scores (0 -> white, 1 -> dark grey)
   private score2color(score:number, domain = [0, 1])
@@ -935,6 +1049,26 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const darkness = linScale(score); // higher score -> darker color
     const hslColor =  d3.rgb(darkness, darkness, darkness);
     return hslColor.toString();
+  }
+
+  // gets the color of a category of a column (attribute)
+  private getColorOfCategory(column: string, category: string){
+    // console.log('path.column: ',column);
+    // console.log('path.category: ',category);
+    let currColumn = this.provider.getRankings()[0].children.filter((item) => {return item.desc.label === column;});
+    let color = null;
+    if(currColumn[0] && (currColumn[0] as ICategoricalColumn).categories)
+    {
+      let currCategories = (currColumn[0] as ICategoricalColumn).categories;
+      for(let i=0; i<currCategories.length; i++){
+        if(currCategories[i].label === category){
+          color = currCategories[i].color;
+        }
+      }
+    }
+    
+    // console.log('path.color: ',color);
+    return color;
   }
 
   // only the display categories will be shown in table
