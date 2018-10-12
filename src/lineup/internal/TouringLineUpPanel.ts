@@ -543,8 +543,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // --------- VISUAL REPRESENTATION ---
   // creates parallel set visualisation (for jaccard, overlap)
   private generateVisualRepParallelSets(containerId: string, cell: any) {
-    console.log('Cell clicken (ParSets): ', cell);
-    console.log('Cell clicken (ParSets) - containerId: ', containerId);
+    console.log('Cell clicken (ParSets): ', {containerId, cell});
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
 
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container ' + containerId + '"]');
@@ -653,8 +652,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates boxplot visualization (for student-test, mwu-test)
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
-    console.log('Cell clicken (BoxPlot): ',cell);
-    console.log('Cell clicken (BoxPlot) - containerId: ',containerId);
+    console.log('Cell clicken (BoxPlot): ',{containerId, cell});
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
     
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
@@ -703,7 +701,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     	// the x-axis
     let x = d3.scale.ordinal()	   
-    .domain( data.map(function(d) { console.log('domain: ',d); return d[0] } ) )	    
+    .domain( data.map(function(d) { return d[0] } ) )	    
     .rangeRoundBands([0 , width], 0.7, 0.3); 		
 
     let xAxis = d3.svg.axis()
