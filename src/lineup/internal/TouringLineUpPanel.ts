@@ -731,7 +731,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let svgFigureGroup = svgCanvas.append('g')
                                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                                  .attr('class','box');
+                                  .attr('class','boxplot');
 
     	// the x-axis
     let x = d3.scale.ordinal()	   
@@ -752,7 +752,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .orient("left");
 
     // draw the boxplots	
-    svgFigureGroup.selectAll(".box")
+    svgFigureGroup.selectAll(".boxplot")
       .data(data)
       .enter().append("g")
       .attr('class',function(d,i) {
@@ -798,6 +798,24 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //   .style("text-anchor", "middle")
       // .style("font-size", "16px") 
       //   .text("Quarter"); 
+
+
+    let boxElements = svgFigureGroup.selectAll('g.box-element')
+                                    .each(function(d) {
+                                      d3.select(this).classed('selected',false);
+                                      // console.log('box.this: ', d3.select(this));
+                                      // console.log('box.d: ',d);
+                                      
+                                      if(d[0] === cell.tableColumn || d[0] === cell.category){
+                                        d3.select(this).classed('selected',true);
+                                      }
+                                    });
+
+    let rectElements = boxElements.selectAll('rect');
+
+
+    let cirlceElements = boxElements.selectAll('circle')
+                                    .attr('r',2);
 
   }
 
@@ -928,19 +946,23 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     let categoryBoxData = []
-    categoryBoxData.push(''+category.label);
-    // get the values of current category
-    for(let g=0;g<groups.length;g++)
+    if(optionDDA === 'Selection')
     {
-      if(groups[g].name === category.label && (groups[g] as any).rows)
+      categoryBoxData.push(''+category.label);
+      // get the values of current category
+      for(let g=0;g<groups.length;g++)
       {
-        let dataCategroy = (groups[g] as any).rows.map((a) => { return a[''+column.column]; });
+        if(groups[g].name === category.label && (groups[g] as any).rows)
+        {
+          let dataCategroy = (groups[g] as any).rows.map((a) => { return a[''+column.column]; });
+          let dataCategroyValid = dataCategroy.filter(Boolean);
 
-        categoryBoxData.push(dataCategroy);
-        min = Math.min(min,Math.min(...(<number[]> dataCategroy)));
-        max = Math.max(max,Math.max(...(<number[]> dataCategroy)));
-        
-        rowBoxData.push(categoryBoxData);
+          categoryBoxData.push(dataCategroyValid);
+          min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
+          max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
+          
+          rowBoxData.push(categoryBoxData);
+        }
       }
     }
 
@@ -973,31 +995,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
 
         dataCurrentHeader = dataCurrentHeader.map((a) => { return a[''+column.column]; });  
-        min = Math.min(min,Math.min(...(<number[]> dataCurrentHeader)));
-        max = Math.max(max,Math.max(...(<number[]> dataCurrentHeader)));
+        let dataCurrentHeaderValid = dataCurrentHeader.filter(Boolean);
+        min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
+        max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
 
         // second elemnt is an array with all the values 
-        currBoxData.push(dataCurrentHeader);
+        currBoxData.push(dataCurrentHeaderValid);
 
         // add the boxplot to all boxplots for this row
         rowBoxData.push(currBoxData);
       }
     }
  
-
-    let boxplotData = [];
-    boxplotData[0] = [];
-    boxplotData[1] = [];
-    boxplotData[2] = [];
-    boxplotData[3] = [];
-    boxplotData[0][0] = "Q1";
-    boxplotData[1][0] = "Q2";
-    boxplotData[2][0] = "Q3";
-    boxplotData[3][0] = "Q4";
-    boxplotData[0][1] = [20000,9879,5070,7343,91,36,7943,10546,9385,8669];
-    boxplotData[1][1] = [15000,9323,9395,8675,5354,6725,10899,9365,8238,7446];
-    boxplotData[2][1] = [8000,3294,17633,12121,4319,18712,17270,13676,6587,16754];
-    boxplotData[3][1] = [2000,5629,5752,7557,5125,5116,5828,6014,5996,8905];
 
     let rowBoxObj = {
       data: rowBoxData,

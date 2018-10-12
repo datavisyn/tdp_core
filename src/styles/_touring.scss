@@ -87,9 +87,27 @@ div.touring {
     g.box-element {
       rect.box {
         stroke: black;
-        stroke-width: 1
+        stroke-width: 1;
+        stroke-opacity: 0;
+        fill-opacity: .5;
+      }
+      line.center, line.median, line.whisker{
+        stroke-opacity: 0.2;
       }
     }
+  
+    g.box-element.selected {
+      rect.box{
+        stroke: black;
+        stroke-width: 1;
+        stroke-opacity: 1;
+        fill-opacity: 1;
+      }
+      line.center, line.median, line.whisker{
+        stroke-opacity: 1;
+      }
+    }
+
 
   }
 
