@@ -1,7 +1,7 @@
 import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking, IDataRow} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, ISImilarityMeasure, MeasureMap} from 'touring';
+import {MethodManager, ISImilarityMeasure, MeasureMap, intersection} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
@@ -58,7 +58,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     d3.select(this.node).selectAll('input[name="compareGroup"]').on('change', () => {
       // using fat arrow: global scope replaces new object's scope and 'this' can be used to call class functions
       const radio = d3.select(this.node).select('input[name="compareGroup"]:checked')
-      console.log('radio button value: ', radio.property('value'), ' | object: ', radio);
+      //console.log('radio button value: ', radio.property('value'), ' | object: ', radio);
       this.updateItemTab()
     });
 
@@ -69,7 +69,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     const self = this;
     // tab changed
-    d3.select(this.node).selectAll('ul.nav a').on('click', function() {
+    d3.select(this.node).selectAll('ul.nav a').on('click', function () {
       if (this.href.indexOf('item') >= 0) {
         self.updateItemTab();
       } else if (this.href.indexOf('attr') >= 0) {
@@ -101,13 +101,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateTouringPanel() {
-    // NOTE: after clicking on a tab, the class is not immidiatly correct/updated.
-    if (d3.select(this.itemTab).classed('active')) {
-      console.log('item tab is active, update content...');
-      this.updateItemTab();
-    } else if (d3.select(this.attributeTab).classed('active')) {
-      console.log('attribtue tab is active, update content...');
-      this.updateAttributeTab();
+    if (!this.touringElem.hidden) {
+      // NOTE: after clicking on a tab, the class is not immidiatly correct/updated.
+      if (d3.select(this.itemTab).classed('active')) {
+        console.log('item tab is active, update content...');
+        this.updateItemTab();
+      } else if (d3.select(this.attributeTab).classed('active')) {
+        console.log('attribtue tab is active, update content...');
+        this.updateAttributeTab();
+      }
+    } else {
+      console.log('Touring Panel is hidden, skip update.');
     }
   }
 
@@ -393,7 +397,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
             }else //all the other columns
             {
-              let score = this.calcScore(data, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
+              const score = this.calcScore(data, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
               
               tableRow[colName] = {
                 label: score, 
@@ -457,14 +461,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     // table cells
-    this.generateMeasureTableCell(measure.id, containerId, rows,dataTable)      
+    this.generateMeasureTableCell(measure.id, containerId, rows, dataTable)      
     
   }
 
   // creates the table cell depending on their functionality
-  private generateMeasureTableCell(measureId: string, containerId: string, rows: d3.Selection<any>, dataTable: any)
-  {
-    switch(measureId) {
+  private generateMeasureTableCell(measureId: string, containerId: string, rows: d3.Selection<any>, dataTable: any) {
+    switch (measureId) {
       case 'jaccard': {
         return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
       }
@@ -484,77 +487,48 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
 
-   // creates the generic table cell for the table (formatting, styling, action handling)
-   private generateGenericMeasureTableCell(containerId: string, rows: d3.Selection<any>, dataTable: any,  actionFunciton: Function)
-   {
+  // creates the generic table cell for the table (formatting, styling, action handling)
+  private generateGenericMeasureTableCell(containerId: string, rows: d3.Selection<any>, dataTable: any, actionFunciton: Function) {
     const that = this;
 
     // create a cell in each row for each column
     // At this point, the rows have data associated.
     // So the data function accesses it.
-    let cells = rows.selectAll('td')
-                    .data(function(row) {
-                      //get all properties defined in dataTable.tableHead as an array with the data from the rows
-                      let returnValues = dataTable.tableHead.map(function(column) {
+    rows.selectAll('td')
+      .data(function (row) {
+        //get all properties defined in dataTable.tableHead as an array with the data from the rows
+        let returnValues = dataTable.tableHead.map(function (column) {
+          // return an object for the column of the data row
+          return row[column.columnName];
+        });
+        // console.log('returnValues: ',returnValues);
 
-                        // return an object for the column of the data row
-                        return row[column.columnName];
-                      });
-                      // console.log('returnValues: ',returnValues);
+        //push all desired column objects into this array
+        let allDesiredReturnValues = returnValues.filter(function (cell) {
+          // return true if rowspan is not defiend OR rowspan exist and is bigger than 0
+          return (cell.rowspan === undefined) || (cell.rowspan && cell.rowspan > 0);
+        });
 
-                      //push all desired column objects into this array
-                      let allDesiredReturnValues = returnValues.filter(function(cell) {
-                          // return true if rowspan is not defiend OR rowspan exist and is bigger than 0
-                          return  (cell.rowspan === undefined) || (cell.rowspan && cell.rowspan >0);
-                        });
-
-                      // console.log('allDesiredReturnValues: ',allDesiredReturnValues);
-                      return allDesiredReturnValues;
-                    })
-                    .enter()
-                    .append('td')
-                    .attr('class','text-center align-middle')
-                    .attr("rowspan", function(d:any){
-                      if(d.rowspan){
-                        return d.rowspan;
-                      }
-                      return 1;
-                     })
-                    .text(function(d:any) { 
-                      if(d.label && Number(d.label.toString())) {
-                        return Number(d.label.toString()).toFixed(2);  
-                      }
-
-                      return d.label; 
-                    })
-                    .style("background-color", function(d:any){
-                      return d.color || '#ffffff';
-                     })
-                    .on("mouseover", function(d:any) {
-                      if(d.action) {
-                        //d3.select(this).classed('bg-primary',true);
-                        d3.select(this).style("background-color", function(d){
-                                                                    return '#fba74d';
-                                                                  })
-                                      .style("font-weight", 'bolder');                                      
-                      }
-                    })					
-                    // FIXME: change colour of text depending on background (balck on black -> bad)
-                    .on("mouseout", function(d:any) {
-                      if(d.action) {
-                        //d3.select(this).classed('bg-primary',false);
-                        d3.select(this).style("background-color", function(d){
-                                                                    return d.color || '#ffffff';
-                                                                  })
-                                      .style("font-weight", 'normal'); 
-                      }
-                    })
-                    .on('click', function(d:any) {
-                      if(d.action) {
-                        actionFunciton.bind(that)(containerId,d);
-                      }
-                    }); 
-   }
+        // console.log('allDesiredReturnValues: ',allDesiredReturnValues);
+        return allDesiredReturnValues;
+      })
+      .enter()
+      .append('td')
+      .attr('class', (d: any) => d.action ? 'text-center align-middle action' : 'text-center align-middle')
+      .style("background-color", (d: any) => d.color || '#ffffff')
+      .attr("rowspan", (d: any) => d.rowspan || 1)
+      .text(function (d: any) {
+        if (d.label && Number(d.label.toString())) {
+          return Number(d.label.toString()).toFixed(2);
+        }
+        return d.label;
+      })
+      .on('click', function (d: any) {
+        if (d.action) {
+          actionFunciton.bind(that)(containerId, d);
+        }
+      });
+  }
  
   // --------- SCORES ---
   // different kinds of score calculations
@@ -568,68 +542,65 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- VISUAL REPRESENTATION ---
   // creates parallel set visualisation (for jaccard, overlap)
-  private generateVisualRepParallelSets(containerId: string, cell: any)
-  {
-    console.log('Cell clicken (ParSets): ',cell);
-    console.log('Cell clicken (ParSets) - containerId: ',containerId);
+  private generateVisualRepParallelSets(containerId: string, cell: any) {
+    console.log('Cell clicken (ParSets): ', cell);
+    console.log('Cell clicken (ParSets) - containerId: ', containerId);
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
-    
-    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
+
+    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container ' + containerId + '"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
 
-    let svgContainer = d3.select('#'+containerId).append('div')
-                                                  .attr('class','svg-container '+containerId);
-  
-    let width = Number(svgContainer.style('width').slice(0,-2));
+    let svgContainer = d3.select('#' + containerId).append('div')
+      .attr('class', 'svg-container ' + containerId);
+
+    let width = Number(svgContainer.style('width').slice(0, -2));
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
-    let dimension1 = '1.Dim: '+cell.column_label;
-    let dimension2 = (optionDDA === 'Selection') ? '2.Dim: Selection' : '2. Dim: Stratification Groups';
-    
+    let dimension1 = cell.column_label+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
+    let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
+
     let colPart = cell.dataVisRep;
     let parSetData = [];
 
-    for(let i=0; i<colPart.length; i++)
-    {
+    for (let i = 0; i < colPart.length; i++) {
       let headerPart = colPart[i].parts;
       let categoryLabel = colPart[i].categoryLabel;
 
-      for(let p=0; p<headerPart.length; p++)
-      {
+      for (let p = 0; p < headerPart.length; p++) {
         let newData = {};
         newData[dimension1] = categoryLabel;
         newData[dimension2] = headerPart[p].label;
         newData['value'] = headerPart[p].amount;
         parSetData.push(newData);
       }
-       
+
     }
-    console.log('Cell clicken (ParSets) - data: ',parSetData);
+    console.log('Cell clicken (ParSets) - data: ', parSetData);
 
 
     const that = this;
 
     // console.log('SVG Conatiner - width: ',width);
     let chart = (<any>d3).parsets()
-                        .tension(0.5) //[0 .. 1] -> 1 = straight line 
-                        .dimensions([dimension1, dimension2])
-                        .value( function (d) { return d.value; })
-                        .width(width)
-                        .height(175); //175
+      .tension(0.5) //[0 .. 1] -> 1 = straight line 
+      .dimensions([dimension1, dimension2])
+      .value(function (d) {return d.value;})
+      .width(width)
+      .height(175); //175
 
     let svgCanvas = svgContainer.append('svg')
-                                .attr('width',chart.width())
-                                .attr('height',chart.height());
-                                // .attr('height',chart.height());
-                                // .attr('width','100%')
-                                // .attr('height','100%');
+      .attr('width', chart.width())
+      .attr('height', chart.height());
+    // .attr('height',chart.height());
+    // .attr('width','100%')
+    // .attr('height','100%');
 
-    let svgFigureGroup = svgCanvas.append('g').attr('class','parSets');
+    let svgFigureGroup = svgCanvas.append('g').attr('class', 'parSets');
 
     // draw parallel sets
     svgFigureGroup.datum(parSetData).call(chart);
-    
+
     //rotation um 90 von den SVG parallel sets
     //svgFigureGroup.attr('transform','rotate(-90) translate(-'+width+',0)');
 
@@ -640,46 +611,43 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //FIXME: the colour of the categories is always the same order blue,orage,green,... 
     //       -> if 2nd category is filterd out the next category should have the colour of the next displayed one
     let svgPaths = svgRibbon.selectAll('path')
-                            .each(function(d) {
-                              d3.select(this).classed('selected',false);
+      .each(function (d) {
+        d3.select(this).classed('selected', false);
 
-                              if(d.parent.name === cell.category && d.name === cell.tableColumn){
-                                d3.select(this).classed('selected',true);
-                              }
-                              
-                              let color = that.getColorOfCategory(d.parent.dimension.substring(7),d.parent.name);
-                              if(color !== null)
-                              {
-                                d3.select(this).style('fill',color);
-                                d3.select(this).style('stroke',color);
-                              }
-                              // console.log('path.this: ', d3.select(this));
-                              // console.log('path.d: ',d);
-                            });
+        if (d.parent.name === cell.category && d.name === cell.tableColumn) {
+          d3.select(this).classed('selected', true);
+        }
+
+        let color = that.getColorOfCategory(d.parent.dimension.substring(7), d.parent.name);
+        if (color !== null) {
+          d3.select(this).style('fill', color);
+          d3.select(this).style('stroke', color);
+        }
+        // console.log('path.this: ', d3.select(this));
+        // console.log('path.d: ',d);
+      });
     // console.log('svgPaths: ',svgPaths);
 
     let svgDimensions = svgFigureGroup.selectAll('g[class=dimension]');
     // console.log('svgDimensions',svgDimensions);
-   
+
     //highlight label of current path
     svgDimensions.selectAll('g')
-                 .each(function(d) {
-                  d3.select(this).select('rect').classed('selected',false);
-                  // console.log('dim.d: ',d);
-                  // console.log('dim.this: ',d3.select(this));
+      .each(function (d) {
+        d3.select(this).select('rect').classed('selected', false);
+        // console.log('dim.d: ',d);
+        // console.log('dim.this: ',d3.select(this));
 
-                  if(d.name === cell.category){
-                    d3.select(this).select('rect').classed('selected',true);
-                  }
+        if (d.name === cell.category) {
+          d3.select(this).select('rect').classed('selected', true);
+        }
 
-                  let color = that.getColorOfCategory(d.dimension.name.substring(7),d.name);
-                  if(color !== null)
-                  {
-                    d3.select(this).select('rect').style('fill',color);
-                  }
-      
-                });
+        let color = that.getColorOfCategory(d.dimension.name.substring(7), d.name);
+        if (color !== null) {
+          d3.select(this).select('rect').style('fill', color);
+        }
 
+      });
   }
  
   // creates boxplot visualization (for student-test, mwu-test)
@@ -845,81 +813,70 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
   // creates data for the visual representation of parallel sets
-  private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any)
-  {
+  private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any) {
     // console.log('---- getColumnPartioning ----');
     // console.log('getColumnPartioning.data',data);
     // console.log('getColumnPartioning.tableHeader',tableHeader);
     // console.log('getColumnPartioning.column',column);
     let columnPartitioning = [];
-    let groups = this.ranking.getGroupedData();
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    const groups = this.ranking.getGroupedData();
+    const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     // go through all categories of current coloumn
-    for(let i=0; i < column.categories.length; i++)
-    {
-      let currCategory = column.categories[i];
+    for (let i = 0; i < column.categories.length; i++) {
+      const currCategory = column.categories[i];
       //gets ids for the selection column (Selected and Unselected)
-      let dataIdCurrCategory = data.filter(item => {return item[''+column.column] === currCategory.label}).map((a) => a.id);
+      let dataIdCurrCategory = [];
 
-      if(this.getRadioButtonValue() === 'group' && column.column !== 'selection' && currCategory.label !== 'Default') //for stratification radio button
-      { //all ids of a cateogry of a column (attribute), but not for selection column or default category group (= no stratification)
-        let currGroups = groups.filter(item => {return item.name === currCategory.label});
-        let dataIdCurrGroups = [];
-        for(let g=0; g<currGroups.length;g++){
-
-          dataIdCurrGroups = ((currGroups[g] as any).rows.map((a) =>  a.id));
-        }
-        dataIdCurrCategory = dataIdCurrGroups;
-      }else if(this.getRadioButtonValue() === 'group' && currCategory.label === 'Default')
-      {//all ids of the whole data (default group) when no stratification exist
-        dataIdCurrCategory = data.map((a) => a.id);
+      if (this.getRadioButtonValue() === 'group') { // stratification
+        //all ids of a stratification group
+        const currGroup = groups.find(item => {return item.name === currCategory.label});
+        dataIdCurrCategory = currGroup.rows.map((a) => a.id);
+      } else { //category
+        // find all ids of the current category
+        dataIdCurrCategory = data.filter((item) => {
+          return item[column.column.toString()] === currCategory.label;
+        }).map((a) => a.id);
       }
 
-      let num = dataIdCurrCategory.length;
+      const num = dataIdCurrCategory.length;
 
-      let currCategoryParts = {
+      const currCategoryParts = {
         categoryLabel: currCategory.label,
         categoryAmount: num,
         parts: []
       };
 
       // go through all columns in header
-      for(let h=0; h<tableHeader.length; h++)
-      {
-        
-        let currHeader = tableHeader[h];
-        
-        if(currHeader.label.length > 0){
-          // let num = data.filter(item => {return item[''+column.column] === currCategory.label}).length;
-          // num = !num ? 0 : num;
+      for (let h = 0; h < tableHeader.length; h++) {
+        const currHeader = tableHeader[h];
+
+        if (currHeader.label.length > 0) {
           let dataIdCurrentHeader = []
-          if(optionDDA === 'Selection'){
+          if (optionDDA === 'Selection') {
+            // Compare categories with selected/unselected
             dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label}).map((a) => a.id);
-          }else{
-            for(let g=0;g<groups.length;g++)
-            {
-              if(groups[g].name === currHeader.label && (groups[g] as any).rows)
-              {
+          } else {
+            // Compare categories with stratification groups
+            for (let g = 0; g < groups.length; g++) {
+              if (groups[g].name === currHeader.label && (groups[g] as any).rows) {
                 dataIdCurrentHeader = (groups[g] as any).rows.map((a) => a.id);
-              }else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
-              {
+              } else if (groups[g].name === currHeader.label && currHeader.label === 'Default') {
                 dataIdCurrentHeader = data.map((a) => a.id);
               }
             }
           }
-          let intersection = dataIdCurrCategory.filter(item => -1 !== dataIdCurrentHeader.indexOf(item));
-          let numHeader = intersection.length;
+          const {intersection: intersect} = intersection(dataIdCurrCategory, dataIdCurrentHeader);
+          const numHeader = intersect.length;
 
-          if(numHeader > 0){
-            let currCatForHead = {
+          if (numHeader > 0) {
+            const currCatForHead = {
               label: currHeader.label,
               amount: numHeader
             };
 
             currCategoryParts.parts.push(currCatForHead);
           }
-
         }
       }
 
@@ -1037,35 +994,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     if (optionDDA === 'Selection') {
       selectionSet = data.filter((item) => item['selection'] === headerCategory);
     } else if (optionDDA === 'Stratification Groups') {
-      for (let i = 0; i < groups.length; i++) {
-        if (groups[i].name === headerCategory) {
-          if (groups.length === 1) {
-            selectionSet = data;
-          } else {
-            selectionSet = groups[i].rows;
-          }
-        }
-      }
+      selectionSet = groups.find((grp) => grp.name === headerCategory).rows;
     }
     // console.log('selectionSet: ',selectionSet);
 
 
     let categorySet = [];
     // use categories or stratification as rows
-    if (this.getRadioButtonValue() === 'category' || columnB === 'selection') {
-      categorySet = data.filter(item => {
-        return item[columnB] === categoryB;
-      });
+    if (this.getRadioButtonValue() === 'category') {
+      categorySet = data.filter((item) => item[columnB] === categoryB);
     } else {
-      for (let i = 0; i < groups.length; i++) {
-        if (groups[i].name === categoryB) {
-          if (groups.length === 1) {
-            categorySet = data;
-          } else {
-            categorySet = groups[i].rows;
-          }
-        }
-      }
+      categorySet = groups.find((grp) => grp.name === categoryB).rows;
     }
     // console.log('categorySet: ',categorySet);
 
@@ -1185,12 +1124,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //    and an entry representing the numerical attributes (if there are any)
       //    and an entry representing the categorical attributes (if there are any)
       //    and an entry representing all these attributes
+      descriptions.unshift(this.ranking.getSelectionDesc());
+      descriptions.unshift(this.ranking.getRankDesc())
       descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
       descriptions.forEach((desc) => {
         (desc as any).categories = stratDesc.categories; // Replace real categopries with those from stratification
       });
-      descriptions.unshift(this.ranking.getSelectionDesc());
-      descriptions.unshift(this.ranking.getRankDesc())
       descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All numerical columns',
         type: 'num_collection'
@@ -1228,9 +1167,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     this.touringElem.hidden = hide;
     if (!hide) {
-      console.log('start touring')
+      console.log('Open Touring Panel')
       //if touring is displayed, ensure the panel is visible
       this.collapse = false;
+      this.updateTouringPanel();
     }
     
     const button = d3.select(this.node).select('.lu-side-panel button.touring')
@@ -1326,17 +1266,16 @@ class RankingAdapter {
     return this.provider;
   }
 
-  /**
-   *  Contains no selection, rank or score data!
-   */
-  private getItems() {
-    return this.provider.data;
-  }
 
   private getScoreColumns() {
     return this.getDisplayedAttributes().filter((attr) => (attr.desc as any)._score);
   }
 
+
+  private oldOrder: Array<number> = new Array();
+  private oldSelection : Array<number> = new Array();
+  private oldAttributes: Array<Column> = new Array();
+  private data: Array<any>;
 
   /**
    * Return an array of displayed items, with their id and data (including selection status and rank).
@@ -1351,37 +1290,67 @@ class RankingAdapter {
    *    ]
    */
   public getItemsDisplayed() {
-    const databaseData = new Array();
-
-    let rank = 0;
-    const scoreCols = this.getScoreColumns();
-    const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
-
-
+    const allItems = this.getItems();
     // get currently displayed data
-    this.getItemOrder().forEach(rowId => { // use order instead of ids for quick access on provider.data array (ids are strings)
-      const row = this.getItems()[rowId]; // row
-      row.rank = rank++; //set rank and increment
-      // include wether the row is selected
-      row.selection = this.getSelection().includes(rowId) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
-      databaseData.push(row);
-    });
+    return this.getItemOrder().map(rowId => allItems[rowId]);
+  }
 
-    // merge score and database data
-    const currentData = [...databaseData.concat(scoresData)
-      .reduce((map, curr) => {
-        map.has(curr.id) || map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
-        
-        const item = map.get(curr.id); // get stored data for this id
 
-        Object.entries(curr).forEach(([k, v]) =>
-          item[k] = v // add the content of the current array item to the data already stored in the map's entry (overwrites if there are the same properties in databaseData and scoreColumn)
-        );
-        
-        return map;
-      }, new Map()).values()]; // give map as input and return it's value
+  public getItems() {
+    // if the attributes are the same, we can reuse the data array
+    // if the selection
 
-    return currentData;
+    // TODO events may be better?
+    const sameAttr = this.oldAttributes.length == this.getDisplayedAttributes().length && this.oldAttributes.filter((attr) => /*note the negation*/ !this.getDisplayedAttributes().some((attr2) => attr2.desc.label === attr.desc.label)).length === 0;
+    const sameSel = this.oldSelection.length == this.getSelection().length && this.oldSelection.every(i => this.getSelection().includes(i));
+    const sameOrder = this.oldOrder.length == this.getItemOrder().length && this.oldOrder.every(i => this.getItemOrder().includes(i));
+
+    // console.log('1', sameAttr);
+    // console.log('2', sameSel);
+    // console.log('3', sameOrder);
+    if (sameAttr && sameSel && sameOrder) {
+      // NOOP
+      // attributes have to be the same (added / remvoed columns)
+      // selection has to be the same                                                 TODO just updated selection data
+      // item order has to be the same (i.e. the same  items order in the same way)   TODO just update the rank, the filtering is done in getItemsDisplayed
+      console.log('reuse the data array')
+    } else {
+      console.log('update the data array')
+      // refresh the data array
+      this.data = null;
+      this.oldAttributes = this.getDisplayedAttributes();
+
+      const databaseData = new Array();
+
+      const scoreCols = this.getScoreColumns();
+      const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
+  
+      this.oldOrder = this.getItemOrder();
+      this.oldSelection = this.getSelection();
+
+      this.provider.data.forEach((item, i) => {
+        let index = this.oldOrder.indexOf(i)
+        item.rank = index >=0 ? index : Number.NaN; //NaN if not found
+
+        // include wether the row is selected
+        item.selection = this.oldSelection.includes(i) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
+        databaseData.push(item);
+      })
+  
+      // merge score and database data
+      this.data = [...databaseData.concat(scoresData)
+        .reduce((map, curr) => {
+          map.has(curr.id) || map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
+          
+          const item = map.get(curr.id); // get stored data for this id
+  
+          Object.entries(curr).forEach(([k, v]) => item[k] = v ); // add the content of the current array item to the data already stored in the map's entry (overwrites if there are the same properties in databaseData and scoreColumn)
+          
+          return map;
+        }, new Map()).values()]; // give map as input and return it's value
+    }
+
+    return this.data;
   }
 
   private getItemOrder() {
@@ -1391,7 +1360,7 @@ class RankingAdapter {
   }
 
   public getDisplayedIds() {
-    const items = this.getItems();
+    const items = this.provider.data;
     return this.getItemOrder().map((i) => items[i].id)
   }
 
@@ -1420,14 +1389,14 @@ class RankingAdapter {
   }
 
   /**
-   * Contains no selection, rank or score data!
+   * Contains  selection, rank and score data.
    */
   public getGroupedData() {
     const data = this.getItemsDisplayed();
 
     let groups = []
 
-    for ( let grp of this.getRanking().getGroups()) {
+    for (let grp of this.getRanking().getGroups()) {
       groups.push({
         name: grp.name,
         color: grp.color,
