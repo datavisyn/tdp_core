@@ -1257,17 +1257,16 @@ class RankingAdapter {
     return this.provider;
   }
 
-  /**
-   *  Contains no selection, rank or score data!
-   */
-  private getItems() {
-    return this.provider.data;
-  }
 
   private getScoreColumns() {
     return this.getDisplayedAttributes().filter((attr) => (attr.desc as any)._score);
   }
 
+
+  private oldOrder: Array<number> = new Array();
+  private oldSelection : Array<number> = new Array();
+  private oldAttributes: Array<Column> = new Array();
+  private data: Array<any>;
 
   /**
    * Return an array of displayed items, with their id and data (including selection status and rank).
@@ -1282,37 +1281,67 @@ class RankingAdapter {
    *    ]
    */
   public getItemsDisplayed() {
-    const databaseData = new Array();
-
-    let rank = 0;
-    const scoreCols = this.getScoreColumns();
-    const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
-
-
+    const allItems = this.getItems();
     // get currently displayed data
-    this.getItemOrder().forEach(rowId => { // use order instead of ids for quick access on provider.data array (ids are strings)
-      const row = this.getItems()[rowId]; // row
-      row.rank = rank++; //set rank and increment
-      // include wether the row is selected
-      row.selection = this.getSelection().includes(rowId) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
-      databaseData.push(row);
-    });
+    return this.getItemOrder().map(rowId => allItems[rowId]);
+  }
 
-    // merge score and database data
-    const currentData = [...databaseData.concat(scoresData)
-      .reduce((map, curr) => {
-        map.has(curr.id) || map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
-        
-        const item = map.get(curr.id); // get stored data for this id
 
-        Object.entries(curr).forEach(([k, v]) =>
-          item[k] = v // add the content of the current array item to the data already stored in the map's entry (overwrites if there are the same properties in databaseData and scoreColumn)
-        );
-        
-        return map;
-      }, new Map()).values()]; // give map as input and return it's value
+  public getItems() {
+    // if the attributes are the same, we can reuse the data array
+    // if the selection
 
-    return currentData;
+    // TODO events may be better?
+    const sameAttr = this.oldAttributes.length == this.getDisplayedAttributes().length && this.oldAttributes.filter((attr) => /*note the negation*/ !this.getDisplayedAttributes().some((attr2) => attr2.desc.label === attr.desc.label)).length === 0;
+    const sameSel = this.oldSelection.length == this.getSelection().length && this.oldSelection.every(i => this.getSelection().includes(i));
+    const sameOrder = this.oldOrder.length == this.getItemOrder().length && this.oldOrder.every(i => this.getItemOrder().includes(i));
+
+    // console.log('1', sameAttr);
+    // console.log('2', sameSel);
+    // console.log('3', sameOrder);
+    if (sameAttr && sameSel && sameOrder) {
+      // NOOP
+      // attributes have to be the same (added / remvoed columns)
+      // selection has to be the same                                                 TODO just updated selection data
+      // item order has to be the same (i.e. the same  items order in the same way)   TODO just update the rank, the filtering is done in getItemsDisplayed
+      console.log('reuse the data array')
+    } else {
+      console.log('update the data array')
+      // refresh the data array
+      this.data = null;
+      this.oldAttributes = this.getDisplayedAttributes();
+
+      const databaseData = new Array();
+
+      const scoreCols = this.getScoreColumns();
+      const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
+  
+      this.oldOrder = this.getItemOrder();
+      this.oldSelection = this.getSelection();
+
+      this.provider.data.forEach((item, i) => {
+        let index = this.oldOrder.indexOf(i)
+        item.rank = index >=0 ? index : Number.NaN; //NaN if not found
+
+        // include wether the row is selected
+        item.selection = this.oldSelection.includes(i) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
+        databaseData.push(item);
+      })
+  
+      // merge score and database data
+      this.data = [...databaseData.concat(scoresData)
+        .reduce((map, curr) => {
+          map.has(curr.id) || map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
+          
+          const item = map.get(curr.id); // get stored data for this id
+  
+          Object.entries(curr).forEach(([k, v]) => item[k] = v ); // add the content of the current array item to the data already stored in the map's entry (overwrites if there are the same properties in databaseData and scoreColumn)
+          
+          return map;
+        }, new Map()).values()]; // give map as input and return it's value
+    }
+
+    return this.data;
   }
 
   private getItemOrder() {
@@ -1322,7 +1351,7 @@ class RankingAdapter {
   }
 
   public getDisplayedIds() {
-    const items = this.getItems();
+    const items = this.provider.data;
     return this.getItemOrder().map((i) => items[i].id)
   }
 
