@@ -275,30 +275,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       const classScope = this;
       panels.each(function(d, i) {
-        const colHeads = d3.select(this).select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
-        colHeads.enter().append('th').attr('class', 'head');
-        
-        const bodyData = classScope.getAttrTableBodyScaffold(inputA, inputB);
-        console.log('body data', bodyData);
-  
-        const trs = d3.select(this).select('tbody').selectAll('tr').data(bodyData, (d) => d[0]);
-        trs.enter().append('tr');
-        const tds = trs.selectAll('td').data((d) => d); // remove 
-        tds.enter().append('td');
-  
-        // Update
-        panelHeader.text((d) => d.label);
-        // Set colheads in thead 
-        colHeads.text((d) => d.label);
-        // set data in tbody
-        tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d)
-  
-        // Exit
-        colHeads.exit().remove(); // remove attribute columns
-        tds.exit().remove(); // remove cells of removed columns
-        trs.exit().remove(); // remove attribute rows
+          classScope.updateTable.bind(classScope)(this);
+
       })
+
+      // Update
+      panelHeader.text((d) => d.label);
      
+      // Exit
       panels.exit().remove(); // exit: remove columns no longer displayed
       panels.order();
     } else {
@@ -307,20 +291,66 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
+  private updateTable(panel) {
+    const inputA = this.prepareInput(d3.select(this.attributeTab).select('select.compareA').select('option:checked').datum());
+    const inputB = this.prepareInput(d3.select(this.attributeTab).select('select.compareB').select('option:checked').datum());
+
+    const measure = d3.select(panel).datum();
+
+    const colHeads = d3.select(panel).select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
+    colHeads.enter().append('th').attr('class', 'head');
+
+    function updateTableBody(bodyData) {
+      console.log('body data', bodyData);
+  
+      const trs = d3.select(panel).select('tbody').selectAll('tr').data(bodyData, (d) => d[0]);
+      trs.enter().append('tr');
+      const tds = trs.selectAll('td').data((d) => d); // remove 
+      tds.enter().append('td');
+      // Set colheads in thead 
+      colHeads.text((d) => d.label);
+      // set data in tbody
+      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d)
+  
+      // Exit
+      colHeads.exit().remove(); // remove attribute columns
+      tds.exit().remove(); // remove cells of removed columns
+      trs.exit().remove(); // remove attribute rows
+    }
+    
+    this.getAttrTableBody(inputA, inputB, measure, true).then(updateTableBody); // initialize
+    this.getAttrTableBody(inputA, inputB, measure, false).then(updateTableBody); // set values
+  }
+
   /**
    * 
    * @param attr1 columns
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  private getAttrTableBodyScaffold(attr1: IColumnDesc[], attr2: IColumnDesc[]): Array<Array<any>>{
+  private getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ASimilarityClass, scaffold: boolean): Promise<Array<Array<any>>>{
     const data = new Array(attr2.length); // n2 arrays (rows) 
     for(let i of data.keys()) {
       data[i] = new Array(attr1.length+1).fill(null) // containing n1+1 elements (header + n1 vlaues)
       data[i][0] = attr2[i].label;
     }
+    
+    if (scaffold) {
+      return Promise.resolve(data);
+    } else 
+    {
+      return new Promise(function(resolve, reject) {
+        for(let row of data) {
+          for(let j of row.keys()) {
+            if(j>0) {
+              row[j] = Math.random();
+            }
+          }
+        }
 
-    return data;
+        setTimeout(() => resolve(data), 5*1000);
+      });
+    }
   }
 
 
