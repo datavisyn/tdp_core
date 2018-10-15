@@ -243,7 +243,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     console.log('Inputs to get attr measures:');
     console.log('A: ', inputA);
     console.log('B: ', inputB);
-    const measures: MeasureMap = MethodManager.getSetMethods(inputA, inputB);;
+    const measures: MeasureMap = MethodManager.getAttributeMethods(inputA, inputB);;
     console.log('Attribute measures for current data: ', measures);
 
     // div element in html where the score and detail view should be added
@@ -276,7 +276,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       const classScope = this;
       panels.each(function(d, i) {
           classScope.updateTable.bind(classScope)(this);
-
       })
 
       // Update
@@ -300,7 +299,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const colHeads = d3.select(panel).select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
     colHeads.enter().append('th').attr('class', 'head');
 
-    function updateTableBody(bodyData) {
+    function updateTableBody(bodyData: Array<Array<any>>) {
       console.log('body data', bodyData);
   
       const trs = d3.select(panel).select('tbody').selectAll('tr').data(bodyData, (d) => d[0]);
@@ -337,13 +336,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     if (scaffold) {
       return Promise.resolve(data);
-    } else 
-    {
-      return new Promise(function(resolve, reject) {
-        for(let row of data) {
+    } else {
+      return new Promise((resolve, reject) => {
+        for(let [i, row] of data.entries()) {
           for(let j of row.keys()) {
             if(j>0) {
-              row[j] = Math.random();
+              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j-1]as any).column)
+              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
+              row[j] = measure.calc(data1, data2)
             }
           }
         }
@@ -1401,14 +1401,14 @@ class RankingAdapter {
    *    ...
    *    ]
    */
-  public getItemsDisplayed() {
+  public getItemsDisplayed(): Array<Object> {
     const allItems = this.getItems();
     // get currently displayed data
     return this.getItemOrder().map(rowId => allItems[rowId]);
   }
 
 
-  public getItems() {
+  public getItems(): Array<Object>{
     // if the attributes are the same, we can reuse the data array
     // if the selection
 
@@ -1516,6 +1516,11 @@ class RankingAdapter {
       });
     }
     return groups;
+  }
+
+  public getAttributeDataDisplayed(attributeId: String) {
+    const data = this.getItemsDisplayed();
+    return data.map((row) => row[attributeId]);
   }
 
   public getSelection() {
