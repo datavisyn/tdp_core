@@ -1,7 +1,7 @@
 import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking, IDataRow} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, ISImilarityMeasure, MeasureMap, intersection, ISimilarityClass, ASimilarityClass, Comparison, Type} from 'touring';
+import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
@@ -254,7 +254,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       //group panel (accordion) for all acordion items
       const timeStamp = this.getIdWithTimestamp('');
 
-      const panels = panelGroup.selectAll('div.panel').data(measures.get(Comparison.get(Type.CATEGORICAL, Type.CATEGORICAL)), (measure: ASimilarityClass) => measure.id); // measure id is key
+      const panels = panelGroup.selectAll('div.panel').data(measures.get(Comparison.get(Type.CATEGORICAL, Type.CATEGORICAL)), (measure: ISimilarityMeasure) => measure.id); // measure id is key
       // Enter
       const panelsEnter = panels.enter().append('div').classed('panel', true) //Create new panels
 
@@ -327,7 +327,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  private getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ASimilarityClass, scaffold: boolean): Promise<Array<Array<any>>>{
+  private getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>>{
     const data = new Array(attr2.length); // n2 arrays (rows) 
     for(let i of data.keys()) {
       data[i] = new Array(attr1.length+1).fill(null) // containing n1+1 elements (header + n1 vlaues)
@@ -392,7 +392,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-  private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
+  private insertMeasure(measure: ISimilarityMeasure, collapseId: string, currentData: Array<any>) {
 
     this.generateMeasureTable(collapseId, measure , currentData);
 
@@ -400,7 +400,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- DATA TABLE LAYOUT ---
   //generates a object, which contains the table head and table body
-  private generateTableLayout(data: Array<any>, measure: ISImilarityMeasure)
+  private generateTableLayout(data: Array<any>, measure: ISimilarityMeasure)
   {
     let generatedTable = {
       tableHead: [],
@@ -465,7 +465,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //generate table body depending on table head and radio button option
-  private getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISImilarityMeasure)
+  private getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
   {
     let tableBody = [];
 
@@ -541,7 +541,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- TABLE GENERATION D3 ---
   // create table in container and depending on dataTable with D3
-  private generateMeasureTable(containerId: string, measure: ISImilarityMeasure, currentData: Array<any>)
+  private generateMeasureTable(containerId: string, measure: ISimilarityMeasure, currentData: Array<any>)
   {
     const dataTable = this.generateTableLayout(currentData, measure);
     const that = this;
@@ -646,7 +646,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
  
   // --------- SCORES ---
   // different kinds of score calculations
-  private calcScore(data, measure: ISImilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
+  private calcScore(data, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
     const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
     const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
@@ -1512,13 +1512,13 @@ class RankingAdapter {
       groups.push({
         name: grp.name,
         color: grp.color,
-        rows: grp.order.map((id) => data.find((item) => item._id === id))
+        rows: grp.order.map((id) => data.find((item: any) => item._id && item._id === id))
       });
     }
     return groups;
   }
 
-  public getAttributeDataDisplayed(attributeId: String) {
+  public getAttributeDataDisplayed(attributeId: string) { //  use lower case string
     const data = this.getItemsDisplayed();
     return data.map((row) => row[attributeId]);
   }
