@@ -1,7 +1,7 @@
 import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking, IDataRow} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, ISImilarityMeasure, MeasureMap, intersection, ISimilarityClass, ASimilarityClass, Comparison, Type} from 'touring';
+import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
@@ -243,7 +243,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     console.log('Inputs to get attr measures:');
     console.log('A: ', inputA);
     console.log('B: ', inputB);
-    const measures: MeasureMap = MethodManager.getSetMethods(inputA, inputB);;
+    const measures: MeasureMap = MethodManager.getAttributeMethods(inputA, inputB);;
     console.log('Attribute measures for current data: ', measures);
 
     // div element in html where the score and detail view should be added
@@ -253,16 +253,16 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       panelGroup.selectAll(':scope > p').remove() // remove immidiate child paragraphs of panelGroup
       //group panel (accordion) for all acordion items
       const timeStamp = this.getIdWithTimestamp('');
-        
-      const panels = panelGroup.selectAll('div.panel').data(measures.get(Comparison.get(Type.CATEGORICAL, Type.CATEGORICAL)), (measure: ASimilarityClass) => measure.id); // measure id is key
+
+      const panels = panelGroup.selectAll('div.panel').data(measures.get(Comparison.get(Type.CATEGORICAL, Type.CATEGORICAL)), (measure: ISimilarityMeasure) => measure.id); // measure id is key
       // Enter
       const panelsEnter = panels.enter().append('div').classed('panel', true) //Create new panels
-      
+
       const panelHeader = panelsEnter //create panel heading
-        .append('div').classed('panel-heading', true).attr('role', 'tab') 
+        .append('div').classed('panel-heading', true).attr('role', 'tab')
         .append('h4').classed('panel-title', true)
-        .append('a').attr('data-toggle','collapse').attr('href', (d) => `#attr-${d.id}-${timeStamp}`).attr('aria-expanded', false);
-        
+        .append('a').attr('data-toggle', 'collapse').attr('href', (d) => `#attr-${d.id}-${timeStamp}`).attr('aria-expanded', false);
+
       const tablesEnter = panelsEnter //create panel content
         .append('div').attr('class', 'panel-collapse collapse')
         .attr('id', (d) => `attr-${d.id}-${timeStamp}`)
@@ -272,35 +272,90 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         .append('thead').append('tr').append('th')
       tablesEnter
         .append('tbody');
-        
-      const colHeads = tablesEnter.select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
-      colHeads.enter().append('th').attr('class', 'head');
-      
-      const trs = tablesEnter.select('tbody').selectAll('tr').data(inputB, (d) => d.column); // column is key
-      const rowsEnter = trs.enter().append('tr');
-      rowsEnter.append('td').attr('class', 'head');
-      const dummyArray = Array.from({length: inputA.length});
-      rowsEnter.selectAll('td.value').data(dummyArray).enter().append('td').attr('class', 'value').append('i').attr('class', 'fa fa-circle-o-notch fa-spin');
-      
+
+      const classScope = this;
+      panels.each(function(d, i) {
+          classScope.updateTable.bind(classScope)(this);
+      })
+
       // Update
       panelHeader.text((d) => d.label);
-      // Set colheads in thead 
-      colHeads.text((d) => d.label);
-      // Set rowHeads in tbody
-      trs.select('td.head').text((d) => d.label);
-
+     
       // Exit
       panels.exit().remove(); // exit: remove columns no longer displayed
       panels.order();
     } else {
-      panelGroup.selectAll("*").remove()
+      panelGroup.selectAll("*").remove(); // avada kedavra mud-panels!
       panelGroup.append('p').text('Sorry, there are no appropriate measures for the selected inputs.');
     }
   }
 
+  private updateTable(panel) {
+    const inputA = this.prepareInput(d3.select(this.attributeTab).select('select.compareA').select('option:checked').datum());
+    const inputB = this.prepareInput(d3.select(this.attributeTab).select('select.compareB').select('option:checked').datum());
 
-   //creates the accordion item (collapse) for one score
-   private createAccordionItem(panelGroup: any, collapseDetails: any) {
+    const measure = d3.select(panel).datum();
+
+    const colHeads = d3.select(panel).select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
+    colHeads.enter().append('th').attr('class', 'head');
+
+    function updateTableBody(bodyData: Array<Array<any>>) {
+      console.log('body data', bodyData);
+  
+      const trs = d3.select(panel).select('tbody').selectAll('tr').data(bodyData, (d) => d[0]);
+      trs.enter().append('tr');
+      const tds = trs.selectAll('td').data((d) => d); // remove 
+      tds.enter().append('td');
+      // Set colheads in thead 
+      colHeads.text((d) => d.label);
+      // set data in tbody
+      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : (Number(d) ? d.toFixed(2) : d));
+  
+      // Exit
+      colHeads.exit().remove(); // remove attribute columns
+      tds.exit().remove(); // remove cells of removed columns
+      trs.exit().remove(); // remove attribute rows
+    }
+    
+    this.getAttrTableBody(inputA, inputB, measure, true).then(updateTableBody); // initialize
+    this.getAttrTableBody(inputA, inputB, measure, false).then(updateTableBody); // set values
+  }
+
+  /**
+   * 
+   * @param attr1 columns
+   * @param arr2 rows
+   * @param scaffold only create the matrix with row headers, but no value calculation
+   */
+  private getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>>{
+    const data = new Array(attr2.length); // n2 arrays (rows) 
+    for(let i of data.keys()) {
+      data[i] = new Array(attr1.length+1).fill(null) // containing n1+1 elements (header + n1 vlaues)
+      data[i][0] = attr2[i].label;
+    }
+    
+    if (scaffold) {
+      return Promise.resolve(data);
+    } else {
+      return new Promise((resolve, reject) => {
+        for(let [i, row] of data.entries()) {
+          for(let j of row.keys()) {
+            if(j>0) {
+              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j-1]as any).column)
+              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
+              row[j] = measure.calc(data1, data2)
+            }
+          }
+        }
+
+        resolve(data);
+      });
+    }
+  }
+
+
+  //creates the accordion item (collapse) for one score
+  private createAccordionItem(panelGroup: any, collapseDetails: any) {
     if (collapseDetails && collapseDetails instanceof Object &&
       collapseDetails.groupId && typeof collapseDetails.groupId === 'string' &&
       collapseDetails.id && typeof collapseDetails.id === 'string' &&
@@ -337,7 +392,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-  private insertMeasure(measure: ISImilarityMeasure, collapseId: string, currentData: Array<any>) {
+  private insertMeasure(measure: ISimilarityMeasure, collapseId: string, currentData: Array<any>) {
 
     this.generateMeasureTable(collapseId, measure , currentData);
 
@@ -345,7 +400,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- DATA TABLE LAYOUT ---
   //generates a object, which contains the table head and table body
-  private generateTableLayout(data: Array<any>, measure: ISImilarityMeasure)
+  private generateTableLayout(data: Array<any>, measure: ISimilarityMeasure)
   {
     let generatedTable = {
       tableHead: [],
@@ -410,7 +465,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //generate table body depending on table head and radio button option
-  private getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISImilarityMeasure)
+  private getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
   {
     let tableBody = [];
 
@@ -486,7 +541,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- TABLE GENERATION D3 ---
   // create table in container and depending on dataTable with D3
-  private generateMeasureTable(containerId: string, measure: ISImilarityMeasure, currentData: Array<any>)
+  private generateMeasureTable(containerId: string, measure: ISimilarityMeasure, currentData: Array<any>)
   {
     const dataTable = this.generateTableLayout(currentData, measure);
     const that = this;
@@ -591,7 +646,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
  
   // --------- SCORES ---
   // different kinds of score calculations
-  private calcScore(data, measure: ISImilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
+  private calcScore(data, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
     const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
     const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
@@ -1366,14 +1421,14 @@ class RankingAdapter {
    *    ...
    *    ]
    */
-  public getItemsDisplayed() {
+  public getItemsDisplayed(): Array<Object> {
     const allItems = this.getItems();
     // get currently displayed data
     return this.getItemOrder().map(rowId => allItems[rowId]);
   }
 
 
-  public getItems() {
+  public getItems(): Array<Object>{
     // if the attributes are the same, we can reuse the data array
     // if the selection
 
@@ -1477,10 +1532,15 @@ class RankingAdapter {
       groups.push({
         name: grp.name,
         color: grp.color,
-        rows: grp.order.map((id) => data.find((item) => item._id === id))
+        rows: grp.order.map((id) => data.find((item: any) => item._id && item._id === id))
       });
     }
     return groups;
+  }
+
+  public getAttributeDataDisplayed(attributeId: string) { //  use lower case string
+    const data = this.getItemsDisplayed();
+    return data.map((row) => row[attributeId]);
   }
 
   public getSelection() {
