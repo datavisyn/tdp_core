@@ -273,29 +273,25 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       tablesEnter
         .append('tbody');
 
+      const classScope = this;
       panels.each(function(d, i) {
         const colHeads = d3.select(this).select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
         colHeads.enter().append('th').attr('class', 'head');
         
-        const bodyData = this.getAttrTableBodyData(inputA, inputB, true);
+        const bodyData = classScope.getAttrTableBodyScaffold(inputA, inputB);
         console.log('body data', bodyData);
   
-        const trs = d3.select(this).select('tbody').selectAll('tr').data(inputB, (d) => d.column); // column is key
-        const rowsEnter = trs.enter().append('tr');
-        rowsEnter.append('td').attr('class', 'head');  // TODo update rows if no. of columns changes.
-        const dummyArray: number[] = Array(inputA.length).fill(null);
-        const tds = rowsEnter.selectAll('td.value').data(dummyArray);
-        tds.enter().append('td').attr('class', 'value')
+        const trs = d3.select(this).select('tbody').selectAll('tr').data(bodyData, (d) => d[0]);
+        trs.enter().append('tr');
+        const tds = trs.selectAll('td').data((d) => d); // remove 
+        tds.enter().append('td');
   
         // Update
         panelHeader.text((d) => d.label);
         // Set colheads in thead 
         colHeads.text((d) => d.label);
-        // Set rowHeads in tbody
-        trs.select('td.head').text((d) => d.label);
         // set data in tbody
-        tds.filter((d) => d === null).append('i').attr('class', 'fa fa-circle-o-notch fa-spin');
-        tds.filter((d) => d !== null).text((d) => d);
+        tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d)
   
         // Exit
         colHeads.exit().remove(); // remove attribute columns
@@ -317,9 +313,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  private getAttrTableBodyData(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Array<Array<String|Number>>{
-    const data = new Array(attr2.length).fill(new Array(attr1.length)); // n2 arrays (rows) containing n1 elements (columns)
-    data.forEach((row, i) => row[0] = attr2[i].label);
+  private getAttrTableBodyScaffold(attr1: IColumnDesc[], attr2: IColumnDesc[]): Array<Array<any>>{
+    const data = new Array(attr2.length); // n2 arrays (rows) 
+    for(let i of data.keys()) {
+      data[i] = new Array(attr1.length+1).fill(null) // containing n1+1 elements (header + n1 vlaues)
+      data[i][0] = attr2[i].label;
+    }
 
     return data;
   }
