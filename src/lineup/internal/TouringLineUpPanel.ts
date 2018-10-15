@@ -673,7 +673,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
-    let dimension1 = cell.column_label;//+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
+    let dimension1 = cell.column_label+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
     let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
 
     let colPart = cell.dataVisRep;
@@ -734,7 +734,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           d3.select(this).classed('selected', true);
         }
 
-        let color = that.getColorOfCategory(d.parent.dimension, d.parent.name);
+        let color = that.getColorOfCategory(d.parent.dimension+'\uFEFF', d.parent.name);
         if (color !== null) {
           d3.select(this).style('fill', color);
           d3.select(this).style('stroke', color);
@@ -758,7 +758,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           d3.select(this).select('rect').classed('selected', true);
         }
 
-        let color = that.getColorOfCategory(d.dimension.name.substring(7), d.name);
+        let color = that.getColorOfCategory(d.dimension.name+'\uFEFF', d.name);
         if (color !== null) {
           d3.select(this).select('rect').style('fill', color);
         }
@@ -1165,7 +1165,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('path.column: ',column);
     // console.log('path.category: ',category);
     let color = null;
-    let currColumn = this.ranking.getDisplayedAttributes().filter((item) => {return (item.desc.label === column);});
+    let currColumn = this.ranking.getDisplayedAttributes();//.filter((item) => {return (item.desc.label === column);});
     for(let col=0;col<currColumn.length;col++){ 
       if(currColumn[col] && (currColumn[col] as ICategoricalColumn).categories)
       {
