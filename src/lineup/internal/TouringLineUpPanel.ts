@@ -615,7 +615,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
-    let dimension1 = cell.column_label+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
+    let dimension1 = cell.column_label;//+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
     let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
 
     let colPart = cell.dataVisRep;
@@ -676,7 +676,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           d3.select(this).classed('selected', true);
         }
 
-        let color = that.getColorOfCategory(d.parent.dimension.substring(7), d.parent.name);
+        let color = that.getColorOfCategory(d.parent.dimension, d.parent.name);
         if (color !== null) {
           d3.select(this).style('fill', color);
           d3.select(this).style('stroke', color);
@@ -783,7 +783,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .attr('class',function(d,i) {
         let classString = 'box-element';
         let dataLabel = `${d[0]}`;
-        let colorLabel = `category-${i}`;
+        let colorLabel = `category-gray`;
 
         return `${classString} ${dataLabel} ${colorLabel}`;
       })
@@ -1092,8 +1092,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       {
         console.log('change color ')
         let calcColor = d3.scale.linear().domain([0,0.051])
-                                          // .range(['#F84058', '#999999']);
-                                          .range(<any[]>['#FF0000', '#FFFFFF']);
+                                          .range(<any[]>['#A9A9A9', '#FFFFFF']);
                                           
         color = calcColor(score).toString();
       }
@@ -1107,17 +1106,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private getColorOfCategory(column: string, category: string){
     // console.log('path.column: ',column);
     // console.log('path.category: ',category);
-    let currColumn = this.provider.getRankings()[0].children.filter((item) => {return item.desc.label === column;});
     let color = null;
-    if(currColumn[0] && (currColumn[0] as ICategoricalColumn).categories)
-    {
-      let currCategories = (currColumn[0] as ICategoricalColumn).categories;
-      for(let i=0; i<currCategories.length; i++){
-        if(currCategories[i].label === category){
-          color = currCategories[i].color;
+    let currColumn = this.ranking.getDisplayedAttributes().filter((item) => {return (item.desc.label === column);});
+    for(let col=0;col<currColumn.length;col++){ 
+      if(currColumn[col] && (currColumn[col] as ICategoricalColumn).categories)
+      {
+        let currCategories = (currColumn[col] as ICategoricalColumn).categories;
+        for(let i=0; i<currCategories.length; i++){
+          if(currCategories[i].label === category){
+            color = currCategories[i].color;
+          }
         }
       }
-    }
+  }
     
     // console.log('path.color: ',color);
     return color;
