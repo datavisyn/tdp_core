@@ -348,7 +348,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           }
         }
 
-        setTimeout(() => resolve(data), 5*1000);
+        resolve(data);
       });
     }
   }
