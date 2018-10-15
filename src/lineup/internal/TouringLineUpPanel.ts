@@ -309,7 +309,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // Set colheads in thead 
       colHeads.text((d) => d.label);
       // set data in tbody
-      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d)
+      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : (Number(d) ? d.toFixed(2) : d));
   
       // Exit
       colHeads.exit().remove(); // remove attribute columns
