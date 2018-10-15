@@ -253,16 +253,16 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       panelGroup.selectAll(':scope > p').remove() // remove immidiate child paragraphs of panelGroup
       //group panel (accordion) for all acordion items
       const timeStamp = this.getIdWithTimestamp('');
-        
+
       const panels = panelGroup.selectAll('div.panel').data(measures.get(Comparison.get(Type.CATEGORICAL, Type.CATEGORICAL)), (measure: ASimilarityClass) => measure.id); // measure id is key
       // Enter
       const panelsEnter = panels.enter().append('div').classed('panel', true) //Create new panels
-      
+
       const panelHeader = panelsEnter //create panel heading
-        .append('div').classed('panel-heading', true).attr('role', 'tab') 
+        .append('div').classed('panel-heading', true).attr('role', 'tab')
         .append('h4').classed('panel-title', true)
-        .append('a').attr('data-toggle','collapse').attr('href', (d) => `#attr-${d.id}-${timeStamp}`).attr('aria-expanded', false);
-        
+        .append('a').attr('data-toggle', 'collapse').attr('href', (d) => `#attr-${d.id}-${timeStamp}`).attr('aria-expanded', false);
+
       const tablesEnter = panelsEnter //create panel content
         .append('div').attr('class', 'panel-collapse collapse')
         .attr('id', (d) => `attr-${d.id}-${timeStamp}`)
@@ -272,35 +272,61 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         .append('thead').append('tr').append('th')
       tablesEnter
         .append('tbody');
-        
-      const colHeads = tablesEnter.select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
-      colHeads.enter().append('th').attr('class', 'head');
-      
-      const trs = tablesEnter.select('tbody').selectAll('tr').data(inputB, (d) => d.column); // column is key
-      const rowsEnter = trs.enter().append('tr');
-      rowsEnter.append('td').attr('class', 'head');
-      const dummyArray = Array.from({length: inputA.length});
-      rowsEnter.selectAll('td.value').data(dummyArray).enter().append('td').attr('class', 'value').append('i').attr('class', 'fa fa-circle-o-notch fa-spin');
-      
-      // Update
-      panelHeader.text((d) => d.label);
-      // Set colheads in thead 
-      colHeads.text((d) => d.label);
-      // Set rowHeads in tbody
-      trs.select('td.head').text((d) => d.label);
 
-      // Exit
+      panels.each(function(d, i) {
+        const colHeads = d3.select(this).select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
+        colHeads.enter().append('th').attr('class', 'head');
+        
+        const bodyData = this.getAttrTableBodyData(inputA, inputB, true);
+        console.log('body data', bodyData);
+  
+        const trs = d3.select(this).select('tbody').selectAll('tr').data(inputB, (d) => d.column); // column is key
+        const rowsEnter = trs.enter().append('tr');
+        rowsEnter.append('td').attr('class', 'head');  // TODo update rows if no. of columns changes.
+        const dummyArray: number[] = Array(inputA.length).fill(null);
+        const tds = rowsEnter.selectAll('td.value').data(dummyArray);
+        tds.enter().append('td').attr('class', 'value')
+  
+        // Update
+        panelHeader.text((d) => d.label);
+        // Set colheads in thead 
+        colHeads.text((d) => d.label);
+        // Set rowHeads in tbody
+        trs.select('td.head').text((d) => d.label);
+        // set data in tbody
+        tds.filter((d) => d === null).append('i').attr('class', 'fa fa-circle-o-notch fa-spin');
+        tds.filter((d) => d !== null).text((d) => d);
+  
+        // Exit
+        colHeads.exit().remove(); // remove attribute columns
+        tds.exit().remove(); // remove cells of removed columns
+        trs.exit().remove(); // remove attribute rows
+      })
+     
       panels.exit().remove(); // exit: remove columns no longer displayed
       panels.order();
     } else {
-      panelGroup.selectAll("*").remove()
+      panelGroup.selectAll("*").remove(); // avada kedavra mud-panels!
       panelGroup.append('p').text('Sorry, there are no appropriate measures for the selected inputs.');
     }
   }
 
+  /**
+   * 
+   * @param attr1 columns
+   * @param arr2 rows
+   * @param scaffold only create the matrix with row headers, but no value calculation
+   */
+  private getAttrTableBodyData(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Array<Array<String|Number>>{
+    const data = new Array(attr2.length).fill(new Array(attr1.length)); // n2 arrays (rows) containing n1 elements (columns)
+    data.forEach((row, i) => row[0] = attr2[i].label);
 
-   //creates the accordion item (collapse) for one score
-   private createAccordionItem(panelGroup: any, collapseDetails: any) {
+    return data;
+  }
+
+
+  //creates the accordion item (collapse) for one score
+  private createAccordionItem(panelGroup: any, collapseDetails: any) {
     if (collapseDetails && collapseDetails instanceof Object &&
       collapseDetails.groupId && typeof collapseDetails.groupId === 'string' &&
       collapseDetails.id && typeof collapseDetails.id === 'string' &&
