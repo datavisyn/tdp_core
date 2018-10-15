@@ -518,7 +518,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                 column: currCol.column,
                 column_label: currCol.label,
                 category: currCategory.label,
-                color: this.score2color(score),
+                color: this.score2color(measure.id,score),
                 action: true,
                 tableColumn: (tableHeader[col] as any).label,
                 dataVisRep: dataVisualRep
@@ -633,7 +633,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .attr("rowspan", (d: any) => d.rowspan || 1)
       .text(function (d: any) {
         if (d.label && Number(d.label.toString())) {
-          return Number(d.label.toString()).toFixed(2);
+          return Number(d.label.toString()).toFixed(3);
         }
         return d.label;
       })
@@ -1129,14 +1129,33 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   // calculates the backgound color for the scores (0 -> white, 1 -> dark grey)
-  private score2color(score:number, domain = [0, 1])
+  private score2color(measureID: string, score:number, domain = [0, 1])
   {
-    score = score || 0; // fix undefined or NaN
+    let color = '#ffffff' //white
+    if(measureID === 'jaccard' || measureID === 'overlap')
+    {
+      score = score || 0; // fix undefined or NaN
 
-    const linScale = d3.scale.linear().domain(domain).range([255, 110]);
-    const darkness = linScale(score); // higher score -> darker color
-    const hslColor =  d3.rgb(darkness, darkness, darkness);
-    return hslColor.toString();
+      const linScale = d3.scale.linear().domain(domain).range([255, 110]);
+      const darkness = linScale(score); // higher score -> darker color
+      const hslColor =  d3.rgb(darkness, darkness, darkness);
+      color = hslColor.toString();
+
+    }else if(measureID === 'student_test' || measureID === 'mwu_test')
+    {
+      if(score < 0.05)
+      {
+        console.log('change color ')
+        let calcColor = d3.scale.linear().domain([0,0.051])
+                                          // .range(['#F84058', '#999999']);
+                                          .range(<any[]>['#FF0000', '#FFFFFF']);
+                                          
+        color = calcColor(score).toString();
+      }
+    }
+
+
+    return color;
   }
 
   // gets the color of a category of a column (attribute)
