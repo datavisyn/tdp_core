@@ -264,7 +264,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         .append('a').attr('data-toggle', 'collapse').attr('href', (d) => `#attr-${d.id}-${timeStamp}`).attr('aria-expanded', false);
 
       const tablesEnter = panelsEnter //create panel content
-        .append('div').attr('class', 'panel-collapse collapse')
+        .append('div').attr('class', 'panel-collapse collapse in')
         .attr('id', (d) => `attr-${d.id}-${timeStamp}`)
         .append('div').attr('class', 'table-container')
         .append('table').attr('class', 'table table-condensed');
