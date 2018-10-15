@@ -322,34 +322,37 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   /**
-   * 
+   * async: return promise
    * @param attr1 columns
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  private getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>>{
+  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>> {
     const data = new Array(attr2.length); // n2 arrays (rows) 
-    for(let i of data.keys()) {
-      data[i] = new Array(attr1.length+1).fill(null) // containing n1+1 elements (header + n1 vlaues)
+    for (let i of data.keys()) {
+      data[i] = new Array(attr1.length + 1).fill(null) // containing n1+1 elements (header + n1 vlaues)
       data[i][0] = attr2[i].label;
     }
-    
+
     if (scaffold) {
-      return Promise.resolve(data);
+      return data;
     } else {
-      return new Promise((resolve, reject) => {
-        for(let [i, row] of data.entries()) {
-          for(let j of row.keys()) {
-            if(j>0) {
-              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j-1]as any).column)
-              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
-              row[j] = measure.calc(data1, data2)
-            }
+      const promises = [];
+      for (let [i, row] of data.entries()) {
+        for (let j of row.keys()) {
+          if (j > 0) {
+            const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
+            const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
+            promises.push(measure.calc(data1, data2)
+              .then((score) => row[j] = score)
+              .catch((err) => row[j] = Number.NaN)
+            ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
           }
         }
+      }
 
-        resolve(data);
-      });
+      await Promise.all(promises); //rather await all at once
+      return data; // then return the data
     }
   }
 
@@ -1532,10 +1535,10 @@ class RankingAdapter {
       groups.push({
         name: grp.name,
         color: grp.color,
-        rows: grp.order.map((id) => data.find((item: any) => item._id && item._id === id))
+        rows: grp.order.map((id) => data.find((item: any) => item._id === id))
       });
     }
-    return groups;
+    return groups;  
   }
 
   public getAttributeDataDisplayed(attributeId: string) { //  use lower case string
