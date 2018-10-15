@@ -578,7 +578,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .attr("rowspan", (d: any) => d.rowspan || 1)
       .text(function (d: any) {
         if (d.label && Number(d.label.toString())) {
-          return Number(d.label.toString()).toFixed(2);
+          return Number(d.label.toString()).toFixed(3);
         }
         return d.label;
       })
