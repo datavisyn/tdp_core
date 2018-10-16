@@ -344,14 +344,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
             const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
             promises.push(measure.calc(data1, data2)
-              .then((score) => row[j] = score)
+              .then((score) => row[j] = score)  // TODO call updateTable here?
               .catch((err) => row[j] = Number.NaN)
             ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
           }
         }
       }
 
-      await Promise.all(promises); //rather await all at once
+      await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
       return data; // then return the data
     }
   }
@@ -1301,11 +1301,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.columnOverview.hidden = !hide;
     
     this.touringElem.hidden = hide;
+    
     if (!hide) {
       console.log('Open Touring Panel')
       //if touring is displayed, ensure the panel is visible
+      this.node.style.flex = "0.33 0.33 auto"; // lineup is 1 1 auto
       this.collapse = false;
       this.updateTouringPanel();
+    } else {
+      this.node.style.flex = null;
     }
     
     const button = d3.select(this.node).select('.lu-side-panel button.touring')
