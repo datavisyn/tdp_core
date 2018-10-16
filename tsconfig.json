@@ -7,10 +7,9 @@
     "moduleResolution": "node",
     "jsx": "react",
     "experimentalDecorators": true,
-    "downlevelIteration": true,
     "lib": [
       "dom",
-      "es2015",
+      "es6",
       "es2016.array.include",
       "es2017.object"
     ],
