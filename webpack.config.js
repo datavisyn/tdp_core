@@ -351,18 +351,8 @@ function generateWebpack(options) {
       }));
     });
   }
-  if (options.min) {
-    // use a minifier
-    base.plugins.push(
-      new webpack.LoaderOptionsPlugin({
-        minimize: true,
-        debug: false
-      }),
-      new webpack.optimize.UglifyJsPlugin());
-  } else {
-    // generate source maps
-    base.devtool = 'source-map';
-  }
+  // generate source maps
+  base.devtool = 'source-map';
   return base;
 }
 
@@ -403,25 +393,7 @@ function generateWebpackConfig(env) {
     base.library = true;
   }
 
-  // single generation
-  if (isDev) {
-    return generateWebpack(base);
-  }
-  if (type.startsWith('app')) { // isProduction app
-    return generateWebpack(Object.assign({}, base, {
-      min: true,
-      nosuffix: true
-    }));
-  }
-  // isProduction
-  return [
-    // plain
-    generateWebpack(base),
-    // minified
-    generateWebpack(Object.assign({}, base, {
-      min: true
-    }))
-  ];
+  return generateWebpack(base);
 }
 
 module.exports = generateWebpackConfig;
