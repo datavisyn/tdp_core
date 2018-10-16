@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, createImpositionBoxPlotDesc, Column, Ranking, IDataRow} from 'lineupjs';
+import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, Column, Ranking, IDataRow} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type} from 'touring';
@@ -458,7 +458,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         let tableHead = {
           columnName: 'col'+(i+colOffset),
           label: groups[i].label,
-          color: '#ffffff'
+          bgcolor: '#ffffff'
         };
         tableHeaders.push(tableHead);
       }
@@ -509,7 +509,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             {
               tableRow[colName] = {
                 label: currCategory.label,
-                color: currCategory.color
+                bgcolor: currCategory.color
               };
 
             }else //all the other columns
@@ -521,7 +521,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                 column: currCol.column,
                 column_label: currCol.label,
                 category: currCategory.label,
-                color: this.score2color(measure.id,score),
+                bgcolor: this.score2color(measure.id,score),
                 action: true,
                 tableColumn: (tableHeader[col] as any).label,
                 dataVisRep: dataVisualRep
@@ -632,7 +632,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .enter()
       .append('td')
       .attr('class', (d: any) => d.action ? 'text-center align-middle action' : 'text-center align-middle')
-      .style("background-color", (d: any) => d.color || '#ffffff')
+      .style("background-color", (d: any) => d.bgcolor || '#ffffff')
+      .style("color", (d: any) => d3.hsl(d.bgcolor || '#ffffff').l > 0.5 ? 'black' : 'white') // scores > 0.875  have white text
       .attr("rowspan", (d: any) => d.rowspan || 1)
       .text(function (d: any) {
         if (d.label && Number(d.label.toString())) {
@@ -1301,7 +1302,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.columnOverview.hidden = !hide;
     
     this.touringElem.hidden = hide;
-    
+
     if (!hide) {
       console.log('Open Touring Panel')
       //if touring is displayed, ensure the panel is visible
