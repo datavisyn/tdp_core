@@ -670,7 +670,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgContainer = d3.select('#' + containerId).append('div')
       .attr('class', 'svg-container ' + containerId);
 
-    let width = Number(svgContainer.style('width').slice(0, -2));
+    let width = Number(svgContainer.style('width').slice(0, -2)); //-20 because the scroll bar (15px) on the left is dynamically added
+    let svgWidth = width - 25;
+    let svgHeight = 175;
+    let svg2DimLabelHeight = 45;
+    // console.log('svgContainer.style("width"): ',svgContainer.style('width'));
+    // console.log('width: ',width);
+
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
@@ -703,17 +709,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .tension(0.5) //[0 .. 1] -> 1 = straight line 
       .dimensions([dimension1, dimension2])
       .value(function (d) {return d.value;})
-      .width(width)
-      .height(175); //175
+      .width(svgWidth)
+      .height(svgHeight);
 
     let svgCanvas = svgContainer.append('svg')
       .attr('width', chart.width())
-      .attr('height', chart.height());
+      .attr('height', chart.height()+svg2DimLabelHeight);
     // .attr('height',chart.height());
     // .attr('width','100%')
     // .attr('height','100%');
 
     let svgFigureGroup = svgCanvas.append('g').attr('class', 'parSets');
+                                              // .attr('width', chart.width())
+                                              // .attr('height', chart.height() + svg2DimLabelHeight);
 
     // draw parallel sets
     svgFigureGroup.datum(parSetData).call(chart);
@@ -725,8 +733,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('svgRibon: ',svgRibbon);
 
     //highlight current path
-    //FIXME: the colour of the categories is always the same order blue,orage,green,... 
-    //       -> if 2nd category is filterd out the next category should have the colour of the next displayed one
     let svgPaths = svgRibbon.selectAll('path')
       .each(function (d) {
         d3.select(this).classed('selected', false);
@@ -735,7 +741,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           d3.select(this).classed('selected', true);
         }
 
-        let color = that.getColorOfCategory(d.parent.dimension+'\uFEFF', d.parent.name);
+        let color = that.getColorOfCategory(d.parent.dimension.slice(0,-1), d.parent.name);
         if (color !== null) {
           d3.select(this).style('fill', color);
           d3.select(this).style('stroke', color);
@@ -745,23 +751,46 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       });
     // console.log('svgPaths: ',svgPaths);
 
-    let svgDimensions = svgFigureGroup.selectAll('g[class=dimension]');
+    let svgDimensions = svgFigureGroup.selectAll('g.dimension')
+      .each(function (d) {
+        console.log('dim.d: ',d);
+        console.log('dim.this: ',d3.select(this));
+        //move 2. dimension underneath the parallel sets
+        if(d.name === dimension2)
+        {
+          const currTransform = d3.select(this).attr('transform').split(',');
+          const currTransformX = Number(currTransform[0].split('(')[1]);
+          // const currTransformY = Number(currTransform[1].slice(0,-1));
+          // console.log('dim.d.transform: ',{currTransform, currTransformX, currTransformY});
+
+          // //dimension label
+          d3.select(this).select('rect').attr('transform',`translate(${currTransformX},40)`);
+          d3.select(this).select('text').attr('transform',`translate(${currTransformX},40)`);
+          
+          // //category labels
+          let categoryLabel = d3.select(this).selectAll('g');
+          categoryLabel.selectAll('rect').attr('transform',`translate(${currTransformX},20)`);
+          categoryLabel.selectAll('text').attr('transform',`translate(${currTransformX},20)`);
+        }
+    });
     // console.log('svgDimensions',svgDimensions);
 
     //highlight label of current path
     svgDimensions.selectAll('g')
       .each(function (d) {
-        d3.select(this).select('rect').classed('selected', false);
-        // console.log('dim.d: ',d);
-        // console.log('dim.this: ',d3.select(this));
+        // console.log('dim.g.d: ',d);
+        // console.log('dim.g.this: ',d3.select(this));
 
+        //deselect all bands
+        d3.select(this).select('rect').classed('selected', false);
+       
+        //select click band
         if (d.name === cell.category) {
           d3.select(this).select('rect').classed('selected', true);
-        }
-
-        let color = that.getColorOfCategory(d.dimension.name+'\uFEFF', d.name);
-        if (color !== null) {
-          d3.select(this).select('rect').style('fill', color);
+          let color = that.getColorOfCategory(d.dimension.name.slice(0,-1), d.name);
+          if (color !== null) {
+            d3.select(this).select('rect').style('fill', color);
+          }
         }
 
       });
@@ -1166,7 +1195,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('path.column: ',column);
     // console.log('path.category: ',category);
     let color = null;
-    let currColumn = this.ranking.getDisplayedAttributes();//.filter((item) => {return (item.desc.label === column);});
+    let currColumn = this.ranking.getDisplayedAttributes().filter((item) => {return (item.desc.label === column);});
     for(let col=0;col<currColumn.length;col++){ 
       if(currColumn[col] && (currColumn[col] as ICategoricalColumn).categories)
       {
