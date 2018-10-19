@@ -1,4 +1,4 @@
-import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, Column, Ranking, IDataRow} from 'lineupjs';
+import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, Column, Ranking, IDataRow, IStringMapColumnDesc} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type} from 'touring';
@@ -479,65 +479,73 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
     //console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
 
+    const groups = this.ranking.getGroupedData();
 
-    // if(this.getRadioButtonValue() === 'category'){
-
-      for(let i=0; i<chosenColumns.length; i++)
-      {
-        let currCol = chosenColumns[i];
-        let currCatAfterFilter = currCol.categories.filter((item) => {return (showCategoriesAfterFilter.indexOf(item.label) !== -1);});
+    console.groupCollapsed(`TableBody - ${measure.id}`);
+    console.time(`time TableBody - ${measure.id}`);
+    for(let i=0; i<chosenColumns.length; i++)
+    {
+      let currCol = chosenColumns[i];
+      let currCatAfterFilter = currCol.categories.filter((item) => {return (showCategoriesAfterFilter.indexOf(item.label) !== -1);});
+      
+      for(let cnt=0; cnt < currCatAfterFilter.length; cnt++)
+      {  
+        let currCategory = currCatAfterFilter[cnt];
+        let tableRow = {};
+        // console.groupCollapsed(`VisualRep - col:${currCol.label}(cat:${currCategory.label})`);
+        // console.time(`Time - VisualRep col:${currCol.label}(cat:${currCategory.label})`);
+        let dataVisualRep = this.getDataVisualRepresentation(measure, data, groups, tableHeader, currCol, currCategory);
+        // console.timeEnd(`Time - VisualRep col:${currCol.label}(cat:${currCategory.label})`);
+        // console.groupEnd();
         
-        for(let cnt=0; cnt < currCatAfterFilter.length; cnt++)
-        {  
-          let currCategory = currCatAfterFilter[cnt];
-          let tableRow = {};
-          let dataVisualRep = this.getDataVisualRepresentation(measure.id, data, tableHeader, currCol, currCategory);
+        for(let col=0; col < tableHeader.length; col++)
+        {
+          let colName = ((tableHeader[col] as any).columnName as string);
           
-          for(let col=0; col < tableHeader.length; col++)
+          if(col === 0) //first column (categorical column)
           {
-            let colName = ((tableHeader[col] as any).columnName as string);
-            
-            if(col === 0) //first column (categorical column)
-            {
-              tableRow[colName] = {
-                label: currCol.label,
-                rowspan: (cnt === 0) ? currCatAfterFilter.length : 0              
-              };
+            tableRow[colName] = {
+              label: currCol.label,
+              rowspan: (cnt === 0) ? currCatAfterFilter.length : 0              
+            };
 
-            }
-            else if(col === 1)  //second column (categoroies of categircal column)
-            {
-              tableRow[colName] = {
-                label: currCategory.label,
-                bgcolor: currCategory.color
-              };
-
-            }else //all the other columns
-            {
-              const score = this.calcScore(data, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
-              
-              tableRow[colName] = {
-                label: score, 
-                column: currCol.column,
-                column_label: currCol.label,
-                category: currCategory.label,
-                bgcolor: this.score2color(measure.id,score),
-                action: true,
-                tableColumn: (tableHeader[col] as any).label,
-                dataVisRep: dataVisualRep
-              };
-            }
           }
+          else if(col === 1)  //second column (categoroies of categircal column)
+          {
+            tableRow[colName] = {
+              label: currCategory.label,
+              bgcolor: currCategory.color
+            };
 
-          tableBody.push(tableRow);
-          tableRow = {};
-
+          }else //all the other columns
+          {
+            const headerLabel = ((tableHeader[col] as any).label as string);
+            // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
+            // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
+            const score = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
+            // console.timeEnd(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
+            // console.groupEnd();
+            tableRow[colName] = {
+              label: score, 
+              column: currCol.column,
+              column_label: currCol.label,
+              category: currCategory.label,
+              bgcolor: this.score2color(measure.id,score),
+              action: true,
+              tableColumn: (tableHeader[col] as any).label,
+              dataVisRep: dataVisualRep
+            };
+          }
         }
-      }
-    // }else{
-    //   //TODO generate table for stratificaiton option of radio button
-    // }
 
+        tableBody.push(tableRow);
+        tableRow = {};
+
+      }
+    }
+    
+    console.timeEnd(`time TableBody - ${measure.id}`); 
+    console.groupEnd();
 
     return tableBody;
   }
@@ -578,28 +586,26 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
     // table cells
-    this.generateMeasureTableCell(measure.id, containerId, rows, dataTable)      
+    this.generateMeasureTableCell(measure, containerId, rows, dataTable)      
     
   }
 
   // creates the table cell depending on their functionality
-  private generateMeasureTableCell(measureId: string, containerId: string, rows: d3.Selection<any>, dataTable: any) {
-    switch (measureId) {
-      case 'jaccard': {
-        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
-      }
-      case 'overlap': {
-        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
-      }
-      case 'student_test': {
-        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
-      }
-      case 'mwu_test': {
-        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
-      }
-      default: {
-        return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
-      }
+  private generateMeasureTableCell(measure: ISimilarityMeasure, containerId: string, rows: d3.Selection<any>, dataTable: any) {
+
+    const typeCategorical = 'categorical';
+    const typeNumber = 'number';
+    const measureTypeA = measure.type.typeA.value;
+    const measureTypeB = measure.type.typeB.value;
+
+    if(measureTypeA === typeCategorical && measureTypeB === typeCategorical){
+      // combination: categorical/categorical
+      // scores: jaccars, overlap
+      return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisualRepParallelSets);
+    }else{
+      // combination: number/categorica | categorical/number | number/number
+      // score: student-test, wolcoxon rank-sum-test, mwu-test
+      return this.generateGenericMeasureTableCell(containerId, rows, dataTable, this.generateVisulRepBoxPlot);
     }
   }
 
@@ -650,8 +656,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
  
   // --------- SCORES ---
   // different kinds of score calculations
-  private calcScore(data, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
-    const dataSets = this.getSelectionAndCategorySets(data, headerCategory, columnB, categoryB);
+  private calcScore(data, groups: Array<any>, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
+    // console.group('get Sets')
+    // console.time(`time - get Sets ${measure.id}`);
+    const dataSets = this.getSelectionAndCategorySets(data, groups, headerCategory, columnB, categoryB);
+    // console.timeEnd(`time - get Sets ${measure.id}`);
+    // console.groupEnd();
     const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
@@ -699,7 +709,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
 
     }
-    console.log('Cell clicken (ParSets) - data: ', parSetData);
+    // console.log('ParSets - data: ', parSetData);
 
 
     const that = this;
@@ -753,8 +763,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let svgDimensions = svgFigureGroup.selectAll('g.dimension')
       .each(function (d) {
-        console.log('dim.d: ',d);
-        console.log('dim.this: ',d3.select(this));
+        // console.log('dim.d: ',d);
+        // console.log('dim.this: ',d3.select(this));
+
         //move 2. dimension underneath the parallel sets
         if(d.name === dimension2)
         {
@@ -811,7 +822,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let data = cell.dataVisRep.data;
     let min = cell.dataVisRep.min;
     let max = cell.dataVisRep.max;
-    console.log('BoxPlot: ',{data,min,max});
+    // console.log('BoxPlot: ',{data,min,max});
 
 
     let containerWidth = Number(svgContainer.style('width').slice(0,-2));
@@ -935,36 +946,33 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    
   // --------- FORMAT DATA FOR VISUAL REPRESENTATION ---
   // gets the data needed for the different visualisations
-  private getDataVisualRepresentation(measureId: string, data: Array<any>, tableHeader: Array<any>, column: any, category: any)
+  private getDataVisualRepresentation(measure: ISimilarityMeasure, data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any, category: any)
   {
-    switch(measureId) {
-      case 'jaccard': {
-        return this.getColumnPartioningParallelSets(data, tableHeader, column);
-      }
-      case 'overlap': {
-        return this.getColumnPartioningParallelSets(data, tableHeader, column);
-      }
-      case 'student_test': {
-        return this.getDataValuesBoxplit(data, tableHeader, column, category);
-      }
-      case 'mwu_test': {
-        return this.getDataValuesBoxplit(data, tableHeader, column, category);
-      }
-      default: {
-        return this.getColumnPartioningParallelSets(data, tableHeader, column);
-      }
+    const typeCategorical = 'categorical';
+    const typeNumber = 'number';
+    const measureTypeA = measure.type.typeA.value;
+    const measureTypeB = measure.type.typeB.value;
+
+    if(measureTypeA === typeCategorical && measureTypeB === typeCategorical){
+      // combination: categorical/categorical
+      // scores: jaccars, overlap
+      return this.getColumnPartioningParallelSets(data, groups, tableHeader, column);
+    }else{
+      // combination: number/categorica | categorical/number | number/number
+      // score: student-test, wolcoxon rank-sum-test, mwu-test
+      return this.getDataValuesBoxplit(data, groups, tableHeader, column, category);
     }
   }
 
 
   // creates data for the visual representation of parallel sets
-  private getColumnPartioningParallelSets(data: Array<any>, tableHeader: Array<any>, column: any) {
+  private getColumnPartioningParallelSets(data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any) {
     // console.log('---- getColumnPartioning ----');
     // console.log('getColumnPartioning.data',data);
     // console.log('getColumnPartioning.tableHeader',tableHeader);
     // console.log('getColumnPartioning.column',column);
     let columnPartitioning = [];
-    const groups = this.ranking.getGroupedData();
+    // const groups = this.ranking.getGroupedData();
     const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     // go through all categories of current coloumn
@@ -1032,14 +1040,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
  
   // creates data for the visual representation of boxplots
-  private getDataValuesBoxplit(data: Array<any>, tableHeader: Array<any>, column: any, category: any)
+  private getDataValuesBoxplit(data: Array<any>, groups: Array<any>,tableHeader: Array<any>, column: any, category: any)
   {
     // console.log('---- getColumnPartioning ----');
     // console.log('getColumnPartioning.data',data);
     // console.log('getColumnPartioning.tableHeader',tableHeader);
     // console.log('getColumnPartioning.column',column);
     // let columnPartitioning = [];
-    let groups = this.ranking.getGroupedData();
+    // let groups = this.ranking.getGroupedData();
     let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
 
     let rowBoxData = [];
@@ -1116,7 +1124,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       max: max
     };
 
-    console.log({rowBoxData , min, max});
+    // console.log({rowBoxData , min, max});
 
     return rowBoxObj;
   }
@@ -1131,10 +1139,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //get the 2 data sets depending on the current configuraiton of the dropdowns and the radio buttons
-  private getSelectionAndCategorySets(data, headerCategory: string, columnB: string, categoryB: string) {
+  private getSelectionAndCategorySets(data, groups: Array<any>, headerCategory: string, columnB: string, categoryB: string) {
     const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
-    const groups = this.ranking.getGroupedData();
-
+    // console.time('get groups time')
+    // console.group('get groups')
+    // const groups = this.ranking.getGroupedData();
+    // console.groupEnd();
+    // console.timeEnd('get groups time')
+    
     let selectionSet = [];
     if (optionDDA === 'Selection') {
       selectionSet = data.filter((item) => item['selection'] === headerCategory);
@@ -1174,11 +1186,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       const hslColor =  d3.rgb(darkness, darkness, darkness);
       color = hslColor.toString();
 
-    }else if(measureID === 'student_test' || measureID === 'mwu_test')
+    }else
     {
-      if(score < 0.05)
+      if(score <= 0.05)
       {
-        console.log('change color ')
+        // console.log('bg color cahnge')
         let calcColor = d3.scale.linear().domain([0,0.051])
                                           .range(<any[]>['#A9A9A9', '#FFFFFF']);
                                           
@@ -1482,7 +1494,8 @@ class RankingAdapter {
       // attributes have to be the same (added / remvoed columns)
       // selection has to be the same                                                 TODO just updated selection data
       // item order has to be the same (i.e. the same  items order in the same way)   TODO just update the rank, the filtering is done in getItemsDisplayed
-      console.log('reuse the data array')
+
+      // console.log('reuse the data array')
     } else {
       console.log('update the data array')
       // refresh the data array
@@ -1561,15 +1574,16 @@ class RankingAdapter {
    * Contains  selection, rank and score data.
    */
   public getGroupedData() {
+    // console.time('get data (getGroupedData) time')
     const data = this.getItemsDisplayed();
-
+    // console.timeEnd('get data (getGroupedData) time')
     let groups = []
 
     for (let grp of this.getRanking().getGroups()) {
       groups.push({
         name: grp.name,
         color: grp.color,
-        rows: grp.order.map((id) => data.find((item: any) => item._id === id))
+        rows: grp.order.map((id) => data[id])
       });
     }
     return groups;  
