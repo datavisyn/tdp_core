@@ -120,7 +120,11 @@ div.touring {
       &.action:hover, &.action:focus { // = td.action:hover
         background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
         font-weight: bolder;
-      }
+      } 
+    }
+    td.selectedCell {
+      background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
+      font-weight: bolder; 
     }
   }
   

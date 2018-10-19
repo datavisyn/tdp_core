@@ -649,7 +649,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       })
       .on('click', function (d: any) {
         if (d.action) {
-          actionFunciton.bind(that)(containerId, d);
+          // remove gb highlighting from all the other tds
+          d3.select(this.parentElement.parentElement).selectAll('td').classed('selectedCell', false);
+          // add bg highlighting 
+          d3.select(this).classed('selectedCell', true); 
+          
+          actionFunciton.bind(that)(containerId, d);  
         }
       });
   }
