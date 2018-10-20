@@ -1589,7 +1589,7 @@ class RankingAdapter {
       groups.push({
         name: grp.name,
         color: grp.color,
-        rows: grp.order.map((id) => data[id])
+        rows: grp.order.map((index) => data[index]).filter((item) => item !== undefined)
       });
     }
     return groups;  
