@@ -340,7 +340,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       const promises = [];
       for (let [i, row] of data.entries()) {
         for (let j of row.keys()) {
-          if (j > 0) {
+          if (j > 0 && measure.type.compares(attr1[j - 1].type, attr2[i].type)) {
             const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
             const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
             promises.push(measure.calc(data1, data2)
