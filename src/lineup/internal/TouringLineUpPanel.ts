@@ -125,8 +125,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private updateItemScores() {
     const currentData = this.ranking.getItemsDisplayed();
     // console.log('current data: ', currentData);
-    const inputA = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum());
-    const inputB = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
+    d3.select
+    const inputA = this.prepareInput(d3.select(this.itemTab).select('select.compareA'));
+    const inputB = this.prepareInput(d3.select(this.itemTab).select('select.compareB'));
 
     // console.log('Inputs to get set measures:');
     // console.log('A: ', inputA);
@@ -237,8 +238,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateAttributeScores() {
-    const inputA = this.prepareInput(d3.select(this.attributeTab).select('select.compareA').select('option:checked').datum());
-    const inputB = this.prepareInput(d3.select(this.attributeTab).select('select.compareB').select('option:checked').datum());
+    const inputA = this.prepareInput(d3.select(this.attributeTab).select('select.compareA'));
+    const inputB = this.prepareInput(d3.select(this.attributeTab).select('select.compareB'));
 
     console.log('Inputs to get attr measures:');
     console.log('A: ', inputA);
@@ -291,10 +292,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateTable(panel) {
-    const inputA = this.prepareInput(d3.select(this.attributeTab).select('select.compareA').select('option:checked').datum());
-    const inputB = this.prepareInput(d3.select(this.attributeTab).select('select.compareB').select('option:checked').datum());
-
     const measure = d3.select(panel).datum();
+    const inputA = this.prepareInput(d3.select(this.attributeTab).select('select.compareA')).filter((desc) => desc.type == measure.type.typeA); // TODO this should be more flexible
+    const inputB = this.prepareInput(d3.select(this.attributeTab).select('select.compareB')).filter((desc) => desc.type == measure.type.typeB);
 
     const colHeads = d3.select(panel).select('thead tr').selectAll('th.head').data(inputA, (d) => d.column); // column is key
     colHeads.enter().append('th').attr('class', 'head');
@@ -425,7 +425,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private getTableHeader()
   {
     let tableHeaders = [];
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
     // console.log('DDA',optionDDA);
 
     if(optionDDA === 'Selection'){
@@ -472,7 +472,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   {
     let tableBody = [];
 
-    const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.itemControls.compareB').select('option:checked').datum());
+    const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.compareB'));
     //console.log('generateTableLayout - chosenColumns: ', chosenColumns);
       
 
@@ -677,7 +677,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates parallel set visualisation (for jaccard, overlap)
   private generateVisualRepParallelSets(containerId: string, cell: any) {
     console.log('Cell clicken (ParSets): ', {containerId, cell});
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container ' + containerId + '"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
@@ -816,7 +816,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
     console.log('Cell clicken (BoxPlot): ',{containerId, cell});
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
     
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
@@ -1053,7 +1053,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('getColumnPartioning.column',column);
     // let columnPartitioning = [];
     // let groups = this.ranking.getGroupedData();
-    let optionDDA = d3.select(this.itemTab).select('select.itemControls.compareA').select('option:checked').datum().label;
+    let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     let rowBoxData = [];
     let min = Infinity;
@@ -1363,7 +1363,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     button.classed('active', !hide);
   }
 
-  private prepareInput = (desc) => {
+  private prepareInput = (dropdown: d3.Selection<any>) => {
+    const desc = dropdown.select('option:checked').datum(); // get selected option
     let filter : Array<string>;
     switch(desc.type) {
       case 'collection':
@@ -1379,7 +1380,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         return [desc];
     }
 
-    return d3.select(this.itemTab).select('select.itemControls.compareB').selectAll('option').data().filter((desc) => filter.includes(desc.type));;
+    return dropdown.selectAll('option').data().filter((desc) => filter.includes(desc.type)); // filter from all options
   }
   
 
