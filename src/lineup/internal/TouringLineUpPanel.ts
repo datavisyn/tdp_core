@@ -1488,13 +1488,10 @@ class RankingAdapter {
     // if the selection
 
     // TODO events may be better?
-    const sameAttr = this.oldAttributes.length == this.getDisplayedAttributes().length && this.oldAttributes.filter((attr) => /*note the negation*/ !this.getDisplayedAttributes().some((attr2) => attr2.desc.label === attr.desc.label)).length === 0;
-    const sameSel = this.oldSelection.length == this.getSelection().length && this.oldSelection.every(i => this.getSelection().includes(i));
-    const sameOrder = this.oldOrder.length == this.getItemOrder().length && this.oldOrder.every(i => this.getItemOrder().includes(i));
+    const sameAttr = this.oldAttributes.length === this.getDisplayedAttributes().length && this.oldAttributes.filter((attr) => /*note the negation*/ !this.getDisplayedAttributes().some((attr2) => attr2.desc.label === attr.desc.label)).length === 0;
+    const sameSel = this.oldSelection.length === this.getSelection().length && this.oldSelection.every((val, i) => this.getSelection()[i] === val);
+    const sameOrder = this.oldOrder.length === this.getItemOrder().length && this.oldOrder.every((val, i) => this.getItemOrder()[i] === val);
 
-    // console.log('1', sameAttr);
-    // console.log('2', sameSel);
-    // console.log('3', sameOrder);
     if (sameAttr && sameSel && sameOrder) {
       // NOOP
       // attributes have to be the same (added / remvoed columns)
@@ -1522,6 +1519,7 @@ class RankingAdapter {
 
         // include wether the row is selected
         item.selection = this.oldSelection.includes(i) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
+        item.strat_groups = this.getRanking().getGroups().findIndex((grp) => grp.order.indexOf(i) >= 0); // index of group = category name, find index by looking up i. -1 if not found
         databaseData.push(item);
       })
   
