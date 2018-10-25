@@ -352,8 +352,6 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
     });
   } else if (col instanceof ScriptColumn) {
     recordPropertyChange(col, provider, lineup, graph, 'script');
-  } else if (col instanceof StringColumn) {
-    recordPropertyChange(col, provider, lineup, graph, 'pattern');
   } else if (col instanceof OrdinalColumn) {
     recordPropertyChange(col, provider, lineup, graph, 'mapping');
   }
@@ -370,8 +368,6 @@ function untrackColumn(col: Column) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);
   } else if (col instanceof ScriptColumn) {
     col.on(`${ScriptColumn.EVENT_SCRIPT_CHANGED}.track`, null);
-  } else if (col instanceof StringColumn) {
-    col.on(`${StringColumn.EVENT_PATTERN_CHANGED}.track`, null);
   }
 }
 
