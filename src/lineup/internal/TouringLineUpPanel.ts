@@ -475,26 +475,21 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.compareB'));
     //console.log('generateTableLayout - chosenColumns: ', chosenColumns);
       
-
-    let showCategoriesAfterFilter = this.getCategoriesAfterFiltering();
-    //console.log('generateTableLayout - remaining labels: ',showCategoriesAfterFilter);
-
     const groups = this.ranking.getGroupedData();
-
+    
     console.groupCollapsed(`TableBody - ${measure.id}`);
     console.time(`time TableBody - ${measure.id}`);
     for(let i=0; i<chosenColumns.length; i++)
     {
       let currCol = chosenColumns[i];
-      let currCatAfterFilter = currCol.categories.filter((item) => {return (showCategoriesAfterFilter.indexOf(item.label) !== -1);});
-      
-      for(let cnt=0; cnt < currCatAfterFilter.length; cnt++)
-      {  
-        let currCategory = currCatAfterFilter[cnt];
+      const colCategories =  this.ranking.getAttributeCategoriesDisplayed(currCol.column);
+      let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.label));
+      currCatAfterFilter.forEach((category, i) => {
+        
         let tableRow = {};
         // console.groupCollapsed(`VisualRep - col:${currCol.label}(cat:${currCategory.label})`);
         // console.time(`Time - VisualRep col:${currCol.label}(cat:${currCategory.label})`);
-        let dataVisualRep = this.getDataVisualRepresentation(measure, data, groups, tableHeader, currCol, currCategory);
+        let dataVisualRep = this.getDataVisualRepresentation(measure, data, groups, tableHeader, currCol, category);
         // console.timeEnd(`Time - VisualRep col:${currCol.label}(cat:${currCategory.label})`);
         // console.groupEnd();
         
@@ -506,30 +501,30 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           {
             tableRow[colName] = {
               label: currCol.label,
-              rowspan: (cnt === 0) ? currCatAfterFilter.length : 0              
+              rowspan: (i === 0) ? currCatAfterFilter.length : 0              
             };
 
           }
           else if(col === 1)  //second column (categoroies of categircal column)
           {
             tableRow[colName] = {
-              label: currCategory.label,
-              bgcolor: currCategory.color
+              label: category.label,
+              bgcolor: category.color
             };
-
+            
           }else //all the other columns
           {
             const headerLabel = ((tableHeader[col] as any).label as string);
             // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
-            const score = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, currCategory.label);
+            const score = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
             // console.timeEnd(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.groupEnd();
             tableRow[colName] = {
               label: score, 
               column: currCol.column,
               column_label: currCol.label,
-              category: currCategory.label,
+              category: category.label,
               bgcolor: this.score2color(measure.id,score),
               action: true,
               tableColumn: (tableHeader[col] as any).label,
@@ -537,11 +532,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             };
           }
         }
-
+        
         tableBody.push(tableRow);
         tableRow = {};
-
-      }
+      });
     }
     
     console.timeEnd(`time TableBody - ${measure.id}`); 
@@ -1229,37 +1223,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     return color;
   }
 
-  // only the display categories will be shown in table
-  private getCategoriesAfterFiltering()
-  {
-    let allRemainingLabels = ['Selected', 'Unselected', ...this.ranking.getStratificationDesc().categories.map((cat) => cat.label)];
-    let columns = this.ranking.getDisplayedAttributes();
-    
-    for(let i=0; i<columns.length; i++)
-    {
-      if((<ICategoricalColumn>columns[i]).categories){
-        let allColCategories = (<ICategoricalColumn>columns[i]).categories;
-        let possibleCategries = [];
-        if(columns[i].desc.type === 'categorical' && (<any>columns[i]).currentFilter) {
-          console.log('filter-labels: ',(<any>columns[i]).currentFilter.filter);
-          possibleCategries = (<any>columns[i]).currentFilter.filter;
-        }
-
-        if(possibleCategries.length > 0) {
-          for(let i=0; i<allColCategories.length; i++) {
-            if(possibleCategries.indexOf(allColCategories[i].label) !== -1){
-              allRemainingLabels.push(allColCategories[i].label);
-            }
-          }
-        }else{
-          allRemainingLabels = allRemainingLabels.concat(allColCategories.map((a) => a.label));
-        }
-      }
-    }
-
-    return allRemainingLabels;
-  }
-
   private updateItemControls() {
     const dropdownA = d3.select(this.itemTab).select('select.compareA');
     // dropdownA ('With')
@@ -1593,9 +1556,22 @@ class RankingAdapter {
     return groups;  
   }
 
+
+  /**
+   * returns the data for the given attribute
+   * @param attributeId column property of the column description
+   */
   public getAttributeDataDisplayed(attributeId: string) { //  use lower case string
     const data = this.getItemsDisplayed();
     return data.map((row) => row[attributeId]);
+  }
+
+  /**
+   * returns the categories of the given attribute
+   * @param attributeId column property of the column description
+   */
+  public getAttributeCategoriesDisplayed(attributeId: string) {
+    return new Set(this.getAttributeDataDisplayed(attributeId))
   }
 
   public getSelection() {
