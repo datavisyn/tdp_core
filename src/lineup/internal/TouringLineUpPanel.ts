@@ -115,11 +115,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-  private updateItemTab() {
-    this.updateItemControls();
+  private async updateItemTab() {
+    await setTimeout( () => this.updateItemControls(), 0);
     //changing the radio button or the removing columns could create a different selection in the dropdowns
     //therefore the touring data will be updated
-    this.updateItemScores();
+    await setTimeout(() => this.updateItemScores(), 0);
   }
 
   private updateItemScores() {
@@ -179,10 +179,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
 
-  private updateAttributeTab() {
+  private async updateAttributeTab() {
     console.log('Updating attribute tab.');
-    this.updateAttributeControls();
-    this.updateAttributeScores();
+    await setTimeout(() => this.updateAttributeControls(), 0);
+    await setTimeout(() => this.updateAttributeScores(), 0);
   }
 
   private updateAttributeControls() {
