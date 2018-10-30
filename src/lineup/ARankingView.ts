@@ -1,4 +1,4 @@
-import {EngineRenderer, spaceFillingRule, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, StackColumn, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -73,6 +73,12 @@ export interface IARankingViewOptions {
   enableHeaderRotation: boolean;
 
   /**
+   * enable that the regular columns are added via a choser dialog
+   * @default false
+   */
+  enableAddingColumnGrouping: boolean;
+
+  /**
    * enable alternating pattern background
    * @default false
    */
@@ -95,7 +101,7 @@ export abstract class ARankingView extends AView {
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
    */
-  private dump: Map<string, number | boolean | number[]> = null;
+  private dump: Set<string> = null;
 
   readonly naturalSize = [800, 500];
 
@@ -140,6 +146,7 @@ export abstract class ARankingView extends AView {
     enableOverviewMode: true,
     enableZoom: true,
     enableAddingColumns: true,
+    enableAddingColumnGrouping: false,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
     enableStripedBackground: false,
@@ -202,7 +209,7 @@ export abstract class ARankingView extends AView {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
-    this.panel = new TouringLineUpPanel(this.provider, this.taggle.ctx, this.options);
+    this.panel = new TouringLineUpPanel(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
@@ -324,7 +331,6 @@ export abstract class ARankingView extends AView {
       return;
     }
     const ranking = this.provider.getRankings()[0];
-    const weightsSuffix = '_weights';
 
     if (mode === EViewMode.FOCUS) {
       this.panel.show();
@@ -333,14 +339,12 @@ export abstract class ARankingView extends AView {
           if (!this.dump.has(c.id)) {
             return;
           }
-
-          c.setWidth(<number>this.dump.get(c.id));
-          if (this.dump.has(c.id + weightsSuffix)) {
-            (<StackColumn>c).setWeights(<number[]>this.dump.get(c.id + weightsSuffix));
-          }
+          c.setVisible(true);
         });
       }
       this.dump = null;
+
+      this.update();
       return;
     }
 
@@ -353,7 +357,7 @@ export abstract class ARankingView extends AView {
     const s = ranking.getPrimarySortCriteria();
     const labelColumn = ranking.children.filter((c) => c.desc.type === 'string')[0];
 
-    this.dump = new Map<string, number | boolean | number[]>();
+    this.dump = new Set<string>();
     ranking.children.forEach((c) => {
       if (c === labelColumn ||
         (s && c === s.col) ||
@@ -363,11 +367,8 @@ export abstract class ARankingView extends AView {
       ) {
         // keep these columns
       } else {
-        if (c instanceof StackColumn) {
-          this.dump.set(c.id + weightsSuffix, (<StackColumn>c).getWeights());
-        }
-        this.dump.set(c.id, c.getWidth());
-        c.hide();
+        c.setVisible(false);
+        this.dump.add(c.id);
       }
     });
   }
@@ -376,7 +377,7 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
-    successfullySaved('Named Set', name);
+    successfullySaved('List of Entities', name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
@@ -452,6 +453,13 @@ export abstract class ARankingView extends AView {
   private getColumns(): Promise<IAdditionalColumnDesc[]> {
     return this.loadColumnDesc().then(({columns}) => {
       const cols = this.getColumnDescs(columns);
+      // compatibility since visible is now a supported feature, so rename ones
+      for (const col of cols) {
+        if (col.visible != null) {
+          (<any>col).initialColumn = col.visible;
+          delete col.visible;
+        }
+      }
       deriveColors(cols);
       return cols;
     });

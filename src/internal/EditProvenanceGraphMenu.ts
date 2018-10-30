@@ -73,7 +73,7 @@ export default class EditProvenanceGraphMenu {
             <li><a href="#" data-action="clone" title="Clone to Temporary Session"><i class="fa fa-clone" aria-hidden="true"></i> Clone to Temporary Session</a></li>
             <li class="divider"></li>
             <li><a href="#" data-action="open" title="Open Session"><i class="fa fa-folder-open-o" aria-hidden="true"></i> Open Existing Session</a></li>
-            <li><a href="#" data-action="persist" title="Persist Session"><i class="fa fa-cloud" aria-hidden="true"></i> Persist Session</a></li>
+            <li><a href="#" data-action="persist" title="Save Session"><i class="fa fa-cloud" aria-hidden="true"></i> Save Session</a></li>
             <li><a href="#" data-action="delete" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
             <li class="divider${__DEBUG__ ? '' : ' hidden'}"></li>
             <li class="${__DEBUG__ ? '' : 'hidden'}"><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
@@ -293,8 +293,8 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
           </div>
           <div class="checkbox">
             <label class="radio-inline">
-              <input type="checkbox" name="${prefix}_agree" required="required"> I agree that provenance graph will be stored permanently.
-              Note that you can delete this provenance graph as part of the <strong>Open Existing Session</strong> dialog.
+              <input type="checkbox" name="${prefix}_agree" required="required">
+              I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the <strong>'Open Existing Session'</strong> dialog.
             </label>
           </div>
       </form>

@@ -147,4 +147,3 @@ export function previewFilterHint(database: string, view: string, extraParams?: 
     });
   };
 }
-

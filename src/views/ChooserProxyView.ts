@@ -4,33 +4,45 @@ import {getProxyUrl} from '../rest';
 import SelectionChooser, {ISelectionChooserOptions} from './SelectionChooser';
 
 export interface IProxyViewOptions extends Partial<ISelectionChooserOptions> {
+  /**
+   * site name
+   */
   name: string;
+  /**
+   * proxy key - will be redirected through a local server proxy
+   */
   proxy: string;
+  /**
+   * direct loading of an iframe site
+   */
   site: string;
+  /**
+   * within the url {argument} will be replaced with the current selected id
+   * @default gene
+   */
   argument: string;
+  /**
+   * idtype of the argument
+   */
   idtype: string;
+  /**
+   * extra object for the link generation
+   */
   extra: object;
+  /**
+   * flag whether just an open externally link should be shown,
+   * i.e. in case iframe is prohibited
+   * @default false
+   */
   openExternally: boolean;
 }
 
 export default class ChooserProxyView extends AView {
   protected options: IProxyViewOptions = {
     name: null,
-    /**
-     * proxy key - will be redirected through a local server proxy
-     */
     proxy: null,
-    /**
-     * direct loading of an iframe site
-     */
     site: null,
-    /**
-     * within the url {argument} will be replaced with the current selected id
-     */
     argument: 'gene',
-    /**
-     * idtype of the argument
-     */
     idtype: null,
     extra: {},
     openExternally: false
@@ -122,7 +134,7 @@ export default class ChooserProxyView extends AView {
     if (this.options.openExternally) {
       this.setBusy(false);
       this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-      Please <a href="${url}" target="_blank">click here
+      Please <a href="${url}" class="alert-link" target="_blank" rel="noopener">click here
       to open ${this.options.name ? this.options.name : 'the external application' }</a> in a new browser tab.</div></p>`;
       return;
     }
