@@ -514,7 +514,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             
           }else //all the other columns
           {
-            const headerLabel = ((tableHeader[col] as any).label as string);
+            // const headerLabel = ((tableHeader[col] as any).label as string);
             // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             const score = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
@@ -1542,7 +1542,7 @@ class RankingAdapter {
    */
   public getGroupedData() {
     // console.time('get data (getGroupedData) time')
-    const data = this.getItemsDisplayed();
+    const data = this.getItems();
     // console.timeEnd('get data (getGroupedData) time')
     let groups = []
 
