@@ -323,9 +323,11 @@ export default class LineUpPanelActions extends EventHandler {
     }
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
-    this.search.data = [
-      this.groupedDialog('Database Columns', this.getColumnDescription(descs, false)),
-      {
+    const items = [
+      this.groupedDialog('Database Columns', this.getColumnDescription(descs, false))
+    ];
+    if (loadedScorePlugins.length > 0) {
+      items.push({
         text: 'Parameterized Scores',
         children: loadedScorePlugins.map((score) => {
           return {
@@ -340,11 +342,16 @@ export default class LineUpPanelActions extends EventHandler {
             }
           };
         })
-      },
-      {
+      });
+    }
+    const scoreDescs = this.getColumnDescription(descs, true);
+    if (scoreDescs.length > 0) {
+      items.push({
         text: 'Previously Added Columns',
-        children: this.getColumnDescription(descs, true)
-      },
+        children: scoreDescs
+      });
+    }
+    items.push(
       this.groupedDialog('Combining Columns', [
           { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
           { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
@@ -358,7 +365,8 @@ export default class LineUpPanelActions extends EventHandler {
           {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
       ]),
       ...metaDataOptions
-    ];
+    );
+    this.search.data = items;
   }
 
   private groupedDialog(text: string, children: ISearchOption[]) {
