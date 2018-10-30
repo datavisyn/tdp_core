@@ -6,6 +6,7 @@
 
 button.touring.active::before {
   color: #ffa500;
+  border: none;
 }
 
 div.touring {
@@ -32,6 +33,78 @@ div.touring {
       font-family: FontAwesome;
       color: #333;
       font-size: 0.9em;
+    }
+
+    .measureTableHeader {
+      
+
+      th.rotate {
+        height: 100px;
+        // width: 40px;
+        // min-width: 40px;
+        // max-width: 40px;
+        position: relative;
+        vertical-align: bottom;
+        padding: 0;
+      }
+      
+      th.rotate > div{
+        position: relative;
+        top: 0px;
+        // left: 40px; /* 80 * tan(45) / 2 = 40 where 80 is the height on the cell and 45 is the transform angle*/
+        height: 100%;
+        -ms-transform:skew(-45deg,0deg);
+        -moz-transform:skew(-45deg,0deg);
+        -webkit-transform:skew(-45deg,0deg);
+        -o-transform:skew(-45deg,0deg);
+        transform:skew(-45deg,0deg);
+        transform-origin: bottom left;
+        overflow: hidden;
+        // border-left: 1px solid #dddddd;
+        border-right: 1px solid #dddddd;
+        // border-top: 1px solid #dddddd;
+        // border-bottom: 1px solid #dddddd;
+      }
+      
+      th.rotate span {
+        -ms-transform:skew(45deg,0deg) rotate(315deg);
+        -moz-transform:skew(45deg,0deg) rotate(315deg);
+        -webkit-transform:skew(45deg,0deg) rotate(315deg);
+        -o-transform:skew(45deg,0deg) rotate(315deg);
+        transform:skew(45deg,0deg) rotate(315deg);
+        transform-origin: bottom left;
+        position: absolute;
+        bottom: 0px; /* 40 cos(45) = 28 with an additional 2px margin*/
+        left: 51px; /*Because it looked good, but there is probably a mathematical link here as well*/
+        display: inline-block;
+        // width: 100%;
+        width: 117px; /* 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle*/
+        text-align: left;
+        padding-left: 0;
+        white-space: nowrap; /*whether to display in one line or not*/
+      }
+
+      td.action {
+        width: 51px !important;
+        min-width: 51px !important;
+        max-width: 51px !important;
+      }
+    }
+
+    .detailVis {
+      border-top: #AAA 1px solid;
+      margin: 0.2em 0 0.6em 0;
+      padding: 0.2em 0;
+    
+
+      .detailDiv {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .detailDiv span{
+        font-weight: normal;
+      }
     }
     
     // ------ parallel sets with D3
@@ -125,6 +198,7 @@ div.touring {
     td.selectedCell {
       background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
       font-weight: bolder; 
+      border: none;
     }
   }
   

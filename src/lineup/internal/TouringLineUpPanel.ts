@@ -572,7 +572,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // table                                        
     let table = tableContainer.append('table')
-                            .attr('class','table table-condensed');
+                            .attr('class','table measureTableHeader');
     
     // table header
     let tableHeader = table.append('thead');
@@ -581,7 +581,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               .data(dataTable.tableHead as Array<any>)
               .enter()
               .append('th')
-              .attr('class','text-center')
+              .attr('class','rotate')
+              .append('div')
+              .append('span')
               .text(function(d) { return (d as any).label; });
 
     // table body
@@ -838,6 +840,32 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgContainer = d3.select('#'+containerId).append('div')
                                                   .attr('class','svg-container '+containerId);
   
+    let divDetailInfo = svgContainer.append('div')
+                                    .classed('detailVis',true);
+
+    // let detailTestType = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                  .classed('detailDiv',true)
+                  .text('Test: ')
+                  .append('span')
+                  .text('[TestName]');
+
+    // let detailTestValue = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                .classed('detailDiv',true)
+                .text('Test-Value/p-Value: ')
+                .append('span')
+                .text('[Value]/[p-Value]');  
+
+    // let detailTestDescr = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                  .classed('detailDiv',true)
+                  .text('Description: ')
+                  .append('span')
+                  .text('[Description]');    
+    
+    
+                                                  
     let data = cell.dataVisRep.data;
     let min = cell.dataVisRep.min;
     let max = cell.dataVisRep.max;
@@ -1210,7 +1238,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       if(score <= 0.05)
       {
         // console.log('bg color cahnge')
-        let calcColor = d3.scale.linear().domain([0,0.051])
+        let calcColor = d3.scale.linear().domain([0,0.05])
                                           .range(<any[]>['#A9A9A9', '#FFFFFF']);
                                           
         color = calcColor(score).toString();
