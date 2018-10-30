@@ -341,12 +341,16 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       for (let [i, row] of data.entries()) {
         for (let j of row.keys()) {
           if (j > 0 && measure.type.compares(attr1[j - 1].type, attr2[i].type)) {
-            const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
-            const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
-            promises.push(measure.calc(data1, data2)
-              .then((score) => row[j] = score)  // TODO call updateTable here?
-              .catch((err) => row[j] = Number.NaN)
-            ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
+            if (j <= i+1) { // start at 
+              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
+              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
+              promises.push(measure.calc(data1, data2)
+                .then((score) => row[j] = score)  // TODO call updateTable here?
+                .catch((err) => row[j] = Number.NaN)
+              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
+            } else {
+              row[j] = '';
+            }
           }
         }
       }
@@ -674,6 +678,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.groupEnd();
     const selectionSet = dataSets.selectionSet.map((item) => item[columnB]); //compare currently used attribute
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
+
+
+    console.log('selectionSet', selectionSet);
+    console.log('categorySet', categorySet);
+
 
     return measure.calc(selectionSet, categorySet)
   }
