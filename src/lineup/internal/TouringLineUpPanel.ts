@@ -482,8 +482,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     for(let i=0; i<chosenColumns.length; i++)
     {
       let currCol = chosenColumns[i];
-      const colCategories =  this.ranking.getAttributeCategoriesDisplayed(currCol.column);
+      let colCategories = new Set(); 
+      const mode = this.getRadioButtonValue();
+      if (mode === 'category') {
+        // Non Stratification
+        colCategories = this.ranking.getAttributeCategoriesDisplayed(currCol.column);
+      } else {
+        //with stratification:
+        colCategories = new Set(this.ranking.getStratificationDesc().categories.map((cat) => cat.label));
+      }
+
+
       let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.label));
+      
       currCatAfterFilter.forEach((category, i) => {
         
         let tableRow = {};
