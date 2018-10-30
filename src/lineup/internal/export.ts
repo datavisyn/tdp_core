@@ -6,7 +6,11 @@ export function exportRanking(columns: Column[], rows: IDataRow[], separator: st
   //optionally quote not numbers
   const escape = new RegExp(`["]`, 'g');
 
-  function quote(l: string, c?: Column) {
+  function quote(v: any, c?: Column) {
+    if (v == null) {
+      return '';
+    }
+    const l = v.toString();
     if (l == null || l === 'null') {
       return '';
     }
@@ -19,7 +23,7 @@ export function exportRanking(columns: Column[], rows: IDataRow[], separator: st
   const r: string[] = [];
   r.push(columns.map((d) => quote(`${d.label}${d.description ? `\n${d.description}` : ''}`)).join(separator));
   rows.forEach((row) => {
-    r.push(columns.map((c) => quote(c.getLabel(row), c)).join(separator));
+    r.push(columns.map((c) => quote(c.getExportValue(row, 'text'), c)).join(separator));
   });
   return r.join('\n');
 }
@@ -58,7 +62,7 @@ function convertRanking(provider: LocalDataProvider, order: number[], columns: C
   } else { // json
     content = exportJSON(columns, rows);
   }
-  const mimeTypes = {csv : 'text/csv', tsv: 'text/text/tab-separated-values', ssv: 'text/csv', json: 'application/json'};
+  const mimeTypes = {csv : 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json'};
   return {
     content,
     mimeType: mimeTypes[type],
