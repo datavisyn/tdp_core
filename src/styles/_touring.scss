@@ -41,14 +41,14 @@ div.touring {
       th.rotate {
         height: 100px;
         position: relative;
-        vertical-align: bottom !important;
+        vertical-align: middle !important;
         padding: 0;
       }
 
       th.rotate > div{
         position: relative;
         top: 0px;
-        left: 1px; /* moves the whole element to the left, because of the borderline widths*/
+        left: 1px; /* moves the whole element to the left, because of the borderline widths */
         height: 100%;
         -ms-transform:skew(-45deg,0deg);
         -moz-transform:skew(-45deg,0deg);
@@ -71,17 +71,18 @@ div.touring {
         transform:skew(45deg,0deg) rotate(315deg);
         transform-origin: bottom left;
         position: absolute;
-        bottom: 0px; /* table header text starts at the bottom of the header cell*/
-        left: 51px; /* width of table cell for the p-values + border width*/
+        bottom: 0px; /* table header text starts at the bottom of the header cell */
+        left: 51px; /* width of table cell for the p-values + border width */
         display: inline-block;
-        width: 120px; /* 100 / cos(45) - 28 * cos(45) = 121.6 , where 100 is the height of the cell, 28 = 2*14 (text height) and 45 the transform angle*/
+        width: 120px; /* 100 / cos(45) - 28 * cos(45) = 121.6 , where 100 is the height of the cell, 28 = 2*14 (text height) and 45 the transform angle */
         text-align: left;
-        // height: 35px; /* 51 * cos(45) , where 51 is the cell width  */
-        vertical-align: bottom !important;
+        height: 35px; /* 51 * cos(45) , where 51 is the cell width  */
+        vertical-align: middle !important;
+        // line-height: normal;
         // white-space: nowrap; /*whether to display in one line or not*/
       }
 
-      // table cells with p-value, there is a default padding of 0px 8px (content + 16px)
+      // table cells with p-value, there is a default padding: 0px 8px (content + 16px)
       td.action { 
         width: 51px !important;
         min-width: 51px !important;
