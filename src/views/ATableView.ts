@@ -283,7 +283,7 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
     return Array.from(row.children)
       .map((d) => {
         const text = (<HTMLTableDataCellElement>d).innerText;
-        return hasMultilines(text) ? `"${text.replace(/\t/g,':')}"` : text;
+        return hasMultilines(text) || text.includes(separator) ? `"${text.replace(/\t/g,':')}"` : text;
       }).join(separator);
   }).join('\n');
   const content = `${headerContent}\n${bodyContent}`;

@@ -82,6 +82,18 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
   dropable: boolean;
 
   /**
+   * name of the select field
+   * @default null
+   */
+  name: string | null;
+
+  /**
+   * id of the select field
+   * @default null
+   */
+  id: string | null;
+
+  /**
    * performs the search
    * @param {string} query the query to search can be ''
    * @param {number} page the page starting with 0 = first page
@@ -184,7 +196,9 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     equalValues: equalArrays,
     cacheResults: true,
     tokenSeparators: /[\s;,]+/mg,
-    defaultTokenSeparator: ' '
+    defaultTokenSeparator: ' ',
+    id: null,
+    name: null
   };
 
   private readonly select2Options: Select2Options = <any>{
@@ -236,7 +250,16 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     this.node = this.options.document.createElement('div');
     this.node.classList.add('select3');
     this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''}></select>`;
+
     this.$select = $('select', this.node);
+
+    if (this.options.name != null) {
+      this.$select.attr('name', this.options.name);
+    }
+    if (this.options.id != null) {
+      this.$select.attr('id', this.options.id);
+    }
+
     this.$select.on('change', this.onChange);
     this.$select.select2(this.select2Options);
     if (this.options.validate && this.options.dropable) {

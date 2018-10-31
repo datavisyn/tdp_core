@@ -406,11 +406,13 @@ def get_count_query(database, view_name, args):
   return dict(query=count_query.format(**replace), args=kwargs)
 
 
-def _fill_up_columns(view, engine):
-  _log.info('fill up view')
-  # update the real object
-  columns = view.columns
-  for col in get_columns(engine, view.table):
+def derive_columns(table_name, engine, columns=None):
+  """
+  helper function to derive the columns of a table
+  """
+  columns = columns or {}
+
+  for col in get_columns(engine, table_name):
     name = col['column']
     if name in columns:
       # merge
@@ -427,11 +429,10 @@ def _fill_up_columns(view, engine):
   categorical_columns = [k for k, col in columns.items() if col['type'] == 'categorical' and 'categories' not in col]
   if number_columns or categorical_columns:
     with session(engine) as s:
-      table = view.table
       if number_columns:
         template = u'min({col}) as {col}_min, max({col}) as {col}_max'
         minmax = ', '.join(template.format(col=col) for col in number_columns)
-        row = next(iter(s.execute(u"""SELECT {minmax} FROM {table}""".format(table=table, minmax=minmax))))
+        row = next(iter(s.execute(u"""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))
         for num_col in number_columns:
           columns[num_col]['min'] = row[num_col + '_min']
           columns[num_col]['max'] = row[num_col + '_max']
@@ -440,9 +441,16 @@ def _fill_up_columns(view, engine):
         if _differentiates_empty_string_and_null(engine.name):
           template += u""" AND {col} <> ''"""
         template += u""" ORDER BY {col} ASC"""
-        cats = s.execute(template.format(col=col, table=table))
+        cats = s.execute(template.format(col=col, table=table_name))
         columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
 
+  return columns
+
+
+def _fill_up_columns(view, engine):
+  _log.info('fill up view')
+  # update the real object
+  view.columns = derive_columns(view.table, engine, view.columns)
   view.columns_filled_up = True
 
 

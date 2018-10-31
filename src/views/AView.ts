@@ -241,8 +241,8 @@ export abstract class AView extends EventHandler implements IView {
    * resolve the name of the current input selection
    * @returns {Promise<string[]>}
    */
-  protected resolveSelection(): Promise<string[]> {
-    return resolveIds(this.selection.idtype, this.selection.range, this.idType);
+  protected resolveSelection(idType = this.idType): Promise<string[]> {
+    return resolveIds(this.selection.idtype, this.selection.range, idType);
   }
 
   setItemSelection(selection: ISelection) {
@@ -250,6 +250,7 @@ export abstract class AView extends EventHandler implements IView {
       return;
     }
     const bak = this.itemSelection;
+    const wasEmpty = bak == null || bak.idtype == null || bak.range.isNone;
     this.itemSelection = selection;
     // propagate
     if (selection.idtype) {
@@ -259,7 +260,11 @@ export abstract class AView extends EventHandler implements IView {
         selection.idtype.select(selection.range);
       }
     }
-    this.itemSelectionChanged();
+    const isEmpty = selection == null || selection.idtype == null || selection.range.isNone;
+    if (!(wasEmpty && isEmpty)) {
+      // the selection has changed when we really have some new values not just another empty one
+      this.itemSelectionChanged();
+    }
     this.fire(AView.EVENT_ITEM_SELECT, bak, selection);
   }
 

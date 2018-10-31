@@ -2,7 +2,7 @@
  * Created by sam on 13.02.2017.
  */
 
-import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column} from 'lineupjs';
+import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
@@ -11,14 +11,22 @@ import {IServerColumn} from '../rest';
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
   selectedSubtype?: string;
+  initialRanking: boolean;
 }
 
 export interface IColumnOptions {
   /**
    * visible by default
    * @default true
+   * @deprecated use initialRanking
    */
-  visible: boolean;
+  visible?: boolean;
+
+  /**
+   * part of the initial ranking by default
+   * @default true
+   */
+  initialRanking: boolean;
   /**
    * custom label instead of the column name
    * @default column
@@ -52,7 +60,7 @@ function baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdd
     column,
     label: column,
     color: '',
-    visible: true,
+    initialRanking: options.visible != null ? options.visible: true,
     width: -1,
     selectedId: -1,
     selectedSubtype: undefined
@@ -189,12 +197,15 @@ export function createInitialRanking(provider: LocalDataProvider, options: Parti
   }, options);
 
   const ranking = provider.pushRanking();
-  if (!o.rank) {
-    const r = ranking.find((d) => d.desc.type === 'rank');
-    if (r) {
-      r.removeMe();
+  const r = ranking.find((d) => d.desc.type === 'rank');
+  if (o.rank) {
+    if (!r) {
+      ranking.insert(provider.create(createRankDesc()), 0);
     }
+  } else if (r) {
+    r.removeMe();
   }
+
   if (o.aggregate) {
     ranking.insert(provider.create(createAggregateDesc()), 0);
   }
@@ -214,14 +225,11 @@ export function createInitialRanking(provider: LocalDataProvider, options: Parti
     return cols;
   };
 
-  const descs = o.order.length > 0 ? resolve() : provider.getColumns().filter((d) => (<any>d).visible !== false);
+  const visibles: IColumnDesc[] = provider.getColumns().filter((d: any) => (<IAdditionalColumnDesc>d).initialRanking);
+  const descs = o.order.length > 0 ? resolve() : visibles;
 
   descs.forEach((d) => {
     const col = provider.create(d);
-    // set initial column width
-    if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {
-      col.setWidth((<any>d).width);
-    }
     ranking.push(col);
   });
 }

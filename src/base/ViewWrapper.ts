@@ -54,7 +54,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   private preInstanceParameter = new Map<string, any>();
   private selection: ISelection;
 
-  constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document) {
+  constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document, private readonly viewOptionGenerator: () => any = () => ({})) {
     super();
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
@@ -137,7 +137,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       }
       // create provenance reference
       this.context = createContext(this.graph, this.plugin, this.ref);
-      this.instance = p.factory(this.context, selection, this.content, {});
+      this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
       this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
       return this.instancePromise = resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
         const idType = this.instance.itemIDType;
@@ -167,6 +167,8 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   destroy() {
     if (this.instance) {
       this.destroyInstance();
+    } else if (this.instancePromise) {
+      this.instancePromise.then(() => this.destroyInstance());
     }
     this.node.remove();
   }
@@ -214,7 +216,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
   setParameterImpl(name: string, value: any) {
     if (this.instance) {
-      return this.instancePromise.then((v) => v.setParameter(name, value));
+      return this.instance.setParameter(name, value);
     }
     this.preInstanceParameter.set(name, value);
     return null;
@@ -233,10 +235,18 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
     if (this.instance) {
       if (matches) {
-        return this.instancePromise.then((v) => v.setInputSelection(selection));
+        return this.instance.setInputSelection(selection);
       } else {
         this.destroyInstance();
       }
+    } else if (this.instancePromise) {
+      return this.instancePromise.then(() => {
+        if (matches) {
+          return this.instance.setInputSelection(selection);
+        } else {
+          this.destroyInstance();
+        }
+      });
     } else if (matches && this.visible) {
       return this.createView(selection);
     }
