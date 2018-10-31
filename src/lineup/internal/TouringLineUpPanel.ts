@@ -572,7 +572,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // table                                        
     let table = tableContainer.append('table')
-                            .attr('class','table measureTableHeader');
+                            .attr('class','table table-condensed measureTableHeader');
     
     // table header
     let tableHeader = table.append('thead');
@@ -582,9 +582,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               .enter()
               .append('th')
               .attr('class','rotate')
-              .append('div')
-              .append('span')
-              .text(function(d) { return (d as any).label; });
+                .append('div')
+                .classed('borderedCell',(d) => {return d.label!=="";})
+                  .append('span')
+                  .text(function(d) { return (d as any).label; });
 
     // table body
     let tableBody = table.append('tbody');

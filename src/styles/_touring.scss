@@ -36,22 +36,19 @@ div.touring {
     }
 
     .measureTableHeader {
-      
+      width: 100%;
 
       th.rotate {
         height: 100px;
-        // width: 40px;
-        // min-width: 40px;
-        // max-width: 40px;
         position: relative;
-        vertical-align: bottom;
+        vertical-align: bottom !important;
         padding: 0;
       }
-      
+
       th.rotate > div{
         position: relative;
         top: 0px;
-        // left: 40px; /* 80 * tan(45) / 2 = 40 where 80 is the height on the cell and 45 is the transform angle*/
+        left: 1px; /* moves the whole element to the left, because of the borderline widths*/
         height: 100%;
         -ms-transform:skew(-45deg,0deg);
         -moz-transform:skew(-45deg,0deg);
@@ -60,10 +57,10 @@ div.touring {
         transform:skew(-45deg,0deg);
         transform-origin: bottom left;
         overflow: hidden;
-        // border-left: 1px solid #dddddd;
-        border-right: 1px solid #dddddd;
-        // border-top: 1px solid #dddddd;
-        // border-bottom: 1px solid #dddddd;
+      }
+
+      th.rotate > div.borderedCell {
+        border-right: 2px solid #dddddd;
       }
       
       th.rotate span {
@@ -74,20 +71,25 @@ div.touring {
         transform:skew(45deg,0deg) rotate(315deg);
         transform-origin: bottom left;
         position: absolute;
-        bottom: 0px; /* 40 cos(45) = 28 with an additional 2px margin*/
-        left: 51px; /*Because it looked good, but there is probably a mathematical link here as well*/
+        bottom: 0px; /* table header text starts at the bottom of the header cell*/
+        left: 51px; /* width of table cell for the p-values + border width*/
         display: inline-block;
-        // width: 100%;
-        width: 117px; /* 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle*/
+        width: 120px; /* 100 / cos(45) - 28 * cos(45) = 121.6 , where 100 is the height of the cell, 28 = 2*14 (text height) and 45 the transform angle*/
         text-align: left;
-        padding-left: 0;
-        white-space: nowrap; /*whether to display in one line or not*/
+        // height: 35px; /* 51 * cos(45) , where 51 is the cell width  */
+        vertical-align: bottom !important;
+        // white-space: nowrap; /*whether to display in one line or not*/
       }
 
-      td.action {
+      // table cells with p-value, there is a default padding of 0px 8px (content + 16px)
+      td.action { 
         width: 51px !important;
         min-width: 51px !important;
         max-width: 51px !important;
+      }
+
+      td {
+        border-right: 2px solid #dddddd;
       }
     }
 
