@@ -125,7 +125,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private updateItemScores() {
     const currentData = this.ranking.getItemsDisplayed();
     // console.log('current data: ', currentData);
-    d3.select
     const inputA = this.prepareInput(d3.select(this.itemTab).select('select.compareA'));
     const inputB = this.prepareInput(d3.select(this.itemTab).select('select.compareB'));
 
@@ -276,7 +275,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       const classScope = this;
       panels.each(function(d, i) {
-          classScope.updateTable.bind(classScope)(this);
+          classScope.updateTable.bind(classScope)(this); // class scope workaround so that we can pass 'this' event as parameter 
       })
 
       // Update
