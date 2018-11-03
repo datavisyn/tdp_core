@@ -123,6 +123,144 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private updateItemScores() {
+    const inputA = this.prepareInput(d3.select(this.itemTab).select('select.compareA'));
+    const inputB = this.prepareInput(d3.select(this.itemTab).select('select.compareB'));
+
+    const setMeasures: Map<Comparison, ISimilarityMeasure[]> = MethodManager.getSetMethods(inputA, inputB);
+    // Map to Arrray
+    // Each array item consists of comparison and and array of measures
+    // type[1] = array of measures
+    // type[1][0] = first measure of the array
+    const filteredMeasures = [...setMeasures].map((type) => type[1][0]);
+
+    // div element in html where the score and detail view should be added
+    const panelGroup = d3.select(this.itemTab).select('.measures');
+
+    if (filteredMeasures && filteredMeasures.length > 0) {
+      panelGroup.selectAll(':scope > p').remove() // remove immidiate child paragraphs of panelGroup
+      //group panel (accordion) for all acordion items
+      const timeStamp = this.getIdWithTimestamp('');
+
+
+      const panels = panelGroup.selectAll('div.panel').data(filteredMeasures, (measure: ISimilarityMeasure) => measure.id); // measure id is key
+      // Enter
+      const panelsEnter = panels.enter().append('div').classed('panel', true) //Create new panels
+
+      const panelHeader = panelsEnter //create panel heading
+        .append('div').classed('panel-heading', true).attr('role', 'tab')
+        .append('h4').classed('panel-title', true)
+        .append('a').attr('data-toggle', 'collapse').attr('href', (d) => `#attr-${d.id}-${timeStamp}`).attr('aria-expanded', false);
+
+      const tablesEnter = panelsEnter //create panel content
+        .append('div').attr('class', 'panel-collapse collapse in')
+        .attr('id', (d) => `attr-${d.id}-${timeStamp}`)
+        .append('div').attr('class', 'table-container')
+        .append('table').attr('class', 'table table-condensed');
+      const theadEnter = tablesEnter
+        .append('thead').append('tr');
+      theadEnter.append('th'); // Attribute Name
+      theadEnter.append('th'); // Category Name
+      tablesEnter
+        .append('tbody');
+
+      const classScope = this;
+      panels.each(function(d, i) {
+          classScope.updateItemTable.bind(classScope)(this); // class scope workaround so that we can pass 'this' event as parameter 
+      })
+
+      // Update
+      panelHeader.text((d) => d.label);
+     
+      // Exit
+      panels.exit().remove(); // exit: remove columns no longer displayed
+      panels.order();
+    } else {
+      panelGroup.selectAll("*").remove(); // avada kedavra mud-panels!
+      panelGroup.append('p').text('Sorry, there are no appropriate measures for the selected inputs.');
+    }
+  }
+
+  private updateItemTable(panel) {
+    const measure = d3.select(panel).datum();
+    const inputA = this.prepareInput(d3.select(this.itemTab).select('select.compareA')).filter((desc) => desc.type == measure.type.typeA); // TODO this should be more flexible
+    const inputB = this.prepareInput(d3.select(this.itemTab).select('select.compareB')).filter((desc) => desc.type == measure.type.typeB);
+
+    const headCategories = [].concat(...inputA.map((col) => col.categories));
+    const colHeads = d3.select(panel).select('thead tr').selectAll('th.head').data(headCategories, (d:any) => d.name); // name of the category is key (not the label)
+    colHeads.enter().append('th').attr('class', 'head');
+
+    function updateTableBody(bodyData: Array<Array<any>>) {
+      console.log('body data', bodyData);
+  
+      const trs = d3.select(panel).select('tbody').selectAll('tr').data(bodyData, (d) => d[0]+'-'+d[1]);
+      trs.enter().append('tr');
+      const tds = trs.selectAll('td').data((d) => d); // remove 
+      tds.enter().append('td');
+      // Set colheads in thead 
+      colHeads.text((d) => d.label);
+      // set data in tbody
+      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : (Number(d) ? d.toFixed(2) : d));
+  
+      // Exit
+      colHeads.exit().remove(); // remove attribute columns
+      tds.exit().remove(); // remove cells of removed columns
+      trs.exit().remove(); // remove attribute rows
+    }
+    
+    this.getItemTableBody(headCategories, inputB, measure, true).then(updateTableBody); // initialize
+    // this.getItemTableBody(inputA, inputB, measure, false).then(updateTableBody); // set values
+  }
+  
+  
+  /**
+   * async: return promise
+   * @param attr1 columns
+   * @param arr2 rows
+   * @param scaffold only create the matrix with row headers, but no value calculation
+   */
+  private async getItemTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>> {
+    const data = new Array(attr2.reduce((sum, col) => sum += col.categories.length ,0)); // rows = number of categories
+    for (let i of data.keys()) {
+      data[i] = new Array(attr1.length + 2).fill(null) // containing n1+2 elements (headers + n1 vlaues)
+    }
+
+    let i = 0;
+    for (let col of attr2) {
+        for (let cat of col.categories) {
+          data[i][0] = col.label;
+          data[i][1] = cat.label;
+          i++;
+        }
+    }
+
+    if (scaffold) {
+      return data;
+    } else {
+      const promises = [];
+      for (let [i, row] of data.entries()) {
+        for (let j of row.keys()) {
+          if (j > 0 && measure.type.compares(attr1[j - 1].type, attr2[i].type)) {
+            if (j <= i+1) { // start at 
+              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
+              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
+              promises.push(measure.calc(data1, data2)
+                .then((score) => row[j] = score)  // TODO call updateTable here?
+                .catch((err) => row[j] = Number.NaN)
+              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
+            } else {
+              row[j] = '';
+            }
+          }
+        }
+      }
+
+      await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
+      return data; // then return the data
+    }
+  }
+
+
+  private updateItemScoresOld() {
     const currentData = this.ranking.getItemsDisplayed();
     // console.log('current data: ', currentData);
     const inputA = this.prepareInput(d3.select(this.itemTab).select('select.compareA'));
@@ -275,7 +413,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       const classScope = this;
       panels.each(function(d, i) {
-          classScope.updateTable.bind(classScope)(this); // class scope workaround so that we can pass 'this' event as parameter 
+          classScope.updateAttrTable.bind(classScope)(this); // class scope workaround so that we can pass 'this' event as parameter 
       })
 
       // Update
@@ -290,7 +428,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     }
   }
 
-  private updateTable(panel) {
+  private updateAttrTable(panel) {
     const measure = d3.select(panel).datum();
     const inputA = this.prepareInput(d3.select(this.attributeTab).select('select.compareA')).filter((desc) => desc.type == measure.type.typeA); // TODO this should be more flexible
     const inputB = this.prepareInput(d3.select(this.attributeTab).select('select.compareB')).filter((desc) => desc.type == measure.type.typeB);
