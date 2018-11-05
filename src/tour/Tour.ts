@@ -4,7 +4,7 @@ import {EXTENSION_POINT_TDP_TOUR, ITDPTourExtensionDesc, IStep} from './extensio
 export interface ITourContext {
   steps(count: number): void;
   show(stepNumber: number, step: IStep): void;
-  hide(): void;
+  hide(finished?: boolean): void;
 }
 
 export default class Tour {
@@ -14,6 +14,10 @@ export default class Tour {
 
   constructor(private readonly desc: ITDPTourExtensionDesc) {
 
+  }
+
+  get id() {
+    return this.desc.id;
   }
 
   get name() {
@@ -58,7 +62,7 @@ export default class Tour {
 
     if (step < 0 || step >= this.steps.length) {
       this.current = -1;
-      context.hide();
+      context.hide(step >= this.steps.length);
       return;
     }
 

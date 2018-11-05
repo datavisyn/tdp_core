@@ -2,7 +2,8 @@ import {resolveTours, ITourContext} from './Tour';
 import Tour from './Tour';
 import {IStep} from './extensions';
 import Popper, {PopperOptions} from 'popper.js';
-import {tickStep} from 'd3-array';
+
+const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 
 export default class TourManager {
 
@@ -21,7 +22,7 @@ export default class TourManager {
   private activeTour: Tour | null = null;
   private tourContext: ITourContext = {
     steps: (count) => this.setSteps(count),
-    hide: () => this.hideTour(),
+    hide: (finished?: boolean) => this.hideTour(finished),
     show: (stepNumber, step) => this.showStep(stepNumber, step)
   };
 
@@ -80,6 +81,7 @@ export default class TourManager {
     this.chooser.tabIndex = -1;
     this.chooser.setAttribute('role', 'dialog');
     this.chooser.id = `tdpTourChooser`;
+    const finished = this.getRememberedFinishedTours();
     this.chooser.innerHTML = `
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -90,8 +92,8 @@ export default class TourManager {
                 <h4 class="modal-title">Help Tours</h4>
             </div>
             <div class="modal-body">
-              <ul>
-                ${this.tours.map((d) => `<li><a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a></li>`).join('')}
+              <ul class="fa-ul">
+                ${this.tours.map((d) => `<li data-id="${d.id}"><i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i><a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a></li>`).join('')}
               </ul>
             </div>
         </div>
@@ -222,10 +224,25 @@ export default class TourManager {
     this.activeTour.start(this.tourContext);
   }
 
-  hideTour() {
+  hideTour(finished: boolean = false) {
     this.clearHighlight();
     this.takeDown();
+    if (finished) {
+      this.rememberFinished(this.activeTour);
+      const finished = this.chooser.querySelector<HTMLElement>(`li[data-id="${this.activeTour.id}"] > i`);
+      finished.classList.remove('fa-square-o');
+      finished.classList.add('fa-check-square');
+    }
     this.activeTour = null;
+  }
 
+  private rememberFinished(tour: Tour) {
+    const old = this.getRememberedFinishedTours();
+    old.add(tour.id);
+    localStorage.setItem(LOCALSTORAGE_FINISHED_TOURS, Array.from(old).join(','));
+  }
+
+  private getRememberedFinishedTours() {
+    return new Set((localStorage.getItem(LOCALSTORAGE_FINISHED_TOURS) || '').split(','));
   }
 }
