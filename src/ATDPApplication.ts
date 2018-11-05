@@ -19,6 +19,7 @@ import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import 'phovea_ui/src/_font-awesome';
 import {list as listPlugins} from 'phovea_core/src/plugin';
 import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
+import TourManager from './tour/TourManager';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -89,11 +90,19 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   protected app: Promise<T> = null;
   protected header: AppHeader;
+  protected tourManager: TourManager;
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
     mixin(this.options, options);
     this.build(document.body, {replaceBody: false});
+    {
+      this.tourManager = new TourManager(document);
+
+      const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
+      button.dataset.toggle = 'modal';
+      button.dataset.target = `#${this.tourManager.chooser.id}`;
+    }
   }
 
   protected createHeader(parent: HTMLElement) {
@@ -101,7 +110,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const header = createHeader(parent, {
       showCookieDisclaimer: this.options.showCookieDisclaimer,
       showAboutLink: this.options.showAboutLink,
-      showHelpLink: this.options.showHelpLink,
+      showHelpLink: 'tours',
       showReportBugLink: this.options.showReportBugLink,
       showOptionsLink: this.options.showOptionsLink,
       appLink: new AppHeaderLink(this.options.name, (event) => {

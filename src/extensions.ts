@@ -10,6 +10,8 @@ import {IColumnDesc} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
 
+export * from './tour/extensions';
+
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
