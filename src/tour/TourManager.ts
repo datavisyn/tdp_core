@@ -15,6 +15,7 @@ export default class TourManager {
 
   private readonly backdrop: HTMLElement;
   private readonly step: HTMLElement;
+  private readonly stepCount: HTMLElement;
   private stepPopper: Popper;
   readonly chooser: HTMLElement;
 
@@ -75,6 +76,9 @@ export default class TourManager {
       };
     });
 
+    this.stepCount = doc.createElement('div');
+    this.stepCount.classList.add('tdp-tour-step-count');
+
     this.tours = resolveTours();
     this.chooser = doc.createElement('div');
     this.chooser.classList.add('modal', 'fade');
@@ -109,6 +113,7 @@ export default class TourManager {
 
     document.body.appendChild(this.backdrop);
     document.body.appendChild(this.step);
+    document.body.appendChild(this.stepCount);
     document.body.appendChild(this.chooser);
   }
 
@@ -169,7 +174,6 @@ export default class TourManager {
   private showStep(stepNumber: number, step: IStep) {
     const focus: HTMLElement = step.selector ? this.step.ownerDocument.querySelector(step.selector) : null;
     this.setFocusElement(focus);
-    this.step.dataset.step = String(stepNumber + 1);
 
     const steps = this.step.querySelectorAll('.tdp-tour-step-dots div');
     Array.from(steps).forEach((button: HTMLElement, i) => {
@@ -189,6 +193,8 @@ export default class TourManager {
       this.stepPopper = null;
     }
     this.step.style.display = 'flex';
+    this.stepCount.style.display = 'flex';
+
     const options: PopperOptions =  {};
     if (step.placement) {
       options.placement = step.placement;
@@ -200,6 +206,15 @@ export default class TourManager {
       const bb = this.step.getBoundingClientRect();
       const parent = this.step.ownerDocument.body.getBoundingClientRect();
       this.step.style.transform = `translate(${(parent.width / 2 - bb.width / 2)}px, ${(parent.height / 2 - bb.height / 2)}px)`;
+    }
+    this.step.scrollIntoView(true);
+
+    this.stepCount.innerText = String(stepNumber + 1);
+    if (focus) {
+      const base = focus.getBoundingClientRect();
+      this.stepCount.style.transform = `translate(${base.left}px, ${base.top}px)`;
+    } else {
+      this.stepCount.style.transform = this.step.style.transform;
     }
   }
 
@@ -215,7 +230,12 @@ export default class TourManager {
     this.clearHighlight();
     this.backdrop.ownerDocument.removeEventListener('keyup', this.escKeyListener);
     this.backdrop.style.display = null;
-    this.step.style.display = null;
+
+    this.step.style.display = 'none';
+    this.step.style.transform = null;
+    this.stepCount.style.display = 'none';
+    this.stepCount.style.transform = null;
+
     if (this.stepPopper) {
       this.stepPopper.destroy();
       this.stepPopper = null;

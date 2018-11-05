@@ -32,6 +32,26 @@ $step-border: black;
   }
 }
 
+.tdp-tour-step-count {
+  display: none;
+  position: absolute;
+  background: $step-color;
+  border-radius: 50%;
+  width: 1.6em;
+  height: 1.6em;
+  left: -0.8em;
+  top: -0.8em;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  font-size: small;
+  text-align: center;
+  color: white;
+  box-shadow: 0px 0px 5px 1px $step-color;
+  transition: transform ease 1s;
+  animation: tdp-tour-fade-in 0.4s;
+}
+
 .tdp-tour-step {
   display: none;
   position: absolute;
@@ -44,23 +64,6 @@ $step-border: black;
   animation: tdp-tour-fade-in 0.4s;
   transition: transform ease 1s;
   flex-direction: column;
-
-  &::before {
-    position: absolute;
-    content: attr(data-step);
-    background: $step-color;
-    border-radius: 50%;
-    width: 1.6em;
-    height: 1.6em;
-    left: -0.8em;
-    top: -0.8em;
-    display: flex;
-    justify-content: center;
-    font-size: small;
-    text-align: center;
-    color: white;
-    box-shadow: 0px 0px 5px 1px $step-color;
-  }
 }
 
 .tdp-tour-step-content {
