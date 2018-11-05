@@ -94,11 +94,14 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
-    mixin(this.options, options);
-    this.build(document.body, {replaceBody: false});
-    {
-      this.tourManager = new TourManager(document);
+    this.tourManager = new TourManager(document);
+    mixin(this.options, {
+      showHelpLink: this.tourManager.hasTours() ? 'tours' : '' // use help button for tours
+    }, options);
 
+    this.build(document.body, {replaceBody: false});
+
+    if (this.tourManager.hasTours()) {
       const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
       button.dataset.toggle = 'modal';
       button.dataset.target = `#${this.tourManager.chooser.id}`;
@@ -110,7 +113,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const header = createHeader(parent, {
       showCookieDisclaimer: this.options.showCookieDisclaimer,
       showAboutLink: this.options.showAboutLink,
-      showHelpLink: 'tours',
+      showHelpLink: this.options.showHelpLink,
       showReportBugLink: this.options.showReportBugLink,
       showOptionsLink: this.options.showOptionsLink,
       appLink: new AppHeaderLink(this.options.name, (event) => {

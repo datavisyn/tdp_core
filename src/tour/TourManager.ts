@@ -111,6 +111,10 @@ export default class TourManager {
     document.body.appendChild(this.chooser);
   }
 
+  hasTours() {
+    return this.tours.length > 0;
+  }
+
   private setHighlight(mask: { left: number, top: number, width: number, height: number }) {
     const area = <HTMLElement>this.backdrop.firstElementChild;
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example

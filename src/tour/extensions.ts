@@ -4,6 +4,7 @@ import {Placement} from 'popper.js';
 export const EXTENSION_POINT_TDP_TOUR = 'tdpTour';
 
 export interface ITDPTourExtensionDesc {
+  id: string;
   name: string;
   description?: string;
   level?: 'beginner' | 'advanced';
