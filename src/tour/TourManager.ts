@@ -36,16 +36,12 @@ export default class TourManager {
     this.step.dataset.step = '0';
       this.step.innerHTML = `
     <div class="tdp-tour-step-content">
-      Test Content
     </div>
     <div class="tdp-tour-step-navigation">
       <div class="tdp-tour-step-dots">
-        <div title="1" class="fa fa-circle"></div>
-        <div title="2" class="fa fa-circle"></div>
-        <div title="3" class="fa fa-circle-o"></div>
-        <div title="4" class="fa fa-circle"></div>
       </div>
       <div class="btn-group" role="group">
+        <button type="button" data-switch="--" class="btn-xs btn btn-default"><i class="fa fa-fast-backward"></i> Restart</button>
         <button type="button" data-switch="-" class="btn-xs btn btn-default"><i class="fa fa-step-backward"></i> Back</button>
         <button type="button" data-switch="0" class="btn-xs btn btn-default"><i class="fa fa-stop"></i> Cancel</button>
         <button type="button" data-switch="+" class="btn-xs btn btn-default"><i class="fa fa-step-forward"></i> Next</button>
@@ -61,6 +57,9 @@ export default class TourManager {
           return;
         }
         switch(button.dataset.switch) {
+        case '--':
+          this.activeTour.jumpTo(0, this.tourContext);
+          break;
         case '-':
           this.activeTour.previous(this.tourContext);
           break;
@@ -164,10 +163,16 @@ export default class TourManager {
     this.setFocusElement(focus);
     this.step.dataset.step = String(stepNumber + 1);
 
-    Array.from(this.step.querySelectorAll('.tdp-tour-step-dots div')).forEach((button: HTMLElement, i) => {
+    const steps = this.step.querySelectorAll('.tdp-tour-step-dots div');
+    Array.from(steps).forEach((button: HTMLElement, i) => {
       button.classList.toggle('fa-circle', i !== stepNumber);
       button.classList.toggle('fa-circle-o', i === stepNumber);
     });
+
+    this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
+    this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0;
+    this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]').innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
+
 
     this.step.querySelector<HTMLElement>('.tdp-tour-step-content')!.innerHTML = step.html;
 
