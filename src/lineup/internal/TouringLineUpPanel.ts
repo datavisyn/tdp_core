@@ -820,8 +820,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
 
-    console.log('selectionSet', selectionSet);
-    console.log('categorySet', categorySet);
+    // console.log('selectionSet', selectionSet);
+    // console.log('categorySet', categorySet);
 
 
     return measure.calc(selectionSet, categorySet)
@@ -859,16 +859,52 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       let headerPart = colPart[i].parts;
       let categoryLabel = colPart[i].categoryLabel;
 
+
       for (let p = 0; p < headerPart.length; p++) {
-        let newData = {};
-        newData[dimension1] = categoryLabel;
-        newData[dimension2] = headerPart[p].label;
-        newData['value'] = headerPart[p].amount;
-        parSetData.push(newData);
+        if(cell.category === categoryLabel && cell.tableColumn === headerPart[p].label)
+        {
+          let pSDIntersection = {};
+          pSDIntersection['value'] = headerPart[p].intersectionAmount;
+          pSDIntersection[dimension1] = categoryLabel;
+          pSDIntersection[dimension2] = headerPart[p].label;
+          if((pSDIntersection as any).value > 0){
+            parSetData.push(pSDIntersection);
+          }
+
+          let pSDCategoryOther = {};
+          pSDCategoryOther['value'] = colPart[i].categoryAmount - headerPart[p].intersectionAmount;
+          pSDCategoryOther[dimension1] = categoryLabel;
+          pSDCategoryOther[dimension2] = 'Others';
+          if((pSDCategoryOther as any).value > 0){
+            parSetData.push(pSDCategoryOther);
+          }
+
+          let pSDOtherCategory = {};
+          pSDOtherCategory['value'] = headerPart[p].currHeaderAmount - headerPart[p].intersectionAmount;
+          pSDOtherCategory[dimension1] = 'Others';
+          pSDOtherCategory[dimension2] = headerPart[p].label;
+          if((pSDOtherCategory as any).value > 0){
+            parSetData.push(pSDOtherCategory);
+          }
+
+
+
+          // let newData = {};
+          // newData['value'] = headerPart[p].intersectionAmount;
+          // newData[dimension1] = cell.category === categoryLabel ? categoryLabel : 'Others';
+          // newData[dimension2] = cell.tableColumn === headerPart[p].label ? headerPart[p].label : 'Others';
+          // //keep current row and column at the first position
+          // if(cell.category === categoryLabel){
+          //   parSetData.unshift(newData);
+          // }else
+          // {
+          //   parSetData.push(newData);
+          // }
+        }
       }
 
     }
-    // console.log('ParSets - data: ', parSetData);
+    console.log('ParSets - data: ', parSetData);
 
 
     const that = this;
@@ -910,13 +946,24 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           d3.select(this).classed('selected', true);
         }
 
-        let color = that.getColorOfCategory(d.parent.dimension.slice(0,-1), d.parent.name);
-        if (color !== null) {
-          d3.select(this).style('fill', color);
-          d3.select(this).style('stroke', color);
+        if (that.getRadioButtonValue() === 'category') {
+          let color = that.getColorOfCategory(d.parent.dimension.slice(0,-1), d.parent.name);
+          if (color !== null) {
+            d3.select(this).style('fill', color);
+            d3.select(this).style('stroke', color);
+          }
+          if(d.parent.name === 'Others') {
+            d3.select(this).attr('class','category-gray');
+          }
+        }else{
+          d3.select(this).classed('category-selected',true);
+          if(d.parent.name === 'Others') {
+            d3.select(this).classed('category-selected',false);
+            d3.select(this).classed('category-gray',true);
+          }
         }
         // console.log('path.this: ', d3.select(this));
-        // console.log('path.d: ',d);
+        console.log('path.d: ',d);
       });
     // console.log('svgPaths: ',svgPaths);
 
@@ -957,9 +1004,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         //select click band
         if (d.name === cell.category) {
           d3.select(this).select('rect').classed('selected', true);
-          let color = that.getColorOfCategory(d.dimension.name.slice(0,-1), d.name);
-          if (color !== null) {
-            d3.select(this).select('rect').style('fill', color);
+          if (that.getRadioButtonValue() === 'category'){
+            let color = that.getColorOfCategory(d.dimension.name.slice(0,-1), d.name);
+            if (color !== null) {
+              d3.select(this).select('rect').style('fill', color);
+            }
+          }else{
+            d3.select(this).select('rect').style('fill', '#fba74d');
           }
         }
 
@@ -1141,7 +1192,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     if(measureTypeA === typeCategorical && measureTypeB === typeCategorical){
       // combination: categorical/categorical
       // scores: jaccars, overlap
-      return this.getColumnPartioningParallelSets(data, groups, tableHeader, column);
+      return this.getColumnPartioningParallelSets(data, groups, tableHeader, column,category);
     }else{
       // combination: number/categorica | categorical/number | number/number
       // score: student-test, wolcoxon rank-sum-test, mwu-test
@@ -1151,14 +1202,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
   // creates data for the visual representation of parallel sets
-  private getColumnPartioningParallelSets(data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any) {
-    // console.log('---- getColumnPartioning ----');
-    // console.log('getColumnPartioning.data',data);
-    // console.log('getColumnPartioning.tableHeader',tableHeader);
-    // console.log('getColumnPartioning.column',column);
+  private getColumnPartioningParallelSets(data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any, category: any) {
+    console.log('---- getColumnPartioning ----');
+    console.log('getColumnPartioning.data',data);
+    console.log('getColumnPartioning.groups',groups);
+    console.log('getColumnPartioning.tableHeader',tableHeader);
+    console.log('getColumnPartioning.column',column);
+    console.log('getColumnPartioning.category',category);
     let columnPartitioning = [];
     // const groups = this.ranking.getGroupedData();
     const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
+
+    const currAttribute: string = column.column.toString();
 
     // go through all categories of current coloumn
     for (let i = 0; i < column.categories.length; i++) {
@@ -1169,17 +1224,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       if (this.getRadioButtonValue() === 'group') { // stratification
         //all ids of a stratification group
         const currGroup = groups.find(item => {return item.name === currCategory.label});
-        dataIdCurrCategory = currGroup.rows.map((a) => a.id);
+        dataIdCurrCategory = currGroup.rows;
       } else { //category
         // find all ids of the current category
         dataIdCurrCategory = data.filter((item) => {
-          return item[column.column.toString()] === currCategory.label;
-        }).map((a) => a.id);
+          return item[currAttribute] === currCategory.label;
+        });
       }
 
       const num = dataIdCurrCategory.length;
 
       const currCategoryParts = {
+        attributeLabel: column.label,
         categoryLabel: currCategory.label,
         categoryAmount: num,
         parts: []
@@ -1193,24 +1249,28 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           let dataIdCurrentHeader = []
           if (optionDDA === 'Selection') {
             // Compare categories with selected/unselected
-            dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label}).map((a) => a.id);
+            dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label});
           } else {
             // Compare categories with stratification groups
             for (let g = 0; g < groups.length; g++) {
               if (groups[g].name === currHeader.label && (groups[g] as any).rows) {
-                dataIdCurrentHeader = (groups[g] as any).rows.map((a) => a.id);
+                dataIdCurrentHeader = (groups[g] as any).rows;
               } else if (groups[g].name === currHeader.label && currHeader.label === 'Default') {
-                dataIdCurrentHeader = data.map((a) => a.id);
+                dataIdCurrentHeader = data;
               }
             }
           }
-          const {intersection: intersect} = intersection(dataIdCurrCategory, dataIdCurrentHeader);
-          const numHeader = intersect.length;
 
+          const currHeaderNum = dataIdCurrentHeader.length;
+
+          const {intersection: intersect} = intersection(dataIdCurrCategory.map((a) => a[currAttribute]), dataIdCurrentHeader.map((a) => a[currAttribute]));
+          const numHeader = intersect.length;
+          
           if (numHeader > 0) {
             const currCatForHead = {
               label: currHeader.label,
-              amount: numHeader
+              intersectionAmount: numHeader,
+              currHeaderAmount: currHeaderNum
             };
 
             currCategoryParts.parts.push(currCatForHead);
@@ -1220,7 +1280,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       columnPartitioning.push(currCategoryParts);
     }
-    // console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
+    console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
     return columnPartitioning;
   }
  
@@ -1392,18 +1452,26 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('path.column: ',column);
     // console.log('path.category: ',category);
     let color = null;
-    let currColumn = this.ranking.getDisplayedAttributes().filter((item) => {return (item.desc.label === column);});
-    for(let col=0;col<currColumn.length;col++){ 
-      if(currColumn[col] && (currColumn[col] as ICategoricalColumn).categories)
-      {
-        let currCategories = (currColumn[col] as ICategoricalColumn).categories;
-        for(let i=0; i<currCategories.length; i++){
-          if(currCategories[i].label === category){
-            color = currCategories[i].color;
+    if(column === 'Selection'){
+      if(category === 'Selected'){
+        color = '#1f77b4';
+      }else {
+        color = '#ff7f0e';
+      }
+    }else {
+      let currColumn = this.ranking.getDisplayedAttributes().filter((item) => {return (item.desc.label === column);});
+      for(let col=0;col<currColumn.length;col++){ 
+        if(currColumn[col] && (currColumn[col] as ICategoricalColumn).categories)
+        {
+          let currCategories = (currColumn[col] as ICategoricalColumn).categories;
+          for(let i=0; i<currCategories.length; i++){
+            if(currCategories[i].label === category){
+              color = currCategories[i].color;
+            }
           }
         }
       }
-  }
+    }
     
     // console.log('path.color: ',color);
     return color;

@@ -127,7 +127,7 @@ div.touring {
     .ribbon path { stroke-opacity: 0; fill-opacity: .5; }
     //.ribbon path.active { fill-opacity: .9; }
     .ribbon-mouse path { fill-opacity: 0; }
-    .ribbon path.selected { fill-opacity: .9; } //new
+    .ribbon path.selected { fill-opacity: .9 !important; } //new
     .category rect.selected { fill-opacity: .3; }
     .dimension:hover > rect.selcted { fill-opacity: .3; }
 
@@ -153,7 +153,8 @@ div.touring {
     .category-18 { fill: #dbdb8d; stroke: #dbdb8d; }
     .category-19 { fill: #9edae5; stroke: #9edae5; }
 
-    .category-gray { fill: #A9A9A9; stroke: #A9A9A9; }
+    .category-gray { fill: #A9A9A9 !important; stroke: #A9A9A9 !important; }
+    .category-selected { fill: #fba74d !important; stroke: #fba74d !important; }
 
     .tooltip {
       background-color: rgba(242, 242, 242, .6);
