@@ -100,7 +100,8 @@ export default class TourManager {
     </div>`;
 
     Array.from(this.chooser.querySelectorAll('.modal-body a')).forEach((a: HTMLElement) => {
-      a.onclick = () => {
+      a.onclick = (evt) => {
+        evt.preventDefault();
         const tour = this.tours.find((d) => d.name === a.dataset.name);
         this.showTour(tour);
       };
@@ -198,8 +199,7 @@ export default class TourManager {
       // center
       const bb = this.step.getBoundingClientRect();
       const parent = this.step.ownerDocument.body.getBoundingClientRect();
-      this.step.style.left = `${(parent.width / 2 - bb.width / 2)}px`;
-      this.step.style.top = `${(parent.height / 2 - bb.height / 2)}px`;
+      this.step.style.transform = `translate(${(parent.width / 2 - bb.width / 2)}px, ${(parent.height / 2 - bb.height / 2)}px)`;
     }
   }
 
@@ -219,6 +219,9 @@ export default class TourManager {
     if (this.stepPopper) {
       this.stepPopper.destroy();
       this.stepPopper = null;
+    }
+    if (this.activeTour) {
+      this.activeTour.reset();
     }
   }
 

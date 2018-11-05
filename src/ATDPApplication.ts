@@ -96,7 +96,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     super();
     this.tourManager = new TourManager(document);
     mixin(this.options, {
-      showHelpLink: this.tourManager.hasTours() ? 'tours' : '' // use help button for tours
+      showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
     }, options);
 
     this.build(document.body, {replaceBody: false});
@@ -105,6 +105,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
       button.dataset.toggle = 'modal';
       button.dataset.target = `#${this.tourManager.chooser.id}`;
+      button.onclick = (evt) => {
+        evt.preventDefault();
+      };
     }
   }
 
