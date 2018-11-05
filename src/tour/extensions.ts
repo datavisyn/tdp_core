@@ -20,4 +20,6 @@ export interface IStep {
   selector: string;
   html: string;
   placement?: Placement;
+  preAction?(): void | PromiseLike<any>;
+  postAction?(): void | PromiseLike<any>;
 }

@@ -30,8 +30,8 @@ export default class Tour {
     }
 
     context.steps(this.steps.length);
-    this.current = 0;
-    context.show(this.current, this.steps[this.current]);
+    return this.jumpTo(0, context);
+
   }
 
   private loadSteps() {
@@ -41,30 +41,37 @@ export default class Tour {
   }
 
   next(context: ITourContext) {
-    if (this.current >= this.steps.length - 1) {
-      this.current = -1;
-      context.hide();
-    } else {
-      context.show(++this.current, this.steps[this.current]);
-    }
+    return this.jumpTo(this.current + 1, context);
   }
 
-  jumpTo(step: number, context: ITourContext) {
+  async jumpTo(step: number, context: ITourContext) {
+    if (step === this.current) {
+      return;
+    }
+
+    if (this.current >= 0) {
+      const before = this.steps[this.current];
+      if (before.postAction) {
+        await before.postAction();
+      }
+    }
+
     if (step < 0 || step >= this.steps.length) {
       this.current = -1;
       context.hide();
-    } else {
-      context.show(this.current = step, this.steps[step]);
+      return;
     }
+
+    this.current = step;
+    const next = this.steps[this.current];
+    if (next.preAction) {
+      await next.preAction();
+    }
+    context.show(this.current, next);
   }
 
   previous(context: ITourContext) {
-    if (this.current <= 0) {
-      this.current = -1;
-      context.hide();
-    } else {
-      context.show(--this.current, this.steps[this.current]);
-    }
+    return this.jumpTo(this.current - 1, context);
   }
 }
 
