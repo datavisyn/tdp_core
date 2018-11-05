@@ -1,4 +1,5 @@
 import {IPlugin} from 'phovea_core/src/plugin';
+import {Placement} from 'popper.js';
 
 export const EXTENSION_POINT_TDP_TOUR = 'tdpTour';
 
@@ -18,4 +19,5 @@ export interface ITDPTourExtension {
 export interface IStep {
   selector: string;
   html: string;
+  placement?: Placement;
 }
