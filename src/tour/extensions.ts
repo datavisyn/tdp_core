@@ -17,7 +17,7 @@ export interface ITDPTourExtension {
 }
 
 export interface IStep {
-  selector: string;
+  selector?: string;
   html: string;
   placement?: Placement;
   preAction?(): void | PromiseLike<any>;

@@ -2,6 +2,7 @@ import {resolveTours, ITourContext} from './Tour';
 import Tour from './Tour';
 import {IStep} from './extensions';
 import Popper, {PopperOptions} from 'popper.js';
+import {tickStep} from 'd3-array';
 
 export default class TourManager {
 
@@ -178,13 +179,22 @@ export default class TourManager {
 
     if (this.stepPopper) {
       this.stepPopper.destroy();
+      this.stepPopper = null;
     }
     this.step.style.display = 'flex';
     const options: PopperOptions =  {};
     if (step.placement) {
       options.placement = step.placement;
     }
-    this.stepPopper = new Popper(focus, this.step, options);
+    if (focus) {
+      this.stepPopper = new Popper(focus, this.step, options);
+    } else {
+      // center
+      const bb = this.step.getBoundingClientRect();
+      const parent = this.step.ownerDocument.body.getBoundingClientRect();
+      this.step.style.left = `${(parent.width / 2 - bb.width / 2)}px`;
+      this.step.style.top = `${(parent.height / 2 - bb.height / 2)}px`;
+    }
   }
 
 
