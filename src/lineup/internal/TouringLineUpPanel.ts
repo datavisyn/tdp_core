@@ -219,16 +219,16 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
   private async getItemTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>> {
-    const data = new Array(attr2.reduce((sum, col) => sum += col.categories.length ,0)); // rows = number of categories
+    const data = new Array(attr2.reduce((sum, col) => sum += (col as ICategoricalColumnDesc).categories.length ,0)); // rows = number of categories
     for (let i of data.keys()) {
       data[i] = new Array(attr1.length + 2).fill(null) // containing n1+2 elements (headers + n1 vlaues)
     }
 
     let i = 0;
     for (let col of attr2) {
-        for (let cat of col.categories) {
+        for (let cat of (col as ICategoricalColumnDesc).categories) {
           data[i][0] = col.label;
-          data[i][1] = cat.label;
+          data[i][1] = (cat as ICategory).label;
           i++;
         }
     }
