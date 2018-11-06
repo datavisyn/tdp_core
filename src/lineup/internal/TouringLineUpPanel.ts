@@ -119,7 +119,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     await setTimeout( () => this.updateItemControls(), 0);
     //changing the radio button or the removing columns could create a different selection in the dropdowns
     //therefore the touring data will be updated
-    await setTimeout(() => this.updateItemScores(), 0);
+    await setTimeout(() => this.updateItemScoresOld(), 0);
   }
 
   private updateItemScores() {
@@ -839,7 +839,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgContainer = d3.select('#' + containerId).append('div')
       .attr('class', 'svg-container ' + containerId);
 
-    let width = Number(svgContainer.style('width').slice(0, -2)); //-20 because the scroll bar (15px) on the left is dynamically added
+    let width = Number(svgContainer.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
     let svgWidth = width - 25;
     let svgHeight = 175;
     let svg2DimLabelHeight = 45;
@@ -1055,19 +1055,19 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     
                                                   
-    let data = cell.dataVisRep.data;
+    let data = cell.dataVisRep.data.filter((item) => {return (item[0] === cell.tableColumn || item[0] === cell.category);});
     let min = cell.dataVisRep.min;
     let max = cell.dataVisRep.max;
     // console.log('BoxPlot: ',{data,min,max});
 
 
-    let containerWidth = Number(svgContainer.style('width').slice(0,-2));
+    let containerWidth = Number(svgContainer.style('width').slice(0,-2)) - 25; //-25 because of the scroll bar
 
     let calcWidth = Math.max(containerWidth,data.length * 50 + 30);
 
     let margin = {top: 5, right: 0, bottom: 50, left: 50};
     let  width = calcWidth - margin.left - margin.right;
-    let height = 200 - margin.top - margin.bottom;
+    let height = 220 - margin.top - margin.bottom;
 
     let chart = (d3 as any).box()
           .whiskers(function(d) {
@@ -1082,7 +1082,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           })
           .height(height)	
           .domain([min, max])
-          .showLabels(false);
+          .showLabels(true);
 
 
     let svgCanvas = svgContainer.append('svg')
@@ -1171,8 +1171,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                       }
                                     });
 
-    let rectElements = boxElements.selectAll('rect');
-
+    if(cell.dataVisRep.color)
+    {                                
+      let rectElements = boxElements.selectAll('rect').style('fill',cell.dataVisRep.color);         
+      let cirlceElements = boxElements.selectAll('circle').style('fill',cell.dataVisRep.color).style('stroke','black');              
+    }
 
     let cirlceElements = boxElements.selectAll('circle')
                                     .attr('r',2);
@@ -1287,34 +1290,37 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // creates data for the visual representation of boxplots
   private getDataValuesBoxplit(data: Array<any>, groups: Array<any>,tableHeader: Array<any>, column: any, category: any)
   {
-    // console.log('---- getColumnPartioning ----');
-    // console.log('getColumnPartioning.data',data);
-    // console.log('getColumnPartioning.tableHeader',tableHeader);
-    // console.log('getColumnPartioning.column',column);
+    console.log('---- getColumnPartioning ----');
+    console.log('getColumnPartioning.data',data);
+    console.log('getColumnPartioning.groups',groups);
+    console.log('getColumnPartioning.tableHeader',tableHeader);
+    console.log('getColumnPartioning.column',column);
+    console.log('getColumnPartioning.category',category);
     // let columnPartitioning = [];
     // let groups = this.ranking.getGroupedData();
     let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     let rowBoxData = [];
-    let min = Infinity;
-    let max = -Infinity;
-
+    // let min = Infinity;
+    // let max = -Infinity;
+    let min = column.domain[0];
+    let max = column.domain[1];
 
     let categoryBoxData = []
     if(optionDDA === 'Selection')
     {
       categoryBoxData.push(''+category.label);
-      // get the values of current category
       for(let g=0;g<groups.length;g++)
+      // get the values of current category
       {
         if(groups[g].name === category.label && (groups[g] as any).rows)
         {
-          let dataCategroy = (groups[g] as any).rows.map((a) => { return a[''+column.column]; });
-          let dataCategroyValid = dataCategroy.filter(Boolean);
+          let dataCategroy = (groups[g] as any).rows.map((a) => { return Number(a[''+column.column]); });
+          let dataCategroyValid = dataCategroy.filter(((item) => item !== undefined || item !== null));
 
           categoryBoxData.push(dataCategroyValid);
-          min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
-          max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
+          // min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
+          // max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
           
           rowBoxData.push(categoryBoxData);
         }
@@ -1341,18 +1347,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           {
             if(groups[g].name === currHeader.label && (groups[g] as any).rows)
             {
-              dataCurrentHeader = (groups[g] as any).rows.map((a) => a);
-            }else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
-            {
-              dataCurrentHeader = data;
-            }
+              dataCurrentHeader = (groups[g] as any).rows;
+            }//else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
+            // {
+            //   dataCurrentHeader = data;
+            // }
           }
         }
 
-        dataCurrentHeader = dataCurrentHeader.map((a) => { return a[''+column.column]; });  
-        let dataCurrentHeaderValid = dataCurrentHeader.filter(Boolean);
-        min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
-        max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
+        dataCurrentHeader = dataCurrentHeader.map((a) => { return Number(a[''+column.column]); });  
+        let dataCurrentHeaderValid = dataCurrentHeader.filter(((item) => item !== undefined || item !== null));
+        // min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
+        // max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
 
         // second elemnt is an array with all the values 
         currBoxData.push(dataCurrentHeaderValid);
@@ -1362,14 +1368,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
     }
  
-
+    const boxColor = column.color ? column.color : null;
     let rowBoxObj = {
+      color: boxColor,
       data: rowBoxData,
       min: min,
       max: max
     };
 
-    // console.log({rowBoxData , min, max});
+    console.log({rowBoxData , min, max});
 
     return rowBoxObj;
   }
