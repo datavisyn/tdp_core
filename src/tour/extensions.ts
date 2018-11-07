@@ -15,6 +15,11 @@ export interface ITDPTourExtensionDesc {
   // manual tours are only triggered on demand via event
   level?: 'beginner' | 'advanced' | 'manual';
 
+  /**
+   * condition whether this tour is available, can be a string = selector to match or a filter function
+   */
+  availableIf?: string | (() => boolean);
+
   load(): Promise<IPlugin & ITDPTourExtension>;
 }
 

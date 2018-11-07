@@ -27,8 +27,17 @@ export default class Tour {
     return this.desc.name;
   }
 
-  get level() {
-    return this.desc.level || 'beginner';
+  canBeListed() {
+    if (this.desc.level === 'manual') {
+      return false;
+    }
+    if (typeof this.desc.availableIf === 'string') {
+      return document.querySelector(this.desc.availableIf) != null;
+    }
+    if (typeof this.desc.availableIf === 'function') {
+      return this.desc.availableIf();
+    }
+    return true;
   }
 
   reset() {

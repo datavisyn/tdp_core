@@ -109,7 +109,7 @@ export default class TourManager {
             </div>
             <div class="modal-body">
               <ul class="fa-ul">
-                ${this.tours.filter((d) => d.level !== 'manual').map((d) => `<li data-id="${d.id}"><i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i><a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a></li>`).join('')}
+                ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}"><i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i><a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a></li>`).join('')}
               </ul>
             </div>
         </div>
@@ -140,7 +140,7 @@ export default class TourManager {
   }
 
   hasTours() {
-    return this.tours.some((a) => a.level !== 'manual');
+    return this.tours.some((d) => d.canBeListed());
   }
 
   private setHighlight(mask: { left: number, top: number, width: number, height: number }) {
