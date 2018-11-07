@@ -137,8 +137,8 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
   cacheResults: boolean;
 
   /**
-   * token separators
-   * @default /[\s;,]+/mg
+   * token separators, spaces, semicolon, colon but not preceded by a backslach
+   * @default /(?<!\\)[\s;,]+/mg
    */
   tokenSeparators?: RegExp;
 
@@ -195,7 +195,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     },
     equalValues: equalArrays,
     cacheResults: true,
-    tokenSeparators: /[\s;,]+/mg,
+    tokenSeparators: /(?<!\\)[\s;,]+/mg,
     defaultTokenSeparator: ' ',
     id: null,
     name: null
