@@ -208,7 +208,13 @@ export default class TourManager {
     this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]').innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
 
 
-    this.step.querySelector<HTMLElement>('.tdp-tour-step-content')!.innerHTML = step.html;
+    const content = this.step.querySelector<HTMLElement>('.tdp-tour-step-content')!;
+    if (typeof step.html === 'function') {
+      content.innerHTML = '';
+      step.html(content);
+    } else {
+      content.innerHTML = step.html;
+    }
 
     if (this.stepPopper) {
       this.stepPopper.destroy();

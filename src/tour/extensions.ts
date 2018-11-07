@@ -38,7 +38,7 @@ export interface IStepContext {
 
 export interface IStep {
   selector?: string;
-  html: string;
+  html: string | ((node: HTMLElement)=>void);
   placement?: Placement;
   preAction?(context: IStepContext): void | PromiseLike<any>;
   postAction?(context: IStepContext): void | PromiseLike<any>;
