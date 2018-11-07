@@ -1,9 +1,17 @@
 import {resolveTours, ITourContext} from './Tour';
 import Tour from './Tour';
-import {IStep} from './extensions';
+import {IStep, GLOBAL_EVENT_START_TOUR} from './extensions';
 import Popper, {PopperOptions} from 'popper.js';
+import {AppHeader} from 'phovea_ui/src/header';
+import {on} from 'phovea_core/src/event';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
+
+export interface ITourManagerContext {
+  doc: Document;
+  app(): Promise<any>; // the TDP App
+  header(): AppHeader;
+}
 
 export default class TourManager {
 
@@ -20,21 +28,25 @@ export default class TourManager {
   readonly chooser: HTMLElement;
 
   private readonly tours: Tour[];
+  private readonly tourContext: ITourContext;
   private activeTour: Tour | null = null;
-  private tourContext: ITourContext = {
-    steps: (count) => this.setSteps(count),
-    hide: (finished?: boolean) => this.hideTour(finished),
-    show: (stepNumber, step) => this.showStep(stepNumber, step)
-  };
+  private activeTourContext: ITourContext | null = null;
 
-  constructor(doc = document) {
-    this.backdrop = doc.createElement('div');
+  constructor(context: ITourManagerContext) {
+    this.tourContext = {
+      app: context.app,
+      header: context.header,
+      steps: (count) => this.setSteps(count),
+      hide: (finished?: boolean) => this.hideTour(finished),
+      show: (stepNumber, step) => this.showStep(stepNumber, step)
+    };
+    this.backdrop = context.doc.createElement('div');
     this.backdrop.classList.add('tdp-tour-backdrop');
     this.backdrop.innerHTML = `<div></div>`;
     this.backdrop.onclick = () => {
       this.hideTour();
     };
-    this.step = doc.createElement('div');
+    this.step = context.doc.createElement('div');
     this.step.classList.add('tdp-tour-step');
     this.step.dataset.step = '0';
       this.step.innerHTML = `
@@ -61,26 +73,26 @@ export default class TourManager {
         }
         switch(button.dataset.switch) {
         case '--':
-          this.activeTour.jumpTo(0, this.tourContext);
+          this.activeTour.jumpTo(0, this.activeTourContext);
           break;
         case '-':
-          this.activeTour.previous(this.tourContext);
+          this.activeTour.previous(this.activeTourContext);
           break;
         case '0':
           this.hideTour();
           break;
         default:
-          this.activeTour.next(this.tourContext);
+          this.activeTour.next(this.activeTourContext);
           break;
         }
       };
     });
 
-    this.stepCount = doc.createElement('div');
+    this.stepCount = context.doc.createElement('div');
     this.stepCount.classList.add('tdp-tour-step-count');
 
     this.tours = resolveTours();
-    this.chooser = doc.createElement('div');
+    this.chooser = context.doc.createElement('div');
     this.chooser.classList.add('modal', 'fade');
     this.chooser.tabIndex = -1;
     this.chooser.setAttribute('role', 'dialog');
@@ -97,7 +109,7 @@ export default class TourManager {
             </div>
             <div class="modal-body">
               <ul class="fa-ul">
-                ${this.tours.map((d) => `<li data-id="${d.id}"><i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i><a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a></li>`).join('')}
+                ${this.tours.filter((d) => d.level !== 'manual').map((d) => `<li data-id="${d.id}"><i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i><a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a></li>`).join('')}
               </ul>
             </div>
         </div>
@@ -115,10 +127,20 @@ export default class TourManager {
     document.body.appendChild(this.step);
     document.body.appendChild(this.stepCount);
     document.body.appendChild(this.chooser);
+
+    // listen to events
+    on(GLOBAL_EVENT_START_TOUR, (_, tourId) => {
+      const tour = this.tours.find((d) => d.id === tourId);
+      if (tour) {
+        this.showTour(tour);
+      } else {
+        console.warn('invalid tour to start:', tourId, this.tours.map((d) => d.id));
+      }
+    });
   }
 
   hasTours() {
-    return this.tours.length > 0;
+    return this.tours.some((a) => a.level !== 'manual');
   }
 
   private setHighlight(mask: { left: number, top: number, width: number, height: number }) {
@@ -166,7 +188,7 @@ export default class TourManager {
         if (!this.activeTour) {
           return;
         }
-        this.activeTour.jumpTo(parseInt(button.dataset.step, 10), this.tourContext);
+        this.activeTour.jumpTo(parseInt(button.dataset.step, 10), this.activeTourContext);
       };
     });
   }
@@ -245,10 +267,11 @@ export default class TourManager {
     }
   }
 
-  showTour(tour: Tour) {
+  showTour(tour: Tour, context: any = {}) {
     this.activeTour = tour;
+    this.activeTourContext = Object.assign({}, context, this.tourContext);
     this.setUp();
-    this.activeTour.start(this.tourContext);
+    this.activeTour.start(this.activeTourContext);
   }
 
   hideTour(finished: boolean = false) {
@@ -261,6 +284,7 @@ export default class TourManager {
       finished.classList.add('fa-check-square');
     }
     this.activeTour = null;
+    this.activeTourContext = null;
   }
 
   private rememberFinished(tour: Tour) {

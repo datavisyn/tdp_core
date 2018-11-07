@@ -273,6 +273,11 @@ export interface IViewPluginDesc extends IPluginDesc {
   helpText?: string;
 
   /**
+   * a tour id to start a tour
+   */
+  helpTourId?: string;
+
+  /**
    * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
    * @default false
    */

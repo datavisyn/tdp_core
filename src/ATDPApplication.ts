@@ -94,7 +94,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
-    this.tourManager = new TourManager(document);
+    this.tourManager = new TourManager({
+      doc: document,
+      header: () => this.header,
+      app: () => this.app
+    });
     mixin(this.options, {
       showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
     }, options);

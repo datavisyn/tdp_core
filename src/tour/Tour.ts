@@ -1,7 +1,10 @@
 import {list} from 'phovea_core/src/plugin';
 import {EXTENSION_POINT_TDP_TOUR, ITDPTourExtensionDesc, IStep} from './extensions';
+import {AppHeader} from 'phovea_ui/src/header';
 
 export interface ITourContext {
+  app(): Promise<any>; // the TDP app
+  header(): AppHeader;
   steps(count: number): void;
   show(stepNumber: number, step: IStep): void;
   hide(finished?: boolean): void;
@@ -22,6 +25,10 @@ export default class Tour {
 
   get name() {
     return this.desc.name;
+  }
+
+  get level() {
+    return this.desc.level || 'beginner';
   }
 
   reset() {
@@ -56,7 +63,7 @@ export default class Tour {
     if (this.current >= 0) {
       const before = this.steps[this.current];
       if (before.postAction) {
-        await before.postAction();
+        await before.postAction(context);
       }
     }
 
@@ -69,7 +76,7 @@ export default class Tour {
     this.current = step;
     const next = this.steps[this.current];
     if (next.preAction) {
-      await next.preAction();
+      await next.preAction(context);
     }
     context.show(this.current, next);
   }
