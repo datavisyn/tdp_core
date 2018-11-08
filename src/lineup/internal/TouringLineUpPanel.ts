@@ -887,8 +887,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             parSetData.push(pSDOtherCategory);
           }
 
-
-
           // let newData = {};
           // newData['value'] = headerPart[p].intersectionAmount;
           // newData[dimension1] = cell.category === categoryLabel ? categoryLabel : 'Others';
@@ -905,8 +903,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     }
     console.log('ParSets - data: ', parSetData);
-
-
     const that = this;
 
     // console.log('SVG Conatiner - width: ',width);
@@ -915,7 +911,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .dimensions([dimension1, dimension2])
       .value(function (d) {return d.value;})
       .width(svgWidth)
-      .height(svgHeight);
+      .height(svgHeight)
+      .on('sortCategories',() => (this.sortCategoryParSetsListener.bind(that)(that, cell.category, '.svg-container.' + containerId)))
+      .on('sortDimensions',() => (this.sortDimensionParSetsListener.bind(that)(that, dimension1, cell.category, cell.tableColumn, '.svg-container.' + containerId)));
 
     let svgCanvas = svgContainer.append('svg')
       .attr('width', chart.width())
@@ -934,89 +932,149 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //rotation um 90 von den SVG parallel sets
     //svgFigureGroup.attr('transform','rotate(-90) translate(-'+width+',0)');
 
-    let svgRibbon = svgFigureGroup.selectAll('g[class=ribbon]');
-    // console.log('svgRibon: ',svgRibbon);
+    let svgRibbons = svgFigureGroup.selectAll('g.ribbon');
+    // console.log('svgRibon: ',svgRibbons);
 
+    //highlight and color ribbons
+    this.highlightAndColorParSetsRibbons(this, svgRibbons, dimension1, cell.category, cell.tableColumn);
+
+
+    //move label dimensions underneath parallel sets
+    let svgDimensions = svgFigureGroup.selectAll('g.dimension');
+    this.moveParSetsDimensionLabels(svgDimensions);
+
+    //highlight label of current path
+    this.highlightParSetsSelectedLabel(this, svgDimensions, cell.category);
+  }
+ 
+  // highlights the backgroud colour of the label of the selected category in parallel sets vis
+  private highlightParSetsSelectedLabel(that, svgDimensions: d3.Selection<any>, category: string)
+  {
+    console.log('highlight dimension labels: ', {svgDimensions, category});
+
+    //highlight label of current path
+    svgDimensions.selectAll('g')
+    .each(function (d) {
+      // console.log('dim.g.d: ',d);
+      // console.log('dim.g.this: ',d3.select(this));
+
+      //unhiglight all rect for labels
+      d3.select(this).select('rect').classed('selected', false);
+    
+      //highlight rect of label for the selected category
+      if (d.name === category) {
+        d3.select(this).select('rect').classed('selected', true);
+        if (that.getRadioButtonValue() === 'category'){
+          let color = that.getColorOfCategory(d.dimension.name.slice(0,-1), d.name);
+          if (color !== null) {
+            d3.select(this).select('rect').style('fill', color);
+          }
+        }else{
+          d3.select(this).select('rect').style('fill', '#fba74d');
+        }
+      }
+
+    });  
+  }
+
+  // sets the ribbon color and highlights the selected on in the parallel sets vis
+  private highlightAndColorParSetsRibbons(that, svgRibbons: d3.Selection<any>, dimensionName: string, category: string, tableColumn: string)
+  {
+    console.log('highlight and color ribbons: ', {svgRibbons, dimensionName, category, tableColumn});
     //highlight current path
-    let svgPaths = svgRibbon.selectAll('path')
+    let svgPaths = svgRibbons.selectAll('path')
       .each(function (d) {
         d3.select(this).classed('selected', false);
 
-        if (d.parent.name === cell.category && d.name === cell.tableColumn) {
+        //the path between the selected row and column will be marked as selected (higher opacity)
+        if ((d.parent.name === category && d.node.name === tableColumn) || (d.parent.name === tableColumn && d.node.name === category)) {
           d3.select(this).classed('selected', true);
         }
 
         if (that.getRadioButtonValue() === 'category') {
-          let color = that.getColorOfCategory(d.parent.dimension.slice(0,-1), d.parent.name);
-          if (color !== null) {
-            d3.select(this).style('fill', color);
-            d3.select(this).style('stroke', color);
-          }
-          if(d.parent.name === 'Others') {
+          //all paths connected to the category of the dimension will be coloured in category's color
+          if((d.parent.dimension === dimensionName && d.parent.name === category) || (d.node.dimension === dimensionName && d.node.name === category)){
+            let color = that.getColorOfCategory(dimensionName.slice(0,-1), category);
+            if (color !== null) {
+              d3.select(this).style('fill', color);
+              d3.select(this).style('stroke', color);
+            }
+          }else{
             d3.select(this).attr('class','category-gray');
           }
         }else{
-          d3.select(this).classed('category-selected',true);
-          if(d.parent.name === 'Others') {
+          d3.select(this).classed('category-selected',true); //make all selected
+          if((d.parent.name === 'Others' && d.node.name !== category) || (d.node.name === 'Others' && d.parent.name !== category)) {
+            //only the path between others and not the current category are coloured gray
             d3.select(this).classed('category-selected',false);
             d3.select(this).classed('category-gray',true);
           }
         }
         // console.log('path.this: ', d3.select(this));
-        console.log('path.d: ',d);
-      });
-    // console.log('svgPaths: ',svgPaths);
-
-    let svgDimensions = svgFigureGroup.selectAll('g.dimension')
-      .each(function (d) {
-        // console.log('dim.d: ',d);
-        // console.log('dim.this: ',d3.select(this));
-
-        //move 2. dimension underneath the parallel sets
-        if(d.name === dimension2)
-        {
-          const currTransform = d3.select(this).attr('transform').split(',');
-          const currTransformX = Number(currTransform[0].split('(')[1]);
-          // const currTransformY = Number(currTransform[1].slice(0,-1));
-          // console.log('dim.d.transform: ',{currTransform, currTransformX, currTransformY});
-
-          // //dimension label
-          d3.select(this).select('rect').attr('transform',`translate(${currTransformX},40)`);
-          d3.select(this).select('text').attr('transform',`translate(${currTransformX},40)`);
-          
-          // //category labels
-          let categoryLabel = d3.select(this).selectAll('g');
-          categoryLabel.selectAll('rect').attr('transform',`translate(${currTransformX},20)`);
-          categoryLabel.selectAll('text').attr('transform',`translate(${currTransformX},20)`);
-        }
-    });
-    // console.log('svgDimensions',svgDimensions);
-
-    //highlight label of current path
-    svgDimensions.selectAll('g')
-      .each(function (d) {
-        // console.log('dim.g.d: ',d);
-        // console.log('dim.g.this: ',d3.select(this));
-
-        //deselect all bands
-        d3.select(this).select('rect').classed('selected', false);
-       
-        //select click band
-        if (d.name === cell.category) {
-          d3.select(this).select('rect').classed('selected', true);
-          if (that.getRadioButtonValue() === 'category'){
-            let color = that.getColorOfCategory(d.dimension.name.slice(0,-1), d.name);
-            if (color !== null) {
-              d3.select(this).select('rect').style('fill', color);
-            }
-          }else{
-            d3.select(this).select('rect').style('fill', '#fba74d');
-          }
-        }
-
+        // console.log('path.d: ',d);
       });
   }
- 
+
+  // moves the label of the second dimension underneath the parralel sets vis
+  private moveParSetsDimensionLabels(svgDimensions: d3.Selection<any>)
+  {
+    console.log('move dimension labels: ', {svgDimensions});
+
+    // parameters for the dimension translation
+    const dimensionTranslate = [-25,40];
+    const categoryTranslate = [0,20];
+    let index = 0;
+
+    svgDimensions.each(function (d) {
+      // console.log('dim.d: ',d);
+      // console.log('dim.this: ',d3.select(this));
+       
+      //identifiy the current dimension
+      if(d.y === 45){
+        index = 0;
+      }else{
+        index = 1;
+      }
+
+      const currTransform = d3.select(this).attr('transform').split(',');
+      const currTransformX = Number(currTransform[0].split('(')[1]);
+
+      // //dimension label
+      d3.select(this).select('rect').attr('transform',`translate(${currTransformX},${dimensionTranslate[index]})`);
+      d3.select(this).select('text').attr('transform',`translate(${currTransformX},${dimensionTranslate[index]})`);
+      
+      // //category labels
+      let categoryLabel = d3.select(this).selectAll('g');
+      categoryLabel.selectAll('rect').attr('transform',`translate(${currTransformX},${categoryTranslate[index]})`);
+      categoryLabel.selectAll('text').attr('transform',`translate(${currTransformX},${categoryTranslate[index]})`);
+    });
+  }
+
+  // method is called when categories are rearranged in the parallel sets vis
+  private sortCategoryParSetsListener(that, category: string, svgElement: string)
+  {
+    console.log('"sortCategoryParSetsListener" was activated: ', {category,svgElement});
+
+    let svgDimensions = d3.selectAll('div'+svgElement).selectAll('g.parSets').selectAll('g.dimension');
+    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+
+  }
+
+  // method is called when dimensions are rearranged in the parrallel sets vis
+  private sortDimensionParSetsListener(that, dimensionName: string, category: string, tableColumn: string, svgElement: string)
+  {
+    console.log('"sortDimensionParSetsListener" was activated: ', {dimensionName,category,tableColumn,svgElement});
+    
+    let svgParSets = d3.selectAll('div'+svgElement).selectAll('g.parSets');
+
+    let svgDimensions = svgParSets.selectAll('g.dimension');
+    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+    this.moveParSetsDimensionLabels(svgDimensions);
+
+    let svgRibbons = svgParSets.selectAll('g.ribbon');
+    this.highlightAndColorParSetsRibbons(that, svgRibbons, dimensionName, category, tableColumn);
+  }
+
   // creates boxplot visualization (for student-test, mwu-test)
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
@@ -1033,25 +1091,25 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                     .classed('detailVis',true);
 
     // let detailTestType = divDetailInfo.append('div');
-    divDetailInfo.append('div')
-                  .classed('detailDiv',true)
-                  .text('Test: ')
-                  .append('span')
-                  .text('[TestName]');
+    // divDetailInfo.append('div')
+    //               .classed('detailDiv',true)
+    //               .text('Test: ')
+    //               .append('span')
+    //               .text('[TestName]');
 
-    // let detailTestValue = divDetailInfo.append('div');
-    divDetailInfo.append('div')
-                .classed('detailDiv',true)
-                .text('Test-Value/p-Value: ')
-                .append('span')
-                .text('[Value]/[p-Value]');  
+    // // let detailTestValue = divDetailInfo.append('div');
+    // divDetailInfo.append('div')
+    //             .classed('detailDiv',true)
+    //             .text('Test-Value/p-Value: ')
+    //             .append('span')
+    //             .text('[Value]/[p-Value]');  
 
-    // let detailTestDescr = divDetailInfo.append('div');
-    divDetailInfo.append('div')
-                  .classed('detailDiv',true)
-                  .text('Description: ')
-                  .append('span')
-                  .text('[Description]');    
+    // // let detailTestDescr = divDetailInfo.append('div');
+    // divDetailInfo.append('div')
+    //               .classed('detailDiv',true)
+    //               .text('Description: ')
+    //               .append('span')
+    //               .text('[Description]');    
     
     
                                                   

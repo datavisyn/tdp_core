@@ -122,14 +122,14 @@ div.touring {
     .dimension rect { stroke: none; fill-opacity: 0; }
     .dimension > rect, .category-background { fill: #fff; }
     .dimension > rect { display: none; }
-    //.category:hover rect { fill-opacity: .3; }
-    //.dimension:hover > rect { fill-opacity: .3; }
-    .ribbon path { stroke-opacity: 0; fill-opacity: .5; }
+    // .category:hover rect { fill-opacity: .3; }
+    // .dimension:hover > rect { fill-opacity: .3; }
+    svg .parSets .ribbon path { stroke-opacity: 0; fill-opacity: .5; }
     //.ribbon path.active { fill-opacity: .9; }
-    .ribbon-mouse path { fill-opacity: 0; }
+    .ribbon-mouse path { fill-opacity: 0; stroke: none; }
     .ribbon path.selected { fill-opacity: .9 !important; } //new
-    .category rect.selected { fill-opacity: .3; }
-    .dimension:hover > rect.selcted { fill-opacity: .3; }
+    .category rect.selected { fill-opacity: .3; } //new
+    .dimension:hover > rect.selcted { fill-opacity: .3; } //new
 
     // predefined colours
     .category-0 { fill: #1f77b4; stroke: #1f77b4; }
@@ -153,7 +153,7 @@ div.touring {
     .category-18 { fill: #dbdb8d; stroke: #dbdb8d; }
     .category-19 { fill: #9edae5; stroke: #9edae5; }
 
-    .category-gray { fill: #A9A9A9 !important; stroke: #A9A9A9 !important; }
+    .category-gray { fill: #808080 !important; stroke: #808080 !important; }
     .category-selected { fill: #fba74d !important; stroke: #fba74d !important; }
 
     .tooltip {
