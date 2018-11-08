@@ -836,6 +836,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container ' + containerId + '"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
 
+    // delete old tooltip
+    let tooltipParSets = d3.select("body").selectAll("div.parsets.tooltip").remove();
+
     let svgContainer = d3.select('#' + containerId).append('div')
       .attr('class', 'svg-container ' + containerId);
 

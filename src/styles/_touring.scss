@@ -9,6 +9,13 @@ button.touring.active::before {
   border: none;
 }
 
+.tooltip {
+  background-color: rgba(242, 242, 242, .6);
+  position: absolute;
+  padding: 5px;	
+  opacity: 1;
+}
+
 div.touring {
   margin-top: 0.5em;
   overflow-y: auto;
@@ -156,11 +163,7 @@ div.touring {
     .category-gray { fill: #808080 !important; stroke: #808080 !important; }
     .category-selected { fill: #fba74d !important; stroke: #fba74d !important; }
 
-    .tooltip {
-      background-color: rgba(242, 242, 242, .6);
-      position: absolute;
-      padding: 5px;
-    }
+    
 
     // ------ boxplot with D3
     g.box-element text {
