@@ -2,6 +2,7 @@ import * as $ from 'jquery';
 import {debounce} from 'phovea_core/src';
 import {EventHandler} from 'phovea_core/src/event';
 import 'select2';
+import {thresholdFreedmanDiaconis} from 'd3-array';
 
 export interface IdTextPair {
   id: string;
@@ -265,6 +266,18 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     if (this.options.validate && this.options.dropable) {
       this.dropFile(<HTMLElement>this.node.querySelector('.select2-container'));
     }
+
+    this.$select.find('input.select2-search__field').on('paste', (evt) => {
+      // see https://jsfiddle.net/GertG/99t5d5vf/
+      // the browser normalizes copy-paste data by its own but to avoid that we do it ourselves
+      const value = (<ClipboardEvent>evt.originalEvent).clipboardData.getData('Text');
+      if (!value) {
+        return;
+      }
+      const data = splitEscaped(value, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
+      this.setSearchQuery(data);
+      return false;
+    });
   }
 
   setSearchQuery(value: string) {
