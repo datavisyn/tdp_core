@@ -950,7 +950,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // highlights the backgroud colour of the label of the selected category in parallel sets vis
   private highlightParSetsSelectedLabel(that, svgDimensions: d3.Selection<any>, category: string)
   {
-    console.log('highlight dimension labels: ', {svgDimensions, category});
+    // console.log('highlight dimension labels: ', {svgDimensions, category});
 
     //highlight label of current path
     svgDimensions.selectAll('g')
@@ -980,7 +980,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // sets the ribbon color and highlights the selected on in the parallel sets vis
   private highlightAndColorParSetsRibbons(that, svgRibbons: d3.Selection<any>, dimensionName: string, category: string, tableColumn: string)
   {
-    console.log('highlight and color ribbons: ', {svgRibbons, dimensionName, category, tableColumn});
+    // console.log('highlight and color ribbons: ', {svgRibbons, dimensionName, category, tableColumn});
     //highlight current path
     let svgPaths = svgRibbons.selectAll('path')
       .each(function (d) {
@@ -1018,7 +1018,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   // moves the label of the second dimension underneath the parralel sets vis
   private moveParSetsDimensionLabels(svgDimensions: d3.Selection<any>)
   {
-    console.log('move dimension labels: ', {svgDimensions});
+    // console.log('move dimension labels: ', {svgDimensions});
 
     // parameters for the dimension translation
     const dimensionTranslate = [-25,40];
@@ -1327,15 +1327,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           const {intersection: intersect} = intersection(dataIdCurrCategory.map((a) => a[currAttribute]), dataIdCurrentHeader.map((a) => a[currAttribute]));
           const numHeader = intersect.length;
           
-          if (numHeader > 0) {
-            const currCatForHead = {
-              label: currHeader.label,
-              intersectionAmount: numHeader,
-              currHeaderAmount: currHeaderNum
-            };
+          const currCatForHead = {
+            label: currHeader.label,
+            intersectionAmount: numHeader,
+            currHeaderAmount: currHeaderNum
+          };
 
-            currCategoryParts.parts.push(currCatForHead);
-          }
+          currCategoryParts.parts.push(currCatForHead);
         }
       }
 
