@@ -120,7 +120,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     await setTimeout( () => this.updateItemControls(), 0);
     //changing the radio button or the removing columns could create a different selection in the dropdowns
     //therefore the touring data will be updated
-    await setTimeout(() => this.updateItemScores(), 0);
+    await setTimeout(() => this.updateItemScoresOld(), 0);
   }
 
   private updateItemScores() {
@@ -213,7 +213,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
   
   
-  private async getTableBody(colData: any[], rowData: any[], )
 
   /**
    * async: return promise
@@ -222,18 +221,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
   private async getItemTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>> {
-    const data = new Array(attr2.reduce((sum, col:any) => sum += col.categories.length ,0)); // rows = number of categories
+    const data = new Array(attr2.reduce((sum, col) => sum += (col as ICategoricalColumnDesc).categories.length ,0)); // rows = number of categories
     for (let i of data.keys()) {
       data[i] = new Array(attr1.reduce((sum, col:any) => sum += col.categories.length ,0) + 2).fill(null) // containing n1+2 elements (headers + n1 vlaues)
     }
 
     let rowIndex = 0;
     for (let col of attr2) {
-      for (let cat of (col as any).categories) {
-        data[rowIndex][0] = col.label;
-        data[rowIndex][1] = cat.label;
-        rowIndex++;
-      }
+        for (let cat of (col as ICategoricalColumnDesc).categories) {
+          data[rowIndex][0] = col.label;
+          data[rowIndex][1] = (cat as ICategory).label;
+          rowIndex++;
+        }
     }
 
     if (scaffold) {
@@ -547,14 +546,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private insertMeasure(measure: ISimilarityMeasure, collapseId: string, currentData: Array<any>) {
-
     this.generateMeasureTable(collapseId, measure , currentData);
-
   }
 
   // --------- DATA TABLE LAYOUT ---
   //generates a object, which contains the table head and table body
-  private generateTableLayout(data: Array<any>, measure: ISimilarityMeasure)
+  private async generateTableLayout(data: Array<any>, measure: ISimilarityMeasure)
   {
     let generatedTable = {
       tableHead: [],
@@ -565,7 +562,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     generatedTable.tableHead = this.getTableHeader();
 
     // TABLE BODY 
-    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data, measure);
+    generatedTable.tableBody  = await this.getTableBody(generatedTable.tableHead, data, measure);
 
     
     // console.log('generateTableLayout: ',generatedTable);
@@ -619,7 +616,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //generate table body depending on table head and radio button option
-  private getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
+  private async getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
   {
     let tableBody = [];
 
@@ -630,9 +627,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     console.groupCollapsed(`TableBody - ${measure.id}`);
     console.time(`time TableBody - ${measure.id}`);
-    for(let i=0; i<chosenColumns.length; i++)
-    {
-      let currCol = chosenColumns[i];
+    for (const currCol of chosenColumns) {
       let colCategories = new Set(); 
       const mode = this.getRadioButtonValue();
       if (mode === 'category') {
@@ -646,8 +641,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.label));
       
-      currCatAfterFilter.forEach((category, i) => {
-        
+      //for (const category of currCatAfterFilter) {
+      for (const [catIndex, category] of currCatAfterFilter.entries()) { // for...of because of the await below (doesn't work in foreach () =>  ...)
         let tableRow = {};
         // console.groupCollapsed(`VisualRep - col:${currCol.label}(cat:${currCategory.label})`);
         // console.time(`Time - VisualRep col:${currCol.label}(cat:${currCategory.label})`);
@@ -663,7 +658,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           {
             tableRow[colName] = {
               label: currCol.label,
-              rowspan: (i === 0) ? currCatAfterFilter.length : 0              
+              rowspan: (catIndex === 0) ? currCatAfterFilter.length : 0              
             };
 
           }
@@ -679,7 +674,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             // const headerLabel = ((tableHeader[col] as any).label as string);
             // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
-            const score = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
+            const score = await this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
             // console.timeEnd(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.groupEnd();
             tableRow[colName] = {
@@ -697,7 +692,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         
         tableBody.push(tableRow);
         tableRow = {};
-      });
+      }
     }
     
     console.timeEnd(`time TableBody - ${measure.id}`); 
@@ -708,9 +703,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- TABLE GENERATION D3 ---
   // create table in container and depending on dataTable with D3
-  private generateMeasureTable(containerId: string, measure: ISimilarityMeasure, currentData: Array<any>)
+  private async generateMeasureTable(containerId: string, measure: ISimilarityMeasure, currentData: Array<any>)
   {
-    const dataTable = this.generateTableLayout(currentData, measure);
+    const dataTable = await this.generateTableLayout(currentData, measure);
     const that = this;
 
     // create a <div> as table container with D3
@@ -830,8 +825,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const categorySet = dataSets.categorySet.map((item) => item[columnB]);
 
 
-    console.log('selectionSet', selectionSet);
-    console.log('categorySet', categorySet);
+    // console.log('selectionSet', selectionSet);
+    // console.log('categorySet', categorySet);
 
 
     return measure.calc(selectionSet, categorySet)
@@ -846,10 +841,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container ' + containerId + '"]');
     oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
 
+    // delete old tooltip
+    let tooltipParSets = d3.select("body").selectAll("div.parsets.tooltip").remove();
+
     let svgContainer = d3.select('#' + containerId).append('div')
       .attr('class', 'svg-container ' + containerId);
 
-    let width = Number(svgContainer.style('width').slice(0, -2)); //-20 because the scroll bar (15px) on the left is dynamically added
+    let width = Number(svgContainer.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
     let svgWidth = width - 25;
     let svgHeight = 175;
     let svg2DimLabelHeight = 45;
@@ -869,18 +867,50 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       let headerPart = colPart[i].parts;
       let categoryLabel = colPart[i].categoryLabel;
 
+
       for (let p = 0; p < headerPart.length; p++) {
-        let newData = {};
-        newData[dimension1] = categoryLabel;
-        newData[dimension2] = headerPart[p].label;
-        newData['value'] = headerPart[p].amount;
-        parSetData.push(newData);
+        if(cell.category === categoryLabel && cell.tableColumn === headerPart[p].label)
+        {
+          let pSDIntersection = {};
+          pSDIntersection['value'] = headerPart[p].intersectionAmount;
+          pSDIntersection[dimension1] = categoryLabel;
+          pSDIntersection[dimension2] = headerPart[p].label;
+          if((pSDIntersection as any).value > 0){
+            parSetData.push(pSDIntersection);
+          }
+
+          let pSDCategoryOther = {};
+          pSDCategoryOther['value'] = colPart[i].categoryAmount - headerPart[p].intersectionAmount;
+          pSDCategoryOther[dimension1] = categoryLabel;
+          pSDCategoryOther[dimension2] = 'Others';
+          if((pSDCategoryOther as any).value > 0){
+            parSetData.push(pSDCategoryOther);
+          }
+
+          let pSDOtherCategory = {};
+          pSDOtherCategory['value'] = headerPart[p].currHeaderAmount - headerPart[p].intersectionAmount;
+          pSDOtherCategory[dimension1] = 'Others';
+          pSDOtherCategory[dimension2] = headerPart[p].label;
+          if((pSDOtherCategory as any).value > 0){
+            parSetData.push(pSDOtherCategory);
+          }
+
+          // let newData = {};
+          // newData['value'] = headerPart[p].intersectionAmount;
+          // newData[dimension1] = cell.category === categoryLabel ? categoryLabel : 'Others';
+          // newData[dimension2] = cell.tableColumn === headerPart[p].label ? headerPart[p].label : 'Others';
+          // //keep current row and column at the first position
+          // if(cell.category === categoryLabel){
+          //   parSetData.unshift(newData);
+          // }else
+          // {
+          //   parSetData.push(newData);
+          // }
+        }
       }
 
     }
-    // console.log('ParSets - data: ', parSetData);
-
-
+    console.log('ParSets - data: ', parSetData);
     const that = this;
 
     // console.log('SVG Conatiner - width: ',width);
@@ -889,7 +919,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .dimensions([dimension1, dimension2])
       .value(function (d) {return d.value;})
       .width(svgWidth)
-      .height(svgHeight);
+      .height(svgHeight)
+      .on('sortCategories',() => (this.sortCategoryParSetsListener.bind(that)(that, cell.category, '.svg-container.' + containerId)))
+      .on('sortDimensions',() => (this.sortDimensionParSetsListener.bind(that)(that, dimension1, cell.category, cell.tableColumn, '.svg-container.' + containerId)));
 
     let svgCanvas = svgContainer.append('svg')
       .attr('width', chart.width())
@@ -908,74 +940,149 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     //rotation um 90 von den SVG parallel sets
     //svgFigureGroup.attr('transform','rotate(-90) translate(-'+width+',0)');
 
-    let svgRibbon = svgFigureGroup.selectAll('g[class=ribbon]');
-    // console.log('svgRibon: ',svgRibbon);
+    let svgRibbons = svgFigureGroup.selectAll('g.ribbon');
+    // console.log('svgRibon: ',svgRibbons);
 
-    //highlight current path
-    let svgPaths = svgRibbon.selectAll('path')
-      .each(function (d) {
-        d3.select(this).classed('selected', false);
+    //highlight and color ribbons
+    this.highlightAndColorParSetsRibbons(this, svgRibbons, dimension1, cell.category, cell.tableColumn);
 
-        if (d.parent.name === cell.category && d.name === cell.tableColumn) {
-          d3.select(this).classed('selected', true);
-        }
 
-        let color = that.getColorOfCategory(d.parent.dimension.slice(0,-1), d.parent.name);
-        if (color !== null) {
-          d3.select(this).style('fill', color);
-          d3.select(this).style('stroke', color);
-        }
-        // console.log('path.this: ', d3.select(this));
-        // console.log('path.d: ',d);
-      });
-    // console.log('svgPaths: ',svgPaths);
+    //move label dimensions underneath parallel sets
+    let svgDimensions = svgFigureGroup.selectAll('g.dimension');
+    this.moveParSetsDimensionLabels(svgDimensions);
 
-    let svgDimensions = svgFigureGroup.selectAll('g.dimension')
-      .each(function (d) {
-        // console.log('dim.d: ',d);
-        // console.log('dim.this: ',d3.select(this));
-
-        //move 2. dimension underneath the parallel sets
-        if(d.name === dimension2)
-        {
-          const currTransform = d3.select(this).attr('transform').split(',');
-          const currTransformX = Number(currTransform[0].split('(')[1]);
-          // const currTransformY = Number(currTransform[1].slice(0,-1));
-          // console.log('dim.d.transform: ',{currTransform, currTransformX, currTransformY});
-
-          // //dimension label
-          d3.select(this).select('rect').attr('transform',`translate(${currTransformX},40)`);
-          d3.select(this).select('text').attr('transform',`translate(${currTransformX},40)`);
-          
-          // //category labels
-          let categoryLabel = d3.select(this).selectAll('g');
-          categoryLabel.selectAll('rect').attr('transform',`translate(${currTransformX},20)`);
-          categoryLabel.selectAll('text').attr('transform',`translate(${currTransformX},20)`);
-        }
-    });
-    // console.log('svgDimensions',svgDimensions);
+    //highlight label of current path
+    this.highlightParSetsSelectedLabel(this, svgDimensions, cell.category);
+  }
+ 
+  // highlights the backgroud colour of the label of the selected category in parallel sets vis
+  private highlightParSetsSelectedLabel(that, svgDimensions: d3.Selection<any>, category: string)
+  {
+    // console.log('highlight dimension labels: ', {svgDimensions, category});
 
     //highlight label of current path
     svgDimensions.selectAll('g')
-      .each(function (d) {
-        // console.log('dim.g.d: ',d);
-        // console.log('dim.g.this: ',d3.select(this));
+    .each(function (d) {
+      // console.log('dim.g.d: ',d);
+      // console.log('dim.g.this: ',d3.select(this));
 
-        //deselect all bands
-        d3.select(this).select('rect').classed('selected', false);
-       
-        //select click band
-        if (d.name === cell.category) {
-          d3.select(this).select('rect').classed('selected', true);
+      //unhiglight all rect for labels
+      d3.select(this).select('rect').classed('selected', false);
+    
+      //highlight rect of label for the selected category
+      if (d.name === category) {
+        d3.select(this).select('rect').classed('selected', true);
+        if (that.getRadioButtonValue() === 'category'){
           let color = that.getColorOfCategory(d.dimension.name.slice(0,-1), d.name);
           if (color !== null) {
             d3.select(this).select('rect').style('fill', color);
           }
+        }else{
+          d3.select(this).select('rect').style('fill', '#fba74d');
+        }
+      }
+
+    });  
+  }
+
+  // sets the ribbon color and highlights the selected on in the parallel sets vis
+  private highlightAndColorParSetsRibbons(that, svgRibbons: d3.Selection<any>, dimensionName: string, category: string, tableColumn: string)
+  {
+    // console.log('highlight and color ribbons: ', {svgRibbons, dimensionName, category, tableColumn});
+    //highlight current path
+    let svgPaths = svgRibbons.selectAll('path')
+      .each(function (d) {
+        d3.select(this).classed('selected', false);
+
+        //the path between the selected row and column will be marked as selected (higher opacity)
+        if ((d.parent.name === category && d.node.name === tableColumn) || (d.parent.name === tableColumn && d.node.name === category)) {
+          d3.select(this).classed('selected', true);
         }
 
+        if (that.getRadioButtonValue() === 'category') {
+          //all paths connected to the category of the dimension will be coloured in category's color
+          if((d.parent.dimension === dimensionName && d.parent.name === category) || (d.node.dimension === dimensionName && d.node.name === category)){
+            let color = that.getColorOfCategory(dimensionName.slice(0,-1), category);
+            if (color !== null) {
+              d3.select(this).style('fill', color);
+              d3.select(this).style('stroke', color);
+            }
+          }else{
+            d3.select(this).attr('class','category-gray');
+          }
+        }else{
+          d3.select(this).classed('category-selected',true); //make all selected
+          if((d.parent.name === 'Others' && d.node.name !== category) || (d.node.name === 'Others' && d.parent.name !== category)) {
+            //only the path between others and not the current category are coloured gray
+            d3.select(this).classed('category-selected',false);
+            d3.select(this).classed('category-gray',true);
+          }
+        }
+        // console.log('path.this: ', d3.select(this));
+        // console.log('path.d: ',d);
       });
   }
- 
+
+  // moves the label of the second dimension underneath the parralel sets vis
+  private moveParSetsDimensionLabels(svgDimensions: d3.Selection<any>)
+  {
+    // console.log('move dimension labels: ', {svgDimensions});
+
+    // parameters for the dimension translation
+    const dimensionTranslate = [-25,40];
+    const categoryTranslate = [0,20];
+    let index = 0;
+
+    svgDimensions.each(function (d) {
+      // console.log('dim.d: ',d);
+      // console.log('dim.this: ',d3.select(this));
+       
+      //identifiy the current dimension
+      if(d.y === 45){
+        index = 0;
+      }else{
+        index = 1;
+      }
+
+      const currTransform = d3.select(this).attr('transform').split(',');
+      const currTransformX = Number(currTransform[0].split('(')[1]);
+
+      // //dimension label
+      d3.select(this).select('rect').attr('transform',`translate(${currTransformX},${dimensionTranslate[index]})`);
+      d3.select(this).select('text').attr('transform',`translate(${currTransformX},${dimensionTranslate[index]})`);
+      
+      // //category labels
+      let categoryLabel = d3.select(this).selectAll('g');
+      categoryLabel.selectAll('rect').attr('transform',`translate(${currTransformX},${categoryTranslate[index]})`);
+      categoryLabel.selectAll('text').attr('transform',`translate(${currTransformX},${categoryTranslate[index]})`);
+    });
+  }
+
+  // method is called when categories are rearranged in the parallel sets vis
+  private sortCategoryParSetsListener(that, category: string, svgElement: string)
+  {
+    console.log('"sortCategoryParSetsListener" was activated: ', {category,svgElement});
+
+    let svgDimensions = d3.selectAll('div'+svgElement).selectAll('g.parSets').selectAll('g.dimension');
+    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+
+  }
+
+  // method is called when dimensions are rearranged in the parrallel sets vis
+  private sortDimensionParSetsListener(that, dimensionName: string, category: string, tableColumn: string, svgElement: string)
+  {
+    console.log('"sortDimensionParSetsListener" was activated: ', {dimensionName,category,tableColumn,svgElement});
+    
+    let svgParSets = d3.selectAll('div'+svgElement).selectAll('g.parSets');
+
+    let svgDimensions = svgParSets.selectAll('g.dimension');
+    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+    this.moveParSetsDimensionLabels(svgDimensions);
+
+    let svgRibbons = svgParSets.selectAll('g.ribbon');
+    this.highlightAndColorParSetsRibbons(that, svgRibbons, dimensionName, category, tableColumn);
+  }
+
   // creates boxplot visualization (for student-test, mwu-test)
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
@@ -992,41 +1099,41 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                     .classed('detailVis',true);
 
     // let detailTestType = divDetailInfo.append('div');
-    divDetailInfo.append('div')
-                  .classed('detailDiv',true)
-                  .text('Test: ')
-                  .append('span')
-                  .text('[TestName]');
+    // divDetailInfo.append('div')
+    //               .classed('detailDiv',true)
+    //               .text('Test: ')
+    //               .append('span')
+    //               .text('[TestName]');
 
-    // let detailTestValue = divDetailInfo.append('div');
-    divDetailInfo.append('div')
-                .classed('detailDiv',true)
-                .text('Test-Value/p-Value: ')
-                .append('span')
-                .text('[Value]/[p-Value]');  
+    // // let detailTestValue = divDetailInfo.append('div');
+    // divDetailInfo.append('div')
+    //             .classed('detailDiv',true)
+    //             .text('Test-Value/p-Value: ')
+    //             .append('span')
+    //             .text('[Value]/[p-Value]');  
 
-    // let detailTestDescr = divDetailInfo.append('div');
-    divDetailInfo.append('div')
-                  .classed('detailDiv',true)
-                  .text('Description: ')
-                  .append('span')
-                  .text('[Description]');    
+    // // let detailTestDescr = divDetailInfo.append('div');
+    // divDetailInfo.append('div')
+    //               .classed('detailDiv',true)
+    //               .text('Description: ')
+    //               .append('span')
+    //               .text('[Description]');    
     
     
                                                   
-    let data = cell.dataVisRep.data;
+    let data = cell.dataVisRep.data.filter((item) => {return (item[0] === cell.tableColumn || item[0] === cell.category);});
     let min = cell.dataVisRep.min;
     let max = cell.dataVisRep.max;
     // console.log('BoxPlot: ',{data,min,max});
 
 
-    let containerWidth = Number(svgContainer.style('width').slice(0,-2));
+    let containerWidth = Number(svgContainer.style('width').slice(0,-2)) - 25; //-25 because of the scroll bar
 
     let calcWidth = Math.max(containerWidth,data.length * 50 + 30);
 
     let margin = {top: 5, right: 0, bottom: 50, left: 50};
     let  width = calcWidth - margin.left - margin.right;
-    let height = 200 - margin.top - margin.bottom;
+    let height = 220 - margin.top - margin.bottom;
 
     let chart = (d3 as any).box()
           .whiskers(function(d) {
@@ -1041,7 +1148,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           })
           .height(height)	
           .domain([min, max])
-          .showLabels(false);
+          .showLabels(true);
 
 
     let svgCanvas = svgContainer.append('svg')
@@ -1130,8 +1237,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                                       }
                                     });
 
-    let rectElements = boxElements.selectAll('rect');
-
+    if(cell.dataVisRep.color)
+    {                                
+      let rectElements = boxElements.selectAll('rect').style('fill',cell.dataVisRep.color);         
+      let cirlceElements = boxElements.selectAll('circle').style('fill',cell.dataVisRep.color).style('stroke','black');              
+    }
 
     let cirlceElements = boxElements.selectAll('circle')
                                     .attr('r',2);
@@ -1151,7 +1261,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     if(measureTypeA === typeCategorical && measureTypeB === typeCategorical){
       // combination: categorical/categorical
       // scores: jaccars, overlap
-      return this.getColumnPartioningParallelSets(data, groups, tableHeader, column);
+      return this.getColumnPartioningParallelSets(data, groups, tableHeader, column,category);
     }else{
       // combination: number/categorica | categorical/number | number/number
       // score: student-test, wolcoxon rank-sum-test, mwu-test
@@ -1161,14 +1271,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
 
   // creates data for the visual representation of parallel sets
-  private getColumnPartioningParallelSets(data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any) {
-    // console.log('---- getColumnPartioning ----');
-    // console.log('getColumnPartioning.data',data);
-    // console.log('getColumnPartioning.tableHeader',tableHeader);
-    // console.log('getColumnPartioning.column',column);
+  private getColumnPartioningParallelSets(data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any, category: any) {
+    console.log('---- getColumnPartioning ----');
+    console.log('getColumnPartioning.data',data);
+    console.log('getColumnPartioning.groups',groups);
+    console.log('getColumnPartioning.tableHeader',tableHeader);
+    console.log('getColumnPartioning.column',column);
+    console.log('getColumnPartioning.category',category);
     let columnPartitioning = [];
     // const groups = this.ranking.getGroupedData();
     const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
+
+    const currAttribute: string = column.column.toString();
 
     // go through all categories of current coloumn
     for (let i = 0; i < column.categories.length; i++) {
@@ -1179,17 +1293,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       if (this.getRadioButtonValue() === 'group') { // stratification
         //all ids of a stratification group
         const currGroup = groups.find(item => {return item.name === currCategory.label});
-        dataIdCurrCategory = currGroup.rows.map((a) => a.id);
+        dataIdCurrCategory = currGroup.rows;
       } else { //category
         // find all ids of the current category
         dataIdCurrCategory = data.filter((item) => {
-          return item[column.column.toString()] === currCategory.label;
-        }).map((a) => a.id);
+          return item[currAttribute] === currCategory.label;
+        });
       }
 
       const num = dataIdCurrCategory.length;
 
       const currCategoryParts = {
+        attributeLabel: column.label,
         categoryLabel: currCategory.label,
         categoryAmount: num,
         parts: []
@@ -1203,68 +1318,73 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           let dataIdCurrentHeader = []
           if (optionDDA === 'Selection') {
             // Compare categories with selected/unselected
-            dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label}).map((a) => a.id);
+            dataIdCurrentHeader = data.filter(item => {return item['selection'] === currHeader.label});
           } else {
             // Compare categories with stratification groups
             for (let g = 0; g < groups.length; g++) {
               if (groups[g].name === currHeader.label && (groups[g] as any).rows) {
-                dataIdCurrentHeader = (groups[g] as any).rows.map((a) => a.id);
+                dataIdCurrentHeader = (groups[g] as any).rows;
               } else if (groups[g].name === currHeader.label && currHeader.label === 'Default') {
-                dataIdCurrentHeader = data.map((a) => a.id);
+                dataIdCurrentHeader = data;
               }
             }
           }
-          const {intersection: intersect} = intersection(dataIdCurrCategory, dataIdCurrentHeader);
+
+          const currHeaderNum = dataIdCurrentHeader.length;
+
+          const {intersection: intersect} = intersection(dataIdCurrCategory.map((a) => a[currAttribute]), dataIdCurrentHeader.map((a) => a[currAttribute]));
           const numHeader = intersect.length;
+          
+          const currCatForHead = {
+            label: currHeader.label,
+            intersectionAmount: numHeader,
+            currHeaderAmount: currHeaderNum
+          };
 
-          if (numHeader > 0) {
-            const currCatForHead = {
-              label: currHeader.label,
-              amount: numHeader
-            };
-
-            currCategoryParts.parts.push(currCatForHead);
-          }
+          currCategoryParts.parts.push(currCatForHead);
         }
       }
 
       columnPartitioning.push(currCategoryParts);
     }
-    // console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
+    console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
     return columnPartitioning;
   }
  
   // creates data for the visual representation of boxplots
   private getDataValuesBoxplit(data: Array<any>, groups: Array<any>,tableHeader: Array<any>, column: any, category: any)
   {
-    // console.log('---- getColumnPartioning ----');
-    // console.log('getColumnPartioning.data',data);
-    // console.log('getColumnPartioning.tableHeader',tableHeader);
-    // console.log('getColumnPartioning.column',column);
+    console.log('---- getColumnPartioning ----');
+    console.log('getColumnPartioning.data',data);
+    console.log('getColumnPartioning.groups',groups);
+    console.log('getColumnPartioning.tableHeader',tableHeader);
+    console.log('getColumnPartioning.column',column);
+    console.log('getColumnPartioning.category',category);
     // let columnPartitioning = [];
     // let groups = this.ranking.getGroupedData();
     let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     let rowBoxData = [];
-    let min = Infinity;
-    let max = -Infinity;
-
+    // let min = Infinity;
+    // let max = -Infinity;
+    let min = column.domain[0];
+    let max = column.domain[1];
 
     let categoryBoxData = []
     if(optionDDA === 'Selection')
     {
       categoryBoxData.push(''+category.label);
-      // get the values of current category
       for(let g=0;g<groups.length;g++)
+      // get the values of current category
       {
         if(groups[g].name === category.label && (groups[g] as any).rows)
         {
-          let dataCategroy = (groups[g] as any).rows.map((a) => { return a[''+column.column]; });
-          let dataCategroyValid = dataCategroy.filter(Boolean);
+          let dataCategroy = (groups[g] as any).rows.map((a) => { return Number(a[''+column.column]); });
+          let dataCategroyValid = dataCategroy.filter(((item) => item !== undefined || item !== null));
 
           categoryBoxData.push(dataCategroyValid);
-          min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
-          max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
+          // min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
+          // max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
           
           rowBoxData.push(categoryBoxData);
         }
@@ -1291,18 +1411,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           {
             if(groups[g].name === currHeader.label && (groups[g] as any).rows)
             {
-              dataCurrentHeader = (groups[g] as any).rows.map((a) => a);
-            }else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
-            {
-              dataCurrentHeader = data;
-            }
+              dataCurrentHeader = (groups[g] as any).rows;
+            }//else if(groups[g].name === currHeader.label && currHeader.label === 'Default')
+            // {
+            //   dataCurrentHeader = data;
+            // }
           }
         }
 
-        dataCurrentHeader = dataCurrentHeader.map((a) => { return a[''+column.column]; });  
-        let dataCurrentHeaderValid = dataCurrentHeader.filter(Boolean);
-        min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
-        max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
+        dataCurrentHeader = dataCurrentHeader.map((a) => { return Number(a[''+column.column]); });  
+        let dataCurrentHeaderValid = dataCurrentHeader.filter(((item) => item !== undefined || item !== null));
+        // min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
+        // max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
 
         // second elemnt is an array with all the values 
         currBoxData.push(dataCurrentHeaderValid);
@@ -1312,14 +1432,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
     }
  
-
+    const boxColor = column.color ? column.color : null;
     let rowBoxObj = {
+      color: boxColor,
       data: rowBoxData,
       min: min,
       max: max
     };
 
-    // console.log({rowBoxData , min, max});
+    console.log({rowBoxData , min, max});
 
     return rowBoxObj;
   }
@@ -1402,18 +1523,26 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('path.column: ',column);
     // console.log('path.category: ',category);
     let color = null;
-    let currColumn = this.ranking.getDisplayedAttributes().filter((item) => {return (item.desc.label === column);});
-    for(let col=0;col<currColumn.length;col++){ 
-      if(currColumn[col] && (currColumn[col] as ICategoricalColumn).categories)
-      {
-        let currCategories = (currColumn[col] as ICategoricalColumn).categories;
-        for(let i=0; i<currCategories.length; i++){
-          if(currCategories[i].label === category){
-            color = currCategories[i].color;
+    if(column === 'Selection'){
+      if(category === 'Selected'){
+        color = '#1f77b4';
+      }else {
+        color = '#ff7f0e';
+      }
+    }else {
+      let currColumn = this.ranking.getDisplayedAttributes().filter((item) => {return (item.desc.label === column);});
+      for(let col=0;col<currColumn.length;col++){ 
+        if(currColumn[col] && (currColumn[col] as ICategoricalColumn).categories)
+        {
+          let currCategories = (currColumn[col] as ICategoricalColumn).categories;
+          for(let i=0; i<currCategories.length; i++){
+            if(currCategories[i].label === category){
+              color = currCategories[i].color;
+            }
           }
         }
       }
-  }
+    }
     
     // console.log('path.color: ',color);
     return color;
