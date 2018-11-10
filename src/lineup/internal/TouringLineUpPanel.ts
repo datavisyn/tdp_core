@@ -6,6 +6,7 @@ import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
 import {isProxyAccessor} from './utils';
+import {categories} from 'lineupjs/src/model/annotations';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -207,11 +208,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       trs.exit().remove(); // remove attribute rows
     }
     
-    this.getItemTableBody(headCategories, inputB, measure, true).then(updateTableBody); // initialize
-    // this.getItemTableBody(inputA, inputB, measure, false).then(updateTableBody); // set values
+    this.getItemTableBody(inputA, inputB, measure, true).then(updateTableBody); // initialize
+    this.getItemTableBody(inputA, inputB, measure, false).then(updateTableBody); // set values
   }
   
   
+  private async getTableBody(colData: any[], rowData: any[], )
+
   /**
    * async: return promise
    * @param attr1 columns
@@ -219,38 +222,45 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
   private async getItemTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>> {
-    const data = new Array(attr2.reduce((sum, col) => sum += col.categories.length ,0)); // rows = number of categories
+    const data = new Array(attr2.reduce((sum, col:any) => sum += col.categories.length ,0)); // rows = number of categories
     for (let i of data.keys()) {
-      data[i] = new Array(attr1.length + 2).fill(null) // containing n1+2 elements (headers + n1 vlaues)
+      data[i] = new Array(attr1.reduce((sum, col:any) => sum += col.categories.length ,0) + 2).fill(null) // containing n1+2 elements (headers + n1 vlaues)
     }
 
-    let i = 0;
+    let rowIndex = 0;
     for (let col of attr2) {
-        for (let cat of col.categories) {
-          data[i][0] = col.label;
-          data[i][1] = cat.label;
-          i++;
-        }
+      for (let cat of (col as any).categories) {
+        data[rowIndex][0] = col.label;
+        data[rowIndex][1] = cat.label;
+        rowIndex++;
+      }
     }
 
     if (scaffold) {
       return data;
     } else {
       const promises = [];
-      for (let [i, row] of data.entries()) {
-        for (let j of row.keys()) {
-          if (j > 0 && measure.type.compares(attr1[j - 1].type, attr2[i].type)) {
-            if (j <= i+1) { // start at 
-              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
-              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
-              promises.push(measure.calc(data1, data2)
-                .then((score) => row[j] = score)  // TODO call updateTable here?
-                .catch((err) => row[j] = Number.NaN)
-              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
-            } else {
-              row[j] = '';
-            }
-          }
+
+      let rowIndex = 0;
+      for (let col2 of attr2) {
+        const attr2data = this.ranking.getAttributeDataDisplayed((col2 as any).column) //minus one because the first column is headers
+        for (let cat2 of (col2 as any).categories) {
+          const cat2Data = attr2data.filter((val) => val===cat2.name);
+          let colIndex = 2;
+          attr1.forEach((col1:any, i) => {
+            const attr1data = this.ranking.getAttributeDataDisplayed((col1 as any).column) //minus one because the first column is headers
+            col1.categories.forEach((cat1, j) => {
+              const cat1Data = attr1data.filter((val) => val===cat1.name);
+              (function(row, col) {
+                promises.push(measure.calc(cat1Data, cat2Data)
+                  .then((score) => data[row][col] = score)  // TODO call updateTable here?
+                  .catch((err) => data[row][col] = Number.NaN)
+                );
+              })(rowIndex, colIndex); // Closure to have the current rowIndex & colIndex inside the 'then' callback
+              colIndex++;
+            });
+          });
+          rowIndex++;
         }
       }
 
