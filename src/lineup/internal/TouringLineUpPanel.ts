@@ -675,7 +675,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             const measureResult = await this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
-            const score = measureResult.scoreValue;
+            let score = measureResult.scoreValue;
+            if(measure.type.typeA.value === 'number' || measure.type.typeB.value === 'number'){
+              score = measureResult.pValue;
+            }
             // console.timeEnd(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.groupEnd();
             tableRow[colName] = {
