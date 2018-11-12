@@ -62,12 +62,10 @@ export class ColumnComparison extends ATouringTask {
 
   initContent() {
     const tablesEnter = d3.select(this.node)
-    .append('div').attr('class', 'table-container')
-    .append('table').attr('class', 'table table-condensed');
-    tablesEnter
-      .append('thead').append('tr').append('th')
-    tablesEnter
-      .append('tbody');
+      .append('div').attr('class', 'table-container')
+      .append('table').attr('class', 'table table-condensed');
+    tablesEnter.append('thead').append('tr').append('th');
+    tablesEnter.append('tbody');
   }
 
   public update(data: any[]) {
@@ -105,7 +103,7 @@ export class ColumnComparison extends ATouringTask {
     const data = new Array(attr2.length); // n2 arrays (rows) 
     for (let i of data.keys()) {
       data[i] = new Array(attr1.length + 1).fill(null) // containing n1+1 elements (header + n1 vlaues)
-      data[i][0] = attr2[i].label;
+      data[i][0] = `<b>${attr2[i].label}</b>`;
     }
 
     if (scaffold) {
