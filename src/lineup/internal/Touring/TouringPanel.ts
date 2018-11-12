@@ -77,7 +77,7 @@ export default class TouringPanel extends LineUpPanelActions {
     //Remove previous output
     d3.select(this.touringElem).selectAll(`div.output *`).remove(); //remove all child elemetns of output
     const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
-    task.init(d3.select(this.touringElem).select('div.output').node() as HTMLElement);
+    task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
   }
 
   public updateOutput() {
@@ -203,7 +203,7 @@ export default class TouringPanel extends LineUpPanelActions {
   }
 }
 
-class RankingAdapter {
+export class RankingAdapter {
 
   constructor(protected readonly provider: LocalDataProvider, private rankingIndex = 0) {  }
 
