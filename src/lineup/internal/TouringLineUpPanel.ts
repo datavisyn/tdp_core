@@ -1,7 +1,7 @@
 import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, Column, Ranking, IDataRow, IStringMapColumnDesc} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type} from 'touring';
+import {MethodManager, ISimilarityMeasure, IMeasureResult, MeasureMap, intersection, Comparison, Type} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
@@ -479,10 +479,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         for (let j of row.keys()) {
           if (j > 0 && measure.type.compares(attr1[j - 1].type, attr2[i].type)) {
             if (j <= i+1) { // start at 
-              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
+              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column); //minus one because the first column is headers
               const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
               promises.push(measure.calc(data1, data2)
-                .then((score) => row[j] = score)  // TODO call updateTable here?
+                .then((score) => row[j] = score.scoreValue)  // TODO call updateTable here?
                 .catch((err) => row[j] = Number.NaN)
               ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
             } else {
@@ -669,7 +669,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             // const headerLabel = ((tableHeader[col] as any).label as string);
             // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
-            const score = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
+            const measureResult = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
+            const score = measureResult.scoreValue;
             // console.timeEnd(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.groupEnd();
             tableRow[colName] = {
@@ -680,7 +681,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               bgcolor: this.score2color(measure.id,score),
               action: true,
               tableColumn: (tableHeader[col] as any).label,
-              dataVisRep: dataVisualRep
+              dataVisRep: dataVisualRep,
+              measureResult: measureResult
             };
           }
         }
@@ -810,7 +812,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
  
   // --------- SCORES ---
   // different kinds of score calculations
-  private calcScore(data, groups: Array<any>, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
+  private calcScore(data, groups: Array<any>, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): IMeasureResult {
     // console.group('get Sets')
     // console.time(`time - get Sets ${measure.id}`);
     const dataSets = this.getSelectionAndCategorySets(data, groups, headerCategory, columnB, categoryB);
@@ -824,7 +826,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('categorySet', categorySet);
 
 
-    return measure.calc(selectionSet, categorySet)
+    return measure.calc(selectionSet, categorySet);
   }
 
   // --------- VISUAL REPRESENTATION ---
