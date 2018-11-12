@@ -191,7 +191,7 @@ export class SelectionCategoryComparison extends RowComparison{
     
     const node = this.node; // for the function below
     function updateTableBody(bodyData: Array<Array<any>>) {
-      const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
+      const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
       trs.enter().append('tr');
       const tds = trs.selectAll('td').data((d) => d); // remove 
       tds.enter().append('td');
@@ -235,6 +235,7 @@ export class SelectionCategoryComparison extends RowComparison{
             rowspan: (col as any).categories.length
           };
         }
+        data[i][0].key = col.label+'-'+cat.label;
         i++;
       }
     }
@@ -248,23 +249,23 @@ export class SelectionCategoryComparison extends RowComparison{
       i=0;
       for (const col of attr2) {
         for (const [j, cat] of (col as any).categories.entries()) {
-          const colData = this.ranking.getAttributeDataDisplayed((col as IServerColumn).column)
+          const allData = this.ranking.getItemsDisplayed();
           const dataCategory = [];
           const dataSelected = [];
           const dataUnselected = [];
           const selectIndices = this.ranking.getSelection();
           
-          for (const val of colData) { // Walk through the array once an populate the data arrays
-            if (val === cat.name) {
-              dataCategory.push(val);
+          for (const item of allData) { // Walk through the array once an populate the data arrays
+            if (item[col.column] === cat.name) {
+              dataCategory.push(item[col.column]);
             }
 
-            const index = selectIndices.findIndex((index) => index === val._id)
+            const index = selectIndices.findIndex((index) => index === item._id)
             if (index >= 0) {
               selectIndices.splice(index, 1); // Remove index as we have reached it
-              dataSelected.push(val)
+              dataSelected.push(item[col.column])
             } else {
-              dataUnselected.push(val);
+              dataUnselected.push(item[col.column]);
             }
           }
 
@@ -272,11 +273,7 @@ export class SelectionCategoryComparison extends RowComparison{
           let iPromise = i;
           // Score with selected:
           promises.push(measure.calc(dataSelected, dataCategory)
-          .then((score) => {
-                console.log(data[iPromise][0])
-                  console.log(iPromise, j)
-                  data[iPromise][j === 0 ? 2 : 1] = {label: score.toFixed(2)};
-                })  // TODO call updateTable here?
+                .then((score) => data[iPromise][j === 0 ? 2 : 1] = {label: score.toFixed(2)})  // TODO call updateTable here?
                 .catch((err) => data[iPromise][j === 0 ? 2 : 1] = {label: Number.NaN}));
 
           // Score with unselected:
