@@ -2,7 +2,7 @@ import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow} fr
 import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type, SCOPE} from 'touring';
 import * as d3 from 'd3';
 import {RankingAdapter} from './TouringPanel';
-import {IServerColumn} from 'tdp_core/src/rest';
+import {IServerColumn} from '../../../rest';
 
 
 export const Tasks = new Array<ATouringTask>();
