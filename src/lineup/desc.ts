@@ -49,6 +49,12 @@ export interface IColumnOptions {
   selectedSubtype: string;
 
   /**
+   * set the column's color
+   * @default: ''
+   */
+  color: string;
+
+  /**
    * extra arguments
    */
   extras?: {[key: string]: any};
