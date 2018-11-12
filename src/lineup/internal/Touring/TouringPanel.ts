@@ -1,9 +1,10 @@
-import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow} from 'lineupjs';
+import {LocalDataProvider, IColumnDesc, ICategory, Column, CategoricalColumn, Ranking, IDataRow, ICategoricalColumnDesc} from 'lineupjs';
 import LineUpPanelActions from '../LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import * as d3 from 'd3';
 import {isProxyAccessor} from '../utils';
 import {Tasks, ATouringTask} from './Tasks'
+import {IColumn} from 'lineupengine';
 
 export default class TouringPanel extends LineUpPanelActions {
 
@@ -47,8 +48,6 @@ export default class TouringPanel extends LineUpPanelActions {
     //    cause changes the displayed table / scores 
     d3.select(this.node).selectAll('select.task').on('input', () => {this.initNewTask(); this.updateOutput()});
     d3.select(this.node).selectAll('select.scope').on('input', () => this.updateOutput());
-
-
 
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
@@ -101,7 +100,14 @@ export default class TouringPanel extends LineUpPanelActions {
     const scopeSelect = d3.select(this.touringElem).select('select.scope');
     
     // TODO remove categories which are not displayed
-    let descriptions: IColumnDesc[] = deepCopy(this.ranking.getDisplayedAttributes().map((col) => col.desc));
+    let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
+      const desc: IColumnDesc = deepCopy(col.desc);
+      if ((col as CategoricalColumn).categories) {
+        (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories);
+      }
+
+      return desc;
+    });
     // we generate an entry for every attribute (categorical, numerical, and maybe more (string?))
     // and an entry representing the selected/unselected items as a attribute with two categories
     // and an entry representing the ranked order of items as numerical attribute
@@ -369,6 +375,9 @@ export class RankingAdapter {
     return new Set(this.getAttributeDataDisplayed(attributeId))
   }
 
+  /**
+   * Returns the '_id' of the selected items
+   */
   public getSelection() {
     return this.provider.getSelection();
   }

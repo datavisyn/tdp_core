@@ -1,8 +1,9 @@
-import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow} from 'lineupjs';
+import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow, ICategoricalColumn} from 'lineupjs';
 import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type, SCOPE} from 'touring';
 import * as d3 from 'd3';
 import {RankingAdapter} from './TouringPanel';
 import {IServerColumn} from '../../../rest';
+import {all} from 'bluebird';
 
 
 export const Tasks = new Array<ATouringTask>();
@@ -39,14 +40,15 @@ export abstract class ATouringTask implements ITouringTask{
     d3.select(this.node).append('h3').text(this.label+':');
   }
 
-  public update(data: any[]) {
-      const ps = d3.select(this.node).selectAll('p').data(data, (data) => data.column); //column property is key
+  public abstract update(data: any[]) 
+  // {
+  //     const ps = d3.select(this.node).selectAll('p').data(data, (data) => data.column); //column property is key
     
-      ps.enter().append('p').text((attr) => attr.label); //enter: add tasks to dropdown
-      // update: nothing to do
-      ps.exit().remove();   // exit: remove tasks no longer displayed
-      ps.order();           // order domelements as in the array
-  }
+  //     ps.enter().append('p').text((attr) => attr.label); //enter: add tasks to dropdown
+  //     // update: nothing to do
+  //     ps.exit().remove();   // exit: remove tasks no longer displayed
+  //     ps.order();           // order domelements as in the array
+  // }
 }
 
 @TaskDecorator()
@@ -145,6 +147,25 @@ export abstract class RowComparison extends ATouringTask {
 
     this.scope = SCOPE.SETS;
   }
+
+  initContent() {
+    //Table
+    const tablesEnter = d3.select(this.node)
+      .append('div').attr('class', 'table-container')
+      .append('table').attr('class', 'table table-condensed');
+
+    //Table Head
+    const thead = tablesEnter.append('thead');
+    const theadRow1 = thead.append('tr').attr('class', 'attr');
+    theadRow1.append('th');
+    theadRow1.append('th').text('Attribute');
+    const theadRow2 = thead.append('tr').attr('class', 'cat');;
+    theadRow2.append('th').text('Attribute');
+    theadRow2.append('th').text('Category');
+
+    //Table Body
+    tablesEnter.append('tbody');
+  }
 }
 
 @TaskDecorator()
@@ -154,6 +175,122 @@ export class SelectionCategoryComparison extends RowComparison{
     super();
     this.id = "selCatCmp";
     this.label = "Compare selected rows with column categories"
+  }
+
+  public update(slsl: any[]) {
+    const catData = slsl.filter((attr) => attr.type === 'categorical');
+    const compareTo = [this.ranking.getSelectionDesc()];
+    const colHeadsAttr = d3.select(this.node).select('thead tr.attr').selectAll('th.head').data(compareTo, (attr) => `${attr.column}/${attr.categories.length}`); //include category length to update if a category is added/removed
+    colHeadsAttr.enter().append('th')
+      .attr('class', 'head')
+      .attr('colspan', (attr) => attr.categories.length);
+    const colHeadsCat = d3.select(this.node).select('thead tr.cat').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
+    colHeadsCat.enter().append('th')
+      .attr('class', 'head');
+
+    
+    const node = this.node; // for the function below
+    function updateTableBody(bodyData: Array<Array<any>>) {
+      const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
+      trs.enter().append('tr');
+      const tds = trs.selectAll('td').data((d) => d); // remove 
+      tds.enter().append('td');
+      // Set colheads in thead 
+      colHeadsAttr.text((d) => d.label);
+      colHeadsCat.text((d) => d.label);
+      // set data in tbody
+      tds.attr('colspan', (d) => d ? d.colspan : 1);
+      tds.attr('rowspan', (d) => d ? d.rowspan : 1);
+      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
+  
+      // Exit
+      tds.exit().remove(); // remove cells of removed columns
+      colHeadsAttr.exit().remove(); // remove attribute columns
+      colHeadsCat.exit().remove(); // remove attribute columns
+      trs.exit().remove(); // remove attribute rows
+    }
+    
+    this.getAttrTableBody(compareTo, catData, true).then(updateTableBody); // initialize
+    this.getAttrTableBody(compareTo, catData, false).then(updateTableBody); // set values
+  }
+
+  /**
+   * async: return promise
+   * @param attr1 columns
+   * @param arr2 rows
+   * @param scaffold only create the matrix with row headers, but no value calculation
+   */
+  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Promise<Array<Array<IScoreCell>>> {
+    const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
+    const allCat2 = [].concat(...attr2.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
+    const data = new Array(allCat2.length); // one row per category
+    let i=0;
+    for (const col of attr2) {
+      for (const [j, cat] of (col as any).categories.entries()) {
+        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
+        data[i][j === 0 ? 1 : 0] = {label: cat.label} // through rowspan, this becomes the first array item 
+        if (j === 0) {
+          data[i][0] = {
+            label: col.label,
+            rowspan: (col as any).categories.length
+          };
+        }
+        i++;
+      }
+    }
+
+    if (scaffold) {
+      return data;
+    } else {
+      const promises = [];
+      const measure = MethodManager.getMeasuresByType(Type.CATEGORICAL, Type.CATEGORICAL, SCOPE.SETS)[0]; // fixed for this task
+      
+      i=0;
+      for (const col of attr2) {
+        for (const [j, cat] of (col as any).categories.entries()) {
+          const colData = this.ranking.getAttributeDataDisplayed((col as IServerColumn).column)
+          const dataCategory = [];
+          const dataSelected = [];
+          const dataUnselected = [];
+          const selectIndices = this.ranking.getSelection();
+          
+          for (const val of colData) { // Walk through the array once an populate the data arrays
+            if (val === cat.name) {
+              dataCategory.push(val);
+            }
+
+            const index = selectIndices.findIndex((index) => index === val._id)
+            if (index >= 0) {
+              selectIndices.splice(index, 1); // Remove index as we have reached it
+              dataSelected.push(val)
+            } else {
+              dataUnselected.push(val);
+            }
+          }
+
+          
+          let iPromise = i;
+          // Score with selected:
+          promises.push(measure.calc(dataSelected, dataCategory)
+          .then((score) => {
+                console.log(data[iPromise][0])
+                  console.log(iPromise, j)
+                  data[iPromise][j === 0 ? 2 : 1] = {label: score.toFixed(2)};
+                })  // TODO call updateTable here?
+                .catch((err) => data[iPromise][j === 0 ? 2 : 1] = {label: Number.NaN}));
+
+          // Score with unselected:
+          promises.push(measure.calc(dataUnselected, dataCategory)
+                .then((score) => data[iPromise][j === 0 ? 3 : 2] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                .catch((err) => data[iPromise][j === 0 ? 3 : 2] = {label: Number.NaN}));
+
+          i++;
+        }
+      }
+
+      await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
+      return data; // then return the data
+    }
   }
 }
 
@@ -165,4 +302,15 @@ export class SelectionStratificationComparison extends RowComparison{
     this.id = "selStratCmp";
     this.label = "Compare selected rows with stratification groups"
   }
+
+  update(data: any) {
+
+  }
+}
+
+interface IScoreCell {
+  label: string,
+  color?: string,
+  rowspan?: number,
+  colspan?: number
 }
