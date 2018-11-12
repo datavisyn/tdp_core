@@ -17,7 +17,7 @@ import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
-import TouringLineUpPanel from './internal/TouringLineUpPanel';
+import TouringPanel from './internal/Touring/TouringPanel';
 import {addLazyColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 
@@ -209,7 +209,7 @@ export abstract class ARankingView extends AView {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
-    this.panel = new TouringLineUpPanel(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
+    this.panel = new TouringPanel(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });

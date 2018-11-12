@@ -1,10 +1,7 @@
-import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, Column, Ranking, IDataRow, IStringMapColumnDesc} from 'lineupjs';
+import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow} from 'lineupjs';
 import LineUpPanelActions from '../LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type} from 'touring';
 import * as d3 from 'd3';
-import 'd3.parsets';
-import 'd3-grubert-boxplot';
 import {isProxyAccessor} from '../utils';
 
 export default class TouringPanel extends LineUpPanelActions {
