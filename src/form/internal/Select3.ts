@@ -138,7 +138,7 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
 
   /**
    * token separators, spaces, semicolon, colon, escaping is done via the backslash
-   * @default /([\s;,]+)+/gm
+   * @default /[\s\n\r;,]+/gm
    */
   tokenSeparators?: RegExp;
 
@@ -195,7 +195,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     },
     equalValues: equalArrays,
     cacheResults: true,
-    tokenSeparators: /([\s;,]+)+/gm,
+    tokenSeparators: /[\s\n\r;,]+/gm,
     defaultTokenSeparator: ' ',
     id: null,
     name: null
@@ -265,6 +265,20 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     if (this.options.validate && this.options.dropable) {
       this.dropFile(<HTMLElement>this.node.querySelector('.select2-container'));
     }
+
+    this.node.addEventListener('paste', (evt) => {
+      // see https://jsfiddle.net/GertG/99t5d5vf/
+      // the browser normalizes copy-paste data by its own but to avoid that we do it ourselves
+      const value = evt.clipboardData ? evt.clipboardData.getData('Text') : '';
+      if (!value) {
+        return;
+      }
+      const data = splitEscaped(value, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
+      this.setSearchQuery(data);
+      evt.preventDefault();
+      evt.stopPropagation();
+      return false;
+    });
   }
 
   setSearchQuery(value: string) {
