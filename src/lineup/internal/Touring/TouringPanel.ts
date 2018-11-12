@@ -3,7 +3,7 @@ import LineUpPanelActions from '../LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import * as d3 from 'd3';
 import {isProxyAccessor} from '../utils';
-import {Tasks} from './Tasks'
+import {Tasks, ATouringTask} from './Tasks'
 
 export default class TouringPanel extends LineUpPanelActions {
 
@@ -26,19 +26,7 @@ export default class TouringPanel extends LineUpPanelActions {
     const buttons = this.node.querySelector('section');
     buttons.appendChild(this.createMarkup('Start Touring', 'touring fa fa-calculator', () => {
       this.toggleTouring();
-
-      console.log('provider', this.provider);
-      console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
-      // console.log('provider.selectedRows: ', this.provider.selectedRows());
-      // console.log('provider.getColumns: ', this.provider.getColumns());
-      // console.log('provider.getRanking: ', this.provider.getRankings());
-      console.log('getGroups', this.provider.getRankings()[0].getGroups())
-      console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
-      // console.log('provider.getFilter: ', this.provider.getFilter());
-      // console.log('data', this.provider.data);
-      console.log('------------------------------------');
     }));
-
 
     this.insertTasks();
     this.addEventListeners();
@@ -55,42 +43,61 @@ export default class TouringPanel extends LineUpPanelActions {
   }
 
   private addEventListeners() {
+    // changes made in dropdowns
+    //    cause changes the displayed table / scores 
+    d3.select(this.node).selectAll('select.task').on('input', () => {this.initNewTask(); this.updateOutput()});
+    d3.select(this.node).selectAll('select.scope').on('input', () => this.updateOutput());
+
+
+
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringPanel.EVENTTYPE, () => this.updateTouringPanel()); //fat arrow to preserve scope in called function (this)
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringPanel.EVENTTYPE, () => this.updateOutput()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN + TouringPanel.EVENTTYPE, () => this.updateTouringPanel());
+    this.provider.on(LocalDataProvider.EVENT_ADD_COLUMN + TouringPanel.EVENTTYPE, () => this.updateInput());
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores 
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN + TouringPanel.EVENTTYPE, () => this.updateTouringPanel());
+    this.provider.on(LocalDataProvider.EVENT_REMOVE_COLUMN + TouringPanel.EVENTTYPE, () => this.updateInput());
 
     // for filter changes and stratification changes
     //  After the number of items has changed, the score change aswell
     // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
-    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringPanel.EVENTTYPE, () => this.updateTouringPanel());
+    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringPanel.EVENTTYPE, () => this.updateOutput());
   }
 
-  private updateTouringPanel() {
+  private initNewTask() {
+    //Remove previous output
+    d3.select(this.touringElem).selectAll(`div.output *`).remove(); //remove all child elemetns of output
+    const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
+    task.init(d3.select(this.touringElem).select('div.output').node() as HTMLElement);
+  }
+
+  public updateOutput() {
     if (!this.touringElem.hidden) {
-      this.updateScope();
-      const attributes = this.prepareInput(d3.select(this.touringElem).select('select.scope'));
-      //TODO update task
+      this.updateTask();
     } else {
       console.log('Touring Panel is hidden, skip update.');
     }
   }
+  private updateTask() {
+    if (d3.select(this.touringElem).selectAll(`div.output *`).empty()) {
+      this.initNewTask(); // First time init
+    }
 
+    const attributes = this.prepareInput(d3.select(this.touringElem).select('select.scope'));
+    const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
+    task.update(attributes);
+  }
 
-
-  private updateScope() {
+  private updateInput() {
     const scopeSelect = d3.select(this.touringElem).select('select.scope');
     
     // TODO remove categories which are not displayed
@@ -129,10 +136,12 @@ export default class TouringPanel extends LineUpPanelActions {
     // update: nothing to do
     scopeOptions.exit().remove();   // exit: remove columns no longer displayed
     scopeOptions.order();           // order domelements as in the array
+
+    this.updateOutput();
   }
 
 
-  private prepareInput = (dropdown: d3.Selection<any>) => {
+  private prepareInput(dropdown: d3.Selection<any>): IColumnDesc[] {
     const desc = dropdown.select('option:checked').datum(); // get selected option
     let filter : Array<string>;
     switch(desc.type) {
@@ -172,7 +181,7 @@ export default class TouringPanel extends LineUpPanelActions {
       console.log('Open Touring Panel')
       this.node.style.flex = "0.33 0.33 auto"; // lineup is 1 1 auto
       this.collapse = false; //if touring is displayed, ensure the panel is visible
-      this.updateTouringPanel();
+      this.updateInput(); //Will also update output
     } else {
       this.node.style.flex = null;
     }
@@ -415,7 +424,7 @@ class RankingAdapter {
   public getRankDesc() {
     return {
       label: 'Rank',
-      type: 'numerical',
+      type: 'number',
       column: 'rank'
     }
   }
