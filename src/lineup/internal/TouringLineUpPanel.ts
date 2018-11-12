@@ -6,6 +6,7 @@ import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
 import {isProxyAccessor} from './utils';
+import {categories} from 'lineupjs/src/model/annotations';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -207,11 +208,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       trs.exit().remove(); // remove attribute rows
     }
     
-    this.getItemTableBody(headCategories, inputB, measure, true).then(updateTableBody); // initialize
-    // this.getItemTableBody(inputA, inputB, measure, false).then(updateTableBody); // set values
+    this.getItemTableBody(inputA, inputB, measure, true).then(updateTableBody); // initialize
+    this.getItemTableBody(inputA, inputB, measure, false).then(updateTableBody); // set values
   }
   
   
+
   /**
    * async: return promise
    * @param attr1 columns
@@ -221,15 +223,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   private async getItemTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], measure: ISimilarityMeasure, scaffold: boolean): Promise<Array<Array<any>>> {
     const data = new Array(attr2.reduce((sum, col) => sum += (col as ICategoricalColumnDesc).categories.length ,0)); // rows = number of categories
     for (let i of data.keys()) {
-      data[i] = new Array(attr1.length + 2).fill(null) // containing n1+2 elements (headers + n1 vlaues)
+      data[i] = new Array(attr1.reduce((sum, col:any) => sum += col.categories.length ,0) + 2).fill(null) // containing n1+2 elements (headers + n1 vlaues)
     }
 
-    let i = 0;
+    let rowIndex = 0;
     for (let col of attr2) {
         for (let cat of (col as ICategoricalColumnDesc).categories) {
-          data[i][0] = col.label;
-          data[i][1] = (cat as ICategory).label;
-          i++;
+          data[rowIndex][0] = col.label;
+          data[rowIndex][1] = (cat as ICategory).label;
+          rowIndex++;
         }
     }
 
@@ -237,20 +239,27 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       return data;
     } else {
       const promises = [];
-      for (let [i, row] of data.entries()) {
-        for (let j of row.keys()) {
-          if (j > 0 && measure.type.compares(attr1[j - 1].type, attr2[i].type)) {
-            if (j <= i+1) { // start at 
-              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
-              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
-              promises.push(measure.calc(data1, data2)
-                .then((score) => row[j] = score)  // TODO call updateTable here?
-                .catch((err) => row[j] = Number.NaN)
-              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
-            } else {
-              row[j] = '';
-            }
-          }
+
+      let rowIndex = 0;
+      for (let col2 of attr2) {
+        const attr2data = this.ranking.getAttributeDataDisplayed((col2 as any).column) //minus one because the first column is headers
+        for (let cat2 of (col2 as any).categories) {
+          const cat2Data = attr2data.filter((val) => val===cat2.name);
+          let colIndex = 2;
+          attr1.forEach((col1:any, i) => {
+            const attr1data = this.ranking.getAttributeDataDisplayed((col1 as any).column) //minus one because the first column is headers
+            col1.categories.forEach((cat1, j) => {
+              const cat1Data = attr1data.filter((val) => val===cat1.name);
+              (function(row, col) {
+                promises.push(measure.calc(cat1Data, cat2Data)
+                  .then((score) => data[row][col] = score)  // TODO call updateTable here?
+                  .catch((err) => data[row][col] = Number.NaN)
+                );
+              })(rowIndex, colIndex); // Closure to have the current rowIndex & colIndex inside the 'then' callback
+              colIndex++;
+            });
+          });
+          rowIndex++;
         }
       }
 
@@ -537,14 +546,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   private insertMeasure(measure: ISimilarityMeasure, collapseId: string, currentData: Array<any>) {
-
     this.generateMeasureTable(collapseId, measure , currentData);
-
   }
 
   // --------- DATA TABLE LAYOUT ---
   //generates a object, which contains the table head and table body
-  private generateTableLayout(data: Array<any>, measure: ISimilarityMeasure)
+  private async generateTableLayout(data: Array<any>, measure: ISimilarityMeasure)
   {
     let generatedTable = {
       tableHead: [],
@@ -555,7 +562,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     generatedTable.tableHead = this.getTableHeader();
 
     // TABLE BODY 
-    generatedTable.tableBody  = this.getTableBody(generatedTable.tableHead, data, measure);
+    generatedTable.tableBody  = await this.getTableBody(generatedTable.tableHead, data, measure);
 
     
     // console.log('generateTableLayout: ',generatedTable);
@@ -609,7 +616,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   }
 
   //generate table body depending on table head and radio button option
-  private getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
+  private async getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
   {
     let tableBody = [];
 
@@ -620,9 +627,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     
     console.groupCollapsed(`TableBody - ${measure.id}`);
     console.time(`time TableBody - ${measure.id}`);
-    for(let i=0; i<chosenColumns.length; i++)
-    {
-      let currCol = chosenColumns[i];
+    for (const currCol of chosenColumns) {
       let colCategories = new Set(); 
       const mode = this.getRadioButtonValue();
       if (mode === 'category') {
@@ -636,8 +641,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.label));
       
-      currCatAfterFilter.forEach((category, i) => {
-        
+      //for (const category of currCatAfterFilter) {
+      for (const [catIndex, category] of currCatAfterFilter.entries()) { // for...of because of the await below (doesn't work in foreach () =>  ...)
         let tableRow = {};
         // console.groupCollapsed(`VisualRep - col:${currCol.label}(cat:${currCategory.label})`);
         // console.time(`Time - VisualRep col:${currCol.label}(cat:${currCategory.label})`);
@@ -653,7 +658,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           {
             tableRow[colName] = {
               label: currCol.label,
-              rowspan: (i === 0) ? currCatAfterFilter.length : 0              
+              rowspan: (catIndex === 0) ? currCatAfterFilter.length : 0              
             };
 
           }
@@ -669,7 +674,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             // const headerLabel = ((tableHeader[col] as any).label as string);
             // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
-            const measureResult = this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
+            const measureResult = await this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
             const score = measureResult.scoreValue;
             // console.timeEnd(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.groupEnd();
@@ -689,7 +694,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         
         tableBody.push(tableRow);
         tableRow = {};
-      });
+      }
     }
     
     console.timeEnd(`time TableBody - ${measure.id}`); 
@@ -700,9 +705,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // --------- TABLE GENERATION D3 ---
   // create table in container and depending on dataTable with D3
-  private generateMeasureTable(containerId: string, measure: ISimilarityMeasure, currentData: Array<any>)
+  private async generateMeasureTable(containerId: string, measure: ISimilarityMeasure, currentData: Array<any>)
   {
-    const dataTable = this.generateTableLayout(currentData, measure);
+    const dataTable = await this.generateTableLayout(currentData, measure);
     const that = this;
 
     // create a <div> as table container with D3
