@@ -80,9 +80,9 @@ export default class TouringPanel extends LineUpPanelActions {
     task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
   }
 
-  public updateOutput() {
+  public async updateOutput() {
     if (!this.touringElem.hidden) {
-      this.updateTask();
+      await setTimeout(() => this.updateTask(), 0);
     } else {
       console.log('Touring Panel is hidden, skip update.');
     }
