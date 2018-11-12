@@ -3,13 +3,13 @@ import LineUpPanelActions from '../LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import * as d3 from 'd3';
 import {isProxyAccessor} from '../utils';
+import {Tasks} from './Tasks'
 
 export default class TouringPanel extends LineUpPanelActions {
 
   private static EVENTTYPE = '.touring';
   private touringElem: HTMLElement;
   private columnOverview: HTMLElement; searchbox: HTMLElement; itemCounter: HTMLElement; // default sidepanel elements
-  private itemTab: Node; attributeTab: Node;
   private ranking : RankingAdapter;
 
 
@@ -34,12 +34,24 @@ export default class TouringPanel extends LineUpPanelActions {
       // console.log('provider.getRanking: ', this.provider.getRankings());
       console.log('getGroups', this.provider.getRankings()[0].getGroups())
       console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
-      // console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
+      // console.log('provider.getFilter: ', this.provider.getFilter());
       // console.log('data', this.provider.data);
       console.log('------------------------------------');
     }));
 
+
+    this.insertTasks();
     this.addEventListeners();
+  }
+  
+  private insertTasks() {
+    const taskSelect = d3.select(this.touringElem).select('select.task');
+    const taskOptions = taskSelect.selectAll('option').data(Tasks, (task) => task.id); 
+    
+    taskOptions.enter().append('option').text((task) => task.label); //enter: add tasks to dropdown
+    // update: nothing to do
+    taskOptions.exit().remove();   // exit: remove tasks no longer displayed
+    taskOptions.order();           // order domelements as in the array
   }
 
   private addEventListeners() {
@@ -68,11 +80,78 @@ export default class TouringPanel extends LineUpPanelActions {
 
   private updateTouringPanel() {
     if (!this.touringElem.hidden) {
-      //TODO
+      this.updateScope();
+      const attributes = this.prepareInput(d3.select(this.touringElem).select('select.scope'));
+      //TODO update task
     } else {
       console.log('Touring Panel is hidden, skip update.');
     }
   }
+
+
+
+  private updateScope() {
+    const scopeSelect = d3.select(this.touringElem).select('select.scope');
+    
+    // TODO remove categories which are not displayed
+    let descriptions: IColumnDesc[] = deepCopy(this.ranking.getDisplayedAttributes().map((col) => col.desc));
+    // we generate an entry for every attribute (categorical, numerical, and maybe more (string?))
+    // and an entry representing the selected/unselected items as a attribute with two categories
+    // and an entry representing the ranked order of items as numerical attribute
+    // and an entry representing the current stratification as categorical attribute
+    // and an entry representing the numerical attributes (if there are any)
+    // and an entry representing the categorical attributes (if there are any)
+    // and an entry representing all these attributes
+    descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
+
+    // Generate an attribute description that represents the current stratification
+    descriptions.unshift(this.ranking.getStratificationDesc());
+    descriptions.unshift(this.ranking.getRankDesc());
+    // Generate a Attribute description that represents the current selection
+    descriptions.unshift(this.ranking.getSelectionDesc());
+    descriptions.unshift({ //There is always at least the rank as numerical column
+      label: 'All numerical columns',
+      type: 'num_collection'
+    });
+    descriptions.unshift({ //There is always at least the selection as categorical column
+      label: 'All categorical columns',
+      type: 'cat_collection'
+    });
+    descriptions.unshift({ // at least selection & rank
+      label: 'All columns',
+      type: 'collection'
+    })
+
+    //bind data, label is key
+    const scopeOptions = scopeSelect.selectAll('option').data(descriptions, (desc) => desc.label); 
+    
+    scopeOptions.enter().append('option').text((desc) => desc.label); //enter: add columns to dropdown, that were added by the user
+    // update: nothing to do
+    scopeOptions.exit().remove();   // exit: remove columns no longer displayed
+    scopeOptions.order();           // order domelements as in the array
+  }
+
+
+  private prepareInput = (dropdown: d3.Selection<any>) => {
+    const desc = dropdown.select('option:checked').datum(); // get selected option
+    let filter : Array<string>;
+    switch(desc.type) {
+      case 'collection':
+        filter = ['categorical', 'number'];
+        break;
+      case 'cat_collection':
+        filter = ['categorical'];
+        break;
+      case 'num_collection':
+        filter = ['number'];
+        break;
+      default:
+        return [desc];
+    }
+
+    return dropdown.selectAll('option').data().filter((desc) => filter.includes(desc.type)); // filter from all options
+  }
+  
   
   private toggleTouring(hide?: boolean) {
     if(!this.touringElem)
@@ -117,18 +196,7 @@ export default class TouringPanel extends LineUpPanelActions {
 
 class RankingAdapter {
 
-  constructor(protected readonly provider: LocalDataProvider, private rankingIndex = 0) {
-    // console.log('provider', this.provider);
-    // console.log('provider.getSelection: ', this.provider.getSelection(), ' of ', this.provider.getTotalNumberOfRows());
-    // console.log('provider.selectedRows: ', this.provider.selectedRows());
-    // console.log('provider.getColumns: ', this.provider.getColumns());
-    // console.log('provider.getRanking: ', this.provider.getRankings());
-    // console.log('getGroups', this.provider.getRankings()[0].getGroups())
-    // console.log('provider.getRankings()[0].children: ', this.provider.getRankings()[0].children);
-    // console.log('provider.getFilter: ', this.provider.getFilter()); //TODO use filter
-    // console.log('data', this.provider.data);
-    // console.log('------------------------------------');
-  }
+  constructor(protected readonly provider: LocalDataProvider, private rankingIndex = 0) {  }
 
   public getProvider(): LocalDataProvider {
     return this.provider;
@@ -352,3 +420,35 @@ class RankingAdapter {
     }
   }
 }
+
+
+
+// SOURCE: https://stackoverflow.com/a/51592360/2549748
+/**
+ * Deep copy function for TypeScript.
+ * @param T Generic type of target/copied value.
+ * @param target Target value to be copied.
+ * @see Source project, ts-deepcopy https://github.com/ykdr2017/ts-deepcopy
+ * @see Code pen https://codepen.io/erikvullings/pen/ejyBYg
+ */
+const deepCopy = <T>(target: T): T => {
+  if (target === null) {
+    return target;
+  }
+  if (target instanceof Date) {
+    return new Date(target.getTime()) as any;
+  }
+  if (target instanceof Array) {
+    const cp = [] as any[];
+    (target as any[]).forEach((v) => { cp.push(v); });
+    return cp.map((n: any) => deepCopy<any>(n)) as any;
+  }
+  if (typeof target === 'object' && target !== {}) {
+    const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
+    Object.keys(cp).forEach(k => {
+      cp[k] = deepCopy<any>(cp[k]);
+    });
+    return cp as T;
+  }
+  return target;
+};
