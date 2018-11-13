@@ -719,7 +719,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     // table                                        
     let table = tableContainer.append('table')
-                            .attr('class','table table-condensed measureTableHeader');
+                            .attr('class','table table-condensed tableHeaderRotated');
     
     // table header
     let tableHeader = table.append('thead');
@@ -728,7 +728,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               .data(dataTable.tableHead as Array<any>)
               .enter()
               .append('th')
-              .attr('class','rotate')
+              .attr('class',(i) => i<2 ? 'rotate table-label' : 'rotate table-value')
+              // .attr('class','rotate table-attribute-col') 
                 .append('div')
                 .classed('borderedCell',(d) => {return d.label!=="";})
                   .append('span')
@@ -796,7 +797,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       })
       .enter()
       .append('td')
-      .attr('class', (d: any) => d.action ? 'text-center align-middle action' : 'text-center align-middle')
+      .attr('class', (d: any) => d.action ? 'text-center align-middle action' : 'text-left align-middle table-label')
       .style("background-color", (d: any) => d.bgcolor || '#ffffff')
       .style("color", (d: any) => d3.hsl(d.bgcolor || '#ffffff').l > 0.5 ? 'black' : 'white') // scores > 0.875  have white text
       .attr("rowspan", (d: any) => d.rowspan || 1)
@@ -849,10 +850,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // delete old tooltip
     let tooltipParSets = d3.select("body").selectAll("div.parsets.tooltip").remove();
 
-    let svgContainer = d3.select('#' + containerId).append('div')
+    let miniVisualisation = d3.select('#' + containerId).append('div')
       .attr('class', 'svg-container ' + containerId);
 
-    let width = Number(svgContainer.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
+
+    this.generateVisualDetails(miniVisualisation);
+
+    let width = Number(miniVisualisation.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
     let svgWidth = width - 25;
     let svgHeight = 175;
     let svg2DimLabelHeight = 45;
@@ -928,7 +932,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .on('sortCategories',() => (this.sortCategoryParSetsListener.bind(that)(that, cell.category, '.svg-container.' + containerId)))
       .on('sortDimensions',() => (this.sortDimensionParSetsListener.bind(that)(that, dimension1, cell.category, cell.tableColumn, '.svg-container.' + containerId)));
 
-    let svgCanvas = svgContainer.append('svg')
+    let svgCanvas = miniVisualisation.append('svg')
       .attr('width', chart.width())
       .attr('height', chart.height()+svg2DimLabelHeight);
     // .attr('height',chart.height());
@@ -1088,43 +1092,48 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     this.highlightAndColorParSetsRibbons(that, svgRibbons, dimensionName, category, tableColumn);
   }
 
+  // adds a div element to the mini visualisation with the detail information to the score
+  private generateVisualDetails (miniVisualisation: d3.Selection<any>){
+    
+    let divDetailInfo = miniVisualisation.append('div')
+                                    .classed('detailVis',true);
+
+    // let detailTestType = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                  .classed('detailDiv',true)
+                  .text('Test: ')
+                  .append('span')
+                  .text('[TestName]');
+
+    // let detailTestValue = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                .classed('detailDiv',true)
+                .text('Test-Value/p-Value: ')
+                .append('span')
+                .text('[Value]/[p-Value]');  
+
+    // let detailTestDescr = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                  .classed('detailDiv',true)
+                  .text('Description: ')
+                  .append('span')
+                  .text('[Description]');    
+  }
+
   // creates boxplot visualization (for student-test, mwu-test)
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
     console.log('Cell clicken (BoxPlot): ',{containerId, cell});
     let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
     
-    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
-    oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
+    let oldMiniVisualisation = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
+    oldMiniVisualisation.remove(); //deletes all generated content im 'measuresDivElement'
 
-    let svgContainer = d3.select('#'+containerId).append('div')
+    let miniVisualisation = d3.select('#'+containerId).append('div')
                                                   .attr('class','svg-container '+containerId);
   
-    let divDetailInfo = svgContainer.append('div')
-                                    .classed('detailVis',true);
+    this.generateVisualDetails(miniVisualisation);
 
-    // let detailTestType = divDetailInfo.append('div');
-    // divDetailInfo.append('div')
-    //               .classed('detailDiv',true)
-    //               .text('Test: ')
-    //               .append('span')
-    //               .text('[TestName]');
-
-    // // let detailTestValue = divDetailInfo.append('div');
-    // divDetailInfo.append('div')
-    //             .classed('detailDiv',true)
-    //             .text('Test-Value/p-Value: ')
-    //             .append('span')
-    //             .text('[Value]/[p-Value]');  
-
-    // // let detailTestDescr = divDetailInfo.append('div');
-    // divDetailInfo.append('div')
-    //               .classed('detailDiv',true)
-    //               .text('Description: ')
-    //               .append('span')
-    //               .text('[Description]');    
-    
-    
                                                   
     let data = cell.dataVisRep.data.filter((item) => {return (item[0] === cell.tableColumn || item[0] === cell.category);});
     let min = cell.dataVisRep.min;
@@ -1132,7 +1141,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('BoxPlot: ',{data,min,max});
 
 
-    let containerWidth = Number(svgContainer.style('width').slice(0,-2)) - 25; //-25 because of the scroll bar
+    let containerWidth = Number(miniVisualisation.style('width').slice(0,-2)) - 25; //-25 because of the scroll bar
 
     let calcWidth = Math.max(containerWidth,data.length * 50 + 30);
 
@@ -1156,7 +1165,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           .showLabels(true);
 
 
-    let svgCanvas = svgContainer.append('svg')
+    let svgCanvas = miniVisualisation.append('svg')
           .attr('width',width + margin.left + margin.right)
           .attr('height',height + margin.top + margin.bottom);      
 

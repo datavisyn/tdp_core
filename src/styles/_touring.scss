@@ -42,62 +42,81 @@ div.touring {
       font-size: 0.9em;
     }
 
-    .measureTableHeader {
-      width: 100%;
+    .table-container {
 
-      th.rotate {
-        height: 100px;
-        position: relative;
-        vertical-align: middle !important;
-        padding: 0;
+      table {
+        width: auto;
+        table-layout: fixed;
+        word-wrap: break-word;
       }
 
-      th.rotate > div{
-        position: relative;
-        top: 0px;
-        left: 1px; /* moves the whole element to the left, because of the borderline widths */
-        height: 100%;
-        -ms-transform:skew(-45deg,0deg);
-        -moz-transform:skew(-45deg,0deg);
-        -webkit-transform:skew(-45deg,0deg);
-        -o-transform:skew(-45deg,0deg);
-        transform:skew(-45deg,0deg);
-        transform-origin: bottom left;
-        overflow: hidden;
+      .table-label {
+        width: 200px;
       }
 
-      th.rotate > div.borderedCell {
-        border-right: 2px solid #dddddd;
-      }
-      
-      th.rotate span {
-        -ms-transform:skew(45deg,0deg) rotate(315deg);
-        -moz-transform:skew(45deg,0deg) rotate(315deg);
-        -webkit-transform:skew(45deg,0deg) rotate(315deg);
-        -o-transform:skew(45deg,0deg) rotate(315deg);
-        transform:skew(45deg,0deg) rotate(315deg);
-        transform-origin: bottom left;
-        position: absolute;
-        bottom: 0px; /* table header text starts at the bottom of the header cell */
-        left: 51px; /* width of table cell for the p-values + border width */
-        display: inline-block;
-        width: 120px; /* 100 / cos(45) - 28 * cos(45) = 121.6 , where 100 is the height of the cell, 28 = 2*14 (text height) and 45 the transform angle */
-        text-align: left;
-        height: 35px; /* 51 * cos(45) , where 51 is the cell width  */
-        vertical-align: middle !important;
-        // line-height: normal;
-        // white-space: nowrap; /*whether to display in one line or not*/
+       // table cells with p-value and their headers, consider padding and border
+      td.action, th.table-value { 
+        width: 55px !important;
+        min-width: 55px !important;
+        max-width: 55px !important;
       }
 
-      // table cells with p-value, there is a default padding: 0px 8px (content + 16px)
-      td.action { 
-        width: 51px !important;
-        min-width: 51px !important;
-        max-width: 51px !important;
+      tr {
+        border-bottom: 1px solid #dddddd;
       }
 
       td {
         border-right: 2px solid #dddddd;
+      }
+      
+
+      .tableHeaderRotated {
+
+        th.rotate {
+          height: 100px;
+          position: relative;
+          vertical-align: middle !important;
+          padding: 0;
+        }
+
+        th.rotate > div{
+          position: relative;
+          top: 0px;
+          left: 1px; /* moves the whole element to the left, because of the borderline widths */
+          height: 100%;
+          -ms-transform:skew(-45deg,0deg);
+          -moz-transform:skew(-45deg,0deg);
+          -webkit-transform:skew(-45deg,0deg);
+          -o-transform:skew(-45deg,0deg);
+          transform:skew(-45deg,0deg);
+          transform-origin: bottom left;
+          overflow: hidden;
+        }
+
+        th.rotate > div.borderedCell {
+          border-right: 2px solid #dddddd;
+        }
+        
+        th.rotate span {
+          -ms-transform:skew(45deg,0deg) rotate(315deg);
+          -moz-transform:skew(45deg,0deg) rotate(315deg);
+          -webkit-transform:skew(45deg,0deg) rotate(315deg);
+          -o-transform:skew(45deg,0deg) rotate(315deg);
+          transform:skew(45deg,0deg) rotate(315deg);
+          transform-origin: bottom left;
+          position: absolute;
+          bottom: 0px; /* table header text starts at the bottom of the header cell */
+          left: 51px; /* width of table cell for the p-values + border width */
+          display: inline-block;
+          width: 120px; /* 100 / cos(45) - 28 * cos(45) = 121.6 , where 100 is the height of the cell, 28 = 2*14 (text height) and 45 the transform angle */
+          text-align: left;
+          height: 35px; /* 51 * cos(45) , where 51 is the cell width  */
+          vertical-align: middle !important;
+          // line-height: normal;
+          // white-space: nowrap; /*whether to display in one line or not*/
+        }
+
+       
       }
     }
 
