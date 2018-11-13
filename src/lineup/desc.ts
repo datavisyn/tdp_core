@@ -49,12 +49,6 @@ export interface IColumnOptions {
   selectedSubtype: string;
 
   /**
-   * set the column's color
-   * @default: ''
-   */
-  color: string;
-
-  /**
    * extra arguments
    */
   extras?: {[key: string]: any};
@@ -91,7 +85,7 @@ export function numberColFromArray(column: string, rows: any[], options: Partial
 export function numberCol(column: string, min: number, max: number, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {
     type: 'number',
-    domain: [min, max],
+    domain: [min, max]
   });
 }
 
