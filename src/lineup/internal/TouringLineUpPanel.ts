@@ -956,11 +956,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //highlight and color ribbons
     this.highlightAndColorParSetsRibbons(this, svgRibbons, dimension1, cell.category, cell.tableColumn);
-
+    svgFigureGroup.selectAll('g.ribbon-mouse').remove();
+    svgRibbons.on('.drag',null)
 
     //move label dimensions underneath parallel sets
     let svgDimensions = svgFigureGroup.selectAll('g.dimension');
     this.moveParSetsDimensionLabels(svgDimensions);
+    svgDimensions.selectAll('text.dimension').selectAll('tspan.sort').remove();
+    svgDimensions.on('.drag', null);
+    svgDimensions.selectAll('g.category').on('.drag', null);
 
     //highlight label of current path
     this.highlightParSetsSelectedLabel(this, svgDimensions, cell.category);
