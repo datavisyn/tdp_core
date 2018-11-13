@@ -45,7 +45,7 @@ export interface IScore<T> {
    * creates the LineUp column description
    * @returns {IColumnDesc & {[p: string]: any}}
    */
-  createDesc(): IColumnDesc & {[key: string]: any};
+  createDesc(extras?: object): IColumnDesc & {[key: string]: any};
 
 
   /**
