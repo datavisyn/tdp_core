@@ -618,10 +618,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   //generate table body depending on table head and radio button option
   private async getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
   {
+    // console.log('getTableBody',{tableHeader, measure, data});
     let tableBody = [];
 
     const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.compareB'));
-    //console.log('generateTableLayout - chosenColumns: ', chosenColumns);
+    // console.log('getTableBody - chosenColumns: ', chosenColumns);
       
     const groups = this.ranking.getGroupedData();
     
@@ -639,7 +640,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       }
 
 
-      let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.label));
+      let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.name));
+      // console.log('displayed Categories: ',{colCategories,currCatAfterFilter});
       
       //for (const category of currCatAfterFilter) {
       for (const [catIndex, category] of currCatAfterFilter.entries()) { // for...of because of the await below (doesn't work in foreach () =>  ...)
@@ -684,8 +686,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             tableRow[colName] = {
               label: score, 
               column: currCol.column,
-              column_label: currCol.label,
+              columnLabel: currCol.label,
               category: category.label,
+              // categoryName: category.name,
               bgcolor: this.score2color(measure.id,score),
               action: true,
               tableColumn: (tableHeader[col] as any).label,
@@ -866,7 +869,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
-    let dimension1 = cell.column_label+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
+    let dimension1 = cell.columnLabel+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
     let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
 
     let colPart = cell.dataVisRep;
@@ -1310,8 +1313,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         dataIdCurrCategory = currGroup.rows;
       } else { //category
         // find all ids of the current category
+        let value = currCategory.label === currCategory.name ? currCategory.label : currCategory.name;
         dataIdCurrCategory = data.filter((item) => {
-          return item[currAttribute] === currCategory.label;
+          return (String (item[currAttribute])) === value;
         });
       }
 
@@ -1902,7 +1906,7 @@ class RankingAdapter {
    */
   public getAttributeDataDisplayed(attributeId: string) { //  use lower case string
     const data = this.getItemsDisplayed();
-    return data.map((row) => row[attributeId]);
+    return data.map((row) => String(row[attributeId]));
   }
 
   /**
