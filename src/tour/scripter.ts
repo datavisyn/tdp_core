@@ -15,15 +15,16 @@ export function wait(timeMs: number): Promise<any> {
  * @param pollFrequencyMs
  * @returns {Promise<HTMLElement | null>} the found element or null
  */
-export function waitFor(selector: string, maxWaitingTime: number = 5000, pollFrequencyMs: number = 500): Promise<HTMLElement | null> {
+export function waitFor(selector: string | (() => HTMLElement | null), maxWaitingTime: number = 5000, pollFrequencyMs: number = 500): Promise<HTMLElement | null> {
+  const s = typeof selector === 'function' ? selector : () =>  document.querySelector<HTMLElement>(selector);
   return new Promise<HTMLElement>(async (resolve) => {
-    let elem: HTMLElement = document.querySelector<HTMLElement>(selector);
-    if (elem != null) {
+    let elem: HTMLElement = s();
+    if (s()) {
       return resolve(elem);
     }
     for (let waited = 0; waited < maxWaitingTime; waited += pollFrequencyMs) {
       await wait(pollFrequencyMs);
-      elem = document.querySelector<HTMLElement>(selector);
+      elem = s();
       if (elem != null) {
         return resolve(elem);
       }
@@ -46,7 +47,7 @@ export function setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | 
  * @param callback
  * @param interval
  */
-export function ensure(callback: () => boolean, interval: number = 500) {
+export function ensure(callback: () => boolean, interval: number = 250) {
   if (!callback() || !isTourVisible()) {
     return;
   }

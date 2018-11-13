@@ -16,9 +16,15 @@ export interface ITourManagerContext {
 
 export default class TourManager {
 
-  private readonly escKeyListener = (evt: KeyboardEvent) => {
+  private readonly keyListener = (evt: KeyboardEvent) => {
     if (evt.which === 27) { // esc
       this.hideTour();
+    } else if (evt.which === 13) { // enter
+      const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
+      if (next.disabled) {
+        return;
+      }
+      next.click();
     }
   }
 
@@ -277,7 +283,7 @@ export default class TourManager {
 
 
   private setUp(tour: Tour, context: any = {}) {
-    this.backdrop.ownerDocument.addEventListener('keyup', this.escKeyListener, {
+    this.backdrop.ownerDocument.addEventListener('keyup', this.keyListener, {
       passive: true
     });
     this.backdrop.style.display = 'block';
@@ -288,7 +294,7 @@ export default class TourManager {
 
   private takeDown() {
     this.clearHighlight();
-    this.backdrop.ownerDocument.removeEventListener('keyup', this.escKeyListener);
+    this.backdrop.ownerDocument.removeEventListener('keyup', this.keyListener);
     this.backdrop.style.display = null;
 
     this.step.style.display = 'none';
