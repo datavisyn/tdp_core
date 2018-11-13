@@ -14,22 +14,14 @@ $step-border: black;
 .tdp-tour-backdrop {
   display: none;
   position: absolute;
+  z-index: 999;
   top: 0;
   left: 0;
-  z-index: 999;
   right: 0;
   bottom: 0;
-
-  > * {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.2);
-    animation: tdp-tour-fade-in 0.2s;
-    transition: clipPath ease 1s;
-  }
+  background: rgba(0, 0, 0, 0.2);
+  animation: tdp-tour-fade-in 0.2s;
+  transition: clipPath ease 1s;
 }
 
 .tdp-tour-step-count {

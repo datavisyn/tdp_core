@@ -20,6 +20,12 @@ export interface ITDPTourExtensionDesc {
    */
   availableIf?: string | (() => boolean);
 
+  /**
+   * if this tour is over multiple pages / page refreshes, need to use the memorize function to store the current state
+   * TODO
+   */
+  multiPage?: boolean;
+
   load(): Promise<IPlugin & ITDPTourExtension>;
 }
 
@@ -37,10 +43,31 @@ export interface IStepContext {
 }
 
 export interface IStep {
+  /**
+   * selector to highlight element
+   */
   selector?: string;
+  /**
+   * html text to show
+   */
   html: string | ((node: HTMLElement)=>void);
+  /**
+   * optional placment option
+   */
   placement?: Placement;
+  /**
+   * executed before the step is shown
+   * @param context
+   */
   preAction?(context: IStepContext): void | PromiseLike<any>;
+  /**
+   * wait for this function o return either 'next' to auto next to the next step or 'enable' to enable the next button only
+   */
+  waitFor?(context: IStepContext): Promise<'next'|'enable'>;
+  /**
+   * executed after the step is shown
+   * @param context
+   */
   postAction?(context: IStepContext): void | PromiseLike<any>;
 }
 

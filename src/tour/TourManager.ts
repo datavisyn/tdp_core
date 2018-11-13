@@ -6,6 +6,7 @@ import {AppHeader} from 'phovea_ui/src/header';
 import {on} from 'phovea_core/src/event';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
+const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';
 
 export interface ITourManagerContext {
   doc: Document;
@@ -42,10 +43,9 @@ export default class TourManager {
     };
     this.backdrop = context.doc.createElement('div');
     this.backdrop.classList.add('tdp-tour-backdrop');
-    this.backdrop.innerHTML = `<div></div>`;
-    this.backdrop.onclick = () => {
-      this.hideTour();
-    };
+    // this.backdrop.onclick = () => {
+    //   this.hideTour();
+    // };
     this.step = context.doc.createElement('div');
     this.step.classList.add('tdp-tour-step');
     this.step.dataset.step = '0';
@@ -137,6 +137,9 @@ export default class TourManager {
         console.warn('invalid tour to start:', tourId, this.tours.map((d) => d.id));
       }
     });
+
+    // auto restart stored multi page tour
+    this.continueTour();
   }
 
   hasTours() {
@@ -144,9 +147,8 @@ export default class TourManager {
   }
 
   private setHighlight(mask: { left: number, top: number, width: number, height: number }) {
-    const area = <HTMLElement>this.backdrop.firstElementChild;
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example
-    area.style.clipPath = `polygon(
+    this.backdrop.style.clipPath = `polygon(
       0% 0%,
       0% 100%,
       ${mask.left}px 100%,
@@ -161,8 +163,7 @@ export default class TourManager {
   }
 
   private clearHighlight() {
-    const area = <HTMLElement>this.backdrop.firstElementChild;
-    area.style.clipPath = null;
+    this.backdrop.style.clipPath = null;
   }
 
   private setFocusElement(elem: HTMLElement) {
@@ -203,10 +204,26 @@ export default class TourManager {
       button.classList.toggle('fa-circle-o', i === stepNumber);
     });
 
-    this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
-    this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0;
-    this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]').innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
+    {
+      this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
+      this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0;
 
+      const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
+      next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
+      next.disabled = false;
+      if (step.waitFor) {
+        next.disabled = true;
+        step.waitFor(this.activeTourContext).then((r) => {
+          if (this.stepCount.innerText !== String(stepNumber + 1)) {
+            return; // step has changed in the mean while
+          }
+          next.disabled = false;
+          if (r === 'next') {
+            next.click();
+          }
+        });
+      }
+    }
 
     const content = this.step.querySelector<HTMLElement>('.tdp-tour-step-content')!;
     if (typeof step.html === 'function') {
@@ -226,6 +243,9 @@ export default class TourManager {
     const options: PopperOptions =  {};
     if (step.placement) {
       options.placement = step.placement;
+      options.modifiers = {
+        flip: {enabled: false}
+      }; // force position
     }
     if (focus) {
       this.stepPopper = new Popper(focus, this.step, options);
@@ -244,14 +264,21 @@ export default class TourManager {
     } else {
       this.stepCount.style.transform = this.step.style.transform;
     }
+
+    if (this.activeTour.multiPage) {
+      this.memorizeActiveStep(stepNumber);
+    }
   }
 
 
-  private setUp() {
+  private setUp(tour: Tour, context: any = {}) {
     this.backdrop.ownerDocument.addEventListener('keyup', this.escKeyListener, {
       passive: true
     });
     this.backdrop.style.display = 'block';
+
+    this.activeTour = tour;
+    this.activeTourContext = Object.assign({}, context, this.tourContext);
   }
 
   private takeDown() {
@@ -274,9 +301,7 @@ export default class TourManager {
   }
 
   showTour(tour: Tour, context: any = {}) {
-    this.activeTour = tour;
-    this.activeTourContext = Object.assign({}, context, this.tourContext);
-    this.setUp();
+    this.setUp(tour, context);
     this.activeTour.start(this.activeTourContext);
   }
 
@@ -291,6 +316,7 @@ export default class TourManager {
     }
     this.activeTour = null;
     this.activeTourContext = null;
+    this.clearStepMemorize();
   }
 
   private rememberFinished(tour: Tour) {
@@ -301,5 +327,34 @@ export default class TourManager {
 
   private getRememberedFinishedTours() {
     return new Set((localStorage.getItem(LOCALSTORAGE_FINISHED_TOURS) || '').split(','));
+  }
+
+  private memorizeActiveStep(stepNumber: number) {
+    if (!this.activeTour) {
+      return;
+    }
+    sessionStorage.setItem(SESSION_STORAGE_MEMORIZED_TOUR, `${this.activeTour.id}#${stepNumber}`);
+  }
+
+  private clearStepMemorize() {
+    sessionStorage.removeItem(SESSION_STORAGE_MEMORIZED_TOUR);
+  }
+
+  private continueTour() {
+    const memorized = sessionStorage.getItem(SESSION_STORAGE_MEMORIZED_TOUR);
+    sessionStorage.getItem(SESSION_STORAGE_MEMORIZED_TOUR);
+    if (!memorized) {
+      return;
+    }
+    const [tourId, stepString] = memorized.split('#');
+
+    const tour = this.tours.find((d) => d.id === tourId);
+    if (!tour) {
+      console.warn('memorized invalid tour', tourId);
+      return;
+    }
+
+    this.setUp(tour, {});
+    this.activeTour.jumpTo(parseInt(stepString, 10) + 1, this.activeTourContext);
   }
 }

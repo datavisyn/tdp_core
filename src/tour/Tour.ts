@@ -19,6 +19,10 @@ export default class Tour {
 
   }
 
+  get multiPage() {
+    return this.desc.multiPage === true;
+  }
+
   get id() {
     return this.desc.id;
   }
@@ -45,11 +49,6 @@ export default class Tour {
   }
 
   async start(context: ITourContext) {
-    if (this.steps.length === 0) {
-      await this.loadSteps();
-    }
-
-    context.steps(this.steps.length);
     return this.jumpTo(0, context);
 
   }
@@ -65,6 +64,11 @@ export default class Tour {
   }
 
   async jumpTo(step: number, context: ITourContext) {
+    if (this.steps.length === 0) {
+      await this.loadSteps();
+      context.steps(this.steps.length);
+    }
+
     if (step === this.current) {
       return;
     }
