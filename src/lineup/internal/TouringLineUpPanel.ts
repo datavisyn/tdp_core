@@ -639,7 +639,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         colCategories = new Set(this.ranking.getStratificationDesc().categories.map((cat) => cat.label));
       }
 
-
+      // item.name is used because for the strand attribute label !== name, as for all the other attributes
       let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.name));
       // console.log('displayed Categories: ',{colCategories,currCatAfterFilter});
       
@@ -688,7 +688,6 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               column: currCol.column,
               columnLabel: currCol.label,
               category: category.label,
-              // categoryName: category.name,
               bgcolor: this.score2color(measure.id,score),
               action: true,
               tableColumn: (tableHeader[col] as any).label,
@@ -1308,12 +1307,14 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       let dataIdCurrCategory = [];
 
       if (this.getRadioButtonValue() === 'group') { // stratification
-        //all ids of a stratification group
+        //all items of a stratification group
         const currGroup = groups.find(item => {return item.name === currCategory.label});
         dataIdCurrCategory = currGroup.rows;
       } else { //category
-        // find all ids of the current category
+        // this case happends in the strand attribute
         let value = currCategory.label === currCategory.name ? currCategory.label : currCategory.name;
+
+        // find all items of the current category
         dataIdCurrCategory = data.filter((item) => {
           return (String (item[currAttribute])) === value;
         });
