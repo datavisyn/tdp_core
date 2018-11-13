@@ -21,8 +21,7 @@ export interface ITDPTourExtensionDesc {
   availableIf?: string | (() => boolean);
 
   /**
-   * if this tour is over multiple pages / page refreshes, need to use the memorize function to store the current state
-   * TODO
+   * if this tour is over multiple pages / page refreshes, i.e. a step contans a `pageBreak`
    */
   multiPage?: boolean;
 
@@ -46,13 +45,13 @@ export interface IStep {
   /**
    * selector to highlight element
    */
-  selector?: string;
+  selector?: string | string[];
   /**
    * html text to show
    */
   html: string | ((node: HTMLElement)=>void);
   /**
-   * optional placment option
+   * optional more precise popper placement
    */
   placement?: Placement | ((options: PopperOptions)=>void);
   /**
@@ -61,7 +60,7 @@ export interface IStep {
    */
   preAction?(context: IStepContext): void | PromiseLike<any>;
   /**
-   * wait for this function o return either 'next' to auto next to the next step or 'enable' to enable the next button only
+   * wait for this function to return either 'next' to auto next to the next step or 'enable' to enable the next button only
    */
   waitFor?(context: IStepContext): Promise<'next'|'enable'>;
   /**

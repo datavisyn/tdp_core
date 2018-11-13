@@ -1,7 +1,7 @@
 import {resolveTours, ITourContext} from './Tour';
 import Tour from './Tour';
 import {IStep, GLOBAL_EVENT_START_TOUR} from './extensions';
-import Popper, {PopperOptions} from 'popper.js';
+import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
 import {AppHeader} from 'phovea_ui/src/header';
 import {on} from 'phovea_core/src/event';
 
@@ -12,6 +12,13 @@ export interface ITourManagerContext {
   doc: Document;
   app(): Promise<any>; // the TDP App
   header(): AppHeader;
+}
+
+interface IBoundingBox {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 }
 
 export default class TourManager {
@@ -152,7 +159,7 @@ export default class TourManager {
     return this.tours.some((d) => d.canBeListed());
   }
 
-  private setHighlight(mask: { left: number, top: number, width: number, height: number }) {
+  private setHighlight(mask: IBoundingBox) {
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example
     this.backdrop.style.clipPath = `polygon(
       0% 0%,
@@ -172,13 +179,12 @@ export default class TourManager {
     this.backdrop.style.clipPath = null;
   }
 
-  private setFocusElement(elem: HTMLElement) {
-    if (!elem) {
+  private setFocusElement(bb: IBoundingBox) {
+    if (!bb) {
       this.clearHighlight();
       return;
     }
-    const base = elem.getBoundingClientRect();
-    this.setHighlight(base);
+    this.setHighlight(bb);
   }
 
   private setSteps(count: number) {
@@ -200,9 +206,51 @@ export default class TourManager {
     });
   }
 
+  private selectHighlight(selector?: string | string[]): ReferenceObject | null {
+    if (!selector) {
+      return null;
+    }
+    if (typeof selector === 'string') {
+      return this.step.ownerDocument.querySelector(selector);
+    }
+    const all = (<HTMLElement[]>[]).concat(...selector.map((d) => Array.from(this.step.ownerDocument.querySelectorAll<HTMLElement>(d))));
+    if (all.length === 0) {
+      return null;
+    }
+    if (all.length === 1) {
+      return all[0];
+    }
+    // merge to one big bounding box
+    const base = all[0].getBoundingClientRect();
+    let top = base.top;
+    let left = base.left;
+    let bottom = base.bottom;
+    let right = base.right;
+    for (const elem of all) {
+      const bb = elem.getBoundingClientRect();
+      if (bb.top < top) {
+        top = bb.top;
+      }
+      if (bb.left < left) {
+        left = bb.left;
+      }
+      if (bb.right > right) {
+        right = bb.right;
+      }
+      if (bb.bottom > bottom) {
+        bottom = bb.bottom;
+      }
+    }
+    return {
+      clientWidth: right - left,
+      clientHeight: bottom - top,
+      getBoundingClientRect: () => ({left, right, top, bottom, width: right - left, height: bottom - top})
+    };
+  }
+
   private showStep(stepNumber: number, step: IStep) {
-    const focus: HTMLElement = step.selector ? this.step.ownerDocument.querySelector(step.selector) : null;
-    this.setFocusElement(focus);
+    const focus = this.selectHighlight(step.selector);
+    this.setFocusElement(focus ? focus.getBoundingClientRect() : null);
 
     const steps = this.step.querySelectorAll('.tdp-tour-step-dots div');
     Array.from(steps).forEach((button: HTMLElement, i) => {
