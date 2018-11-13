@@ -39,3 +39,27 @@ export function setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | 
   elem.value = value;
   return elem.dispatchEvent(new Event('change'));
 }
+
+
+/**
+ * intervall execute things will callback returns true
+ * @param callback
+ * @param interval
+ */
+export function ensure(callback: () => boolean, interval: number = 500) {
+  if (!callback() || !isTourVisible()) {
+    return;
+  }
+  let id = -1;
+  const w = () => {
+    if (!callback() || !isTourVisible()) {
+      clearInterval(id);
+    }
+  };
+  id = self.setInterval(w, interval);
+}
+
+export function isTourVisible() {
+  const counter = document.querySelector<HTMLElement>('.tdp-tour-step-count')!;
+  return counter.style.display === 'flex'; // visible -> active
+}

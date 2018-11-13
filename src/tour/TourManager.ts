@@ -211,7 +211,9 @@ export default class TourManager {
       const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
       next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
       next.disabled = false;
-      if (step.waitFor) {
+      if (step.pageBreak && this.activeTour.multiPage) {
+        next.disabled = true;
+      } else if (step.waitFor) {
         next.disabled = true;
         step.waitFor(this.activeTourContext).then((r) => {
           if (this.stepCount.innerText !== String(stepNumber + 1)) {
@@ -240,12 +242,15 @@ export default class TourManager {
     this.step.style.display = 'flex';
     this.stepCount.style.display = 'flex';
 
-    const options: PopperOptions =  {};
-    if (step.placement) {
+    const options: PopperOptions =  {
+      modifiers: {
+        preventOverflow: {boundariesElement: 'window'}
+      }
+    };
+    if (typeof step.placement === 'string') {
       options.placement = step.placement;
-      options.modifiers = {
-        flip: {enabled: false}
-      }; // force position
+    } else if (typeof step.placement === 'function') {
+      step.placement(options);
     }
     if (focus) {
       this.stepPopper = new Popper(focus, this.step, options);
@@ -265,8 +270,8 @@ export default class TourManager {
       this.stepCount.style.transform = this.step.style.transform;
     }
 
-    if (this.activeTour.multiPage) {
-      this.memorizeActiveStep(stepNumber);
+    if (this.activeTour.multiPage && step.pageBreak) {
+      this.memorizeActiveStep(stepNumber + 1);
     }
   }
 
@@ -342,7 +347,7 @@ export default class TourManager {
 
   private continueTour() {
     const memorized = sessionStorage.getItem(SESSION_STORAGE_MEMORIZED_TOUR);
-    sessionStorage.getItem(SESSION_STORAGE_MEMORIZED_TOUR);
+    sessionStorage.removeItem(SESSION_STORAGE_MEMORIZED_TOUR);
     if (!memorized) {
       return;
     }
@@ -355,6 +360,6 @@ export default class TourManager {
     }
 
     this.setUp(tour, {});
-    this.activeTour.jumpTo(parseInt(stepString, 10) + 1, this.activeTourContext);
+    this.activeTour.jumpTo(parseInt(stepString, 10), this.activeTourContext);
   }
 }

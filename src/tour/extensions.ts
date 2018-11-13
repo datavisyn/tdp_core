@@ -1,5 +1,5 @@
 import {IPlugin} from 'phovea_core/src/plugin';
-import {Placement} from 'popper.js';
+import {Placement, PopperOptions} from 'popper.js';
 import {fire} from 'phovea_core/src/event';
 import {AppHeader} from 'phovea_ui/src/header';
 import {IViewPluginDesc, IView, ISelection} from '../extensions';
@@ -54,7 +54,7 @@ export interface IStep {
   /**
    * optional placment option
    */
-  placement?: Placement;
+  placement?: Placement | ((options: PopperOptions)=>void);
   /**
    * executed before the step is shown
    * @param context
@@ -69,6 +69,11 @@ export interface IStep {
    * @param context
    */
   postAction?(context: IStepContext): void | PromiseLike<any>;
+
+  /**
+   * in case of multi page tours whether after this is a new page
+   */
+  pageBreak?: boolean;
 }
 
 export function startTour(tourId: string, context: any = {}) {
