@@ -931,8 +931,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .value(function (d) {return d.value;})
       .width(svgWidth)
       .height(svgHeight)
-      .on('sortCategories',() => (this.sortCategoryParSetsListener.bind(that)(that, cell.category, '.svg-container.' + containerId)))
-      .on('sortDimensions',() => (this.sortDimensionParSetsListener.bind(that)(that, dimension1, cell.category, cell.tableColumn, '.svg-container.' + containerId)));
+      .spacing(10);
 
     let svgCanvas = miniVisualisation.append('svg')
       .attr('width', chart.width())
