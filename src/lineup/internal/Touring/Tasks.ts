@@ -3,7 +3,6 @@ import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison,
 import * as d3 from 'd3';
 import {RankingAdapter} from './TouringPanel';
 import {IServerColumn} from '../../../rest';
-import {all} from 'bluebird';
 
 
 export const Tasks = new Array<ATouringTask>();

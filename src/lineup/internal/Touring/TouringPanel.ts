@@ -4,8 +4,7 @@ import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html
 import * as d3 from 'd3';
 import {isProxyAccessor} from '../utils';
 import {Tasks, ATouringTask} from './Tasks'
-import {IColumn} from 'lineupengine';
-import {IServerColumn} from 'tdp_core/src/rest';
+import {IServerColumn} from '../../../rest';
 
 export default class TouringPanel extends LineUpPanelActions {
 
