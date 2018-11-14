@@ -178,6 +178,11 @@ export class SelectionCategoryComparison extends RowComparison{
   public update(data: any[]) {
     const catData = data.filter((attr) => attr.type === 'categorical');
     const compareTo = [this.ranking.getSelectionDesc()];
+
+    this.createTable(catData, compareTo);
+  }
+
+  createTable(catData: any[], compareTo: {categories: ICategory[]; label: string; type: string; column: string;}[]): any {
     const colHeadsAttr = d3.select(this.node).select('thead tr.attr').selectAll('th.head').data(compareTo, (attr) => `${attr.column}/${attr.categories.length}`); //include category length to update if a category is added/removed
     colHeadsAttr.enter().append('th')
       .attr('class', 'head')
@@ -186,7 +191,6 @@ export class SelectionCategoryComparison extends RowComparison{
     colHeadsCat.enter().append('th')
       .attr('class', 'head');
 
-    
     const node = this.node; // for the function below
     function updateTableBody(bodyData: Array<Array<any>>) {
       const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
@@ -219,7 +223,7 @@ export class SelectionCategoryComparison extends RowComparison{
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Promise<Array<Array<IScoreCell>>> {
+  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Promise<Array<Array<IScoreCell>>> {
     const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
     const allCat2 = [].concat(...attr2.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
     const data = new Array(allCat2.length); // one row per category
@@ -297,7 +301,7 @@ export class SelectionCategoryComparison extends RowComparison{
 }
 
 @TaskDecorator()
-export class SelectionStratificationComparison extends RowComparison{
+export class SelectionStratificationComparison extends SelectionCategoryComparison{
 
   constructor() {
     super();
@@ -306,7 +310,10 @@ export class SelectionStratificationComparison extends RowComparison{
   }
 
   update(data: any) {
+    const catData = data.filter((attr) => attr.type === 'categorical');
+    const compareTo = [this.ranking.getStratificationDesc()];
 
+    this.createTable(catData, compareTo);
   }
 }
 

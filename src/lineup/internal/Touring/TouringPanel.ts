@@ -435,13 +435,13 @@ export class RankingAdapter {
       column: 'selection'
     };
   }
-
   public getStratificationDesc() {
     return {
-      categories: this.getRanking().getGroups().map((group) => ({
+      categories: this.getRanking().getGroups().map((group, index) => ({
         name: group.name,
-        label: group.name
-        // TODO get colors of stratification
+        label: group.name,
+        color: '#ffffff', // TODO get colors of stratification
+        value: index
       })), // if not stratifified, there is only one group ('Default')
       label: 'Stratification Groups',
       type: 'categorical',
