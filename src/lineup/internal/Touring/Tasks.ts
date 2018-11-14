@@ -43,7 +43,6 @@ export abstract class ATouringTask implements ITouringTask{
   public abstract update(data: any[]) 
   // {
   //     const ps = d3.select(this.node).selectAll('p').data(data, (data) => data.column); //column property is key
-    
   //     ps.enter().append('p').text((attr) => attr.label); //enter: add tasks to dropdown
   //     // update: nothing to do
   //     ps.exit().remove();   // exit: remove tasks no longer displayed
@@ -246,7 +245,7 @@ export class SelectionCategoryComparison extends RowComparison{
       const promises = [];
       const measure = MethodManager.getMeasuresByType(Type.CATEGORICAL, Type.CATEGORICAL, SCOPE.SETS)[0]; // fixed for this task
       
-      i=0;
+      let i=0;
       for (const col of attr2) {
         for (const [j, cat] of (col as any).categories.entries()) {
           const allData = this.ranking.getItemsDisplayed();
