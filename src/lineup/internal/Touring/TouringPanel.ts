@@ -54,7 +54,7 @@ export default class TouringPanel extends LineUpPanelActions {
     // change in selection
     //  might cause changes the displayed table / scores 
     //  if no items are selected, the table should be displayed by a message
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringPanel.EVENTTYPE, () => this.updateOutput()); //fat arrow to preserve scope in called function (this)
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + TouringPanel.EVENTTYPE, () => this.updateInput()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)

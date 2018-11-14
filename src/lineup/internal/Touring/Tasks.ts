@@ -207,6 +207,7 @@ export class SelectionCategoryComparison extends RowComparison{
       colHeadsAttr.exit().remove(); // remove attribute columns
       colHeadsCat.exit().remove(); // remove attribute columns
       trs.exit().remove(); // remove attribute rows
+      trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
     }
     
     this.getAttrTableBody(compareTo, catData, true).then(updateTableBody); // initialize
