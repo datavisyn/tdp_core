@@ -277,7 +277,7 @@ export default class TourManager {
         next.disabled = true;
       } else if (step.waitFor) {
         next.disabled = true;
-        step.waitFor(this.activeTourContext).then((r) => {
+        step.waitFor.call(step, this.activeTourContext).then((r) => {
           if (this.stepCount.innerText !== String(stepNumber + 1)) {
             return; // step has changed in the mean while
           }

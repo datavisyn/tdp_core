@@ -59,7 +59,7 @@ export interface IStep {
    * executed before the step is shown
    * @param context
    */
-  preAction?(context: IStepContext): void | PromiseLike<any>;
+  preAction?(context: IStepContext): any | PromiseLike<any>;
   /**
    * wait for this function to return either 'next' to auto next to the next step or 'enable' to enable the next button only
    */
@@ -68,7 +68,7 @@ export interface IStep {
    * executed after the step is shown
    * @param context
    */
-  postAction?(context: IStepContext): void | PromiseLike<any>;
+  postAction?(context: IStepContext): any | PromiseLike<any>;
 
   /**
    * in case of multi page tours whether after this is a new page

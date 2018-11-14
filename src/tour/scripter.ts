@@ -33,12 +33,38 @@ export function waitFor(selector: string | (() => HTMLElement | null), maxWaitin
   });
 }
 
+export function waitForSelector(this: { selector?: string}) {
+  return !this.selector ? Promise.resolve() : waitFor(this.selector);
+}
+
+export function click(elem: HTMLElement | string) {
+  const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
+  if (!e) {
+    return false;
+  }
+  e.click();
+}
+
+export function clickSelector(this: { selector?: string}) {
+  return click(this.selector);
+}
+
 /**
  * sets the value on the given element and also trigger a change event
  */
-export function setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement, value: string) {
-  elem.value = value;
-  return elem.dispatchEvent(new Event('change'));
+export function setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string) {
+  const e = typeof elem === 'string' ? document.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(elem) : elem;
+  if (!e) {
+    return;
+  }
+  e.value = value;
+  return e.dispatchEvent(new Event('change'));
+}
+
+export function setValueAndTriggerSelector(value: string) {
+  return function(this: {selector?: string}) {
+    setValueAndTrigger(this.selector, value);
+  };
 }
 
 

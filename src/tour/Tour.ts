@@ -39,7 +39,7 @@ export default class Tour {
       return document.querySelector(this.desc.availableIf) != null;
     }
     if (typeof this.desc.availableIf === 'function') {
-      return this.desc.availableIf();
+      return this.desc.availableIf.call(this.desc);
     }
     return true;
   }
@@ -76,7 +76,7 @@ export default class Tour {
     if (this.current >= 0) {
       const before = this.steps[this.current];
       if (before.postAction) {
-        await before.postAction(context);
+        await before.postAction.call(before, context);
       }
     }
 
@@ -89,7 +89,7 @@ export default class Tour {
     this.current = step;
     const next = this.steps[this.current];
     if (next.preAction) {
-      await next.preAction(context);
+      await next.preAction.call(next, context);
     }
     context.show(this.current, next);
   }
