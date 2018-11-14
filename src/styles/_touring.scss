@@ -51,7 +51,9 @@ div.touring {
       }
 
       .table-label {
-        width: 200px;
+        width: 200px !important;
+        min-width: 200px !important;
+        max-width: 200px !important;
       }
 
        // table cells with p-value and their headers, consider padding and border
