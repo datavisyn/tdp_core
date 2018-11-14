@@ -255,17 +255,17 @@ export class SelectionCategoryComparison extends RowComparison{
           const dataUnselected = [];
           const selectIndices = this.ranking.getSelection();
           
-          for (const item of allData) { // Walk through the array once an populate the data arrays
-            if (item[col.column] === cat.name) {
-              dataCategory.push(item[col.column]);
+          for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
+            const colId = (col as IServerColumn).column;
+            if (item[colId] === cat.name) { // TODO what else can we do here if the value is not the column name?
+              dataCategory.push(item[colId]);
             }
 
-            const index = selectIndices.findIndex((index) => index === item._id)
-            if (index >= 0) {
-              selectIndices.splice(index, 1); // Remove index as we have reached it
-              dataSelected.push(item[col.column])
+            if (selectIndices.length > 0 && index === selectIndices[0]) {
+              selectIndices.shift(); // Remove first element as we have reached it
+              dataSelected.push(item[colId])
             } else {
-              dataUnselected.push(item[col.column]);
+              dataUnselected.push(item[colId]);
             }
           }
 
