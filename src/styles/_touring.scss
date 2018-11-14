@@ -68,7 +68,30 @@ div.touring {
       td {
         border-right: 2px solid #dddddd;
       }
+
+      td.icon-category::before {
+        display: inline-block;
+        font: normal normal normal 14px/1 lu-font, serif;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #999;
+        width: 1.2em;
+        content: "\e810";
+      }
       
+      td.icon-number::before {
+        display: inline-block;
+        font: normal normal normal 14px/1 lu-font, serif;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #999;
+        width: 1.2em;
+        content: "\e811";
+      }
 
       .tableHeaderRotated {
 

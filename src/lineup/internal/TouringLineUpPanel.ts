@@ -7,6 +7,7 @@ import 'd3.parsets';
 import 'd3-grubert-boxplot';
 import {isProxyAccessor} from './utils';
 import {categories} from 'lineupjs/src/model/annotations';
+import { toData } from '../../form/internal/AFormElement';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -660,6 +661,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           {
             tableRow[colName] = {
               label: currCol.label,
+              type: currCol.type,
               rowspan: (catIndex === 0) ? currCatAfterFilter.length : 0              
             };
 
@@ -804,7 +806,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       })
       .enter()
       .append('td')
-      .attr('class', (d: any) => d.action ? 'text-center align-middle action' : 'text-left align-middle table-label')
+      .attr('class', (d: any) => {
+        let classes = d.action ? 'text-center align-middle action' : 'text-left align-middle table-label'
+
+        // icon for the attribute type
+        if(!d.action && d.type && d.type === 'categorical'){
+          classes = classes + ' icon-category';
+        }else if (!d.action && d.type && d.type === 'number'){
+          classes = classes + ' icon-number';
+        }
+
+        return classes;
+      })
       .style("background-color", (d: any) => d.bgcolor || '#ffffff')
       .style("color", (d: any) => d3.hsl(d.bgcolor || '#ffffff').l > 0.5 ? 'black' : 'white') // scores > 0.875  have white text
       .attr("rowspan", (d: any) => d.rowspan || 1)
