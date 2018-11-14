@@ -240,7 +240,7 @@ export class RankingAdapter {
    *    ...
    *    ]
    */
-  public getItemsDisplayed(): Array<Object> {
+  public getItemsDisplayed(sort = true): Array<Object> {
     const allItems = this.getItems();
     // get currently displayed data
     return this.getItemOrder().map(rowId => allItems[rowId]);
@@ -283,7 +283,9 @@ export class RankingAdapter {
 
         // include wether the row is selected
         item.selection = this.oldSelection.includes(i) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
-        item.strat_groups = this.getRanking().getGroups().findIndex((grp) => grp.order.indexOf(i) >= 0); // index of group = category name, find index by looking up i. -1 if not found
+        const stratGroupIndex = this.getRanking().getGroups().findIndex((grp) => grp.order.indexOf(i) >= 0);
+        const stratGroupName = stratGroupIndex === -1 ? 'Unknown' : this.getRanking().getGroups()[stratGroupIndex].name
+        item.strat_groups = stratGroupName; // index of group = category name, find index by looking up i. -1 if not found
         databaseData.push(item);
       })
   
@@ -303,6 +305,9 @@ export class RankingAdapter {
     return this.data;
   }
 
+  /**
+   * Returns an array of indices for the providers data array
+   */
   private getItemOrder() {
     // order is always defined for groups (rows (data) only if there is an stratification)
     return [].concat(...this.getRanking().getGroups().map((grp) => grp.order)); // Map groups to order arrays and concat those
@@ -376,10 +381,21 @@ export class RankingAdapter {
   }
 
   /**
+   * Returns the index of the selected items in the provider data array
+   */
+  private getSelectionUnsorted() {
+    return this.provider.getSelection();
+  }
+
+   /**
    * Returns the '_id' of the selected items
    */
   public getSelection() {
-    return this.provider.getSelection();
+    // we have the indices for the unsorted data array by this.getSelectionUnsorted() {
+    // and we have an array of indices to sort the data array by this.getItemOrder();
+    // --> the position of the indices from the selection in the order array is the new index
+    const orderedIndices = this.getItemOrder();
+    return this.getSelectionUnsorted().map((unorderedIndex) => orderedIndices.findIndex((orderedIndex) => orderedIndex === unorderedIndex));
   }
 
   public getScoreData(desc: IColumnDesc | any) {
