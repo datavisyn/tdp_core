@@ -273,7 +273,7 @@ export default class TourManager {
       const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
       next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
       next.disabled = false;
-      if (step.pageBreak && this.activeTour.multiPage) {
+      if (step.pageBreak === 'user' && this.activeTour.multiPage) {
         next.disabled = true;
       } else if (step.waitFor) {
         next.disabled = true;

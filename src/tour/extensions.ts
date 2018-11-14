@@ -72,9 +72,9 @@ export interface IStep {
 
   /**
    * in case of multi page tours whether after this is a new page
-   * @default false
+   * @default null
    */
-  pageBreak?: boolean;
+  pageBreak?: 'manual' | 'user';
 
   /**
    * whether to allow that the user is interacting with the focus element

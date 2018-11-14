@@ -52,21 +52,48 @@ export function clickSelector(this: { selector?: string}) {
 /**
  * sets the value on the given element and also trigger a change event
  */
-export function setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string) {
+export function setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string, eventType: 'change'|'input' = 'change') {
   const e = typeof elem === 'string' ? document.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(elem) : elem;
   if (!e) {
     return;
   }
   e.value = value;
-  return e.dispatchEvent(new Event('change'));
+  return e.dispatchEvent(new Event(eventType, {
+    bubbles: true,
+    cancelable: true
+  }));
 }
 
-export function setValueAndTriggerSelector(value: string) {
+
+export function keyDownEnter(elem: HTMLElement | string) {
+  const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
+  if (!e) {
+    return;
+  }
+  const event = new KeyboardEvent('keydown', <any>{
+    bubbles: true,
+    cancelable: true,
+    key: 'Enter',
+    code: 'Enter',
+    which: 13,
+    keyCode: 13
+  });
+  e.dispatchEvent(event);
+}
+
+export function setValueAndTriggerSelector(value: string, eventType: 'change'|'input' = 'change') {
   return function(this: {selector?: string}) {
-    setValueAndTrigger(this.selector, value);
+    setValueAndTrigger(this.selector, value, eventType);
   };
 }
 
+export function toggleClass(elem: HTMLElement | string, clazz: string, toggle?: boolean) {
+  const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
+  if (!e) {
+    return;
+  }
+  e.classList.toggle(clazz, toggle);
+}
 
 /**
  * intervall execute things will callback returns true
