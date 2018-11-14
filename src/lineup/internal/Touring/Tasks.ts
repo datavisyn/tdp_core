@@ -18,7 +18,7 @@ export interface ITouringTask {
   id: string;
   label: string;
   
-  scope: SCOPE; //  Attributes or subsets of them?
+  scope: SCOPE; // Does the Task use attributes or subsets of them?
 }
 
 export abstract class ATouringTask implements ITouringTask{
