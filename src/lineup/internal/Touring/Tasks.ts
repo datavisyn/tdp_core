@@ -268,9 +268,8 @@ export class SelectionCategoryComparison extends RowComparison{
               dataUnselected.push(item[colId]);
             }
           }
-
           
-          let iPromise = i;
+          let iPromise = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
           // Score with selected:
           promises.push(measure.calc(dataSelected, dataCategory)
                 .then((score) => data[iPromise][j === 0 ? 2 : 1] = {label: score.toFixed(2)})  // TODO call updateTable here?
