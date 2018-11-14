@@ -253,7 +253,7 @@ export class RankingAdapter {
 
     // TODO events may be better?
     const sameAttr = this.oldAttributes.length === this.getDisplayedAttributes().length && this.oldAttributes.filter((attr) => /*note the negation*/ !this.getDisplayedAttributes().some((attr2) => attr2.desc.label === attr.desc.label)).length === 0;
-    const sameSel = this.oldSelection.length === this.getSelection().length && this.oldSelection.every((val, i) => this.getSelection()[i] === val);
+    const sameSel = this.oldSelection.length === this.getSelectionUnsorted().length && this.oldSelection.every((val, i) => this.getSelectionUnsorted()[i] === val);
     const sameOrder = this.oldOrder.length === this.getItemOrder().length && this.oldOrder.every((val, i) => this.getItemOrder()[i] === val);
 
     if (sameAttr && sameSel && sameOrder) {
@@ -275,7 +275,7 @@ export class RankingAdapter {
       const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
   
       this.oldOrder = this.getItemOrder();
-      this.oldSelection = this.getSelection();
+      this.oldSelection = this.getSelectionUnsorted();
 
       this.provider.data.forEach((item, i) => {
         let index = this.oldOrder.indexOf(i)
@@ -383,7 +383,7 @@ export class RankingAdapter {
   /**
    * Returns the index of the selected items in the provider data array
    */
-  private getSelectionUnsorted() {
+  public getSelectionUnsorted() {
     return this.provider.getSelection();
   }
 
@@ -395,7 +395,10 @@ export class RankingAdapter {
     // and we have an array of indices to sort the data array by this.getItemOrder();
     // --> the position of the indices from the selection in the order array is the new index
     const orderedIndices = this.getItemOrder();
-    return this.getSelectionUnsorted().map((unorderedIndex) => orderedIndices.findIndex((orderedIndex) => orderedIndex === unorderedIndex));
+    const unorderedSelectionINdices = this.getSelectionUnsorted();
+    const orderedSelectionIndices = unorderedSelectionINdices.map((unorderedIndex) => orderedIndices.findIndex((orderedIndex) => orderedIndex === unorderedIndex))
+    const sortedOreredSelectionIndices = orderedSelectionIndices.sort((a, b) => a - b);
+    return sortedOreredSelectionIndices;
   }
 
   public getScoreData(desc: IColumnDesc | any) {
@@ -417,11 +420,11 @@ export class RankingAdapter {
   public getSelectionDesc() {
     const selCategories = new Array<ICategory>();
     const numberOfRows = this.getItemOrder().length; // get length of stratification groups and sum them up
-    if (this.getSelection().length > 0) {
+    if (this.getSelectionUnsorted().length > 0) {
       selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
     } // else: none selected
 
-    if (this.getSelection().length < numberOfRows) {
+    if (this.getSelectionUnsorted().length < numberOfRows) {
       selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
     } // else: all selected
 

@@ -250,9 +250,9 @@ export class SelectionCategoryComparison extends RowComparison{
         for (const [j, cat] of (col as any).categories.entries()) {
           const allData = this.ranking.getItemsDisplayed();
           const dataCategory = [];
-          const dataSelected = [];
-          const dataUnselected = [];
-          const selectIndices = this.ranking.getSelection();
+          const dataSelected = []; // TODO: hardcoded -> bad
+          const dataUnselected = []; // TODO: hardcoded -> bad
+          const selectIndices = this.ranking.getSelection(); 
           
           for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
             const colId = (col as IServerColumn).column;
@@ -268,18 +268,25 @@ export class SelectionCategoryComparison extends RowComparison{
             }
           }
           
-          let iPromise = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
+          let rowIndex = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
           // Score with selected:
-          promises.push(measure.calc(dataSelected, dataCategory)
-                .then((score) => data[iPromise][j === 0 ? 2 : 1] = {label: score.toFixed(2)})  // TODO call updateTable here?
-                .catch((err) => data[iPromise][j === 0 ? 2 : 1] = {label: Number.NaN}));
+          let firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+          if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
+            let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
+            promises.push(measure.calc(dataSelected, dataCategory)
+                  .then((score) => data[rowIndex][selScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                  .catch((err) => data[rowIndex][selScoreIndex] = {label: Number.NaN}));
+          }
 
-          // Score with unselected:
-          promises.push(measure.calc(dataUnselected, dataCategory)
-                .then((score) => data[iPromise][j === 0 ? 3 : 2] = {label: score.toFixed(2)})  // TODO call updateTable here?
-                .catch((err) => data[iPromise][j === 0 ? 3 : 2] = {label: Number.NaN}));
+          if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
+            let unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
+            // Score with unselected:
+            promises.push(measure.calc(dataUnselected, dataCategory)
+                  .then((score) => data[rowIndex][unselScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                  .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
 
-          i++;
+            i++;
+          }
         }
       }
 
