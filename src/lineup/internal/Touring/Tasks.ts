@@ -176,8 +176,8 @@ export class SelectionCategoryComparison extends RowComparison{
     this.label = "Compare selected rows with column categories"
   }
 
-  public update(slsl: any[]) {
-    const catData = slsl.filter((attr) => attr.type === 'categorical');
+  public update(data: any[]) {
+    const catData = data.filter((attr) => attr.type === 'categorical');
     const compareTo = [this.ranking.getSelectionDesc()];
     const colHeadsAttr = d3.select(this.node).select('thead tr.attr').selectAll('th.head').data(compareTo, (attr) => `${attr.column}/${attr.categories.length}`); //include category length to update if a category is added/removed
     colHeadsAttr.enter().append('th')

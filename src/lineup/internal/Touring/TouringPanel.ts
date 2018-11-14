@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 import {isProxyAccessor} from '../utils';
 import {Tasks, ATouringTask} from './Tasks'
 import {IColumn} from 'lineupengine';
+import {IServerColumn} from 'tdp_core/src/rest';
 
 export default class TouringPanel extends LineUpPanelActions {
 
@@ -69,7 +70,7 @@ export default class TouringPanel extends LineUpPanelActions {
     // for filter changes and stratification changes
     //  After the number of items has changed, the score change aswell
     // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
-    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringPanel.EVENTTYPE, () => this.updateOutput());
+    this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED + TouringPanel.EVENTTYPE, () => this.updateInput());
   }
 
   private initNewTask() {
@@ -99,11 +100,11 @@ export default class TouringPanel extends LineUpPanelActions {
   private updateInput() {
     const scopeSelect = d3.select(this.touringElem).select('select.scope');
     
-    // TODO remove categories which are not displayed
     let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
+      const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
       const desc: IColumnDesc = deepCopy(col.desc);
       if ((col as CategoricalColumn).categories) {
-        (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories);
+        (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories).filter((category) => displayedCategories.has(category.name));
       }
 
       return desc;
