@@ -692,7 +692,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               action: true,
               tableColumn: (tableHeader[col] as any).label,
               dataVisRep: dataVisualRep,
-              measureResult: measureResult
+              measureResult: measureResult,
+              measure: measure
             };
           }
         }
@@ -715,6 +716,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const dataTable = await this.generateTableLayout(currentData, measure);
     const that = this;
 
+    if(measure.type.typeA.value === 'number' || measure.type.typeB.value === 'number'){
+      this.createLegend(d3.select('#'+containerId));
+    }
+    
     // create a <div> as table container with D3
     let tableContainer = d3.select('#'+containerId).append('div')
                                                   .attr('class','table-container');
@@ -856,7 +861,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .attr('class', 'svg-container ' + containerId);
 
 
-    this.generateVisualDetails(miniVisualisation);
+    this.generateVisualDetails(miniVisualisation, cell.measure, cell.measureResult);
 
     let width = Number(miniVisualisation.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
     let svgWidth = width - 25;
@@ -943,7 +948,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgFigureGroup = svgCanvas.append('g').attr('class', 'parSets');
                                               // .attr('width', chart.width())
                                               // .attr('height', chart.height() + svg2DimLabelHeight);
-
+    
     // draw parallel sets
     svgFigureGroup.datum(parSetData).call(chart);
 
@@ -1072,33 +1077,33 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     });
   }
 
-  // method is called when categories are rearranged in the parallel sets vis
-  private sortCategoryParSetsListener(that, category: string, svgElement: string)
-  {
-    console.log('"sortCategoryParSetsListener" was activated: ', {category,svgElement});
+  // // method is called when categories are rearranged in the parallel sets vis
+  // private sortCategoryParSetsListener(that, category: string, svgElement: string)
+  // {
+  //   console.log('"sortCategoryParSetsListener" was activated: ', {category,svgElement});
 
-    let svgDimensions = d3.selectAll('div'+svgElement).selectAll('g.parSets').selectAll('g.dimension');
-    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+  //   let svgDimensions = d3.selectAll('div'+svgElement).selectAll('g.parSets').selectAll('g.dimension');
+  //   this.highlightParSetsSelectedLabel(that, svgDimensions, category);
 
-  }
+  // }
 
-  // method is called when dimensions are rearranged in the parrallel sets vis
-  private sortDimensionParSetsListener(that, dimensionName: string, category: string, tableColumn: string, svgElement: string)
-  {
-    console.log('"sortDimensionParSetsListener" was activated: ', {dimensionName,category,tableColumn,svgElement});
+  // // method is called when dimensions are rearranged in the parrallel sets vis
+  // private sortDimensionParSetsListener(that, dimensionName: string, category: string, tableColumn: string, svgElement: string)
+  // {
+  //   console.log('"sortDimensionParSetsListener" was activated: ', {dimensionName,category,tableColumn,svgElement});
     
-    let svgParSets = d3.selectAll('div'+svgElement).selectAll('g.parSets');
+  //   let svgParSets = d3.selectAll('div'+svgElement).selectAll('g.parSets');
 
-    let svgDimensions = svgParSets.selectAll('g.dimension');
-    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
-    this.moveParSetsDimensionLabels(svgDimensions);
+  //   let svgDimensions = svgParSets.selectAll('g.dimension');
+  //   this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+  //   this.moveParSetsDimensionLabels(svgDimensions);
 
-    let svgRibbons = svgParSets.selectAll('g.ribbon');
-    this.highlightAndColorParSetsRibbons(that, svgRibbons, dimensionName, category, tableColumn);
-  }
+  //   let svgRibbons = svgParSets.selectAll('g.ribbon');
+  //   this.highlightAndColorParSetsRibbons(that, svgRibbons, dimensionName, category, tableColumn);
+  // }
 
   // adds a div element to the mini visualisation with the detail information to the score
-  private generateVisualDetails (miniVisualisation: d3.Selection<any>){
+  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult){
     
     let divDetailInfo = miniVisualisation.append('div')
                                     .classed('detailVis',true);
@@ -1108,41 +1113,119 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
                   .classed('detailDiv',true)
                   .text('Test: ')
                   .append('span')
-                  .text('[TestName]');
+                  .text(measure.label);
 
     // let detailTestValue = divDetailInfo.append('div');
+    let scoreValue = measureResult.scoreValue.toFixed(3);
+    let pValue = measureResult.pValue.toFixed(3);
     divDetailInfo.append('div')
                 .classed('detailDiv',true)
                 .text('Test-Value/p-Value: ')
                 .append('span')
-                .text('[Value]/[p-Value]');  
+                .text(`${scoreValue}/${pValue}`);  
 
     // let detailTestDescr = divDetailInfo.append('div');
     divDetailInfo.append('div')
                   .classed('detailDiv',true)
                   .text('Description: ')
                   .append('span')
-                  .text('[Description]');    
+                  .text(measure.description);    
   }
 
+  // creates legend for the p-value
+  private createLegend(parentElement: d3.Selection<any>)
+  {
+    let divLegend = parentElement.append('div').classed('measure-legend',true);
+    let svgLegendContainer = divLegend.append('svg')
+                              .attr('width','100%')
+                              .attr('height',50);
+
+    let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
+                                                  .attr('id','gradLegend');    
+    svgDefs.append('stop')
+            .attr('offset','0%')
+            .attr('stop-color','#A9A9A9'); 
+    svgDefs.append('stop')
+            .attr('offset','50%')
+            .attr('stop-color','#FFFFFF'); 
+
+    let svgLegendGroup = svgLegendContainer.append('g');
+    let svgRect1 = svgLegendGroup.append('rect')
+                                .attr('x',10)
+                                .attr('y',10)
+                                .attr('width',150)
+                                .attr('height',15)
+                                .style('fill','url(#gradLegend)')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+    let svgText11 = svgLegendGroup.append('text')
+    .attr('x',10)
+    .attr('y',40)
+    .attr('text-anchor','start')
+    .text('0');
+    let svgText12 = svgLegendGroup.append('text')
+    .attr('x',85)
+    .attr('y',40)
+    .attr('text-anchor','middle')
+    .text('0.05');
+    let svgText13 = svgLegendGroup.append('text')
+    .attr('x',160)
+    .attr('y',40)
+    .attr('text-anchor','end')
+    .text('0.1');
+    let svgRect2 = svgLegendGroup.append('rect')
+                                .attr('x',170)
+                                .attr('y',10)
+                                .attr('width',150)
+                                .attr('height',15)
+                                .style('fill','white')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+
+    let svgText21 = svgLegendGroup.append('text')
+    .attr('x',170)
+    .attr('y',40)
+    .attr('text-anchor','start')
+    .text('0.1');
+    let svgText22 = svgLegendGroup.append('text')
+    .attr('x',320)
+    .attr('y',40)
+    .attr('text-anchor','end')
+    .text('1');
+  }
   // creates boxplot visualization (for student-test, mwu-test)
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
     console.log('Cell clicken (BoxPlot): ',{containerId, cell});
     let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
     
+    // delete old tooltip and miniVis
     let oldMiniVisualisation = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
     oldMiniVisualisation.remove(); //deletes all generated content im 'measuresDivElement'
 
+    
+    let tooltipParSets = d3.select("body").selectAll("div.boxplot.tooltip").remove();
+
+    // create new tooltip and miniVis
     let miniVisualisation = d3.select('#'+containerId).append('div')
                                                   .attr('class','svg-container '+containerId);
   
-    this.generateVisualDetails(miniVisualisation);
+
+    let tooltipBoxplot = d3.select("body").append("div").style("display", "none").attr("class", "tooltip boxplot");
+    tooltipBoxplot.style("display", "none");
+
+    this.generateVisualDetails(miniVisualisation, cell.measure, cell.measureResult);
 
                                                   
     let data = cell.dataVisRep.data.filter((item) => {return (item[0] === cell.tableColumn || item[0] === cell.category);});
-    let min = cell.dataVisRep.min;
-    let max = cell.dataVisRep.max;
+    let min = Math.min(...data.map((a) => (a[2].min)));
+    let max = Math.max(...data.map((a) => (a[2].max)));
+    
+    // check if the min and may are not infinte
+    min = isFinite(min) ? min : cell.dataVisRep.domainMin;
+    max = isFinite(max) ? max : cell.dataVisRep.domainMax;
+    // remove all empty sets
+    data = data.filter((item) => {return (item[1].length !== 0)});
     // console.log('BoxPlot: ',{data,min,max});
 
 
@@ -1150,7 +1233,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     let calcWidth = Math.max(containerWidth,data.length * 50 + 30);
 
-    let margin = {top: 5, right: 0, bottom: 50, left: 50};
+    let margin = {top: 10, right: 0, bottom: 50, left: 100};
     let  width = calcWidth - margin.left - margin.right;
     let height = 220 - margin.top - margin.bottom;
 
@@ -1167,7 +1250,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           })
           .height(height)	
           .domain([min, max])
-          .showLabels(true);
+          .showLabels(false);
 
 
     let svgCanvas = miniVisualisation.append('svg')
@@ -1211,25 +1294,25 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .call(chart.width(x.rangeBand())); 
      
     // add a title
-    // svgFigureGroup.append("text")
-    //     .attr("x", (width / 2))             
-    //     .attr("y", 0 + (margin.top / 2))
-    //     .attr("text-anchor", "middle")  
-    //     .style("font-size", "18px") 
-    //     //.style("text-decoration", "underline")  
-    //     .text("Revenue 2012");
+    svgFigureGroup.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 + (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "18px") 
+        //.style("text-decoration", "underline")  
+        .text(cell.columnLabel);
 
     // draw y axis
     svgFigureGroup.append("g")
       .attr("class", "y axis")
       .call(yAxis);
-    //   .append("text") // and text1
-    //   .attr("transform", "rotate(-90)")
-    //   .attr("y", 6)
-    //   .attr("dy", ".71em")
-    //   .style("text-anchor", "end")
-    //   .style("font-size", "16px") 
-    //   .text("Revenue in €");		
+      // .append("text") // and text1
+      // .attr("transform", "rotate(-90)")
+      // .attr("y", 6)
+      // .attr("dy", ".71em")
+      // .style("text-anchor", "end")
+      // .style("font-size", "16px") 
+      // .text(cell.columnLabel);		
 
     // draw x axis	
     svgFigureGroup.append("g")
@@ -1242,28 +1325,43 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // .attr("dy", ".71em")
       //   .style("text-anchor", "middle")
       // .style("font-size", "16px") 
-      //   .text("Quarter"); 
+      //   .text(cell.columnLabel); 
 
 
-    let boxElements = svgFigureGroup.selectAll('g.box-element')
-                                    .each(function(d) {
-                                      d3.select(this).classed('selected',false);
-                                      // console.log('box.this: ', d3.select(this));
-                                      // console.log('box.d: ',d);
-                                      
-                                      if(d[0] === cell.tableColumn || d[0] === cell.category){
-                                        d3.select(this).classed('selected',true);
-                                      }
-                                    });
+    let boxElements = svgFigureGroup.selectAll('g.box-element').classed('selected',true);
 
+    let cirlceElements = boxElements.selectAll('circle')
+                                    .attr('r',2);
     if(cell.dataVisRep.color)
     {                                
       let rectElements = boxElements.selectAll('rect').style('fill',cell.dataVisRep.color);         
       let cirlceElements = boxElements.selectAll('circle').style('fill',cell.dataVisRep.color).style('stroke','black');              
     }
 
-    let cirlceElements = boxElements.selectAll('circle')
-                                    .attr('r',2);
+    // tooltip
+    boxElements.on("mouseover", function(d) {
+                  // console.log('boxplot.tooltip.d',d)		
+                  let m = d3.mouse(d3.select("body").node());
+                  tooltipBoxplot.transition()		
+                      .duration(200)		
+                      .style("opacity", .9);
+                  let min = (d[1][0]).toFixed(2);
+                  let q1 = (d[1].quartiles[0]).toFixed(2);
+                  let median = (d[1].quartiles[1]).toFixed(2);
+                  let q3 = (d[1].quartiles[2]).toFixed(2);
+                  let max = (d[1][d[1].length-1]).toFixed(2);
+                  tooltipBoxplot	.html(`min = ${min}</br>q1 = ${q1}</br>median = ${median}</br>q3 = ${q3}</br>max = ${max}`)	
+                      .style("display", null)
+                      .style("left", m[0] + 30 + "px")
+                      .style("top", m[1] - 20 + "px")	
+                })					
+                .on("mouseout", function(d) {		
+                  tooltipBoxplot.transition()		
+                        .duration(500)		
+                        .style("display", 'none')
+                        .style("opacity", 0);	
+                });
+
 
   }
 
@@ -1291,12 +1389,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // creates data for the visual representation of parallel sets
   private getColumnPartioningParallelSets(data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any, category: any) {
-    console.log('---- getColumnPartioning ----');
-    console.log('getColumnPartioning.data',data);
-    console.log('getColumnPartioning.groups',groups);
-    console.log('getColumnPartioning.tableHeader',tableHeader);
-    console.log('getColumnPartioning.column',column);
-    console.log('getColumnPartioning.category',category);
+    // console.log('---- getColumnPartioning ----');
+    // console.log('getColumnPartioning.data',data);
+    // console.log('getColumnPartioning.groups',groups);
+    // console.log('getColumnPartioning.tableHeader',tableHeader);
+    // console.log('getColumnPartioning.column',column);
+    // console.log('getColumnPartioning.category',category);
     let columnPartitioning = [];
     // const groups = this.ranking.getGroupedData();
     const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
@@ -1369,28 +1467,28 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       columnPartitioning.push(currCategoryParts);
     }
-    console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
+    // console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
     return columnPartitioning;
   }
  
   // creates data for the visual representation of boxplots
   private getDataValuesBoxplit(data: Array<any>, groups: Array<any>,tableHeader: Array<any>, column: any, category: any)
   {
-    console.log('---- getColumnPartioning ----');
-    console.log('getColumnPartioning.data',data);
-    console.log('getColumnPartioning.groups',groups);
-    console.log('getColumnPartioning.tableHeader',tableHeader);
-    console.log('getColumnPartioning.column',column);
-    console.log('getColumnPartioning.category',category);
+    // console.log('---- getColumnPartioning ----');
+    // console.log('getColumnPartioning.data',data);
+    // console.log('getColumnPartioning.groups',groups);
+    // console.log('getColumnPartioning.tableHeader',tableHeader);
+    // console.log('getColumnPartioning.column',column);
+    // console.log('getColumnPartioning.category',category);
     // let columnPartitioning = [];
     // let groups = this.ranking.getGroupedData();
     let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     let rowBoxData = [];
-    // let min = Infinity;
-    // let max = -Infinity;
-    let min = column.domain[0];
-    let max = column.domain[1];
+    let boxMinMax = [];
+    let min = Infinity;
+    let max = -Infinity;
+
 
     let categoryBoxData = []
     if(optionDDA === 'Selection')
@@ -1402,12 +1500,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         if(groups[g].name === category.label && (groups[g] as any).rows)
         {
           let dataCategroy = (groups[g] as any).rows.map((a) => { return Number(a[''+column.column]); });
-          let dataCategroyValid = dataCategroy.filter(((item) => item !== undefined || item !== null));
+          let dataCategroyValid = dataCategroy.filter((item) => { return (item !== undefined) && (item !== null) && (!Number.isNaN(item)); });
 
           categoryBoxData.push(dataCategroyValid);
-          // min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
-          // max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
-          
+          min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
+          max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
+          categoryBoxData.push({min: min, max: max});
+
           rowBoxData.push(categoryBoxData);
         }
       }
@@ -1422,6 +1521,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       
       if(currHeader.label.length > 0){
         let currBoxData = [];
+        min = Infinity;
+        max = -Infinity;
         //first element is boxplot label
         currBoxData.push(''+currHeader.label);
 
@@ -1442,12 +1543,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
 
         dataCurrentHeader = dataCurrentHeader.map((a) => { return Number(a[''+column.column]); });  
-        let dataCurrentHeaderValid = dataCurrentHeader.filter(((item) => item !== undefined || item !== null));
-        // min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
-        // max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
+        let dataCurrentHeaderValid = dataCurrentHeader.filter((item) => { return (item !== undefined) && (item !== null) && (!Number.isNaN(item)); });
+        min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
+        max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
 
         // second elemnt is an array with all the values 
         currBoxData.push(dataCurrentHeaderValid);
+        currBoxData.push({min: min, max: max});
 
         // add the boxplot to all boxplots for this row
         rowBoxData.push(currBoxData);
@@ -1458,11 +1560,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let rowBoxObj = {
       color: boxColor,
       data: rowBoxData,
-      min: min,
-      max: max
+      domainMin: column.domain[0],
+      domainMax: column.domain[1]
     };
 
-    console.log({rowBoxData , min, max});
+    // console.log({rowBoxData , min, max});
 
     return rowBoxObj;
   }

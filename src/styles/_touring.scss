@@ -9,7 +9,7 @@ button.touring.active::before {
   border: none;
 }
 
-.tooltip {
+.tooltip.parsets, .tooltip.boxplot {
   background-color: rgba(242, 242, 242, .6);
   position: absolute;
   padding: 5px;	
