@@ -11,6 +11,17 @@
 $step-color: black;
 $step-border: black;
 
+
+.tdp-tour-backdrop-blocker {
+  display: none;
+  position: absolute;
+  z-index: 1999;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: tdp-tour-fade-in 0.2;
+}
 .tdp-tour-backdrop {
   display: none;
   position: absolute;

@@ -36,6 +36,7 @@ export default class TourManager {
   }
 
   private readonly backdrop: HTMLElement;
+  private readonly backdropBlocker: HTMLElement;
   private readonly step: HTMLElement;
   private readonly stepCount: HTMLElement;
   private stepPopper: Popper;
@@ -54,8 +55,12 @@ export default class TourManager {
       hide: (finished?: boolean) => this.hideTour(finished),
       show: (stepNumber, step) => this.showStep(stepNumber, step)
     };
+
     this.backdrop = context.doc.createElement('div');
     this.backdrop.classList.add('tdp-tour-backdrop');
+
+    this.backdropBlocker = context.doc.createElement('div');
+    this.backdropBlocker.classList.add('tdp-tour-backdrop-blocker');
     // this.backdrop.onclick = () => {
     //   this.hideTour();
     // };
@@ -136,6 +141,7 @@ export default class TourManager {
       };
     });
 
+    document.body.appendChild(this.backdropBlocker);
     document.body.appendChild(this.backdrop);
     document.body.appendChild(this.step);
     document.body.appendChild(this.stepCount);
@@ -252,6 +258,8 @@ export default class TourManager {
     const focus = this.selectHighlight(step.selector);
     this.setFocusElement(focus ? focus.getBoundingClientRect() : null);
 
+    this.backdropBlocker.style.display = step.allowUserInteraction ? null : 'block';
+
     const steps = this.step.querySelectorAll('.tdp-tour-step-dots div');
     Array.from(steps).forEach((button: HTMLElement, i) => {
       button.classList.toggle('fa-circle', i !== stepNumber);
@@ -344,6 +352,7 @@ export default class TourManager {
     this.clearHighlight();
     this.backdrop.ownerDocument.removeEventListener('keyup', this.keyListener);
     this.backdrop.style.display = null;
+    this.backdropBlocker.style.display = null;
 
     this.step.style.display = 'none';
     this.step.style.transform = null;

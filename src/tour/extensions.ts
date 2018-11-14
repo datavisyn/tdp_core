@@ -52,6 +52,7 @@ export interface IStep {
   html: string | ((node: HTMLElement)=>void);
   /**
    * optional more precise popper placement
+   * @default auto
    */
   placement?: Placement | ((options: PopperOptions)=>void);
   /**
@@ -71,8 +72,15 @@ export interface IStep {
 
   /**
    * in case of multi page tours whether after this is a new page
+   * @default false
    */
   pageBreak?: boolean;
+
+  /**
+   * whether to allow that the user is interacting with the focus element
+   * @default false
+   */
+  allowUserInteraction?: boolean;
 }
 
 export function startTour(tourId: string, context: any = {}) {
