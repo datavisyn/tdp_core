@@ -1,5 +1,5 @@
 import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow, ICategoricalColumn} from 'lineupjs';
-import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type, SCOPE} from 'touring';
+import {MethodManager, IMeasureResult, Type, SCOPE} from 'touring';
 import * as d3 from 'd3';
 import {RankingAdapter} from './TouringPanel';
 import {IServerColumn} from '../../../rest';
@@ -36,7 +36,7 @@ export abstract class ATouringTask implements ITouringTask{
   }
   
   initContent() {
-    d3.select(this.node).append('h3').text(this.label+':');
+    d3.select(this.node).append('div').classed('details', true);
   }
 
   public abstract update(data: any[]) 
@@ -48,12 +48,34 @@ export abstract class ATouringTask implements ITouringTask{
   //     ps.order();           // order domelements as in the array
   // }
 
-  toScoreCell(score): IScoreCell {
+  toScoreCell(score: IMeasureResult): IScoreCell {
     const color =  score2color(score);
     return {
-      label: score.toFixed(2),
+      label: score.pValue.toFixed(2),
       background: color.background,
-      foreground: color.foreground
+      foreground: color.foreground,
+      score: score
+    }
+  }
+
+  onClick(tableCell) {
+    const cellData = d3.select(tableCell).datum();
+
+    d3.select(this.node).selectAll('td').classed('selectedCell', false); // remove gb highlighting from all tds
+    const details = d3.select(this.node).select('div.details');
+    details.selectAll('*').remove(); // avada kedavra outdated details!
+
+    if (cellData.score) { //Currenlty only cells with a score are calculated (no category or attribute label cells)
+      // Color table cell
+      d3.select(this.node).selectAll('td').classed('selectedCell', false); // remove gb highlighting from all the other tds
+      d3.select(tableCell).classed('selectedCell', true); // add bg highlighting 
+  
+      // Display details
+      if(cellData.generateDescription) {
+        cellData.generateDescription(details); //generate description into details div
+      } else {
+        details.append('p').text('There are no details for the selected table cell.');
+      }
     }
   }
 }
@@ -75,15 +97,17 @@ export class ColumnComparison extends ATouringTask {
       .append('table').attr('class', 'table table-condensed');
     tablesEnter.append('thead').append('tr').append('th');
     tablesEnter.append('tbody');
+
+    super.initContent();
   }
 
   public update(data: any[]) {
     const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
     colHeads.enter().append('th').attr('class', 'head');
     
-    const node = this.node; // for the function below
+    const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<any>>) {
-      const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
+      const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
       trs.enter().append('tr');
       const tds = trs.selectAll('td').data((d) => d); // remove 
       tds.enter().append('td');
@@ -95,7 +119,8 @@ export class ColumnComparison extends ATouringTask {
       tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
       tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
       tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
-  
+      tds.on('click', function() { that.onClick.bind(that)(this)})
+
       // Exit
       colHeads.exit().remove(); // remove attribute columns
       tds.exit().remove(); // remove cells of removed columns
@@ -176,6 +201,8 @@ export abstract class RowComparison extends ATouringTask {
 
     //Table Body
     tablesEnter.append('tbody');
+
+    super.initContent();
   }
 }
 
@@ -203,9 +230,9 @@ export class SelectionStratificationComparison extends RowComparison{
     colHeadsCat.enter().append('th')
       .attr('class', 'head');
 
-    const node = this.node; // for the function below
+    const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<IScoreCell>>) {
-      const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
+      const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
       trs.enter().append('tr');
       const tds = trs.selectAll('td').data((d) => d);
       tds.enter().append('td');
@@ -218,6 +245,7 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
       tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
       tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
+      tds.on('click', function() { that.onClick.bind(that)(this)})
   
       // Exit
       tds.exit().remove(); // remove cells of removed columns
@@ -503,7 +531,8 @@ interface IScoreCell {
   background?: string,
   foreground?: string,
   rowspan?: number,
-  colspan?: number
+  colspan?: number,
+  score?: IMeasureResult
 }
 
 
