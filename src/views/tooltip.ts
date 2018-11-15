@@ -108,7 +108,8 @@ export function popOver(html: string | (() => string), reference: HTMLElement, c
     if (isRelated(evt, reference) || isRelated(evt, tooltip)) {
       return; // if we switch to the tooltip or vice versa ignore it
     }
-    tooltip = <HTMLElement>showTooltip(typeof html === 'function' ? html() : html, coords? coords : reference, simpleTooltip);
+    showTooltip(typeof html === 'function' ? html() : html, coords? coords : reference, simpleTooltip);
+    tooltip = findTooltip(true);
     tooltip.addEventListener('mouseleave', leave);
     reference.addEventListener('mouseleave', leave);
   };
