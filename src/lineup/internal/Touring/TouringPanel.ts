@@ -97,53 +97,57 @@ export default class TouringPanel extends LineUpPanelActions {
   }
 
   private updateInput() {
-    const scopeSelect = d3.select(this.touringElem).select('select.scope');
-    
-    let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
-      const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
-      const desc: IColumnDesc = deepCopy(col.desc);
-      if ((col as CategoricalColumn).categories) {
-        (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories).filter((category) => displayedCategories.has(category.name));
-      }
+    if (!this.touringElem.hidden) {
+      const scopeSelect = d3.select(this.touringElem).select('select.scope');
+      
+      let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
+        const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
+        const desc: IColumnDesc = deepCopy(col.desc);
+        if ((col as CategoricalColumn).categories) {
+          (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories).filter((category) => displayedCategories.has(category.name));
+        }
 
-      return desc;
-    });
-    // we generate an entry for every attribute (categorical, numerical, and maybe more (string?))
-    // and an entry representing the selected/unselected items as a attribute with two categories
-    // and an entry representing the ranked order of items as numerical attribute
-    // and an entry representing the current stratification as categorical attribute
-    // and an entry representing the numerical attributes (if there are any)
-    // and an entry representing the categorical attributes (if there are any)
-    // and an entry representing all these attributes
-    descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
+        return desc;
+      });
+      // we generate an entry for every attribute (categorical, numerical, and maybe more (string?))
+      // and an entry representing the selected/unselected items as a attribute with two categories
+      // and an entry representing the ranked order of items as numerical attribute
+      // and an entry representing the current stratification as categorical attribute
+      // and an entry representing the numerical attributes (if there are any)
+      // and an entry representing the categorical attributes (if there are any)
+      // and an entry representing all these attributes
+      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
 
-    // Generate an attribute description that represents the current stratification
-    descriptions.unshift(this.ranking.getStratificationDesc());
-    descriptions.unshift(this.ranking.getRankDesc());
-    // Generate a Attribute description that represents the current selection
-    descriptions.unshift(this.ranking.getSelectionDesc());
-    descriptions.unshift({ //There is always at least the rank as numerical column
-      label: 'All numerical columns',
-      type: 'num_collection'
-    });
-    descriptions.unshift({ //There is always at least the selection as categorical column
-      label: 'All categorical columns',
-      type: 'cat_collection'
-    });
-    descriptions.unshift({ // at least selection & rank
-      label: 'All columns',
-      type: 'collection'
-    })
+      // Generate an attribute description that represents the current stratification
+      descriptions.unshift(this.ranking.getStratificationDesc());
+      descriptions.unshift(this.ranking.getRankDesc());
+      // Generate a Attribute description that represents the current selection
+      descriptions.unshift(this.ranking.getSelectionDesc());
+      descriptions.unshift({ //There is always at least the rank as numerical column
+        label: 'All numerical columns',
+        type: 'num_collection'
+      });
+      descriptions.unshift({ //There is always at least the selection as categorical column
+        label: 'All categorical columns',
+        type: 'cat_collection'
+      });
+      descriptions.unshift({ // at least selection & rank
+        label: 'All columns',
+        type: 'collection'
+      })
 
-    //bind data, label is key
-    const scopeOptions = scopeSelect.selectAll('option').data(descriptions, (desc) => desc.label); 
-    
-    scopeOptions.enter().append('option').text((desc) => desc.label); //enter: add columns to dropdown, that were added by the user
-    // update: nothing to do
-    scopeOptions.exit().remove();   // exit: remove columns no longer displayed
-    scopeOptions.order();           // order domelements as in the array
+      //bind data, label is key
+      const scopeOptions = scopeSelect.selectAll('option').data(descriptions, (desc) => desc.label); 
+      
+      scopeOptions.enter().append('option').text((desc) => desc.label); //enter: add columns to dropdown, that were added by the user
+      // update: nothing to do
+      scopeOptions.exit().remove();   // exit: remove columns no longer displayed
+      scopeOptions.order();           // order domelements as in the array
 
-    this.updateOutput();
+      this.updateOutput();
+    } else {
+      console.log('Touring Panel is hidden, skip update.');
+    }
   }
 
 

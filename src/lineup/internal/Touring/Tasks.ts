@@ -47,6 +47,15 @@ export abstract class ATouringTask implements ITouringTask{
   //     ps.exit().remove();   // exit: remove tasks no longer displayed
   //     ps.order();           // order domelements as in the array
   // }
+
+  toScoreCell(score): IScoreCell {
+    const color =  score2color(score);
+    return {
+      label: score.toFixed(2),
+      background: color.background,
+      foreground: color.foreground
+    }
+  }
 }
 
 @TaskDecorator()
@@ -74,14 +83,18 @@ export class ColumnComparison extends ATouringTask {
     
     const node = this.node; // for the function below
     function updateTableBody(bodyData: Array<Array<any>>) {
-      const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0]);
+      const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
       trs.enter().append('tr');
       const tds = trs.selectAll('td').data((d) => d); // remove 
       tds.enter().append('td');
       // Set colheads in thead 
       colHeads.text((d) => d.label);
       // set data in tbody
-      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : (Number(d) ? d.toFixed(2) : d));
+      tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
+      tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
+      tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
+      tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
+      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
   
       // Exit
       colHeads.exit().remove(); // remove attribute columns
@@ -103,7 +116,7 @@ export class ColumnComparison extends ATouringTask {
     const data = new Array(attr2.length); // n2 arrays (rows) 
     for (let i of data.keys()) {
       data[i] = new Array(attr1.length + 1).fill(null) // containing n1+1 elements (header + n1 vlaues)
-      data[i][0] = `<b>${attr2[i].label}</b>`;
+      data[i][0] = {label: `<b>${attr2[i].label}</b>`};
     }
 
     if (scaffold) {
@@ -119,7 +132,7 @@ export class ColumnComparison extends ATouringTask {
               const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1]as IServerColumn).column) //minus one because the first column is headers
               const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as IServerColumn).column);
               promises.push(measure.calc(data1, data2)
-                .then((score) => row[j] = score)  // TODO call updateTable here?
+                .then((score) => row[j] = this.toScoreCell(score))  // TODO call updateTable here?
                 .catch((err) => row[j] = Number.NaN)
               ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
             } else {
@@ -191,17 +204,19 @@ export class SelectionStratificationComparison extends RowComparison{
       .attr('class', 'head');
 
     const node = this.node; // for the function below
-    function updateTableBody(bodyData: Array<Array<any>>) {
+    function updateTableBody(bodyData: Array<Array<IScoreCell>>) {
       const trs = d3.select(node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
       trs.enter().append('tr');
-      const tds = trs.selectAll('td').data((d) => d); // remove 
+      const tds = trs.selectAll('td').data((d) => d);
       tds.enter().append('td');
       // Set colheads in thead 
       colHeadsAttr.text((d) => d.label);
       colHeadsCat.text((d) => d.label);
       // set data in tbody
-      tds.attr('colspan', (d) => d ? d.colspan : 1);
-      tds.attr('rowspan', (d) => d ? d.rowspan : 1);
+      tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
+      tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
+      tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
+      tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
       tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
   
       // Exit
@@ -283,7 +298,7 @@ export class SelectionStratificationComparison extends RowComparison{
             if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
               let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
               promises.push(measure.calc(dataSelected, grpData4Col)
-                    .then((score) => data[rowIndex][selScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                    .then((score) => data[rowIndex][selScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
                     .catch((err) => data[rowIndex][selScoreIndex] = {label: Number.NaN}));
             }
 
@@ -291,7 +306,7 @@ export class SelectionStratificationComparison extends RowComparison{
               let unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
               // Score with unselected:
               promises.push(measure.calc(dataUnselected, grpData4Col)
-                    .then((score) => data[rowIndex][unselScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                    .then((score) => data[rowIndex][unselScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
                     .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
             }
             i++;
@@ -381,7 +396,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
           if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
             let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
             promises.push(measure.calc(dataSelected, dataCategory)
-                  .then((score) => data[rowIndex][selScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                  .then((score) => data[rowIndex][selScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
                   .catch((err) => data[rowIndex][selScoreIndex] = {label: Number.NaN}));
           }
 
@@ -389,7 +404,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             let unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
             // Score with unselected:
             promises.push(measure.calc(dataUnselected, dataCategory)
-                  .then((score) => data[rowIndex][unselScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                  .then((score) => data[rowIndex][unselScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
                   .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
           }
           i++;
@@ -465,7 +480,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                 const grpData4ColCol = grpData.rows.map((row) => row[(col as IServerColumn).column]); //data for the current column
 
                 promises.push(measure.calc(grpData4ColRow, grpData4ColCol)
-                  .then((score) => data[rowIndex][colIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                  .then((score) => data[rowIndex][colIndex] = this.toScoreCell(score))  // TODO call updateTable here?
                   .catch((err) => data[rowIndex][colIndex] = {label: Number.NaN}));
               } else {
                 data[rowIndex][colIndex] = {label: ''}
@@ -483,8 +498,31 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
 }
 
 interface IScoreCell {
+  key?: string,
   label: string,
-  color?: string,
+  background?: string,
+  foreground?: string,
   rowspan?: number,
   colspan?: number
+}
+
+
+
+export function score2color(score:number) : {background: string, foreground: string} {
+  let background ='#ffffff' //white
+  let foreground = '#333333' //kinda black
+
+
+  if(score && score <= 1) {
+    // console.log('bg color cahnge')
+    let calcColor = d3.scale.linear().domain([1, 0]).range(<any[]>['#A9A9A9', '#FFFFFF']);
+                                      
+    background = calcColor(score).toString();
+    foreground = d3.hsl(background).l > 0.5 ? '#333333' : 'white'
+  }
+
+  return {
+    background: background,
+    foreground: foreground
+  };
 }
