@@ -209,6 +209,8 @@ export class SelectionStratificationComparison extends RowComparison{
       colHeadsAttr.exit().remove(); // remove attribute columns
       colHeadsCat.exit().remove(); // remove attribute columns
       trs.exit().remove(); // remove attribute rows
+      colHeadsAttr.order();
+      colHeadsCat.order();
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
     }
     
@@ -291,9 +293,8 @@ export class SelectionStratificationComparison extends RowComparison{
               promises.push(measure.calc(dataUnselected, grpData4Col)
                     .then((score) => data[rowIndex][unselScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
                     .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
-
-              i++;
             }
+            i++;
           }
         }
       }
@@ -390,7 +391,82 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             promises.push(measure.calc(dataUnselected, dataCategory)
                   .then((score) => data[rowIndex][unselScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
                   .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
+          }
+          i++;
+        }
+      }
 
+      await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
+      return data; // then return the data
+    }
+  }
+}
+
+@TaskDecorator()
+export class PairwiseStratificationComparison extends SelectionStratificationComparison{
+
+  constructor() {
+    super();
+    this.id = "pairStratCmp";
+    this.label = "Pairwise compare stratification groups"
+  }
+
+  update(data: any) {
+    // numerical and categorical data is ok
+    const compareTo = [this.ranking.getStratificationDesc()];
+    this.createTable(data, compareTo);
+  }
+
+  /**
+   * async: return promise
+   * @param attr1 columns
+   * @param arr2 rows
+   * @param scaffold only create the matrix with row headers, but no value calculation
+   */
+  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Promise<Array<Array<IScoreCell>>> {
+    const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
+    const groupedData = this.ranking.getGroupedData();
+    const data = new Array(attr2.length * groupedData.length); // each attribute has the same groups
+
+    let i=0;
+    for (const col of attr2) {
+      for (const [j, grp] of groupedData.entries()) {
+        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
+        data[i][j === 0 ? 1 : 0] = {label: grp.label} // through rowspan, this becomes the first array item 
+        if (j === 0) {
+          data[i][0] = {
+            label: col.label,
+            rowspan: groupedData.length
+          };
+        }
+        data[i][0].key = col.label+'-'+grp.name;
+        i++;
+      }
+    }
+
+    if (scaffold) {
+      return data;
+    } else {
+      const promises = [];
+      let i=0;
+      
+      for (const col of attr2) {
+        const measures = MethodManager.getMeasuresByType(col.type, col.type, SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
+        if (measures.length > 0) { 
+          const measure = measures[0];
+          for (const [j, grpData] of groupedData.entries()) {
+            const grpData4ColRow = grpData.rows.map((row) => row[(col as IServerColumn).column]); //data for the current row
+            const rowIndex = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
+            const firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+            
+            for (const [k, grpData] of groupedData.entries()) {
+                const colIndex = firstScoreIndex + k;
+                const grpData4ColCol = grpData.rows.map((row) => row[(col as IServerColumn).column]); //data for the current column
+
+                promises.push(measure.calc(grpData4ColRow, grpData4ColCol)
+                .then((score) => data[rowIndex][colIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                .catch((err) => data[rowIndex][colIndex] = {label: Number.NaN}));
+            }
             i++;
           }
         }
