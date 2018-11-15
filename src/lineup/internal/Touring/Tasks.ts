@@ -460,12 +460,16 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
             const firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
             
             for (const [k, grpData] of groupedData.entries()) {
-                const colIndex = firstScoreIndex + k;
+              const colIndex = firstScoreIndex + k;
+              if(k <= j) { // only diagonal
                 const grpData4ColCol = grpData.rows.map((row) => row[(col as IServerColumn).column]); //data for the current column
 
                 promises.push(measure.calc(grpData4ColRow, grpData4ColCol)
-                .then((score) => data[rowIndex][colIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
-                .catch((err) => data[rowIndex][colIndex] = {label: Number.NaN}));
+                  .then((score) => data[rowIndex][colIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                  .catch((err) => data[rowIndex][colIndex] = {label: Number.NaN}));
+              } else {
+                data[rowIndex][colIndex] = {label: ''}
+              }
             }
             i++;
           }
