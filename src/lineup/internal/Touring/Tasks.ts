@@ -167,19 +167,18 @@ export abstract class RowComparison extends ATouringTask {
 }
 
 @TaskDecorator()
-export class SelectionCategoryComparison extends RowComparison{
+export class SelectionStratificationComparison extends RowComparison{
 
   constructor() {
     super();
-    this.id = "selCatCmp";
-    this.label = "Compare selected rows with column categories"
+    this.id = "selStratCmp";
+    this.label = "Compare selected rows with stratification groups"
   }
 
-  public update(data: any[]) {
-    const catData = data.filter((attr) => attr.type === 'categorical');
+  update(data: any) {
+    // numerical and categorical data is ok
     const compareTo = [this.ranking.getSelectionDesc()];
-
-    this.createTable(catData, compareTo);
+    this.createTable(data, compareTo);
   }
 
   createTable(catData: any[], compareTo: {categories: ICategory[]; label: string; type: string; column: string;}[]): any {
@@ -225,6 +224,108 @@ export class SelectionCategoryComparison extends RowComparison{
    */
   async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Promise<Array<Array<IScoreCell>>> {
     const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
+    const allGroups = this.ranking.getStratificationDesc().categories;
+    const data = new Array(attr2.length * allGroups.length); // each attribute has the same groups
+
+    let i=0;
+    for (const col of attr2) {
+      for (const [j, grp] of allGroups.entries()) {
+        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
+        data[i][j === 0 ? 1 : 0] = {label: grp.label} // through rowspan, this becomes the first array item 
+        if (j === 0) {
+          data[i][0] = {
+            label: col.label,
+            rowspan: allGroups.length
+          };
+        }
+        data[i][0].key = col.label+'-'+grp.name;
+        i++;
+      }
+    }
+
+    if (scaffold) {
+      return data;
+    } else {
+      const promises = [];
+      
+      let i=0;
+      for (const col of attr2) {
+        const measures = MethodManager.getMeasuresByType(col.type, col.type, SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
+        if (measures.length > 0) { 
+          const measure = measures[0];
+          for (const [j, cat] of (col as any).categories.entries()) { //TODO only diagonal
+            const allData = this.ranking.getItemsDisplayed();
+            const dataCategory = [];
+            const dataSelected = []; // TODO: hardcoded -> bad
+            const dataUnselected = []; // TODO: hardcoded -> bad
+            const selectIndices = this.ranking.getSelection(); 
+            
+            for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
+              const colId = (col as IServerColumn).column;
+              if (item[colId] === cat.name) { // TODO what else can we do here if the value is not the column name?
+                dataCategory.push(item[colId]);
+              }
+
+              if (selectIndices.length > 0 && index === selectIndices[0]) {
+                selectIndices.shift(); // Remove first element as we have reached it
+                dataSelected.push(item[colId])
+              } else {
+                dataUnselected.push(item[colId]);
+              }
+            }
+            
+            let rowIndex = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
+            // Score with selected:
+            let firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+            if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
+              let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
+              promises.push(measure.calc(dataSelected, dataCategory)
+                    .then((score) => data[rowIndex][selScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                    .catch((err) => data[rowIndex][selScoreIndex] = {label: Number.NaN}));
+            }
+
+            if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
+              let unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
+              // Score with unselected:
+              promises.push(measure.calc(dataUnselected, dataCategory)
+                    .then((score) => data[rowIndex][unselScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
+                    .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
+
+              i++;
+            }
+          }
+        }
+      }
+
+      await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
+      return data; // then return the data
+    }
+  }
+}
+
+
+@TaskDecorator()
+export class SelectionCategoryComparison extends SelectionStratificationComparison{
+
+  constructor() {
+    super();
+    this.id = "selCatCmp";
+    this.label = "Compare selected rows with column categories"
+  }
+
+  public update(data: any[]) {
+    const catData = data.filter((attr) => attr.type === 'categorical');
+    super.update(catData);
+  }
+
+  /**
+   * async: return promise
+   * @param attr1 columns
+   * @param arr2 rows
+   * @param scaffold only create the matrix with row headers, but no value calculation
+   */
+  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Promise<Array<Array<IScoreCell>>> {
+    const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
     const allCat2 = [].concat(...attr2.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
     const data = new Array(allCat2.length); // one row per category
     let i=0;
@@ -247,7 +348,7 @@ export class SelectionCategoryComparison extends RowComparison{
       return data;
     } else {
       const promises = [];
-      const measure = MethodManager.getMeasuresByType(Type.CATEGORICAL, Type.CATEGORICAL, SCOPE.SETS)[0]; // fixed for this task
+      const measure = MethodManager.getMeasuresByType(Type.CATEGORICAL, Type.CATEGORICAL, SCOPE.SETS)[0]; // fixed for this task: we compare categories to groups of items of the same column --> always categorical
       
       let i=0;
       for (const col of attr2) {
@@ -297,23 +398,6 @@ export class SelectionCategoryComparison extends RowComparison{
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
       return data; // then return the data
     }
-  }
-}
-
-@TaskDecorator()
-export class SelectionStratificationComparison extends SelectionCategoryComparison{
-
-  constructor() {
-    super();
-    this.id = "selStratCmp";
-    this.label = "Compare selected rows with stratification groups"
-  }
-
-  update(data: any) {
-    const catData = data.filter((attr) => attr.type === 'categorical');
-    const compareTo = [this.ranking.getStratificationDesc()];
-
-    this.createTable(catData, compareTo);
   }
 }
 
