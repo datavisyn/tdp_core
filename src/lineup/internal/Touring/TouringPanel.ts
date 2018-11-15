@@ -355,6 +355,7 @@ export class RankingAdapter {
     for (let grp of this.getRanking().getGroups()) {
       groups.push({
         name: grp.name,
+        label: grp.name,
         color: grp.color,
         rows: grp.order.map((index) => data[index]).filter((item) => item !== undefined)
       });

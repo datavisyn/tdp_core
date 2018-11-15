@@ -224,18 +224,18 @@ export class SelectionStratificationComparison extends RowComparison{
    */
   async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean): Promise<Array<Array<IScoreCell>>> {
     const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
-    const allGroups = this.ranking.getStratificationDesc().categories;
-    const data = new Array(attr2.length * allGroups.length); // each attribute has the same groups
+    const groupedData = this.ranking.getGroupedData();
+    const data = new Array(attr2.length * groupedData.length); // each attribute has the same groups
 
     let i=0;
     for (const col of attr2) {
-      for (const [j, grp] of allGroups.entries()) {
+      for (const [j, grp] of groupedData.entries()) {
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
         data[i][j === 0 ? 1 : 0] = {label: grp.label} // through rowspan, this becomes the first array item 
         if (j === 0) {
           data[i][0] = {
             label: col.label,
-            rowspan: allGroups.length
+            rowspan: groupedData.length
           };
         }
         data[i][0].key = col.label+'-'+grp.name;
@@ -248,38 +248,39 @@ export class SelectionStratificationComparison extends RowComparison{
     } else {
       const promises = [];
       
+      
       let i=0;
+      
       for (const col of attr2) {
         const measures = MethodManager.getMeasuresByType(col.type, col.type, SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) { 
           const measure = measures[0];
-          for (const [j, cat] of (col as any).categories.entries()) { //TODO only diagonal
-            const allData = this.ranking.getItemsDisplayed();
-            const dataCategory = [];
-            const dataSelected = []; // TODO: hardcoded -> bad
-            const dataUnselected = []; // TODO: hardcoded -> bad
-            const selectIndices = this.ranking.getSelection(); 
-            
-            for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
-              const colId = (col as IServerColumn).column;
-              if (item[colId] === cat.name) { // TODO what else can we do here if the value is not the column name?
-                dataCategory.push(item[colId]);
-              }
-
-              if (selectIndices.length > 0 && index === selectIndices[0]) {
-                selectIndices.shift(); // Remove first element as we have reached it
-                dataSelected.push(item[colId])
-              } else {
-                dataUnselected.push(item[colId]);
-              }
+          //prepare data (selected data is the same for all groups of this column)
+          const allData = this.ranking.getItemsDisplayed();
+          const dataSelected = []; // TODO: hardcoded -> bad
+          const dataUnselected = []; // TODO: hardcoded -> bad
+          const selectIndices = this.ranking.getSelection(); 
+          
+          for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
+            const colId = (col as IServerColumn).column;
+            if (selectIndices.length > 0 && index === selectIndices[0]) {
+              selectIndices.shift(); // Remove first element as we have reached it
+              dataSelected.push(item[colId])
+            } else {
+              dataUnselected.push(item[colId]);
             }
-            
+          }
+
+
+          for (const [j, grpData] of groupedData.entries()) {
+            const grpData4Col = grpData.rows.map((row) => row[(col as IServerColumn).column]);
+
             let rowIndex = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
             // Score with selected:
             let firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
             if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
               let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
-              promises.push(measure.calc(dataSelected, dataCategory)
+              promises.push(measure.calc(dataSelected, grpData4Col)
                     .then((score) => data[rowIndex][selScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
                     .catch((err) => data[rowIndex][selScoreIndex] = {label: Number.NaN}));
             }
@@ -287,7 +288,7 @@ export class SelectionStratificationComparison extends RowComparison{
             if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
               let unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
               // Score with unselected:
-              promises.push(measure.calc(dataUnselected, dataCategory)
+              promises.push(measure.calc(dataUnselected, grpData4Col)
                     .then((score) => data[rowIndex][unselScoreIndex] = {label: score.toFixed(2)})  // TODO call updateTable here?
                     .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
 
