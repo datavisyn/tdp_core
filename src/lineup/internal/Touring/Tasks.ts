@@ -377,7 +377,10 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
     for (const col of attr2) {
       for (const [j, cat] of (col as any).categories.entries()) {
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
-        data[i][j === 0 ? 1 : 0] = {label: cat.label} // through rowspan, this becomes the first array item 
+        data[i][j === 0 ? 1 : 0] = {
+          label: cat.label,
+          background: cat.color
+        } // through rowspan, this becomes the first array item 
         if (j === 0) {
           data[i][0] = {
             label: col.label,
