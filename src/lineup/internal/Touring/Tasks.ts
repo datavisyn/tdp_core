@@ -118,7 +118,7 @@ export class ColumnComparison extends ATouringTask {
       tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
       tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
       tds.style('background-color', (d) => d !== null ? d.background : '#FFFFFF');
-      tds.classed('action', (d) => (d.score !== undefined));
+      tds.classed('action', (d) => (d !== null && d.score !== undefined));
       tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
       tds.on('click', function() { that.onClick.bind(that)(this)})
 
@@ -245,7 +245,7 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
       tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
       tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
-      tds.classed('action', (d) => (d.score !== undefined));
+      tds.classed('action', (d) => (d !== null && d.score !== undefined));
       tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
       tds.on('click', function() { that.onClick.bind(that)(this)})
   
