@@ -445,7 +445,7 @@ export class RankingAdapter {
       categories: this.getRanking().getGroups().map((group, index) => ({
         name: group.name,
         label: group.name,
-        color: '#ffffff', // TODO get colors of stratification
+        color: group.color,
         value: index
       })), // if not stratifified, there is only one group ('Default')
       label: 'Stratification Groups',

@@ -1,4 +1,4 @@
-import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow, ICategoricalColumn} from 'lineupjs';
+import {IColumnDesc, ICategory} from 'lineupjs';
 import {MethodManager, IMeasureResult, Type, SCOPE} from 'touring';
 import * as d3 from 'd3';
 import {RankingAdapter} from './TouringPanel';
@@ -276,7 +276,10 @@ export class SelectionStratificationComparison extends RowComparison{
     for (const col of attr2) {
       for (const [j, grp] of groupedData.entries()) {
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
-        data[i][j === 0 ? 1 : 0] = {label: grp.label} // through rowspan, this becomes the first array item 
+        data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
+          label: grp.label,
+          background: grp.color
+        }
         if (j === 0) {
           data[i][0] = {
             label: col.label,
@@ -377,10 +380,10 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
     for (const col of attr2) {
       for (const [j, cat] of (col as any).categories.entries()) {
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
-        data[i][j === 0 ? 1 : 0] = {
+        data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: cat.label,
           background: cat.color
-        } // through rowspan, this becomes the first array item 
+        } 
         if (j === 0) {
           data[i][0] = {
             label: col.label,
@@ -478,7 +481,10 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
     for (const col of attr2) {
       for (const [j, grp] of groupedData.entries()) {
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
-        data[i][j === 0 ? 1 : 0] = {label: grp.label} // through rowspan, this becomes the first array item 
+        data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
+          label: grp.label,
+          background: grp.color
+        }
         if (j === 0) {
           data[i][0] = {
             label: col.label,
