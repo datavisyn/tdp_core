@@ -49,7 +49,7 @@ export abstract class ATouringTask implements ITouringTask{
   // }
 
   toScoreCell(score: IMeasureResult): IScoreCell {
-    const color =  score2color(score);
+    const color =  score2color(score.pValue);
     return {
       label: score.pValue.toFixed(2),
       background: color.background,
@@ -542,9 +542,9 @@ export function score2color(score:number) : {background: string, foreground: str
   let foreground = '#333333' //kinda black
 
 
-  if(score && score <= 1) {
+  if(score <= 0.05) {
     // console.log('bg color cahnge')
-    let calcColor = d3.scale.linear().domain([1, 0]).range(<any[]>['#A9A9A9', '#FFFFFF']);
+    let calcColor = d3.scale.linear().domain([0, 0.05]).range(<any[]>['#A9A9A9', '#FFFFFF']);
                                       
     background = calcColor(score).toString();
     foreground = d3.hsl(background).l > 0.5 ? '#333333' : 'white'
