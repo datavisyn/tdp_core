@@ -117,7 +117,8 @@ export class ColumnComparison extends ATouringTask {
       tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
       tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
       tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
-      tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
+      tds.style('background-color', (d) => d !== null ? d.background : '#FFFFFF');
+      tds.classed('action', (d) => (d.score !== undefined));
       tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
       tds.on('click', function() { that.onClick.bind(that)(this)})
 
@@ -158,7 +159,7 @@ export class ColumnComparison extends ATouringTask {
               const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as IServerColumn).column);
               promises.push(measure.calc(data1, data2)
                 .then((score) => row[j] = this.toScoreCell(score))  // TODO call updateTable here?
-                .catch((err) => row[j] = Number.NaN)
+                .catch((err) => row[j] = {label: 'err'})
               ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
             } else {
               row[j] = ''; // empty (not null, because null will display spinning wheel)
@@ -244,6 +245,7 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
       tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
       tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
+      tds.classed('action', (d) => (d.score !== undefined));
       tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
       tds.on('click', function() { that.onClick.bind(that)(this)})
   
@@ -330,7 +332,7 @@ export class SelectionStratificationComparison extends RowComparison{
               let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
               promises.push(measure.calc(dataSelected, grpData4Col)
                     .then((score) => data[rowIndex][selScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
-                    .catch((err) => data[rowIndex][selScoreIndex] = {label: Number.NaN}));
+                    .catch((err) => data[rowIndex][selScoreIndex] = {label: 'err'}));
             }
 
             if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
@@ -338,7 +340,7 @@ export class SelectionStratificationComparison extends RowComparison{
               // Score with unselected:
               promises.push(measure.calc(dataUnselected, grpData4Col)
                     .then((score) => data[rowIndex][unselScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
-                    .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
+                    .catch((err) => data[rowIndex][unselScoreIndex] = {label: 'err'}));
             }
             i++;
           }
@@ -431,7 +433,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
             promises.push(measure.calc(dataSelected, dataCategory)
                   .then((score) => data[rowIndex][selScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
-                  .catch((err) => data[rowIndex][selScoreIndex] = {label: Number.NaN}));
+                  .catch((err) => data[rowIndex][selScoreIndex] = {label: 'err'}));
           }
 
           if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
@@ -439,7 +441,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             // Score with unselected:
             promises.push(measure.calc(dataUnselected, dataCategory)
                   .then((score) => data[rowIndex][unselScoreIndex] = this.toScoreCell(score))  // TODO call updateTable here?
-                  .catch((err) => data[rowIndex][unselScoreIndex] = {label: Number.NaN}));
+                  .catch((err) => data[rowIndex][unselScoreIndex] = {label: 'err'}));
           }
           i++;
         }
@@ -518,7 +520,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
 
                 promises.push(measure.calc(grpData4ColRow, grpData4ColCol)
                   .then((score) => data[rowIndex][colIndex] = this.toScoreCell(score))  // TODO call updateTable here?
-                  .catch((err) => data[rowIndex][colIndex] = {label: Number.NaN}));
+                  .catch((err) => data[rowIndex][colIndex] = {label: 'err'}));
               } else {
                 data[rowIndex][colIndex] = {label: ''}
               }
