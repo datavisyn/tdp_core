@@ -1,12 +1,13 @@
 import {ICategoricalColumnDesc, ICategoricalColumn, LocalDataProvider, IColumnDesc, ICategory, CategoricalColumn, Column, Ranking, IDataRow, IStringMapColumnDesc} from 'lineupjs';
 import LineUpPanelActions from './LineUpPanelActions';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
-import {MethodManager, ISimilarityMeasure, MeasureMap, intersection, Comparison, Type} from 'touring';
+import {MethodManager, ISimilarityMeasure, IMeasureResult, MeasureMap, intersection, Comparison, Type} from 'touring';
 import * as d3 from 'd3';
 import 'd3.parsets';
 import 'd3-grubert-boxplot';
 import {isProxyAccessor} from './utils';
 import {categories} from 'lineupjs/src/model/annotations';
+import { toData } from '../../form/internal/AFormElement';
 
 export default class TouringLineUpPanel extends LineUpPanelActions {
 
@@ -488,10 +489,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         for (let j of row.keys()) {
           if (j > 0 && measure.type.compares(attr1[j - 1].type, attr2[i].type)) {
             if (j <= i+1) { // start at 
-              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column) //minus one because the first column is headers
+              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1] as any).column); //minus one because the first column is headers
               const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as any).column);
               promises.push(measure.calc(data1, data2)
-                .then((score) => row[j] = score)  // TODO call updateTable here?
+                .then((score) => row[j] = score.scoreValue)  // TODO call updateTable here?
                 .catch((err) => row[j] = Number.NaN)
               ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
             } else {
@@ -618,10 +619,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
   //generate table body depending on table head and radio button option
   private async getTableBody(tableHeader: Array<any>, data: Array<any>, measure: ISimilarityMeasure)
   {
+    // console.log('getTableBody',{tableHeader, measure, data});
     let tableBody = [];
 
     const chosenColumns = this.prepareInput(d3.select(this.itemTab).select('select.compareB'));
-    //console.log('generateTableLayout - chosenColumns: ', chosenColumns);
+    // console.log('getTableBody - chosenColumns: ', chosenColumns);
       
     const groups = this.ranking.getGroupedData();
     
@@ -638,8 +640,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         colCategories = new Set(this.ranking.getStratificationDesc().categories.map((cat) => cat.label));
       }
 
-
-      let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.label));
+      // item.name is used because for the strand attribute label !== name, as for all the other attributes
+      let currCatAfterFilter = currCol.categories.filter((item) => colCategories.has(item.name));
+      // console.log('displayed Categories: ',{colCategories,currCatAfterFilter});
       
       //for (const category of currCatAfterFilter) {
       for (const [catIndex, category] of currCatAfterFilter.entries()) { // for...of because of the await below (doesn't work in foreach () =>  ...)
@@ -658,6 +661,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           {
             tableRow[colName] = {
               label: currCol.label,
+              type: currCol.type,
               rowspan: (catIndex === 0) ? currCatAfterFilter.length : 0              
             };
 
@@ -674,18 +678,24 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
             // const headerLabel = ((tableHeader[col] as any).label as string);
             // console.groupCollapsed(`Score - col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.time(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
-            const score = await this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
+            const measureResult = await this.calcScore(data, groups, measure ,(tableHeader[col] as any).label, currCol.column, category.label);
+            let score = measureResult.scoreValue;
+            if(measure.type.typeA.value === 'number' || measure.type.typeB.value === 'number'){
+              score = measureResult.pValue;
+            }
             // console.timeEnd(`Time - Score calculation col:${currCol.label}(cat:${currCategory.label}) | head:${headerLabel}`);
             // console.groupEnd();
             tableRow[colName] = {
               label: score, 
               column: currCol.column,
-              column_label: currCol.label,
+              columnLabel: currCol.label,
               category: category.label,
               bgcolor: this.score2color(measure.id,score),
               action: true,
               tableColumn: (tableHeader[col] as any).label,
-              dataVisRep: dataVisualRep
+              dataVisRep: dataVisualRep,
+              measureResult: measureResult,
+              measure: measure
             };
           }
         }
@@ -708,13 +718,17 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     const dataTable = await this.generateTableLayout(currentData, measure);
     const that = this;
 
+    if(measure.type.typeA.value === 'number' || measure.type.typeB.value === 'number'){
+      this.createLegend(d3.select('#'+containerId));
+    }
+    
     // create a <div> as table container with D3
     let tableContainer = d3.select('#'+containerId).append('div')
                                                   .attr('class','table-container');
 
     // table                                        
     let table = tableContainer.append('table')
-                            .attr('class','table table-condensed measureTableHeader');
+                            .attr('class','table table-condensed tableHeaderRotated');
     
     // table header
     let tableHeader = table.append('thead');
@@ -723,7 +737,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
               .data(dataTable.tableHead as Array<any>)
               .enter()
               .append('th')
-              .attr('class','rotate')
+              .attr('class',(i) => i<2 ? 'rotate table-label' : 'rotate table-value')
+              // .attr('class','rotate table-attribute-col') 
                 .append('div')
                 .classed('borderedCell',(d) => {return d.label!=="";})
                   .append('span')
@@ -791,7 +806,18 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       })
       .enter()
       .append('td')
-      .attr('class', (d: any) => d.action ? 'text-center align-middle action' : 'text-center align-middle')
+      .attr('class', (d: any) => {
+        let classes = d.action ? 'text-center align-middle action' : 'text-left align-middle table-label'
+
+        // icon for the attribute type
+        if(!d.action && d.type && d.type === 'categorical'){
+          classes = classes + ' icon-category';
+        }else if (!d.action && d.type && d.type === 'number'){
+          classes = classes + ' icon-number';
+        }
+
+        return classes;
+      })
       .style("background-color", (d: any) => d.bgcolor || '#ffffff')
       .style("color", (d: any) => d3.hsl(d.bgcolor || '#ffffff').l > 0.5 ? 'black' : 'white') // scores > 0.875  have white text
       .attr("rowspan", (d: any) => d.rowspan || 1)
@@ -815,7 +841,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
  
   // --------- SCORES ---
   // different kinds of score calculations
-  private calcScore(data, groups: Array<any>, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): number {
+  private calcScore(data, groups: Array<any>, measure: ISimilarityMeasure, headerCategory: string, columnB: string, categoryB: string): IMeasureResult {
     // console.group('get Sets')
     // console.time(`time - get Sets ${measure.id}`);
     const dataSets = this.getSelectionAndCategorySets(data, groups, headerCategory, columnB, categoryB);
@@ -829,7 +855,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // console.log('categorySet', categorySet);
 
 
-    return measure.calc(selectionSet, categorySet)
+    return measure.calc(selectionSet, categorySet);
   }
 
   // --------- VISUAL REPRESENTATION ---
@@ -844,10 +870,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     // delete old tooltip
     let tooltipParSets = d3.select("body").selectAll("div.parsets.tooltip").remove();
 
-    let svgContainer = d3.select('#' + containerId).append('div')
+    let miniVisualisation = d3.select('#' + containerId).append('div')
       .attr('class', 'svg-container ' + containerId);
 
-    let width = Number(svgContainer.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
+
+    this.generateVisualDetails(miniVisualisation, cell.measure, cell.measureResult);
+
+    let width = Number(miniVisualisation.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
     let svgWidth = width - 25;
     let svgHeight = 175;
     let svg2DimLabelHeight = 45;
@@ -857,7 +886,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //dimensions for the parallel sets
     //added prefix of dimension, otherwise the parallel sets can't be drawn with the same dimension twice
-    let dimension1 = cell.column_label+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
+    let dimension1 = cell.columnLabel+'\uFEFF'; //append ZERO WIDTH NO-BREAK SPACE 
     let dimension2 = (optionDDA === 'Selection') ? 'Selection' : 'Stratification Groups';
 
     let colPart = cell.dataVisRep;
@@ -920,10 +949,9 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .value(function (d) {return d.value;})
       .width(svgWidth)
       .height(svgHeight)
-      .on('sortCategories',() => (this.sortCategoryParSetsListener.bind(that)(that, cell.category, '.svg-container.' + containerId)))
-      .on('sortDimensions',() => (this.sortDimensionParSetsListener.bind(that)(that, dimension1, cell.category, cell.tableColumn, '.svg-container.' + containerId)));
+      .spacing(10);
 
-    let svgCanvas = svgContainer.append('svg')
+    let svgCanvas = miniVisualisation.append('svg')
       .attr('width', chart.width())
       .attr('height', chart.height()+svg2DimLabelHeight);
     // .attr('height',chart.height());
@@ -933,7 +961,7 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let svgFigureGroup = svgCanvas.append('g').attr('class', 'parSets');
                                               // .attr('width', chart.width())
                                               // .attr('height', chart.height() + svg2DimLabelHeight);
-
+    
     // draw parallel sets
     svgFigureGroup.datum(parSetData).call(chart);
 
@@ -945,11 +973,15 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
     //highlight and color ribbons
     this.highlightAndColorParSetsRibbons(this, svgRibbons, dimension1, cell.category, cell.tableColumn);
-
+    svgFigureGroup.selectAll('g.ribbon-mouse').remove();
+    svgRibbons.on('.drag',null)
 
     //move label dimensions underneath parallel sets
     let svgDimensions = svgFigureGroup.selectAll('g.dimension');
     this.moveParSetsDimensionLabels(svgDimensions);
+    svgDimensions.selectAll('text.dimension').selectAll('tspan.sort').remove();
+    svgDimensions.on('.drag', null);
+    svgDimensions.selectAll('g.category').on('.drag', null);
 
     //highlight label of current path
     this.highlightParSetsSelectedLabel(this, svgDimensions, cell.category);
@@ -1058,80 +1090,163 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     });
   }
 
-  // method is called when categories are rearranged in the parallel sets vis
-  private sortCategoryParSetsListener(that, category: string, svgElement: string)
-  {
-    console.log('"sortCategoryParSetsListener" was activated: ', {category,svgElement});
+  // // method is called when categories are rearranged in the parallel sets vis
+  // private sortCategoryParSetsListener(that, category: string, svgElement: string)
+  // {
+  //   console.log('"sortCategoryParSetsListener" was activated: ', {category,svgElement});
 
-    let svgDimensions = d3.selectAll('div'+svgElement).selectAll('g.parSets').selectAll('g.dimension');
-    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+  //   let svgDimensions = d3.selectAll('div'+svgElement).selectAll('g.parSets').selectAll('g.dimension');
+  //   this.highlightParSetsSelectedLabel(that, svgDimensions, category);
 
-  }
+  // }
 
-  // method is called when dimensions are rearranged in the parrallel sets vis
-  private sortDimensionParSetsListener(that, dimensionName: string, category: string, tableColumn: string, svgElement: string)
-  {
-    console.log('"sortDimensionParSetsListener" was activated: ', {dimensionName,category,tableColumn,svgElement});
+  // // method is called when dimensions are rearranged in the parrallel sets vis
+  // private sortDimensionParSetsListener(that, dimensionName: string, category: string, tableColumn: string, svgElement: string)
+  // {
+  //   console.log('"sortDimensionParSetsListener" was activated: ', {dimensionName,category,tableColumn,svgElement});
     
-    let svgParSets = d3.selectAll('div'+svgElement).selectAll('g.parSets');
+  //   let svgParSets = d3.selectAll('div'+svgElement).selectAll('g.parSets');
 
-    let svgDimensions = svgParSets.selectAll('g.dimension');
-    this.highlightParSetsSelectedLabel(that, svgDimensions, category);
-    this.moveParSetsDimensionLabels(svgDimensions);
+  //   let svgDimensions = svgParSets.selectAll('g.dimension');
+  //   this.highlightParSetsSelectedLabel(that, svgDimensions, category);
+  //   this.moveParSetsDimensionLabels(svgDimensions);
 
-    let svgRibbons = svgParSets.selectAll('g.ribbon');
-    this.highlightAndColorParSetsRibbons(that, svgRibbons, dimensionName, category, tableColumn);
+  //   let svgRibbons = svgParSets.selectAll('g.ribbon');
+  //   this.highlightAndColorParSetsRibbons(that, svgRibbons, dimensionName, category, tableColumn);
+  // }
+
+  // adds a div element to the mini visualisation with the detail information to the score
+  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult){
+    
+    let divDetailInfo = miniVisualisation.append('div')
+                                    .classed('detailVis',true);
+
+    // let detailTestType = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                  .classed('detailDiv',true)
+                  .text('Test: ')
+                  .append('span')
+                  .text(measure.label);
+
+    // let detailTestValue = divDetailInfo.append('div');
+    let scoreValue = measureResult.scoreValue.toFixed(3);
+    let pValue = measureResult.pValue.toFixed(3);
+    divDetailInfo.append('div')
+                .classed('detailDiv',true)
+                .text('Test-Value/p-Value: ')
+                .append('span')
+                .text(`${scoreValue}/${pValue}`);  
+
+    // let detailTestDescr = divDetailInfo.append('div');
+    divDetailInfo.append('div')
+                  .classed('detailDiv',true)
+                  .text('Description: ')
+                  .append('span')
+                  .text(measure.description);    
   }
 
+  // creates legend for the p-value
+  private createLegend(parentElement: d3.Selection<any>)
+  {
+    let divLegend = parentElement.append('div').classed('measure-legend',true);
+    let svgLegendContainer = divLegend.append('svg')
+                              .attr('width','100%')
+                              .attr('height',50);
+
+    let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
+                                                  .attr('id','gradLegend');    
+    svgDefs.append('stop')
+            .attr('offset','0%')
+            .attr('stop-color','#A9A9A9'); 
+    svgDefs.append('stop')
+            .attr('offset','50%')
+            .attr('stop-color','#FFFFFF'); 
+
+    let svgLegendGroup = svgLegendContainer.append('g');
+    let svgRect1 = svgLegendGroup.append('rect')
+                                .attr('x',10)
+                                .attr('y',10)
+                                .attr('width',150)
+                                .attr('height',15)
+                                .style('fill','url(#gradLegend)')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+    let svgText11 = svgLegendGroup.append('text')
+    .attr('x',10)
+    .attr('y',40)
+    .attr('text-anchor','start')
+    .text('0');
+    let svgText12 = svgLegendGroup.append('text')
+    .attr('x',85)
+    .attr('y',40)
+    .attr('text-anchor','middle')
+    .text('0.05');
+    let svgText13 = svgLegendGroup.append('text')
+    .attr('x',160)
+    .attr('y',40)
+    .attr('text-anchor','end')
+    .text('0.1');
+    let svgRect2 = svgLegendGroup.append('rect')
+                                .attr('x',170)
+                                .attr('y',10)
+                                .attr('width',150)
+                                .attr('height',15)
+                                .style('fill','white')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+
+    let svgText21 = svgLegendGroup.append('text')
+    .attr('x',170)
+    .attr('y',40)
+    .attr('text-anchor','start')
+    .text('0.1');
+    let svgText22 = svgLegendGroup.append('text')
+    .attr('x',320)
+    .attr('y',40)
+    .attr('text-anchor','end')
+    .text('1');
+  }
   // creates boxplot visualization (for student-test, mwu-test)
   private generateVisulRepBoxPlot(containerId: string, cell: any) 
   {
     console.log('Cell clicken (BoxPlot): ',{containerId, cell});
     let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
     
-    let oldSvgContainer = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
-    oldSvgContainer.remove(); //deletes all generated content im 'measuresDivElement'
+    // delete old tooltip and miniVis
+    let oldMiniVisualisation = d3.select(this.itemTab).select('div[class="svg-container '+containerId+'"]');
+    oldMiniVisualisation.remove(); //deletes all generated content im 'measuresDivElement'
 
-    let svgContainer = d3.select('#'+containerId).append('div')
+    
+    let tooltipParSets = d3.select("body").selectAll("div.boxplot.tooltip").remove();
+
+    // create new tooltip and miniVis
+    let miniVisualisation = d3.select('#'+containerId).append('div')
                                                   .attr('class','svg-container '+containerId);
   
-    let divDetailInfo = svgContainer.append('div')
-                                    .classed('detailVis',true);
 
-    // let detailTestType = divDetailInfo.append('div');
-    // divDetailInfo.append('div')
-    //               .classed('detailDiv',true)
-    //               .text('Test: ')
-    //               .append('span')
-    //               .text('[TestName]');
+    let tooltipBoxplot = d3.select("body").append("div").style("display", "none").attr("class", "tooltip boxplot");
+    tooltipBoxplot.style("display", "none");
 
-    // // let detailTestValue = divDetailInfo.append('div');
-    // divDetailInfo.append('div')
-    //             .classed('detailDiv',true)
-    //             .text('Test-Value/p-Value: ')
-    //             .append('span')
-    //             .text('[Value]/[p-Value]');  
+    this.generateVisualDetails(miniVisualisation, cell.measure, cell.measureResult);
 
-    // // let detailTestDescr = divDetailInfo.append('div');
-    // divDetailInfo.append('div')
-    //               .classed('detailDiv',true)
-    //               .text('Description: ')
-    //               .append('span')
-    //               .text('[Description]');    
-    
-    
                                                   
     let data = cell.dataVisRep.data.filter((item) => {return (item[0] === cell.tableColumn || item[0] === cell.category);});
-    let min = cell.dataVisRep.min;
-    let max = cell.dataVisRep.max;
+    let min = Math.min(...data.map((a) => (a[2].min)));
+    let max = Math.max(...data.map((a) => (a[2].max)));
+    
+    // check if the min and may are not infinte
+    min = isFinite(min) ? min : cell.dataVisRep.domainMin;
+    max = isFinite(max) ? max : cell.dataVisRep.domainMax;
+    // remove all empty sets
+    data = data.filter((item) => {return (item[1].length !== 0)});
     // console.log('BoxPlot: ',{data,min,max});
 
 
-    let containerWidth = Number(svgContainer.style('width').slice(0,-2)) - 25; //-25 because of the scroll bar
+    let containerWidth = Number(miniVisualisation.style('width').slice(0,-2)) - 25; //-25 because of the scroll bar
 
     let calcWidth = Math.max(containerWidth,data.length * 50 + 30);
 
-    let margin = {top: 5, right: 0, bottom: 50, left: 50};
+    let margin = {top: 10, right: 0, bottom: 50, left: 100};
     let  width = calcWidth - margin.left - margin.right;
     let height = 220 - margin.top - margin.bottom;
 
@@ -1148,10 +1263,10 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
           })
           .height(height)	
           .domain([min, max])
-          .showLabels(true);
+          .showLabels(false);
 
 
-    let svgCanvas = svgContainer.append('svg')
+    let svgCanvas = miniVisualisation.append('svg')
           .attr('width',width + margin.left + margin.right)
           .attr('height',height + margin.top + margin.bottom);      
 
@@ -1192,25 +1307,25 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       .call(chart.width(x.rangeBand())); 
      
     // add a title
-    // svgFigureGroup.append("text")
-    //     .attr("x", (width / 2))             
-    //     .attr("y", 0 + (margin.top / 2))
-    //     .attr("text-anchor", "middle")  
-    //     .style("font-size", "18px") 
-    //     //.style("text-decoration", "underline")  
-    //     .text("Revenue 2012");
+    svgFigureGroup.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 + (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "18px") 
+        //.style("text-decoration", "underline")  
+        .text(cell.columnLabel);
 
     // draw y axis
     svgFigureGroup.append("g")
       .attr("class", "y axis")
       .call(yAxis);
-    //   .append("text") // and text1
-    //   .attr("transform", "rotate(-90)")
-    //   .attr("y", 6)
-    //   .attr("dy", ".71em")
-    //   .style("text-anchor", "end")
-    //   .style("font-size", "16px") 
-    //   .text("Revenue in €");		
+      // .append("text") // and text1
+      // .attr("transform", "rotate(-90)")
+      // .attr("y", 6)
+      // .attr("dy", ".71em")
+      // .style("text-anchor", "end")
+      // .style("font-size", "16px") 
+      // .text(cell.columnLabel);		
 
     // draw x axis	
     svgFigureGroup.append("g")
@@ -1223,28 +1338,43 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       // .attr("dy", ".71em")
       //   .style("text-anchor", "middle")
       // .style("font-size", "16px") 
-      //   .text("Quarter"); 
+      //   .text(cell.columnLabel); 
 
 
-    let boxElements = svgFigureGroup.selectAll('g.box-element')
-                                    .each(function(d) {
-                                      d3.select(this).classed('selected',false);
-                                      // console.log('box.this: ', d3.select(this));
-                                      // console.log('box.d: ',d);
-                                      
-                                      if(d[0] === cell.tableColumn || d[0] === cell.category){
-                                        d3.select(this).classed('selected',true);
-                                      }
-                                    });
+    let boxElements = svgFigureGroup.selectAll('g.box-element').classed('selected',true);
 
+    let cirlceElements = boxElements.selectAll('circle')
+                                    .attr('r',2);
     if(cell.dataVisRep.color)
     {                                
       let rectElements = boxElements.selectAll('rect').style('fill',cell.dataVisRep.color);         
       let cirlceElements = boxElements.selectAll('circle').style('fill',cell.dataVisRep.color).style('stroke','black');              
     }
 
-    let cirlceElements = boxElements.selectAll('circle')
-                                    .attr('r',2);
+    // tooltip
+    boxElements.on("mouseover", function(d) {
+                  // console.log('boxplot.tooltip.d',d)		
+                  let m = d3.mouse(d3.select("body").node());
+                  tooltipBoxplot.transition()		
+                      .duration(200)		
+                      .style("opacity", .9);
+                  let min = (d[1][0]).toFixed(2);
+                  let q1 = (d[1].quartiles[0]).toFixed(2);
+                  let median = (d[1].quartiles[1]).toFixed(2);
+                  let q3 = (d[1].quartiles[2]).toFixed(2);
+                  let max = (d[1][d[1].length-1]).toFixed(2);
+                  tooltipBoxplot	.html(`min = ${min}</br>q1 = ${q1}</br>median = ${median}</br>q3 = ${q3}</br>max = ${max}`)	
+                      .style("display", null)
+                      .style("left", m[0] + 30 + "px")
+                      .style("top", m[1] - 20 + "px")	
+                })					
+                .on("mouseout", function(d) {		
+                  tooltipBoxplot.transition()		
+                        .duration(500)		
+                        .style("display", 'none')
+                        .style("opacity", 0);	
+                });
+
 
   }
 
@@ -1272,12 +1402,12 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
   // creates data for the visual representation of parallel sets
   private getColumnPartioningParallelSets(data: Array<any>, groups: Array<any>, tableHeader: Array<any>, column: any, category: any) {
-    console.log('---- getColumnPartioning ----');
-    console.log('getColumnPartioning.data',data);
-    console.log('getColumnPartioning.groups',groups);
-    console.log('getColumnPartioning.tableHeader',tableHeader);
-    console.log('getColumnPartioning.column',column);
-    console.log('getColumnPartioning.category',category);
+    // console.log('---- getColumnPartioning ----');
+    // console.log('getColumnPartioning.data',data);
+    // console.log('getColumnPartioning.groups',groups);
+    // console.log('getColumnPartioning.tableHeader',tableHeader);
+    // console.log('getColumnPartioning.column',column);
+    // console.log('getColumnPartioning.category',category);
     let columnPartitioning = [];
     // const groups = this.ranking.getGroupedData();
     const optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
@@ -1291,13 +1421,16 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       let dataIdCurrCategory = [];
 
       if (this.getRadioButtonValue() === 'group') { // stratification
-        //all ids of a stratification group
+        //all items of a stratification group
         const currGroup = groups.find(item => {return item.name === currCategory.label});
         dataIdCurrCategory = currGroup.rows;
       } else { //category
-        // find all ids of the current category
+        // this case happends in the strand attribute
+        let value = currCategory.label === currCategory.name ? currCategory.label : currCategory.name;
+
+        // find all items of the current category
         dataIdCurrCategory = data.filter((item) => {
-          return item[currAttribute] === currCategory.label;
+          return (String (item[currAttribute])) === value;
         });
       }
 
@@ -1347,28 +1480,28 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
 
       columnPartitioning.push(currCategoryParts);
     }
-    console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
+    // console.log('getColumnPartioning.columnPartitioning',columnPartitioning);
     return columnPartitioning;
   }
  
   // creates data for the visual representation of boxplots
   private getDataValuesBoxplit(data: Array<any>, groups: Array<any>,tableHeader: Array<any>, column: any, category: any)
   {
-    console.log('---- getColumnPartioning ----');
-    console.log('getColumnPartioning.data',data);
-    console.log('getColumnPartioning.groups',groups);
-    console.log('getColumnPartioning.tableHeader',tableHeader);
-    console.log('getColumnPartioning.column',column);
-    console.log('getColumnPartioning.category',category);
+    // console.log('---- getColumnPartioning ----');
+    // console.log('getColumnPartioning.data',data);
+    // console.log('getColumnPartioning.groups',groups);
+    // console.log('getColumnPartioning.tableHeader',tableHeader);
+    // console.log('getColumnPartioning.column',column);
+    // console.log('getColumnPartioning.category',category);
     // let columnPartitioning = [];
     // let groups = this.ranking.getGroupedData();
     let optionDDA = d3.select(this.itemTab).select('select.compareA').select('option:checked').datum().label;
 
     let rowBoxData = [];
-    // let min = Infinity;
-    // let max = -Infinity;
-    let min = column.domain[0];
-    let max = column.domain[1];
+    let boxMinMax = [];
+    let min = Infinity;
+    let max = -Infinity;
+
 
     let categoryBoxData = []
     if(optionDDA === 'Selection')
@@ -1380,12 +1513,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         if(groups[g].name === category.label && (groups[g] as any).rows)
         {
           let dataCategroy = (groups[g] as any).rows.map((a) => { return Number(a[''+column.column]); });
-          let dataCategroyValid = dataCategroy.filter(((item) => item !== undefined || item !== null));
+          let dataCategroyValid = dataCategroy.filter((item) => { return (item !== undefined) && (item !== null) && (!Number.isNaN(item)); });
 
           categoryBoxData.push(dataCategroyValid);
-          // min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
-          // max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
-          
+          min = Math.min(min,Math.min(...(<number[]> dataCategroyValid)));
+          max = Math.max(max,Math.max(...(<number[]> dataCategroyValid)));
+          categoryBoxData.push({min: min, max: max});
+
           rowBoxData.push(categoryBoxData);
         }
       }
@@ -1400,6 +1534,8 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
       
       if(currHeader.label.length > 0){
         let currBoxData = [];
+        min = Infinity;
+        max = -Infinity;
         //first element is boxplot label
         currBoxData.push(''+currHeader.label);
 
@@ -1420,12 +1556,13 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
         }
 
         dataCurrentHeader = dataCurrentHeader.map((a) => { return Number(a[''+column.column]); });  
-        let dataCurrentHeaderValid = dataCurrentHeader.filter(((item) => item !== undefined || item !== null));
-        // min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
-        // max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
+        let dataCurrentHeaderValid = dataCurrentHeader.filter((item) => { return (item !== undefined) && (item !== null) && (!Number.isNaN(item)); });
+        min = Math.min(min,Math.min(...(<number[]> dataCurrentHeaderValid)));
+        max = Math.max(max,Math.max(...(<number[]> dataCurrentHeaderValid)));
 
         // second elemnt is an array with all the values 
         currBoxData.push(dataCurrentHeaderValid);
+        currBoxData.push({min: min, max: max});
 
         // add the boxplot to all boxplots for this row
         rowBoxData.push(currBoxData);
@@ -1436,11 +1573,11 @@ export default class TouringLineUpPanel extends LineUpPanelActions {
     let rowBoxObj = {
       color: boxColor,
       data: rowBoxData,
-      min: min,
-      max: max
+      domainMin: column.domain[0],
+      domainMax: column.domain[1]
     };
 
-    console.log({rowBoxData , min, max});
+    // console.log({rowBoxData , min, max});
 
     return rowBoxObj;
   }
@@ -1888,7 +2025,7 @@ class RankingAdapter {
    */
   public getAttributeDataDisplayed(attributeId: string) { //  use lower case string
     const data = this.getItemsDisplayed();
-    return data.map((row) => row[attributeId]);
+    return data.map((row) => String(row[attributeId]));
   }
 
   /**
