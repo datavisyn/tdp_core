@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 import {isProxyAccessor} from '../utils';
 import {Tasks, ATouringTask} from './Tasks'
 import {IServerColumn} from '../../../rest';
+import { dirtyValues } from '../../../../../node_modules/lineupjs/src/model/Column';
 
 export default class TouringPanel extends LineUpPanelActions {
 
@@ -75,6 +76,10 @@ export default class TouringPanel extends LineUpPanelActions {
   private initNewTask() {
     //Remove previous output
     d3.select(this.touringElem).selectAll(`div.output *`).remove(); //remove all child elemetns of output
+
+    //add legend for the p-values
+    this.createLegend(d3.select(this.touringElem).selectAll('div.output'));
+
     const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
     task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
   }
@@ -88,12 +93,74 @@ export default class TouringPanel extends LineUpPanelActions {
   }
   private updateTask() {
     if (d3.select(this.touringElem).selectAll(`div.output *`).empty()) {
-      this.initNewTask(); // First time init
+      this.initNewTask(); // First time init 
     }
 
     const attributes = this.prepareInput(d3.select(this.touringElem).select('select.scope'));
     const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
     task.update(attributes);
+  }
+
+    // creates legend for the p-value
+  private createLegend(parentElement: d3.Selection<any>)
+  {
+    let divLegend = parentElement.append('div').classed('measure-legend',true);
+    let svgLegendContainer = divLegend.append('svg')
+                              .attr('width','100%')
+                              .attr('height',50);
+
+    let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
+                                                  .attr('id','gradLegend');    
+    svgDefs.append('stop')
+            .attr('offset','0%')
+            .attr('stop-color','#A9A9A9'); 
+    svgDefs.append('stop')
+            .attr('offset','50%')
+            .attr('stop-color','#FFFFFF'); 
+
+    let svgLegendGroup = svgLegendContainer.append('g');
+    let svgRect1 = svgLegendGroup.append('rect')
+                                .attr('x',10)
+                                .attr('y',10)
+                                .attr('width',150)
+                                .attr('height',15)
+                                .style('fill','url(#gradLegend)')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+    let svgText11 = svgLegendGroup.append('text')
+    .attr('x',10)
+    .attr('y',40)
+    .attr('text-anchor','start')
+    .text('0');
+    let svgText12 = svgLegendGroup.append('text')
+    .attr('x',85)
+    .attr('y',40)
+    .attr('text-anchor','middle')
+    .text('0.05');
+    let svgText13 = svgLegendGroup.append('text')
+    .attr('x',160)
+    .attr('y',40)
+    .attr('text-anchor','end')
+    .text('0.1');
+    let svgRect2 = svgLegendGroup.append('rect')
+                                .attr('x',170)
+                                .attr('y',10)
+                                .attr('width',150)
+                                .attr('height',15)
+                                .style('fill','white')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+
+    let svgText21 = svgLegendGroup.append('text')
+    .attr('x',170)
+    .attr('y',40)
+    .attr('text-anchor','start')
+    .text('0.1');
+    let svgText22 = svgLegendGroup.append('text')
+    .attr('x',320)
+    .attr('y',40)
+    .attr('text-anchor','end')
+    .text('1');
   }
 
   private updateInput() {
