@@ -31,6 +31,10 @@ export default class Tour {
     return this.desc.name;
   }
 
+  get description() {
+    return this.desc.description;
+  }
+
   canBeListed() {
     if (this.desc.level === 'manual') {
       return false;

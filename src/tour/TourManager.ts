@@ -127,7 +127,11 @@ export default class TourManager {
             </div>
             <div class="modal-body">
               <ul class="fa-ul">
-                ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}"><i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i><a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a></li>`).join('')}
+                ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}">
+                  <i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i>
+                  <a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a>
+                  ${d.description ? `<p>${d.description}</p>` : ''}
+                </li>`).join('')}
               </ul>
             </div>
         </div>
