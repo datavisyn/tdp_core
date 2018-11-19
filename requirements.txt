@@ -1,4 +1,4 @@
-phovea_server.git~=2.1.0
+phovea_server~=2.1.0
 pymongo==3.0.3
 requests==2.19.1
 SQLAlchemy==1.1.11
