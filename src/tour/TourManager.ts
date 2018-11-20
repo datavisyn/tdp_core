@@ -26,12 +26,6 @@ export default class TourManager {
   private readonly keyListener = (evt: KeyboardEvent) => {
     if (evt.which === 27) { // esc
       this.hideTour();
-    } else if (evt.which === 13) { // enter
-      const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
-      if (next.disabled) {
-        return;
-      }
-      next.click();
     }
   }
 
@@ -270,11 +264,11 @@ export default class TourManager {
       button.classList.toggle('fa-circle-o', i === stepNumber);
     });
 
+    const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
     {
       this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
       this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0;
 
-      const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
       next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
       next.disabled = false;
       if (step.pageBreak === 'user' && this.activeTour.multiPage) {
@@ -308,6 +302,14 @@ export default class TourManager {
     this.step.style.display = 'flex';
     this.stepCount.style.display = 'flex';
 
+    {
+      next.focus();
+      if (!step.allowUserInteraction) {
+        // force focus on next button
+        next.onblur = () => next.focus();
+      }
+    }
+
     if (focus) {
       const options: PopperOptions =  {
         modifiers: {
@@ -323,8 +325,8 @@ export default class TourManager {
         let centerTop = (parent.height / 2 - bb.height / 2);
         const centerBottom = centerTop + bb.height;
 
-        if (!(base.bottom < centerTop || base.top > centerBottom)) {
-          // overlap with the focus element shift step
+        if (!(base.bottom < centerTop || base.top > centerBottom) && !(base.right < centerLeft || base.left > (centerLeft + bb.width))) {
+          // overlap with the focus element shift step vertically
           if ((base.bottom + bb.height) < parent.height) {
             // can shift down
             centerTop = base.bottom + 5; // space
