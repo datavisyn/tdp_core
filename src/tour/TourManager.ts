@@ -308,18 +308,43 @@ export default class TourManager {
     this.step.style.display = 'flex';
     this.stepCount.style.display = 'flex';
 
-    const options: PopperOptions =  {
-      modifiers: {
-        preventOverflow: {boundariesElement: 'window'}
-      }
-    };
-    if (typeof step.placement === 'string') {
-      options.placement = step.placement;
-    } else if (typeof step.placement === 'function') {
-      step.placement(options);
-    }
     if (focus) {
-      this.stepPopper = new Popper(focus, this.step, options);
+      const options: PopperOptions =  {
+        modifiers: {
+          preventOverflow: {boundariesElement: 'window'}
+        }
+      };
+      if (step.placement === 'centered') {
+        // center but avoid the focus element
+        const base = focus.getBoundingClientRect();
+        const bb = this.step.getBoundingClientRect();
+        const parent = this.step.ownerDocument.body.getBoundingClientRect();
+        const centerLeft = (parent.width / 2 - bb.width / 2);
+        let centerTop = (parent.height / 2 - bb.height / 2);
+        const centerBottom = centerTop + bb.height;
+
+        if (!(base.bottom < centerTop || base.top > centerBottom)) {
+          // overlap with the focus element shift step
+          if ((base.bottom + bb.height) < parent.height) {
+            // can shift down
+            centerTop = base.bottom + 5; // space
+          } else if ((base.top - bb.height) >= 0) {
+            // above is ok
+            centerTop = base.top - bb.height;
+          } else {
+            // no where to fit put down
+            centerTop = parent.height - bb.height;
+          }
+        }
+        this.step.style.transform = `translate(${centerLeft}px, ${centerTop}px)`;
+      } else {
+        if (typeof step.placement === 'string') {
+          options.placement = step.placement;
+        } else if (typeof step.placement === 'function') {
+          step.placement(options);
+        }
+        this.stepPopper = new Popper(focus, this.step, options);
+      }
     } else {
       // center
       const bb = this.step.getBoundingClientRect();
