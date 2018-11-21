@@ -152,7 +152,7 @@ export class ColumnComparison extends ATouringTask {
       for (let [i, row] of data.entries()) {
         for (let j of row.keys()) {
           if (j > 0) {
-            const measures = MethodManager.getMeasuresByType(attr1[j - 1].type, attr2[i].type, SCOPE.ATTRIBUTES); 
+            const measures = MethodManager.getMeasuresByType(Type.get(attr1[j - 1].type), Type.get(attr2[i].type), SCOPE.ATTRIBUTES); 
             if (measures.length > 0 && j <= i+1) { // start at 
               const measure = measures[0]// Always the first
               const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1]as IServerColumn).column) //minus one because the first column is headers
@@ -303,7 +303,7 @@ export class SelectionStratificationComparison extends RowComparison{
 
       let i=0;
       for (const col of attr2) {
-        const measures = MethodManager.getMeasuresByType(col.type, col.type, SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
+        const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) { 
           const measure = measures[0];
           //prepare data (selected data is the same for all groups of this column)
@@ -518,7 +518,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
       let i=0;
       
       for (const col of attr2) {
-        const measures = MethodManager.getMeasuresByType(col.type, col.type, SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
+        const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) { 
           const measure = measures[0];
           for (const [j, grpData] of groupedData.entries()) {
