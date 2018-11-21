@@ -96,3 +96,14 @@ $step-border: black;
     cursor: pointer;
   }
 }
+
+
+.tdp-tour-step.tdp-tour-back-disabled {
+  .tdp-tour-step-dots > div {
+    pointer-events: none;
+  }
+
+  button[data-switch="-"] {
+    display: none;
+  }
+}

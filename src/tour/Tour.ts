@@ -15,7 +15,7 @@ export default class Tour {
 
   private steps: IStep[] = [];
 
-  constructor(private readonly desc: ITDPTourExtensionDesc) {
+  constructor(public readonly desc: ITDPTourExtensionDesc) {
 
   }
 

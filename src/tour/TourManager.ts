@@ -267,7 +267,7 @@ export default class TourManager {
     const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
     {
       this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
-      this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0;
+      this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0 || this.activeTour.desc.canJumpAround === false;
 
       next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
       next.disabled = false;
@@ -377,6 +377,7 @@ export default class TourManager {
 
     this.activeTour = tour;
     this.activeTourContext = Object.assign({}, context, this.tourContext);
+    this.step.classList.toggle('tdp-tour-back-disabled', tour.desc.canJumpAround === false);
   }
 
   private takeDown() {

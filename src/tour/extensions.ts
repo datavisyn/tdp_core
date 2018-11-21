@@ -25,6 +25,11 @@ export interface ITDPTourExtensionDesc {
    */
   multiPage?: boolean;
 
+  /**
+   * whether the user can influence the order of the tour like jumping around or go back
+   */
+  canJumpAround?: boolean;
+
   load(): Promise<IPlugin & ITDPTourExtension>;
 }
 
