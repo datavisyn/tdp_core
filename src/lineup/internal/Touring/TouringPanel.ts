@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 import {isProxyAccessor} from '../utils';
 import {Tasks, ATouringTask} from './Tasks'
 import {IServerColumn} from '../../../rest';
+import { dirtyValues } from '../../../../../node_modules/lineupjs/src/model/Column';
 
 export default class TouringPanel extends LineUpPanelActions {
 
@@ -75,6 +76,7 @@ export default class TouringPanel extends LineUpPanelActions {
   private initNewTask() {
     //Remove previous output
     d3.select(this.touringElem).selectAll(`div.output *`).remove(); //remove all child elemetns of output
+
     const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
     task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
   }
@@ -88,13 +90,14 @@ export default class TouringPanel extends LineUpPanelActions {
   }
   private updateTask() {
     if (d3.select(this.touringElem).selectAll(`div.output *`).empty()) {
-      this.initNewTask(); // First time init
+      this.initNewTask(); // First time init 
     }
 
     const attributes = this.prepareInput(d3.select(this.touringElem).select('select.scope'));
     const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
     task.update(attributes);
   }
+
 
   private updateInput() {
     if (!this.touringElem.hidden) {
