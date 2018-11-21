@@ -1,8 +1,8 @@
-import {IColumnDesc, ICategory} from 'lineupjs';
-import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParamets, Type, SCOPE} from 'touring';
-import * as d3 from 'd3';
-import {RankingAdapter} from './TouringPanel';
 import {IServerColumn} from '../../../rest';
+import {RankingAdapter} from './RankingAdapter';
+import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE} from 'touring';
+import {IColumnDesc, ICategory} from 'lineupjs';
+import * as d3 from 'd3';
 
 
 export const Tasks = new Array<ATouringTask>();
@@ -51,7 +51,7 @@ export abstract class ATouringTask implements ITouringTask{
   //     ps.order();           // order domelements as in the array
   // }
 
-  toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParamets): IScoreCell {
+  toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
     const color =  score2color(score.pValue);
     return {
       label: score.pValue.toFixed(2),
@@ -63,85 +63,85 @@ export abstract class ATouringTask implements ITouringTask{
     }
   }
 
-      // creates legend for the p-value
-      private createLegend(parentElement: d3.Selection<any>)
-      {
-        let divLegend = parentElement.append('div').classed('measure-legend',true);
-        let svgLegendContainer = divLegend.append('svg')
-                                  .attr('width','100%')
-                                  .attr('height',70);
-    
-        let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
-                                                      .attr('id','gradLegend');    
-        svgDefs.append('stop')
-                .attr('offset','0%')
-                .attr('stop-color','#A9A9A9'); 
-        svgDefs.append('stop')
-                .attr('offset','50%')
-                .attr('stop-color','#FFFFFF'); 
-        
-        let xStart = 10;
-        let yStart = 25;
-        let barWidth = 150;
-        let barHeight = 15;
-        let barSpace = 10;
-        let textHeight = 15;
-    
-        let svgLegendLabel = svgLegendContainer.append('g');
-        let svgLabel = svgLegendLabel.append('text')
-        .attr('x',5)
-        .attr('y',15)
-        .attr('text-anchor','start')
-        .text('p-value:');
-    
-        
-    
-        let svgLegendGroup = svgLegendContainer.append('g');
-        let svgRect1 = svgLegendGroup.append('rect')
-                                    .attr('x',xStart)
-                                    .attr('y',yStart)
-                                    .attr('width',barWidth)
-                                    .attr('height',barHeight)
-                                    .style('fill','url(#gradLegend)')
-                                    .style('stroke-width',1)
-                                    .style('stroke','black');
-        let svgText11 = svgLegendGroup.append('text')
-        .attr('x',xStart)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','start')
-        .text('0');
-        let svgText12 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth/2)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','middle')
-        .text('0.05');
-        let svgText13 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','end')
-        .text('0.1');
-        let svgRect2 = svgLegendGroup.append('rect')
-                                    .attr('x',xStart+barWidth+barSpace)
-                                    .attr('y',yStart)
-                                    .attr('width',barWidth)
-                                    .attr('height',barHeight)
-                                    .style('fill','white')
-                                    .style('stroke-width',1)
-                                    .style('stroke','black');
-    
-        let svgText21 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth+barSpace)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','start')
-        .text('0.1');
-        let svgText22 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth+barSpace+barWidth)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','end')
-        .text('1');
-      }
+  // creates legend for the p-value
+  private createLegend(parentElement: d3.Selection<any>)
+  {
+    let divLegend = parentElement.append('div').classed('measure-legend',true);
+    let svgLegendContainer = divLegend.append('svg')
+                              .attr('width','100%')
+                              .attr('height',70);
 
-  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult){
+    let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
+                                                  .attr('id','gradLegend');    
+    svgDefs.append('stop')
+            .attr('offset','0%')
+            .attr('stop-color','#A9A9A9'); 
+    svgDefs.append('stop')
+            .attr('offset','50%')
+            .attr('stop-color','#FFFFFF'); 
+    
+    let xStart = 10;
+    let yStart = 25;
+    let barWidth = 150;
+    let barHeight = 15;
+    let barSpace = 10;
+    let textHeight = 15;
+
+    let svgLegendLabel = svgLegendContainer.append('g');
+    let svgLabel = svgLegendLabel.append('text')
+    .attr('x',5)
+    .attr('y',15)
+    .attr('text-anchor','start')
+    .text('p-value:');
+
+    
+
+    let svgLegendGroup = svgLegendContainer.append('g');
+    let svgRect1 = svgLegendGroup.append('rect')
+                                .attr('x',xStart)
+                                .attr('y',yStart)
+                                .attr('width',barWidth)
+                                .attr('height',barHeight)
+                                .style('fill','url(#gradLegend)')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+    let svgText11 = svgLegendGroup.append('text')
+    .attr('x',xStart)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','start')
+    .text('0');
+    let svgText12 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth/2)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','middle')
+    .text('0.05');
+    let svgText13 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','end')
+    .text('0.1');
+    let svgRect2 = svgLegendGroup.append('rect')
+                                .attr('x',xStart+barWidth+barSpace)
+                                .attr('y',yStart)
+                                .attr('width',barWidth)
+                                .attr('height',barHeight)
+                                .style('fill','white')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+
+    let svgText21 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth+barSpace)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','start')
+    .text('0.1');
+    let svgText22 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth+barSpace+barWidth)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','end')
+    .text('1');
+  }
+
+  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
     
     let divDetailInfo = miniVisualisation.append('div')
                                     .classed('detailVis',true);
@@ -198,11 +198,10 @@ export abstract class ATouringTask implements ITouringTask{
       }
       
       // display visualisation
-      if(measure.visualization){
+      if(measure.visualization) {
         const visualization: IMeasureVisualization = measure.visualization;
-        if(cellData.setParameters)
-        {
-          visualization.generateVisualization(details,cellData.setParameters);
+        if(cellData.setParameters) {
+          visualization.generateVisualization(details, cellData.setParameters);
         }
         
       }  
@@ -250,9 +249,9 @@ export class ColumnComparison extends ATouringTask {
       tds.style('background-color', (d) => d !== null ? d.background : '#FFFFFF');
       tds.attr('class', (d: any) => {
         // icon for the attribute type
-        if(d && d.type && d.type === 'categorical'){
+        if(d && d.type && d.type === 'categorical') {
           return 'icon-category';
-        }else if (d && d.type && d.type === 'number'){
+        }else if (d && d.type && d.type === 'number') {
           return 'icon-number';
         }
         return null;
@@ -394,10 +393,10 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
       tds.attr('class', (d: any) => {
         // icon for the attribute type
-        if(d && d.type && d.type === 'categorical'){
+        if(d && d.type && d.type === 'categorical') {
 
           return 'icon-category';
-        }else if (d && d.type && d.type === 'number'){
+        }else if (d && d.type && d.type === 'number') {
           return 'icon-number';
         }
         return null;
@@ -756,7 +755,7 @@ interface IScoreCell {
   colspan?: number,
   score?: IMeasureResult,
   measure?: ISimilarityMeasure,
-  setParameters?: ISetParamets
+  setParameters?: ISetParameters
 }
 
 
