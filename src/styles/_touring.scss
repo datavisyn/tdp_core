@@ -9,7 +9,7 @@ button.touring.active::before {
   border: none;
 }
 
-.tooltip.parsets, .tooltip.boxplot {
+.tooltip.parsets, .tooltip.boxplot, .tooltip.scatterplot {
   background-color: rgba(242, 242, 242, .6);
   position: absolute;
   padding: 5px;	
@@ -237,6 +237,19 @@ div.touring {
       }
     }
 
+    // ------ scattter plot with D3
+    g.scatterplot circle.datapoint{
+      stroke: none;
+      opacity: 0.2;
+      fill: black;
+    }
+    g.scatterplot circle.datapoint:hover{
+      // stroke: black;
+      // stroke-width: 1;
+      // stroke-opacity: 1;
+      opacity: 1;
+      fill: #fba74d  !important;
+    }
 
   }
 
