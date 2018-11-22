@@ -15,10 +15,6 @@ export interface IProxyViewOptions {
    * idtype of the argument
    */
   idtype: string;
-  /**
-   * extra object for the link generation
-   */
-  extra: object;
 
   /**
    * idType of item selection
@@ -30,8 +26,7 @@ export default class MessagingProxyView extends AView {
   protected options: IProxyViewOptions = {
     site: null,
     idtype: null,
-    itemIDType: null,
-    extra: {}
+    itemIDType: null
   };
 
   readonly naturalSize = [1280, 800];
@@ -70,8 +65,11 @@ export default class MessagingProxyView extends AView {
       // send initial selection
       this.sendInputSelectionMessage();
     };
+    iframe.src = this.options.site;
     // listen on iframe events
     window.addEventListener('message', this.onWindowMessage);
+
+    this.node.appendChild(iframe);
   }
 
   private onWindowMessage = (evt: MessageEvent) => {
@@ -136,7 +134,7 @@ export default class MessagingProxyView extends AView {
     }
 
     return this.resolveSelection().then((ids) => {
-      if (!ids || ids.length === 1) {
+      if (!ids || ids.length === 0) {
         this.setNoMappingFoundHint(true);
         return;
       }
@@ -152,7 +150,8 @@ export default class MessagingProxyView extends AView {
     if (!this.iframeWindow) {
       return;
     }
-    this.iframeWindow.postMessage(msg, this.iframeWindow.location.origin);
+    const url = new URL(this.options.site);
+    this.iframeWindow.postMessage(msg, url.origin);
   }
 
   private sendItemSelectionMessage() {
