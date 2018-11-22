@@ -32,6 +32,7 @@ export default class MessagingProxyView extends AView {
   readonly naturalSize = [1280, 800];
 
   private iframeWindow: Window | null = null;
+  private messageQueue: ITDPMessage[] = [];
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
     super(context, selection, parent);
@@ -64,10 +65,15 @@ export default class MessagingProxyView extends AView {
       this.iframeWindow = iframe.contentWindow;
       // send initial selection
       this.sendInputSelectionMessage();
+
+      // send queued messages
+      this.messageQueue.splice(0, this.messageQueue.length).forEach((msg) => this.sendMessage(msg));
     };
     iframe.src = this.options.site;
     // listen on iframe events
-    window.addEventListener('message', this.onWindowMessage);
+    window.addEventListener('message', this.onWindowMessage, {
+      passive: true
+    });
 
     this.node.appendChild(iframe);
   }
@@ -146,8 +152,11 @@ export default class MessagingProxyView extends AView {
     });
   }
 
-  private sendMessage(msg: ITDPMessage) {
+  private sendMessage(msg: ITDPMessage, queueIfNotExisting = false) {
     if (!this.iframeWindow) {
+      if (queueIfNotExisting) {
+        this.messageQueue.push(msg);
+      }
       return;
     }
     const url = new URL(this.options.site);
@@ -155,16 +164,12 @@ export default class MessagingProxyView extends AView {
   }
 
   private sendItemSelectionMessage() {
-    if (!this.iframeWindow) {
-      return;
-    }
-
     const s = this.getItemSelection();
     if (!s || s.range.isNone) {
       this.sendMessage({ type: 'tdpSetItemSelection', payload: {
         idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
         ids: []
-      }});
+      }}, true);
       return;
     }
 
@@ -172,7 +177,7 @@ export default class MessagingProxyView extends AView {
       this.sendMessage({ type: 'tdpSetItemSelection', payload: {
         idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
         ids
-      }});
+      }}, true);
     });
   }
 
@@ -185,7 +190,7 @@ export default class MessagingProxyView extends AView {
     this.sendMessage({ type: 'tdpSetParameter', payload: {
       name,
       value
-    }});
+    }}, true);
   }
 
   private static isNoNSecurePage(url: string) {
