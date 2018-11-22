@@ -80,7 +80,7 @@ function convertRanking(provider: LocalDataProvider, order: number[], columns: C
 
   const separators = {csv : ',', tsv: '\t', ssv: ';'};
   let content: Promise<Blob> | Blob;
-  const mimeTypes = {csv : 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json'};
+  const mimeTypes = {csv : 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
   const mimeType = mimeTypes[type];
   if (type in separators) {
     content = toBlob(exportRanking(columns, rows, separators[type]), mimeType);

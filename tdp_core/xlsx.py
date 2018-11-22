@@ -13,6 +13,29 @@ _log = logging.getLogger(__name__)
 app = Namespace(__name__)
 
 
+_types = dict(b='boolean',s='string')
+
+def to_type(cell):
+  if not cell:
+    return 'string'
+  if cell.is_date:
+    return 'date'
+  if cell.data_type in _types:
+    return _types[cell.data_type]
+  v = cell.value
+  if isinstance(v, int) or isinstance(v, long):
+    return 'int'
+  if isinstance(v, float):
+    return 'float'
+  return 'string'
+
+
+def _convert_value(v):
+  if isinstance(v, datetime):
+    return v.isoformat()
+  return v
+
+
 @app.route('/to_json', methods=['POST'])
 def _xlsx2json():
   file = request.files.get('file')
@@ -21,32 +44,13 @@ def _xlsx2json():
 
   wb = load_workbook(file, read_only=True)
 
-  types = dict(b='boolean',s='string')
 
-  def to_type(cell):
-    if not cell:
-      return 'string'
-    if cell.is_date:
-      return 'date'
-    if cell.data_type in types:
-      return types[cell.data_type]
-    v = cell.value
-    if isinstance(v, int) or isinstance(v, long):
-      return 'int'
-    if isinstance(v, float):
-      return 'float'
-    return 'string'
-
-  def convert_value(v):
-    if isinstance(v, datetime):
-      return v.isoformat()
-    return v
 
   def convert_row(row, cols):
     result = {}
 
     for r,c in zip(cols, row):
-      result[c['name']] = convert_value(r.value)
+      result[c['name']] = _convert_value(r.value)
 
     return result
 
@@ -70,6 +74,26 @@ def _xlsx2json():
   )
 
   return jsonify(data)
+
+
+@app.route('/to_json_array', methods=['POST'])
+def _xlsx2json_array():
+  file = request.files.get('file')
+  if not file:
+    abort(403, 'missing file')
+
+  wb = load_workbook(file, read_only=True)
+
+  def convert_row(row):
+    return [unicode(_convert_value(cell.value)) for cell in row]
+
+  if not wb.worksheets:
+    return jsonify([])
+
+  ws = wb.worksheets[0]
+
+  rows = [convert_row(row) for row in ws.iter_rows()]
+  return jsonify(rows)
 
 
 @app.route('/from_json', methods=['POST'])
