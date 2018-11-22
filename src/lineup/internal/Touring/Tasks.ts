@@ -1,6 +1,6 @@
 import {IServerColumn} from '../../../rest';
 import {RankingAdapter} from './RankingAdapter';
-import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE} from 'touring';
+import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, Workers} from 'touring';
 import {IColumnDesc, ICategory} from 'lineupjs';
 import * as d3 from 'd3';
 
@@ -363,12 +363,16 @@ export class SelectionStratificationComparison extends RowComparison{
   }
 
   update(data: any) {
+    Workers.terminateAll(); // Abort all calculations as their results are no longer needed
     // numerical and categorical data is ok
     const compareTo = [this.ranking.getSelectionDesc()];
     this.createTable(data, compareTo);
   }
 
   createTable(catData: any[], compareTo: {categories: ICategory[]; label: string; type: string; column: string;}[]): any {
+    const timestamp = new Date().getTime().toString();
+    d3.select(this.node).attr('data-timestamp', timestamp);
+
     const colHeadsAttr = d3.select(this.node).select('thead tr.attr').selectAll('th.head').data(compareTo, (attr) => `${attr.column}/${attr.categories.length}`); //include category length to update if a category is added/removed
     colHeadsAttr.enter().append('th')
       .attr('class', 'head')
@@ -378,7 +382,11 @@ export class SelectionStratificationComparison extends RowComparison{
       .attr('class', 'head');
 
     const that = this; // for the function below
-    function updateTableBody(bodyData: Array<Array<IScoreCell>>) {
+    function updateTableBody(bodyData: Array<Array<IScoreCell>>, timestamp: string) {
+      if (d3.select(that.node).attr('data-timestamp') !== timestamp) {
+        return; // skip outdated result
+      }
+
       const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
       trs.enter().append('tr');
       const tds = trs.selectAll('td').data((d) => d);
@@ -394,9 +402,8 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.attr('class', (d: any) => {
         // icon for the attribute type
         if(d && d.type && d.type === 'categorical') {
-
           return 'icon-category';
-        }else if (d && d.type && d.type === 'number') {
+        } else if (d && d.type && d.type === 'number') {
           return 'icon-number';
         }
         return null;
@@ -414,8 +421,8 @@ export class SelectionStratificationComparison extends RowComparison{
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
     }
     
-    this.getAttrTableBody(compareTo, catData, true, null).then(updateTableBody); // initialize
-    this.getAttrTableBody(compareTo, catData, false, updateTableBody).then(updateTableBody); // set values
+    this.getAttrTableBody(compareTo, catData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
+    this.getAttrTableBody(compareTo, catData, false, (data: IScoreCell[][]) => updateTableBody(data, timestamp)); // set values
   }
 
   /**
@@ -494,7 +501,7 @@ export class SelectionStratificationComparison extends RowComparison{
               };
               promises.push(measure.calc(dataSelected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
-                      data[rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
+                      data[rowIndex][selScoreIndex] = this.toScoreCell(score, measure, setParameters);
                       update(data);
                     })
                     .catch((err) => data[rowIndex][selScoreIndex] = {label: 'err'} ));
@@ -513,7 +520,7 @@ export class SelectionStratificationComparison extends RowComparison{
               // Score with unselected:
               promises.push(measure.calc(dataUnselected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
-                      data[rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
+                      data[rowIndex][unselScoreIndex] = this.toScoreCell(score, measure, setParameters);
                       update(data);
                     })
                     .catch((err) => data[rowIndex][unselScoreIndex] = {label: 'err'}));
