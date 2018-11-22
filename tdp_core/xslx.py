@@ -14,7 +14,7 @@ app = Namespace(__name__)
 
 
 @app.route('/to_json', methods=['POST'])
-def _xslx2json():
+def _xlsx2json():
   file = request.files.get('file')
   if not file:
     abort(403, 'missing file')
@@ -73,7 +73,7 @@ def _xslx2json():
 
 
 @app.route('/from_json', methods=['POST'])
-def _json2xslx():
+def _json2xlsx():
   data = request.json
   wb = Workbook(write_only=True)
 
