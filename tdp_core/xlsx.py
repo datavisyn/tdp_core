@@ -13,7 +13,8 @@ _log = logging.getLogger(__name__)
 app = Namespace(__name__)
 
 
-_types = dict(b='boolean',s='string')
+_types = dict(b='boolean', s='string')
+
 
 def to_type(cell):
   if not cell:
@@ -44,12 +45,10 @@ def _xlsx2json():
 
   wb = load_workbook(file, read_only=True)
 
-
-
   def convert_row(row, cols):
     result = {}
 
-    for r,c in zip(cols, row):
+    for r, c in zip(cols, row):
       result[c['name']] = _convert_value(r.value)
 
     return result
@@ -60,7 +59,7 @@ def _xlsx2json():
     ws_cols = next(ws_rows, [])
     ws_first_row = next(ws_rows, [])
 
-    cols = [dict(name=h.value, type=to_type(r)) for h,r in zip(ws_cols, ws_first_row)]
+    cols = [dict(name=h.value, type=to_type(r)) for h, r in zip(ws_cols, ws_first_row)]
 
     rows = []
     rows.append(convert_row(cols, ws_first_row))
@@ -118,7 +117,6 @@ def _json2xlsx():
   for sheet in data.get('sheets', []):
     ws = wb.create_sheet(title=sheet['title'])
     cols = sheet['columns']
-    colnames = [col['name'] for col in cols]
 
     ws.append(to_header(col['name']) for col in cols)
 
@@ -130,7 +128,6 @@ def _json2xlsx():
     tmp.seek(0)
     s = tmp.read()
     return Response(s, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
 
 
 def create():
