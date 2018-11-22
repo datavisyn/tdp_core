@@ -26,12 +26,6 @@ export default class TourManager {
   private readonly keyListener = (evt: KeyboardEvent) => {
     if (evt.which === 27) { // esc
       this.hideTour();
-    } else if (evt.which === 13) { // enter
-      const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
-      if (next.disabled) {
-        return;
-      }
-      next.click();
     }
   }
 
@@ -270,11 +264,11 @@ export default class TourManager {
       button.classList.toggle('fa-circle-o', i === stepNumber);
     });
 
+    const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
     {
       this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
-      this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0;
+      this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0 || this.activeTour.desc.canJumpAround === false;
 
-      const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
       next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
       next.disabled = false;
       if (step.pageBreak === 'user' && this.activeTour.multiPage) {
@@ -308,18 +302,51 @@ export default class TourManager {
     this.step.style.display = 'flex';
     this.stepCount.style.display = 'flex';
 
-    const options: PopperOptions =  {
-      modifiers: {
-        preventOverflow: {boundariesElement: 'window'}
+    {
+      next.focus();
+      if (!step.allowUserInteraction) {
+        // force focus on next button
+        next.onblur = () => next.focus();
       }
-    };
-    if (typeof step.placement === 'string') {
-      options.placement = step.placement;
-    } else if (typeof step.placement === 'function') {
-      step.placement(options);
     }
+
     if (focus) {
-      this.stepPopper = new Popper(focus, this.step, options);
+      const options: PopperOptions =  {
+        modifiers: {
+          preventOverflow: {boundariesElement: 'window'}
+        }
+      };
+      if (step.placement === 'centered') {
+        // center but avoid the focus element
+        const base = focus.getBoundingClientRect();
+        const bb = this.step.getBoundingClientRect();
+        const parent = this.step.ownerDocument.body.getBoundingClientRect();
+        const centerLeft = (parent.width / 2 - bb.width / 2);
+        let centerTop = (parent.height / 2 - bb.height / 2);
+        const centerBottom = centerTop + bb.height;
+
+        if (!(base.bottom < centerTop || base.top > centerBottom) && !(base.right < centerLeft || base.left > (centerLeft + bb.width))) {
+          // overlap with the focus element shift step vertically
+          if ((base.bottom + bb.height) < parent.height) {
+            // can shift down
+            centerTop = base.bottom + 5; // space
+          } else if ((base.top - bb.height) >= 0) {
+            // above is ok
+            centerTop = base.top - bb.height;
+          } else {
+            // no where to fit put down
+            centerTop = parent.height - bb.height;
+          }
+        }
+        this.step.style.transform = `translate(${centerLeft}px, ${centerTop}px)`;
+      } else {
+        if (typeof step.placement === 'string') {
+          options.placement = step.placement;
+        } else if (typeof step.placement === 'function') {
+          step.placement(options);
+        }
+        this.stepPopper = new Popper(focus, this.step, options);
+      }
     } else {
       // center
       const bb = this.step.getBoundingClientRect();
@@ -350,6 +377,7 @@ export default class TourManager {
 
     this.activeTour = tour;
     this.activeTourContext = Object.assign({}, context, this.tourContext);
+    this.step.classList.toggle('tdp-tour-back-disabled', tour.desc.canJumpAround === false);
   }
 
   private takeDown() {

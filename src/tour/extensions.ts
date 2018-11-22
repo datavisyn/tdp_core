@@ -25,6 +25,11 @@ export interface ITDPTourExtensionDesc {
    */
   multiPage?: boolean;
 
+  /**
+   * whether the user can influence the order of the tour like jumping around or go back
+   */
+  canJumpAround?: boolean;
+
   load(): Promise<IPlugin & ITDPTourExtension>;
 }
 
@@ -52,9 +57,10 @@ export interface IStep {
   html: string | ((node: HTMLElement)=>void);
   /**
    * optional more precise popper placement
+   * centered ... center of screen but avoid the highlighted element
    * @default auto
    */
-  placement?: Placement | ((options: PopperOptions)=>void);
+  placement?: Placement | ((options: PopperOptions)=>void) | 'centered';
   /**
    * executed before the step is shown
    * @param context

@@ -108,6 +108,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     if (this.tourManager.hasTours()) {
       const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
       button.dataset.toggle = 'modal';
+      button.tabIndex = -1;
       button.dataset.target = `#${this.tourManager.chooser.id}`;
       button.onclick = (evt) => {
         evt.preventDefault();
