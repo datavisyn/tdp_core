@@ -1,18 +1,16 @@
 import {sendAPI, api2absURL, send} from 'phovea_core/src/ajax';
 
 export interface IXSLXColumn {
-  title: string;
-  key: string;
-  type: 'number'|'string';
+  name: string;
+  type: 'string'|'float'|'int'|'date'|'boolean';
 }
 
 export interface IXSLXSheet {
   columns: IXSLXColumn[];
-  rows: { [key: string]: any}[];
+  rows: { [key: string]: string|number|Date|boolean|null}[];
 }
 
 export interface IXSLXJSONFile {
-  filename: string;
   sheet: IXSLXSheet[];
 }
 

@@ -1,7 +1,11 @@
 from phovea_server.ns import Namespace, request, abort, Response
 from phovea_server.util import jsonify
 from openpyxl import Workbook, load_workbook
+from openpyxl.worksheet.write_only import WriteOnlyCell
+from openpyxl.styles import Font
 from tempfile import NamedTemporaryFile
+from datetime import datetime
+import dateutil.parser
 import logging
 
 __author__ = 'Samuel Gratzl'
@@ -17,10 +21,49 @@ def _xslx2json():
 
   wb = load_workbook(file, read_only=True)
 
+  types = dict(b='boolean',s='string')
+
+  def to_type(cell):
+    if not cell:
+      return 'string'
+    if cell.is_date:
+      return 'date'
+    if cell.data_type in types:
+      return types[cell.data_type]
+    v = cell.value
+    if isinstance(v, int) or isinstance(v, long):
+      return 'int'
+    if isinstance(v, float):
+      return 'float'
+    return 'string'
+
+  def convert_value(v):
+    if isinstance(v, datetime):
+      return v.isoformat()
+    return v
+
+  def convert_row(row, cols):
+    result = {}
+
+    for r,c in zip(cols, row):
+      result[c['name']] = convert_value(r.value)
+
+    return result
+
   def convert_sheet(ws):
-    # ws.iter_rows()
-    # ws.iter_cols()
-    return dict(title=ws.title)
+
+    ws_rows = ws.iter_rows()
+    ws_cols = next(ws_rows, [])
+    ws_first_row = next(ws_rows, [])
+
+    cols = [dict(name=h.value, type=to_type(r)) for h,r in zip(ws_cols, ws_first_row)]
+
+    rows = []
+    rows.append(convert_row(cols, ws_first_row))
+    for row in ws_rows:
+      rows.append(convert_row(cols, row))
+
+    return dict(title=ws.title, columns=cols, rows=rows)
 
   data = dict(
     sheets=[convert_sheet(ws) for ws in wb.worksheets]
@@ -34,8 +77,29 @@ def _json2xslx():
   data = request.json
   wb = Workbook(write_only=True)
 
+  bold = Font(bold=True)
+
+  def to_header(v):
+    c = WriteOnlyCell(ws, value=v)
+    c.font = bold
+    return c
+
+  def to_value(v, coltype):
+    if coltype == 'date':
+      if isinstance(v, int) or isinstance(v, long):
+        return datetime.fromtimestamp(v)
+      return dateutil.parser.parse(v)
+    return v
+
   for sheet in data.get('sheets', []):
     ws = wb.create_sheet(title=sheet['title'])
+    cols = sheet['columns']
+    colnames = [col['name'] for col in cols]
+
+    ws.append(to_header(col['name']) for col in cols)
+
+    for row in sheet['rows']:
+      ws.append(to_value(row.get(col['name'], None), col['type']) for col in cols)
 
   with NamedTemporaryFile() as tmp:
     wb.save(tmp.name)
