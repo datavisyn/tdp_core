@@ -33,3 +33,8 @@ export function xlsx2jsonArray(file: File): Promise<any[][]> {
 export function json2xlsx(file: IXLSXJSONFile): Promise<Blob> {
   return send(api2absURL('/tdp/xlsx/from_json'), file, 'POST', 'blob', 'application/json');
 }
+
+
+export function jsonArray2xlsx(file: any[][]): Promise<Blob> {
+  return send(api2absURL('/tdp/xlsx/from_json_array'), file, 'POST', 'blob', 'application/json');
+}

@@ -130,6 +130,22 @@ def _json2xlsx():
     return Response(s, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
+@app.route('/from_json_array', methods=['POST'])
+def _json_array2xlsx():
+  data = request.json
+  wb = Workbook(write_only=True)
+  ws = wb.create_sheet()
+
+  for row in data:
+    ws.append(row)
+
+  with NamedTemporaryFile() as tmp:
+    wb.save(tmp.name)
+    tmp.seek(0)
+    s = tmp.read()
+    return Response(s, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
 def create():
   """
    entry point of this plugin
