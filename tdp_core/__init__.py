@@ -33,6 +33,10 @@ def phovea(registry):
                   {
                       'namespace': '/api/tdp/config'
                   })
+  registry.append('namespace', 'tdp_xslx2json', 'tdp_core.xslx',
+                  {
+                      'namespace': '/api/tdp/xslx'
+                  })
   registry.append('mapping_provider', 'tdp_core', 'tdp_core.mapping_table')
   registry.append('greenifier', 'psycopg2', 'tdp_core.sql_use_gevent', {})
   # generator-phovea:end
