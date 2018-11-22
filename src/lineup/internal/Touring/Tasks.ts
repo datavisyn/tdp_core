@@ -300,7 +300,7 @@ export class ColumnComparison extends ATouringTask {
                 setB: data2,
                 setBDesc: attr2[i]
               };
-              promises.push(measure.calc(data1, data2)
+              promises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
               .then((score) => {
                 row[j] = this.toScoreCell(score,measure,setParameters);
                 update(data);
@@ -492,7 +492,7 @@ export class SelectionStratificationComparison extends RowComparison{
                 setBDesc: col,
                 setBCategory: groupedData[j]
               };
-              promises.push(measure.calc(dataSelected, grpData4Col)
+              promises.push(measure.calc(dataSelected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
                       data[rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
                       update(data);
@@ -511,7 +511,7 @@ export class SelectionStratificationComparison extends RowComparison{
                 setBCategory: groupedData[j]
               };
               // Score with unselected:
-              promises.push(measure.calc(dataUnselected, grpData4Col)
+              promises.push(measure.calc(dataUnselected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
                       data[rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
                       update(data);
@@ -616,7 +616,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               setBDesc: col,
               setBCategory: cat.name 
             };
-            promises.push(measure.calc(dataSelected, dataCategory)
+            promises.push(measure.calc(dataSelected, dataCategory, dataSelected.concat(dataUnselected))
                   .then((score) => {
                     data[rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
@@ -635,7 +635,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               setBCategory: cat.name 
             };
             // Score with unselected:
-            promises.push(measure.calc(dataUnselected, dataCategory)
+            promises.push(measure.calc(dataUnselected, dataCategory, dataSelected.concat(dataUnselected))
                     .then((score) => {
                       data[rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
                       update(data);
@@ -725,7 +725,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                   setBDesc: col,
                   setBCategory: groupedData[j],
                 };
-                promises.push(measure.calc(grpData4ColRow, grpData4ColCol)
+                promises.push(measure.calc(grpData4ColRow, grpData4ColCol, [])
                   .then((score) => {
                     data[rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
