@@ -382,7 +382,7 @@ export abstract class ARankingView extends AView {
   }
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
-    colDesc.color = this.colors.getColumnColor(id);
+    colDesc.color = colDesc.color? colDesc.color : this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
       this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
@@ -390,12 +390,14 @@ export abstract class ARankingView extends AView {
   }
 
   private addScoreColumn(score: IScore<any>) {
-    const colDesc = score.createDesc();
+    const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
+
+    const colDesc = score.createDesc(args);
     // flag that it is a score
     colDesc._score = true;
 
     const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
-    const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
+
     const data = score.compute(ids, this.itemIDType, args);
     return this.addColumn(colDesc, data);
   }

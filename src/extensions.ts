@@ -10,6 +10,8 @@ import {IColumnDesc} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
 
+export * from './tour/extensions';
+
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
@@ -45,7 +47,7 @@ export interface IScore<T> {
    * creates the LineUp column description
    * @returns {IColumnDesc & {[p: string]: any}}
    */
-  createDesc(): IColumnDesc & {[key: string]: any};
+  createDesc(extras?: object): IColumnDesc & {[key: string]: any};
 
 
   /**
@@ -269,6 +271,11 @@ export interface IViewPluginDesc extends IPluginDesc {
    * as an alternative an help text shown as pop up
    */
   helpText?: string;
+
+  /**
+   * a tour id to start a tour
+   */
+  helpTourId?: string;
 
   /**
    * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out

@@ -10,3 +10,8 @@
 @import './dialogs';
 @import './tooltip';
 @import './touring';
+@import './tour';
+
+$lu_assets: '~lineupjs/src/assets';
+
+@import '~lineupjs/src/styles/lineup';

@@ -1,8 +1,8 @@
-import {IColumnDesc, ICategory} from 'lineupjs';
-import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParamets, Type, SCOPE} from 'touring';
-import * as d3 from 'd3';
-import {RankingAdapter} from './TouringPanel';
 import {IServerColumn} from '../../../rest';
+import {RankingAdapter} from './RankingAdapter';
+import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, Workers} from 'touring';
+import {IColumnDesc, ICategory} from 'lineupjs';
+import * as d3 from 'd3';
 
 
 export const Tasks = new Array<ATouringTask>();
@@ -51,7 +51,7 @@ export abstract class ATouringTask implements ITouringTask{
   //     ps.order();           // order domelements as in the array
   // }
 
-  toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParamets): IScoreCell {
+  toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
     const color =  score2color(score.pValue);
     return {
       label: score.pValue.toFixed(2),
@@ -63,85 +63,85 @@ export abstract class ATouringTask implements ITouringTask{
     }
   }
 
-      // creates legend for the p-value
-      private createLegend(parentElement: d3.Selection<any>)
-      {
-        let divLegend = parentElement.append('div').classed('measure-legend',true);
-        let svgLegendContainer = divLegend.append('svg')
-                                  .attr('width','100%')
-                                  .attr('height',70);
-    
-        let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
-                                                      .attr('id','gradLegend');    
-        svgDefs.append('stop')
-                .attr('offset','0%')
-                .attr('stop-color','#A9A9A9'); 
-        svgDefs.append('stop')
-                .attr('offset','50%')
-                .attr('stop-color','#FFFFFF'); 
-        
-        let xStart = 10;
-        let yStart = 25;
-        let barWidth = 150;
-        let barHeight = 15;
-        let barSpace = 10;
-        let textHeight = 15;
-    
-        let svgLegendLabel = svgLegendContainer.append('g');
-        let svgLabel = svgLegendLabel.append('text')
-        .attr('x',5)
-        .attr('y',15)
-        .attr('text-anchor','start')
-        .text('p-value:');
-    
-        
-    
-        let svgLegendGroup = svgLegendContainer.append('g');
-        let svgRect1 = svgLegendGroup.append('rect')
-                                    .attr('x',xStart)
-                                    .attr('y',yStart)
-                                    .attr('width',barWidth)
-                                    .attr('height',barHeight)
-                                    .style('fill','url(#gradLegend)')
-                                    .style('stroke-width',1)
-                                    .style('stroke','black');
-        let svgText11 = svgLegendGroup.append('text')
-        .attr('x',xStart)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','start')
-        .text('0');
-        let svgText12 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth/2)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','middle')
-        .text('0.05');
-        let svgText13 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','end')
-        .text('0.1');
-        let svgRect2 = svgLegendGroup.append('rect')
-                                    .attr('x',xStart+barWidth+barSpace)
-                                    .attr('y',yStart)
-                                    .attr('width',barWidth)
-                                    .attr('height',barHeight)
-                                    .style('fill','white')
-                                    .style('stroke-width',1)
-                                    .style('stroke','black');
-    
-        let svgText21 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth+barSpace)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','start')
-        .text('0.1');
-        let svgText22 = svgLegendGroup.append('text')
-        .attr('x',xStart+barWidth+barSpace+barWidth)
-        .attr('y',yStart+barHeight+textHeight)
-        .attr('text-anchor','end')
-        .text('1');
-      }
+  // creates legend for the p-value
+  private createLegend(parentElement: d3.Selection<any>)
+  {
+    let divLegend = parentElement.append('div').classed('measure-legend',true);
+    let svgLegendContainer = divLegend.append('svg')
+                              .attr('width','100%')
+                              .attr('height',70);
 
-  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult){
+    let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
+                                                  .attr('id','gradLegend');    
+    svgDefs.append('stop')
+            .attr('offset','0%')
+            .attr('stop-color','#A9A9A9'); 
+    svgDefs.append('stop')
+            .attr('offset','50%')
+            .attr('stop-color','#FFFFFF'); 
+    
+    let xStart = 10;
+    let yStart = 25;
+    let barWidth = 150;
+    let barHeight = 15;
+    let barSpace = 10;
+    let textHeight = 15;
+
+    let svgLegendLabel = svgLegendContainer.append('g');
+    let svgLabel = svgLegendLabel.append('text')
+    .attr('x',5)
+    .attr('y',15)
+    .attr('text-anchor','start')
+    .text('p-value:');
+
+    
+
+    let svgLegendGroup = svgLegendContainer.append('g');
+    let svgRect1 = svgLegendGroup.append('rect')
+                                .attr('x',xStart)
+                                .attr('y',yStart)
+                                .attr('width',barWidth)
+                                .attr('height',barHeight)
+                                .style('fill','url(#gradLegend)')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+    let svgText11 = svgLegendGroup.append('text')
+    .attr('x',xStart)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','start')
+    .text('0');
+    let svgText12 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth/2)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','middle')
+    .text('0.05');
+    let svgText13 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','end')
+    .text('0.1');
+    let svgRect2 = svgLegendGroup.append('rect')
+                                .attr('x',xStart+barWidth+barSpace)
+                                .attr('y',yStart)
+                                .attr('width',barWidth)
+                                .attr('height',barHeight)
+                                .style('fill','white')
+                                .style('stroke-width',1)
+                                .style('stroke','black');
+
+    let svgText21 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth+barSpace)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','start')
+    .text('0.1');
+    let svgText22 = svgLegendGroup.append('text')
+    .attr('x',xStart+barWidth+barSpace+barWidth)
+    .attr('y',yStart+barHeight+textHeight)
+    .attr('text-anchor','end')
+    .text('1');
+  }
+
+  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
     
     let divDetailInfo = miniVisualisation.append('div')
                                     .classed('detailVis',true);
@@ -198,11 +198,10 @@ export abstract class ATouringTask implements ITouringTask{
       }
       
       // display visualisation
-      if(measure.visualization){
+      if(measure.visualization) {
         const visualization: IMeasureVisualization = measure.visualization;
-        if(cellData.setParameters)
-        {
-          visualization.generateVisualization(details,cellData.setParameters);
+        if(cellData.setParameters) {
+          visualization.generateVisualization(details, cellData.setParameters);
         }
         
       }  
@@ -250,9 +249,9 @@ export class ColumnComparison extends ATouringTask {
       tds.style('background-color', (d) => d !== null ? d.background : '#FFFFFF');
       tds.attr('class', (d: any) => {
         // icon for the attribute type
-        if(d && d.type && d.type === 'categorical'){
+        if(d && d.type && d.type === 'categorical') {
           return 'icon-category';
-        }else if (d && d.type && d.type === 'number'){
+        }else if (d && d.type && d.type === 'number') {
           return 'icon-number';
         }
         return null;
@@ -290,7 +289,7 @@ export class ColumnComparison extends ATouringTask {
       for (let [i, row] of data.entries()) {
         for (let j of row.keys()) {
           if (j > 0) {
-            const measures = MethodManager.getMeasuresByType(attr1[j - 1].type, attr2[i].type, SCOPE.ATTRIBUTES); 
+            const measures = MethodManager.getMeasuresByType(Type.get(attr1[j - 1].type), Type.get(attr2[i].type), SCOPE.ATTRIBUTES); 
             if (measures.length > 0 && j <= i+1) { // start at 
               const measure = measures[0]// Always the first
               const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1]as IServerColumn).column) //minus one because the first column is headers
@@ -301,7 +300,7 @@ export class ColumnComparison extends ATouringTask {
                 setB: data2,
                 setBDesc: attr2[i]
               };
-              promises.push(measure.calc(data1, data2)
+              promises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
               .then((score) => {
                 row[j] = this.toScoreCell(score,measure,setParameters);
                 update(data);
@@ -364,12 +363,16 @@ export class SelectionStratificationComparison extends RowComparison{
   }
 
   update(data: any) {
+    Workers.terminateAll(); // Abort all calculations as their results are no longer needed
     // numerical and categorical data is ok
     const compareTo = [this.ranking.getSelectionDesc()];
     this.createTable(data, compareTo);
   }
 
   createTable(catData: any[], compareTo: {categories: ICategory[]; label: string; type: string; column: string;}[]): any {
+    const timestamp = new Date().getTime().toString();
+    d3.select(this.node).attr('data-timestamp', timestamp);
+
     const colHeadsAttr = d3.select(this.node).select('thead tr.attr').selectAll('th.head').data(compareTo, (attr) => `${attr.column}/${attr.categories.length}`); //include category length to update if a category is added/removed
     colHeadsAttr.enter().append('th')
       .attr('class', 'head')
@@ -379,7 +382,11 @@ export class SelectionStratificationComparison extends RowComparison{
       .attr('class', 'head');
 
     const that = this; // for the function below
-    function updateTableBody(bodyData: Array<Array<IScoreCell>>) {
+    function updateTableBody(bodyData: Array<Array<IScoreCell>>, timestamp: string) {
+      if (d3.select(that.node).attr('data-timestamp') !== timestamp) {
+        return; // skip outdated result
+      }
+
       const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
       trs.enter().append('tr');
       const tds = trs.selectAll('td').data((d) => d);
@@ -394,10 +401,9 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
       tds.attr('class', (d: any) => {
         // icon for the attribute type
-        if(d && d.type && d.type === 'categorical'){
-
+        if(d && d.type && d.type === 'categorical') {
           return 'icon-category';
-        }else if (d && d.type && d.type === 'number'){
+        } else if (d && d.type && d.type === 'number') {
           return 'icon-number';
         }
         return null;
@@ -415,8 +421,8 @@ export class SelectionStratificationComparison extends RowComparison{
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
     }
     
-    this.getAttrTableBody(compareTo, catData, true, null).then(updateTableBody); // initialize
-    this.getAttrTableBody(compareTo, catData, false, updateTableBody).then(updateTableBody); // set values
+    this.getAttrTableBody(compareTo, catData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
+    this.getAttrTableBody(compareTo, catData, false, (data: IScoreCell[][]) => updateTableBody(data, timestamp)); // set values
   }
 
   /**
@@ -457,7 +463,7 @@ export class SelectionStratificationComparison extends RowComparison{
 
       let i=0;
       for (const col of attr2) {
-        const measures = MethodManager.getMeasuresByType(col.type, col.type, SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
+        const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) { 
           const measure = measures[0];
           //prepare data (selected data is the same for all groups of this column)
@@ -493,9 +499,9 @@ export class SelectionStratificationComparison extends RowComparison{
                 setBDesc: col,
                 setBCategory: groupedData[j]
               };
-              promises.push(measure.calc(dataSelected, grpData4Col)
+              promises.push(measure.calc(dataSelected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
-                      data[rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
+                      data[rowIndex][selScoreIndex] = this.toScoreCell(score, measure, setParameters);
                       update(data);
                     })
                     .catch((err) => data[rowIndex][selScoreIndex] = {label: 'err'} ));
@@ -512,9 +518,9 @@ export class SelectionStratificationComparison extends RowComparison{
                 setBCategory: groupedData[j]
               };
               // Score with unselected:
-              promises.push(measure.calc(dataUnselected, grpData4Col)
+              promises.push(measure.calc(dataUnselected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
-                      data[rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
+                      data[rowIndex][unselScoreIndex] = this.toScoreCell(score, measure, setParameters);
                       update(data);
                     })
                     .catch((err) => data[rowIndex][unselScoreIndex] = {label: 'err'}));
@@ -617,7 +623,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               setBDesc: col,
               setBCategory: cat.name 
             };
-            promises.push(measure.calc(dataSelected, dataCategory)
+            promises.push(measure.calc(dataSelected, dataCategory, dataSelected.concat(dataUnselected))
                   .then((score) => {
                     data[rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
@@ -636,7 +642,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               setBCategory: cat.name 
             };
             // Score with unselected:
-            promises.push(measure.calc(dataUnselected, dataCategory)
+            promises.push(measure.calc(dataUnselected, dataCategory, dataSelected.concat(dataUnselected))
                     .then((score) => {
                       data[rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
                       update(data);
@@ -706,7 +712,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
       let i=0;
       
       for (const col of attr2) {
-        const measures = MethodManager.getMeasuresByType(col.type, col.type, SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
+        const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) { 
           const measure = measures[0];
           for (const [j, grpData] of groupedData.entries()) {
@@ -726,7 +732,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                   setBDesc: col,
                   setBCategory: groupedData[j],
                 };
-                promises.push(measure.calc(grpData4ColRow, grpData4ColCol)
+                promises.push(measure.calc(grpData4ColRow, grpData4ColCol, [])
                   .then((score) => {
                     data[rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
@@ -756,7 +762,7 @@ interface IScoreCell {
   colspan?: number,
   score?: IMeasureResult,
   measure?: ISimilarityMeasure,
-  setParameters?: ISetParamets
+  setParameters?: ISetParameters
 }
 
 

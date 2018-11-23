@@ -137,8 +137,8 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
   cacheResults: boolean;
 
   /**
-   * token separators
-   * @default /[\s;,]+/mg
+   * token separators, spaces, semicolon, colon, escaping is done via the backslash
+   * @default /[\s\n\r;,]+/gm
    */
   tokenSeparators?: RegExp;
 
@@ -195,7 +195,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     },
     equalValues: equalArrays,
     cacheResults: true,
-    tokenSeparators: /[\s;,]+/mg,
+    tokenSeparators: /[\s\n\r;,]+/gm,
     defaultTokenSeparator: ' ',
     id: null,
     name: null
@@ -265,6 +265,20 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     if (this.options.validate && this.options.dropable) {
       this.dropFile(<HTMLElement>this.node.querySelector('.select2-container'));
     }
+
+    this.node.addEventListener('paste', (evt) => {
+      // see https://jsfiddle.net/GertG/99t5d5vf/
+      // the browser normalizes copy-paste data by its own but to avoid that we do it ourselves
+      const value = evt.clipboardData ? evt.clipboardData.getData('Text') : '';
+      if (!value) {
+        return;
+      }
+      const data = splitEscaped(value, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
+      this.setSearchQuery(data);
+      evt.preventDefault();
+      evt.stopPropagation();
+      return false;
+    });
   }
 
   setSearchQuery(value: string) {
@@ -328,7 +342,8 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
   private loadFile(file: File) {
     const f = new FileReader();
     f.addEventListener('load', () => {
-      const data = String(f.result).replace(this.options.tokenSeparators, this.options.defaultTokenSeparator); // normalize
+      const v = String(f.result);
+      const data = splitEscaped(v, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
       this.setSearchQuery(data);
     });
     f.readAsText(file, 'utf-8');
@@ -443,7 +458,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     if (term.length === 0) {
       return query;
     }
-    const arr = term.split(this.options.tokenSeparators);
+    const arr = splitEscaped(term, this.options.tokenSeparators, true);
     //filter to valid (non empty) entries
     const valid = Array.from(new Set(arr.map((a) => a.trim().toLowerCase()).filter((a) => a.length > 0)));
 
@@ -504,6 +519,25 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
   }
 }
 
+export function splitEscaped(value: string, reg: RegExp, unescape: boolean) {
+  const elems = value.split(reg);
+  const seps = value.match(reg) || [];
+  const r: string[] = [];
+
+  while (elems.length > 0) {
+    const elem = elems.shift();
+    const sep = seps.shift();
+    if (elem.endsWith('\\') && elems.length > 0) {
+      // next one is an escaped split so merge again together
+      const next = elems.shift();
+      const full = (unescape ? elem.slice(0, elem.length - 1) : elem) + sep + next;
+      elems.unshift(full); // readd again
+      continue;
+    }
+    r.push(elem);
+  }
+  return r;
+}
 
 /**
  * escape the given string to be used as regex
