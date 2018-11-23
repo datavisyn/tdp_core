@@ -9,8 +9,8 @@ button.touring.active::before {
   border: none;
 }
 
-.tooltip.parsets, .tooltip.boxplot, .tooltip.scatterplot {
-  background-color: rgba(242, 242, 242, .6);
+.tooltip.measure {
+  background-color: #C0C0C0;
   position: absolute;
   padding: 5px;	
   opacity: 1;
@@ -244,10 +244,31 @@ div.touring {
       fill: black;
     }
     g.scatterplot circle.datapoint:hover{
+      opacity: 1;
+      fill: #fba74d  !important;
+    }
+
+    // // ------ line chart with D3
+    g.linechart path.dataline{
+      fill: "none";
+      stroke-width: 1;
+      stroke-linejoin: "round";
+      stroke-linecap: "round";
+    }
+
+    g.linechart g.baseline{
+      fill: "none";
+      stroke-width: 1;
+      stroke-linejoin: "round";
+      stroke-linecap: "round";
+      stroke: black;
+    }
+
+    g.linechart path.dataline:hover{
       // stroke: black;
       // stroke-width: 1;
       // stroke-opacity: 1;
-      opacity: 1;
+      opacity: 0.8;
       fill: #fba74d  !important;
     }
 
