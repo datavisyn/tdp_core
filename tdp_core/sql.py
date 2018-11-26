@@ -33,15 +33,15 @@ def list_view(database):
 
 
 def _assign_ids(r, view):
-  return r and (request.args.get('_assignids', False) or (view.assign_ids and '_id' not in r[0]))
+  return r and (request.values.get('_assignids', False) or (view.assign_ids and '_id' not in r[0]))
 
 
 def _return_query():
   # return true if the key is given and the value doesn't start with 'f' -> no value, true, True, T
   key = '_return_query'
-  if key not in request.args:
+  if key not in request.values:
     return False
-  v = request.args[key]
+  v = request.values[key]
   return not v or v.lower()[0] != 'f'
 
 
@@ -65,17 +65,17 @@ def _format_json_decimal(obj):
 def _formatter(view_name):
   if view_name.endswith('.csv'):
     return view_name[:-4], _format_csv
-  elif request.args.get('_format') == 'csv':
+  elif request.values.get('_format') == 'csv':
     return view_name, _format_csv
   elif view_name.endswith('.json'):
     return view_name[:-5], _format_json_decimal
-  elif request.args.get('_format') == 'json':
+  elif request.values.get('_format') == 'json':
     return view_name, _format_json_decimal
   return view_name, jsonify
 
 
-@app.route('/<database>/<view_name>')
-@app.route('/<database>/<view_name>/filter')
+@app.route('/<database>/<view_name>', methods=['GET', 'POST'])
+@app.route('/<database>/<view_name>/filter', methods=['GET', 'POST'])
 @login_required
 def get_filtered_data(database, view_name):
   """
@@ -86,16 +86,16 @@ def get_filtered_data(database, view_name):
   """
   view_name, format = _formatter(view_name)
   if _return_query():
-    return jsonify(db.get_filtered_query(database, view_name, request.args))
+    return jsonify(db.get_filtered_query(database, view_name, request.values))
 
-  r, view = db.get_filtered_data(database, view_name, request.args)
+  r, view = db.get_filtered_data(database, view_name, request.values)
 
   if _assign_ids(r, view):
     r = db.assign_ids(r, view.idtype)
   return format(r)
 
 
-@app.route('/<database>/<view_name>/score')
+@app.route('/<database>/<view_name>/score', methods=['GET', 'POST'])
 @login_required
 def get_score_data(database, view_name):
   """
@@ -106,12 +106,12 @@ def get_score_data(database, view_name):
   """
   view_name, format = _formatter(view_name)
   if _return_query():
-    return jsonify(db.get_filtered_query(database, view_name, request.args))
+    return jsonify(db.get_filtered_query(database, view_name, request.values))
 
-  r, view = db.get_filtered_data(database, view_name, request.args)
+  r, view = db.get_filtered_data(database, view_name, request.values)
 
   data_idtype = view.idtype
-  target_idtype = request.args.get('target', data_idtype)
+  target_idtype = request.values.get('target', data_idtype)
 
   if data_idtype != target_idtype:
     mapped_scores = map_scores(r, data_idtype, target_idtype)
@@ -123,7 +123,7 @@ def get_score_data(database, view_name):
   return format(mapped_scores)
 
 
-@app.route('/<database>/<view_name>/count')
+@app.route('/<database>/<view_name>/count', methods=['GET', 'POST'])
 @login_required
 def get_count_data(database, view_name):
   """
@@ -134,9 +134,9 @@ def get_count_data(database, view_name):
   """
   view_name, _ = _formatter(view_name)
   if _return_query():
-    return jsonify(db.get_count_query(database, view_name, request.args))
+    return jsonify(db.get_count_query(database, view_name, request.values))
 
-  r = db.get_count(database, view_name, request.args)
+  r = db.get_count(database, view_name, request.values)
 
   return jsonify(r)
 
@@ -149,7 +149,7 @@ def get_desc(database, view_name):
   return jsonify(dict(idType=view.idtype, columns=view.columns.values()))
 
 
-@app.route('/<database>/<view_name>/lookup')
+@app.route('/<database>/<view_name>/lookup', methods=['GET', 'POST'])
 @login_required
 def lookup(database, view_name):
   """
@@ -157,14 +157,14 @@ def lookup(database, view_name):
   This function is used in conjunction with Select2 form elements
   """
   view_name, _ = _formatter(view_name)
-  query = request.args.get('query', '').lower()
-  page = int(request.args.get('page', 0))  # zero based
-  limit = int(request.args.get('limit', 30))  # or 'all'
+  query = request.values.get('query', '').lower()
+  page = int(request.values.get('page', 0))  # zero based
+  limit = int(request.values.get('limit', 30))  # or 'all'
 
   if _return_query():
-    return db.lookup_query(database, view_name, query, page, limit, request.args)
+    return db.lookup_query(database, view_name, query, page, limit, request.values)
 
-  r_items, more, view = db.lookup(database, view_name, query, page, limit, request.args)
+  r_items, more, view = db.lookup(database, view_name, query, page, limit, request.values)
 
   if _assign_ids(r_items, view):
     r_items = db.assign_ids(r_items, view.idtype)

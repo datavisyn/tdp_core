@@ -4,6 +4,7 @@ import {showErrorModalDialog} from '../dialogs';
 import {IRow} from '../rest';
 import {ISelection, IViewContext} from './';
 import {AView} from './AView';
+import {jsonArray2xlsx} from '../internal/xlsx';
 
 export interface ISortItem<T> {
   node: HTMLElement;
@@ -22,7 +23,7 @@ export interface IATableViewOptions<T> {
   condensed: boolean;
   sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>);
   exportable?: boolean;
-  exportSeparator?: ',' | ';'; // multiline cells wont work with semicolon or tab separation
+  exportSeparator?: ',' | ';' | 'xlsx'; // multiline cells wont work with semicolon or tab separation
 }
 
 /**
@@ -249,17 +250,54 @@ export function enableSort<T>(this: void, header: HTMLElement, body: HTMLElement
  * Download the HTML Table content.
  */
 export function exportHtmlTableContent(document: Document, tableRoot: HTMLElement, separator: string, name: string) {
-  const content = parseHtmlTableContent(tableRoot, separator);
+  if (separator !== 'xlsx') {
+    const content = parseHtmlTableContent(tableRoot, separator);
+    download(document, new Blob([content], {type: 'text/csv;charset=utf-8'}), `${name}.csv`);
+    return;
+  }
+
+  const {columns, rows} = extractFromHTML(tableRoot);
+
+  function isNumeric(value: any): boolean {
+    return typeof value === 'string' && !isNaN(parseFloat(value));
+  }
+
+  // parse numbers
+  const guessed = rows.map((row) => row.map((s) => isNumeric(s) ? parseFloat(s) : s));
+  guessed.unshift(columns);
+  jsonArray2xlsx(guessed).then((blob) => download(document, blob, `${name}.xlsx`));
+}
+
+
+function download(document: Document, blob: Blob, name: string) {
   const downloadLink = document.createElement('a');
-  const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
   downloadLink.href = URL.createObjectURL(blob);
-  (<any>downloadLink).download = `${name}.csv`;
+  (<any>downloadLink).download = name;
 
   document.body.appendChild(downloadLink);
   downloadLink.click();
   document.body.removeChild(downloadLink);
 }
 
+/**
+ * Parse HTML Table header and body content.
+ * @returns {string} The table content in csv format
+ */
+function extractFromHTML(tableRoot: HTMLElement) {
+
+  const columns = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
+    .map((d) => (<HTMLTableHeaderCellElement>d).innerText);
+
+  const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'))
+    .filter((tr) => tr.parentElement.parentElement === tableRoot || tr.parentElement === tableRoot); // only parse first nested level
+  const rows = bodyRows.map((row: HTMLTableRowElement) => {
+    return Array.from(row.children).map((d) => (<HTMLTableDataCellElement>d).innerText);
+  });
+  return {
+    columns,
+    rows
+  };
+}
 /**
  * Parse HTML Table header and body content.
  * @returns {string} The table content in csv format
@@ -275,15 +313,12 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
     return text.match(/\n/g);
   };
 
-  const headerContent = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
-    .map((d) => (<HTMLTableHeaderCellElement>d).innerText).join(separator);
-  const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'))
-    .filter((tr) => tr.parentElement.parentElement === tableRoot || tr.parentElement === tableRoot); // only parse first nested level
-  const bodyContent = bodyRows.map((row: HTMLTableRowElement) => {
-    return Array.from(row.children)
-      .map((d) => {
-        const text = (<HTMLTableDataCellElement>d).innerText;
-        return hasMultilines(text) ? `"${text.replace(/\t/g,':')}"` : text;
+  const {columns, rows} = extractFromHTML(tableRoot);
+
+  const headerContent = columns.join(separator);
+  const bodyContent = rows.map((row) => {
+    return row.map((text) => {
+        return hasMultilines(text) || text.includes(separator) ? `"${text.replace(/\t/g,':')}"` : text;
       }).join(separator);
   }).join('\n');
   const content = `${headerContent}\n${bodyContent}`;

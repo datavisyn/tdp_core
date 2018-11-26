@@ -41,6 +41,7 @@ export interface ISubSelect2Desc extends ISubDesc {
 export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
   type: FormElementType.SELECT3;
   return?: 'text'|'id';
+  name: string;
 }
 
 declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc|ISubSelect3Desc;
@@ -469,8 +470,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   focus() {
     // open dropdown
     $(this.$node.select('.dropdown-menu').node()).show();
-  };
-
+  }
 }
 
 function isEqual(a: IFormRow[], b: IFormRow[]) {

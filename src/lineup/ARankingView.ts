@@ -72,6 +72,12 @@ export interface IARankingViewOptions {
   enableHeaderRotation: boolean;
 
   /**
+   * enable that the regular columns are added via a choser dialog
+   * @default false
+   */
+  enableAddingColumnGrouping: boolean;
+
+  /**
    * enable alternating pattern background
    * @default false
    */
@@ -139,6 +145,7 @@ export abstract class ARankingView extends AView {
     enableOverviewMode: true,
     enableZoom: true,
     enableAddingColumns: true,
+    enableAddingColumnGrouping: false,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
     enableStripedBackground: false,
@@ -201,7 +208,7 @@ export abstract class ARankingView extends AView {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
-    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
+    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
@@ -371,12 +378,12 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
-    successfullySaved('Named Set', name);
+    successfullySaved('List of Entities', name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
-    colDesc.color = this.colors.getColumnColor(id);
+    colDesc.color = colDesc.color? colDesc.color : this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
       this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
@@ -384,12 +391,14 @@ export abstract class ARankingView extends AView {
   }
 
   private addScoreColumn(score: IScore<any>) {
-    const colDesc = score.createDesc();
+    const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
+
+    const colDesc = score.createDesc(args);
     // flag that it is a score
     colDesc._score = true;
 
     const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
-    const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
+
     const data = score.compute(ids, this.itemIDType, args);
     return this.addColumn(colDesc, data);
   }
