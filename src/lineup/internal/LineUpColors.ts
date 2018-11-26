@@ -9,16 +9,8 @@ export default class LineUpColors {
   private readonly colorMap = new Map<number, {color: string, items: number}>();
   private colors: string[];
 
-  init(ranking: Ranking) {
-    const colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));
-    // remove colors that are already in use from the list
-    ranking.flatColumns.forEach((d) => {
-      const i = colors.indexOf(d.color);
-      if (i > -1) {
-        colors.splice(i, 1);
-      }
-    });
-    this.colors = colors;
+  init() {
+    this.colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));
   }
 
   getColumnColor(id: number): string {
