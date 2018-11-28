@@ -1,6 +1,7 @@
 import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from 'lineupjs';
 import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
+import {json2xlsx} from '../../internal/xlsx';
 
 export function exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
   //optionally quote not numbers
@@ -32,14 +33,32 @@ export function exportJSON(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getExportValue(row, 'json');
     }
     return r;
   });
   return JSON.stringify(converted, null, 2);
 }
 
-export declare type ExportType = 'json' | 'csv' | 'tsv' | 'ssv';
+export function exportxlsx(columns: Column[], rows: IDataRow[]) {
+  const converted = rows.map((row) => {
+    const r: any = {};
+    for (const col of columns) {
+      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+    }
+    return r;
+  });
+  return json2xlsx({
+    sheets: [{
+      title: 'LineUp',
+      columns: columns.map((d) => ({name: d.label, type: <'float'|'string'>(isNumberColumn(d) ? 'float' : 'string')})),
+      rows: converted
+    }]
+  });
+}
+
+export declare type ExportType = 'json' | 'csv' | 'tsv' | 'ssv' | 'xlsx';
+
 
 export function exportLogic(type: 'custom' | ExportType, onlySelected: boolean, provider: LocalDataProvider) {
   if (type === 'custom') {
@@ -52,22 +71,29 @@ export function exportLogic(type: 'custom' | ExportType, onlySelected: boolean, 
   }
 }
 
+function toBlob(content: string, mimeType: string) {
+  return new Blob([content], {type: mimeType});
+}
+
 function convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportType, name: string) {
   const rows = provider.viewRawRows(order);
 
   const separators = {csv : ',', tsv: '\t', ssv: ';'};
-  let content: string;
+  let content: Promise<Blob> | Blob;
+  const mimeTypes = {csv : 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+  const mimeType = mimeTypes[type];
   if (type in separators) {
-    content = exportRanking(columns, rows, separators[type]);
+    content = toBlob(exportRanking(columns, rows, separators[type]), mimeType);
+  } else if (type === 'xlsx') {
+    content = exportxlsx(columns, rows);
   } else { // json
-    content = exportJSON(columns, rows);
+    content = toBlob(exportJSON(columns, rows), mimeType);
   }
-  const mimeTypes = {csv : 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json'};
-  return {
-    content,
+  return Promise.resolve(content).then((c) => ({
+    content: c,
     mimeType: mimeTypes[type],
     name: `${name}.${type === 'ssv' ? 'csv' : type}`
-  };
+  }));
 }
 
 interface IExportData {
@@ -118,6 +144,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
           <option value="tsv">TSV (tab separated)</option>
           <option value="ssv">CSV (semicolon separated)</option>
           <option value="json">JSON</option>
+          <option value="xlsx">Microsoft Excel (xlsx)</option>
         </select>
       </div>
     `;

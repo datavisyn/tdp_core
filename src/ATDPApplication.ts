@@ -19,6 +19,7 @@ import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import 'phovea_ui/src/_font-awesome';
 import {list as listPlugins} from 'phovea_core/src/plugin';
 import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
+import TourManager from './tour/TourManager';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -89,11 +90,30 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   protected app: Promise<T> = null;
   protected header: AppHeader;
+  protected tourManager: TourManager;
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
-    mixin(this.options, options);
+    this.tourManager = new TourManager({
+      doc: document,
+      header: () => this.header,
+      app: () => this.app
+    });
+    mixin(this.options, {
+      showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
+    }, options);
+
     this.build(document.body, {replaceBody: false});
+
+    if (this.tourManager.hasTours()) {
+      const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
+      button.dataset.toggle = 'modal';
+      button.tabIndex = -1;
+      button.dataset.target = `#${this.tourManager.chooser.id}`;
+      button.onclick = (evt) => {
+        evt.preventDefault();
+      };
+    }
   }
 
   protected createHeader(parent: HTMLElement) {

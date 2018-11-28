@@ -5,6 +5,7 @@ from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from .dbmanager import DBManager
 from .utils import clean_query, secure_replacements
+from werkzeug.datastructures import MultiDict
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -457,7 +458,7 @@ def _fill_up_columns(view, engine):
 def _lookup(database, view_name, query, page, limit, args):
   config, engine, view = resolve_view(database, view_name)
 
-  arguments = args.copy()
+  arguments = MultiDict(args)
   offset = page * limit
   # replace with wildcard version
   arguments['query'] = u'%{}%'.format(query)

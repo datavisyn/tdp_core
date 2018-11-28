@@ -23,6 +23,7 @@ import {resolveImmediately} from 'phovea_core/src';
 import {none} from 'phovea_core/src/range';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {setParameter} from '../internal/cmds';
+import {startViewTour} from '../tour/extensions';
 
 
 export default class ViewWrapper extends EventHandler implements IViewProvider {
@@ -86,6 +87,18 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       });
     } else if (plugin.helpUrl) {
       this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+    } else if (plugin.helpTourId) {
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" class="view-help" title="Show help tour of this view"><span aria-hidden="true">Show Help Tour</span></a>`);
+      this.node.lastElementChild!.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        startViewTour(plugin.helpTourId, {
+          plugin,
+          node: this.node,
+          instance: this.instance,
+          selection: this.selection
+        });
+      });
     }
 
     if (plugin.preview) {

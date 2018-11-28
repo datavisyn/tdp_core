@@ -1,4 +1,4 @@
-import {api2absURL, getAPIData, getAPIJSON} from 'phovea_core/src/ajax';
+import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI} from 'phovea_core/src/ajax';
 import {IScoreRow} from './lineup';
 
 export const REST_NAMESPACE = '/tdp';
@@ -58,12 +58,21 @@ export interface IParams {
   [key: string]: string | number | boolean | string[] | number[] | boolean[];
 }
 
+const TOO_LONG_URL = 4096;
+
 function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}, assignIds: boolean = false) {
   const mmethod = method === 'none' ? '' : `/${method}`;
   if (assignIds) {
     params._assignids = true; // assign globally ids on the server side
   }
-  return getAPIJSON(`${REST_DB_NAMESPACE}/${database}/${view}${mmethod}`, params);
+
+  const url = `${REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
+  const encoded = encodeParams(params);
+  if (encoded && (url.length + encoded.length > TOO_LONG_URL)) {
+    // use post instead
+    return sendAPI(url, params, 'POST');
+  }
+  return getAPIJSON(url, params);
 }
 
 /**

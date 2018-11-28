@@ -3,10 +3,10 @@
  */
 
 
-@at-root {
-  @import "~select2/dist/css/select2.min.css";
-  @import "~select2-bootstrap-theme/dist/select2-bootstrap.min.css";
+@import "~select2/dist/css/select2.min.css";
+@import "~select2-bootstrap-theme/dist/select2-bootstrap.min.css";
 
+@at-root {
   .select2-results__option .ensg,
   .select2-selection__rendered .ensg {
     font-size: 12px;
@@ -38,5 +38,9 @@
   .select2-container--bootstrap .select2-results__group {
     color: #444;
     background: #efefef;
+  }
+
+  .select2-dropdown {
+    z-index: 2051;
   }
 }

@@ -217,11 +217,13 @@ export default class LineUpPanelActions extends EventHandler {
         <li><a href="#" data-s="a" data-t="tsv">TSV (tab separated)</a></li>
         <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
         <li><a href="#" data-s="a" data-t="json">JSON</a></li>
+        <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
         <li class="dropdown-header">Download Selected Rows Only</li>
         <li><a href="#" data-s="s" data-t="csv">CSV (comma separated)</a></li>
         <li><a href="#" data-s="s" data-t="tsv">TSV (tab separated)</a></li>
         <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
         <li><a href="#" data-s="s" data-t="json">JSON</a></li>
+        <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
         <li role="separator" class="divider"></li>
         <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
       </ul>

@@ -239,7 +239,6 @@
 $lu_assets: '~lineupjs/src/assets';
 
 @at-root {
-  @import '~lineupjs/src/styles/lineup';
 
   .tdp-ranking-export-form {
     user-select: none;
@@ -271,5 +270,9 @@ $lu_assets: '~lineupjs/src/assets';
 
   .lu-side-panel > main > section::before {
     content: 'Column Summaries';
+  }
+
+  .lu-hierarchy .lu-search::before {
+    height: 19px;
   }
 }
