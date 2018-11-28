@@ -156,11 +156,23 @@ export abstract class ATouringTask implements ITouringTask{
     // let detailTestValue = divDetailInfo.append('div');
     let scoreValue = measureResult.scoreValue.toFixed(3);
     let pValue = measureResult.pValue.toFixed(3);
-    divDetailInfo.append('div')
-                .classed('detailDiv',true)
-                .text('Test-Value/p-Value: ')
-                .append('span')
-                .text(`${scoreValue}/${pValue}`);  
+    let detailInfoValues = divDetailInfo.append('div')
+                          .classed('detailDiv',true);
+                          // .text(`Test-Value: ${scoreValue}, p-Value: ${pValue}`);
+    detailInfoValues.append('span')
+                    .classed('detail-label',true)
+                    .text('Test-Value: ');
+    detailInfoValues.append('span')
+                    .text(scoreValue);    
+    
+    detailInfoValues.append('span')
+                    .text(', ');    
+                    
+    detailInfoValues.append('span')
+                    .classed('detail-label',true)
+                    .text('p-Value: ');    
+    detailInfoValues.append('span')
+                    .text(pValue);    
   
     // let detailTestDescr = divDetailInfo.append('div');
     divDetailInfo.append('div')
@@ -215,7 +227,7 @@ export class ColumnComparison extends ATouringTask {
   constructor() {
     super();
     this.id = "attrCmp";
-    this.label = "Pairwise compare columns";
+    this.label = "Compare Columns pairwise";
 
     this.scope = SCOPE.ATTRIBUTES;
   }
@@ -359,7 +371,7 @@ export class SelectionStratificationComparison extends RowComparison{
   constructor() {
     super();
     this.id = "selStratCmp";
-    this.label = "Compare selected rows with stratification groups"
+    this.label = "Compare Selected Rows with Stratification Groups"
   }
 
   update(data: any) {
@@ -543,7 +555,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
   constructor() {
     super();
     this.id = "selCatCmp";
-    this.label = "Compare selected rows with column categories"
+    this.label = "Compare Selected Rows with Column Categories"
   }
 
   public update(data: any[]) {
@@ -665,7 +677,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
   constructor() {
     super();
     this.id = "pairStratCmp";
-    this.label = "Pairwise compare stratification groups"
+    this.label = "Compare Stratification Groups pairwise"
   }
 
   update(data: any) {
