@@ -21,7 +21,7 @@ div.touring {
   overflow-y: auto;
 
   .measures, .output {
-    border-top: #AAA 2px solid;
+    border-top: #AAA 1px solid;
 
     a:hover, a:focus {
         color: #1f77b4;
@@ -61,6 +61,11 @@ div.touring {
         width: 55px !important;
         min-width: 55px !important;
         max-width: 55px !important;
+        text-align: right;
+      }
+
+      td {
+        padding: 1px 5px !important;
       }
 
       tr {
@@ -159,6 +164,10 @@ div.touring {
       .detailDiv span{
         font-weight: normal;
       }
+
+      .detailDiv span.detail-label{
+        font-weight: bold;
+      }
     }
     
     // ------ parallel sets with D3
@@ -250,8 +259,9 @@ div.touring {
 
     // // ------ line chart with D3
     g.linechart path.dataline{
-      fill: "none";
-      stroke-width: 1;
+      fill-opacity: 0;
+      fill: #fba74d;
+      stroke-width: 2;
       stroke-linejoin: "round";
       stroke-linecap: "round";
     }
@@ -268,8 +278,8 @@ div.touring {
       // stroke: black;
       // stroke-width: 1;
       // stroke-opacity: 1;
-      opacity: 0.8;
-      fill: #fba74d  !important;
+      fill-opacity: 0.4;
+      // fill: #fba74d  !important;
     }
 
   }
