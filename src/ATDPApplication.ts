@@ -15,7 +15,11 @@ import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
 import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
+import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import 'phovea_ui/src/_font-awesome';
+import {list as listPlugins} from 'phovea_core/src/plugin';
+import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
+import TourManager from './tour/TourManager';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -37,7 +41,32 @@ export interface ITDPOptions {
    */
   showCookieDisclaimer: boolean;
 
-  showResearchDisclaimer: boolean;
+  showResearchDisclaimer: boolean | ((content: HTMLElement) => void);
+
+  showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
+
+  /**
+   * show/hide the options link
+   * default: false
+   */
+  showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
+
+  /**
+   * show/hide the bug report link
+   * default: true
+   */
+  showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
+
+  /**
+   * show help link true or the url to link
+   * default: false
+   */
+  showHelpLink: boolean | string;
+
+  /**
+   * default: true
+   */
+  enableProvenanceUrlTracking?: boolean;
 }
 
 /**
@@ -51,35 +80,71 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     name: 'Target Discovery Platform',
     prefix: 'tdp',
     showCookieDisclaimer: false,
-    showResearchDisclaimer: true
+    showResearchDisclaimer: true,
+    showAboutLink: true,
+    showHelpLink: false,
+    showOptionsLink: false,
+    showReportBugLink: true,
+    enableProvenanceUrlTracking: true
   };
 
   protected app: Promise<T> = null;
   protected header: AppHeader;
+  protected tourManager: TourManager;
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
-    mixin(this.options, options);
+    this.tourManager = new TourManager({
+      doc: document,
+      header: () => this.header,
+      app: () => this.app
+    });
+    mixin(this.options, {
+      showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
+    }, options);
+
     this.build(document.body, {replaceBody: false});
+
+    if (this.tourManager.hasTours()) {
+      const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
+      button.dataset.toggle = 'modal';
+      button.tabIndex = -1;
+      button.dataset.target = `#${this.tourManager.chooser.id}`;
+      button.onclick = (evt) => {
+        evt.preventDefault();
+      };
+    }
   }
 
-  protected buildImpl(body: HTMLElement) {
+  protected createHeader(parent: HTMLElement) {
     //create the common header
-    const headerOptions = {
+    const header = createHeader(parent, {
       showCookieDisclaimer: this.options.showCookieDisclaimer,
-      showOptionsLink: true, // always activate options
+      showAboutLink: this.options.showAboutLink,
+      showHelpLink: this.options.showHelpLink,
+      showReportBugLink: this.options.showReportBugLink,
+      showOptionsLink: this.options.showOptionsLink,
       appLink: new AppHeaderLink(this.options.name, (event) => {
         event.preventDefault();
         this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
         return false;
       })
-    };
-    this.header = createHeader(<HTMLElement>body.querySelector('div.box'), headerOptions);
+    });
 
-    const aboutDialogBody = this.header.aboutDialog;
     if (this.options.showResearchDisclaimer) {
-      aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+      const aboutDialogBody = header.aboutDialog;
+      if (typeof this.options.showResearchDisclaimer === 'function') {
+        this.options.showResearchDisclaimer(aboutDialogBody);
+      } else {
+        aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+      }
     }
+
+    return header;
+  }
+
+  protected buildImpl(body: HTMLElement) {
+    this.header = this.createHeader(<HTMLElement>body.querySelector('div.box'));
 
     this.on('jumped_to,loaded_graph', () => this.header.ready());
     //load all available provenance graphs
@@ -88,7 +153,10 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       storage: localStorage,
       application: this.options.prefix
     });
-    const clueManager = new CLUEGraphManager(manager);
+
+    this.cleanUpOld(manager);
+
+    const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
 
     this.header.wait();
 
@@ -97,7 +165,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     const loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
-      loginForm: this.options.loginForm
+      loginForm: this.options.loginForm,
+      watch: true
     });
     loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
       // reopen after logged out
@@ -112,12 +181,13 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
 
     const main = <HTMLElement>document.body.querySelector('main');
+    const content = <HTMLElement>body.querySelector('div.content');
 
     //wrapper around to better control when the graph will be resolved
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
-    graph.catch((error: {graph: string}) => {
+    graph.catch((error: { graph: string }) => {
       showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
@@ -128,12 +198,12 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu.setGraph(graph);
     });
 
-    const provVis = loadProvenanceGraphVis(graph, body.querySelector('div.content'), {
+    const provVis = loadProvenanceGraphVis(graph, content, {
       thumbnails: false,
       provVisCollapsed: true,
       hideCLUEButtonsOnCollapse: true
     });
-    const storyVis = loadStoryVis(graph, <HTMLElement>body.querySelector('div.content'), main, {
+    const storyVis = loadStoryVis(graph, content, main, {
       thumbnails: false
     });
 
@@ -144,6 +214,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       graphResolver(clueManager.chooseLazy(true));
 
       this.app.then((appInstance) => this.initSessionImpl(appInstance));
+      this.customizeApp(content, main);
     };
 
     let forceShowLoginDialogTimeout: any = -1;
@@ -160,6 +231,40 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     }
 
     return {graph, manager: clueManager, storyVis, provVis};
+  }
+
+  /**
+   * customize the using extension point
+   */
+  private customizeApp(content: HTMLElement, main: HTMLElement) {
+    const plugins = listPlugins(EXTENSION_POINT_TDP_APP_EXTENSION);
+    if (plugins.length === 0) {
+      return;
+    }
+    Promise.all([<any>this.app, ...plugins.map((d) => d.load())]).then((args) => {
+      const appInstance = args[0];
+      const plugins: IAppExtensionExtension[] = args.slice(1);
+
+      for (const plugin of plugins) {
+        plugin.factory({
+          header: this.header,
+          content,
+          main,
+          app: appInstance
+        });
+      }
+    });
+  }
+
+  private cleanUpOld(manager: MixedStorageProvenanceGraphManager) {
+    const workspaces = manager.listLocalSync().sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
+    // cleanup up temporary ones
+    if (workspaces.length > KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
+      const toDelete = workspaces.slice(KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
+      Promise.all(toDelete.map((d) => manager.delete(d))).catch((error) => {
+        console.warn('cannot delete old graphs:', error);
+      });
+    }
   }
 
   /**

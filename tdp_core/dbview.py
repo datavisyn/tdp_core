@@ -2,27 +2,20 @@ import logging
 import re
 from collections import OrderedDict
 from phovea_server.security import current_user
+from .utils import clean_query
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
 REGEX_TYPE = type(re.compile(''))
 
 
-def _clean_query(query):
-  if callable(query):
-    return 'custom function'
-  query = query.strip()
-  query = query.replace('\n', '')
-  # remove two spaces till there are no more
-  while '  ' in query:
-    query = query.replace('  ', ' ')
-  return query
-
-
 class ArgumentInfo(object):
-  def __init__(self, type=None, as_list=False):
+  def __init__(self, type=None, description='', example=None, as_list=False, is_id=None):
     self.type = type
+    self.description = description
+    self.example = example
     self.as_list = as_list
+    self.is_id = is_id
 
 
 class DBFilterData(object):
@@ -35,6 +28,9 @@ class DBFilterData(object):
 class DBView(object):
   def __init__(self, idtype=None, query=None):
     self.description = ''
+    self.summary = ''
+    self.query_type = 'generic'
+    self.tags = []
     self.idtype = idtype
     self.query = query
     self.queries = {}
@@ -54,10 +50,10 @@ class DBView(object):
 
   def dump(self, name):
     from collections import OrderedDict
-    r = OrderedDict(name=name, description=self.description)
+    r = OrderedDict(name=name, description=self.description, type=self.query_type)
     if self.idtype:
       r['idType'] = self.idtype
-    r['query'] = _clean_query(self.query)
+    r['query'] = clean_query(self.query)
     args = [a for a in self.arguments]
     args.extend(self.replacements)
     r['arguments'] = args
@@ -66,7 +62,7 @@ class DBView(object):
     if self.filters:
       r['filters'] = self.filters.keys()
     if self.queries:
-      r['queries'] = {k: _clean_query(v) for k, v in self.queries.items()}
+      r['queries'] = {k: clean_query(v) for k, v in self.queries.items()}
     return r
 
   def is_valid_filter(self, key):
@@ -135,8 +131,13 @@ class DBViewBuilder(object):
   db view builder pattern implementation
   """
 
-  def __init__(self):
+  def __init__(self, query_type='generic', tags=None):
+    """
+    :param query_type:
+    """
     self.v = DBView()
+    self.v.query_type = query_type
+    self.v.tags = tags or []
 
   def clone(self, view):
     """
@@ -144,8 +145,10 @@ class DBViewBuilder(object):
     :param view: the view to copy from
     :return: self
     """
+    self.v.query_type = view.query_type
     self.v.idtype = view.idtype
     self.v.description = view.description
+    self.v.summary = view.summary
     self.v.query = view.query
     self.v.queries = view.queries.copy()
     self.v.columns = view.columns.copy()
@@ -157,13 +160,15 @@ class DBViewBuilder(object):
     self.v.security = view.security
     return self
 
-  def description(self, desc):
+  def description(self, desc, summary=None):
     """
     optional description of this query
     :param desc: the description text
+    :param summary: optional shorter summary text
     :return: self
     """
     self.v.description = desc
+    self.v.summary = summary or (desc if len(desc) < 20 else desc[0:20] + '...')
     return self
 
   def assign_ids(self):
@@ -317,16 +322,19 @@ class DBViewBuilder(object):
       self.v.valid_replacements[replace] = valid_replacements
     return self
 
-  def arg(self, arg, type=None, as_list=False):
+  def arg(self, arg, type=None, description='', example=None, as_list=False, is_id=None):
     """
     adds another argument of this query (using :arg) which will be replaced within SQL
     :param arg: the argument key
     :param type: optional type of the argument, like int or float
+    :param description: optional argument description
+    :param example: optional argument example
     :param as_list: optional whether the argument has to be a list
+    :param is_id: optional whether the argument is an id argument, the value is the idtype required
     :return: self
     """
     self.v.arguments.append(arg)
-    self.v.argument_infos[arg] = ArgumentInfo(type, as_list)
+    self.v.argument_infos[arg] = ArgumentInfo(type, description, example, as_list, is_id)
     return self
 
   def call(self, f=None):
@@ -447,16 +455,16 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
   if prefix is None:
     prefix = table
 
-  queries[prefix + '_items'] = DBViewBuilder().idtype(idtype).table(table).query(u"""
+  queries[prefix + '_items'] = DBViewBuilder('lookup').idtype(idtype).table(table).query(u"""
         SELECT {id}, {{column}} AS text
         FROM {table} WHERE LOWER({{column}}) LIKE :query
         ORDER BY {{column}} ASC""".format(id=id_query, table=table)).replace('column', columns).assign_ids().call(call_function).call(limit_offset).arg('query').build()
 
-  queries[prefix + '_items_verify'] = DBViewBuilder().idtype(idtype).table(table).query(u"""
+  queries[prefix + '_items_verify'] = DBViewBuilder('helper').idtype(idtype).table(table).query(u"""
         SELECT {id}, {name} AS text
         FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).filter(name_column, 'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
 
-  queries[prefix + '_unique'] = DBViewBuilder().query(u"""
+  queries[prefix + '_unique'] = DBViewBuilder('lookup').query(u"""
         SELECT d as id, d as text
         FROM (
           SELECT distinct {{column}} AS d
@@ -464,7 +472,7 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
           ) as t
         ORDER BY d ASC""".format(table=table)).replace('column', columns).call(limit_offset).arg('query').build()
 
-  queries[prefix + '_unique_all'] = DBViewBuilder().query(u"""
+  queries[prefix + '_unique_all'] = DBViewBuilder('helper').query(u"""
         SELECT distinct {{column}} AS text
         FROM {table} ORDER BY {{column}} ASC """.format(table=table)).replace('column', columns).build()
 

@@ -1,0 +1,108 @@
+openapi: 3.0.0
+servers:
+  - url: /api/tdp/
+info:
+  version: 4.0.2
+  title: Target Discovery Platform API
+
+tags:
+  - name: _security
+    description: security relevant queries
+
+security:
+  - basicAuth: []
+  - cookieAuth: []
+  - apiKeyAuth: []
+
+paths:
+  '/../../login':
+    post:
+      tags:
+        - _security
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/userlogin'
+      security: []    # no authentication
+      responses:
+        '200':
+          description: >
+            Successfully authenticated.
+          content:
+            application/json:
+             schema:
+               $ref: '#/components/schemas/user'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    apiKeyAuth:
+      type: apiKey
+      in: query
+      name: api_key
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session  # cookie name
+  responses:
+    error:
+      description: Internal Server Error
+      content:
+        text/plain:
+          schema:
+            title: Error
+            type: string
+    invalid:
+      description: Invalid Request
+      content:
+        text/plain:
+          schema:
+            title: Error
+            type: string
+    notFound:
+      description: Not Found
+      content:
+        text/plain:
+          schema:
+            title: Error
+            type: string
+    notAllowed:
+      description: 'Not Allowed to perform the operation, are you logged in?'
+      content:
+        text/plain:
+          schema:
+            title: Error
+            type: string
+  schemas:
+    userlogin:
+      type: object
+      properties:
+        username:
+          type: string
+
+        password:
+          type: string
+          format: password
+      required:
+        - username
+        - password
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - roles

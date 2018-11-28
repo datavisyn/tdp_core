@@ -1,0 +1,30 @@
+openapi: 3.0.0
+tags:
+  - name: proxy
+    description: proxy api
+paths:
+  '/proxy/{site}':
+    parameters:
+      - name: site
+        in: path
+        required: true
+        description: the site key as defined in the targid_proxy extension point
+        schema:
+          type: string
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: proxy.get_details
+      description: proxy to another get another website
+      tags:
+        - proxy
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: the proxied website
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'

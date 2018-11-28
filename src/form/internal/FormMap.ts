@@ -7,12 +7,13 @@ import {event as d3event} from 'd3';
 import * as $ from 'jquery';
 import AFormElement, {toData} from './AFormElement';
 import {IFormElementDesc, IFormParent, FormElementType} from '../interfaces';
-import {ISelectOptions, resolveData} from './FormSelect';
+import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
 import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
 import {mixin} from 'phovea_core/src';
 import {IFormElement} from '../';
 import * as session from 'phovea_core/src/session';
 import {resolveImmediately} from 'phovea_core/src';
+import {ISelect3Options, default as Select3, IdTextPair} from './Select3';
 
 export interface ISubDesc {
   name: string;
@@ -37,7 +38,13 @@ export interface ISubSelect2Desc extends ISubDesc {
   ajax?: any;
 }
 
-declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc;
+export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
+  type: FormElementType.SELECT3;
+  return?: 'text'|'id';
+  name: string;
+}
+
+declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc|ISubSelect3Desc;
 
 /**
  * Add specific options for input form elements
@@ -157,7 +164,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           <div class="dropdown-menu" aria-labelledby="${this.desc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="btn btn-default btn-sm right">Apply</button>      
+                <button class="btn btn-default btn-sm right">Apply</button>
             </div>
           </div>
       `);
@@ -217,6 +224,13 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         this.inlineOnChange(this, v, toData(v), previous);
       });
     }
+
+    {
+      const v = this.value;
+      if (v.length > 0) {
+        this.fire(FormMap.EVENT_INITIAL_VALUE, v, []);
+      }
+    }
   }
 
   private addValueEditor(row: IFormRow, parent: Element, entries: ISubDescs[]) {
@@ -240,7 +254,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           row.value = this.value;
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
         });
-        resolveData(desc.optionsData)([]).then((values) => {
+        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">Select me...</option>` : '') + values.map(mapOptions).join('');
           if (initialValue) {
             (<HTMLSelectElement>parent.firstElementChild).selectedIndex = values.map((d) => typeof d === 'string' ? d : d.value).indexOf(initialValue);
@@ -254,7 +268,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       case FormElementType.SELECT2:
         parent.insertAdjacentHTML('afterbegin', `<select class="form-control" style="width: 100%"></select>`);
 
-        resolveData(desc.optionsData)([]).then((values) => {
+        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
           // in case of ajax but have default value
           if (desc.ajax && values.length === 0 && initialValue) {
@@ -297,6 +311,20 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
             }
             that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
           });
+        });
+        break;
+      case FormElementType.SELECT3:
+        const select3 = new Select3(desc);
+        parent.appendChild(select3.node);
+        if (initialValue) {
+          select3.value = Array.isArray(initialValue) ? initialValue : [initialValue];
+        } else if (!defaultSelection && that.desc.options.uniqueKeys) {
+          select3.value = [];
+        }
+        that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+        select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
+          row.value = next;
+          this.fire(FormMap.EVENT_CHANGE, next);
         });
         break;
       default:
@@ -436,13 +464,13 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.previousValue = this.value; // force update
     this.buildMap();
     this.updateBadge();
+    this.updateStoredValue();
   }
 
   focus() {
     // open dropdown
     $(this.$node.select('.dropdown-menu').node()).show();
-  };
-
+  }
 }
 
 function isEqual(a: IFormRow[], b: IFormRow[]) {

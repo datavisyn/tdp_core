@@ -1,21 +1,14 @@
-
-import EngineRenderer from 'lineupjs/src/ui/engine/EngineRenderer';
-import {defaultConfig} from 'lineupjs/src/config';
-import {ILineUpConfig} from 'lineupjs/src/interfaces';
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
-import Column, {IColumnDesc} from 'lineupjs/src/model/Column';
-import {deriveColors} from 'lineupjs/src/utils';
-import {LocalDataProvider} from 'lineupjs/src/provider';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
-import {createInitialRanking, IAdditionalColumnDesc, deriveColumns} from './desc';
+import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
@@ -23,13 +16,12 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import {IServerColumn, IViewDescription} from '../rest';
-import LineUpPanelActions from './internal/LineUpPanelActions';
+import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
-import StackColumn from 'lineupjs/src/model/StackColumn';
-import TaggleRenderer from 'lineupjs/src/ui/taggle/TaggleRenderer';
-import {IRule, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
+import {successfullySaved} from '../notifications';
 
 export {IRankingWrapper} from './internal/ranking';
+export {LocalDataProvider as DataProvider} from 'lineupjs';
 
 export interface IARankingViewOptions {
   /**
@@ -58,26 +50,43 @@ export interface IARankingViewOptions {
   /**
    * additional attributes for stored named sets
    */
-  subType: { key: string, value: string };
+  subType: {key: string, value: string};
 
   /**
    * enable taggle overview mode switcher
    * @default true
    */
-  enableOverviewMode: boolean|'active';
+  enableOverviewMode: boolean | 'active';
   /**
    * enable zoom button
    * @default true
    */
   enableZoom: boolean;
 
-  enableSidePanel: boolean|'collapsed';
+  enableSidePanel: boolean | 'collapsed';
 
   enableAddingColumns: boolean;
 
   enableHeaderSummary: boolean;
 
-  customOptions: Partial<ILineUpConfig>;
+  enableHeaderRotation: boolean;
+
+  /**
+   * enable that the regular columns are added via a choser dialog
+   * @default false
+   */
+  enableAddingColumnGrouping: boolean;
+
+  /**
+   * enable alternating pattern background
+   * @default false
+   */
+  enableStripedBackground: boolean;
+
+  itemRowHeight: number | ((row: any, index: number) => number) | null;
+
+  customOptions: Partial<ITaggleOptions>;
+  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
 }
 
 export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
@@ -87,21 +96,11 @@ export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
  */
 export abstract class ARankingView extends AView {
 
-  private readonly config = {
-    violationChanged: (_rule, violation?: string) => this.panel.setViolation(violation),
-    header: {
-      summary: true
-    },
-    body: {
-      animation: true,
-      rowPadding: 0, //since padding is used
-    }
-  };
   /**
    * Stores the ranking data when collapsing columns on modeChange()
    * @type {any}
    */
-  private dump: Map<string, number | boolean | number[]> = null;
+  private dump: Set<string> = null;
 
   readonly naturalSize = [800, 500];
 
@@ -110,13 +109,8 @@ export abstract class ARankingView extends AView {
    */
   private readonly stats: HTMLElement;
 
-  private readonly provider = new LocalDataProvider([], [], {
-    maxNestedSortingCriteria: Infinity,
-    maxGroupColumns: Infinity,
-    filterGlobally: true,
-    grouping: true
-  });
-  private readonly taggle: EngineRenderer|TaggleRenderer;
+  private readonly provider: LocalDataProvider;
+  private readonly taggle: EngineRenderer | TaggleRenderer;
   private readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
 
@@ -143,6 +137,7 @@ export abstract class ARankingView extends AView {
   protected readonly options: Readonly<IARankingViewOptions> = {
     itemName: 'item',
     itemNamePlural: 'items',
+    itemRowHeight: null,
     itemIDType: null,
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
@@ -150,42 +145,70 @@ export abstract class ARankingView extends AView {
     enableOverviewMode: true,
     enableZoom: true,
     enableAddingColumns: true,
+    enableAddingColumnGrouping: false,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
-    customOptions: {}
+    enableStripedBackground: false,
+    enableHeaderRotation: false,
+    customOptions: {},
+    customProviderOptions: {
+      maxNestedSortingCriteria: Infinity,
+      maxGroupColumns: Infinity,
+      filterGlobally: true
+    }
   };
 
-  private readonly selectionAdapter: ISelectionAdapter|null;
+  private readonly selectionAdapter: ISelectionAdapter | null;
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
 
     // variants for deriving the item name
-    const idTypeNames = options.itemIDType ? {itemName: resolve(options.itemIDType).name, itemNamePlural: resolve(options.itemIDType).name}: {};
+    const idTypeNames = options.itemIDType ? {
+      itemName: resolve(options.itemIDType).name,
+      itemNamePlural: resolve(options.itemIDType).name
+    } : {};
     const names = options.itemName ? {itemNamePlural: typeof options.itemName === 'function' ? () => `${(<any>options.itemName)()}s` : `${options.itemName}s`} : {};
     mixin(this.options, idTypeNames, names, options);
 
 
-    this.node.classList.add('lineup', 'lu-taggle');
+    this.node.classList.add('lineup', 'lu-taggle', 'lu');
     this.node.insertAdjacentHTML('beforeend', `<div></div>`);
-
     this.stats = this.node.ownerDocument.createElement('p');
 
 
+    this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config = mixin(this.config, {
-      header: {
-        summary: this.options.enableHeaderSummary
-      }
+    const config: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+      summaryHeader: this.options.enableHeaderSummary,
+      labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
-    this.taggle = !this.options.enableOverviewMode? new EngineRenderer(this.provider, <HTMLElement>this.node.firstElementChild!, mixin(defaultConfig(), config)) : new TaggleRenderer(<HTMLElement>this.node.firstElementChild!, this.provider, config);
+    if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
+      config.rowHeight = this.options.itemRowHeight;
+    } else if (typeof this.options.itemRowHeight === 'function') {
+      const f = this.options.itemRowHeight;
+      config.dynamicHeight = () => ({
+        defaultHeight: 18,
+        padding: () => 0,
+        height: (item: IGroupItem | IGroupData) => {
+          return isGroup(item) ? 70 : f(item.v, item.i);
+        }
+      });
+    }
 
-    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options);
+
+
+    const lineupParent = <HTMLElement>this.node.firstElementChild!;
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, config) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+      violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
+    }));
+
+    this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
       this.saveNamedSet(order, name, description, isPublic);
     });
@@ -206,7 +229,7 @@ export abstract class ARankingView extends AView {
         (<TaggleRenderer>this.taggle).switchRule(rule);
       });
       if (this.options.enableOverviewMode === 'active') {
-        (<TaggleRenderer>this.taggle).switchRule(spacefilling);
+        (<TaggleRenderer>this.taggle).switchRule(rule);
       }
     }
 
@@ -222,7 +245,7 @@ export abstract class ARankingView extends AView {
     this.selectionAdapter = this.createSelectionAdapter();
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return resolveImmediately(super.init(params, onParameterChange)).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
@@ -260,20 +283,20 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
   }
 
-  protected parameterChanged(name: string): PromiseLike<any>|void {
+  protected parameterChanged(name: string): PromiseLike<any> | void {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
       return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
     }
   }
 
-  protected itemSelectionChanged(): PromiseLike<any>|void {
+  protected itemSelectionChanged(): PromiseLike<any> | void {
     this.selectionHelper.setItemSelection(this.getItemSelection());
     this.updateLineUpStats();
     super.itemSelectionChanged();
   }
 
-  protected selectionChanged(): PromiseLike<any>|void {
+  protected selectionChanged(): PromiseLike<any> | void {
     if (this.selectionAdapter) {
       return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
     }
@@ -307,7 +330,6 @@ export abstract class ARankingView extends AView {
       return;
     }
     const ranking = this.provider.getRankings()[0];
-    const weightsSuffix = '_weights';
 
     if (mode === EViewMode.FOCUS) {
       this.panel.show();
@@ -316,14 +338,12 @@ export abstract class ARankingView extends AView {
           if (!this.dump.has(c.id)) {
             return;
           }
-
-          c.setWidth(<number>this.dump.get(c.id));
-          if(this.dump.has(c.id + weightsSuffix)) {
-            (<StackColumn>c).setWeights(<number[]>this.dump.get(c.id + weightsSuffix));
-          }
+          c.setVisible(true);
         });
       }
       this.dump = null;
+
+      this.update();
       return;
     }
 
@@ -333,24 +353,21 @@ export abstract class ARankingView extends AView {
       return;
     }
 
-    const s = ranking.getSortCriteria();
+    const s = ranking.getPrimarySortCriteria();
     const labelColumn = ranking.children.filter((c) => c.desc.type === 'string')[0];
 
-    this.dump = new Map<string, number | boolean | number[]>();
+    this.dump = new Set<string>();
     ranking.children.forEach((c) => {
       if (c === labelColumn ||
-        c === s.col ||
+        (s && c === s.col) ||
         c.desc.type === 'rank' ||
         c.desc.type === 'selection' ||
         (<any>c.desc).column === 'id' // = Ensembl column
       ) {
         // keep these columns
       } else {
-        if(c instanceof StackColumn) {
-          this.dump.set(c.id + weightsSuffix, (<StackColumn>c).getWeights());
-        }
-        this.dump.set(c.id, c.getWidth());
-        c.hide();
+        c.setVisible(false);
+        this.dump.add(c.id);
       }
     });
   }
@@ -359,11 +376,12 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
+    successfullySaved('List of Entities', name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): { col: Column, loaded: Promise<Column> } {
-    colDesc.color = this.colors.getColumnColor(id);
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
+    colDesc.color = colDesc.color? colDesc.color : this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
       this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
@@ -371,17 +389,19 @@ export abstract class ARankingView extends AView {
   }
 
   private addScoreColumn(score: IScore<any>) {
-    const colDesc = score.createDesc();
+    const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
+
+    const colDesc = score.createDesc(args);
     // flag that it is a score
     colDesc._score = true;
 
     const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
-    const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
+
     const data = score.compute(ids, this.itemIDType, args);
     return this.addColumn(colDesc, data);
   }
 
-  private async withoutTracking<T>(f: () => T): Promise<T> {
+  protected async withoutTracking<T>(f: () => T): Promise<T> {
     return this.built.then(() => withoutTracking(this.context.ref, f));
   }
 
@@ -434,6 +454,13 @@ export abstract class ARankingView extends AView {
   private getColumns(): Promise<IAdditionalColumnDesc[]> {
     return this.loadColumnDesc().then(({columns}) => {
       const cols = this.getColumnDescs(columns);
+      // compatibility since visible is now a supported feature, so rename ones
+      for (const col of cols) {
+        if (col.visible != null) {
+          (<any>col).initialColumn = col.visible;
+          delete col.visible;
+        }
+      }
       deriveColors(cols);
       return cols;
     });
@@ -467,29 +494,25 @@ export abstract class ARankingView extends AView {
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
-      console.error(error);
-      this.setBusy(false);
-    });
+        console.error(error);
+        this.setBusy(false);
+      });
   }
 
   protected builtLineUp(lineup: LocalDataProvider) {
     // hook
   }
 
-  protected createInitialRanking(lineup: ADataProvider) {
-    createInitialRanking(this.provider);
+  protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
+    createInitialRanking(lineup, options);
   }
 
   protected customizeRanking(ranking: IRankingWrapper) {
     // hook
   }
 
-  private setLineUpData(rows: IRow[]) {
-    if (rows.length > 0) {
-      this.node.classList.remove('nodata');
-    } else {
-      this.node.classList.add('nodata');
-    }
+  protected setLineUpData(rows: IRow[]) {
+    this.setHint(rows.length === 0, 'No data found for selection and parameter.');
     this.provider.setData(rows);
     this.selectionHelper.rows = rows;
     this.selectionHelper.setItemSelection(this.getItemSelection());
@@ -509,7 +532,7 @@ export abstract class ARankingView extends AView {
   /**
    * Writes the number of total, selected and shown items in the parameter area
    */
-  private updateLineUpStats() {
+  updateLineUpStats() {
     const showStats = (total: number, selected = 0, shown = 0) => {
       const name = shown === 1 ? this.options.itemName : this.options.itemNamePlural;
       return `Showing ${shown} ${total > 0 ? `of ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} selected` : ''}`;

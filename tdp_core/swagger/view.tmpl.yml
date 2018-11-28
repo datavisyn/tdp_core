@@ -1,0 +1,171 @@
+openapi: 3.0.0
+paths:
+  {% if features.generic %}
+  '/db/{{database}}/{{view}}':
+    get:
+      summary: '{{summary}}'
+      description: '{{description}}'
+      tags:
+        - db_{{database}}
+        - query_generic
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
+      parameters:
+        - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/format'
+        {%- for arg in args %}
+        - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
+        {%- endfor %}
+        {%- for filter in filters %}
+        - $ref: '#/components/parameters/filter_{{database}}_{{view}}_filter_{{filter}}'
+        {%- endfor %}
+      responses:
+        '200':
+          $ref: '#/components/responses/entries_{{database}}_{{view}}'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.desc %}
+  '/db/{{database}}/{{view}}/desc':
+    get:
+      summary: '{{summary}}'
+      description: '{{description}}'
+      tags:
+        - db_{{database}}
+        - query_generic
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
+      responses:
+        '200':
+          $ref: '#/components/responses/queryDesc'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.lookup %}
+  '/db/{{database}}/{{view}}/lookup':
+    get:
+      summary: '{{summary}}'
+      description: '{{description}}'
+      tags:
+        - db_{{database}}
+        - query_lookup
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
+      parameters:
+        - $ref: '#/components/parameters/lookupQuery'
+        - $ref: '#/components/parameters/lookupPage'
+        - $ref: '#/components/parameters/lookupLimit'
+      responses:
+        '200':
+          $ref: '#/components/responses/queryLookup'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  {%- endif %}
+  {% if features.score %}
+  '/db/{{database}}/{{view}}/score':
+    get:
+      summary: '{{summary}}'
+      description: '{{description}}'
+      tags:
+        - db_{{database}}
+        - query_score
+        {%- for tag in tags %}
+        - {{tag}}
+        {%- endfor %}
+      parameters:
+        - $ref: '#/components/parameters/scoreTarget'
+        - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/format'
+        {%- for arg in args %}
+        - $ref: '#/components/parameters/arg_{{database}}_{{view}}_{{arg.name}}'
+        {%- endfor %}
+        {%- for filter in filters %}
+        - $ref: '#/components/parameters/filter_{{database}}_{{view}}_filter_{{filter}}'
+        {%- endfor %}
+      responses:
+        '200':
+          $ref: '#/components/responses/queryScore'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  {%- endif %}
+
+
+components:
+  parameters: {% if empty %}{}{% endif %}
+    {%- for arg in args %}
+    'arg_{{database}}_{{view}}_{{arg.name}}':
+      name: '{{arg.name}}'
+      description: '{{arg.description}}'
+      required: true
+      in: query
+      {% if arg.example %}example: {{arg.example}}{% endif %}
+      schema:
+        {% if arg.as_list == false %}type: {{arg.type}}{% endif %}
+        {% if arg.as_list %}type: array
+        minLength: 1
+        items:
+          type: {{arg.type}}
+      style: form
+        {%- endif %}
+        {% if arg.enum %}
+        enum:
+          {% for e in arg.enum %}- '{% if e.name %}{{e.name}}{% else %}{{e}}{% endif %}'
+          {% endfor %}
+      {%- endif %}
+    {%- endfor %}
+    {%- for filter in filters %}
+    'filter_{{database}}_{{view}}_filter_{{filter}}':
+      name: filter_{{filter}}
+      required: false
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+        minLength: 1
+      style: form
+    {%- endfor %}
+  responses:
+    entries_{{database}}_{{view}}:
+      description: Successful response
+      content:
+        text/csv:
+          schema:
+            type: string
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/entry_{{database}}_{{view}}'
+            #oneOf:
+            #  - $ref: '#/components/schemas/returnQuery'
+
+  schemas:
+    entry_{{database}}_{{view}}:
+      type: object
+      properties: {% if propsempty %}{}{% endif %}
+      {%- for prop in props %}
+        '{{prop.name}}':
+          type: {{prop.type}}
+          {% if prop.categories %}
+          enum:
+            {% for e in prop.categories %}- '{% if e.name %}{{e.name}}{% else %}{{e}}{% endif %}'
+            {% endfor %}
+          {%- endif %}
+          {% if prop.min %}
+          minimum: {{prop.min}}
+          maximum: {{prop.max}}
+          {%- endif %}
+      {%- endfor %}
+      additionalProperties: true

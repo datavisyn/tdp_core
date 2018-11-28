@@ -102,7 +102,7 @@ def _generate_id():
 
 @app.route('/attachment/', methods=['POST'])
 @etag
-def post_attachments():
+def post_attachment():
   """
   simple attachment management
   :return:
@@ -111,15 +111,10 @@ def post_attachments():
 
   id = _generate_id()
   # keep the encoded string
-  data = request.values.get('data', None)
-  if data is None:
-    import json
-    data = json.dumps(request.values.to_dict())
-
   creator = security.current_username()
   permissions = security.DEFAULT_PERMISSION
 
-  entry = dict(id=id, creator=creator, permissions=permissions, data=data)
+  entry = dict(id=id, creator=creator, permissions=permissions, data=request.data)
   db.attachments.insert_one(entry)
   return id
 
@@ -151,12 +146,7 @@ def get_attachment(attachment_id):
       abort(403, u'Attachment with id "{}" is write protected'.format(attachment_id))
     filter = dict(id=attachment_id)
     # keep the encoded string
-    data = request.values.get('data', None)
-    if data is None:
-      import json
-      data = json.dumps(request.values.to_dict())
-
-    query = {'$set': dict(data=data)}
+    query = {'$set': dict(data=request.data)}
     db.attachments.find_one_and_update(filter, query)
     return attachment_id
 

@@ -7,14 +7,8 @@
   flex-direction: row;
   height: 100%;
 
-  &.nodata {
-    &::before {
-      margin-top: 40px;
-      content: 'No data found for selection and parameter.';
-    }
-    > div * {
-      display: none;
-    }
+  .lu-row {
+    line-height: 1;
   }
 
   %lu-panel-button {
@@ -51,10 +45,14 @@
       margin: 0;
     }
 
-    header > button {
-      @extend %lu-panel-button;
+    > div.lu-adder {
+      margin-top: 1em;
 
-      display: none;
+      > button {
+        @extend %lu-panel-button;
+
+        display: none;
+      }
     }
 
     > a {
@@ -112,6 +110,7 @@
       > a {
         width: 100%;
         order: 1;
+
         &::before {
           content: $fa-var-arrow-left;
         }
@@ -123,7 +122,14 @@
         margin-right: 0;
       }
 
-      > header {
+      > div,
+      > .lu-stats,
+      > header,
+      > main {
+        display: none;
+      }
+
+      > div.lu-adder {
         order: 2;
         padding: 0;
         display: flex;
@@ -160,10 +166,6 @@
             max-height: 50vh;
           }
         }
-      }
-
-      > div {
-        display: none;
       }
 
       .gap {
@@ -203,6 +205,20 @@
   }
 }
 
+.lu-dialog {
+  label: {
+    margin: 0;
+  }
+
+  &.lu-filter-table > div:first-of-type > * {
+    flex: 0 0 auto;
+  }
+}
+
+.lu-collapser {
+  display: none;
+}
+
 .lineup-engine {
   position: absolute;
   top: 0;
@@ -214,11 +230,49 @@
   > header {
     padding-bottom: 1px; // no idea otherwise scrollbar
   }
+
+  footer {
+    display: block !important;
+  }
 }
 
-$lu_use_font_awesome: true;
 $lu_assets: '~lineupjs/src/assets';
 
 @at-root {
-  @import '~lineupjs/src/styles/taggle';
+
+  .tdp-ranking-export-form {
+    user-select: none;
+    -moz-user-select: none;
+
+    .radio {
+      margin-left: 1em;
+    }
+  }
+
+  .tdp-ranking-export-form-handle {
+    > span {
+      visibility: hidden;
+      padding: 0 0.5em 0 1em;
+      cursor: grab;
+    }
+
+    &:hover > span,
+    &.dragging > span {
+      visibility: visible;
+    }
+
+    &.dragging {
+      border: 1px solid lightgray;
+      border-radius: 3px;
+      cursor: grabbing;
+    }
+  }
+
+  .lu-side-panel > main > section::before {
+    content: 'Column Summaries';
+  }
+
+  .lu-hierarchy .lu-search::before {
+    height: 19px;
+  }
 }

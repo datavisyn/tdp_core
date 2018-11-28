@@ -1,7 +1,4 @@
-import Column from 'lineupjs/src/model/Column';
-import Ranking from 'lineupjs/src/model/Ranking';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-
+import {Column, Ranking, LocalDataProvider} from 'lineupjs';
 
 export interface IRankingWrapper {
   sortBy(column: string, asc?: boolean): boolean;
@@ -11,8 +8,8 @@ export interface IRankingWrapper {
   findColumn<T extends Column>(column: string): T | null;
 }
 
-export function wrapRanking(data: ADataProvider, ranking: Ranking) {
-  const findColumn = (column: string) => ranking.find((d) => (<any>d.desc).column === column);
+export function wrapRanking(data: LocalDataProvider, ranking: Ranking) {
+  const findColumn = (column: string) => ranking.find((d) => (<any>d.desc).column === column || d.desc.label === column);
   return <IRankingWrapper> {
     findColumn,
     sortBy: (column: string, asc = true) => {

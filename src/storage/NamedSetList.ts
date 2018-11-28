@@ -19,6 +19,7 @@ import {
   EEntity,
   hasPermission
 } from 'phovea_core/src/security';
+import {successfullySaved, successfullyDeleted} from '../notifications';
 
 export default class NamedSetList {
   readonly node: HTMLElement;
@@ -64,9 +65,10 @@ export default class NamedSetList {
       };
 
       const editedSet = await editNamedSet(namedSet.id, params);
+      successfullySaved('Named Set', name);
       this.replace(namedSet, editedSet);
     });
-  };
+  }
 
   update() {
     const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
@@ -136,6 +138,7 @@ export default class NamedSetList {
         );
         if (deleteIt) {
           await deleteNamedSet(namedSet.id);
+          successfullyDeleted('Dashboard', namedSet.name);
           this.remove(namedSet);
         }
       });

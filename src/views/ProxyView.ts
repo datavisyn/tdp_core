@@ -2,7 +2,8 @@
  * Created by Holger Stitz on 07.09.2016.
  */
 
-import {mixin} from 'phovea_core/src/index';
+import {mixin} from 'phovea_core/src';
+import {resolve} from 'phovea_core/src/idtype';
 import {IViewContext, ISelection} from './interfaces';
 import {FormElementType, IFormSelectElement, IFormSelectOption} from '../form';
 import AD3View from './AD3View';
@@ -16,6 +17,7 @@ export interface IProxyViewOptions {
   argument: string;
   idtype?: string;
   extra: object;
+  openExternally: boolean;
 }
 
 /**
@@ -39,11 +41,12 @@ export default class ProxyView extends AD3View {
      * idtype of the argument
      */
     idtype: null,
-    extra: {}
+    extra: {},
+    openExternally: false
   };
 
   private readonly openExternally: HTMLElement;
-  
+
   readonly naturalSize = [1280, 800];
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
@@ -54,7 +57,7 @@ export default class ProxyView extends AD3View {
     this.openExternally = parent.ownerDocument.createElement('p');
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any) => Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     super.init(params, onParameterChange);
 
     // inject stats
@@ -170,6 +173,14 @@ export default class ProxyView extends AD3View {
       return;
     }
 
+    if (this.options.openExternally) {
+      this.setBusy(false);
+      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
+      Please <a href="${url}" class="alert-link" target="_blank" rel="noopener">click here
+      to open the external application</a> in a new browser tab.</div></p>`;
+      return;
+    }
+
     this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url: `${location.protocol}${url}`}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
@@ -184,7 +195,8 @@ export default class ProxyView extends AD3View {
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
-    this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${this.options.idtype}</i>.</p>`);
+    const to = this.options.idtype ? resolve(this.options.idtype).name : 'Unknown';
+    this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${to}</i>.</p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }

@@ -1,8 +1,5 @@
 
-import SidePanel from 'lineupjs/src/ui/panel/SidePanel';
-import {IRankingHeaderContext} from 'lineupjs/src/ui/engine/interfaces';
-import {regular, spacefilling} from 'lineupjs/src/ui/taggle/LineUpRuleSet';
-import {createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createMinDesc, createMaxDesc, createMeanDesc, createNestedDesc} from 'lineupjs/src/model';
+import {SidePanel, spaceFillingRule, IGroupSearchItem, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isSupportType, Column} from 'lineupjs';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -10,17 +7,22 @@ import {
   IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
 } from '../../extensions';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
-import {exportRanking} from 'lineupjs/src/provider/utils';
-import SearchBox from 'lineupjs/src/ui/panel/SearchBox';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions, MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} from '../ARankingView';
+import {exportLogic} from './export';
+import {lazyDialogModule} from '../../dialogs';
 
 export interface ISearchOption {
   text: string;
   id: string;
   action(): void;
 }
+
+export const rule = spaceFillingRule({
+  groupHeight: 70,
+  rowHeight: 18,
+  groupPadding: 5
+});
 
 /**
  * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
@@ -53,15 +55,15 @@ export default class LineUpPanelActions extends EventHandler {
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
 
-  private idType: IDType|null = null;
+  private idType: IDType | null = null;
 
-  private readonly search: SearchBox<ISearchOption>|null;
+  private readonly search: SearchBox<ISearchOption> | null;
 
   readonly panel: SidePanel;
   private overview: HTMLElement;
   private wasCollapsed = false;
 
-  constructor(protected readonly provider: ADataProvider, ctx: IRankingHeaderContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
+  constructor(protected readonly provider: LocalDataProvider, ctx: any, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
 
     if (options.enableAddingColumns) {
@@ -95,7 +97,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.collapse = false;
     }
 
-    if(this.wasHidden) {
+    if (this.wasHidden) {
       this.show();
     }
   }
@@ -128,8 +130,8 @@ export default class LineUpPanelActions extends EventHandler {
     this.node.insertAdjacentHTML('afterbegin', `
       <a href="#" title="(Un)Collapse"></a>
       <section></section>
-      <header><button class="fa fa-plus" title="Add Column"></button>
-      </header>`);
+      <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
+      </div>`);
 
     this.node.querySelector('a')!.addEventListener('click', (evt) => {
       evt.preventDefault();
@@ -149,7 +151,7 @@ export default class LineUpPanelActions extends EventHandler {
       buttons.appendChild(this.appendOverviewButton());
     }
 
-    const header = <HTMLElement>this.node.querySelector('header')!;
+    const header = <HTMLElement>this.node.querySelector('.lu-adder')!;
 
     header.addEventListener('mouseleave', () => {
       header.classList.remove('once');
@@ -158,7 +160,7 @@ export default class LineUpPanelActions extends EventHandler {
     if (this.search) {
       header.appendChild(this.search.node);
 
-      this.node.querySelector('header button')!.addEventListener('click', (evt) => {
+      this.node.querySelector('.lu-adder button')!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
         if (!this.collapse) {
@@ -190,9 +192,9 @@ export default class LineUpPanelActions extends EventHandler {
     const listener = () => {
       const selected = this.overview.classList.toggle('fa-th-list');
       this.overview.classList.toggle('fa-list');
-      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? spacefilling : regular);
+      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
     };
-    return this.overview =  this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list': 'fa fa-list', listener);
+    return this.overview = this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
   }
 
   setViolation(violation?: string) {
@@ -204,10 +206,44 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private appendDownload() {
-    const listener = (ranking: Ranking) => {
-      this.exportRanking(ranking, <ADataProvider>this.provider);
-    };
-    return this.createMarkup('Export Data', 'fa fa-download', listener);
+    const node = this.node.ownerDocument.createElement('div');
+    node.classList.add('btn-group');
+    node.innerHTML = `
+      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li class="dropdown-header">Download All Rows</li>
+        <li><a href="#" data-s="a" data-t="csv">CSV (comma separated)</a></li>
+        <li><a href="#" data-s="a" data-t="tsv">TSV (tab separated)</a></li>
+        <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
+        <li><a href="#" data-s="a" data-t="json">JSON</a></li>
+        <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
+        <li class="dropdown-header">Download Selected Rows Only</li>
+        <li><a href="#" data-s="s" data-t="csv">CSV (comma separated)</a></li>
+        <li><a href="#" data-s="s" data-t="tsv">TSV (tab separated)</a></li>
+        <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
+        <li><a href="#" data-s="s" data-t="json">JSON</a></li>
+        <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
+      </ul>
+    `;
+
+    const links = Array.from(node.querySelectorAll('a'));
+    for (const link of links) {
+      link.onclick = (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        const type = link.dataset.t;
+        const onlySelected = link.dataset.s === 's';
+        exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
+          this.downloadFile(content, mimeType, name);
+        });
+      };
+    }
+
+
+    return node;
   }
 
   private appendSaveRanking() {
@@ -215,7 +251,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.saveRankingDialog(ranking.getOrder());
     };
 
-    return this.createMarkup('Save Named Set', 'fa fa-save', listener);
+    return this.createMarkup('Save List of Entities', 'fa fa-save', listener);
   }
 
   private appendExtraButtons() {
@@ -224,24 +260,20 @@ export default class LineUpPanelActions extends EventHandler {
       const listener = () => {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
-      return this.createMarkup(button.title,'fa ' + button.cssClass, listener);
+      return this.createMarkup(button.title, 'fa ' + button.cssClass, listener);
     });
   }
 
-  protected exportRanking(ranking: Ranking, provider: ADataProvider) {
-    Promise.resolve(provider.view(ranking.getOrder())).then((data) => this.exportRankingImpl(ranking, data));
-  }
-
-  protected exportRankingImpl(ranking: Ranking, data: any[]) {
-    const content = exportRanking(ranking, data, {separator: ';', quote: true, verboseColumnHeaders: true});
-    const downloadLink = document.createElement('a');
-    const blob = new Blob([content], {type: 'text/csv;charset=utf-8'});
+  private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
+    const doc = this.node.ownerDocument;
+    const downloadLink = doc.createElement('a');
+    const blob = new Blob([content], {type: mimeType});
     downloadLink.href = URL.createObjectURL(blob);
-    (<any>downloadLink).download = 'export.csv';
+    (<any>downloadLink).download = name;
 
-    document.body.appendChild(downloadLink);
+    doc.body.appendChild(downloadLink);
     downloadLink.click();
-    document.body.removeChild(downloadLink);
+    downloadLink.remove();
   }
 
   protected saveRankingDialog(order: number[]) {
@@ -257,7 +289,7 @@ export default class LineUpPanelActions extends EventHandler {
   private getColumnDescription(descs: IColumnDesc[], addScores: boolean) {
     return descs
       .filter((d) => Boolean((<any>d)._score) === addScores)
-      .map((d) => ({ text: d.label, id: (<any>d).column, action: () => this.addColumn(d)}))
+      .map((d) => ({text: d.label, id: (<any>d).column, action: () => this.addColumn(d)}))
       .sort((a, b) => a.text.localeCompare(b.text));
   }
 
@@ -271,7 +303,7 @@ export default class LineUpPanelActions extends EventHandler {
     const ordinoScores: IPluginDesc[] = await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
     const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
-    const metaDataPluginPromises: Promise<ISearchOption>[] = metaDataPluginDescs
+    const metaDataPluginPromises: Promise<IGroupSearchItem<any>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
         .then((loadedPlugin: IPlugin) => loadedPlugin.factory(plugin))
         .then((scores: IScoreLoader[]) => {
@@ -293,12 +325,11 @@ export default class LineUpPanelActions extends EventHandler {
     }
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
-    this.search.data = [
-      {
-        text: 'Database Columns',
-        children: this.getColumnDescription(descs, false)
-      },
-      {
+    const items = [
+      this.groupedDialog('Database Columns', this.getColumnDescription(descs, false))
+    ];
+    if (loadedScorePlugins.length > 0) {
+      items.push({
         text: 'Parameterized Scores',
         children: loadedScorePlugins.map((score) => {
           return {
@@ -313,33 +344,64 @@ export default class LineUpPanelActions extends EventHandler {
             }
           };
         })
-      },
-      {
+      });
+    }
+    const scoreDescs = this.getColumnDescription(descs, true);
+    if (scoreDescs.length > 0) {
+      items.push({
         text: 'Previously Added Columns',
-        children: this.getColumnDescription(descs, true)
-      },
-      {
-        text: 'Combining Columns',
-        children: [
+        children: scoreDescs
+      });
+    }
+    items.push(
+      this.groupedDialog('Combining Columns', [
           { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
           { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
           { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-          { text: 'Max Combination', id: 'max', action: () => this.addColumn(createMaxDesc()) },
-          { text: 'Min Combination', id: 'min', action: () => this.addColumn(createMinDesc()) },
-          { text: 'Mean Combination', id: 'mean', action: () => this.addColumn(createMeanDesc()) },
+          { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
           { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
-        ]
-      },
-      {
-        text: 'Support Columns',
-        children: [
-          { text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group')) },
-          { text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc()) },
-          { text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc()) }
-        ]
-      },
+      ]),
+      this.groupedDialog('Support Columns', [
+          {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
+          {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+          {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+      ]),
       ...metaDataOptions
-    ];
+    );
+    this.search.data = items;
+  }
+
+  private groupedDialog(text: string, children: ISearchOption[]) {
+    const viaDialog = this.options.enableAddingColumnGrouping;
+    if (!viaDialog) {
+      return { text, children };
+    }
+    return {
+      text: `${text} &hellip;`,
+      id: `group_${text}`,
+      action: () => {
+        // choooser dialog
+        lazyDialogModule().then((dialogs) => {
+          const dialog = new dialogs.FormDialog(`Add ${text} &hellip;`, 'Add Column');
+          dialog.form.insertAdjacentHTML('beforeend', `
+            <select name="column" class="form-control">
+              ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}
+            </select>
+          `);
+          dialog.onSubmit(() => {
+            const data = dialog.getFormData();
+            const selectedId = data.get('column');
+            const child = children.find((d) => d.id === selectedId);
+            if (child) {
+              child.action();
+            }
+            return false;
+          });
+          dialog.hideOnSubmit();
+          dialog.show();
+        });
+      }
+    };
   }
 
   private buildMetaDataDescriptions(desc: IScoreLoaderExtensionDesc, columns: IScoreLoader[]) {
@@ -365,7 +427,7 @@ export default class LineUpPanelActions extends EventHandler {
     // pass dataSource into InvertedAggregatedScore factory method
     Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType!, this.resolveArgs())) // open modal dialog
       .then((params) => { // modal dialog is closed and score created
-        if(Array.isArray(params)) {
+        if (Array.isArray(params)) {
           params.forEach((param) => this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.name, scorePlugin.desc.id, param));
         } else {
           this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
@@ -374,12 +436,12 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   toggleDisableOverviewButton(disable: boolean = false) {
-    if(!this.options.enableOverviewMode) {
+    if (!this.options.enableOverviewMode) {
       return;
     }
 
     (<HTMLButtonElement>this.overview).disabled = disable;
-    if(disable) {
+    if (disable) {
       this.overview.title = `Overview disabled due to too many items in the table. Please filter the table below the threshold of ${MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW} items to enable the overview mode.`;
       this.overview.style.cursor = 'not-allowed';
     } else {

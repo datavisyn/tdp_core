@@ -25,6 +25,14 @@ export enum FormElementType {
      */
   SELECT2_MULTIPLE,
     /**
+     * SELECT2 with additional functionality such as validation, tokenize and file drag
+     */
+  SELECT3,
+    /**
+     * similar to SELECT3 but with multiple selections allowed
+     */
+  SELECT3_MULTIPLE,
+    /**
      * a text field
      * @see IFormInputTextDesc
      */
@@ -43,7 +51,12 @@ export enum FormElementType {
      * a checkbox
      * @see ICheckBoxElementDesc
      */
-  CHECKBOX
+  CHECKBOX,
+    /**
+     * a checkbox
+     * @see IRadioElementDesc
+     */
+  RADIO
 }
 
 /**
@@ -126,6 +139,8 @@ export interface IFormElementDesc {
    * @param previousValue the previous value
    */
   onChange?: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
+
+  onInit?: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
 }
 
 

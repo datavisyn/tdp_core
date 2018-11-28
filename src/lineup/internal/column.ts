@@ -1,16 +1,10 @@
 /**
  * Created by Samuel Gratzl on 12.09.2017.
  */
-import {IDataProvider} from 'lineupjs/src/provider/ADataProvider';
-import {IColumnDesc, ScaleMappingFunction} from 'lineupjs/src/model';
+import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, CategoricalColumn, toCategories} from 'lineupjs';
 import {createAccessor} from './utils';
 import {IScoreRow} from '../../extensions';
 import {showErrorModalDialog} from '../../dialogs';
-import ValueColumn from 'lineupjs/src/model/ValueColumn';
-import NumberColumn from 'lineupjs/src/model/NumberColumn';
-import {default as BoxPlotColumn} from 'lineupjs/src/model/BoxPlotColumn';
-import NumbersColumn from 'lineupjs/src/model/NumbersColumn';
-import Column from 'lineupjs/src/model/Column';
 import {extent, min, max} from 'd3';
 
 
@@ -45,6 +39,9 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
   if (colDesc.sortedByMe) {
     col.sortByMe(colDesc.sortedByMe === true || colDesc.sortedByMe === 'asc');
   }
+  if (colDesc.groupByMe) {
+    col.groupByMe();
+  }
 
   // error handling
   data
@@ -78,8 +75,23 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
     if (colDesc.type === 'numbers' && rows.length > 0) {
       // hack in the data length
       const ncol = <NumbersColumn>col;
-      (<any>colDesc).dataLength = rows[0].score.length;
+      const columns = (<any>rows)._columns;
+      // inject labels
+      if (columns) {
+        (<any>ncol).originalLabels = (<any>colDesc).labels = columns;
+      }
+      (<any>ncol)._dataLength = (<any>colDesc).dataLength = rows[0].score.length;
+
       ncol.setSplicer({length: rows[0].score.length, splice: (d) => d});
+    }
+
+    if (colDesc.type === 'categorical' && (<any>rows)._categories) {
+      const ccol = <any>col;
+      colDesc.categories = (<any>rows)._categories;
+      const categories = toCategories(colDesc);
+      ccol.categories = categories;
+      ccol.lookup.clear();
+      categories.forEach((c) => ccol.lookup.set(c.name, c));
     }
 
     // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value

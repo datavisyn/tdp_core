@@ -7,7 +7,7 @@ import {IDType} from 'phovea_core/src/idtype';
 import {list as rlist} from 'phovea_core/src/range';
 import {EventHandler} from 'phovea_core/src/event';
 import {IRow} from '../';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
+import {LocalDataProvider} from 'lineupjs';
 
 
 /**
@@ -49,7 +49,7 @@ export default class LineUpSelectionHelper extends EventHandler {
   private readonly orderedSelectedIndices = <number[]>[];
   private uid2index = new Map<number, number>();
 
-  constructor(private readonly provider: ADataProvider, private readonly idType: () => IDType) {
+  constructor(private readonly provider: LocalDataProvider, private readonly idType: () => IDType) {
     super();
     this.addEventListener();
   }
@@ -70,13 +70,13 @@ export default class LineUpSelectionHelper extends EventHandler {
   }
 
   private addEventListener() {
-    this.provider.on(ADataProvider.EVENT_SELECTION_CHANGED, (indices: number[]) => {
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices: number[]) => {
       this.onMultiSelectionChanged(indices);
     });
   }
 
   private removeEventListener() {
-    this.provider.on(ADataProvider.EVENT_SELECTION_CHANGED, null);
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, null);
   }
 
   private onMultiSelectionChanged(indices: number[]) {

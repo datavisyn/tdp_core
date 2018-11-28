@@ -4,6 +4,8 @@ import phovea_server.config
 from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from .dbmanager import DBManager
+from .utils import clean_query, secure_replacements
+from werkzeug.datastructures import MultiDict
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -15,7 +17,16 @@ def _supports_sql_parameters(dialect):
   return dialect.lower() != 'sqlite' and dialect.lower() != 'oracle'  # sqlite doesn't support array parameters, postgres does
 
 
+def _differentiates_empty_string_and_null(dialect):
+  return dialect.lower() != 'oracle'  # for Oracle, an empty string is the same as a null string
+
+
 def resolve(database):
+  """
+  finds and return the connector and engine for the given database
+  :param database: database key to lookup
+  :return: (connector, engine)
+  """
   if database not in configs:
     abort(404, u'Database with id "{}" cannot be found'.format(database))
   r = configs[database]
@@ -25,6 +36,33 @@ def resolve(database):
     if view.needs_to_fill_up_columns() and view.table is not None:
       _fill_up_columns(view, engine)
   return r
+
+
+def resolve_engine(database):
+  """
+  finds and return the engine for the given database
+  :param database: database key to lookup
+  :return: engine
+  """
+  if database not in configs:
+    abort(404, u'Database with id "{}" cannot be found'.format(database))
+  return configs.engine(database)
+
+
+def resolve_view(database, view_name):
+  """
+  finds and return the connector, engine, and view for the given database and view_name
+  :param database: database key to lookup
+  :param view_name: view name to lookup
+  :return: (connector, engine, view)
+  """
+  connector, engine = resolve(database)
+  if view_name not in connector.views:
+    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
+  view = connector.views[view_name]
+  if not view.can_access():
+    abort(403)
+  return connector, engine, view
 
 
 def assign_ids(rows, idtype):
@@ -76,9 +114,8 @@ class WrappedSession(object):
     session wrapper of sql alchemy with auto cleanup
     :param engine:
     """
-    from sqlalchemy.orm import sessionmaker, scoped_session
     _log.info('creating session')
-    self._session = scoped_session(sessionmaker(bind=engine))()
+    self._session = configs.create_session(engine)
     self._supports_array_parameter = _supports_sql_parameters(engine.name)
 
   def execute(self, sql, **kwargs):
@@ -89,7 +126,7 @@ class WrappedSession(object):
     :return: the session result
     """
     parsed = to_query(sql, self._supports_array_parameter, kwargs)
-    _log.info(parsed)
+    _log.info('%s (%s)', parsed, kwargs)
     return self._session.execute(parsed, kwargs)
 
   def run(self, sql, **kwargs):
@@ -100,7 +137,7 @@ class WrappedSession(object):
     :return: list of dicts
     """
     parsed = to_query(sql, self._supports_array_parameter, kwargs)
-    _log.info(parsed)
+    _log.info('%s (%s)', parsed, kwargs)
     result = self._session.execute(parsed, kwargs)
     columns = result.keys()
     return [{c: r[c] for c in columns} for r in result]
@@ -111,10 +148,26 @@ class WrappedSession(object):
   def __enter__(self):
     return self
 
+  def commit(self):
+    self._session.commit()
+
+  def flush(self):
+    self._session.flush()
+
+  def rollback(self):
+    self._session.rollback()
+
+  def _destroy(self):
+    if self._session:
+      _log.info('removing session again')
+      self._session.close()
+      self._session = None
+
+  def __del__(self):
+    self._destroy()
+
   def __exit__(self, exc_type, exc_val, exc_tb):
-    _log.info('removing session again')
-    self._session.close()
-    self._session = None
+    self._destroy()
 
 
 def session(engine):
@@ -201,7 +254,6 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   replacements = replacements or {}
   arguments = arguments or {}
   replacements = _handle_aggregated_score(view, config, replacements, arguments)
-  secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
   # convert to index lookup
   kwargs = {}
@@ -218,7 +270,8 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       parser = info.type if info and info.type is not None else lambda x: x
       try:
         if info and info.as_list:
-          value = [parser(v) for v in arguments.getlist(lookup_key)]
+          vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
+          value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
         else:
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
@@ -256,10 +309,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
   :param filters: the dict of dynamically build filter
   :return: (r, view) tuple of the resulting rows and the resolved view
   """
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
@@ -278,10 +328,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
 
 
 def get_query(database, view_name, replacements=None, arguments=None, extra_sql_argument=None):
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
   kwargs, replace = prepare_arguments(view, config, replacements, arguments, extra_sql_argument)
 
@@ -290,36 +337,27 @@ def get_query(database, view_name, replacements=None, arguments=None, extra_sql_
   if callable(query):
     return dict(query='custom function', args=kwargs)
 
-  return dict(query=query.format(**replace), args=kwargs)
+  return dict(query=clean_query(query.format(**replace)), args=kwargs)
 
 
 def get_filtered_data(database, view_name, args):
-  config, _ = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
+  config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  view = config.views[view_name]
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   return get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
 
 def get_filtered_query(database, view_name, args):
-  config, _ = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
+  config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  view = config.views[view_name]
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   return get_query(database, view_name, replacements, processed_args, extra_args)
 
 
 def _get_count(database, view_name, args):
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
   replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
 
@@ -369,11 +407,13 @@ def get_count_query(database, view_name, args):
   return dict(query=count_query.format(**replace), args=kwargs)
 
 
-def _fill_up_columns(view, engine):
-  _log.info('fill up view')
-  # update the real object
-  columns = view.columns
-  for col in get_columns(engine, view.table):
+def derive_columns(table_name, engine, columns=None):
+  """
+  helper function to derive the columns of a table
+  """
+  columns = columns or {}
+
+  for col in get_columns(engine, table_name):
     name = col['column']
     if name in columns:
       # merge
@@ -390,29 +430,35 @@ def _fill_up_columns(view, engine):
   categorical_columns = [k for k, col in columns.items() if col['type'] == 'categorical' and 'categories' not in col]
   if number_columns or categorical_columns:
     with session(engine) as s:
-      table = view.table
       if number_columns:
         template = u'min({col}) as {col}_min, max({col}) as {col}_max'
         minmax = ', '.join(template.format(col=col) for col in number_columns)
-        row = next(iter(s.execute(u"""SELECT {minmax} FROM {table}""".format(table=table, minmax=minmax))))
+        row = next(iter(s.execute(u"""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))
         for num_col in number_columns:
           columns[num_col]['min'] = row[num_col + '_min']
           columns[num_col]['max'] = row[num_col + '_max']
       for col in categorical_columns:
-        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} <> '' and {col} is not NULL ORDER BY {col} ASC"""
-        cats = s.execute(template.format(col=col, table=table))
+        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} is not NULL"""
+        if _differentiates_empty_string_and_null(engine.name):
+          template += u""" AND {col} <> ''"""
+        template += u""" ORDER BY {col} ASC"""
+        cats = s.execute(template.format(col=col, table=table_name))
         columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
 
+  return columns
+
+
+def _fill_up_columns(view, engine):
+  _log.info('fill up view')
+  # update the real object
+  view.columns = derive_columns(view.table, engine, view.columns)
   view.columns_filled_up = True
 
 
 def _lookup(database, view_name, query, page, limit, args):
-  config, engine = resolve(database)
-  if view_name not in config.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
-  view = config.views[view_name]
+  config, engine, view = resolve_view(database, view_name)
 
-  arguments = args.copy()
+  arguments = MultiDict(args)
   offset = page * limit
   # replace with wildcard version
   arguments['query'] = u'%{}%'.format(query)

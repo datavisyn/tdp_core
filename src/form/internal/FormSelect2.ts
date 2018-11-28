@@ -79,7 +79,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
 
   private readonly listener = () => {
     this.fire(FormSelect2.EVENT_CHANGE, this.value, this.$select);
-  }
+  };
 
   /**
    * Constructor
@@ -112,7 +112,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     });
     const df = this.desc.options.data;
     const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
-    this.$select = this.buildSelect2($select, this.desc.options || {}, data);
+    this.buildSelect2($select, this.desc.options || {}, data);
 
 
     // propagate change action with the data of the selected option
@@ -149,10 +149,14 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     }
     mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
 
-    const $s = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
+    this.$select = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial
-    this.previousValue = this.resolveValue($s.select2('data'));
-    return $s;
+    this.previousValue = this.resolveValue(this.$select.select2('data'));
+
+    if (defaultVal) {
+      this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
+    }
+    return this.$select;
   }
 
   private resolveValue(items: ISelect2Option[]) {
@@ -222,6 +226,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
       // TODO doesn't work for AJAX based solutions
       this.$select.val(r).trigger('change');
       this.previousValue = this.value; // force set
+      this.updateStoredValue();
     } finally {
       this.$select.on('change.propagate', this.listener);
     }

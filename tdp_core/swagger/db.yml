@@ -1,0 +1,368 @@
+openapi: 3.0.0
+tags:
+  - name: db
+    description: database api
+  - name: query_generic
+    description: generic queries
+  - name: query_score
+    description: score queries
+  - name: query_lookup
+    description: lookup queries
+paths:
+  /db/:
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: sql.list_databases
+      description: list all known databases
+      tags:
+        - db
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfDatabases
+                type: array
+                items:
+                  $ref: '#/components/schemas/database'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+  '/db/{database}/':
+    parameters:
+      - $ref: '#/components/parameters/database'
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: sql.list_view
+      description: list all views of a given database
+      tags:
+        - db
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfViews
+                type: array
+                items:
+                  $ref: '#/components/schemas/view'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/db/{database}/{view}':
+    parameters:
+      - $ref: '#/components/parameters/database'
+      - $ref: '#/components/parameters/view'
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: sql.get_filtered_data
+      description: see the base version with additional filter possiblities
+      tags:
+        - db
+        - query_generic
+      parameters:
+        - $ref: '#/components/parameters/returnQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/entries_generic'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/db/{database}/{view}/score':
+    parameters:
+      - $ref: '#/components/parameters/database'
+      - $ref: '#/components/parameters/view'
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: sql.get_score_data
+      description: >-
+        see the base version with additional filter possibilities and score
+        mapping
+      tags:
+        - db
+        - query_score
+      parameters:
+        - $ref: '#/components/parameters/returnQuery'
+        - $ref: '#/components/parameters/format'
+        - $ref: '#/components/parameters/scoreTarget'
+      responses:
+        '200':
+          $ref: '#/components/responses/queryScore'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/db/{database}/{view}/count':
+    parameters:
+      - $ref: '#/components/parameters/database'
+      - $ref: '#/components/parameters/view'
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: sql.get_count_data
+      description: see the base version but returns just the number of results
+      tags:
+        - db
+        - query_generic
+      responses:
+        '200':
+          $ref: '#/components/responses/queryCount'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/db/{database}/{view}/desc':
+    parameters:
+      - $ref: '#/components/parameters/database'
+      - $ref: '#/components/parameters/view'
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: sql.get_desc
+      description: returns the description information of the given view
+      tags:
+        - db
+        - query_generic
+      responses:
+        '200':
+          $ref: '#/components/responses/queryDesc'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+  '/db/{database}/{view}/lookup':
+    parameters:
+      - $ref: '#/components/parameters/database'
+      - $ref: '#/components/parameters/view'
+    get:
+      x-swagger-router-controller: tdp_core
+      operationId: sql.lookup
+      description: lookups up the given query term using this view
+      tags:
+        - db
+        - query_lookup
+      parameters:
+        - $ref: '#/components/parameters/lookupQuery'
+        - $ref: '#/components/parameters/lookupPage'
+        - $ref: '#/components/parameters/lookupLimit'
+      responses:
+        '200':
+          $ref: '#/components/responses/queryLookup'
+        '403':
+          $ref: '#/components/responses/notAllowed'
+        '404':
+          $ref: '#/components/responses/notFound'
+components:
+  parameters:
+    database:
+      name: database
+      description: the database key
+      in: path
+      required: true
+      schema:
+        type: string
+    view:
+      name: view
+      description: the view name
+      in: path
+      required: true
+      schema:
+        type: string
+    returnQuery:
+      name: _return_query
+      in: query
+      schema:
+        type: boolean
+        default: false
+      required: false
+    format:
+      name: _format
+      in: query
+      schema:
+        type: string
+        enum:
+          - json
+          - csv
+      required: false
+    lookupQuery:
+      name: query
+      in: query
+      required: true
+      description: the search string
+      schema:
+        type: string
+    lookupPage:
+      name: page
+      in: query
+      required: false
+      description: result page
+      schema:
+        type: integer
+        default: 0
+    lookupLimit:
+      name: limit
+      in: query
+      required: false
+      description: number of results per page
+      schema:
+        type: integer
+        default: 30
+    scoreTarget:
+      name: target
+      in: query
+      required: false
+      description: target idtype to map the resulting scores to
+      schema:
+        type: string
+  responses:
+    queryDesc:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            title: column description
+            type: object
+            properties:
+              idType:
+                type: string
+                description: the IDType of resulting rows
+              columns:
+                $ref: '#/components/schemas/columns'
+    queryLookup:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            title: column description
+            type: object
+            properties:
+              more:
+                type: boolean
+                description: whether more results exists
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: integer
+                    description: the system wide unique id
+                  id:
+                    type: string
+                    description: the id of the found entry
+                  text:
+                    type: string
+                    description: label that matched the given query
+    queryCount:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - title: number of records
+                type: integer
+              - $ref: '#/components/schemas/returnQueryResult'
+    queryScore:
+      description: Successful response
+      content:
+        text/csv:
+          schema:
+            type: string
+        application/json:
+          schema:
+            title: ArrayOfRows
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+              additionalProperties: true
+    entries_generic:
+      description: Successful response
+      content:
+        text/csv:
+          schema:
+            type: string
+        application/json:
+          schema:
+            title: ArrayOfRows
+            type: array
+            items:
+              type: object
+              additionalProperties: true
+  schemas:
+    database:
+      type: string
+    view:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        arguments:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+        query:
+          type: string
+        columns:
+          $ref: '#/components/schemas/columns'
+        idType:
+          type: string
+        filters:
+          type: array
+          items:
+            type: string
+        queries:
+          type: object
+          additionalProperties: true
+      required:
+        - name
+        - description
+        - arguments
+        - query
+    columns:
+      type: array
+      description: list of columns
+      items:
+        $ref: '#/components/schemas/column'
+    column:
+      type: object
+      properties:
+        column:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+            - categorical
+            - number
+            - string
+        min:
+          type: number
+        max:
+          type: number
+        categories:
+          type: array
+          items:
+            type: string
+      required:
+        - column
+        - type
+        - label
+      additionalProperties: true
+    returnQueryResult:
+      type: object
+      properties:
+        query:
+          type: string
+        args:
+          type: object
+          additionalProperties: true
+      required:
+        - query
+        - args

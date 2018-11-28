@@ -2,26 +2,31 @@
  * Created by sam on 13.02.2017.
  */
 
-import {createSelectionDesc, createAggregateDesc, IColumnDesc} from 'lineupjs/src/model';
-import {ICategory} from 'lineupjs/src/model/ICategoricalColumn';
+import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
 import {extent} from 'd3';
 import {IAnyVector} from 'phovea_core/src/vector';
 import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
-import ADataProvider from 'lineupjs/src/provider/ADataProvider';
 import {IServerColumn} from '../rest';
-import {deriveHierarchy, ICategoryNode, isHierarchical} from 'lineupjs/src/model/HierarchyColumn';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
   selectedSubtype?: string;
+  initialRanking: boolean;
 }
 
 export interface IColumnOptions {
   /**
    * visible by default
    * @default true
+   * @deprecated use initialRanking
    */
-  visible: boolean;
+  visible?: boolean;
+
+  /**
+   * part of the initial ranking by default
+   * @default true
+   */
+  initialRanking: boolean;
   /**
    * custom label instead of the column name
    * @default column
@@ -55,7 +60,7 @@ function baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdd
     column,
     label: column,
     color: '',
-    visible: true,
+    initialRanking: options.visible != null ? options.visible: true,
     width: -1,
     selectedId: -1,
     selectedSubtype: undefined
@@ -80,7 +85,7 @@ export function numberColFromArray(column: string, rows: any[], options: Partial
 export function numberCol(column: string, min: number, max: number, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {
     type: 'number',
-    domain: [min, max],
+    domain: [min, max]
   });
 }
 
@@ -88,11 +93,11 @@ export function numberCol(column: string, min: number, max: number, options: Par
 /**
  * creates a new LineUp description for a categorical column
  * @param {string} column the column name to use
- * @param {(string | ICategory)[]} categories description of the categories
+ * @param {(string | Partial<ICategory>)[]} categories description of the categories
  * @param {Partial<IColumnOptions>} options
  * @returns {IAdditionalColumnDesc}
  */
-export function categoricalCol(column: string, categories: (string|ICategory)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+export function categoricalCol(column: string, categories: (string|Partial<ICategory>)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   if (isHierarchical(categories)) {
     return hierarchicalCol(column, deriveHierarchy(<any[]>categories), options);
   }
@@ -117,6 +122,21 @@ export function hierarchicalCol(column: string, hierarchy: ICategoryNode, option
 export function stringCol(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
   return Object.assign(baseColumn(column, options), {});
 }
+
+/**
+ * creates a new LineUp description for a link column
+ * @param {string} column the column name to use
+ * @param {string} linkPattern the pattern to resolve links from values, $1 will be replaced by the current value, $2 with the URL encoded version of it
+ * @param {Partial<IColumnOptions>} options
+ * @returns {IAdditionalColumnDesc}
+ */
+export function linkCol(column: string, linkPattern: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  return Object.assign(stringCol(column, options), {
+    pattern: linkPattern,
+    renderer: 'link'
+  });
+}
+
 
 /**
  * creates a new LineUp description for a boolean column
@@ -161,17 +181,55 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
   return r;
 }
 
-export function createInitialRanking(provider: ADataProvider) {
-  const ranking = provider.pushRanking();
-  ranking.insert(provider.create(createAggregateDesc()), 0);
-  ranking.push(provider.create(createSelectionDesc()));
+export interface IInitialRankingOptions {
+  aggregate: boolean;
+  selection: boolean;
+  rank: boolean;
+  order: string[];
+}
 
-  provider.getColumns().filter((d) => (<any>d).visible !== false).forEach((d) => {
-    const col = provider.create(d);
-    // set initial column width
-    if (typeof (<any>d).width === 'number' && (<any>d).width > -1) {
-      col.setWidth((<any>d).width);
+export function createInitialRanking(provider: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
+  const o: Readonly<IInitialRankingOptions> = Object.assign({
+    aggregate: true,
+    selection: true,
+    rank: true,
+    order: []
+  }, options);
+
+  const ranking = provider.pushRanking();
+  const r = ranking.find((d) => d.desc.type === 'rank');
+  if (o.rank) {
+    if (!r) {
+      ranking.insert(provider.create(createRankDesc()), 0);
     }
+  } else if (r) {
+    r.removeMe();
+  }
+
+  if (o.aggregate) {
+    ranking.insert(provider.create(createAggregateDesc()), 0);
+  }
+  if (o.selection) {
+    ranking.push(provider.create(createSelectionDesc()));
+  }
+
+  const resolve = () => {
+    const all = provider.getColumns();
+    const cols: IColumnDesc[] = [];
+    o.order.forEach((c) => {
+      const col = all.find((d) => (<any>d).column === c || d.label === c);
+      if (col) {
+        cols.push(col);
+      }
+    });
+    return cols;
+  };
+
+  const visibles: IColumnDesc[] = provider.getColumns().filter((d: any) => (<IAdditionalColumnDesc>d).initialRanking);
+  const descs = o.order.length > 0 ? resolve() : visibles;
+
+  descs.forEach((d) => {
+    const col = provider.create(d);
     ranking.push(col);
   });
 }
@@ -188,4 +246,41 @@ export function deriveColumns(columns: IServerColumn[]) {
         return stringCol(col.column, {label: niceName(col.label)});
     }
   });
+}
+
+
+function isHierarchical(categories: (string | Partial<ICategory>)[]) {
+  if (categories.length === 0 || typeof categories[0] === 'string') {
+    return false;
+  }
+  // check if any has a given parent name
+  return categories.some((c) => (<any>c).parent != null);
+}
+
+function deriveHierarchy(categories: (Partial<ICategory> & { parent: string | null })[]) {
+  const lookup = new Map<string, ICategoryNode>();
+  categories.forEach((c) => {
+    const p = c.parent || '';
+    // set and fill up proxy
+    const item = Object.assign(<ICategoryNode>{
+      children: [],
+      label: c.name!,
+      name: c.name!,
+      color: Column.DEFAULT_COLOR,
+      value: 0
+    }, lookup.get(c.name!) || {}, c);
+    lookup.set(c.name!, item);
+
+    if (!lookup.has(p)) {
+      // create proxy
+      lookup.set(p, {name: p, children: [], label: p, value: 0, color: Column.DEFAULT_COLOR});
+    }
+    lookup.get(p)!.children.push(item);
+  });
+  const root = lookup.get('')!;
+  console.assert(root !== undefined, 'hierarchy with no root');
+  if (root.children.length === 1) {
+    return root.children[0];
+  }
+  return root;
 }
