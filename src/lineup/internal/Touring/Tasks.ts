@@ -78,14 +78,14 @@ export abstract class ATouringTask implements ITouringTask{
     let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
                                                   .attr('id','gradLegend');    
     svgDefs.append('stop')
-            .attr('offset','25%')
-            .attr('stop-color','#FFFFFF');
+            .attr('offset','0%')
+            .attr('stop-color','#000000');
+    // svgDefs.append('stop')
+    //         .attr('offset','50%')
+    //         .attr('stop-color','#F1F1F1');
     svgDefs.append('stop')
-            .attr('offset','50%')
-            .attr('stop-color','#F1F1F1');
-    svgDefs.append('stop')
-            .attr('offset','100%')
-            .attr('stop-color','#000000'); 
+            .attr('offset','5%')
+            .attr('stop-color','#FFFFFF'); 
     
     let xStart = 0;
     let yStart = 0;
