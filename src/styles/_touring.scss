@@ -249,7 +249,7 @@ div.touring {
     // ------ scattter plot with D3
     g.scatterplot circle.datapoint{
       stroke: none;
-      opacity: 0.2;
+      opacity: 1;
       fill: black;
     }
     g.scatterplot circle.datapoint:hover{
