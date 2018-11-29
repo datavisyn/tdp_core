@@ -10,7 +10,7 @@ export default class LineUpColors {
   private colors: string[];
 
   init(ranking: Ranking) {
-    let colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));
+    const colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));
     // remove colors that are already in use from the list
     ranking.flatColumns.forEach((d) => {
       const i = colors.indexOf(d.color);
