@@ -121,19 +121,19 @@ export default class TouringPanel extends LineUpPanelActions {
       descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
 
       // Generate an attribute description that represents the current stratification
-      descriptions.push(this.ranking.getStratificationDesc());
-      descriptions.push(this.ranking.getRankDesc());
+      descriptions.unshift(this.ranking.getStratificationDesc());
+      descriptions.unshift(this.ranking.getRankDesc());
       // Generate a Attribute description that represents the current selection
-      descriptions.push(this.ranking.getSelectionDesc());
-      descriptions.push({ //There is always at least the rank as numerical column
+      descriptions.unshift(this.ranking.getSelectionDesc());
+      descriptions.unshift({ //There is always at least the rank as numerical column
         label: 'All Numerical Columns',
         type: 'num_collection'
       });
-      descriptions.push({ //There is always at least the selection as categorical column
+      descriptions.unshift({ //There is always at least the selection as categorical column
         label: 'All Categorical Columns',
         type: 'cat_collection'
       });
-      descriptions.push({ // at least selection & rank
+      descriptions.unshift({ // at least selection & rank
         label: 'All Columns',
         type: 'collection'
       })
