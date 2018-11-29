@@ -84,7 +84,7 @@ export abstract class ATouringTask implements ITouringTask{
     //         .attr('offset','50%')
     //         .attr('stop-color','#F1F1F1');
     svgDefs.append('stop')
-            .attr('offset','5%')
+            .attr('offset','25%')
             .attr('stop-color','#FFFFFF'); 
     
     let xStart = 0;
@@ -176,11 +176,11 @@ export abstract class ATouringTask implements ITouringTask{
                                     .classed('detailVis',true);
   
     // let detailTestType = divDetailInfo.append('div');
-    divDetailInfo.append('div')
-                  .classed('detailDiv',true)
-                  .text('Test: ')
-                  .append('span')
-                  .text(measure.label);
+    // divDetailInfo.append('div')
+    //               .classed('detailDiv',true)
+    //               .text('Test: ')
+    //               .append('span')
+    //               .text();
   
     // let detailTestValue = divDetailInfo.append('div');
     let scoreValue = measureResult.scoreValue.toFixed(3);
@@ -190,7 +190,7 @@ export abstract class ATouringTask implements ITouringTask{
                           // .text(`Test-Value: ${scoreValue}, p-Value: ${pValue}`);
     detailInfoValues.append('span')
                     .classed('detail-label',true)
-                    .text('Test-Value: ');
+                    .text(measure.label + ': ');
     detailInfoValues.append('span')
                     .text(scoreValue);    
     
