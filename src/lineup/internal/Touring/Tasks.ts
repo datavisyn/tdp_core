@@ -331,7 +331,7 @@ export class ColumnComparison extends ATouringTask {
         for (let j of row.keys()) {
           if (j > 0) {
             const measures = MethodManager.getMeasuresByType(Type.get(attr1[j - 1].type), Type.get(attr2[i].type), SCOPE.ATTRIBUTES); 
-            if (measures.length > 0 && j <= i+1) { // start at 
+            if (measures.length > 0 && j <= i) { // start at 
               const measure = measures[0]// Always the first
               const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1]as IServerColumn).column) //minus one because the first column is headers
               const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as IServerColumn).column);
@@ -348,6 +348,8 @@ export class ColumnComparison extends ATouringTask {
               })
                 .catch((err) => row[j] = {label: 'err'})
               ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
+            } else if (j-1 == i) {
+              row[j] = { label: '--' };
             } else {
               row[j] = ''; // empty (not null, because null will display spinning wheel)
             }
