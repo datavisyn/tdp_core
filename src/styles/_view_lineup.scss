@@ -271,4 +271,8 @@ $lu_assets: '~lineupjs/src/assets';
   .lu-side-panel > main > section::before {
     content: 'Column Summaries';
   }
+
+  .lu-hierarchy .lu-search::before {
+    height: 19px;
+  }
 }

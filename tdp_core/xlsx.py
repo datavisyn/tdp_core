@@ -1,0 +1,153 @@
+from phovea_server.ns import Namespace, request, abort, Response
+from phovea_server.util import jsonify
+from openpyxl import Workbook, load_workbook
+from openpyxl.worksheet.write_only import WriteOnlyCell
+from openpyxl.styles import Font
+from tempfile import NamedTemporaryFile
+from datetime import datetime
+import dateutil.parser
+import logging
+
+__author__ = 'Samuel Gratzl'
+_log = logging.getLogger(__name__)
+app = Namespace(__name__)
+
+
+_types = dict(b='boolean', s='string')
+
+
+def to_type(cell):
+  if not cell:
+    return 'string'
+  if cell.is_date:
+    return 'date'
+  if cell.data_type in _types:
+    return _types[cell.data_type]
+  v = cell.value
+  if isinstance(v, int) or isinstance(v, long):
+    return 'int'
+  if isinstance(v, float):
+    return 'float'
+  return 'string'
+
+
+def _convert_value(v):
+  if isinstance(v, datetime):
+    return v.isoformat()
+  return v
+
+
+@app.route('/to_json', methods=['POST'])
+def _xlsx2json():
+  file = request.files.get('file')
+  if not file:
+    abort(403, 'missing file')
+
+  wb = load_workbook(file, read_only=True)
+
+  def convert_row(row, cols):
+    result = {}
+
+    for r, c in zip(cols, row):
+      result[c['name']] = _convert_value(r.value)
+
+    return result
+
+  def convert_sheet(ws):
+
+    ws_rows = ws.iter_rows()
+    ws_cols = next(ws_rows, [])
+    ws_first_row = next(ws_rows, [])
+
+    cols = [dict(name=h.value, type=to_type(r)) for h, r in zip(ws_cols, ws_first_row)]
+
+    rows = []
+    rows.append(convert_row(cols, ws_first_row))
+    for row in ws_rows:
+      rows.append(convert_row(cols, row))
+
+    return dict(title=ws.title, columns=cols, rows=rows)
+
+  data = dict(
+    sheets=[convert_sheet(ws) for ws in wb.worksheets]
+  )
+
+  return jsonify(data)
+
+
+@app.route('/to_json_array', methods=['POST'])
+def _xlsx2json_array():
+  file = request.files.get('file')
+  if not file:
+    abort(403, 'missing file')
+
+  wb = load_workbook(file, read_only=True)
+
+  def convert_row(row):
+    return [unicode(_convert_value(cell.value)) for cell in row]
+
+  if not wb.worksheets:
+    return jsonify([])
+
+  ws = wb.worksheets[0]
+
+  rows = [convert_row(row) for row in ws.iter_rows()]
+  return jsonify(rows)
+
+
+@app.route('/from_json', methods=['POST'])
+def _json2xlsx():
+  data = request.json
+  wb = Workbook(write_only=True)
+
+  bold = Font(bold=True)
+
+  def to_header(v):
+    c = WriteOnlyCell(ws, value=v)
+    c.font = bold
+    return c
+
+  def to_value(v, coltype):
+    if coltype == 'date':
+      if isinstance(v, int) or isinstance(v, long):
+        return datetime.fromtimestamp(v)
+      return dateutil.parser.parse(v)
+    return v
+
+  for sheet in data.get('sheets', []):
+    ws = wb.create_sheet(title=sheet['title'])
+    cols = sheet['columns']
+
+    ws.append(to_header(col['name']) for col in cols)
+
+    for row in sheet['rows']:
+      ws.append(to_value(row.get(col['name'], None), col['type']) for col in cols)
+
+  with NamedTemporaryFile() as tmp:
+    wb.save(tmp.name)
+    tmp.seek(0)
+    s = tmp.read()
+    return Response(s, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+@app.route('/from_json_array', methods=['POST'])
+def _json_array2xlsx():
+  data = request.json
+  wb = Workbook(write_only=True)
+  ws = wb.create_sheet()
+
+  for row in data:
+    ws.append(row)
+
+  with NamedTemporaryFile() as tmp:
+    wb.save(tmp.name)
+    tmp.seek(0)
+    s = tmp.read()
+    return Response(s, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+def create():
+  """
+   entry point of this plugin
+  """
+  return app
