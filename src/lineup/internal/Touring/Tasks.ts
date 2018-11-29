@@ -67,78 +67,107 @@ export abstract class ATouringTask implements ITouringTask{
   private createLegend(parentElement: d3.Selection<any>)
   {
     let divLegend = parentElement.append('div').classed('measure-legend',true);
+    let svgWidth = Number(divLegend.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
+
     let svgLegendContainer = divLegend.append('svg')
                               .attr('width','100%')
-                              .attr('height',70);
+                              .attr('height',35);
+                              // .attr('viewBox','0 0 100% 35')
+                              // .attr('preserveAspectRatio','xMaxYMin meet');
 
     let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
                                                   .attr('id','gradLegend');    
     svgDefs.append('stop')
-            .attr('offset','0%')
-            .attr('stop-color','#A9A9A9'); 
+            .attr('offset','25%')
+            .attr('stop-color','#FFFFFF');
     svgDefs.append('stop')
             .attr('offset','50%')
-            .attr('stop-color','#FFFFFF'); 
+            .attr('stop-color','#F1F1F1');
+    svgDefs.append('stop')
+            .attr('offset','100%')
+            .attr('stop-color','#000000'); 
     
-    let xStart = 10;
-    let yStart = 25;
-    let barWidth = 150;
-    let barHeight = 15;
-    let barSpace = 10;
+    let xStart = 0;
+    let yStart = 0;
+    let barWidth = 300;
+    let barHeight = 10;
+    let space = 5;
     let textHeight = 15;
-
-    let svgLegendLabel = svgLegendContainer.append('g');
-    let svgLabel = svgLegendLabel.append('text')
-    .attr('x',5)
-    .attr('y',15)
-    .attr('text-anchor','start')
-    .text('p-value:');
-
-    
-
-    let svgLegendGroup = svgLegendContainer.append('g');
-    let svgRect1 = svgLegendGroup.append('rect')
-                                .attr('x',xStart)
-                                .attr('y',yStart)
-                                .attr('width',barWidth)
-                                .attr('height',barHeight)
-                                .style('fill','url(#gradLegend)')
-                                .style('stroke-width',1)
-                                .style('stroke','black');
-    let svgText11 = svgLegendGroup.append('text')
+    let textWidth = 50;
+    let tickLength = 5;
+    let lineWidth = 1;
+    let xSize = barWidth + textWidth + 5;
+    let xPos = Math.floor(svgWidth - xSize);
+    console.log('legend:', {svgWidth,xSize,xPos});
+    xStart = xStart + textWidth;
+    let svgLegend = svgLegendContainer.append('g').style('transform', `translate(${xPos}px, 0)`);
+    let svgLegendLabel = svgLegend.append('g');
+    // label
+    svgLegendLabel.append('text')
     .attr('x',xStart)
-    .attr('y',yStart+barHeight+textHeight)
-    .attr('text-anchor','start')
-    .text('0');
-    let svgText12 = svgLegendGroup.append('text')
-    .attr('x',xStart+barWidth/2)
-    .attr('y',yStart+barHeight+textHeight)
-    .attr('text-anchor','middle')
-    .text('0.05');
-    let svgText13 = svgLegendGroup.append('text')
-    .attr('x',xStart+barWidth)
-    .attr('y',yStart+barHeight+textHeight)
+    .attr('y',yStart+barHeight)
     .attr('text-anchor','end')
-    .text('0.1');
-    let svgRect2 = svgLegendGroup.append('rect')
-                                .attr('x',xStart+barWidth+barSpace)
-                                .attr('y',yStart)
-                                .attr('width',barWidth)
-                                .attr('height',barHeight)
-                                .style('fill','white')
-                                .style('stroke-width',1)
-                                .style('stroke','black');
+    .text('p-Value');
 
-    let svgText21 = svgLegendGroup.append('text')
-    .attr('x',xStart+barWidth+barSpace)
-    .attr('y',yStart+barHeight+textHeight)
-    .attr('text-anchor','start')
-    .text('0.1');
-    let svgText22 = svgLegendGroup.append('text')
-    .attr('x',xStart+barWidth+barSpace+barWidth)
-    .attr('y',yStart+barHeight+textHeight)
-    .attr('text-anchor','end')
-    .text('1');
+    xStart = xStart + space;
+
+    let svgLegendGroup = svgLegend.append('g');
+    // bar + bottom line
+    svgLegendGroup.append('rect')
+      .attr('x',xStart).attr('y',yStart)
+      .attr('width',barWidth)
+      .attr('height',barHeight)
+      .style('fill','url(#gradLegend)');
+    svgLegendGroup.append('line')
+      .attr('x1',xStart).attr('y1',yStart+barHeight)
+      .attr('x2',xStart+barWidth).attr('y2',yStart+barHeight)
+      .style('stroke-width',lineWidth).style('stroke','black');
+
+    // label: 0 + tick
+    svgLegendGroup.append('text')
+      .attr('x',xStart).attr('y',yStart+barHeight+textHeight)
+      .attr('text-anchor','middle').text('0');
+    svgLegendGroup.append('line')
+      .attr('x1',xStart).attr('y1',yStart)
+      .attr('x2',xStart).attr('y2',yStart+barHeight-(lineWidth/2)+tickLength)
+      .style('stroke-width',lineWidth/2).style('stroke','black');
+
+    // label: 0.05 + tick
+    svgLegendGroup.append('text')
+      .attr('x',xStart+(barWidth*0.25)).attr('y',yStart+barHeight+textHeight)
+      .attr('text-anchor','middle').text('0.05');
+    svgLegendGroup.append('line')
+      .attr('x1',xStart+(barWidth*0.25)).attr('y1',yStart+barHeight-(lineWidth/2))
+      .attr('x2',xStart+(barWidth*0.25)).attr('y2',yStart+barHeight-(lineWidth/2)+tickLength)
+      .style('stroke-width',lineWidth/2).style('stroke','black');  
+
+      // label: 0.05 + tick
+    svgLegendGroup.append('text')
+      .attr('x',xStart+(barWidth*0.5)).attr('y',yStart+barHeight+textHeight)
+      .attr('text-anchor','middle').text('0.1');
+    svgLegendGroup.append('line')
+      .attr('x1',xStart+(barWidth*0.5)).attr('y1',yStart+barHeight-(lineWidth/2))
+      .attr('x2',xStart+(barWidth*0.5)).attr('y2',yStart+barHeight-(lineWidth/2)+tickLength)
+      .style('stroke-width',lineWidth/2).style('stroke','black');  
+
+    // label: 0.5 + tick
+    svgLegendGroup.append('text')
+      .attr('x',xStart+(barWidth*0.75)).attr('y',yStart+barHeight+textHeight)
+      .attr('text-anchor','middle').text('0.5');
+    svgLegendGroup.append('line')
+      .attr('x1',xStart+(barWidth*0.75)).attr('y1',yStart+barHeight-(lineWidth/2))
+      .attr('x2',xStart+(barWidth*0.75)).attr('y2',yStart+barHeight-(lineWidth/2)+tickLength)
+      .style('stroke-width',lineWidth/2).style('stroke','black');
+
+    // label: 1 + tick
+    svgLegendGroup.append('text')
+      .attr('x',xStart+barWidth).attr('y',yStart+barHeight+textHeight)
+      .attr('text-anchor','middle').text('1');
+    svgLegendGroup.append('line')
+      .attr('x1',xStart+barWidth).attr('y1',yStart)
+      .attr('x2',xStart+barWidth).attr('y2',yStart+barHeight-(lineWidth/2)+tickLength)
+      .style('stroke-width',lineWidth/2).style('stroke','black');  
+
   }
 
   private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
@@ -227,7 +256,7 @@ export class ColumnComparison extends ATouringTask {
   constructor() {
     super();
     this.id = "attrCmp";
-    this.label = "Compare Columns pairwise";
+    this.label = "Compare Columns Pairwise";
 
     this.scope = SCOPE.ATTRIBUTES;
   }
@@ -338,7 +367,7 @@ export abstract class RowComparison extends ATouringTask {
   constructor() {
     super();
     this.id = "itemCmp";
-    this.label = "Pairwise compare rows";
+    this.label = "Pairwise Compare Rows";
 
     this.scope = SCOPE.SETS;
   }
@@ -677,7 +706,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
   constructor() {
     super();
     this.id = "pairStratCmp";
-    this.label = "Compare Stratification Groups pairwise"
+    this.label = "Compare Stratification Groups Pairwise"
   }
 
   update(data: any) {
@@ -786,7 +815,7 @@ export function score2color(score:number) : {background: string, foreground: str
 
   if(score <= 0.05) {
     // console.log('bg color cahnge')
-    let calcColor = d3.scale.linear().domain([0.05, 1]).range(<any[]>['#A9A9A9', '#FFFFFF']);
+    let calcColor = d3.scale.linear().domain([0.05, 1]).range(<any[]>['#000000', '#FFFFFF']);
                                       
     background = calcColor(score).toString();
     foreground = d3.hsl(background).l > 0.5 ? '#333333' : 'white'

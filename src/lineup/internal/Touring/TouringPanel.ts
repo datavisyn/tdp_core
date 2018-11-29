@@ -126,15 +126,15 @@ export default class TouringPanel extends LineUpPanelActions {
       // Generate a Attribute description that represents the current selection
       descriptions.unshift(this.ranking.getSelectionDesc());
       descriptions.unshift({ //There is always at least the rank as numerical column
-        label: 'All numerical columns',
+        label: 'All Numerical Columns',
         type: 'num_collection'
       });
       descriptions.unshift({ //There is always at least the selection as categorical column
-        label: 'All categorical columns',
+        label: 'All Categorical Columns',
         type: 'cat_collection'
       });
       descriptions.unshift({ // at least selection & rank
-        label: 'All columns',
+        label: 'All Columns',
         type: 'collection'
       })
 
