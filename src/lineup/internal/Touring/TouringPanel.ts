@@ -118,7 +118,7 @@ export default class TouringPanel extends LineUpPanelActions {
       // and an entry representing the numerical attributes (if there are any)
       // and an entry representing the categorical attributes (if there are any)
       // and an entry representing all these attributes
-      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)).reverse(); // filter attributes by type
+      descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)); // filter attributes by type
 
       // Generate an attribute description that represents the current stratification
       descriptions.push(this.ranking.getStratificationDesc());
