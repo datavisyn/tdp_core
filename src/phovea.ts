@@ -40,4 +40,12 @@ export default function (registry: IRegistry) {
   actionFunction('lineupSetColumn', 'setColumnImpl', () => System.import('./lineup/internal/cmds'));
   actionFunction('lineupAddColumn', 'addColumnImpl', () => System.import('./lineup/internal/cmds'));
   actionFunction('lineupMoveColumn', 'moveColumnImpl', () => System.import('./lineup/internal/cmds'));
+
+
+  registry.push('tdpView', 'messageTest', () => System.import('./views/messaging/MessagingProxyView'), {
+    name: 'MesssageTest',
+    idtype: 'Ensembl',
+    selection: 'some',
+    site: 'http://127.0.0.1:5700/'
+  });
 }
