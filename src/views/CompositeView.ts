@@ -15,7 +15,6 @@ import {
 import {
   horizontalSplit,
   horizontalStackedLineUp,
-  IBuildAbleOrViewLike,
   root,
   tabbing,
   verticalSplit,
@@ -92,6 +91,60 @@ function unprefix(name: string) {
     rest: name.slice(index + 1)
   };
 }
+
+
+class WrapperView implements ILayoutView {
+  private _visible = true;
+
+  constructor(public readonly instance: IView, public readonly key: string) {
+  }
+
+  get minSize() {
+    const given = (<any>this.instance).naturalSize;
+    if (Array.isArray(given)) {
+      return <[number, number]>given;
+    }
+    return <[number, number]>[0, 0];
+  }
+
+  createParams(hideHeader: boolean) {
+    const parent = this.node.closest('section');
+    const header = parent.querySelector('header');
+    if (hideHeader) {
+      header.innerHTML = '';
+    }
+    header.insertAdjacentHTML('beforeend', `<div class="parameters form-inline"></div>`);
+    return <HTMLElement>header.lastElementChild;
+  }
+
+  get node() {
+    return this.instance.node;
+  }
+
+  destroy() {
+    this.instance.destroy();
+  }
+
+  get visible() {
+    return this._visible;
+  }
+
+  set visible(value: boolean) {
+    this._visible = value;
+    this.instance.modeChanged(value ? EViewMode.FOCUS : EViewMode.HIDDEN);
+  }
+
+  resized() {
+    if (this.visible && this.instance && typeof (<any>this.instance).update === 'function' && this.node.getBoundingClientRect().width > 0) {
+      (<any>this.instance!).update();
+    }
+  }
+
+  dumpReference() {
+    return -1;
+  }
+}
+
 
 export default class CompositeView extends EventHandler implements IView {
   private readonly options: Readonly<IACompositeViewOptions> = {
@@ -441,58 +494,6 @@ export default class CompositeView extends EventHandler implements IView {
     });
   }
 
-}
-
-class WrapperView implements ILayoutView {
-  private _visible = true;
-
-  constructor(public readonly instance: IView, public readonly key: string) {
-  }
-
-  get minSize() {
-    const given = (<any>this.instance).naturalSize;
-    if (Array.isArray(given)) {
-      return <[number, number]>given;
-    }
-    return <[number, number]>[0, 0];
-  }
-
-  createParams(hideHeader: boolean) {
-    const parent = this.node.closest('section');
-    const header = parent.querySelector('header');
-    if (hideHeader) {
-      header.innerHTML = '';
-    }
-    header.insertAdjacentHTML('beforeend', `<div class="parameters form-inline"></div>`);
-    return <HTMLElement>header.lastElementChild;
-  }
-
-  get node() {
-    return this.instance.node;
-  }
-
-  destroy() {
-    this.instance.destroy();
-  }
-
-  get visible() {
-    return this._visible;
-  }
-
-  set visible(value: boolean) {
-    this._visible = value;
-    this.instance.modeChanged(value ? EViewMode.FOCUS : EViewMode.HIDDEN);
-  }
-
-  resized() {
-    if (this.visible && this.instance && typeof (<any>this.instance).update === 'function' && this.node.getBoundingClientRect().width > 0) {
-      (<any>this.instance!).update();
-    }
-  }
-
-  dumpReference() {
-    return -1;
-  }
 }
 
 function isRegex(v: string) {
