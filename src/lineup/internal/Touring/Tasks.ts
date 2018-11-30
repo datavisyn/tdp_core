@@ -382,12 +382,9 @@ export abstract class RowComparison extends ATouringTask {
 
     //Table Head
     const thead = tablesEnter.append('thead');
-    const theadRow1 = thead.append('tr').attr('class', 'attr');
-    theadRow1.append('th');
-    theadRow1.append('th').text('Attribute');
-    const theadRow2 = thead.append('tr').attr('class', 'cat');;
-    theadRow2.append('th').text('Attribute');
-    theadRow2.append('th').text('Category');
+    const theadRow = thead.append('tr').attr('class', 'cat');;
+    theadRow.append('th').text('Attribute');
+    theadRow.append('th').text('Category');
 
     //Table Body
     tablesEnter.append('tbody');
@@ -416,10 +413,7 @@ export class SelectionStratificationComparison extends RowComparison{
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    const colHeadsAttr = d3.select(this.node).select('thead tr.attr').selectAll('th.head').data(compareTo, (attr) => `${attr.column}/${attr.categories.length}`); //include category length to update if a category is added/removed
-    colHeadsAttr.enter().append('th')
-      .attr('class', 'head')
-      .attr('colspan', (attr) => attr.categories.length);
+    console.log('compareTo', compareTo)
     const colHeadsCat = d3.select(this.node).select('thead tr.cat').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
     colHeadsCat.enter().append('th')
       .attr('class', 'head');
@@ -435,7 +429,6 @@ export class SelectionStratificationComparison extends RowComparison{
       const tds = trs.selectAll('td').data((d) => d);
       tds.enter().append('td');
       // Set colheads in thead 
-      colHeadsAttr.text((d) => d.label);
       colHeadsCat.text((d) => d.label);
       // set data in tbody
       tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
@@ -456,10 +449,8 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.on('click', function() { that.onClick.bind(that)(this)})
       // Exit
       tds.exit().remove(); // remove cells of removed columns
-      colHeadsAttr.exit().remove(); // remove attribute columns
       colHeadsCat.exit().remove(); // remove attribute columns
       trs.exit().remove(); // remove attribute rows
-      colHeadsAttr.order();
       colHeadsCat.order();
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
     }
