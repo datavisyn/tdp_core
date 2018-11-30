@@ -429,7 +429,8 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.enter().append('td');
       // Set colheads in thead 
       colHeadsCat.text((d) => d.label);
-      colHeadsCat.style("background-color", (d) => d && d.color ? d.color : '#FFFFFF');
+      colHeadsCat.style("background-color", (d) => d && d.color ? d.color : '#FFF');
+      colHeadsCat.style("color", (d) => d && d.color ? textColor4Background(d.color) : '#333');
       // set data in tbody
       tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
       tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
@@ -476,7 +477,8 @@ export class SelectionStratificationComparison extends RowComparison{
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: grp.label,
-          background: grp.color
+          background: grp.color,
+          foreground:  textColor4Background(grp.color)
         }
         if (j === 0) {
           data[i][0] = {
@@ -601,7 +603,8 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: cat.label,
-          background: cat.color
+          background: cat.color,
+          foreground: textColor4Background(cat.color)
         } 
         if (j === 0) {
           data[i][0] = {
@@ -725,7 +728,8 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: grp.label,
-          background: grp.color
+          background: grp.color,
+          foreground:  textColor4Background(grp.color)
         }
         if (j === 0) {
           data[i][0] = {
@@ -811,11 +815,21 @@ export function score2color(score:number) : {background: string, foreground: str
     let calcColor = d3.scale.linear().domain([0.05, 1]).range(<any[]>['#000000', '#FFFFFF']);
                                       
     background = calcColor(score).toString();
-    foreground = d3.hsl(background).l > 0.5 ? '#333333' : 'white'
+    foreground = textColor4Background(background);
   }
 
   return {
     background: background,
     foreground: foreground
   };
+}
+
+
+export function textColor4Background(backgroundColor: string) {
+  let color = '#333333';
+  if ('transparent' !== backgroundColor && d3.hsl(backgroundColor).l < 0.5) { //transparent has lightness of zero
+    color =  'white';
+  }
+  
+  return color;
 }
