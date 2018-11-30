@@ -250,118 +250,7 @@ export abstract class ATouringTask implements ITouringTask{
   }
 }
 
-@TaskDecorator()
-export class ColumnComparison extends ATouringTask {
 
-  constructor() {
-    super();
-    this.id = "attrCmp";
-    this.label = "Compare Columns Pairwise";
-
-    this.scope = SCOPE.ATTRIBUTES;
-  }
-
-  initContent() {
-    const tablesEnter = d3.select(this.node)
-      .append('div').attr('class', 'table-container')
-      .append('table').attr('class', 'table table-condensed');
-    tablesEnter.append('thead').append('tr').append('th');
-    tablesEnter.append('tbody');
-
-    super.initContent();
-  }
-
-  public update(data: any[]) {
-    const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
-    colHeads.enter().append('th').attr('class', 'head');
-    
-    const that = this; // for the function below
-    function updateTableBody(bodyData: Array<Array<any>>) {
-      const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
-      trs.enter().append('tr');
-      const tds = trs.selectAll('td').data((d) => d); // remove 
-      tds.enter().append('td');
-      // Set colheads in thead 
-      colHeads.text((d) => d.label);
-      // set data in tbody
-      tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
-      tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
-      tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
-      tds.style('background-color', (d) => d !== null ? d.background : '#FFFFFF');
-      tds.attr('class', (d: any) => {
-        // icon for the attribute type
-        if(d && d.type && d.type === 'categorical') {
-          return 'icon-category';
-        }else if (d && d.type && d.type === 'number') {
-          return 'icon-number';
-        }
-        return null;
-      });
-      tds.classed('action', (d) => (d !== null && d.score !== undefined));
-      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
-      tds.on('click', function() { that.onClick.bind(that)(this)})
-      // Exit
-      colHeads.exit().remove(); // remove attribute columns
-      tds.exit().remove(); // remove cells of removed columns
-      trs.exit().remove(); // remove attribute rows
-    }
-    
-    this.getAttrTableBody(data, data, true, null).then(updateTableBody); // initialize
-    this.getAttrTableBody(data, data, false, updateTableBody).then(updateTableBody); // set values
-  }
-
-  /**
-   * async: return promise
-   * @param attr1 columns
-   * @param arr2 rows
-   * @param scaffold only create the matrix with row headers, but no value calculation
-   */
-  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<any>>> {
-    const data = new Array(attr2.length); // n2 arrays (rows) 
-    for (let i of data.keys()) {
-      data[i] = new Array(attr1.length + 1).fill(null) // containing n1+1 elements (header + n1 vlaues)
-      data[i][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
-    }
-
-    if (scaffold) {
-      return data;
-    } else {
-      const promises = [];
-      for (let [i, row] of data.entries()) {
-        for (let j of row.keys()) {
-          if (j > 0) {
-            const measures = MethodManager.getMeasuresByType(Type.get(attr1[j - 1].type), Type.get(attr2[i].type), SCOPE.ATTRIBUTES); 
-            if (measures.length > 0 && j <= i) { // start at 
-              const measure = measures[0]// Always the first
-              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1]as IServerColumn).column) //minus one because the first column is headers
-              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as IServerColumn).column);
-              const setParameters = {
-                setA: data1,
-                setADesc: attr1[j - 1],
-                setB: data2,
-                setBDesc: attr2[i]
-              };
-              promises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
-              .then((score) => {
-                row[j] = this.toScoreCell(score,measure,setParameters);
-                update(data);
-              })
-                .catch((err) => row[j] = {label: 'err'})
-              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
-            } else if (j-1 == i) {
-              row[j] = { label: '--' };
-            } else {
-              row[j] = ''; // empty (not null, because null will display spinning wheel)
-            }
-          }
-        }
-      }
-
-      await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
-      return data; // then return the data
-    }
-  }
-}
 
 // No decorator as i don't want it in the dropdown 
 export abstract class RowComparison extends ATouringTask {
@@ -822,6 +711,119 @@ export function score2color(score:number) : {background: string, foreground: str
     background: background,
     foreground: foreground
   };
+}
+
+@TaskDecorator()
+export class ColumnComparison extends ATouringTask {
+
+  constructor() {
+    super();
+    this.id = "attrCmp";
+    this.label = "Compare Columns Pairwise";
+
+    this.scope = SCOPE.ATTRIBUTES;
+  }
+
+  initContent() {
+    const tablesEnter = d3.select(this.node)
+      .append('div').attr('class', 'table-container')
+      .append('table').attr('class', 'table table-condensed');
+    tablesEnter.append('thead').append('tr').append('th');
+    tablesEnter.append('tbody');
+
+    super.initContent();
+  }
+
+  public update(data: any[]) {
+    const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
+    colHeads.enter().append('th').attr('class', 'head');
+    
+    const that = this; // for the function below
+    function updateTableBody(bodyData: Array<Array<any>>) {
+      const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
+      trs.enter().append('tr');
+      const tds = trs.selectAll('td').data((d) => d); // remove 
+      tds.enter().append('td');
+      // Set colheads in thead 
+      colHeads.text((d) => d.label);
+      // set data in tbody
+      tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
+      tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
+      tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
+      tds.style('background-color', (d) => d !== null ? d.background : '#FFFFFF');
+      tds.attr('class', (d: any) => {
+        // icon for the attribute type
+        if(d && d.type && d.type === 'categorical') {
+          return 'icon-category';
+        }else if (d && d.type && d.type === 'number') {
+          return 'icon-number';
+        }
+        return null;
+      });
+      tds.classed('action', (d) => (d !== null && d.score !== undefined));
+      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
+      tds.on('click', function() { that.onClick.bind(that)(this)})
+      // Exit
+      colHeads.exit().remove(); // remove attribute columns
+      tds.exit().remove(); // remove cells of removed columns
+      trs.exit().remove(); // remove attribute rows
+    }
+    
+    this.getAttrTableBody(data, data, true, null).then(updateTableBody); // initialize
+    this.getAttrTableBody(data, data, false, updateTableBody).then(updateTableBody); // set values
+  }
+
+  /**
+   * async: return promise
+   * @param attr1 columns
+   * @param arr2 rows
+   * @param scaffold only create the matrix with row headers, but no value calculation
+   */
+  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<any>>> {
+    const data = new Array(attr2.length); // n2 arrays (rows) 
+    for (let i of data.keys()) {
+      data[i] = new Array(attr1.length + 1).fill(null) // containing n1+1 elements (header + n1 vlaues)
+      data[i][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
+    }
+
+    if (scaffold) {
+      return data;
+    } else {
+      const promises = [];
+      for (let [i, row] of data.entries()) {
+        for (let j of row.keys()) {
+          if (j > 0) {
+            const measures = MethodManager.getMeasuresByType(Type.get(attr1[j - 1].type), Type.get(attr2[i].type), SCOPE.ATTRIBUTES); 
+            if (measures.length > 0 && j <= i) { // start at 
+              const measure = measures[0]// Always the first
+              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1]as IServerColumn).column) //minus one because the first column is headers
+              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as IServerColumn).column);
+              const setParameters = {
+                setA: data1,
+                setADesc: attr1[j - 1],
+                setB: data2,
+                setBDesc: attr2[i]
+              };
+              promises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
+              .then((score) => {
+                row[j] = this.toScoreCell(score,measure,setParameters);
+                update(data);
+              })
+                .catch((err) => row[j] = {label: 'err'})
+              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
+            } else if (j-1 == i) {
+              row[j] = { label: '--' };
+            } else {
+              row[j] = ''; // empty (not null, because null will display spinning wheel)
+            }
+          }
+        }
+      }
+
+      await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
+      return data; // then return the data
+    }
+  }
 }
 
 
