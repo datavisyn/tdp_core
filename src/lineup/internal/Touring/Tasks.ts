@@ -67,8 +67,7 @@ export abstract class ATouringTask implements ITouringTask{
   private createLegend(parentElement: d3.Selection<any>)
   {
     let divLegend = parentElement.append('div').classed('measure-legend',true);
-    let svgWidth = Number(divLegend.style('width').slice(0, -2)); //-25 because the scroll bar (15px) on the left is dynamically added
-
+    
     let svgLegendContainer = divLegend.append('svg')
                               .attr('width','100%')
                               .attr('height',35);
@@ -96,11 +95,9 @@ export abstract class ATouringTask implements ITouringTask{
     let textWidth = 50;
     let tickLength = 5;
     let lineWidth = 1;
-    let xSize = barWidth + textWidth + 5;
-    let xPos = Math.floor(svgWidth - xSize);
-    console.log('legend:', {svgWidth,xSize,xPos});
+
     xStart = xStart + textWidth;
-    let svgLegend = svgLegendContainer.append('g').style('transform', `translate(${xPos}px, 0)`);
+    let svgLegend = svgLegendContainer.append('g');
     let svgLegendLabel = svgLegend.append('g');
     // label
     svgLegendLabel.append('text')
