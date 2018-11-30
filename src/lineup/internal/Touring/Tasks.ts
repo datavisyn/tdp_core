@@ -430,6 +430,7 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.enter().append('td');
       // Set colheads in thead 
       colHeadsCat.text((d) => d.label);
+      colHeadsCat.style("background-color", (d) => d && d.color ? d.color : '#FFFFFF');
       // set data in tbody
       tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
       tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
