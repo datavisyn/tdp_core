@@ -203,6 +203,10 @@
       overflow: auto;
     }
   }
+
+  .lu-hierarchy .lu-hierarchy-adder {
+    display: flex; // override `body[data-clue='E'] footer` from CLUE
+  }
 }
 
 .lu-dialog {
