@@ -207,6 +207,10 @@
   .lu-hierarchy .lu-hierarchy-adder {
     display: flex; // override `body[data-clue='E'] footer` from CLUE
   }
+
+  .lu-side-panel-entry[data-type="categorical"] {
+    margin-bottom: 45px;
+  }
 }
 
 .lu-dialog {
