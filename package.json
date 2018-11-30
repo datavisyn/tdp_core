@@ -78,7 +78,7 @@
     "@types/d3": "3.5.36",
     "@types/select2": "4.0.41",
     "d3": "3.5.17",
-    "lineupjs": "^4.0.0-alpha.8",
+    "lineupjs": "github:datavisyn/lineupjs#develop",
     "phovea_clue": "~2.1.0",
     "select2": "4.0.4",
     "select2-bootstrap-theme": "0.1.0-beta.9",
