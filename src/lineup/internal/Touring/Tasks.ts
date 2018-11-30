@@ -766,7 +766,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                   setBDesc: col,
                   setBCategory: groupedData[j],
                 };
-                promises.push(measure.calc(grpData4ColRow, grpData4ColCol, [])
+                promises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
                   .then((score) => {
                     data[rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
