@@ -379,12 +379,9 @@ export abstract class RowComparison extends ATouringTask {
 
     //Table Head
     const thead = tablesEnter.append('thead');
-    const theadRow1 = thead.append('tr').attr('class', 'attr');
-    theadRow1.append('th');
-    theadRow1.append('th').text('Attribute');
-    const theadRow2 = thead.append('tr').attr('class', 'cat');;
-    theadRow2.append('th').text('Attribute');
-    theadRow2.append('th').text('Category');
+    const theadRow = thead.append('tr').attr('class', 'cat');;
+    theadRow.append('th').text('Attribute');
+    theadRow.append('th').text('Category');
 
     //Table Body
     tablesEnter.append('tbody');
@@ -413,10 +410,6 @@ export class SelectionStratificationComparison extends RowComparison{
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    const colHeadsAttr = d3.select(this.node).select('thead tr.attr').selectAll('th.head').data(compareTo, (attr) => `${attr.column}/${attr.categories.length}`); //include category length to update if a category is added/removed
-    colHeadsAttr.enter().append('th')
-      .attr('class', 'head')
-      .attr('colspan', (attr) => attr.categories.length);
     const colHeadsCat = d3.select(this.node).select('thead tr.cat').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
     colHeadsCat.enter().append('th')
       .attr('class', 'head');
@@ -432,8 +425,9 @@ export class SelectionStratificationComparison extends RowComparison{
       const tds = trs.selectAll('td').data((d) => d);
       tds.enter().append('td');
       // Set colheads in thead 
-      colHeadsAttr.text((d) => d.label);
       colHeadsCat.text((d) => d.label);
+      colHeadsCat.style("background-color", (d) => d && d.color ? d.color : '#FFF');
+      colHeadsCat.style("color", (d) => d && d.color ? textColor4Background(d.color) : '#333');
       // set data in tbody
       tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
       tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
@@ -453,10 +447,8 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.on('click', function() { that.onClick.bind(that)(this)})
       // Exit
       tds.exit().remove(); // remove cells of removed columns
-      colHeadsAttr.exit().remove(); // remove attribute columns
       colHeadsCat.exit().remove(); // remove attribute columns
       trs.exit().remove(); // remove attribute rows
-      colHeadsAttr.order();
       colHeadsCat.order();
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
     }
@@ -482,7 +474,8 @@ export class SelectionStratificationComparison extends RowComparison{
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: grp.label,
-          background: grp.color
+          background: grp.color,
+          foreground:  textColor4Background(grp.color)
         }
         if (j === 0) {
           data[i][0] = {
@@ -607,7 +600,8 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: cat.label,
-          background: cat.color
+          background: cat.color,
+          foreground: textColor4Background(cat.color)
         } 
         if (j === 0) {
           data[i][0] = {
@@ -731,7 +725,8 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
         data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: grp.label,
-          background: grp.color
+          background: grp.color,
+          foreground:  textColor4Background(grp.color)
         }
         if (j === 0) {
           data[i][0] = {
@@ -772,7 +767,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                   setBDesc: col,
                   setBCategory: groupedData[j],
                 };
-                promises.push(measure.calc(grpData4ColRow, grpData4ColCol, [])
+                promises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
                   .then((score) => {
                     data[rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
@@ -817,11 +812,21 @@ export function score2color(score:number) : {background: string, foreground: str
     let calcColor = d3.scale.linear().domain([0.05, 1]).range(<any[]>['#000000', '#FFFFFF']);
                                       
     background = calcColor(score).toString();
-    foreground = d3.hsl(background).l > 0.5 ? '#333333' : 'white'
+    foreground = textColor4Background(background);
   }
 
   return {
     background: background,
     foreground: foreground
   };
+}
+
+
+export function textColor4Background(backgroundColor: string) {
+  let color = '#333333';
+  if ('transparent' !== backgroundColor && d3.hsl(backgroundColor).l < 0.5) { //transparent has lightness of zero
+    color =  'white';
+  }
+  
+  return color;
 }
