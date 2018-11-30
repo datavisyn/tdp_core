@@ -89,8 +89,6 @@ export interface IARankingViewOptions {
   customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
 }
 
-export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
-
 /**
  * base class for views based on LineUp
  */
@@ -544,7 +542,6 @@ export abstract class ARankingView extends AView {
     const r = this.provider.getRankings()[0];
     const shown = r && r.getOrder() ? r.getOrder().length : 0;
     this.stats.textContent = showStats(total, selected, shown);
-    this.panel.toggleDisableOverviewButton(shown > MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW);
   }
 
   /**
