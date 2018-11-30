@@ -413,7 +413,6 @@ export class SelectionStratificationComparison extends RowComparison{
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    console.log('compareTo', compareTo)
     const colHeadsCat = d3.select(this.node).select('thead tr.cat').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
     colHeadsCat.enter().append('th')
       .attr('class', 'head');
