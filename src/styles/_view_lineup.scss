@@ -11,22 +11,125 @@
     line-height: 1;
   }
 
-  %lu-panel-button {
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    cursor: pointer;
-    z-index: 1;
-    color: #000;
+  > div {
+    flex: 1 1 auto;
+    position: relative;
+  }
 
-    &:hover {
-      background-color: #eaeaea;
+  &.overview-detail {
+    > div {
+      display: flex;
+      flex-direction: column;
+
+      > header {
+        flex: 0 0 auto;
+      }
+
+      > div {
+        flex: 1 1 auto;
+        position: relative;
+      }
+    }
+
+    header.overview {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow: auto;
+    }
+  }
+}
+
+.lu-dialog {
+  label: {
+    margin: 0;
+  }
+
+  &.lu-filter-table > div:first-of-type > * {
+    flex: 0 0 auto;
+  }
+}
+
+.lu-collapser {
+  display: none;
+}
+
+.lineup-engine {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+
+  > header {
+    padding-bottom: 1px; // no idea otherwise scrollbar
+  }
+
+  footer {
+    display: block !important;
+  }
+}
+
+$lu_assets: '~lineupjs/src/assets';
+
+@at-root {
+
+  .tdp-ranking-export-form {
+    user-select: none;
+    -moz-user-select: none;
+
+    .radio {
+      margin-left: 1em;
     }
   }
 
-  .lu-side-panel {
+  .tdp-ranking-export-form-handle {
+    > span {
+      visibility: hidden;
+      padding: 0 0.5em 0 1em;
+      cursor: grab;
+    }
+
+    &:hover > span,
+    &.dragging > span {
+      visibility: visible;
+    }
+
+    &.dragging {
+      border: 1px solid lightgray;
+      border-radius: 3px;
+      cursor: grabbing;
+    }
+  }
+
+  .lu-side-panel > main > section::before {
+    content: 'Column Summaries';
+  }
+
+  .lu-hierarchy .lu-search::before {
+    height: 19px;
+  }
+
+  .tdp-view-lineup.lu-side-panel {
     flex: 0 0 auto;
     position: relative;
+
+
+    %lu-panel-button {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 5px 10px;
+      cursor: pointer;
+      z-index: 1;
+      color: #000;
+
+      &:hover {
+        background-color: #eaeaea;
+      }
+    }
 
     > section {
       flex: 0 0 auto;
@@ -174,105 +277,38 @@
     }
   }
 
-  > div {
-    flex: 1 1 auto;
-    position: relative;
-  }
+  .lu-sidepanel-top-form {
+    display: flex;
 
-  &.overview-detail {
-    > div {
-      display: flex;
-      flex-direction: column;
-
-      > header {
-        flex: 0 0 auto;
-      }
-
-      > div {
-        flex: 1 1 auto;
-        position: relative;
-      }
-    }
-
-    header.overview {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      overflow: auto;
+    > p {
+      flex: 1 1 0;
     }
   }
-}
 
-.lu-dialog {
-  label: {
-    margin: 0;
-  }
+  .lu-side-panel-top.tdp-view-lineup.lu-side-panel.collapsed {
+    display: inline-flex;
+    flex-direction: row;
+    z-index: 100;
+    max-width: unset;
+    width: unset;
+    float: right;
 
-  &.lu-filter-table > div:first-of-type > * {
-    flex: 0 0 auto;
-  }
-}
+    > section {
+      flex-direction: row;
+      max-width: unset;
+    }
 
-.lu-collapser {
-  display: none;
-}
-
-.lineup-engine {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  overflow: auto;
-
-  > header {
-    padding-bottom: 1px; // no idea otherwise scrollbar
-  }
-
-  footer {
-    display: block !important;
-  }
-}
-
-$lu_assets: '~lineupjs/src/assets';
-
-@at-root {
-
-  .tdp-ranking-export-form {
-    user-select: none;
-    -moz-user-select: none;
-
-    .radio {
+    .gap {
+      margin-top: unset;
       margin-left: 1em;
     }
-  }
 
-  .tdp-ranking-export-form-handle {
-    > span {
-      visibility: hidden;
-      padding: 0 0.5em 0 1em;
-      cursor: grab;
+    > div.lu-adder {
+      margin-top: 0;
+
+      &.once .lu-search {
+        left: -1.2em;
+      }
     }
-
-    &:hover > span,
-    &.dragging > span {
-      visibility: visible;
-    }
-
-    &.dragging {
-      border: 1px solid lightgray;
-      border-radius: 3px;
-      cursor: grabbing;
-    }
-  }
-
-  .lu-side-panel > main > section::before {
-    content: 'Column Summaries';
-  }
-
-  .lu-hierarchy .lu-search::before {
-    height: 19px;
   }
 }
