@@ -24,7 +24,7 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
   const accessor = createAccessor(colDesc);
 
   // generate a unique column
-  (<any>colDesc).column = `dC${colDesc.label.replace(/\s+/,'')}`;
+  (<any>colDesc).column = colDesc.scoreID || `dC${colDesc.label.replace(/\s+/,'')}`;
 
   provider.pushDesc(colDesc);
   //mark as lazy loaded
