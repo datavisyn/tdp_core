@@ -309,6 +309,15 @@ $lu_assets: '~lineupjs/src/assets';
       &.once .lu-search {
         left: -1.2em;
       }
+
+      &.once::before {
+        content: '';
+        top: -10px;
+        left: -2.5em;
+        right: -15em;
+        bottom: -3em;
+        position: absolute;
+      }
     }
   }
 }

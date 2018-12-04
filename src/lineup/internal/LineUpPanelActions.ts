@@ -72,7 +72,7 @@ export default class LineUpPanelActions extends EventHandler {
         placeholder: 'Add Column...'
       });
       this.search.on(SearchBox.EVENT_SELECT, (item) => {
-        this.node.querySelector('header')!.classList.remove('once');
+        this.node.querySelector('.lu-adder')!.classList.remove('once');
         item.action();
       });
     }
