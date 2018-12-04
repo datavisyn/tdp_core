@@ -9,6 +9,7 @@ export const Tasks = new Array<ATouringTask>();
 export function TaskDecorator() {
   return function (target: {new(): ATouringTask}) { // only instantiable subtypes of ATouringTask can be passed.
     Tasks.push(new target());
+    Tasks.sort((a, b) => b.order - a.order); //sort descending
   };
 }
 
@@ -26,6 +27,8 @@ export abstract class ATouringTask implements ITouringTask{
   public node: HTMLElement;
   
   public scope: SCOPE;
+
+  public order: number = 0; // order of the tasks, the higher the more important
 
   ranking: RankingAdapter;
 
@@ -285,7 +288,8 @@ export class SelectionStratificationComparison extends RowComparison{
   constructor() {
     super();
     this.id = "selStratCmp";
-    this.label = "Compare Selected Rows with Stratification Groups"
+    this.label = "Compare Selected Rows with Stratification Groups";
+    this.order = 80;
   }
 
   update(data: any) {
@@ -465,7 +469,8 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
   constructor() {
     super();
     this.id = "selCatCmp";
-    this.label = "Compare Selected Rows with Column Categories"
+    this.label = "Compare Selected Rows with Column Categories";
+    this.order = 100;
   }
 
   public update(data: any[]) {
@@ -588,7 +593,8 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
   constructor() {
     super();
     this.id = "pairStratCmp";
-    this.label = "Compare Stratification Groups Pairwise"
+    this.label = "Compare Stratification Groups Pairwise";
+    this.order = 60;
   }
 
   update(data: any) {
@@ -717,6 +723,7 @@ export class ColumnComparison extends ATouringTask {
     super();
     this.id = "attrCmp";
     this.label = "Compare Columns Pairwise";
+    this.order = 20;
 
     this.scope = SCOPE.ATTRIBUTES;
   }
