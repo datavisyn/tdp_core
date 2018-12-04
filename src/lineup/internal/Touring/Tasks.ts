@@ -242,7 +242,7 @@ export abstract class ATouringTask implements ITouringTask{
       if(measure.visualization) {
         const visualization: IMeasureVisualization = measure.visualization;
         if(cellData.setParameters) {
-          visualization.generateVisualization(details, cellData.setParameters);
+          visualization.generateVisualization(details, cellData.setParameters, cellData.score);
         }
         
       }  
