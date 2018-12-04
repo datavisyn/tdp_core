@@ -120,8 +120,8 @@ export default class TouringPanel extends LineUpPanelActions {
       // and an entry representing all these attributes
       descriptions = descriptions.filter((desc) => ['categorical', 'number'].includes(desc.type)).reverse(); // filter attributes by type
 
-      descriptions.push(this.ranking.getRankDesc());
       descriptions.push(this.ranking.getSelectionDesc());
+      descriptions.push(this.ranking.getRankDesc());
       descriptions.push(this.ranking.getStratificationDesc());
       descriptions.unshift({ // at least selection & rank
         label: 'All Columns',
