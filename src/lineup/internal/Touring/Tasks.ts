@@ -769,8 +769,10 @@ export class ColumnComparison extends ATouringTask {
       tds.on('click', function() { that.onClick.bind(that)(this)})
       // Exit
       colHeads.exit().remove(); // remove attribute columns
+      colHeads.order();
       tds.exit().remove(); // remove cells of removed columns
       trs.exit().remove(); // remove attribute rows
+      trs.order();
     }
     
     this.getAttrTableBody(data, data, true, null).then(updateTableBody); // initialize
