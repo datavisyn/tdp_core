@@ -54,7 +54,7 @@ export abstract class ATouringTask implements ITouringTask{
   toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
     const color =  score2color(score.pValue);
     return {
-      label: score.pValue.toFixed(2),
+      label: score.pValue.toFixed(3),
       background: color.background,
       foreground: color.foreground,
       score: score,
