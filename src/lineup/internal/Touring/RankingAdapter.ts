@@ -211,7 +211,9 @@ export class RankingAdapter {
     return data;
   }
 
-
+  /**
+   * Generate a Attribute description that represents the current selection
+   */
   public getSelectionDesc() {
     const selCategories = new Array<ICategory>();
     const numberOfRows = this.getItemOrder().length; // get length of stratification groups and sum them up
@@ -230,6 +232,10 @@ export class RankingAdapter {
       column: 'selection'
     };
   }
+
+  /**
+   * Generate an attribute description that represents the current stratification
+   */
   public getStratificationDesc() {
     return {
       categories: this.getRanking().getGroups().map((group, index) => ({
