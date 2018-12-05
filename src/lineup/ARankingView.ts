@@ -63,7 +63,7 @@ export interface IARankingViewOptions {
    */
   enableZoom: boolean;
 
-  enableSidePanel: boolean | 'collapsed';
+  enableSidePanel: boolean | 'collapsed' | 'top';
 
   enableAddingColumns: boolean;
 
@@ -233,7 +233,9 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
-      this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+      if (this.options.enableSidePanel !== 'top') {
+        this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+      }
     }
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
@@ -248,7 +250,12 @@ export abstract class ARankingView extends AView {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
       base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
-      base.lastElementChild!.appendChild(this.stats);
+      const container = <HTMLElement>base.lastElementChild!;
+      container.appendChild(this.stats);
+
+      if (this.options.enableSidePanel === 'top') {
+        container.insertAdjacentElement('afterbegin', this.panel.node);
+      }
     });
   }
 
