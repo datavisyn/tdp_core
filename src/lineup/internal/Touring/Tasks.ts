@@ -267,11 +267,11 @@ export abstract class RowComparison extends ATouringTask {
     //Table
     const tablesEnter = d3.select(this.node)
       .append('div').attr('class', 'table-container')
-      .append('table').attr('class', 'table table-condensed');
+      .append('table');
 
     //Table Head
     const thead = tablesEnter.append('thead');
-    const theadRow = thead.append('tr').attr('class', 'cat');;
+    const theadRow = thead.append('tr');
     theadRow.append('th').text('Attribute');
     theadRow.append('th').text('Category');
 
@@ -303,9 +303,9 @@ export class SelectionStratificationComparison extends RowComparison{
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    const colHeadsCat = d3.select(this.node).select('thead tr.cat').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
+    const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
     colHeadsCat.enter().append('th')
-      .attr('class', 'head');
+      .attr('class', 'head'); //th.head are the column headers
 
     const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<IScoreCell>>, timestamp: string) {
@@ -731,8 +731,12 @@ export class ColumnComparison extends ATouringTask {
   initContent() {
     const tablesEnter = d3.select(this.node)
       .append('div').attr('class', 'table-container')
-      .append('table').attr('class', 'table table-condensed');
+      .append('table');
+
+    //Table Head
     tablesEnter.append('thead').append('tr').append('th');
+
+    //Table Body
     tablesEnter.append('tbody');
 
     super.initContent();
@@ -740,7 +744,7 @@ export class ColumnComparison extends ATouringTask {
 
   public update(data: any[]) {
     const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
-    colHeads.enter().append('th').attr('class', 'head');
+    colHeads.enter().append('th').attr('class', 'head'); //th.head are the column headers
     
     const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<any>>) {

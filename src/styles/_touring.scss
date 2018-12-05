@@ -43,110 +43,35 @@ div.touring {
     }
 
     .table-container {
+      overflow-x: auto;
 
       table {
-        width: auto;
-        table-layout: fixed;
-        word-wrap: break-word;
-      }
-
-      .table-label {
-        width: 200px !important;
-        min-width: 200px !important;
-        max-width: 200px !important;
-      }
-
-       // table cells with p-value and their headers, consider padding and border
-      td.action, th.table-value { 
-        width: 55px !important;
-        min-width: 55px !important;
-        max-width: 55px !important;
-        text-align: right;
-      }
-
-      td {
-        padding: 1px 5px !important;
-      }
-
-      tr {
-        border-bottom: 1px solid #dddddd;
-      }
-
-      td {
-        border-right: 2px solid #dddddd;
-      }
-
-      td.icon-category::before {
-        display: inline-block;
-        font: normal normal normal 14px/1 lu-font, serif;
-        font-size: inherit;
-        text-rendering: auto;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        color: #999;
-        width: 1.2em;
-        content: "\e810";
-      }
-      
-      td.icon-number::before {
-        display: inline-block;
-        font: normal normal normal 14px/1 lu-font, serif;
-        font-size: inherit;
-        text-rendering: auto;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        color: #999;
-        width: 1.2em;
-        content: "\e811";
-      }
-
-      .tableHeaderRotated {
-
-        th.rotate {
-          height: 100px;
-          position: relative;
-          vertical-align: middle !important;
-          padding: 0;
-        }
-
-        th.rotate > div{
-          position: relative;
-          top: 0px;
-          left: 1px; /* moves the whole element to the left, because of the borderline widths */
-          height: 100%;
-          -ms-transform:skew(-45deg,0deg);
-          -moz-transform:skew(-45deg,0deg);
-          -webkit-transform:skew(-45deg,0deg);
-          -o-transform:skew(-45deg,0deg);
-          transform:skew(-45deg,0deg);
-          transform-origin: bottom left;
-          overflow: hidden;
-        }
-
-        th.rotate > div.borderedCell {
-          border-right: 2px solid #dddddd;
-        }
+        width: auto;  // full width
+        table-layout: fixed; // The table and column widths are set by the widths of table and col or by the width of the first row of cells. Cells in other rows do not affect column widths.
         
-        th.rotate span {
-          -ms-transform:skew(45deg,0deg) rotate(315deg);
-          -moz-transform:skew(45deg,0deg) rotate(315deg);
-          -webkit-transform:skew(45deg,0deg) rotate(315deg);
-          -o-transform:skew(45deg,0deg) rotate(315deg);
-          transform:skew(45deg,0deg) rotate(315deg);
-          transform-origin: bottom left;
-          position: absolute;
-          bottom: 0px; /* table header text starts at the bottom of the header cell */
-          left: 51px; /* width of table cell for the p-values + border width */
-          display: inline-block;
-          width: 120px; /* 100 / cos(45) - 28 * cos(45) = 121.6 , where 100 is the height of the cell, 28 = 2*14 (text height) and 45 the transform angle */
-          text-align: left;
-          height: 35px; /* 51 * cos(45) , where 51 is the cell width  */
-          vertical-align: middle !important;
-          // line-height: normal;
-          // white-space: nowrap; /*whether to display in one line or not*/
+        td {
+          &.action:hover, &.action:focus { // = td.action:hover
+            background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
+            font-weight: bolder;
+          } 
+          &.selectedCell {
+            background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
+            font-weight: bolder; 
+          }
+          &.icon-category::before {
+            display: inline-block; // so that the width property works
+            width: 1.2em; //to have some space between icon and the text in the td
+            font-family: lu-font; // some icon font 
+            color: #999; // #515151 is to dark
+            content: "\e810";
+          }
+          &.icon-number::before {
+            font-family: lu-font;
+            color: #999;
+            width: 1.2em;
+            content: "\e811";
+          }
         }
-
-       
       }
     }
 
@@ -278,22 +203,6 @@ div.touring {
       fill-opacity: 0.4;
     }
 
-  }
-
-  .table-container {
-    overflow-x: auto;
-
-    td {
-      &.action:hover, &.action:focus { // = td.action:hover
-        background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
-        font-weight: bolder;
-      } 
-    }
-    td.selectedCell {
-      background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
-      font-weight: bolder; 
-      border: none;
-    }
   }
   
   .tab-pane {
