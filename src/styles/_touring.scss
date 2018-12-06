@@ -1,5 +1,3 @@
-//@import "~d3.parsets/d3.parsets.css";
-
 [hidden] {
   display: none !important;
 }
@@ -17,7 +15,7 @@ button.touring.active::before {
 }
 
 div.touring {
-  margin-top: 0.5em;
+  margin-top: 0.5rem;
   overflow-y: auto;
 
   .measures, .output {
@@ -44,10 +42,14 @@ div.touring {
 
     .table-container {
       overflow-x: auto;
-
+      
       table {
         width: auto;  // full width
         table-layout: fixed; // The table and column widths are set by the widths of table and col or by the width of the first row of cells. Cells in other rows do not affect column widths.
+        
+        tbody.bottom-margin {
+          border-bottom: 0.4rem solid white;  // table's border spacing applies to all rows and tbody has no margin
+        }
         
         td {
           &.action:hover, &.action:focus { // = td.action:hover
@@ -203,10 +205,5 @@ div.touring {
     g.linechart path.dataline:hover{
       fill-opacity: 0.4;
     }
-
-  }
-  
-  .tab-pane {
-    margin: 0.5em 0 0 0.5em;
   }
 }

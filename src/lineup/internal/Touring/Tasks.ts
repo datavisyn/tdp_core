@@ -314,7 +314,7 @@ export class SelectionStratificationComparison extends RowComparison{
 
       // create a table body for every column
       const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>> 
-      bodies.enter().append('tbody'); //For each IColumnTableData, create a tbody
+      bodies.enter().append('tbody').classed('bottom-margin', true); //For each IColumnTableData, create a tbody
 
       // the data of each row is of type: Array<IScoreCell>
       const trs = bodies.selectAll('tr').data((d) => d, (d) => d[0].key); // had to specify the function to derive the data (d -> d)
