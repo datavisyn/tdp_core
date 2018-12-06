@@ -44,14 +44,32 @@ div.touring {
       overflow-x: auto;
       
       table {
-        width: auto;  // full width
         table-layout: fixed; // The table and column widths are set by the widths of table and col or by the width of the first row of cells. Cells in other rows do not affect column widths.
-        
+
+        th, td {
+          min-width: 5ch;
+          max-width: 5ch;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
+          &:not(.head) {
+            min-width: 5ch;
+            max-width: 10em;
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+          }
+        }
+
         tbody.bottom-margin {
           border-bottom: 0.4rem solid white;  // table's border spacing applies to all rows and tbody has no margin
         }
-        
+
         td {
+          &[rowspan] {
+            vertical-align: text-top;
+          }
+
           &.action:hover, &.action:focus { // = td.action:hover
             background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
             font-weight: bolder;
