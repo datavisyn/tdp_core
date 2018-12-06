@@ -40,8 +40,18 @@ export abstract class ATouringTask implements ITouringTask{
   }
   
   initContent() {
+    const tablesEnter = d3.select(this.node)
+      .append('div').attr('class', 'table-container')
+      .append('table');
+
+    //Table Head
+    tablesEnter.append('thead').append('tr').append('th');
+
+    //Table Body
+    //Table Body --> no table body, we create multiple bodies below (one for each column to group it's categories (rows in the table))
+
     //add legend for the p-values
-    this.createLegend( d3.select(this.node));
+    this.createLegend(d3.select(this.node));
     //add div for the detail (detail text and visualisation)
     d3.select(this.node).append('div').classed('details', true);
   }
@@ -265,20 +275,9 @@ export abstract class RowComparison extends ATouringTask {
   }
 
   initContent() {
-    //Table
-    const tablesEnter = d3.select(this.node)
-      .append('div').attr('class', 'table-container')
-      .append('table');
-
-    //Table Head
-    const thead = tablesEnter.append('thead');
-    const theadRow = thead.append('tr');
-    theadRow.append('th').text('Attribute');
-    theadRow.append('th').text('Category');
-
-    //Table Body --> no table body, we create multiple bodies below (one for each column to group it's categories (rows in the table))
-
     super.initContent();
+    
+    d3.select(this.node).select('table thead tr').append('th'); //Append another th for the category/group labels
   }
 }
 
@@ -317,7 +316,7 @@ export class SelectionStratificationComparison extends RowComparison{
       const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>> 
       bodies.enter().append('tbody'); //For each IColumnTableData, create a tbody
 
-        // the data of each row is of type: Array<IScoreCell>
+      // the data of each row is of type: Array<IScoreCell>
       const trs = bodies.selectAll('tr').data((d) => d, (d) => d[0].key); // had to specify the function to derive the data (d -> d)
       trs.enter().append('tr');
       const tds = trs.selectAll('td').data((d) => d);   // the data of each td is of type: IScoreCell
@@ -711,29 +710,30 @@ export class ColumnComparison extends ATouringTask {
     this.scope = SCOPE.ATTRIBUTES;
   }
 
-  initContent() {
-    const tablesEnter = d3.select(this.node)
-      .append('div').attr('class', 'table-container')
-      .append('table');
-
-    //Table Head
-    tablesEnter.append('thead').append('tr').append('th');
-
-    //Table Body
-    tablesEnter.append('tbody');
-
-    super.initContent();
-  }
-
   public update(data: any[]) {
+    Workers.terminateAll(); // Abort all calculations as their results are no longer needed
+    const timestamp = new Date().getTime().toString();
+    d3.select(this.node).attr('data-timestamp', timestamp);
+
     const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
     colHeads.enter().append('th').attr('class', 'head'); //th.head are the column headers
     
     const that = this; // for the function below
-    function updateTableBody(bodyData: Array<Array<any>>) {
-      const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].label);
+    function updateTableBody(bodyData: Array<Array<Array<IScoreCell>>>) {
+      if (d3.select(that.node).attr('data-timestamp') !== timestamp) {
+        return; // skip outdated result
+      }
+
+      const test = bodyData.slice();
+      console.log(test)
+      // create a table body for every column
+      const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>> 
+      bodies.enter().append('tbody'); //For each IColumnTableData, create a tbody
+
+      // the data of each row is of type: Array<IScoreCell>
+      const trs = bodies.selectAll('tr').data((d) => d, (d) => d[0].label); // had to specify the function to derive the data (d -> d)
       trs.enter().append('tr');
-      const tds = trs.selectAll('td').data((d) => d); // remove 
+      const tds = trs.selectAll('td').data((d) => d)
       tds.enter().append('td');
       // Set colheads in thead 
       colHeads.text((d) => d.label);
@@ -745,13 +745,15 @@ export class ColumnComparison extends ATouringTask {
       tds.attr('data-type', (d) => d.type);
       tds.classed('action', (d) => d.score !== undefined);
       tds.html((d) => d.label);
-      tds.on('click', function() { that.onClick.bind(that)(this)})
+      tds.on('click', function() { that.onClick.bind(that)(this); })
       // Exit
       colHeads.exit().remove(); // remove attribute columns
       colHeads.order();
       tds.exit().remove(); // remove cells of removed columns
       trs.exit().remove(); // remove attribute rows
+      bodies.exit().remove();
       trs.order();
+      bodies.order();
     }
     
     this.getAttrTableBody(data, data, true, null).then(updateTableBody); // initialize
@@ -764,42 +766,41 @@ export class ColumnComparison extends ATouringTask {
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<any>>> {
-    const data = new Array(attr2.length); // n2 arrays (rows) 
-    for (let i of data.keys()) {
-      data[i] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
-      data[i][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
+  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
+    const data = this.prepareDataArray(attr1, attr2);
+
+    //TODO This method assumes attr1 and attr2 contain the same attribues and are ordered in the same way (cells are skipped based on index not on label match or whatever)
+    if (attr1 !== attr2) {
+      throw Error('This method can not handle two different arrays');
     }
 
     if (scaffold) {
       return data;
     } else {
       const promises = [];
-      for (let [i, row] of data.entries()) {
-        for (let j of row.keys()) {
-          if (j > 0) {
-            const measures = MethodManager.getMeasuresByType(Type.get(attr1[j - 1].type), Type.get(attr2[i].type), SCOPE.ATTRIBUTES); 
-            if (measures.length > 0 && j <= i) { // start at 
-              const measure = measures[0]// Always the first
-              const data1 = this.ranking.getAttributeDataDisplayed((attr1[j - 1]as IServerColumn).column) //minus one because the first column is headers
-              const data2 = this.ranking.getAttributeDataDisplayed((attr2[i] as IServerColumn).column);
-              const setParameters = {
-                setA: data1,
-                setADesc: attr1[j - 1],
-                setB: data2,
-                setBDesc: attr2[i]
-              };
-              promises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
-              .then((score) => {
-                row[j] = this.toScoreCell(score,measure,setParameters);
-                update(data);
-              })
-                .catch((err) => row[j] = {label: 'err'})
-              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
-            } else if (j-1 == i) {
-              row[j] = { label: '--' };
-            } else {
-              row[j] = ''; // empty (not null, because null will display spinning wheel)
+      for (const [bodyIndex, rows] of data.entries()) {
+        for (const row of rows) {
+          for (const colIndex of row.keys()) { // just one row so I directly index it here
+            if (colIndex > 0) {
+              const measures = MethodManager.getMeasuresByType(Type.get(attr1[colIndex - 1].type), Type.get(attr2[bodyIndex].type), SCOPE.ATTRIBUTES); 
+              if (measures.length > 0 && colIndex <= bodyIndex) { // start at 
+                const measure = measures[0]// Always the first
+                const data1 = this.ranking.getAttributeDataDisplayed((attr1[colIndex - 1]as IServerColumn).column) //minus one because the first column is headers
+                const data2 = this.ranking.getAttributeDataDisplayed((attr2[bodyIndex] as IServerColumn).column);
+                const setParameters = {
+                  setA: data1,
+                  setADesc: attr1[colIndex - 1],
+                  setB: data2,
+                  setBDesc: attr2[bodyIndex]
+                };
+                promises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
+                .then((score) => {
+                  row[colIndex] = this.toScoreCell(score,measure,setParameters);
+                  update(data);
+                })
+                  .catch((err) => row[colIndex] = {label: 'err'})
+                ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
+              }
             }
           }
         }
@@ -808,6 +809,21 @@ export class ColumnComparison extends ATouringTask {
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
       return data; // then return the data
     }
+  }
+
+  prepareDataArray(attr1: IColumnDesc[], attr2: IColumnDesc[]) {
+    const data = new Array(attr2.length); // n2 arrays (bodies) 
+    for (let i of data.keys()) {
+      data[i] = new Array(1); //currently just one row
+      data[i][0] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
+      data[i][0][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
+      data[i][0][i+1] = {label: '&#x22F1'};
+      for (let j=i+2; j<data[i][0].length; j++) { //half of the table stays empty
+        data[i][0][j] = { label: '' }; // empty (not null, because null will display spinning wheel)
+      }
+    }
+
+    return data;
   }
 }
 
