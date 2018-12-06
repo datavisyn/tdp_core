@@ -3,6 +3,7 @@ import {RankingAdapter} from './RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, Workers} from 'touring';
 import {IColumnDesc, ICategory} from 'lineupjs';
 import * as d3 from 'd3';
+import {IScore} from 'tdp_core/src/extensions';
 
 
 export const Tasks = new Array<ATouringTask>();
@@ -275,8 +276,7 @@ export abstract class RowComparison extends ATouringTask {
     theadRow.append('th').text('Attribute');
     theadRow.append('th').text('Category');
 
-    //Table Body
-    tablesEnter.append('tbody');
+    //Table Body --> no table body, we create multiple bodies below (one for each column to group it's categories (rows in the table))
 
     super.initContent();
   }
@@ -308,15 +308,21 @@ export class SelectionStratificationComparison extends RowComparison{
       .attr('class', 'head'); //th.head are the column headers
 
     const that = this; // for the function below
-    function updateTableBody(bodyData: Array<Array<IScoreCell>>, timestamp: string) {
+    function updateTableBody(bodyData: Array<Array<Array<IScoreCell>>>, timestamp: string) {
       if (d3.select(that.node).attr('data-timestamp') !== timestamp) {
         return; // skip outdated result
       }
 
-      const trs = d3.select(that.node).select('tbody').selectAll('tr').data(bodyData, (d) => d[0].key);
+      // create a table body for every column
+      const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>> 
+      bodies.enter().append('tbody'); //For each IColumnTableData, create a tbody
+
+        // the data of each row is of type: Array<IScoreCell>
+      const trs = bodies.selectAll('tr').data((d) => d, (d) => d[0].key); // had to specify the function to derive the data (d -> d)
       trs.enter().append('tr');
-      const tds = trs.selectAll('td').data((d) => d);
+      const tds = trs.selectAll('td').data((d) => d);   // the data of each td is of type: IScoreCell
       tds.enter().append('td');
+
       // Set colheads in thead 
       colHeadsCat.text((d) => d.label);
       colHeadsCat.style("background-color", (d) => d && d.color ? d.color : '#FFF');
@@ -334,12 +340,14 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.exit().remove(); // remove cells of removed columns
       colHeadsCat.exit().remove(); // remove attribute columns
       trs.exit().remove(); // remove attribute rows
+      bodies.exit().remove();
       colHeadsCat.order();
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
+      bodies.order();
     }
     
     this.getAttrTableBody(compareTo, catData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
-    this.getAttrTableBody(compareTo, catData, false, (data: IScoreCell[][]) => updateTableBody(data, timestamp)); // set values
+    this.getAttrTableBody(compareTo, catData, false, (data) => updateTableBody(data, timestamp)); // set values
   }
 
   /**
@@ -348,39 +356,17 @@ export class SelectionStratificationComparison extends RowComparison{
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<IScoreCell>>> {
+  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
     const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
     const groupedData = this.ranking.getGroupedData();
-    const data: Array<Array<IScoreCell>> = new Array(attr2.length * groupedData.length); // each attribute has the same groups
-
-    let i=0;
-    for (const col of attr2) {
-      for (const [j, grp] of groupedData.entries()) {
-        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell)
-        data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
-          label: grp.label,
-          background: grp.color,
-          foreground:  textColor4Background(grp.color)
-        }
-        if (j === 0) {
-          data[i][0] = {
-            label: col.label,
-            rowspan: groupedData.length,
-            type: col.type
-          };
-        }
-        data[i][0].key = col.label+'-'+grp.name;
-        i++;
-      }
-    }
+    const data = this.prepareDataArray(allCat1, groupedData, attr2);
 
     if (scaffold) {
       return data;
     } else {
       const promises = [];
 
-      let i=0;
-      for (const col of attr2) {
+      for (const [bodyIndex, col] of attr2.entries()) {
         const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) { 
           const measure = measures[0];
@@ -401,12 +387,12 @@ export class SelectionStratificationComparison extends RowComparison{
           }
 
 
-          for (const [j, grpData] of groupedData.entries()) {
+          for (const [rowIndex, grpData] of groupedData.entries()) {
             const grpData4Col = grpData.rows.map((row) => row[(col as IServerColumn).column]);
 
-            let rowIndex = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
+            const scopedBodyIndex = bodyIndex; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
             // Score with selected:
-            let firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+            let firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
             if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
               let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
               const setParameters = {
@@ -415,14 +401,14 @@ export class SelectionStratificationComparison extends RowComparison{
                 setACategory: 'Selected',
                 setB: grpData4Col,
                 setBDesc: col,
-                setBCategory: groupedData[j]
+                setBCategory: groupedData[rowIndex]
               };
               promises.push(measure.calc(dataSelected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
-                      data[rowIndex][selScoreIndex] = this.toScoreCell(score, measure, setParameters);
+                      data[scopedBodyIndex][rowIndex][selScoreIndex] = this.toScoreCell(score, measure, setParameters);
                       update(data);
                     })
-                    .catch((err) => data[rowIndex][selScoreIndex] = {label: 'err'} ));
+                    .catch((err) => data[scopedBodyIndex][rowIndex][selScoreIndex] = {label: 'err'} ));
             }
 
             if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
@@ -433,17 +419,16 @@ export class SelectionStratificationComparison extends RowComparison{
                 setACategory: 'Unselected',
                 setB: grpData4Col,
                 setBDesc: col,
-                setBCategory: groupedData[j]
+                setBCategory: groupedData[rowIndex]
               };
               // Score with unselected:
               promises.push(measure.calc(dataUnselected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
-                      data[rowIndex][unselScoreIndex] = this.toScoreCell(score, measure, setParameters);
+                      data[scopedBodyIndex][rowIndex][unselScoreIndex] = this.toScoreCell(score, measure, setParameters);
                       update(data);
                     })
-                    .catch((err) => data[rowIndex][unselScoreIndex] = {label: 'err'}));
+                    .catch((err) => data[scopedBodyIndex][rowIndex][unselScoreIndex] = {label: 'err'}));
             }
-            i++;
           }
         }
       }
@@ -451,6 +436,31 @@ export class SelectionStratificationComparison extends RowComparison{
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
       return data; // then return the data
     }
+  }
+  prepareDataArray(allCat1: any[], groupedData: any[], attr2: IColumnDesc[]) {
+    const data: Array<Array<Array<IScoreCell>>> = new Array(attr2.length); // An array for each attribute (n*tbody)
+    for (const [i, col] of attr2.entries()) {
+        data[i] = new Array(groupedData.length); // An array for each group (m * tr; comparison to stratification (all columns have the same groups))
+
+        for (const [j, grp] of groupedData.entries()) {
+          data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell)
+          data[i][j][j === 0 ? 1 : 0] = { // through rowspan, the group labels can become the first array item 
+            label: grp.label,
+            background: grp.color,
+            foreground:  textColor4Background(grp.color)
+          }
+          if (j === 0) {
+            data[i][j][0] = {
+              label: col.label,
+              rowspan: groupedData.length,
+              type: col.type
+            };
+          }
+          data[i][j][0].key = col.label+'-'+grp.name;
+        }
+    }
+
+    return data;
   }
 }
 
@@ -476,30 +486,9 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<IScoreCell>>> {
+  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
     const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
-    const allCat2 = [].concat(...attr2.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
-    const data = new Array(allCat2.length); // one row per category
-    let i=0;
-    for (const col of attr2) {
-      for (const [j, cat] of (col as any).categories.entries()) {
-        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
-        data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
-          label: cat.label,
-          background: cat.color,
-          foreground: textColor4Background(cat.color)
-        } 
-        if (j === 0) {
-          data[i][0] = {
-            label: col.label,
-            rowspan: (col as any).categories.length,
-            type: col.type
-          };
-        }
-        data[i][0].key = col.label+'-'+cat.label;
-        i++;
-      }
-    }
+    const data = this.prepareDataArray(allCat1, attr2);
 
     if (scaffold) {
       return data;
@@ -507,9 +496,8 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
       const promises = [];
       const measure = MethodManager.getMeasuresByType(Type.CATEGORICAL, Type.CATEGORICAL, SCOPE.SETS)[0]; // fixed for this task: we compare categories to groups of items of the same column --> always categorical
       
-      let i=0;
-      for (const col of attr2) {
-        for (const [j, cat] of (col as any).categories.entries()) {
+      for (const [bodyIndex, col] of attr2.entries()) {
+        for (const [rowIndex, cat] of (col as any).categories.entries()) {
           const allData = this.ranking.getItemsDisplayed();
           const dataCategory = [];
           const dataSelected = []; // TODO: hardcoded -> bad
@@ -530,9 +518,9 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             }
           }
           
-          let rowIndex = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
+          const scopedBodyIndex = bodyIndex; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
           // Score with selected:
-          let firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+          let firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
           if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
             let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
             const setParameters = {
@@ -545,10 +533,10 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             };
             promises.push(measure.calc(dataSelected, dataCategory, dataSelected.concat(dataUnselected))
                   .then((score) => {
-                    data[rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
+                    data[scopedBodyIndex][rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
                   })
-                  .catch((err) => data[rowIndex][selScoreIndex] = {label: 'err'}));
+                  .catch((err) => data[scopedBodyIndex][rowIndex][selScoreIndex] = {label: 'err'}));
           }
 
           if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
@@ -564,18 +552,43 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             // Score with unselected:
             promises.push(measure.calc(dataUnselected, dataCategory, dataSelected.concat(dataUnselected))
                     .then((score) => {
-                      data[rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
+                      data[scopedBodyIndex][rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
                       update(data);
                     })
-                  .catch((err) => data[rowIndex][unselScoreIndex] = {label: 'err'}));
+                  .catch((err) => data[scopedBodyIndex][rowIndex][unselScoreIndex] = {label: 'err'}));
           }
-          i++;
         }
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
       return data; // then return the data
     }
+  }
+
+
+  prepareDataArray(allCat1: any[], attr2: IColumnDesc[]) {
+    const data = new Array(attr2.length); // one array per attribute (number of table bodies)
+    for (const [i, col] of attr2.entries()) {
+      data[i] = new Array((col as any).categories.length); // one array per category (number of rows in body)
+      for (const [j, cat] of (col as any).categories.entries()) {
+        data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
+        data[i][j][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
+          label: cat.label,
+          background: cat.color,
+          foreground: textColor4Background(cat.color)
+        } 
+        if (j === 0) {
+          data[i][j][0] = {
+            label: col.label,
+            rowspan: (col as any).categories.length,
+            type: col.type
+          };
+        }
+        data[i][j][0].key = col.label+'-'+cat.label;
+      }
+    }
+    
+    return data;
   }
 }
 
@@ -601,50 +614,28 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<IScoreCell>>> {
+  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
     const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
     const groupedData = this.ranking.getGroupedData();
-    const data = new Array(attr2.length * groupedData.length); // each attribute has the same groups
-
-    let i=0;
-    for (const col of attr2) {
-      for (const [j, grp] of groupedData.entries()) {
-        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
-        data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
-          label: grp.label,
-          background: grp.color,
-          foreground:  textColor4Background(grp.color)
-        }
-        if (j === 0) {
-          data[i][0] = {
-            label: col.label,
-            rowspan: groupedData.length,
-            type: col.type
-          };
-        }
-        data[i][0].key = col.label+'-'+grp.name;
-        i++;
-      }
-    }
+    const data = this.prepareDataArray(allCat1, groupedData, attr2);
 
     if (scaffold) {
       return data;
     } else {
       const promises = [];
-      let i=0;
-      
-      for (const col of attr2) {
+
+      for (const [bodyIndex, col] of attr2.entries()) {
         const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) { 
           const measure = measures[0];
-          for (const [j, grpData] of groupedData.entries()) {
+          for (const [rowIndex, grpData] of groupedData.entries()) {
             const grpData4ColRow = grpData.rows.map((row) => row[(col as IServerColumn).column]); //data for the current row
-            const rowIndex = i; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
-            const firstScoreIndex = j === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+            const scopedBodyIndex = bodyIndex; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
+            const firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
             
             for (const [k, grpData] of groupedData.entries()) {
               const colIndex = firstScoreIndex + k;
-              if(k <= j) { // only diagonal
+              if(k <= rowIndex) { // only diagonal
                 const grpData4ColCol = grpData.rows.map((row) => row[(col as IServerColumn).column]); //data for the current column
                 const setParameters = {
                   setA: grpData4ColCol,
@@ -652,19 +643,18 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                   setACategory: groupedData[k],
                   setB: grpData4ColRow,
                   setBDesc: col,
-                  setBCategory: groupedData[j],
+                  setBCategory: groupedData[rowIndex],
                 };
                 promises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
                   .then((score) => {
-                    data[rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
+                    data[scopedBodyIndex][rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
                     update(data);
                   })
-                  .catch((err) => data[rowIndex][colIndex] = {label: 'err'}));
+                  .catch((err) => data[scopedBodyIndex][rowIndex][colIndex] = {label: 'err'}));
               } else {
-                data[rowIndex][colIndex] = {label: ''}
+                data[scopedBodyIndex][rowIndex][colIndex] = {label: ''}
               }
             }
-            i++;
           }
         }
       }
