@@ -322,21 +322,13 @@ export class SelectionStratificationComparison extends RowComparison{
       colHeadsCat.style("background-color", (d) => d && d.color ? d.color : '#FFF');
       colHeadsCat.style("color", (d) => d && d.color ? textColor4Background(d.color) : '#333');
       // set data in tbody
-      tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
-      tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
-      tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
-      tds.style("background-color", (d) => d !== null ? d.background : '#FFFFFF');
-      tds.attr('class', (d: any) => {
-        // icon for the attribute type
-        if(d && d.type && d.type === 'categorical') {
-          return 'icon-category';
-        } else if (d && d.type && d.type === 'number') {
-          return 'icon-number';
-        }
-        return null;
-      });
-      tds.classed('action', (d) => (d !== null && d.score !== undefined));
-      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
+      tds.attr('colspan', (d) => d.colspan);
+      tds.attr('rowspan', (d) => d.rowspan);
+      tds.style("color", (d) => d.foreground);
+      tds.style("background-color", (d) => d.background);
+      tds.attr('data-type', (d) => d.type);
+      tds.classed('action', (d) => d.score !== undefined);
+      tds.html((d) => d.label);
       tds.on('click', function() { that.onClick.bind(that)(this)})
       // Exit
       tds.exit().remove(); // remove cells of removed columns
@@ -359,12 +351,12 @@ export class SelectionStratificationComparison extends RowComparison{
   async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<IScoreCell>>> {
     const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
     const groupedData = this.ranking.getGroupedData();
-    const data = new Array(attr2.length * groupedData.length); // each attribute has the same groups
+    const data: Array<Array<IScoreCell>> = new Array(attr2.length * groupedData.length); // each attribute has the same groups
 
     let i=0;
     for (const col of attr2) {
       for (const [j, grp] of groupedData.entries()) {
-        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
+        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell)
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: grp.label,
           background: grp.color,
@@ -491,7 +483,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
     let i=0;
     for (const col of attr2) {
       for (const [j, cat] of (col as any).categories.entries()) {
-        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
+        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: cat.label,
           background: cat.color,
@@ -617,7 +609,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
     let i=0;
     for (const col of attr2) {
       for (const [j, grp] of groupedData.entries()) {
-        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill(null)
+        data[i] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
         data[i][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item 
           label: grp.label,
           background: grp.color,
@@ -686,6 +678,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
 interface IScoreCell {
   key?: string,
   label: string,
+  type?: string,
   background?: string,
   foreground?: string,
   rowspan?: number,
@@ -755,21 +748,13 @@ export class ColumnComparison extends ATouringTask {
       // Set colheads in thead 
       colHeads.text((d) => d.label);
       // set data in tbody
-      tds.attr('colspan', (d) => d !== null ? d.colspan : 1);
-      tds.attr('rowspan', (d) => d !== null ? d.rowspan : 1);
-      tds.style("color", (d) => d !== null  ? d.foreground : '#333333');
-      tds.style('background-color', (d) => d !== null ? d.background : '#FFFFFF');
-      tds.attr('class', (d: any) => {
-        // icon for the attribute type
-        if(d && d.type && d.type === 'categorical') {
-          return 'icon-category';
-        }else if (d && d.type && d.type === 'number') {
-          return 'icon-number';
-        }
-        return null;
-      });
-      tds.classed('action', (d) => (d !== null && d.score !== undefined));
-      tds.html((d) => d === null ? '<i class="fa fa-circle-o-notch fa-spin"></i>' : d.label);
+      tds.attr('colspan', (d) => d.colspan);
+      tds.attr('rowspan', (d) => d.rowspan);
+      tds.style("color", (d) => d.foreground);
+      tds.style('background-color', (d) => d.background);
+      tds.attr('data-type', (d) => d.type);
+      tds.classed('action', (d) => d.score !== undefined);
+      tds.html((d) => d.label);
       tds.on('click', function() { that.onClick.bind(that)(this)})
       // Exit
       colHeads.exit().remove(); // remove attribute columns
@@ -792,7 +777,7 @@ export class ColumnComparison extends ATouringTask {
   private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][]) => void): Promise<Array<Array<any>>> {
     const data = new Array(attr2.length); // n2 arrays (rows) 
     for (let i of data.keys()) {
-      data[i] = new Array(attr1.length + 1).fill(null) // containing n1+1 elements (header + n1 vlaues)
+      data[i] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
       data[i][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
     }
 

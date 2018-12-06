@@ -58,17 +58,18 @@ div.touring {
             background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
             font-weight: bolder; 
           }
-          &.icon-category::before {
+
+          &[data-type]::before {
             display: inline-block; // so that the width property works
             width: 1.2em; //to have some space between icon and the text in the td
             font-family: lu-font; // some icon font 
             color: #999; // #515151 is to dark
+          }
+
+          &[data-type='categorical']::before {
             content: "\e810";
           }
-          &.icon-number::before {
-            font-family: lu-font;
-            color: #999;
-            width: 1.2em;
+          &[data-type='number']::before {
             content: "\e811";
           }
         }
