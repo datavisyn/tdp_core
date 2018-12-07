@@ -3,7 +3,6 @@ import {RankingAdapter} from './RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, Workers} from 'touring';
 import {IColumnDesc, ICategory} from 'lineupjs';
 import * as d3 from 'd3';
-import {IScore} from 'tdp_core/src/extensions';
 
 
 export const Tasks = new Array<ATouringTask>();
