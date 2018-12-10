@@ -79,6 +79,9 @@ div.touring {
             min-width: $col-min-size;
             max-width: $col-max-size;
             padding: 0 $wide-col-padding;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           &.action {
