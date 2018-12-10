@@ -715,7 +715,8 @@ export class ColumnComparison extends ATouringTask {
     d3.select(this.node).attr('data-timestamp', timestamp);
 
     const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
-    colHeads.enter().append('th').attr('class', 'head'); //th.head are the column headers
+    const colHeadsSpan = colHeads.enter().append('th')
+      .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
     
     const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<Array<IScoreCell>>>) {
@@ -735,7 +736,7 @@ export class ColumnComparison extends ATouringTask {
       const tds = trs.selectAll('td').data((d) => d)
       tds.enter().append('td');
       // Set colheads in thead 
-      colHeads.text((d) => d.label);
+      colHeadsSpan.text((d) => d.label);
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
       tds.attr('rowspan', (d) => d.rowspan);
