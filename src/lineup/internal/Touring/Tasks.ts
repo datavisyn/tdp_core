@@ -302,8 +302,8 @@ export class SelectionStratificationComparison extends RowComparison{
     d3.select(this.node).attr('data-timestamp', timestamp);
 
     const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
-    colHeadsCat.enter().append('th')
-      .attr('class', 'head'); //th.head are the column headers
+    const colHeadsCatSpan = colHeadsCat.enter().append('th')
+      .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
 
     const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<Array<IScoreCell>>>, timestamp: string) {
@@ -322,9 +322,9 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.enter().append('td');
 
       // Set colheads in thead 
-      colHeadsCat.text((d) => d.label);
-      colHeadsCat.style("background-color", (d) => d && d.color ? d.color : '#FFF');
-      colHeadsCat.style("color", (d) => d && d.color ? textColor4Background(d.color) : '#333');
+      colHeadsCatSpan.text((d) => d.label);
+      colHeadsCatSpan.style("background-color", (d) => d && d.color ? d.color : '#FFF');
+      colHeadsCatSpan.style("color", (d) => d && d.color ? textColor4Background(d.color) : '#333');
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
       tds.attr('rowspan', (d) => d.rowspan);

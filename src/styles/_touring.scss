@@ -58,15 +58,47 @@ div.touring {
         th {
           min-width: $col-min-size;
           max-width: $col-min-size;
-          overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
           padding: 0 $narrow-col-padding;
 
           &:not(.head) { // cells of row labels in header
-            min-width: $col-min-size;
+            min-width: $col-min-size; //flexible from min to max
             max-width: $col-max-size;
             padding: 0 $wide-col-padding;
+          }
+
+          &.rotate {
+            height:140px;
+
+            > div {
+              transform: 
+                translate(25px, 51px) /* Magic Numbers */
+                rotate(-45deg);
+              width: 30px;
+              
+              > span {
+                display: inline-block;  // to set a width
+                min-width: $col-max-size; // same width as the row labels, but not flexible
+                max-width: $col-max-size;
+                box-sizing: border-box; // i dont want to mess with the padding
+
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 2px;
+
+                > span {
+                  max-width: 100%; // just as wide as the parent
+                  display: inline-block; // to make width & string truncation work
+                  vertical-align: bottom; // at the bottom of the parent
+                  overflow: hidden; // important to stop text at right border
+                  white-space: nowrap; // no line breaks
+                  text-overflow: ellipsis;
+                  
+                  box-sizing: border-box; // i dont want to mess with the padding
+                  padding: 0.25em 0.5em;
+                }
+              }
+            }
           }
         }
 
