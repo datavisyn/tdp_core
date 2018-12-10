@@ -58,9 +58,6 @@ div.touring {
         th {
           min-width: $col-min-size;
           max-width: $col-min-size;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          padding: 0 $narrow-col-padding;
 
           &:not(.head) { // cells of row labels in header
             min-width: $col-min-size; //flexible from min to max
@@ -68,12 +65,12 @@ div.touring {
             padding: 0 $wide-col-padding;
           }
 
-          &.rotate {
-            height:140px;
+          &.rotate { // adapted from https://css-tricks.com/rotated-table-column-headers/
+            height:112px;
 
             > div {
               transform: 
-                translate(25px, 51px) /* Magic Numbers */
+                translate(29px, 37px) /* Magic Numbers */
                 rotate(-45deg);
               width: 30px;
               
@@ -107,7 +104,7 @@ div.touring {
             vertical-align: text-top; // move text of multi-row cells to the top
           }
 
-          &:not(.action) { // row labels
+          &:not(.score) { // row labels
             min-width: $col-min-size;
             max-width: $col-max-size;
             padding: 0 $wide-col-padding;
@@ -126,7 +123,7 @@ div.touring {
 
             border-style: solid;
             border-color: #ccc;
-            border-width: 0px;
+            border-width: 0px; // overwrite the default
             border-right-width: 1px; // just on the right
           }
 
