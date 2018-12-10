@@ -39,6 +39,14 @@ export abstract class ATouringTask implements ITouringTask{
   }
   
   initContent() {
+    let headline = "Similarity of ";
+    if (SCOPE.ATTRIBUTES === this.scope) {
+      headline += 'Columns';
+    } else {
+      headline += ' Rows'
+    }
+    d3.select(this.node).append('h1').text(headline);
+
     const tablesEnter = d3.select(this.node).append('table');
 
     //Table Head

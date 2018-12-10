@@ -33,6 +33,14 @@ div.touring {
       top: 0; left: 0;
       right: 0; bottom: 0;
       overflow: auto;
+
+      h1 {
+        display: block;
+        position: absolute; // absolute to float over the table
+        top: 0;
+        left: 0.5em;
+        font-size: 1.5em;
+      }
     }
 
     a:hover, a:focus {
@@ -71,17 +79,17 @@ div.touring {
         max-width: $col-min-size;
 
         &:not(.head) { // cells of row labels in header
-          min-width: $col-min-size; //flexible from min to max
+          min-width: $col-max-size*0.7; //flexible from min to max
           max-width: $col-max-size;
           padding: 0 $wide-col-padding;
         }
 
         &.rotate { // adapted from https://css-tricks.com/rotated-table-column-headers/
-          height:112px;
+          height:120px;
 
           > div {
             transform: 
-              translate(29px, 37px) /* Magic Numbers */
+              translate(29px, 40px) /* Magic Numbers */
               rotate(-45deg);
             width: 30px;
             
@@ -116,7 +124,7 @@ div.touring {
         }
 
         &:not(.score) { // row labels
-          min-width: $col-min-size;
+          min-width: $col-max-size*0.7;
           max-width: $col-max-size;
           padding: 0 $wide-col-padding;
           overflow: hidden;
