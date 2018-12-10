@@ -39,9 +39,7 @@ export abstract class ATouringTask implements ITouringTask{
   }
   
   initContent() {
-    const tablesEnter = d3.select(this.node)
-      .append('div').attr('class', 'table-container')
-      .append('table');
+    const tablesEnter = d3.select(this.node).append('table');
 
     //Table Head
     tablesEnter.append('thead').append('tr').append('th');
@@ -188,7 +186,7 @@ export abstract class ATouringTask implements ITouringTask{
     divDetails.selectAll('svg').remove();
 
     // remove selected cell highlighting
-    let allTds = d3.select(this.node).select('div.table-container').selectAll('td');
+    let allTds = d3.select(this.node).selectAll('td');
     allTds.classed('selectedCell',false);
     
   }
