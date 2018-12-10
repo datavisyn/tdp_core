@@ -353,7 +353,7 @@ export class SelectionStratificationComparison extends RowComparison{
     }
     
     this.getAttrTableBody(compareTo, catData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
-    this.getAttrTableBody(compareTo, catData, false, (data) => updateTableBody(data, timestamp)); // set values
+    this.getAttrTableBody(compareTo, catData, false, (data) => updateTableBody(data, timestamp)).then((data) => updateTableBody(data, timestamp)); // set values
   }
 
   /**
@@ -654,7 +654,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                 promises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
                   .then((score) => {
                     data[scopedBodyIndex][rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
-                    update(data);
+                    //update(data);
                   })
                   .catch((err) => data[scopedBodyIndex][rowIndex][colIndex] = {label: 'err'}));
               } else if (k === rowIndex) {
