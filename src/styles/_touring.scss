@@ -116,7 +116,7 @@ div.touring {
             white-space: nowrap;
           }
 
-          &.action {
+          &.score {
             // no min-width here because than the cell gets larger on hover (wich makes the text bolder)
             max-width: $col-min-size;
             text-align: center; // padding workaround, because we make the font bolder on hover and can use the whitespace of the cell this way
@@ -124,15 +124,22 @@ div.touring {
             text-overflow: clip; // cells are so small, the ... would take to much space
             white-space: nowrap;
 
+            border-style: solid;
+            border-color: #ccc;
+            border-width: 0px;
+            border-right-width: 1px; // just on the right
+          }
+
+          &.action {
             &:hover, &:focus { // = td.action:hover
               background-color: #fba74d !important; // important because to overwrite the htmml inline color definition              
               font-weight: bolder;
             } 
-          }
 
-          &.selectedCell {
-            background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
-            font-weight: bolder; 
+            &.selectedCell {
+              background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
+              font-weight: bolder; 
+            }
           }
 
           &[data-type]::before {

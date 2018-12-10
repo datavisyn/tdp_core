@@ -332,6 +332,7 @@ export class SelectionStratificationComparison extends RowComparison{
       tds.style("background-color", (d) => d.background);
       tds.attr('data-type', (d) => d.type);
       tds.classed('action', (d) => d.score !== undefined);
+      tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
       tds.on('click', function() { that.onClick.bind(that)(this)})
       // Exit
@@ -633,7 +634,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
             
             for (const [k, grpData] of groupedData.entries()) {
               const colIndex = firstScoreIndex + k;
-              if(k <= rowIndex) { // only diagonal
+              if(k < rowIndex) { // only diagonal
                 const grpData4ColCol = grpData.rows.map((row) => row[(col as IServerColumn).column]); //data for the current column
                 const setParameters = {
                   setA: grpData4ColCol,
@@ -649,8 +650,10 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                     update(data);
                   })
                   .catch((err) => data[scopedBodyIndex][rowIndex][colIndex] = {label: 'err'}));
+              } else if (k === rowIndex) {
+                data[scopedBodyIndex][rowIndex][colIndex] = {label: '&#x2261', measure: measure}
               } else {
-                data[scopedBodyIndex][rowIndex][colIndex] = {label: ''}
+                data[scopedBodyIndex][rowIndex][colIndex] = {label: '', measure: measure}
               }
             }
           }
@@ -744,6 +747,7 @@ export class ColumnComparison extends ATouringTask {
       tds.style('background-color', (d) => d.background);
       tds.attr('data-type', (d) => d.type);
       tds.classed('action', (d) => d.score !== undefined);
+      tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
       tds.on('click', function() { that.onClick.bind(that)(this); })
       // Exit
@@ -817,9 +821,9 @@ export class ColumnComparison extends ATouringTask {
       data[i] = new Array(1); //currently just one row
       data[i][0] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
       data[i][0][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
-      data[i][0][i+1] = {label: '&#x22F1'};
+      data[i][0][i+1] = {label: '&#x2261', measure: null};
       for (let j=i+2; j<data[i][0].length; j++) { //half of the table stays empty
-        data[i][0][j] = { label: '' }; // empty (not null, because null will display spinning wheel)
+        data[i][0][j] = { label: '', measure: null}; // empty (not null, because null will display spinning wheel)
       }
     }
 
