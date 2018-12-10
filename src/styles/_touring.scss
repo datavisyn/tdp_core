@@ -15,15 +15,33 @@ button.touring.active::before {
 }
 
 div.touring {
-  margin-top: 0.5rem;
-  overflow-y: auto;
+  flex: 1 0 auto; // sidebar uses flexbox
 
-  .measures, .output {
+  // the touring div itself uses a flexbox for the children:
+  display: flex; 
+  flex-direction: column;
+
+  padding-top: 1em;
+
+  .output {
+    position: relative;
+    flex: 1;
+    
+    .task {
+      position: absolute;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      overflow: auto;
+    }
+  }
+    
+
+  .output {
     border-top: #AAA 1px solid;
 
     a:hover, a:focus {
-        color: #1f77b4;
-        text-decoration: none;
+      color: #1f77b4;
+      text-decoration: none;
     }
 
     a[aria-expanded="false"]::before {
@@ -41,8 +59,6 @@ div.touring {
     }
 
     .table-container {
-      overflow-x: auto;
-      
       table {
         $wide-col-padding: 0.5em;
         $narrow-col-padding: 0.2em;
