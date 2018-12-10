@@ -87,7 +87,7 @@ div.touring {
           &.action {
             // no min-width here because than the cell gets larger on hover (wich makes the text bolder)
             max-width: $col-min-size;
-            text-align: center;
+            text-align: center; // padding workaround, because we make the font bolder on hover and can use the whitespace of the cell this way
             overflow: hidden;
             text-overflow: clip; // cells are so small, the ... would take to much space
             white-space: nowrap;
