@@ -180,17 +180,23 @@ export abstract class ATouringTask implements ITouringTask{
 
   }
 
+  protected removeOldVisuallization () {
+
+    // remove old visualization and details
+    let divDetails = d3.select(this.node).select('div.details');
+    divDetails.selectAll('div').remove();
+    divDetails.selectAll('svg').remove();
+
+    // remove selected cell highlighting
+    let allTds = d3.select(this.node).select('div.table-container').selectAll('td');
+    allTds.classed('selectedCell',false);
+    
+  }
+
   private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
     
     let divDetailInfo = miniVisualisation.append('div')
                                     .classed('detailVis',true);
-  
-    // let detailTestType = divDetailInfo.append('div');
-    // divDetailInfo.append('div')
-    //               .classed('detailDiv',true)
-    //               .text('Test: ')
-    //               .append('span')
-    //               .text();
   
     // let detailTestValue = divDetailInfo.append('div');
     let scoreValue = measureResult.scoreValue.toFixed(3);
@@ -294,6 +300,7 @@ export class SelectionStratificationComparison extends RowComparison{
     Workers.terminateAll(); // Abort all calculations as their results are no longer needed
     // numerical and categorical data is ok
     const compareTo = [this.ranking.getSelectionDesc()];
+    this.removeOldVisuallization();
     this.createTable(data, compareTo);
   }
 
@@ -377,8 +384,7 @@ export class SelectionStratificationComparison extends RowComparison{
           
           for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
             const colId = (col as IServerColumn).column;
-            if (selectIndices.length > 0 && index === selectIndices[0]) {
-              selectIndices.shift(); // Remove first element as we have reached it
+            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)){
               dataSelected.push(item[colId])
             } else {
               dataUnselected.push(item[colId]);
@@ -604,6 +610,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
   update(data: any) {
     // numerical and categorical data is ok
     const compareTo = [this.ranking.getStratificationDesc()];
+    this.removeOldVisuallization();
     this.createTable(data, compareTo);
   }
 
@@ -716,6 +723,8 @@ export class ColumnComparison extends ATouringTask {
     Workers.terminateAll(); // Abort all calculations as their results are no longer needed
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
+
+    this.removeOldVisuallization();
 
     const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
     const colHeadsSpan = colHeads.enter().append('th')
