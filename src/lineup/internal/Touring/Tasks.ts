@@ -400,8 +400,7 @@ export class SelectionStratificationComparison extends RowComparison{
           
           for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
             const colId = (col as IServerColumn).column;
-            if (selectIndices.length > 0 && index === selectIndices[0]) {
-              selectIndices.shift(); // Remove first element as we have reached it
+            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)){
               dataSelected.push(item[colId])
             } else {
               dataUnselected.push(item[colId]);
