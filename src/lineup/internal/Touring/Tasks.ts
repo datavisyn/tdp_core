@@ -1,6 +1,6 @@
 import {IServerColumn} from '../../../rest';
 import {RankingAdapter} from './RankingAdapter';
-import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, Workers} from 'touring';
+import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, WorkerManager} from 'touring';
 import {IColumnDesc, ICategory} from 'lineupjs';
 import * as d3 from 'd3';
 
@@ -303,7 +303,7 @@ export class SelectionStratificationComparison extends RowComparison{
   }
 
   update(data: any) {
-    Workers.terminateAll(); // Abort all calculations as their results are no longer needed
+    WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
     // numerical and categorical data is ok
     const compareTo = [this.ranking.getSelectionDesc()];
     this.removeOldVisuallization();
@@ -660,7 +660,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                 promises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
                   .then((score) => {
                     data[scopedBodyIndex][rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
-                    //update(data);
+                    update(data);
                   })
                   .catch((err) => data[scopedBodyIndex][rowIndex][colIndex] = {label: 'err'}));
               } else if (k === rowIndex) {
@@ -726,7 +726,7 @@ export class ColumnComparison extends ATouringTask {
   }
 
   public update(data: any[]) {
-    Workers.terminateAll(); // Abort all calculations as their results are no longer needed
+    WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
