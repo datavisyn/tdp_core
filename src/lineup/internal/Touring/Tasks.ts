@@ -521,8 +521,8 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               dataCategory.push(item[colId]);
             }
 
-            if (selectIndices.length > 0 && index === selectIndices[0]) {
-              selectIndices.shift(); // Remove first element as we have reached it
+            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)){
+              // selectIndices.shift(); // Remove first element as we have reached it
               dataSelected.push(item[colId])
             } else {
               dataUnselected.push(item[colId]);
@@ -743,7 +743,7 @@ export class ColumnComparison extends ATouringTask {
       }
 
       const test = bodyData.slice();
-      console.log(test)
+      // console.log(test)
       // create a table body for every column
       const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>> 
       bodies.enter().append('tbody'); //For each IColumnTableData, create a tbody
