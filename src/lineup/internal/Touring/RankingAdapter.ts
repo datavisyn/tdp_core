@@ -67,7 +67,7 @@ export class RankingAdapter {
 
       const scoreCols = this.getScoreColumns();
       const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
-  
+
       this.oldOrder = this.getItemOrder();
       this.oldSelection = this.getSelectionUnsorted();
 
@@ -82,16 +82,16 @@ export class RankingAdapter {
         item.strat_groups = stratGroupName; // index of group = category name, find index by looking up i. -1 if not found
         databaseData.push(item);
       })
-  
+
       // merge score and database data
       this.data = [...databaseData.concat(scoresData)
         .reduce((map, curr) => {
           map.has(curr.id) || map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
-          
+
           const item = map.get(curr.id); // get stored data for this id
-  
+
           Object.entries(curr).forEach(([k, v]) => item[k] = v ); // add the content of the current array item to the data already stored in the map's entry (overwrites if there are the same properties in databaseData and scoreColumn)
-          
+
           return map;
         }, new Map()).values()]; // give map as input and return it's value
     }
@@ -154,7 +154,7 @@ export class RankingAdapter {
         rows: grp.order.map((index) => data[index]).filter((item) => item !== undefined)
       });
     }
-    return groups;  
+    return groups;
   }
 
 
@@ -205,7 +205,7 @@ export class RankingAdapter {
       for (let id of ids) {
         let dataEntry = {id: id};
         dataEntry[desc.column] = accessor({v: {id: id}, i: null} as IDataRow); // i is not used by the accessor function
-        data.push(dataEntry); 
+        data.push(dataEntry);
       }
     }
     return data;
