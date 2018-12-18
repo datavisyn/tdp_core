@@ -1,6 +1,6 @@
 import LineUpPanelActions from '../LineUpPanelActions';
 import {RankingAdapter} from './RankingAdapter';
-import {Tasks, ATouringTask} from './Tasks'
+import {tasks as Tasks, ATouringTask} from './Tasks'
 import {IServerColumn} from '../../../rest';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {LocalDataProvider, IColumnDesc, Column, CategoricalColumn, ICategoricalColumnDesc} from 'lineupjs';

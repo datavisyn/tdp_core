@@ -5,11 +5,11 @@ import {IColumnDesc, ICategory} from 'lineupjs';
 import * as d3 from 'd3';
 
 
-export const Tasks = new Array<ATouringTask>();
+export const tasks = new Array<ATouringTask>();
 export function TaskDecorator() {
   return function (target: {new(): ATouringTask}) { // only instantiable subtypes of ATouringTask can be passed.
-    Tasks.push(new target());
-    Tasks.sort((a, b) => b.order - a.order); //sort descending
+    tasks.push(new target());
+    tasks.sort((a, b) => b.order - a.order); //sort descending
   };
 }
 
@@ -21,7 +21,7 @@ export interface ITouringTask {
   scope: SCOPE; // Does the Task use attributes or subsets of them?
 }
 
-export abstract class ATouringTask implements ITouringTask{
+export abstract class ATouringTask implements ITouringTask {
   public id: string;
   public label: string;
   public node: HTMLElement;
@@ -39,11 +39,11 @@ export abstract class ATouringTask implements ITouringTask{
   }
 
   initContent() {
-    let headline = "Similarity of ";
+    let headline = 'Similarity of ';
     if (SCOPE.ATTRIBUTES === this.scope) {
       headline += 'Columns';
     } else {
-      headline += ' Rows'
+      headline += ' Rows';
     }
     d3.select(this.node).append('h1').text(headline);
 
@@ -61,7 +61,7 @@ export abstract class ATouringTask implements ITouringTask{
     d3.select(this.node).append('div').classed('details', true);
   }
 
-  public abstract update(data: any[])
+  public abstract update(data: any[]);
   // {
   //     const ps = d3.select(this.node).selectAll('p').data(data, (data) => data.column); //column property is key
   //     ps.enter().append('p').text((attr) => attr.label); //enter: add tasks to dropdown
@@ -76,24 +76,23 @@ export abstract class ATouringTask implements ITouringTask{
       label: score.pValue.toFixed(3),
       background: color.background,
       foreground: color.foreground,
-      score: score,
-      measure: measure,
-      setParameters: setParameters
-    }
+      score,
+      measure,
+      setParameters
+    };
   }
 
   // creates legend for the p-value
-  private createLegend(parentElement: d3.Selection<any>)
-  {
-    let divLegend = parentElement.append('div').classed('measure-legend',true);
+  private createLegend(parentElement: d3.Selection<any>) {
+    const divLegend = parentElement.append('div').classed('measure-legend',true);
 
-    let svgLegendContainer = divLegend.append('svg')
+    const svgLegendContainer = divLegend.append('svg')
                               .attr('width','100%')
                               .attr('height',35);
                               // .attr('viewBox','0 0 100% 35')
                               // .attr('preserveAspectRatio','xMaxYMin meet');
 
-    let svgDefs = svgLegendContainer.append('defs').append('linearGradient')
+                              const svgDefs = svgLegendContainer.append('defs').append('linearGradient')
                                                   .attr('id','gradLegend');
     svgDefs.append('stop')
             .attr('offset','0%')
@@ -106,18 +105,18 @@ export abstract class ATouringTask implements ITouringTask{
             .attr('stop-color','#FFFFFF');
 
     let xStart = 0;
-    let yStart = 0;
-    let barWidth = 300;
-    let barHeight = 10;
-    let space = 5;
-    let textHeight = 15;
-    let textWidth = 50;
-    let tickLength = 5;
-    let lineWidth = 1;
+    const yStart = 0;
+    const barWidth = 300;
+    const barHeight = 10;
+    const space = 5;
+    const textHeight = 15;
+    const textWidth = 50;
+    const tickLength = 5;
+    const lineWidth = 1;
 
     xStart = xStart + textWidth;
-    let svgLegend = svgLegendContainer.append('g');
-    let svgLegendLabel = svgLegend.append('g');
+    const svgLegend = svgLegendContainer.append('g');
+    const svgLegendLabel = svgLegend.append('g');
     // label
     svgLegendLabel.append('text')
     .attr('x',xStart)
@@ -127,7 +126,7 @@ export abstract class ATouringTask implements ITouringTask{
 
     xStart = xStart + space;
 
-    let svgLegendGroup = svgLegend.append('g');
+    const svgLegendGroup = svgLegend.append('g');
     // bar + bottom line
     svgLegendGroup.append('rect')
       .attr('x',xStart).attr('y',yStart)
@@ -189,25 +188,25 @@ export abstract class ATouringTask implements ITouringTask{
   protected removeOldVisuallization () {
 
     // remove old visualization and details
-    let divDetails = d3.select(this.node).select('div.details');
+    const divDetails = d3.select(this.node).select('div.details');
     divDetails.selectAll('div').remove();
     divDetails.selectAll('svg').remove();
 
     // remove selected cell highlighting
-    let allTds = d3.select(this.node).selectAll('td');
+    const allTds = d3.select(this.node).selectAll('td');
     allTds.classed('selectedCell',false);
 
   }
 
   private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
 
-    let divDetailInfo = miniVisualisation.append('div')
+    const divDetailInfo = miniVisualisation.append('div')
                                     .classed('detailVis',true);
 
-    // let detailTestValue = divDetailInfo.append('div');
-    let scoreValue = measureResult.scoreValue.toFixed(3);
-    let pValue = measureResult.pValue.toFixed(3);
-    let detailInfoValues = divDetailInfo.append('div')
+    // const detailTestValue = divDetailInfo.append('div');
+    const scoreValue = measureResult.scoreValue.toFixed(3);
+    const pValue = measureResult.pValue.toFixed(3);
+    const detailInfoValues = divDetailInfo.append('div')
                           .classed('detailDiv',true);
                           // .text(`Test-Value: ${scoreValue}, p-Value: ${pValue}`);
     detailInfoValues.append('span')
@@ -225,7 +224,7 @@ export abstract class ATouringTask implements ITouringTask{
     detailInfoValues.append('span')
                     .text(pValue);
 
-    // let detailTestDescr = divDetailInfo.append('div');
+    // const detailTestDescr = divDetailInfo.append('div');
     divDetailInfo.append('div')
                   .classed('detailDiv',true)
                   .text('Description: ')
@@ -279,8 +278,8 @@ export abstract class RowComparison extends ATouringTask {
 
   constructor() {
     super();
-    this.id = "itemCmp";
-    this.label = "Pairwise Compare Rows";
+    this.id = 'itemCmp';
+    this.label = 'Pairwise Compare Rows';
 
     this.scope = SCOPE.SETS;
   }
@@ -293,12 +292,12 @@ export abstract class RowComparison extends ATouringTask {
 }
 
 @TaskDecorator()
-export class SelectionStratificationComparison extends RowComparison{
+export class SelectionStratificationComparison extends RowComparison {
 
   constructor() {
     super();
-    this.id = "selStratCmp";
-    this.label = "Compare Selected Rows with Stratification Groups";
+    this.id = 'selStratCmp';
+    this.label = 'Compare Selected Rows with Stratification Groups';
     this.order = 80;
   }
 
@@ -336,18 +335,18 @@ export class SelectionStratificationComparison extends RowComparison{
 
       // Set colheads in thead
       colHeadsCatSpan.text((d) => d.label);
-      colHeadsCatSpan.style("background-color", (d) => d && d.color ? d.color : '#FFF');
-      colHeadsCatSpan.style("color", (d) => d && d.color ? textColor4Background(d.color) : '#333');
+      colHeadsCatSpan.style('background-color', (d) => d && d.color ? d.color : '#FFF');
+      colHeadsCatSpan.style('color', (d) => d && d.color ? textColor4Background(d.color) : '#333');
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
       tds.attr('rowspan', (d) => d.rowspan);
-      tds.style("color", (d) => d.foreground);
-      tds.style("background-color", (d) => d.background);
+      tds.style('color', (d) => d.foreground);
+      tds.style('background-color', (d) => d.background);
       tds.attr('data-type', (d) => d.type);
       tds.classed('action', (d) => d.score !== undefined);
       tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
-      tds.on('click', function() { that.onClick.bind(that)(this)})
+      tds.on('click', function() { that.onClick.bind(that)(this); });
       // Exit
       tds.exit().remove(); // remove cells of removed columns
       colHeadsCat.exit().remove(); // remove attribute columns
@@ -390,8 +389,8 @@ export class SelectionStratificationComparison extends RowComparison{
 
           for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
             const colId = (col as IServerColumn).column;
-            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)){
-              dataSelected.push(item[colId])
+            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)) {
+              dataSelected.push(item[colId]);
             } else {
               dataUnselected.push(item[colId]);
             }
@@ -403,9 +402,9 @@ export class SelectionStratificationComparison extends RowComparison{
 
             const scopedBodyIndex = bodyIndex; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
             // Score with selected:
-            let firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+            const firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
             if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
-              let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
+              const selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
               const setParameters = {
                 setA: dataSelected,
                 setADesc: attr1[0],
@@ -423,7 +422,7 @@ export class SelectionStratificationComparison extends RowComparison{
             }
 
             if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
-              let unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
+              const unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
               const setParameters = {
                 setA: dataUnselected,
                 setADesc: attr1[0],
@@ -454,12 +453,13 @@ export class SelectionStratificationComparison extends RowComparison{
         data[i] = new Array(groupedData.length); // An array for each group (m * tr; comparison to stratification (all columns have the same groups))
 
         for (const [j, grp] of groupedData.entries()) {
-          data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell)
+          data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
           data[i][j][j === 0 ? 1 : 0] = { // through rowspan, the group labels can become the first array item
             label: grp.label,
             background: grp.color,
             foreground:  textColor4Background(grp.color)
-          }
+          };
+
           if (j === 0) {
             data[i][j][0] = {
               label: col.label,
@@ -477,12 +477,12 @@ export class SelectionStratificationComparison extends RowComparison{
 
 
 @TaskDecorator()
-export class SelectionCategoryComparison extends SelectionStratificationComparison{
+export class SelectionCategoryComparison extends SelectionStratificationComparison {
 
   constructor() {
     super();
-    this.id = "selCatCmp";
-    this.label = "Compare Selected Rows with Column Categories";
+    this.id = 'selCatCmp';
+    this.label = 'Compare Selected Rows with Column Categories';
     this.order = 100;
   }
 
@@ -521,9 +521,9 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               dataCategory.push(item[colId]);
             }
 
-            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)){
+            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)) {
               // selectIndices.shift(); // Remove first element as we have reached it
-              dataSelected.push(item[colId])
+              dataSelected.push(item[colId]);
             } else {
               dataUnselected.push(item[colId]);
             }
@@ -531,9 +531,9 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
 
           const scopedBodyIndex = bodyIndex; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
           // Score with selected:
-          let firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
+          const firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
           if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
-            let selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
+            const selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
             const setParameters = {
               setA: dataSelected,
               setADesc: attr1[0],
@@ -551,7 +551,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
           }
 
           if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
-            let unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
+            const unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
             const setParameters = {
               setA: dataUnselected,
               setADesc: attr1[0],
@@ -587,7 +587,8 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
           label: cat.label,
           background: cat.color,
           foreground: textColor4Background(cat.color)
-        }
+        };
+
         if (j === 0) {
           data[i][j][0] = {
             label: col.label,
@@ -604,12 +605,12 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
 }
 
 @TaskDecorator()
-export class PairwiseStratificationComparison extends SelectionStratificationComparison{
+export class PairwiseStratificationComparison extends SelectionStratificationComparison {
 
   constructor() {
     super();
-    this.id = "pairStratCmp";
-    this.label = "Compare Stratification Groups Pairwise";
+    this.id = 'pairStratCmp';
+    this.label = 'Compare Stratification Groups Pairwise';
     this.order = 60;
   }
 
@@ -664,9 +665,9 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                   })
                   .catch((err) => data[scopedBodyIndex][rowIndex][colIndex] = {label: 'err'}));
               } else if (k === rowIndex) {
-                data[scopedBodyIndex][rowIndex][colIndex] = {label: '&#x2261', measure: measure}
+                data[scopedBodyIndex][rowIndex][colIndex] = {label: '&#x2261', measure};
               } else {
-                data[scopedBodyIndex][rowIndex][colIndex] = {label: '', measure: measure}
+                data[scopedBodyIndex][rowIndex][colIndex] = {label: '', measure};
               }
             }
           }
@@ -680,37 +681,34 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
 }
 
 interface IScoreCell {
-  key?: string,
-  label: string,
-  type?: string,
-  background?: string,
-  foreground?: string,
-  rowspan?: number,
-  colspan?: number,
-  score?: IMeasureResult,
-  measure?: ISimilarityMeasure,
-  setParameters?: ISetParameters
+  key?: string;
+  label: string;
+  type?: string;
+  background?: string;
+  foreground?: string;
+  rowspan?: number;
+  colspan?: number;
+  score?: IMeasureResult;
+  measure?: ISimilarityMeasure;
+  setParameters?: ISetParameters;
 }
 
 
 
 export function score2color(score:number) : {background: string, foreground: string} {
-  let background ='#ffffff' //white
-  let foreground = '#333333' //kinda black
+  let background ='#ffffff'; //white
+  let foreground = '#333333'; //kinda black
 
 
   if(score <= 0.05) {
     // console.log('bg color cahnge')
-    let calcColor = d3.scale.linear().domain([0.05, 1]).range(<any[]>['#000000', '#FFFFFF']);
+    const calcColor = d3.scale.linear().domain([0.05, 1]).range(<any[]>['#000000', '#FFFFFF']);
 
     background = calcColor(score).toString();
     foreground = textColor4Background(background);
   }
 
-  return {
-    background: background,
-    foreground: foreground
-  };
+  return {background, foreground};
 }
 
 @TaskDecorator()
@@ -718,8 +716,8 @@ export class ColumnComparison extends ATouringTask {
 
   constructor() {
     super();
-    this.id = "attrCmp";
-    this.label = "Compare Columns Pairwise";
+    this.id = 'attrCmp';
+    this.label = 'Compare Columns Pairwise';
     this.order = 20;
 
     this.scope = SCOPE.ATTRIBUTES;
@@ -751,20 +749,20 @@ export class ColumnComparison extends ATouringTask {
       // the data of each row is of type: Array<IScoreCell>
       const trs = bodies.selectAll('tr').data((d) => d, (d) => d[0].label); // had to specify the function to derive the data (d -> d)
       trs.enter().append('tr');
-      const tds = trs.selectAll('td').data((d) => d)
+      const tds = trs.selectAll('td').data((d) => d);
       tds.enter().append('td');
       // Set colheads in thead
       colHeadsSpan.text((d) => d.label);
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
       tds.attr('rowspan', (d) => d.rowspan);
-      tds.style("color", (d) => d.foreground);
+      tds.style('color', (d) => d.foreground);
       tds.style('background-color', (d) => d.background);
       tds.attr('data-type', (d) => d.type);
       tds.classed('action', (d) => d.score !== undefined);
       tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
-      tds.on('click', function() { that.onClick.bind(that)(this); })
+      tds.on('click', function() { that.onClick.bind(that)(this); });
       // Exit
       colHeads.exit().remove(); // remove attribute columns
       colHeads.order();
@@ -803,8 +801,8 @@ export class ColumnComparison extends ATouringTask {
             if (colIndex > 0) {
               const measures = MethodManager.getMeasuresByType(Type.get(attr1[colIndex - 1].type), Type.get(attr2[bodyIndex].type), SCOPE.ATTRIBUTES);
               if (measures.length > 0 && colIndex <= bodyIndex) { // start at
-                const measure = measures[0]// Always the first
-                const data1 = this.ranking.getAttributeDataDisplayed((attr1[colIndex - 1]as IServerColumn).column) //minus one because the first column is headers
+                const measure = measures[0]; // Always the first
+                const data1 = this.ranking.getAttributeDataDisplayed((attr1[colIndex - 1]as IServerColumn).column); //minus one because the first column is headers
                 const data2 = this.ranking.getAttributeDataDisplayed((attr2[bodyIndex] as IServerColumn).column);
                 const setParameters = {
                   setA: data1,
@@ -832,7 +830,7 @@ export class ColumnComparison extends ATouringTask {
 
   prepareDataArray(attr1: IColumnDesc[], attr2: IColumnDesc[]) {
     const data = new Array(attr2.length); // n2 arrays (bodies)
-    for (let i of data.keys()) {
+    for (const i of data.keys()) {
       data[i] = new Array(1); //currently just one row
       data[i][0] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
       data[i][0][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
