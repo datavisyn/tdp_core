@@ -448,13 +448,14 @@ export class SelectionStratificationComparison extends RowComparison {
       return data; // then return the data
     }
   }
+
   prepareDataArray(allCat1: any[], groupedData: any[], attr2: IColumnDesc[]) {
     const data: Array<Array<Array<IScoreCell>>> = new Array(attr2.length); // An array for each attribute (n*tbody)
     for (const [i, col] of attr2.entries()) {
         data[i] = new Array(groupedData.length); // An array for each group (m * tr; comparison to stratification (all columns have the same groups))
 
         for (const [j, grp] of groupedData.entries()) {
-          data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
+          data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell);
           data[i][j][j === 0 ? 1 : 0] = { // through rowspan, the group labels can become the first array item
             label: grp.label,
             background: grp.color,
@@ -583,7 +584,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
     for (const [i, col] of attr2.entries()) {
       data[i] = new Array((col as any).categories.length); // one array per category (number of rows in body)
       for (const [j, cat] of (col as any).categories.entries()) {
-        data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell);
+        data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell);
         data[i][j][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item
           label: cat.label,
           background: cat.color,
