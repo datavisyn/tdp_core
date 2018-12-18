@@ -378,6 +378,7 @@ export class SelectionStratificationComparison extends RowComparison {
       const promises = [];
 
       for (const [bodyIndex, col] of attr2.entries()) {
+        const colPromises = [];
         const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) {
           const measure = measures[0];
@@ -413,10 +414,9 @@ export class SelectionStratificationComparison extends RowComparison {
                 setBDesc: col,
                 setBCategory: groupedData[rowIndex]
               };
-              promises.push(measure.calc(dataSelected, grpData4Col, dataSelected.concat(dataUnselected))
+              colPromises.push(measure.calc(dataSelected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
                       data[scopedBodyIndex][rowIndex][selScoreIndex] = this.toScoreCell(score, measure, setParameters);
-                      update(data);
                     })
                     .catch((err) => data[scopedBodyIndex][rowIndex][selScoreIndex] = {label: 'err'} ));
             }
@@ -432,15 +432,16 @@ export class SelectionStratificationComparison extends RowComparison {
                 setBCategory: groupedData[rowIndex]
               };
               // Score with unselected:
-              promises.push(measure.calc(dataUnselected, grpData4Col, dataSelected.concat(dataUnselected))
+              colPromises.push(measure.calc(dataUnselected, grpData4Col, dataSelected.concat(dataUnselected))
                     .then((score) => {
                       data[scopedBodyIndex][rowIndex][unselScoreIndex] = this.toScoreCell(score, measure, setParameters);
-                      update(data);
                     })
                     .catch((err) => data[scopedBodyIndex][rowIndex][unselScoreIndex] = {label: 'err'}));
             }
           }
         }
+        Promise.all(colPromises).then(() => update(data));
+        promises.concat(colPromises);
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
@@ -508,6 +509,7 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
       const measure = MethodManager.getMeasuresByType(Type.CATEGORICAL, Type.CATEGORICAL, SCOPE.SETS)[0]; // fixed for this task: we compare categories to groups of items of the same column --> always categorical
 
       for (const [bodyIndex, col] of attr2.entries()) {
+        const colPromises = [];
         for (const [rowIndex, cat] of (col as any).categories.entries()) {
           const allData = this.ranking.getItemsDisplayed();
           const dataCategory = [];
@@ -522,7 +524,6 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
             }
 
             if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)) {
-              // selectIndices.shift(); // Remove first element as we have reached it
               dataSelected.push(item[colId]);
             } else {
               dataUnselected.push(item[colId]);
@@ -542,10 +543,9 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               setBDesc: col,
               setBCategory: cat.name
             };
-            promises.push(measure.calc(dataSelected, dataCategory, dataSelected.concat(dataUnselected))
+            colPromises.push(measure.calc(dataSelected, dataCategory, dataSelected.concat(dataUnselected))
                   .then((score) => {
                     data[scopedBodyIndex][rowIndex][selScoreIndex] = this.toScoreCell(score,measure,setParameters);
-                    update(data);
                   })
                   .catch((err) => data[scopedBodyIndex][rowIndex][selScoreIndex] = {label: 'err'}));
           }
@@ -561,14 +561,15 @@ export class SelectionCategoryComparison extends SelectionStratificationComparis
               setBCategory: cat.name
             };
             // Score with unselected:
-            promises.push(measure.calc(dataUnselected, dataCategory, dataSelected.concat(dataUnselected))
+            colPromises.push(measure.calc(dataUnselected, dataCategory, dataSelected.concat(dataUnselected))
                     .then((score) => {
                       data[scopedBodyIndex][rowIndex][unselScoreIndex] = this.toScoreCell(score,measure,setParameters);
-                      update(data);
                     })
                   .catch((err) => data[scopedBodyIndex][rowIndex][unselScoreIndex] = {label: 'err'}));
           }
         }
+        Promise.all(colPromises).then(() => update(data));
+        promises.concat(colPromises);
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
@@ -638,6 +639,7 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
       const promises = [];
 
       for (const [bodyIndex, col] of attr2.entries()) {
+        const colPromises = [];
         const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) {
           const measure = measures[0];
@@ -658,10 +660,9 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                   setBDesc: col,
                   setBCategory: groupedData[rowIndex],
                 };
-                promises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
+                colPromises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
                   .then((score) => {
                     data[scopedBodyIndex][rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
-                    update(data);
                   })
                   .catch((err) => data[scopedBodyIndex][rowIndex][colIndex] = {label: 'err'}));
               } else if (k === rowIndex) {
@@ -672,6 +673,8 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
             }
           }
         }
+        promises.concat(colPromises);
+        Promise.all(colPromises).then(() => update(data));
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
@@ -796,6 +799,7 @@ export class ColumnComparison extends ATouringTask {
     } else {
       const promises = [];
       for (const [bodyIndex, rows] of data.entries()) {
+        const colPromises = [];
         for (const row of rows) {
           for (const colIndex of row.keys()) { // just one row so I directly index it here
             if (colIndex > 0) {
@@ -810,10 +814,9 @@ export class ColumnComparison extends ATouringTask {
                   setB: data2,
                   setBDesc: attr2[bodyIndex]
                 };
-                promises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
+                colPromises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
                 .then((score) => {
                   row[colIndex] = this.toScoreCell(score,measure,setParameters);
-                  update(data);
                 })
                   .catch((err) => row[colIndex] = {label: 'err'})
                 ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
@@ -821,6 +824,8 @@ export class ColumnComparison extends ATouringTask {
             }
           }
         }
+        promises.concat(colPromises);
+        Promise.all(colPromises).then(() => update(data));
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
