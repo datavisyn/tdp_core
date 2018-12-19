@@ -156,16 +156,6 @@ div.touring {
           border-right-width: 1px; // just on the right
         }
 
-        div {
-          display: flex;
-          align-items: center;
-          height: 100%;
-        }
-        div svg {
-          margin: 0 auto;
-          display: block;
-        }
-
         &.action {
           &:hover, &:focus { // = td.action:hover
             background-color: #fba74d !important; // important because to overwrite the htmml inline color definition              
