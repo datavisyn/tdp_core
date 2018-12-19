@@ -71,9 +71,17 @@ export abstract class ATouringTask implements ITouringTask{
   // }
 
   toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
-    const color =  score2color(score.pValue);
+    let color =  score2color(score.pValue);
+    let cellLabel = score.pValue.toFixed(3);
+    if(score.pValue === -1) {
+      cellLabel = 'n/a';
+      color = {
+        background: '#ffffff', //white
+        foreground: '#333333' //kinda black
+      };
+    }
     return {
-      label: score.pValue.toFixed(3),
+      label: cellLabel,
       background: color.background,
       foreground: color.foreground,
       score: score,
@@ -764,7 +772,7 @@ export class ColumnComparison extends ATouringTask {
       tds.classed('action', (d) => d.score !== undefined);
       tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
-      tds.on('click', function() { that.onClick.bind(that)(this); })
+      tds.on('click', function() { that.onClick.bind(that)(this); });
       // Exit
       colHeads.exit().remove(); // remove attribute columns
       colHeads.order();
