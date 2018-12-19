@@ -1,6 +1,6 @@
 import LineUpPanelActions from '../LineUpPanelActions';
 import {RankingAdapter} from './RankingAdapter';
-import {tasks as Tasks, ATouringTask} from './Tasks'
+import {tasks as Tasks, ATouringTask} from './Tasks';
 import {IServerColumn} from '../../../rest';
 import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
 import {LocalDataProvider, IColumnDesc, Column, CategoricalColumn, ICategoricalColumnDesc} from 'lineupjs';
@@ -12,6 +12,7 @@ export default class TouringPanel extends LineUpPanelActions {
   private touringElem: HTMLElement;
   private columnOverview: HTMLElement; searchbox: HTMLElement; itemCounter: HTMLElement; // default sidepanel elements
   private ranking : RankingAdapter;
+  private currentTask: ATouringTask;
 
 
   protected init() {
@@ -46,7 +47,7 @@ export default class TouringPanel extends LineUpPanelActions {
   private addEventListeners() {
     // changes made in dropdowns
     //    cause changes the displayed table / scores
-    d3.select(this.node).selectAll('select.task').on('input', () => {this.initNewTask(); this.updateOutput()});
+    d3.select(this.node).selectAll('select.task').on('input', () => {this.initNewTask(); this.updateOutput(); });
     d3.select(this.node).selectAll('select.scope').on('input', () => this.updateOutput());
 
     // DATA CHANGE LISTENERS
@@ -93,8 +94,8 @@ export default class TouringPanel extends LineUpPanelActions {
     }
 
     const attributes = this.prepareInput(d3.select(this.touringElem).select('select.scope'));
-    const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
-    task.update(attributes);
+    this.currentTask = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
+    this.currentTask.update(attributes);
   }
 
 
@@ -173,12 +174,12 @@ export default class TouringPanel extends LineUpPanelActions {
 
 
   private toggleTouring(hide?: boolean) {
-    if(!this.touringElem)
+    if(!this.touringElem) {
       return; // the elements are undefined
+    }
 
     if (hide === undefined) {
-      // if not hidden -> hide
-      hide =!this.touringElem.hidden;
+      hide =!this.touringElem.hidden; // if not hidden -> hide
     }
     // hide touring -> not hide normal content
     this.searchbox.hidden = !hide;
@@ -188,15 +189,16 @@ export default class TouringPanel extends LineUpPanelActions {
     this.touringElem.hidden = hide;
 
     if (!hide) {
-      console.log('Open Touring Panel')
-      this.node.style.flex = "0.33 0.33 auto"; // lineup is 1 1 auto
+      console.log('Open Touring Panel');
+      this.node.style.flex = '0.33 0.33 auto'; // lineup is 1 1 auto
       this.collapse = false; //if touring is displayed, ensure the panel is visible
       this.updateInput(); //Will also update output
     } else {
       this.node.style.flex = null;
+      this.currentTask.abort(); // abort workers
     }
 
-    const button = d3.select(this.node).select('.lu-side-panel button.touring')
+    const button = d3.select(this.node).select('.lu-side-panel button.touring');
     button.classed('active', !hide);
   }
 
@@ -237,7 +239,7 @@ const deepCopy = <T>(target: T): T => {
   }
   if (typeof target === 'object' && target !== {}) {
     const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
-    Object.keys(cp).forEach(k => {
+    Object.keys(cp).forEach((k) => {
       cp[k] = deepCopy<any>(cp[k]);
     });
     return cp as T;

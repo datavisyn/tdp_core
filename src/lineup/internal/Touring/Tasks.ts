@@ -32,6 +32,10 @@ export abstract class ATouringTask implements ITouringTask {
 
   ranking: RankingAdapter;
 
+  public abort() {
+    WorkerManager.terminateAll();
+  }
+
   public init(ranking: RankingAdapter, node: HTMLElement) {
     this.ranking = ranking;
     this.node = d3.select(node).append('div').attr('class', `task ${this.id}`).node() as HTMLElement;
