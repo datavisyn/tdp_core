@@ -2,7 +2,6 @@ import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow} fr
 import {isProxyAccessor} from '../utils';
 
 
-
 export class RankingAdapter {
 
   constructor(protected readonly provider: LocalDataProvider, private rankingIndex = 0) {  }
@@ -37,11 +36,11 @@ export class RankingAdapter {
   public getItemsDisplayed(sort = true): Array<Object> {
     const allItems = this.getItems();
     // get currently displayed data
-    return this.getItemOrder().map(rowId => allItems[rowId]);
+    return this.getItemOrder().map((rowId) => allItems[rowId]);
   }
 
 
-  public getItems(): Array<Object>{
+  public getItems(): Array<Object> {
     // if the attributes are the same, we can reuse the data array
     // if the selection
 
@@ -58,7 +57,7 @@ export class RankingAdapter {
 
       // console.log('reuse the data array')
     } else {
-      console.log('update the data array')
+      console.log('update the data array');
       // refresh the data array
       this.data = null;
       this.oldAttributes = this.getDisplayedAttributes();
@@ -67,31 +66,33 @@ export class RankingAdapter {
 
       const scoreCols = this.getScoreColumns();
       const scoresData = [].concat(...scoreCols.map((col) => this.getScoreData(col.desc)));
-  
+
       this.oldOrder = this.getItemOrder();
       this.oldSelection = this.getSelectionUnsorted();
 
       this.provider.data.forEach((item, i) => {
-        let index = this.oldOrder.indexOf(i)
+        const index = this.oldOrder.indexOf(i);
         item.rank = index >=0 ? index : Number.NaN; //NaN if not found
 
         // include wether the row is selected
         item.selection = this.oldSelection.includes(i) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
         const stratGroupIndex = this.getRanking().getGroups().findIndex((grp) => grp.order.indexOf(i) >= 0);
-        const stratGroupName = stratGroupIndex === -1 ? 'Unknown' : this.getRanking().getGroups()[stratGroupIndex].name
+        const stratGroupName = stratGroupIndex === -1 ? 'Unknown' : this.getRanking().getGroups()[stratGroupIndex].name;
         item.strat_groups = stratGroupName; // index of group = category name, find index by looking up i. -1 if not found
         databaseData.push(item);
-      })
-  
+      });
+
       // merge score and database data
       this.data = [...databaseData.concat(scoresData)
         .reduce((map, curr) => {
-          map.has(curr.id) || map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
-          
+          if (!map.has(curr.id)) {
+            map.set(curr.id, {}); //include id in map if not already part of it, initialize with empty object
+          }
+
           const item = map.get(curr.id); // get stored data for this id
-  
+
           Object.entries(curr).forEach(([k, v]) => item[k] = v ); // add the content of the current array item to the data already stored in the map's entry (overwrites if there are the same properties in databaseData and scoreColumn)
-          
+
           return map;
         }, new Map()).values()]; // give map as input and return it's value
     }
@@ -110,7 +111,7 @@ export class RankingAdapter {
 
   public getDisplayedIds() {
     const items = this.provider.data;
-    return this.getItemOrder().map((i) => items[i].id)
+    return this.getItemOrder().map((i) => items[i].id);
   }
 
 
@@ -144,9 +145,9 @@ export class RankingAdapter {
     // console.time('get data (getGroupedData) time')
     const data = this.getItems();
     // console.timeEnd('get data (getGroupedData) time')
-    let groups = []
+    const groups = [];
 
-    for (let grp of this.getRanking().getGroups()) {
+    for (const grp of this.getRanking().getGroups()) {
       groups.push({
         name: grp.name,
         label: grp.name,
@@ -154,7 +155,7 @@ export class RankingAdapter {
         rows: grp.order.map((index) => data[index]).filter((item) => item !== undefined)
       });
     }
-    return groups;  
+    return groups;
   }
 
 
@@ -172,7 +173,7 @@ export class RankingAdapter {
    * @param attributeId column property of the column description
    */
   public getAttributeCategoriesDisplayed(attributeId: string) {
-    return new Set(this.getAttributeDataDisplayed(attributeId))
+    return new Set(this.getAttributeDataDisplayed(attributeId));
   }
 
   /**
@@ -182,7 +183,7 @@ export class RankingAdapter {
     return this.provider.getSelection();
   }
 
-   /**
+  /**
    * Returns the '_id' of the selected items
    */
   public getSelection() {
@@ -191,7 +192,7 @@ export class RankingAdapter {
     // --> the position of the indices from the selection in the order array is the new index
     const orderedIndices = this.getItemOrder();
     const unorderedSelectionINdices = this.getSelectionUnsorted();
-    const orderedSelectionIndices = unorderedSelectionINdices.map((unorderedIndex) => orderedIndices.findIndex((orderedIndex) => orderedIndex === unorderedIndex))
+    const orderedSelectionIndices = unorderedSelectionINdices.map((unorderedIndex) => orderedIndices.findIndex((orderedIndex) => orderedIndex === unorderedIndex));
     const sortedOreredSelectionIndices = orderedSelectionIndices.sort((a, b) => a - b);
     return sortedOreredSelectionIndices;
   }
@@ -199,13 +200,13 @@ export class RankingAdapter {
   public getScoreData(desc: IColumnDesc | any) {
     const accessor = desc.accessor;
     const ids = this.getDisplayedIds();
-    let data = [];
+    const data = [];
 
     if (desc.column && isProxyAccessor(accessor)) {
-      for (let id of ids) {
-        let dataEntry = {id: id};
-        dataEntry[desc.column] = accessor({v: {id: id}, i: null} as IDataRow); // i is not used by the accessor function
-        data.push(dataEntry); 
+      for (const id of ids) {
+        const dataEntry = {id};
+        dataEntry[desc.column] = accessor({v: {id}, i: null} as IDataRow); // i is not used by the accessor function
+        data.push(dataEntry);
       }
     }
     return data;
@@ -222,7 +223,7 @@ export class RankingAdapter {
     } // else: none selected
 
     if (this.getSelectionUnsorted().length < numberOfRows) {
-      selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', })
+      selCategories.push({name: 'Unselected', label: 'Unselected', value: 1, color: '#ff7f0e', });
     } // else: all selected
 
     return {
@@ -247,7 +248,7 @@ export class RankingAdapter {
       label: 'Stratification Groups',
       type: 'categorical',
       column: 'strat_groups'
-    }
+    };
   }
 
   public getRankDesc() {
@@ -255,6 +256,6 @@ export class RankingAdapter {
       label: 'Rank',
       type: 'number',
       column: 'rank'
-    }
+    };
   }
 }
