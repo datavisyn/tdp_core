@@ -842,7 +842,7 @@ export class ColumnComparison extends ATouringTask {
     const data = new Array(attr2.length); // n2 arrays (bodies)
     for (const i of data.keys()) {
       data[i] = new Array(1); //currently just one row
-      data[i][0] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
+      data[i][0] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
       data[i][0][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
       data[i][0][i+1] = {label: '&#x2261', measure: null};
       for (let j=i+2; j<data[i][0].length; j++) { //half of the table stays empty
