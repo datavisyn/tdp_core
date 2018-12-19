@@ -3,6 +3,7 @@ import {RankingAdapter} from './RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, WorkerManager} from 'touring';
 import {IColumnDesc, ICategory} from 'lineupjs';
 import * as d3 from 'd3';
+import { cell } from 'phovea_core/src/range';
 
 
 export const tasks = new Array<ATouringTask>();
@@ -77,8 +78,13 @@ export abstract class ATouringTask implements ITouringTask {
   toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
     let color =  score2color(score.pValue);
     let cellLabel = score.pValue.toFixed(3);
+
+    cellLabel = cellLabel.substring(1); //remove leading 0
+    if(cellLabel > 0.1) {
+      cellLabel = '';
+    }
     if(score.pValue === -1) {
-      cellLabel = 'n/a';
+      cellLabel = '-';
       color = {
         background: '#ffffff', //white
         foreground: '#333333' //kinda black
@@ -718,7 +724,7 @@ export function score2color(score:number) : {background: string, foreground: str
 
   if(score <= 0.05) {
     // console.log('bg color cahnge')
-    const calcColor = d3.scale.linear().domain([0.05, 1]).range(<any[]>['#000000', '#FFFFFF']);
+    const calcColor = d3.scale.linear().domain([0, 0.05]).range(<any[]>['#000000', '#FFFFFF']);
 
     background = calcColor(score).toString();
     foreground = textColor4Background(background);
@@ -830,6 +836,7 @@ export class ColumnComparison extends ATouringTask {
                 colPromises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
                 .then((score) => {
                   row[colIndex] = this.toScoreCell(score,measure,setParameters);
+                  data[colIndex-1][0][bodyIndex+1] = row[colIndex];
                 })
                   .catch((err) => row[colIndex] = {label: 'err'})
                 ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
@@ -852,10 +859,10 @@ export class ColumnComparison extends ATouringTask {
       data[i] = new Array(1); //currently just one row
       data[i][0] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>'} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
       data[i][0][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
-      data[i][0][i+1] = {label: '&#x2261', measure: null};
-      for (let j=i+2; j<data[i][0].length; j++) { //half of the table stays empty
-        data[i][0][j] = { label: '', measure: null}; // empty (not null, because null will display spinning wheel)
-      }
+      data[i][0][i+1] = {label: '&#x26AB', measure: null};
+      // for (let j=i+2; j<data[i][0].length; j++) { //half of the table stays empty
+      //   data[i][0][j] = { label: '', measure: null}; // empty (not null, because null will display spinning wheel)
+      // }
     }
 
     return data;
