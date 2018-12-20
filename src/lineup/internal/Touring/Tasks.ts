@@ -287,6 +287,69 @@ export abstract class ATouringTask implements ITouringTask {
       }
     }
   }
+
+  onMouseOver(tableCell, state: boolean) {
+    if(d3.select(tableCell).classed('score')) {
+
+      const tr = d3.select(tableCell).node().parentNode;
+      const allTds = d3.select(tr).selectAll('td');
+      // console.log('allTds', allTds[0]);
+      let index = -1;
+      const currLength = allTds[0].length;
+      // get current index of cell in row
+      for(let i=0; i<currLength; i++) {
+        if(allTds[0][i] === tableCell) {
+          index = i;
+        }
+      }
+
+      const tbody = d3.select(tr).node().parentNode; //current body
+      const table = d3.select(tbody).node().parentNode; //current table
+
+      // highlight row
+      d3.select(tr).selectAll('td').classed('cross-selection',state);
+      // highlight the first cell in the first for of a body with rowspan
+      d3.select(tbody).select('tr').select('td').classed('cross-selection',state);
+
+      // highlight column
+      const allBodies = d3.select(table).selectAll('tbody');
+      // console.log('allBodies : ',allBodies);
+
+      // go through all bodies
+      for(const currBody of allBodies[0]) {
+        const currRows = d3.select(currBody).selectAll('tr');
+        // go through all rows of current body
+        for(const currRow of currRows[0]) {
+          // get all cells of current row and highlight
+          const currCells = d3.select(currRow).selectAll('td');
+          // calc the index for the cell which should be highlighted
+          const currCellsLen = currCells[0].length;
+          let currIndex = index;
+          if (currCellsLen > currLength) {
+            currIndex = index+1;
+          } else if (currCellsLen < currLength) {
+            currIndex = index-1;
+          }
+          // highlight cell of current body and current row
+          d3.select(currCells[0][currIndex]).classed('cross-selection',state);
+        }
+      }
+
+      // maxIndex is the maximum number of table cell in the table
+      const maxLength = d3.select(tbody).select('tr').selectAll('td')[0].length;
+
+      // if currMaxIndex and maxIndex are not the same -> increase headerIndex by one
+      // because the current row has one cell fewer
+      const headerIndex = (currLength === maxLength) ? index : index+1;
+
+      // highlight column label
+      const allHeads = d3.select(table).select('thead').selectAll('th');
+      if(index > -1) {
+        // use header index
+        d3.select(allHeads[0][headerIndex]).select('div').select('span').select('span').classed('cross-selection',state);
+      }
+    }
+  }
 }
 
 
@@ -365,6 +428,8 @@ export class SelectionStratificationComparison extends RowComparison {
       tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
       tds.on('click', function() { that.onClick.bind(that)(this); });
+      tds.on('mouseover', function() { that.onMouseOver.bind(that)(this,true); });
+      tds.on('mouseout', function() { that.onMouseOver.bind(that)(this,false); });
       // Exit
       tds.exit().remove(); // remove cells of removed columns
       colHeadsCat.exit().remove(); // remove attribute columns
@@ -785,6 +850,9 @@ export class ColumnComparison extends ATouringTask {
       tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
       tds.on('click', function() { that.onClick.bind(that)(this); });
+      tds.on('mouseover', function() { that.onMouseOver.bind(that)(this,true); });
+      tds.on('mouseout', function() { that.onMouseOver.bind(that)(this,false); });
+
       // Exit
       colHeads.exit().remove(); // remove attribute columns
       colHeads.order();
