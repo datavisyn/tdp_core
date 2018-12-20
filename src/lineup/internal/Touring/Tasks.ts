@@ -307,7 +307,7 @@ export abstract class ATouringTask implements ITouringTask {
       const table = d3.select(tbody).node().parentNode; //current table
 
       // highlight row
-      d3.select(tr).selectAll('td').classed('cross-selection',state);
+      // d3.select(tr).select('td').classed('cross-selection',state);
       // highlight the first cell in the first for of a body with rowspan
       d3.select(tbody).select('tr').select('td').classed('cross-selection',state);
 
@@ -316,24 +316,24 @@ export abstract class ATouringTask implements ITouringTask {
       // console.log('allBodies : ',allBodies);
 
       // go through all bodies
-      for(const currBody of allBodies[0]) {
-        const currRows = d3.select(currBody).selectAll('tr');
-        // go through all rows of current body
-        for(const currRow of currRows[0]) {
-          // get all cells of current row and highlight
-          const currCells = d3.select(currRow).selectAll('td');
-          // calc the index for the cell which should be highlighted
-          const currCellsLen = currCells[0].length;
-          let currIndex = index;
-          if (currCellsLen > currLength) {
-            currIndex = index+1;
-          } else if (currCellsLen < currLength) {
-            currIndex = index-1;
-          }
-          // highlight cell of current body and current row
-          d3.select(currCells[0][currIndex]).classed('cross-selection',state);
-        }
-      }
+      // for(const currBody of allBodies[0]) {
+      //   const currRows = d3.select(currBody).selectAll('tr');
+      //   // go through all rows of current body
+      //   for(const currRow of currRows[0]) {
+      //     // get all cells of current row and highlight
+      //     const currCells = d3.select(currRow).selectAll('td');
+      //     // calc the index for the cell which should be highlighted
+      //     const currCellsLen = currCells[0].length;
+      //     let currIndex = index;
+      //     if (currCellsLen > currLength) {
+      //       currIndex = index+1;
+      //     } else if (currCellsLen < currLength) {
+      //       currIndex = index-1;
+      //     }
+      //     // highlight cell of current body and current row
+      //     d3.select(currCells[0][currIndex]).classed('cross-selection',state);
+      //   }
+      // }
 
       // maxIndex is the maximum number of table cell in the table
       const maxLength = d3.select(tbody).select('tr').selectAll('td')[0].length;
@@ -426,7 +426,7 @@ export class SelectionStratificationComparison extends RowComparison {
           color = 'white';
         }
         d3.select(parent).style('color', color);
-      })
+      });
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
       tds.attr('rowspan', (d) => d.rowspan);
@@ -756,12 +756,23 @@ export class PairwiseStratificationComparison extends SelectionStratificationCom
                 colPromises.push(measure.calc(grpData4ColRow, grpData4ColCol, this.ranking.getAttributeDataDisplayed((col as IServerColumn).column))
                   .then((score) => {
                     data[scopedBodyIndex][rowIndex][colIndex] = this.toScoreCell(score,measure,setParameters);
+                    const mirrorRowIndex = colIndex - firstScoreIndex; //remove number of cell labels
+                    const firstCol = rowIndex === 0 ? 2 : 1; //define index of first column for each row
+                    const mirrorFirstScoreIndex = colIndex === firstCol ? 2 : 1; //number of attribute label for a row
+                    const mirrorColIndec = rowIndex + mirrorFirstScoreIndex; //add number of label cells as offset
+                    const mirrorSetParameters = {
+                      setA: setParameters.setB,
+                      setADesc: setParameters.setBDesc,
+                      setACategory: setParameters.setBCategory,
+                      setB: setParameters.setA,
+                      setBDesc: setParameters.setADesc,
+                      setBCategory: setParameters.setACategory
+                    };
+                    data[scopedBodyIndex][mirrorRowIndex][mirrorColIndec] = this.toScoreCell(score,measure,mirrorSetParameters);
                   })
                   .catch((err) => data[scopedBodyIndex][rowIndex][colIndex] = {label: 'err'}));
               } else if (k === rowIndex) {
-                data[scopedBodyIndex][rowIndex][colIndex] = {label: '&#x2261', measure};
-              } else {
-                data[scopedBodyIndex][rowIndex][colIndex] = {label: '', measure};
+                data[scopedBodyIndex][rowIndex][colIndex] = {label: '&#x26AB', measure};
               }
             }
           }
@@ -913,7 +924,14 @@ export class ColumnComparison extends ATouringTask {
                 colPromises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
                 .then((score) => {
                   row[colIndex] = this.toScoreCell(score,measure,setParameters);
-                  data[colIndex-1][0][bodyIndex+1] = row[colIndex];
+                  const mirrorSetParameters = {
+                    setA: setParameters.setB,
+                    setADesc: setParameters.setBDesc,
+                    setB: setParameters.setA,
+                    setBDesc: setParameters.setADesc
+                  };
+
+                  data[colIndex-1][0][bodyIndex+1] = this.toScoreCell(score,measure,mirrorSetParameters);
                 })
                   .catch((err) => row[colIndex] = {label: 'err'})
                 ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array

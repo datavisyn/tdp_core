@@ -133,10 +133,10 @@ div.touring {
         }
       }
 
-      .cross-selection  {
+      .cross-selection, .cross-selection::before   {
         background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition 
         color: black !important;
-        font-weight: bold !important;
+        // font-weight: bolder !important;
       }
 
       td {
