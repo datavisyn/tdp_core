@@ -106,8 +106,8 @@ div.touring {
             > span {
               position: relative;
               display: inline-block;  // to set a width
-              min-width: 150px; // same width as the row labels, but not flexible
-              max-width: 150px;
+              min-width: 165px; // same width as the row labels, but not flexible
+              max-width: 165px;
               box-sizing: border-box; // i dont want to mess with the padding
 
               // border-bottom: 2px solid $table-border-color;
@@ -127,13 +127,27 @@ div.touring {
                 box-sizing: border-box; // i dont want to mess with the padding
                 padding: 0.1em 0.5em 0.1em 1.5em;
                 z-index: -1;
+
+                &[data-type]::before {
+                  display: inline-block; // so that the width property works
+                  width: 1.2em; //to have some space between icon and the text in the td
+                  font-family: lu-font; // some icon font 
+                  color: #999; // #515151 is to dark
+                }
+
+                &[data-type='categorical']::before {
+                  content: "\e810";
+                }
+                &[data-type='number']::before {
+                  content: "\e811";
+                }
               }
             }
           }
         }
       }
 
-      .cross-selection, .cross-selection::before   {
+      .cross-selection, .cross-selection::before, .cross-selection span::before  {
         background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition 
         color: black !important;
         // font-weight: bolder !important;
