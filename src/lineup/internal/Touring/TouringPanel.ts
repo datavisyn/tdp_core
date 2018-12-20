@@ -2,7 +2,7 @@ import LineUpPanelActions from '../LineUpPanelActions';
 import {RankingAdapter} from './RankingAdapter';
 import {tasks as Tasks, ATouringTask} from './Tasks';
 import {IServerColumn} from '../../../rest';
-import panelHTML from 'html-loader!./TouringPanel.html'; // webpack imports html to variable
+import panelHTML from 'html-loader!./TouringPanel2.html'; // webpack imports html to variable
 import {LocalDataProvider, IColumnDesc, Column, CategoricalColumn, ICategoricalColumnDesc} from 'lineupjs';
 import * as d3 from 'd3';
 
@@ -30,8 +30,8 @@ export default class TouringPanel extends LineUpPanelActions {
       this.toggleTouring();
     }));
 
-    this.insertTasks();
-    this.addEventListeners();
+    //this.insertTasks();
+    //this.addEventListeners();
   }
 
   private insertTasks() {
@@ -192,10 +192,10 @@ export default class TouringPanel extends LineUpPanelActions {
       console.log('Open Touring Panel');
       this.node.style.flex = '0.33 0.33 auto'; // lineup is 1 1 auto
       this.collapse = false; //if touring is displayed, ensure the panel is visible
-      this.updateInput(); //Will also update output
+      //this.updateInput(); //Will also update output
     } else {
       this.node.style.flex = null;
-      this.currentTask.abort(); // abort workers
+      //this.currentTask.abort(); // abort workers
     }
 
     const button = d3.select(this.node).select('.lu-side-panel button.touring');
