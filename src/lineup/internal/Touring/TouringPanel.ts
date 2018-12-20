@@ -39,7 +39,8 @@ export default class TouringPanel extends LineUpPanelActions {
 
     taskButtons.enter() //enter: add a button for each task
       .append('div').attr('class', `btn-wrapper col-sm-${Math.max(Math.floor(8/Tasks.length),1)}`)
-      .append('button').attr('class', 'task-btn btn btn-default btn-lg btn-block').text((task) => task.label);
+      .append('button').attr('class', 'task-btn btn btn-default btn-lg btn-block').text((task) => task.label)
+        .classed('active', (d, i) => i === 0); // Activate first task
 
     // update: nothing to do
     taskButtons.exit().remove();   // exit: remove tasks no longer displayed
