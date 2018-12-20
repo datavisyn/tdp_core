@@ -42,7 +42,7 @@ export default class TouringPanel extends LineUpPanelActions {
 
     taskButtons.enter() //enter: add a button for each task
       .append('div').attr('class', `btn-wrapper col-sm-${Math.max(Math.floor(8/Tasks.length),1)}`)
-      .append('button').attr('class', 'btn btn-default btn-lg btn-block').text((task) => task.label);
+      .append('button').attr('class', 'task-btn btn btn-default btn-lg btn-block').text((task) => task.label);
 
     // update: nothing to do
     taskButtons.exit().remove();   // exit: remove tasks no longer displayed
@@ -50,10 +50,14 @@ export default class TouringPanel extends LineUpPanelActions {
   }
 
   private addEventListeners() {
-    // changes made in dropdowns
-    //    cause changes the displayed table / scores
-    d3.select(this.node).selectAll('select.task').on('input', () => {this.initNewTask(); this.updateOutput(); });
-    d3.select(this.node).selectAll('select.scope').on('input', () => this.updateOutput());
+    // Click a different task
+    d3.select(this.node).selectAll('button.task-btn').on('click', (task) => {
+      const taskButtons = d3.select(this.node).selectAll('button.task-btn');
+      taskButtons.classed('active', (d) => d.id === task.id);
+
+      this.initNewTask();
+      this.updateOutput();
+    });
 
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
@@ -82,7 +86,7 @@ export default class TouringPanel extends LineUpPanelActions {
     //Remove previous output
     d3.select(this.touringElem).selectAll(`div.output *`).remove(); //remove all child elemetns of output
 
-    const task = d3.select(this.touringElem).select('select.task option:checked').datum() as ATouringTask;
+    const task = d3.select(this.touringElem).select('button.task-btn.active').datum() as ATouringTask;
     task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
   }
 
