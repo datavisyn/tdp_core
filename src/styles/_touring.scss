@@ -24,6 +24,10 @@ div.touring {
   padding-top: 1em;
   padding-left: 0.5em;
 
+  .task-btn.active {
+    background-color: #fba74d;
+  }
+
   .output {
     border-top: #AAA 1px solid;
     position: relative;
