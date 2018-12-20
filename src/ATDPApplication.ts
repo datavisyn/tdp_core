@@ -241,18 +241,17 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     if (plugins.length === 0) {
       return;
     }
-    Promise.all([<any>this.app, ...plugins.map((d) => d.load())]).then((args) => {
-      const appInstance = args[0];
-      const plugins: IAppExtensionExtension[] = args.slice(1);
-
-      for (const plugin of plugins) {
-        plugin.factory({
-          header: this.header,
-          content,
-          main,
-          app: appInstance
-        });
-      }
+    this.app.then((app) => {
+      Promise.all(plugins.map((d) => d.load())).then((plugins: IAppExtensionExtension[]) => {
+        for (const plugin of plugins) {
+          plugin.factory({
+            header: this.header,
+            content,
+            main,
+            app
+          });
+        }
+      });
     });
   }
 
