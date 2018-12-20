@@ -1,25 +1,18 @@
 <div class="touring" hidden>
   <div class="input">
-      <div class="form-group clearfix">
-        <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
-          <label>Task:</label>
+    <div class="type form-horizontal"> <!-- https://getbootstrap.com/docs/3.3/css/#forms-horizontal -->
+      <div class="form-group">
+        <label class="col-sm-4 control-label" style="padding-top: 1em;">What do you want to compare?</label> <!-- 1em top padding to center vertically-->
+        <div class="col-sm-4"> <!-- wrap in div to make the horizontal form thing work -->
+            <button type="submit" class="btn btn-warning btn-lg btn-block">Columns</button> <!-- default, therefore warning  (orange) -->
         </div>
-        <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
-          <select class="form-control task">
-          </select>
-        </div>
-      </div>
-      <!-- with -->
-      <div class="form-group clearfix">
-        <div class="col-sm-3" style="margin:0 !important;padding:0 !important">
-          <label>Compare:</label>
-        </div>
-        <div class="col-sm-9" style="margin:0 !important;padding:0 !important">
-          <select class="form-control scope">
-          </select>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-default btn-lg btn-block">Rows</button>
         </div>
       </div>
+    </div>
+    <div class="data"></div> <!-- task specific input-->
   </div>
 
-  <div class="output"></div>
+  <div class="output"></div> <!-- task output -->
 </div>
