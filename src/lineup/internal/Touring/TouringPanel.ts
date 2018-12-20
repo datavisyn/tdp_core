@@ -37,12 +37,11 @@ export default class TouringPanel extends LineUpPanelActions {
   private insertTasks() {
     // For each Task, create a button
     // Link tasks with buttons
-
     const taskSelectForm = d3.select(this.touringElem).select('.input .type .form-group');
     const taskButtons = taskSelectForm.selectAll('.btn-wrapper').data(Tasks, (task) => task.id);
 
     taskButtons.enter() //enter: add a button for each task
-      .append('div').attr('class', 'btn-wrapper col-sm-4')
+      .append('div').attr('class', `btn-wrapper col-sm-${Math.max(Math.floor(8/Tasks.length),1)}`)
       .append('button').attr('class', 'btn btn-default btn-lg btn-block').text((task) => task.label);
 
     // update: nothing to do
