@@ -30,18 +30,24 @@ export default class TouringPanel extends LineUpPanelActions {
       this.toggleTouring();
     }));
 
-    //this.insertTasks();
-    //this.addEventListeners();
+    this.insertTasks();
+    this.addEventListeners();
   }
 
   private insertTasks() {
-    const taskSelect = d3.select(this.touringElem).select('select.task');
-    const taskOptions = taskSelect.selectAll('option').data(Tasks, (task) => task.id);
+    // For each Task, create a button
+    // Link tasks with buttons
 
-    taskOptions.enter().append('option').text((task) => task.label); //enter: add tasks to dropdown
+    const taskSelectForm = d3.select(this.touringElem).select('.input .type .form-group');
+    const taskButtons = taskSelectForm.selectAll('.btn-wrapper').data(Tasks, (task) => task.id);
+
+    taskButtons.enter() //enter: add a button for each task
+      .append('div').attr('class', 'btn-wrapper col-sm-4')
+      .append('button').attr('class', 'btn btn-default btn-lg btn-block').text((task) => task.label);
+
     // update: nothing to do
-    taskOptions.exit().remove();   // exit: remove tasks no longer displayed
-    taskOptions.order();           // order domelements as in the array
+    taskButtons.exit().remove();   // exit: remove tasks no longer displayed
+    taskButtons.order();           // order domelements as in the array
   }
 
   private addEventListeners() {
@@ -192,10 +198,10 @@ export default class TouringPanel extends LineUpPanelActions {
       console.log('Open Touring Panel');
       this.node.style.flex = '0.33 0.33 auto'; // lineup is 1 1 auto
       this.collapse = false; //if touring is displayed, ensure the panel is visible
-      //this.updateInput(); //Will also update output
+      this.updateInput(); //Will also update output
     } else {
       this.node.style.flex = null;
-      //this.currentTask.abort(); // abort workers
+      this.currentTask.abort(); // abort workers
     }
 
     const button = d3.select(this.node).select('.lu-side-panel button.touring');
