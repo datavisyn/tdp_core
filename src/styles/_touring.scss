@@ -29,7 +29,6 @@ div.touring {
   }
 
   .output {
-    border-top: #AAA 1px solid;
     position: relative;
     flex: 1;
     
@@ -39,11 +38,15 @@ div.touring {
       right: 0; bottom: 0;
       overflow: auto;
 
+      select[multiple] {
+        height: 4em; // a little less  high
+      }
+
       h1 {
         display: block;
-        position: absolute; // absolute to float over the table
-        top: 0;
-        left: 0;
+        // position: absolute; // absolute to float over the table
+        // top: 0;
+        // left: 0;
         font-size: 1.2em;
       }
     }

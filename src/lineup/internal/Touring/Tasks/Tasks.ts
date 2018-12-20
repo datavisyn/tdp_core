@@ -1,9 +1,9 @@
-import {IServerColumn} from '../../../rest';
-import {RankingAdapter} from './RankingAdapter';
+import {IServerColumn} from '../../../../rest';
+import {RankingAdapter} from '../RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, WorkerManager} from 'touring';
 import {IColumnDesc, ICategory} from 'lineupjs';
 import * as d3 from 'd3';
-import { cell } from 'phovea_core/src/range';
+import colCmpHtml from 'html-loader!./ColumnComparison.html'; // webpack imports html to variable
 
 
 export const tasks = new Array<ATouringTask>();
@@ -44,36 +44,11 @@ export abstract class ATouringTask implements ITouringTask {
   }
 
   initContent() {
-    let headline = 'Similarity of ';
-    if (SCOPE.ATTRIBUTES === this.scope) {
-      headline += 'Columns';
-    } else {
-      headline += ' Rows';
-    }
-    d3.select(this.node).append('h1').text(headline);
-
-    const tablesEnter = d3.select(this.node).append('table');
-
-    //Table Head
-    tablesEnter.append('thead').append('tr').append('th');
-
-    //Table Body
-    //Table Body --> no table body, we create multiple bodies below (one for each column to group it's categories (rows in the table))
-
     //add legend for the p-values
-    this.createLegend(d3.select(this.node));
-    //add div for the detail (detail text and visualisation)
-    d3.select(this.node).append('div').classed('details', true);
+    this.createLegend(d3.select(this.node).select('div.legend'));
   }
 
-  public abstract update(data: any[]);
-  // {
-  //     const ps = d3.select(this.node).selectAll('p').data(data, (data) => data.column); //column property is key
-  //     ps.enter().append('p').text((attr) => attr.label); //enter: add tasks to dropdown
-  //     // update: nothing to do
-  //     ps.exit().remove();   // exit: remove tasks no longer displayed
-  //     ps.order();           // order domelements as in the array
-  // }
+  public abstract update();
 
   toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
     let color =  score2color(score.pValue);
@@ -301,7 +276,12 @@ export class ColumnComparison extends ATouringTask {
     this.scope = SCOPE.ATTRIBUTES;
   }
 
-  public update(data: any[]) {
+  public initContent() {
+    this.node.insertAdjacentHTML('beforeend', colCmpHtml);
+    super.initContent();
+  }
+
+  public update() {
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
