@@ -80,7 +80,7 @@ export abstract class ATouringTask implements ITouringTask {
     let cellLabel = score.pValue.toFixed(3);
 
     cellLabel = cellLabel.substring(1); //remove leading 0
-    if(cellLabel > 0.1) {
+    if(score.pValue > 0.1) {
       cellLabel = '';
     }
     if(score.pValue === -1) {
