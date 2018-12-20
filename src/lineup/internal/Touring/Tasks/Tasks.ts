@@ -1,9 +1,10 @@
 import {IServerColumn} from '../../../../rest';
 import {RankingAdapter} from '../RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, WorkerManager} from 'touring';
-import {IColumnDesc, ICategory} from 'lineupjs';
+import {IColumnDesc, ICategory, Column, CategoricalColumn, ICategoricalColumnDesc, LocalDataProvider} from 'lineupjs';
 import * as d3 from 'd3';
 import colCmpHtml from 'html-loader!./ColumnComparison.html'; // webpack imports html to variable
+import {update} from 'phovea_core/src/data';
 
 
 export const tasks = new Array<ATouringTask>();
@@ -23,6 +24,7 @@ export interface ITouringTask {
 }
 
 export abstract class ATouringTask implements ITouringTask {
+  public static EVENTTYPE = '.touringTask';
   public id: string;
   public label: string;
   public node: HTMLElement;
@@ -41,11 +43,38 @@ export abstract class ATouringTask implements ITouringTask {
     this.ranking = ranking;
     this.node = d3.select(node).append('div').attr('class', `task ${this.id}`).node() as HTMLElement;
     this.initContent();
+    this.addEventListeners();
   }
 
   initContent() {
     //add legend for the p-values
     this.createLegend(d3.select(this.node).select('div.legend'));
+  }
+
+
+
+  private addEventListeners() {
+    // DATA CHANGE LISTENERS
+    // -----------------------------------------------
+    // change in selection
+    //  might cause changes the displayed table / scores
+    //  if no items are selected, the table should be displayed by a message
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_SELECTION_CHANGED + ATouringTask.EVENTTYPE, () => this.update()); //fat arrow to preserve scope in called function (this)
+
+    // column of a table was added
+    //  causes changes in the second item dropdown (b)
+    //  might cause changes the displayed table / scores
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => this.update());
+
+    // column of a table was removed
+    //  causes changes in the second item dropdown (b)
+    //  might cause changes the displayed table / scores
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => this.update());
+
+    // for filter changes and stratification changes
+    //  After the number of items has changed, the score change aswell
+    // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ORDER_CHANGED + ATouringTask.EVENTTYPE, () => this.update());
   }
 
   public abstract update();
@@ -279,16 +308,71 @@ export class ColumnComparison extends ATouringTask {
   public initContent() {
     this.node.insertAdjacentHTML('beforeend', colCmpHtml);
     super.initContent();
+
+    d3.select(this.node).selectAll('select.attr').on('input', () => this.updateTable());
   }
 
   public update() {
+    this.updateAttributeSelectors();
+  }
+
+  public updateAttributeSelectors() {
+    let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
+      const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
+      const desc: IColumnDesc = deepCopy(col.desc);
+      if ((col as CategoricalColumn).categories) {
+        (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories).filter((category) => displayedCategories.has(category.name));
+      }
+
+      return desc;
+    });
+
+    const validTypes = ['categorical', 'number'];
+    descriptions = descriptions.filter((desc) => validTypes.includes(desc.type)); // filter attributes by type
+    descriptions.unshift(this.ranking.getSelectionDesc());
+    descriptions.unshift(this.ranking.getRankDesc());
+
+    const attrSelectors = d3.select(this.node).selectAll('select.attr');
+    const options = attrSelectors.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
+    options.enter().append('option').text((desc) => desc.label);
+
+    let updateTable = !options.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
+
+    const attrSelect1 =  d3.select(this.node).select('select.attr[name="attr1[]"]');
+    if (attrSelect1.selectAll('option:checked').empty()) { // make a default selection
+      attrSelect1.selectAll('option').attr('selected', (desc, i) => i === descriptions.length-1 ? true : null ); // by default, select last column. set the others to null to remove the selected property
+      updateTable = true; // attributes have changed
+    }
+
+    const attrSelect2 = d3.select(this.node).select('select.attr[name="attr2[]"]');
+    if (attrSelect2.selectAll('option:checked').empty()) { // make a default selection
+      attrSelect2.selectAll('option').attr('selected', true); // by default, select all
+      updateTable = true; // attributes have changed
+    }
+
+    options.exit().remove();
+    options.order();
+
+    if (updateTable) {
+      this.updateTable();
+    }
+  }
+
+  public updateTable() {
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
+    this.removeOldVisuallization();
+
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    this.removeOldVisuallization();
 
-    const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(data, (d) => d.column); // column is key
+    let colData =  d3.select(this.node).selectAll('select.attr[name="attr1[]"] option:checked').data();
+    let rowData = d3.select(this.node).selectAll('select.attr[name="attr2[]"]  option:checked').data();
+    if(colData.length > rowData.length) {
+      [rowData, colData] = [colData, rowData]; // avoid having more columns than rows --> flip table
+    }
+
+    const colHeads = d3.select(this.node).select('thead tr').selectAll('th.head').data(colData, (d) => d.column); // column is key
     const colHeadsSpan = colHeads.enter().append('th')
       .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
 
@@ -298,8 +382,6 @@ export class ColumnComparison extends ATouringTask {
         return; // skip outdated result
       }
 
-      const test = bodyData.slice();
-      // console.log(test)
       // create a table body for every column
       const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>>
       bodies.enter().append('tbody'); //For each IColumnTableData, create a tbody
@@ -331,8 +413,8 @@ export class ColumnComparison extends ATouringTask {
       bodies.order();
     }
 
-    this.getAttrTableBody(data, data, true, null).then(updateTableBody); // initialize
-    this.getAttrTableBody(data, data, false, updateTableBody).then(updateTableBody); // set values
+    this.getAttrTableBody(colData, rowData, true, null).then(updateTableBody); // initialize
+    this.getAttrTableBody(colData, rowData, false, updateTableBody).then(updateTableBody); // set values
   }
 
   /**
@@ -341,47 +423,51 @@ export class ColumnComparison extends ATouringTask {
    * @param arr2 rows
    * @param scaffold only create the matrix with row headers, but no value calculation
    */
-  private async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
-    const data = this.prepareDataArray(attr1, attr2);
-
-    //TODO This method assumes attr1 and attr2 contain the same attribues and are ordered in the same way (cells are skipped based on index not on label match or whatever)
-    if (attr1 !== attr2) {
-      throw Error('This method can not handle two different arrays');
-    }
+  private async getAttrTableBody(colAttributes: IColumnDesc[], rowAttributes: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
+    const data = this.prepareDataArray(colAttributes, rowAttributes);
 
     if (scaffold) {
       return data;
     } else {
       const promises = [];
-      for (const [bodyIndex, rows] of data.entries()) {
-        const colPromises = [];
-        for (const row of rows) {
-          for (const colIndex of row.keys()) { // just one row so I directly index it here
-            if (colIndex > 0) {
-              const measures = MethodManager.getMeasuresByType(Type.get(attr1[colIndex - 1].type), Type.get(attr2[bodyIndex].type), SCOPE.ATTRIBUTES);
-              if (measures.length > 0 && colIndex <= bodyIndex) { // start at
-                const measure = measures[0]; // Always the first
-                const data1 = this.ranking.getAttributeDataDisplayed((attr1[colIndex - 1]as IServerColumn).column); //minus one because the first column is headers
-                const data2 = this.ranking.getAttributeDataDisplayed((attr2[bodyIndex] as IServerColumn).column);
-                const setParameters = {
-                  setA: data1,
-                  setADesc: attr1[colIndex - 1],
-                  setB: data2,
-                  setBDesc: attr2[bodyIndex]
-                };
-                colPromises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
+      for (const [rowIndex, row] of rowAttributes.entries()) {
+        const rowPromises = [];
+        for (const [colIndex, col] of colAttributes.entries()) {
+          const colIndexInRows = rowAttributes.indexOf(col);
+          const rowIndexInCols = colAttributes.indexOf(row);
+
+          if (row.label === col.label) {
+            //identical attributes
+            data[rowIndex][0][colIndex+1] = {label: '&#x26AB', measure: null};
+          } else if (rowIndexInCols >= 0 && colIndexInRows >= 0 && colIndexInRows < rowIndex) {
+            // the row is also part of the column array, and the column is one of the previous rows
+            console.log('skipedy dee', col.label, row.label);
+          } else {
+            const measures = MethodManager.getMeasuresByType(Type.get(row.type), Type.get(col.type), SCOPE.ATTRIBUTES);
+            if (measures.length > 0) { // start at
+              const measure = measures[0]; // Always the first
+              const data1 = this.ranking.getAttributeDataDisplayed((col as IServerColumn).column); //minus one because the first column is headers
+              const data2 = this.ranking.getAttributeDataDisplayed((row as IServerColumn).column);
+              const setParameters = {
+                setA: data1,
+                setADesc: col,
+                setB: data2,
+                setBDesc: row
+              };
+              rowPromises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
                 .then((score) => {
-                  row[colIndex] = this.toScoreCell(score,measure,setParameters);
-                  data[colIndex-1][0][bodyIndex+1] = row[colIndex];
-                })
-                  .catch((err) => row[colIndex] = {label: 'err'})
-                ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
-              }
+                  data[rowIndex][0][colIndex+1] = this.toScoreCell(score, measure, setParameters);
+                  if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
+                    data[colIndexInRows][0][rowIndexInCols+1] = this.toScoreCell(score, measure, setParameters);
+                  }
+                }).catch((err) => row[colIndex] = {label: 'err'})
+              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
             }
           }
         }
-        promises.concat(colPromises);
-        Promise.all(colPromises).then(() => update(data));
+
+        promises.concat(rowPromises);
+        Promise.all(rowPromises).then(() => update(data));
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
@@ -389,16 +475,12 @@ export class ColumnComparison extends ATouringTask {
     }
   }
 
-  prepareDataArray(attr1: IColumnDesc[], attr2: IColumnDesc[]) {
-    const data = new Array(attr2.length); // n2 arrays (bodies)
+  prepareDataArray(colAttributes: IColumnDesc[], rowAttributes: IColumnDesc[]) {
+    const data = new Array(rowAttributes.length); // n2 arrays (bodies)
     for (const i of data.keys()) {
-      data[i] = new Array(1); //currently just one row
-      data[i][0] = new Array(attr1.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
-      data[i][0][0] = {label: `<b>${attr2[i].label}</b>`, type: attr2[i].type};
-      data[i][0][i+1] = {label: '&#x26AB', measure: null};
-      // for (let j=i+2; j<data[i][0].length; j++) { //half of the table stays empty
-      //   data[i][0][j] = { label: '', measure: null}; // empty (not null, because null will display spinning wheel)
-      // }
+      data[i] = new Array(1); //currently just one row per attribute
+      data[i][0] = new Array(colAttributes.length + 1).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell); // containing n1+1 elements (header + n1 vlaues)
+      data[i][0][0] = {label: `<b>${rowAttributes[i].label}</b>`, type: rowAttributes[i].type};
     }
 
     return data;
@@ -641,3 +723,33 @@ export function textColor4Background(backgroundColor: string) {
 
   return color;
 }
+
+// SOURCE: https://stackoverflow.com/a/51592360/2549748
+/**
+ * Deep copy function for TypeScript.
+ * @param T Generic type of target/copied value.
+ * @param target Target value to be copied.
+ * @see Source project, ts-deepcopy https://github.com/ykdr2017/ts-deepcopy
+ * @see Code pen https://codepen.io/erikvullings/pen/ejyBYg
+ */
+const deepCopy = <T>(target: T): T => {
+  if (target === null) {
+    return target;
+  }
+  if (target instanceof Date) {
+    return new Date(target.getTime()) as any;
+  }
+  if (target instanceof Array) {
+    const cp = [] as any[];
+    (target as any[]).forEach((v) => { cp.push(v); });
+    return cp.map((n: any) => deepCopy<any>(n)) as any;
+  }
+  if (typeof target === 'object' && target !== {}) {
+    const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
+    Object.keys(cp).forEach((k) => {
+      cp[k] = deepCopy<any>(cp[k]);
+    });
+    return cp as T;
+  }
+  return target;
+};
