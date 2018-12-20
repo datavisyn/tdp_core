@@ -72,11 +72,13 @@ div.touring {
       $narrow-col-padding: 0.2em;
       $col-min-size: 4.5ch;
       $col-max-size: 15em;
+      $highlight-color: #fba74d;
+      $table-border-color: white;
       
       table-layout: fixed; // The table and column widths are set by the widths of table and col or by the width of the first row of cells. Cells in other rows do not affect column widths.
       
       tbody.bottom-margin {
-        border-bottom: 0.5rem solid white;  // table's border spacing applies to all rows and tbody has no margin
+        border-bottom: 1px solid $table-border-color;  // table's border spacing applies to all rows and tbody has no margin
       }
 
       th {
@@ -91,22 +93,28 @@ div.touring {
 
         &.rotate { // adapted from https://css-tricks.com/rotated-table-column-headers/
           height:120px;
+          z-index: -1;
+          position: relative;
 
           > div {
             transform: 
-              
-              translate(20px,40px) /* Magic Numbers */
+              translate(4px,58px) /* Magic Numbers */
               rotate(-45deg);
             width: 30px;
+            z-index: -1;
             
             > span {
+              position: relative;
               display: inline-block;  // to set a width
-              min-width: $col-max-size; // same width as the row labels, but not flexible
-              max-width: $col-max-size;
+              min-width: 150px; // same width as the row labels, but not flexible
+              max-width: 150px;
               box-sizing: border-box; // i dont want to mess with the padding
 
-              border-bottom: 1px solid white;
-              padding-bottom: 2px;
+              // border-bottom: 2px solid $table-border-color;
+              padding-bottom: 0px;
+              padding-top: 1px;
+              z-index: -1;
+              line-height: 1.428;              
 
               > span {
                 max-width: 100%; // just as wide as the parent
@@ -117,23 +125,26 @@ div.touring {
                 text-overflow: ellipsis;
                 
                 box-sizing: border-box; // i dont want to mess with the padding
-                padding: 0.1em 0.5em;
+                padding: 0.1em 0.5em 0.1em 1.5em;
+                z-index: -1;
               }
             }
           }
         }
       }
 
-      tr {
-        border-bottom: 1px  white solid;
-      }
-
       .cross-selection  {
-        background-color: #fba74d !important; // important because to overwrite the htmml inline color definition              
+        background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition 
+        color: black !important;
+        font-weight: bold !important;
       }
 
       td {
-        border-right: 1px solid white;
+        border: 1px solid $table-border-color;
+        z-index: 10;
+        border-collapse: collapse;
+        position: relative;
+        background: white;
         &[rowspan] {
           vertical-align: text-top; // move text of multi-row cells to the top
         }
@@ -155,20 +166,20 @@ div.touring {
           text-overflow: clip; // cells are so small, the ... would take to much space
           white-space: nowrap;
 
-          border-style: solid;
-          border-color: white;
-          border-width: 0px; // overwrite the default
-          border-right-width: 1px; // just on the right
+          // border-style: solid;
+          // border-color: $table-border-color;
+          // border-width: 0px; // overwrite the default
+          // border-right-width: 1px; // just on the right
         }
 
         &.action, &.score {
           &:hover, &:focus { // = td.action:hover
-            background-color: #fba74d !important; // important because to overwrite the htmml inline color definition              
+            background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition              
             font-weight: bolder;
           } 
 
           &.selectedCell {
-            background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
+            background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition
             font-weight: bolder; 
           }
         }
@@ -293,7 +304,7 @@ div.touring {
     }
     g.scatterplot circle.datapoint:hover{
       opacity: 1;
-      fill: #fba74d  !important;
+      fill: #fba74d !important;
     }
 
     // // ------ line chart with D3

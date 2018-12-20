@@ -346,7 +346,7 @@ export abstract class ATouringTask implements ITouringTask {
       const allHeads = d3.select(table).select('thead').selectAll('th');
       if(index > -1) {
         // use header index
-        d3.select(allHeads[0][headerIndex]).select('div').select('span').select('span').classed('cross-selection',state);
+        d3.select(allHeads[0][headerIndex]).select('div').select('span').classed('cross-selection',state);
       }
     }
   }
@@ -416,8 +416,17 @@ export class SelectionStratificationComparison extends RowComparison {
 
       // Set colheads in thead
       colHeadsCatSpan.text((d) => d.label);
-      colHeadsCatSpan.style('background-color', (d) => d && d.color ? d.color : '#FFF');
-      colHeadsCatSpan.style('color', (d) => d && d.color ? textColor4Background(d.color) : '#333');
+      // colHeadsCatSpan.style('background-color', (d) => d && d.color ? d.color : '#FFF');
+      // colHeadsCatSpan.style('color', (d) => d && d.color ? textColor4Background(d.color) : '#333');
+      colHeadsCatSpan.each(function(d) {
+        const parent = d3.select(this).node().parentNode; //parent span-element
+        d3.select(parent).style('background-color', (d) => d && d.color ? d.color : '#FFF');
+        let color = '#333333';
+        if(d && d.color && 'transparent' !== d.color && d3.hsl(d.color).l < 0.5) { //transparent has lightness of zero
+          color = 'white';
+        }
+        d3.select(parent).style('color', color);
+      })
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
       tds.attr('rowspan', (d) => d.rowspan);
