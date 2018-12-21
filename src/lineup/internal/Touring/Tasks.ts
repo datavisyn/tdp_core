@@ -859,7 +859,6 @@ export class ColumnComparison extends ATouringTask {
       const tds = trs.selectAll('td').data((d) => d);
       tds.enter().append('td');
       // Set colheads in thead
-      console.log('colHeadsCat: ',colHeads);
       colHeadsSpan.text((d) => d.label);
       colHeadsSpan.attr('data-type',(d) => (d.type));
       // set data in tbody
