@@ -1,6 +1,6 @@
 import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow} from 'lineupjs';
 import {isProxyAccessor} from '../utils';
-import {IServerColumn} from 'tdp_core/src/rest';
+import {IServerColumn} from '../../../rest';
 
 
 export interface IAttributeCategory extends ICategory {
