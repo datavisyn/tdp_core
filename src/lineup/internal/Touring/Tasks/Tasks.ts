@@ -1,5 +1,5 @@
 import {IServerColumn} from '../../../../rest';
-import {RankingAdapter} from '../RankingAdapter';
+import {RankingAdapter, IAttributeCategory} from '../RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, WorkerManager} from 'touring';
 import {IColumnDesc, ICategory, Column, CategoricalColumn, ICategoricalColumnDesc, LocalDataProvider} from 'lineupjs';
 import * as d3 from 'd3';
@@ -521,6 +521,12 @@ export class RowComparison extends ATouringTask {
     // Update Row Selectors
     // Rows are grouped by categories, so we filter the categorical attributes:
     const catDescriptions = descriptions.filter((desc) => (desc as ICategoricalColumnDesc).categories);
+    catDescriptions.forEach((catDescription) => {
+      (catDescription as ICategoricalColumnDesc).categories.forEach((category) => {
+        (category as IAttributeCategory).attribute = (catDescription as IServerColumn); // store the attribute taht the category belongs to
+      });
+    });
+
     // For each attribute, create a <optgroup>
     const rowSelectors = d3.select(this.node).selectAll('select.row');
     const optGroups = rowSelectors.selectAll('optgroup').data(catDescriptions, (desc) => desc.label);
@@ -569,7 +575,7 @@ export class RowComparison extends ATouringTask {
     console.log('Update the table');
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
     this.removeOldVisuallization();
-//  createTable(catData: any[], compareTo: {categories: ICategory[]; label: string; type: string; column: string;}[]): any {
+
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
@@ -602,7 +608,7 @@ export class RowComparison extends ATouringTask {
       tds.enter().append('td');
 
       // Set colheads in thead
-      colHeadsCatSpan.text((d) => d.label);
+      colHeadsCatSpan.text((d) => `${d.attribute.label}: ${d.label}`);
       colHeadsCatSpan.style('background-color', (d) => d && d.color ? d.color : '#FFF');
       colHeadsCatSpan.style('color', (d) => d && d.color ? textColor4Background(d.color) : '#333');
       // set data in tbody
@@ -642,7 +648,7 @@ export class RowComparison extends ATouringTask {
    * @param scaffold only create the matrix with row headers, but no value calculation
    * @param update
    */
-  async getAttrTableBody(colGroups: ICategoricalColumnDesc[], rowGroups: ICategoricalColumnDesc[], rowAttributes: IColumnDesc[] ,scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
+  async getAttrTableBody(colGroups: IAttributeCategory[], rowGroups: IAttributeCategory[], rowAttributes: IColumnDesc[] ,scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
     const data = this.prepareDataArray(colGroups, rowGroups, rowAttributes);
 
     if (scaffold) {
@@ -650,15 +656,40 @@ export class RowComparison extends ATouringTask {
     } else {
       const promises = [];
 
-      for (const [bodyIndex, col] of rowAttributes.entries()) {
-        const colPromises = [];
-        const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
+      // the row and column indices stay the same, only the data changes ->  we want to retrieve these indices only once.
+      const rowGrpsIndices = rowGroups.map((rowGrp) => this.ranking.getRowsWithCategory(rowGrp));
+      const colGrpsIndices = rowGroups.map((rowGrp) => this.ranking.getRowsWithCategory(rowGrp));
+
+      for (const [bodyIndex, attr] of rowAttributes.entries()) {
+        const attrPromises = [];
+        const attrData = this.ranking.getAttributeDataDisplayed((attr as IServerColumn).column); //minus one because the first column is headers
+        const measures = MethodManager.getMeasuresByType(Type.get(attr.type), Type.get(attr.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) {
           const measure = measures[0];
-          // TODO
+
+          for (const [rowIndex, rowGrp] of rowGroups.entries()) {
+            // Get the data of 'attr' for the rows inside 'rowGrp'
+            const rowData = rowGrpsIndices[rowIndex].map((i) => attrData[i]);
+            for (const [colIndex, colGrp] of colGroups.entries()) {
+              const colData = colGrpsIndices[colIndex].map((i) => attrData[i]);
+
+              const setParameters = {
+                setA: rowData,
+                setADesc: rowGrp.attribute,
+                setACategory: rowGrp.label,
+                setB: colData,
+                setBDesc: colGrp.attribute,
+                setBCategory: colGrp.label
+              };
+
+              const colIndexOffset = rowIndex === 0 ? 2 : 1; // Two columns if the attribute label is in the same line, (otherwise 1 (because rowspan))
+              attrPromises.push(measure.calc(rowData, colData, attrData)
+                .then((score) => data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters)));
+            }
+          }
         }
-        Promise.all(colPromises).then(() => update(data));
-        promises.concat(colPromises);
+        Promise.all(attrPromises).then(() => update(data));
+        promises.concat(attrPromises);
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
@@ -666,7 +697,7 @@ export class RowComparison extends ATouringTask {
     }
   }
 
-  prepareDataArray(colGroups: ICategoricalColumnDesc[], rowGroups: ICategoricalColumnDesc[], rowAttributes: IColumnDesc[]) {
+  prepareDataArray(colGroups: IAttributeCategory[], rowGroups: IAttributeCategory[], rowAttributes: IColumnDesc[]) {
     const data = new Array(rowAttributes.length); // one array per attribute (number of table bodies)
 
     for (const [i, attr] of rowAttributes.entries()) {
@@ -674,7 +705,7 @@ export class RowComparison extends ATouringTask {
       for (const [j, rowGrp] of rowGroups.entries()) {
         data[i][j] = new Array(colGroups.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell);
         data[i][j][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item
-          label: rowGrp.label,
+          label: `${rowGrp.attribute.label}: ${rowGrp.label}`,
           background: rowGrp.color,
           foreground: textColor4Background(rowGrp.color)
         };
@@ -682,11 +713,12 @@ export class RowComparison extends ATouringTask {
         if (j === 0) {
           data[i][j][0] = {
             label: attr.label,
-            rowspan: (attr as any).categories.length,
+            rowspan: rowGroups.length,
             type: attr.type
           };
         }
-        data[i][j][0].key = attr.label+'-'+rowGrp.label;
+
+        data[i][j][0].key = `${attr.label}-${rowGrp.attribute.label}-${rowGrp.label}`;
       }
     }
 

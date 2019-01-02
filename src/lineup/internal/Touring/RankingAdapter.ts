@@ -1,8 +1,24 @@
 import {LocalDataProvider, IColumnDesc, ICategory, Column, Ranking, IDataRow} from 'lineupjs';
 import {isProxyAccessor} from '../utils';
+import {IServerColumn} from 'tdp_core/src/rest';
 
+
+export interface IAttributeCategory extends ICategory {
+  attribute: IServerColumn;
+}
 
 export class RankingAdapter {
+  getRowsWithCategory(attrCategory: IAttributeCategory): number[] {
+    const indices = [];
+
+    const attrData = this.getAttributeDataDisplayed(attrCategory.attribute.column);
+    for (const [rowIndex, rowData] of attrData.entries()) {
+      if (rowData === attrCategory.name) {
+        indices.push(rowIndex);
+      }
+    }
+    return indices;
+  }
 
   constructor(protected readonly provider: LocalDataProvider, private rankingIndex = 0) {  }
 
