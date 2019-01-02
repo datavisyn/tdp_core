@@ -526,8 +526,10 @@ export class RowComparison extends ATouringTask {
     const optGroups = rowSelectors.selectAll('optgroup').data(catDescriptions, (desc) => desc.label);
     optGroups.enter().append('optgroup').attr('label', (desc) => desc.label);
     // For each category, create a <option> inside the optgroup
-    const rowOptions = optGroups.selectAll('option').data((d: ICategoricalColumnDesc) => d.categories);
+    const rowOptions = optGroups.selectAll('option').data((d: ICategoricalColumnDesc) => d.categories, (cat: ICategory) => cat.label);
     rowOptions.enter().append('option').text((cat: ICategory) => cat.label);
+
+    let updateTable = !rowOptions.exit().filter(':checked').empty(); //if checked categories are removed, the table has to update
 
     // Remove atribtues and categories that were removed and order the html elements
     rowOptions.exit().remove();
@@ -535,16 +537,31 @@ export class RowComparison extends ATouringTask {
     optGroups.exit().remove();
     optGroups.order();
 
+    rowSelectors.each(function() { // function to reference the <select> with 'this'
+      const emptySelection = d3.select(this).selectAll('option:checked').empty();
+      if (emptySelection) {
+        d3.select(this).select('optgroup').selectAll('option').attr('selected', true); // select the categories of the first attribute by default
+        updateTable = true;
+      }
+    });
+
     // Update Attribute Selectors
     const attrSelector = d3.select(this.node).select('select.attr');
     const attrOptions = attrSelector.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
     attrOptions.enter().append('option').text((desc) => desc.label);
 
-    let updateTable = !attrOptions.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
+    updateTable = updateTable || !attrOptions.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
 
     if (attrSelector.selectAll('option:checked').empty()) { // make a default selection
       attrSelector.selectAll('option').attr('selected', (desc, i) => i === descriptions.length-1 ? true : null ); // by default, select last column. set the others to null to remove the selected property
       updateTable = true; // attributes have changed
+    }
+
+    attrOptions.exit().remove();
+    attrOptions.order();
+
+    if (updateTable) {
+      this.updateTable();
     }
   }
 
