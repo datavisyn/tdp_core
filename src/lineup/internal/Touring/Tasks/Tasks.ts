@@ -51,7 +51,6 @@ export abstract class ATouringTask implements ITouringTask {
   }
 
 
-
   private addEventListeners() {
     // DATA CHANGE LISTENERS
     // -----------------------------------------------
@@ -77,6 +76,25 @@ export abstract class ATouringTask implements ITouringTask {
   }
 
   public abstract update();
+
+
+  getAttriubuteDescriptions(): IColumnDesc[] {
+    let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
+      const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
+      const desc: IColumnDesc = deepCopy(col.desc);
+      if ((col as CategoricalColumn).categories) {
+        (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories).filter((category) => displayedCategories.has(category.name));
+      }
+
+      return desc;
+    });
+
+    const validTypes = ['categorical', 'number'];
+    descriptions = descriptions.filter((desc) => validTypes.includes(desc.type)); // filter attributes by type
+    descriptions.unshift(this.ranking.getSelectionDesc());
+    descriptions.unshift(this.ranking.getRankDesc());
+    return descriptions;
+  }
 
   toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
     let color =  score2color(score.pValue);
@@ -316,20 +334,7 @@ export class ColumnComparison extends ATouringTask {
   }
 
   public updateAttributeSelectors() {
-    let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
-      const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
-      const desc: IColumnDesc = deepCopy(col.desc);
-      if ((col as CategoricalColumn).categories) {
-        (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories).filter((category) => displayedCategories.has(category.name));
-      }
-
-      return desc;
-    });
-
-    const validTypes = ['categorical', 'number'];
-    descriptions = descriptions.filter((desc) => validTypes.includes(desc.type)); // filter attributes by type
-    descriptions.unshift(this.ranking.getSelectionDesc());
-    descriptions.unshift(this.ranking.getRankDesc());
+   const descriptions = this.getAttriubuteDescriptions();
 
     const attrSelectors = d3.select(this.node).selectAll('select.attr');
     const options = attrSelectors.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
@@ -511,9 +516,36 @@ export class RowComparison extends ATouringTask {
   }
 
   private updateSelectors(): any {
+    const descriptions = this.getAttriubuteDescriptions();
+
     // Update Row Selectors
+    // Rows are grouped by categories, so we filter the categorical attributes:
+    const catDescriptions = descriptions.filter((desc) => (desc as ICategoricalColumnDesc).categories);
+    // For each attribute, create a <optgroup>
+    const rowSelectors = d3.select(this.node).selectAll('select.row');
+    const optGroups = rowSelectors.selectAll('optgroup').data(catDescriptions, (desc) => desc.label);
+    optGroups.enter().append('optgroup').attr('label', (desc) => desc.label);
+    // For each category, create a <option> inside the optgroup
+    const rowOptions = optGroups.selectAll('option').data((d: ICategoricalColumnDesc) => d.categories);
+    rowOptions.enter().append('option').text((cat: ICategory) => cat.label);
+
+    // Remove atribtues and categories that were removed and order the html elements
+    rowOptions.exit().remove();
+    rowOptions.order();
+    optGroups.exit().remove();
+    optGroups.order();
 
     // Update Attribute Selectors
+    const attrSelector = d3.select(this.node).select('select.attr');
+    const attrOptions = attrSelector.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
+    attrOptions.enter().append('option').text((desc) => desc.label);
+
+    let updateTable = !attrOptions.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
+
+    if (attrSelector.selectAll('option:checked').empty()) { // make a default selection
+      attrSelector.selectAll('option').attr('selected', (desc, i) => i === descriptions.length-1 ? true : null ); // by default, select last column. set the others to null to remove the selected property
+      updateTable = true; // attributes have changed
+    }
   }
 
   updateTable() {
