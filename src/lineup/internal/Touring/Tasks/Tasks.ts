@@ -566,18 +566,22 @@ export class RowComparison extends ATouringTask {
   }
 
   updateTable() {
+    console.log('Update the table');
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
-    // numerical and categorical data is ok
-    const compareTo = [this.ranking.getSelectionDesc()];
     this.removeOldVisuallization();
-    this.createTable([], compareTo);
-  }
-
-  createTable(catData: any[], compareTo: {categories: ICategory[]; label: string; type: string; column: string;}[]): any {
+//  createTable(catData: any[], compareTo: {categories: ICategory[]; label: string; type: string; column: string;}[]): any {
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data([].concat(...compareTo.map((attr)  => attr.categories)), (cat) => cat.name); // cat.name != label
+    let colGrpData =  d3.select(this.node).selectAll('select.row[name="row1[]"] option:checked').data();
+    let rowGrpData = d3.select(this.node).selectAll('select.row[name="row2[]"]  option:checked').data();
+    if(colGrpData.length > rowGrpData.length) {
+      [rowGrpData, colGrpData] = [colGrpData, rowGrpData]; // avoid having more columns than rows --> flip table
+    }
+    const rowAttrData = d3.select(this.node).selectAll('select.attr[name="attr[]"]  option:checked').data();
+    console.log(colGrpData, rowGrpData, rowAttrData);
+
+    const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data(colGrpData, (cat) => cat.name); // cat.name != label
     const colHeadsCatSpan = colHeadsCat.enter().append('th')
       .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
 
@@ -611,6 +615,7 @@ export class RowComparison extends ATouringTask {
       tds.classed('score', (d) => d.measure !== undefined);
       tds.html((d) => d.label);
       tds.on('click', function() { that.onClick.bind(that)(this); });
+
       // Exit
       tds.exit().remove(); // remove cells of removed columns
       colHeadsCat.exit().remove(); // remove attribute columns
@@ -621,88 +626,36 @@ export class RowComparison extends ATouringTask {
       bodies.order();
     }
 
-    this.getAttrTableBody(compareTo, catData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
-    this.getAttrTableBody(compareTo, catData, false, (data) => updateTableBody(data, timestamp)).then((data) => updateTableBody(data, timestamp)); // set values
+    this.getAttrTableBody(colGrpData, rowGrpData, rowAttrData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
+    this.getAttrTableBody(colGrpData, rowGrpData, rowAttrData, false, (data) => updateTableBody(data, timestamp)).then((data) => updateTableBody(data, timestamp)); // set values
   }
 
   /**
-   * async: return promise
-   * @param attr1 columns
-   * @param arr2 rows
+   *     For each attribute in rowAttributes, we want to comapre the rows inside colGroups with the rows of rowGroups
+   *     i.e. the number of table rows is: |rowAttributes| * |rowGroups|
+   *     and there are |colGroups| columns
+   *     + plus the rows and columns where we put labels
+   *
+   * @param colGroups
+   * @param rowGroups
+   * @param rowAttributes
    * @param scaffold only create the matrix with row headers, but no value calculation
+   * @param update
    */
-  async getAttrTableBody(attr1: IColumnDesc[], attr2: IColumnDesc[], scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
-    const allCat1 = [].concat(...attr1.map((attr: any)  => attr.categories.map((catObj) => catObj.label)));
-    const groupedData = this.ranking.getGroupedData();
-    const data = this.prepareDataArray(allCat1, groupedData, attr2);
+  async getAttrTableBody(colGroups: ICategoricalColumnDesc[], rowGroups: ICategoricalColumnDesc[], rowAttributes: IColumnDesc[] ,scaffold: boolean, update: (bodyData: IScoreCell[][][]) => void): Promise<Array<Array<Array<IScoreCell>>>> {
+    const data = this.prepareDataArray(colGroups, rowGroups, rowAttributes);
 
     if (scaffold) {
       return data;
     } else {
       const promises = [];
 
-      for (const [bodyIndex, col] of attr2.entries()) {
+      for (const [bodyIndex, col] of rowAttributes.entries()) {
         const colPromises = [];
         const measures = MethodManager.getMeasuresByType(Type.get(col.type), Type.get(col.type), SCOPE.SETS); // Always compare selected elements with a group of elements of the same column
         if (measures.length > 0) {
           const measure = measures[0];
-          //prepare data (selected data is the same for all groups of this column)
-          const allData = this.ranking.getItemsDisplayed();
-          const dataSelected = []; // TODO: hardcoded -> bad
-          const dataUnselected = []; // TODO: hardcoded -> bad
-          const selectIndices = this.ranking.getSelection();
-
-          for (const [index, item] of allData.entries()) { // Walk through the array once an populate the data arrays
-            const colId = (col as IServerColumn).column;
-            if (selectIndices.length > 0 &&  (selectIndices.indexOf(index) !== -1)) {
-              dataSelected.push(item[colId]);
-            } else {
-              dataUnselected.push(item[colId]);
-            }
-          }
-
-
-          for (const [rowIndex, grpData] of groupedData.entries()) {
-            const grpData4Col = grpData.rows.map((row) => row[(col as IServerColumn).column]);
-
-            const scopedBodyIndex = bodyIndex; // by declaring it in this block, it is scoped and we don't need a closure to have the right value in the promise
-            // Score with selected:
-            const firstScoreIndex = rowIndex === 0 ? 2 : 1; //rows with attribute label have a 2 items, others just 1 item before the first score
-            if(allCat1.indexOf('Selected') >= 0) { // ensure that there is a column
-              const selScoreIndex = firstScoreIndex + allCat1.indexOf('Selected');
-              const setParameters = {
-                setA: dataSelected,
-                setADesc: attr1[0],
-                setACategory: 'Selected',
-                setB: grpData4Col,
-                setBDesc: col,
-                setBCategory: groupedData[rowIndex]
-              };
-              colPromises.push(measure.calc(dataSelected, grpData4Col, dataSelected.concat(dataUnselected))
-                    .then((score) => {
-                      data[scopedBodyIndex][rowIndex][selScoreIndex] = this.toScoreCell(score, measure, setParameters);
-                    })
-                    .catch((err) => data[scopedBodyIndex][rowIndex][selScoreIndex] = {label: 'err'} ));
-            }
-
-            if(allCat1.indexOf('Unselected') >= 0) {  // ensure that there is a column
-              const unselScoreIndex = firstScoreIndex + allCat1.indexOf('Unselected');
-              const setParameters = {
-                setA: dataUnselected,
-                setADesc: attr1[0],
-                setACategory: 'Unselected',
-                setB: grpData4Col,
-                setBDesc: col,
-                setBCategory: groupedData[rowIndex]
-              };
-              // Score with unselected:
-              colPromises.push(measure.calc(dataUnselected, grpData4Col, dataSelected.concat(dataUnselected))
-                    .then((score) => {
-                      data[scopedBodyIndex][rowIndex][unselScoreIndex] = this.toScoreCell(score, measure, setParameters);
-                    })
-                    .catch((err) => data[scopedBodyIndex][rowIndex][unselScoreIndex] = {label: 'err'}));
-            }
-          }
+          // TODO
         }
         Promise.all(colPromises).then(() => update(data));
         promises.concat(colPromises);
@@ -713,28 +666,28 @@ export class RowComparison extends ATouringTask {
     }
   }
 
-  prepareDataArray(allCat1: any[], groupedData: any[], attr2: IColumnDesc[]) {
-    const data: Array<Array<Array<IScoreCell>>> = new Array(attr2.length); // An array for each attribute (n*tbody)
-    for (const [i, col] of attr2.entries()) {
-        data[i] = new Array(groupedData.length); // An array for each group (m * tr; comparison to stratification (all columns have the same groups))
+  prepareDataArray(colGroups: ICategoricalColumnDesc[], rowGroups: ICategoricalColumnDesc[], rowAttributes: IColumnDesc[]) {
+    const data = new Array(rowAttributes.length); // one array per attribute (number of table bodies)
 
-        for (const [j, grp] of groupedData.entries()) {
-          data[i][j] = new Array(allCat1.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell);
-          data[i][j][j === 0 ? 1 : 0] = { // through rowspan, the group labels can become the first array item
-            label: grp.label,
-            background: grp.color,
-            foreground:  textColor4Background(grp.color)
+    for (const [i, attr] of rowAttributes.entries()) {
+      data[i] = new Array(rowGroups.length); // one array per rowGroup (number of rows in body)
+      for (const [j, rowGrp] of rowGroups.entries()) {
+        data[i][j] = new Array(colGroups.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell);
+        data[i][j][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item
+          label: rowGrp.label,
+          background: rowGrp.color,
+          foreground: textColor4Background(rowGrp.color)
+        };
+
+        if (j === 0) {
+          data[i][j][0] = {
+            label: attr.label,
+            rowspan: (attr as any).categories.length,
+            type: attr.type
           };
-
-          if (j === 0) {
-            data[i][j][0] = {
-              label: col.label,
-              rowspan: groupedData.length,
-              type: col.type
-            };
-          }
-          data[i][j][0].key = col.label+'-'+grp.name;
         }
+        data[i][j][0].key = attr.label+'-'+rowGrp.label;
+      }
     }
 
     return data;
