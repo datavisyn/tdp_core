@@ -80,9 +80,9 @@ export abstract class ATouringTask implements ITouringTask {
 
   getAttriubuteDescriptions(): IColumnDesc[] {
     let descriptions: IColumnDesc[] = this.ranking.getDisplayedAttributes().map((col: Column) => {
-      const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
       const desc: IColumnDesc = deepCopy(col.desc);
       if ((col as CategoricalColumn).categories) {
+        const displayedCategories = this.ranking.getAttributeCategoriesDisplayed((col.desc as IServerColumn).column);
         (desc as ICategoricalColumnDesc).categories = deepCopy((col as CategoricalColumn).categories).filter((category) => displayedCategories.has(category.name));
       }
 
@@ -528,7 +528,7 @@ export class RowComparison extends ATouringTask {
     });
 
     // For each attribute, create a <optgroup>
-    const rowSelectors = d3.select(this.node).selectAll('select.row');
+    const rowSelectors = d3.select(this.node).selectAll('select.rowGrp');
     const optGroups = rowSelectors.selectAll('optgroup').data(catDescriptions, (desc) => desc.label);
     optGroups.enter().append('optgroup').attr('label', (desc) => desc.label);
     // For each category, create a <option> inside the optgroup
@@ -579,8 +579,8 @@ export class RowComparison extends ATouringTask {
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    let colGrpData =  d3.select(this.node).selectAll('select.row[name="row1[]"] option:checked').data();
-    let rowGrpData = d3.select(this.node).selectAll('select.row[name="row2[]"]  option:checked').data();
+    let colGrpData =  d3.select(this.node).selectAll('select.rowGrp[name="row1[]"] option:checked').data();
+    let rowGrpData = d3.select(this.node).selectAll('select.rowGrp[name="row2[]"]  option:checked').data();
     if(colGrpData.length > rowGrpData.length) {
       [rowGrpData, colGrpData] = [colGrpData, rowGrpData]; // avoid having more columns than rows --> flip table
     }
