@@ -88,17 +88,12 @@ export abstract class ATouringTask implements ITouringTask {
     // -----------------------------------------------
     // change in selection
     //  might cause changes the displayed table / scores
-    //  if no items are selected, the table should be displayed by a message
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_SELECTION_CHANGED + ATouringTask.EVENTTYPE, () => this.updateTable()); //fat arrow to preserve scope in called function (this)
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_SELECTION_CHANGED + ATouringTask.EVENTTYPE, () => this.update(true)); //fat arrow to preserve scope in called function (this)
 
-    // column of a table was added
-    //  causes changes in the second item dropdown (b)
+    // column of a table was added/removed
+    //  causes changes in the available attributes (b)
     //  might cause changes the displayed table / scores
     this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
-
-    // column of a table was removed
-    //  causes changes in the second item dropdown (b)
-    //  might cause changes the displayed table / scores
     this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
 
     // for filter changes and stratification changes
