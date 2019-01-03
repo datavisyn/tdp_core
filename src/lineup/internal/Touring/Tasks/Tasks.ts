@@ -285,7 +285,6 @@ export abstract class ATouringTask implements ITouringTask {
 
     if (cellData.score) { //Currenlty only cells with a score are calculated (no category or attribute label cells)
       // Color table cell
-      d3.select(this.node).selectAll('td').classed('selectedCell', false); // remove gb highlighting from all the other tds
       d3.select(tableCell).classed('selectedCell', true); // add bg highlighting
 
       const reusltScore : IMeasureResult = cellData.score;
