@@ -64,7 +64,7 @@ export interface IARankingViewOptions {
    */
   enableZoom: boolean;
 
-  enableSidePanel: boolean | 'collapsed';
+  enableSidePanel: boolean | 'collapsed' | 'top';
 
   enableAddingColumns: boolean;
 
@@ -89,8 +89,6 @@ export interface IARankingViewOptions {
   customOptions: Partial<ITaggleOptions>;
   customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
 }
-
-export const MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW = 2000;
 
 /**
  * base class for views based on LineUp
@@ -236,7 +234,9 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
-      this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+      if (this.options.enableSidePanel !== 'top') {
+        this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+      }
     }
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
@@ -251,7 +251,12 @@ export abstract class ARankingView extends AView {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
       base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
-      base.lastElementChild!.appendChild(this.stats);
+      const container = <HTMLElement>base.lastElementChild!;
+      container.appendChild(this.stats);
+
+      if (this.options.enableSidePanel === 'top') {
+        container.insertAdjacentElement('afterbegin', this.panel.node);
+      }
     });
   }
 
@@ -545,7 +550,6 @@ export abstract class ARankingView extends AView {
     const r = this.provider.getRankings()[0];
     const shown = r && r.getOrder() ? r.getOrder().length : 0;
     this.stats.textContent = showStats(total, selected, shown);
-    this.panel.toggleDisableOverviewButton(shown > MAX_AMOUNT_OF_ROWS_TO_DISABLE_OVERVIEW);
   }
 
   /**
