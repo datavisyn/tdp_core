@@ -733,6 +733,9 @@ export class RowComparison extends ATouringTask {
       // the row and column indices stay the same, only the data changes ->  we want to retrieve these indices only once.
       const rowGrpsIndices = rowGroups.map((rowGrp) => this.ranking.getRowsWithCategory(rowGrp));
       const colGrpsIndices = rowGroups.map((rowGrp) => this.ranking.getRowsWithCategory(rowGrp));
+      // if a group is part of the column and row item groups, we use these array to get the correct index (so we can avoid duplicate calculations)
+      const rowIndex4colGrp = colGroups.map((colGrp) => rowGroups.indexOf(colGrp));
+      const colIndex4rowGrp = rowGroups.map((rowGrp) => colGroups.indexOf(rowGrp));
 
       for (const [bodyIndex, attr] of rowAttributes.entries()) {
         const attrPromises = [];
@@ -749,6 +752,8 @@ export class RowComparison extends ATouringTask {
 
               if (rowGrp.label === colGrp.label) { // identical groups
                 data[bodyIndex][rowIndex][colIndexOffset + colIndex] = {label: '&#x26AB', measure};
+              } else if (colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0 && rowIndex4colGrp[colIndex] < rowIndex) {
+                // the rowGrp is also part of the colGroups array, and the colGrp is one of the previous rowGroups --> i.e. already calculated in a table row above the current one
               } else {
                 const colData = colGrpsIndices[colIndex].map((i) => attrData[i]);
 
@@ -762,7 +767,13 @@ export class RowComparison extends ATouringTask {
                 };
 
                 attrPromises.push(measure.calc(rowData, colData, attrData)
-                  .then((score) => data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters)));
+                  .then((score) => {
+                    data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters);
+                    if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
+                      const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1; // Currenlty, we can't have duplicates in the first line, so this will always be 1
+                      data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = this.toScoreCell(score, measure, setParameters);
+                    }
+                  }));
               }
             }
           }
