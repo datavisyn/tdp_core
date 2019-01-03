@@ -24,8 +24,11 @@ div.touring {
   padding-top: 1em;
   padding-left: 0.5em;
 
+  .task-btn.active {
+    background-color: #fba74d;
+  }
+
   .output {
-    border-top: #AAA 1px solid;
     position: relative;
     flex: 1;
     
@@ -35,11 +38,15 @@ div.touring {
       right: 0; bottom: 0;
       overflow: auto;
 
+      select[multiple] {
+        height: 8em;
+      }
+
       h1 {
         display: block;
-        position: absolute; // absolute to float over the table
-        top: 0;
-        left: 0;
+        // position: absolute; // absolute to float over the table
+        // top: 0;
+        // left: 0;
         font-size: 1.2em;
       }
     }
@@ -106,7 +113,7 @@ div.touring {
             > span {
               position: relative;
               display: inline-block;  // to set a width
-              min-width: 165px; // same width as the row labels, but not flexible
+              min-width: 165px;
               max-width: 165px;
               box-sizing: border-box; // i dont want to mess with the padding
 
