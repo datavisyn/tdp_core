@@ -42,13 +42,21 @@ div.touring {
         height: 8em;
       }
 
-      h1 {
-        display: block;
-        // position: absolute; // absolute to float over the table
-        // top: 0;
-        // left: 0;
-        font-size: 1.2em;
+      .table-container {
+        position: relative;
+
+        header {
+          display: block;
+          position: absolute; // absolute to float over the table
+          top: 0;
+          left: 0;
+
+          h1 {
+            font-size: 1.2em;
+          }
+        }
       }
+
     }
 
     a:hover, a:focus {
@@ -181,6 +189,7 @@ div.touring {
 
         &.action, &.score {
           cursor: pointer;
+          vertical-align: bottom; // Actually, it should be middle, but bottom looks more centered ¯\_(ツ)_/¯
 
           &:hover, &:focus { // = td.action:hover
             background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition              
@@ -192,13 +201,23 @@ div.touring {
             font-weight: bolder; 
           }
         }
+
+        span.circle {
+          display: inline-block;
+          width: 0.8em;
+          height: 0.8em;
+          vertical-align: middle;
+          background-color: #333;
+          border: 1px solid transparent;
+          border-radius: 100%;
+        }
       }
     }
 
     .detailVis {
       border-top: #AAA 1px solid;
-      margin: 0.2em 0 0.6em 0;
-      padding: 0.2em 0;
+      margin: 0.5em 0;
+      padding: 0.5em 0;
     
 
       .detailDiv {

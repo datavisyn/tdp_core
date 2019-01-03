@@ -488,7 +488,7 @@ export class ColumnComparison extends ATouringTask {
       const tds = trs.selectAll('td').data((d) => d);
       tds.enter().append('td');
       // Set colheads in thead
-      colHeadsSpan.text((d) => d.label);
+      colHeadsSpan.html((d) => d.label);
       colHeadsSpan.attr('data-type',(d) => (d.type));
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
@@ -537,7 +537,7 @@ export class ColumnComparison extends ATouringTask {
 
           if (row.label === col.label) {
             //identical attributes
-            data[rowIndex][0][colIndex+1] = {label: '&#x26AB', measure: null};
+            data[rowIndex][0][colIndex+1] = {label: '<span class="circle"/>', measure: null};
           } else if (rowIndexInCols >= 0 && colIndexInRows >= 0 && colIndexInRows < rowIndex) {
             // the row is also part of the column array, and the column is one of the previous rows
           } else {
@@ -786,7 +786,7 @@ export class RowComparison extends ATouringTask {
               const colIndexOffset = rowIndex === 0 ? 2 : 1; // Two columns if the attribute label is in the same line, (otherwise 1 (because rowspan))
 
               if (rowGrp.label === colGrp.label) { // identical groups
-                data[bodyIndex][rowIndex][colIndexOffset + colIndex] = {label: '&#x26AB', measure};
+                data[bodyIndex][rowIndex][colIndexOffset + colIndex] = {label: '<span class="circle"/>', measure};
               } else if (colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0 && rowIndex4colGrp[colIndex] < rowIndex) {
                 // the rowGrp is also part of the colGroups array, and the colGrp is one of the previous rowGroups --> i.e. already calculated in a table row above the current one
               } else {
