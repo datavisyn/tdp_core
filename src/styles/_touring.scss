@@ -180,6 +180,8 @@ div.touring {
         }
 
         &.action, &.score {
+          cursor: pointer;
+
           &:hover, &:focus { // = td.action:hover
             background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition              
             font-weight: bolder;
