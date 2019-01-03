@@ -15,12 +15,44 @@ export function TaskDecorator() {
 }
 
 
+// SOURCE: https://stackoverflow.com/a/51592360/2549748
+/**
+ * Deep copy function for TypeScript.
+ * @param T Generic type of target/copied value.
+ * @param target Target value to be copied.
+ * @see Source project, ts-deepcopy https://github.com/ykdr2017/ts-deepcopy
+ * @see Code pen https://codepen.io/erikvullings/pen/ejyBYg
+ */
+const deepCopy = <T>(target: T): T => {
+  if (target === null) {
+    return target;
+  }
+  if (target instanceof Date) {
+    return new Date(target.getTime()) as any;
+  }
+  if (target instanceof Array) {
+    const cp = [] as any[];
+    (target as any[]).forEach((v) => { cp.push(v); });
+    return cp.map((n: any) => deepCopy<any>(n)) as any;
+  }
+  if (typeof target === 'object' && target !== {}) {
+    const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
+    Object.keys(cp).forEach((k) => {
+      cp[k] = deepCopy<any>(cp[k]);
+    });
+    return cp as T;
+  }
+  return target;
+};
+
+
 export interface ITouringTask {
   id: string;
   label: string;
 
   scope: SCOPE; // Does the Task use attributes or subsets of them?
 }
+
 
 export abstract class ATouringTask implements ITouringTask {
   public static EVENTTYPE = '.touringTask';
@@ -849,7 +881,6 @@ interface IScoreCell {
 }
 
 
-
 export function score2color(score:number) : {background: string, foreground: string} {
   let background ='#ffffff'; //white
   let foreground = '#333333'; //kinda black
@@ -875,33 +906,3 @@ export function textColor4Background(backgroundColor: string) {
 
   return color;
 }
-
-// SOURCE: https://stackoverflow.com/a/51592360/2549748
-/**
- * Deep copy function for TypeScript.
- * @param T Generic type of target/copied value.
- * @param target Target value to be copied.
- * @see Source project, ts-deepcopy https://github.com/ykdr2017/ts-deepcopy
- * @see Code pen https://codepen.io/erikvullings/pen/ejyBYg
- */
-const deepCopy = <T>(target: T): T => {
-  if (target === null) {
-    return target;
-  }
-  if (target instanceof Date) {
-    return new Date(target.getTime()) as any;
-  }
-  if (target instanceof Array) {
-    const cp = [] as any[];
-    (target as any[]).forEach((v) => { cp.push(v); });
-    return cp.map((n: any) => deepCopy<any>(n)) as any;
-  }
-  if (typeof target === 'object' && target !== {}) {
-    const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
-    Object.keys(cp).forEach((k) => {
-      cp[k] = deepCopy<any>(cp[k]);
-    });
-    return cp as T;
-  }
-  return target;
-};
