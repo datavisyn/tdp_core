@@ -528,7 +528,13 @@ export class ColumnComparison extends ATouringTask {
                   if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
                     data[colIndexInRows][0][rowIndexInCols+1] = this.toScoreCell(score, measure, setParameters);
                   }
-                }).catch((err) => row[colIndex] = {label: 'err'})
+                }).catch((err) => {
+                  const errorCell = {label: 'err'};
+                  data[rowIndex][0][colIndex+1] = errorCell;
+                  if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
+                    data[colIndexInRows][0][rowIndexInCols + 1] = errorCell;
+                  }
+                })
               ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
             }
           }
@@ -773,7 +779,16 @@ export class RowComparison extends ATouringTask {
                       const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1; // Currenlty, we can't have duplicates in the first line, so this will always be 1
                       data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = this.toScoreCell(score, measure, setParameters);
                     }
-                  }));
+                  })
+                  .catch((err) => {
+                    const errorCell = {label: 'err'};
+                    data[bodyIndex][rowIndex][colIndexOffset + colIndex] = errorCell;
+                    if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
+                      const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1;
+                      data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = errorCell;
+                    }
+                  })
+                );
               }
             }
           }
