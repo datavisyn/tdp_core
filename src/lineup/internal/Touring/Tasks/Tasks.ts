@@ -57,25 +57,26 @@ export abstract class ATouringTask implements ITouringTask {
     // change in selection
     //  might cause changes the displayed table / scores
     //  if no items are selected, the table should be displayed by a message
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_SELECTION_CHANGED + ATouringTask.EVENTTYPE, () => this.update()); //fat arrow to preserve scope in called function (this)
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_SELECTION_CHANGED + ATouringTask.EVENTTYPE, () => this.updateTable()); //fat arrow to preserve scope in called function (this)
 
     // column of a table was added
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => this.update());
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
 
     // column of a table was removed
     //  causes changes in the second item dropdown (b)
     //  might cause changes the displayed table / scores
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => this.update());
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
 
     // for filter changes and stratification changes
     //  After the number of items has changed, the score change aswell
     // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_ORDER_CHANGED + ATouringTask.EVENTTYPE, () => this.update());
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ORDER_CHANGED + ATouringTask.EVENTTYPE, () => this.update(true));
   }
 
-  public abstract update();
+  public abstract update(forceTableUpdate: boolean): void;
+  public abstract updateTable(): void;
 
 
   getAttriubuteDescriptions(): IColumnDesc[] {
@@ -391,37 +392,39 @@ export class ColumnComparison extends ATouringTask {
     d3.select(this.node).selectAll('select').on('input', () => this.updateTable());
   }
 
-  public update() {
-    this.updateAttributeSelectors();
+
+  public update(forceTableUpdate: boolean): void {
+    const tableChanged = this.updateAttributeSelectors();
+    if (forceTableUpdate || tableChanged) {
+      this.updateTable();
+    }
   }
 
-  public updateAttributeSelectors() {
+  public updateAttributeSelectors(): boolean {
    const descriptions = this.getAttriubuteDescriptions();
 
     const attrSelectors = d3.select(this.node).selectAll('select.attr');
     const options = attrSelectors.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
     options.enter().append('option').text((desc) => desc.label);
 
-    let updateTable = !options.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
+    let tableChanged = !options.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
 
     const attrSelect1 =  d3.select(this.node).select('select.attr[name="attr1[]"]');
     if (attrSelect1.selectAll('option:checked').empty()) { // make a default selection
       attrSelect1.selectAll('option').attr('selected', (desc, i) => i === descriptions.length-1 ? true : null ); // by default, select last column. set the others to null to remove the selected property
-      updateTable = true; // attributes have changed
+      tableChanged = true; // attributes have changed
     }
 
     const attrSelect2 = d3.select(this.node).select('select.attr[name="attr2[]"]');
     if (attrSelect2.selectAll('option:checked').empty()) { // make a default selection
       attrSelect2.selectAll('option').attr('selected', true); // by default, select all
-      updateTable = true; // attributes have changed
+      tableChanged = true; // attributes have changed
     }
 
     options.exit().remove();
     options.order();
 
-    if (updateTable) {
-      this.updateTable();
-    }
+    return tableChanged;
   }
 
   public updateTable() {
@@ -529,6 +532,7 @@ export class ColumnComparison extends ATouringTask {
                     data[colIndexInRows][0][rowIndexInCols+1] = this.toScoreCell(score, measure, setParameters);
                   }
                 }).catch((err) => {
+                  console.error(err);
                   const errorCell = {label: 'err'};
                   data[rowIndex][0][colIndex+1] = errorCell;
                   if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
@@ -582,11 +586,14 @@ export class RowComparison extends ATouringTask {
   }
 
 
-  public update() {
-    this.updateSelectors();
+  public update(forceTableUpdate: boolean): void {
+    const tableChanged = this.updateSelectors();
+    if (forceTableUpdate || tableChanged) {
+      this.updateTable();
+    }
   }
 
-  private updateSelectors(): any {
+  private updateSelectors(): boolean {
     const descriptions = this.getAttriubuteDescriptions();
 
     // Update Row Selectors
@@ -606,7 +613,7 @@ export class RowComparison extends ATouringTask {
     const rowOptions = optGroups.selectAll('option').data((d: ICategoricalColumnDesc) => d.categories, (cat: ICategory) => cat.label);
     rowOptions.enter().append('option').text((cat: ICategory) => cat.label);
 
-    let updateTable = !rowOptions.exit().filter(':checked').empty(); //if checked categories are removed, the table has to update
+    let tableChanged = !rowOptions.exit().filter(':checked').empty(); //if checked categories are removed, the table has to update
 
     // Remove atribtues and categories that were removed and order the html elements
     rowOptions.exit().remove();
@@ -618,7 +625,7 @@ export class RowComparison extends ATouringTask {
       const emptySelection = d3.select(this).selectAll('option:checked').empty();
       if (emptySelection) {
         d3.select(this).select('optgroup').selectAll('option').attr('selected', true); // select the categories of the first attribute by default
-        updateTable = true;
+        tableChanged = true;
       }
     });
 
@@ -627,23 +634,20 @@ export class RowComparison extends ATouringTask {
     const attrOptions = attrSelector.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
     attrOptions.enter().append('option').text((desc) => desc.label);
 
-    updateTable = updateTable || !attrOptions.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
+    tableChanged = tableChanged || !attrOptions.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
 
     if (attrSelector.selectAll('option:checked').empty()) { // make a default selection
       attrSelector.selectAll('option').attr('selected', (desc, i) => i === descriptions.length-1 ? true : null ); // by default, select last column. set the others to null to remove the selected property
-      updateTable = true; // attributes have changed
+      tableChanged = true; // attributes have changed
     }
 
     attrOptions.exit().remove();
     attrOptions.order();
 
-    if (updateTable) {
-      this.updateTable();
-    }
+    return tableChanged;
   }
 
   updateTable() {
-    console.log('Update the table');
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
     this.removeOldVisuallization();
 
@@ -656,8 +660,6 @@ export class RowComparison extends ATouringTask {
       [rowGrpData, colGrpData] = [colGrpData, rowGrpData]; // avoid having more columns than rows --> flip table
     }
     const rowAttrData = d3.select(this.node).selectAll('select.attr[name="attr[]"]  option:checked').data();
-    console.log(colGrpData, rowGrpData, rowAttrData);
-
     const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data(colGrpData, (cat) => cat.name); // cat.name != label
     const colHeadsCatSpan = colHeadsCat.enter().append('th')
       .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
@@ -781,6 +783,7 @@ export class RowComparison extends ATouringTask {
                     }
                   })
                   .catch((err) => {
+                    console.error(err);
                     const errorCell = {label: 'err'};
                     data[bodyIndex][rowIndex][colIndexOffset + colIndex] = errorCell;
                     if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
