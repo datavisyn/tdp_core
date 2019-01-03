@@ -51,10 +51,14 @@ export default class TouringPanel extends LineUpPanelActions {
     // Click a different task
     d3.select(this.node).selectAll('button.task-btn').on('click', (task) => {
       const taskButtons = d3.select(this.node).selectAll('button.task-btn');
-      taskButtons.classed('active', (d) => d.id === task.id);
+      const oldTask = taskButtons.filter('.active');
 
-      this.initNewTask();
-      this.updateOutput();
+      if (!oldTask.empty() && oldTask.datum().id !== task.id) { //task changed
+        taskButtons.classed('active', (d) => d.id === task.id);
+
+        this.initNewTask();
+        this.updateOutput();
+      }
     });
   }
 
