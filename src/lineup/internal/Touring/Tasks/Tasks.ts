@@ -746,20 +746,25 @@ export class RowComparison extends ATouringTask {
             // Get the data of 'attr' for the rows inside 'rowGrp'
             const rowData = rowGrpsIndices[rowIndex].map((i) => attrData[i]);
             for (const [colIndex, colGrp] of colGroups.entries()) {
-              const colData = colGrpsIndices[colIndex].map((i) => attrData[i]);
-
-              const setParameters = {
-                setA: rowData,
-                setADesc: rowGrp.attribute,
-                setACategory: rowGrp.label,
-                setB: colData,
-                setBDesc: colGrp.attribute,
-                setBCategory: colGrp.label
-              };
-
               const colIndexOffset = rowIndex === 0 ? 2 : 1; // Two columns if the attribute label is in the same line, (otherwise 1 (because rowspan))
-              attrPromises.push(measure.calc(rowData, colData, attrData)
-                .then((score) => data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters)));
+
+              if (rowGrp.label === colGrp.label) { // identical groups
+                data[bodyIndex][rowIndex][colIndexOffset + colIndex] = {label: '&#x26AB', measure};
+              } else {
+                const colData = colGrpsIndices[colIndex].map((i) => attrData[i]);
+
+                const setParameters = {
+                  setA: rowData,
+                  setADesc: attr,
+                  setACategory: rowGrp.label,
+                  setB: colData,
+                  setBDesc: attr,
+                  setBCategory: colGrp.label
+                };
+
+                attrPromises.push(measure.calc(rowData, colData, attrData)
+                  .then((score) => data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters)));
+              }
             }
           }
         }
