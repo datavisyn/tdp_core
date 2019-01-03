@@ -127,20 +127,6 @@ div.touring {
                 box-sizing: border-box; // i dont want to mess with the padding
                 padding: 0.1em 0.5em 0.1em 1.5em;
                 z-index: -1;
-
-                &[data-type]::before {
-                  display: inline-block; // so that the width property works
-                  width: 1.2em; //to have some space between icon and the text in the td
-                  font-family: lu-font; // some icon font 
-                  color: #999; // #515151 is to dark
-                }
-
-                &[data-type='categorical']::before {
-                  content: "\e810";
-                }
-                &[data-type='number']::before {
-                  content: "\e811";
-                }
               }
             }
           }
@@ -196,20 +182,6 @@ div.touring {
             background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition
             font-weight: bolder; 
           }
-        }
-
-        &[data-type]::before {
-          display: inline-block; // so that the width property works
-          width: 1.2em; //to have some space between icon and the text in the td
-          font-family: lu-font; // some icon font 
-          color: #999; // #515151 is to dark
-        }
-
-        &[data-type='categorical']::before {
-          content: "\e810";
-        }
-        &[data-type='number']::before {
-          content: "\e811";
         }
       }
     }
@@ -341,5 +313,19 @@ div.touring {
     g.linechart path.dataline:hover{
       fill-opacity: 0.4;
     }
+  }
+
+  [data-type]::before {
+    display: inline-block; // so that the width property works
+    width: 1.2em; //to have some space between icon and the text in the td
+    font-family: lu-font; // some icon font 
+    color: #999; // #515151 is to dark
+  }
+
+  [data-type='categorical']::before {
+    content: "\e810";
+  }
+  [data-type='number']::before {
+    content: "\e811";
   }
 }
