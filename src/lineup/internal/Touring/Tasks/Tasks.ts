@@ -3,7 +3,9 @@ import {RankingAdapter, IAttributeCategory} from '../RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, WorkerManager} from 'touring';
 import {IColumnDesc, ICategory, Column, CategoricalColumn, ICategoricalColumnDesc, LocalDataProvider} from 'lineupjs';
 import colCmpHtml from 'html-loader!./ColumnComparison.html'; // webpack imports html to variable
+import colCmpIcon from './colCmp.png';
 import rowCmpHtml from 'html-loader!./RowComparison.html'; // webpack imports html to variable
+import rowCmpIcon from './rowCmp.png';
 import * as $ from 'jquery';
 import * as d3 from 'd3';
 
@@ -60,6 +62,7 @@ export abstract class ATouringTask implements ITouringTask {
   public id: string;
   public label: string;
   public node: HTMLElement;
+  public icon: string;
 
   public scope: SCOPE;
 
@@ -408,6 +411,7 @@ export class ColumnComparison extends ATouringTask {
     this.id = 'colCmp';
     this.label = 'Columns';
     this.order = 20;
+    this.icon = colCmpIcon;
 
     this.scope = SCOPE.ATTRIBUTES;
   }
@@ -607,6 +611,7 @@ export class RowComparison extends ATouringTask {
     this.id = 'rowCmp';
     this.label = 'Rows';
     this.order = 10;
+    this.icon = rowCmpIcon;
 
     this.scope = SCOPE.SETS;
   }

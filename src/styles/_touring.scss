@@ -7,9 +7,17 @@ $highlight-color: #ffa500;
   display: none !important;
 }
 
-button.touring.active::before {
-  color: $highlight-color;
-  border: none;
+button {
+  &.touring.active::before {
+    color: $highlight-color;
+    border: none;
+  }
+
+  img {
+    height: 1.2em;
+    width: auto;
+    padding-right: 1em;
+  }
 }
 
 .tooltip.measure {
