@@ -1,11 +1,14 @@
-$ordino-active-color: #ffa500;
+$active-color: #eaeaea;
 $dark-font-color: #333;
+$highlight-color: #ffa500;
+
+
 [hidden] {
   display: none !important;
 }
 
 button.touring.active::before {
-  color: $ordino-active-color;
+  color: $highlight-color;
   border: none;
 }
 
@@ -19,7 +22,7 @@ button.touring.active::before {
 div.touring {
   flex: 1 0 auto; // sidebar uses flexbox
 
-  // the touring div itself uses a flexbox for the children:
+  // the touring div itself also uses a flexbox for the children:
   display: flex; 
   flex-direction: column;
 
@@ -27,17 +30,34 @@ div.touring {
   padding-left: 0.5em;
 
   .task-btn.active {
-    background-color: $ordino-active-color;
+    background-color: $active-color;
+  }
+
+  
+  label.control-label {
+    padding: 0px;
+    padding-left: 15px; //bootstrap default
   }
 
   .output {
     position: relative;
     flex: 1;
 
-    .select2 .select2-selection__choice {
-      background-color: $ordino-active-color;
-      span {
-        color: $dark-font-color;
+    $wide-col-padding: 0.5em;
+    $narrow-col-padding: 0.2em;
+    $col-min-size: 4.5ch;
+    $col-max-size: 15em;
+
+    .select2-results__option--highlighted {
+      background-color: darken($color: #ddd, $amount: 20%); // #ddd is default color for selected elements
+    }
+
+    .select2 {
+      .select2-selection__choice {
+        background-color: $active-color;
+        span {
+          color: $dark-font-color;
+        }
       }
     }
     
@@ -47,14 +67,20 @@ div.touring {
       right: 0; bottom: 0;
       overflow: auto;
 
+      .input {
+        overflow: hidden;
+      }
+      
       .table-container {
         position: relative;
+        border-top: 1px #AAA solid;
 
         header {
           display: block;
           position: absolute; // absolute to float over the table
           top: 0;
           left: 0;
+          width: 13em;
 
           h1 {
             font-size: 1.2em;
@@ -83,15 +109,14 @@ div.touring {
     }
 
     .measure-legend {
-      margin-top: 10px;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      svg {
+        vertical-align: middle;
+      }
     }
 
     table {
-      $wide-col-padding: 0.5em;
-      $narrow-col-padding: 0.2em;
-      $col-min-size: 4.5ch;
-      $col-max-size: 15em;
-      $highlight-color: #fba74d;
       $table-border-color: white;
       
       table-layout: fixed; // The table and column widths are set by the widths of table and col or by the width of the first row of cells. Cells in other rows do not affect column widths.
@@ -220,21 +245,19 @@ div.touring {
 
     .detailVis {
       border-top: #AAA 1px solid;
-      margin: 0.5em 0;
       padding: 0.5em 0;
     
-
       .detailDiv {
         font-weight: bold;
         color: $dark-font-color;
-      }
-
-      .detailDiv span{
-        font-weight: normal;
-      }
-
-      .detailDiv span.detail-label{
-        font-weight: bold;
+        
+        span{
+          font-weight: normal;
+          
+          &.detail-label{
+            font-weight: bold;
+          }
+        }
       }
     }
     

@@ -83,9 +83,10 @@ export abstract class ATouringTask implements ITouringTask {
     this.createLegend(d3.select(this.node).select('div.legend'));
 
     // make selectors functional
+    const parent = this.node;
     const updateTable = this.updateTable.bind(this);
     d3.select(this.node).selectAll('select').each(function() { // Convert to select2
-      const $select2 = $(this).select2({width: 'resolve', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. '});
+      const $select2 = $(this).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. ', dropdownParent: $(parent)});
       $select2.on('select2:select select2:unselect', updateTable);
     });
   }
@@ -353,7 +354,10 @@ export abstract class ATouringTask implements ITouringTask {
   onMouseOver(tableCell, state: boolean) {
     if(d3.select(tableCell).classed('score')) {
 
-      const tr = d3.select(tableCell).node().parentNode;
+      const tr = tableCell.parentNode; //current row
+      const tbody = tr.parentNode;     //current body
+      const table = tbody.parentNode;  //current table
+
       const allTds = d3.select(tr).selectAll('td');
       // console.log('allTds', allTds[0]);
       let index = -1;
@@ -365,37 +369,10 @@ export abstract class ATouringTask implements ITouringTask {
         }
       }
 
-      const tbody = d3.select(tr).node().parentNode; //current body
-      const table = d3.select(tbody).node().parentNode; //current table
-
-      // highlight row
-      // d3.select(tr).select('td').classed('cross-selection',state);
-      // highlight the first cell in the first for of a body with rowspan
+      // highlight all label cells in row
+      d3.select(tr).selectAll('td:not(.score)').classed('cross-selection',state);
+      // highlight the first cell in the first row of the cells tbody
       d3.select(tbody).select('tr').select('td').classed('cross-selection',state);
-
-      // highlight column
-      const allBodies = d3.select(table).selectAll('tbody');
-      // console.log('allBodies : ',allBodies);
-
-      // go through all bodies
-      // for(const currBody of allBodies[0]) {
-      //   const currRows = d3.select(currBody).selectAll('tr');
-      //   // go through all rows of current body
-      //   for(const currRow of currRows[0]) {
-      //     // get all cells of current row and highlight
-      //     const currCells = d3.select(currRow).selectAll('td');
-      //     // calc the index for the cell which should be highlighted
-      //     const currCellsLen = currCells[0].length;
-      //     let currIndex = index;
-      //     if (currCellsLen > currLength) {
-      //       currIndex = index+1;
-      //     } else if (currCellsLen < currLength) {
-      //       currIndex = index-1;
-      //     }
-      //     // highlight cell of current body and current row
-      //     d3.select(currCells[0][currIndex]).classed('cross-selection',state);
-      //   }
-      // }
 
       // maxIndex is the maximum number of table cell in the table
       const maxLength = d3.select(tbody).select('tr').selectAll('td')[0].length;
@@ -574,7 +551,7 @@ export class ColumnComparison extends ATouringTask {
                   }
                 }).catch((err) => {
                   console.error(err);
-                  const errorCell = {label: 'err'};
+                  const errorCell = {label: 'err', measure};
                   data[rowIndex][0][colIndex+1] = errorCell;
                   if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
                     data[colIndexInRows][0][rowIndexInCols + 1] = errorCell;
@@ -829,7 +806,7 @@ export class RowComparison extends ATouringTask {
                   })
                   .catch((err) => {
                     console.error(err);
-                    const errorCell = {label: 'err'};
+                    const errorCell = {label: 'err', measure};
                     data[bodyIndex][rowIndex][colIndexOffset + colIndex] = errorCell;
                     if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
                       const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1;
