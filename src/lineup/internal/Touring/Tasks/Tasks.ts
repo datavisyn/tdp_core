@@ -2,9 +2,10 @@ import {IServerColumn} from '../../../../rest';
 import {RankingAdapter, IAttributeCategory} from '../RankingAdapter';
 import {MethodManager, IMeasureResult, ISimilarityMeasure, IMeasureVisualization, ISetParameters, Type, SCOPE, WorkerManager} from 'touring';
 import {IColumnDesc, ICategory, Column, CategoricalColumn, ICategoricalColumnDesc, LocalDataProvider} from 'lineupjs';
-import * as d3 from 'd3';
 import colCmpHtml from 'html-loader!./ColumnComparison.html'; // webpack imports html to variable
 import rowCmpHtml from 'html-loader!./RowComparison.html'; // webpack imports html to variable
+import * as $ from 'jquery';
+import * as d3 from 'd3';
 
 export const tasks = new Array<ATouringTask>();
 export function TaskDecorator() {
@@ -78,8 +79,21 @@ export abstract class ATouringTask implements ITouringTask {
   }
 
   initContent() {
-    //add legend for the p-values
+    // add legend for the p-values
     this.createLegend(d3.select(this.node).select('div.legend'));
+
+    // make selectors functional
+    const updateTable = this.updateTable.bind(this);
+    d3.select(this.node).selectAll('select').each(function() { // Convert to select2
+      const $select2 = $(this).select2({width: 'resolve', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. '});
+      $select2.on('select2:select select2:unselect', updateTable);
+    });
+  }
+
+  updateSelect2(): any {
+    d3.select(this.node).selectAll('select').each(function() {
+      $(this).trigger('change'); // notify about updated content
+    });
   }
 
 
@@ -415,8 +429,6 @@ export class ColumnComparison extends ATouringTask {
   public initContent() {
     this.node.insertAdjacentHTML('beforeend', colCmpHtml);
     super.initContent();
-
-    d3.select(this.node).selectAll('select').on('input', () => this.updateTable());
   }
 
 
@@ -450,6 +462,8 @@ export class ColumnComparison extends ATouringTask {
 
     options.exit().remove();
     options.order();
+
+    super.updateSelect2();
 
     return tableChanged;
   }
@@ -609,7 +623,9 @@ export class RowComparison extends ATouringTask {
     this.node.insertAdjacentHTML('beforeend', rowCmpHtml);
     super.initContent();
 
-    d3.select(this.node).selectAll('select').on('input', () => this.updateTable());
+    d3.select(this.node).selectAll('select.rowGrp').each(function() { // Convert to select2
+      $(this).data('placeholder', 'Select one or more groups of rows.');
+    });
   }
 
 
@@ -664,12 +680,14 @@ export class RowComparison extends ATouringTask {
     tableChanged = tableChanged || !attrOptions.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
 
     if (attrSelector.selectAll('option:checked').empty()) { // make a default selection
-      attrSelector.selectAll('option').attr('selected', (desc, i) => i === descriptions.length-1 ? true : null ); // by default, select last column. set the others to null to remove the selected property
+      attrSelector.selectAll('option').attr('selected',true); // by default, select all columns.
       tableChanged = true; // attributes have changed
     }
 
     attrOptions.exit().remove();
     attrOptions.order();
+
+    super.updateSelect2();
 
     return tableChanged;
   }
