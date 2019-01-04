@@ -1,7 +1,7 @@
 import {api2absURL, send, getAPIJSON, sendAPI} from 'phovea_core/src/ajax';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {parse, RangeLike} from 'phovea_core/src/range';
-import {currentUserNameOrAnonymous, ALL_READ_NONE, ALL_READ_READ} from 'phovea_core/src/security';
+import {currentUserNameOrAnonymous, ALL_READ_NONE, ALL_READ_READ, ISecureItem} from 'phovea_core/src/security';
 import {REST_NAMESPACE as TDP_NAMESPACE} from '../rest';
 import {ENamedSetType, IStoredNamedSet} from './interfaces';
 
@@ -21,18 +21,18 @@ export function listNamedSetsAsOptions(idType: IDType | string = null) {
   return listNamedSets(idType).then((namedSets) => namedSets.map((d) => ({name: d.name, value: d.id})));
 }
 
-export function saveNamedSet(name: string, idType: IDType | string, ids: RangeLike, subType: { key: string, value: string }, description = '', isPublic: boolean = false) {
-  const data = {
+export function saveNamedSet(name: string, idType: IDType | string, ids: RangeLike, subType: { key: string, value: string }, description = '', sec: Partial<ISecureItem>) {
+  const data = Object.assign({
     name,
     type: ENamedSetType.NAMEDSET,
     creator: currentUserNameOrAnonymous(),
-    permissions: isPublic ? ALL_READ_READ : ALL_READ_NONE,
+    permissions: ALL_READ_NONE,
     idType: resolve(idType).id,
     ids: parse(ids).toString(),
     subTypeKey: subType.key,
     subTypeValue: subType.value,
     description
-  };
+  }, sec);
   return sendAPI(`${REST_NAMESPACE}/namedsets/`, data, 'POST');
 }
 

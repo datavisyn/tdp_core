@@ -1,39 +1,36 @@
 import {IStoredNamedSet} from './interfaces';
 import {FormDialog} from 'phovea_ui/src/dialogs';
-import {EEntity, hasPermission} from 'phovea_core/src/security';
+import {ISecureItem} from 'phovea_core/src/security';
+import {permissionForm} from '../internal/utils';
 
-export default function editDialog(namedSet: IStoredNamedSet, result: (name: string, description: string, isPublic: boolean) => void) {
+export default function editDialog(namedSet: IStoredNamedSet, result: (name: string, description: string, sec: Partial<ISecureItem>) => void) {
   const isCreate = namedSet === null;
   const title = isCreate ? 'Save' : 'Edit';
   const dialog = new FormDialog(title + ' List of Entities', title, 'namedset_form');
 
+  const permissions = permissionForm(namedSet);
+
   dialog.form.innerHTML = `
     <div class="form-group">
       <label for="namedset_name">Name</label>
-      <input type="text" class="form-control" id="namedset_name" placeholder="Name" required="required" ${namedSet ? `value="${namedSet.name}"` : ''}>
+      <input type="text" class="form-control" name="name" id="namedset_name" placeholder="Name" required="required" ${namedSet ? `value="${namedSet.name}"` : ''}>
     </div>
     <div class="form-group">
       <label for="namedset_description">Description</label>
-      <textarea class="form-control" id="namedset_description" rows="5" placeholder="Description">${namedSet ? namedSet.description : ''}</textarea>
+      <textarea class="form-control" name="description" id="namedset_description" rows="5" placeholder="Description">${namedSet ? namedSet.description : ''}</textarea>
     </div>
-    <div class="radio">
-      <label class="radio-inline">
-        <input type="radio" name="namedset_public" value="private" ${!(namedSet && hasPermission(namedSet, EEntity.OTHERS)) ? 'checked="checked"' : ''}> <i class="fa fa-user"></i> Private
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="namedset_public" id="namedset_public" value="public" ${namedSet && hasPermission(namedSet, EEntity.OTHERS) ? 'checked="checked"' : ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
-      </label>
-    </div>
+    ${permissions.template}
   `;
 
   dialog.onHide(() => dialog.destroy());
 
   dialog.onSubmit(() => {
-    const name = (<HTMLInputElement>document.getElementById('namedset_name')).value;
-    const description = (<HTMLInputElement>document.getElementById('namedset_description')).value;
-    const isPublic = (<HTMLInputElement>document.getElementById('namedset_public')).checked;
+    const data = new FormData(dialog.form);
+    const name = data.get('name').toString();
+    const description = data.get('description').toString();
+    const sec = permissions.resolve(data);
 
-    result(name, description, isPublic);
+    result(name, description, sec);
     dialog.hide();
     return false;
   });
