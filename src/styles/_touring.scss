@@ -73,6 +73,7 @@ div.touring {
       
       .table-container {
         position: relative;
+        min-height: 100px;
         border-top: 1px #AAA solid;
 
         header {
@@ -80,7 +81,6 @@ div.touring {
           position: absolute; // absolute to float over the table
           top: 0;
           left: 0;
-          width: 13em;
 
           h1 {
             font-size: 1.2em;

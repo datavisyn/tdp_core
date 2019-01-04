@@ -97,6 +97,15 @@ export abstract class ATouringTask implements ITouringTask {
     });
   }
 
+  updateTableDescription(isTableEmpty: boolean): any {
+    if (isTableEmpty) {
+      const text = 'Please specify the data to compare with the select boxes above.';
+      d3.select(this.node).select('header').style('width', null).select('p').text(text);
+    } else {
+      const text = 'Click on a p-Value in the table for details.';
+      d3.select(this.node).select('header').style('width', '13em').select('p').text(text);
+    }
+  }
 
   private addEventListeners() {
     // DATA CHANGE LISTENERS
@@ -469,6 +478,9 @@ export class ColumnComparison extends ATouringTask {
         return; // skip outdated result
       }
 
+      that.updateTableDescription(bodyData.length === 0);
+
+
       // create a table body for every column
       const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>>
       bodies.enter().append('tbody'); //For each IColumnTableData, create a tbody
@@ -572,6 +584,9 @@ export class ColumnComparison extends ATouringTask {
   }
 
   prepareDataArray(colAttributes: IColumnDesc[], rowAttributes: IColumnDesc[]) {
+    if(rowAttributes.length === 0 || colAttributes.length === 0) {
+      return [];
+    }
     const data = new Array(rowAttributes.length); // n2 arrays (bodies)
     for (const i of data.keys()) {
       data[i] = new Array(1); //currently just one row per attribute
@@ -678,9 +693,11 @@ export class RowComparison extends ATouringTask {
 
     let colGrpData =  d3.select(this.node).selectAll('select.rowGrp[name="row1[]"] option:checked').data();
     let rowGrpData = d3.select(this.node).selectAll('select.rowGrp[name="row2[]"]  option:checked').data();
+
     if(colGrpData.length > rowGrpData.length) {
       [rowGrpData, colGrpData] = [colGrpData, rowGrpData]; // avoid having more columns than rows --> flip table
     }
+
     const rowAttrData = d3.select(this.node).selectAll('select.attr[name="attr[]"]  option:checked').data();
     const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data(colGrpData, (cat) => cat.name); // cat.name != label
     const colHeadsCatSpan = colHeadsCat.enter().append('th')
@@ -691,6 +708,8 @@ export class RowComparison extends ATouringTask {
       if (d3.select(that.node).attr('data-timestamp') !== timestamp) {
         return; // skip outdated result
       }
+
+      that.updateTableDescription(bodyData.length === 0);
 
       // create a table body for every column
       const bodies = d3.select(that.node).select('table').selectAll('tbody').data(bodyData, (d) => d[0][0].label); // the data of each body is of type: Array<Array<IScoreCell>>
@@ -828,6 +847,9 @@ export class RowComparison extends ATouringTask {
   }
 
   prepareDataArray(colGroups: IAttributeCategory[], rowGroups: IAttributeCategory[], rowAttributes: IColumnDesc[]) {
+    if(colGroups.length === 0 || rowGroups.length === 0 || rowAttributes.length === 0) {
+      return []; //return empty array, will cause an empty table
+    }
     const data = new Array(rowAttributes.length); // one array per attribute (number of table bodies)
 
     for (const [i, attr] of rowAttributes.entries()) {
