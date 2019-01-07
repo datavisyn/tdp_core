@@ -277,24 +277,22 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
     </div>`
     });
     dialog.form.innerHTML = `
-      <form>
-          <div class="form-group">
-            <label for="${prefix}_name">Name</label>
-            <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
-          </div>
-          <div class="form-group">
-            <label for="${prefix}_desc">Description</label>
-            <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
-          </div>
-          ${args.permission ? permissions.template : ''}
-          <div class="checkbox">
-            <label class="radio-inline">
-              <input type="checkbox" name="${prefix}_agree" required="required">
-              I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the <strong>'Open Existing Session'</strong> dialog.
-            </label>
-          </div>
-      </form>
+        <div class="form-group">
+          <label for="${prefix}_name">Name</label>
+          <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
+        </div>
+        <div class="form-group">
+          <label for="${prefix}_desc">Description</label>
+          <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
+        </div>
+        <div class="checkbox">
+          <label class="radio-inline">
+            <input type="checkbox" name="${prefix}_agree" required="required">
+            I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the <strong>'Open Existing Session'</strong> dialog.
+          </label>
+        </div>
     `;
+    dialog.form.lastElementChild!.insertAdjacentElement('beforebegin', permissions.node);
     return new Promise((resolve) => {
       dialog.onHide(() => {
         resolve(null);

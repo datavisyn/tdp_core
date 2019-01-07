@@ -1,4 +1,5 @@
-import {ISecureItem, hasPermission, EEntity, ALL_READ_NONE, ALL_READ_READ, ALL_NONE_NONE, ALL_ALL_NONE_NONE, ALL_ALL_READ_READ, decode} from 'phovea_core/src/security';
+import {randomId} from 'phovea_core/src';
+import {ALL_ALL_NONE_NONE, ALL_ALL_READ_NONE, ALL_ALL_READ_READ, ANONYMOUS_USER, currentUser, decode, EPermission, ISecureItem} from 'phovea_core/src/security';
 
 const MIN = 60;
 const HOUR = MIN * 60;
@@ -46,6 +47,8 @@ export interface IPermissionFormOptions {
    * extra html
    */
   extra: string;
+
+  doc: Document;
 }
 
 /**
@@ -54,20 +57,93 @@ export interface IPermissionFormOptions {
  */
 export function permissionForm(item?: ISecureItem, options: Partial<IPermissionFormOptions> = {}) {
   const o: Readonly<IPermissionFormOptions> = Object.assign({
-    extra: ''
+    extra: '',
+    doc: document
   }, options);
+  const user = currentUser();
+  const roles = user ? user.roles : ANONYMOUS_USER.roles;
+
+  const permission = decode(item ? item.permissions : ALL_ALL_READ_NONE);
+
+  const id = randomId();
+  const div = o.doc.createElement('div');
+  div.classList.add('radio');
+  div.innerHTML = `
+    <label class="radio-inline">
+      <input type="radio" name="permission_public" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+    </label>
+    <label class="radio-inline">
+      <input type="radio" name="permission_public" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
+    </label>
+    <button type="button" name="permission_advanced" class="btn btn-default btn-xs pull-right">Advanced</button>
+    ${o.extra}
+    <div class="tdp-permissions">
+      <div class="tdp-permissions-entry">
+        <label>Public</label>
+        <span></span>
+        <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_public" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+          </label>
+          <label class="btn btn-primary ${permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_public" value="read" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+          </label>
+          <label class="btn btn-primary ${permission.others.has(EPermission.WRITE)} ? 'active' : ''">
+            <input type="radio" name="permission_public" value="write" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+          </label>
+        </div>
+      </div>
+      <p class="help-block">
+        define which are the default permissions for other users to access this item
+      </p>
+      <div class="tdp-permissions-entry">
+        <label for="permission_group_name_${id}">Group</label>
+        <select id="permission_group_name_${id}" name="permission_group_name" class="form-control input-sm">
+          ${roles.map((d) => `<option value="${d}" ${item && item.group === d ? 'selected' : ''}>${d}</option>`).join('')}
+        </select>
+        <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+          </label>
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_group" value="read" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+          </label>
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_group" value="write" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+          </label>
+        </div>
+      </div>
+      <p class="help-block">
+        specify a group / role which you are part of that should have extra rights, such as a group of administrators
+      </p>
+      <div class="tdp-permissions-entry">
+        <label for="permission_buddies_name_${id}">Buddies</label>
+        <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="list of usernames separated by semicolon" value="${item && item.buddies ? item.buddies.join(';') : ''}">
+        <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+          </label>
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+          </label>
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
+            <input type="radio" name="permission_buddies" value="write" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+          </label>
+        </div>
+      </div>
+      <p class="help-block">
+        Buddies are a list of user names that can have advanced rights, such as backup administrators
+      </p>
+    </div>`;
+
+  div.querySelector<HTMLElement>('button[name=permission_advanced]').onclick = (evt) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+    div.classList.toggle('tdp-permissions-open');
+  };
+
   return {
-    template: `
-    <div class="radio">
-      <label class="radio-inline">
-        <input type="radio" name="permission_public" value="private" ${!(item && hasPermission(item, EEntity.OTHERS)) ? 'checked="checked"' : ''}> <i class="fa fa-user"></i> Private
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="permission_public" value="public" ${item && hasPermission(item, EEntity.OTHERS) ? 'checked="checked"' : ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
-      </label>
-      ${o.extra}
-    </div>
-    `,
+    node: div,
     resolve: (data: FormData): Partial<ISecureItem> => {
       const makePublic = data.get('permission_public').toString();
       return {
@@ -76,63 +152,3 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
     }
   };
 }
-
-const per = decode();
-const a =
-`<div class="tdp-permissions">
-  <div>
-    <label>Public</label>
-    <span></span>
-    <div class="btn-group" data-toggle="buttons">
-      <label class="btn btn-primary active">
-        <input type="radio" name="permission_public" value="none" autocomplete="off" checked> <i class="fa fa-user"></i> Private
-      </label>
-      <label class="btn btn-primary">
-        <input type="radio" name="permission_public" value="read" autocomplete="off"> <i class="fa fa-eye"></i> Read
-      </label>
-      <label class="btn btn-primary">
-        <input type="radio" name="permission_public" value="write" autocomplete="off"> <i class="fa fa-edit"></i> Write
-      </label>
-    </div>
-    <p class="help-block">
-      define which are the default permissions for other users to access this item
-    </p>
-  </div>
-  <div>
-     <label>Group</label>
-     <select name="permission_group_name" class="form-control">
-     </select
-     <div class="btn-group" data-toggle="buttons">
-       <label class="btn btn-primary active">
-         <input type="radio" name="permission_group" value="none" autocomplete="off" checked> <i class="fa fa-user"></i> Private
-       </label>
-       <label class="btn btn-primary">
-         <input type="radio" name="permission_group" value="read" autocomplete="off"> <i class="fa fa-eye"></i> Read
-       </label>
-       <label class="btn btn-primary">
-         <input type="radio" name="permission_group" value="write" autocomplete="off"> <i class="fa fa-edit"></i> Write
-       </label>
-     </div>
-     <p class="help-block">
-       specify a group / role which you are part of that should extra rights, such as a group of administrators
-     </p>
-  </div>
-  <div>
-    <label>Buddies</label>
-    <input name="permission_buddies_name" class="form-control">
-    <div class="btn-group" data-toggle="buttons">
-      <label class="btn btn-primary active">
-        <input type="radio" name="permission_buddies" value="none" autocomplete="off" checked> <i class="fa fa-user"></i> Private
-      </label>
-      <label class="btn btn-primary">
-        <input type="radio" name="permission_buddies" value="read" autocomplete="off"> <i class="fa fa-eye"></i> Read
-      </label>
-      <label class="btn btn-primary">
-        <input type="radio" name="permission_buddies" value="write" autocomplete="off"> <i class="fa fa-edit"></i> Write
-      </label>
-    </div>
-    <p class="help-block">
-      Buddies are a list of user names that can have advanced rights, such as backup administrators
-    </p>
-  </div>
-`

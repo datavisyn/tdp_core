@@ -19,8 +19,8 @@ export default function editDialog(namedSet: IStoredNamedSet, result: (name: str
       <label for="namedset_description">Description</label>
       <textarea class="form-control" name="description" id="namedset_description" rows="5" placeholder="Description">${namedSet ? namedSet.description : ''}</textarea>
     </div>
-    ${permissions.template}
   `;
+  dialog.form.appendChild(permissions.node);
 
   dialog.onHide(() => dialog.destroy());
 
