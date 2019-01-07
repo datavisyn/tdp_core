@@ -83,7 +83,7 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
         <span></span>
         <div class="btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary ${!permission.others.has(EPermission.READ) ? 'active' : ''}">
-            <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+            <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> No Permission
           </label>
           <label class="btn btn-primary ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'active' : ''}">
             <input type="radio" name="permission_others" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
@@ -103,7 +103,7 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
         </select>
         <div class="btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary ${!permission.group.has(EPermission.READ) ? 'active' : ''}">
-            <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+            <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> No Permission
           </label>
           <label class="btn btn-primary ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'active' : ''}">
             <input type="radio" name="permission_group" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
@@ -121,7 +121,7 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
         <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="list of usernames separated by semicolon" value="${item && item.buddies ? item.buddies.join(';') : ''}">
         <div class="btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary ${!permission.buddies.has(EPermission.READ) ? 'active' : ''}">
-            <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+            <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> No Permission
           </label>
           <label class="btn btn-primary ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'active' : ''}">
             <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
