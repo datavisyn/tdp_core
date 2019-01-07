@@ -786,7 +786,7 @@ export class RowComparison extends ATouringTask {
 
       // the row and column indices stay the same, only the data changes ->  we want to retrieve these indices only once.
       const rowGrpsIndices = rowGroups.map((rowGrp) => this.ranking.getRowsWithCategory(rowGrp));
-      const colGrpsIndices = rowGroups.map((rowGrp) => this.ranking.getRowsWithCategory(rowGrp));
+      const colGrpsIndices = colGroups.map((colGrp) => this.ranking.getRowsWithCategory(colGrp));
       // if a group is part of the column and row item groups, we use these array to get the correct index (so we can avoid duplicate calculations)
       const rowIndex4colGrp = colGroups.map((colGrp) => rowGroups.indexOf(colGrp));
       const colIndex4rowGrp = rowGroups.map((rowGrp) => colGroups.indexOf(rowGrp));
