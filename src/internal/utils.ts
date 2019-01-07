@@ -1,5 +1,5 @@
 import {randomId} from 'phovea_core/src';
-import {ALL_ALL_NONE_NONE, ALL_ALL_READ_NONE, ALL_ALL_READ_READ, ANONYMOUS_USER, currentUser, decode, EPermission, ISecureItem} from 'phovea_core/src/security';
+import {ALL_ALL_NONE_NONE, ALL_ALL_READ_NONE, ALL_ALL_READ_READ, ANONYMOUS_USER, currentUser, decode, EPermission, ISecureItem, Permission, encode} from 'phovea_core/src/security';
 
 const MIN = 60;
 const HOUR = MIN * 60;
@@ -82,14 +82,14 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
         <label>Public</label>
         <span></span>
         <div class="btn-group btn-group-xs" data-toggle="buttons">
-          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_public" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+          <label class="btn btn-primary ${!permission.others.has(EPermission.READ) ? 'active' : ''}">
+            <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
           </label>
-          <label class="btn btn-primary ${permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_public" value="read" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+          <label class="btn btn-primary ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'active' : ''}">
+            <input type="radio" name="permission_others" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
           </label>
-          <label class="btn btn-primary ${permission.others.has(EPermission.WRITE)} ? 'active' : ''">
-            <input type="radio" name="permission_public" value="write" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+          <label class="btn btn-primary ${permission.others.has(EPermission.WRITE) ? 'active' : ''}">
+            <input type="radio" name="permission_others" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
           </label>
         </div>
       </div>
@@ -102,14 +102,14 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
           ${roles.map((d) => `<option value="${d}" ${item && item.group === d ? 'selected' : ''}>${d}</option>`).join('')}
         </select>
         <div class="btn-group btn-group-xs" data-toggle="buttons">
-          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+          <label class="btn btn-primary ${!permission.group.has(EPermission.READ) ? 'active' : ''}">
+            <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
           </label>
-          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_group" value="read" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+          <label class="btn btn-primary ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'active' : ''}">
+            <input type="radio" name="permission_group" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
           </label>
-          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_group" value="write" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+          <label class="btn btn-primary ${permission.group.has(EPermission.WRITE) ? 'active' : ''}">
+            <input type="radio" name="permission_group" value="write" autocomplete="off" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
           </label>
         </div>
       </div>
@@ -120,14 +120,14 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
         <label for="permission_buddies_name_${id}">Buddies</label>
         <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="list of usernames separated by semicolon" value="${item && item.buddies ? item.buddies.join(';') : ''}">
         <div class="btn-group btn-group-xs" data-toggle="buttons">
-          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+          <label class="btn btn-primary ${!permission.buddies.has(EPermission.READ) ? 'active' : ''}">
+            <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
           </label>
-          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+          <label class="btn btn-primary ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'active' : ''}">
+            <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
           </label>
-          <label class="btn btn-primary ${!permission.others.has(EPermission.READ)} ? 'active' : ''">
-            <input type="radio" name="permission_buddies" value="write" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+          <label class="btn btn-primary ${permission.buddies.has(EPermission.WRITE) ? 'active' : ''}">
+            <input type="radio" name="permission_buddies" value="write" autocomplete="off" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
           </label>
         </div>
       </div>
@@ -142,12 +142,82 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
     div.classList.toggle('tdp-permissions-open');
   };
 
+  const publicSimple = Array.from(div.querySelectorAll<HTMLInputElement>('input[name=permission_public]'));
+  const others = Array.from(div.querySelectorAll<HTMLInputElement>('input[name=permission_others]'));
+  const group = Array.from(div.querySelectorAll<HTMLInputElement>('input[name=permission_group]'));
+  const buddies = Array.from(div.querySelectorAll<HTMLInputElement>('input[name=permission_buddies]'));
+
+  const syncActive = () => {
+    others.forEach((d) => d.parentElement.classList.toggle('active', d.checked));
+    group.forEach((d) => d.parentElement.classList.toggle('active', d.checked));
+    buddies.forEach((d) => d.parentElement.classList.toggle('active', d.checked));
+  };
+
+  publicSimple.forEach((d) => {
+    d.onchange = () => {
+      if (!d.checked) {
+        return;
+      }
+      // sync with others
+      const target = d.value === 'public' ? 'read' : 'none';
+      others.forEach((o) => o.checked = o.value === target);
+      const groupSelected = group.find((d) => d.checked);
+      if (groupSelected && groupSelected.value === 'none') {
+        group.forEach((i) => i.checked = i.value === target);
+      }
+      const buddiesSelected = buddies.find((d) => d.checked);
+      if (buddiesSelected && buddiesSelected.value === 'none') {
+        buddies.forEach((d) => d.checked = d.value === target);
+      }
+      syncActive();
+    };
+  });
+  others.forEach((clicked) => {
+    clicked.onchange = () => {
+      if (!clicked.checked) {
+        return;
+      }
+      // sync with public
+      {
+        const target = clicked.value === 'none' ? 'private' : 'public';
+        publicSimple.forEach((o) => o.checked = o.value === target);
+      }
+      // others at least with the same right
+      if (clicked.value === 'read' || clicked.value === 'write') {
+        const groupSelected = group.find((d) => d.checked);
+        if (groupSelected && (groupSelected.value === 'none' || (groupSelected.value === 'read' && clicked.value === 'write'))) {
+          group.forEach((i) => i.checked = i.value === clicked.value);
+        }
+        const buddiesSelected = buddies.find((d) => d.checked);
+        if (buddiesSelected && (buddiesSelected.value === 'none' || (buddiesSelected.value === 'read' && clicked.value === 'write'))) {
+          buddies.forEach((d) => d.checked = d.value === clicked.value);
+        }
+      }
+      syncActive();
+    };
+  });
+
+  const toSet = (value: string) => {
+    if (value === 'read') {
+      return new Set([EPermission.READ]);
+    } else if (value === 'write') {
+      return new Set([EPermission.READ, EPermission.WRITE]);
+    }
+    return new Set();
+  };
+
   return {
     node: div,
     resolve: (data: FormData): Partial<ISecureItem> => {
-      const makePublic = data.get('permission_public').toString();
+      const others = toSet(data.get('permission_others').toString());
+      const group = toSet(data.get('permission_group').toString());
+      const groupName = data.get('permission_group_name').toString();
+      const buddies = toSet(data.get('permission_buddies').toString());
+      const buddiesName = data.get('permission_buddies_name').toString().split(';').map((d) => d.trim()).filter((d) => d.length > 0);
       return {
-        permissions: makePublic === 'public' ? ALL_ALL_READ_READ : ALL_ALL_NONE_NONE
+        permissions: encode(new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]), group, others, buddies),
+        group: groupName,
+        buddies: buddiesName
       };
     }
   };
