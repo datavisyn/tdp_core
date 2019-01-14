@@ -140,6 +140,7 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
     evt.preventDefault();
     evt.stopPropagation();
     div.classList.toggle('tdp-permissions-open');
+    (<HTMLElement>evt.target).classList.toggle('active');
   };
 
   const publicSimple = Array.from(div.querySelectorAll<HTMLInputElement>('input[name=permission_public]'));
