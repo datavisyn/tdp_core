@@ -11,9 +11,11 @@
 .tdp-permissions-entry {
   display: flex;
   align-items: center;
+  margin-top: 2em;
 
   > label {
     min-width: 6em;
+    padding-left: 0;
   }
 
   > span,
