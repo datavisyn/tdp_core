@@ -24,4 +24,8 @@
     flex: 1 1 0;
     margin: 0 0.5em;
   }
+
+  > div.btn-group label input[name*=permission_] {
+    display: none;
+  }
 }
