@@ -157,7 +157,10 @@ export abstract class ATouringTask implements ITouringTask {
 
     cellLabel = cellLabel.substring(1); //remove leading 0
     if(score.pValue > 0.1) {
-      cellLabel = '';
+      color = {
+        background: '#ffffff', //white
+        foreground: '#ffffff', //white
+      };
     }
     if(score.pValue === -1) {
       cellLabel = '-';
