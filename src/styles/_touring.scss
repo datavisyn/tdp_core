@@ -229,12 +229,14 @@ div.touring {
           vertical-align: bottom; // Actually, it should be middle, but bottom looks more centered ¯\_(ツ)_/¯
 
           &:hover, &:focus { // = td.action:hover
-            background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition              
+            background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition
+            color: black !important;
             font-weight: bolder;
           } 
 
           &.selectedCell {
             background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition
+            color: black !important;
             font-weight: bolder; 
           }
         }
