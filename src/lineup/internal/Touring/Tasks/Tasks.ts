@@ -146,6 +146,7 @@ export abstract class ATouringTask implements ITouringTask {
 
     const validTypes = ['categorical', 'number'];
     descriptions = descriptions.filter((desc) => validTypes.includes(desc.type)); // filter attributes by type
+    descriptions.unshift(this.ranking.getStratificationDesc());
     descriptions.unshift(this.ranking.getSelectionDesc());
     descriptions.unshift(this.ranking.getRankDesc());
     return descriptions;
