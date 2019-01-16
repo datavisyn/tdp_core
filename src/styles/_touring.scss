@@ -56,11 +56,17 @@ div.touring {
     $col-min-size: 4.5ch;
     $col-max-size: 15em;
 
-    .select2-results__option--highlighted {
-      background-color: darken($color: #ddd, $amount: 20%); // #ddd is default color for selected elements
+    .select2-dropdown { //dropdown is seperatly attached to DOM
+      .select2-results__option--highlighted { // inside the dropdown, which is not inside the .select2
+        background-color: darken($color: #ddd, $amount: 20%); // #ddd is default color for selected elements
+      }
+  
+      .select2-results__group {
+        cursor: pointer; // let it look clickable
+      }
     }
 
-    .select2 {
+    .select2 { // the input that is always visible
       .select2-selection__choice {
         background-color: $active-color;
         span {

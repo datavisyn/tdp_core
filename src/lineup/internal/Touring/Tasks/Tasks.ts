@@ -89,8 +89,25 @@ export abstract class ATouringTask implements ITouringTask {
     const parent = this.node;
     const updateTable = this.updateTable.bind(this);
     d3.select(this.node).selectAll('select').each(function() { // Convert to select2
-      const $select2 = $(this).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. ', dropdownParent: $(parent)});
+      const select2 = this;
+      const $select2 = $(select2).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. ', dropdownParent: $(parent)});
       $select2.on('select2:select select2:unselect', updateTable);
+      $select2.on('select2:open', () => { // elements are created when select2 is opened, and destroyed when closed
+        setTimeout(() => { // setTimeout so this shit actually works (mouseover listener not registered if done immidiatly)
+          const optgroups = d3.select(parent).selectAll('.select2-results__group');
+          optgroups.on('click', function() {
+            const hoverGrp = d3.select(this).text(); // get text of hovered select2 label
+            // update html in the actual select html element
+            const optGroup = d3.select(select2).selectAll('optgroup').filter((d) => d.label === hoverGrp); //get optgroup of hovered select2 label
+            optGroup.selectAll('option').attr('selected', true); // select all child options
+            // TODO selected in html only does select initially. that is the reason why checked != selected
+            // update styles in open dropdown
+            $(this).next().find('li').attr('aria-selected', 'true'); // set all categories clicked
+
+            $select2.trigger('change'); // notify select2 of these updates
+          });
+        }, 0);
+      });
     });
   }
 
@@ -700,7 +717,7 @@ export class RowComparison extends ATouringTask {
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
 
-    let colGrpData =  d3.select(this.node).selectAll('select.rowGrp[name="row1[]"] option:checked').data();
+    let colGrpData = d3.select(this.node).selectAll('select.rowGrp[name="row1[]"] option:checked').data();
     let rowGrpData = d3.select(this.node).selectAll('select.rowGrp[name="row2[]"]  option:checked').data();
 
     if(colGrpData.length > rowGrpData.length) {
