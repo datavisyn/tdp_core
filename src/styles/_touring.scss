@@ -57,12 +57,38 @@ div.touring {
     $col-max-size: 15em;
 
     .select2-dropdown { //dropdown is seperatly attached to DOM
-      .select2-results__option--highlighted { // inside the dropdown, which is not inside the .select2
-        background-color: darken($color: #ddd, $amount: 20%); // #ddd is default color for selected elements
+      $hover-background-color: darken($color: #ddd, $amount: 20%); // #ddd is default color for selected elements
+      $hover-color: white;
+
+      .select2-results>.select2-results__options {
+        max-height: 50vh; //50% of browser window
+      }
+
+      .select2-results__option--highlighted { //hover effect for non nested options (not in optgroup)
+        background-color: $hover-background-color; // do my own hover styling
+        color: $hover-color;
+      }
+      .select2-results__options--nested { //hover effect for options in optgroups
+        .select2-results__option--highlighted { // inside the dropdown, which is not inside the .select2
+          background-color: transparent; // default hover styling is done by adding a class
+          color: $dark-font-color;
+          &[aria-selected=true] { //reset 
+            background-color: #ddd;
+            color: $dark-font-color;
+          }
+        }
+        .select2-results__option:hover {
+          background-color: $hover-background-color; // do my own hover styling
+          color: $hover-color;
+        }
       }
   
       .select2-results__group {
         cursor: pointer; // let it look clickable
+        &:hover {
+          background-color: $hover-background-color;
+          color: $hover-color;
+        }
       }
     }
 
