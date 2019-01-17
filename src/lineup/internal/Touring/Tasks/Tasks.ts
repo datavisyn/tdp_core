@@ -99,12 +99,13 @@ export abstract class ATouringTask implements ITouringTask {
             const hoverGrp = d3.select(this).text(); // get text of hovered select2 label
             // update html in the actual select html element
             const optGroup = d3.select(select2).selectAll('optgroup').filter((d) => d.label === hoverGrp); //get optgroup of hovered select2 label
-            optGroup.selectAll('option').attr('selected', true); // select all child options
-            // TODO selected in html only does select initially. that is the reason why checked != selected
+            const options = optGroup.selectAll('option');
+            const newState = !options.filter(':not(:checked)').empty(); // if not all options are selected --> true = select all, deselect if all options are already selected
+            options.each(function() {(this as HTMLOptionElement).selected = newState;}); // set state of all child options
             // update styles in open dropdown
-            $(this).next().find('li').attr('aria-selected', 'true'); // set all categories clicked
+            $(this).next().find('li').attr('aria-selected', newState.toString()); // accesability and styling
 
-            $select2.trigger('change'); // notify select2 of these updates
+            $select2.trigger('change').trigger(newState ? 'select2:select' : 'select2:unselect'); // notify select2 of these updates
           });
         }, 0);
       });
@@ -461,13 +462,13 @@ export class ColumnComparison extends ATouringTask {
 
     const attrSelect1 =  d3.select(this.node).select('select.attr[name="attr1[]"]');
     if (attrSelect1.selectAll('option:checked').empty()) { // make a default selection
-      attrSelect1.selectAll('option').attr('selected', (desc, i) => i === descriptions.length-1 ? true : null ); // by default, select last column. set the others to null to remove the selected property
+      attrSelect1.selectAll('option').each(function(desc, i) {(this as HTMLOptionElement).selected = i === descriptions.length-1 ? true : false ;}); // by default, select last column. set the others to null to remove the selected property
       tableChanged = true; // attributes have changed
     }
 
     const attrSelect2 = d3.select(this.node).select('select.attr[name="attr2[]"]');
     if (attrSelect2.selectAll('option:checked').empty()) { // make a default selection
-      attrSelect2.selectAll('option').attr('selected', true); // by default, select all
+      attrSelect2.selectAll('option').each(function() {(this as HTMLOptionElement).selected = true;}); // by default, select all
       tableChanged = true; // attributes have changed
     }
 
@@ -685,7 +686,7 @@ export class RowComparison extends ATouringTask {
     rowSelectors.each(function() { // function to reference the <select> with 'this'
       const emptySelection = d3.select(this).selectAll('option:checked').empty();
       if (emptySelection) {
-        d3.select(this).select('optgroup').selectAll('option').attr('selected', true); // select the categories of the first attribute by default
+        d3.select(this).select('optgroup').selectAll('option').each(function() {(this as HTMLOptionElement).selected = true;}); // select the categories of the first attribute by default
         tableChanged = true;
       }
     });
@@ -698,7 +699,7 @@ export class RowComparison extends ATouringTask {
     tableChanged = tableChanged || !attrOptions.exit().filter(':checked').empty(); //if checked attributes are removed, the table has to update
 
     if (attrSelector.selectAll('option:checked').empty()) { // make a default selection
-      attrSelector.selectAll('option').attr('selected',true); // by default, select all columns.
+      attrSelector.selectAll('option').each(function() {(this as HTMLOptionElement).selected = true;}); // by default, select all columns.
       tableChanged = true; // attributes have changed
     }
 
