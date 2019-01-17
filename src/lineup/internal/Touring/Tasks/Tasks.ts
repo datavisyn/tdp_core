@@ -321,7 +321,7 @@ export abstract class ATouringTask implements ITouringTask {
 
     // const detailTestValue = divDetailInfo.append('div');
     const scoreValue = measureResult.scoreValue.toFixed(3);
-    const pValue = measureResult.pValue.toFixed(3);
+    const pValue = measureResult.pValue.toFixed(3) === '-1.000' ? 'n/a' : measureResult.pValue.toFixed(3);
     const detailInfoValues = divDetailInfo.append('div')
                           .classed('detailDiv',true);
                           // .text(`Test-Value: ${scoreValue}, p-Value: ${pValue}`);
