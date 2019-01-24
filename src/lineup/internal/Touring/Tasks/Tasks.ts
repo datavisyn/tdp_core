@@ -164,7 +164,12 @@ export abstract class ATouringTask implements ITouringTask {
 
     const validTypes = ['categorical', 'number'];
     descriptions = descriptions.filter((desc) => validTypes.includes(desc.type)); // filter attributes by type
-    descriptions.unshift(this.ranking.getStratificationDesc());
+    const stratDesc = this.ranking.getStratificationDesc();
+    const reallyStratified = stratDesc.categories.length > 1; //stratification is only the "default group"
+    const stratificationHierarchy = reallyStratified && stratDesc.categories.some((cat) => cat.label.indexOf('∩') >= 0); //not grouping hierachy if intersection symbol is not in label (https://github.com/lineupjs/lineupjs/blob/60bffa3b8c665bd7fa28c1ab577ba24dba84913c/src/model/internal.ts#L31)
+    if(stratificationHierarchy) {
+      descriptions.unshift(stratDesc);
+    }
     descriptions.unshift(this.ranking.getSelectionDesc());
     descriptions.unshift(this.ranking.getRankDesc());
     return descriptions;
