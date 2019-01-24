@@ -8,6 +8,7 @@ import rowCmpHtml from 'html-loader!./RowComparison.html'; // webpack imports ht
 import rowCmpIcon from './rowCmp.png';
 import * as $ from 'jquery';
 import * as d3 from 'd3';
+import {cell} from 'phovea_core/src/range';
 
 export const tasks = new Array<ATouringTask>();
 export function TaskDecorator() {
@@ -179,7 +180,7 @@ export abstract class ATouringTask implements ITouringTask {
     let color =  score2color(score.pValue);
     let cellLabel = score.pValue.toFixed(3);
 
-    cellLabel = cellLabel.substring(1); //remove leading 0
+    cellLabel = cellLabel.startsWith('0') ? cellLabel.substring(1) : score.pValue.toFixed(2); // [0,1) --> .123, 1 --> 1.00
     if(score.pValue > 0.1) {
       color = {
         background: '#ffffff', //white
