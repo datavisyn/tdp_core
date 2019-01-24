@@ -8,6 +8,10 @@ export interface IAttributeCategory extends ICategory {
 }
 
 export class RankingAdapter {
+  static readonly RANK_COLUMN_ID = 'rank';
+  static readonly SELECTION_COLUMN_ID = 'selection';
+  static readonly GROUP_COLUMN_ID = 'group_hierarchy';
+
   getRowsWithCategory(attrCategory: IAttributeCategory): number[] {
     const indices = [];
 
@@ -88,13 +92,13 @@ export class RankingAdapter {
 
       this.provider.data.forEach((item, i) => {
         const index = this.oldOrder.indexOf(i);
-        item.rank = index >=0 ? index : Number.NaN; //NaN if not found
+        item[RankingAdapter.RANK_COLUMN_ID] = index >=0 ? index : Number.NaN; //NaN if not found
 
         // include wether the row is selected
-        item.selection = this.oldSelection.includes(i) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
-        const stratGroupIndex = this.getRanking().getGroups().findIndex((grp) => grp.order.indexOf(i) >= 0);
-        const stratGroupName = stratGroupIndex === -1 ? 'Unknown' : this.getRanking().getGroups()[stratGroupIndex].name;
-        item.strat_groups = stratGroupName; // index of group = category name, find index by looking up i. -1 if not found
+        item[RankingAdapter.SELECTION_COLUMN_ID] = this.oldSelection.includes(i) ? 'Selected' : 'Unselected'; // TODO compare perfomance with assiging all Unselected and then only set those from the selection array
+        const groupIndex = this.getRanking().getGroups().findIndex((grp) => grp.order.indexOf(i) >= 0);
+        const groupName = groupIndex === -1 ? 'Unknown' : this.getRanking().getGroups()[groupIndex].name;
+        item[RankingAdapter.GROUP_COLUMN_ID] = groupName; // index of group = category name, find index by looking up i. -1 if not found
         databaseData.push(item);
       });
 
@@ -120,7 +124,7 @@ export class RankingAdapter {
    * Returns an array of indices for the providers data array
    */
   private getItemOrder() {
-    // order is always defined for groups (rows (data) only if there is an stratification)
+    // order is always defined for groups (rows (data) only if there is a grouping)
     return [].concat(...this.getRanking().getGroups().map((grp) => grp.order)); // Map groups to order arrays and concat those
 
   }
@@ -233,7 +237,7 @@ export class RankingAdapter {
    */
   public getSelectionDesc() {
     const selCategories = new Array<ICategory>();
-    const numberOfRows = this.getItemOrder().length; // get length of stratification groups and sum them up
+    const numberOfRows = this.getItemOrder().length; // get length of groups and sum them up
     if (this.getSelectionUnsorted().length > 0) {
       selCategories.push({name: 'Selected', label: 'Selected', value: 0, color: '#1f77b4', });
     } // else: none selected
@@ -246,24 +250,24 @@ export class RankingAdapter {
       categories: selCategories,
       label: 'Selection',
       type: 'categorical',
-      column: 'selection'
+      column: RankingAdapter.SELECTION_COLUMN_ID
     };
   }
 
   /**
-   * Generate an attribute description that represents the current stratification
+   * Generate an attribute description that represents the current grouping hierarchy
    */
-  public getStratificationDesc() {
+  public getGroupDesc() {
     return {
       categories: this.getRanking().getGroups().map((group, index) => ({
         name: group.name,
         label: group.name,
         color: group.color,
         value: index
-      })), // if not stratifified, there is only one group ('Default')
-      label: 'Stratification Groups',
+      })), // if not grouped, there is only one group ('Default')
+      label: 'Groups',
       type: 'categorical',
-      column: 'strat_groups'
+      column: RankingAdapter.GROUP_COLUMN_ID
     };
   }
 
@@ -271,7 +275,7 @@ export class RankingAdapter {
     return {
       label: 'Rank',
       type: 'number',
-      column: 'rank'
+      column: RankingAdapter.RANK_COLUMN_ID
     };
   }
 }

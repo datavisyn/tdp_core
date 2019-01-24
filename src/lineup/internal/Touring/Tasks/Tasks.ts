@@ -141,9 +141,9 @@ export abstract class ATouringTask implements ITouringTask {
     this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
     this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
 
-    // for filter changes and stratification changes
+    // for filter changes and grouping changes
     //  After the number of items has changed, the score change aswell
-    // If the stratification changes, the "Stratification" attribute and possibly the table has to be changed
+    // If the grouping changes, the "Group" attribute and possibly the table has to be changed
     this.ranking.getProvider().on(LocalDataProvider.EVENT_ORDER_CHANGED + ATouringTask.EVENTTYPE, () => this.update(true));
   }
 
@@ -164,11 +164,11 @@ export abstract class ATouringTask implements ITouringTask {
 
     const validTypes = ['categorical', 'number'];
     descriptions = descriptions.filter((desc) => validTypes.includes(desc.type)); // filter attributes by type
-    const stratDesc = this.ranking.getStratificationDesc();
-    const reallyStratified = stratDesc.categories.length > 1; //stratification is only the "default group"
-    const stratificationHierarchy = reallyStratified && stratDesc.categories.some((cat) => cat.label.indexOf('∩') >= 0); //not grouping hierachy if intersection symbol is not in label (https://github.com/lineupjs/lineupjs/blob/60bffa3b8c665bd7fa28c1ab577ba24dba84913c/src/model/internal.ts#L31)
-    if(stratificationHierarchy) {
-      descriptions.unshift(stratDesc);
+    const groupDesc = this.ranking.getGroupDesc();
+    const reallyGrouped = groupDesc.categories.length > 1; //grouping is only the "default group"
+    const groupingHierarchy = reallyGrouped && groupDesc.categories.some((cat) => cat.label.indexOf('∩') >= 0); //not grouping hierachy if intersection symbol is not in label (https://github.com/lineupjs/lineupjs/blob/60bffa3b8c665bd7fa28c1ab577ba24dba84913c/src/model/internal.ts#L31)
+    if(groupingHierarchy) {
+      descriptions.unshift(groupDesc);
     }
     descriptions.unshift(this.ranking.getSelectionDesc());
     descriptions.unshift(this.ranking.getRankDesc());
