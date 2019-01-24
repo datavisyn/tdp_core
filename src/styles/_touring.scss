@@ -162,7 +162,7 @@ div.touring {
       table-layout: fixed; // The table and column widths are set by the widths of table and col or by the width of the first row of cells. Cells in other rows do not affect column widths.
       
       tbody.bottom-margin {
-        border-bottom: 1px solid $table-border-color;  // table's border spacing applies to all rows and tbody has no margin
+        border-bottom: 0.5em solid $table-border-color;  // table's border spacing applies to all rows and tbody has no margin
       }
 
       th {
