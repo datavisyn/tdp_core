@@ -99,7 +99,7 @@ export abstract class ATouringTask implements ITouringTask {
           optgroups.on('click', function() {
             const hoverGrp = d3.select(this).text(); // get text of hovered select2 label
             // update html in the actual select html element
-            const optGroup = d3.select(select2).selectAll('optgroup').filter((d) => d.label === hoverGrp); //get optgroup of hovered select2 label
+            const optGroup = d3.select(select2).select(`optgroup[label="${hoverGrp}"]`); //get optgroup of hovered select2 label
             const options = optGroup.selectAll('option');
             const newState = !options.filter(':not(:checked)').empty(); // if not all options are selected --> true = select all, deselect if all options are already selected
             options.each(function() {(this as HTMLOptionElement).selected = newState;}); // set state of all child options
@@ -460,7 +460,7 @@ export class ColumnComparison extends ATouringTask {
   public updateAttributeSelectors(): boolean {
    const descriptions = this.getAttriubuteDescriptions();
 
-    const attrSelectors = d3.select(this.node).selectAll('select.attr');
+    const attrSelectors = d3.select(this.node).selectAll('select.attr optgroup');
     const options = attrSelectors.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
     options.enter().append('option').text((desc) => desc.label);
 
