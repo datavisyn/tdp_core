@@ -64,6 +64,10 @@ div.touring {
         max-height: 50vh; //50% of browser window
       }
 
+      .select2-results__option { //changes the padding of every option in the dropdown
+        padding: 2px 6px;
+      }
+
       .select2-results__option--highlighted { //hover effect for non nested options (not in optgroup)
         background-color: $hover-background-color; // do my own hover styling
         color: $hover-color;
