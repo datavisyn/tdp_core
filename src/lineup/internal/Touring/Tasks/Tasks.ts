@@ -732,7 +732,7 @@ export class RowComparison extends ATouringTask {
     }
 
     const rowAttrData = d3.select(this.node).selectAll('select.attr[name="attr[]"]  option:checked').data();
-    const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data(colGrpData, (cat) => cat.name); // cat.name != label
+    const colHeadsCat = d3.select(this.node).select('thead tr').selectAll('th.head').data(colGrpData, (cat) => cat.attribute.column + ':' + cat.name); // cat.name != label; add column to handle identical category names
     const colHeadsCatSpan = colHeadsCat.enter().append('th')
       .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
 
@@ -755,7 +755,7 @@ export class RowComparison extends ATouringTask {
       tds.enter().append('td');
 
       // Set colheads in thead
-      colHeadsCatSpan.text((d) => d.label);
+      colHeadsCatSpan.text((d) => `${d.label} (${d.attribute.label})`);
       colHeadsCatSpan.each(function(d) {
         const parent = d3.select(this).node().parentNode; //parent span-element
         d3.select(parent).style('background-color', (d) => d && d.color ? d.color : '#FFF');
@@ -763,7 +763,8 @@ export class RowComparison extends ATouringTask {
         if(d && d.color && 'transparent' !== d.color && d3.hsl(d.color).l < 0.5) { //transparent has lightness of zero
           color = 'white';
         }
-        d3.select(parent).style('color', color);
+        d3.select(parent.parentNode).style('color', color)
+          .attr('title', (d) => `${d.label} (${d.attribute.label})`);
       });
       // set data in tbody
       tds.attr('colspan', (d) => d.colspan);
@@ -890,7 +891,7 @@ export class RowComparison extends ATouringTask {
       for (const [j, rowGrp] of rowGroups.entries()) {
         data[i][j] = new Array(colGroups.length + (j === 0 ? 2 : 1)).fill({label: '<i class="fa fa-circle-o-notch fa-spin"></i>', measure: null} as IScoreCell);
         data[i][j][j === 0 ? 1 : 0] = { // through rowspan, this becomes the first array item
-          label: `${rowGrp.attribute.label}: ${rowGrp.label}`,
+          label: `${rowGrp.label} (${rowGrp.attribute.label})`,
           background: rowGrp.color,
           foreground: textColor4Background(rowGrp.color)
         };
