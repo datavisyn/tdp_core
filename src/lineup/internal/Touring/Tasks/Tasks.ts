@@ -8,7 +8,6 @@ import rowCmpHtml from 'html-loader!./RowComparison.html'; // webpack imports ht
 import rowCmpIcon from './rowCmp.png';
 import * as $ from 'jquery';
 import * as d3 from 'd3';
-import {cell} from 'phovea_core/src/range';
 
 export const tasks = new Array<ATouringTask>();
 export function TaskDecorator() {
@@ -443,7 +442,9 @@ export abstract class ATouringTask implements ITouringTask {
           for (const attr of cellData.highlightData.filter((data) => data.category !== undefined)) {
             const indices = this.ranking.getAttributeDataDisplayed(attr.column).reduce((indices,cat,index) => cat === attr.category ? [...indices, index] : indices, []);
             for (const index of indices) {
-              d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${id}"]`).style('background-color', state ? '#FB4' : null);
+              d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${id}"]`).style('background-color', state ? attr.color : null);
+              const catId = d3.select(`.lineup-engine header .lu-header[title^="${attr.label}"]`).attr('data-col-id');
+              d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${catId}"]`).style('border', state ? `1px black dashed` : null);
             }
           }
         }
@@ -877,8 +878,8 @@ export class RowComparison extends ATouringTask {
 
                 const highlight : IHighlightData[] = [
                     {column: (attr as IServerColumn).column, label: attr.label},
-                    {column: rowGrp.attribute.column, label: rowGrp.attribute.label, category: rowGrp.name},
-                    {column: colGrp.attribute.column, label: colGrp.attribute.label, category: colGrp.name}];
+                    {column: rowGrp.attribute.column, label: rowGrp.attribute.label, category: rowGrp.name, color: rowGrp.color},
+                    {column: colGrp.attribute.column, label: colGrp.attribute.label, category: colGrp.name, color: colGrp.color}];
 
                 attrPromises.push(measure.calc(rowData, colData, attrData)
                   .then((score) => {
@@ -962,6 +963,7 @@ interface IHighlightData {
     column: string; //attribute.column
     label: string;
     category?: string; // cat.name
+    color?: string;
 }
 
 
