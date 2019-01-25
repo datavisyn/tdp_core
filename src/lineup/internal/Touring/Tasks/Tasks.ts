@@ -191,7 +191,7 @@ export abstract class ATouringTask implements ITouringTask {
       cellLabel = '-';
       color = {
         background: '#ffffff', //white
-        foreground: '#333333' //kinda black
+        foreground: '#ffffff', //white
       };
     }
     return {
