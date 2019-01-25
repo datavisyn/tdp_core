@@ -176,7 +176,7 @@ export abstract class ATouringTask implements ITouringTask {
     return descriptions;
   }
 
-  toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters): IScoreCell {
+  toScoreCell(score: IMeasureResult, measure :ISimilarityMeasure, setParameters: ISetParameters, highlightData: IHighlightData[]): IScoreCell {
     let color =  score2color(score.pValue);
     let cellLabel = score.pValue.toFixed(3);
 
@@ -200,7 +200,8 @@ export abstract class ATouringTask implements ITouringTask {
       foreground: color.foreground,
       score,
       measure,
-      setParameters
+      setParameters,
+      highlightData
     };
   }
 
@@ -429,11 +430,22 @@ export abstract class ATouringTask implements ITouringTask {
       }
 
       const cellData = d3.select(tableCell).datum() as IScoreCell;
-      if (cellData && cellData.setParameters) {
-        for (const attr of [cellData.setParameters.setADesc.label, cellData.setParameters.setBDesc.label]) {
-          const header = d3.select(`.lineup-engine header .lu-header[title^="${attr}"]`).style('background-color', state ? '#FB4' : null); // |= starts with whole word (does not work for selection checkboxes)
-          const id = header.attr('data-col-id');
-          d3.selectAll(`.lineup-engine main .lu-row [data-id="${id}"]`).style('background-color', state ? '#FB4' : null);
+      if (cellData && cellData.highlightData) {
+        // highlight col headers
+        let id;
+        for (const attr of cellData.highlightData.filter((data) => data.category === undefined)) {
+          const header = d3.select(`.lineup-engine header .lu-header[title^="${attr.label}"]`).style('background-color', state ? '#FB4' : null); // |= starts with whole word (does not work for selection checkboxes)
+          id = header.attr('data-col-id');
+        }
+
+        if (id) {
+          // highlight cat rows
+          for (const attr of cellData.highlightData.filter((data) => data.category !== undefined)) {
+            const indices = this.ranking.getAttributeDataDisplayed(attr.column).reduce((indices,cat,index) => cat === attr.category ? [...indices, index] : indices, []);
+            for (const index of indices) {
+              d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${id}"]`).style('background-color', state ? '#FB4' : null);
+            }
+          }
         }
       }
     }
@@ -596,11 +608,16 @@ export class ColumnComparison extends ATouringTask {
                 setB: data2,
                 setBDesc: row
               };
+
+              const highlight : IHighlightData[] = [
+                  {column: (row as IServerColumn).column, label: row.label},
+                  {column: (col as IServerColumn).column, label: col.label}];
+
               rowPromises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
                 .then((score) => {
-                  data[rowIndex][0][colIndex+1] = this.toScoreCell(score, measure, setParameters);
+                  data[rowIndex][0][colIndex+1] = this.toScoreCell(score, measure, setParameters, highlight);
                   if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
-                    data[colIndexInRows][0][rowIndexInCols+1] = this.toScoreCell(score, measure, setParameters);
+                    data[colIndexInRows][0][rowIndexInCols+1] = this.toScoreCell(score, measure, setParameters, highlight);
                   }
                 }).catch((err) => {
                   console.error(err);
@@ -858,12 +875,17 @@ export class RowComparison extends ATouringTask {
                   setBCategory: colGrp.label
                 };
 
+                const highlight : IHighlightData[] = [
+                    {column: (attr as IServerColumn).column, label: attr.label},
+                    {column: rowGrp.attribute.column, label: rowGrp.attribute.label, category: rowGrp.name},
+                    {column: colGrp.attribute.column, label: colGrp.attribute.label, category: colGrp.name}];
+
                 attrPromises.push(measure.calc(rowData, colData, attrData)
                   .then((score) => {
-                    data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters);
+                    data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters, highlight);
                     if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
                       const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1; // Currenlty, we can't have duplicates in the first line, so this will always be 1
-                      data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = this.toScoreCell(score, measure, setParameters);
+                      data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = this.toScoreCell(score, measure, setParameters, highlight);
                     }
                   })
                   .catch((err) => {
@@ -933,6 +955,13 @@ interface IScoreCell {
   score?: IMeasureResult;
   measure?: ISimilarityMeasure;
   setParameters?: ISetParameters;
+  highlightData?: IHighlightData[];
+}
+
+interface IHighlightData {
+    column: string; //attribute.column
+    label: string;
+    category?: string; // cat.name
 }
 
 
