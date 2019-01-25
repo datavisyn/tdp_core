@@ -427,6 +427,15 @@ export abstract class ATouringTask implements ITouringTask {
         // use header index
         d3.select(allHeads[0][headerIndex]).select('div').select('span').classed('cross-selection',state);
       }
+
+      const cellData = d3.select(tableCell).datum() as IScoreCell;
+      if (cellData && cellData.setParameters) {
+        for (const attr of [cellData.setParameters.setADesc.label, cellData.setParameters.setBDesc.label]) {
+          const header = d3.select(`.lineup-engine header .lu-header[title^="${attr}"]`).style('background-color', state ? '#FB4' : null); // |= starts with whole word (does not work for selection checkboxes)
+          const id = header.attr('data-col-id');
+          d3.selectAll(`.lineup-engine main .lu-row [data-id="${id}"]`).style('background-color', state ? '#FB4' : null);
+        }
+      }
     }
   }
 }
