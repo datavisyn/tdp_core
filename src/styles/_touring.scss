@@ -229,7 +229,6 @@ div.touring {
       .cross-selection, .cross-selection::before, .cross-selection span::before  {
         background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition
         color: black !important;
-        // font-weight: bolder !important;
       }
 
       td {
@@ -237,6 +236,8 @@ div.touring {
         border-collapse: collapse;
         position: relative;
         background: white;
+        background-clip: padding-box; // fix firefox bug: td background stretches over tbody border
+
         &[rowspan] {
           vertical-align: text-top; // move text of multi-row cells to the top
         }
