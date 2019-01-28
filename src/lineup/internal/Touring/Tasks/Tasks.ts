@@ -591,7 +591,14 @@ export class ColumnComparison extends ATouringTask {
                 .then((score) => {
                   data[rowIndex][0][colIndex+1] = this.toScoreCell(score, measure, setParameters);
                   if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
-                    data[colIndexInRows][0][rowIndexInCols+1] = this.toScoreCell(score, measure, setParameters);
+                    //invert A and B so that the axis labels are conistent
+                    const setParametersInverted = {
+                      setA: setParameters.setB,
+                      setADesc: setParameters.setBDesc,
+                      setB: setParameters.setA,
+                      setBDesc: setParameters.setADesc
+                    };
+                    data[colIndexInRows][0][rowIndexInCols+1] = this.toScoreCell(score, measure, setParametersInverted);
                   }
                 }).catch((err) => {
                   console.error(err);
