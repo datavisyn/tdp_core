@@ -637,7 +637,7 @@ export class ColumnComparison extends ATouringTask {
 
                 if(sessionScore === null || sessionScore === undefined || sessionScore.length === 2) {
                   score = measure.calc(data1, data2, null);
-                }else if (sessionScore !== null || sessionScore !== undefined) {
+                } else if (sessionScore !== null || sessionScore !== undefined) {
                   score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
                 }
 
@@ -951,7 +951,7 @@ export class RowComparison extends ATouringTask {
 
                   if(sessionScore === null || sessionScore === undefined) {
                     score = measure.calc(rowData, colData, attrData);
-                  }else if (sessionScore !== null || sessionScore !== undefined) {
+                  } else if (sessionScore !== null || sessionScore !== undefined) {
                     score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
                   }
 
