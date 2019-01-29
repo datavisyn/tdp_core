@@ -633,7 +633,7 @@ export class ColumnComparison extends ATouringTask {
                 const sessionScore = sessionStorage.getItem(hashValue);
                 // console.log('sessionScore: ', sessionScore);
                 // score for the measure
-                let score = null;
+                let score : IMeasureResult = null;
 
                 if(sessionScore === null || sessionScore === undefined || sessionScore.length === 2) {
                   score = measure.calc(data1, data2, null);
@@ -947,7 +947,7 @@ export class RowComparison extends ATouringTask {
                   const sessionScore = sessionStorage.getItem(hashValue);
                   // console.log('sessionScore: ', sessionScore);
                   // score for the measure
-                  let score = null;
+                  let score  : IMeasureResult = null;
 
                   if(sessionScore === null || sessionScore === undefined) {
                     score = measure.calc(rowData, colData, attrData);
