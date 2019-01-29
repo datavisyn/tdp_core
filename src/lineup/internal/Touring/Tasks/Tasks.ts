@@ -644,7 +644,7 @@ export class ColumnComparison extends ATouringTask {
                 // return score
                 resolve(score);
 
-                }).then((score) => {
+                }).then((score: IMeasureResult) => {
 
                   const scoreString = JSON.stringify(score);
                   // console.log('new score: ', score);
@@ -958,7 +958,7 @@ export class RowComparison extends ATouringTask {
                   // return score;
                   resolve(score);
 
-                }).then((score) => {
+                }).then((score: IMeasureResult) => {
 
                   const scoreString = JSON.stringify(score);
                   // console.log('new score: ', score);
