@@ -8,6 +8,7 @@ import rowCmpHtml from 'html-loader!./RowComparison.html'; // webpack imports ht
 import rowCmpIcon from './rowCmp.png';
 import * as $ from 'jquery';
 import * as d3 from 'd3';
+import * as XXH from 'xxhashjs';
 
 export const tasks = new Array<ATouringTask>();
 export function TaskDecorator() {
@@ -614,9 +615,45 @@ export class ColumnComparison extends ATouringTask {
                   {column: (row as IServerColumn).column, label: row.label},
                   {column: (col as IServerColumn).column, label: col.label}];
 
-              rowPromises.push(measure.calc(data1, data2, null) //allData is not needed here, data1 and data2 contain all items of the attributes.
-                .then((score) => {
+              //generate HashObject and hash value
+              const hashObject = {
+                ids : this.ranking.getDisplayedIds(),
+                selection : this.ranking.getSelection(),
+                row : {lable: (row as IServerColumn).label, column: (row as IServerColumn).column},
+                column : {lable: (col as IServerColumn).label, column: (col as IServerColumn).column},
+              };
+              // console.log('hashObject: ', hashObject);
+              const hashObjectString = JSON.stringify(hashObject);
+              // console.log('hashObject.srtringify: ', hashObjectString);
+              const hashValue = XXH.h32(hashObjectString,0).toString(16);
+              // console.log('Hash: ', hashValue);
+
+              rowPromises.push(new Promise((resolve, reject) => {
+                //get score from sessionStorage
+                const sessionScore = sessionStorage.getItem(hashValue);
+                // console.log('sessionScore: ', sessionScore);
+                // score for the measure
+                let score = null;
+
+                if(sessionScore === null || sessionScore === undefined || sessionScore.length === 2)
+                {
+                  score = measure.calc(data1, data2, null);
+                }else if (sessionScore !== null || sessionScore !== undefined) {
+                  score = JSON.parse(sessionScore);
+                }
+
+                // return score;
+                resolve(score);
+
+                }).then((score) => {
+
+                  const scoreString = JSON.stringify(score);
+                  // console.log('new score: ', score);
+                  // console.log('new scoreString: ', scoreString);
+                  sessionStorage.setItem(hashValue, scoreString);
+
                   data[rowIndex][0][colIndex+1] = this.toScoreCell(score, measure, setParameters, highlight);
+
                   if(rowIndexInCols >= 0 && colIndexInRows >= 0) {
                     //invert A and B so that the axis labels are conistent
                     const setParametersInverted = {
@@ -635,7 +672,9 @@ export class ColumnComparison extends ATouringTask {
                     data[colIndexInRows][0][rowIndexInCols + 1] = errorCell;
                   }
                 })
-              ); // if you 'await' here, the calculations are done sequentially, rather than parallel. so store the promises in an array
+              );
+
+
             }
           }
         }
@@ -888,24 +927,63 @@ export class RowComparison extends ATouringTask {
                     {column: rowGrp.attribute.column, label: rowGrp.attribute.label, category: rowGrp.name, color: rowGrp.color},
                     {column: colGrp.attribute.column, label: colGrp.attribute.label, category: colGrp.name, color: colGrp.color}];
 
-                attrPromises.push(measure.calc(rowData, colData, attrData)
-                  .then((score) => {
-                    data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters, highlight);
+
+                //generate HashObject and hash value
+                const hashObject = {
+                  ids : this.ranking.getDisplayedIds(),
+                  selection : this.ranking.getSelection(),
+                  attribute : {lable: (attr as IServerColumn).label, column: (attr as IServerColumn).column},
+                  setACategory: rowGrp.label,
+                  setBCaregory: colGrp.label
+                };
+                // console.log('hashObject: ', hashObject);
+                const hashObjectString = JSON.stringify(hashObject);
+                // console.log('hashObject.srtringify: ', hashObjectString);
+                const hashValue = XXH.h32(hashObjectString,0).toString(16);
+                // console.log('Hash: ', hash);
+
+
+                attrPromises.push(new Promise((resolve, reject) => {
+                  //get score from sessionStorage
+                  const sessionScore = sessionStorage.getItem(hashValue);
+                  // console.log('sessionScore: ', sessionScore);
+                  // score for the measure
+                  let score = null;
+
+                  if(sessionScore === null || sessionScore === undefined)
+                  {
+                    score = measure.calc(rowData, colData, attrData);
+                  }else if (sessionScore !== null || sessionScore !== undefined) {
+                    score = JSON.parse(sessionScore);
+                  }
+
+                  // return score;
+                  resolve(score);
+
+                }).then((score) => {
+
+                  const scoreString = JSON.stringify(score);
+                  // console.log('new score: ', score);
+                  // console.log('new scoreString: ', scoreString);
+                  sessionStorage.setItem(hashValue, scoreString);
+
+                  data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters, highlight);
                     if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
                       const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1; // Currenlty, we can't have duplicates in the first line, so this will always be 1
                       data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = this.toScoreCell(score, measure, setParameters, highlight);
                     }
-                  })
-                  .catch((err) => {
-                    console.error(err);
-                    const errorCell = {label: 'err', measure};
-                    data[bodyIndex][rowIndex][colIndexOffset + colIndex] = errorCell;
-                    if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
-                      const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1;
-                      data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = errorCell;
-                    }
-                  })
-                );
+
+                }).catch((err) => {
+                  console.error(err);
+                  const errorCell = {label: 'err', measure};
+                  data[bodyIndex][rowIndex][colIndexOffset + colIndex] = errorCell;
+                  if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
+                    const colIndexOffset4Duplicate = rowIndex4colGrp[colIndex] === 0 ? 2 : 1;
+                    data[bodyIndex][rowIndex4colGrp[colIndex]][colIndexOffset4Duplicate + colIndex4rowGrp[rowIndex]] = errorCell;
+                  }
+                }));
+
+                
               }
             }
           }
