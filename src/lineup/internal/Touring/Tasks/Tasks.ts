@@ -633,18 +633,18 @@ export class ColumnComparison extends ATouringTask {
                 const sessionScore = sessionStorage.getItem(hashValue);
                 // console.log('sessionScore: ', sessionScore);
                 // score for the measure
-                let score: IMeasureResult = null;
+                let score: Promise<IMeasureResult> = null;
 
                 if(sessionScore === null || sessionScore === undefined || sessionScore.length === 2) {
                   score = measure.calc(data1, data2, null);
                 }else if (sessionScore !== null || sessionScore !== undefined) {
-                  score = JSON.parse(sessionScore) as IMeasureResult;
+                  score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
                 }
 
                 // return score
                 resolve(score);
 
-                }).then((score: IMeasureResult) => {
+                }).then((score) => {
 
                   const scoreString = JSON.stringify(score);
                   // console.log('new score: ', score);
@@ -947,18 +947,18 @@ export class RowComparison extends ATouringTask {
                   const sessionScore = sessionStorage.getItem(hashValue);
                   // console.log('sessionScore: ', sessionScore);
                   // score for the measure
-                  let score: IMeasureResult = null;
+                  let score: Promise<IMeasureResult> = null;
 
                   if(sessionScore === null || sessionScore === undefined) {
                     score = measure.calc(rowData, colData, attrData);
                   }else if (sessionScore !== null || sessionScore !== undefined) {
-                    score = JSON.parse(sessionScore) as IMeasureResult;
+                    score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
                   }
 
                   // return score;
                   resolve(score);
 
-                }).then((score: IMeasureResult) => {
+                }).then((score) => {
 
                   const scoreString = JSON.stringify(score);
                   // console.log('new score: ', score);
