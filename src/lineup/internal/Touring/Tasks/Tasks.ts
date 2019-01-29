@@ -635,14 +635,13 @@ export class ColumnComparison extends ATouringTask {
                 // score for the measure
                 let score = null;
 
-                if(sessionScore === null || sessionScore === undefined || sessionScore.length === 2)
-                {
+                if(sessionScore === null || sessionScore === undefined || sessionScore.length === 2) {
                   score = measure.calc(data1, data2, null);
                 }else if (sessionScore !== null || sessionScore !== undefined) {
                   score = JSON.parse(sessionScore);
                 }
 
-                // return score;
+                // return score
                 resolve(score);
 
                 }).then((score) => {
@@ -950,8 +949,7 @@ export class RowComparison extends ATouringTask {
                   // score for the measure
                   let score = null;
 
-                  if(sessionScore === null || sessionScore === undefined)
-                  {
+                  if(sessionScore === null || sessionScore === undefined) {
                     score = measure.calc(rowData, colData, attrData);
                   }else if (sessionScore !== null || sessionScore !== undefined) {
                     score = JSON.parse(sessionScore);
@@ -983,7 +981,7 @@ export class RowComparison extends ATouringTask {
                   }
                 }));
 
-                
+
               }
             }
           }
