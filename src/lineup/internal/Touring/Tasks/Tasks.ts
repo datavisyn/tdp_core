@@ -628,17 +628,17 @@ export class ColumnComparison extends ATouringTask {
               const hashValue = XXH.h32(hashObjectString,0).toString(16);
               // console.log('Hash: ', hashValue);
 
-              rowPromises.push(new Promise((resolve, reject) => {
+              rowPromises.push(new Promise<IMeasureResult>((resolve, reject) => {
                 //get score from sessionStorage
                 const sessionScore = sessionStorage.getItem(hashValue);
                 // console.log('sessionScore: ', sessionScore);
                 // score for the measure
-                let score : IMeasureResult = null;
+                let score: IMeasureResult = null;
 
                 if(sessionScore === null || sessionScore === undefined || sessionScore.length === 2) {
                   score = measure.calc(data1, data2, null);
                 }else if (sessionScore !== null || sessionScore !== undefined) {
-                  score = JSON.parse(sessionScore);
+                  score = JSON.parse(sessionScore) as IMeasureResult;
                 }
 
                 // return score
@@ -942,17 +942,17 @@ export class RowComparison extends ATouringTask {
                 // console.log('Hash: ', hash);
 
 
-                attrPromises.push(new Promise((resolve, reject) => {
+                attrPromises.push(new Promise<IMeasureResult>((resolve, reject) => {
                   //get score from sessionStorage
                   const sessionScore = sessionStorage.getItem(hashValue);
                   // console.log('sessionScore: ', sessionScore);
                   // score for the measure
-                  let score  : IMeasureResult = null;
+                  let score: IMeasureResult = null;
 
                   if(sessionScore === null || sessionScore === undefined) {
                     score = measure.calc(rowData, colData, attrData);
                   }else if (sessionScore !== null || sessionScore !== undefined) {
-                    score = JSON.parse(sessionScore);
+                    score = JSON.parse(sessionScore) as IMeasureResult;
                   }
 
                   // return score;
