@@ -963,8 +963,8 @@ export class RowComparison extends ATouringTask {
                 };
 
                 // remove selection ids, if both row and column are not selection
-                if (hashObject.attribute.lable !== 'Selection' && 
-                    hashObject.setACategory !== 'Unselected' && hashObject.setACategory !== 'Selected' && 
+                if (hashObject.attribute.lable !== 'Selection' &&
+                    hashObject.setACategory !== 'Unselected' && hashObject.setACategory !== 'Selected' &&
                     hashObject.setBCategory !== 'Unselected' && hashObject.setBCategory !== 'Selected') {
                   delete hashObject.selection;
                 }
