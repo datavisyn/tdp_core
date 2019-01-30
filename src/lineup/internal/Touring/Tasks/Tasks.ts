@@ -628,6 +628,8 @@ export class ColumnComparison extends ATouringTask {
               const hashValue = XXH.h32(hashObjectString,0).toString(16);
               // console.log('Hash: ', hashValue);
 
+              let isStoredScoreAvailable = false; //flag for the availability of a stored score
+
               rowPromises.push(new Promise<IMeasureResult>((resolve, reject) => {
                 //get score from sessionStorage
                 const sessionScore = sessionStorage.getItem(hashValue);
@@ -639,6 +641,7 @@ export class ColumnComparison extends ATouringTask {
                   score = measure.calc(data1, data2, null);
                 } else if (sessionScore !== null || sessionScore !== undefined) {
                   score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
+                  isStoredScoreAvailable = true;
                 }
 
                 // return score
@@ -646,10 +649,12 @@ export class ColumnComparison extends ATouringTask {
 
                 }).then((score) => {
 
-                  const scoreString = JSON.stringify(score);
-                  // console.log('new score: ', score);
-                  // console.log('new scoreString: ', scoreString);
-                  sessionStorage.setItem(hashValue, scoreString);
+                  if(!isStoredScoreAvailable) {
+                    const scoreString = JSON.stringify(score);
+                    // console.log('new score: ', score);
+                    // console.log('new scoreString: ', scoreString);
+                    sessionStorage.setItem(hashValue, scoreString);
+                  }
 
                   data[rowIndex][0][colIndex+1] = this.toScoreCell(score, measure, setParameters, highlight);
 
@@ -941,6 +946,7 @@ export class RowComparison extends ATouringTask {
                 const hashValue = XXH.h32(hashObjectString,0).toString(16);
                 // console.log('Hash: ', hash);
 
+                let isStoredScoreAvailable = false; //flag for the availability of a stored score
 
                 attrPromises.push(new Promise<IMeasureResult>((resolve, reject) => {
                   //get score from sessionStorage
@@ -953,6 +959,7 @@ export class RowComparison extends ATouringTask {
                     score = measure.calc(rowData, colData, attrData);
                   } else if (sessionScore !== null || sessionScore !== undefined) {
                     score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
+                    isStoredScoreAvailable = true;
                   }
 
                   // return score;
@@ -960,10 +967,12 @@ export class RowComparison extends ATouringTask {
 
                 }).then((score) => {
 
-                  const scoreString = JSON.stringify(score);
-                  // console.log('new score: ', score);
-                  // console.log('new scoreString: ', scoreString);
-                  sessionStorage.setItem(hashValue, scoreString);
+                  if(!isStoredScoreAvailable) {
+                    const scoreString = JSON.stringify(score);
+                    // console.log('new score: ', score);
+                    // console.log('new scoreString: ', scoreString);
+                    sessionStorage.setItem(hashValue, scoreString);
+                  }
 
                   data[bodyIndex][rowIndex][colIndexOffset + colIndex] = this.toScoreCell(score, measure, setParameters, highlight);
                     if(colIndex4rowGrp[rowIndex] >= 0 && rowIndex4colGrp[colIndex] >= 0) {
