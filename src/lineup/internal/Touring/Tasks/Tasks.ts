@@ -637,6 +637,12 @@ export class ColumnComparison extends ATouringTask {
                 row : {lable: (row as IServerColumn).label, column: (row as IServerColumn).column},
                 column : {lable: (col as IServerColumn).label, column: (col as IServerColumn).column},
               };
+
+              // remove selection ids, if both row and column are not selection
+              if (hashObject.row.lable !== 'Selection' && hashObject.column.lable !== 'Selection') {
+                delete hashObject.selection;
+              }
+
               // console.log('hashObject: ', hashObject);
               const hashObjectString = JSON.stringify(hashObject);
               // console.log('hashObject.srtringify: ', hashObjectString);
@@ -953,8 +959,16 @@ export class RowComparison extends ATouringTask {
                   selection : this.ranking.getSelection(),
                   attribute : {lable: (attr as IServerColumn).label, column: (attr as IServerColumn).column},
                   setACategory: rowGrp.label,
-                  setBCaregory: colGrp.label
+                  setBCategory: colGrp.label
                 };
+
+                // remove selection ids, if both row and column are not selection
+                if (hashObject.attribute.lable !== 'Selection' && 
+                    hashObject.setACategory !== 'Unselected' && hashObject.setACategory !== 'Selected' && 
+                    hashObject.setBCategory !== 'Unselected' && hashObject.setBCategory !== 'Selected') {
+                  delete hashObject.selection;
+                }
+
                 // console.log('hashObject: ', hashObject);
                 const hashObjectString = JSON.stringify(hashObject);
                 // console.log('hashObject.srtringify: ', hashObjectString);
