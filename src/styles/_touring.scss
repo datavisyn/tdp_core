@@ -1,10 +1,23 @@
 $active-color: #eaeaea;
 $dark-font-color: #333;
-$highlight-color: #ffa500;
+$highlight-color: #D4D4D4;
 
 
 [hidden] {
   display: none !important;
+}
+
+
+.touring-highlight {
+  background-color: $highlight-color !important;
+
+  &.touring-highlight-dark {
+    background-color: darken($highlight-color, 25%) !important;
+  }
+}
+
+.touring-highlight-border {
+  border: 1px black dashed  !important;
 }
 
 button {
@@ -214,6 +227,7 @@ div.touring {
                   overflow: hidden; // important to stop text at right border
                   white-space: nowrap; // no line breaks
                   text-overflow: ellipsis;
+                  font-weight: normal;
 
                   box-sizing: border-box; // i dont want to mess with the padding
                   padding: 0.1em 0.5em 0.1em 1.5em;
@@ -274,7 +288,7 @@ div.touring {
           vertical-align: bottom; // Actually, it should be middle, but bottom looks more centered ¯\_(ツ)_/¯
 
           &:hover, &:focus { // = td.action:hover
-            background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition
+            background-color: darken($highlight-color, 25%) !important; // important because to overwrite the htmml inline color definition
             color: black !important;
             font-weight: bolder;
           }
