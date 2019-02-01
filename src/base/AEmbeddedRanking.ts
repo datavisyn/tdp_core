@@ -35,7 +35,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
       graph,
       ref,
       desc: <any>{
-        idtype
+        idtype: idtype.id
       }
     };
     const selection = {

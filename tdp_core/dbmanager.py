@@ -69,7 +69,7 @@ class DBManager(object):
     engine = connector.create_engine(config)
 
     self._engines[item] = engine
-    self._sessionmakers[engine] = connector.create_session(engine)
+    self._sessionmakers[engine] = connector.create_sessionmaker(engine)
     return engine
 
   def __getitem__(self, item):
