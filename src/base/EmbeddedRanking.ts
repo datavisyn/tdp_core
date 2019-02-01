@@ -135,3 +135,5 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     }
   }
 }
+
+export default AEmbeddedRanking;
