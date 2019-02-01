@@ -310,18 +310,18 @@ export abstract class ATouringTask implements ITouringTask {
 
   }
 
-  protected removeOldVisuallization () {
-
-    // remove old visualization and details
-    const divDetails = d3.select(this.node).select('div.details');
-    divDetails.selectAll('div').remove();
-    divDetails.selectAll('svg').remove();
-
+  // protected removeOldVisuallization () {
+//
+  //   // remove old visualization and details
+  //   const divDetails = d3.select(this.node).select('div.details');
+  //   divDetails.selectAll('div').remove();
+  //   divDetails.selectAll('svg').remove();
+//
     // remove selected cell highlighting
-    const allTds = d3.select(this.node).selectAll('td');
-    allTds.classed('selectedCell',false);
-
-  }
+    // const allTds = d3.select(this.node).selectAll('td');
+    // allTds.classed('selectedCell',false);
+//
+  // }
 
   private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
 
@@ -357,21 +357,107 @@ export abstract class ATouringTask implements ITouringTask {
                   .text(measure.description);
   }
 
-  onClick(tableCell) {
-    const cellData = d3.select(tableCell).datum();
-    console.log('Cell click - data: ',cellData);
+  protected updateSelectionAndVisuallization () {
 
+    // current task
+    const currTask = d3.select(this.node).attr('class');
+    // save selection
+    const selCellObjString = sessionStorage.getItem('touringSelCell');
+    const selCellObj = JSON.parse(selCellObjString);
+    // console.log('stored selection labels: ', selCellObj);
+
+    if(selCellObj && currTask === selCellObj.task) {
+
+      let rowLabel = null;
+      let categoryLabel = null;
+      if(selCellObj.rowLabels.length === 1) {
+        rowLabel = selCellObj.rowLabels[0];
+      } else  if(selCellObj.rowLabels.length === 2) {
+        const firstEle = selCellObj.rowLabels[0];
+
+        rowLabel = firstEle.rowspan !== null ? firstEle : selCellObj.rowLabels[1];
+        categoryLabel = firstEle.rowspan !== null ? selCellObj.rowLabels[1] : firstEle;
+      }
+      // console.log('selected labels: ',{selCellObj,rowLabel,categoryLabel});
+      // get index for column
+      let colIndex = null;
+      d3.select(this.node).select('thead').selectAll('th').each(function (d,i) {
+        const classedHead = d3.select(this).classed('head');
+        const classedRotate = d3.select(this).classed('rotate');
+        if(classedHead && classedRotate) {
+          const currCol = d3.select(this) === null ? '' : d3.select(this).text();
+          // console.log('currCol:', currCol, ' | index: ', i);
+          if(currCol === selCellObj.colLabel) {
+            colIndex = i;
+          }
+        }
+
+      });
+      // get table body
+      let tableBody = null;
+      d3.select(this.node).selectAll('tbody').select('tr:nth-child(1)').select('td:nth-child(1)').each(function (d) {
+        const currRow = d3.select(this).select('b').text();
+        if (currRow === rowLabel.label) {
+          tableBody = this.parentNode.parentNode;
+        }
+      });
+
+
+      let selectedCell = null;
+      // look for last selected cell
+      if(colIndex !== null && tableBody !== null) {
+
+        // console.log('selectedBody: ', tableBody, ' | colIndex: ' ,colIndex);
+        if(categoryLabel === null) {
+          const allTds = d3.select(tableBody).selectAll('td');
+          selectedCell = allTds[0][colIndex];
+        } else {
+          d3.select(tableBody).select('tr').each(function (d,i) {
+            const currTds = d3.select(this).selectAll('td');
+            const catIndex = i === 0 ? 1 : 0;
+            const cellIndex = i === 0 ? colIndex : colIndex-1;
+            const currCate = d3.select(currTds[0][catIndex]).text();
+            if(currCate === categoryLabel) {
+              selectedCell = currTds[0][cellIndex];
+            }
+          });
+        }
+
+        // highlight selected cell and update visualization
+        if(selectedCell !== null) {
+
+          const cellData = d3.select(selectedCell).datum();
+          // console.log('selectedCell data: ', cellData);
+
+          // highlight selected cell
+          this.highlightSelectedCell(selectedCell, cellData);
+
+          // generate visualization for cell
+          // this.visualizeSelectedCell(selectedCell, cellData);
+        }
+      }
+
+
+    }
+  }
+
+  private highlightSelectedCell(tableCell, cellData) {
     // remove bg highlighting from all tds
     d3.select(this.node).selectAll('td').classed('selectedCell', false);
-
-    // remove all old details
-    const details = d3.select(this.node).select('div.details');
-    details.selectAll('*').remove(); // avada kedavra outdated details!
-
 
     if (cellData.score) { //Currenlty only cells with a score are calculated (no category or attribute label cells)
       // Color table cell
       d3.select(tableCell).classed('selectedCell', true); // add bg highlighting
+    }
+
+  }
+
+  private visualizeSelectedCell(tableCell, cellData) {
+    // remove all old details
+    const details = d3.select(this.node).select('div.details');
+    details.selectAll('*').remove(); // avada kedavra outdated details!
+
+    if (cellData.score) { //Currenlty only cells with a score are calculated (no category or attribute label cells)
 
       const reusltScore : IMeasureResult = cellData.score;
       const measure : ISimilarityMeasure = cellData.measure;
@@ -392,6 +478,71 @@ export abstract class ATouringTask implements ITouringTask {
 
       }
     }
+  }
+
+  onClick(tableCell) {
+    const cellData = d3.select(tableCell).datum();
+    console.log('Cell click - data: ',cellData);
+
+    // save data for selected cell in sesisonStorage
+    let selCellObj;
+    const task = d3.select(this.node).attr('class');
+    // save selected cell in sessionStorage
+    if (cellData.measure !== null && cellData.score) {
+      const colLabel = d3.select(this.node).selectAll('span.cross-selection').text();
+      const rowLabels = [];
+      d3.select(this.node).selectAll('td.cross-selection').each(function (d) {
+        const label = d3.select(this).text();
+        const rowspan = d3.select(this).attr('rowspan');
+        const obj = {label, rowspan };
+        rowLabels.push(obj);
+      });
+
+      // create selected cell object
+      selCellObj = {task, colLabel, rowLabels};
+    } else {
+      selCellObj = {task, colLabel: null, rowLabels: null };
+    }
+
+    console.log('selectionLabels: ', selCellObj);
+    const selCellObjString = JSON.stringify(selCellObj);
+    sessionStorage.setItem('touringSelCell', selCellObjString);
+
+    this.highlightSelectedCell(tableCell, cellData);
+    this.visualizeSelectedCell(tableCell, cellData);
+
+
+    // // remove bg highlighting from all tds
+    // d3.select(this.node).selectAll('td').classed('selectedCell', false);
+
+    // // remove all old details
+    // const details = d3.select(this.node).select('div.details');
+    // details.selectAll('*').remove(); // avada kedavra outdated details!
+
+
+    // if (cellData.score) { //Currenlty only cells with a score are calculated (no category or attribute label cells)
+    //   // Color table cell
+    //   d3.select(tableCell).classed('selectedCell', true); // add bg highlighting
+
+    //   const reusltScore : IMeasureResult = cellData.score;
+    //   const measure : ISimilarityMeasure = cellData.measure;
+
+    //   // Display details
+    //   if(measure) {
+    //     this.generateVisualDetails(details,measure,reusltScore); //generate description into details div
+    //   } else {
+    //     details.append('p').text('There are no details for the selected table cell.');
+    //   }
+
+    //   // display visualisation
+    //   if(measure.visualization) {
+    //     const visualization: IMeasureVisualization = measure.visualization;
+    //     if(cellData.setParameters) {
+    //       visualization.generateVisualization(details, cellData.setParameters, cellData.score);
+    //     }
+
+    //   }
+    // }
   }
 
   onMouseOver(tableCell, state: boolean) {
@@ -526,7 +677,7 @@ export class ColumnComparison extends ATouringTask {
 
   public updateTable() {
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
-    this.removeOldVisuallization();
+    // this.removeOldVisuallization();
 
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
@@ -583,6 +734,7 @@ export class ColumnComparison extends ATouringTask {
       bodies.exit().remove();
       trs.order();
       bodies.order();
+      that.updateSelectionAndVisuallization();
     }
 
     this.getAttrTableBody(colData, rowData, true, null).then(updateTableBody); // initialize
@@ -817,7 +969,7 @@ export class RowComparison extends ATouringTask {
 
   updateTable() {
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
-    this.removeOldVisuallization();
+    // this.removeOldVisuallization();
 
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
@@ -885,6 +1037,7 @@ export class RowComparison extends ATouringTask {
       colHeadsCat.order();
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
       bodies.order();
+      that.updateSelectionAndVisuallization();
     }
 
     this.getAttrTableBody(colGrpData, rowGrpData, rowAttrData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
