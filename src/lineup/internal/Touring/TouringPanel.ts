@@ -68,6 +68,9 @@ export default class TouringPanel extends LineUpPanelActions {
     //Remove previous output
     d3.select(this.touringElem).selectAll(`div.output *`).remove(); //remove all child elemetns of output
 
+    // remove selected cell of session storage
+    sessionStorage.removeItem('touringSelCell');
+
     const task = d3.select(this.touringElem).select('button.task-btn.active').datum() as ATouringTask;
     task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
   }

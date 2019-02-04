@@ -357,7 +357,7 @@ export abstract class ATouringTask implements ITouringTask {
                   .text(measure.description);
   }
 
-  protected updateSelectionAndVisuallization () {
+  protected updateSelectionAndVisuallization (row) {
 
     // current task
     const currTask = d3.select(this.node).attr('class');
@@ -370,15 +370,16 @@ export abstract class ATouringTask implements ITouringTask {
 
       let rowLabel = null;
       let categoryLabel = null;
-      if(selCellObj.rowLabels.length === 1) {
+      if(selCellObj.rowLabels !== null && selCellObj.rowLabels.length === 1) {
         rowLabel = selCellObj.rowLabels[0];
-      } else  if(selCellObj.rowLabels.length === 2) {
+      } else  if(selCellObj.rowLabels !== null && selCellObj.rowLabels.length === 2) {
         const firstEle = selCellObj.rowLabels[0];
 
         rowLabel = firstEle.rowspan !== null ? firstEle : selCellObj.rowLabels[1];
         categoryLabel = firstEle.rowspan !== null ? selCellObj.rowLabels[1] : firstEle;
       }
       // console.log('selected labels: ',{selCellObj,rowLabel,categoryLabel});
+
       // get index for column
       let colIndex = null;
       d3.select(this.node).select('thead').selectAll('th').each(function (d,i) {
@@ -397,7 +398,7 @@ export abstract class ATouringTask implements ITouringTask {
       let tableBody = null;
       d3.select(this.node).selectAll('tbody').select('tr:nth-child(1)').select('td:nth-child(1)').each(function (d) {
         const currRow = d3.select(this).select('b').text();
-        if (currRow === rowLabel.label) {
+        if (rowLabel !== null && currRow === rowLabel.label) {
           tableBody = this.parentNode.parentNode;
         }
       });
@@ -409,20 +410,21 @@ export abstract class ATouringTask implements ITouringTask {
 
         // console.log('selectedBody: ', tableBody, ' | colIndex: ' ,colIndex);
         if(categoryLabel === null) {
-          const allTds = d3.select(tableBody).selectAll('td');
+          const allTds = d3.select(tableBody).select('tr').selectAll('td');
           selectedCell = allTds[0][colIndex];
         } else {
-          d3.select(tableBody).select('tr').each(function (d,i) {
+          d3.select(tableBody).selectAll('tr').each(function (d,i) {
             const currTds = d3.select(this).selectAll('td');
             const catIndex = i === 0 ? 1 : 0;
             const cellIndex = i === 0 ? colIndex : colIndex-1;
             const currCate = d3.select(currTds[0][catIndex]).text();
-            if(currCate === categoryLabel) {
+            if(currCate === categoryLabel.label) {
               selectedCell = currTds[0][cellIndex];
             }
           });
         }
 
+        // console.log('updateSelectionAndVisuallization: ', {row, tableBody, colIndex, selectedCell});
         // highlight selected cell and update visualization
         if(selectedCell !== null) {
 
@@ -432,8 +434,10 @@ export abstract class ATouringTask implements ITouringTask {
           // highlight selected cell
           this.highlightSelectedCell(selectedCell, cellData);
 
-          // generate visualization for cell
-          // this.visualizeSelectedCell(selectedCell, cellData);
+          if(row !== null && row.label === rowLabel.label) {
+            // generate visualization for cell
+            this.visualizeSelectedCell(selectedCell, cellData);
+          }
         }
       }
 
@@ -734,7 +738,6 @@ export class ColumnComparison extends ATouringTask {
       bodies.exit().remove();
       trs.order();
       bodies.order();
-      that.updateSelectionAndVisuallization();
     }
 
     this.getAttrTableBody(colData, rowData, true, null).then(updateTableBody); // initialize
@@ -857,7 +860,7 @@ export class ColumnComparison extends ATouringTask {
         }
 
         promises.concat(rowPromises);
-        Promise.all(rowPromises).then(() => update(data));
+        Promise.all(rowPromises).then(() => {update(data);this.updateSelectionAndVisuallization(row);});
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
@@ -1037,7 +1040,6 @@ export class RowComparison extends ATouringTask {
       colHeadsCat.order();
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
       bodies.order();
-      that.updateSelectionAndVisuallization();
     }
 
     this.getAttrTableBody(colGrpData, rowGrpData, rowAttrData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
@@ -1177,7 +1179,7 @@ export class RowComparison extends ATouringTask {
             }
           }
         }
-        Promise.all(attrPromises).then(() => update(data));
+        Promise.all(attrPromises).then(() => {update(data);this.updateSelectionAndVisuallization(attr);});
         promises.concat(attrPromises);
       }
 
