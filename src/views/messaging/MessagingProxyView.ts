@@ -4,7 +4,7 @@ import {resolve} from 'phovea_core/src/idtype';
 import {resolveIds} from '../resolve';
 import {parse, none} from 'phovea_core/src/range';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
-import {DEFAULT_SELECTION_NAME} from 'tdp_core/src/extensions';
+import {DEFAULT_SELECTION_NAME} from '../../extensions';
 
 
 export interface IProxyViewOptions {
