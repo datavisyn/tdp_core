@@ -77,6 +77,7 @@ class DBManager(object):
     from flask import _app_ctx_stack
 
     # create a session maker that is scoped by the flask application
+    # see also https://github.com/pallets/flask-sqlalchemy/blob/master/flask_sqlalchemy/__init__.py#L712-L716
     self._websessionmakers[engine] = scoped_session(maker, scopefunc=_app_ctx_stack.__ident_func__)
     return engine
 
