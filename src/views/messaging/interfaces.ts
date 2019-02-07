@@ -3,6 +3,7 @@
 export interface ITDPSetInputSelectionMessage {
   type: 'tdpSetInputSelection';
   payload: {
+    name: string;
     idType: string;
     ids: string[];
   };
@@ -12,6 +13,7 @@ export interface ITDPSetInputSelectionMessage {
 export interface ITDPSetItemSelectionMessage {
   type: 'tdpSetItemSelection';
   payload: {
+    name?: string;
     idType: string;
     ids: string[];
   };
