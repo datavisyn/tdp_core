@@ -15,7 +15,6 @@ class DBManager(object):
     self._plugins = {}
     self._engines = dict()
     self._sessionmakers = dict()
-    self._websessionmakers = dict()
 
     for p in list_plugins('tdp-sql-database-definition'):
       config = configview(p.configKey)
@@ -73,11 +72,6 @@ class DBManager(object):
     self._engines[item] = engine
     self._sessionmakers[engine] = maker
 
-    from sqlalchemy.orm import scoped_session
-    from flask import _app_ctx_stack
-
-    # create a session maker that is scoped by the flask application
-    self._websessionmakers[engine] = scoped_session(maker, scopefunc=_app_ctx_stack.__ident_func__)
     return engine
 
   def __getitem__(self, item):
@@ -100,9 +94,25 @@ class DBManager(object):
 
   def create_web_session(self, engine):
     """
-    create a session that is scoped by the current flask request
+    create a session that is scoped by the current flask request.
+    Note: if an exception occurs in the debug mode tho flask for debugging reason won't destroy it so it will be done after the next request
     """
-    return self._websessionmakers[engine]()
+    from flask import current_app
+
+    session = self.create_session(engine)
+
+    _log.info('create web session')
+
+    def close_db(response_or_exc):
+      _log.info('remove web session')
+      session.close()
+      current_app.teardown_appcontext_funcs.remove(close_db)
+      return response_or_exc
+
+    # use append to avoid setup_method wrapper check
+    current_app.teardown_appcontext_funcs.append(close_db)
+
+    return session
 
   def __contains__(self, item):
     return item in self.connectors
