@@ -517,3 +517,22 @@ class DBConnector(object):
   def dump(self, name):
     from collections import OrderedDict
     return OrderedDict(name=name, description=self.description)
+
+  def create_engine(self, config):
+    import sqlalchemy
+
+    engine_options = config.get('engine', default={})
+    engine = sqlalchemy.create_engine(self.dburl, **engine_options)
+    # Assuming that gevent monkey patched the builtin
+    # threading library, we're likely good to use
+    # SQLAlchemy's QueuePool, which is the default
+    # pool class.  However, we need to make it use
+    # threadlocal connections
+    # https://github.com/kljensen/async-flask-sqlalchemy-example/blob/master/server.py
+    engine.pool._use_threadlocal = True
+
+    return engine
+
+  def create_sessionmaker(self, engine):
+    from sqlalchemy.orm import sessionmaker
+    return sessionmaker(bind=engine)
