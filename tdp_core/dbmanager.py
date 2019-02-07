@@ -95,7 +95,7 @@ class DBManager(object):
   def create_web_session(self, engine):
     """
     create a session that is scoped by the current flask request.
-    Note: if an exception occurs in the debug mode tho flask for debugging reason won't destroy it so it will be done after the next request
+    Note: if an exception occurs in the debug mode, flask for debugging reason won't destroy it so it will be done after the next request
     """
     from flask import current_app
 

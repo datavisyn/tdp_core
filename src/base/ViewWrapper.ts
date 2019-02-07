@@ -215,7 +215,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
   get idType() {
     const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
-    return selection && selection.idtype ? selection.idtype : guessIDType(this.plugin); // TODO
+    return selection && selection.idtype ? selection.idtype : guessIDType(this.plugin); // TODO: better IDType strategy than guessIDType?
   }
 
   private destroyInstance() {

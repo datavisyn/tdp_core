@@ -87,6 +87,9 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     this.ranking = new EmbeddedRankingView(context, selection, this.node, options);
 
     // since set in the constructor it is safe
+    // this.data is set by ARankingView's constructor (see hack where `this.context.ref.value.data` is set)
+    // with `graph.findOrAddObject` above the reference of `this` (AEmbeddedRanking) is set to `this.context.ref.value` in ARankingView
+    // therefore is this.data of AEmbeddedRanking === `this.context.ref.value` in ARankingView's constructor
     const lineup = this.data;
     lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection: number[]) => {
       const rows = selection.map((d) => lineup.data[d]);
