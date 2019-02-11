@@ -330,7 +330,7 @@ export abstract class ATouringTask implements ITouringTask {
 
     // const detailTestValue = divDetailInfo.append('div');
     const scoreValue = measureResult.scoreValue.toFixed(3);
-    const pValue = measureResult.pValue.toFixed(3) === '-1.000' ? 'n/a' : measureResult.pValue.toFixed(3);
+    const pValue = measureResult.pValue === -1 ? 'n/a' : (measureResult.pValue as number).toExponential();
     const detailInfoValues = divDetailInfo.append('div')
                           .classed('detailDiv',true);
                           // .text(`Test-Value: ${scoreValue}, p-Value: ${pValue}`);
@@ -662,7 +662,7 @@ export abstract class ATouringTask implements ITouringTask {
       const category = rowCategories.pop();
       const isColTask = category === row ? true : false;
       const cellData = d3.select(tableCell).datum();
-      const scoreValue = cellData.score.scoreValue;
+      const scoreValue = cellData.score.scoreValue.toFixed(3);
       let scorePvalue = cellData.score.pValue;
       if(scorePvalue === -1) {
         scorePvalue = 'n/a';
