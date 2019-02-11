@@ -796,6 +796,9 @@ export class ColumnComparison extends ATouringTask {
               // remove selection ids, if both row and column are not selection
               if (hashObject.row.lable !== 'Selection' && hashObject.column.lable !== 'Selection') {
                 delete hashObject.selection;
+                if (hashObject.row.lable !== 'Rank' && hashObject.column.lable !== 'Rank') {
+                  hashObject.ids = this.ranking.getDisplayedIds().sort();
+                }
               }
 
               // console.log('hashObject: ', hashObject);
@@ -1122,6 +1125,9 @@ export class RowComparison extends ATouringTask {
                     hashObject.setACategory !== 'Unselected' && hashObject.setACategory !== 'Selected' &&
                     hashObject.setBCategory !== 'Unselected' && hashObject.setBCategory !== 'Selected') {
                   delete hashObject.selection;
+                  if (hashObject.attribute.lable !== 'Rank') {
+                    hashObject.ids = this.ranking.getDisplayedIds().sort();
+                  }
                 }
 
                 // console.log('hashObject: ', hashObject);
