@@ -622,6 +622,71 @@ export abstract class ATouringTask implements ITouringTask {
       }
     }
   }
+
+  createToolTip(tableCell) : String {
+    if(d3.select(tableCell).classed('score') && d3.select(tableCell).classed('action')) {
+      const tr = tableCell.parentNode; //current row
+      const tbody = tr.parentNode;     //current body
+      const table = tbody.parentNode;  //current table
+
+      const allTds = d3.select(tr).selectAll('td');
+      // console.log('allTds', allTds[0]);
+      let index = -1;
+      const currLength = allTds[0].length;
+      // get current index of cell in row
+      for(let i=0; i<currLength; i++) {
+        if(allTds[0][i] === tableCell) {
+          index = i;
+        }
+      }
+
+      // all label cells in row
+      const rowCategories = [];
+      const row1 = d3.select(tr).selectAll('td:not(.score)').each(function() {
+        rowCategories.push(d3.select(this).text());
+      });
+      // the first cell in the first row of the cells tbody
+      const row = d3.select(tbody).select('tr').select('td').text();
+
+      // maxIndex is the maximum number of table cell in the table
+      const maxLength = d3.select(tbody).select('tr').selectAll('td')[0].length;
+
+      // if currMaxIndex and maxIndex are not the same -> increase headerIndex by one
+      // because the current row has one cell fewer
+      const headerIndex = (currLength === maxLength) ? index : index+1;
+
+      // column label
+      const allHeads = d3.select(table).select('thead').selectAll('th');
+      const header = d3.select(allHeads[0][headerIndex]).select('div').select('span').text();
+
+      const category = rowCategories.pop();
+      const isColTask = category === row ? true : false;
+      const cellData = d3.select(tableCell).datum();
+      const scoreValue = cellData.score.scoreValue;
+      let scorePvalue = cellData.score.pValue;
+      if(scorePvalue === -1) {
+        scorePvalue = 'n/a';
+      } else {
+        scorePvalue = (scorePvalue as number).toExponential();
+      }
+
+
+      let tooltipText = '';
+      if(isColTask) {
+        tooltipText = `Column: ${header}\nRow: ${row}\nScore: ${scoreValue}\np-Value: ${scorePvalue}`;
+      } else {
+        tooltipText = `Data Column: ${row}\nColumn: ${header}\nRow: ${category}\nScore: ${scoreValue}\np-Value: ${scorePvalue}`;
+      }
+
+      return tooltipText;
+    } else {
+      // cell that have no p-values
+      return null;
+    }
+
+  }
+
+
 }
 
 @TaskDecorator()
@@ -730,6 +795,8 @@ export class ColumnComparison extends ATouringTask {
       tds.on('click', function() { that.onClick.bind(that)(this); });
       tds.on('mouseover', function() { that.onMouseOver.bind(that)(this,true); });
       tds.on('mouseout', function() { that.onMouseOver.bind(that)(this,false); });
+      tds.attr('title',function() {  return that.createToolTip.bind(that)(this); });
+
       // Exit
       colHeads.exit().remove(); // remove attribute columns
       colHeads.order();
@@ -1034,6 +1101,7 @@ export class RowComparison extends ATouringTask {
       tds.on('click', function() { that.onClick.bind(that)(this); });
       tds.on('mouseover', function() { that.onMouseOver.bind(that)(this,true); });
       tds.on('mouseout', function() { that.onMouseOver.bind(that)(this,false); });
+      tds.attr('title',function() {  return that.createToolTip.bind(that)(this); });
 
       // Exit
       tds.exit().remove(); // remove cells of removed columns
