@@ -171,15 +171,18 @@ export default class TourManager {
     this.backdrop.style.height = `${fullAppHeight}px`;
     this.backdrop.style.width = `${fullAppWidth}px`;
 
+    // also consider the current scroll offset inside the window
+    const scrollOffset = self.scrollY;
+
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example
     this.backdrop.style.clipPath = `polygon(
       0% 0%,
       0% ${fullAppHeight}px,
       ${mask.left}px ${fullAppHeight}px,
-      ${mask.left}px ${mask.top}px,
-      ${mask.left + mask.width}px ${mask.top}px,
-      ${mask.left + mask.width}px ${mask.top + mask.height}px,
-      ${mask.left}px ${mask.top + mask.height}px,
+      ${mask.left}px ${mask.top + scrollOffset}px,
+      ${mask.left + mask.width}px ${mask.top + scrollOffset}px,
+      ${mask.left + mask.width}px ${mask.top + mask.height + scrollOffset}px,
+      ${mask.left}px ${mask.top + mask.height + scrollOffset}px,
       ${mask.left}px ${fullAppHeight}px,
       ${fullAppWidth}px ${fullAppHeight}px,
       ${fullAppWidth}px 0%
