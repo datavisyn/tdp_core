@@ -95,22 +95,19 @@ class DBManager(object):
   def create_web_session(self, engine):
     """
     create a session that is scoped by the current flask request.
-    Note: if an exception occurs in the debug mode, flask for debugging reason won't destroy it so it will be done after the next request
+    Note: if an exception occurs in the debug mode, flask for debugging reason won't destroy it
     """
-    from flask import current_app
+    from flask import after_this_request
 
     session = self.create_session(engine)
 
     _log.info('create web session')
 
+    @after_this_request
     def close_db(response_or_exc):
       _log.info('remove web session')
       session.close()
-      current_app.teardown_appcontext_funcs.remove(close_db)
       return response_or_exc
-
-    # use append to avoid setup_method wrapper check
-    current_app.teardown_appcontext_funcs.append(close_db)
 
     return session
 
