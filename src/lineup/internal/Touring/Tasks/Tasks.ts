@@ -1163,14 +1163,13 @@ export class RowComparison extends ATouringTask {
                 // the rowGrp is also part of the colGroups array, and the colGrp is one of the previous rowGroups --> i.e. already calculated in a table row above the current one
               } else {
                 const colData = colGrpsIndices[colIndex].map((i) => attrData[i]);
-
                 const setParameters = {
                   setA: rowData,
                   setADesc: attr,
-                  setACategory: rowGrp.label,
+                  setACategory: {label: `${rowGrp.label} (${rowGrp.attribute.label})`, color: rowGrp.color},
                   setB: colData,
                   setBDesc: attr,
-                  setBCategory: colGrp.label
+                  setBCategory: {label: `${colGrp.label} (${colGrp.attribute.label})`, color: colGrp.color}
                 };
 
                 const highlight : IHighlightData[] = [
