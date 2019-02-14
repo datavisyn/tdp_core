@@ -46,10 +46,13 @@ function dirtyRankingWaiter(ranking: Ranking) {
     ranking.on(`${Ranking.EVENT_DIRTY_ORDER}.track`, null);
 
     let resolver: () => void;
+    // store the promise and the resolve function in variables
+    // the waiter (promise) will only be resolved when the resolver is called
+    // so the promise is locked until the `${Ranking.EVENT_ORDER_CHANGED}.track` event is triggered
     waiter = new Promise<void>((resolve) => resolver = resolve);
     ranking.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, () => {
       ranking.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, null); // disable
-      resolver();
+      resolver(); // resolve waiter promise
     });
   });
 
@@ -58,7 +61,7 @@ function dirtyRankingWaiter(ranking: Ranking) {
     if (!waiter) {
       return undo;
     }
-    return waiter.then(() => undo);
+    return waiter.then(() => undo); // locked until the resolver is executed (i.e. when the event dispatches)
   };
 }
 
