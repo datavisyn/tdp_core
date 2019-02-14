@@ -90,7 +90,7 @@ export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) 
     resolver();
   });
   p.insertRanking(added, index);
-  return waiter.then(() => ({
+  return waiter.then(() => ({ // the waiter promise is resolved as soon as the `${Ranking.EVENT_ORDER_CHANGED}.track` event is dispatched. see the `dirtyRankingWaiter` function for details
     inverse: addRanking(inputs[0], parameter.index, null)
   }));
 }
