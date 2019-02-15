@@ -147,6 +147,7 @@ export interface IViewContext {
   readonly ref: IObjectRef<any>;
 }
 
+export const DEFAULT_SELECTION_NAME = 'default';
 
 export interface IView extends IEventHandler {
   /**
@@ -177,20 +178,28 @@ export interface IView extends IEventHandler {
   /**
    * changes the input selection as given to the constructor of this class
    * @param {ISelection} selection
+   * @param {string} name name of the selection in case of multiple ones, default = DEFAULT_SELECTION_NAME
    */
-  setInputSelection(selection: ISelection): void;
+  setInputSelection(selection: ISelection, name?: string): void;
 
   /**
    * sets the selection of the items within this view
    * @param {ISelection} selection
+   * @param {string} name named item selection in case of multiple ones, default = DEFAULT_SELECTION_NAME
    */
-  setItemSelection(selection: ISelection): void;
+  setItemSelection(selection: ISelection, name?: string): void;
 
   /**
    * returns the current item selection
    * @returns {ISelection}
+   * @param {string} name named item selection in case of multiple ones, default = DEFAULT_SELECTION_NAME
    */
-  getItemSelection(): ISelection;
+  getItemSelection(name?: string): ISelection;
+
+  /**
+   * return the item selection name, in case not implemented only the default one will be assumed
+   */
+  getItemSelectionNames?(): string[];
 
   /**
    * return the current parameter value for the given name

@@ -284,8 +284,8 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   protected saveRankingDialog(order: number[]) {
-    editDialog(null, (name, description, isPublic) => {
-      this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, isPublic);
+    editDialog(null, (name, description, sec) => {
+      this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec);
     });
   }
 

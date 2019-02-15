@@ -14,6 +14,7 @@ import {
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
 import {resolveIds} from './resolve';
+import {DEFAULT_SELECTION_NAME} from '../extensions';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -48,10 +49,14 @@ export abstract class AView extends EventHandler implements IView {
   private readonly paramsFallback = new Map<string, any>();
   private readonly shared = new Map<string, any>();
   private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
-  private itemSelection: ISelection = {idtype: null, range: none()};
+  private readonly itemSelections = new Map<string, ISelection>();
+  private readonly selections = new Map<string, ISelection>();
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
+    this.selections.set(DEFAULT_SELECTION_NAME, selection);
+    this.itemSelections.set(DEFAULT_SELECTION_NAME, {idtype: null, range: none()});
+
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
     parent.appendChild(this.node);
@@ -137,6 +142,10 @@ export abstract class AView extends EventHandler implements IView {
     return [];
   }
 
+  getItemSelectionNames() {
+    return Array.from(this.itemSelections.keys());
+  }
+
   /**
    * finds the element form element based on the given id
    * @param {string} id
@@ -218,23 +227,35 @@ export abstract class AView extends EventHandler implements IView {
     // hook
   }
 
-  setInputSelection(selection: ISelection) {
-    if (isSameSelection(this.selection, selection)) {
+  setInputSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+    const current = this.selections.get(name);
+    if (current && isSameSelection(current, selection)) {
       return;
     }
-    this.selection = selection;
-    return this.selectionChanged();
+    this.selections.set(name, selection);
+    if (name === DEFAULT_SELECTION_NAME) {
+      this.selection = selection;
+    }
+    return this.selectionChanged(name);
+  }
+
+  protected getInputSelection(name: string = DEFAULT_SELECTION_NAME) {
+    return this.selections.get(name);
+  }
+
+  protected getInputSelectionNames() {
+    return Array.from(this.selections.keys());
   }
 
   /**
    * hook triggerd when the input selection has changed
    */
-  protected selectionChanged() {
+  protected selectionChanged(_name: string = DEFAULT_SELECTION_NAME) {
     // hook
   }
 
   get itemIDType() {
-    return this.itemSelection.idtype;
+    return this.getItemSelection()!.idtype;
   }
 
   /**
@@ -245,38 +266,46 @@ export abstract class AView extends EventHandler implements IView {
     return resolveIds(this.selection.idtype, this.selection.range, idType);
   }
 
-  setItemSelection(selection: ISelection) {
-    if (isSameSelection(this.itemSelection, selection)) {
+  setItemSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+    const current = this.itemSelections.get(name);
+    if (current && isSameSelection(current, selection)) {
       return;
     }
-    const bak = this.itemSelection;
-    const wasEmpty = bak == null || bak.idtype == null || bak.range.isNone;
-    this.itemSelection = selection;
+    const wasEmpty = current == null || current.idtype == null || current.range.isNone;
+    this.itemSelections.set(name, selection);
     // propagate
     if (selection.idtype) {
-      if (selection.range.isNone) {
-        selection.idtype.clear(defaultSelectionType);
+      if (name === DEFAULT_SELECTION_NAME) {
+        if (selection.range.isNone) {
+          selection.idtype.clear(defaultSelectionType);
+        } else {
+          selection.idtype.select(selection.range);
+        }
       } else {
-        selection.idtype.select(selection.range);
+        if (selection.range.isNone) {
+          selection.idtype.clear(name);
+        } else {
+          selection.idtype.select(name, selection.range);
+        }
       }
     }
     const isEmpty = selection == null || selection.idtype == null || selection.range.isNone;
     if (!(wasEmpty && isEmpty)) {
       // the selection has changed when we really have some new values not just another empty one
-      this.itemSelectionChanged();
+      this.itemSelectionChanged(name);
     }
-    this.fire(AView.EVENT_ITEM_SELECT, bak, selection);
+    this.fire(AView.EVENT_ITEM_SELECT, current, selection, name);
   }
 
   /**
    * hook when the item selection has changed
    */
-  protected itemSelectionChanged() {
+  protected itemSelectionChanged(_name: string = DEFAULT_SELECTION_NAME) {
     // hook
   }
 
-  getItemSelection() {
-    return this.itemSelection;
+  getItemSelection(name: string = DEFAULT_SELECTION_NAME) {
+    return this.itemSelections.get(name) || {idtype: null, range: none()};
   }
 
   modeChanged(mode: EViewMode) {

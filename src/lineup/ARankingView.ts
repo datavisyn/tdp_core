@@ -19,6 +19,7 @@ import {IServerColumn, IViewDescription} from '../rest';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
+import {ISecureItem} from 'phovea_core/src/security';
 
 export {IRankingWrapper} from './internal/ranking';
 export {LocalDataProvider as DataProvider} from 'lineupjs';
@@ -177,6 +178,8 @@ export abstract class ARankingView extends AView {
 
     this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
+    // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
+    // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
@@ -207,8 +210,8 @@ export abstract class ARankingView extends AView {
     }));
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
-      this.saveNamedSet(order, name, description, isPublic);
+    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
+      this.saveNamedSet(order, name, description, sec);
     });
     this.panel.on(LineUpPanelActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
       this.addScoreColumn(scoreImpl);
@@ -378,9 +381,9 @@ export abstract class ARankingView extends AView {
   }
 
 
-  private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
+  private async saveNamedSet(order: number[], name: string, description: string, sec: Partial<ISecureItem>) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
-    const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
+    const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
     successfullySaved('List of Entities', name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }

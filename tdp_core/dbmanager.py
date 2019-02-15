@@ -65,22 +65,13 @@ class DBManager(object):
     connector = self.connectors[item]
     # _log.info('%s -> %s', p.id, connector.dburl)
     config = configview(p.configKey)
-    engine_options = config.get('engine', default={})
 
-    import sqlalchemy
-    from sqlalchemy.orm import sessionmaker
-
-    engine = sqlalchemy.create_engine(connector.dburl, **engine_options)
-    # Assuming that gevent monkey patched the builtin
-    # threading library, we're likely good to use
-    # SQLAlchemy's QueuePool, which is the default
-    # pool class.  However, we need to make it use
-    # threadlocal connections
-    # https://github.com/kljensen/async-flask-sqlalchemy-example/blob/master/server.py
-    engine.pool._use_threadlocal = True
+    engine = connector.create_engine(config)
+    maker = connector.create_sessionmaker(engine)
 
     self._engines[item] = engine
-    self._sessionmakers[engine] = sessionmaker(bind=engine)
+    self._sessionmakers[engine] = maker
+
     return engine
 
   def __getitem__(self, item):
@@ -100,6 +91,25 @@ class DBManager(object):
 
   def create_session(self, engine):
     return self._sessionmakers[engine]()
+
+  def create_web_session(self, engine):
+    """
+    create a session that is scoped by the current flask request.
+    Note: if an exception occurs in the debug mode, flask for debugging reason won't destroy it
+    """
+    from flask import after_this_request
+
+    session = self.create_session(engine)
+
+    _log.info('create web session')
+
+    @after_this_request
+    def close_db(response_or_exc):
+      _log.info('remove web session')
+      session.close()
+      return response_or_exc
+
+    return session
 
   def __contains__(self, item):
     return item in self.connectors

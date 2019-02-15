@@ -251,10 +251,10 @@ $lu_assets: '~lineupjs/src/assets';
 
         &.once::before {
           content: '';
-          top: -10px;
-          left: -15em;
+          top: -30px;
+          left: -20em;
           right: 0;
-          bottom: -10px;
+          bottom: -50vh;
           position: absolute;
         }
 
