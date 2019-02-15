@@ -172,18 +172,19 @@ export default class TourManager {
     this.backdrop.style.width = `${fullAppWidth}px`;
 
     // also consider the current scroll offset inside the window
-    const scrollOffset = self.scrollY;
+    const scrollOffsetX = self.scrollX;
+    const scrollOffsetY = self.scrollY;
 
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example
     this.backdrop.style.clipPath = `polygon(
       0% 0%,
       0% ${fullAppHeight}px,
-      ${mask.left}px ${fullAppHeight}px,
-      ${mask.left}px ${mask.top + scrollOffset}px,
-      ${mask.left + mask.width}px ${mask.top + scrollOffset}px,
-      ${mask.left + mask.width}px ${mask.top + mask.height + scrollOffset}px,
-      ${mask.left}px ${mask.top + mask.height + scrollOffset}px,
-      ${mask.left}px ${fullAppHeight}px,
+      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
+      ${mask.left + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
+      ${mask.left + mask.width + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
+      ${mask.left + mask.width + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
+      ${mask.left + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
+      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
       ${fullAppWidth}px ${fullAppHeight}px,
       ${fullAppWidth}px 0%
     )`;
@@ -368,7 +369,9 @@ export default class TourManager {
     this.stepCount.innerText = String(stepNumber + 1);
     if (focus) {
       const base = focus.getBoundingClientRect();
-      this.stepCount.style.transform = `translate(${base.left}px, ${base.top}px)`;
+      const scrollOffsetX = self.scrollX;
+      const scrollOffsetY = self.scrollY;
+      this.stepCount.style.transform = `translate(${base.left + scrollOffsetX}px, ${base.top + scrollOffsetY}px)`;
     } else {
       this.stepCount.style.transform = this.step.style.transform;
     }
