@@ -28,18 +28,3 @@
 .select.map-selector option:disabled {
   color: darkgray;
 }
-
-span.filter-facet-tooltip-enabled {
-  &::after {
-    @include fa-icon();
-    content: $fa-var-info-circle;
-    padding-right: 5px;
-    padding-left: 5px;
-    margin-top: 1px;
-  }
-}
-
-
-span.filter-facet-tooltip-disabled {
-  display: none;
-}
