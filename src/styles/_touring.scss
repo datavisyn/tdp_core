@@ -60,6 +60,11 @@ div.touring {
     padding-left: 15px; //bootstrap default
   }
 
+
+  .input { // task switcher & task input
+    overflow: hidden; // from the bootstrap stuff we get some overflow which introduces scrollbars --> hide it 
+  }
+
   .output {
     position: relative;
     flex: 1;
@@ -123,10 +128,6 @@ div.touring {
       top: 0; left: 0;
       right: 0; bottom: 0;
       overflow: auto;
-
-      .input {
-        overflow: hidden;
-      }
 
       .table-container {
         position: relative;
