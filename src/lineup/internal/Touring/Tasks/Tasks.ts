@@ -97,7 +97,7 @@ export abstract class ATouringTask implements ITouringTask {
     d3.select(this.node).selectAll('select').each(function() { // Convert to select2
       const select2 = this;
       //console.log('convert', select2.name);
-      const $select2 = $(select2).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. ', dropdownParent: $(parent)});
+      const $select2 = $(select2).select2({width: '100%', closeOnSelect: false, placeholder: 'Select one or more columns. ', dropdownParent: $(parent)});
       $select2.on('select2:select select2:unselect', updateTable);
       $select2.on('select2:open', () => { // elements are created when select2 is opened, and destroyed when closed
         setTimeout(() => { // setTimeout so this shit actually works (mouseover listener not registered if done immidiatly)
@@ -128,7 +128,10 @@ export abstract class ATouringTask implements ITouringTask {
   destroySelect2(): void {
     // check if initialized with class, see: https://select2.org/programmatic-control/methods#checking-if-the-plugin-is-initialized
     d3.select(this.node).selectAll('select.select2-hidden-accessible').each(function() {
-      $(this).select2('destroy');
+      $(this).select2('destroy'); // reset to standard select element
+      // unbind events: https://select2.org/programmatic-control/methods#event-unbinding
+      $(this).off('select2:select');
+      $(this).off('select2:unselect');
     });
   }
 
