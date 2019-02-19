@@ -89,6 +89,9 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
       protected setLineUpData(rows: IRow[]) {
         super.setLineUpData(rows);
         // maybe trigger a score reload if needed
+        if (this.triggerScoreReload) {
+          this.reloadScores();
+        }
       }
 
       protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
@@ -116,8 +119,10 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     });
 
     const dummy = this.node.ownerDocument.createElement('div');
-    this.ranking.init(dummy, () => null);
-    return lineup;
+    return Promise.resolve(this.ranking.init(dummy, () => null)).then(() => {
+      this.initialized();
+      return lineup;
+    });
   }
 
   protected abstract loadColumnDescs(): Promise<IColumnDesc[]> | IColumnDesc[];
@@ -125,6 +130,10 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
   protected abstract createInitialRanking(lineup: LocalDataProvider): void;
 
   protected selectedRowsChanged(_rows: T[]) {
+    // hook
+  }
+
+  protected initialized() {
     // hook
   }
 
