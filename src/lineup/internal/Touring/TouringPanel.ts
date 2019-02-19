@@ -27,8 +27,15 @@ export default class TouringPanel extends LineUpPanelActions {
       this.toggleTouring();
     }));
 
+    this.initTasks();
     this.insertTasks();
     this.addEventListeners();
+  }
+
+  private initTasks() {
+    for (const task of Tasks) {
+      task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
+    }
   }
 
   private insertTasks() {
@@ -53,26 +60,14 @@ export default class TouringPanel extends LineUpPanelActions {
     // Click a different task
     d3.select(this.node).selectAll('button.task-btn').on('click', (task) => {
       const taskButtons = d3.select(this.node).selectAll('button.task-btn');
-      const oldTask = taskButtons.filter('.active');
 
-      if (!oldTask.empty() && oldTask.datum().id !== task.id) { //task changed
+      if (this.currentTask && this.currentTask.id !== task.id) { // task changed
         taskButtons.classed('active', (d) => d.id === task.id);
 
-        this.initNewTask();
-        this.updateOutput();
+        this.currentTask.hide(); // hide old task
+        this.updateOutput(); // will show new task
       }
     });
-  }
-
-  private initNewTask() {
-    //Remove previous output
-    d3.select(this.touringElem).selectAll(`div.output *`).remove(); //remove all child elemetns of output
-
-    // remove selected cell of session storage
-    sessionStorage.removeItem('touringSelCell');
-
-    const task = d3.select(this.touringElem).select('button.task-btn.active').datum() as ATouringTask;
-    task.init(this.ranking, d3.select(this.touringElem).select('div.output').node() as HTMLElement);
   }
 
   public async updateOutput() {
@@ -84,11 +79,8 @@ export default class TouringPanel extends LineUpPanelActions {
   }
 
   private updateTask() {
-    if (d3.select(this.touringElem).selectAll(`div.output *`).empty()) {
-      this.initNewTask(); // First time init
-    }
-
     this.currentTask = d3.select(this.touringElem).select('button.task-btn.active').datum() as ATouringTask;
+    this.currentTask.show();
     this.currentTask.update(true);
   }
 

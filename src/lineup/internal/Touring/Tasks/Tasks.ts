@@ -81,8 +81,17 @@ export abstract class ATouringTask implements ITouringTask {
   public init(ranking: RankingAdapter, node: HTMLElement) {
     this.ranking = ranking;
     this.node = d3.select(node).append('div').attr('class', `task ${this.id}`).node() as HTMLElement;
+    this.hide(); //hide initially
     this.initContent();
     this.addEventListeners();
+  }
+
+  public show() {
+    d3.select(this.node).attr('hidden', null);
+  }
+
+  public hide() {
+    d3.select(this.node).attr('hidden', true);
   }
 
   initContent() {
@@ -427,8 +436,7 @@ export abstract class ATouringTask implements ITouringTask {
 
         // console.log('updateSelectionAndVisuallization: ', {row, tableBody, colIndex, selectedCell});
         // highlight selected cell and update visualization
-        if(selectedCell !== null) {
-
+        if(selectedCell) {
           const cellData = d3.select(selectedCell).datum();
           // console.log('selectedCell data: ', cellData);
 
@@ -515,39 +523,6 @@ export abstract class ATouringTask implements ITouringTask {
 
     this.highlightSelectedCell(tableCell, cellData);
     this.visualizeSelectedCell(tableCell, cellData);
-
-
-    // // remove bg highlighting from all tds
-    // d3.select(this.node).selectAll('td').classed('selectedCell', false);
-
-    // // remove all old details
-    // const details = d3.select(this.node).select('div.details');
-    // details.selectAll('*').remove(); // avada kedavra outdated details!
-
-
-    // if (cellData.score) { //Currenlty only cells with a score are calculated (no category or attribute label cells)
-    //   // Color table cell
-    //   d3.select(tableCell).classed('selectedCell', true); // add bg highlighting
-
-    //   const reusltScore : IMeasureResult = cellData.score;
-    //   const measure : ISimilarityMeasure = cellData.measure;
-
-    //   // Display details
-    //   if(measure) {
-    //     this.generateVisualDetails(details,measure,reusltScore); //generate description into details div
-    //   } else {
-    //     details.append('p').text('There are no details for the selected table cell.');
-    //   }
-
-    //   // display visualisation
-    //   if(measure.visualization) {
-    //     const visualization: IMeasureVisualization = measure.visualization;
-    //     if(cellData.setParameters) {
-    //       visualization.generateVisualization(details, cellData.setParameters, cellData.score);
-    //     }
-
-    //   }
-    // }
   }
 
   onMouseOver(tableCell, state: boolean) {
@@ -643,7 +618,7 @@ export abstract class ATouringTask implements ITouringTask {
 
       // all label cells in row
       const rowCategories = [];
-      const row1 = d3.select(tr).selectAll('td:not(.score)').each(function() {
+      d3.select(tr).selectAll('td:not(.score)').each(function() {
         rowCategories.push(d3.select(this).text());
       });
       // the first cell in the first row of the cells tbody
@@ -932,7 +907,7 @@ export class ColumnComparison extends ATouringTask {
         }
 
         promises.concat(rowPromises);
-        Promise.all(rowPromises).then(() => {update(data);this.updateSelectionAndVisuallization(row);});
+        Promise.all(rowPromises).then(() => { update(data); this.updateSelectionAndVisuallization(row); });
       }
 
       await Promise.all(promises); //rather await all at once: https://developers.google.com/web/fundamentals/primers/async-functions#careful_avoid_going_too_sequential
@@ -1042,9 +1017,9 @@ export class RowComparison extends ATouringTask {
     return tableChanged;
   }
 
+
   updateTable() {
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
-    // this.removeOldVisuallization();
 
     const timestamp = new Date().getTime().toString();
     d3.select(this.node).attr('data-timestamp', timestamp);
