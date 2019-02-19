@@ -22,7 +22,7 @@ $highlight-color: #D4D4D4;
 
 button {
   &.touring.active::before {
-    color: $highlight-color;
+    color: #ffa500; // use highlight color of column headers
     border: none;
   }
 
