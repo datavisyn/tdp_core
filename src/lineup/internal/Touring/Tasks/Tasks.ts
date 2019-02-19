@@ -9,6 +9,7 @@ import rowCmpIcon from './rowCmp.png';
 import * as $ from 'jquery';
 import * as d3 from 'd3';
 import * as XXH from 'xxhashjs';
+import {isNumber} from 'util';
 
 export const tasks = new Array<ATouringTask>();
 export function TaskDecorator() {
@@ -319,26 +320,13 @@ export abstract class ATouringTask implements ITouringTask {
 
   }
 
-  // protected removeOldVisuallization () {
-//
-  //   // remove old visualization and details
-  //   const divDetails = d3.select(this.node).select('div.details');
-  //   divDetails.selectAll('div').remove();
-  //   divDetails.selectAll('svg').remove();
-//
-    // remove selected cell highlighting
-    // const allTds = d3.select(this.node).selectAll('td');
-    // allTds.classed('selectedCell',false);
-//
-  // }
-
   private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
 
     const divDetailInfo = miniVisualisation.append('div')
                                     .classed('detailVis',true);
 
     // const detailTestValue = divDetailInfo.append('div');
-    const scoreValue = measureResult.scoreValue.toFixed(3);
+    const scoreValue = isNumber(measureResult.scoreValue) && !isNaN(measureResult.scoreValue) ? measureResult.scoreValue.toFixed(3) : 'n/a';
     const pValue = measureResult.pValue === -1 ? 'n/a' : (measureResult.pValue as number).toExponential();
     const detailInfoValues = divDetailInfo.append('div')
                           .classed('detailDiv',true);
@@ -670,9 +658,9 @@ export abstract class ATouringTask implements ITouringTask {
 
       const category = rowCategories.pop();
       const isColTask = category === row ? true : false;
-      const cellData = d3.select(tableCell).datum();
-      const scoreValue = cellData.score.scoreValue.toFixed(3);
-      let scorePvalue = cellData.score.pValue;
+      const cellData = d3.select(tableCell).datum() as IScoreCell;
+      const scoreValue = isNumber(cellData.score.scoreValue) && !isNaN(cellData.score.scoreValue)  ? cellData.score.scoreValue.toFixed(3) : 'n/a';
+      let scorePvalue : string|number = cellData.score.pValue;
       if(scorePvalue === -1) {
         scorePvalue = 'n/a';
       } else {
@@ -725,6 +713,7 @@ export class ColumnComparison extends ATouringTask {
   }
 
   public updateAttributeSelectors(): boolean {
+    // console.log('update selectors');
    const descriptions = this.getAttriubuteDescriptions();
 
     const attrSelectors = d3.select(this.node).selectAll('select.attr optgroup');
@@ -754,6 +743,7 @@ export class ColumnComparison extends ATouringTask {
   }
 
   public updateTable() {
+    // console.log('update table');
     WorkerManager.terminateAll(); // Abort all calculations as their results are no longer needed
     // this.removeOldVisuallization();
 

@@ -77,7 +77,7 @@ export class RankingAdapter {
 
       // console.log('reuse the data array')
     } else {
-      console.log('update the data array');
+      // console.log('update the data array');
       // refresh the data array
       this.data = null;
       this.oldAttributes = this.getDisplayedAttributes();
