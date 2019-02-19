@@ -8,7 +8,7 @@ import {resolve} from 'phovea_core/src/idtype';
 
 
 interface IEmbeddedRanking extends ARankingView {
-  rebuildLineUp(mode: 'data' | 'data+desc'): void;
+  rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
   runWithoutTracking<T>(f: () => T): Promise<T>;
 }
 
@@ -46,6 +46,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     const that = this;
 
     class EmbeddedRankingView extends ARankingView implements IEmbeddedRanking {
+      private triggerScoreReload = false;
+
       protected loadColumnDesc() {
         return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns}));
       }
@@ -65,12 +67,26 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
         return Promise.resolve(that.loadRows());
       }
 
-      rebuildLineUp(mode: 'data' | 'data+desc' = 'data') {
-        if (mode === 'data') {
-          this.reloadData();
-        } else {
-          this.rebuild();
+      rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data') {
+        switch (mode) {
+          case 'scores':
+            return this.reloadScores();
+          case 'data':
+            return this.reloadData();
+          case 'data+scores':
+            this.triggerScoreReload = true;
+            return this.reloadData();
+          case 'data+desc':
+            return this.rebuild();
+          case 'data+desc+scores':
+            this.triggerScoreReload = true;
+            return this.rebuild();
         }
+      }
+
+      protected setLineUpData(rows: IRow[]) {
+        super.setLineUpData(rows);
+        // maybe trigger a score reload if needed
       }
 
       protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
@@ -123,7 +139,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     });
   }
 
-  protected rebuild(mode: 'data' | 'data+desc' = 'data') {
+  protected rebuild(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data') {
     if (this.ranking) {
       this.ranking.rebuildLineUp(mode);
     }
