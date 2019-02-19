@@ -19,7 +19,11 @@ export class AScoreAccessorProxy<T> {
 
   }
 
-  set rows(rows: IScoreRow<T>[]) {
+  clear() {
+    this.scores.clear();
+  }
+
+  setRows(rows: IScoreRow<T>[]) {
     rows.forEach(({id, score}) => this.scores.set(String(id), score));
   }
 
