@@ -87,7 +87,10 @@ export abstract class ATouringTask implements ITouringTask {
   initContent() {
     // add legend for the p-values
     this.createLegend(d3.select(this.node).select('div.legend'));
+    this.createSelect2();
+  }
 
+  createSelect2(): void {
     // make selectors functional
     const parent = this.node;
     const updateTable = this.updateTable.bind(this);
@@ -115,9 +118,15 @@ export abstract class ATouringTask implements ITouringTask {
     });
   }
 
-  updateSelect2(): any {
+  updateSelect2(): void {
+    // console.log('update select2');
+    this.destroySelect2();
+    this.createSelect2();
+  }
+
+  destroySelect2(): void {
     d3.select(this.node).selectAll('select').each(function() {
-      $(this).trigger('change'); // notify about updated content
+      $(this).select2('destroy');
     });
   }
 
@@ -141,8 +150,8 @@ export abstract class ATouringTask implements ITouringTask {
     // column of a table was added/removed
     //  causes changes in the available attributes (b)
     //  might cause changes the displayed table / scores
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => this.update(false));
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => { /*console.log('added column');*/ this.update(false); });
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => { /*console.log('rem column');*/ this.update(false); });
 
     // for filter changes and grouping changes
     //  After the number of items has changed, the score change aswell
