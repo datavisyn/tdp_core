@@ -56,8 +56,9 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
           initialRanking: true,
           width: -1,
           selectedId: -1,
-          selectedSubtype: undefined
-        }, c));
+          selectedSubtype: undefined,
+          ...c
+        }));
       }
 
       protected loadRows() {
