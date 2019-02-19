@@ -53,7 +53,7 @@ class CategoricalScoreAccessorProxy extends AScoreAccessorProxy<string> {
  * @param colDesc
  * @returns {CategoricalScoreAccessorProxy|NumberScoreAccessorProxy}
  */
-export function createAccessor(colDesc: any) {
+export function createAccessor(colDesc: any): AScoreAccessorProxy<any> {
   const accessor = colDesc.type === 'categorical' ? new CategoricalScoreAccessorProxy(colDesc.missingValue) : new NumberScoreAccessorProxy(colDesc.missingValue);
   colDesc.accessor = accessor.accessor;
   return accessor;
