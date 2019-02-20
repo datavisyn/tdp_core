@@ -236,11 +236,11 @@ export abstract class ATouringTask implements ITouringTask {
 
     const svgLegendContainer = divLegend.append('svg')
                               .attr('width','100%')
-                              .attr('height',35);
+                              .attr('height',50);
                               // .attr('viewBox','0 0 100% 35')
                               // .attr('preserveAspectRatio','xMaxYMin meet');
 
-                              const svgDefs = svgLegendContainer.append('defs').append('linearGradient')
+    const svgDefs = svgLegendContainer.append('defs').append('linearGradient')
                                                   .attr('id','gradLegend');
     svgDefs.append('stop')
             .attr('offset','0%')
@@ -330,6 +330,13 @@ export abstract class ATouringTask implements ITouringTask {
       .attr('x1',xStart+barWidth).attr('y1',yStart)
       .attr('x2',xStart+barWidth).attr('y2',yStart+barHeight-(lineWidth/2)+tickLength)
       .style('stroke-width',lineWidth/2).style('stroke','black');
+
+    // label: no p-value correction
+    svgLegendLabel.append('text')
+    .attr('x',xStart)
+    .attr('y',yStart+barHeight+2*textHeight)
+    .attr('text-anchor','start')
+    .text('No p-Value correction for multiple comparisons.');
 
   }
 
@@ -681,6 +688,10 @@ export class ColumnComparison extends ATouringTask {
   public initContent() {
     this.node.insertAdjacentHTML('beforeend', colCmpHtml);
     super.initContent();
+
+    const headerDesc = d3.select(this.node).select('thead tr').select('th').classed('head-descr',true).append('header');
+    headerDesc.append('h1').text('Similarity of Columns');
+    headerDesc.append('p').text('Click on a p-Value in the table for details.');
   }
 
 
@@ -947,6 +958,10 @@ export class RowComparison extends ATouringTask {
   initContent() {
     this.node.insertAdjacentHTML('beforeend', rowCmpHtml);
     super.initContent();
+
+    const headerDesc = d3.select(this.node).select('thead tr').select('th').classed('head-descr',true).append('header');
+    headerDesc.append('h1').text('Difference of Rows');
+    headerDesc.append('p').text('Click on a p-Value in the table for details.');
 
     d3.select(this.node).selectAll('select.rowGrp').each(function() { // Convert to select2
       $(this).data('placeholder', 'Select one or more groups of rows.');

@@ -135,13 +135,14 @@ div.touring {
         border-top: 1px #AAA solid;
 
         header {
-          display: block;
-          position: absolute; // absolute to float over the table
-          top: 0;
-          left: 0;
-
+          z-index: -1; // above td elements
+          background-color: white;
           h1 {
             font-size: 1.2em;
+          }
+          
+          p {
+            font-weight: normal;
           }
         }
       }
@@ -175,7 +176,7 @@ div.touring {
     }
 
     table {
-      $table-border-color: white;
+      $table-border-color: white; 
 
       table-layout: fixed; // The table and column widths are set by the widths of table and col or by the width of the first row of cells. Cells in other rows do not affect column widths.
 
@@ -186,17 +187,18 @@ div.touring {
       th {
         min-width: $col-min-size;
         max-width: $col-min-size;
+        position: sticky;      
+        top: 0;
+        z-index: 2;
 
         &:not(.head) { // cells of row labels in header
           min-width: $col-max-size*0.7; //flexible from min to max
           max-width: $col-max-size;
           padding: 0 $wide-col-padding;
+          background-color: white; 
         }
 
         &.head {
-          position: sticky;
-          top: 0;
-          z-index: 2; // above td elements
 
           &.rotate { // adapted from https://css-tricks.com/rotated-table-column-headers/
             height:120px;
@@ -218,6 +220,7 @@ div.touring {
                 padding-top: 1px;
                 line-height: 1.25; //defines height of headers
                 border-bottom: 2px solid $table-border-color; //make space between headers non-transparent (removed for last header below)
+                background-color: white; 
 
                 > span {
                   transform: skew(-45deg,0deg); //unskew the text
@@ -295,7 +298,7 @@ div.touring {
           }
 
           &.selectedCell {
-            background-color: $highlight-color !important; // important because to overwrite the htmml inline color definition
+            background-color: #fba74d !important; // important because to overwrite the htmml inline color definition
             color: black !important;
             font-weight: bolder;
           }
@@ -416,6 +419,13 @@ div.touring {
     g.scatterplot circle.datapoint:hover{
       opacity: 1;
       fill: #fba74d !important;
+    }
+
+    g.scatterplot g.regression {
+      path,line {
+        stroke: rgb(194, 194, 194) !important;
+        stroke-width: 2 !important;
+      }
     }
 
     // // ------ line chart with D3
