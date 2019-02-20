@@ -396,7 +396,7 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  private addScoreColumn(score: IScore<any>) {
+  private addScoreColumn(score: IScore<any>, position?: number) {
     const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
 
     const colDesc = score.createDesc(args);
@@ -406,7 +406,7 @@ export abstract class ARankingView extends AView {
     const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
     const data = score.compute(ids, this.itemIDType, args);
 
-    const r = this.addColumn(colDesc, data);
+    const r = this.addColumn(colDesc, data, -1, position);
 
     // use _score function to reload the score
     colDesc._score = () => {
@@ -438,8 +438,8 @@ export abstract class ARankingView extends AView {
    * @param {IScore<any>} score
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
-  addTrackedScoreColumn(score: IScore<any>) {
-    return this.withoutTracking(() => this.addScoreColumn(score));
+  addTrackedScoreColumn(score: IScore<any>, position?: number) {
+    return this.withoutTracking(() => this.addScoreColumn(score, position));
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {

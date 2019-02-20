@@ -30,9 +30,12 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
   //mark as lazy loaded
   (<any>colDesc).lazyLoaded = true;
   const col = provider.create(colDesc);
-  if(position === undefined || position === null) {
+  if (position == null) {
     ranking.push(col);
   } else {
+    if (position < 0) {
+      position = ranking.children.length - position;
+    }
     ranking.insert(col, position);
   }
 
