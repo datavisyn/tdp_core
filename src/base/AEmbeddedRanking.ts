@@ -160,17 +160,17 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     return this.ranking.runWithoutTracking(() => f(this.data));
   }
 
-  protected addTrackedScoreColumn(scoreId: string, scoreParams: any);
-  protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any) {
+  protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number);
+  protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number) {
     if (typeof score !== 'string') {
-      return this.ranking.addTrackedScoreColumn(score);
+      return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
     }
 
     const pluginDesc = getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, score);
     return pluginDesc.load().then((plugin) => {
       const instance: IScore<any> | IScore<any>[] = plugin.factory(scoreParams, pluginDesc);
       const scores = Array.isArray(instance) ? instance : [instance];
-      return Promise.all(scores.map((s) => this.ranking.addTrackedScoreColumn(s)));
+      return Promise.all(scores.map((s) => this.ranking.addTrackedScoreColumn(s, position)));
     });
   }
 

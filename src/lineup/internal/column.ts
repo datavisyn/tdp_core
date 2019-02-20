@@ -34,7 +34,7 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
     ranking.push(col);
   } else {
     if (position < 0) {
-      position = ranking.children.length - position;
+      position = ranking.children.length - -position + 1; // -- since negative
     }
     ranking.insert(col, position);
   }
