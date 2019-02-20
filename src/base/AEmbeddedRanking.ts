@@ -118,8 +118,10 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
       this.selectedRowsChanged(rows);
     });
 
-    const dummy = this.node.ownerDocument.createElement('div');
-    return Promise.resolve(this.ranking.init(dummy, () => null)).then(() => {
+    const form = this.node.ownerDocument.createElement('div');
+    form.classList.add('parameters', 'form-inline');
+    this.node.insertAdjacentElement('afterbegin', form);
+    return Promise.resolve(this.ranking.init(form, () => null)).then(() => {
       this.initialized();
       return lineup;
     });
