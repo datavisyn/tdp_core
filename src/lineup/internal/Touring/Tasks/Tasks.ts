@@ -347,7 +347,7 @@ export abstract class ATouringTask implements ITouringTask {
 
     // const detailTestValue = divDetailInfo.append('div');
     const scoreValue = isNumber(measureResult.scoreValue) && !isNaN(measureResult.scoreValue) ? measureResult.scoreValue.toFixed(3) : 'n/a';
-    const pValue = measureResult.pValue === -1 ? 'n/a' : (measureResult.pValue as number).toExponential();
+    const pValue = measureResult.pValue === -1 ? 'n/a' : (measureResult.pValue as number).toExponential(3);
     const detailInfoValues = divDetailInfo.append('div')
                           .classed('detailDiv',true);
                           // .text(`Test-Value: ${scoreValue}, p-Value: ${pValue}`);
@@ -650,7 +650,7 @@ export abstract class ATouringTask implements ITouringTask {
       if(scorePvalue === -1) {
         scorePvalue = 'n/a';
       } else {
-        scorePvalue = (scorePvalue as number).toExponential();
+        scorePvalue = (scorePvalue as number).toExponential(3);
       }
 
 
