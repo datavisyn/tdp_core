@@ -1,5 +1,5 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
-import {ProvenanceGraph} from 'phovea_core/src/provenance';
+import {ProvenanceGraph, cat} from 'phovea_core/src/provenance';
 import {none, parse} from 'phovea_core/src/range';
 import {ARankingView, IARankingViewOptions, IRow, IScore} from '../lineup';
 import {IInitialRankingOptions} from '../lineup/desc';
@@ -31,7 +31,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
   }
 
   protected buildRanking(graph: ProvenanceGraph, refKey: string, options: Partial<IARankingViewOptions> = {}) {
-    const ref = graph.findOrAddObject(this, refKey);
+    const ref = graph.findOrAddObject(this, refKey, cat.visual);
     const idtype = resolve('_dummy');
     const context = {
       graph,
