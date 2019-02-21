@@ -793,6 +793,12 @@ export class ColumnComparison extends ATouringTask {
       bodies.exit().remove();
       trs.order();
       bodies.order();
+
+
+      d3.select(that.node).select('th.head.rotate svg').remove();
+      d3.select(that.node).select('th.head.rotate') //select first
+        .insert('svg', ':first-child')
+        .append('polygon').attr('points', '0,0 120,0 0,120'); // 120 is thead height, 45° rotation --> 120 is also width
     }
 
     this.getAttrTableBody(colData, rowData, true, null).then(updateTableBody); // initialize
@@ -1051,12 +1057,6 @@ export class RowComparison extends ATouringTask {
     const colHeadsCatSpan = colHeadsCat.enter().append('th')
       .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
 
-    if(d3.select(this.node).select('th.head.rotate svg').empty()) {
-      d3.select(this.node).select('th.head.rotate') //select first
-        .insert('svg', ':first-child')
-        .append('polygon').attr('points', '0,0 118,0 0,118');
-    }
-
     const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<Array<IScoreCell>>>, timestamp: string) {
       if (d3.select(that.node).attr('data-timestamp') !== timestamp) {
@@ -1109,6 +1109,11 @@ export class RowComparison extends ATouringTask {
       colHeadsCat.order();
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
       bodies.order();
+
+      d3.select(that.node).select('th.head.rotate svg').remove();
+      d3.select(that.node).select('th.head.rotate') //select first
+        .insert('svg', ':first-child')
+        .append('polygon').attr('points', '0,0 120,0 0,120'); // 120 is thead height, 45° rotation --> 120 is also width
     }
 
     this.getAttrTableBody(colGrpData, rowGrpData, rowAttrData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
