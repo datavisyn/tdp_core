@@ -1051,6 +1051,12 @@ export class RowComparison extends ATouringTask {
     const colHeadsCatSpan = colHeadsCat.enter().append('th')
       .attr('class', 'head rotate').append('div').append('span').append('span'); //th.head are the column headers
 
+    if(d3.select(this.node).select('th.head.rotate svg').empty()) {
+      d3.select(this.node).select('th.head.rotate') //select first
+        .insert('svg', ':first-child')
+        .append('polygon').attr('points', '0,0 118,0 0,118');
+    }
+
     const that = this; // for the function below
     function updateTableBody(bodyData: Array<Array<Array<IScoreCell>>>, timestamp: string) {
       if (d3.select(that.node).attr('data-timestamp') !== timestamp) {

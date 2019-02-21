@@ -203,6 +203,16 @@ div.touring {
           &.rotate { // adapted from https://css-tricks.com/rotated-table-column-headers/
             height:120px;
 
+            svg {
+              position: absolute;
+              top: 0;
+              left: 0;
+
+              polygon {
+                fill: white;
+              }
+            }
+
             > div {
               transform: translate(12px,48px) //3. Back to the correct position
                          rotate(-45deg)       //2. Rotate to correct angle
