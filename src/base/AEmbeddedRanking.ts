@@ -90,6 +90,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
         super.setLineUpData(rows);
         // maybe trigger a score reload if needed
         if (this.triggerScoreReload) {
+          this.triggerScoreReload = false;
           this.reloadScores();
         }
       }
