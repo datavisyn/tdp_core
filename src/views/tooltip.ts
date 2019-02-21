@@ -98,7 +98,7 @@ function isRelated(evt: MouseEvent, ref: HTMLElement) {
  * @param {HTMLElement} reference
  * @param { number, number } coords
  */
-export function popOver(html: string | HTMLElement | (() => string), reference: HTMLElement, coords?: { x: number, y: number }, simpleTooltip: boolean = true) {
+export function popOver(html: string | HTMLElement | (() => string | HTMLElement), reference: HTMLElement, coords?: { x: number, y: number }, simpleTooltip: boolean = true) {
   let tooltip: HTMLElement;
 
   const leave = (evt: MouseEvent) => {
