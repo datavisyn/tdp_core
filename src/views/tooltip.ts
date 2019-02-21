@@ -61,13 +61,19 @@ export function hideTooltip() {
   }
 }
 
-export function showTooltip(html: string | null, reference: HTMLElement | { x: number, y: number }, simpleTooltip: boolean = true) {
+export function showTooltip(html: string | HTMLElement | null, reference: HTMLElement | { x: number, y: number }, simpleTooltip: boolean = true) {
   if (!html) {
     return hideTooltip();
   }
   const tooltip: HTMLElement = findTooltip(true);
-  const content = <HTMLElement>tooltip.querySelector('div');
-  content.innerHTML = html;
+  const content = tooltip.querySelector<HTMLElement>('div');
+
+  if (typeof html === 'string') {
+    content.innerHTML = html;
+  } else {
+    content.innerHTML = '';
+    content.appendChild(html);
+  }
   showTooltipAt(tooltip, reference, simpleTooltip);
   return tooltip;
 }
@@ -121,7 +127,7 @@ export function popOver(html: string | (() => string), reference: HTMLElement, c
  * similar to a tooltip but the hiding and showing will be done automatically
  * @param {(items: T[]) => string} contentGenerator
  */
-export function generateTooltip<T>(contentGenerator: (items: T[]) => string, simpleTooltip: boolean = true) {
+export function generateTooltip<T>(contentGenerator: (items: T[]) => string | HTMLElement, simpleTooltip: boolean = true) {
   let tooltip: HTMLElement;
   return (parent: HTMLElement, items: T[], x: number, y: number, event: MouseEvent) => {
     const hide = items.length <= 0;
