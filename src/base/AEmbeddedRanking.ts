@@ -163,6 +163,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
   }
 
   protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number);
+  protected addTrackedScoreColumn(score: IScore<any>, position?: number);
   protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number) {
     if (typeof score !== 'string') {
       return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
