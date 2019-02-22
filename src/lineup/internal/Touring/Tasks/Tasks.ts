@@ -83,15 +83,17 @@ export abstract class ATouringTask implements ITouringTask {
     this.node = d3.select(node).append('div').attr('class', `task ${this.id}`).node() as HTMLElement;
     this.hide(); //hide initially
     this.initContent();
-    this.addEventListeners();
   }
 
   public show() {
     d3.select(this.node).attr('hidden', null);
+    this.addEventListeners();
+    this.update(true);
   }
 
   public hide() {
     d3.select(this.node).attr('hidden', true);
+    this.removeEventListeners();
   }
 
   initContent() {
@@ -171,6 +173,13 @@ export abstract class ATouringTask implements ITouringTask {
     //  After the number of items has changed, the score change aswell
     // If the grouping changes, the "Group" attribute and possibly the table has to be changed
     this.ranking.getProvider().on(LocalDataProvider.EVENT_ORDER_CHANGED + ATouringTask.EVENTTYPE, () => this.update(true));
+  }
+
+  private removeEventListeners() {
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_SELECTION_CHANGED + ATouringTask.EVENTTYPE, null);
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, null);
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, null);
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ORDER_CHANGED + ATouringTask.EVENTTYPE, null);
   }
 
   public abstract update(forceTableUpdate: boolean): void;
