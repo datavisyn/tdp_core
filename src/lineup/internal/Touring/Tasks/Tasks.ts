@@ -249,8 +249,9 @@ export abstract class ATouringTask implements ITouringTask {
                               // .attr('viewBox','0 0 100% 35')
                               // .attr('preserveAspectRatio','xMaxYMin meet');
 
+    const legendId = Date.now();
     const svgDefs = svgLegendContainer.append('defs').append('linearGradient')
-                                                  .attr('id','gradLegend');
+                                                  .attr('id','pValue-gradLegend-'+legendId);
     svgDefs.append('stop')
             .attr('offset','0%')
             .attr('stop-color','#000000');
@@ -289,7 +290,7 @@ export abstract class ATouringTask implements ITouringTask {
       .attr('x',xStart).attr('y',yStart)
       .attr('width',barWidth)
       .attr('height',barHeight)
-      .style('fill','url(#gradLegend)');
+      .style('fill','url(#pValue-gradLegend-'+legendId+')');
     svgLegendGroup.append('line')
       .attr('x1',xStart).attr('y1',yStart+barHeight)
       .attr('x2',xStart+barWidth).attr('y2',yStart+barHeight)
