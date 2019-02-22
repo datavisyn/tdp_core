@@ -388,7 +388,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number) {
     colDesc.color = colDesc.color? colDesc.color : this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
@@ -396,17 +396,37 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  private addScoreColumn(score: IScore<any>) {
+  private addScoreColumn(score: IScore<any>, position?: number) {
     const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
 
     const colDesc = score.createDesc(args);
-    // flag that it is a score
+    // flag that it is a score but it also a reload function
     colDesc._score = true;
 
     const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
-
     const data = score.compute(ids, this.itemIDType, args);
-    return this.addColumn(colDesc, data);
+
+    const r = this.addColumn(colDesc, data, -1, position);
+
+    // use _score function to reload the score
+    colDesc._score = () => {
+      const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+      const data = score.compute(ids, this.itemIDType, args);
+      return r.reload(data);
+    };
+    return r;
+  }
+
+  protected reloadScores(visibleOnly = false) {
+    let scores: {_score: () => any}[] = <any[]>this.provider.getColumns().filter((d) => typeof (<any>d)._score === 'function');
+
+    if (visibleOnly) {
+      // check if part of any ranking
+      const usedDescs = new Set([].concat(...this.provider.getRankings().map((d) => d.flatColumns.map((d) => d.desc))));
+      scores = scores.filter((d) => usedDescs.has(d));
+    }
+
+    return Promise.all(scores.map((d) => d._score()));
   }
 
   protected async withoutTracking<T>(f: () => T): Promise<T> {
@@ -418,8 +438,8 @@ export abstract class ARankingView extends AView {
    * @param {IScore<any>} score
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
-  addTrackedScoreColumn(score: IScore<any>) {
-    return this.withoutTracking(() => this.addScoreColumn(score));
+  addTrackedScoreColumn(score: IScore<any>, position?: number) {
+    return this.withoutTracking(() => this.addScoreColumn(score, position));
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
