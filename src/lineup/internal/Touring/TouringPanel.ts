@@ -81,7 +81,6 @@ export default class TouringPanel extends LineUpPanelActions {
   private updateTask() {
     this.currentTask = d3.select(this.touringElem).select('button.task-btn.active').datum() as ATouringTask;
     this.currentTask.show();
-    this.currentTask.update(true);
   }
 
 
