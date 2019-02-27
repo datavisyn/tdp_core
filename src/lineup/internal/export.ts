@@ -119,7 +119,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
         <label>Columns</label>
         ${flat.map((col) => `
           <div class="checkbox tdp-ranking-export-form-handle">
-          <span class=" fa fa-sort"></span>
+          <span class="fa fa-sort"></span>
           <label>
             <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
             ${col.label}

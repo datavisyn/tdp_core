@@ -1,14 +1,16 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
-import {ProvenanceGraph} from 'phovea_core/src/provenance';
+import {ProvenanceGraph, cat} from 'phovea_core/src/provenance';
 import {none, parse} from 'phovea_core/src/range';
-import {ARankingView, IARankingViewOptions, IRow} from '../lineup';
+import {ARankingView, IARankingViewOptions, IRow, IScore} from '../lineup';
 import {IInitialRankingOptions} from '../lineup/desc';
 import {IViewProvider} from '../lineup/internal/cmds';
 import {resolve} from 'phovea_core/src/idtype';
+import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../extensions';
+import {get as getPlugin} from 'phovea_core/src/plugin';
 
 
 interface IEmbeddedRanking extends ARankingView {
-  rebuildLineUp(mode: 'data' | 'data+desc'): void;
+  rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
   runWithoutTracking<T>(f: () => T): Promise<T>;
 }
 
@@ -29,7 +31,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
   }
 
   protected buildRanking(graph: ProvenanceGraph, refKey: string, options: Partial<IARankingViewOptions> = {}) {
-    const ref = graph.findOrAddObject(this, refKey);
+    const ref = graph.findOrAddObject(this, refKey, cat.visual);
     const idtype = resolve('_dummy');
     const context = {
       graph,
@@ -46,6 +48,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     const that = this;
 
     class EmbeddedRankingView extends ARankingView implements IEmbeddedRanking {
+      private triggerScoreReload = false;
+
       protected loadColumnDesc() {
         return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns}));
       }
@@ -56,19 +60,38 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
           initialRanking: true,
           width: -1,
           selectedId: -1,
-          selectedSubtype: undefined
-        }, c));
+          selectedSubtype: undefined,
+          ...c
+        }));
       }
 
       protected loadRows() {
         return Promise.resolve(that.loadRows());
       }
 
-      rebuildLineUp(mode: 'data' | 'data+desc' = 'data') {
-        if (mode === 'data') {
-          this.reloadData();
-        } else {
-          this.rebuild();
+      rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data') {
+        switch (mode) {
+          case 'scores':
+            return this.reloadScores();
+          case 'data':
+            return this.reloadData();
+          case 'data+scores':
+            this.triggerScoreReload = true;
+            return this.reloadData();
+          case 'data+desc':
+            return this.rebuild();
+          case 'data+desc+scores':
+            this.triggerScoreReload = true;
+            return this.rebuild();
+        }
+      }
+
+      protected setLineUpData(rows: IRow[]) {
+        super.setLineUpData(rows);
+        // maybe trigger a score reload if needed
+        if (this.triggerScoreReload) {
+          this.triggerScoreReload = false;
+          this.reloadScores();
         }
       }
 
@@ -96,9 +119,13 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
       this.selectedRowsChanged(rows);
     });
 
-    const dummy = this.node.ownerDocument.createElement('div');
-    this.ranking.init(dummy, () => null);
-    return lineup;
+    const form = this.node.ownerDocument.createElement('div');
+    form.classList.add('parameters', 'form-inline');
+    this.node.insertAdjacentElement('afterbegin', form);
+    return Promise.resolve(this.ranking.init(form, () => null)).then(() => {
+      this.initialized();
+      return lineup;
+    });
   }
 
   protected abstract loadColumnDescs(): Promise<IColumnDesc[]> | IColumnDesc[];
@@ -106,6 +133,10 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
   protected abstract createInitialRanking(lineup: LocalDataProvider): void;
 
   protected selectedRowsChanged(_rows: T[]) {
+    // hook
+  }
+
+  protected initialized() {
     // hook
   }
 
@@ -122,7 +153,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     });
   }
 
-  protected rebuild(mode: 'data' | 'data+desc' = 'data') {
+  protected rebuild(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data') {
     if (this.ranking) {
       this.ranking.rebuildLineUp(mode);
     }
@@ -130,6 +161,21 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
 
   protected runWithoutTracking<T>(f: (lineup: LocalDataProvider) => T): Promise<T> {
     return this.ranking.runWithoutTracking(() => f(this.data));
+  }
+
+  protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number);
+  protected addTrackedScoreColumn(score: IScore<any>, position?: number);
+  protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number) {
+    if (typeof score !== 'string') {
+      return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
+    }
+
+    const pluginDesc = getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, score);
+    return pluginDesc.load().then((plugin) => {
+      const instance: IScore<any> | IScore<any>[] = plugin.factory(scoreParams, pluginDesc);
+      const scores = Array.isArray(instance) ? instance : [instance];
+      return Promise.all(scores.map((s) => this.ranking.addTrackedScoreColumn(s, position)));
+    });
   }
 
   update() {
