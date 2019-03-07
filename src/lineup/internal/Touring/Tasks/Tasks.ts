@@ -864,15 +864,16 @@ export class ColumnComparison extends ATouringTask {
                 column : {lable: (col as IServerColumn).label, column: (col as IServerColumn).column},
               };
 
-              // remove selection ids, if both row and column are not selection
+              // remove selection ids, if both row and column are not 'Selection'
               if (hashObject.row.lable !== 'Selection' && hashObject.column.lable !== 'Selection') {
                 delete hashObject.selection;
-                if (hashObject.row.lable !== 'Rank' && hashObject.column.lable !== 'Rank') {
-                  hashObject.ids = this.ranking.getDisplayedIds().sort();
-                }
+              }
+              // sort the ids, if both row and column are not 'Rank'
+              if (hashObject.row.lable !== 'Rank' && hashObject.column.lable !== 'Rank') {
+                hashObject.ids = this.ranking.getDisplayedIds().sort();
               }
 
-              // console.log('hashObject: ', hashObject);
+              console.log('hashObject: ', hashObject, ' | unsortedSelction: ', this.ranking.getSelectionUnsorted());
               const hashObjectString = JSON.stringify(hashObject);
               // console.log('hashObject.srtringify: ', hashObjectString);
               const hashValue = XXH.h32(hashObjectString,0).toString(16);
@@ -1200,14 +1201,15 @@ export class RowComparison extends ATouringTask {
                   setBCategory: colGrp.label
                 };
 
-                // remove selection ids, if both row and column are not selection
+                // remove selection ids, if both categories and the data column are not selection
                 if (hashObject.attribute.lable !== 'Selection' &&
                     hashObject.setACategory !== 'Unselected' && hashObject.setACategory !== 'Selected' &&
                     hashObject.setBCategory !== 'Unselected' && hashObject.setBCategory !== 'Selected') {
                   delete hashObject.selection;
-                  if (hashObject.attribute.lable !== 'Rank') {
-                    hashObject.ids = this.ranking.getDisplayedIds().sort();
-                  }
+                }
+                // sort the ids, if the data column is not 'Rank'
+                if (hashObject.attribute.lable !== 'Rank') {
+                  hashObject.ids = this.ranking.getDisplayedIds().sort();
                 }
 
                 // console.log('hashObject: ', hashObject);
