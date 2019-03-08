@@ -91,7 +91,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
         // maybe trigger a score reload if needed
         if (this.triggerScoreReload) {
           this.triggerScoreReload = false;
-          this.reloadScores();
+          setTimeout(() => this.reloadScores(), 200); // HACK: wait until lineup has finished creating its new order before the score is reloaded
         }
       }
 
