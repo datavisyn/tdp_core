@@ -275,7 +275,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * a link to an external help page
    */
-  helpUrl?: string;
+  helpUrl?: string | { url: string, linkText: string, title: string };
   /**
    * as an alternative an help text shown as pop up
    */
