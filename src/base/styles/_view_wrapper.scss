@@ -85,6 +85,7 @@ article.#{$tdp-css-prefix}-view-wrapper {
     &::before {
       @include fa-icon();
       content: $fa-var-question-circle;
+      margin-right: 0.3em;
     }
   }
 
