@@ -350,12 +350,41 @@ export abstract class ATouringTask implements ITouringTask {
 
   }
 
-  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult) {
+  private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult, setParameters: ISetParameters) {
 
     const divDetailInfo = miniVisualisation.append('div')
                                     .classed('detailVis',true);
 
-    // const detailTestValue = divDetailInfo.append('div');
+    // the 2 compared sets
+    const setALabel = setParameters.setACategory ? setParameters.setACategory.label : setParameters.setADesc.label;
+    const setBLabel = setParameters.setBCategory ? setParameters.setBCategory.label : setParameters.setBDesc.label;
+    const detailSetInfo = divDetailInfo.append('div')
+                    .classed('detailDiv',true);
+    if(setParameters.setACategory) {
+      detailSetInfo.append('span')
+                    .classed('detail-label',true)
+                    .text('Data Column: ')
+                      .append('span')
+                      .text(setParameters.setADesc.label);
+      detailSetInfo.append('span')
+                    .text(' / ');
+    }
+    detailSetInfo.append('span')
+                  .classed('detail-label',true)
+                  .text('Comparing ');
+    detailSetInfo.append('span')
+                  .text(setALabel+' ')
+                    .append('span')
+                    .text('['+measureResult.setSizeA+']');
+    detailSetInfo.append('span')
+                  .classed('detail-label',true)
+                  .text(' vs. ');
+    detailSetInfo.append('span')
+                  .text(setBLabel+' ')
+                    .append('span')
+                    .text('['+measureResult.setSizeB+']');
+
+    // test value + p-value
     const scoreValue = isNumber(measureResult.scoreValue) && !isNaN(measureResult.scoreValue) ? measureResult.scoreValue.toFixed(3) : 'n/a';
     const pValue = measureResult.pValue === -1 ? 'n/a' : (measureResult.pValue as number).toExponential(3);
     const detailInfoValues = divDetailInfo.append('div')
@@ -376,7 +405,7 @@ export abstract class ATouringTask implements ITouringTask {
     detailInfoValues.append('span')
                     .text(pValue);
 
-    // const detailTestDescr = divDetailInfo.append('div');
+    // test description
     divDetailInfo.append('div')
                   .classed('detailDiv',true)
                   .text('Description: ')
@@ -489,12 +518,12 @@ export abstract class ATouringTask implements ITouringTask {
 
     if (cellData.score) { //Currenlty only cells with a score are calculated (no category or attribute label cells)
 
-      const reusltScore : IMeasureResult = cellData.score;
+      const resultScore : IMeasureResult = cellData.score;
       const measure : ISimilarityMeasure = cellData.measure;
 
       // Display details
       if(measure) {
-        this.generateVisualDetails(details,measure,reusltScore); //generate description into details div
+        this.generateVisualDetails(details,measure,resultScore,cellData.setParameters); //generate description into details div
       } else {
         details.append('p').text('There are no details for the selected table cell.');
       }
@@ -873,7 +902,7 @@ export class ColumnComparison extends ATouringTask {
                 hashObject.ids = this.ranking.getDisplayedIds().sort();
               }
 
-              console.log('hashObject: ', hashObject, ' | unsortedSelction: ', this.ranking.getSelectionUnsorted());
+              // console.log('hashObject: ', hashObject, ' | unsortedSelction: ', this.ranking.getSelectionUnsorted());
               const hashObjectString = JSON.stringify(hashObject);
               // console.log('hashObject.srtringify: ', hashObjectString);
               const hashValue = XXH.h32(hashObjectString,0).toString(16);
