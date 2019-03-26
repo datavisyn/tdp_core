@@ -54,6 +54,12 @@ div.touring {
     background-color: $active-color;
   }
 
+  .removeMiniVis-btn {
+    float: right !important;
+    padding: 0px 7px !important;
+    margin: 2px 1px !important;
+  }
+
 
   label.control-label {
     padding: 0px;

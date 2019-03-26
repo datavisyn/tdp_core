@@ -350,9 +350,35 @@ export abstract class ATouringTask implements ITouringTask {
 
   }
 
+  // removes mini visualization with details, and highlighting
+  private removeCellDetails (details: d3.Selection<any>) {
+    // remove bg highlighting from all tds
+    d3.select(this.node).selectAll('div.table-container').selectAll('td').classed('selectedCell', false);
+
+    // remove saved selection from session storage
+    const selCellObj = {task: this.id, colLabel: null, rowLabels: null };
+    console.log('selectionLabels: ', selCellObj);
+    const selCellObjString = JSON.stringify(selCellObj);
+    sessionStorage.setItem('touringSelCell', selCellObjString);
+
+    // remove mini visualization with details
+    details.selectAll('*').remove();
+  }
+
+  // generates the detail inforamtion to the test and the remove button
   private generateVisualDetails (miniVisualisation: d3.Selection<any>, measure: ISimilarityMeasure, measureResult: IMeasureResult, setParameters: ISetParameters) {
 
-    const divDetailInfo = miniVisualisation.append('div')
+    const divDetailInfoContainer = miniVisualisation.append('div')
+                                    .classed('detailVisContainer',true);
+
+    //button for mini visualization removal
+    const that = this;
+    const detailRemoveButton = divDetailInfoContainer.append('button');
+    detailRemoveButton.attr('class','btn btn-default removeMiniVis-btn');
+    detailRemoveButton.on('click', function() { that.removeCellDetails.bind(that)(miniVisualisation); });
+    detailRemoveButton.html('x');
+
+    const divDetailInfo = divDetailInfoContainer.append('div')
                                     .classed('detailVis',true);
 
     // the 2 compared sets
@@ -523,7 +549,7 @@ export abstract class ATouringTask implements ITouringTask {
 
       // Display details
       if(measure) {
-        this.generateVisualDetails(details,measure,resultScore,cellData.setParameters); //generate description into details div
+        this.generateVisualDetails(details, measure, resultScore, cellData.setParameters); //generate description into details div
       } else {
         details.append('p').text('There are no details for the selected table cell.');
       }
