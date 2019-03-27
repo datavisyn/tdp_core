@@ -863,6 +863,8 @@ export class ColumnComparison extends ATouringTask {
       d3.select(that.node).select('th.head.rotate svg').remove();
       d3.select(that.node).select('th.head.rotate') //select first
         .insert('svg', ':first-child')
+        .attr('width',120)
+        .attr('height',120)
         .append('polygon').attr('points', '0,0 120,0 0,120'); // 120 is thead height, 45° rotation --> 120 is also width
     }
 
