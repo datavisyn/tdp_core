@@ -196,7 +196,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
   });
 }
 
-function resortAble(base: HTMLElement, elementSelector: string) {
+export function resortAble(base: HTMLElement, elementSelector: string) {
   const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
 
   const enable = (item: HTMLElement) => {
