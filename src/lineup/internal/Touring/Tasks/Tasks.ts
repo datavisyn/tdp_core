@@ -859,13 +859,14 @@ export class ColumnComparison extends ATouringTask {
       trs.order();
       bodies.order();
 
+      const svgWidth = 120 + 33 * colData.length; // calculated width for the svg and polygon
 
       d3.select(that.node).select('th.head.rotate svg').remove();
       d3.select(that.node).select('th.head.rotate') //select first
         .insert('svg', ':first-child')
-        .attr('width',120)
+        .attr('width',svgWidth)
         .attr('height',120)
-        .append('polygon').attr('points', '0,0 120,0 0,120'); // 120 is thead height, 45° rotation --> 120 is also width
+        .append('polygon').attr('points', '0,0 '+svgWidth+',0 0,120'); // 120 is thead height, 45° rotation --> 120 is also width
     }
 
     this.getAttrTableBody(colData, rowData, true, null).then(updateTableBody); // initialize
@@ -1178,10 +1179,14 @@ export class RowComparison extends ATouringTask {
       trs.order(); // Order the trs is important, if you have no items selected and then do select some, the select category would be at the bottom and the unselect category at the top of the table
       bodies.order();
 
+      const svgWidth = 120 + 33 * colGrpData.length; // 120 height with 45° widht also 120, calculated width for the svg and polygon
+
       d3.select(that.node).select('th.head.rotate svg').remove();
       d3.select(that.node).select('th.head.rotate') //select first
         .insert('svg', ':first-child')
-        .append('polygon').attr('points', '0,0 120,0 0,120'); // 120 is thead height, 45° rotation --> 120 is also width
+        .attr('width',svgWidth)
+        .attr('height',120)
+        .append('polygon').attr('points', '0,0 '+svgWidth+',0 0,120'); // 120 is thead height
     }
 
     this.getAttrTableBody(colGrpData, rowGrpData, rowAttrData, true, null).then((data) => updateTableBody(data, timestamp)); // initialize
