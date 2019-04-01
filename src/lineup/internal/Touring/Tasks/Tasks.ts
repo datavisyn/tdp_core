@@ -108,7 +108,7 @@ export abstract class ATouringTask implements ITouringTask {
     d3.select(this.node).selectAll('select').each(function() { // Convert to select2
       const select2 = this;
       //console.log('convert', select2.name);
-      const $select2 = $(select2).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. ', dropdownParent: $(parent)});
+      const $select2 = $(select2).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. '/*, dropdownParent: $(parent)*/});
       $select2.on('select2:select select2:unselect', updateTable);
       $select2.on('select2:open', () => { // elements are created when select2 is opened, and destroyed when closed
         setTimeout(() => { // setTimeout so this shit actually works (mouseover listener not registered if done immidiatly)
@@ -805,8 +805,8 @@ export class ColumnComparison extends ATouringTask {
     d3.select(this.node).attr('data-timestamp', timestamp);
 
 
-    let colData =  d3.select(this.node).selectAll('select.attr[name="attr1[]"] option:checked').data();
-    let rowData = d3.select(this.node).selectAll('select.attr[name="attr2[]"]  option:checked').data();
+    let colData =  d3.selectAll('select.attr[name="attr1[]"] option:checked').data();
+    let rowData = d3.selectAll('select.attr[name="attr2[]"]  option:checked').data();
     if(colData.length > rowData.length) {
       [rowData, colData] = [colData, rowData]; // avoid having more columns than rows --> flip table
     }
