@@ -103,16 +103,15 @@ export abstract class ATouringTask implements ITouringTask {
 
   createSelect2(): void {
     // make selectors functional
-    const parent = this.node;
     const updateTable = this.updateTable.bind(this);
     d3.select(this.node).selectAll('select').each(function() { // Convert to select2
       const select2 = this;
       //console.log('convert', select2.name);
-      const $select2 = $(select2).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. '/*, dropdownParent: $(parent)*/});
+      const $select2 = $(select2).select2({width: '100%', allowClear: true, closeOnSelect: false, placeholder: 'Select one or more columns. '});
       $select2.on('select2:select select2:unselect', updateTable);
       $select2.on('select2:open', () => { // elements are created when select2 is opened, and destroyed when closed
         setTimeout(() => { // setTimeout so this shit actually works (mouseover listener not registered if done immidiatly)
-          const optgroups = d3.select(parent).selectAll('.select2-results__group');
+          const optgroups = d3.selectAll('.select2-results__group');
           optgroups.on('click', function() {
             const hoverGrp = d3.select(this).text(); // get text of hovered select2 label
             // update html in the actual select html element
@@ -1088,7 +1087,7 @@ export class RowComparison extends ATouringTask {
     });
 
     // Update Attribute Selectors
-    const attrSelector = d3.select(this.node).select('select.attr');
+    const attrSelector = d3.select(this.node).select('select.attr optgroup');
     const attrOptions = attrSelector.selectAll('option').data(descriptions, (desc) => desc.label); // duplicates are filtered automatically
     attrOptions.enter().append('option').text((desc) => desc.label);
 
