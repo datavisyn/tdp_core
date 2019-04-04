@@ -634,38 +634,42 @@ export abstract class ATouringTask implements ITouringTask {
       }
 
       const cellData = d3.select(tableCell).datum() as IScoreCell;
-      if (cellData && cellData.highlightData) {
-        if (state) {
-          this.hoverTimerId = window.setTimeout(() => { //highlight after 800ms if mouse is still on cell
-            // highlight col headers
-            let id;
-            for (const attr of cellData.highlightData.filter((data) => data.category === undefined)) {
-              const header = d3.select(`.lineup-engine header .lu-header[title^="${attr.label}"]`).classed('touring-highlight', true); // |= starts with whole word (does not work for selection checkboxes)
-              id = header.attr('data-col-id');
-            }
+      this.setLineupHighlight(cellData, state, 'touring-highlight-hover');
+    }
+  }
 
-            if (id) {
-              // highlight cat rows
-              for (const attr of cellData.highlightData.filter((data) => data.category !== undefined)) {
-                const indices = this.ranking.getAttributeDataDisplayed(attr.column).reduce((indices,cat,index) => cat === attr.category ? [...indices, index] : indices, []);
-                for (const index of indices) {
-                  const elem = d3.select(`.lineup-engine main .lu-row[data-index="${index}"][data-agg="detail"] [data-id="${id}"]`);
-                  if (!elem.empty()) {
-                    const setDarker = elem.classed('touring-highlight');
-                    elem.classed('touring-highlight', true)
-                        .classed('touring-highlight-dark', setDarker);
+  setLineupHighlight(cellData: IScoreCell, enable: boolean, cssClass: string) {
+    if (cellData && cellData.highlightData) {
+      if (enable) {
+        this.hoverTimerId = window.setTimeout(() => { //highlight after 800ms if mouse is still on cell
+          // highlight col headers
+          let id;
+          for (const attr of cellData.highlightData.filter((data) => data.category === undefined)) {
+            const header = d3.select(`.lineup-engine header .lu-header[title^="${attr.label}"]`).classed(`${cssClass}`, true); // |= starts with whole word (does not work for selection checkboxes)
+            id = header.attr('data-col-id');
+          }
 
-                    const catId = d3.select(`.lineup-engine header .lu-header[title^="${attr.label}"]`).attr('data-col-id');
-                    d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${catId}"]`).classed('touring-highlight-border', true);
-                  }
+          if (id) {
+            // highlight cat rows
+            for (const attr of cellData.highlightData.filter((data) => data.category !== undefined)) {
+              const indices = this.ranking.getAttributeDataDisplayed(attr.column).reduce((indices,cat,index) => cat === attr.category ? [...indices, index] : indices, []);
+              for (const index of indices) {
+                const elem = d3.select(`.lineup-engine main .lu-row[data-index="${index}"][data-agg="detail"] [data-id="${id}"]`);
+                if (!elem.empty()) {
+                  const setDarker = elem.classed(`${cssClass}`);
+                  elem.classed(`${cssClass}`, true)
+                      .classed(`${cssClass}-dark`, setDarker);
+
+                  const catId = d3.select(`.lineup-engine header .lu-header[title^="${attr.label}"]`).attr('data-col-id');
+                  d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${catId}"]`).classed(`${cssClass}-border`, true);
                 }
               }
             }
-          }, 200);
-        } else {
-          window.clearTimeout(this.hoverTimerId);
-          d3.selectAll('.touring-highlight,.touring-highlight-dark,.touring-highlight-border').classed('touring-highlight touring-highlight-dark touring-highlight-border', false);
-        }
+          }
+        }, 200);
+      } else {
+        window.clearTimeout(this.hoverTimerId);
+        d3.selectAll(`.${cssClass},.${cssClass}-dark,.${cssClass}-border`).classed(`${cssClass} ${cssClass}-dark ${cssClass}-border`, false);
       }
     }
   }
