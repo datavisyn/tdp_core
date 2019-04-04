@@ -649,7 +649,7 @@ export abstract class ATouringTask implements ITouringTask {
               for (const attr of cellData.highlightData.filter((data) => data.category !== undefined)) {
                 const indices = this.ranking.getAttributeDataDisplayed(attr.column).reduce((indices,cat,index) => cat === attr.category ? [...indices, index] : indices, []);
                 for (const index of indices) {
-                  const elem = d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${id}"]`);
+                  const elem = d3.select(`.lineup-engine main .lu-row[data-index="${index}"][data-agg="detail"] [data-id="${id}"]`);
                   if (!elem.empty()) {
                     const setDarker = elem.classed('touring-highlight');
                     elem.classed('touring-highlight', true)
