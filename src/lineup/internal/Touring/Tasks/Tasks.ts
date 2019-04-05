@@ -651,25 +651,27 @@ export abstract class ATouringTask implements ITouringTask {
 
           if (id) {
             // highlight cat rows
+            let i = 1;
             for (const attr of cellData.highlightData.filter((data) => data.category !== undefined)) {
               const indices = this.ranking.getAttributeDataDisplayed(attr.column).reduce((indices,cat,index) => cat === attr.category ? [...indices, index] : indices, []);
               for (const index of indices) {
                 const elem = d3.select(`.lineup-engine main .lu-row[data-index="${index}"][data-agg="detail"] [data-id="${id}"]`);
                 if (!elem.empty()) {
-                  const setDarker = elem.classed(`${cssClass}`);
-                  elem.classed(`${cssClass}`, true)
+                  const setDarker = elem.classed(`${cssClass}-1`); //if previous class is already set
+                  elem.classed(`${cssClass}-${i}`, true)
                       .classed(`${cssClass}-dark`, setDarker);
 
                   const catId = d3.select(`.lineup-engine header .lu-header[title^="${attr.label}"]`).attr('data-col-id');
                   d3.select(`.lineup-engine main .lu-row[data-index="${index}"] [data-id="${catId}"]`).classed(`${cssClass}-border`, true);
                 }
               }
+              i++;
             }
           }
         }, 200);
       } else {
         window.clearTimeout(this.hoverTimerId);
-        d3.selectAll(`.${cssClass},.${cssClass}-dark,.${cssClass}-border`).classed(`${cssClass} ${cssClass}-dark ${cssClass}-border`, false);
+        d3.selectAll(`.${cssClass},.${cssClass}-dark,.${cssClass}-1,.${cssClass}-2,.${cssClass}-border`).classed(`${cssClass} ${cssClass}-1 ${cssClass}-2 ${cssClass}-dark ${cssClass}-border`, false);
       }
     }
   }
