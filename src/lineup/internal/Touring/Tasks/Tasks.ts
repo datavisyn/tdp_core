@@ -934,7 +934,7 @@ export class ColumnComparison extends ATouringTask {
                 hashObject.ids = this.ranking.getDisplayedIds().sort();
               }
 
-              // console.log('hashObject: ', hashObject, ' | unsortedSelction: ', this.ranking.getSelectionUnsorted());
+              console.log('hashObject: ', hashObject, ' | unsortedSelction: ', this.ranking.getSelectionUnsorted());
               const hashObjectString = JSON.stringify(hashObject);
               // console.log('hashObject.srtringify: ', hashObjectString);
               const hashValue = XXH.h32(hashObjectString,0).toString(16);
@@ -943,9 +943,10 @@ export class ColumnComparison extends ATouringTask {
               let isStoredScoreAvailable = false; //flag for the availability of a stored score
 
               rowPromises.push(new Promise<IMeasureResult>((resolve, reject) => {
+
                 //get score from sessionStorage
                 const sessionScore = sessionStorage.getItem(hashValue);
-                // console.log('sessionScore: ', sessionScore);
+                console.log('sessionScore: ', sessionScore);
                 // score for the measure
                 let score: Promise<IMeasureResult> = null;
 
@@ -954,6 +955,13 @@ export class ColumnComparison extends ATouringTask {
                 } else if (sessionScore !== null || sessionScore !== undefined) {
                   score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
                   isStoredScoreAvailable = true;
+                }
+
+                // check if all values are NaN
+                const uniqueData1 = data1.filter((item) => Number.isNaN(item));
+                const uniqueData2 = data2.filter((item) => Number.isNaN(item));
+                if(data1.length === uniqueData1.length || data2.length === uniqueData2.length ) {
+                    isStoredScoreAvailable = true;
                 }
 
                 // return score
@@ -1297,6 +1305,13 @@ export class RowComparison extends ATouringTask {
                   } else if (sessionScore !== null || sessionScore !== undefined) {
                     score = Promise.resolve(JSON.parse(sessionScore)) as Promise<IMeasureResult>;
                     isStoredScoreAvailable = true;
+                  }
+
+                  // check if all values are NaN
+                  const uniqueDataRow = rowData.filter((item) => Number.isNaN(item));
+                  const uniqueDataCol = colData.filter((item) => Number.isNaN(item));
+                  if(rowData.length === uniqueDataRow.length || colData.length === uniqueDataCol.length ) {
+                      isStoredScoreAvailable = true;
                   }
 
                   // return score;
