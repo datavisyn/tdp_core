@@ -1,7 +1,8 @@
 $active-color: #eaeaea;
 $dark-font-color: #333;
-$highlight-color: #D4D4D4;
-
+$highlight-color: rgb(212,212,212);
+$highlight-color-1: rgb(207, 230, 230); //blueish
+$highlight-color-2: rgb(207, 230, 207); //greenish
 
 [hidden] {
   display: none !important;
@@ -10,12 +11,16 @@ $highlight-color: #D4D4D4;
 
 .touring-highlight-hover {
   background-color: $highlight-color !important;
-
-  &.touring-highlight-hover-dark {
-    background-color: darken($highlight-color, 25%) !important;
-  }
 }
-
+.touring-highlight-hover-1 {
+  background-color: $highlight-color-1 !important;
+}
+.touring-highlight-hover-2 {
+  background-color: $highlight-color-2 !important;
+}
+.touring-highlight-hover-dark {
+  background-color: darken($highlight-color, 10%) !important;
+}
 .touring-highlight-hover-border {
   border: 1px black dashed  !important;
 }
