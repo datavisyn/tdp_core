@@ -165,7 +165,7 @@ export abstract class ATouringTask implements ITouringTask {
     // column of a table was added/removed
     //  causes changes in the available attributes (b)
     //  might cause changes the displayed table / scores
-    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => { /*console.log('added column');*/ this.update(false); });
+    this.ranking.getProvider().on(LocalDataProvider.EVENT_ADD_COLUMN + ATouringTask.EVENTTYPE, () => { /*console.log('added column');*/ setTimeout(this.update, 100, false); });
     this.ranking.getProvider().on(LocalDataProvider.EVENT_REMOVE_COLUMN + ATouringTask.EVENTTYPE, () => { /*console.log('rem column');*/ this.update(false); });
 
     // for filter changes and grouping changes
