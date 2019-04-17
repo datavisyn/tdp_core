@@ -492,6 +492,8 @@ export abstract class ARankingView extends AView {
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
+    }).then(() => {
+      return this.loadLazyInitialColumns(this.provider);
     }).catch(showErrorModalDialog)
       .catch((error) => {
         console.error(error);
@@ -501,6 +503,16 @@ export abstract class ARankingView extends AView {
 
   protected builtLineUp(lineup: LocalDataProvider) {
     // hook
+  }
+
+  /**
+   * Setup columns that are loaded lazy and must be available before the RankingView built promise is resolved.
+   * This function is an empty hook. Override this function and return a promise when all lazy columns are loaded.
+   * @param lineup LocalDataProvider
+   */
+  protected loadLazyInitialColumns(lineup: LocalDataProvider): Promise<any> {
+    // hook
+    return Promise.resolve();
   }
 
   protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
