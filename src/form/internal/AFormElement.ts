@@ -50,6 +50,10 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     return session.retrieve(`${this.id}_value`, defaultValue);
   }
 
+  protected hasStoredValue(): boolean {
+    return session.has(`${this.id}_value`);
+  }
+
   isRequired() {
     return this.desc.required;
   }
