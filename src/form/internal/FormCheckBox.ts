@@ -12,6 +12,10 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
      * unchecked value
      */
     unchecked?: any;
+    /**
+     * default value
+     */
+    isChecked?: any;
   };
 }
 
@@ -49,11 +53,12 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     this.$input.classed('form-control', false); //remove falsy class again
 
     const options = this.desc.options;
-    const defaultValue = this.getStoredValue(options.unchecked) === options.checked;
-    this.previousValue = defaultValue;
-    this.$input.property('checked', defaultValue);
-    if (defaultValue !== options.unchecked) {
-      this.fire(FormCheckBox.EVENT_INITIAL_VALUE, defaultValue, options.unchecked);
+    const isChecked: boolean = options.isChecked != null? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
+    this.previousValue = isChecked;
+    this.$input.property('checked', isChecked);
+    if (this.hasStoredValue()) { // trigger if we have a stored value
+      // TODO: using the new value `isChecked` may be wrong, because it's of type boolean and options.checked and options.unchecked could be anything --> this.getStoredValue(...) should probably be used instead
+      this.fire(FormCheckBox.EVENT_INITIAL_VALUE, isChecked, options.unchecked); // store initial values as actions with results in the provenance graph
     }
 
     this.handleDependent();
@@ -70,7 +75,7 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    */
   get value() {
     const options = this.desc.options;
-    return this.$input.property('checked') ? options.checked: options.unchecked;
+    return this.$input.property('checked') ? options.checked : options.unchecked;
   }
 
   /**
