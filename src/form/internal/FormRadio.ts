@@ -47,7 +47,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
     this.value = defaultValue;
     this.previousValue = defaultValue;
 
-    if (defaultValue !== defaultOption) {
+    if (this.hasStoredValue()) {
       this.fire(FormRadio.EVENT_INITIAL_VALUE, this.value, defaultOption);
     }
 
