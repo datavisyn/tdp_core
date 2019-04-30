@@ -493,7 +493,7 @@ def lookup(database, view_name, query, page, limit, args):
   with session(engine) as sess:
     r_items = sess.run(sql.format(**replace), **kwargs)
 
-  more = len(r_items) > limit
+  more = len(r_items) >= limit
   if more:
     # hit the boundary of more remove the artificial one
     del r_items[-1]
