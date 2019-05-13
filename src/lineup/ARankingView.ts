@@ -310,7 +310,7 @@ export abstract class ARankingView extends AView {
     }
   }
 
-  private createContext(): IContext {
+  protected createContext(): IContext {
     const ranking = this.provider.getLastRanking();
     const columns = ranking ? ranking.flatColumns : [];
     return {
