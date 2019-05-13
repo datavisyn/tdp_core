@@ -272,7 +272,15 @@ export abstract class ARankingView extends AView {
    */
   protected initImpl() {
     super.initImpl();
-    return this.built = this.build();
+    this.built = this.build();
+    // return this.built = this.build();
+
+    // wait with resolving initImpl until the lazy loading is complete
+    return new Promise((resolve) => {
+      this.built
+        .then(() => this.loadLazyInitialColumns(this.provider))
+        .then(() => resolve(this.built)); // resolve original built promise
+    });
   }
 
   /**
@@ -492,8 +500,6 @@ export abstract class ARankingView extends AView {
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
-    }).then(() => {
-      return this.loadLazyInitialColumns(this.provider);
     }).catch(showErrorModalDialog)
       .catch((error) => {
         console.error(error);
@@ -510,7 +516,7 @@ export abstract class ARankingView extends AView {
    * This function is an empty hook. Override this function and return a promise when all lazy columns are loaded.
    * @param lineup LocalDataProvider
    */
-  protected loadLazyInitialColumns(lineup: LocalDataProvider): Promise<any> {
+  protected loadLazyInitialColumns(lineup: LocalDataProvider): PromiseLike<any> {
     // hook
     return Promise.resolve();
   }
