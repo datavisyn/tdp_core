@@ -10,12 +10,13 @@ REGEX_TYPE = type(re.compile(''))
 
 
 class ArgumentInfo(object):
-  def __init__(self, type=None, description='', example=None, as_list=False, is_id=None):
+  def __init__(self, type=None, description='', example=None, as_list=False, is_id=None, list_as_tuple=False):
     self.type = type
     self.description = description
     self.example = example
     self.as_list = as_list
     self.is_id = is_id
+    self.list_as_tuple = list_as_tuple
 
 
 class DBFilterData(object):
@@ -322,7 +323,7 @@ class DBViewBuilder(object):
       self.v.valid_replacements[replace] = valid_replacements
     return self
 
-  def arg(self, arg, type=None, description='', example=None, as_list=False, is_id=None):
+  def arg(self, arg, type=None, description='', example=None, as_list=False, is_id=None, list_as_tuple=False):
     """
     adds another argument of this query (using :arg) which will be replaced within SQL
     :param arg: the argument key
@@ -331,10 +332,11 @@ class DBViewBuilder(object):
     :param example: optional argument example
     :param as_list: optional whether the argument has to be a list
     :param is_id: optional whether the argument is an id argument, the value is the idtype required
+    :param list_as_tuple: optional whether the argument is a list but should be submitted as tuple (f.e. in oracle; especially for IN statements); use the key with ':' in the query
     :return: self
     """
     self.v.arguments.append(arg)
-    self.v.argument_infos[arg] = ArgumentInfo(type, description, example, as_list, is_id)
+    self.v.argument_infos[arg] = ArgumentInfo(type, description, example, as_list, is_id, list_as_tuple)
     return self
 
   def call(self, f=None):
