@@ -105,8 +105,18 @@ class DBView(object):
     v = self.valid_replacements[key]
     if isinstance(v, list):
       return value in v
-    if v == int or v == float:
-      return type(value) == v
+    if v == int:
+      try:
+        int(value)  # try to cast value to int
+        return True  # successful type cast
+      except ValueError:
+        return False
+    if v == float:
+      try:
+        float(value)  # try to cast value to float
+        return True  # successful type cast
+      except ValueError:
+        return False
     if isinstance(v, REGEX_TYPE):
       return v.match(value)
     _log.info(u'unknown %s %s %s', key, value, v)
