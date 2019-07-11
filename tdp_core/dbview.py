@@ -107,14 +107,14 @@ class DBView(object):
       return value in v
     if v == int:
       try:
-        int(value) # try to cast value to int
-        return True # successful type cast
+        int(value)  # try to cast value to int
+        return True  # successful type cast
       except ValueError:
         return False
     if v == float:
       try:
-        float(value) # try to cast value to float
-        return True # successful type cast
+        float(value)  # try to cast value to float
+        return True  # successful type cast
       except ValueError:
         return False
     if isinstance(v, REGEX_TYPE):
