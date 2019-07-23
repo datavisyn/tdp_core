@@ -80,6 +80,10 @@ def filter_logic(view, args):
       k = k[:-2]
     if k.startswith('filter_'):
       where_clause[k[7:]] = v  # remove filter_
+    elif k.startswith('filterL_'):
+      where_clause[k[6:]] = v  # remove filter -> leaves 'L_[columnname]'
+    elif k.startswith('filterG_'):
+      where_clause[k[6:]] = v  # remove filter -> leaves 'G_[columnname]'
     else:
       processed_args.setlist(k, v)
 
@@ -108,8 +112,17 @@ def filter_logic(view, args):
     l = len(v)
     kp = k.replace('.', '_')
     if l == 1:  # single value
-      extra_args[kp] = v[0]
       operator = '='
+      if kp.startswith('L_'):
+        # keep the 'L_' for kp to distinguish from the 'G_' in the created sub_query
+        k = k[2:] # remove the 'L_' to use the right column name in the created sub_query
+        operator = '<'
+      if kp.startswith('G_'):
+        # keep the 'G_' for kp to distinguish from the 'L_'in the created sub_query
+        k = k[2:] # remove the 'G_' to use the right column name in the created sub_query
+        operator = '>'
+         
+      extra_args[kp] = v[0]
     else:
       extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
       operator = 'IN'
@@ -118,6 +131,9 @@ def filter_logic(view, args):
     return sub_query.format(operator=operator, value=':' + kp)
 
   for key in where_clause.keys():
+    if key.startswith('L_') or key.startswith('G_'):
+      key = key[2:] #remove the leading identifiers (less,greater) for filter parameter check in view.is_valid_filter(key):
+
     if not view.is_valid_filter(key):
       _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
       del where_clause[key]
