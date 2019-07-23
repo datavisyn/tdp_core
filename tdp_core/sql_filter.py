@@ -124,15 +124,26 @@ def filter_logic(view, args):
          
       extra_args[kp] = v[0]
     else:
-      extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
-      operator = 'IN'
+      if kp.startswith('L_'):
+        # keep the 'L_' for kp to distinguish from the 'G_' in the created sub_query
+        k = k[2:] # remove the 'L_' to use the right column name in the created sub_query
+        operator = '<'
+        extra_args[kp] = min(v) # use the smallest value as the limit
+      elif kp.startswith('G_'):
+        # keep the 'G_' for kp to distinguish from the 'L_'in the created sub_query
+        k = k[2:] # remove the 'G_' to use the right column name in the created sub_query
+        operator = '>'
+        extra_args[kp] = max(v) # use the biggest value as the limit
+      else:
+        extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
+        operator = 'IN'
     # find the sub query to replace, can be injected for more complex filter operations based on the input
     sub_query = view.get_filter_subquery(k)
     return sub_query.format(operator=operator, value=':' + kp)
 
   for key in where_clause.keys():
     if key.startswith('L_') or key.startswith('G_'):
-      key = key[2:] #remove the leading identifiers (less,greater) for filter parameter check in view.is_valid_filter(key):
+      key = key[2:] #remove the leading identifiers (L_=less,G_=greater) for filter parameter check in view.is_valid_filter(key):
 
     if not view.is_valid_filter(key):
       _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
