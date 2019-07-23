@@ -105,6 +105,22 @@ function prefixFilter(filters: IParams) {
   return r;
 }
 
+function prefixFilterLess(filters: IParams) {
+  const r: IParams = {};
+  Object.keys(filters).map((key) => r[key.startsWith('filterL_') ? key : `filterL_${key}`] = filters[key]);
+  return r;
+}
+
+function prefixFilterGreater(filters: IParams) {
+  const r: IParams = {};
+  Object.keys(filters).map((key) => r[key.startsWith('filterG_') ? key : `filterG_${key}`] = filters[key]);
+  return r;
+}
+
+export function mergeParamAndAllFilters(params: IParams, filters: IParams, lessFilters: IParams, greaterFilters: IParams) {
+  return Object.assign({}, params, prefixFilter(filters), prefixFilterLess(lessFilters), prefixFilterGreater(greaterFilters));
+}
+
 export function mergeParamAndFilters(params: IParams, filters: IParams) {
   return Object.assign({}, params, prefixFilter(filters));
 }
@@ -123,6 +139,21 @@ export function getTDPFilteredRows(database: string, view: string, params: IPara
 }
 
 /**
+ * query the TDP rest api to read data with additional given filters
+ * @param {string} database the database connector key
+ * @param {string} view the view id
+ * @param {IParams} params additional parameters
+ * @param {IParams} filters filters to use
+ * @param {IParams} lessFilters less filters to use, e.g. 'id': 5 -> id < 5; multiple filters on the same column results in using the smallest value for the column, e.g. {'id': 5, 'id':10} -> id < 5
+ * @param {IParams} greaterFilters greater filters to use, e.g. 'id': 5 -> id > 5; multiple filters on the same column results in using the biggest value for the column, e.g. {'id': 5, 'id':10} -> id > 10
+ * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
+ * @returns {Promise<IRow[]>}
+ */
+export function getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IParams, lessFilters: IParams = {}, greaterFilters: IParams = {}, assignIds: boolean = false): Promise<IRow[]> {
+  return getTDPDataImpl(database, view, 'filter', mergeParamAndAllFilters(params, filters, lessFilters, greaterFilters), assignIds);
+}
+
+/**
  * query the TDP rest api to read a score
  * @param {string} database the database connector key
  * @param {string} view the view id
@@ -135,6 +166,20 @@ export function getTDPScore<T>(database: string, view: string, params: IParams =
 }
 
 /**
+ * query the TDP rest api to read a score
+ * @param {string} database the database connector key
+ * @param {string} view the view id
+ * @param {IParams} params additional parameters
+ * @param {IParams} filters filters to use
+ * @param {IParams} lessFilters less filters to use, e.g. 'id': 5 -> id < 5; multiple filters on the same column results in using the smallest value for the column, e.g. {'id': 5, 'id':10} -> id < 5
+ * @param {IParams} greaterFilters greater filters to use, e.g. 'id': 5 -> id > 5; multiple filters on the same column results in using the biggest value for the column, e.g. {'id': 5, 'id':10} -> id > 10
+ * @returns {Promise<IScoreRow<T>[]>}
+ */
+export function getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IParams = {}, lessFilters: IParams = {}, greaterFilters: IParams = {}): Promise<IScoreRow<T>[]> {
+  return getTDPDataImpl(database, view, 'score', mergeParamAndAllFilters(params, filters, lessFilters, greaterFilters));
+}
+
+/**
  * query the TDP rest api to compute the number of rows matching this query
  * @param {string} database the database connector key
  * @param {string} view the view id
@@ -144,6 +189,20 @@ export function getTDPScore<T>(database: string, view: string, params: IParams =
  */
 export function getTDPCount(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<number> {
   return getTDPDataImpl(database, view, 'count', Object.assign({}, params, prefixFilter(filters)));
+}
+
+/**
+ * query the TDP rest api to compute the number of rows matching this query
+ * @param {string} database the database connector key
+ * @param {string} view the view id
+ * @param {IParams} params additional parameters
+ * @param {IParams} filters filters to use
+ * @param {IParams} lessFilters less filters to use, e.g. 'id': 5 -> id < 5; multiple filters on the same column results in using the smallest value for the column, e.g. {'id': 5, 'id':10} -> id < 5
+ * @param {IParams} greaterFilters greater filters to use, e.g. 'id': 5 -> id > 5; multiple filters on the same column results in using the biggest value for the column, e.g. {'id': 5, 'id':10} -> id > 10
+ * @returns {Promise<number>}
+ */
+export function getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IParams = {}, lessFilters: IParams = {}, greaterFilters: IParams = {}): Promise<number> {
+  return getTDPDataImpl(database, view, 'count', mergeParamAndAllFilters(params, filters, lessFilters, greaterFilters));
 }
 
 export interface ILookupItem {
