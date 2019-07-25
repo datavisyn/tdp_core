@@ -132,7 +132,7 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
 
 
 export interface ISelection {
-  readonly idtype: IDType;
+  readonly idtype: IDType; // see phovea_core/src/idtype/manager#resolve
   readonly range: Range;
 
   /**
@@ -143,7 +143,7 @@ export interface ISelection {
 
 export interface IViewContext {
   readonly graph: ProvenanceGraph;
-  readonly desc: IViewPluginDesc;
+  readonly desc: IViewPluginDesc; // see tdp_core/src/views/interfaces#toViewPluginDesc and phovea_core/src/plugin#get
   readonly ref: IObjectRef<any>;
 }
 
