@@ -159,6 +159,16 @@ export abstract class ARankingView extends AView {
 
   private readonly selectionAdapter: ISelectionAdapter | null;
 
+  /**
+   * Creates a RankingView with the given selection.
+   *
+   * @remarks You need to call init() to actually display the Ranking View.
+   *
+   * @param context TODO
+   * @param selection The Ids and IdType of the selection
+   * @param parent where to put the ranking view
+   * @param options TODO
+   */
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
 
@@ -248,7 +258,11 @@ export abstract class ARankingView extends AView {
     this.selectionAdapter = this.createSelectionAdapter();
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
+  /**
+   * @param params Will display the "Showing x of y ..." message
+   * @param onParameterChange TODO
+   */
+  init(params: HTMLElement, onParameterChange?: (name: string, value: any, previousValue: any) => Promise<any>) {
     return resolveImmediately(super.init(params, onParameterChange)).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
