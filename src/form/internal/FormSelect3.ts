@@ -59,6 +59,10 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
     const options = Object.assign(this.desc.options, {multiple: this.multiple});
     this.select3 = new Select3(options);
     this.$node.node().appendChild(this.select3.node);
+
+    this.desc.attributes.clazz = this.desc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
+    this.setAttributes(this.$node.select('.select3'), this.desc.attributes);
+
     this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);
     });
