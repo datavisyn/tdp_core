@@ -38,9 +38,13 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
     const $buttons = this.$node.selectAll('label.radio-inline').data(options.buttons);
     $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<input type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}"> ${d.name}`);
 
-    $buttons.select('input').on('change', (d) => {
+    const $buttonElements = $buttons.select('input');
+
+    $buttonElements.on('change', (d) => {
       this.fire(FormRadio.EVENT_CHANGE, d, $buttons);
     });
+
+    this.setAttributes($buttonElements, this.desc.attributes);
 
     const defaultOption = options.buttons[0].data;
     const defaultValue = this.getStoredValue(defaultOption);
