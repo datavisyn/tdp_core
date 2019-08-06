@@ -486,7 +486,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
         const original = i.text;
         const valid = validated.get(original.toLowerCase());
         const dom = <HTMLElement>processing.find((d) => d.textContent.endsWith(original));
-        if (!valid) {
+        if (!valid && i.verified !== 'verified') {
           i.verified = 'invalid';
         } else {
           // remove key

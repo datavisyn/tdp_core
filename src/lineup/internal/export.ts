@@ -3,6 +3,10 @@ import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
 import {json2xlsx} from '../../internal/xlsx';
 
+function isDateColumn(column:Column) {
+  return column.desc.type === 'date';
+}
+
 export function exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
   //optionally quote not numbers
   const escape = new RegExp(`["]`, 'g');
@@ -51,7 +55,7 @@ export function exportxlsx(columns: Column[], rows: IDataRow[]) {
   return json2xlsx({
     sheets: [{
       title: 'LineUp',
-      columns: columns.map((d) => ({name: d.label, type: <'float'|'string'>(isNumberColumn(d) ? 'float' : 'string')})),
+      columns: columns.map((d) => ({name: d.label, type: <'float'|'string' |'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d)? 'date':'string')})),
       rows: converted
     }]
   });
@@ -119,7 +123,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
         <label>Columns</label>
         ${flat.map((col) => `
           <div class="checkbox tdp-ranking-export-form-handle">
-          <span class=" fa fa-sort"></span>
+          <span class="fa fa-sort"></span>
           <label>
             <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
             ${col.label}
@@ -192,7 +196,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
   });
 }
 
-function resortAble(base: HTMLElement, elementSelector: string) {
+export function resortAble(base: HTMLElement, elementSelector: string) {
   const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
 
   const enable = (item: HTMLElement) => {

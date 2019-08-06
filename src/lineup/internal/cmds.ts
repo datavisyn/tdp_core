@@ -3,8 +3,8 @@
  */
 
 
-import {IObjectRef, action, meta, cat, op, ProvenanceGraph} from 'phovea_core/src/provenance';
-import {NumberColumn, createMappingFunction, StringColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column} from 'lineupjs';
+import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
+import {NumberColumn, createMappingFunction, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 
 
@@ -34,21 +34,65 @@ function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
   return temporaryUntracked.has(lineup.hash);
 }
 
+/**
+ * tracks whether the ranking was dirty and in case it is waits for the ranking to be ordered again
+ * @param ranking
+ */
+function dirtyRankingWaiter(ranking: Ranking) {
+  let waiter: Promise<void> | null = null;
+
+  ranking.on(`${Ranking.EVENT_DIRTY_ORDER}.track`, () => {
+    // disable
+    ranking.on(`${Ranking.EVENT_DIRTY_ORDER}.track`, null);
+
+    let resolver: () => void;
+    // store the promise and the resolve function in variables
+    // the waiter (promise) will only be resolved when the resolver is called
+    // so the promise is locked until the `${Ranking.EVENT_ORDER_CHANGED}.track` event is triggered
+    waiter = new Promise<void>((resolve) => resolver = resolve);
+    ranking.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, () => {
+      ranking.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, null); // disable
+      resolver(); // resolve waiter promise
+    });
+  });
+
+  return (undo: ICmdResult) => {
+    ranking.on(`${Ranking.EVENT_DIRTY_ORDER}.track`, null); // disable
+    if (!waiter) {
+      return undo;
+    }
+    return waiter.then(() => undo); // locked until the resolver is executed (i.e. when the event dispatches)
+  };
+}
+
 export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const index: number = parameter.index;
-  let ranking: Ranking;
-  if (parameter.dump) { //add
-    ignoreNext = LocalDataProvider.EVENT_ADD_RANKING;
-    p.insertRanking(p.restoreRanking(parameter.dump), index);
-  } else { //remove
-    ranking = p.getRankings()[index];
+
+  if (!parameter.dump) { // remove
+    const ranking = p.getRankings()[index];
     ignoreNext = LocalDataProvider.EVENT_REMOVE_RANKING;
     p.removeRanking(ranking);
+    return {
+      inverse: addRanking(inputs[0], parameter.index, ranking.dump(p.toDescRef))
+    };
   }
-  return {
-    inverse: addRanking(inputs[0], parameter.index, parameter.dump ? null : ranking.dump(p.toDescRef))
-  };
+
+  // add
+  ignoreNext = LocalDataProvider.EVENT_ADD_RANKING;
+  const added = p.restoreRanking(parameter.dump);
+
+  // wait for sorted
+  let resolver: () => void;
+  const waiter = new Promise<void>((resolve) => resolver = resolve);
+  added.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, () => {
+    added.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, null); // disable
+    resolver();
+  });
+  p.insertRanking(added, index);
+  return waiter.then(() => ({ // the waiter promise is resolved as soon as the `${Ranking.EVENT_ORDER_CHANGED}.track` event is dispatched. see the `dirtyRankingWaiter` function for details
+    inverse: addRanking(inputs[0], parameter.index, null)
+  }));
 }
 
 export function addRanking(provider: IObjectRef<any>, index: number, dump?: any) {
@@ -68,11 +112,12 @@ export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], para
   const bak = toSortObject(ranking.getSortCriteria());
   ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
   //expects just null not undefined
+  const waitForSorted = dirtyRankingWaiter(ranking);
   ranking.sortBy(parameter.value.col ? (ranking.findByPath(parameter.value.col) || null) : null, parameter.value.asc);
 
-  return {
+  return waitForSorted({
     inverse: setRankingSortCriteria(inputs[0], parameter.rid, bak)
-  };
+  });
 }
 
 
@@ -87,6 +132,8 @@ export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: 
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
 
+  const waitForSorted = dirtyRankingWaiter(ranking);
+
   let current: ISortCriteria[];
   const columns: ISortCriteria[] = parameter.columns.map((c) => ({col: ranking.findByPath(c.col), asc: c.asc}));
   if (parameter.isSorting) {
@@ -94,13 +141,13 @@ export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: 
     ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
     ranking.setSortCriteria(columns);
   } else {
-    const current = ranking.getGroupSortCriteria();
+    current = ranking.getGroupSortCriteria();
     ignoreNext = Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED;
     ranking.setGroupSortCriteria(columns);
   }
-  return {
+  return waitForSorted({
     inverse: setSortCriteria(inputs[0], parameter.rid, current.map(toSortObject), parameter.isSorting)
-  };
+  });
 }
 
 
@@ -118,10 +165,12 @@ export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter:
   const current = ranking.getGroupCriteria().map((d) => d.fqpath);
   const columns = parameter.columns.map((p) => ranking.findByPath(p));
   ignoreNext = Ranking.EVENT_GROUP_CRITERIA_CHANGED;
+
+  const waitForSorted = dirtyRankingWaiter(ranking);
   ranking.setGroupCriteria(columns);
-  return {
+  return waitForSorted({
     inverse: setGroupCriteria(inputs[0], parameter.rid, current)
-  };
+  });
 }
 
 export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
@@ -137,21 +186,23 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
 
   let bak = null;
+  const waitForSorted = dirtyRankingWaiter(ranking);
   let source: Column | Ranking = ranking;
   if (parameter.path) {
     source = ranking.findByPath(parameter.path);
   }
   ignoreNext = `${parameter.prop}Changed`;
-  if (parameter.prop === 'mapping' && source instanceof NumberColumn) {
+  if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
     bak = source.getMapping().dump();
     source.setMapping(createMappingFunction(parameter.value));
   } else if (source) {
     bak = source[`get${prop}`]();
     source[`set${prop}`].call(source, parameter.value);
   }
-  return {
+
+  return waitForSorted({
     inverse: setColumn(inputs[0], parameter.rid, parameter.path, parameter.prop, bak)
-  };
+  });
 }
 
 export interface IViewProvider {
@@ -174,47 +225,51 @@ export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path
 
 export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
-  let ranking: Ranking | CompositeColumn = p.getRankings()[parameter.rid];
+  const ranking = p.getRankings()[parameter.rid];
+  let parent: Ranking | CompositeColumn = ranking;
 
+  const waitForSorted = dirtyRankingWaiter(ranking);
   const index: number = parameter.index;
   let bak = null;
   if (parameter.path) {
-    ranking = <CompositeColumn>ranking.findByPath(parameter.path);
+    parent = <CompositeColumn>ranking.findByPath(parameter.path);
   }
-  if (ranking) {
+  if (parent) {
     if (parameter.dump) { //add
       ignoreNext = Ranking.EVENT_ADD_COLUMN;
-      ranking.insert(p.restoreColumn(parameter.dump), index);
+      parent.insert(p.restoreColumn(parameter.dump), index);
     } else { //remove
-      bak = ranking.at(index);
+      bak = parent.at(index);
       ignoreNext = Ranking.EVENT_REMOVE_COLUMN;
-      ranking.remove(bak);
+      parent.remove(bak);
     }
   }
-  return {
+  return waitForSorted({
     inverse: addColumn(inputs[0], parameter.rid, parameter.path, index, parameter.dump || !bak ? null : p.dumpColumn(bak))
-  };
+  });
 }
 
 export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
-  let ranking: Ranking | CompositeColumn = p.getRankings()[parameter.rid];
+  const ranking = p.getRankings()[parameter.rid];
+  let parent: Ranking | CompositeColumn = ranking;
+  const waitForSorted = dirtyRankingWaiter(ranking);
 
   const index: number = parameter.index;
   const target: number = parameter.moveTo;
   let bak = null;
   if (parameter.path) {
-    ranking = <CompositeColumn>ranking.findByPath(parameter.path);
+    parent = <CompositeColumn>ranking.findByPath(parameter.path);
   }
-  if (ranking) {
-    bak = ranking.at(index);
+  if (parent) {
+    bak = parent.at(index);
     ignoreNext = Ranking.EVENT_MOVE_COLUMN;
-    ranking.move(bak, target);
+    parent.move(bak, target);
   }
-  return {
+  return waitForSorted({
     //shift since indices shifted
     inverse: moveColumn(inputs[0], parameter.rid, parameter.path, target, index > target ? index + 1 : target)
-  };
+  });
 }
 
 export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, dump: any) {
@@ -252,7 +307,7 @@ function delayedCall(callback: (old: any, newValue: any) => void, timeToDelay = 
     } else {
       oldest = old;
     }
-    tm = setTimeout(callbackImpl.bind(this, newValue), timeToDelay);
+    tm = self.setTimeout(callbackImpl.bind(this, newValue), timeToDelay);
   };
 }
 

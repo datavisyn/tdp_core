@@ -59,7 +59,8 @@ export default class LineUpPanelActions extends EventHandler {
 
   private readonly search: SearchBox<ISearchOption> | null;
 
-  readonly panel: SidePanel;
+  readonly panel: SidePanel | null;
+  readonly node: HTMLElement;
   private overview: HTMLElement;
   private wasCollapsed = false;
 
@@ -71,18 +72,22 @@ export default class LineUpPanelActions extends EventHandler {
         placeholder: 'Add Column...'
       });
       this.search.on(SearchBox.EVENT_SELECT, (item) => {
-        this.node.querySelector('header')!.classList.remove('once');
+        this.node.querySelector('.lu-adder')!.classList.remove('once');
         item.action();
       });
     }
 
-    this.panel = new SidePanel(ctx, doc, {
-      chooser: false
-    });
-
-    if (options.enableSidePanel === 'collapsed') {
-      this.collapse = true;
+    if (this.options.enableSidePanel !== 'top') {
+      this.panel = new SidePanel(ctx, doc, {
+        chooser: false
+      });
+      this.node = this.panel.node;
+    } else {
+      this.node = doc.createElement('div');
+      this.node.classList.add('lu-side-panel', 'lu-side-panel-top');
     }
+    this.node.classList.add('tdp-view-lineup');
+    this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
 
     this.init();
   }
@@ -118,26 +123,28 @@ export default class LineUpPanelActions extends EventHandler {
     this.node.style.display = 'flex';
   }
 
+  private get isTopMode() {
+    return this.options.enableSidePanel === 'top';
+  }
+
   get wasHidden() {
     return this.node.style.display === 'none';
   }
 
-  get node() {
-    return this.panel.node;
-  }
-
   private init() {
     this.node.insertAdjacentHTML('afterbegin', `
-      <a href="#" title="(Un)Collapse"></a>
       <section></section>
       <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
       </div>`);
 
-    this.node.querySelector('a')!.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      evt.stopPropagation();
-      this.collapse = !this.collapse;
-    });
+    if (!this.isTopMode) { // top mode doesn't need collapse feature
+      this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="(Un)Collapse"></a>`);
+      this.node.querySelector('a')!.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.collapse = !this.collapse;
+      });
+    }
 
     const buttons = this.node.querySelector('section');
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
@@ -211,7 +218,7 @@ export default class LineUpPanelActions extends EventHandler {
     node.innerHTML = `
       <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
       </button>
-      <ul class="dropdown-menu dropdown-menu-right">
+      <ul class="dropdown-menu dropdown-menu-${this.isTopMode ? 'left' : 'right'}">
         <li class="dropdown-header">Download All Rows</li>
         <li><a href="#" data-s="a" data-t="csv">CSV (comma separated)</a></li>
         <li><a href="#" data-s="a" data-t="tsv">TSV (tab separated)</a></li>
@@ -277,8 +284,8 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   protected saveRankingDialog(order: number[]) {
-    editDialog(null, (name, description, isPublic) => {
-      this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, isPublic);
+    editDialog(null, (name, description, sec) => {
+      this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec);
     });
   }
 

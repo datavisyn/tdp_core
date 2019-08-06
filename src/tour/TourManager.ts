@@ -164,18 +164,29 @@ export default class TourManager {
   }
 
   private setHighlight(mask: IBoundingBox) {
+    const fullAppHeight = this.backdrop.ownerDocument.body.scrollHeight; // full page height including scroll bars
+    const fullAppWidth = this.backdrop.ownerDocument.body.scrollWidth; // full page width including scroll bars
+
+    // set the new height of the backdrop
+    this.backdrop.style.height = `${fullAppHeight}px`;
+    this.backdrop.style.width = `${fullAppWidth}px`;
+
+    // also consider the current scroll offset inside the window
+    const scrollOffsetX = self.scrollX;
+    const scrollOffsetY = self.scrollY;
+
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example
     this.backdrop.style.clipPath = `polygon(
       0% 0%,
-      0% 100%,
-      ${mask.left}px 100%,
-      ${mask.left}px ${mask.top}px,
-      ${mask.left + mask.width}px ${mask.top}px,
-      ${mask.left + mask.width}px ${mask.top + mask.height}px,
-      ${mask.left}px ${mask.top + mask.height}px,
-      ${mask.left}px 100%,
-      100% 100%,
-      100% 0%
+      0% ${fullAppHeight}px,
+      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
+      ${mask.left + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
+      ${mask.left + mask.width + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
+      ${mask.left + mask.width + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
+      ${mask.left + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
+      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
+      ${fullAppWidth}px ${fullAppHeight}px,
+      ${fullAppWidth}px 0%
     )`;
   }
 
@@ -277,7 +288,7 @@ export default class TourManager {
         next.disabled = true;
         step.waitFor.call(step, this.activeTourContext).then((r) => {
           if (this.stepCount.innerText !== String(stepNumber + 1)) {
-            return; // step has changed in the mean while
+            return; // step has changed in the meantime
           }
           next.disabled = false;
           if (r === 'next') {
@@ -358,7 +369,9 @@ export default class TourManager {
     this.stepCount.innerText = String(stepNumber + 1);
     if (focus) {
       const base = focus.getBoundingClientRect();
-      this.stepCount.style.transform = `translate(${base.left}px, ${base.top}px)`;
+      const scrollOffsetX = self.scrollX;
+      const scrollOffsetY = self.scrollY;
+      this.stepCount.style.transform = `translate(${base.left + scrollOffsetX}px, ${base.top + scrollOffsetY}px)`;
     } else {
       this.stepCount.style.transform = this.step.style.transform;
     }

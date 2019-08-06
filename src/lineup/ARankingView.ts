@@ -19,6 +19,7 @@ import {IServerColumn, IViewDescription} from '../rest';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
+import {ISecureItem} from 'phovea_core/src/security';
 
 export {IRankingWrapper} from './internal/ranking';
 export {LocalDataProvider as DataProvider} from 'lineupjs';
@@ -63,7 +64,7 @@ export interface IARankingViewOptions {
    */
   enableZoom: boolean;
 
-  enableSidePanel: boolean | 'collapsed';
+  enableSidePanel: boolean | 'collapsed' | 'top';
 
   enableAddingColumns: boolean;
 
@@ -177,6 +178,8 @@ export abstract class ARankingView extends AView {
 
     this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
+    // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
+    // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
@@ -207,8 +210,8 @@ export abstract class ARankingView extends AView {
     }));
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
-      this.saveNamedSet(order, name, description, isPublic);
+    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
+      this.saveNamedSet(order, name, description, sec);
     });
     this.panel.on(LineUpPanelActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
       this.addScoreColumn(scoreImpl);
@@ -235,7 +238,9 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
-      this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+      if (this.options.enableSidePanel !== 'top') {
+        this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
+      }
     }
 
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
@@ -250,7 +255,12 @@ export abstract class ARankingView extends AView {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
       base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
-      base.lastElementChild!.appendChild(this.stats);
+      const container = <HTMLElement>base.lastElementChild!;
+      container.appendChild(this.stats);
+
+      if (this.options.enableSidePanel === 'top') {
+        container.insertAdjacentElement('afterbegin', this.panel.node);
+      }
     });
   }
 
@@ -373,14 +383,14 @@ export abstract class ARankingView extends AView {
   }
 
 
-  private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
+  private async saveNamedSet(order: number[], name: string, description: string, sec: Partial<ISecureItem>) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
-    const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
+    const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
     successfullySaved('List of Entities', name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number) {
     colDesc.color = colDesc.color? colDesc.color : this.colors.getColumnColor(id);
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
@@ -388,17 +398,37 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  private addScoreColumn(score: IScore<any>) {
+  private addScoreColumn(score: IScore<any>, position?: number) {
     const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
 
     const colDesc = score.createDesc(args);
-    // flag that it is a score
+    // flag that it is a score but it also a reload function
     colDesc._score = true;
 
     const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
-
     const data = score.compute(ids, this.itemIDType, args);
-    return this.addColumn(colDesc, data);
+
+    const r = this.addColumn(colDesc, data, -1, position);
+
+    // use _score function to reload the score
+    colDesc._score = () => {
+      const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+      const data = score.compute(ids, this.itemIDType, args);
+      return r.reload(data);
+    };
+    return r;
+  }
+
+  protected reloadScores(visibleOnly = false) {
+    let scores: {_score: () => any}[] = <any[]>this.provider.getColumns().filter((d) => typeof (<any>d)._score === 'function');
+
+    if (visibleOnly) {
+      // check if part of any ranking
+      const usedDescs = new Set([].concat(...this.provider.getRankings().map((d) => d.flatColumns.map((d) => d.desc))));
+      scores = scores.filter((d) => usedDescs.has(d));
+    }
+
+    return Promise.all(scores.map((d) => d._score()));
   }
 
   protected async withoutTracking<T>(f: () => T): Promise<T> {
@@ -410,8 +440,8 @@ export abstract class ARankingView extends AView {
    * @param {IScore<any>} score
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
-  addTrackedScoreColumn(score: IScore<any>) {
-    return this.withoutTracking(() => this.addScoreColumn(score));
+  addTrackedScoreColumn(score: IScore<any>, position?: number) {
+    return this.withoutTracking(() => this.addScoreColumn(score, position));
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
