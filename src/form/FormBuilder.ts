@@ -59,7 +59,7 @@ export default class FormBuilder {
     elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
     elementDesc.attributes.clazz += ' form-control';
 
-    this.elements.set(elementDesc.id, create(this, this.$node, elementDesc));
+    create(this, this.$node, elementDesc).then((element) => this.elements.set(elementDesc.id, element));
   }
 
   /**
