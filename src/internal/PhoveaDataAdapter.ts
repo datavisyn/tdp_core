@@ -19,7 +19,8 @@ export default class PhoveaDataAdapter {
       columns: t.desc.columns.map((c: ITableColumn<IValueTypeDesc>) => Object.assign({
         column: c.column || c.name,
         label: c.name
-      }, mapType(c.value)))
+      }, mapType(c.value))),
+      idType: t.idtype.name
     };
   }
 

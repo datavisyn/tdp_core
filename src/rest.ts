@@ -203,6 +203,12 @@ export interface IServerColumn {
 }
 
 export interface IViewDescription {
+
+  /**
+   * idType of the DBView, can be null
+   */
+  idType: string;
+
   /**
    * list of columns within this view
    */
