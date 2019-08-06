@@ -51,7 +51,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
       private triggerScoreReload = false;
 
       protected loadColumnDesc() {
-        return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns}));
+        return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns, idType: this.idType.name}));
       }
 
       protected getColumnDescs(columns: any[]) {
