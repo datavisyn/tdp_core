@@ -66,7 +66,7 @@ export interface IFormElementDesc {
   /**
    * Choose a type which element should be created
    */
-  type: FormElementType;
+  type: FormElementType | string;
 
   /**
    * Unique identifier for each page
