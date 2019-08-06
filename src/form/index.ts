@@ -11,3 +11,6 @@ export {IFormMapDesc, convertRow2MultiMap, IFormMultiMap, IFormRow} from './inte
 export {IButtonElementDesc} from './internal/FormButton';
 export {default as FormDialog} from './FormDialog';
 export {nameLookupDesc} from './internal/builder';
+
+// name of the phovea extension type for all form elements
+export const FORM_EXTENSION_POINT = 'tdpFormElement';

@@ -14,49 +14,49 @@ export enum FormElementType {
    * shows a simple select box
    * @see IFormSelectDesc
    */
-  SELECT,
+  SELECT = 'FormSelect',
     /**
      * shows a select box based on select2
      * @see IFormSelect2
      */
-  SELECT2,
+  SELECT2 = 'FormSelect2',
     /**
      * similar to SELECT2 but with multiple selections allowed
      */
-  SELECT2_MULTIPLE,
+  SELECT2_MULTIPLE = 'FormSelect2Multiple',
     /**
      * SELECT2 with additional functionality such as validation, tokenize and file drag
      */
-  SELECT3,
+  SELECT3 = 'FormSelect3',
     /**
      * similar to SELECT3 but with multiple selections allowed
      */
-  SELECT3_MULTIPLE,
+  SELECT3_MULTIPLE = 'FormSelect3Multiple',
     /**
      * a text field
      * @see IFormInputTextDesc
      */
-  INPUT_TEXT,
+  INPUT_TEXT = 'FormInputText',
     /**
      * a complex dynamic sub map form element
      * @see IFormMapDesc
      */
-  MAP,
+  MAP = 'FormMap',
     /**
      * a simple button
      * @see IButtonElementDesc
      */
-  BUTTON,
+  BUTTON = 'FormButton',
     /**
      * a checkbox
      * @see ICheckBoxElementDesc
      */
-  CHECKBOX,
+  CHECKBOX = 'FormCheckBox',
     /**
      * a checkbox
      * @see IRadioElementDesc
      */
-  RADIO
+  RADIO = 'FormRadio'
 }
 
 /**
