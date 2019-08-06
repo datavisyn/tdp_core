@@ -115,25 +115,25 @@ def filter_logic(view, args):
       operator = '='
       if kp.startswith('L_'):
         # keep the 'L_' for kp to distinguish from the 'G_' in the created sub_query
-        k = k[2:] # remove the 'L_' to use the right column name in the created sub_query
+        k = k[2:]  # remove the 'L_' to use the right column name in the created sub_query
         operator = '<'
       if kp.startswith('G_'):
         # keep the 'G_' for kp to distinguish from the 'L_'in the created sub_query
-        k = k[2:] # remove the 'G_' to use the right column name in the created sub_query
+        k = k[2:]  # remove the 'G_' to use the right column name in the created sub_query
         operator = '>'
-         
+
       extra_args[kp] = v[0]
     else:
       if kp.startswith('L_'):
         # keep the 'L_' for kp to distinguish from the 'G_' in the created sub_query
-        k = k[2:] # remove the 'L_' to use the right column name in the created sub_query
+        k = k[2:]  # remove the 'L_' to use the right column name in the created sub_query
         operator = '<'
-        extra_args[kp] = min(v) # use the smallest value as the limit
+        extra_args[kp] = min(v)  # use the smallest value as the limit
       elif kp.startswith('G_'):
         # keep the 'G_' for kp to distinguish from the 'L_'in the created sub_query
-        k = k[2:] # remove the 'G_' to use the right column name in the created sub_query
+        k = k[2:]  # remove the 'G_' to use the right column name in the created sub_query
         operator = '>'
-        extra_args[kp] = max(v) # use the biggest value as the limit
+        extra_args[kp] = max(v)  # use the biggest value as the limit
       else:
         extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
         operator = 'IN'
@@ -143,7 +143,7 @@ def filter_logic(view, args):
 
   for key in where_clause.keys():
     if key.startswith('L_') or key.startswith('G_'):
-      key = key[2:] #remove the leading identifiers (L_=less,G_=greater) for filter parameter check in view.is_valid_filter(key):
+      key = key[2:]  # remove the leading identifiers (L_=less,G_=greater) for filter parameter check in view.is_valid_filter(key):
 
     if not view.is_valid_filter(key):
       _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
