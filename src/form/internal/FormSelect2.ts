@@ -3,7 +3,6 @@
  */
 
 import 'select2';
-import * as d3 from 'd3';
 import * as $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
 import {api2absURL} from 'phovea_core/src/ajax';
@@ -73,7 +72,7 @@ export const DEFAULT_AJAX_OPTIONS = Object.assign({
  */
 export default class FormSelect2 extends AFormElement<IFormSelect2> {
 
-  private $select: d3.Selection<any>;
+  private selectElement: HTMLElement;
 
   private $jqSelect: JQuery;
 
@@ -86,14 +85,17 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
   /**
    * Constructor
    * @param form
-   * @param $parent
+   * @param parentElement
    * @param desc
    * @param multiple
    */
-  constructor(form: IForm, $parent, desc: IFormSelect2, multiple: 'multiple'|'single' = 'single') {
+  constructor(form: IForm, parentElement: HTMLElement, desc: IFormSelect2, multiple: 'multiple'|'single' = 'single') {
     super(form, desc);
 
-    this.$node = $parent.append('div').classed('form-group', true);
+    this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('form-group');
+    parentElement.appendChild(this.node);
+
     this.multiple = multiple === 'multiple';
 
     this.build();
@@ -105,9 +107,10 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
   protected build() {
     super.build();
 
-    this.$select = this.$node.append('select');
-    this.setAttributes(this.$select, this.desc.attributes);
+    this.selectElement = this.node.ownerDocument.createElement('select');
+    this.node.appendChild(this.selectElement);
 
+    this.setAttributes(this.selectElement, this.desc.attributes);
   }
 
   /**
@@ -121,7 +124,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     });
     const df = this.desc.options.data;
     const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
-    this.buildSelect2(this.$select, this.desc.options || {}, data);
+    this.buildSelect2(this.selectElement, this.desc.options || {}, data);
 
 
     // propagate change action with the data of the selected option
@@ -131,7 +134,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
   /**
    * Builds the jQuery select2
    */
-  private buildSelect2($select: d3.Selection<any>, options: IFormSelect2Options, data?: ISelect2Option[]) {
+  private buildSelect2(selectElement: HTMLElement, options: IFormSelect2Options, data?: ISelect2Option[]) {
     const select2Options: Select2Options = {};
 
     let initialValue: string[] = [];
@@ -158,7 +161,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     }
     mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
 
-    this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
+    this.$jqSelect = (<any>$(selectElement)).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial
     this.previousValue = this.resolveValue(this.$jqSelect.select2('data'));
 

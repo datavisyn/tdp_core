@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import * as d3 from 'd3';
 import {randomId} from 'phovea_core/src/index';
 import {IFormElement, IFormElementDesc, IForm} from './interfaces';
 import {create} from './internal';
@@ -25,11 +24,11 @@ export default class FormBuilder {
 
   /**
    * Constructor
-   * @param $parent Node that the form should be attached to
+   * @param parentElement DOM element that the form should be attached to
    * @param formId unique form id
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = randomId()) {
-    this.form = new Form($parent, formId);
+  constructor(parentElement: HTMLElement, private readonly formId = randomId()) {
+    this.form = new Form(parentElement, formId);
   }
 
   /**
@@ -40,7 +39,7 @@ export default class FormBuilder {
   appendElement(elementDesc: IFormElementDesc) {
     const desc = updateElementDesc(elementDesc, this.formId);
 
-    const elementPromise = create(this.form, this.form.$node, desc);
+    const elementPromise = create(this.form, this.form.node, desc);
     this.elementPromises.push(elementPromise);
 
     // append element to form once it is loaded

@@ -5,7 +5,6 @@ import {FormDialog as Dialog} from 'phovea_ui/src/dialogs';
 import {randomId} from 'phovea_core/src';
 import FormBuilder from './FormBuilder';
 import {IFormElementDesc, IForm} from './interfaces';
-import {select} from 'd3';
 
 /**
  * a utililty dialog to show a dialog modal using a FormBuilder
@@ -22,7 +21,7 @@ export default class FormDialog extends Dialog {
   constructor(title: string, primaryButton: string, formId = 'form' + randomId(5)) {
     super(title, primaryButton, formId);
     this.body.innerHTML = ''; //clear old form since the form builder brings its own
-    this.builder = new FormBuilder(select(this.body), formId);
+    this.builder = new FormBuilder(this.body, formId);
 
     this.onHide(() => {
       this.destroy();

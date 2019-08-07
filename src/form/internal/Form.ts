@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import * as d3 from 'd3';
 import {randomId} from 'phovea_core/src/index';
 import {IFormElement, IForm, IFormElementDesc} from '../interfaces';
 
@@ -36,7 +35,7 @@ export class Form implements IForm {
   /**
    * DOM node for the form itself
    */
-  readonly $node: d3.Selection<any>;
+  readonly node: HTMLElement;
 
   /**
    * Map of all appended form elements with the element id as key
@@ -45,11 +44,13 @@ export class Form implements IForm {
 
   /**
    * Constructor
-   * @param $parent Node that the form should be attached to
+   * @param parentElement Node that the form should be attached to
    * @param formId unique form id
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = randomId()) {
-    this.$node = $parent.append('form').attr('id', this.formId);
+  constructor(parentElement: HTMLElement, private readonly formId = randomId()) {
+    this.node = parentElement.ownerDocument.createElement('form');
+    this.node.setAttribute('id', this.formId);
+    parentElement.appendChild(this.node);
   }
 
   /**

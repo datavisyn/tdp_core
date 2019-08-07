@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import {Selection} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import * as session from 'phovea_core/src/session';
@@ -16,7 +15,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
   readonly id: string;
 
-  protected $node: Selection<any>;
+  protected node: HTMLElement;
 
   protected previousValue: any = null;
 
@@ -63,7 +62,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
       return true;
     }
     const v = this.hasValue();
-    this.$node.classed('has-error', !v);
+    this.node.classList.toggle('has-error', !v);
     return v;
   }
 
@@ -72,7 +71,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   isVisible() {
-    return !this.$node.classed('hidden');
+    return !this.node.classList.toggle('hidden');
   }
 
   /**
@@ -80,7 +79,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * @param visible
    */
   setVisible(visible: boolean) {
-    this.$node.classed('hidden', !visible);
+    this.node.classList.toggle('hidden', !visible);
   }
 
   protected addChangeListener() {
@@ -106,11 +105,14 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     this.addChangeListener();
 
     if (this.desc.visible === false) {
-      this.$node.classed('hidden', true);
+      this.node.classList.toggle('hidden', true);
     }
 
     if (!this.desc.hideLabel) {
-      this.$node.append('label').attr('for', this.desc.attributes.id).text(this.desc.label);
+      const label = this.node.ownerDocument.createElement('label');
+      label.setAttribute('for', this.desc.attributes.id);
+      label.innerText = this.desc.label;
+      this.node.appendChild(label);
     }
   }
 
@@ -124,21 +126,21 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   /**
    * Set a list of object properties and values to a given node
    * Note: Use `clazz` instead of the attribute `class` (which is a reserved keyword in JavaScript)
-   * @param $node
+   * @param node
    * @param attributes Plain JS object with key as attribute name and the value as attribute value
    */
-  protected setAttributes($node: Selection<any>, attributes: {[key: string]: any}) {
+  protected setAttributes(node: HTMLElement, attributes: {[key: string]: any}) {
     if (!attributes) {
       return;
     }
 
     Object.keys(attributes).forEach((key) => {
-      $node.attr((key === 'clazz') ? 'class' : key, attributes[key]);
+      node.setAttribute((key === 'clazz') ? 'class' : key, attributes[key]);
     });
 
     if (this.desc.required && !this.desc.showIf) {
       // auto enable just if there is no conditional viewing
-      $node.attr('required', 'required');
+      node.setAttribute('required', 'required');
     }
   }
 
@@ -158,7 +160,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
           onDependentChange(values);
         }
         if (showIf) {
-          this.$node.classed('hidden', !showIf(values));
+          this.node.classList.toggle('hidden', !showIf(values));
         }
       });
     });
@@ -166,7 +168,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     // initial values
     const values = dependElements.map((d) => d.value);
     if (showIf) {
-      this.$node.classed('hidden', !this.desc.showIf(values));
+      this.node.classList.toggle('hidden', !this.desc.showIf(values));
     }
     return values;
   }

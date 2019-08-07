@@ -3,7 +3,6 @@
  */
 
 import 'select2';
-import {event as d3event} from 'd3';
 import * as $ from 'jquery';
 import AFormElement, {toData} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
@@ -89,7 +88,7 @@ function hasInlineParent(node: HTMLElement) {
 
 export default class FormMap extends AFormElement<IFormMapDesc> {
 
-  private $group: d3.Selection<any>;
+  private groupElement: HTMLDivElement;
   private rows: IFormRow[] = [];
   private readonly inline: boolean;
 
@@ -98,14 +97,17 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   /**
    * Constructor
    * @param form
-   * @param $parent
+   * @param parentElement
    * @param desc
    */
-  constructor(form: IForm, $parent, desc: IFormMapDesc) {
+  constructor(form: IForm, parentElement: HTMLElement, desc: IFormMapDesc) {
     super(form, desc);
 
-    this.$node = $parent.append('div').classed('form-group', true);
-    this.inline = hasInlineParent(<HTMLElement>this.$node.node());
+    this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('form-group');
+    parentElement.appendChild(this.node);
+
+    this.inline = hasInlineParent(this.node);
     if (this.inline && this.desc.onChange) {
       //change the default onChange handler for the inline cas
       this.inlineOnChange = this.desc.onChange;
@@ -118,7 +120,9 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   private updateBadge() {
     const dependent = (this.desc.dependsOn || []).map((id) => this.form.getElementById(id));
     resolveImmediately(this.desc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-      this.$node.select('span.badge').html(text).attr('title', `${text} items remaining after filtering`);
+      const span = this.node.querySelector('span.badge');
+      span.innerHTML = text;
+      span.setAttribute('title', `${text} items remaining after filtering`);
     });
   }
 
@@ -147,7 +151,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.addChangeListener();
 
     if (this.desc.visible === false) {
-      this.$node.classed('hidden', true);
+      this.node.classList.add('hidden');
     }
 
     if (this.inline) {
@@ -155,8 +159,8 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         //default badge provider for inline
         this.desc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
       }
-      this.$node.classed('dropdown', true);
-      this.$node.html(`
+      this.node.classList.add('dropdown');
+      this.node.innerHTML = `
           <button class="btn btn-default dropdown-toggle" type="button" id="${this.desc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.desc.label}
             <span class="badge"></span>
@@ -168,31 +172,36 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
                 <button class="btn btn-default btn-sm right">Apply</button>
             </div>
           </div>
-      `);
-      this.$node.select('button.right').on('click', () => {
-
-        (<MouseEvent>d3event).preventDefault();
+      `;
+      this.node.querySelector('button.right').addEventListener('click', (event) => {
+        event.preventDefault();
       });
-      this.$group = this.$node.select('div.form-horizontal');
-      this.$group.on('click', () => {
+      this.groupElement = this.node.querySelector('div.form-horizontal');
+      this.groupElement.addEventListener('click', (event) => {
         // stop click propagation to avoid closing the dropdown
-        (<MouseEvent>d3event).stopPropagation();
+        event.stopPropagation();
       });
 
     } else {
       if (!this.desc.hideLabel) {
-        const $label = this.$node.append('label').attr('for', this.desc.attributes.id);
+        const label = this.node.ownerDocument.createElement('label');
+        label.setAttribute('for', this.desc.attributes.id);
+        this.node.appendChild(label);
+
         if (this.desc.options.badgeProvider) {
-          $label.html(`${this.desc.label} <span class="badge"></span>`);
+          label.innerHTML = `${this.desc.label} <span class="badge"></span>`;
         } else {
-          $label.text(this.desc.label);
+          label.innerText = this.desc.label;
         }
       }
-      this.$group = this.$node.append('div');
+
+      this.groupElement = this.node.ownerDocument.createElement('div');
+      this.node.appendChild(this.groupElement);
     }
-    this.setAttributes(this.$group, this.desc.attributes);
+    this.setAttributes(this.groupElement, this.desc.attributes);
     // adapt default settings
-    this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-group-sm', true);
+    this.groupElement.classList.add('form-horizontal', 'form-group-sm');
+    this.groupElement.classList.remove('form-control');
   }
 
   /**
@@ -223,7 +232,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
     if (this.inline && this.inlineOnChange) {
       // trigger change on onChange listener just when the dialog is closed
-      $(this.$node.node()).on('hidden.bs.dropdown', () => {
+      $(this.node).on('hidden.bs.dropdown', () => {
         const v = this.value;
         const previous = this.previousValue;
         if (isEqual(v, previous)) {
@@ -261,7 +270,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         // register on change listener
         parent.firstElementChild.addEventListener('change', function (this: HTMLSelectElement) {
           row.value = this.value;
-          that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+          that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
         });
         resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">Select me...</option>` : '') + values.map(mapOptions).join('');
@@ -271,7 +280,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
             const first = values[0];
             row.value = typeof first === 'string' || !first ? first : first.value;
           }
-          that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+          that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
         });
         break;
       case FormElementType.SELECT2:
@@ -300,7 +309,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
             row.value = typeof first === 'string' || !first ? first : first.value;
           }
 
-          that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+          that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
           // register on change listener use full select2 items
           $s.on('change', function (this: HTMLSelectElement) {
             const data = $s.select2('data');
@@ -318,7 +327,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
                 row.value = row.value[0];
               }
             }
-            that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+            that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
           });
         });
         break;
@@ -330,7 +339,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         } else if (!defaultSelection && that.desc.options.uniqueKeys) {
           select3.value = [];
         }
-        that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+        that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
         select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
           row.value = next;
           this.fire(FormMap.EVENT_CHANGE, next);
@@ -340,9 +349,9 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         parent.insertAdjacentHTML('afterbegin', `<input class="form-control" value="${initialValue || ''}">`);
         parent.firstElementChild.addEventListener('change', function (this: HTMLInputElement) {
           row.value = this.value;
-          that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+          that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
         });
-        that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+        that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
     }
   }
 
@@ -358,7 +367,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   private buildMapImpl(entries: ISubDescs[]) {
     const that = this;
-    const group = <HTMLDivElement>this.$group.node();
+    const group = this.groupElement;
     group.innerHTML = ''; // remove all approach
     // filter to only valid entries
     const values = this.rows.filter((d) => !!d.key && entries.find((e) => e.value === d.key));
@@ -417,7 +426,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           children.splice(0, children.length - 1).forEach((d) => d.remove());
           updateOptions();
         }
-        that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+        that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
       });
       row.querySelector('select').addEventListener('change', function (this: HTMLSelectElement) {
         if (!this.value) {
@@ -425,7 +434,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           row.remove();
           that.rows.splice(that.rows.indexOf(d), 1);
           updateOptions();
-          that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+          that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
           return;
         }
         if (d.key !== this.value) { // value changed
@@ -478,7 +487,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   focus() {
     // open dropdown
-    $(this.$node.select('.dropdown-menu').node()).show();
+    $(this.node.querySelector('.dropdown-menu')).show();
   }
 }
 

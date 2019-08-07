@@ -1,5 +1,4 @@
 import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
-import * as d3 from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
 
 export interface IButtonElementDesc extends IFormElementDesc {
@@ -8,17 +7,19 @@ export interface IButtonElementDesc extends IFormElementDesc {
 }
 
 export default class FormButton extends EventHandler implements IFormElement {
-  private $button: d3.Selection<HTMLButtonElement>;
-  private $node: d3.Selection<any>;
+  private button: HTMLElement;
+  private node: HTMLElement;
   private clicked: boolean = false;
 
   readonly type: FormElementType.BUTTON;
   readonly id: string;
 
-  constructor(readonly parent: IForm, readonly $parent, readonly desc: IButtonElementDesc) {
+  constructor(readonly parent: IForm, readonly parentElement: HTMLElement, readonly desc: IButtonElementDesc) {
     super();
     this.id = desc.id;
-    this.$node = $parent.append('div').classed('form-group', true);
+    this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('form-group');
+    parentElement.appendChild(this.node);
     this.build();
   }
 
@@ -27,7 +28,7 @@ export default class FormButton extends EventHandler implements IFormElement {
    * @param visible
    */
   setVisible(visible: boolean) {
-    this.$node.classed('hidden', !visible);
+    this.node.classList.toggle('hidden', !visible);
   }
 
   get value(): boolean {
@@ -43,21 +44,23 @@ export default class FormButton extends EventHandler implements IFormElement {
   }
 
   protected build() {
-    this.$button = this.$node.append('button').classed(this.desc.attributes.clazz, true);
-    this.$button.html(() => this.desc.iconClass? `<i class="${this.desc.iconClass}"></i> ${this.desc.label}` : this.desc.label);
+    this.button = this.node.ownerDocument.createElement('button');
+    this.button.classList.toggle(this.desc.attributes.clazz, true);
+    this.button.innerHTML = this.desc.iconClass? `<i class="${this.desc.iconClass}"></i> ${this.desc.label}` : this.desc.label;
+    this.node.appendChild(this.button);
   }
 
   initialize() {
-    this.$button.on('click', () => {
+    this.button.addEventListener('click', (event) => {
       this.value = true;
       this.desc.onClick();
-      (<Event>d3.event).preventDefault();
-      (<Event>d3.event).stopPropagation();
+      event.preventDefault();
+      event.stopPropagation();
     });
     // TODO doesn't support show if
   }
 
   focus() {
-    (<HTMLButtonElement>this.$button.node()).focus();
+    this.button.focus();
   }
 }

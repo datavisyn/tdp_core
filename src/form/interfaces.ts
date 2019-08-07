@@ -146,9 +146,9 @@ export interface IFormElementDesc {
 
 export interface IForm {
   /**
-   * The DOM node as D3 selection
+   * The DOM node of the form
    */
-  $node: d3.Selection<any>;
+  node: HTMLElement;
 
   /**
    * Append a form element and builds it
