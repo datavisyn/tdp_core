@@ -4,7 +4,7 @@
 
 import * as d3 from 'd3';
 import AFormElement from './AFormElement';
-import {IFormElementDesc, IFormParent} from '../interfaces';
+import {IFormElementDesc, IForm} from '../interfaces';
 
 
 /**
@@ -29,12 +29,12 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
 
   /**
    * Constructor
-   * @param parent
+   * @param form
    * @param $parent
    * @param desc
    */
-  constructor(parent: IFormParent, $parent, desc: IFormInputTextDesc) {
-    super(parent, desc);
+  constructor(form: IForm, $parent: d3.Selection<any>, desc: IFormInputTextDesc) {
+    super(form, desc);
 
     this.$node = $parent.append('div').classed('form-group', true);
 
@@ -43,12 +43,18 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
 
   /**
    * Build the label and input element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     super.build();
     this.$input = this.$node.append('input').attr('type', (this.desc.options || {}).type || 'text');
     this.setAttributes(this.$input, this.desc.attributes);
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  initialize() {
+    super.initialize();
 
     const defaultValue = (this.desc.options || {}).type === 'number' ? '0' : '';
     const defaultText = this.getStoredValue(defaultValue);

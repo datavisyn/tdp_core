@@ -1,4 +1,4 @@
-import {IFormElementDesc, IFormParent} from '../interfaces';
+import {IFormElementDesc, IForm} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 
@@ -25,12 +25,12 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
 
   /**
    * Constructor
-   * @param parent
+   * @param form
    * @param $parent
    * @param desc
    */
-  constructor(parent: IFormParent, $parent: d3.Selection<any>, desc: ICheckBoxElementDesc) {
-    super(parent, Object.assign({options: { checked: true, unchecked: false}}, desc));
+  constructor(form: IForm, $parent: d3.Selection<any>, desc: ICheckBoxElementDesc) {
+    super(form, Object.assign({options: { checked: true, unchecked: false}}, desc));
 
     this.$node = $parent.append('div').classed('checkbox', true);
 
@@ -39,7 +39,6 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
 
   /**
    * Build the label and input element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     super.build();
@@ -51,6 +50,13 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     }
     this.setAttributes(this.$input, this.desc.attributes);
     this.$input.classed('form-control', false); //remove falsy class again
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  initialize() {
+    super.initialize();
 
     const options = this.desc.options;
     const isChecked: boolean = options.isChecked != null? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;

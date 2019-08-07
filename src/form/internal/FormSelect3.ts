@@ -3,7 +3,7 @@
  */
 
 import AFormElement from './AFormElement';
-import {IFormParent} from '../interfaces';
+import {IForm} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
 import Select3, {IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
@@ -35,13 +35,13 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
   /**
    * Constructor
-   * @param parent
+   * @param form
    * @param $parent
    * @param desc
    * @param multiple
    */
-  constructor(parent: IFormParent, $parent, desc: IFormSelect3, multiple: 'multiple' | 'single' = 'single') {
-    super(parent, desc);
+  constructor(form: IForm, $parent, desc: IFormSelect3, multiple: 'multiple' | 'single' = 'single') {
+    super(form, desc);
 
     this.$node = $parent.append('div').classed('form-group', true);
     this.multiple = multiple === 'multiple';
@@ -51,7 +51,6 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
   /**
    * Build the label and select element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     super.build();
@@ -62,6 +61,14 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
     this.desc.attributes.clazz = this.desc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
     this.setAttributes(this.$node.select('.select3'), this.desc.attributes);
+
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  initialize() {
+    super.initialize();
 
     this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);

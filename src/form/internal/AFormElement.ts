@@ -4,7 +4,7 @@
 
 import {Selection} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
-import {IFormElementDesc, IFormParent, IFormElement} from '../interfaces';
+import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import * as session from 'phovea_core/src/session';
 
 /**
@@ -22,10 +22,10 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
   /**
    * Constructor
-   * @param parent
+   * @param form
    * @param desc
    */
-  constructor(protected readonly parent: IFormParent, protected readonly desc: T) {
+  constructor(protected readonly form: IForm, protected readonly desc: T) {
     super();
     this.id = desc.id;
 
@@ -115,6 +115,13 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   /**
+   * Initialize dependent form fields, bind the change listener, and propagate the selection by firing a change event
+   */
+  initialize() {
+    // hook
+  }
+
+  /**
    * Set a list of object properties and values to a given node
    * Note: Use `clazz` instead of the attribute `class` (which is a reserved keyword in JavaScript)
    * @param $node
@@ -142,7 +149,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
     const showIf = this.desc.showIf;
 
-    const dependElements = (this.desc.dependsOn || []).map((depOn) => this.parent.getElementById(depOn));
+    const dependElements = (this.desc.dependsOn || []).map((depOn) => this.form.getElementById(depOn));
 
     dependElements.forEach((depElem) => {
       depElem.on(AFormElement.EVENT_CHANGE, () => {

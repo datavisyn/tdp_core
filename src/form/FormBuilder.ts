@@ -4,8 +4,9 @@
 
 import * as d3 from 'd3';
 import {randomId} from 'phovea_core/src/index';
-import {IFormElement, IFormElementDesc} from './interfaces';
+import {IFormElement, IFormElementDesc, IForm} from './interfaces';
 import {create} from './internal';
+import {Form, updateElementDesc} from './internal/Form';
 
 /**
  * Builds a form from a given collection of form elements
@@ -13,14 +14,14 @@ import {create} from './internal';
 export default class FormBuilder {
 
   /**
-   * DOM node for the form itself
+   * The form that will be build
    */
-  private readonly $node: d3.Selection<any>;
+  private readonly form: IForm;
 
   /**
-   * Map of all appended form elements with the element id as key
+   * Map of all future elements
    */
-  private readonly elements = new Map<string, IFormElement>();
+  private readonly elementPromises: Promise<IFormElement>[] = [];
 
   /**
    * Constructor
@@ -28,21 +29,7 @@ export default class FormBuilder {
    * @param formId unique form id
    */
   constructor($parent: d3.Selection<any>, private readonly formId = randomId()) {
-    this.$node = $parent.append('form').attr('id', this.formId);
-  }
-
-  get length() {
-    return this.elements.size;
-  }
-
-  /**
-   * Builds a form from a list of given form element descriptions
-   * @param elements
-   */
-  build(elements: IFormElementDesc[]) {
-    elements.forEach((el) => {
-      this.appendElement(el);
-    });
+    this.form = new Form($parent, formId);
   }
 
   /**
@@ -51,59 +38,39 @@ export default class FormBuilder {
    * @param elementDesc
    */
   appendElement(elementDesc: IFormElementDesc) {
-    // inject formId into form element id
-    const uid = elementDesc.id + '_' + this.formId;
+    const desc = updateElementDesc(elementDesc, this.formId);
 
-    elementDesc.attributes = elementDesc.attributes || {};
-    elementDesc.attributes.id = uid; // add id as attribute
-    elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
-    elementDesc.attributes.clazz += ' form-control';
+    const elementPromise = create(this.form, this.form.$node, desc);
+    this.elementPromises.push(elementPromise);
 
-    create(this, this.$node, elementDesc).then((element) => this.elements.set(elementDesc.id, element));
-  }
-
-  /**
-   * Returns the form element instance, if exists. Otherwise returns `null`.
-   * @param id
-   * @returns {IFormElement}
-   */
-  getElementById(id: string) {
-    return this.elements.get(id);
-  }
-
-  /**
-   * Returns an object with the form element id as key and the current data as value
-   * @returns {{}}
-   */
-  getElementData(): { [key: string]: any } {
-    const r: { [key: string]: any } = {};
-    this.elements.forEach((el, key) => {
-      const value = el.value;
-      r[key] = (value !== null && value.data !== undefined) ? value.data : value;
+    // append element to form once it is loaded
+    elementPromise.then((element: IFormElement) => {
+      this.form.appendElement(element);
     });
-    return r;
   }
 
   /**
-   * Returns an object with the form element id as key and the current form element value
-   * @returns {{}}
+   * Append multiple elements at once to the form
+   * @param elements list of element descriptions
    */
-  getElementValues(): { [key: string]: any } {
-    const r: { [key: string]: any } = {};
-    this.elements.forEach((el, key) => {
-      const value = el.value;
-      r[key] = value.value || value;
+  appendElements(elements: IFormElementDesc[]) {
+    elements.forEach((el) => {
+      this.appendElement(el);
     });
-    return r;
   }
 
   /**
-   * validates the current form
-   * @returns {boolean} if valid
+   * Builds a form from a list of given form element descriptions
+   * Once everything is initialized the form is returned
+   *
+   * @returns {IForm} Loaded and initialized form
    */
-  validate() {
-    return Array.from(this.elements.values())
-      .map((d) => d.validate()) // perform validation on each element (returns array of boolean values)
-      .every((d) => d); // return true if every validation was truthy
+  build(): Promise<IForm> {
+    // initialize when all elements are loaded
+    return Promise.all(this.elementPromises)
+      .then(() => {
+        this.form.initializeAllElements();
+        return this.form;
+      });
   }
 }

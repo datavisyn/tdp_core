@@ -5,7 +5,7 @@
 import * as d3 from 'd3';
 import * as session from 'phovea_core/src/session';
 import AFormElement from './AFormElement';
-import {IFormElementDesc, IFormParent, IFormElement} from '../interfaces';
+import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import {resolveImmediately} from 'phovea_core/src';
 
 
@@ -60,12 +60,12 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
 
   /**
    * Constructor
-   * @param parent
+   * @param form
    * @param $parent
    * @param desc
    */
-  constructor(parent: IFormParent, $parent: d3.Selection<any>, desc: IFormSelectDesc) {
-    super(parent, desc);
+  constructor(form: IForm, $parent: d3.Selection<any>, desc: IFormSelectDesc) {
+    super(form, desc);
 
     this.$node = $parent.append('div').classed('form-group', true);
 
@@ -88,14 +88,21 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
 
   /**
    * Build the label and select element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     super.build();
 
-    const options = this.desc.options;
     this.$select = this.$node.append('select');
     this.setAttributes(this.$select, this.desc.attributes);
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  initialize() {
+    super.initialize();
+
+    const options = this.desc.options;
 
     // propagate change action with the data of the selected option
     this.$select.on('change.propagate', () => {

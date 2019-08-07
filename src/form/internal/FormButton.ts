@@ -1,4 +1,4 @@
-import {FormElementType, IFormElement, IFormElementDesc, IFormParent} from '../interfaces';
+import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
 import * as d3 from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
 
@@ -15,7 +15,7 @@ export default class FormButton extends EventHandler implements IFormElement {
   readonly type: FormElementType.BUTTON;
   readonly id: string;
 
-  constructor(readonly parent: IFormParent, readonly $parent, readonly desc: IButtonElementDesc) {
+  constructor(readonly parent: IForm, readonly $parent, readonly desc: IButtonElementDesc) {
     super();
     this.id = desc.id;
     this.$node = $parent.append('div').classed('form-group', true);
@@ -42,17 +42,19 @@ export default class FormButton extends EventHandler implements IFormElement {
     return true;
   }
 
-
-  build() {
+  protected build() {
     this.$button = this.$node.append('button').classed(this.desc.attributes.clazz, true);
     this.$button.html(() => this.desc.iconClass? `<i class="${this.desc.iconClass}"></i> ${this.desc.label}` : this.desc.label);
+  }
+
+  initialize() {
     this.$button.on('click', () => {
       this.value = true;
       this.desc.onClick();
       (<Event>d3.event).preventDefault();
       (<Event>d3.event).stopPropagation();
     });
-    //TODO doesn't support show if
+    // TODO doesn't support show if
   }
 
   focus() {

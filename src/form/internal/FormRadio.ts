@@ -1,4 +1,4 @@
-import {IFormElementDesc, IFormParent} from '../interfaces';
+import {IFormElementDesc, IForm} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 import {IFormSelectOption} from './FormSelect';
@@ -13,12 +13,12 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
 
   /**
    * Constructor
-   * @param parent
+   * @param form
    * @param $parent
    * @param desc
    */
-  constructor(parent: IFormParent, $parent: d3.Selection<any>, desc: IRadioElementDesc) {
-    super(parent, Object.assign({options: { buttons: [] }}, desc));
+  constructor(form: IForm, $parent: d3.Selection<any>, desc: IRadioElementDesc) {
+    super(form, Object.assign({options: { buttons: [] }}, desc));
 
     this.$node = $parent.append('div');
 
@@ -27,7 +27,6 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
 
   /**
    * Build the label and input element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     super.build();
@@ -48,6 +47,15 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
     this.desc.attributes.clazz = this.desc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because it is mainly used for text inputs and destroys the styling of the radio
     this.setAttributes($buttonElements, this.desc.attributes);
 
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  initialize() {
+    super.initialize();
+
+    const options = this.desc.options;
     const defaultOption = options.buttons[0].data;
     const defaultValue = this.getStoredValue(defaultOption);
     this.value = defaultValue;

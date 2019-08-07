@@ -6,7 +6,7 @@ import 'select2';
 import {event as d3event} from 'd3';
 import * as $ from 'jquery';
 import AFormElement, {toData} from './AFormElement';
-import {IFormElementDesc, IFormParent, FormElementType} from '../interfaces';
+import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
 import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
 import {mixin} from 'phovea_core/src';
@@ -97,12 +97,12 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   /**
    * Constructor
-   * @param parent
+   * @param form
    * @param $parent
    * @param desc
    */
-  constructor(parent: IFormParent, $parent, desc: IFormMapDesc) {
-    super(parent, desc);
+  constructor(form: IForm, $parent, desc: IFormMapDesc) {
+    super(form, desc);
 
     this.$node = $parent.append('div').classed('form-group', true);
     this.inline = hasInlineParent(<HTMLElement>this.$node.node());
@@ -116,7 +116,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   }
 
   private updateBadge() {
-    const dependent = (this.desc.dependsOn || []).map((id) => this.parent.getElementById(id));
+    const dependent = (this.desc.dependsOn || []).map((id) => this.form.getElementById(id));
     resolveImmediately(this.desc.options.badgeProvider(this.value, ...dependent)).then((text) => {
       this.$node.select('span.badge').html(text).attr('title', `${text} items remaining after filtering`);
     });
@@ -142,13 +142,14 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   /**
    * Build the label and input element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     this.addChangeListener();
+
     if (this.desc.visible === false) {
       this.$node.classed('hidden', true);
     }
+
     if (this.inline) {
       if (!this.desc.options.badgeProvider) {
         //default badge provider for inline
@@ -192,6 +193,14 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.setAttributes(this.$group, this.desc.attributes);
     // adapt default settings
     this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-group-sm', true);
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  initialize() {
+    super.initialize();
+
     this.rows = this.getStoredValue([]);
     this.previousValue = this.value;
 
@@ -341,7 +350,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     if (Array.isArray(this.desc.options.entries)) {
       this.buildMapImpl(this.desc.options.entries);
     } else { // function case
-      const dependent = (this.desc.dependsOn || []).map((id) => this.parent.getElementById(id));
+      const dependent = (this.desc.dependsOn || []).map((id) => this.form.getElementById(id));
       const entries = this.desc.options.entries(...dependent);
       this.buildMapImpl(entries);
     }
