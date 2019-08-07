@@ -82,7 +82,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
    * @param v
    */
   set value(v: any) {
-    this.node.querySelectorAll('input').forEach((input) => {
+    Array.from(this.node.querySelectorAll('input')).forEach((input) => {
       input.checked = input['__data__'] === v || input['__data__'].data === v;
     });
     this.previousValue = v; // force old value change
