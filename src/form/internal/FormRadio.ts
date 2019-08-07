@@ -74,7 +74,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
    */
   get value() {
     const input = this.node.querySelector('input:checked');
-    return input ? input['__data__'].data : null;
+    return input ? (<any>input).__data__.data : null;
   }
 
   /**
@@ -83,7 +83,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
    */
   set value(v: any) {
     Array.from(this.node.querySelectorAll('input')).forEach((input) => {
-      input.checked = input['__data__'] === v || input['__data__'].data === v;
+      input.checked = (<any>input).__data__ === v || (<any>input).__data__.data === v;
     });
     this.previousValue = v; // force old value change
     this.updateStoredValue();

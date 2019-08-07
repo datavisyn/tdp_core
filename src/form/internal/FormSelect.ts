@@ -193,7 +193,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
    */
   get value() {
     const option = this.selectElement.selectedOptions[0];
-    return option ? option['__data__'] : null;
+    return option ? (<any>option).__data__ : null;
   }
 
   /**
@@ -209,7 +209,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     }
 
     Array.from(this.selectElement.querySelectorAll('option')).forEach((option: HTMLOptionElement, i) => {
-      const d = option['__data__'];
+      const d = (<any>option).__data__;
       if ((v.value && d.value === v.value) || d.value === v || d === v) {
         this.selectElement.selectedIndex = i;
         this.updateStoredValue();
