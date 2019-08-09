@@ -20,8 +20,22 @@ export interface IRow {
   [key: string]: any;
 }
 
+/**
+ * Describes the properties returned for each database connector
+ */
+export interface IDatabaseDesc {
+  /**
+   *  name of the db connector (defined for a connector in the __init__.py function)
+   */
+  readonly name: string;
+  /**
+   * Description of the connector. Empty string if not set server-side.
+   */
+  readonly description: string;
+}
 
-export function getTDPDatabases(): Promise<string[]> {
+
+export function getTDPDatabases(): Promise<IDatabaseDesc[]> {
   return getAPIJSON(`${REST_DB_NAMESPACE}/`);
 }
 
