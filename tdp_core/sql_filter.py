@@ -80,10 +80,14 @@ def filter_logic(view, args):
       k = k[:-2]
     if k.startswith('filter_'):
       where_clause[k[7:]] = v  # remove filter_
-    elif k.startswith('filterL_'):
-      where_clause[k[6:]] = v  # remove filter -> leaves 'L_[columnname]'
-    elif k.startswith('filterG_'):
-      where_clause[k[6:]] = v  # remove filter -> leaves 'G_[columnname]'
+    elif k.startswith('filter_lt_'):
+      where_clause[k[7:]] = v  # remove filter_ -> leaves 'lt_[columnname]'
+    elif k.startswith('filter_lte_'):
+      where_clause[k[7:]] = v  # remove filter_ -> leaves 'lte_[columnname]'
+    elif k.startswith('filter_gt_'):
+      where_clause[k[7:]] = v  # remove filter_ -> leaves 'gt_[columnname]'
+    elif k.startswith('filter_gte_'):
+      where_clause[k[7:]] = v  # remove filter_ -> leaves 'gte_[columnname]'
     else:
       processed_args.setlist(k, v)
 
@@ -113,41 +117,61 @@ def filter_logic(view, args):
     kp = k.replace('.', '_')
     if l == 1:  # single value
       operator = '='
-      if kp.startswith('L_'):
-        # keep the 'L_' for kp to distinguish from the 'G_' in the created sub_query
-        k = k[2:]  # remove the 'L_' to use the right column name in the created sub_query
+      if kp.startswith('lt_'):
+        # keep the 'lt_' for kp to distinguish from the others ('lte_','gt_','gte_') in the created sub_query
+        k = k[3:]  # remove the 'lt_' to use the right column name in the created sub_query
         operator = '<'
-      if kp.startswith('G_'):
-        # keep the 'G_' for kp to distinguish from the 'L_'in the created sub_query
-        k = k[2:]  # remove the 'G_' to use the right column name in the created sub_query
+      if kp.startswith('lte_'):
+        # keep the 'lte_' for kp to distinguish from the others ('lt_','gt_','gte_') in the created sub_query
+        k = k[4:]  # remove the 'lte_' to use the right column name in the created sub_query
+        operator = '<='
+      if kp.startswith('gt_'):
+        # keep the 'gt_' for kp to distinguish from the others ('lt_','lte_','gte_') in the created sub_query
+        k = k[3:]  # remove the 'gt_' to use the right column name in the created sub_query
         operator = '>'
+      if kp.startswith('gte_'):
+        # keep the 'gte_' for kp to distinguish from the others ('lt_','lte_','gt_') in the created sub_query
+        k = k[4:]  # remove the 'gte_' to use the right column name in the created sub_query
+        operator = '>='
 
       extra_args[kp] = v[0]
     else:
-      if kp.startswith('L_'):
-        # keep the 'L_' for kp to distinguish from the 'G_' in the created sub_query
-        k = k[2:]  # remove the 'L_' to use the right column name in the created sub_query
-        operator = '<'
-        extra_args[kp] = min(v)  # use the smallest value as the limit
-      elif kp.startswith('G_'):
-        # keep the 'G_' for kp to distinguish from the 'L_'in the created sub_query
-        k = k[2:]  # remove the 'G_' to use the right column name in the created sub_query
-        operator = '>'
-        extra_args[kp] = max(v)  # use the biggest value as the limit
-      else:
-        extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
-        operator = 'IN'
+      # there are no lt,lte,gt, and gte filters with multiple values, see lines 156 to 171
+      extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
+      operator = 'IN'
     # find the sub query to replace, can be injected for more complex filter operations based on the input
     sub_query = view.get_filter_subquery(k)
     return sub_query.format(operator=operator, value=':' + kp)
 
   for key in where_clause.keys():
-    if key.startswith('L_') or key.startswith('G_'):
-      key = key[2:]  # remove the leading identifiers (L_=less,G_=greater) for filter parameter check in view.is_valid_filter(key):
+    columntype = ''
+    morethanone = None
+    filterkey = key  # filter key is the value for the filter type + column
+    if key.startswith('lt_') or key.startswith('gt_'):
+      morethanone = (len(where_clause[filterkey]) > 1)  # check if the lt,lte,gt, and gte filters have only one value
+      key = key[3:]  # remove the leading identifiers (lt_=less than,gt_=greater than) for filter parameter check in view.is_valid_filter(key):
+      columntype = view.columns.get(key).get('type')
+
+    if key.startswith('lte_') or key.startswith('gte_'):
+      morethanone = (len(where_clause[filterkey]) > 1)  # check if the lt,lte,gt, and gte filters have only one value
+      key = key[4:]  # remove the leading identifiers (lte_=less than equals,gte_=greater than equals) for filter parameter check in view.is_valid_filter(key):
+      columntype = view.columns.get(key).get('type')
+
+    if morethanone:  # number of values check
+      # if lt,lte,gt, and gte filter have more than one value, remove from filter query
+      _log.warn('filter "%s" has too many values ("%s"), only one is allowed', filterkey, where_clause[filterkey])
+      _log.warn('filter "%s" will be removed from filter query', filterkey)
+      del where_clause[filterkey]
+
+    if columntype != '' and columntype != 'number':  # column type check
+      # if the lt,lte,gt, and gte filters are NOT applied to number column, remove from filter query
+      _log.warn('filters "lt","lte","gt", and "gte" are only applicable to columns of type "number", "%s" is not of type "number"', key)
+      _log.warn('filter "%s" will be removed from filter query', filterkey)
+      del where_clause[filterkey]
 
     if not view.is_valid_filter(key):
       _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
-      del where_clause[key]
+      del where_clause[filterkey]
 
   where_default_clause = []
   where_group_clauses = {group: [] for group in view.filter_groups()}
