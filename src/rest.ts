@@ -53,6 +53,21 @@ export function getProxyUrl(proxy: string, args: any) {
 export function getTDPProxyData(proxy: string, args: any, type: string = 'json') {
   return getAPIData(`${REST_NAMESPACE}/proxy/${proxy}`, args, type);
 }
+/**
+ * interface that contains all posible filters for the database API
+ * @param normal calumn values have to be eqaul to the filter value
+ * @param lt less than filter, column values have to be lower than the filter value
+ * @param lte less than equlas filter, column values have to be lower or equal to the filter value
+ * @param gt greater than filter, column values have to be higher than the filter value
+ * @param gte greater than equals filter, column values have to be higher or equal to the filter value
+ */
+export interface IAllFilters {
+  normal: IParams;
+  lt: IParams;
+  lte: IParams;
+  gt: IParams;
+  gte: IParams;
+}
 
 export interface IParams {
   [key: string]: string | number | boolean | string[] | number[] | boolean[];
@@ -105,21 +120,22 @@ function prefixFilter(filters: IParams) {
   return r;
 }
 
-function prefixFilterLess(filters: IParams) {
+function dynamicFilterPrefix(filters: IParams, prefix: string) {
   const r: IParams = {};
-  Object.keys(filters).map((key) => r[key.startsWith('filterL_') ? key : `filterL_${key}`] = filters[key]);
+  Object.keys(filters).map((key) => r[key.startsWith(prefix) ? key : prefix+`_${key}`] = filters[key]);
   return r;
 }
 
-function prefixFilterGreater(filters: IParams) {
-  const r: IParams = {};
-  Object.keys(filters).map((key) => r[key.startsWith('filterG_') ? key : `filterG_${key}`] = filters[key]);
-  return r;
+function mergeParamAndAllFilters(params: IParams, filters: IAllFilters) {
+  const normal = prefixFilter(filters.normal);
+  const lt = dynamicFilterPrefix(filters.lt,'filter_lt');
+  const lte = dynamicFilterPrefix(filters.lte,'filter_lte');
+  const gt = dynamicFilterPrefix(filters.gt,'filter_gt');
+  const gte = dynamicFilterPrefix(filters.gte,'filter_gte');
+
+  return Object.assign({}, params, normal, lt, lte, gt, gte);
 }
 
-export function mergeParamAndAllFilters(params: IParams, filters: IParams, lessFilters: IParams, greaterFilters: IParams) {
-  return Object.assign({}, params, prefixFilter(filters), prefixFilterLess(lessFilters), prefixFilterGreater(greaterFilters));
-}
 
 export function mergeParamAndFilters(params: IParams, filters: IParams) {
   return Object.assign({}, params, prefixFilter(filters));
@@ -143,14 +159,12 @@ export function getTDPFilteredRows(database: string, view: string, params: IPara
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
- * @param {IParams} filters filters to use
- * @param {IParams} lessFilters less filters to use, e.g. 'id': 5 -> id < 5; multiple filters on the same column results in using the smallest value for the column, e.g. {'id': 5, 'id':10} -> id < 5
- * @param {IParams} greaterFilters greater filters to use, e.g. 'id': 5 -> id > 5; multiple filters on the same column results in using the biggest value for the column, e.g. {'id': 5, 'id':10} -> id > 10
+ * @param {IAllFilters} filters object that contains all filter options: normal, lt (=less than), lte (=less than equals), gt (=greater than), and gte (=greater than equals),
  * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
  * @returns {Promise<IRow[]>}
  */
-export function getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IParams, lessFilters: IParams = {}, greaterFilters: IParams = {}, assignIds: boolean = false): Promise<IRow[]> {
-  return getTDPDataImpl(database, view, 'filter', mergeParamAndAllFilters(params, filters, lessFilters, greaterFilters), assignIds);
+export function getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IAllFilters = { normal:{}, lt:{}, lte:{}, gt:{}, gte:{} }, assignIds: boolean = false): Promise<IRow[]> {
+  return getTDPDataImpl(database, view, 'filter', mergeParamAndAllFilters(params, filters), assignIds);
 }
 
 /**
@@ -170,13 +184,11 @@ export function getTDPScore<T>(database: string, view: string, params: IParams =
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
- * @param {IParams} filters filters to use
- * @param {IParams} lessFilters less filters to use, e.g. 'id': 5 -> id < 5; multiple filters on the same column results in using the smallest value for the column, e.g. {'id': 5, 'id':10} -> id < 5
- * @param {IParams} greaterFilters greater filters to use, e.g. 'id': 5 -> id > 5; multiple filters on the same column results in using the biggest value for the column, e.g. {'id': 5, 'id':10} -> id > 10
+ * @param {IAllFilters} filters object that contains all filter options: normal, lt (=less than), lte (=less than equals), gt (=greater than), and gte (=greater than equals),
  * @returns {Promise<IScoreRow<T>[]>}
  */
-export function getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IParams = {}, lessFilters: IParams = {}, greaterFilters: IParams = {}): Promise<IScoreRow<T>[]> {
-  return getTDPDataImpl(database, view, 'score', mergeParamAndAllFilters(params, filters, lessFilters, greaterFilters));
+export function getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IAllFilters = { normal:{}, lt:{}, lte:{}, gt:{}, gte:{} }): Promise<IScoreRow<T>[]> {
+  return getTDPDataImpl(database, view, 'score', mergeParamAndAllFilters(params, filters));
 }
 
 /**
@@ -196,13 +208,11 @@ export function getTDPCount(database: string, view: string, params: IParams = {}
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
- * @param {IParams} filters filters to use
- * @param {IParams} lessFilters less filters to use, e.g. 'id': 5 -> id < 5; multiple filters on the same column results in using the smallest value for the column, e.g. {'id': 5, 'id':10} -> id < 5
- * @param {IParams} greaterFilters greater filters to use, e.g. 'id': 5 -> id > 5; multiple filters on the same column results in using the biggest value for the column, e.g. {'id': 5, 'id':10} -> id > 10
+ * @param {IAllFilters} filters object that contains all filter options: normal, lt (=less than), lte (=less than equals), gt (=greater than), and gte (=greater than equals),
  * @returns {Promise<number>}
  */
-export function getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IParams = {}, lessFilters: IParams = {}, greaterFilters: IParams = {}): Promise<number> {
-  return getTDPDataImpl(database, view, 'count', mergeParamAndAllFilters(params, filters, lessFilters, greaterFilters));
+export function getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IAllFilters = { normal:{}, lt:{}, lte:{}, gt:{}, gte:{} } ): Promise<number> {
+  return getTDPDataImpl(database, view, 'count', mergeParamAndAllFilters(params, filters));
 }
 
 export interface ILookupItem {
