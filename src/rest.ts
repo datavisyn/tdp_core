@@ -53,13 +53,14 @@ export function getProxyUrl(proxy: string, args: any) {
 export function getTDPProxyData(proxy: string, args: any, type: string = 'json') {
   return getAPIData(`${REST_NAMESPACE}/proxy/${proxy}`, args, type);
 }
+
 /**
- * interface that contains all posible filters for the database API
- * @param normal calumn values have to be eqaul to the filter value
- * @param lt less than filter, column values have to be lower than the filter value
- * @param lte less than equlas filter, column values have to be lower or equal to the filter value
- * @param gt greater than filter, column values have to be higher than the filter value
- * @param gte greater than equals filter, column values have to be higher or equal to the filter value
+ * Interface that contains all possible filters for the database API
+ * @param normal column values have to be equal to the filter value (string, numerical)
+ * @param lt less than filter, column values have to be lower than the filter value (numerical only)
+ * @param lte less than equlas filter, column values have to be lower or equal to the filter value (numerical only)
+ * @param gt greater than filter, column values have to be higher than the filter value (numerical only)
+ * @param gte greater than equals filter, column values have to be higher or equal to the filter value (numerical only)
  */
 export interface IAllFilters {
   normal: IParams;
@@ -114,28 +115,21 @@ export function getTDPRows(database: string, view: string, params: IParams = {},
   return getTDPDataImpl(database, view, 'none', params, assignIds);
 }
 
-function prefixFilter(filters: IParams) {
+function prefixFilter(filters: IParams, prefix: string = 'filter') {
   const r: IParams = {};
-  Object.keys(filters).map((key) => r[key.startsWith('filter_') ? key : `filter_${key}`] = filters[key]);
-  return r;
-}
-
-function dynamicFilterPrefix(filters: IParams, prefix: string) {
-  const r: IParams = {};
-  Object.keys(filters).map((key) => r[key.startsWith(prefix) ? key : prefix+`_${key}`] = filters[key]);
+  Object.keys(filters).map((key) => r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = filters[key]);
   return r;
 }
 
 function mergeParamAndAllFilters(params: IParams, filters: IAllFilters) {
   const normal = prefixFilter(filters.normal);
-  const lt = dynamicFilterPrefix(filters.lt,'filter_lt');
-  const lte = dynamicFilterPrefix(filters.lte,'filter_lte');
-  const gt = dynamicFilterPrefix(filters.gt,'filter_gt');
-  const gte = dynamicFilterPrefix(filters.gte,'filter_gte');
+  const lt = prefixFilter(filters.lt, 'filter_lt');
+  const lte = prefixFilter(filters.lte, 'filter_lte');
+  const gt = prefixFilter(filters.gt, 'filter_gt');
+  const gte = prefixFilter(filters.gte, 'filter_gte');
 
   return Object.assign({}, params, normal, lt, lte, gt, gte);
 }
-
 
 export function mergeParamAndFilters(params: IParams, filters: IParams) {
   return Object.assign({}, params, prefixFilter(filters));
@@ -159,7 +153,7 @@ export function getTDPFilteredRows(database: string, view: string, params: IPara
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
- * @param {IAllFilters} filters object that contains all filter options: normal, lt (=less than), lte (=less than equals), gt (=greater than), and gte (=greater than equals),
+ * @param {IAllFilters} filters object that contains all filter options: normal, lt (= less than), lte (= less than equals), gt (= greater than), and gte (= greater than equals),
  * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
  * @returns {Promise<IRow[]>}
  */
@@ -176,7 +170,7 @@ export function getTDPFilteredRowsWithLessGreater(database: string, view: string
  * @returns {Promise<IScoreRow<T>[]>}
  */
 export function getTDPScore<T>(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<IScoreRow<T>[]> {
-  return getTDPDataImpl(database, view, 'score', Object.assign({}, params, prefixFilter(filters)));
+  return getTDPDataImpl(database, view, 'score', mergeParamAndFilters(params, filters));
 }
 
 /**
@@ -200,7 +194,7 @@ export function getTDPScoreWithLessGreater<T>(database: string, view: string, pa
  * @returns {Promise<number>}
  */
 export function getTDPCount(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<number> {
-  return getTDPDataImpl(database, view, 'count', Object.assign({}, params, prefixFilter(filters)));
+  return getTDPDataImpl(database, view, 'count', mergeParamAndFilters(params, filters));
 }
 
 /**
