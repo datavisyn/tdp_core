@@ -11,10 +11,8 @@ def tdp_login_required(func):
       config, _, view = resolve_view(kwargs['database'], view_name)
       if isinstance(view.security, bool) and view.security is False:  # if security is disabled for the view just call it without checking the login
         return func(*args, **kwargs)
-      # check the login if security was not disabled
-      return login_required(func)
-
-    return login_required(func)
+      return login_required(func)(*args, **kwargs)  # call the function returned by the decorator
+    return login_required(func)(*args, **kwargs)
 
   # override the name of the decorated view, otherwise we get an internal server error when we use the decorator more than once
   decorated_view.__name__ = func.__name__
