@@ -1,4 +1,4 @@
-from phovea_server.ns import Namespace, request, abort, Response
+from phovea_server.ns import Namespace, request, abort
 from . import db
 from .utils import map_scores
 from phovea_server.util import jsonify

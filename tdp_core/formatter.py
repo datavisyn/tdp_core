@@ -1,6 +1,7 @@
 from phovea_server.ns import request, Response
 from phovea_server.util import jsonify
 
+
 def _format_csv(array_of_dicts):
   import pandas as pd
   import io
@@ -16,6 +17,7 @@ def _format_csv(array_of_dicts):
 
 def _format_json_decimal(obj):
   return jsonify(obj, double_precision=15)
+
 
 def formatter(view_name):
   if view_name.endswith('.csv'):
