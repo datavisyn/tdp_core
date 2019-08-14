@@ -28,22 +28,27 @@ $dataviyn_font: Monda !default;
 
 nav.navbar,
 nav.navbar-inverse {
+  min-height: auto; // Temp fix until https://github.com/phovea/phovea_clue/issues/140 is fixed
   .navbar-brand.caleydo_app {
     background: none;
     padding-left: 0;
 
     &:before {
       @include datavisyn-font();
-      content: 'd';
-      font-size: 80%;
-      background: black;
-      border-radius: 5px;
-      padding: 0.2em 0.3em;
-      margin-left: 0.2em;
+      display: inline-block;
+      height:36px;
+      width:32px;
+      background: url('~tdp_core/src/assets/icons/datavisyn/datavisyn_newlogo.png') no-repeat 0 0;
+      content: '';
+      background-size: 32px 36px;
+      margin-left: 0.8em;
       margin-right: 0.2em;
-      color: white;
     }
   }
+}
+
+nav .navbar-nav {
+  margin-top: 8px;
 }
 
 .#{$datavisyn_css_prefix}-font {
