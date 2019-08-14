@@ -2,7 +2,6 @@ from phovea_server.ns import Namespace, request, abort, Response
 from . import db
 from .utils import map_scores
 from phovea_server.util import jsonify
-from phovea_server.security import login_required
 from .security import tdp_login_required
 from .formatter import formatter
 import logging
@@ -21,13 +20,13 @@ def load_ids(idtype, mapping):
 
 
 @app.route('/')
-@login_required
+@tdp_login_required
 def list_database():
   return jsonify([v.dump(k) for k, v in db.configs.connectors.items()])
 
 
 @app.route('/<database>/')
-@login_required
+@tdp_login_required
 def list_view(database):
   config_engine = db.resolve(database)
   if not config_engine:
@@ -50,7 +49,7 @@ def _return_query():
 
 @app.route('/<database>/<view_name>', methods=['GET', 'POST'])
 @app.route('/<database>/<view_name>/filter', methods=['GET', 'POST'])
-@login_required
+@tdp_login_required
 def get_filtered_data(database, view_name):
   """
   version of getting data in which the arguments starting with `filter_` are used to build a where clause
@@ -98,7 +97,7 @@ def get_score_data(database, view_name):
 
 
 @app.route('/<database>/<view_name>/count', methods=['GET', 'POST'])
-@login_required
+@tdp_login_required
 def get_count_data(database, view_name):
   """
   similar to the /filter clause but returns the count of results instead of the rows itself
@@ -116,7 +115,7 @@ def get_count_data(database, view_name):
 
 
 @app.route('/<database>/<view_name>/desc')
-@login_required
+@tdp_login_required
 def get_desc(database, view_name):
   view_name, _ = formatter(view_name)
   config, _, view = db.resolve_view(database, view_name)
@@ -124,7 +123,7 @@ def get_desc(database, view_name):
 
 
 @app.route('/<database>/<view_name>/lookup', methods=['GET', 'POST'])
-@login_required
+@tdp_login_required
 def lookup(database, view_name):
   """
   Does the same job as search, but paginates the result set
