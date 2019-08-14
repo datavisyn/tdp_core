@@ -14,4 +14,7 @@ def tdp_login_required(func):
       return login_required(func)
 
     return login_required(func)
+
+  # override the name of the decorated view, otherwise we get an internal server error when we use the decorator more than once
+  decorated_view.__name__ = func.__name__
   return decorated_view
