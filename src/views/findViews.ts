@@ -110,6 +110,9 @@ export function canAccess(p: any) {
     }
     return security(user);
   }
+  if (typeof security === 'boolean') {
+    return security === false; // check if security is disabled
+  }
   return true;
 }
 

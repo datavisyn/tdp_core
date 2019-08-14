@@ -43,7 +43,7 @@ class DBView(object):
     self.argument_infos = {}
     self.filters = {}
     self.table = None
-    self.security = None
+    self.security = True
     self.assign_ids = False
 
   def needs_to_fill_up_columns(self):
@@ -133,6 +133,8 @@ class DBView(object):
       return True
     if callable(self.security):
       return self.security(current_user())
+    if isinstance(self.security, bool) and self.security is False: # check if security is a boolean and if it's disabled, i.e. it's value is False
+      return True # return that we're allowed to access the view, because its security is disabled
     role = unicode(self.security)
     return current_user().has_role(role)
 

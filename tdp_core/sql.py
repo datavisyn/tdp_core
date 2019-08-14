@@ -3,7 +3,10 @@ from . import db
 from .utils import map_scores
 from phovea_server.util import jsonify
 from phovea_server.security import login_required
+from .security import tdp_login_required
+from .formatter import formatter
 import logging
+
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -45,35 +48,6 @@ def _return_query():
   return not v or v.lower()[0] != 'f'
 
 
-def _format_csv(array_of_dicts):
-  import pandas as pd
-  import io
-
-  if not array_of_dicts:
-    return Response('', mimetype='text/csv')
-
-  out = io.BytesIO()
-  d = pd.DataFrame.from_records(array_of_dicts)
-  d.to_csv(out, sep='\t', encoding='utf-8', index=False)
-  return Response(out.getvalue(), mimetype='text/csv')
-
-
-def _format_json_decimal(obj):
-  return jsonify(obj, double_precision=15)
-
-
-def _formatter(view_name):
-  if view_name.endswith('.csv'):
-    return view_name[:-4], _format_csv
-  elif request.values.get('_format') == 'csv':
-    return view_name, _format_csv
-  elif view_name.endswith('.json'):
-    return view_name[:-5], _format_json_decimal
-  elif request.values.get('_format') == 'json':
-    return view_name, _format_json_decimal
-  return view_name, jsonify
-
-
 @app.route('/<database>/<view_name>', methods=['GET', 'POST'])
 @app.route('/<database>/<view_name>/filter', methods=['GET', 'POST'])
 @login_required
@@ -84,7 +58,7 @@ def get_filtered_data(database, view_name):
   :param view_name:
   :return:
   """
-  view_name, format = _formatter(view_name)
+  view_name, format = formatter(view_name)
   if _return_query():
     return jsonify(db.get_filtered_query(database, view_name, request.values))
 
@@ -96,7 +70,7 @@ def get_filtered_data(database, view_name):
 
 
 @app.route('/<database>/<view_name>/score', methods=['GET', 'POST'])
-@login_required
+@tdp_login_required
 def get_score_data(database, view_name):
   """
   version of getting data like filter with additional mapping of score entries
@@ -104,7 +78,7 @@ def get_score_data(database, view_name):
   :param view_name:
   :return:
   """
-  view_name, format = _formatter(view_name)
+  view_name, format = formatter(view_name)
   if _return_query():
     return jsonify(db.get_filtered_query(database, view_name, request.values))
 
@@ -132,7 +106,7 @@ def get_count_data(database, view_name):
   :param view_name:
   :return:
   """
-  view_name, _ = _formatter(view_name)
+  view_name, _ = formatter(view_name)
   if _return_query():
     return jsonify(db.get_count_query(database, view_name, request.values))
 
@@ -144,7 +118,7 @@ def get_count_data(database, view_name):
 @app.route('/<database>/<view_name>/desc')
 @login_required
 def get_desc(database, view_name):
-  view_name, _ = _formatter(view_name)
+  view_name, _ = formatter(view_name)
   config, _, view = db.resolve_view(database, view_name)
   return jsonify(dict(idType=view.idtype, columns=view.columns.values()))
 
@@ -156,7 +130,7 @@ def lookup(database, view_name):
   Does the same job as search, but paginates the result set
   This function is used in conjunction with Select2 form elements
   """
-  view_name, _ = _formatter(view_name)
+  view_name, _ = formatter(view_name)
   query = request.values.get('query', '').lower()
   page = int(request.values.get('page', 0))  # zero based
   limit = int(request.values.get('limit', 30))  # or 'all'
