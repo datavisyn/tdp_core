@@ -2,10 +2,10 @@ from phovea_server.ns import Namespace, request, abort
 from . import db
 from .utils import map_scores
 from phovea_server.util import jsonify
+from phovea_server.security import login_required
 from .security import tdp_login_required
 from .formatter import formatter
 import logging
-
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def list_database():
 
 
 @app.route('/<database>/')
-@tdp_login_required
+@login_required
 def list_view(database):
   config_engine = db.resolve(database)
   if not config_engine:
@@ -57,7 +57,9 @@ def get_filtered_data(database, view_name):
   :param view_name:
   :return:
   """
+
   view_name, format = formatter(view_name)
+
   if _return_query():
     return jsonify(db.get_filtered_query(database, view_name, request.values))
 

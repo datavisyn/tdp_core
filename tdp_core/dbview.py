@@ -1,7 +1,7 @@
 import logging
 import re
 from collections import OrderedDict
-from phovea_server.security import current_user
+from phovea_server.security import current_user, is_logged_in
 from .utils import clean_query
 
 __author__ = 'Samuel Gratzl'
@@ -129,14 +129,14 @@ class DBView(object):
     return self.argument_infos.get(key)
 
   def can_access(self):
-    if self.security is None:
-      return True
+    if isinstance(self.security, str):
+      role = unicode(self.security)
+      return current_user().has_role(role)
     if callable(self.security):
       return self.security(current_user())
     if isinstance(self.security, bool) and self.security is False:  # check if security is a boolean and if it's disabled, i.e. it's value is False
       return True  # return that we're allowed to access the view, because its security is disabled
-    role = unicode(self.security)
-    return current_user().has_role(role)
+    return is_logged_in()  # because security is not disabled check if the user is at least logged in
 
 
 class DBViewBuilder(object):
