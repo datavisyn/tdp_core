@@ -43,7 +43,7 @@ class DBView(object):
     self.argument_infos = {}
     self.filters = {}
     self.table = None
-    self.security = True
+    self.security = None
     self.assign_ids = False
 
   def needs_to_fill_up_columns(self):
@@ -128,7 +128,15 @@ class DBView(object):
   def get_argument_info(self, key):
     return self.argument_infos.get(key)
 
-  def can_access(self):
+  # TODO: improve the logic of this function, because even for unauthorized can_access returns True, i.e. that the user can access the resource. Somewhere else the server checks whether the user is authenticated or not
+  def can_access(self, check_default_security = False):
+    """
+    check whether a user can access a DBView (DBView.security is checked and can either be a boolean, a string (=group the user must belong to) or a function) or not.
+    :param check_default_security: bool; True if the security should be checked by default, otherwise it is False (default = False)
+    :return: bool
+    """
+    if self.security is None and check_default_security is False:
+      return True
     if isinstance(self.security, str):
       role = unicode(self.security)
       return current_user().has_role(role)

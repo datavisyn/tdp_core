@@ -1,10 +1,12 @@
 from phovea_server.security import login_required
 from .formatter import formatter
 from .db import resolve_view
+from functools import wraps
 
 
 # custom login_required decorator to be able to disable the login for DBViews, i.e. to make them public
 def tdp_login_required(func):
+  @wraps(func)
   def decorated_view(*args, **kwargs):
     if kwargs['view_name'] is not None and kwargs['database'] is not None:
       view_name, _ = formatter(kwargs['view_name'])
@@ -14,6 +16,4 @@ def tdp_login_required(func):
       return login_required(func)(*args, **kwargs)  # call the function returned by the decorator
     return login_required(func)(*args, **kwargs)
 
-  # override the name of the decorated view, otherwise we get an internal server error when we use the decorator more than once
-  decorated_view.__name__ = func.__name__
   return decorated_view
