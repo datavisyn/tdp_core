@@ -49,7 +49,7 @@ def resolve_engine(database):
   return configs.engine(database)
 
 
-def resolve_view(database, view_name, check_default_security = False):
+def resolve_view(database, view_name, check_default_security=False):
   """
   finds and return the connector, engine, and view for the given database and view_name
   :param database: database key to lookup

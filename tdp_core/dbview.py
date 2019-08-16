@@ -129,7 +129,7 @@ class DBView(object):
     return self.argument_infos.get(key)
 
   # TODO: improve the logic of this function, because even for unauthorized can_access returns True, i.e. that the user can access the resource. Somewhere else the server checks whether the user is authenticated or not
-  def can_access(self, check_default_security = False):
+  def can_access(self, check_default_security=False):
     """
     check whether a user can access a DBView (DBView.security is checked and can either be a boolean, a string (=group the user must belong to) or a function) or not.
     :param check_default_security: bool; True if the security should be checked by default, otherwise it is False (default = False)
