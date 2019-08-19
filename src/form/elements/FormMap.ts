@@ -10,7 +10,7 @@ import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
 import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
 import {mixin} from 'phovea_core/src';
-import {IFormElement} from '../';
+import {IFormElement} from '..';
 import * as session from 'phovea_core/src/session';
 import {resolveImmediately} from 'phovea_core/src';
 import {ISelect3Options, default as Select3, IdTextPair} from './Select3';
