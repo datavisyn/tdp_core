@@ -55,7 +55,7 @@ export default class FormButton extends EventHandler implements IFormElement {
     this.$button.html(() => this.elementDesc.iconClass? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
   }
 
-  initialize() {
+  init() {
     this.$button.on('click', () => {
       this.value = true;
       this.elementDesc.onClick();

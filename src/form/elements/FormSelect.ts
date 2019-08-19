@@ -101,8 +101,8 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
     const options = this.elementDesc.options;
 

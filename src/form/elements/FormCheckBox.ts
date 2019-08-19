@@ -57,8 +57,8 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
     const options = this.elementDesc.options;
     const isChecked: boolean = options.isChecked != null? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;

@@ -200,8 +200,8 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
     this.rows = this.getStoredValue([]);
     this.previousValue = this.value;

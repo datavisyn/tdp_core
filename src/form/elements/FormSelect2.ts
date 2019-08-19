@@ -115,8 +115,8 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
     const values = this.handleDependent(() => {
       //not supported

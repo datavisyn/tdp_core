@@ -120,7 +120,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   /**
    * Initialize dependent form fields, bind the change listener, and propagate the selection by firing a change event
    */
-  initialize() {
+  init() {
     // hook
   }
 

@@ -68,8 +68,8 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
     this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);

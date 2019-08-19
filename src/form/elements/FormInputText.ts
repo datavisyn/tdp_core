@@ -55,8 +55,8 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
     const defaultValue = (this.elementDesc.options || {}).type === 'number' ? '0' : '';
     const defaultText = this.getStoredValue(defaultValue);

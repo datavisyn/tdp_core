@@ -54,8 +54,8 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
     const options = this.elementDesc.options;
     const defaultOption = options.buttons[0].data;
