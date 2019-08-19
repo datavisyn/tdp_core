@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 import {IForm, IFormElementDesc,IFormElement} from '../interfaces';
-import {list, IPluginDesc} from 'phovea_core/src/plugin';
+import {get} from 'phovea_core/src/plugin';
 import {FORM_EXTENSION_POINT} from '..';
 
 /**
@@ -14,13 +14,11 @@ import {FORM_EXTENSION_POINT} from '..';
  * @param desc form element description
  */
 export function create(form: IForm, $parent: d3.Selection<any>, desc: IFormElementDesc): Promise<IFormElement> {
-  const plugins = list((pluginDesc: IPluginDesc) => {
-    return pluginDesc.type === FORM_EXTENSION_POINT && pluginDesc.id === desc.type;
-  });
-  if(plugins.length === 0) {
+  const plugin = get(FORM_EXTENSION_POINT, desc.type);
+  if(!plugin) {
     throw new Error('unknown form element type: ' + desc.type);
   }
-  return plugins[0].load().then((p) => {
+  return plugin.load().then((p) => {
     // selection is used in SELECT2 and SELECT3
     if(p.desc.selection) {
       return p.factory(form, $parent, <any>desc, p.desc.selection);
