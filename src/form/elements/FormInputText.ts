@@ -5,6 +5,7 @@
 import * as d3 from 'd3';
 import AFormElement from './AFormElement';
 import {IFormElementDesc, IForm} from '../interfaces';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 
 /**
@@ -29,12 +30,13 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
 
   /**
    * Constructor
-   * @param form
-   * @param $parent
-   * @param desc
+   * @param form The form this element is a part of
+   * @param $parent The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent: d3.Selection<any>, desc: IFormInputTextDesc) {
-    super(form, desc);
+  constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, elementDesc, pluginDesc);
 
     this.$node = $parent.append('div').classed('form-group', true);
 
@@ -46,8 +48,8 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
    */
   protected build() {
     super.build();
-    this.$input = this.$node.append('input').attr('type', (this.desc.options || {}).type || 'text');
-    this.setAttributes(this.$input, this.desc.attributes);
+    this.$input = this.$node.append('input').attr('type', (this.elementDesc.options || {}).type || 'text');
+    this.setAttributes(this.$input, this.elementDesc.attributes);
   }
 
   /**
@@ -56,7 +58,7 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
   initialize() {
     super.initialize();
 
-    const defaultValue = (this.desc.options || {}).type === 'number' ? '0' : '';
+    const defaultValue = (this.elementDesc.options || {}).type === 'number' ? '0' : '';
     const defaultText = this.getStoredValue(defaultValue);
     this.previousValue = defaultText;
     this.$input.property('value', defaultText);

@@ -11,18 +11,14 @@ import {FORM_EXTENSION_POINT} from '..';
  *
  * @param form the form to which the element will be appended
  * @param $parent parent D3 selection element
- * @param desc form element description
+ * @param elementDesc form element description
  */
-export function create(form: IForm, $parent: d3.Selection<any>, desc: IFormElementDesc): Promise<IFormElement> {
-  const plugin = get(FORM_EXTENSION_POINT, desc.type);
+export function create(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormElementDesc): Promise<IFormElement> {
+  const plugin = get(FORM_EXTENSION_POINT, elementDesc.type);
   if(!plugin) {
-    throw new Error('unknown form element type: ' + desc.type);
+    throw new Error('unknown form element type: ' + elementDesc.type);
   }
   return plugin.load().then((p) => {
-    // selection is used in SELECT2 and SELECT3
-    if(p.desc.selection) {
-      return p.factory(form, $parent, <any>desc, p.desc.selection);
-    }
-    return p.factory(form, $parent, <any>desc);
+    return p.factory(form, $parent, <any>elementDesc, p.desc);
   });
 }

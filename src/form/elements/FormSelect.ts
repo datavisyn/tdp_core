@@ -7,6 +7,7 @@ import * as session from 'phovea_core/src/session';
 import AFormElement from './AFormElement';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import {resolveImmediately} from 'phovea_core/src';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 
 export interface IFormSelectOption {
@@ -60,12 +61,13 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
 
   /**
    * Constructor
-   * @param form
-   * @param $parent
-   * @param desc
+   * @param form The form this element is a part of
+   * @param $parent The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent: d3.Selection<any>, desc: IFormSelectDesc) {
-    super(form, desc);
+  constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormSelectDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, elementDesc, pluginDesc);
 
     this.$node = $parent.append('div').classed('form-group', true);
 
@@ -73,14 +75,14 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   }
 
   protected updateStoredValue() {
-    if (!this.desc.useSession) {
+    if (!this.elementDesc.useSession) {
       return;
     }
     session.store(`${this.id}_selectedIndex`, this.getSelectedIndex());
   }
 
   protected getStoredValue<T>(defaultValue:T): T {
-    if (!this.desc.useSession) {
+    if (!this.elementDesc.useSession) {
       return defaultValue;
     }
     return session.retrieve(`${this.id}_selectedIndex`, defaultValue);
@@ -93,7 +95,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     super.build();
 
     this.$select = this.$node.append('select');
-    this.setAttributes(this.$select, this.desc.attributes);
+    this.setAttributes(this.$select, this.elementDesc.attributes);
   }
 
   /**
@@ -102,7 +104,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   initialize() {
     super.initialize();
 
-    const options = this.desc.options;
+    const options = this.elementDesc.options;
 
     // propagate change action with the data of the selected option
     this.$select.on('change.propagate', () => {

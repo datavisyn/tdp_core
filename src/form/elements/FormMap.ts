@@ -14,6 +14,7 @@ import {IFormElement} from '..';
 import * as session from 'phovea_core/src/session';
 import {resolveImmediately} from 'phovea_core/src';
 import {ISelect3Options, default as Select3, IdTextPair} from './Select3';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 export interface ISubDesc {
   name: string;
@@ -97,44 +98,45 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   /**
    * Constructor
-   * @param form
-   * @param $parent
-   * @param desc
+   * @param form The form this element is a part of
+   * @param $parent The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent, desc: IFormMapDesc) {
-    super(form, desc);
+  constructor(form: IForm, $parent, elementDesc: IFormMapDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, elementDesc, pluginDesc);
 
     this.$node = $parent.append('div').classed('form-group', true);
     this.inline = hasInlineParent(<HTMLElement>this.$node.node());
-    if (this.inline && this.desc.onChange) {
+    if (this.inline && this.elementDesc.onChange) {
       //change the default onChange handler for the inline cas
-      this.inlineOnChange = this.desc.onChange;
-      this.desc.onChange = null;
+      this.inlineOnChange = this.elementDesc.onChange;
+      this.elementDesc.onChange = null;
     }
 
     this.build();
   }
 
   private updateBadge() {
-    const dependent = (this.desc.dependsOn || []).map((id) => this.form.getElementById(id));
-    resolveImmediately(this.desc.options.badgeProvider(this.value, ...dependent)).then((text) => {
+    const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
+    resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
       this.$node.select('span.badge').html(text).attr('title', `${text} items remaining after filtering`);
     });
   }
 
   private get sessionKey() {
-    return `formBuilder.map.${this.id}${this.desc.options.sessionKeySuffix || ''}`;
+    return `formBuilder.map.${this.id}${this.elementDesc.options.sessionKeySuffix || ''}`;
   }
 
   protected updateStoredValue() {
-    if (!this.desc.useSession) {
+    if (!this.elementDesc.useSession) {
       return;
     }
     session.store(this.sessionKey, this.value);
   }
 
   protected getStoredValue<T>(defaultValue:T): T {
-    if (!this.desc.useSession) {
+    if (!this.elementDesc.useSession) {
       return defaultValue;
     }
     return session.retrieve(this.sessionKey, defaultValue);
@@ -146,23 +148,23 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   protected build() {
     this.addChangeListener();
 
-    if (this.desc.visible === false) {
+    if (this.elementDesc.visible === false) {
       this.$node.classed('hidden', true);
     }
 
     if (this.inline) {
-      if (!this.desc.options.badgeProvider) {
+      if (!this.elementDesc.options.badgeProvider) {
         //default badge provider for inline
-        this.desc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
+        this.elementDesc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
       }
       this.$node.classed('dropdown', true);
       this.$node.html(`
-          <button class="btn btn-default dropdown-toggle" type="button" id="${this.desc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            ${this.desc.label}
+          <button class="btn btn-default dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            ${this.elementDesc.label}
             <span class="badge"></span>
             <span class="caret"></span>
           </button>
-          <div class="dropdown-menu" aria-labelledby="${this.desc.attributes.id}l" style="min-width: 25em">
+          <div class="dropdown-menu" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
                 <button class="btn btn-default btn-sm right">Apply</button>
@@ -180,17 +182,17 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       });
 
     } else {
-      if (!this.desc.hideLabel) {
-        const $label = this.$node.append('label').attr('for', this.desc.attributes.id);
-        if (this.desc.options.badgeProvider) {
-          $label.html(`${this.desc.label} <span class="badge"></span>`);
+      if (!this.elementDesc.hideLabel) {
+        const $label = this.$node.append('label').attr('for', this.elementDesc.attributes.id);
+        if (this.elementDesc.options.badgeProvider) {
+          $label.html(`${this.elementDesc.label} <span class="badge"></span>`);
         } else {
-          $label.text(this.desc.label);
+          $label.text(this.elementDesc.label);
         }
       }
       this.$group = this.$node.append('div');
     }
-    this.setAttributes(this.$group, this.desc.attributes);
+    this.setAttributes(this.$group, this.elementDesc.attributes);
     // adapt default settings
     this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-group-sm', true);
   }
@@ -204,7 +206,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.rows = this.getStoredValue([]);
     this.previousValue = this.value;
 
-    if (this.desc.options.badgeProvider) {
+    if (this.elementDesc.options.badgeProvider) {
       this.updateBadge();
       this.on('change', () => {
         this.updateBadge();
@@ -214,7 +216,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     this.handleDependent(() => {
       this.rows = []; // clear old
       this.buildMap();
-      if (this.desc.options.badgeProvider) {
+      if (this.elementDesc.options.badgeProvider) {
         this.updateBadge();
       }
     });
@@ -245,7 +247,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   private addValueEditor(row: IFormRow, parent: Element, entries: ISubDescs[]) {
     const that = this;
     const desc = entries.find((d) => d.value === row.key);
-    const defaultSelection = this.desc.options.defaultSelection !== false;
+    const defaultSelection = this.elementDesc.options.defaultSelection !== false;
 
     function mapOptions(d: any|string) {
       const value = typeof d === 'string' || !d ? d : (d.value || d.id);
@@ -290,7 +292,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           $s.select2(mixin({}, desc.ajax ? DEFAULT_AJAX_OPTIONS: DEFAULT_OPTIONS, desc));
           if (initialValue) {
             $s.val(initially).trigger('change');
-          } else if (!defaultSelection && that.desc.options.uniqueKeys) {
+          } else if (!defaultSelection && that.elementDesc.options.uniqueKeys) {
             // force no selection
             $s.val([]).trigger('change');
           }
@@ -327,7 +329,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
         parent.appendChild(select3.node);
         if (initialValue) {
           select3.value = Array.isArray(initialValue) ? initialValue : [initialValue];
-        } else if (!defaultSelection && that.desc.options.uniqueKeys) {
+        } else if (!defaultSelection && that.elementDesc.options.uniqueKeys) {
           select3.value = [];
         }
         that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
@@ -347,11 +349,11 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   }
 
   private buildMap() {
-    if (Array.isArray(this.desc.options.entries)) {
-      this.buildMapImpl(this.desc.options.entries);
+    if (Array.isArray(this.elementDesc.options.entries)) {
+      this.buildMapImpl(this.elementDesc.options.entries);
     } else { // function case
-      const dependent = (this.desc.dependsOn || []).map((id) => this.form.getElementById(id));
-      const entries = this.desc.options.entries(...dependent);
+      const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
+      const entries = this.elementDesc.options.entries(...dependent);
       this.buildMapImpl(entries);
     }
   }
@@ -368,7 +370,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
     const updateOptions = () => {
       // disable used options
-      if (!this.desc.options.uniqueKeys) {
+      if (!this.elementDesc.options.uniqueKeys) {
         return;
       }
       const keys = new Set<string>(this.rows.map((d) => d.key));
