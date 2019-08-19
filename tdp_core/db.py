@@ -54,6 +54,7 @@ def resolve_view(database, view_name, check_default_security=False):
   finds and return the connector, engine, and view for the given database and view_name
   :param database: database key to lookup
   :param view_name: view name to lookup
+  :param check_default_security: bool; usually view.can_access returns True when no security is defined on the view. This parameter can be used to tell the method that it should check the security anyway, e.g. that the user is at least logged in
   :return: (connector, engine, view)
   """
   connector, engine = resolve(database)

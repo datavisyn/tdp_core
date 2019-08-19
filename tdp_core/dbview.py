@@ -132,7 +132,7 @@ class DBView(object):
   def can_access(self, check_default_security=False):
     """
     check whether a user can access a DBView (DBView.security is checked and can either be a boolean, a string (=group the user must belong to) or a function) or not.
-    :param check_default_security: bool; True if the security should be checked by default, otherwise it is False (default = False)
+    :param check_default_security: bool (default = False); True if the security should be checked by default, e.g. although self.security is None, otherwise the function will return True
     :return: bool
     """
     if self.security is None and check_default_security is False:
