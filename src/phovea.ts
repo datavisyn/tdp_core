@@ -47,15 +47,15 @@ export default function (registry: IRegistry) {
   actionFunction('lineupAddColumn', 'addColumnImpl', () => System.import('./lineup/internal/cmds'));
   actionFunction('lineupMoveColumn', 'moveColumnImpl', () => System.import('./lineup/internal/cmds'));
 
-  formElements(FormElementType.SELECT, () => System.import('./form/internal/FormSelect'));
-  formElements(FormElementType.SELECT2, () => System.import('./form/internal/FormSelect2'), { selection: 'single' });
-  formElements(FormElementType.SELECT2_MULTIPLE, () => System.import('./form/internal/FormSelect2'), { selection: 'multiple' });
-  formElements(FormElementType.SELECT3, () => System.import('./form/internal/FormSelect3'), { selection: 'single' });
-  formElements(FormElementType.SELECT3_MULTIPLE, () => System.import('./form/internal/FormSelect3'), { selection: 'multiple' });
-  formElements(FormElementType.INPUT_TEXT, () => System.import('./form/internal/FormInputText'));
-  formElements(FormElementType.MAP, () => System.import('./form/internal/FormMap'));
-  formElements(FormElementType.BUTTON, () => System.import('./form/internal/FormButton'));
-  formElements(FormElementType.CHECKBOX, () => System.import('./form/internal/FormCheckBox'));
-  formElements(FormElementType.RADIO, () => System.import('./form/internal/FormRadio'));
+  formElements(FormElementType.SELECT, () => System.import('./form/elements/FormSelect'));
+  formElements(FormElementType.SELECT2, () => System.import('./form/elements/FormSelect2'), { selection: 'single' });
+  formElements(FormElementType.SELECT2_MULTIPLE, () => System.import('./form/elements/FormSelect2'), { selection: 'multiple' });
+  formElements(FormElementType.SELECT3, () => System.import('./form/elements/FormSelect3'), { selection: 'single' });
+  formElements(FormElementType.SELECT3_MULTIPLE, () => System.import('./form/elements/FormSelect3'), { selection: 'multiple' });
+  formElements(FormElementType.INPUT_TEXT, () => System.import('./form/elements/FormInputText'));
+  formElements(FormElementType.MAP, () => System.import('./form/elements/FormMap'));
+  formElements(FormElementType.BUTTON, () => System.import('./form/elements/FormButton'));
+  formElements(FormElementType.CHECKBOX, () => System.import('./form/elements/FormCheckBox'));
+  formElements(FormElementType.RADIO, () => System.import('./form/elements/FormRadio'));
 
 }

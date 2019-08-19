@@ -1,5 +1,6 @@
 import {IFormElementDesc, IForm} from '../interfaces';
 import {AFormElement} from './AFormElement';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 export interface ICheckBoxElementDesc extends IFormElementDesc {
   options: {
@@ -24,12 +25,13 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
 
   /**
    * Constructor
-   * @param form
-   * @param parentElement
-   * @param desc
+   * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, parentElement: HTMLElement, desc: ICheckBoxElementDesc) {
-    super(form, Object.assign({options: { checked: true, unchecked: false}}, desc));
+  constructor(form: IForm, parentElement: HTMLElement, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, Object.assign({options: { checked: true, unchecked: false}}, elementDesc), pluginDesc);
 
     this.node = parentElement.ownerDocument.createElement('div');
     this.node.classList.add('checkbox');
@@ -52,17 +54,17 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
       this.inputElement.setAttribute('type', 'checkbox');
       this.node.appendChild(this.inputElement);
     }
-    this.setAttributes(this.inputElement, this.desc.attributes);
+    this.setAttributes(this.inputElement, this.elementDesc.attributes);
     this.inputElement.classList.remove('form-control'); // remove falsy class again
   }
 
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
-    const options = this.desc.options;
+    const options = this.elementDesc.options;
     const isChecked: boolean = options.isChecked != null? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
     this.previousValue = isChecked;
     this.inputElement.checked = isChecked;
@@ -84,7 +86,7 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @returns {string}
    */
   get value() {
-    const options = this.desc.options;
+    const options = this.elementDesc.options;
     return this.inputElement.checked ? options.checked : options.unchecked;
   }
 
@@ -93,7 +95,7 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @param v
    */
   set value(v: any) {
-    const options = this.desc.options;
+    const options = this.elementDesc.options;
     this.inputElement.value = (v === options.checked).toString();
     this.previousValue = v === options.checked; // force old value change
     this.updateStoredValue();

@@ -67,7 +67,7 @@ export class Form implements IForm {
    * At this stage it is possible to reference dependencies to other form fields
    */
   initializeAllElements() {
-    this.elements.forEach((element) => element.initialize());
+    this.elements.forEach((element) => element.init());
   }
 
   /**

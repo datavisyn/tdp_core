@@ -7,6 +7,7 @@ import * as session from 'phovea_core/src/session';
 import AFormElement from './AFormElement';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import {resolveImmediately} from 'phovea_core/src';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 
 export interface IFormSelectOption {
@@ -60,12 +61,13 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
 
   /**
    * Constructor
-   * @param form
-   * @param parentElement
-   * @param desc
+   * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, parentElement: HTMLElement, desc: IFormSelectDesc) {
-    super(form, desc);
+  constructor(form: IForm, parentElement: HTMLElement, elementDesc: IFormSelectDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, elementDesc, pluginDesc);
 
     this.node = parentElement.ownerDocument.createElement('div');
     this.node.classList.add('form-group');
@@ -75,14 +77,14 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   }
 
   protected updateStoredValue() {
-    if (!this.desc.useSession) {
+    if (!this.elementDesc.useSession) {
       return;
     }
     session.store(`${this.id}_selectedIndex`, this.getSelectedIndex());
   }
 
   protected getStoredValue<T>(defaultValue:T): T {
-    if (!this.desc.useSession) {
+    if (!this.elementDesc.useSession) {
       return defaultValue;
     }
     return session.retrieve(`${this.id}_selectedIndex`, defaultValue);
@@ -97,16 +99,16 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     this.selectElement = this.node.ownerDocument.createElement('select');
     this.node.appendChild(this.selectElement);
 
-    this.setAttributes(this.selectElement, this.desc.attributes);
+    this.setAttributes(this.selectElement, this.elementDesc.attributes);
   }
 
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
-    const options = this.desc.options;
+    const options = this.elementDesc.options;
 
     // propagate change action with the data of the selected option
     this.selectElement.addEventListener('change.propagate', () => {

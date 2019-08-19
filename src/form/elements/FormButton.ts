@@ -1,5 +1,6 @@
 import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
 import {EventHandler} from 'phovea_core/src/event';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 export interface IButtonElementDesc extends IFormElementDesc {
   onClick: () => void;
@@ -14,12 +15,20 @@ export default class FormButton extends EventHandler implements IFormElement {
   readonly type: FormElementType.BUTTON;
   readonly id: string;
 
-  constructor(readonly parent: IForm, readonly parentElement: HTMLElement, readonly desc: IButtonElementDesc) {
+  /**
+   * Constructor
+   * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
+   */
+  constructor(readonly form: IForm, readonly parentElement: HTMLElement, readonly desc: IButtonElementDesc, readonly pluginDesc: IPluginDesc) {
     super();
     this.id = desc.id;
     this.node = parentElement.ownerDocument.createElement('div');
     this.node.classList.add('form-group');
     parentElement.appendChild(this.node);
+
     this.build();
   }
 
@@ -50,7 +59,7 @@ export default class FormButton extends EventHandler implements IFormElement {
     this.node.appendChild(this.button);
   }
 
-  initialize() {
+  init() {
     this.button.addEventListener('click', (event) => {
       this.value = true;
       this.desc.onClick();

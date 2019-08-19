@@ -4,8 +4,8 @@
 
 import {randomId} from 'phovea_core/src/index';
 import {IFormElement, IFormElementDesc, IForm} from './interfaces';
-import {create} from './internal';
-import {Form, updateElementDesc} from './internal/Form';
+import {create} from './elements';
+import {Form, updateElementDesc} from './elements/Form';
 
 /**
  * Builds a form from a given collection of form elements

@@ -2,6 +2,7 @@ import {IFormElementDesc, IForm} from '../interfaces';
 import {select} from 'd3';
 import {AFormElement} from './AFormElement';
 import {IFormSelectOption} from './FormSelect';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 export interface IRadioElementDesc extends IFormElementDesc {
   options: {
@@ -13,12 +14,13 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
 
   /**
    * Constructor
-   * @param form
-   * @param parentElement
-   * @param desc
+   * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, parentElement: HTMLElement, desc: IRadioElementDesc) {
-    super(form, Object.assign({options: { buttons: [] }}, desc));
+  constructor(form: IForm, parentElement: HTMLElement, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, Object.assign({options: { buttons: [] }}, elementDesc), pluginDesc);
 
     this.node = parentElement.ownerDocument.createElement('div');
     parentElement.appendChild(this.node);
@@ -32,7 +34,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
   protected build() {
     super.build();
 
-    const options = this.desc.options;
+    const options = this.elementDesc.options;
 
     const $buttons = select(this.node).selectAll('label.radio-inline').data(options.buttons);
     $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<input type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}"> ${d.name}`);
@@ -44,18 +46,18 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
     });
 
     // TODO: fix that the form-control class is only appended for textual form elements, not for all
-    this.desc.attributes.clazz = this.desc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because it is mainly used for text inputs and destroys the styling of the radio
-    this.setAttributes(<HTMLElement>$buttonElements.node(), this.desc.attributes);
+    this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because it is mainly used for text inputs and destroys the styling of the radio
+    this.setAttributes(<HTMLElement>$buttonElements.node(), this.elementDesc.attributes);
 
   }
 
   /**
    * Bind the change listener and propagate the selection by firing a change event
    */
-  initialize() {
-    super.initialize();
+  init() {
+    super.init();
 
-    const options = this.desc.options;
+    const options = this.elementDesc.options;
     const defaultOption = options.buttons[0].data;
     const defaultValue = this.getStoredValue(defaultOption);
     this.value = defaultValue;
