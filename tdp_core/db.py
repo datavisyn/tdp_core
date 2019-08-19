@@ -49,18 +49,20 @@ def resolve_engine(database):
   return configs.engine(database)
 
 
-def resolve_view(database, view_name):
+def resolve_view(database, view_name, check_default_security=False):
   """
   finds and return the connector, engine, and view for the given database and view_name
   :param database: database key to lookup
   :param view_name: view name to lookup
+  :param check_default_security: bool; usually view.can_access returns True when no security is defined on the view. This parameter can be used to tell the method that it should check the security anyway, e.g. that the user is at least logged in
   :return: (connector, engine, view)
   """
   connector, engine = resolve(database)
   if view_name not in connector.views:
     abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   view = connector.views[view_name]
-  if not view.can_access():
+  # TODO: improve the logic of the view.can_access function, because even for unauthorized can_access returns True, i.e. that the user can access the resource. Somewhere else the server checks whether the user is authenticated or not
+  if not view.can_access(check_default_security):
     abort(403)
   return connector, engine, view
 
