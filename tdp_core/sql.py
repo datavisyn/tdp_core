@@ -2,7 +2,6 @@ from phovea_server.ns import Namespace, request, abort
 from . import db
 from .utils import map_scores
 from phovea_server.util import jsonify
-from phovea_server.security import login_required
 from .security import tdp_login_required
 from .formatter import formatter
 import logging
@@ -26,7 +25,7 @@ def list_database():
 
 
 @app.route('/<database>/')
-@login_required
+@tdp_login_required
 def list_view(database):
   config_engine = db.resolve(database)
   if not config_engine:

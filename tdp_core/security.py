@@ -8,7 +8,7 @@ from functools import wraps
 def tdp_login_required(func):
   @wraps(func)
   def decorated_view(*args, **kwargs):
-    if kwargs['view_name'] is not None and kwargs['database'] is not None:
+    if kwargs.get('view_name', None) is not None and kwargs.get('database', None) is not None:
       view_name, _ = formatter(kwargs['view_name'])
       config, _, view = resolve_view(kwargs['database'], view_name)
       if isinstance(view.security, bool) and view.security is False:  # if security is disabled for the view just call it without checking the login
