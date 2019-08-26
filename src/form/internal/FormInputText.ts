@@ -20,6 +20,12 @@ export interface IFormInputTextDesc extends IFormElementDesc {
      * @default text
      */
     type?: string;
+
+    /**
+     * Step size for input type `number`
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#step
+     */
+    step?: string;
   };
 }
 
@@ -49,6 +55,10 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
     super.build();
     this.$input = this.$node.append('input').attr('type', (this.desc.options || {}).type || 'text');
     this.setAttributes(this.$input, this.desc.attributes);
+
+    if((this.desc.options || {}).type === 'number' && (this.desc.options || {}).step) {
+      this.$input.attr('step', this.desc.options.step);
+    }
 
     const defaultValue = (this.desc.options || {}).type === 'number' ? '0' : '';
     const defaultText = this.getStoredValue(defaultValue);
