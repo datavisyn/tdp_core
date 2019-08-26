@@ -332,9 +332,10 @@ export default class LineUpPanelActions extends EventHandler {
     }
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
-    const items = [
-      this.groupedDialog('Database Columns', this.getColumnDescription(descs, false))
+    const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [
+      this.groupedDialog('Annotation Columns', this.getColumnDescription(descs, false))
     ];
+
     if (loadedScorePlugins.length > 0) {
       items.push({
         text: 'Parameterized Scores',
@@ -353,6 +354,7 @@ export default class LineUpPanelActions extends EventHandler {
         })
       });
     }
+
     const scoreDescs = this.getColumnDescription(descs, true);
     if (scoreDescs.length > 0) {
       items.push({
@@ -360,25 +362,34 @@ export default class LineUpPanelActions extends EventHandler {
         children: scoreDescs
       });
     }
-    items.push(
-      this.groupedDialog('Combining Columns', [
-          { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
-          { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
-          { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-          { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
-          { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
-      ]),
-      this.groupedDialog('Support Columns', [
-          {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
-          {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
-          {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
-      ]),
-      ...metaDataOptions
-    );
+
+    const combiningColumns = this.groupedDialog('Combining Columns', [
+      { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
+      { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
+      { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
+      { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
+      { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+    ]);
+
+    const supportColumns = this.groupedDialog('Support Columns', [
+        {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
+        {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+        {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+    ]);
+
+    items.push({
+      text: 'Special Columns',
+      children: [
+        combiningColumns,
+        supportColumns,
+        ...metaDataOptions
+      ]
+    });
+
     this.search.data = items;
   }
 
-  private groupedDialog(text: string, children: ISearchOption[]) {
+  private groupedDialog(text: string, children: ISearchOption[]):ISearchOption | IGroupSearchItem<ISearchOption> {
     const viaDialog = this.options.enableAddingColumnGrouping;
     if (!viaDialog) {
       return { text, children };
