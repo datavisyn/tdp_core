@@ -34,13 +34,19 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
     const $label = this.$node.select('label');
 
     const options = this.desc.options;
-    // this.setAttributes(this.$input, this.desc.attributes);
+
     const $buttons = this.$node.selectAll('label.radio-inline').data(options.buttons);
     $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<input type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}"> ${d.name}`);
 
-    $buttons.select('input').on('change', (d) => {
+    const $buttonElements = $buttons.select('input');
+
+    $buttonElements.on('change', (d) => {
       this.fire(FormRadio.EVENT_CHANGE, d, $buttons);
     });
+
+    // TODO: fix that the form-control class is only appended for textual form elements, not for all
+    this.desc.attributes.clazz = this.desc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because it is mainly used for text inputs and destroys the styling of the radio
+    this.setAttributes($buttonElements, this.desc.attributes);
 
     const defaultOption = options.buttons[0].data;
     const defaultValue = this.getStoredValue(defaultOption);
