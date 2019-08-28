@@ -80,14 +80,6 @@ def filter_logic(view, args):
       k = k[:-2]
     if k.startswith('filter_'):
       where_clause[k[7:]] = v  # remove filter_
-    elif k.startswith('filter_lt_'):
-      where_clause[k[7:]] = v  # remove filter_ -> leaves 'lt_[columnname]'
-    elif k.startswith('filter_lte_'):
-      where_clause[k[7:]] = v  # remove filter_ -> leaves 'lte_[columnname]'
-    elif k.startswith('filter_gt_'):
-      where_clause[k[7:]] = v  # remove filter_ -> leaves 'gt_[columnname]'
-    elif k.startswith('filter_gte_'):
-      where_clause[k[7:]] = v  # remove filter_ -> leaves 'gte_[columnname]'
     else:
       processed_args.setlist(k, v)
 
@@ -136,7 +128,7 @@ def filter_logic(view, args):
 
       extra_args[kp] = v[0]
     else:
-      # there are no lt,lte,gt, and gte filters with multiple values, see lines 156 to 171
+      # there are no lt,lte,gt, and gte filters with multiple values, see about 10 code lines below
       extra_args[kp] = tuple(v)  # multi values need to be a tuple not a list
       operator = 'IN'
     # find the sub query to replace, can be injected for more complex filter operations based on the input
@@ -144,34 +136,42 @@ def filter_logic(view, args):
     return sub_query.format(operator=operator, value=':' + kp)
 
   for key in where_clause.keys():
-    columntype = ''
-    morethanone = None
-    filterkey = key  # filter key is the value for the filter type + column
+    # key: is the attribute/column, but for greater and less filters it also includes one of the filter prefixes (lt_, lte_, gt_, or gte_)
+    original_key = key  # is a copy of key, to keep the possible greater (gt_,gte_) or less (lt_,lte_) filter prefix
+
+    is_greater_less_filter = False
+    check_complement_filter = False
+
     if key.startswith('lt_') or key.startswith('gt_'):
-      morethanone = (len(where_clause[filterkey]) > 1)  # check if the lt,lte,gt, and gte filters have only one value
       key = key[3:]  # remove the leading identifiers (lt_=less than,gt_=greater than) for filter parameter check in view.is_valid_filter(key):
-      columntype = view.columns.get(key).get('type')
+      is_greater_less_filter = True
 
     if key.startswith('lte_') or key.startswith('gte_'):
-      morethanone = (len(where_clause[filterkey]) > 1)  # check if the lt,lte,gt, and gte filters have only one value
       key = key[4:]  # remove the leading identifiers (lte_=less than equals,gte_=greater than equals) for filter parameter check in view.is_valid_filter(key):
-      columntype = view.columns.get(key).get('type')
+      is_greater_less_filter = True
+      check_complement_filter = True
 
-    if morethanone:  # number of values check
-      # if lt,lte,gt, and gte filter have more than one value, remove from filter query
-      _log.warn('filter "%s" has too many values ("%s"), only one is allowed', filterkey, where_clause[filterkey])
-      _log.warn('filter "%s" will be removed from filter query', filterkey)
-      del where_clause[filterkey]
-
-    if columntype != '' and columntype != 'number':  # column type check
-      # if the lt,lte,gt, and gte filters are NOT applied to number column, remove from filter query
-      _log.warn('filters "lt","lte","gt", and "gte" are only applicable to columns of type "number", "%s" is not of type "number"', key)
-      _log.warn('filter "%s" will be removed from filter query', filterkey)
-      del where_clause[filterkey]
-
+    # check if key (attribute/column) does exist in view
     if not view.is_valid_filter(key):
-      _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
-      del where_clause[filterkey]
+      raise RuntimeError('Invalid filter key detected, "' + original_key + '"')
+
+    # check if column type is number for one of the greater (gt and gte) or less (lt and lte) filters
+    column_type = view.columns.get(key).get('type')
+    if is_greater_less_filter and column_type != 'number':
+      raise RuntimeError('Filters "lt","lte","gt", and "gte" are only applicable to columns of type "number", "' + key + '" is not of type "number".')
+
+    # check if a greater (gt or gte) or less (lt or lte) filter was used on the same column more than once
+    if is_greater_less_filter and (len(where_clause[original_key]) > 1):
+      separator = '", "'
+      raise RuntimeError('Filter "' + original_key + '" has too many values ("' + separator.join(where_clause[original_key]) + '"), only one is allowed.')
+
+    # check complement filter for gte or lte (gt or lt respectively)
+    if check_complement_filter:
+      complement_filter = original_key[:2]+'_'+key  # create complement filter
+      complement_filter_exist = complement_filter in where_clause  # look if complement filter exist in the where clause
+      # check if complement filter exists
+      if complement_filter_exist:
+        raise RuntimeError('Filter "' + original_key + '" has a complement filter "' + complement_filter + '", only on of these filters is allowed.')
 
   where_default_clause = []
   where_group_clauses = {group: [] for group in view.filter_groups()}
