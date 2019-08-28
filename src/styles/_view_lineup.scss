@@ -207,7 +207,6 @@ $lu_assets: '~lineupjs/src/assets';
     }
 
     .download-data-dropdown {
-
       // show the number of selected rows after the element
       li[data-num-selected-rows]::after {
         content: ' (' attr(data-num-selected-rows) ')';
