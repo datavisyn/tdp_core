@@ -214,19 +214,25 @@ export default class LineUpPanelActions extends EventHandler {
 
   private appendDownload() {
     const node = this.node.ownerDocument.createElement('div');
-    node.classList.add('btn-group');
+    node.classList.add('btn-group', 'download-data-dropdown');
     node.innerHTML = `
       <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
       </button>
       <ul class="dropdown-menu dropdown-menu-${this.isTopMode ? 'left' : 'right'}">
         <li class="dropdown-header">Download All Rows</li>
         <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li class="dropdown-header">Download Selected Rows Only</li>
+        <li class="dropdown-header" data-num-selected-rows="0">Download Selected Rows Only</li>
         <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
         <li role="separator" class="divider"></li>
         <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
       </ul>
     `;
+
+    // Listen for row selection and update number of selected rows
+    // Show/hide some dropdown menu points accordingly using CSS
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.download-menu', (indices: number[]) => {
+      (<HTMLElement>node.querySelector('[data-num-selected-rows]')).dataset.numSelectedRows = indices.length.toString();
+    });
 
     const links = Array.from(node.querySelectorAll('a'));
     for (const link of links) {
