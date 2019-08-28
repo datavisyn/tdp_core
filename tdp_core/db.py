@@ -344,7 +344,11 @@ def get_filtered_data(database, view_name, args):
   config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  try:
+    replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  except RuntimeError as error:
+    abort(400,error.message)
+
   return get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
 
@@ -352,14 +356,21 @@ def get_filtered_query(database, view_name, args):
   config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  try:
+    replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  except RuntimeError as error:
+    abort(400,error.message)
+
   return get_query(database, view_name, replacements, processed_args, extra_args)
 
 
 def _get_count(database, view_name, args):
   config, engine, view = resolve_view(database, view_name)
 
-  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  try:
+    replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  except RuntimeError as error:
+    abort(400,error.message)
 
   kwargs, replace = prepare_arguments(view, config, replacements, processed_args, extra_args)
 
