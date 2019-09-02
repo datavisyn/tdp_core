@@ -7,6 +7,7 @@ import {IViewProvider} from '../lineup/internal/cmds';
 import {resolve} from 'phovea_core/src/idtype';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../extensions';
 import {get as getPlugin} from 'phovea_core/src/plugin';
+import {IViewDescription} from '../rest';
 
 
 interface IEmbeddedRanking extends ARankingView {
@@ -50,7 +51,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     class EmbeddedRankingView extends ARankingView implements IEmbeddedRanking {
       private triggerScoreReload = false;
 
-      protected loadColumnDesc() {
+      protected loadColumnDesc() : Promise<IViewDescription> {
         return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns, idType: this.idType.name}));
       }
 

@@ -39,18 +39,29 @@ export function getTDPDatabases(): Promise<IDatabaseDesc[]> {
   return getAPIJSON(`${REST_DB_NAMESPACE}/`);
 }
 
-export interface IViewDesc {
+export interface IViewDescription {
+
+  /**
+   * idType of the DBView, can be null
+   */
+  idType: string | null;
+
+  /**
+   * list of columns within this view, can be empty
+   */
+  columns: IServerColumn[];
+}
+
+export interface IDatabaseViewDesc extends IViewDescription {
   name: string;
   description: string;
   arguments: string[];
   query: string;
-  columns?: IServerColumn[];
-  idType?: string;
   filters?: string[];
   queries?: { [name: string]: string };
 }
 
-export function getTDPViews(database: string): Promise<Readonly<IViewDesc>[]> {
+export function getTDPViews(database: string): Promise<Readonly<IDatabaseViewDesc>[]> {
   return getAPIJSON(`${REST_DB_NAMESPACE}/${database}/`);
 }
 
@@ -216,25 +227,12 @@ export interface IServerColumn {
   max?: number;
 }
 
-export interface IViewDescription {
-
-  /**
-   * idType of the DBView, can be null
-   */
-  idType: string;
-
-  /**
-   * list of columns within this view
-   */
-  columns: IServerColumn[];
-}
-
 /**
  * queries the server side column information of the given view
  * @param {string} database
  * @param {string} view
- * @returns {Promise<Readonly<IViewDescription>>}
+ * @returns {Promise<Readonly<IDatabaseViewDesc>>}
  */
-export function getTDPDesc(database: string, view: string): Promise<Readonly<IViewDescription>> {
+export function getTDPDesc(database: string, view: string): Promise<Readonly<IDatabaseViewDesc>> {
   return getTDPDataImpl(database, view, 'desc');
 }
