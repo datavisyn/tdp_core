@@ -58,8 +58,7 @@ class DBView(object):
     args = [a for a in self.arguments]
     args.extend(self.replacements)
     r['arguments'] = args
-    if self.columns:
-      r['columns'] = self.columns.values()
+    r['columns'] = self.columns.values() if self.columns else []  # some views have no columns -> return empty array
     if self.filters:
       r['filters'] = self.filters.keys()
     if self.queries:
