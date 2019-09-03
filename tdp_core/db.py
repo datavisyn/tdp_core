@@ -288,9 +288,9 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
           if(view.query):
             # HACK: this hack allows us to inject arguments (DBViewBuilder.args) into the query (like the replacements) but at the same time use the list_as_tuple option
             # We'll replace the query's argument with a placeholder, which is then used as a replacement, i.e. replaced via str.format(...)
-            MAGIC_PLACEHOLDER = "magic_list_as_tuple_replacement"
-            replace[MAGIC_PLACEHOLDER] = value
-            view.query = view.query.replace(":" + lookup_key, "{" + MAGIC_PLACEHOLDER + "}")
+            magic_placeholder = "magic_list_as_tuple_replacement"
+            replace[magic_placeholder] = value
+            view.query = view.query.replace(":" + lookup_key, "{" + magic_placeholder + "}")
           else:
             kwargs[arg] = value
           continue
