@@ -179,4 +179,13 @@ export default class SelectionChooser {
     return changed;
   }
 
+  /**
+   * change the selected value programmatically
+   */
+  setSelection(value: any) {
+    const element = <IFormSelectElement>this.accessor(this.formID);
+
+    element.value = value;
+  }
+
 }
