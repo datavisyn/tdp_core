@@ -3,7 +3,7 @@
  */
 import {IForm, IFormElementDesc,IFormElement} from '../interfaces';
 import {get} from 'phovea_core/src/plugin';
-import {FORM_EXTENSION_POINT} from '..';
+import {EP_TDP_CORE_FORM_ELEMENT} from '..';
 
 /**
  * Factory method to create form elements for the phovea extension type `tdpFormElement`.
@@ -14,7 +14,7 @@ import {FORM_EXTENSION_POINT} from '..';
  * @param elementDesc form element description
  */
 export function create(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormElementDesc): Promise<IFormElement> {
-  const plugin = get(FORM_EXTENSION_POINT, elementDesc.type);
+  const plugin = get(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
   if(!plugin) {
     throw new Error('unknown form element type: ' + elementDesc.type);
   }

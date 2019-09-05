@@ -13,4 +13,4 @@ export {default as FormDialog} from './FormDialog';
 export {nameLookupDesc} from './elements/builder';
 
 // name of the phovea extension type for all form elements
-export const FORM_EXTENSION_POINT = 'tdpFormElement';
+export const EP_TDP_CORE_FORM_ELEMENT = 'epTdpCoreFormElement';

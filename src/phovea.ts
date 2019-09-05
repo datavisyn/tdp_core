@@ -5,7 +5,7 @@
  **************************************************************************** */
 import {IRegistry} from 'phovea_core/src/plugin';
 import {FormElementType} from './form';
-import {FORM_EXTENSION_POINT} from './form';
+import {EP_TDP_CORE_FORM_ELEMENT} from './form';
 
 export default function (registry: IRegistry) {
   function actionFunction(id: string, factory: string, loader: () => any, options?: {}) {
@@ -17,7 +17,7 @@ export default function (registry: IRegistry) {
   }
 
   function formElements(id: string, loader: () => any, options?: any) {
-    registry.push(FORM_EXTENSION_POINT, id, loader, options);
+    registry.push(EP_TDP_CORE_FORM_ELEMENT, id, loader, options);
   }
 
   actionFunction('tdpInitSession', 'initSessionImpl', () => System.import('./internal/cmds'), {
