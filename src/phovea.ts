@@ -5,7 +5,7 @@
  **************************************************************************** */
 import {IRegistry} from 'phovea_core/src/plugin';
 import {FormElementType} from './form';
-import {EP_TDP_CORE_FORM_ELEMENT} from './form';
+import {EP_TDP_CORE_FORM_ELEMENT} from './extensions';
 
 export default function (registry: IRegistry) {
   function actionFunction(id: string, factory: string, loader: () => any, options?: {}) {

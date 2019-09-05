@@ -24,6 +24,19 @@ export const EXTENSION_POINT_TDP_LIST_FILTERS = 'tdpListFilters';
 export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
 
 /**
+ * Register new form elements for the form builder. Form elements must implement the `IFormElement`.
+ *
+ * @registryParam {object} [parameter] The registry parameter depend on the form element. Hence, all defined parameters are passed to the form element as `pluginDesc`.
+ *
+ * @factoryParam {Form} form The form this element is a part of
+ * @factoryParam {D3.Selction} $parent The parent node this element will be attached to
+ * @factoryParam {IFormElementDesc} elementDesc The form element description from the form builder
+ * @factoryParam {IPluginDesc} pluginDesc The phovea extension point options
+ * @factoryReturns {IFormElement} An instance of the form element
+ */
+export const EP_TDP_CORE_FORM_ELEMENT = 'epTdpCoreFormElement';
+
+/**
  * a score item
  */
 export interface IScoreRow<T> {

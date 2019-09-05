@@ -3,7 +3,7 @@
  */
 import {IForm, IFormElementDesc,IFormElement} from '../interfaces';
 import {get} from 'phovea_core/src/plugin';
-import {EP_TDP_CORE_FORM_ELEMENT} from '..';
+import {EP_TDP_CORE_FORM_ELEMENT} from '../../extensions';
 
 /**
  * Factory method to create form elements for the phovea extension type `tdpFormElement`.
