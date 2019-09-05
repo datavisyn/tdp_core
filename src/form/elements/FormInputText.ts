@@ -70,7 +70,7 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
     super.init();
 
     if((this.elementDesc.options || {}).type === 'number' && (this.elementDesc.options || {}).step) {
-      this.$input.attr('step', this.elementDesc.options.step);
+      this.input.setAttribute('step', this.elementDesc.options.step);
     }
 
     const defaultValue = (this.elementDesc.options || {}).type === 'number' ? '0' : '';
