@@ -39,13 +39,19 @@ li[data-header=optionsLink] {
   color: inherit;
   transition: color ease .2s;
 
-  overflow: hidden;
-  max-width: 10em;
-  text-overflow: ellipsis;
-
   &.active {
     color: blue;
   }
+}
+
+.dropdown-label {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857;
+  color: #777777;
+  white-space: nowrap;
 }
 
 .toast-container {
