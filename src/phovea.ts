@@ -15,13 +15,13 @@ export default function (registry: IRegistry) {
   }
 
   actionFunction('tdpInitSession', 'initSessionImpl', () => System.import('./internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'session',
       action: 'init'
     }
   });
   actionFunction('tdpSetParameter', 'setParameterImpl', () => System.import('./internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'view',
       action: 'setParameter'
     }
@@ -35,13 +35,13 @@ export default function (registry: IRegistry) {
 
 
   actionFunction('tdpAddScore', 'addScoreImpl', () => System.import('./lineup/internal/scorecmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'score',
       action: 'add'
     }
   });
   actionFunction('tdpRemoveScore', 'removeScoreImpl', () => System.import('./lineup/internal/scorecmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'score',
       action: 'remove'
     }
@@ -54,43 +54,43 @@ export default function (registry: IRegistry) {
   actionCompressor('ordinoScoreCompressor', 'compressComp', '(ordinoAddScore|ordinoRemoveScore)', () => System.import('./lineup/internal/scorecmds'));
 
   actionFunction('lineupAddRanking', 'addRankingImpl', () => System.import('./lineup/internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'lineup',
       action: 'addRanking'
     }
   });
   actionFunction('lineupSetRankingSortCriteria', 'setRankingSortCriteriaImpl', () => System.import('./lineup/internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'lineup',
       action: 'setRankingSortCriteria'
     }
   });
   actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => System.import('./lineup/internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'lineup',
       action: 'setSortCriteria'
     }
   });
   actionFunction('lineupSetGroupCriteria', 'setGroupCriteriaImpl', () => System.import('./lineup/internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'lineup',
       action: 'setGroupCriteria'
     }
   });
   actionFunction('lineupSetColumn', 'setColumnImpl', () => System.import('./lineup/internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'lineup',
       action: 'setColumn'
     }
   });
   actionFunction('lineupAddColumn', 'addColumnImpl', () => System.import('./lineup/internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'lineup',
       action: 'addColumn'
     }
   });
   actionFunction('lineupMoveColumn', 'moveColumnImpl', () => System.import('./lineup/internal/cmds'), {
-    tdp_matomo: {
+    analytics: {
       category: 'lineup',
       action: 'moveColumn'
     }
