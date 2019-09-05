@@ -211,7 +211,7 @@ export interface IFormElement extends IEventHandler {
    * Initialize the current element
    * It is possible to reference to other elements (e.g., form.getElementById) in this stage
    */
-  init();
+  init(): void;
 
   /**
    * Set the visibility of an form element
