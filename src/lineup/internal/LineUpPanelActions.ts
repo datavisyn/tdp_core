@@ -331,7 +331,7 @@ export default class LineUpPanelActions extends EventHandler {
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [
-      this.groupedDialog('Annotation Columns', this.getColumnDescription(descs, false))
+      this.groupedDialog('Database Columns', this.getColumnDescription(descs, false))
     ];
 
     if (loadedScorePlugins.length > 0) {
