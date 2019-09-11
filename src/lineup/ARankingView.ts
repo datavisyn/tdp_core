@@ -509,7 +509,6 @@ export abstract class ARankingView extends AView {
       this.createInitialRanking(this.provider);
       const ranking = this.provider.getLastRanking();
       this.customizeRanking(wrapRanking(this.provider, ranking));
-      this.colors.init(ranking);
     }).then(() => {
       if (this.selectionAdapter) {
         // init first time
