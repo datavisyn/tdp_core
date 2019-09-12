@@ -12,7 +12,7 @@ def map_scores(scores, from_idtype, to_idtype):
   :return: a mapped version of the scores
   """
   from phovea_server.dataset import get_mappingmanager
-  from itertools import izip
+  
 
   if len(scores) == 0:
     return []
@@ -23,7 +23,7 @@ def map_scores(scores, from_idtype, to_idtype):
   mapped_ids = manager(from_idtype, to_idtype, [r['id'] for r in scores])
 
   mapped_scores = []
-  for score, mapped in izip(scores, mapped_ids):
+  for score, mapped in zip(scores, mapped_ids):
     if not mapped:
       continue
     for target_id in mapped:

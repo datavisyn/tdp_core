@@ -29,7 +29,7 @@ def _gen():
   base['paths'] = OrderedDict(sorted(base['paths'].items(), key=lambda t: t[0]))
 
   with io.open(path.join(here, 'swagger', 'view.tmpl.yml'), 'r', encoding='utf-8') as f:
-    template = Template(unicode(f.read()))
+    template = Template(str(f.read()))
 
   tags = base['tags']
 
@@ -47,7 +47,7 @@ def _gen():
     db.resolve(database)  # trigger filling up columns
 
     # add database tag
-    tags.append(dict(name=u'db_' + database, description=connector.description or ''))
+    tags.append(dict(name='db_' + database, description=connector.description or ''))
 
     for view, dbview in connector.views.items():
       if not dbview.can_access() or dbview.query_type == 'private':

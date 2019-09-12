@@ -10,7 +10,7 @@ def _replace_named_sets_in_ids(v):
   :param v:
   :return:
   """
-  import storage
+  from . import storage
   import phovea_server.plugin
 
   manager = phovea_server.plugin.lookup('idmanager')

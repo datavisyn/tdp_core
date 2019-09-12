@@ -28,7 +28,7 @@ def resolve(database):
   :return: (connector, engine)
   """
   if database not in configs:
-    abort(404, u'Database with id "{}" cannot be found'.format(database))
+    abort(404, 'Database with id "{}" cannot be found'.format(database))
   r = configs[database]
   # derive needed columns
   connector, engine = r
@@ -45,7 +45,7 @@ def resolve_engine(database):
   :return: engine
   """
   if database not in configs:
-    abort(404, u'Database with id "{}" cannot be found'.format(database))
+    abort(404, 'Database with id "{}" cannot be found'.format(database))
   return configs.engine(database)
 
 
@@ -59,7 +59,7 @@ def resolve_view(database, view_name, check_default_security=False):
   """
   connector, engine = resolve(database)
   if view_name not in connector.views:
-    abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
+    abort(404, 'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   view = connector.views[view_name]
   # TODO: improve the logic of the view.can_access function, because even for unauthorized can_access returns True, i.e. that the user can access the resource. Somewhere else the server checks whether the user is authenticated or not
   if not view.can_access(check_default_security):
@@ -77,7 +77,7 @@ def assign_ids(rows, idtype):
   import phovea_server.plugin
 
   manager = phovea_server.plugin.lookup('idmanager')
-  for _id, row in itertools.izip(manager((r['id'] for r in rows), idtype), rows):
+  for _id, row in zip(manager((r['id'] for r in rows), idtype), rows):
     row['_id'] = _id
   return rows
 
@@ -266,11 +266,11 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       info = view.get_argument_info(arg)
       lookup_key = arg
       if lookup_key not in arguments:
-        if (arg + u'[]') in arguments:
-          lookup_key = (arg + u'[]')
+        if (arg + '[]') in arguments:
+          lookup_key = (arg + '[]')
         elif not info or not info.list_as_tuple:
-          _log.warn(u'missing argument "%s": "%s"', view.query, arg)
-          abort(400, u'missing argument: ' + arg)
+          _log.warn('missing argument "%s": "%s"', view.query, arg)
+          abort(400, 'missing argument: ' + arg)
       parser = info.type if info and info.type is not None else lambda x: x
       try:
         if info and info.as_list:
@@ -282,9 +282,9 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
             value = "(1, null)"
           else:
             if(str(vs[0]).isdigit() and (info.type is None or info.type == int)):
-              value = u'(1,%s)' % '),(1,'.join(vs)
+              value = '(1,%s)' % '),(1,'.join(vs)
             else:
-              value = u'(1,\'%s\')' % '\'),(1,\''.join(vs)
+              value = '(1,\'%s\')' % '\'),(1,\''.join(vs)
           if(view.query):
             # HACK: this hack allows us to inject arguments (DBViewBuilder.args) into the query (like the replacements) but at the same time use the list_as_tuple option
             # We'll replace the query's argument with a placeholder, which is then used as a replacement, i.e. replaced via str.format(...)
@@ -298,7 +298,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
       except ValueError as verr:
-        abort(400, u'invalid argument for: ' + arg + ' - ' + unicode(verr.message))
+        abort(400, 'invalid argument for: ' + arg + ' - ' + str(verr.message))
 
   if extra_sql_argument is not None:
     kwargs.update(extra_sql_argument)
@@ -311,8 +311,8 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       else:
         value = replacements.get(arg, fallback)  # if not a secure one fallback with an argument
       if not view.is_valid_replacement(arg, value):
-        _log.warn(u'invalid replacement value detected "%s": "%s"="%s"', view.query, arg, value)
-        abort(400, u'the given parameter "%s" is invalid' % arg)
+        _log.warn('invalid replacement value detected "%s": "%s"="%s"', view.query, arg, value)
+        abort(400, 'the given parameter "%s" is invalid' % arg)
       else:
         replace[arg] = value
 
@@ -342,7 +342,7 @@ def get_data(database, view_name, replacements=None, arguments=None, extra_sql_a
 
   with session(engine) as sess:
     if config.statement_timeout is not None:
-      _log.info(u'set statement_timeout to {}'.format(config.statement_timeout))
+      _log.info('set statement_timeout to {}'.format(config.statement_timeout))
       sess.execute(config.statement_timeout_query.format(config.statement_timeout))
     r = sess.run(query.format(**replace), **kwargs)
   return r, view
@@ -387,7 +387,7 @@ def _get_count(database, view_name, args):
   if 'count' in view.queries:
     count_query = view.queries['count']
   elif view.table:
-    count_query = u'SELECT count(d.*) as count FROM {table} d {{joins}} {{where}}'.format(table=view.table)
+    count_query = 'SELECT count(d.*) as count FROM {table} d {{joins}} {{where}}'.format(table=view.table)
   else:
     count_query = None
     abort(500, 'invalid view configuration, missing count query and cannot derive it')
@@ -411,7 +411,7 @@ def get_count(database, view_name, args):
 
   with session(engine) as sess:
     if config.statement_timeout is not None:
-      _log.info(u'set statement_timeout to {}'.format(config.statement_timeout))
+      _log.info('set statement_timeout to {}'.format(config.statement_timeout))
       sess.execute(config.statement_timeout_query.format(config.statement_timeout))
     r = sess.run(count_query.format(**replace), **kwargs)
   if r:
@@ -452,19 +452,19 @@ def derive_columns(table_name, engine, columns=None):
   if number_columns or categorical_columns:
     with session(engine) as s:
       if number_columns:
-        template = u'min({col}) as {col}_min, max({col}) as {col}_max'
+        template = 'min({col}) as {col}_min, max({col}) as {col}_max'
         minmax = ', '.join(template.format(col=col) for col in number_columns)
-        row = next(iter(s.execute(u"""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))
+        row = next(iter(s.execute("""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))
         for num_col in number_columns:
           columns[num_col]['min'] = row[num_col + '_min']
           columns[num_col]['max'] = row[num_col + '_max']
       for col in categorical_columns:
-        template = u"""SELECT distinct {col} as cat FROM {table} WHERE {col} is not NULL"""
+        template = """SELECT distinct {col} as cat FROM {table} WHERE {col} is not NULL"""
         if _differentiates_empty_string_and_null(engine.name):
-          template += u""" AND {col} <> ''"""
-        template += u""" ORDER BY {col} ASC"""
+          template += """ AND {col} <> ''"""
+        template += """ ORDER BY {col} ASC"""
         cats = s.execute(template.format(col=col, table=table_name))
-        columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
+        columns[col]['categories'] = [str(r['cat']) for r in cats if r['cat'] is not None]
 
   return columns
 
@@ -482,10 +482,10 @@ def _lookup(database, view_name, query, page, limit, args):
   arguments = MultiDict(args)
   offset = page * limit
   # replace with wildcard version
-  arguments['query'] = u'%{}%'.format(query)
-  arguments['query_end'] = u'%{}'.format(query)
-  arguments['query_start'] = u'{}%'.format(query)
-  arguments['query_match'] = u'{}'.format(query)
+  arguments['query'] = '%{}%'.format(query)
+  arguments['query_end'] = '%{}'.format(query)
+  arguments['query_start'] = '{}%'.format(query)
+  arguments['query_match'] = '{}'.format(query)
   # add 1 for checking if we have more
   replacements = dict(limit=limit + 1, offset=offset, offset2=(offset + limit + 1))
 

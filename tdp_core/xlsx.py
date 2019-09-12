@@ -24,7 +24,7 @@ def to_type(cell):
   if cell.data_type in _types:
     return _types[cell.data_type]
   v = cell.value
-  if isinstance(v, int) or isinstance(v, long):
+  if isinstance(v, int) or isinstance(v, int):
     return 'int'
   if isinstance(v, float):
     return 'float'
@@ -84,7 +84,7 @@ def _xlsx2json_array():
   wb = load_workbook(file, read_only=True)
 
   def convert_row(row):
-    return [unicode(_convert_value(cell.value)) for cell in row]
+    return [str(_convert_value(cell.value)) for cell in row]
 
   if not wb.worksheets:
     return jsonify([])
@@ -109,7 +109,7 @@ def _json2xlsx():
 
   def to_value(v, coltype):
     if coltype == 'date':
-      if isinstance(v, int) or isinstance(v, long):
+      if isinstance(v, int) or isinstance(v, int):
         return datetime.fromtimestamp(v)
       return dateutil.parser.parse(v)
     return v

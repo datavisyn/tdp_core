@@ -3,7 +3,7 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-from __future__ import with_statement, print_function
+
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
