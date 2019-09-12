@@ -120,7 +120,7 @@ def get_count_data(database, view_name):
 def get_desc(database, view_name):
   view_name, _ = formatter(view_name)
   config, _, view = db.resolve_view(database, view_name)
-  return jsonify(dict(idType=view.idtype, columns=view.columns.values()))
+  return jsonify(dict(idType=view.idtype, columns=list(view.columns.values())))
 
 
 @app.route('/<database>/<view_name>/lookup', methods=['GET', 'POST'])
