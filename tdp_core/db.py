@@ -298,7 +298,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
       except ValueError as verr:
-        abort(400, 'invalid argument for: ' + arg + ' - ' + str(verr.message))
+        abort(400, 'invalid argument for: ' + arg + ' - ' + str(verr))
 
   if extra_sql_argument is not None:
     kwargs.update(extra_sql_argument)
