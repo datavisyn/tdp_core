@@ -1,8 +1,7 @@
 language: python
 sudo: required
 env:
-- TOXENV=py27
-- TOXENV=py34
+- TOXENV=py37
 node_js:
 - 6
 addons:
