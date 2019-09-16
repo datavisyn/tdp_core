@@ -1,12 +1,13 @@
 from phovea_server.ns import Namespace, request, abort, Response
 from phovea_server.util import jsonify
 from openpyxl import Workbook, load_workbook
-from openpyxl.worksheet.write_only import WriteOnlyCell
+from openpyxl.cell import WriteOnlyCell
 from openpyxl.styles import Font
 from tempfile import NamedTemporaryFile
 from datetime import datetime
 import dateutil.parser
 import logging
+
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
