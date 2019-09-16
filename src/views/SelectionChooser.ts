@@ -67,7 +67,7 @@ export default class SelectionChooser {
     return this.updateImpl(selection, true);
   }
 
-  chosen(): { id: number, name: string } | null {
+  chosen(): { id: number, name: string, targetIDValue: string } | null {
     const s = this.accessor(this.formID).value;
     if (!s || s.data === SelectionChooser.INVALID_MAPPING) {
       return null;
@@ -75,7 +75,7 @@ export default class SelectionChooser {
     if (s.data) {
       return s.data;
     }
-    return {id: parseInt(s.id, 10), name: s.name};
+    return {id: parseInt(s.id, 10), name: s.name, targetIDValue: s.name}; // targetIDValue = name as fallback if the data attribute is not available
   }
 
   private async toItems(selection: ISelection): Promise<(IFormSelectOption|IFormSelectOptionGroup)[]> {
@@ -144,7 +144,8 @@ export default class SelectionChooser {
           value: String(d),
           data: {
             id: d,
-            name: groupNames[j]
+            name: groupNames[j],
+            targetIDValue: targetNames[j] // this is the original ID from the target's idType. this can be used internally in the detail view
           }
         }))
       };
