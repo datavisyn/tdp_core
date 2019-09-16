@@ -11,7 +11,7 @@ export interface ISelectionChooserOptions {
   /**
    * In case of 1:n mappings between the selection's IDType and the readableIDType the readableSubOptionIDType can be used map the n options to readable names
    */
-  readableSubOptionIDType: IDTypeLike;
+  readableTargetIDType: IDTypeLike;
   label: string;
   appendOriginalLabel: boolean;
   selectNewestByDefault: boolean;
@@ -29,14 +29,14 @@ export default class SelectionChooser {
 
   private readonly target: IDType | null;
   private readonly readAble: IDType | null;
-  private readonly readAbleSubOptionsIDType: IDType | null;
+  private readonly readableTargetIDType: IDType | null;
   readonly desc: IFormElementDesc;
   private readonly formID: string;
   private readonly options : Readonly<ISelectionChooserOptions> = {
     appendOriginalLabel: true,
     selectNewestByDefault: true,
     readableIDType: null,
-    readableSubOptionIDType: null,
+    readableTargetIDType: null,
     label: 'Show'
   };
   private currentOptions: IFormSelectOption[];
@@ -45,7 +45,7 @@ export default class SelectionChooser {
     Object.assign(this.options, options);
     this.target = targetIDType ? resolve(targetIDType) : null;
     this.readAble = options.readableIDType ? resolve(options.readableIDType) : null;
-    this.readAbleSubOptionsIDType = options.readableSubOptionIDType ? resolve(options.readableSubOptionIDType) : null;
+    this.readableTargetIDType = options.readableTargetIDType ? resolve(options.readableTargetIDType) : null;
 
     this.formID = `forms.chooser.select.${this.target ? this.target.id : randomId(4)}`;
     this.desc = {
@@ -100,12 +100,11 @@ export default class SelectionChooser {
     const targetIdsFlat = (<number[]>[]).concat(...targetIds);
     const targetNames = await target.unmap(targetIdsFlat);
 
-    // in case of 1:n mappings the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some IDs).
-    // the readableSubOptionIDType provide the possibility to add an extra IDType to map the actual options to instead of the target
+    // in case of 1:n mappings the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).
+    // the readableTargetIDType provides the possibility to add an extra IDType to map the actual options to instead of the target IDs
     let readAbleSubOptions: string[];
-    if (this.readAbleSubOptionsIDType) {
-      const optionsIDs: string[][] = await target.mapNameToName(targetNames, this.readAbleSubOptionsIDType);
-
+    if (this.readableTargetIDType) {
+      const optionsIDs: string[][] = await target.mapNameToName(targetNames, this.readableTargetIDType);
       readAbleSubOptions = [].concat(...optionsIDs);
     }
 
