@@ -102,10 +102,10 @@ export default class SelectionChooser {
 
     // in case of 1:n mappings the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).
     // the readableTargetIDType provides the possibility to add an extra IDType to map the actual options to instead of the target IDs
-    let readAbleSubOptions: string[];
+    const readAbleSubOptions: string[] = [];
     if (this.readableTargetIDType) {
-      const optionsIDs: string[][] = await target.mapNameToName(targetNames, this.readableTargetIDType);
-      readAbleSubOptions = [].concat(...optionsIDs);
+      const optionsIDs: string[] = await target.mapNameToFirstName(targetNames, this.readableTargetIDType);
+      readAbleSubOptions.push(...optionsIDs);
     }
 
     const subOptions = readAbleSubOptions && readAbleSubOptions.length > 0? readAbleSubOptions : targetNames;
