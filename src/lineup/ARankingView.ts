@@ -249,7 +249,7 @@ export abstract class ARankingView extends AView {
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    return resolveImmediately(super.init(params, onParameterChange)).then(() => {
+    return super.init(params, onParameterChange).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
       base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
