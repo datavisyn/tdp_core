@@ -24,7 +24,8 @@ export default class SelectionChooser {
 
   private static readonly INVALID_MAPPING = {
     name: 'Invalid',
-    id: -1
+    id: -1,
+    label: ''
   };
 
   private readonly target: IDType | null;
@@ -67,7 +68,7 @@ export default class SelectionChooser {
     return this.updateImpl(selection, true);
   }
 
-  chosen(): { id: number, name: string } | null {
+  chosen(): { id: number, name: string, label: string } | null {
     const s = this.accessor(this.formID).value;
     if (!s || s.data === SelectionChooser.INVALID_MAPPING) {
       return null;
@@ -75,7 +76,7 @@ export default class SelectionChooser {
     if (s.data) {
       return s.data;
     }
-    return {id: parseInt(s.id, 10), name: s.name};
+    return {id: parseInt(s.id, 10), name: s.name, label: s.name};
   }
 
   private async toItems(selection: ISelection): Promise<(IFormSelectOption|IFormSelectOptionGroup)[]> {
@@ -92,7 +93,7 @@ export default class SelectionChooser {
       return sourceIds.map((d, i) => ({
         value: String(d),
         name: labels[i],
-        data: {id: d, name: sourceNames[i]}
+        data: {id: d, name: sourceNames[i], label: labels[i]}
       }));
     }
 
@@ -106,7 +107,7 @@ export default class SelectionChooser {
       return targetIds.map((d, i) => ({
         value: String(d[0]),
         name: labels[i],
-        data: {id: d[0], name: targetNames[i]}
+        data: {id: d[0], name: targetNames[i], label: labels[i]}
       }));
     }
 
@@ -145,7 +146,8 @@ export default class SelectionChooser {
           value: String(d),
           data: {
             id: d,
-            name: originalTargetNames[j] // this is the original ID from the target's idType to be used internally in the detail view
+            name: originalTargetNames[j], // this is the original ID from the target's idType to be used internally in the detail view
+            label: groupNames[j]
           }
         }))
       };
