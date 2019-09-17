@@ -64,6 +64,8 @@ export default class ProxyView extends AD3View {
     const base = <HTMLElement>params.querySelector('form') || params;
     base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
     base.lastElementChild!.appendChild(this.openExternally);
+
+    return Promise.resolve();
   }
 
   protected initImpl() {

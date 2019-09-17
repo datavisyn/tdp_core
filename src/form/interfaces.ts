@@ -14,49 +14,49 @@ export enum FormElementType {
    * shows a simple select box
    * @see IFormSelectDesc
    */
-  SELECT,
+  SELECT = 'FormSelect',
     /**
      * shows a select box based on select2
      * @see IFormSelect2
      */
-  SELECT2,
+  SELECT2 = 'FormSelect2',
     /**
      * similar to SELECT2 but with multiple selections allowed
      */
-  SELECT2_MULTIPLE,
+  SELECT2_MULTIPLE = 'FormSelect2Multiple',
     /**
      * SELECT2 with additional functionality such as validation, tokenize and file drag
      */
-  SELECT3,
+  SELECT3 = 'FormSelect3',
     /**
      * similar to SELECT3 but with multiple selections allowed
      */
-  SELECT3_MULTIPLE,
+  SELECT3_MULTIPLE = 'FormSelect3Multiple',
     /**
      * a text field
      * @see IFormInputTextDesc
      */
-  INPUT_TEXT,
+  INPUT_TEXT = 'FormInputText',
     /**
      * a complex dynamic sub map form element
      * @see IFormMapDesc
      */
-  MAP,
+  MAP = 'FormMap',
     /**
      * a simple button
      * @see IButtonElementDesc
      */
-  BUTTON,
+  BUTTON = 'FormButton',
     /**
      * a checkbox
      * @see ICheckBoxElementDesc
      */
-  CHECKBOX,
+  CHECKBOX = 'FormCheckBox',
     /**
      * a checkbox
      * @see IRadioElementDesc
      */
-  RADIO
+  RADIO = 'FormRadio'
 }
 
 /**
@@ -66,7 +66,7 @@ export interface IFormElementDesc {
   /**
    * Choose a type which element should be created
    */
-  type: FormElementType;
+  type: FormElementType | string;
 
   /**
    * Unique identifier for each page
@@ -144,8 +144,53 @@ export interface IFormElementDesc {
 }
 
 
-export interface IFormParent {
+export interface IForm {
+  /**
+   * The DOM node as D3 selection
+   */
+  $node: d3.Selection<any>;
+
+  /**
+   * Append a form element and builds it
+   * Note: The initialization of the element must be done using `initializeAllElements`
+   * @param element Form element
+   */
+  appendElement(element: IFormElement);
+
+  /**
+   * Initialize all elements of this form
+   * At this stage it is possible to reference dependencies to other form fields
+   */
+  initializeAllElements();
+
+  /**
+   * Retrieve element by identifer
+   * @param id element identifier
+   */
   getElementById(id: string): IFormElement;
+
+  /**
+   * Returns an object with the form element id as key and the current data as value
+   * @returns {{}}
+   */
+  getElementData(): { [key: string]: any };
+
+  /**
+   * Returns an object with the form element id as key and the current form element value
+   * @returns {{}}
+   */
+  getElementValues(): { [key: string]: any };
+
+  /**
+   * validates the current form
+   * @returns {boolean} if valid
+   */
+  validate();
+
+  /**
+   * number of form elements
+   */
+  readonly length: number;
 }
 
 /**
@@ -161,6 +206,12 @@ export interface IFormElement extends IEventHandler {
    * Form element value
    */
   value: any;
+
+  /**
+   * Initialize the current element
+   * It is possible to reference to other elements (e.g., form.getElementById) in this stage
+   */
+  init(): void;
 
   /**
    * Set the visibility of an form element

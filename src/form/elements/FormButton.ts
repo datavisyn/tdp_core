@@ -1,6 +1,7 @@
-import {FormElementType, IFormElement, IFormElementDesc, IFormParent} from '../interfaces';
+import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
 import * as d3 from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 export interface IButtonElementDesc extends IFormElementDesc {
   onClick: () => void;
@@ -15,9 +16,16 @@ export default class FormButton extends EventHandler implements IFormElement {
   readonly type: FormElementType.BUTTON;
   readonly id: string;
 
-  constructor(readonly parent: IFormParent, readonly $parent, readonly desc: IButtonElementDesc) {
+  /**
+   * Constructor
+   * @param form The form this element is a part of
+   * @param $parent The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
+   */
+  constructor(readonly form: IForm, readonly $parent, readonly elementDesc: IButtonElementDesc, readonly pluginDesc: IPluginDesc) {
     super();
-    this.id = desc.id;
+    this.id = elementDesc.id;
     this.$node = $parent.append('div').classed('form-group', true);
     this.build();
   }
@@ -42,17 +50,19 @@ export default class FormButton extends EventHandler implements IFormElement {
     return true;
   }
 
+  protected build() {
+    this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
+    this.$button.html(() => this.elementDesc.iconClass? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
+  }
 
-  build() {
-    this.$button = this.$node.append('button').classed(this.desc.attributes.clazz, true);
-    this.$button.html(() => this.desc.iconClass? `<i class="${this.desc.iconClass}"></i> ${this.desc.label}` : this.desc.label);
+  init() {
     this.$button.on('click', () => {
       this.value = true;
-      this.desc.onClick();
+      this.elementDesc.onClick();
       (<Event>d3.event).preventDefault();
       (<Event>d3.event).stopPropagation();
     });
-    //TODO doesn't support show if
+    // TODO doesn't support show if
   }
 
   focus() {

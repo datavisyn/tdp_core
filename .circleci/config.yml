@@ -10,7 +10,7 @@ jobs:
           command: |
             (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
       - restore_cache:
-          key: deps3-{{ checksum "package.json" }}
+          key: deps4-{{ checksum "package.json" }}
       - run:
           name: install-npm-wee
           command: npm install
@@ -19,7 +19,7 @@ jobs:
           command: |
             (grep -l '._resolved.: .\(git[^:]*\|bitbucket\):' ./node_modules/*/package.json || true) | xargs -r dirname | xargs -r rm -rf
       - save_cache:
-          key: deps3-{{ checksum "package.json" }}
+          key: deps4-{{ checksum "package.json" }}
           paths:
           - ./node_modules
       - run: #install all dependencies

@@ -4,7 +4,8 @@
 
 import * as d3 from 'd3';
 import AFormElement from './AFormElement';
-import {IFormElementDesc, IFormParent} from '../interfaces';
+import {IFormElementDesc, IForm} from '../interfaces';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 
 /**
@@ -20,6 +21,12 @@ export interface IFormInputTextDesc extends IFormElementDesc {
      * @default text
      */
     type?: string;
+
+    /**
+     * Step size for input type `number`
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#step
+     */
+    step?: string;
   };
 }
 
@@ -29,12 +36,13 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
 
   /**
    * Constructor
-   * @param parent
-   * @param $parent
-   * @param desc
+   * @param form The form this element is a part of
+   * @param $parent The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(parent: IFormParent, $parent, desc: IFormInputTextDesc) {
-    super(parent, desc);
+  constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, elementDesc, pluginDesc);
 
     this.$node = $parent.append('div').classed('form-group', true);
 
@@ -43,14 +51,24 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
 
   /**
    * Build the label and input element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     super.build();
-    this.$input = this.$node.append('input').attr('type', (this.desc.options || {}).type || 'text');
-    this.setAttributes(this.$input, this.desc.attributes);
+    this.$input = this.$node.append('input').attr('type', (this.elementDesc.options || {}).type || 'text');
+    this.setAttributes(this.$input, this.elementDesc.attributes);
+  }
 
-    const defaultValue = (this.desc.options || {}).type === 'number' ? '0' : '';
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  init() {
+    super.init();
+
+    if((this.elementDesc.options || {}).type === 'number' && (this.elementDesc.options || {}).step) {
+      this.$input.attr('step', this.elementDesc.options.step);
+    }
+
+    const defaultValue = (this.elementDesc.options || {}).type === 'number' ? '0' : '';
     const defaultText = this.getStoredValue(defaultValue);
     this.previousValue = defaultText;
     this.$input.property('value', defaultText);
