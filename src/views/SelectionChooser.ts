@@ -5,11 +5,11 @@ import {ISelection} from './interfaces';
 
 export interface ISelectionChooserOptions {
   /**
-   * Readable IDType the selection is being mapped to. If there is a 1:n mapping this IDType is used as the options group
+   * Readable IDType the selection is being mapped to. If there is a 1:n mapping or in case of different readable and target IDTypes this IDType is used as the options group
    */
   readableIDType: IDTypeLike;
   /**
-   * In case of 1:n mappings between the selection's IDType and the readableIDType the readableSubOptionIDType can be used map the n options to readable names
+   * In case of 1:n mappings between the selection's IDType and the readableIDType (or in case of different readable and target IDTypes) the readableSubOptionIDType can be used map the n options to readable names
    */
   readableTargetIDType: IDTypeLike;
   label: string;
@@ -100,7 +100,7 @@ export default class SelectionChooser {
     const targetIdsFlat = (<number[]>[]).concat(...targetIds);
     const targetNames = await target.unmap(targetIdsFlat);
 
-    // in case of 1:n mappings the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).
+    // in case of either 1:n mappings or when the target IDType and the readable IDType are different the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).
     // the readableTargetIDType provides the possibility to add an extra IDType to map the actual options to instead of the target IDs
     const readAbleSubOptions: string[] = [];
     if (this.readableTargetIDType) {
