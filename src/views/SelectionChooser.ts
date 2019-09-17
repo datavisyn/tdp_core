@@ -24,7 +24,8 @@ export default class SelectionChooser {
 
   private static readonly INVALID_MAPPING = {
     name: 'Invalid',
-    id: -1
+    id: -1,
+    label: ''
   };
 
   private readonly target: IDType | null;
@@ -67,7 +68,7 @@ export default class SelectionChooser {
     return this.updateImpl(selection, true);
   }
 
-  chosen(): { id: number, name: string, targetIDValue: string } | null {
+  chosen(): { id: number, name: string, label: string } | null {
     const s = this.accessor(this.formID).value;
     if (!s || s.data === SelectionChooser.INVALID_MAPPING) {
       return null;
@@ -75,7 +76,7 @@ export default class SelectionChooser {
     if (s.data) {
       return s.data;
     }
-    return {id: parseInt(s.id, 10), name: s.name, targetIDValue: s.name}; // targetIDValue = name as fallback if the data attribute is not available
+    return {id: parseInt(s.id, 10), name: s.name, label: s.name};
   }
 
   private async toItems(selection: ISelection): Promise<(IFormSelectOption|IFormSelectOptionGroup)[]> {
@@ -92,13 +93,23 @@ export default class SelectionChooser {
       return sourceIds.map((d, i) => ({
         value: String(d),
         name: labels[i],
-        data: {id: d, name: sourceNames[i]}
+        data: {id: d, name: sourceNames[i], label: labels[i]}
       }));
     }
 
     const targetIds = await source.mapToID(sourceIds, target);
     const targetIdsFlat = (<number[]>[]).concat(...targetIds);
     const targetNames = await target.unmap(targetIdsFlat);
+
+
+    if (target === readAble && targetIds.every((d) => d.length === 1)) {
+      // keep it simple target = readable and single hit - so just show flat
+      return targetIds.map((d, i) => ({
+        value: String(d[0]),
+        name: labels[i],
+        data: {id: d[0], name: targetNames[i], label: labels[i]}
+      }));
+    }
 
     // in case of either 1:n mappings or when the target IDType and the readable IDType are different the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).
     // the readableTargetIDType provides the possibility to add an extra IDType to map the actual options to instead of the target IDs
@@ -110,19 +121,11 @@ export default class SelectionChooser {
 
     const subOptions = readAbleSubOptions && readAbleSubOptions.length > 0? readAbleSubOptions : targetNames;
 
-    if (target === readAble && targetIds.every((d) => d.length === 1)) {
-      // keep it simple target = readable and single hit - so just show flat
-      return targetIds.map((d, i) => ({
-        value: String(d[0]),
-        name: labels[i],
-        data: {id: d[0], name: subOptions[i]}
-      }));
-    }
-
     let acc = 0;
     const base = labels.map((name, i) => {
       const group = targetIds[i];
       const groupNames = subOptions.slice(acc, acc + group.length);
+      const originalTargetNames = targetNames.slice(acc, acc + group.length);
       acc += group.length;
 
       if (group.length === 0) {
@@ -139,12 +142,12 @@ export default class SelectionChooser {
       return <IFormSelectOptionGroup>{
         name,
         children: group.map((d, j) => ({
-          name: groupNames[j],
+          name: groupNames[j], // either the original ID of the target or the readableTargetID is shown as an option if the readableTargetIDType is available
           value: String(d),
           data: {
             id: d,
-            name: groupNames[j],
-            targetIDValue: targetNames[j] // this is the original ID from the target's idType. this can be used internally in the detail view
+            name: originalTargetNames[j], // this is the original ID from the target's idType to be used internally in the detail view
+            label: groupNames[j]
           }
         }))
       };
