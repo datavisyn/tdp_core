@@ -61,7 +61,7 @@ class DBView(object):
     if self.columns:
       r['columns'] = self.columns.values()
     if self.filters:
-      r['filters'] = self.filters.keys()
+      r['filters'] = list(self.filters.keys())
     if self.queries:
       r['queries'] = {k: clean_query(v) for k, v in self.queries.items()}
     return r

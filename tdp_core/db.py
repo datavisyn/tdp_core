@@ -103,7 +103,7 @@ def to_query(q, supports_array_parameter, parameters):
     # sounds like an array
     # convert from :ids to (:ids0, :ids1, :ids2)
     subparameters = {(k + str(i)): vi for i, vi in enumerate(v)}
-    q = q.replace(':' + k, '({ids})'.format(ids=', '.join(':' + p for p in subparameters.keys())))
+    q = q.replace(':' + k, '({ids})'.format(ids=', '.join(':' + p for p in list(subparameters.keys()))))
     del parameters[k]  # delete single
     parameters.update(subparameters)  # add sub
 

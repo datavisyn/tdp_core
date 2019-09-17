@@ -81,7 +81,7 @@ def _gen():
         for k in dbview.filters.keys():
           filters.add(k)
         if not filters:
-          for k in dbview.columns.keys():
+          for k in list(dbview.columns.keys()):
             filters.add(k)
 
       if 'agg_score' in dbview.replacements:

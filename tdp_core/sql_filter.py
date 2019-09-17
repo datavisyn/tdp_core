@@ -117,7 +117,7 @@ def filter_logic(view, args):
     sub_query = view.get_filter_subquery(k)
     return sub_query.format(operator=operator, value=':' + kp)
 
-  for key in where_clause.keys():
+  for key in list(where_clause.keys()):
     if not view.is_valid_filter(key):
       _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
       del where_clause[key]
