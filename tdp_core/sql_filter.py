@@ -171,7 +171,7 @@ def filter_logic(view, args):
       complement_filter_exist = complement_filter in where_clause  # look if complement filter exist in the where clause
       # check if complement filter exists
       if complement_filter_exist:
-        raise RuntimeError('Filter "' + original_key + '" has a complement filter "' + complement_filter + '", only on of these filters is allowed.')
+        raise RuntimeError('Filter "' + original_key + '" has a complement filter "' + complement_filter + '", only one of these filters is allowed.')
 
   where_default_clause = []
   where_group_clauses = {group: [] for group in view.filter_groups()}
