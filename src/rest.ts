@@ -1,4 +1,4 @@
-import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI} from 'phovea_core/src/ajax';
+import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI, MAX_URL_LENGTH} from 'phovea_core/src/ajax';
 import {IScoreRow} from './lineup';
 
 export const REST_NAMESPACE = '/tdp';
@@ -20,8 +20,22 @@ export interface IRow {
   [key: string]: any;
 }
 
+/**
+ * Describes the properties returned for each database connector
+ */
+export interface IDatabaseDesc {
+  /**
+   *  name of the db connector (defined for a connector in the __init__.py function)
+   */
+  readonly name: string;
+  /**
+   * Description of the connector. Empty string if not set server-side.
+   */
+  readonly description: string;
+}
 
-export function getTDPDatabases(): Promise<string[]> {
+
+export function getTDPDatabases(): Promise<IDatabaseDesc[]> {
   return getAPIJSON(`${REST_DB_NAMESPACE}/`);
 }
 
@@ -99,8 +113,6 @@ const emptyFilters: IAllFilters = {
   gte:{}
 };
 
-const TOO_LONG_URL = 4096;
-
 function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}, assignIds: boolean = false) {
   const mmethod = method === 'none' ? '' : `/${method}`;
   if (assignIds) {
@@ -109,7 +121,7 @@ function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter
 
   const url = `${REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
   const encoded = encodeParams(params);
-  if (encoded && (url.length + encoded.length > TOO_LONG_URL)) {
+  if (encoded && (url.length + encoded.length > MAX_URL_LENGTH)) {
     // use post instead
     return sendAPI(url, params, 'POST');
   }

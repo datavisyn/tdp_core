@@ -4,7 +4,7 @@
 import {FormDialog as Dialog} from 'phovea_ui/src/dialogs';
 import {randomId} from 'phovea_core/src';
 import FormBuilder from './FormBuilder';
-import {IFormElementDesc} from './interfaces';
+import {IFormElementDesc, IForm} from './interfaces';
 import {select} from 'd3';
 
 /**
@@ -34,33 +34,36 @@ export default class FormDialog extends Dialog {
    * @param {IFormElementDesc} elements
    */
   append(...elements: IFormElementDesc[]) {
-    this.builder.build(elements);
+    this.builder.appendElements(elements);
   }
 
   /**
    * register a callback when the form is submitted
-   * @param {(builder?: FormBuilder) => void} callback called when submitted
+   * @param form the form of this dialog
+   * @param callback called when submitted
    * @returns {JQuery}
    */
-  onSubmit(callback: (builder?: FormBuilder)=>void) {
+  private onFormSubmit(form: IForm, callback: (form?: IForm) => void) {
     return super.onSubmit(() => {
-      if (!this.builder.validate()) {
+      if (!form.validate()) {
         return false;
       }
-      callback(this.builder);
+      callback(form);
       return false;
     });
   }
 
   /**
    * utility to show this dialog and resolve as soon it has been been submitted
-   * @param {(builder: FormBuilder) => T} processData converter from a form builder to the output format
+   * @param processData converter from a form builder to the output format
    * @returns {Promise<T>}
    */
-  showAsPromise<T>(processData: (builder: FormBuilder) => T) {
+  async showAsPromise<T>(processData: (form: IForm) => T) {
+    const form: IForm = await this.builder.build();
+
     return new Promise<T>((resolve) => {
-      this.onSubmit((builder) => {
-        const data = processData(builder);
+      this.onFormSubmit(form, (form: IForm) => {
+        const data = processData(form);
         if (data !== null) {
           this.hide();
           resolve(data);

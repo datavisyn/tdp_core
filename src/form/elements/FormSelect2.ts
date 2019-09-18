@@ -8,8 +8,9 @@ import * as $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
 import {api2absURL} from 'phovea_core/src/ajax';
 import AFormElement from './AFormElement';
-import {IFormParent} from '../interfaces';
+import {IForm} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text'|'id';
@@ -73,50 +74,60 @@ export const DEFAULT_AJAX_OPTIONS = Object.assign({
  */
 export default class FormSelect2 extends AFormElement<IFormSelect2> {
 
-  private $select: JQuery;
+  private $select: d3.Selection<any>;
 
-  private readonly multiple: boolean;
+  private $jqSelect: JQuery;
+
+  private readonly isMultiple: boolean;
 
   private readonly listener = () => {
-    this.fire(FormSelect2.EVENT_CHANGE, this.value, this.$select);
+    this.fire(FormSelect2.EVENT_CHANGE, this.value, this.$jqSelect);
   }
 
   /**
    * Constructor
-   * @param parent
-   * @param $parent
-   * @param desc
-   * @param multiple
+   * @param form The form this element is a part of
+   * @param $parent The parent node this element will be attached to
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(parent: IFormParent, $parent, desc: IFormSelect2, multiple: 'multiple'|'single' = 'single') {
-    super(parent, desc);
+  constructor(form: IForm, $parent, elementDesc: IFormSelect2, readonly pluginDesc: IPluginDesc) {
+    super(form, elementDesc, pluginDesc);
 
     this.$node = $parent.append('div').classed('form-group', true);
-    this.multiple = multiple === 'multiple';
+
+    this.isMultiple = (pluginDesc.selection === 'multiple');
 
     this.build();
   }
 
   /**
    * Build the label and select element
-   * Bind the change listener and propagate the selection by firing a change event
    */
   protected build() {
     super.build();
 
-    const $select = this.$node.append('select');
-    this.setAttributes($select, this.desc.attributes);
+    this.$select = this.$node.append('select');
+    this.setAttributes(this.$select, this.elementDesc.attributes);
+
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  init() {
+    super.init();
 
     const values = this.handleDependent(() => {
       //not supported
     });
-    const df = this.desc.options.data;
+    const df = this.elementDesc.options.data;
     const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
-    this.buildSelect2($select, this.desc.options || {}, data);
+    this.buildSelect2(this.$select, this.elementDesc.options || {}, data);
 
 
     // propagate change action with the data of the selected option
-    this.$select.on('change.propagate', this.listener);
+    this.$jqSelect.on('change.propagate', this.listener);
   }
 
   /**
@@ -129,7 +140,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     const defaultVal: any = this.getStoredValue(null);
 
     if (defaultVal) {
-      if (this.multiple) {
+      if (this.isMultiple) {
         const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];
         initialValue = defaultValues.map((d) => typeof d === 'string' ? d : d.id);
         if (!data) { //derive default data if none is set explictly
@@ -143,30 +154,30 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
       }
     }
 
-    if (this.multiple) {
+    if (this.isMultiple) {
       select2Options.multiple = true;
       select2Options.allowClear = true;
     }
     mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
 
-    this.$select = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
+    this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial
-    this.previousValue = this.resolveValue(this.$select.select2('data'));
+    this.previousValue = this.resolveValue(this.$jqSelect.select2('data'));
 
     if (defaultVal) {
       this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
     }
-    return this.$select;
+    return this.$jqSelect;
   }
 
   private resolveValue(items: ISelect2Option[]) {
-    const returnValue = this.desc.options.return;
+    const returnValue = this.elementDesc.options.return;
     const returnF = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
     if (!items || items.length === 0) {
-      return this.multiple ?  [] : returnF({id: '', text: ''});
+      return this.isMultiple ?  [] : returnF({id: '', text: ''});
     }
     const data = items.map((d) => ({id: d.id, text: d.text, data: d.data? d.data : undefined})).map(returnF);
-    return this.multiple ? data : data[0];
+    return this.isMultiple ? data : data[0];
   }
 
   /**
@@ -174,12 +185,12 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
    * @returns {string|{name: string, value: string, data: any}|null}
    */
   get value(): (ISelect2Option|string)|(ISelect2Option|string)[] {
-    return this.resolveValue(this.$select.select2('data'));
+    return this.resolveValue(this.$jqSelect.select2('data'));
   }
 
   hasValue() {
     const v = this.value;
-    if (this.multiple) {
+    if (this.isMultiple) {
       return (<any[]>v).length > 0;
     } else {
       return v !== '' || (<any>v).id !== '';
@@ -192,17 +203,17 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
    */
   set value(v: (ISelect2Option|string)|(ISelect2Option|string)[]) {
     try {
-      this.$select.off('change.propagate', this.listener);
+      this.$jqSelect.off('change.propagate', this.listener);
 
       // if value is undefined or null, clear
       if (!v) {
-        this.$select.val([]).trigger('change');
-        this.previousValue = this.multiple ? [] : null;
+        this.$jqSelect.val([]).trigger('change');
+        this.previousValue = this.isMultiple ? [] : null;
         return;
       }
       let r: string|string[] = null;
 
-      if (this.multiple) {
+      if (this.isMultiple) {
         const values = Array.isArray(v) ? v : [v];
         r = values.map((d: any) => d.value || d.id);
         const old = <ISelect2Option[]>this.value;
@@ -224,16 +235,16 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
       }
       // need to select just the ids
       // TODO doesn't work for AJAX based solutions
-      this.$select.val(r).trigger('change');
+      this.$jqSelect.val(r).trigger('change');
       this.previousValue = this.value; // force set
       this.updateStoredValue();
     } finally {
-      this.$select.on('change.propagate', this.listener);
+      this.$jqSelect.on('change.propagate', this.listener);
     }
   }
 
   focus() {
-    this.$select.select2('open');
+    this.$jqSelect.select2('open');
   }
 
 }
