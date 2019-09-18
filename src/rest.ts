@@ -53,7 +53,7 @@ export interface IViewDescription {
   columns: IServerColumn[];
 }
 
-export interface IDatabaseViewDesc extends IViewDescription {
+export interface IDatabaseViewDesc extends Partial<IViewDescription> {
   name: string;
   description: string;
   arguments: string[];
