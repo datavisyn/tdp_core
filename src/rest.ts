@@ -56,17 +56,31 @@ export function getTDPProxyData(proxy: string, args: any, type: string = 'json')
 
 /**
  * Interface that contains all possible filters for the database API
- * @param normal column values have to be equal to the filter value (string, numerical)
- * @param lt less than filter, column values have to be lower than the filter value (numerical only)
- * @param lte less than equlas filter, column values have to be lower or equal to the filter value (numerical only)
- * @param gt greater than filter, column values have to be higher than the filter value (numerical only)
- * @param gte greater than equals filter, column values have to be higher or equal to the filter value (numerical only)
  */
 export interface IAllFilters {
+  /**
+   * column values have to be equal to the filter value (string, numerical)
+   */
   normal: IParams;
+
+  /**
+   * less than filter, column values have to be lower than the filter value (numerical only)
+   */
   lt: IParams;
+
+  /**
+   * less than equlas filter, column values have to be lower or equal to the filter value (numerical only)
+   */
   lte: IParams;
+
+  /**
+   * greater than filter, column values have to be higher than the filter value (numerical only)
+   */
   gt: IParams;
+
+  /**
+   * greater than equals filter, column values have to be higher or equal to the filter value (numerical only)
+   */
   gte: IParams;
 }
 
