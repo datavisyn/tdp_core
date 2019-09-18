@@ -1,5 +1,6 @@
 import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI} from 'phovea_core/src/ajax';
 import {IScoreRow} from './lineup';
+import {IDTypeLike} from 'phovea_core/src/idtype';
 
 export const REST_NAMESPACE = '/tdp';
 export const REST_DB_NAMESPACE = `${REST_NAMESPACE}/db`;
@@ -44,7 +45,7 @@ export interface IViewDescription {
   /**
    * idType of the DBView, can be null
    */
-  idType: string | null;
+  idType: IDTypeLike | null;
 
   /**
    * list of columns within this view, can be empty
