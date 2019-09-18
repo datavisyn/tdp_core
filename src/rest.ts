@@ -129,12 +129,24 @@ export function getTDPRows(database: string, view: string, params: IParams = {},
   return getTDPDataImpl(database, view, 'none', params, assignIds);
 }
 
-function prefixFilter(filters: IParams, prefix: string = 'filter') {
+/**
+ * Add a prefix to the keys of all given URL parameters
+ * @param params URL parameter
+ * @param prefix The prefix for the parameter keys (default is `filter`)
+ */
+function prefixFilter(params: IParams, prefix: string = 'filter') {
   const r: IParams = {};
-  Object.keys(filters).map((key) => r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = filters[key]);
+  Object.keys(params).map((key) => r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = params[key]);
   return r;
 }
 
+/**
+ * Merges the "regular" parameters with filter parameters for the URL.
+ * Filter parameters are prefixed accordingly to be accepted by the backend.
+ *
+ * @param params URL parameters
+ * @param filters URL filter parameters
+ */
 function mergeParamAndAllFilters(params: IParams, filters: IAllFilters) {
   const normal = prefixFilter(filters.normal);
   const lt = prefixFilter(filters.lt, 'filter_lt');
@@ -145,6 +157,13 @@ function mergeParamAndAllFilters(params: IParams, filters: IAllFilters) {
   return Object.assign({}, params, normal, lt, lte, gt, gte);
 }
 
+/**
+ * Merges the "regular" parameters with filter parameters for the URL.
+ * Filter parameters are prefixed accordingly to be accepted by the backend.
+ *
+ * @param params URL parameters
+ * @param filters URL filter parameters
+ */
 export function mergeParamAndFilters(params: IParams, filters: IParams) {
   return Object.assign({}, params, prefixFilter(filters));
 }
