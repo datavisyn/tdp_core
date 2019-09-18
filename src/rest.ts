@@ -54,6 +54,10 @@ export function getTDPProxyData(proxy: string, args: any, type: string = 'json')
   return getAPIData(`${REST_NAMESPACE}/proxy/${proxy}`, args, type);
 }
 
+export interface IParams {
+  [key: string]: string | number | boolean | string[] | number[] | boolean[];
+}
+
 /**
  * Interface that contains all possible filters for the database API
  */
@@ -84,9 +88,16 @@ export interface IAllFilters {
   gte: IParams;
 }
 
-export interface IParams {
-  [key: string]: string | number | boolean | string[] | number[] | boolean[];
-}
+/**
+ * Define empty filter object for use as function default parameter
+ */
+const emptyFilters: IAllFilters = {
+  normal:{},
+  lt:{},
+  lte:{},
+  gt:{},
+  gte:{}
+};
 
 const TOO_LONG_URL = 4096;
 
@@ -186,11 +197,11 @@ export function getTDPFilteredRows(database: string, view: string, params: IPara
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
- * @param {IAllFilters} filters object that contains all filter options: normal, lt (= less than), lte (= less than equals), gt (= greater than), and gte (= greater than equals),
+ * @param {IAllFilters} filters object that contains all filter options
  * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
  * @returns {Promise<IRow[]>}
  */
-export function getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IAllFilters = { normal:{}, lt:{}, lte:{}, gt:{}, gte:{} }, assignIds: boolean = false): Promise<IRow[]> {
+export function getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IAllFilters = emptyFilters, assignIds: boolean = false): Promise<IRow[]> {
   return getTDPDataImpl(database, view, 'filter', mergeParamAndAllFilters(params, filters), assignIds);
 }
 
@@ -211,10 +222,10 @@ export function getTDPScore<T>(database: string, view: string, params: IParams =
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
- * @param {IAllFilters} filters object that contains all filter options: normal, lt (=less than), lte (=less than equals), gt (=greater than), and gte (=greater than equals),
+ * @param {IAllFilters} filters object that contains all filter options
  * @returns {Promise<IScoreRow<T>[]>}
  */
-export function getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IAllFilters = { normal:{}, lt:{}, lte:{}, gt:{}, gte:{} }): Promise<IScoreRow<T>[]> {
+export function getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<IScoreRow<T>[]> {
   return getTDPDataImpl(database, view, 'score', mergeParamAndAllFilters(params, filters));
 }
 
@@ -235,10 +246,10 @@ export function getTDPCount(database: string, view: string, params: IParams = {}
  * @param {string} database the database connector key
  * @param {string} view the view id
  * @param {IParams} params additional parameters
- * @param {IAllFilters} filters object that contains all filter options: normal, lt (=less than), lte (=less than equals), gt (=greater than), and gte (=greater than equals),
+ * @param {IAllFilters} filters object that contains all filter options
  * @returns {Promise<number>}
  */
-export function getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IAllFilters = { normal:{}, lt:{}, lte:{}, gt:{}, gte:{} } ): Promise<number> {
+export function getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<number> {
   return getTDPDataImpl(database, view, 'count', mergeParamAndAllFilters(params, filters));
 }
 
