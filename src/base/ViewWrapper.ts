@@ -77,7 +77,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     this.node.classList.toggle('not-allowed', !this.allowed);
 
     if (plugin.helpText) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -90,12 +90,12 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       });
     } else if (plugin.helpUrl) {
       if (typeof plugin.helpUrl === 'string') {
-        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
       } else { // object version of helpUrl
-        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" class="view-help" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
+        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
       }
     } else if (plugin.helpTourId) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" class="view-help" title="Show help tour of this view"><span aria-hidden="true">Show Help Tour</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="Show help tour of this view"><span aria-hidden="true">Show Help Tour</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
