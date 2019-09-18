@@ -37,23 +37,23 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent, desc: IFormSelect3, readonly pluginDesc: IPluginDesc) {
-    super(form, $parent, desc, pluginDesc);
+  constructor(form: IForm, desc: IFormSelect3, readonly pluginDesc: IPluginDesc) {
+    super(form, desc, pluginDesc);
 
     this.isMultiple = (pluginDesc.selection === 'multiple');
   }
 
   /**
    * Build the label and select element
+   * @param $formNode The parent node this element will be attached to
    */
-  build() {
+  build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = this.$parent.append('div').classed('form-group', true);
+    this.$node = $formNode.append('div').classed('form-group', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 

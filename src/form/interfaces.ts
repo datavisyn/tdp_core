@@ -146,11 +146,6 @@ export interface IFormElementDesc {
 
 export interface IForm {
   /**
-   * The DOM node as D3 selection
-   */
-  $node: d3.Selection<any>;
-
-  /**
    * Append a form element and builds it
    * Note: The initialization of the element must be done using `initAllElements()`
    * @param element Form element
@@ -216,8 +211,9 @@ export interface IFormElement extends IEventHandler {
 
   /**
    * Build the current element and add the DOM element to the form DOM element.
+   * @param $formNode The parent node this element will be attached to
    */
-  build(): void;
+  build($formNode: d3.Selection<any>): void;
 
   /**
    * Initialize the current element

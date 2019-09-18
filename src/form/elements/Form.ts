@@ -36,7 +36,7 @@ export class Form implements IForm {
   /**
    * DOM node for the form itself
    */
-  readonly $node: d3.Selection<any>;
+  private readonly $node: d3.Selection<any>;
 
   /**
    * Map of all appended form elements with the element id as key
@@ -58,7 +58,7 @@ export class Form implements IForm {
    * @param element Form element
    */
   appendElement(element: IFormElement) {
-    element.build();
+    element.build(this.$node);
     this.elements.set(element.id, element);
   }
 

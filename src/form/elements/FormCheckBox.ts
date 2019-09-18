@@ -27,21 +27,21 @@ export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, $parent, Object.assign({options: { checked: true, unchecked: false}}, elementDesc), pluginDesc);
+  constructor(form: IForm, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, Object.assign({options: { checked: true, unchecked: false}}, elementDesc), pluginDesc);
   }
 
   /**
    * Build the label and input element
+   * @param $formNode The parent node this element will be attached to
    */
-  build() {
+  build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = this.$parent.append('div').classed('checkbox', true);
+    this.$node = $formNode.append('div').classed('checkbox', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 

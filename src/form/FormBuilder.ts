@@ -40,7 +40,7 @@ export default class FormBuilder {
   appendElement(elementDesc: IFormElementDesc) {
     const desc = updateElementDesc(elementDesc, this.formId);
 
-    const elementPromise = create(this.form, this.form.$node, desc);
+    const elementPromise = create(this.form, desc);
     this.elementPromises.push(elementPromise);
   }
 

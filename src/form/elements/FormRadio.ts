@@ -15,21 +15,21 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, $parent, Object.assign({options: { buttons: [] }}, elementDesc), pluginDesc);
+  constructor(form: IForm, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
+    super(form, Object.assign({options: { buttons: [] }}, elementDesc), pluginDesc);
   }
 
   /**
    * Build the label and input element
+   * @param $formNode The parent node this element will be attached to
    */
-  build() {
+  build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = this.$parent.append('div');
+    this.$node = $formNode.append('div');
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 
