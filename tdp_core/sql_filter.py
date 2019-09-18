@@ -156,7 +156,7 @@ def filter_logic(view, args):
       raise RuntimeError('Invalid filter key detected, "' + original_key + '"')
 
     # check if column type is number for one of the greater (gt and gte) or less (lt and lte) filters
-    column_type = view.columns.get(key).get('type')
+    column_type = view.columns.get(key, {}).get('type')
     if is_greater_less_filter and column_type != 'number':
       raise RuntimeError('Filters "lt","lte","gt", and "gte" are only applicable to columns of type "number", "' + key + '" is not of type "number".')
 
