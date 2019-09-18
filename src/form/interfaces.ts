@@ -152,10 +152,17 @@ export interface IForm {
 
   /**
    * Append a form element and builds it
-   * Note: The initialization of the element must be done using `initializeAllElements`
+   * Note: The initialization of the element must be done using `initAllElements()`
    * @param element Form element
    */
   appendElement(element: IFormElement);
+
+  /**
+   * Append multiple form element at once and build them
+   * Note: The initialization of the element must be done using `initAllElements()`
+   * @param element Form element
+   */
+  appendElements(element: IFormElement[]);
 
   /**
    * Initialize all elements of this form
@@ -206,6 +213,11 @@ export interface IFormElement extends IEventHandler {
    * Form element value
    */
   value: any;
+
+  /**
+   * Build the current element and add the DOM element to the form DOM element.
+   */
+  build(): void;
 
   /**
    * Initialize the current element

@@ -54,11 +54,21 @@ export class Form implements IForm {
 
   /**
    * Append a form element and builds it
-   * Note: The initialization of the element must be done using `initializeAllElements`
+   * Note: The initialization of the element must be done using `initAllElements()`
    * @param element Form element
    */
   appendElement(element: IFormElement) {
+    element.build();
     this.elements.set(element.id, element);
+  }
+
+  /**
+   * Append multiple form element at once and and build them
+   * Note: The initialization of the element must be done using `initAllElements()`
+   * @param element Form element
+   */
+  appendElements(elements: IFormElement[]) {
+    elements.forEach((element) => this.appendElement(element));
   }
 
   /**

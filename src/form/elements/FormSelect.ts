@@ -67,11 +67,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormSelectDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, elementDesc, pluginDesc);
-
-    this.$node = $parent.append('div').classed('form-group', true);
-
-    this.build();
+    super(form, $parent, elementDesc, pluginDesc);
   }
 
   protected updateStoredValue() {
@@ -91,8 +87,12 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   /**
    * Build the label and select element
    */
-  protected build() {
-    super.build();
+  build() {
+    this.addChangeListener();
+
+    this.$node = this.$parent.append('div').classed('form-group', true);
+    this.setVisible(this.elementDesc.visible);
+    this.appendLabel();
 
     this.$select = this.$node.append('select');
     this.setAttributes(this.$select, this.elementDesc.attributes);

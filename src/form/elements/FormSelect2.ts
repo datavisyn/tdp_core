@@ -92,24 +92,23 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, $parent, elementDesc: IFormSelect2, readonly pluginDesc: IPluginDesc) {
-    super(form, elementDesc, pluginDesc);
-
-    this.$node = $parent.append('div').classed('form-group', true);
+    super(form, $parent, elementDesc, pluginDesc);
 
     this.isMultiple = (pluginDesc.selection === 'multiple');
-
-    this.build();
   }
 
   /**
    * Build the label and select element
    */
-  protected build() {
-    super.build();
+  build() {
+    this.addChangeListener();
+
+    this.$node = this.$parent.append('div').classed('form-group', true);
+    this.setVisible(this.elementDesc.visible);
+    this.appendLabel();
 
     this.$select = this.$node.append('select');
     this.setAttributes(this.$select, this.elementDesc.attributes);
-
   }
 
   /**
