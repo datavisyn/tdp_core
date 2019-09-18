@@ -69,7 +69,7 @@ export default class FormBuilder {
     // initialize when all elements are loaded
     return Promise.all(this.elementPromises)
       .then(() => {
-        this.form.initializeAllElements();
+        this.form.initAllElements();
         return this.form;
       });
   }
