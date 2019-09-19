@@ -92,29 +92,18 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   private $group: d3.Selection<any>;
   private rows: IFormRow[] = [];
-  private readonly inline: boolean;
 
-  private readonly inlineOnChange: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
+  private inline: boolean;
+  private inlineOnChange: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
 
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent, elementDesc: IFormMapDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(form: IForm, elementDesc: IFormMapDesc, readonly pluginDesc: IPluginDesc) {
     super(form, elementDesc, pluginDesc);
-
-    this.$node = $parent.append('div').classed('form-group', true);
-    this.inline = hasInlineParent(<HTMLElement>this.$node.node());
-    if (this.inline && this.elementDesc.onChange) {
-      //change the default onChange handler for the inline cas
-      this.inlineOnChange = this.elementDesc.onChange;
-      this.elementDesc.onChange = null;
-    }
-
-    this.build();
   }
 
   private updateBadge() {
@@ -144,12 +133,19 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   /**
    * Build the label and input element
+   * @param $formNode The parent node this element will be attached to
    */
-  protected build() {
+  build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    if (this.elementDesc.visible === false) {
-      this.$node.classed('hidden', true);
+    this.$node = $formNode.append('div').classed('form-group', true);
+    this.setVisible(this.elementDesc.visible);
+
+    this.inline = hasInlineParent(<HTMLElement>this.$node.node());
+    if (this.inline && this.elementDesc.onChange) {
+      //change the default onChange handler for the inline cas
+      this.inlineOnChange = this.elementDesc.onChange;
+      this.elementDesc.onChange = null;
     }
 
     if (this.inline) {

@@ -37,23 +37,24 @@ export default class FormInputText extends AFormElement<IFormInputTextDesc> {
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(form: IForm, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
     super(form, elementDesc, pluginDesc);
-
-    this.$node = $parent.append('div').classed('form-group', true);
-
-    this.build();
   }
 
   /**
    * Build the label and input element
+   * @param $formNode The parent node this element will be attached to
    */
-  protected build() {
-    super.build();
+  build($formNode: d3.Selection<any>) {
+    this.addChangeListener();
+
+    this.$node = $formNode.append('div').classed('form-group', true);
+    this.setVisible(this.elementDesc.visible);
+    this.appendLabel();
+
     this.$input = this.$node.append('input').attr('type', (this.elementDesc.options || {}).type || 'text');
     this.setAttributes(this.$input, this.elementDesc.attributes);
   }

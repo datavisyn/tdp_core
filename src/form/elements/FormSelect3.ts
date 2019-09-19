@@ -37,24 +37,25 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent, desc: IFormSelect3, readonly pluginDesc: IPluginDesc) {
+  constructor(form: IForm, desc: IFormSelect3, readonly pluginDesc: IPluginDesc) {
     super(form, desc, pluginDesc);
 
-    this.$node = $parent.append('div').classed('form-group', true);
     this.isMultiple = (pluginDesc.selection === 'multiple');
-
-    this.build();
   }
 
   /**
    * Build the label and select element
+   * @param $formNode The parent node this element will be attached to
    */
-  protected build() {
-    super.build();
+  build($formNode: d3.Selection<any>) {
+    this.addChangeListener();
+
+    this.$node = $formNode.append('div').classed('form-group', true);
+    this.setVisible(this.elementDesc.visible);
+    this.appendLabel();
 
     const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple});
     this.select3 = new Select3(options);
@@ -62,7 +63,6 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
     this.setAttributes(this.$node.select('.select3'), this.elementDesc.attributes);
-
   }
 
   /**

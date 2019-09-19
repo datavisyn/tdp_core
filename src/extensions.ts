@@ -29,7 +29,6 @@ export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
  * @registryParam {object} [parameter] The registry parameter depend on the form element. Hence, all defined parameters are passed to the form element as `pluginDesc`.
  *
  * @factoryParam {Form} form The form this element is a part of
- * @factoryParam {D3.Selction} $parent The parent node this element will be attached to
  * @factoryParam {IFormElementDesc} elementDesc The form element description from the form builder
  * @factoryParam {IPluginDesc} pluginDesc The phovea extension point options
  * @factoryReturns {IFormElement} An instance of the form element

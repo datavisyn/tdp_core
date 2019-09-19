@@ -13,12 +13,12 @@ import {EP_TDP_CORE_FORM_ELEMENT} from '../../extensions';
  * @param $parent parent D3 selection element
  * @param elementDesc form element description
  */
-export function create(form: IForm, $parent: d3.Selection<any>, elementDesc: IFormElementDesc): Promise<IFormElement> {
+export function create(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement> {
   const plugin = get(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
   if(!plugin) {
     throw new Error('unknown form element type: ' + elementDesc.type);
   }
   return plugin.load().then((p) => {
-    return p.factory(form, $parent, <any>elementDesc, p.desc);
+    return p.factory(form, <any>elementDesc, p.desc);
   });
 }

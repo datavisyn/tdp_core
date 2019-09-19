@@ -19,15 +19,12 @@ export default class FormButton extends EventHandler implements IFormElement {
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(readonly form: IForm, readonly $parent, readonly elementDesc: IButtonElementDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(readonly form: IForm, readonly elementDesc: IButtonElementDesc, readonly pluginDesc: IPluginDesc) {
     super();
     this.id = elementDesc.id;
-    this.$node = $parent.append('div').classed('form-group', true);
-    this.build();
   }
 
   /**
@@ -50,7 +47,12 @@ export default class FormButton extends EventHandler implements IFormElement {
     return true;
   }
 
-  protected build() {
+  /**
+   * Build the current element and add the DOM element to the form DOM element.
+   * @param $formNode The parent node this element will be attached to
+   */
+  build($formNode) {
+    this.$node = $formNode.append('div').classed('form-group', true);
     this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
     this.$button.html(() => this.elementDesc.iconClass? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
   }

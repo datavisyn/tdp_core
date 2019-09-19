@@ -15,23 +15,24 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, $parent: d3.Selection<any>, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(form: IForm, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
     super(form, Object.assign({options: { buttons: [] }}, elementDesc), pluginDesc);
-
-    this.$node = $parent.append('div');
-
-    this.build();
   }
 
   /**
    * Build the label and input element
+   * @param $formNode The parent node this element will be attached to
    */
-  protected build() {
-    super.build();
+  build($formNode: d3.Selection<any>) {
+    this.addChangeListener();
+
+    this.$node = $formNode.append('div');
+    this.setVisible(this.elementDesc.visible);
+    this.appendLabel();
+
     const $label = this.$node.select('label');
 
     const options = this.elementDesc.options;
@@ -48,7 +49,6 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
     // TODO: fix that the form-control class is only appended for textual form elements, not for all
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because it is mainly used for text inputs and destroys the styling of the radio
     this.setAttributes($buttonElements, this.elementDesc.attributes);
-
   }
 
   /**

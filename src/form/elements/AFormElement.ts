@@ -24,7 +24,6 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   /**
    * Constructor
    * @param form The form this element is a part of
-   * @param $parent The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
@@ -79,10 +78,10 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   /**
-   * Set the visibility of an form element
+   * Set the visibility of an form element (default = true)
    * @param visible
    */
-  setVisible(visible: boolean) {
+  setVisible(visible: boolean = true) {
     this.$node.classed('hidden', !visible);
   }
 
@@ -105,23 +104,27 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     this.elementDesc.onChange(this, value, toData(value), old);
   }
 
-  protected build() {
-    this.addChangeListener();
-
-    if (this.elementDesc.visible === false) {
-      this.$node.classed('hidden', true);
-    }
-
-    if (!this.elementDesc.hideLabel) {
-      this.$node.append('label').attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
-    }
-  }
+  /**
+   * Build the current element and add the DOM element to the form DOM element.
+   * The implementation of this function must set the `$node` property!
+   */
+  abstract build($formNode: Selection<any>);
 
   /**
    * Initialize dependent form fields, bind the change listener, and propagate the selection by firing a change event
    */
   init() {
     // hook
+  }
+
+  /**
+   * Append a label to the node element if `hideLabel = false` in the element description
+   */
+  protected appendLabel() {
+    if (this.elementDesc.hideLabel) {
+      return;
+    }
+    this.$node.append('label').attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
   }
 
   /**

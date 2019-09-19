@@ -40,13 +40,8 @@ export default class FormBuilder {
   appendElement(elementDesc: IFormElementDesc) {
     const desc = updateElementDesc(elementDesc, this.formId);
 
-    const elementPromise = create(this.form, this.form.$node, desc);
+    const elementPromise = create(this.form, desc);
     this.elementPromises.push(elementPromise);
-
-    // append element to form once it is loaded
-    elementPromise.then((element: IFormElement) => {
-      this.form.appendElement(element);
-    });
   }
 
   /**
@@ -68,8 +63,9 @@ export default class FormBuilder {
   build(): Promise<IForm> {
     // initialize when all elements are loaded
     return Promise.all(this.elementPromises)
-      .then(() => {
-        this.form.initializeAllElements();
+      .then((elements: IFormElement[]) => {
+        this.form.appendElements(elements);
+        this.form.initAllElements();
         return this.form;
       });
   }

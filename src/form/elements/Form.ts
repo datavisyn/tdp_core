@@ -36,7 +36,7 @@ export class Form implements IForm {
   /**
    * DOM node for the form itself
    */
-  readonly $node: d3.Selection<any>;
+  private readonly $node: d3.Selection<any>;
 
   /**
    * Map of all appended form elements with the element id as key
@@ -54,18 +54,28 @@ export class Form implements IForm {
 
   /**
    * Append a form element and builds it
-   * Note: The initialization of the element must be done using `initializeAllElements`
+   * Note: The initialization of the element must be done using `initAllElements()`
    * @param element Form element
    */
   appendElement(element: IFormElement) {
+    element.build(this.$node);
     this.elements.set(element.id, element);
+  }
+
+  /**
+   * Append multiple form element at once and and build them
+   * Note: The initialization of the element must be done using `initAllElements()`
+   * @param element Form element
+   */
+  appendElements(elements: IFormElement[]) {
+    elements.forEach((element) => this.appendElement(element));
   }
 
   /**
    * Initialize all elements of this form
    * At this stage it is possible to reference dependencies to other form fields
    */
-  initializeAllElements() {
+  initAllElements() {
     this.elements.forEach((element) => element.init());
   }
 
