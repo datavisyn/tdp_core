@@ -52,8 +52,7 @@ class DBView(object):
   def dump(self, name):
     from collections import OrderedDict
     r = OrderedDict(name=name, description=self.description, type=self.query_type)
-    if self.idtype:
-      r['idType'] = self.idtype
+    r['idType'] = self.idtype
     r['query'] = clean_query(self.query)
     args = [a for a in self.arguments]
     args.extend(self.replacements)
