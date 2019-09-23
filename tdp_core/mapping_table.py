@@ -15,10 +15,13 @@ class SQLMappingTable(object):
 
   def __call__(self, ids):
     # ensure strings
-    ids = [str(i.decode('utf-8')) for i in ids]
+    print(type(ids))
+    # ids = [i.decode('utf-8') for i in ids if not isinstance(i, int)]
+    ids = [i for i in ids]
 
     if self._integer_ids:  # convert to integer ids
       ids = [int(i) for i in ids]
+
 
     with db.session(self._engine) as session:
       mapped = session.execute(self._query, ids=ids)
