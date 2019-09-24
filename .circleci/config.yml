@@ -25,6 +25,9 @@ jobs:
       - run: #install all dependencies
           name: install-npm-wee2
           command: npm install
+      - run:
+          name: show-installed-npm-dependencies
+          command: npm list --depth=0
       - restore_cache:
           key: deps1-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
       - run:
