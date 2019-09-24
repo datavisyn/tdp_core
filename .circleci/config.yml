@@ -7,39 +7,40 @@ jobs:
     steps:
       - checkout
       - run:
-          name: update-npm-package
+          name: Update npm package to v6.11.3
           command: sudo npm i -g npm@6.11.3
       - run:
-          name: show-node-version
+          name: Show node and npm version
           command: |
             node -v
             npm -v
       - run:
+          name: Install Docker packages from docker_packages.txt
           command: |
             (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
       - restore_cache:
           key: deps4-{{ checksum "package.json" }}
       - run:
-          name: install-npm-wee
+          name: Install npm dependencies
           command: npm install
-      - run: #remove all resolved github dependencies
-          name: delete-vcs-dependencies
+      - run:
+          name: Remove npm dependencies installed from git repositories (avoid caching of old commits)
           command: |
             (grep -l '._resolved.: .\(git[^:]*\|bitbucket\):' ./node_modules/*/package.json || true) | xargs -r dirname | xargs -r rm -rf
       - save_cache:
           key: deps4-{{ checksum "package.json" }}
           paths:
           - ./node_modules
-      - run: #install all dependencies
-          name: install-npm-wee2
+      - run:
+          name: Install npm dependencies from git repositories (always get newest commit)
           command: npm install
       - run:
-          name: show-installed-npm-dependencies
+          name: Show installed npm dependencies
           command: npm list --depth=0
       - restore_cache:
           key: deps1-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
       - run:
-          name: install-pip-wee
+          name: Install pip requirements
           command: |
             virtualenv ~/venv
             . ~/venv/bin/activate
@@ -49,13 +50,13 @@ jobs:
           key: deps1-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
           paths:
           - ~/venv
-      - run: #force update of VCS dependencies?
-          name: update-pip-vcs-dependencies
+      - run:
+          name: Force an update of VCS dependencies for pip # not sure if this is working ?
           command: |
             . ~/venv/bin/activate
             pip install --upgrade --upgrade-strategy=only-if-needed -r requirements.txt
       - run:
-          name: build
+          name: Build
           command: |
             . ~/venv/bin/activate
             npm run build
