@@ -7,6 +7,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: show-node-version
+          command: |
+            node -v
+            npm -v
+      - run:
           command: |
             (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
       - restore_cache:
