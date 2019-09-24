@@ -11,6 +11,8 @@ export default function editDialog(namedSet: IStoredNamedSet, result: (name: str
   const permissions = permissionForm(namedSet);
 
   dialog.form.innerHTML = `
+    <p>This dialog allows you to save the list of currently shown entities without any extra data. Afterwards, you can start new analyses using this entity subset by selecting it on the start page.</p>
+    <p style="margin-bottom: 15px">However, if you want to save the entire analysis session and not only the list of entities, please use the dialog <i>Analysis Session Management</i> at the top.</p>
     <div class="form-group">
       <label for="namedset_name">Name</label>
       <input type="text" class="form-control" name="name" id="namedset_name" placeholder="Name" required="required" ${namedSet ? `value="${namedSet.name}"` : ''}>
