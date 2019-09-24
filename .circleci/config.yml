@@ -32,7 +32,7 @@ jobs:
           paths:
           - ./node_modules
       - run:
-          name: Install npm dependencies from git repositories (always get newest commit)
+          name: Install npm dependencies from git repositories (always get latest commit)
           command: npm install
       - run:
           name: Show installed npm dependencies
