@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: update-npm-package
-          command: npm i -g npm@6.11.3
+          command: sudo npm i -g npm@6.11.3
       - run:
           name: show-node-version
           command: |
