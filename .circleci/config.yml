@@ -51,7 +51,7 @@ jobs:
           paths:
           - ~/venv
       - run:
-          name: Force an update of VCS dependencies for pip # not sure if this is working ?
+          name: Force an update of pip dependencies from git repositories # not sure if this is working ?
           command: |
             . ~/venv/bin/activate
             pip install --upgrade --upgrade-strategy=only-if-needed -r requirements.txt
