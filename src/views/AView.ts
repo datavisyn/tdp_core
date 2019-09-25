@@ -6,15 +6,15 @@ import {select} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
 import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
 import {none} from 'phovea_core/src/range';
-import {IFormElementDesc} from '../form';
-import FormBuilder from '../form/FormBuilder';
-import {toData} from '../form/internal/AFormElement';
+import {IFormElementDesc, FormBuilder} from '../form';
+import {toData} from '../form/elements/AFormElement';
 import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
 import {resolveIds} from './resolve';
 import {DEFAULT_SELECTION_NAME} from '../extensions';
+import {IForm} from '../form/interfaces';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -45,7 +45,7 @@ export abstract class AView extends EventHandler implements IView {
   readonly idType: IDType;
   readonly node: HTMLElement;
 
-  private params: FormBuilder;
+  private params: IForm;
   private readonly paramsFallback = new Map<string, any>();
   private readonly shared = new Map<string, any>();
   private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
@@ -96,8 +96,8 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   /*final*/
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    this.params = this.buildParameterForm(params, onParameterChange);
+  async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
+    this.params = await this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
   }
 
@@ -109,7 +109,7 @@ export abstract class AView extends EventHandler implements IView {
     return null;
   }
 
-  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
+  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
     const builder = new FormBuilder(select(params));
 
     //work on a local copy since we change it by adding an onChange handler
@@ -128,9 +128,9 @@ export abstract class AView extends EventHandler implements IView {
     });
     this.paramsChangeListener = onParameterChange;
 
-    builder.build(descs);
+    builder.appendElements(descs);
 
-    return builder;
+    return builder.build();
   }
 
   /**

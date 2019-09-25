@@ -220,8 +220,8 @@ export default class MessagingProxyView extends AView {
     this.node.innerHTML = `
         <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em"><strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.
             However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.
-            Please use the following <a href="${url}" target="_blank" class="alert-link">link</a> to open the website in a separate window:
-            <br><br><a href="${url}" target="_blank" class="alert-link">${url}</a>
+            Please use the following <a href="${url}" target="_blank" rel="noopener" class="alert-link">link</a> to open the website in a separate window:
+            <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
         </div></p><p></p>`;
     this.fire(MessagingProxyView.EVENT_LOADING_FINISHED);
   }

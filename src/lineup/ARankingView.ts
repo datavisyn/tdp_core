@@ -251,7 +251,7 @@ export abstract class ARankingView extends AView {
   }
 
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    return resolveImmediately(super.init(params, onParameterChange)).then(() => {
+    return super.init(params, onParameterChange).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
       base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
@@ -391,7 +391,8 @@ export abstract class ARankingView extends AView {
   }
 
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number) {
-    colDesc.color = colDesc.color? colDesc.color : this.colors.getColumnColor(id);
+    // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
+    colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
       this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
@@ -510,7 +511,6 @@ export abstract class ARankingView extends AView {
       this.createInitialRanking(this.provider);
       const ranking = this.provider.getLastRanking();
       this.customizeRanking(wrapRanking(this.provider, ranking));
-      this.colors.init();
     }).then(() => {
       if (this.selectionAdapter) {
         // init first time

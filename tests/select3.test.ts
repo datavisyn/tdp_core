@@ -1,5 +1,5 @@
 /// <reference types="jasmine" />
-import {splitEscaped} from '../src/form/internal/Select3';
+import {splitEscaped} from '../src/form/elements/Select3';
 
 describe('select3', () => {
   describe('splitEscaped', () => {

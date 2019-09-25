@@ -3,10 +3,11 @@
  */
 
 import AFormElement from './AFormElement';
-import {IFormParent} from '../interfaces';
+import {IForm} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
 import Select3, {IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
+import {IPluginDesc} from 'phovea_core/src/plugin';
 
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
   return?: 'text' | 'id';
@@ -29,39 +30,46 @@ export interface IFormSelect3 extends IFormSelectDesc {
  */
 export default class FormSelect3 extends AFormElement<IFormSelect3> {
 
-  private readonly multiple: boolean;
+  private readonly isMultiple: boolean;
 
   private select3: Select3<IdTextPair>;
 
   /**
    * Constructor
-   * @param parent
-   * @param $parent
-   * @param desc
-   * @param multiple
+   * @param form The form this element is a part of
+   * @param elementDesc The form element description
+   * @param pluginDesc The phovea extension point description
    */
-  constructor(parent: IFormParent, $parent, desc: IFormSelect3, multiple: 'multiple' | 'single' = 'single') {
-    super(parent, desc);
+  constructor(form: IForm, desc: IFormSelect3, readonly pluginDesc: IPluginDesc) {
+    super(form, desc, pluginDesc);
 
-    this.$node = $parent.append('div').classed('form-group', true);
-    this.multiple = multiple === 'multiple';
-
-    this.build();
+    this.isMultiple = (pluginDesc.selection === 'multiple');
   }
 
   /**
    * Build the label and select element
-   * Bind the change listener and propagate the selection by firing a change event
+   * @param $formNode The parent node this element will be attached to
    */
-  protected build() {
-    super.build();
+  build($formNode: d3.Selection<any>) {
+    this.addChangeListener();
 
-    const options = Object.assign(this.desc.options, {multiple: this.multiple});
+    this.$node = $formNode.append('div').classed('form-group', true);
+    this.setVisible(this.elementDesc.visible);
+    this.appendLabel();
+
+    const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple});
     this.select3 = new Select3(options);
     this.$node.node().appendChild(this.select3.node);
 
-    this.desc.attributes.clazz = this.desc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
-    this.setAttributes(this.$node.select('.select3'), this.desc.attributes);
+    this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
+    this.setAttributes(this.$node.select('.select3'), this.elementDesc.attributes);
+  }
+
+  /**
+   * Bind the change listener and propagate the selection by firing a change event
+   */
+  init() {
+    super.init();
 
     this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);
@@ -73,15 +81,15 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
    * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
    */
   get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[] {
-    const returnValue = this.desc.options.return;
+    const returnValue = this.elementDesc.options.return;
     const returnFn = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
     const value = <IdTextPair[]>this.select3.value;
 
     if (!value || value.length === 0) {
-      return this.multiple ? [] : returnFn({id: '', text: ''});
+      return this.isMultiple ? [] : returnFn({id: '', text: ''});
     }
     const data = value.map((d) => ({id: d.id, text: d.text})).map(returnFn);
-    return this.multiple ? data : data[0];
+    return this.isMultiple ? data : data[0];
   }
 
   hasValue() {
@@ -111,9 +119,9 @@ export default class FormSelect3 extends AFormElement<IFormSelect3> {
     }
 
     this.previousValue = this.select3.value;
-    if (Array.isArray(v) && v.length > 0 && !this.multiple) { // an array of items or string (id or text)
+    if (Array.isArray(v) && v.length > 0 && !this.isMultiple) { // an array of items or string (id or text)
       this.select3.value = v.slice(0, 1).map(toIdTextPair);
-    } else if (Array.isArray(v) && v.length > 0 && this.multiple) {
+    } else if (Array.isArray(v) && v.length > 0 && this.isMultiple) {
       this.select3.value = v.map(toIdTextPair);
     } else if (!Array.isArray(v)) { // an item or string (id or text)
       this.select3.value = [toIdTextPair(v)];

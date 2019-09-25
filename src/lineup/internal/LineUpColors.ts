@@ -7,11 +7,7 @@ export default class LineUpColors {
    * Map that assigns each selection ID a color, which is used as color for columns
    */
   private readonly colorMap = new Map<number, {color: string, items: number}>();
-  private colors: string[];
-
-  init() {
-    this.colors = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));
-  }
+  private colors: string[] = scale.category10().range().concat(scale.category20().range().filter((_d,i) => i % 2 === 1));
 
   getColumnColor(id: number): string {
     if (id < 0) {
