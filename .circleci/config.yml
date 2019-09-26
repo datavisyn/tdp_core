@@ -18,8 +18,8 @@ jobs:
           name: Install Docker packages from docker_packages.txt
           command: |
             (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
-      - restore_cache:
-          key: deps4-{{ checksum "package.json" }}
+      # - restore_cache:
+      #     key: deps4-{{ checksum "package.json" }}
       - run:
           name: Install npm dependencies
           command: npm ci
