@@ -7,8 +7,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Update npm package to v6.6.0
-          command: sudo npm i -g npm@6.6.0
+          name: Update npm package to v6.11
+          command: sudo npm i -g npm@6.11
       - run:
           name: Show node and npm version
           command: |
