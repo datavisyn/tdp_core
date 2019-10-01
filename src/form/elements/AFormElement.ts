@@ -139,7 +139,15 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     }
 
     Object.keys(attributes).forEach((key) => {
-      $node.attr((key === 'clazz') ? 'class' : key, attributes[key]);
+      switch (key) {
+        case 'clazz':
+          const cssClasses = attributes[key].split(' '); // tokenize CSS classes at space
+          cssClasses.forEach((cssClass) => $node.classed(cssClass, true));
+          break;
+        default:
+          $node.attr(key, attributes[key]);
+          break;
+      }
     });
 
     if (this.elementDesc.required && !this.elementDesc.showIf) {
