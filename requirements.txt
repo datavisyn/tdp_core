@@ -1,4 +1,4 @@
-phovea_server>=2.3.0,<2.4
+phovea_server>=2.3.0,<3.0.0
 pymongo==3.0.3
 requests~=2.20.0
 SQLAlchemy==1.1.11
