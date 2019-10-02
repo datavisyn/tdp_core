@@ -65,7 +65,7 @@ def _xlsx2json():
     rows = []
     rows.append(convert_row(cols, ws_first_row))
     for row in ws_rows:
-      rows.append(convert_row(cols, row))
+      rows.append(str(convert_row(cols, row)))
 
     return dict(title=ws.title, columns=cols, rows=rows)
 
@@ -118,11 +118,10 @@ def _json2xlsx():
   for sheet in data.get('sheets', []):
     ws = wb.create_sheet(title=sheet['title'])
     cols = sheet['columns']
-
     ws.append(to_header(col['name']) for col in cols)
 
     for row in sheet['rows']:
-      ws.append(to_value(row.get(col['name'], None), col['type']) for col in cols)
+      ws.append(str(to_value(row.get(col['name'], None), col['type'])) for col in cols)
 
   with NamedTemporaryFile() as tmp:
     wb.save(tmp.name)
