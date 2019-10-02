@@ -97,13 +97,13 @@ def to_query(q, supports_array_parameter, parameters):
     return sqlalchemy.sql.text(q)
 
   # need to suffix all array parameter and wrap with ()
-  for k, v in parameters.items():
+  for k, v in list(parameters.items()):
     if not isinstance(v, list) and not isinstance(v, tuple):
       continue
     # sounds like an array
     # convert from :ids to (:ids0, :ids1, :ids2)
     subparameters = {(k + str(i)): vi for i, vi in enumerate(v)}
-    q = q.replace(':' + k, '({ids})'.format(ids=', '.join(':' + p for p in list(subparameters.keys()))))
+    q = q.replace(':' + k, '({ids})'.format(ids=', '.join(':' + p for p in subparameters.keys())))
     del parameters[k]  # delete single
     parameters.update(subparameters)  # add sub
 

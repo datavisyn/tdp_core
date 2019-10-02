@@ -59,7 +59,7 @@ class DBView(object):
     args.extend(self.replacements)
     r['arguments'] = args
     if self.columns:
-      r['columns'] = self.columns.values()
+      r['columns'] = list(self.columns.values())
     if self.filters:
       r['filters'] = list(self.filters.keys())
     if self.queries:
