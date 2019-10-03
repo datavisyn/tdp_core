@@ -48,7 +48,7 @@ let errorAlertHandler = (error: any) => {
     return xhr.text().then((body: string) => {
       if (xhr.status !== 400) {
         body = `${body}<hr>
-          The requested URL was:<br><a href="${xhr.url}" target="_blank" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
+          The requested URL was:<br><a href="${xhr.url}" target="_blank" rel="noopener" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
       }
       pushNotification('danger', `<strong>Error ${xhr.status} (${xhr.statusText})</strong>: ${body}`, DEFAULT_ERROR_AUTO_HIDE);
       return Promise.reject(error);
