@@ -75,7 +75,7 @@ def filter_logic(view, args):
   processed_args = MultiDict()
   extra_args = dict()
   where_clause = {}
-  for k, v in args.lists():
+  for k, v in list(args.lists()):
     if k.endswith('[]'):
       k = k[:-2]
     if k.startswith('filter_'):
@@ -84,7 +84,7 @@ def filter_logic(view, args):
       processed_args.setlist(k, v)
 
   # handle special namedset4 filter types by resolve them and and the real ids as filter
-  for k, v in where_clause.items():
+  for k, v in list(where_clause.items()):
     if k.startswith('namedset4'):
       del where_clause[k]  # delete value
       real_key = k[9:]  # remove the namedset4 part
@@ -175,7 +175,7 @@ def filter_logic(view, args):
 
   where_default_clause = []
   where_group_clauses = {group: [] for group in view.filter_groups()}
-  for k, v in where_clause.items():
+  for k, v in list(where_clause.items()):
     if len(v) <= 0:
       continue
     clause = to_clause(k, v)
@@ -191,7 +191,7 @@ def filter_logic(view, args):
   replacements['where'] = (' WHERE ' + ' AND '.join(c for c, _ in where_default_clause)) if where_default_clause else ''
   # unique joins
   replacements['joins'] = ' '.join(set(j for _, j in where_default_clause if j is not None))
-  for group, v in where_group_clauses.items():
+  for group, v in list(where_group_clauses.items()):
     replacements['and_' + group + '_where'] = (' AND ' + ' AND '.join(c for c, _ in v)) if v else ''
     replacements[group + '_where'] = (' WHERE ' + ' AND '.join(c for c, _ in v)) if v else ''
     replacements[group + '_joins'] = ' '.join(set(j for _, j in v if j is not None))
