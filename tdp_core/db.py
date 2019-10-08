@@ -368,7 +368,7 @@ def get_filtered_data(database, view_name, args):
   try:
     replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   except RuntimeError as error:
-    abort(400, error.message)
+    abort(400, error)
 
   return get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
@@ -380,7 +380,7 @@ def get_filtered_query(database, view_name, args):
   try:
     replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   except RuntimeError as error:
-    abort(400, error.message)
+    abort(400, error)
 
   return get_query(database, view_name, replacements, processed_args, extra_args)
 
@@ -391,7 +391,7 @@ def _get_count(database, view_name, args):
   try:
     replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
   except RuntimeError as error:
-    abort(400, error.message)
+    abort(400, error)
 
   kwargs, replace = prepare_arguments(view, config, replacements, processed_args, extra_args)
 
