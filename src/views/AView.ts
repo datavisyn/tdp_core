@@ -12,7 +12,7 @@ import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
-import {resolveIds, resolveAllNames, resolveAllIds} from './resolve';
+import {resolveIds, resolveAllNames, resolveAllIds, resolveNames} from './resolve';
 import {DEFAULT_SELECTION_NAME} from '../extensions';
 import {IForm} from '../form/interfaces';
 
@@ -271,7 +271,7 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveSelectionByName(idType = this.idType): Promise<string[]> {
-    return resolveIds(this.selection.idtype, this.selection.range, idType);
+    return resolveNames(this.selection.idtype, this.selection.range, idType);
   }
 
    /**
