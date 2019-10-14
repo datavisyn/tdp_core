@@ -116,7 +116,7 @@ export abstract class AView extends EventHandler implements IView {
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
 
 
-    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean)=>void = <any>onParameterChange;
+    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean) => void = <any>onParameterChange;
 
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
@@ -274,10 +274,10 @@ export abstract class AView extends EventHandler implements IView {
     return resolveNames(this.selection.idtype, this.selection.range, idType);
   }
 
-   /**
+  /**
    * resolves the ids of the current input selection to all 1:n related names, not just the first one like resolveSelection does
    * @returns {Promise<string[]>}
-   */
+  */
   protected resolveMultipleSelections(idType = this.idType): Promise<string[][]> {
     return resolveAllIds(this.selection.idtype, this.selection.range, idType);
   }
