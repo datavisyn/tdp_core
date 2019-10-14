@@ -92,7 +92,7 @@ class DBView(object):
     return None
 
   def filter_groups(self):
-    r = set([v.group for v in self.filters.values()])
+    r = set([v.group for v in list(self.filters.values())])
     if None in r:
       r.remove(None)
     return r
@@ -256,7 +256,7 @@ class DBViewBuilder(object):
     :param join: additional join to inject
     :return:
     """
-    for key in keys:
+    for key in list(keys):
       self.filter(key, alias=alias, table=table, group=group, join=join)
     return self
 
