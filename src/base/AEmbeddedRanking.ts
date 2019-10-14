@@ -107,7 +107,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
         return super.withoutTracking(f);
       }
 
-      protected getParameterFormDescs() {
+      protected getParameterFormDescs(): IFormElementDesc[] {
         const base = super.getParameterFormDescs();
         return [
           ...base,
