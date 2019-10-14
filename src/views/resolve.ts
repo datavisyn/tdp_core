@@ -33,3 +33,38 @@ export function resolveIds(fromIDType: IDType, ids: Range | number[], toIDType: 
   // assume mappable
   return fromIDType.mapToFirstName(ids, target);
 }
+
+export function resolveNames(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[]> {
+  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  if (fromIDType.id === target.id) {
+    // same just unmap to name
+    return fromIDType.unmap(ids);
+  }
+  // assume mappable
+  return fromIDType.unmap(ids).then((names) => {
+    return fromIDType.mapNameToFirstName(names, target);
+  });
+
+}
+
+export function resolveAllNames(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[][]> {
+  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  if (fromIDType.id === target.id) {
+    // same just unmap to name
+    return fromIDType.unmap(ids).then((ids) => [ids]);
+  }
+  // assume mappable
+  return fromIDType.unmap(ids).then((names) => {
+    return fromIDType.mapNameToName(names, target);
+  });
+}
+
+export function resolveAllIds(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[][]> {
+  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  if (fromIDType.id === target.id) {
+    // same just unmap to name
+    return fromIDType.unmap(ids).then((ids) => [ids]);
+  }
+  // assume mappable
+  return fromIDType.mapToName(ids, target);
+}

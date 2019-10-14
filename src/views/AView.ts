@@ -12,7 +12,7 @@ import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
-import {resolveIds} from './resolve';
+import {resolveIds, resolveAllNames, resolveAllIds} from './resolve';
 import {DEFAULT_SELECTION_NAME} from '../extensions';
 import {IForm} from '../form/interfaces';
 
@@ -259,12 +259,38 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   /**
-   * resolve the name of the current input selection
+   * resolve the id of the current input selection
    * @returns {Promise<string[]>}
    */
   protected resolveSelection(idType = this.idType): Promise<string[]> {
     return resolveIds(this.selection.idtype, this.selection.range, idType);
   }
+
+  /**
+   * resolve the name of the current input selection
+   * @returns {Promise<string[]>}
+   */
+  protected resolveSelectionByName(idType = this.idType): Promise<string[]> {
+    return resolveIds(this.selection.idtype, this.selection.range, idType);
+  }
+
+   /**
+   * resolves the ids of the current input selection to all 1:n related names, not just the first one like resolveSelection does
+   * @returns {Promise<string[]>}
+   */
+  protected resolveMultipleSelections(idType = this.idType): Promise<string[][]> {
+    return resolveAllIds(this.selection.idtype, this.selection.range, idType);
+  }
+
+  /**
+   * resolves the names of the current input selection to all 1:n related names, not just the first one like resolveSelection does
+   * @returns {Promise<string[]>}
+   */
+  protected resolveMultipleSelectionsByName(idType = this.idType): Promise<string[][]> {
+    return resolveAllNames(this.selection.idtype, this.selection.range, idType);
+  }
+
+
 
   setItemSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
     const current = this.itemSelections.get(name);
