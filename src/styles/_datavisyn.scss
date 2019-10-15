@@ -37,7 +37,6 @@ nav.navbar-inverse {
     margin-left: 0.8em;
 
     &:before {
-      @include datavisyn-font();
       height: 14px;
       width: 20px;
       background: url('~tdp_core/src/assets/icons/datavisyn_logo.svg') no-repeat top left;
