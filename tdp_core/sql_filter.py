@@ -105,9 +105,9 @@ def filter_logic(view, args):
         where_clause[real_key].extend(ids)
 
   def to_clause(k, v):
-    l = len(v)
+    length = len(v)
     kp = k.replace('.', '_')
-    if l == 1:  # single value
+    if length == 1:  # single value
       operator = '='
       if kp.startswith('lt_'):
         # keep the 'lt_' for kp to distinguish from the others ('lte_', 'gt_', 'gte_') in the created sub_query
@@ -153,7 +153,9 @@ def filter_logic(view, args):
 
     # check if key (attribute/column) does exist in view
     if not view.is_valid_filter(key):
-      raise RuntimeError('Invalid filter key detected, "' + original_key + '"')
+      _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
+      del where_clause[key]
+      # raise RuntimeError('Invalid filter key detected, "' + original_key + '"')
 
     # check if column type is number for one of the greater ('gt' and 'gte') or less ('lt' and 'lte') filters
     column_type = view.columns.get(key, {}).get('type')
