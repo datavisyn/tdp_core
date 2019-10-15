@@ -1,4 +1,3 @@
-import itertools
 import logging
 import phovea_server.config
 from .sql_filter import filter_logic
