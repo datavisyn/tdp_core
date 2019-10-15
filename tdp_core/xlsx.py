@@ -85,7 +85,7 @@ def _xlsx2json_array():
   wb = load_workbook(file, read_only=True)
 
   def convert_row(row):
-    return [str(_convert_value(cell.value)) for cell in row]
+    return [_convert_value(cell.value) for cell in row]
 
   if not wb.worksheets:
     return jsonify([])
