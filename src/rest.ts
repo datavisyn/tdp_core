@@ -40,7 +40,7 @@ export function getTDPDatabases(): Promise<IDatabaseDesc[]> {
   return getAPIJSON(`${REST_DB_NAMESPACE}/`);
 }
 
-export interface IViewDescription {
+export interface IServerColumnDesc {
 
   /**
    * idType of the DBView, can be null
@@ -53,7 +53,7 @@ export interface IViewDescription {
   columns: IServerColumn[];
 }
 
-export interface IDatabaseViewDesc extends IViewDescription {
+export interface IDatabaseViewDesc extends IServerColumnDesc {
   name: string;
   description: string;
   arguments: string[];
