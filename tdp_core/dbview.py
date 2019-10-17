@@ -1,7 +1,7 @@
 import logging
 import re
 from collections import OrderedDict
-from phovea_server.security import current_user
+from phovea_server.security import current_user, is_logged_in
 from .utils import clean_query
 
 __author__ = 'Samuel Gratzl'
@@ -126,13 +126,23 @@ class DBView(object):
   def get_argument_info(self, key):
     return self.argument_infos.get(key)
 
-  def can_access(self):
-    if self.security is None:
+  # TODO: improve the logic of this function, because even for unauthorized can_access returns True, i.e. that the user can access the resource. Somewhere else the server checks whether the user is authenticated or not
+  def can_access(self, check_default_security=False):
+    """
+    check whether a user can access a DBView (DBView.security is checked and can either be a boolean, a string (=group the user must belong to) or a function) or not.
+    :param check_default_security: bool (default = False); True if the security should be checked by default, e.g. although self.security is None, otherwise the function will return True
+    :return: bool
+    """
+    if self.security is None and check_default_security is False:
       return True
+    if isinstance(self.security, str):
+      role = unicode(self.security)
+      return current_user().has_role(role)
     if callable(self.security):
       return self.security(current_user())
-    role = unicode(self.security)
-    return current_user().has_role(role)
+    if isinstance(self.security, bool) and self.security is False:  # check if security is a boolean and if it's disabled, i.e. it's value is False
+      return True  # return that we're allowed to access the view, because its security is disabled
+    return is_logged_in()  # because security is not disabled check if the user is at least logged in
 
 
 class DBViewBuilder(object):
