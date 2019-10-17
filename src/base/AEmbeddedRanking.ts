@@ -7,6 +7,7 @@ import {IViewProvider} from '../lineup/internal/cmds';
 import {resolve} from 'phovea_core/src/idtype';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../extensions';
 import {get as getPlugin} from 'phovea_core/src/plugin';
+import {IFormElementDesc} from '../form';
 
 
 interface IEmbeddedRanking extends ARankingView {
@@ -105,6 +106,14 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
       runWithoutTracking<T>(f: () => T): Promise<T> {
         return super.withoutTracking(f);
       }
+
+      protected getParameterFormDescs(): IFormElementDesc[] {
+        const base = super.getParameterFormDescs();
+        return [
+          ...base,
+          ...that.getParameterFormDescs()
+        ];
+      }
     }
 
     this.ranking = new EmbeddedRankingView(context, selection, this.node, options);
@@ -182,6 +191,15 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     if (this.ranking) {
       this.ranking.update();
     }
+  }
+
+  /**
+   * return a list of FormBuilder element descriptions to build the parameter form
+   * @returns {IFormElementDesc[]}
+   */
+  protected getParameterFormDescs(): IFormElementDesc[] {
+    // hook
+    return [];
   }
 }
 
