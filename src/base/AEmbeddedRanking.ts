@@ -7,8 +7,8 @@ import {IViewProvider} from '../lineup/internal/cmds';
 import {resolve} from 'phovea_core/src/idtype';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../extensions';
 import {get as getPlugin} from 'phovea_core/src/plugin';
+import {IServerColumnDesc} from '../rest';
 import {IFormElementDesc} from '../form';
-
 
 interface IEmbeddedRanking extends ARankingView {
   rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
@@ -51,8 +51,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     class EmbeddedRankingView extends ARankingView implements IEmbeddedRanking {
       private triggerScoreReload = false;
 
-      protected loadColumnDesc() {
-        return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns}));
+      protected loadColumnDesc() : Promise<IServerColumnDesc> {
+        return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns, idType: this.idType.name}));
       }
 
       protected getColumnDescs(columns: any[]) {
