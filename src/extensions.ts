@@ -3,10 +3,10 @@ import {IUser} from 'phovea_core/src/security';
 import {IObjectRef, ProvenanceGraph} from 'phovea_core/src/provenance';
 import Range from 'phovea_core/src/range/Range';
 import {IEventHandler} from 'phovea_core/src/event';
-import {IScore} from './lineup';
+import {IScore, IAdditionalColumnDesc} from './lineup';
 import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
-import {IColumnDesc} from 'lineupjs';
+import {IColumnDesc, Column} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
 
@@ -15,6 +15,7 @@ export * from './tour/extensions';
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
+export const EXTENSION_POINT_TDP_SCORE_COLUMN_PATCHER = 'tdpScoreColumnPatcher';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
 export const EXTENSION_POINT_TDP_INSTANT_VIEW = 'tdpInstantView';
@@ -109,6 +110,14 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   idtype: string;
 
   load(): Promise<IPlugin & IScoreLoaderExtension>;
+}
+
+export interface IScoreColumnPatcherExtension {
+  factory(pluginDesc: IPluginDesc, colDesc: IAdditionalColumnDesc, rows: IScoreRow<any>[], col: Column): Promise<void>;
+}
+
+export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
+  load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 
 export interface IRankingButtonExtension {
