@@ -164,10 +164,10 @@ export abstract class ARankingView extends AView {
    *
    * @remarks You need to call init() to actually display the Ranking View.
    *
-   * @param context TODO
+   * @param context with provenance graph to store the executed operations
    * @param selection The Ids and IdType of the selection
    * @param parent where to put the ranking view
-   * @param options TODO
+   * @param options to configure the ranking view
    */
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
@@ -259,8 +259,8 @@ export abstract class ARankingView extends AView {
   }
 
   /**
-   * @param params Will display the "Showing x of y ..." message
-   * @param onParameterChange TODO
+   * @param params Seperate element that Will display the "Showing x of y ..." message
+   * @param onParameterChange optional eventlistener for content changes
    */
   init(params: HTMLElement, onParameterChange?: (name: string, value: any, previousValue: any) => Promise<any>) {
     return resolveImmediately(super.init(params, onParameterChange)).then(() => {
