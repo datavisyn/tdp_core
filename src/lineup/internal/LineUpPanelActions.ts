@@ -214,27 +214,25 @@ export default class LineUpPanelActions extends EventHandler {
 
   private appendDownload() {
     const node = this.node.ownerDocument.createElement('div');
-    node.classList.add('btn-group');
+    node.classList.add('btn-group', 'download-data-dropdown');
     node.innerHTML = `
       <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
       </button>
       <ul class="dropdown-menu dropdown-menu-${this.isTopMode ? 'left' : 'right'}">
         <li class="dropdown-header">Download All Rows</li>
-        <li><a href="#" data-s="a" data-t="csv">CSV (comma separated)</a></li>
-        <li><a href="#" data-s="a" data-t="tsv">TSV (tab separated)</a></li>
-        <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
-        <li><a href="#" data-s="a" data-t="json">JSON</a></li>
         <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li class="dropdown-header">Download Selected Rows Only</li>
-        <li><a href="#" data-s="s" data-t="csv">CSV (comma separated)</a></li>
-        <li><a href="#" data-s="s" data-t="tsv">TSV (tab separated)</a></li>
-        <li><a href="#" data-s="a" data-t="ssv">CSV (semicolon separated)</a></li>
-        <li><a href="#" data-s="s" data-t="json">JSON</a></li>
+        <li class="dropdown-header" data-num-selected-rows="0">Download Selected Rows Only</li>
         <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
         <li role="separator" class="divider"></li>
         <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
       </ul>
     `;
+
+    // Listen for row selection and update number of selected rows
+    // Show/hide some dropdown menu points accordingly using CSS
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.download-menu', (indices: number[]) => {
+      (<HTMLElement>node.querySelector('[data-num-selected-rows]')).dataset.numSelectedRows = indices.length.toString();
+    });
 
     const links = Array.from(node.querySelectorAll('a'));
     for (const link of links) {
@@ -332,9 +330,10 @@ export default class LineUpPanelActions extends EventHandler {
     }
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
-    const items = [
+    const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [
       this.groupedDialog('Database Columns', this.getColumnDescription(descs, false))
     ];
+
     if (loadedScorePlugins.length > 0) {
       items.push({
         text: 'Parameterized Scores',
@@ -353,6 +352,7 @@ export default class LineUpPanelActions extends EventHandler {
         })
       });
     }
+
     const scoreDescs = this.getColumnDescription(descs, true);
     if (scoreDescs.length > 0) {
       items.push({
@@ -360,25 +360,34 @@ export default class LineUpPanelActions extends EventHandler {
         children: scoreDescs
       });
     }
-    items.push(
-      this.groupedDialog('Combining Columns', [
-          { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
-          { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
-          { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-          { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
-          { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
-      ]),
-      this.groupedDialog('Support Columns', [
-          {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
-          {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
-          {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
-      ]),
-      ...metaDataOptions
-    );
+
+    const combiningColumns = this.groupedDialog('Combining Columns', [
+      { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
+      { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
+      { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
+      { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
+      { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+    ]);
+
+    const supportColumns = this.groupedDialog('Support Columns', [
+        {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
+        {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+        {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+    ]);
+
+    items.push({
+      text: 'Special Columns',
+      children: [
+        combiningColumns,
+        supportColumns,
+        ...metaDataOptions
+      ]
+    });
+
     this.search.data = items;
   }
 
-  private groupedDialog(text: string, children: ISearchOption[]) {
+  private groupedDialog(text: string, children: ISearchOption[]):ISearchOption | IGroupSearchItem<ISearchOption> {
     const viaDialog = this.options.enableAddingColumnGrouping;
     if (!viaDialog) {
       return { text, children };

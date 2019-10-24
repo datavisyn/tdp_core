@@ -27,7 +27,7 @@ export default class EditProvenanceGraphMenu {
   }
 
   updateGraphMetaData(graph: ProvenanceGraph) {
-    this.node.querySelector('a span').innerHTML = graph.desc.name;
+    this.node.querySelector('span.session-name').innerHTML = graph.desc.name;
     const syncIcon = this.node.querySelector('.sync-indicator');
     const persisted = isPersistent(graph.desc);
     const persistAction = (<HTMLLinkElement>this.node.querySelector('a[data-action="persist"]').parentElement);
@@ -68,17 +68,19 @@ export default class EditProvenanceGraphMenu {
 
     li.innerHTML = `
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><i class="fa fa-clock-o sync-indicator" aria-hidden="true"></i> <span>No Name</span></a>
+             aria-expanded="false"><i class="fa fa-folder-open-o" aria-hidden="true"></i> <i class="fa fa-save sync-indicator" aria-hidden="true"></i> <span>Analysis Session Management</span></a>
           <ul class="dropdown-menu">
+            <li class="dropdown-label"><i class="fa fa-clock-o" aria-hidden="true"></i> <span class="session-name">No Name</span></li>
+            <li class="divider"></li>
             <li><a href="#" data-action="edit" title="Edit Details"><i class="fa fa-edit" aria-hidden="true"></i> Edit Details</a></li>
             <li><a href="#" data-action="clone" title="Clone to Temporary Session"><i class="fa fa-clone" aria-hidden="true"></i> Clone to Temporary Session</a></li>
             <li class="divider"></li>
             <li><a href="#" data-action="open" title="Open Session"><i class="fa fa-folder-open-o" aria-hidden="true"></i> Open Existing Session</a></li>
-            <li><a href="#" data-action="persist" title="Save Session"><i class="fa fa-cloud" aria-hidden="true"></i> Save Session</a></li>
+            <li><a href="#" data-action="persist" title="Save Session"><i class="fa fa-save" aria-hidden="true"></i> Save Session</a></li>
             <li><a href="#" data-action="delete" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
-            <li class="divider${__DEBUG__ ? '' : ' hidden'}"></li>
-            <li class="${__DEBUG__ ? '' : 'hidden'}"><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
-            <li class="${__DEBUG__ ? '' : 'hidden'}"><a href="#" data-action="export" title="Export Graph"><i class="fa fa-download" aria-hidden="true"></i> Export Session</a></li>
+            <li class="divider"></li>
+            <li><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
+            <li><a href="#" data-action="export" title="Export Graph"><i class="fa fa-download" aria-hidden="true"></i> Export Session</a></li>
           </ul>`;
 
     (<HTMLLinkElement>li.querySelector('a[data-action="edit"]')).addEventListener('click', (event) => {

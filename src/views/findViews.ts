@@ -16,7 +16,7 @@ import {
 } from '../extensions';
 import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import Range from 'phovea_core/src/range/Range';
-import {currentUser} from 'phovea_core/src/security';
+import {currentUser, isLoggedIn} from 'phovea_core/src/security';
 import {resolveImmediately} from 'phovea_core/src';
 
 export interface IDiscoveredView {
@@ -109,6 +109,12 @@ export function canAccess(p: any) {
       return false;
     }
     return security(user);
+  }
+  if (typeof security === 'boolean') {
+    if (security === true) { // if security is set on a view with a boolean flag check if the user is at least logged in
+      return isLoggedIn();
+    }
+    return true; // security is disabled - the resource is publicly available, the user can access it
   }
   return true;
 }
