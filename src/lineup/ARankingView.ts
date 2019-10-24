@@ -259,7 +259,7 @@ export abstract class ARankingView extends AView {
   }
 
   /**
-   * @param params Seperate element that Will display the "Showing x of y ..." message
+   * @param params Seperate element that displays the "Showing x of y ..." message
    * @param onParameterChange optional eventlistener for content changes
    */
   init(params: HTMLElement, onParameterChange?: (name: string, value: any, previousValue: any) => Promise<any>) {

@@ -109,7 +109,7 @@ export abstract class AView extends EventHandler implements IView {
     return null;
   }
 
-  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
+  private buildParameterForm(params: HTMLElement, onParameterChange?: (name: string, value: any, previousValue: any) => Promise<any>) {
     const builder = new FormBuilder(select(params));
 
     //work on a local copy since we change it by adding an onChange handler
@@ -126,7 +126,7 @@ export abstract class AView extends EventHandler implements IView {
         p.onInit = (formElement, value, _data, previousValue) => onInit(formElement.id, value, previousValue, true);
       }
     });
-    this.paramsChangeListener = onParameterChange;
+    this.paramsChangeListener = onParameterChange; // undefined if not passed as parameter
 
     builder.build(descs);
 
@@ -183,7 +183,9 @@ export abstract class AView extends EventHandler implements IView {
     if (old === value) {
       return;
     }
-    await this.paramsChangeListener(name, value, old);
+    if (this.paramsChangeListener) { // optional parameter in init()
+      await this.paramsChangeListener(name, value, old);
+    }
     await this.setParameter(name, value);
   }
 
