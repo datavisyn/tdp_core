@@ -3,7 +3,7 @@ import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
 import {json2xlsx} from '../../internal/xlsx';
 
-function isDateColumn(column:Column) {
+function isDateColumn(column: Column) {
   return column.desc.type === 'date';
 }
 
@@ -48,14 +48,14 @@ export function exportxlsx(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+      r[`${col.label}${col.description || ''}`] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
     }
     return r;
   });
   return json2xlsx({
     sheets: [{
       title: 'LineUp',
-      columns: columns.map((d) => ({name: d.label, type: <'float'|'string' |'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d)? 'date':'string')})),
+      columns: columns.map((d) => ({name: `${d.label}${d.description || ''}`, type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
       rows: converted
     }]
   });
@@ -82,9 +82,9 @@ function toBlob(content: string, mimeType: string) {
 function convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportType, name: string) {
   const rows = provider.viewRawRows(order);
 
-  const separators = {csv : ',', tsv: '\t', ssv: ';'};
+  const separators = {csv: ',', tsv: '\t', ssv: ';'};
   let content: Promise<Blob> | Blob;
-  const mimeTypes = {csv : 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+  const mimeTypes = {csv: 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
   const mimeType = mimeTypes[type];
   if (type in separators) {
     content = toBlob(exportRanking(columns, rows, separators[type]), mimeType);
@@ -163,7 +163,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
 
         const rows = data.get('rows').toString();
         let order: number[];
-        switch(rows) {
+        switch (rows) {
           case 'selected':
             order = provider.getSelection();
             break;
