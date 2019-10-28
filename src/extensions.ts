@@ -15,7 +15,6 @@ export * from './tour/extensions';
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
-export const EXTENSION_POINT_TDP_SCORE_COLUMN_PATCHER = 'tdpScoreColumnPatcher';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
 export const EXTENSION_POINT_TDP_INSTANT_VIEW = 'tdpInstantView';
@@ -112,7 +111,19 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreLoaderExtension>;
 }
 
+export const EP_TDP_CORE_SCORE_COLUMN_PATCHER = 'epTdpCoreScoreColumnPatcher';
+
+/**
+ * Extension to patch a LineUp column generated as score.
+ */
 export interface IScoreColumnPatcherExtension {
+  /**
+   * Patcher function called for every column to patch.
+   * @param pluginDesc Description of the plugin.
+   * @param colDesc Description of the column.
+   * @param rows Rows from the score.
+   * @param col Column to patch.
+   */
   factory(pluginDesc: IPluginDesc, colDesc: IAdditionalColumnDesc, rows: IScoreRow<any>[], col: Column): Promise<void>;
 }
 

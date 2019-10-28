@@ -3,7 +3,7 @@
  */
 import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, CategoricalColumn, toCategories} from 'lineupjs';
 import {createAccessor} from './utils';
-import {IScoreRow, EXTENSION_POINT_TDP_SCORE_COLUMN_PATCHER, IScoreColumnPatcherExtensionDesc} from '../../extensions';
+import {IScoreRow, EP_TDP_CORE_SCORE_COLUMN_PATCHER, IScoreColumnPatcherExtensionDesc} from '../../extensions';
 import {showErrorModalDialog} from '../../dialogs';
 import {extent, min, max} from 'd3';
 import {list as listPlugins} from 'phovea_core/src/plugin';
@@ -137,7 +137,7 @@ async function patchColumn(colDesc: any, rows: IScoreRow<any>[], col: Column): P
   }
 
   // Await all patchers to complete before returning
-  await Promise.all(listPlugins(EXTENSION_POINT_TDP_SCORE_COLUMN_PATCHER).map(async (pluginDesc: IScoreColumnPatcherExtensionDesc) => {
+  await Promise.all(listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER).map(async (pluginDesc: IScoreColumnPatcherExtensionDesc) => {
     const plugin = await pluginDesc.load();
     plugin.factory(pluginDesc, colDesc, rows, col);
   }));
