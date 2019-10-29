@@ -48,14 +48,14 @@ export function exportxlsx(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[`${col.label}${col.description || ''}`] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+      r[`${col.label}${col.description ? `\n${col.description}` : ''}`] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
     }
     return r;
   });
   return json2xlsx({
     sheets: [{
       title: 'LineUp',
-      columns: columns.map((d) => ({name: `${d.label}${d.description || ''}`, type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
+      columns: columns.map((d) => ({name: `${d.label}${d.description ? `\n${d.description}` : ''}`, type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
       rows: converted
     }]
   });
