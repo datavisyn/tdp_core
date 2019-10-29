@@ -7,7 +7,7 @@ function isDateColumn(column: Column) {
   return column.desc.type === 'date';
 }
 
-function getColName(column: Column) {
+function getColumnName(column: Column) {
   return column.label + (column.description ? '\n' + column.description : '');
 }
 
@@ -30,7 +30,7 @@ export function exportRanking(columns: Column[], rows: IDataRow[], separator: st
   }
 
   const r: string[] = [];
-  r.push(columns.map((d) => quote(getColName(d))).join(separator));
+  r.push(columns.map((d) => quote(getColumnName(d))).join(separator));
   rows.forEach((row) => {
     r.push(columns.map((c) => quote(c.getExportValue(row, 'text'), c)).join(separator));
   });
@@ -52,14 +52,14 @@ export function exportxlsx(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[getColName(col)] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+      r[getColumnName(col)] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
     }
     return r;
   });
   return json2xlsx({
     sheets: [{
       title: 'LineUp',
-      columns: columns.map((d) => ({name: getColName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
+      columns: columns.map((d) => ({name: getColumnName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
       rows: converted
     }]
   });
