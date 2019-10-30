@@ -41,7 +41,7 @@ export function exportJSON(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getExportValue(row, 'json');
+      r[getColumnName(col)] = isNumberColumn(col) ? col.getRawNumber(row) : col.getExportValue(row, 'json');
     }
     return r;
   });
