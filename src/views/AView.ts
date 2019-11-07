@@ -183,7 +183,6 @@ export abstract class AView extends EventHandler implements IView {
     if (old === value) {
       return;
     }
-
     await this.paramsChangeListener(name, value, old);
     await this.setParameter(name, value);
   }
