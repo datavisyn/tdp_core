@@ -259,9 +259,9 @@ export abstract class ARankingView extends AView {
 
   /**
    * @param params Seperate element that displays the "Showing x of y ..." message
-   * @param onParameterChange optional eventlistener for content changes
+   * @param onParameterChange eventlistener for content changes
    */
-  init(params: HTMLElement, onParameterChange?: (name: string, value: any, previousValue: any) => Promise<any>) {
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return super.init(params, onParameterChange).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
