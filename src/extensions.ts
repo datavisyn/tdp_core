@@ -3,10 +3,10 @@ import {IUser} from 'phovea_core/src/security';
 import {IObjectRef, ProvenanceGraph} from 'phovea_core/src/provenance';
 import Range from 'phovea_core/src/range/Range';
 import {IEventHandler} from 'phovea_core/src/event';
-import {IScore} from './lineup';
+import {IScore, IAdditionalColumnDesc} from './lineup';
 import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
-import {IColumnDesc} from 'lineupjs';
+import {IColumnDesc, Column} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
 
@@ -109,6 +109,26 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   idtype: string;
 
   load(): Promise<IPlugin & IScoreLoaderExtension>;
+}
+
+export const EP_TDP_CORE_SCORE_COLUMN_PATCHER = 'epTdpCoreScoreColumnPatcher';
+
+/**
+ * Extension to patch a LineUp column generated as score.
+ */
+export interface IScoreColumnPatcherExtension {
+  /**
+   * Patcher function called for every column to patch.
+   * @param pluginDesc Description of the plugin.
+   * @param colDesc Description of the column.
+   * @param rows Rows from the score.
+   * @param col Column to patch.
+   */
+  factory(pluginDesc: IPluginDesc, colDesc: IAdditionalColumnDesc, rows: IScoreRow<any>[], col: Column): Promise<void>;
+}
+
+export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
+  load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 
 export interface IRankingButtonExtension {

@@ -13,9 +13,8 @@ import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
-import {IRow} from '../rest';
+import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
-import {IServerColumn, IViewDescription} from '../rest';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
@@ -463,7 +462,7 @@ export abstract class ARankingView extends AView {
    * load the table description from the server
    * @returns {Promise<IViewDescription>} the column descriptions
    */
-  protected abstract loadColumnDesc(): Promise<IViewDescription>;
+  protected abstract loadColumnDesc(): Promise<IServerColumnDesc>;
 
   /**
    * load the rows of LineUp
