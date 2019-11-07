@@ -283,7 +283,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   /**
-   * resolves the names of the current input selection to all 1:n related names, not just the first one like resolveSelection does
+   * resolve the names of the current input selection to all 1:n related names, not just the first one like `resolveSelectionByName` does
    * @returns {Promise<string[]>}
    */
   protected resolveMultipleSelectionsByName(idType = this.idType): Promise<string[][]> {
