@@ -13,6 +13,14 @@ export function resolveIdToNames(fromIDType: IDType, id: number, toIDType: IDTyp
   return fromIDType.mapToName([id], target).then((names) => names);
 }
 
+/**
+ * Maps exactly one _id (numeric id) of the fromIDtype to the first occurrence of the toIDtype
+ *
+ * @param fromIDType The IDType to map from
+ * @param id The current _id
+ * @param toIDtype The IDType to map to
+ * @returns a Promise to the matching id of the toIDtype
+ */
 export function resolveId(fromIDType: IDType, id: number, toIDtype: IDType | string = null): Promise<string> {
   const target = toIDtype === null ? fromIDType : resolve(toIDtype);
   if (fromIDType.id === target.id) {
@@ -24,6 +32,14 @@ export function resolveId(fromIDType: IDType, id: number, toIDtype: IDType | str
   return fromIDType.mapToFirstName([id], target).then((names) => names[0]);
 }
 
+/**
+ * Maps numerous _ids (numeric ids) of the fromIDtype to each first occurrence of the toIDtype
+ *
+ * @param fromIDType The IDType to map from
+ * @param ids The current _ids
+ * @param toIDtype The IDType to map to
+ * @returns a Promise to the matching id of the toIDtype
+ */
 export function resolveIds(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[]> {
   const target = toIDType === null ? fromIDType : resolve(toIDType);
   if (fromIDType.id === target.id) {
@@ -34,6 +50,14 @@ export function resolveIds(fromIDType: IDType, ids: Range | number[], toIDType: 
   return fromIDType.mapToFirstName(ids, target);
 }
 
+/**
+ * Maps numerous ids (named ids) of the fromIDtype to each first occurrence of the toIDtype
+ *
+ * @param fromIDType The IDType to map from
+ * @param ids The current _ids
+ * @param toIDtype The IDType to map to
+ * @returns a Promise to the matching id of the toIDtype
+ */
 export function resolveNames(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[]> {
   const target = toIDType === null ? fromIDType : resolve(toIDType);
   if (fromIDType.id === target.id) {
@@ -47,6 +71,15 @@ export function resolveNames(fromIDType: IDType, ids: Range | number[], toIDType
 
 }
 
+/**
+ * Maps numerous ids (named ids) of the fromIDtype to all occurrence of the toIDtype
+ * This can resolve a n:m mapping
+ *
+ * @param fromIDType The IDType to map from
+ * @param ids The current _ids
+ * @param toIDtype The IDType to map to
+ * @returns a Promise to the matching id of the toIDtype
+ */
 export function resolveAllNames(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[][]> {
   const target = toIDType === null ? fromIDType : resolve(toIDType);
   if (fromIDType.id === target.id) {
@@ -59,6 +92,15 @@ export function resolveAllNames(fromIDType: IDType, ids: Range | number[], toIDT
   });
 }
 
+/**
+ * Maps numerous _ids (numeric ids) of the fromIDtype to all occurrence of the toIDtype
+ * This can resolve a n:m mapping
+ *
+ * @param fromIDType The IDType to map from
+ * @param ids The current _ids
+ * @param toIDtype The IDType to map to
+ * @returns a Promise to the matching id of the toIDtype
+ */
 export function resolveAllIds(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[][]> {
   const target = toIDType === null ? fromIDType : resolve(toIDType);
   if (fromIDType.id === target.id) {
