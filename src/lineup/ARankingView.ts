@@ -91,6 +91,7 @@ export interface IARankingViewOptions {
 
 /**
  * base class for views based on LineUp
+ * There is also AEmbeddedRanking to display simple rankings with LineUp.
  */
 export abstract class ARankingView extends AView {
 
@@ -160,6 +161,7 @@ export abstract class ARankingView extends AView {
 
   /**
    * Creates a RankingView with the given selection.
+   * Can be wrapped with a ViewWrapper.
    *
    * @remarks You need to call init() to actually display the Ranking View.
    *
