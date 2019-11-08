@@ -73,10 +73,10 @@ abstract class ASessionList {
     });
     $enter.select('a[data-action="select"]').on('click', (d) => {
       stopEvent();
-      if (!canWrite(d)) {
-        manager.cloneLocal(d);
-      } else {
+      if (canWrite(d)) {
         manager.loadGraph(d);
+      } else {
+        manager.cloneLocal(d);
       }
       return false;
     });
