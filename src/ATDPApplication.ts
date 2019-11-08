@@ -136,7 +136,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       if (typeof this.options.showResearchDisclaimer === 'function') {
         this.options.showResearchDisclaimer(aboutDialogBody);
       } else {
-        aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purpose only</strong>.</span></div>');
+        aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.</span></div>');
       }
     }
 
