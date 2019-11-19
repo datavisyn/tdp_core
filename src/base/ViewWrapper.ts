@@ -24,7 +24,7 @@ import {none} from 'phovea_core/src/range';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {setParameter} from '../internal/cmds';
 import {startViewTour} from '../tour/extensions';
-import i18next from '../../../phovea_core/src/i18n';
+import i18next from 'phovea_core/src/i18n';
 
 
 export default class ViewWrapper extends EventHandler implements IViewProvider {

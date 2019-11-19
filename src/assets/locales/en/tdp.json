@@ -83,6 +83,26 @@
           "addColumn": "Add Column",
           "removeColumn": "Remove Column",
           "moveColumn": "Move Column"
+        },
+        "exports": {
+          "exportData": "Export Data",
+          "export": "Export",
+          "columns": "Columns",
+          "rows": "Rows",
+          "allRows": "All Rows",
+          "selectedRows": "Selected Rows Only",
+          "notSelectedRows": "Not Selected Rows Only",
+          "exportName": "Export Name",
+          "nameOfExported": "name of the exported file",
+          "exportFormat": "Export Format",
+          "exportFormatCapital": "Export Format",
+          "csvComma": "CSV (comma separated)",
+          "tsv": "TSV (tab separated)",
+          "csvColon": "CSV (semicolon separated)",
+          "json": "JSON",
+          "excel": "Microsoft Excel (xlsx)"
+
+
         }
       }
     }

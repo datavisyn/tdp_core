@@ -2,6 +2,7 @@ import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from
 import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
 import {json2xlsx} from '../../internal/xlsx';
+import i18next from 'phovea_core/src/i18n';
 
 function isDateColumn(column: Column) {
   return column.desc.type === 'date';
@@ -113,7 +114,7 @@ interface IExportData {
 
 function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
   return lazyDialogModule().then((dialogs) => {
-    const dialog = new dialogs.FormDialog('Export Data &hellip;', '<i class="fa fa-download"></i> Export');
+    const dialog = new dialogs.FormDialog(`${i18next.t('tdp:core.lineup.internal.exports.exportData')} &hellip;`, `<i class="fa fa-download"></i>${i18next.t('tdp:core.lineup.internal.exports.export')}`);
 
     const id = `e${randomId(3)}`;
     const ranking = provider.getFirstRanking();
@@ -124,7 +125,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
 
     dialog.form.innerHTML = `
       <div class="form-group">
-        <label>Columns</label>
+        <label>${i18next.t('tdp.core.lineup.internal.exports.columns')}</label>
         ${flat.map((col) => `
           <div class="checkbox tdp-ranking-export-form-handle">
           <span class="fa fa-sort"></span>
@@ -136,23 +137,23 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
         `).join('')}
       </div>
       <div class="form-group">
-        <label>Rows</label>
-        <div class="radio"><label><input type="radio" name="rows" value="all" checked>All rows (${ranking.getOrder().length})</label></div>
-        <div class="radio"><label><input type="radio" name="rows" value="selected">Selected row only (${provider.getSelection().length})</label></div>
-        <div class="radio"><label><input type="radio" name="rows" value="not">Not selected rows only (${ranking.getOrder().length - provider.getSelection().length})</label></div>
+        <label>${i18next.t('tdp.core.lineup.internal.exports.rows')}</label>
+        <div class="radio"><label><input type="radio" name="rows" value="all" checked>${i18next.t('tdp.core.lineup.internal.exports.allRows')} (${ranking.getOrder().length})</label></div>
+        <div class="radio"><label><input type="radio" name="rows" value="selected">${i18next.t('tdp.core.lineup.internal.exports.selectedRows')} (${provider.getSelection().length})</label></div>
+        <div class="radio"><label><input type="radio" name="rows" value="not">${i18next.t('tdp.core.lineup.internal.exports.notSelectedRows')} (${ranking.getOrder().length - provider.getSelection().length})</label></div>
       </div>
       <div class="form-group">
-        <label for="name_${id}">Export Name</label>
-        <input class="form-control" id="name_${id}" name="name" value="Export" placeholder="name of the exported file">
+        <label for="name_${id}">${i18next.t('tdp.core.lineup.internal.exports.exportName')}</label>
+        <input class="form-control" id="name_${id}" name="name" value="Export" placeholder="${i18next.t('tdp.core.lineup.internal.exports.nameOfExported')}">
       </div>
       <div class="form-group">
-        <label for="type_${id}">Export Format</label>
-        <select class="form-control" id="type_${id}" name="type" required placeholder="export format">
-          <option value="csv" selected>CSV (comma separated)</option>
-          <option value="tsv">TSV (tab separated)</option>
-          <option value="ssv">CSV (semicolon separated)</option>
-          <option value="json">JSON</option>
-          <option value="xlsx">Microsoft Excel (xlsx)</option>
+        <label for="type_${id}">${i18next.t('tdp.core.lineup.internal.exports.exportFormatCapital')}</label>
+        <select class="form-control" id="type_${id}" name="type" required placeholder="${i18next.t('tdp.core.lineup.internal.exports.exportFormat')}">
+        <option value="csv" selected>${i18next.t('tdp.core.lineup.internal.exports.csvComma')}</option>
+        <option value="tsv">${i18next.t('tdp.core.lineup.internal.exports.tsv')}</option>
+        <option value="ssv">${i18next.t('tdp.core.lineup.internal.exports.csvColon')}</option>
+        <option value="json">${i18next.t('tdp.core.lineup.internal.exports.json')}</option>
+        <option value="xlsx">${i18next.t('tdp.core.lineup.internal.exports.excel')}</option>
         </select>
       </div>
     `;
