@@ -130,6 +130,17 @@
           "selectionCheckbox": "Selection Checkbox",
           "aggregateGroup": "Aggregate Group",
           "specialColumns": "Special Columns"
+        },
+        "OverviewColumn": {
+          "selectedInOverview": "Selected in Overview",
+          "rest": "Rest",
+          "overviewSelection": "'Overview Selection",
+          "focus": "Focus"
+        },
+        "scorecmds": {
+          "score": "Score",
+          "add": "Add",
+          "remove": "Remove"
         }
       }
     }
