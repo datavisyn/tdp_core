@@ -11,6 +11,7 @@ import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {exportLogic} from './export';
 import {lazyDialogModule} from '../../dialogs';
+import i18next from 'phovea_core/src/i18n';
 
 export interface ISearchOption {
   text: string;
@@ -69,7 +70,7 @@ export default class LineUpPanelActions extends EventHandler {
 
     if (options.enableAddingColumns) {
       this.search = new SearchBox<ISearchOption>({
-        placeholder: 'Add Column...'
+        placeholder: i18next.t('tdp:core.lineup.internal.LineupPanelActions.searchPlaceholder')
       });
       this.search.on(SearchBox.EVENT_SELECT, (item) => {
         this.node.querySelector('.lu-adder')!.classList.remove('once');
@@ -134,11 +135,11 @@ export default class LineUpPanelActions extends EventHandler {
   private init() {
     this.node.insertAdjacentHTML('afterbegin', `
       <section></section>
-      <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
+      <div class="lu-adder">${this.search ? `<button class="fa fa-plus" title="${i18next.t('tdp:core.lineup.internal.LineupPanelActions.addColumnButton')}"></button>` : ''}
       </div>`);
 
     if (!this.isTopMode) { // top mode doesn't need collapse feature
-      this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="(Un)Collapse"></a>`);
+      this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="${i18next.t('tdp:core.lineup.internal.LineupPanelActions.collapseButton')}"></a>`);
       this.node.querySelector('a')!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -151,8 +152,8 @@ export default class LineUpPanelActions extends EventHandler {
     buttons.appendChild(this.appendSaveRanking());
     buttons.appendChild(this.appendDownload());
     if (this.options.enableZoom) {
-      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
-      buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
+      buttons.appendChild(this.createMarkup(i18next.t('tdp:core.lineup.internal.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
+      buttons.appendChild(this.createMarkup(i18next.t('tdp:core.lineup.internal.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
     }
     if (this.options.enableOverviewMode) {
       buttons.appendChild(this.appendOverviewButton());
@@ -201,7 +202,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.overview.classList.toggle('fa-list');
       this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
     };
-    return this.overview = this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+    return this.overview = this.createMarkup(i18next.t('tdp:core.lineup.internal.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
   }
 
   setViolation(violation?: string) {
@@ -216,15 +217,15 @@ export default class LineUpPanelActions extends EventHandler {
     const node = this.node.ownerDocument.createElement('div');
     node.classList.add('btn-group', 'download-data-dropdown');
     node.innerHTML = `
-      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
+      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${i18next.t('tdp:core.lineup.internal.LineupPanelActions.downloadData')}">
       </button>
       <ul class="dropdown-menu dropdown-menu-${this.isTopMode ? 'left' : 'right'}">
-        <li class="dropdown-header">Download All Rows</li>
-        <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li class="dropdown-header" data-num-selected-rows="0">Download Selected Rows Only</li>
-        <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
+        <li class="dropdown-header">${i18next.t('tdp:core.lineup.internal.LineupPanelActions.downloadAll')}</li>
+        <li><a href="#" data-s="a" data-t="xlsx">${i18next.t('tdp:core.lineup.internal.LineupPanelActions.excel')}</a></li>
+        <li class="dropdown-header" data-num-selected-rows="0">${i18next.t('tdp:core.lineup.internal.LineupPanelActions.downloadSelectedRows')}</li>
+        <li><a href="#" data-s="s" data-t="xlsx">${i18next.t('tdp:core.lineup.internal.LineupPanelActions.excel')}</a></li>
         <li role="separator" class="divider"></li>
-        <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
+        <li><a href="#" data-s="s" data-t="custom">${i18next.t('tdp:core.lineup.internal.LineupPanelActions.customize')} &hellip;</a></li>
       </ul>
     `;
 
@@ -256,7 +257,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.saveRankingDialog(ranking.getOrder());
     };
 
-    return this.createMarkup('Save List of Entities', 'fa fa-save', listener);
+    return this.createMarkup(i18next.t('tdp:core.lineup.internal.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
   }
 
   private appendExtraButtons() {
@@ -331,12 +332,12 @@ export default class LineUpPanelActions extends EventHandler {
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [
-      this.groupedDialog('Database Columns', this.getColumnDescription(descs, false))
+      this.groupedDialog(i18next.t('tdp:core.lineup.internal.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false))
     ];
 
     if (loadedScorePlugins.length > 0) {
       items.push({
-        text: 'Parameterized Scores',
+        text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.parameterizedScores'),
         children: loadedScorePlugins.map((score) => {
           return {
             text: score.text,
@@ -356,27 +357,27 @@ export default class LineUpPanelActions extends EventHandler {
     const scoreDescs = this.getColumnDescription(descs, true);
     if (scoreDescs.length > 0) {
       items.push({
-        text: 'Previously Added Columns',
+        text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.previouslyAddedColumns'),
         children: scoreDescs
       });
     }
 
-    const combiningColumns = this.groupedDialog('Combining Columns', [
-      { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
-      { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
-      { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-      { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
-      { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+    const combiningColumns = this.groupedDialog(i18next.t('tdp:core.lineup.internal.LineupPanelActions.combiningColumns'), [
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(i18next.t('tdp:core.lineup.internal.LineupPanelActions.weightedSum')))},
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(i18next.t('tdp:core.lineup.internal.LineupPanelActions.scriptedCombination')))},
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(i18next.t('tdp:core.lineup.internal.LineupPanelActions.nested')))},
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc())},
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.databaseColumns'), id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
     ]);
 
-    const supportColumns = this.groupedDialog('Support Columns', [
-        {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
-        {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
-        {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+    const supportColumns = this.groupedDialog(i18next.t('tdp:core.lineup.internal.LineupPanelActions.supportColumns'), [
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(i18next.t('tdp:core.lineup.internal.LineupPanelActions.group')))},
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+      {text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
     ]);
 
     items.push({
-      text: 'Special Columns',
+      text: i18next.t('tdp:core.lineup.internal.LineupPanelActions.specialColumns'),
       children: [
         combiningColumns,
         supportColumns,
@@ -387,10 +388,10 @@ export default class LineUpPanelActions extends EventHandler {
     this.search.data = items;
   }
 
-  private groupedDialog(text: string, children: ISearchOption[]):ISearchOption | IGroupSearchItem<ISearchOption> {
+  private groupedDialog(text: string, children: ISearchOption[]): ISearchOption | IGroupSearchItem<ISearchOption> {
     const viaDialog = this.options.enableAddingColumnGrouping;
     if (!viaDialog) {
-      return { text, children };
+      return {text, children};
     }
     return {
       text: `${text} &hellip;`,
@@ -398,7 +399,7 @@ export default class LineUpPanelActions extends EventHandler {
       action: () => {
         // choooser dialog
         lazyDialogModule().then((dialogs) => {
-          const dialog = new dialogs.FormDialog(`Add ${text} &hellip;`, 'Add Column');
+          const dialog = new dialogs.FormDialog(`Add ${text} &hellip;`, i18next.t('tdp:core.lineup.internal.LineupPanelActions.addColumnButton'));
           dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">
               ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}

@@ -73,7 +73,7 @@
       "buddiesDescription": "Buddies are a list of user names that can have advanced rights, such as backup administrators"
     },
     "lineup": {
-      "Internal": {
+      "internal": {
         "Cmds": {
           "addRanking": "Add Ranking",
           "removeRanking": "Remove Ranking",
@@ -101,8 +101,35 @@
           "csvColon": "CSV (semicolon separated)",
           "json": "JSON",
           "excel": "Microsoft Excel (xlsx)"
-
-
+        },
+        "LineupPanelActions": {
+          "searchPlaceholder": "Add Column...",
+          "addColumnButton": "Add Column",
+          "collapseButton": "(Un)Collapse",
+          "zoomIn": "Zoom In",
+          "zoomOut": "Zoom Out",
+          "toggleOverview": "En/Disable Overview",
+          "downloadData": "Download Data",
+          "downloadAll": "Download All",
+          "excel": "Microsoft Excel (xlsx)",
+          "downloadSelectedRows": "Download Selected Rows Only",
+          "customize": "Customize",
+          "saveEntities": "Save List of Entities",
+          "databaseColumns": "Database Columns",
+          "parameterizedScores": "Parameterized Scores",
+          "previouslyAddedColumns": "Previously Added Columns",
+          "combiningColumns": "Combining Columns",
+          "weightedSum": "Weighted Sum",
+          "scriptedCombination": "Scripted Combination",
+          "nested": "Nested",
+          "reduce": "Min/Max/Mean Combination",
+          "imposition": "Imposition",
+          "supportColumns": "Support Columns",
+          "group": "Group",
+          "groupInformation": "Group Information",
+          "selectionCheckbox": "Selection Checkbox",
+          "aggregateGroup": "Aggregate Group",
+          "specialColumns": "Special Columns"
         }
       }
     }
