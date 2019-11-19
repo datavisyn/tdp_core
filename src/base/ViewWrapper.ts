@@ -24,6 +24,7 @@ import {none} from 'phovea_core/src/range';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {setParameter} from '../internal/cmds';
 import {startViewTour} from '../tour/extensions';
+import i18next from '../../../phovea_core/src/i18n';
 
 
 export default class ViewWrapper extends EventHandler implements IViewProvider {
@@ -77,7 +78,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     this.node.classList.toggle('not-allowed', !this.allowed);
 
     if (plugin.helpText) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -90,12 +91,12 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       });
     } else if (plugin.helpUrl) {
       if (typeof plugin.helpUrl === 'string') {
-        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
       } else { // object version of helpUrl
         this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
       }
     } else if (plugin.helpTourId) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="Show help tour of this view"><span aria-hidden="true">Show Help Tour</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelpTourLabel')}</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -351,26 +352,27 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
 function selectionText(selection: any, idType: string) {
   const label = idType.includes('*') || idType.includes('(') ? 'item' : resolve(idType).name;
+  console.log(i18next.t('tdp:core.ViewWrapper.selectionTextNone', {label}))
   switch (String(selection)) {
     case '':
     case 'none':
     case '0':
-      return `No ${label} is required`;
+      return i18next.t('tdp:core.ViewWrapper.selectionTextNone', {label});
     case 'any':
-      return `Any number of ${label}s is valid`;
+      return i18next.t('tdp:core.ViewWrapper.selectionTextAny', {label});
     case 'single':
     case '1':
-      return `Exactly one ${label} is required`;
+      return i18next.t('tdp:core.ViewWrapper.selectionTextOne', {label});
     case 'small_multiple':
     case 'multiple':
     case 'some':
     case 'chooser':
-      return `One or more ${label}s are required`;
+      return i18next.t('tdp:core.ViewWrapper.selectionTextMultiple', {label});
     case '2':
-      return `Exactly two ${label}s are required`;
+      return i18next.t('tdp:core.ViewWrapper.selectionTextTwo', {label});
     default:
       console.error('unknown selector: ', selection, idType);
-      return `Unknown selector: ${selection}`;
+      return i18next.t('tdp:core.ViewWrapper.selectionTextDefault', {selection});
   }
 }
 

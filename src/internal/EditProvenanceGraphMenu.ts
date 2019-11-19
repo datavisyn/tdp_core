@@ -13,6 +13,7 @@ import {IEvent, fire as globalFire} from 'phovea_core/src/event';
 import {DEFAULT_SUCCESS_AUTO_HIDE, pushNotification} from '../notifications';
 import {TemporarySessionList, PersistentSessionList} from '../SessionList';
 import {permissionForm} from './utils';
+import i18next from 'phovea_core/src/i18n';
 
 declare const __DEBUG__;
 export const GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
@@ -68,19 +69,19 @@ export default class EditProvenanceGraphMenu {
 
     li.innerHTML = `
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><i class="fa fa-folder-open-o" aria-hidden="true"></i> <i class="fa fa-save sync-indicator" aria-hidden="true"></i> <span>Analysis Session Management</span></a>
+             aria-expanded="false"><i class="fa fa-folder-open-o" aria-hidden="true"></i> <i class="fa fa-save sync-indicator" aria-hidden="true"></i> <span>${i18next.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
           <ul class="dropdown-menu">
-            <li class="dropdown-label"><i class="fa fa-clock-o" aria-hidden="true"></i> <span class="session-name">No Name</span></li>
+            <li class="dropdown-label"><i class="fa fa-clock-o" aria-hidden="true"></i> <span class="session-name">${i18next.t('tdp:core.EditProvenanceMenu.sessionName')}</span></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="edit" title="Edit Details"><i class="fa fa-edit" aria-hidden="true"></i> Edit Details</a></li>
-            <li><a href="#" data-action="clone" title="Clone to Temporary Session"><i class="fa fa-clone" aria-hidden="true"></i> Clone to Temporary Session</a></li>
+            <li><a href="#" data-action="edit" title="${i18next.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fa fa-edit" aria-hidden="true"></i> ${i18next.t('tdp:core.EditProvenanceMenu.editDetails')}</a></li>
+            <li><a href="#" data-action="clone" title="${i18next.t('tdp:core.EditProvenanceMenu.cloneTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i> ${i18next.t('tdp:core.EditProvenanceMenu.cloneTemporary')}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="open" title="Open Session"><i class="fa fa-folder-open-o" aria-hidden="true"></i> Open Existing Session</a></li>
-            <li><a href="#" data-action="persist" title="Save Session"><i class="fa fa-save" aria-hidden="true"></i> Save Session</a></li>
-            <li><a href="#" data-action="delete" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
+            <li><a href="#" data-action="open" title="${i18next.t('tdp:core.EditProvenanceMenu.openSession')}"><i class="fa fa-folder-open-o" aria-hidden="true"></i> ${i18next.t('tdp:core.EditProvenanceMenu.openExisting')}</a></li>
+            <li><a href="#" data-action="persist" title="${i18next.t('tdp:core.EditProvenanceMenu.saveSession')}"><i class="fa fa-save" aria-hidden="true"></i> ${i18next.t('tdp:core.EditProvenanceMenu.saveSession')}</a></li>
+            <li><a href="#" data-action="delete" title="${i18next.t('tdp:core.EditProvenanceMenu.delete')}"><i class="fa fa-trash" aria-hidden="true"></i> ${i18next.t('tdp:core.EditProvenanceMenu.delete')}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
-            <li><a href="#" data-action="export" title="Export Graph"><i class="fa fa-download" aria-hidden="true"></i> Export Session</a></li>
+            <li><a href="#" data-action="import" title="${i18next.t('tdp:core.EditProvenanceMenu.importGraph')}"><i class="fa fa-upload" aria-hidden="true"></i> ${i18next.t('tdp:core.EditProvenanceMenu.importSession')}</a></li>
+            <li><a href="#" data-action="export" title="${i18next.t('tdp:core.EditProvenanceMenu.exportGraph')}"><i class="fa fa-download" aria-hidden="true"></i> ${i18next.t('tdp:core.EditProvenanceMenu.exportSession')}</a></li>
           </ul>`;
 
     (<HTMLLinkElement>li.querySelector('a[data-action="edit"]')).addEventListener('click', (event) => {
@@ -119,16 +120,16 @@ export default class EditProvenanceGraphMenu {
 
       lazyDialogModule()
         .then(({generateDialog}) => {
-          const dialog = generateDialog('Open Session', 'Open');
+          const dialog = generateDialog(i18next.t('tdp:core.EditProvenanceMenu.openSession'), i18next.t('tdp:core.EditProvenanceMenu.open'));
           dialog.body.classList.add('tdp-session-dialog');
           dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
             <div role="tab" class="collapsed">
-            <h4>Temporary Sessions</h4>
+            <h4>${i18next.t('tdp:core.EditProvenanceMenu.temporarySessions')}</h4>
             <div role="tabpanel" data-session="t">
             </div>
           </div>
           <div role="tab" class="collapsed">
-            <h4>Persistent Sessions</h4>
+            <h4>${i18next.t('tdp:core.EditProvenanceMenu.persistentSessions')}</h4>
             <div role="tabpanel" data-session="p">
             </div>
           </div>`;
@@ -162,9 +163,9 @@ export default class EditProvenanceGraphMenu {
             hash.set('clue_graph', `clue_graph=${encodeURIComponent(this.graph.desc.id)}`);
             hash.set('clue_state', `clue_state=${this.graph.act.id}`);
             const url = `${location.href.replace(location.hash, '')}#${Array.from(hash.values()).join('&')}`;
-            pushNotification('success', `Session "${this.graph.desc.name}" successfully persisted.
-            <br>URL to share: <br>
-            <a href="${url}" title="Current persistent session link">${url}</a>`, -1);
+            pushNotification('success', `${i18next.t('tdp:core.EditProvenanceMenu.successNotification', {name: this.graph.desc.name})}
+            <br>${i18next.t('tdp:core.EditProvenanceMenu.urlToShare')} <br>
+            <a href="${url}" title="${i18next.t('tdp:core.EditProvenanceMenu.currentLink')}">${url}</a>`, -1);
             globalFire(GLOBAL_EVENT_MANIPULATED);
           });
         }
@@ -179,7 +180,7 @@ export default class EditProvenanceGraphMenu {
         return false;
       }
       lazyDialogModule()
-        .then(({areyousure}) => areyousure(`Are you sure to delete session: "${this.graph.desc.name}"`))
+        .then(({areyousure}) => areyousure(i18next.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
         .then((deleteIt) => {
           if (deleteIt) {
             Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
@@ -214,7 +215,7 @@ export default class EditProvenanceGraphMenu {
         li.appendChild(helper);
         helper.click();
         helper.remove();
-        pushNotification('success', `Session "${this.graph.desc.name}" successfully exported`, DEFAULT_SUCCESS_AUTO_HIDE);
+        pushNotification('success', i18next.t('tdp:core.EditProvenanceMenu.successMessage', {name: this.graph.desc.name}), DEFAULT_SUCCESS_AUTO_HIDE);
       };
       a.readAsDataURL(blob);
       return false;
@@ -225,8 +226,8 @@ export default class EditProvenanceGraphMenu {
       event.stopPropagation();
       //import dialog
       lazyDialogModule().then(({generateDialog}) => {
-        const d = generateDialog('Select File', 'Upload');
-        d.body.innerHTML = `<input type="file" placeholder="Select File to Upoad">`;
+        const d = generateDialog(i18next.t('tdp:core.EditProvenanceMenu.selectFile'), i18next.t('tdp:core.EditProvenanceMenu.upload'));
+        d.body.innerHTML = `<input type="file" placeholder="${i18next.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
         (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
           const file = (<HTMLInputElement>evt.target).files[0];
           const reader = new FileReader();
@@ -253,8 +254,8 @@ export function isPersistent(d: IProvenanceGraphDataDescription) {
 export function persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
   const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
   return editProvenanceGraphMetaData(d, {
-    title: '<i class="fa fa-cloud"></i> Persist Session',
-    button: '<i class="fa fa-cloud"></i> Persist',
+    title: `<i class="fa fa-cloud"></i> ${i18next.t('tdp:core.EditProvenanceMenu.persistSession')}`,
+    button: `<i class="fa fa-cloud"></i> ${i18next.t('tdp:core.EditProvenanceMenu.persist')}`,
     name
   });
 }
@@ -263,10 +264,10 @@ export function isPublic(d: ISecureItem) {
   return hasPermission(d, EEntity.OTHERS);
 }
 
-export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: { button?: string, title?: string, permission?: boolean, name?: string } = {}) {
+export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
   args = mixin({
     button: 'Edit',
-    title: '<i class="fa fa-edit" aria-hidden="true"></i> Edit Session Details',
+    title: `<i class="fa fa-edit" aria-hidden="true"></i>${i18next.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
     permission: true,
     name: d.name
   }, args);
@@ -275,22 +276,22 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
     const prefix = 'd' + randomId();
     const permissions = permissionForm(d, {
       extra: `<div class="help-block">
-      Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.
+      ${i18next.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
     </div>`
     });
     dialog.form.innerHTML = `
         <div class="form-group">
-          <label for="${prefix}_name">Name</label>
+          <label for="${prefix}_name">${i18next.t('tdp:core.EditProvenanceMenu.name')}</label>
           <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
         </div>
         <div class="form-group">
-          <label for="${prefix}_desc">Description</label>
+          <label for="${prefix}_desc">${i18next.t('tdp:core.EditProvenanceMenu.description')}</label>
           <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
         </div>
         <div class="checkbox">
           <label class="radio-inline">
             <input type="checkbox" name="${prefix}_agree" required="required">
-            I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the <strong>'Open Existing Session'</strong> dialog.
+            ${i18next.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${i18next.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${i18next.t('tdp:core.EditProvenanceMenu.dialog')}.
           </label>
         </div>
     `;
