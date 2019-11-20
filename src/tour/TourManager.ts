@@ -4,6 +4,7 @@ import {IStep, GLOBAL_EVENT_START_TOUR} from './extensions';
 import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
 import {AppHeader} from 'phovea_ui/src/header';
 import {on} from 'phovea_core/src/event';
+import i18next from 'phovea_core/src/i18n';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';
@@ -61,17 +62,17 @@ export default class TourManager {
     this.step = context.doc.createElement('div');
     this.step.classList.add('tdp-tour-step');
     this.step.dataset.step = '0';
-      this.step.innerHTML = `
+    this.step.innerHTML = `
     <div class="tdp-tour-step-content">
     </div>
     <div class="tdp-tour-step-navigation">
       <div class="tdp-tour-step-dots">
       </div>
       <div class="btn-group" role="group">
-        <button type="button" data-switch="--" class="btn-xs btn btn-default"><i class="fa fa-fast-backward"></i> Restart</button>
-        <button type="button" data-switch="-" class="btn-xs btn btn-default"><i class="fa fa-step-backward"></i> Back</button>
-        <button type="button" data-switch="0" class="btn-xs btn btn-default"><i class="fa fa-stop"></i> Cancel</button>
-        <button type="button" data-switch="+" class="btn-xs btn btn-default"><i class="fa fa-step-forward"></i> Next</button>
+        <button type="button" data-switch="--" class="btn-xs btn btn-default"><i class="fa fa-fast-backward"></i> ${i18next.t('tdp:core.TourManager.restartButton')}</button>
+        <button type="button" data-switch="-" class="btn-xs btn btn-default"><i class="fa fa-step-backward"></i> ${i18next.t('tdp:core.TourManager.backButton')}</button>
+        <button type="button" data-switch="0" class="btn-xs btn btn-default"><i class="fa fa-stop"></i> ${i18next.t('tdp:core.TourManager.cancelButton')}</button>
+        <button type="button" data-switch="+" class="btn-xs btn btn-default"><i class="fa fa-step-forward"></i>${i18next.t('tdp:core.TourManager.nextButton')}</button>
       </div>
     </div>
     `;
@@ -83,19 +84,19 @@ export default class TourManager {
         if (!this.activeTour) {
           return;
         }
-        switch(button.dataset.switch) {
-        case '--':
-          this.activeTour.jumpTo(0, this.activeTourContext);
-          break;
-        case '-':
-          this.activeTour.previous(this.activeTourContext);
-          break;
-        case '0':
-          this.hideTour();
-          break;
-        default:
-          this.activeTour.next(this.activeTourContext);
-          break;
+        switch (button.dataset.switch) {
+          case '--':
+            this.activeTour.jumpTo(0, this.activeTourContext);
+            break;
+          case '-':
+            this.activeTour.previous(this.activeTourContext);
+            break;
+          case '0':
+            this.hideTour();
+            break;
+          default:
+            this.activeTour.next(this.activeTourContext);
+            break;
         }
       };
     });
@@ -117,13 +118,13 @@ export default class TourManager {
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Help Tours</h4>
+                <h4 class="modal-title">${i18next.t('tdp:core.TourManager.helpTours')}</h4>
             </div>
             <div class="modal-body">
               <ul class="fa-ul">
                 ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}">
                   <i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i>
-                  <a href="#" title="show tour" data-dismiss="modal" data-name="${d.name}">${d.name}</a>
+                  <a href="#" title="${i18next.t('tdp:core.TourManager.showTour')}" data-dismiss="modal" data-name="${d.name}">${d.name}</a>
                   ${d.description ? `<p>${d.description}</p>` : ''}
                 </li>`).join('')}
               </ul>
@@ -206,7 +207,7 @@ export default class TourManager {
     const dots = this.step.querySelector<HTMLElement>('.tdp-tour-step-dots');
     dots.innerHTML = '';
     for (let i = 0; i < count; ++i) {
-      dots.insertAdjacentHTML('beforeend', `<div title="Jump to step ${i + 1}" data-step="${i}" class="fa fa-circle"></div>`);
+      dots.insertAdjacentHTML('beforeend', `<div title="${i18next.t('tdp:core.TourManager.jumpToStep', {step: i + 1})}" data-step="${i}" class="fa fa-circle"></div>`);
     }
 
     Array.from(this.step.querySelectorAll('.tdp-tour-step-dots div')).forEach((button: HTMLElement) => {
@@ -280,7 +281,7 @@ export default class TourManager {
       this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
       this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0 || this.activeTour.desc.canJumpAround === false;
 
-      next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> Finish` : `<i class="fa fa-step-forward"></i> Next`;
+      next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> ${i18next.t('tdp:core.TourManager.finishButton')}` : `<i class="fa fa-step-forward"></i> ${i18next.t('tdp:core.TourManager.nextButton')}`;
       next.disabled = false;
       if (step.pageBreak === 'user' && this.activeTour.multiPage) {
         next.disabled = true;
@@ -322,7 +323,7 @@ export default class TourManager {
     }
 
     if (focus) {
-      const options: PopperOptions =  {
+      const options: PopperOptions = {
         modifiers: {
           preventOverflow: {boundariesElement: 'window'}
         }
