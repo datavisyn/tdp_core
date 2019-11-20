@@ -1,3 +1,5 @@
+import i18next from 'phovea_core/src/i18n';
+
 /**
  * Created by Samuel Gratzl
  */
@@ -35,11 +37,11 @@ export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger
 }
 
 export function successfullySaved(type: string, name: string) {
-  pushNotification('success', `${type} "${name}" successfully saved`, DEFAULT_SUCCESS_AUTO_HIDE);
+  pushNotification('success', i18next.t('tdp:core.savedNotification', {type, name}), DEFAULT_SUCCESS_AUTO_HIDE);
 }
 
 export function successfullyDeleted(type: string, name: string) {
-  pushNotification('success', `${type} "${name}" successfully deleted`, DEFAULT_SUCCESS_AUTO_HIDE);
+  pushNotification('success', i18next.t('tdp:core.deletedNotification', {type, name}), DEFAULT_SUCCESS_AUTO_HIDE);
 }
 
 let errorAlertHandler = (error: any) => {
@@ -48,7 +50,7 @@ let errorAlertHandler = (error: any) => {
     return xhr.text().then((body: string) => {
       if (xhr.status !== 400) {
         body = `${body}<hr>
-          The requested URL was:<br><a href="${xhr.url}" target="_blank" rel="noopener" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
+        ${i18next.t('tdp:core.requestedUrl')}<br><a href="${xhr.url}" target="_blank" rel="noopener" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
       }
       pushNotification('danger', `<strong>Error ${xhr.status} (${xhr.statusText})</strong>: ${body}`, DEFAULT_ERROR_AUTO_HIDE);
       return Promise.reject(error);

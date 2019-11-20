@@ -215,10 +215,15 @@
       "formSelectName": "No mapping found"
     },
     "disclaimerMessage": "<strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.",
+
     "sessionNotFound": "Session Not Found!",
     "newSession": "Create New Temporary Session",
     "notAccessibleMessage": "The requested session <strong>\"{{id}}\"</strong> was not found or is not accessible.",
     "possibleReasonsMessage": "Possible reasons are that you  <ul> <li> requested a <i> temporary session </i> that is already expired</li> <li> tried to access a < i > temporary session </i> of another user</li><li> tried to access a <i> private persistent session </i> of another user</li></ul>",
-    "contactOwnerMessage": "In the latter two cases, please contact the original owner of the session to create a public persistent session."
+    "contactOwnerMessage": "In the latter two cases, please contact the original owner of the session to create a public persistent session.",
+
+    "savedNotification": "{{type}} \"{{name}}\" successfully saved",
+    "deletedNotification": "{{type}} \"{{name}}\" successfully deleted",
+    "requestedUrl": "The requested URL was:"
   }
 }
