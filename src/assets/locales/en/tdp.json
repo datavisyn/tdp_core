@@ -1,6 +1,6 @@
 {
   "core": {
-    "hello": "hello",
+
     "ViewWrapper": {
       "showHelp": "Show Help",
       "showHelpLabel": "Show help of this view",
@@ -13,6 +13,7 @@
       "selectionTextTwo": "Exactly two {{label}}s are required",
       "selectionTextDefault": "Unknown selector: {{selection}}"
     },
+
     "FormMap": {
       "badgeTitle": "`{{text}} items remaining after filtering`",
       "apply": "Apply",
@@ -20,10 +21,12 @@
       "select": "Select...",
       "remove": "Remove"
     },
+
     "cmdsInternal": {
       "initializeSession": "Initialize Session",
       "setParameter": "Set Parameter \"{{name}}\""
     },
+
     "EditProvenanceMenu": {
       "sessionHeader": "Analysis Session Management",
       "sessionName": "No Name",
@@ -57,6 +60,7 @@
       "confirmMessage": " I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the",
       "dialog": "dialog"
     },
+
     "utilsInternal": {
       "notAllowed": "Not Allowed, please contact your system administrator",
       "private": "Private",
@@ -73,6 +77,7 @@
       "buddiesPlaceholder": "list of usernames separated by semicolon",
       "buddiesDescription": "Buddies are a list of user names that can have advanced rights, such as backup administrators"
     },
+
     "editDialog": {
       "save": "Save",
       "edit": "Edit",
@@ -82,6 +87,7 @@
       "name": "Name",
       "description": "Description"
     },
+
     "NamedSetList": {
       "predefinedSets": "predefined Sets",
       "mySets": "My Sets",
@@ -97,6 +103,7 @@
       "title": "Name: {{d.name}}\nDescription: {{d.description}})",
       "title_extended": "Name: {{d.name}}\nDescription: {{d.description}} \nCreator: {{creator}}\nPublic: {{public}}"
     },
+
     "TourManager": {
       "restartButton": "Restart",
       "backButton": "Back",
@@ -107,6 +114,33 @@
       "showTour": "show tour",
       "jumpToStep": "Jump to step {{step}}"
     },
+
+    "SessionList": {
+      "delete": "Delete",
+      "deleteSession": "Delete Session",
+      "continue": "Continue",
+      "edit": "Edit",
+      "continueSession": "Continue Session",
+      "cloneToTemporary": "Clone to Temporary Session",
+      "persistSession": "Persist Session",
+      "editSessionDetails": "Edit Session Details",
+      "deleteIt": "Are you sure to delete session: \"{{name}}\"",
+      "session": "Session",
+      "status": "Public (everyone can see it)",
+      "status_private": "Private",
+      "unknown": "Unknown",
+      "loaderText": "Loading...",
+      "name": "Name",
+      "creator": "Creator",
+      "access": "Access",
+      "date": "Date",
+      "actions": "Actions",
+      "sessionMessage": "A temporary session will only be stored in your local browser cache.It is not possible to share a link to states of this session with others. Only the {{latest}} most recent sessions will be stored.",
+      "paragraphText": "The persistent session will be stored on the server.By default, sessions are private, meaning that only the creator has access to it.If the status is set to public, others can also see the session and access certain states by opening a shared link.",
+      "mySessions": "My Sessions",
+      "otherSessions": "Other Sessions"
+    },
+
     "lineup": {
       "internal": {
         "Cmds": {
@@ -119,6 +153,7 @@
           "removeColumn": "Remove Column",
           "moveColumn": "Move Column"
         },
+
         "exports": {
           "exportData": "Export Data",
           "export": "Export",
@@ -137,6 +172,7 @@
           "json": "JSON",
           "excel": "Microsoft Excel (xlsx)"
         },
+
         "LineupPanelActions": {
           "searchPlaceholder": "Add Column...",
           "addColumnButton": "Add Column",
@@ -166,22 +202,26 @@
           "aggregateGroup": "Aggregate Group",
           "specialColumns": "Special Columns"
         },
+
         "OverviewColumn": {
           "selectedInOverview": "Selected in Overview",
           "rest": "Rest",
           "overviewSelection": "'Overview Selection",
           "focus": "Focus"
         },
+
         "scorecmds": {
           "score": "Score",
           "add": "Add",
           "remove": "Remove"
         }
       },
+
       "OverviewDetailRanking": {
         "overview": "Overview",
         "detailTable": "Detail Table"
       },
+
       "RankingView": {
         "successfullySaved": "List of Entities",
         "notFoundHint": "No data found for selection and parameter.",
@@ -214,6 +254,7 @@
 
       "formSelectName": "No mapping found"
     },
+
     "disclaimerMessage": "<strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.",
 
     "sessionNotFound": "Session Not Found!",
