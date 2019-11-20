@@ -20,6 +20,7 @@ import 'phovea_ui/src/_font-awesome';
 import {list as listPlugins} from 'phovea_core/src/plugin';
 import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
 import TourManager from './tour/TourManager';
+import i18next from 'phovea_core/src/i18n';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -136,7 +137,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       if (typeof this.options.showResearchDisclaimer === 'function') {
         this.options.showResearchDisclaimer(aboutDialogBody);
       } else {
-        aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.</span></div>');
+        aboutDialogBody.insertAdjacentHTML('afterbegin', `<div class="alert alert-warning" role="alert">${i18next.t('tdp:core.disclaimerMessage')}</span></div>`);
       }
     }
 
@@ -187,7 +188,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
-    graph.catch((error: { graph: string }) => {
+    graph.catch((error: {graph: string}) => {
       showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 

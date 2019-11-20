@@ -4,6 +4,7 @@
 
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui/src/dialogs';
+import i18next from 'phovea_core/src/i18n';
 
 export {setGlobalErrorTemplate} from 'phovea_ui/src/errors';
 
@@ -28,23 +29,18 @@ export function lazyDialogModule(): Promise<IDialogModule> {
  */
 export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses: string = '') {
   lazyDialogModule().then(({generateDialog}) => {
-    const dialog = generateDialog('Session Not Found!', 'Create New Temporary Session', additionalCSSClasses);
+    const dialog = generateDialog(i18next.t('tdp:core.sessionNotFound'), i18next.t('tdp:core.newSession'), additionalCSSClasses);
     // append bg-danger to the dialog parent element
     dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
     dialog.body.innerHTML = `
         <p>
-            The requested session <strong>"${id}"</strong> was not found or is not accessible.
+           ${i18next.t('tdp:core.notAccessibleMessage', {id})}
         </p>
         <p>
-            Possible reasons are that you
-            <ul>
-                <li>requested a <i>temporary session</i> that is already expired</li>
-                <li>tried to access a <i>temporary session</i> of another user</li>
-                <li>tried to access a <i>private persistent session</i> of another user</li>
-            </ul>
+           ${i18next.t('tdp:core.possibleReasonsMessage')}
         </p>
         <p>
-            In the latter two cases, please contact the original owner of the session to create a public persistent session.
+          ${i18next.t('tdp:core.contactOwnerMessage')}
         </p>`;
     dialog.onSubmit(() => {
       dialog.hide();
