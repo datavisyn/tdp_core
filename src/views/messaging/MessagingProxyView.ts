@@ -220,7 +220,7 @@ export default class MessagingProxyView extends AView {
     this.setBusy(false);
     this.node.innerHTML = `
     <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-    ${i18next.t('tdp:core.views.messaging.noHttpsMessagePart1')} <a href="" target="_blank" rel="noopener" class="alert-link">${i18next.t('tdp:core.views.messaging.noHttpsMessagePart2')}
+    ${i18next.t('tdp:core.views.noHttpsMessagePart1')} <a href="" target="_blank" rel="noopener" class="alert-link">${i18next.t('tdp:core.views.noHttpsMessagePart2')}
        <br><br><a href="" target="_blank" rel="noopener" class="alert-link"></a>
    </div></p><p></p>`;
     this.fire(MessagingProxyView.EVENT_LOADING_FINISHED);

@@ -1,5 +1,6 @@
 {
   "core": {
+    "hello": "hello",
     "ViewWrapper": {
       "showHelp": "Show Help",
       "showHelpLabel": "Show help of this view",
@@ -190,10 +191,14 @@
       }
     },
     "views": {
-      "messaging": {
-        "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.\nHowever, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.\nPlease use the following",
-        "noHttpsMessagePart2": "link</a> to open the website in a separate window:"
-      }
+      "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.\nHowever, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.\nPlease use the following",
+      "noHttpsMessagePart2": "link</a> to open the website in a separate window:",
+      "tableDownloadButton": "Download Table as Spreadsheet",
+      "busyMessage": "Preparing awesome stuff for you...",
+      "defaultHint": "No data found for the given {{name}}",
+      "defaultHint_unknown": "No data found for the given Unknown",
+      "noMappingFoundHint": "No mapping found for the given {{name}} to {{id}}",
+      "noMappingFoundHint_unknown":"No mapping found for the given Unknown to {{id}}"
     }
   }
 }
