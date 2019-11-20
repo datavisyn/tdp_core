@@ -20,6 +20,7 @@ import {
   hasPermission
 } from 'phovea_core/src/security';
 import {successfullySaved, successfullyDeleted} from '../notifications';
+import i18next from 'phovea_core/src/i18n';
 
 export default class NamedSetList {
   readonly node: HTMLElement;
@@ -40,9 +41,9 @@ export default class NamedSetList {
 
   private async build() {
     this.node.innerHTML = `
-      <section class="predefined-named-sets"><header>Predefined Sets</header><ul class="loading"></ul></section>
-      <section class="custom-named-sets"><header>My Sets</header><ul class="loading"></ul></section>
-      <section class="other-named-sets"><header>Public Sets</header><ul class="loading"></ul></section>`;
+      <section class="predefined-named-sets"><header>${ i18next.t('tdp:core.NamedSetList.predefinedSets')}</header><ul class="loading"></ul></section>
+      <section class="custom-named-sets"><header> ${i18next.t('tdp:core.NamedSetList.mySets')}</header><ul class="loading"></ul></section>
+      <section class="other-named-sets"><header> ${i18next.t('tdp:core.NamedSetList.publicSets')}</header><ul class="loading"></ul></section>`;
 
     this.filter = await this.findFilters();
     const data = await this.list();
@@ -64,7 +65,7 @@ export default class NamedSetList {
       }, sec);
 
       const editedSet = await editNamedSet(namedSet.id, params);
-      successfullySaved('Named Set', name);
+      successfullySaved(i18next.t('tdp:core.NamedSetList.namedSet'), name);
       this.replace(namedSet, editedSet);
     });
   }
@@ -111,8 +112,8 @@ export default class NamedSetList {
     $enter.append('a')
       .classed('edit', true)
       .attr('href', '#')
-      .html(`<i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="sr-only">Edit</span>`)
-      .attr('title', 'Edit')
+      .html(`<i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="sr-only"> ${i18next.t('tdp:core.NamedSetList.edit')}</span>`)
+      .attr('title', i18next.t('tdp:core.NamedSetList.edit') as string)
       .on('click', (namedSet: IStoredNamedSet) => {
         // prevent changing the hash (href)
         (<Event>d3event).preventDefault();
@@ -122,8 +123,8 @@ export default class NamedSetList {
     $enter.append('a')
       .classed('delete', true)
       .attr('href', '#')
-      .html(`<i class="fa fa-trash" aria-hidden="true"></i> <span class="sr-only">Delete</span>`)
-      .attr('title', 'Delete')
+      .html(`<i class="fa fa-trash" aria-hidden="true"></i> <span class="sr-only">${i18next.t('tdp:core.NamedSetList.delete')}</span>`)
+      .attr('title', i18next.t('tdp:core.NamedSetList.delete') as string)
       .on('click', async (namedSet: IStoredNamedSet) => {
         // prevent changing the hash (href)
         (<Event>d3event).preventDefault();
@@ -132,26 +133,29 @@ export default class NamedSetList {
           return;
         }
 
-        const deleteIt = await areyousure(`The named set <i>${namedSet.name}</i> will be deleted and cannot be restored. Continue?`,
-          {title: `Delete named set`}
+        const deleteIt = await areyousure(i18next.t('tdp:core.NamedSetList.dialogText', {name: namedSet.name}),
+          {title: i18next.t('tdp:core.NamedSetList.deleteSet')}
         );
         if (deleteIt) {
           await deleteNamedSet(namedSet.id);
-          successfullyDeleted('Dashboard', namedSet.name);
+          successfullyDeleted(i18next.t('tdp:core.NamedSetList.dashboard'), namedSet.name);
           this.remove(namedSet);
         }
       });
 
     //update
     $options.select('a.goto').text((d) => d.name)
-      .attr('title', (d) => `Name: ${d.name}\nDescription: ${d.description}${d.type === ENamedSetType.NAMEDSET ? `\nCreator: ${(<IStoredNamedSet>d).creator}\nPublic: ${hasPermission(<IStoredNamedSet>d, EEntity.OTHERS)}` : ''}`);
+      .attr('title', (d) => {
+        const extendedData = d.type === ENamedSetType.NAMEDSET ? {context: 'extended', creator: (<IStoredNamedSet>d).creator, public: hasPermission(<IStoredNamedSet>d, EEntity.OTHERS)} : {};
+        return i18next.t('tdp:core.lineup.NamedSetList.title', {name: d.name, description: d.description, ...extendedData}) as string; // i18next context feature
+      });
     $options.select('a.delete').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d));
     $options.select('a.edit').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d));
     $options.select('a.public')
       .classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d))
       .html((d) => {
         const isPublic = d.type === ENamedSetType.NAMEDSET && hasPermission(<IStoredNamedSet>d, EEntity.OTHERS);
-        return `<i class="fa ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${isPublic ? 'Public' : 'Private'}"></i> <span class="sr-only">${isPublic ? 'Public' : 'Private'}</span>`;
+        return `<i class="fa ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${i18next.t('tdp:core.NamedSetList.status', {context: isPublic ? 'public' : ''})}"></i> <span class="sr-only">${isPublic ? 'Public' : 'Private'}</span>`;
       });
 
     $options.exit().remove();

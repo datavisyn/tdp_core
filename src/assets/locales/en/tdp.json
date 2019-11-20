@@ -170,11 +170,13 @@
         "namedSet": "Named Set",
         "edit": "Edit",
         "delete": "Delete",
-        "theNamedSet": "The named set",
-        "willBeDeleted": "will be deleted and cannot be restored. Continue?",
-        "deleteNamedSet": "Delete named set",
-        "dashboard": "Dashboard"
-
+        "dialogText": "The named set <i>{{name}}</i> will be deleted and cannot be restored. Continue?",
+        "deleteSet": "Delete named set",
+        "dashboard": "Dashboard",
+        "status": "Private",
+        "status_public": "Public",
+        "title": "Name: {{d.name}}\nDescription: {{d.description}})",
+        "title_extended": "Name: {{d.name}}\nDescription: {{d.description}} \nCreator: {{creator}}\nPublic: {{public}}"
       }
     }
   }
