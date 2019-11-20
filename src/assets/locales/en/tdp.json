@@ -190,15 +190,29 @@
         "selected": "selected"
       }
     },
+
     "views": {
       "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.\nHowever, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.\nPlease use the following",
       "noHttpsMessagePart2": "link</a> to open the website in a separate window:",
+
       "tableDownloadButton": "Download Table as Spreadsheet",
       "busyMessage": "Preparing awesome stuff for you...",
       "defaultHint": "No data found for the given {{name}}",
       "defaultHint_unknown": "No data found for the given Unknown",
       "noMappingFoundHint": "No mapping found for the given {{name}} to {{id}}",
-      "noMappingFoundHint_unknown":"No mapping found for the given Unknown to {{id}}"
+      "noMappingFoundHint_unknown": "No mapping found for the given Unknown to {{id}}",
+
+      "toOption": " to {{id}}",
+      "noMappingFound": "No mapping found from the given gene {{name}}",
+      "please": "PLease",
+      "externalApplication": "the external application",
+      "openExternally": "click here\nto open {{name}} </a> in a new browser tab.",
+      "isLoaded": "The web page below is directly loaded from",
+      "screwed": "We are all screwed :(",
+
+      "noViews": "No views defined",
+
+      "formSelectName": "No mapping found"
     }
   }
 }

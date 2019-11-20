@@ -1,7 +1,8 @@
 import {randomId} from 'phovea_core/src';
 import {IDType, IDTypeLike, resolve} from 'phovea_core/src/idtype';
-import {FormElementType, IFormElement, IFormElementDesc, IFormSelectElement, IFormSelectOptionGroup,  IFormSelectOption} from '../form';
+import {FormElementType, IFormElement, IFormElementDesc, IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption} from '../form';
 import {ISelection} from './interfaces';
+import i18next from 'phovea_core/src/i18n';
 
 export interface ISelectionChooserOptions {
   /**
@@ -33,7 +34,7 @@ export default class SelectionChooser {
   private readonly readableTargetIDType: IDType | null;
   readonly desc: IFormElementDesc;
   private readonly formID: string;
-  private readonly options : Readonly<ISelectionChooserOptions> = {
+  private readonly options: Readonly<ISelectionChooserOptions> = {
     appendOriginalLabel: true,
     selectNewestByDefault: true,
     readableIDType: null,
@@ -68,7 +69,7 @@ export default class SelectionChooser {
     return this.updateImpl(selection, true);
   }
 
-  chosen(): { id: number, name: string, label: string } | null {
+  chosen(): {id: number, name: string, label: string} | null {
     const s = this.accessor(this.formID).value;
     if (!s || s.data === SelectionChooser.INVALID_MAPPING) {
       return null;
@@ -79,7 +80,7 @@ export default class SelectionChooser {
     return {id: parseInt(s.id, 10), name: s.name, label: s.name};
   }
 
-  private async toItems(selection: ISelection): Promise<(IFormSelectOption|IFormSelectOptionGroup)[]> {
+  private async toItems(selection: ISelection): Promise<(IFormSelectOption | IFormSelectOptionGroup)[]> {
     const source = selection.idtype;
     const sourceIds = selection.range.dim(0).asList();
     const sourceNames = await source.unmap(sourceIds);
@@ -119,7 +120,7 @@ export default class SelectionChooser {
       readAbleSubOptions.push(...optionsIDs);
     }
 
-    const subOptions = readAbleSubOptions && readAbleSubOptions.length > 0? readAbleSubOptions : targetNames;
+    const subOptions = readAbleSubOptions && readAbleSubOptions.length > 0 ? readAbleSubOptions : targetNames;
 
     let acc = 0;
     const base = labels.map((name, i) => {
@@ -133,7 +134,7 @@ export default class SelectionChooser {
         return <IFormSelectOptionGroup>{
           name,
           children: [{
-            name: 'No Mapping found',
+            name: i18next.t('tdp:core.views.formSelectName'),
             value: '',
             data: SelectionChooser.INVALID_MAPPING
           }]
@@ -159,7 +160,7 @@ export default class SelectionChooser {
     return this.toItems(selection).then((r) => this.updateItems(r, reuseOld));
   }
 
-  private updateItems(options: (IFormSelectOption|IFormSelectOptionGroup)[], reuseOld: boolean) {
+  private updateItems(options: (IFormSelectOption | IFormSelectOptionGroup)[], reuseOld: boolean) {
     const element = <IFormSelectElement>this.accessor(this.formID);
 
     const flatOptions = options.reduce((acc, d) => {

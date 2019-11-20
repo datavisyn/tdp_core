@@ -2,6 +2,7 @@ import AView from './AView';
 import {IViewContext, ISelection} from './interfaces';
 import {getProxyUrl} from '../rest';
 import SelectionChooser, {ISelectionChooserOptions} from './SelectionChooser';
+import i18next from 'phovea_core/src/i18n';
 
 export interface IProxyViewOptions extends Partial<ISelectionChooserOptions> {
   /**
@@ -116,8 +117,8 @@ export default class ChooserProxyView extends AView {
 
     const selectedItemId = this.chooser.chosen();
     if (selectedItemId == null) {
-      const to =  this.options.idtype ? ` to ${this.options.idtype}` : '';
-      this.setNoMappingFoundHint(true, `No mapping found from the given gene${to}`);
+      const to = this.options.idtype ? i18next.t('tdp:core.views.toOption', {id: this.options.idtype}) : '';
+      this.setNoMappingFoundHint(true, i18next.t('tdp:core.views.noMappingFound', {name: to}));
       return;
     }
 
@@ -134,12 +135,11 @@ export default class ChooserProxyView extends AView {
     if (this.options.openExternally) {
       this.setBusy(false);
       this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-      Please <a href="${url}" class="alert-link" target="_blank" rel="noopener">click here
-      to open ${this.options.name ? this.options.name : 'the external application' }</a> in a new browser tab.</div></p>`;
+     ${i18next.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">  ${i18next.t('tdp:core.views.openExternally', {name: this.options.name ? this.options.name : '$t(tdp:core.views.externalApplication)'})}</div></p>`;
       return;
     }
 
-    this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${i18next.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
 
     const iframe = this.node.ownerDocument.createElement('iframe');
     iframe.src = url;
@@ -152,7 +152,7 @@ export default class ChooserProxyView extends AView {
 
   protected showErrorMessage() {
     this.setBusy(false);
-    this.node.innerHTML = `<p>We are all screwed :(</p>`;
+    this.node.innerHTML = `<p>${i18next.t('tdp:core.views.screwed')}</p>`;
     this.openExternally.innerHTML = ``;
     this.fire(ChooserProxyView.EVENT_LOADING_FINISHED);
   }
@@ -168,9 +168,8 @@ export default class ChooserProxyView extends AView {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.node.innerHTML = `
-        <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em"><strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.
-            However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.
-            Please use the following <a href="${url}" target="_blank" rel="noopener" class="alert-link">link</a> to open the website in a separate window:
+        <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
+        ${i18next.t('tdp:core.views.noHttpsMessagePart1')} <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18next.t('tdp:core.views.noHttpsMessagePart2')}
             <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
         </div></p><p></p>`;
     this.openExternally.innerHTML = ``;
