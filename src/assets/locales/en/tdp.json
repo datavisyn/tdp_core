@@ -142,6 +142,39 @@
           "add": "Add",
           "remove": "Remove"
         }
+      },
+      "OverviewDetailRanking": {
+        "overview": "Overview",
+        "detailTable": "Detail Table"
+      },
+      "RankingView": {
+        "successfullySaved": "List of Entities",
+        "notFoundHint": "No data found for selection and parameter.",
+        "showing": "Showing",
+        "of": "of",
+        "selected": "selected"
+      },
+      "editDialog": {
+        "save": "Save",
+        "edit": "Edit",
+        "listOfEntities": " List of Entities",
+        "dialogText1": "This dialog allows you to save the list of currently shown entities without any extra data. Afterwards, you can start new analyses using this entity subset by selecting it on the start page.",
+        "dialogText2": "However, if you want to save the entire analysis session and not only the list of entities, please use the dialog <i> Analysis Session Management </i> at the top.",
+        "name": "Name",
+        "description": "Description"
+      },
+      "NamedSetList": {
+        "predefinedSets": "predefined Sets",
+        "mySets": "My Sets",
+        "publicSets": "Public Sets",
+        "namedSet": "Named Set",
+        "edit": "Edit",
+        "delete": "Delete",
+        "theNamedSet": "The named set",
+        "willBeDeleted": "will be deleted and cannot be restored. Continue?",
+        "deleteNamedSet": "Delete named set",
+        "dashboard": "Dashboard"
+
       }
     }
   }
