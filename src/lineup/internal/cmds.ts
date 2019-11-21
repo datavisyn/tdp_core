@@ -207,8 +207,17 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
     bak = source.getMapping().dump();
     source.setMapping(createMappingFunction(parameter.value));
   } else if (source) {
-    bak = source[`get${prop}`]();
-    source[`set${prop}`].call(source, parameter.value);
+    // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
+    switch (parameter.prop) {
+      case 'rendererType':
+        bak = source[`getRenderer`]();
+        source[`setRenderer`].call(source, parameter.value);
+        break;
+      default:
+        bak = source[`get${prop}`]();
+        source[`set${prop}`].call(source, parameter.value);
+        break;
+    }
   }
 
   return waitForSorted({
