@@ -16,7 +16,7 @@
     },
 
     "FormMap": {
-      "badgeTitle": "`{{text}} items remaining after filtering`",
+      "badgeTitle": "{{text}} items remaining after filtering",
       "apply": "Apply",
       "selectMe": "Select me...",
       "select": "Select...",
