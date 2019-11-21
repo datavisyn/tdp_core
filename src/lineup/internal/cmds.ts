@@ -8,6 +8,17 @@ import {NumberColumn, createMappingFunction, LocalDataProvider, StackColumn, Scr
 import {resolveImmediately} from 'phovea_core/src';
 
 
+// used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
+enum LineUpTrackAndUntrackActions {
+  metaData = 'metaData',
+  filter = 'filter',
+  rendererType = 'rendererType',
+  groupRenderer = 'groupRenderer',
+  sortMethod = 'sortMethod',
+  ChangedFilter = 'Changed.filter',
+  width = 'width',
+}
+
 const CMD_SET_SORTING_CRITERIA = 'lineupSetRankingSortCriteria';
 const CMD_SET_SORTING_CRITERIAS = 'lineupSetSortCriteria';
 const CMD_SET_GROUP_CRITERIA = 'lineupSetGroupCriteria';
@@ -342,11 +353,11 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
 }
 
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
-  recordPropertyChange(col, provider, lineup, graph, 'metaData');
-  recordPropertyChange(col, provider, lineup, graph, 'filter');
-  recordPropertyChange(col, provider, lineup, graph, 'rendererType');
-  recordPropertyChange(col, provider, lineup, graph, 'groupRenderer');
-  recordPropertyChange(col, provider, lineup, graph, 'sortMethod');
+  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.metaData);
+  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.filter);
+  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.rendererType);
+  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.groupRenderer);
+  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.sortMethod);
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
   if (col instanceof CompositeColumn) {
@@ -414,7 +425,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
 
 
 function untrackColumn(col: Column) {
-  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'sortMethod'), null);
+  col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
