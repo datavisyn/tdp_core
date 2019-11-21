@@ -83,7 +83,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
         evt.preventDefault();
         evt.stopPropagation();
         lazyDialogModule().then((dialogs) => {
-          const d = dialogs.generateDialog(plugin.name, 'Close');
+          const d = dialogs.generateDialog(plugin.name, i18next.t('tdp:core.ViewWrapper.close'));
           d.body.innerHTML = plugin.helpText;
           d.show();
           d.hideOnSubmit();
@@ -96,7 +96,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
         this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
       }
     } else if (plugin.helpTourId) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelpTourLabel')}</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelpTour')}</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -352,7 +352,6 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
 
 function selectionText(selection: any, idType: string) {
   const label = idType.includes('*') || idType.includes('(') ? 'item' : resolve(idType).name;
-  console.log(i18next.t('tdp:core.ViewWrapper.selectionTextNone', {label}))
   switch (String(selection)) {
     case '':
     case 'none':

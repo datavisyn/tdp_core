@@ -4,6 +4,7 @@
     "ViewWrapper": {
       "showHelp": "Show Help",
       "showHelpLabel": "Show help of this view",
+      "close": "Close",
       "showHelpTour": "Show Help Tour",
       "showHelpTourLabel": "Show help tour of this view",
       "selectionTextNone": "No {{label}} is required",
