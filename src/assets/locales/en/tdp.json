@@ -23,11 +23,6 @@
       "remove": "Remove"
     },
 
-    "cmdsInternal": {
-      "initializeSession": "Initialize Session",
-      "setParameter": "Set Parameter \"{{name}}\""
-    },
-
     "EditProvenanceMenu": {
       "sessionHeader": "Analysis Session Management",
       "sessionName": "No Name",
@@ -255,6 +250,10 @@
 
       "formSelectName": "No mapping found"
     },
+
+
+    "initializeSession": "Initialize Session",
+    "setParameter": "Set Parameter \"{{name}}\"",
 
     "disclaimerMessage": "<strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.",
 

@@ -33,7 +33,7 @@ export function initSessionImpl(_inputs: IObjectRef<any>[], parameters: object) 
 }
 
 export function initSession(map: object) {
-  return action(meta(i18next.t('tdp:core.cmdsInternal.initializeSession'), cat.custom, op.update), CMD_INIT_SESSION, initSessionImpl, [], map);
+  return action(meta(i18next.t('tdp:core.initializeSession'), cat.custom, op.update), CMD_INIT_SESSION, initSessionImpl, [], map);
 }
 
 export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, graph: ProvenanceGraph) {
@@ -50,7 +50,7 @@ export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, gra
 
 export function setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any) {
   //assert view
-  return action(meta(i18next.t('tdp:core.cmdsInternal.setParameter', {name}), cat.visual, op.update), CMD_SET_PARAMETER, setParameterImpl, [view], {
+  return action(meta(i18next.t('tdp:core.setParameter', {name}), cat.visual, op.update), CMD_SET_PARAMETER, setParameterImpl, [view], {
     name,
     value,
     previousValue
