@@ -10,11 +10,11 @@ export {setGlobalErrorTemplate} from 'phovea_ui/src/errors';
 export {errorAlert as showErrorModalDialog} from './notifications';
 
 export interface IDialogModule {
-  generateDialog(title: string, primaryBtnText?: string): Dialog;
+  generateDialog(title: string, primaryBtnText?: string, additionalCSSClasses?: string): Dialog;
 
   areyousure(msg?: string, options?: IAreYouSureOptions | string): Promise<boolean>;
 
-  FormDialog: {new(title: string, primaryBtnText?: string, formId?: string): FormDialog};
+  FormDialog: {new(title: string, primaryBtnText?: string, formId?: string, additionalCSSClasses?: string): FormDialog};
 }
 
 export function lazyDialogModule(): Promise<IDialogModule> {
@@ -26,9 +26,9 @@ export function lazyDialogModule(): Promise<IDialogModule> {
  * @param {CLUEGraphManager} manager
  * @param {string} id session id
  */
-export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string) {
+export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses: string = '') {
   lazyDialogModule().then(({generateDialog}) => {
-    const dialog = generateDialog('Session Not Found!', 'Create New Temporary Session');
+    const dialog = generateDialog('Session Not Found!', 'Create New Temporary Session', additionalCSSClasses);
     // append bg-danger to the dialog parent element
     dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
     dialog.body.innerHTML = `
