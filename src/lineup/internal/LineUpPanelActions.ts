@@ -137,7 +137,7 @@ export default class LineUpPanelActions extends EventHandler {
       <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
       </div>`);
 
-    if (!this.isTopMode) { // top mode doesn't need collapse feature
+    if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
       this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="(Un)Collapse"></a>`);
       this.node.querySelector('a')!.addEventListener('click', (evt) => {
         evt.preventDefault();
@@ -148,8 +148,12 @@ export default class LineUpPanelActions extends EventHandler {
 
     const buttons = this.node.querySelector('section');
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
-    buttons.appendChild(this.appendSaveRanking());
-    buttons.appendChild(this.appendDownload());
+    if(this.options.enableSaveRanking) {
+      buttons.appendChild(this.appendSaveRanking());
+    }
+    if(this.options.enableDownload) {
+      buttons.appendChild(this.appendDownload());
+    }
     if (this.options.enableZoom) {
       buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
       buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
@@ -330,11 +334,13 @@ export default class LineUpPanelActions extends EventHandler {
     }
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
-    const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [
-      this.groupedDialog('Database Columns', this.getColumnDescription(descs, false))
-    ];
+    const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
-    if (loadedScorePlugins.length > 0) {
+    if(this.options.enableAddingDatabaseColumns) {
+      items.push(this.groupedDialog('Database Columns', this.getColumnDescription(descs, false)));
+    }
+
+    if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
       items.push({
         text: 'Parameterized Scores',
         children: loadedScorePlugins.map((score) => {
@@ -353,36 +359,49 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
 
-    const scoreDescs = this.getColumnDescription(descs, true);
-    if (scoreDescs.length > 0) {
-      items.push({
-        text: 'Previously Added Columns',
-        children: scoreDescs
-      });
+    if(this.options.enableAddingPreviousColumns) {
+      const scoreDescs = this.getColumnDescription(descs, true);
+      if (scoreDescs.length > 0) {
+        items.push({
+          text: 'Previously Added Columns',
+          children: scoreDescs
+        });
+      }
     }
 
-    const combiningColumns = this.groupedDialog('Combining Columns', [
-      { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
-      { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
-      { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-      { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
-      { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
-    ]);
+    const specialColumnsOption = {
+      text: 'Special Columns',
+      children: []
+    };
 
-    const supportColumns = this.groupedDialog('Support Columns', [
+    if(this.options.enableAddingCombiningColumns) {
+      const combiningColumns = this.groupedDialog('Combining Columns', [
+        { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
+        { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
+        { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
+        { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
+        { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+      ]);
+      specialColumnsOption.children.push(combiningColumns);
+    }
+
+    if(this.options.enableAddingSupportColumns) {
+      const supportColumns = this.groupedDialog('Support Columns', [
         {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
         {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
         {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
-    ]);
+      ]);
+      specialColumnsOption.children.push(supportColumns);
+    }
 
-    items.push({
-      text: 'Special Columns',
-      children: [
-        combiningColumns,
-        supportColumns,
-        ...metaDataOptions
-      ]
-    });
+    if(this.options.enableAddingMetaDataColumns) {
+      specialColumnsOption.children.push(...metaDataOptions);
+    }
+
+    // Only add special columns option if there are any items available
+    if(specialColumnsOption.children.length > 0) {
+      items.push(specialColumnsOption);
+    }
 
     this.search.data = items;
   }
