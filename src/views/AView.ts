@@ -78,13 +78,13 @@ export abstract class AView extends EventHandler implements IView {
     if (!value || !busyMessage) {
       delete this.node.dataset.busy;
     } else if (busyMessage) {
-      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : 'Preparing awesome stuff for you...';
+      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : i18next.t('tdp:core.views.busyMessage');
     }
   }
 
   protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
-    const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}
-    const defaultHintMessage = i18next.t('tdp:core.views.defaultHint', {...conditionalData})
+    const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'};
+    const defaultHintMessage = i18next.t('tdp:core.views.defaultHint', {...conditionalData});
     this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;

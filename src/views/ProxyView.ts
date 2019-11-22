@@ -178,10 +178,9 @@ export default class ProxyView extends AD3View {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML =
-        `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-     ${i18next.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">  ${i18next.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}
-     </div></p>`;
+      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
+      ${i18next.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${i18next.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}</a>
+      ${i18next.t('tdp:core.views.newTab')}</div></p>`;
       return;
     }
 
@@ -199,8 +198,8 @@ export default class ProxyView extends AD3View {
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
-    const to = this.options.idtype ? resolve(this.options.idtype).name : 'Unknown';
-    this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${to}</i>.</p>`);
+    const to = this.options.idtype ? resolve(this.options.idtype).name : i18next.t('tdp:core.views.unknown');
+    this.$node.html(`<p>${i18next.t('tdp:core.views.cannotMap', {name: this.selection.idtype.name, selectedItemId, to})}</p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
@@ -216,10 +215,10 @@ export default class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-    ${i18next.t('tdp:core.views.noHttpsMessagePart1')} <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18next.t('tdp:core.views.noHttpsMessagePart2')}
-        <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
-    </div></p><p></p>`);
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18next.t('tdp:core.views.noHttpsMessagePart1')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18next.t('tdp:core.views.link')}</a> ${i18next.t('tdp:core.views.noHttpsMessagePart2')}
+       <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
+   </div></p><p></p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }

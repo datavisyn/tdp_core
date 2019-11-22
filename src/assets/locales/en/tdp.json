@@ -249,8 +249,9 @@
     },
 
     "views": {
-      "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.\nHowever, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.\nPlease use the following",
-      "noHttpsMessagePart2": "link</a> to open the website in a separate window:",
+      "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.Please use the following",
+      "link": "link",
+      "noHttpsMessagePart2": " to open the website in a separate window:",
 
       "tableDownloadButton": "Download Table as Spreadsheet",
       "busyMessage": "Preparing awesome stuff for you...",
@@ -263,8 +264,11 @@
       "noMappingFound": "No mapping found from the given gene {{name}}",
       "please": "PLease",
       "externalApplication": "the external application",
-      "openExternally": "click here\nto open {{name}} </a> in a new browser tab.",
+      "openExternally": "click here to open {{name}}",
+      "newTab": "in a new browser tab.",
       "isLoaded": "The web page below is directly loaded from",
+      "unknown":"Unknown",
+      "cannotMap":"Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",
       "screwed": "We are all screwed :(",
 
       "noViews": "No views defined",
