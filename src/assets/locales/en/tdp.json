@@ -78,14 +78,14 @@
       "save": "Save",
       "edit": "Edit",
       "listOfEntities": " List of Entities",
-      "dialogText1": "This dialog allows you to save the list of currently shown entities without any extra data. Afterwards, you can start new analyses using this entity subset by selecting it on the start page.",
-      "dialogText2": "However, if you want to save the entire analysis session and not only the list of entities, please use the dialog <i> Analysis Session Management </i> at the top.",
+      "dialog1": "This dialog allows you to save the list of currently shown entities without any extra data. Afterwards, you can start new analyses using this entity subset by selecting it on the start page.",
+      "dialog2": "However, if you want to save the entire analysis session and not only the list of entities, please use the dialog <i> Analysis Session Management </i> at the top.",
       "name": "Name",
       "description": "Description"
     },
 
     "NamedSetList": {
-      "predefinedSets": "predefined Sets",
+      "predefinedSets": "Predefined Sets",
       "mySets": "My Sets",
       "publicSets": "Public Sets",
       "namedSet": "Named Set",
@@ -94,10 +94,10 @@
       "dialogText": "The named set <i>{{name}}</i> will be deleted and cannot be restored. Continue?",
       "deleteSet": "Delete named set",
       "dashboard": "Dashboard",
-      "status": "Private",
-      "status_public": "Public",
-      "title": "Name: {{d.name}}\nDescription: {{d.description}})",
-      "title_extended": "Name: {{d.name}}\nDescription: {{d.description}} \nCreator: {{creator}}\nPublic: {{public}}"
+      "status": "Public",
+      "status_private": "Private",
+      "title": "Name: {{name}}\nDescription: {{description}})",
+      "title_extended": "Name: {{name}}\nDescription: {{description}} \nCreator: {{creator}}\nPublic: {{public}}"
     },
 
     "TourManager": {

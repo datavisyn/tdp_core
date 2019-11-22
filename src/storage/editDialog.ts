@@ -12,8 +12,8 @@ export default function editDialog(namedSet: IStoredNamedSet, result: (name: str
   const permissions = permissionForm(namedSet);
 
   dialog.form.innerHTML = `
-    <p> ${i18next.t('tdp:core.editDialog.dialogText1')}</p>
-    <p style="margin-bottom: 15px">${i18next.t('tdp:core.editDialog.dialogText2')}</p>
+    <p> ${i18next.t('tdp:core.editDialog.dialog1')}</p>
+    <p style="margin-bottom: 15px">${i18next.t('tdp:core.editDialog.dialog2')}</p>
     <div class="form-group">
       <label for="namedset_name">${i18next.t('tdp:core.editDialog.name')}</label>
       <input type="text" class="form-control" name="name" id="namedset_name" placeholder="${i18next.t('tdp:core.editDialog.name')}" required="required" ${namedSet ? `value="${namedSet.name}"` : ''}>

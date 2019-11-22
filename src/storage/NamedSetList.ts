@@ -147,7 +147,7 @@ export default class NamedSetList {
     $options.select('a.goto').text((d) => d.name)
       .attr('title', (d) => {
         const extendedData = d.type === ENamedSetType.NAMEDSET ? {context: 'extended', creator: (<IStoredNamedSet>d).creator, public: hasPermission(<IStoredNamedSet>d, EEntity.OTHERS)} : {};
-        return i18next.t('tdp:core.lineup.NamedSetList.title', {name: d.name, description: d.description, ...extendedData}) as string; // i18next context feature
+        return i18next.t('tdp:core.NamedSetList.title', {name: d.name, description: d.description, ...extendedData}) as string; // i18next context feature
       });
     $options.select('a.delete').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d));
     $options.select('a.edit').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d));
@@ -155,7 +155,7 @@ export default class NamedSetList {
       .classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d))
       .html((d) => {
         const isPublic = d.type === ENamedSetType.NAMEDSET && hasPermission(<IStoredNamedSet>d, EEntity.OTHERS);
-        return `<i class="fa ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${i18next.t('tdp:core.NamedSetList.status', {context: isPublic ? 'public' : ''})}"></i> <span class="sr-only">${isPublic ? 'Public' : 'Private'}</span>`;
+        return `<i class="fa ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${i18next.t('tdp:core.NamedSetList.status', {context: isPublic ? '' : 'private'})}"></i> <span class="sr-only">${isPublic ? 'Public' : 'Private'}</span>`;
       });
 
     $options.exit().remove();
