@@ -7,18 +7,18 @@ const HOUR = MIN * 60;
 const DAY = HOUR * 24;
 
 const areas: [number, string | ((d: number) => string)][] = [
-  [-1, i18next.t('tdp:core.utilsInternal.future')],
-  [43, i18next.t('tdp:core.utilsInternal.fewSecondsAgo')],
-  [44, i18next.t('tdp:core.utilsInternal.secondsAgo')],
-  [89, i18next.t('tdp:core.utilsInternal.minuteAgo', {count: 1})],
-  [44 * MIN, (d) => i18next.t('tdp:core.utilsInternal.minuteAgo', {count: Math.ceil(d / MIN)})],
-  [89 * MIN, i18next.t('tdp:core.utilsInternal.hourAgo', {count: 1})],
-  [21 * HOUR, (d) => i18next.t('tdp:core.utilsInternal.hourAgo', {count: Math.ceil(d / HOUR)})],
-  [35 * HOUR, i18next.t('tdp:core.utilsInternal.dayAgo', {count: 1})],
-  [25 * DAY, (d) => i18next.t('tdp:core.utilsInternal.dayAgo', {count: Math.ceil(d / DAY)})],
-  [45 * DAY, i18next.t('tdp:core.utilsInternal.monthAgo', {count: 1})],
-  [319 * DAY, (d) => i18next.t('tdp:core.utilsInternal.monthAgo', {count: Math.ceil(d / DAY / 30)})],
-  [547 * DAY, (d) => i18next.t('tdp:core.utilsInternal.yearAgoAgo')]
+  [-1, 'in the future'],
+  [43, 'a few seconds ago'],
+  [44, '44 seconds ago'],
+  [89, 'a minute ago'],
+  [44 * MIN, (d) => `${Math.ceil(d / MIN)} minutes ago`],
+  [89 * MIN, 'an hour ago'],
+  [21 * HOUR, (d) => `${Math.ceil(d / HOUR)} hours ago`],
+  [35 * HOUR, 'a day ago'],
+  [25 * DAY, (d) => `${Math.ceil(d / DAY)} days ago`],
+  [45 * DAY, 'a month ago'],
+  [319 * DAY, (d) => `${Math.ceil(d / DAY / 30)} months ago`],
+  [547 * DAY, (d) => 'a year ago']
 ];
 
 /**

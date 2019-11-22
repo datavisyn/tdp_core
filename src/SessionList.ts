@@ -180,7 +180,7 @@ export class TemporarySessionList extends ASessionList {
           <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</td>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('td').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18next.t('tdp:core.SessionList.status') as string : i18next.t('tdp:core..status', {context: 'private'}) as string);
+      $tr.select('td').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18next.t('tdp:core.SessionList.status') as string : i18next.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('td:nth-of-type(2)')
         .text((d) => d.ts ? fromNow(d.ts) : i18next.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
@@ -197,7 +197,7 @@ export class TemporarySessionList extends ASessionList {
           <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</span>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('span').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18next.t('tdp:core.SessionList.status') as string : i18next.t('tdp:core..status', {context: 'private'}) as string);
+      $tr.select('span').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18next.t('tdp:core.SessionList.status') as string : i18next.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('span:nth-of-type(2)')
         .text((d) => d.ts ? fromNow(d.ts) : i18next.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
@@ -282,7 +282,7 @@ export class PersistentSessionList extends ASessionList {
       const otherworkspaces = data.filter((d) => d.creator !== me);
 
       const publicTitle = i18next.t('tdp:core.SessionList.status') as string;
-      const privateTitle = i18next.t('tdp:core..status', {context: 'private'}) as string
+      const privateTitle = i18next.t('tdp:core.SessionList.status', {context: 'private'}) as string
       const unknownText = i18next.t('tdp:core.SessionList.unknown')
 
       if (this.mode === 'table') {
