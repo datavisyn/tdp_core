@@ -57,15 +57,78 @@ export interface IARankingViewOptions {
    * @default true
    */
   enableOverviewMode: boolean | 'active';
+
   /**
    * enable zoom button
    * @default true
    */
   enableZoom: boolean;
 
+  /**
+   * enable download data button
+   * @default true
+   */
+  enableDownload: boolean;
+
+  /**
+   * enable save list of entities button
+   * @default true
+   */
+  enableSaveRanking: boolean;
+
+  /**
+   * enable collapsing button of side panel
+   * @default true
+   */
+  enableSidePanelCollapsing: boolean;
+
+  /**
+   * enable side panel
+   * @default 'collapsed'
+   */
   enableSidePanel: boolean | 'collapsed' | 'top';
 
+  /**
+   * enable add columns button
+   * @default true
+   */
   enableAddingColumns: boolean;
+
+  /**
+   * enable support columns in the add column dialog
+   * @default true
+   */
+  enableAddingSupportColumns: boolean;
+
+  /**
+   * enable combining columns in the add column dialog
+   * @default true
+   */
+  enableAddingCombiningColumns: boolean;
+
+  /**
+   * enable score columns in the add column dialog
+   * @default true
+   */
+  enableAddingScoreColumns: boolean;
+
+  /**
+   * enable previously created columns in the add column dialog
+   * @default true
+   */
+  enableAddingPreviousColumns: boolean;
+
+  /**
+   * enable database columns in the add column dialog
+   * @default true
+   */
+  enableAddingDatabaseColumns: boolean;
+
+  /**
+   * enable meta data score columns in the add column dialog
+   * @default true
+   */
+  enableAddingMetaDataColumns: boolean;
 
   enableHeaderSummary: boolean;
 
@@ -91,6 +154,7 @@ export interface IARankingViewOptions {
 
 /**
  * base class for views based on LineUp
+ * There is also AEmbeddedRanking to display simple rankings with LineUp.
  */
 export abstract class ARankingView extends AView {
 
@@ -142,8 +206,17 @@ export abstract class ARankingView extends AView {
     subType: {key: '', value: ''},
     enableOverviewMode: true,
     enableZoom: true,
+    enableDownload: true,
+    enableSaveRanking: true,
     enableAddingColumns: true,
     enableAddingColumnGrouping: false,
+    enableAddingSupportColumns: true,
+    enableAddingCombiningColumns: true,
+    enableAddingScoreColumns: true,
+    enableAddingPreviousColumns: true,
+    enableAddingDatabaseColumns: true,
+    enableAddingMetaDataColumns: true,
+    enableSidePanelCollapsing: true,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
     enableStripedBackground: false,
@@ -158,6 +231,17 @@ export abstract class ARankingView extends AView {
 
   private readonly selectionAdapter: ISelectionAdapter | null;
 
+  /**
+   * Creates a RankingView with the given selection.
+   * Can be wrapped with a ViewWrapper.
+   *
+   * @remarks You need to call init() to actually display the Ranking View.
+   *
+   * @param context with provenance graph to store the executed operations
+   * @param selection The Ids and IdType of the selection
+   * @param parent where to put the ranking view
+   * @param options to configure the ranking view
+   */
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
 
@@ -247,6 +331,10 @@ export abstract class ARankingView extends AView {
     this.selectionAdapter = this.createSelectionAdapter();
   }
 
+  /**
+   * @param params Seperate element that displays the "Showing x of y ..." message
+   * @param onParameterChange eventlistener for content changes
+   */
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return super.init(params, onParameterChange).then(() => {
       // inject stats
