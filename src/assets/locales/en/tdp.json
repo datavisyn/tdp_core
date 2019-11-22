@@ -159,80 +159,81 @@
     },
 
     "lineup": {
-      "internal": {
-        "Cmds": {
-          "addRanking": "Add Ranking",
-          "removeRanking": "Remove Ranking",
-          "changeSortCriteria": "Change Sort Criteria",
-          "changeGroupCriteria": "Change Group Criteria",
-          "setProperty": "Set Property {{prop}}",
-          "addColumn": "Add Column",
-          "removeColumn": "Remove Column",
-          "moveColumn": "Move Column"
-        },
 
-        "exports": {
-          "exportData": "Export Data",
-          "export": "Export",
-          "columns": "Columns",
-          "rows": "Rows",
-          "allRows": "All Rows",
-          "selectedRows": "Selected Rows Only",
-          "notSelectedRows": "Not Selected Rows Only",
-          "exportName": "Export Name",
-          "nameOfExported": "name of the exported file",
-          "exportFormat": "Export Format",
-          "exportFormatCapital": "Export Format",
-          "csvComma": "CSV (comma separated)",
-          "tsv": "TSV (tab separated)",
-          "csvColon": "CSV (semicolon separated)",
-          "json": "JSON",
-          "excel": "Microsoft Excel (xlsx)"
-        },
-
-        "LineupPanelActions": {
-          "searchPlaceholder": "Add Column...",
-          "addColumnButton": "Add Column",
-          "collapseButton": "(Un)Collapse",
-          "zoomIn": "Zoom In",
-          "zoomOut": "Zoom Out",
-          "toggleOverview": "En/Disable Overview",
-          "downloadData": "Download Data",
-          "downloadAll": "Download All",
-          "excel": "Microsoft Excel (xlsx)",
-          "downloadSelectedRows": "Download Selected Rows Only",
-          "customize": "Customize",
-          "saveEntities": "Save List of Entities",
-          "databaseColumns": "Database Columns",
-          "parameterizedScores": "Parameterized Scores",
-          "previouslyAddedColumns": "Previously Added Columns",
-          "combiningColumns": "Combining Columns",
-          "weightedSum": "Weighted Sum",
-          "scriptedCombination": "Scripted Combination",
-          "nested": "Nested",
-          "reduce": "Min/Max/Mean Combination",
-          "imposition": "Imposition",
-          "supportColumns": "Support Columns",
-          "group": "Group",
-          "groupInformation": "Group Information",
-          "selectionCheckbox": "Selection Checkbox",
-          "aggregateGroup": "Aggregate Group",
-          "specialColumns": "Special Columns"
-        },
-
-        "OverviewColumn": {
-          "selectedInOverview": "Selected in Overview",
-          "rest": "Rest",
-          "overviewSelection": "'Overview Selection",
-          "focus": "Focus"
-        },
-
-        "scorecmds": {
-          "score": "Score",
-          "add": "Add",
-          "remove": "Remove"
-        }
+      "cmds": {
+        "addRanking": "Add Ranking",
+        "removeRanking": "Remove Ranking",
+        "changeSortCriteria": "Change Sort Criteria",
+        "changeGroupCriteria": "Change Group Criteria",
+        "setProperty": "Set Property {{prop}}",
+        "addColumn": "Add Column",
+        "removeColumn": "Remove Column",
+        "moveColumn": "Move Column"
       },
+
+      "exports": {
+        "exportData": "Export Data",
+        "export": "Export",
+        "columns": "Columns",
+        "rows": "Rows",
+        "allRows": "All Rows",
+        "selectedRows": "Selected Rows Only",
+        "notSelectedRows": "Not Selected Rows Only",
+        "exportName": "Export Name",
+        "nameOfExported": "name of the exported file",
+        "exportFormat": "Export Format",
+        "exportFormatCapital": "Export Format",
+        "csvComma": "CSV (comma separated)",
+        "tsv": "TSV (tab separated)",
+        "csvColon": "CSV (semicolon separated)",
+        "json": "JSON",
+        "excel": "Microsoft Excel (xlsx)"
+      },
+
+      "LineupPanelActions": {
+        "searchPlaceholder": "Add Column...",
+        "addColumnButton": "Add Column",
+        "collapseButton": "(Un)Collapse",
+        "zoomIn": "Zoom In",
+        "zoomOut": "Zoom Out",
+        "toggleOverview": "En/Disable Overview",
+        "downloadData": "Download Data",
+        "downloadAll": "Download All",
+        "excel": "Microsoft Excel (xlsx)",
+        "downloadSelectedRows": "Download Selected Rows Only",
+        "customize": "Customize",
+        "saveEntities": "Save List of Entities",
+        "databaseColumns": "Database Columns",
+        "parameterizedScores": "Parameterized Scores",
+        "previouslyAddedColumns": "Previously Added Columns",
+        "combiningColumns": "Combining Columns",
+        "weightedSum": "Weighted Sum",
+        "scriptedCombination": "Scripted Combination",
+        "nested": "Nested",
+        "reduce": "Min/Max/Mean Combination",
+        "imposition": "Imposition",
+        "supportColumns": "Support Columns",
+        "group": "Group",
+        "groupInformation": "Group Information",
+        "selectionCheckbox": "Selection Checkbox",
+        "aggregateGroup": "Aggregate Group",
+        "specialColumns": "Special Columns",
+        "addText":"Add {{text}} &hellip;"
+      },
+
+      "OverviewColumn": {
+        "selectedInOverview": "Selected in Overview",
+        "rest": "Rest",
+        "overviewSelection": "'Overview Selection",
+        "focus": "Focus"
+      },
+
+      "scorecmds": {
+        "score": "Score",
+        "add": "Add",
+        "remove": "Remove"
+      },
+
 
       "OverviewDetailRanking": {
         "overview": "Overview",
@@ -267,8 +268,8 @@
       "openExternally": "click here to open {{name}}",
       "newTab": "in a new browser tab.",
       "isLoaded": "The web page below is directly loaded from",
-      "unknown":"Unknown",
-      "cannotMap":"Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",
+      "unknown": "Unknown",
+      "cannotMap": "Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",
       "screwed": "We are all screwed :(",
 
       "noViews": "No views defined",

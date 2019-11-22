@@ -97,7 +97,7 @@ export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) 
 }
 
 export function addRanking(provider: IObjectRef<any>, index: number, dump?: any) {
-  return action(meta(dump ? i18next.t('tdp:core.lineup.internal.cmds.addRanking') : i18next.t('tdp:core.lineup.internal.cmds.removeRanking'), cat.layout, dump ? op.create : op.remove), CMD_ADD_RANKING, addRankingImpl, [provider], {
+  return action(meta(dump ? i18next.t('tdp:core.lineup.cmds.addRanking') : i18next.t('tdp:core.lineup.cmds.removeRanking'), cat.layout, dump ? op.create : op.remove), CMD_ADD_RANKING, addRankingImpl, [provider], {
     index,
     dump
   });
@@ -123,7 +123,7 @@ export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], para
 
 
 export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any) {
-  return action(meta(i18next.t('tdp:core.lineup.internal.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
+  return action(meta(i18next.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
     rid,
     value
   });
@@ -153,7 +153,7 @@ export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: 
 
 
 export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true) {
-  return action(meta(i18next.t('tdp:core.lineup.internal.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
+  return action(meta(i18next.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
     rid,
     columns,
     isSorting
@@ -175,7 +175,7 @@ export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter:
 }
 
 export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
-  return action(meta(i18next.t('tdp:core.lineup.internal.cmds.changeGroupCriteria'), cat.layout, op.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
+  return action(meta(i18next.t('tdp:core.lineup.cmds.changeGroupCriteria'), cat.layout, op.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
     rid,
     columns
   });
@@ -216,7 +216,7 @@ export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path
   // assert ALineUpView and update the stats
   provider.value.getInstance().updateLineUpStats();
 
-  return action(meta(i18next.t('tdp:core.lineup.internal.cmds.setProperty', {prop}), cat.layout, op.update), CMD_SET_COLUMN, setColumnImpl, [provider], {
+  return action(meta(i18next.t('tdp:core.lineup.cmds.setProperty', {prop}), cat.layout, op.update), CMD_SET_COLUMN, setColumnImpl, [provider], {
     rid,
     path,
     prop,
@@ -274,7 +274,7 @@ export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parame
 }
 
 export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, dump: any) {
-  return action(meta(dump ? i18next.t('tdp:core.lineup.internal.cmds.addColumn') : i18next.t('tdp:core.lineup.internal.cmds.removeColumn'), cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
+  return action(meta(dump ? i18next.t('tdp:core.lineup.cmds.addColumn') : i18next.t('tdp:core.lineup.cmds.removeColumn'), cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
     rid,
     path,
     index,
@@ -283,7 +283,7 @@ export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path
 }
 
 export function moveColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, moveTo: number) {
-  return action(meta(i18next.t('tdp:core.lineup.internal.cmds.moveColumn'), cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
+  return action(meta(i18next.t('tdp:core.lineup.cmds.moveColumn'), cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
     rid,
     path,
     index,
