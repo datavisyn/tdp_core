@@ -3,23 +3,25 @@ jobs:
   build:
     working_directory: ~/phovea
     docker:
-      - image: caleydo/phovea_circleci_python:v2.0
+      - image: caleydo/phovea_circleci_python:v3.0
     steps:
       - checkout
       - run:
-          name: Update npm package to v6.11
-          command: sudo npm i -g npm@6.11
-      - run:
-          name: Show node and npm version
+          name: Show Node.js and npm version
           command: |
             node -v
             npm -v
+      - run:
+          name: Show Python and pip version
+          command: |
+            python --version
+            pip --version
       - run:
           name: Install Docker packages from docker_packages.txt
           command: |
             (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
       - restore_cache:
-          key: deps4-{{ checksum "package.json" }}
+          key: deps4-{{ .Branch }}-{{ checksum "package.json" }}
       - run:
           name: Install npm dependencies
           command: npm install
@@ -28,7 +30,7 @@ jobs:
           command: |
             (grep -l '._resolved.: .\(git[^:]*\|bitbucket\):' ./node_modules/*/package.json || true) | xargs -r dirname | xargs -r rm -rf
       - save_cache:
-          key: deps4-{{ checksum "package.json" }}
+          key: deps4-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
           - ./node_modules
       - run:
@@ -36,9 +38,9 @@ jobs:
           command: npm install
       - run:
           name: Show installed npm dependencies
-          command: npm list --depth=0
+          command: npm list --depth=1 || true
       - restore_cache:
-          key: deps1-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
       - run:
           name: Install pip requirements
           command: |
@@ -47,7 +49,7 @@ jobs:
             pip install -r requirements_dev.txt
             pip install -r requirements.txt
       - save_cache:
-          key: deps1-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
           paths:
           - ~/venv
       - run:
@@ -56,13 +58,28 @@ jobs:
             . ~/venv/bin/activate
             pip install --upgrade --upgrade-strategy=only-if-needed -r requirements.txt
       - run:
+          name: Show installed pip packages
+          command: pip list || true
+      - run:
           name: Build
           command: |
             . ~/venv/bin/activate
-            npm run build
-
+            npm run dist
+      - store_artifacts:
+          path: dist
+          prefix: dist
 workflows:
   version: 2
+#  build-nightly:
+#    triggers:
+#      - schedule:
+#          cron: "15 1 * * 1-5" # "At 01:15 on every day-of-week from Monday through Friday.”, see: https://crontab.guru/#15_1_*_*_1-5
+#          filters:
+#            branches:
+#              only:
+#                - develop
+#    jobs:
+#      - build
   build-branch:
     jobs:
       - build:
