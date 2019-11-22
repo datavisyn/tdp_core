@@ -205,6 +205,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   ignoreNext = `${parameter.prop}Changed`;
   if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
     bak = source.getMapping().toJSON();
+    source.setMapping(createMappingFunction(parameter.value));
   } else if (source) {
     // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
     switch (parameter.prop) {
