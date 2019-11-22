@@ -58,6 +58,18 @@
     },
 
     "utilsInternal": {
+      "future": "in the future",
+      "fewSecondsAgo": "a few seconds ago",
+      "secondsAgo": "44 seconds ago",
+      "minuteAgo": "a minute ago",
+      "minuteAgo_plural": "{{count}} minutes ago",
+      "hourAgo": "an hour ago",
+      "hourAgo_plural": "{{count}} hours ago",
+      "dayAgo": "a day ago",
+      "dayAgo_plural": "{{count}} days ago",
+      "monthAgo": "an month ago",
+      "monthAgo_plural": "{{count}} months ago",
+      "yearAgo": "a year ago",
       "notAllowed": "Not Allowed, please contact your system administrator",
       "private": "Private",
       "publicMsg": "Public (everybody can see and use it)",
