@@ -204,8 +204,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   }
   ignoreNext = `${parameter.prop}Changed`;
   if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
-    bak = source.getMapping().dump();
-    source.setMapping(createMappingFunction(parameter.value));
+    bak = source.getMapping().toJSON();
   } else if (source) {
     // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
     switch (parameter.prop) {
@@ -418,11 +417,10 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
       if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, lineup)) {
         return;
       }
-      // console.log(col.fqpath, 'mapping', old.dump(), newValue.dump());
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(setColumn(lineup, rid, path, 'mapping', newValue.dump()), {
-        inverse: setColumn(lineup, rid, path, 'mapping', old.dump())
+      graph.pushWithResult(setColumn(lineup, rid, path, 'mapping', newValue.toJSON()), {
+        inverse: setColumn(lineup, rid, path, 'mapping', old.toJSON())
       });
     });
   } else if (col instanceof ScriptColumn) {
