@@ -4,7 +4,7 @@
 import {get} from 'phovea_core/src/data';
 import {ITable, ITableColumn} from 'phovea_core/src/table';
 import {ICategoricalValueTypeDesc, INumberValueTypeDesc, IValueTypeDesc} from 'phovea_core/src/datatype';
-import {IRow, IViewDescription} from '../rest';
+import {IRow, IServerColumnDesc} from '../rest';
 
 export default class PhoveaDataAdapter {
   private readonly data: Promise<ITable>;
@@ -13,13 +13,14 @@ export default class PhoveaDataAdapter {
     this.data = <any>get(datasetId);
   }
 
-  async getDesc(): Promise<IViewDescription> {
+  async getDesc(): Promise<IServerColumnDesc> {
     const t = await this.data;
     return {
       columns: t.desc.columns.map((c: ITableColumn<IValueTypeDesc>) => Object.assign({
         column: c.column || c.name,
         label: c.name
-      }, mapType(c.value)))
+      }, mapType(c.value))),
+      idType: t.idtype.name
     };
   }
 
