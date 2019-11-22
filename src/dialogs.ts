@@ -37,7 +37,12 @@ export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: 
            ${i18next.t('tdp:core.notAccessibleMessage', {id})}
         </p>
         <p>
-           ${i18next.t('tdp:core.possibleReasonsMessage')}
+        ${i18next.t('tdp:core.possibleReasons')}
+        <ul>
+            <li>${i18next.t('tdp:core.possibleReason1')}</li>
+            <li>${i18next.t('tdp:core.possibleReason2')}</li>
+            <li>${i18next.t('tdp:core.possibleReason3')}</li>
+        </ul>
         </p>
         <p>
           ${i18next.t('tdp:core.contactOwnerMessage')}

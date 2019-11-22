@@ -1,6 +1,25 @@
 {
   "core": {
 
+    "initializeSession": "Initialize Session",
+    "setParameter": "Set Parameter \"{{name}}\"",
+
+    "disclaimerMessage": "<strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.",
+
+    "sessionNotFound": "Session Not Found!",
+    "newSession": "Create New Temporary Session",
+    "notAccessibleMessage": "The requested session <strong>\"{{id}}\"</strong> was not found or is not accessible.",
+    "possibleReasons": " Possible reasons are that you",
+    "possibleReason1": "requested a <i>temporary session</i> that is already expired",
+    "possibleReason2": "tried to access a <i>temporary session</i> of another user",
+    "possibleReason3": "tried to access a <i>private persistent session</i> of another user",
+    "contactOwnerMessage": "In the latter two cases, please contact the original owner of the session to create a public persistent session.",
+
+    "savedNotification": "{{type}} \"{{name}}\" successfully saved",
+    "deletedNotification": "{{type}} \"{{name}}\" successfully deleted",
+    "requestedUrl": "The requested URL was:",
+    "errorNotification": "<strong>Error {{status}} ({{statusText}})</strong>: {{body}}",
+
     "ViewWrapper": {
       "showHelp": "Show Help",
       "showHelpLabel": "Show help of this view",
@@ -106,6 +125,7 @@
       "cancelButton": "Cancel",
       "nextButton": "Next",
       "finishButton": "Finish",
+      "closeButton": "Close",
       "helpTours": "Help Tours",
       "showTour": "show tour",
       "jumpToStep": "Jump to step {{step}}"
@@ -250,22 +270,6 @@
       "noViews": "No views defined",
 
       "formSelectName": "No mapping found"
-    },
-
-
-    "initializeSession": "Initialize Session",
-    "setParameter": "Set Parameter \"{{name}}\"",
-
-    "disclaimerMessage": "<strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.",
-
-    "sessionNotFound": "Session Not Found!",
-    "newSession": "Create New Temporary Session",
-    "notAccessibleMessage": "The requested session <strong>\"{{id}}\"</strong> was not found or is not accessible.",
-    "possibleReasonsMessage": "Possible reasons are that you  <ul> <li> requested a <i> temporary session </i> that is already expired</li> <li> tried to access a < i > temporary session </i> of another user</li><li> tried to access a <i> private persistent session </i> of another user</li></ul>",
-    "contactOwnerMessage": "In the latter two cases, please contact the original owner of the session to create a public persistent session.",
-
-    "savedNotification": "{{type}} \"{{name}}\" successfully saved",
-    "deletedNotification": "{{type}} \"{{name}}\" successfully deleted",
-    "requestedUrl": "The requested URL was:"
+    }
   }
 }
