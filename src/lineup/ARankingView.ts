@@ -1,4 +1,4 @@
-import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
+import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IDataRow} from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -280,7 +280,7 @@ export abstract class ARankingView extends AView {
         defaultHeight: 18,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? 70 : f(item.v, item.i);
+          return isGroup(item) ? 70 : f((<Partial<IDataRow & IGroupItem>>item).v, (<Partial<IDataRow & IGroupItem>>item).i);
         }
       });
     }
