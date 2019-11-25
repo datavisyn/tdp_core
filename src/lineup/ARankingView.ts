@@ -493,14 +493,14 @@ export abstract class ARankingView extends AView {
     // flag that it is a score but it also a reload function
     colDesc._score = true;
 
-    const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+    const ids = this.selectionHelper.rowIdsAsSet(<number[]>this.provider.getRankings()[0].getOrder());
     const data = score.compute(ids, this.itemIDType, args);
 
     const r = this.addColumn(colDesc, data, -1, position);
 
     // use _score function to reload the score
     colDesc._score = () => {
-      const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+      const ids = this.selectionHelper.rowIdsAsSet(<number[]>this.provider.getRankings()[0].getOrder());
       const data = score.compute(ids, this.itemIDType, args);
       return r.reload(data);
     };
