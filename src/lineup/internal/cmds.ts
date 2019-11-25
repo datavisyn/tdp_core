@@ -4,7 +4,7 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
-import {NumberColumn, createMappingFunction, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn} from 'lineupjs';
+import {NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 
 
@@ -206,7 +206,12 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   ignoreNext = `${parameter.prop}Changed`;
   if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
     bak = source.getMapping().toJSON();
-    source.setMapping(createMappingFunction(parameter.value));
+    if (parameter.value.type.includes('linear')) {
+      parameter.value.type = 'linear';
+    }
+    const availableMappingFunctions = mappingFunctions();
+    const selectedMappingFunction = mappingFunctions()[parameter.value.type];
+    source.setMapping(new selectedMappingFunction(parameter.value));
   } else if (source) {
     // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
     switch (parameter.prop) {
