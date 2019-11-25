@@ -149,7 +149,7 @@ export interface IARankingViewOptions {
   itemRowHeight: number | ((row: any, index: number) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
-  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
+  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
 }
 
 /**
