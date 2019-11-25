@@ -6,14 +6,15 @@ import {select} from 'd3';
 import {EventHandler} from 'phovea_core/src/event';
 import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
 import {none} from 'phovea_core/src/range';
-import {IFormElementDesc} from '../form';
-import FormBuilder from '../form/FormBuilder';
-import {toData} from '../form/internal/AFormElement';
+import {IFormElementDesc, FormBuilder} from '../form';
+import {toData} from '../form/elements/AFormElement';
 import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
-import {resolveIds} from './resolve';
+import {resolveIds, resolveAllNames, resolveAllIds, resolveNames} from './resolve';
+import {DEFAULT_SELECTION_NAME} from '../extensions';
+import {IForm} from '../form/interfaces';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -44,14 +45,18 @@ export abstract class AView extends EventHandler implements IView {
   readonly idType: IDType;
   readonly node: HTMLElement;
 
-  private params: FormBuilder;
+  private params: IForm;
   private readonly paramsFallback = new Map<string, any>();
   private readonly shared = new Map<string, any>();
   private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
-  private itemSelection: ISelection = {idtype: null, range: none()};
+  private readonly itemSelections = new Map<string, ISelection>();
+  private readonly selections = new Map<string, ISelection>();
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
+    this.selections.set(DEFAULT_SELECTION_NAME, selection);
+    this.itemSelections.set(DEFAULT_SELECTION_NAME, {idtype: null, range: none()});
+
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
     parent.appendChild(this.node);
@@ -91,8 +96,8 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   /*final*/
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    this.params = this.buildParameterForm(params, onParameterChange);
+  async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
+    this.params = await this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
   }
 
@@ -104,14 +109,14 @@ export abstract class AView extends EventHandler implements IView {
     return null;
   }
 
-  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
+  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
     const builder = new FormBuilder(select(params));
 
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
 
 
-    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean)=>void = <any>onParameterChange;
+    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean) => void = <any>onParameterChange;
 
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
@@ -123,9 +128,9 @@ export abstract class AView extends EventHandler implements IView {
     });
     this.paramsChangeListener = onParameterChange;
 
-    builder.build(descs);
+    builder.appendElements(descs);
 
-    return builder;
+    return builder.build();
   }
 
   /**
@@ -135,6 +140,10 @@ export abstract class AView extends EventHandler implements IView {
   protected getParameterFormDescs(): IFormElementDesc[] {
     // hook
     return [];
+  }
+
+  getItemSelectionNames() {
+    return Array.from(this.itemSelections.keys());
   }
 
   /**
@@ -218,65 +227,111 @@ export abstract class AView extends EventHandler implements IView {
     // hook
   }
 
-  setInputSelection(selection: ISelection) {
-    if (isSameSelection(this.selection, selection)) {
+  setInputSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+    const current = this.selections.get(name);
+    if (current && isSameSelection(current, selection)) {
       return;
     }
-    this.selection = selection;
-    return this.selectionChanged();
+    this.selections.set(name, selection);
+    if (name === DEFAULT_SELECTION_NAME) {
+      this.selection = selection;
+    }
+    return this.selectionChanged(name);
+  }
+
+  protected getInputSelection(name: string = DEFAULT_SELECTION_NAME) {
+    return this.selections.get(name);
+  }
+
+  protected getInputSelectionNames() {
+    return Array.from(this.selections.keys());
   }
 
   /**
    * hook triggerd when the input selection has changed
    */
-  protected selectionChanged() {
+  protected selectionChanged(_name: string = DEFAULT_SELECTION_NAME) {
     // hook
   }
 
   get itemIDType() {
-    return this.itemSelection.idtype;
+    return this.getItemSelection()!.idtype;
   }
 
   /**
-   * resolve the name of the current input selection
+   * resolve the id of the current input selection
    * @returns {Promise<string[]>}
    */
   protected resolveSelection(idType = this.idType): Promise<string[]> {
     return resolveIds(this.selection.idtype, this.selection.range, idType);
   }
 
-  setItemSelection(selection: ISelection) {
-    if (isSameSelection(this.itemSelection, selection)) {
+  /**
+   * resolve the name of the current input selection
+   * @returns {Promise<string[]>}
+   */
+  protected resolveSelectionByName(idType = this.idType): Promise<string[]> {
+    return resolveNames(this.selection.idtype, this.selection.range, idType);
+  }
+
+  /**
+   * resolve the ids of the current input selection to all 1:n related names, not just the first one like `resolveSelection` does
+   * @returns {Promise<string[]>}
+   */
+  protected resolveMultipleSelections(idType = this.idType): Promise<string[][]> {
+    return resolveAllIds(this.selection.idtype, this.selection.range, idType);
+  }
+
+  /**
+   * resolve the names of the current input selection to all 1:n related names, not just the first one like `resolveSelectionByName` does
+   * @returns {Promise<string[]>}
+   */
+  protected resolveMultipleSelectionsByName(idType = this.idType): Promise<string[][]> {
+    return resolveAllNames(this.selection.idtype, this.selection.range, idType);
+  }
+
+
+
+  setItemSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+    const current = this.itemSelections.get(name);
+    if (current && isSameSelection(current, selection)) {
       return;
     }
-    const bak = this.itemSelection;
-    const wasEmpty = bak == null || bak.idtype == null || bak.range.isNone;
-    this.itemSelection = selection;
+    const wasEmpty = current == null || current.idtype == null || current.range.isNone;
+    this.itemSelections.set(name, selection);
     // propagate
     if (selection.idtype) {
-      if (selection.range.isNone) {
-        selection.idtype.clear(defaultSelectionType);
+      if (name === DEFAULT_SELECTION_NAME) {
+        if (selection.range.isNone) {
+          selection.idtype.clear(defaultSelectionType);
+        } else {
+          selection.idtype.select(selection.range);
+        }
       } else {
-        selection.idtype.select(selection.range);
+        if (selection.range.isNone) {
+          selection.idtype.clear(name);
+        } else {
+          selection.idtype.select(name, selection.range);
+        }
       }
     }
     const isEmpty = selection == null || selection.idtype == null || selection.range.isNone;
     if (!(wasEmpty && isEmpty)) {
       // the selection has changed when we really have some new values not just another empty one
-      this.itemSelectionChanged();
+      this.itemSelectionChanged(name);
     }
-    this.fire(AView.EVENT_ITEM_SELECT, bak, selection);
+    this.fire(AView.EVENT_ITEM_SELECT, current, selection, name);
   }
 
   /**
    * hook when the item selection has changed
    */
-  protected itemSelectionChanged() {
+  protected itemSelectionChanged(_name: string = DEFAULT_SELECTION_NAME) {
     // hook
   }
 
-  getItemSelection() {
-    return this.itemSelection;
+  getItemSelection(name: string = DEFAULT_SELECTION_NAME) {
+    return this.itemSelections.get(name) || {idtype: null, range: none()};
   }
 
   modeChanged(mode: EViewMode) {

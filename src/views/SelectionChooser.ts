@@ -4,7 +4,14 @@ import {FormElementType, IFormElement, IFormElementDesc, IFormSelectElement, IFo
 import {ISelection} from './interfaces';
 
 export interface ISelectionChooserOptions {
+  /**
+   * Readable IDType the selection is being mapped to. If there is a 1:n mapping or in case of different readable and target IDTypes this IDType is used as the options group
+   */
   readableIDType: IDTypeLike;
+  /**
+   * In case of 1:n mappings between the selection's IDType and the readableIDType (or in case of different readable and target IDTypes) the readableSubOptionIDType can be used map the n options to readable names
+   */
+  readableTargetIDType: IDTypeLike;
   label: string;
   appendOriginalLabel: boolean;
   selectNewestByDefault: boolean;
@@ -17,17 +24,20 @@ export default class SelectionChooser {
 
   private static readonly INVALID_MAPPING = {
     name: 'Invalid',
-    id: -1
+    id: -1,
+    label: ''
   };
 
   private readonly target: IDType | null;
   private readonly readAble: IDType | null;
+  private readonly readableTargetIDType: IDType | null;
   readonly desc: IFormElementDesc;
   private readonly formID: string;
   private readonly options : Readonly<ISelectionChooserOptions> = {
     appendOriginalLabel: true,
     selectNewestByDefault: true,
     readableIDType: null,
+    readableTargetIDType: null,
     label: 'Show'
   };
   private currentOptions: IFormSelectOption[];
@@ -36,6 +46,7 @@ export default class SelectionChooser {
     Object.assign(this.options, options);
     this.target = targetIDType ? resolve(targetIDType) : null;
     this.readAble = options.readableIDType ? resolve(options.readableIDType) : null;
+    this.readableTargetIDType = options.readableTargetIDType ? resolve(options.readableTargetIDType) : null;
 
     this.formID = `forms.chooser.select.${this.target ? this.target.id : randomId(4)}`;
     this.desc = {
@@ -57,7 +68,7 @@ export default class SelectionChooser {
     return this.updateImpl(selection, true);
   }
 
-  chosen(): { id: number, name: string } | null {
+  chosen(): { id: number, name: string, label: string } | null {
     const s = this.accessor(this.formID).value;
     if (!s || s.data === SelectionChooser.INVALID_MAPPING) {
       return null;
@@ -65,7 +76,7 @@ export default class SelectionChooser {
     if (s.data) {
       return s.data;
     }
-    return {id: parseInt(s.id, 10), name: s.name};
+    return {id: parseInt(s.id, 10), name: s.name, label: s.name};
   }
 
   private async toItems(selection: ISelection): Promise<(IFormSelectOption|IFormSelectOptionGroup)[]> {
@@ -82,27 +93,39 @@ export default class SelectionChooser {
       return sourceIds.map((d, i) => ({
         value: String(d),
         name: labels[i],
-        data: {id: d, name: sourceNames[i]}
+        data: {id: d, name: sourceNames[i], label: labels[i]}
       }));
     }
 
     const targetIds = await source.mapToID(sourceIds, target);
-    const targetIdsFlat =  (<number[]>[]).concat(...targetIds);
+    const targetIdsFlat = (<number[]>[]).concat(...targetIds);
     const targetNames = await target.unmap(targetIdsFlat);
+
 
     if (target === readAble && targetIds.every((d) => d.length === 1)) {
       // keep it simple target = readable and single hit - so just show flat
       return targetIds.map((d, i) => ({
         value: String(d[0]),
         name: labels[i],
-        data: {id: d[0], name: targetNames[i]}
+        data: {id: d[0], name: targetNames[i], label: labels[i]}
       }));
     }
+
+    // in case of either 1:n mappings or when the target IDType and the readable IDType are different the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).
+    // the readableTargetIDType provides the possibility to add an extra IDType to map the actual options to instead of the target IDs
+    const readAbleSubOptions: string[] = [];
+    if (this.readableTargetIDType) {
+      const optionsIDs: string[] = await target.mapNameToFirstName(targetNames, this.readableTargetIDType);
+      readAbleSubOptions.push(...optionsIDs);
+    }
+
+    const subOptions = readAbleSubOptions && readAbleSubOptions.length > 0? readAbleSubOptions : targetNames;
 
     let acc = 0;
     const base = labels.map((name, i) => {
       const group = targetIds[i];
-      const groupNames = targetNames.slice(acc, acc + group.length);
+      const groupNames = subOptions.slice(acc, acc + group.length);
+      const originalTargetNames = targetNames.slice(acc, acc + group.length);
       acc += group.length;
 
       if (group.length === 0) {
@@ -119,11 +142,12 @@ export default class SelectionChooser {
       return <IFormSelectOptionGroup>{
         name,
         children: group.map((d, j) => ({
-          name: groupNames[j],
+          name: groupNames[j], // either the original ID of the target or the readableTargetID is shown as an option if the readableTargetIDType is available
           value: String(d),
           data: {
             id: d,
-            name: groupNames[j]
+            name: originalTargetNames[j], // this is the original ID from the target's idType to be used internally in the detail view
+            label: groupNames[j]
           }
         }))
       };
@@ -177,6 +201,15 @@ export default class SelectionChooser {
     element.setVisible(options.length > 1);
 
     return changed;
+  }
+
+  /**
+   * change the selected value programmatically
+   */
+  setSelection(value: any) {
+    const element = <IFormSelectElement>this.accessor(this.formID);
+
+    element.value = value;
   }
 
 }

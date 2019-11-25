@@ -57,12 +57,11 @@ export default class NamedSetList {
     if (!canWrite(namedSet)) {
       return;
     }
-    editDialog(namedSet, async (name, description, isPublic) => {
-      const params = {
+    editDialog(namedSet, async (name, description, sec) => {
+      const params = Object.assign({
         name,
-        description,
-        permissions: isPublic ? ALL_READ_READ : ALL_NONE_NONE
-      };
+        description
+      }, sec);
 
       const editedSet = await editNamedSet(namedSet.id, params);
       successfullySaved('Named Set', name);

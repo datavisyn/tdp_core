@@ -206,6 +206,21 @@ $lu_assets: '~lineupjs/src/assets';
       }
     }
 
+    .download-data-dropdown {
+      // show the number of selected rows after the element
+      li[data-num-selected-rows]::after {
+        content: ' (' attr(data-num-selected-rows) ')';
+        display: inline;
+      }
+
+      // hide the dropdown-header and the next list point (= download link), if no rows are selected
+      // note that this only works for a *single* link as after the header list item!
+      li[data-num-selected-rows='0'],
+      li[data-num-selected-rows='0'] + li {
+        display: none;
+      }
+    }
+
     &.collapsed {
       max-width: 3em;
       min-width: 0;
@@ -251,8 +266,8 @@ $lu_assets: '~lineupjs/src/assets';
 
         &.once::before {
           content: '';
-          top: -10px;
-          left: -15em;
+          top: -30px;
+          left: -20em;
           right: 0;
           bottom: -50vh;
           position: absolute;

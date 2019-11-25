@@ -1,7 +1,7 @@
 import logging
 import re
 from collections import OrderedDict
-from phovea_server.security import current_user
+from phovea_server.security import current_user, is_logged_in
 from .utils import clean_query
 
 __author__ = 'Samuel Gratzl'
@@ -10,12 +10,13 @@ REGEX_TYPE = type(re.compile(''))
 
 
 class ArgumentInfo(object):
-  def __init__(self, type=None, description='', example=None, as_list=False, is_id=None):
+  def __init__(self, type=None, description='', example=None, as_list=False, is_id=None, list_as_tuple=False):
     self.type = type
     self.description = description
     self.example = example
     self.as_list = as_list
     self.is_id = is_id
+    self.list_as_tuple = list_as_tuple
 
 
 class DBFilterData(object):
@@ -51,14 +52,12 @@ class DBView(object):
   def dump(self, name):
     from collections import OrderedDict
     r = OrderedDict(name=name, description=self.description, type=self.query_type)
-    if self.idtype:
-      r['idType'] = self.idtype
+    r['idType'] = self.idtype
     r['query'] = clean_query(self.query)
     args = [a for a in self.arguments]
     args.extend(self.replacements)
     r['arguments'] = args
-    if self.columns:
-      r['columns'] = self.columns.values()
+    r['columns'] = self.columns.values() if self.columns else []  # some views have no columns -> return empty array
     if self.filters:
       r['filters'] = self.filters.keys()
     if self.queries:
@@ -104,8 +103,18 @@ class DBView(object):
     v = self.valid_replacements[key]
     if isinstance(v, list):
       return value in v
-    if v == int or v == float:
-      return type(value) == v
+    if v == int:
+      try:
+        int(value)  # try to cast value to int
+        return True  # successful type cast
+      except ValueError:
+        return False
+    if v == float:
+      try:
+        float(value)  # try to cast value to float
+        return True  # successful type cast
+      except ValueError:
+        return False
     if isinstance(v, REGEX_TYPE):
       return v.match(value)
     _log.info(u'unknown %s %s %s', key, value, v)
@@ -117,13 +126,23 @@ class DBView(object):
   def get_argument_info(self, key):
     return self.argument_infos.get(key)
 
-  def can_access(self):
-    if self.security is None:
+  # TODO: improve the logic of this function, because even for unauthorized can_access returns True, i.e. that the user can access the resource. Somewhere else the server checks whether the user is authenticated or not
+  def can_access(self, check_default_security=False):
+    """
+    check whether a user can access a DBView (DBView.security is checked and can either be a boolean, a string (=group the user must belong to) or a function) or not.
+    :param check_default_security: bool (default = False); True if the security should be checked by default, e.g. although self.security is None, otherwise the function will return True
+    :return: bool
+    """
+    if self.security is None and check_default_security is False:
       return True
+    if isinstance(self.security, str):
+      role = unicode(self.security)
+      return current_user().has_role(role)
     if callable(self.security):
       return self.security(current_user())
-    role = unicode(self.security)
-    return current_user().has_role(role)
+    if isinstance(self.security, bool) and self.security is False:  # check if security is a boolean and if it's disabled, i.e. it's value is False
+      return True  # return that we're allowed to access the view, because its security is disabled
+    return is_logged_in()  # because security is not disabled check if the user is at least logged in
 
 
 class DBViewBuilder(object):
@@ -322,7 +341,7 @@ class DBViewBuilder(object):
       self.v.valid_replacements[replace] = valid_replacements
     return self
 
-  def arg(self, arg, type=None, description='', example=None, as_list=False, is_id=None):
+  def arg(self, arg, type=None, description='', example=None, as_list=False, is_id=None, list_as_tuple=False):
     """
     adds another argument of this query (using :arg) which will be replaced within SQL
     :param arg: the argument key
@@ -331,10 +350,11 @@ class DBViewBuilder(object):
     :param example: optional argument example
     :param as_list: optional whether the argument has to be a list
     :param is_id: optional whether the argument is an id argument, the value is the idtype required
+    :param list_as_tuple: optional whether the argument is a list but should be submitted as tuple (f.e. in oracle; especially for IN statements); use the key with ':' in the query
     :return: self
     """
     self.v.arguments.append(arg)
-    self.v.argument_infos[arg] = ArgumentInfo(type, description, example, as_list, is_id)
+    self.v.argument_infos[arg] = ArgumentInfo(type, description, example, as_list, is_id, list_as_tuple)
     return self
 
   def call(self, f=None):
@@ -517,3 +537,22 @@ class DBConnector(object):
   def dump(self, name):
     from collections import OrderedDict
     return OrderedDict(name=name, description=self.description)
+
+  def create_engine(self, config):
+    import sqlalchemy
+
+    engine_options = config.get('engine', default={})
+    engine = sqlalchemy.create_engine(self.dburl, **engine_options)
+    # Assuming that gevent monkey patched the builtin
+    # threading library, we're likely good to use
+    # SQLAlchemy's QueuePool, which is the default
+    # pool class.  However, we need to make it use
+    # threadlocal connections
+    # https://github.com/kljensen/async-flask-sqlalchemy-example/blob/master/server.py
+    engine.pool._use_threadlocal = True
+
+    return engine
+
+  def create_sessionmaker(self, engine):
+    from sqlalchemy.orm import sessionmaker
+    return sessionmaker(bind=engine)

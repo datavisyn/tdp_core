@@ -1,14 +1,14 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "homepage": "https://phovea.caleydo.org",
-  "version": "5.0.5-SNAPSHOT",
+  "version": "6.1.1-SNAPSHOT",
   "author": {
     "name": "datavisyn",
-    "email": "contact@caleydo.org",
-    "url": "https://caleydo.org"
+    "email": "contact@datavisyn.io",
+    "url": "https://www.datavisyn.io"
   },
   "license": "BSD-3-Clause",
+  "homepage": "https://www.datavisyn.io",
   "bugs": {
     "url": "https://github.com/datavisyn/tdp_core/issues"
   },
@@ -81,15 +81,15 @@
     "d3": "3.5.17",
     "d3.parsets": "git+https://github.com/jasondavies/d3-parsets.git#v1.2.4",
     "d3-grubert-boxplot": "gist:366430a0ac8e6e55ce09b040b5b493a6",
-    "lineupjs": "~3.1.7",
-    "phovea_clue": "~2.1.0",
+    "lineupjs": "github:lineupjs/lineupjs#develop",
+    "phovea_clue": "^2.2.0",
     "select2": "4.0.4",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "@types/jquery": "2.0.33",
     "jquery": "3.1.1",
     "touring": "github:caleydo/touring#master",
     "xxhashjs": "^0.2.2"
-    
+
   },
   "main": "build/tdp_core.js",
   "devDependencies": {
@@ -111,7 +111,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-webpack": "2.0.3",
     "mkdirp": "0.5.1",
-    "node-sass": "4.7.2",
+    "node-sass": "^4.12.0",
     "null-loader": "0.1.1",
     "raw-loader": "0.5.1",
     "sass-loader": "6.0.7",

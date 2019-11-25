@@ -12,6 +12,7 @@ import {ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem} from 
 import {IEvent, fire as globalFire} from 'phovea_core/src/event';
 import {DEFAULT_SUCCESS_AUTO_HIDE, pushNotification} from '../notifications';
 import {TemporarySessionList, PersistentSessionList} from '../SessionList';
+import {permissionForm} from './utils';
 
 declare const __DEBUG__;
 export const GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
@@ -26,7 +27,7 @@ export default class EditProvenanceGraphMenu {
   }
 
   updateGraphMetaData(graph: ProvenanceGraph) {
-    this.node.querySelector('a span').innerHTML = graph.desc.name;
+    this.node.querySelector('span.session-name').innerHTML = graph.desc.name;
     const syncIcon = this.node.querySelector('.sync-indicator');
     const persisted = isPersistent(graph.desc);
     const persistAction = (<HTMLLinkElement>this.node.querySelector('a[data-action="persist"]').parentElement);
@@ -67,17 +68,19 @@ export default class EditProvenanceGraphMenu {
 
     li.innerHTML = `
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><i class="fa fa-clock-o sync-indicator" aria-hidden="true"></i> <span>No Name</span></a>
+             aria-expanded="false"><i class="fa fa-folder-open-o" aria-hidden="true"></i> <i class="fa fa-save sync-indicator" aria-hidden="true"></i> <span>Analysis Session Management</span></a>
           <ul class="dropdown-menu">
+            <li class="dropdown-label"><i class="fa fa-clock-o" aria-hidden="true"></i> <span class="session-name">No Name</span></li>
+            <li class="divider"></li>
             <li><a href="#" data-action="edit" title="Edit Details"><i class="fa fa-edit" aria-hidden="true"></i> Edit Details</a></li>
             <li><a href="#" data-action="clone" title="Clone to Temporary Session"><i class="fa fa-clone" aria-hidden="true"></i> Clone to Temporary Session</a></li>
             <li class="divider"></li>
             <li><a href="#" data-action="open" title="Open Session"><i class="fa fa-folder-open-o" aria-hidden="true"></i> Open Existing Session</a></li>
-            <li><a href="#" data-action="persist" title="Save Session"><i class="fa fa-cloud" aria-hidden="true"></i> Save Session</a></li>
+            <li><a href="#" data-action="persist" title="Save Session"><i class="fa fa-save" aria-hidden="true"></i> Save Session</a></li>
             <li><a href="#" data-action="delete" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></li>
-            <li class="divider${__DEBUG__ ? '' : ' hidden'}"></li>
-            <li class="${__DEBUG__ ? '' : 'hidden'}"><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
-            <li class="${__DEBUG__ ? '' : 'hidden'}"><a href="#" data-action="export" title="Export Graph"><i class="fa fa-download" aria-hidden="true"></i> Export Session</a></li>
+            <li class="divider"></li>
+            <li><a href="#" data-action="import" title="Import Graph"><i class="fa fa-upload" aria-hidden="true"></i> Import Session</a></li>
+            <li><a href="#" data-action="export" title="Export Graph"><i class="fa fa-download" aria-hidden="true"></i> Export Session</a></li>
           </ul>`;
 
     (<HTMLLinkElement>li.querySelector('a[data-action="edit"]')).addEventListener('click', (event) => {
@@ -270,45 +273,37 @@ export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, 
   return lazyDialogModule().then(({FormDialog}) => {
     const dialog = new FormDialog(args.title, args.button);
     const prefix = 'd' + randomId();
+    const permissions = permissionForm(d, {
+      extra: `<div class="help-block">
+      Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.
+    </div>`
+    });
     dialog.form.innerHTML = `
-      <form>
-          <div class="form-group">
-            <label for="${prefix}_name">Name</label>
-            <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
-          </div>
-          <div class="form-group">
-            <label for="${prefix}_desc">Description</label>
-            <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
-          </div>
-          <div class="checkbox" ${!args.permission ? `style="display: none"` : ''}>
-            <label class="radio-inline">
-              <input type="radio" name="${prefix}_public" value="private" ${!isPublic(d) ? 'checked="checked"' : ''}> <i class="fa fa-user"></i> Private
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="${prefix}_public" id="${prefix}_public" value="public" ${isPublic(d) ? 'checked="checked"' : ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
-            </label>
-            <div class="help-block">
-              Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.
-            </div>
-          </div>
-          <div class="checkbox">
-            <label class="radio-inline">
-              <input type="checkbox" name="${prefix}_agree" required="required">
-              I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the <strong>'Open Existing Session'</strong> dialog.
-            </label>
-          </div>
-      </form>
+        <div class="form-group">
+          <label for="${prefix}_name">Name</label>
+          <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
+        </div>
+        <div class="form-group">
+          <label for="${prefix}_desc">Description</label>
+          <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
+        </div>
+        <div class="checkbox">
+          <label class="radio-inline">
+            <input type="checkbox" name="${prefix}_agree" required="required">
+            I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the <strong>'Open Existing Session'</strong> dialog.
+          </label>
+        </div>
     `;
+    dialog.form.lastElementChild!.insertAdjacentElement('beforebegin', permissions.node);
     return new Promise((resolve) => {
       dialog.onHide(() => {
         resolve(null);
       });
       dialog.onSubmit(() => {
-        const extras = {
+        const extras = Object.assign({
           name: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_name`)).value,
           description: (<HTMLTextAreaElement>dialog.body.querySelector(`#${prefix}_desc`)).value,
-          permissions: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_public`)).checked ? ALL_READ_READ : ALL_READ_NONE
-        };
+        }, args.permission ? permissions.resolve(new FormData(dialog.form)) : d.permissions);
         resolve(extras);
         dialog.hide();
         return false;

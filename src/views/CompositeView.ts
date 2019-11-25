@@ -469,9 +469,10 @@ export default class CompositeView extends EventHandler implements IView {
     const desc = (<ICompositeViewPluginDesc>this.context.desc);
 
     const toEntry = (desc: IElementDesc): Promise<ICompositeInfo> => {
+      const descOptions = desc.options || {};
       return Promise.resolve(desc.loader()).then((instance) => (<ICompositeInfo>{
         key: desc.key,
-        options: desc.options,
+        options: Object.assign({}, descOptions, this.options), // also pass the view options from the ViewWrapper to all views
         create: getFactoryMethod(instance, desc.factory || 'create')
       }));
     };

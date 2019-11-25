@@ -13,13 +13,13 @@ import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
-import {IRow} from '../rest';
+import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
-import {IServerColumn, IViewDescription} from '../rest';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import TouringPanel from './internal/Touring/TouringPanel';
 import {addLazyColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
+import {ISecureItem} from 'phovea_core/src/security';
 
 export {IRankingWrapper} from './internal/ranking';
 export {LocalDataProvider as DataProvider} from 'lineupjs';
@@ -58,15 +58,78 @@ export interface IARankingViewOptions {
    * @default true
    */
   enableOverviewMode: boolean | 'active';
+
   /**
    * enable zoom button
    * @default true
    */
   enableZoom: boolean;
 
+  /**
+   * enable download data button
+   * @default true
+   */
+  enableDownload: boolean;
+
+  /**
+   * enable save list of entities button
+   * @default true
+   */
+  enableSaveRanking: boolean;
+
+  /**
+   * enable collapsing button of side panel
+   * @default true
+   */
+  enableSidePanelCollapsing: boolean;
+
+  /**
+   * enable side panel
+   * @default 'collapsed'
+   */
   enableSidePanel: boolean | 'collapsed' | 'top';
 
+  /**
+   * enable add columns button
+   * @default true
+   */
   enableAddingColumns: boolean;
+
+  /**
+   * enable support columns in the add column dialog
+   * @default true
+   */
+  enableAddingSupportColumns: boolean;
+
+  /**
+   * enable combining columns in the add column dialog
+   * @default true
+   */
+  enableAddingCombiningColumns: boolean;
+
+  /**
+   * enable score columns in the add column dialog
+   * @default true
+   */
+  enableAddingScoreColumns: boolean;
+
+  /**
+   * enable previously created columns in the add column dialog
+   * @default true
+   */
+  enableAddingPreviousColumns: boolean;
+
+  /**
+   * enable database columns in the add column dialog
+   * @default true
+   */
+  enableAddingDatabaseColumns: boolean;
+
+  /**
+   * enable meta data score columns in the add column dialog
+   * @default true
+   */
+  enableAddingMetaDataColumns: boolean;
 
   enableHeaderSummary: boolean;
 
@@ -92,6 +155,7 @@ export interface IARankingViewOptions {
 
 /**
  * base class for views based on LineUp
+ * There is also AEmbeddedRanking to display simple rankings with LineUp.
  */
 export abstract class ARankingView extends AView {
 
@@ -143,8 +207,17 @@ export abstract class ARankingView extends AView {
     subType: {key: '', value: ''},
     enableOverviewMode: true,
     enableZoom: true,
+    enableDownload: true,
+    enableSaveRanking: true,
     enableAddingColumns: true,
     enableAddingColumnGrouping: false,
+    enableAddingSupportColumns: true,
+    enableAddingCombiningColumns: true,
+    enableAddingScoreColumns: true,
+    enableAddingPreviousColumns: true,
+    enableAddingDatabaseColumns: true,
+    enableAddingMetaDataColumns: true,
+    enableSidePanelCollapsing: true,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
     enableStripedBackground: false,
@@ -159,6 +232,17 @@ export abstract class ARankingView extends AView {
 
   private readonly selectionAdapter: ISelectionAdapter | null;
 
+  /**
+   * Creates a RankingView with the given selection.
+   * Can be wrapped with a ViewWrapper.
+   *
+   * @remarks You need to call init() to actually display the Ranking View.
+   *
+   * @param context with provenance graph to store the executed operations
+   * @param selection The Ids and IdType of the selection
+   * @param parent where to put the ranking view
+   * @param options to configure the ranking view
+   */
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent);
 
@@ -178,6 +262,8 @@ export abstract class ARankingView extends AView {
 
     this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
+    // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
+    // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
     this.context.ref.value.data = this.provider;
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
@@ -208,8 +294,8 @@ export abstract class ARankingView extends AView {
     }));
 
     this.panel = new TouringPanel(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, isPublic: boolean) => {
-      this.saveNamedSet(order, name, description, isPublic);
+    this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
+      this.saveNamedSet(order, name, description, sec);
     });
     this.panel.on(LineUpPanelActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {
       this.addScoreColumn(scoreImpl);
@@ -246,8 +332,12 @@ export abstract class ARankingView extends AView {
     this.selectionAdapter = this.createSelectionAdapter();
   }
 
+  /**
+   * @param params Seperate element that displays the "Showing x of y ..." message
+   * @param onParameterChange eventlistener for content changes
+   */
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    return resolveImmediately(super.init(params, onParameterChange)).then(() => {
+    return super.init(params, onParameterChange).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
       base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
@@ -379,32 +469,53 @@ export abstract class ARankingView extends AView {
   }
 
 
-  private async saveNamedSet(order: number[], name: string, description: string, isPublic: boolean = false) {
+  private async saveNamedSet(order: number[], name: string, description: string, sec: Partial<ISecureItem>) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
-    const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, isPublic);
+    const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
     successfullySaved('List of Entities', name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): {col: Column, loaded: Promise<Column>} {
-    colDesc.color = colDesc.color? colDesc.color : this.colors.getColumnColor(id);
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number) {
+    // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
+    colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
       this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
     });
   }
 
-  private addScoreColumn(score: IScore<any>) {
+  private addScoreColumn(score: IScore<any>, position?: number) {
     const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
 
     const colDesc = score.createDesc(args);
-    // flag that it is a score
+    // flag that it is a score but it also a reload function
     colDesc._score = true;
 
     const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
-
     const data = score.compute(ids, this.itemIDType, args);
-    return this.addColumn(colDesc, data);
+
+    const r = this.addColumn(colDesc, data, -1, position);
+
+    // use _score function to reload the score
+    colDesc._score = () => {
+      const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+      const data = score.compute(ids, this.itemIDType, args);
+      return r.reload(data);
+    };
+    return r;
+  }
+
+  protected reloadScores(visibleOnly = false) {
+    let scores: {_score: () => any}[] = <any[]>this.provider.getColumns().filter((d) => typeof (<any>d)._score === 'function');
+
+    if (visibleOnly) {
+      // check if part of any ranking
+      const usedDescs = new Set([].concat(...this.provider.getRankings().map((d) => d.flatColumns.map((d) => d.desc))));
+      scores = scores.filter((d) => usedDescs.has(d));
+    }
+
+    return Promise.all(scores.map((d) => d._score()));
   }
 
   protected async withoutTracking<T>(f: () => T): Promise<T> {
@@ -416,8 +527,8 @@ export abstract class ARankingView extends AView {
    * @param {IScore<any>} score
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
-  addTrackedScoreColumn(score: IScore<any>) {
-    return this.withoutTracking(() => this.addScoreColumn(score));
+  addTrackedScoreColumn(score: IScore<any>, position?: number) {
+    return this.withoutTracking(() => this.addScoreColumn(score, position));
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
@@ -440,7 +551,7 @@ export abstract class ARankingView extends AView {
    * load the table description from the server
    * @returns {Promise<IViewDescription>} the column descriptions
    */
-  protected abstract loadColumnDesc(): Promise<IViewDescription>;
+  protected abstract loadColumnDesc(): Promise<IServerColumnDesc>;
 
   /**
    * load the rows of LineUp
@@ -486,7 +597,6 @@ export abstract class ARankingView extends AView {
       this.createInitialRanking(this.provider);
       const ranking = this.provider.getLastRanking();
       this.customizeRanking(wrapRanking(this.provider, ranking));
-      this.colors.init(ranking);
     }).then(() => {
       if (this.selectionAdapter) {
         // init first time

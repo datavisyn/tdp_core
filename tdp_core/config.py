@@ -1,4 +1,4 @@
-from phovea_server.ns import Namespace
+from phovea_server.ns import Namespace, abort
 from phovea_server.util import jsonify
 from phovea_server.config import get as get_config
 from phovea_server.plugin import list as list_plugins
@@ -14,8 +14,10 @@ def _config(path):
   key = path[0]
 
   plugin = next((p for p in list_plugins('tdp-config-safe-keys') if p.id == key), None)
-  if not plugin:
-    return 404, 'key not found'
+
+  if plugin is None:
+    _log.error('404: config key "{}" not found'.format(key))
+    abort(404, u'config key "{}" not found'.format(key))
 
   path[0] = plugin.configKey
   return jsonify(get_config('.'.join(path)))

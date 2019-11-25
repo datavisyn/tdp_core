@@ -3,6 +3,14 @@ import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
 import {json2xlsx} from '../../internal/xlsx';
 
+function isDateColumn(column: Column) {
+  return column.desc.type === 'date';
+}
+
+function getColumnName(column: Column) {
+  return column.label + (column.description ? '\n' + column.description : '');
+}
+
 export function exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
   //optionally quote not numbers
   const escape = new RegExp(`["]`, 'g');
@@ -22,7 +30,7 @@ export function exportRanking(columns: Column[], rows: IDataRow[], separator: st
   }
 
   const r: string[] = [];
-  r.push(columns.map((d) => quote(`${d.label}${d.description ? `\n${d.description}` : ''}`)).join(separator));
+  r.push(columns.map((d) => quote(getColumnName(d))).join(separator));
   rows.forEach((row) => {
     r.push(columns.map((c) => quote(c.getExportValue(row, 'text'), c)).join(separator));
   });
@@ -33,7 +41,7 @@ export function exportJSON(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getExportValue(row, 'json');
+      r[getColumnName(col)] = isNumberColumn(col) ? col.getRawNumber(row) : col.getExportValue(row, 'json');
     }
     return r;
   });
@@ -44,14 +52,14 @@ export function exportxlsx(columns: Column[], rows: IDataRow[]) {
   const converted = rows.map((row) => {
     const r: any = {};
     for (const col of columns) {
-      r[col.label] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+      r[getColumnName(col)] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
     }
     return r;
   });
   return json2xlsx({
     sheets: [{
       title: 'LineUp',
-      columns: columns.map((d) => ({name: d.label, type: <'float'|'string'>(isNumberColumn(d) ? 'float' : 'string')})),
+      columns: columns.map((d) => ({name: getColumnName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
       rows: converted
     }]
   });
@@ -78,9 +86,9 @@ function toBlob(content: string, mimeType: string) {
 function convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportType, name: string) {
   const rows = provider.viewRawRows(order);
 
-  const separators = {csv : ',', tsv: '\t', ssv: ';'};
+  const separators = {csv: ',', tsv: '\t', ssv: ';'};
   let content: Promise<Blob> | Blob;
-  const mimeTypes = {csv : 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+  const mimeTypes = {csv: 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
   const mimeType = mimeTypes[type];
   if (type in separators) {
     content = toBlob(exportRanking(columns, rows, separators[type]), mimeType);
@@ -119,7 +127,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
         <label>Columns</label>
         ${flat.map((col) => `
           <div class="checkbox tdp-ranking-export-form-handle">
-          <span class=" fa fa-sort"></span>
+          <span class="fa fa-sort"></span>
           <label>
             <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
             ${col.label}
@@ -159,7 +167,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
 
         const rows = data.get('rows').toString();
         let order: number[];
-        switch(rows) {
+        switch (rows) {
           case 'selected':
             order = provider.getSelection();
             break;
@@ -192,7 +200,7 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
   });
 }
 
-function resortAble(base: HTMLElement, elementSelector: string) {
+export function resortAble(base: HTMLElement, elementSelector: string) {
   const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
 
   const enable = (item: HTMLElement) => {

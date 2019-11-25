@@ -49,18 +49,20 @@ def resolve_engine(database):
   return configs.engine(database)
 
 
-def resolve_view(database, view_name):
+def resolve_view(database, view_name, check_default_security=False):
   """
   finds and return the connector, engine, and view for the given database and view_name
   :param database: database key to lookup
   :param view_name: view name to lookup
+  :param check_default_security: bool; usually view.can_access returns True when no security is defined on the view. This parameter can be used to tell the method that it should check the security anyway, e.g. that the user is at least logged in
   :return: (connector, engine, view)
   """
   connector, engine = resolve(database)
   if view_name not in connector.views:
     abort(404, u'view with id "{}" cannot be found in database "{}"'.format(view_name, database))
   view = connector.views[view_name]
-  if not view.can_access():
+  # TODO: improve the logic of the view.can_access function, because even for unauthorized can_access returns True, i.e. that the user can access the resource. Somewhere else the server checks whether the user is authenticated or not
+  if not view.can_access(check_default_security):
     abort(403)
   return connector, engine, view
 
@@ -257,6 +259,8 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
 
   # convert to index lookup
   kwargs = {}
+  replace = {}
+
   if view.arguments is not None:
     for arg in view.arguments:
       info = view.get_argument_info(arg)
@@ -264,7 +268,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       if lookup_key not in arguments:
         if (arg + u'[]') in arguments:
           lookup_key = (arg + u'[]')
-        else:
+        elif not info or not info.list_as_tuple:
           _log.warn(u'missing argument "%s": "%s"', view.query, arg)
           abort(400, u'missing argument: ' + arg)
       parser = info.type if info and info.type is not None else lambda x: x
@@ -272,6 +276,24 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
         if info and info.as_list:
           vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
           value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
+        elif info and info.list_as_tuple:
+          vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
+          if len(vs) == 0:
+            value = "(1, null)"
+          else:
+            if(str(vs[0]).isdigit() and (info.type is None or info.type == int)):
+              value = u'(1,%s)' % '),(1,'.join(vs)
+            else:
+              value = u'(1,\'%s\')' % '\'),(1,\''.join(vs)
+          if(view.query):
+            # HACK: this hack allows us to inject arguments (DBViewBuilder.args) into the query (like the replacements) but at the same time use the list_as_tuple option
+            # We'll replace the query's argument with a placeholder, which is then used as a replacement, i.e. replaced via str.format(...)
+            magic_placeholder = "magic_list_as_tuple_replacement"
+            replace[magic_placeholder] = value
+            view.query = view.query.replace(":" + lookup_key, "{" + magic_placeholder + "}")
+          else:
+            kwargs[arg] = value
+          continue
         else:
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
@@ -281,7 +303,6 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
   if extra_sql_argument is not None:
     kwargs.update(extra_sql_argument)
 
-  replace = {}
   if view.replacements is not None:
     for arg in view.replacements:
       fallback = arguments.get(arg, '')
@@ -344,7 +365,11 @@ def get_filtered_data(database, view_name, args):
   config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  try:
+    replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  except RuntimeError as error:
+    abort(400, error.message)
+
   return get_data(database, view_name, replacements, processed_args, extra_args, where_clause)
 
 
@@ -352,14 +377,21 @@ def get_filtered_query(database, view_name, args):
   config, _, view = resolve_view(database, view_name)
   # convert to index lookup
   # row id start with 1
-  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  try:
+    replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  except RuntimeError as error:
+    abort(400, error.message)
+
   return get_query(database, view_name, replacements, processed_args, extra_args)
 
 
 def _get_count(database, view_name, args):
   config, engine, view = resolve_view(database, view_name)
 
-  replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  try:
+    replacements, processed_args, extra_args, where_clause = filter_logic(view, args)
+  except RuntimeError as error:
+    abort(400, error.message)
 
   kwargs, replace = prepare_arguments(view, config, replacements, processed_args, extra_args)
 

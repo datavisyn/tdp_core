@@ -11,7 +11,7 @@
 
 import {EventHandler} from 'phovea_core/src/event';
 import {IViewProvider} from '../lineup/internal/scorecmds';
-import {ISelection, IView, IViewContext, IViewPluginDesc} from '../extensions';
+import {ISelection, IView, IViewContext, IViewPluginDesc, DEFAULT_SELECTION_NAME} from '../extensions';
 import ObjectNode, {cat, ref} from 'phovea_core/src/provenance/ObjectNode';
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {canAccess} from '../views/findViews';
@@ -46,17 +46,20 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
    */
   private context: IViewContext;
 
-  private listenerItemSelect = (_event: any, oldSelection: ISelection, newSelection: ISelection) => {
-    this.fire(AView.EVENT_ITEM_SELECT, oldSelection, newSelection);
+  private listenerItemSelect = (_event: any, oldSelection: ISelection, newSelection: ISelection, name: string = DEFAULT_SELECTION_NAME) => {
+    this.fire(AView.EVENT_ITEM_SELECT, oldSelection, newSelection, name);
   }
 
   // caches before the instance exists but things are set
-  private preInstanceItemSelection: ISelection = {idtype: null, range: none()};
-  private preInstanceParameter = new Map<string, any>();
-  private selection: ISelection;
+  private readonly preInstanceItemSelections = new Map<string, ISelection>();
+  private readonly preInstanceParameter = new Map<string, any>();
+  private readonly inputSelections = new Map<string, ISelection>();
 
   constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document, private readonly viewOptionGenerator: () => any = () => ({})) {
     super();
+
+    this.preInstanceItemSelections.set(DEFAULT_SELECTION_NAME, {idtype: null, range: none()});
+
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
     this.allowed = canAccess(plugin);
@@ -74,7 +77,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     this.node.classList.toggle('not-allowed', !this.allowed);
 
     if (plugin.helpText) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -86,9 +89,13 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
         });
       });
     } else if (plugin.helpUrl) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+      if (typeof plugin.helpUrl === 'string') {
+        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="Show help of this view"><span aria-hidden="true">Show Help</span></a>`);
+      } else { // object version of helpUrl
+        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
+      }
     } else if (plugin.helpTourId) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" class="view-help" title="Show help tour of this view"><span aria-hidden="true">Show Help Tour</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="Show help tour of this view"><span aria-hidden="true">Show Help Tour</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -96,7 +103,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
           plugin,
           node: this.node,
           instance: this.instance,
-          selection: this.selection
+          selection: this.inputSelections.get(DEFAULT_SELECTION_NAME)
         });
       });
     }
@@ -112,9 +119,10 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   set visible(visible: boolean) {
-    if (visible && this.instance == null && this.selection && this.match(this.selection)) {
+    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+    if (visible && this.instance == null && selection && this.match(selection)) {
       //lazy init
-      this.createView(this.selection);
+      this.createView(selection);
     }
     if (visible) {
       this.node.classList.remove('hidden');
@@ -153,10 +161,17 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
       this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
       return this.instancePromise = resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
+        this.inputSelections.forEach((v, k) => {
+          if (k !== DEFAULT_SELECTION_NAME) { // already handled
+            this.instance.setInputSelection(v, k);
+          }
+        });
+
         const idType = this.instance.itemIDType;
         if (idType) {
-          if (this.preInstanceItemSelection.idtype) {
-            this.instance.setItemSelection(this.preInstanceItemSelection);
+          const selection = this.preInstanceItemSelections.get(DEFAULT_SELECTION_NAME);
+          if (selection.idtype) {
+            this.instance.setItemSelection(selection);
           } else {
             this.instance.setItemSelection({
               idtype: idType,
@@ -164,6 +179,13 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
             });
           }
         }
+
+        this.preInstanceItemSelections.forEach((v, k) => {
+          if (k !== DEFAULT_SELECTION_NAME) { // already handed
+            this.instance.setItemSelection(v, k);
+          }
+        });
+
         this.instance.on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
 
         this.preInstanceParameter.forEach((value, key) => {
@@ -187,15 +209,17 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   matchesIDType(idType: IDType) {
-    if (this.selection) {
-      return this.selection.idtype === idType;
+    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+    if (selection) {
+      return selection.idtype === idType;
     }
     const p = this.plugin;
     return (p.idtype ? new RegExp(p.idtype) : /.*/).test(idType.id);
   }
 
   get idType() {
-    return this.selection && this.selection.idtype ? this.selection.idtype : guessIDType(this.plugin); // TODO
+    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+    return selection && selection.idtype ? selection.idtype : guessIDType(this.plugin); // TODO: better IDType strategy than guessIDType?
   }
 
   private destroyInstance() {
@@ -235,27 +259,37 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     return null;
   }
 
+  /**
+   * @deprecated use setInputSelection instead
+   */
   setParameterSelection(selection?: ISelection) {
-    if (isSameSelection(this.selection, selection)) {
+    return this.setInputSelection(selection);
+  }
+
+  setInputSelection(selection?: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+    const current = this.inputSelections.get(name);
+    const isDefault = name === DEFAULT_SELECTION_NAME;
+
+    if (isSameSelection(current, selection)) {
       return;
     }
-    this.selection = selection;
-    if (selection) {
+    this.inputSelections.set(name, selection);
+    if (selection && isDefault) {
       this.node.dataset.idtype = selection.idtype.id;
     }
-    const matches = selection && this.match(selection);
+    const matches = selection && (!isDefault || this.match(selection));
     this.node.classList.toggle('disabled-view', !this.allowed || !matches);
 
     if (this.instance) {
       if (matches) {
-        return this.instance.setInputSelection(selection);
+        return this.instance.setInputSelection(selection, name);
       } else {
         this.destroyInstance();
       }
     } else if (this.instancePromise) {
       return this.instancePromise.then(() => {
         if (matches) {
-          return this.instance.setInputSelection(selection);
+          return this.instance.setInputSelection(selection, name);
         } else {
           this.destroyInstance();
         }
@@ -269,31 +303,38 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     return matchLength(this.plugin.selection, selection.range.dim(0).length);
   }
 
+  /**
+   * @deprecated use getInputSelection instead
+   */
   getParameterSelection() {
-    return this.selection;
+    return this.getInputSelection();
+  }
+
+  getInputSelection(name: string = DEFAULT_SELECTION_NAME) {
+    return this.inputSelections.get(name);
   }
 
   get itemIDType(): IDType | null {
     return this.instance ? this.instance.itemIDType : null;
   }
 
-  getItemSelection(): ISelection {
+  getItemSelection(name: string = DEFAULT_SELECTION_NAME): ISelection {
     if (this.instance) {
-      return this.instance.getItemSelection();
+      return this.instance.getItemSelection(name);
     }
-    return this.preInstanceItemSelection;
+    return this.preInstanceItemSelections.get(name);
   }
 
-  setItemSelection(sel: ISelection) {
+  setItemSelection(sel: ISelection, name: string = DEFAULT_SELECTION_NAME) {
     if (this.instance) {
       this.instancePromise.then((v) => {
         v.off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
-        v.setItemSelection(sel);
+        v.setItemSelection(sel, name);
         v.on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
       });
       return;
     }
-    this.preInstanceItemSelection = sel;
+    this.preInstanceItemSelections.set(name, sel);
   }
 
   update() {
