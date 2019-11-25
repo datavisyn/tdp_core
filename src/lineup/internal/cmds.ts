@@ -14,6 +14,7 @@ enum LineUpTrackAndUntrackActions {
   filter = 'filter',
   rendererType = 'rendererType',
   groupRenderer = 'groupRenderer',
+  summaryRenderer = 'summaryRenderer',
   sortMethod = 'sortMethod',
   ChangedFilter = 'Changed.filter',
   width = 'width',
@@ -366,6 +367,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.filter);
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.rendererType);
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.groupRenderer);
+  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.summaryRenderer);
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.sortMethod);
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
@@ -433,7 +435,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
 
 
 function untrackColumn(col: Column) {
-  col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
+  col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);

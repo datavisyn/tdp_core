@@ -19,6 +19,7 @@ export default class OverviewColumn extends BooleanColumn {
     }));
     this.setDefaultRenderer('boolean');
     this.setDefaultGroupRenderer('boolean');
+    this.setDefaultSummaryRenderer('categorical');
     this.setWidthImpl(0); // hide
   }
 
