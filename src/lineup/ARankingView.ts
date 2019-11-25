@@ -8,7 +8,7 @@ import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
-import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
+import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions, IColumnOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
