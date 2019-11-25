@@ -17,10 +17,10 @@ export default class OverviewColumn extends BooleanColumn {
     super(id, Object.assign(desc, {
       label: 'Overview Selection'
     }));
-    this.setDefaultRenderer('boolean');
-    this.setDefaultGroupRenderer('boolean');
-    this.setDefaultSummaryRenderer('categorical');
-    this.setWidthImpl(0); // hide
+    (<Column>this).setDefaultRenderer('boolean');
+    (<Column>this).setDefaultGroupRenderer('boolean');
+    (<Column>this).setDefaultSummaryRenderer('categorical');
+    (<Column>this).setWidthImpl(0); // hide
   }
 
   getValue(row: IDataRow) {
@@ -29,7 +29,7 @@ export default class OverviewColumn extends BooleanColumn {
 
   setOverview(rows?: any[], name = 'Focus') {
     this.currentOverview = {name, rows};
-    this.fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, this.overviewSelection = new Set<any>(rows || []));
+    (<Column>this).fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, this.overviewSelection = new Set<any>(rows || []));
   }
 
   getOverview() {
