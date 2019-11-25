@@ -574,9 +574,9 @@ export abstract class ARankingView extends AView {
       const cols = this.getColumnDescs(columns);
       // compatibility since visible is now a supported feature, so rename ones
       for (const col of cols) {
-        if (col.visible != null) {
-          (<any>col).initialColumn = col.visible;
-          delete col.visible;
+        if ((<IColumnOptions>col).visible != null) {
+          (<any>col).initialColumn = (<IColumnOptions>col).visible;
+          delete (<IColumnOptions>col).visible;
         }
       }
       deriveColors(cols);
