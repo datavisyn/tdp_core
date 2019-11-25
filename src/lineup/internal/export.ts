@@ -75,7 +75,7 @@ export function exportLogic(type: 'custom' | ExportType, onlySelected: boolean, 
     const ranking = provider.getFirstRanking();
     const order = onlySelected ? provider.getSelection() : ranking!.getOrder();
     const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
-    return Promise.resolve(convertRanking(<number[]>provider, order, columns, type, ranking.getLabel()));
+    return Promise.resolve(convertRanking(provider, order, columns, type, ranking.getLabel()));
   }
 }
 
