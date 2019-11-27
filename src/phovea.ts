@@ -3,7 +3,7 @@
  * Copyright (c) The Caleydo Team. All rights reserved.
  * Licensed under the new BSD license, available at http://caleydo.org/license
  **************************************************************************** */
-import {IRegistry} from 'phovea_core/src/plugin';
+import {IRegistry, asResource} from 'phovea_core/src/plugin';
 import {FormElementType} from './form';
 import {EP_TDP_CORE_FORM_ELEMENT} from './extensions';
 
@@ -114,14 +114,8 @@ export default function (registry: IRegistry) {
   formElements(FormElementType.RADIO, () => System.import('./form/elements/FormRadio'));
 
   registry.push('epPhoveaCoreLocale', 'phoveaCoreLocaleEN', function () {
-    return System.import('./assets/locales/en/tdp.json').then(function (json) {
-      return {
-        create: () => json
-      };
-    });
+    return System.import('./assets/locales/en/tdp.json').then(asResource);
   }, {
-    order: 0,
     ns: 'tdp',
-    lng: 'en'
   });
 }
