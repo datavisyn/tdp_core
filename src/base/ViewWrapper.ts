@@ -24,7 +24,7 @@ import {none} from 'phovea_core/src/range';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {setParameter} from '../internal/cmds';
 import {startViewTour} from '../tour/extensions';
-import i18next from 'phovea_core/src/i18n';
+import i18n from 'phovea_core/src/i18n';
 
 
 export default class ViewWrapper extends EventHandler implements IViewProvider {
@@ -78,12 +78,12 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     this.node.classList.toggle('not-allowed', !this.allowed);
 
     if (plugin.helpText) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18n.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
         lazyDialogModule().then((dialogs) => {
-          const d = dialogs.generateDialog(plugin.name, i18next.t('tdp:core.ViewWrapper.close'));
+          const d = dialogs.generateDialog(plugin.name, i18n.t('tdp:core.ViewWrapper.close'));
           d.body.innerHTML = plugin.helpText;
           d.show();
           d.hideOnSubmit();
@@ -91,12 +91,12 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
       });
     } else if (plugin.helpUrl) {
       if (typeof plugin.helpUrl === 'string') {
-        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
+        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="${i18n.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
       } else { // object version of helpUrl
         this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
       }
     } else if (plugin.helpTourId) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18next.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span aria-hidden="true">${i18next.t('tdp:core.ViewWrapper.showHelpTour')}</span></a>`);
+      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${i18n.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span aria-hidden="true">${i18n.t('tdp:core.ViewWrapper.showHelpTour')}</span></a>`);
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -356,22 +356,22 @@ function selectionText(selection: any, idType: string) {
     case '':
     case 'none':
     case '0':
-      return i18next.t('tdp:core.ViewWrapper.selectionTextNone', {label});
+      return i18n.t('tdp:core.ViewWrapper.selectionTextNone', {label});
     case 'any':
-      return i18next.t('tdp:core.ViewWrapper.selectionTextAny', {label});
+      return i18n.t('tdp:core.ViewWrapper.selectionTextAny', {label});
     case 'single':
     case '1':
-      return i18next.t('tdp:core.ViewWrapper.selectionTextOne', {label});
+      return i18n.t('tdp:core.ViewWrapper.selectionTextOne', {label});
     case 'small_multiple':
     case 'multiple':
     case 'some':
     case 'chooser':
-      return i18next.t('tdp:core.ViewWrapper.selectionTextMultiple', {label});
+      return i18n.t('tdp:core.ViewWrapper.selectionTextMultiple', {label});
     case '2':
-      return i18next.t('tdp:core.ViewWrapper.selectionTextTwo', {label});
+      return i18n.t('tdp:core.ViewWrapper.selectionTextTwo', {label});
     default:
       console.error('unknown selector: ', selection, idType);
-      return i18next.t('tdp:core.ViewWrapper.selectionTextDefault', {selection});
+      return i18n.t('tdp:core.ViewWrapper.selectionTextDefault', {selection});
   }
 }
 

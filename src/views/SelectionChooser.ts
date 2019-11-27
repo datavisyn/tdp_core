@@ -2,7 +2,7 @@ import {randomId} from 'phovea_core/src';
 import {IDType, IDTypeLike, resolve} from 'phovea_core/src/idtype';
 import {FormElementType, IFormElement, IFormElementDesc, IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption} from '../form';
 import {ISelection} from './interfaces';
-import i18next from 'phovea_core/src/i18n';
+import i18n from 'phovea_core/src/i18n';
 
 export interface ISelectionChooserOptions {
   /**
@@ -134,7 +134,7 @@ export default class SelectionChooser {
         return <IFormSelectOptionGroup>{
           name,
           children: [{
-            name: i18next.t('tdp:core.views.formSelectName'),
+            name: i18n.t('tdp:core.views.formSelectName'),
             value: '',
             data: SelectionChooser.INVALID_MAPPING
           }]

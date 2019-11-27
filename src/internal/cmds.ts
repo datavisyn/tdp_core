@@ -5,7 +5,7 @@
 import {IObjectRef, ProvenanceGraph, action, meta, op, cat, ActionNode} from 'phovea_core/src/provenance';
 import * as session from 'phovea_core/src/session';
 import {lastOnly} from 'phovea_clue/src/compress';
-import i18next from 'phovea_core/src/i18n';
+import i18n from 'phovea_core/src/i18n';
 
 //old name
 export const CMD_INIT_SESSION = 'tdpInitSession';
@@ -33,7 +33,7 @@ export function initSessionImpl(_inputs: IObjectRef<any>[], parameters: object) 
 }
 
 export function initSession(map: object) {
-  return action(meta(i18next.t('tdp:core.initializeSession'), cat.custom, op.update), CMD_INIT_SESSION, initSessionImpl, [], map);
+  return action(meta(i18n.t('tdp:core.initializeSession'), cat.custom, op.update), CMD_INIT_SESSION, initSessionImpl, [], map);
 }
 
 export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, graph: ProvenanceGraph) {
@@ -50,7 +50,7 @@ export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, gra
 
 export function setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any) {
   //assert view
-  return action(meta(i18next.t('tdp:core.setParameter', {name}), cat.visual, op.update), CMD_SET_PARAMETER, setParameterImpl, [view], {
+  return action(meta(i18n.t('tdp:core.setParameter', {name}), cat.visual, op.update), CMD_SET_PARAMETER, setParameterImpl, [view], {
     name,
     value,
     previousValue

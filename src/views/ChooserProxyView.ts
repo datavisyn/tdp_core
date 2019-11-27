@@ -2,7 +2,7 @@ import AView from './AView';
 import {IViewContext, ISelection} from './interfaces';
 import {getProxyUrl} from '../rest';
 import SelectionChooser, {ISelectionChooserOptions} from './SelectionChooser';
-import i18next from 'phovea_core/src/i18n';
+import i18n from 'phovea_core/src/i18n';
 
 export interface IProxyViewOptions extends Partial<ISelectionChooserOptions> {
   /**
@@ -117,8 +117,8 @@ export default class ChooserProxyView extends AView {
 
     const selectedItemId = this.chooser.chosen();
     if (selectedItemId == null) {
-      const to = this.options.idtype ? i18next.t('tdp:core.views.toOption', {id: this.options.idtype}) : '';
-      this.setNoMappingFoundHint(true, i18next.t('tdp:core.views.noMappingFound', {name: to}));
+      const to = this.options.idtype ? i18n.t('tdp:core.views.toOption', {id: this.options.idtype}) : '';
+      this.setNoMappingFoundHint(true, i18n.t('tdp:core.views.noMappingFound', {name: to}));
       return;
     }
 
@@ -135,12 +135,12 @@ export default class ChooserProxyView extends AView {
     if (this.options.openExternally) {
       this.setBusy(false);
       this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-     ${i18next.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${i18next.t('tdp:core.views.openExternally', {name: this.options.name ? this.options.name : '$t(tdp:core.views.externalApplication)'})}</a>
-     ${i18next.t('tdp:core.views.newTab')}</div></p>`;
+     ${i18n.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${i18n.t('tdp:core.views.openExternally', {name: this.options.name ? this.options.name : '$t(tdp:core.views.externalApplication)'})}</a>
+     ${i18n.t('tdp:core.views.newTab')}</div></p>`;
       return;
     }
 
-    this.openExternally.innerHTML = `${i18next.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
 
     const iframe = this.node.ownerDocument.createElement('iframe');
     iframe.src = url;
@@ -153,7 +153,7 @@ export default class ChooserProxyView extends AView {
 
   protected showErrorMessage() {
     this.setBusy(false);
-    this.node.innerHTML = `<p>${i18next.t('tdp:core.views.screwed')}</p>`;
+    this.node.innerHTML = `<p>${i18n.t('tdp:core.views.screwed')}</p>`;
     this.openExternally.innerHTML = ``;
     this.fire(ChooserProxyView.EVENT_LOADING_FINISHED);
   }
@@ -169,8 +169,8 @@ export default class ChooserProxyView extends AView {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.node.innerHTML = `
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18next.t('tdp:core.views.noHttpsMessagePart1')}
-    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18next.t('tdp:core.views.link')}</a> ${i18next.t('tdp:core.views.noHttpsMessagePart2')}
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
        <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
    </div></p><p></p>`;
     this.openExternally.innerHTML = ``;

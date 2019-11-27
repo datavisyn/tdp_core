@@ -4,7 +4,7 @@
 
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui/src/dialogs';
-import i18next from 'phovea_core/src/i18n';
+import i18n from 'phovea_core/src/i18n';
 
 export {setGlobalErrorTemplate} from 'phovea_ui/src/errors';
 
@@ -29,23 +29,23 @@ export function lazyDialogModule(): Promise<IDialogModule> {
  */
 export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses: string = '') {
   lazyDialogModule().then(({generateDialog}) => {
-    const dialog = generateDialog(i18next.t('tdp:core.sessionNotFound'), i18next.t('tdp:core.newSession'), additionalCSSClasses);
+    const dialog = generateDialog(i18n.t('tdp:core.sessionNotFound'), i18n.t('tdp:core.newSession'), additionalCSSClasses);
     // append bg-danger to the dialog parent element
     dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
     dialog.body.innerHTML = `
         <p>
-           ${i18next.t('tdp:core.notAccessibleMessage', {id})}
+           ${i18n.t('tdp:core.notAccessibleMessage', {id})}
         </p>
         <p>
-        ${i18next.t('tdp:core.possibleReasons')}
+        ${i18n.t('tdp:core.possibleReasons')}
         <ul>
-            <li>${i18next.t('tdp:core.possibleReason1')}</li>
-            <li>${i18next.t('tdp:core.possibleReason2')}</li>
-            <li>${i18next.t('tdp:core.possibleReason3')}</li>
+            <li>${i18n.t('tdp:core.possibleReason1')}</li>
+            <li>${i18n.t('tdp:core.possibleReason2')}</li>
+            <li>${i18n.t('tdp:core.possibleReason3')}</li>
         </ul>
         </p>
         <p>
-          ${i18next.t('tdp:core.contactOwnerMessage')}
+          ${i18n.t('tdp:core.contactOwnerMessage')}
         </p>`;
     dialog.onSubmit(() => {
       dialog.hide();

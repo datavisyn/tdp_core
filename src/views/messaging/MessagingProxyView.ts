@@ -5,8 +5,7 @@ import {resolveIds} from '../resolve';
 import {parse, none} from 'phovea_core/src/range';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
 import {DEFAULT_SELECTION_NAME} from '../../extensions';
-import i18next from 'i18next';
-
+import i18n from 'phovea_core/src/i18n';
 
 export interface IProxyViewOptions {
   /**
@@ -219,8 +218,8 @@ export default class MessagingProxyView extends AView {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.node.innerHTML = `
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18next.t('tdp:core.views.noHttpsMessagePart1')}
-    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18next.t('tdp:core.views.link')}</a> ${i18next.t('tdp:core.views.noHttpsMessagePart2')}
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
        <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
    </div></p><p></p>`;
     this.fire(MessagingProxyView.EVENT_LOADING_FINISHED);

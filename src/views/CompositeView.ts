@@ -23,7 +23,7 @@ import {
 } from 'phovea_ui/src/layout/builder';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
-import i18next from 'phovea_core/src/i18n';
+import i18n from 'phovea_core/src/i18n';
 
 interface IElementDesc {
   key: string;
@@ -174,7 +174,7 @@ export default class CompositeView extends EventHandler implements IView {
       this.idType = resolve(context.desc.idtype);
     }
 
-    this.root = root(view(i18next.t('tdp:core.views.noViews')));
+    this.root = root(view(i18n.t('tdp:core.views.noViews')));
     this.root.node.classList.add('tdp-view', 'composite-view');
     parent.appendChild(this.root.node);
   }
