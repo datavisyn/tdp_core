@@ -394,7 +394,7 @@ export default class LineUpPanelActions extends EventHandler {
       return {text, children};
     }
     return {
-      text: text,
+      text,
       id: `group_${text}`,
       action: () => {
         // choooser dialog

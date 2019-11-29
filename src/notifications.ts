@@ -52,7 +52,7 @@ let errorAlertHandler = (error: any) => {
         body = `${body}<hr>
         ${i18n.t('tdp:core.requestedUrl')}<br><a href="${xhr.url}" target="_blank" rel="noopener" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
       }
-      pushNotification('danger', i18n.t('tdp:core.ErrorNotification', {status: xhr.status, statusText: xhr.statusText, body}), DEFAULT_ERROR_AUTO_HIDE);
+      pushNotification('danger', i18n.t('tdp:core.errorNotification', {status: xhr.status, statusText: xhr.statusText, body}), DEFAULT_ERROR_AUTO_HIDE);
       return Promise.reject(error);
     });
   }

@@ -72,7 +72,7 @@
       "isPublicMessage": "Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.",
       "name": "Name",
       "description": "Description",
-      "confirmMessage": " I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the",
+      "confirmMessage": "I agree that the current session will be stored on the application server in form of a provenance graph. Please note that you can delete sessions as part of the",
       "dialog": "dialog"
     },
 
@@ -85,9 +85,9 @@
       "noPermission": "No Permission",
       "read": "Read",
       "write": "Write",
-      "definePermissions": " define which are the default permissions for other users to access this item",
+      "definePermissions": "define which are the default permissions for other users to access this item",
       "group": "Group",
-      "specifyRole": " specify a group / role which you are part of that should have extra rights, such as a group of administrators",
+      "specifyRole": "specify a group / role which you are part of that should have extra rights, such as a group of administrators",
       "buddies": "Buddies",
       "buddiesPlaceholder": "list of usernames separated by semicolon",
       "buddiesDescription": "Buddies are a list of user names that can have advanced rights, such as backup administrators"
@@ -115,7 +115,7 @@
       "dashboard": "Dashboard",
       "status": "Public",
       "status_private": "Private",
-      "title": "Name: {{name}}\nDescription: {{description}})",
+      "title": "Name: {{name}}\nDescription: {{description}}",
       "title_extended": "Name: {{name}}\nDescription: {{description}} \nCreator: {{creator}}\nPublic: {{public}}"
     },
 
@@ -218,7 +218,7 @@
         "selectionCheckbox": "Selection Checkbox",
         "aggregateGroup": "Aggregate Group",
         "specialColumns": "Special Columns",
-        "addText":"Add {{text}} &hellip;"
+        "addText":"Add {{text}}"
       },
 
       "OverviewColumn": {
