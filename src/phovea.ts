@@ -6,6 +6,7 @@
 import {IRegistry, asResource} from 'phovea_core/src/plugin';
 import {FormElementType} from './form';
 import {EP_TDP_CORE_FORM_ELEMENT} from './extensions';
+import {EP_PHOVEA_CORE_LOCALE, ILocaleEPDesc} from 'phovea_core/src/extensions';
 
 export default function (registry: IRegistry) {
   function actionFunction(id: string, factory: string, loader: () => any, options?: {}) {
@@ -113,9 +114,9 @@ export default function (registry: IRegistry) {
   formElements(FormElementType.CHECKBOX, () => System.import('./form/elements/FormCheckBox'));
   formElements(FormElementType.RADIO, () => System.import('./form/elements/FormRadio'));
 
-  registry.push('epPhoveaCoreLocale', 'tdpCoreLocaleEN', function () {
+  registry.push(EP_PHOVEA_CORE_LOCALE, 'tdpCoreLocaleEN', function () {
     return System.import('./assets/locales/en/tdp.json').then(asResource);
-  }, {
+  }, <ILocaleEPDesc>{
     ns: 'tdp',
   });
 }
