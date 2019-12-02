@@ -20,7 +20,7 @@ import 'phovea_ui/src/_font-awesome';
 import {list as listPlugins} from 'phovea_core/src/plugin';
 import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
 import TourManager from './tour/TourManager';
-import i18n from 'phovea_core/src/i18n';
+import i18n, {initI18n} from 'phovea_core/src/i18n';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -95,16 +95,20 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
-    this.tourManager = new TourManager({
-      doc: document,
-      header: () => this.header,
-      app: () => this.app
-    });
-    mixin(this.options, {
-      showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
-    }, options);
 
-    this.build(document.body, {replaceBody: false}).then(() => {
+    initI18n().then(() => { //Initialize i18n and then load application
+      this.tourManager = new TourManager({
+        doc: document,
+        header: () => this.header,
+        app: () => this.app
+      });
+
+      mixin(this.options, {
+        showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
+      }, options);
+
+      this.build(document.body, {replaceBody: false});
+
       if (this.tourManager.hasTours()) {
         const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
 
