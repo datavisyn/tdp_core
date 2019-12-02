@@ -113,7 +113,7 @@ export default function (registry: IRegistry) {
   formElements(FormElementType.CHECKBOX, () => System.import('./form/elements/FormCheckBox'));
   formElements(FormElementType.RADIO, () => System.import('./form/elements/FormRadio'));
 
-  registry.push('epPhoveaCoreLocale', 'phoveaCoreLocaleEN', function () {
+  registry.push('epPhoveaCoreLocale', 'tdpCoreLocaleEN', function () {
     return System.import('./assets/locales/en/tdp.json').then(asResource);
   }, {
     ns: 'tdp',
