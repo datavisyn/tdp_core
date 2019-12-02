@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "@types/d3": "~3.5.36",
-    "@types/select2": "~4.0.47",
+    "@types/select2": "4.0.41",
     "d3": "~3.5.17",
     "lineupjs": "github:lineupjs/lineupjs#develop",
     "phovea_clue": "^2.2.0",
