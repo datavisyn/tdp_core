@@ -77,6 +77,20 @@
     },
 
     "utilsInternal": {
+      "future": "in the future",
+      "fewSecondsAgo": "a few seconds ago",
+      "secondsAgo": "44 seconds ago",
+      "minute": "a minute ago",
+      "minute_plural": "{{count}} minutes ago",
+      "hour": "an hour ago",
+      "hour_plural": "{{count}} hours ago",
+      "day": "a day ago",
+      "day_plural": "{{}} days ago",
+      "month": "a month ago",
+      "month_plural": "{{}} months ago",
+      "year": "a year ago",
+      "farAway": "far far away",
+
       "notAllowed": "Not Allowed, please contact your system administrator",
       "private": "Private",
       "publicMsg": "Public (everybody can see and use it)",
@@ -218,7 +232,7 @@
         "selectionCheckbox": "Selection Checkbox",
         "aggregateGroup": "Aggregate Group",
         "specialColumns": "Special Columns",
-        "addText":"Add {{text}} &hellip;"
+        "addText": "Add {{text}} &hellip;"
       },
 
       "OverviewColumn": {

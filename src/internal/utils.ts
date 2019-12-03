@@ -6,20 +6,22 @@ const MIN = 60;
 const HOUR = MIN * 60;
 const DAY = HOUR * 24;
 
-const areas: [number, string | ((d: number) => string)][] = [
-  [-1, 'in the future'],
-  [43, 'a few seconds ago'],
-  [44, '44 seconds ago'],
-  [89, 'a minute ago'],
-  [44 * MIN, (d) => `${Math.ceil(d / MIN)} minutes ago`],
-  [89 * MIN, 'an hour ago'],
-  [21 * HOUR, (d) => `${Math.ceil(d / HOUR)} hours ago`],
-  [35 * HOUR, 'a day ago'],
-  [25 * DAY, (d) => `${Math.ceil(d / DAY)} days ago`],
-  [45 * DAY, 'a month ago'],
-  [319 * DAY, (d) => `${Math.ceil(d / DAY / 30)} months ago`],
-  [547 * DAY, (d) => 'a year ago']
-];
+const getAreas: () => [number, string | ((d: number) => string)][] = () => {
+  return [
+    [-1, i18n.t('tdp:core.utilsInternal.future')],
+    [43, i18n.t('tdp:core.utilsInternal.fewSecondsAgo')],
+    [44, i18n.t('tdp:core.utilsInternal.secondsAgo')],
+    [89, i18n.t('tdp:core.utilsInternal.minute')],
+    [44 * MIN, (d) => i18n.t('tdp:core.utilsInternal.minute', {count: Math.ceil(d / MIN)})],
+    [89 * MIN, i18n.t('tdp:core.utilsInternal.hour')],
+    [21 * HOUR, (d) => i18n.t('tdp:core.utilsInternal.hour', {count: Math.ceil(d / HOUR)})],
+    [35 * HOUR, i18n.t('tdp:core.utilsInternal.day')],
+    [25 * DAY, (d) => i18n.t('tdp:core.utilsInternal.day', {count: Math.ceil(d / DAY)})],
+    [45 * DAY, i18n.t('tdp:core.utilsInternal.month')],
+    [319 * DAY, (d) => i18n.t('tdp:core.utilsInternal.month', {count: Math.ceil(d / DAY / 30)})],
+    [547 * DAY, (d) => i18n.t('tdp:core.utilsInternal.hour')]
+  ];
+};
 
 /**
  * see http://momentjs.com/docs/#/displaying/fromnow/
@@ -30,12 +32,12 @@ export function fromNow(date: Date | number) {
   const now = Date.now();
   const deltaInSeconds = Math.floor((now - (typeof date === 'number' ? date : date.getTime())) / 1000);
 
-  const area = areas.find((d) => deltaInSeconds <= d[0]);
+  const area = getAreas().find((d) => deltaInSeconds <= d[0]);
   if (area) {
     const formatter = area[1];
     return typeof formatter === 'string' ? formatter : formatter(deltaInSeconds);
   }
-  return 'far far away';
+  return i18n.t('tdp:core.utilsInternal.farAway');
 }
 
 export function notAllowedText(notAllowed: boolean | string) {
