@@ -55,7 +55,9 @@ const tsLoaderDev = [
     options: {
       happyPackMode: true, // IMPORTANT! use happyPackMode mode to speed-up compilation and reduce errors reported to webpack,
       compilerOptions: {
-        target: 'es6'
+        target: 'es6',
+        jsx: 'react',
+        jsxFactory: 'h',
       }
     }
   }
@@ -280,7 +282,7 @@ function generateWebpack(options) {
   if (!options.bundle || options.isApp) {
     // extract the included css file to own file
     const p = new ExtractTextPlugin({
-      filename: (options.isApp || options.moduleBundle ? 'style' : pkg.name) + (options.min && !options.nosuffix ? '.min' : '') + '.css',
+      filename: (options.isApp || options.moduleBundle ? '[name]' : pkg.name) + (options.min && !options.nosuffix ? '.min' : '') + '.css',
       allChunks: true // there seems to be a bug in dynamically loaded chunk styles are not loaded, workaround: extract all styles from all chunks
     });
     base.plugins.push(p);
