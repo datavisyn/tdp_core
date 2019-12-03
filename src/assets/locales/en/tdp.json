@@ -171,9 +171,9 @@
         "moveColumn": "Move Column"
       },
 
-      "exports": {
-        "exportData": "Export Data",
-        "export": "Export",
+      "export": {
+        "exportData": "Export Data &hellip;",
+        "export": " Export",
         "columns": "Columns",
         "rows": "Rows",
         "allRows": "All Rows",
@@ -201,7 +201,7 @@
         "downloadAll": "Download All",
         "excel": "Microsoft Excel (xlsx)",
         "downloadSelectedRows": "Download Selected Rows Only",
-        "customize": "Customize",
+        "customize": "Customize&hellip;",
         "saveEntities": "Save List of Entities",
         "databaseColumns": "Database Columns",
         "parameterizedScores": "Parameterized Scores",
@@ -218,7 +218,7 @@
         "selectionCheckbox": "Selection Checkbox",
         "aggregateGroup": "Aggregate Group",
         "specialColumns": "Special Columns",
-        "addText":"Add {{text}}"
+        "addText":"Add {{text}} &hellip;"
       },
 
       "OverviewColumn": {
@@ -230,8 +230,8 @@
 
       "scorecmds": {
         "score": "Score",
-        "add": "Add",
-        "remove": "Remove"
+        "add": "Add {{scoreName}}",
+        "remove": "Remove {{scoreName}}"
       },
 
 

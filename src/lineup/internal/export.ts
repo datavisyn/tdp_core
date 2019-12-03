@@ -114,7 +114,7 @@ interface IExportData {
 
 function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
   return lazyDialogModule().then((dialogs) => {
-    const dialog = new dialogs.FormDialog(`${i18n.t('tdp:core.lineup.export.exportData')} &hellip;`, `<i class="fa fa-download"></i>${i18n.t('tdp:core.lineup.export.export')}`);
+    const dialog = new dialogs.FormDialog(`${i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${i18n.t('tdp:core.lineup.export.export')}`);
 
     const id = `e${randomId(3)}`;
     const ranking = provider.getFirstRanking();

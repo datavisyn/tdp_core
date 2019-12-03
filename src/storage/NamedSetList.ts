@@ -155,7 +155,8 @@ export default class NamedSetList {
       .classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d))
       .html((d) => {
         const isPublic = d.type === ENamedSetType.NAMEDSET && hasPermission(<IStoredNamedSet>d, EEntity.OTHERS);
-        return `<i class="fa ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${i18n.t('tdp:core.NamedSetList.status', {context: isPublic ? '' : 'private'})}"></i> <span class="sr-only">${isPublic ? 'Public' : 'Private'}</span>`;
+        const publicOrPrivate = i18n.t('tdp:core.NamedSetList.status', {context: isPublic ? '' : 'private'});
+        return `<i class="fa ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${publicOrPrivate}"></i> <span class="sr-only">${publicOrPrivate}</span>`;
       });
 
     $options.exit().remove();

@@ -225,7 +225,7 @@ export default class LineUpPanelActions extends EventHandler {
         <li class="dropdown-header" data-num-selected-rows="0">${i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</li>
         <li><a href="#" data-s="s" data-t="xlsx">${i18n.t('tdp:core.lineup.LineupPanelActions.excel')}</a></li>
         <li role="separator" class="divider"></li>
-        <li><a href="#" data-s="s" data-t="custom">${i18n.t('tdp:core.lineup.LineupPanelActions.customize')} &hellip;</a></li>
+        <li><a href="#" data-s="s" data-t="custom">${i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a></li>
       </ul>
     `;
 
@@ -394,7 +394,7 @@ export default class LineUpPanelActions extends EventHandler {
       return {text, children};
     }
     return {
-      text,
+      text: `${text} &hellip;`,
       id: `group_${text}`,
       action: () => {
         // choooser dialog

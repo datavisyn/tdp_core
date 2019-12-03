@@ -60,7 +60,7 @@ export async function removeScoreImpl(inputs: IObjectRef<IViewProvider>[], param
 }
 
 export function addScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
-  return action(meta(`${i18n.t('tdp:core.lineup.scorecmds.add')} ${scoreName}`, cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], {
     id: scoreId,
     params
   });
@@ -71,11 +71,11 @@ export async function pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRe
   const currentParams = {id: scoreId, params, storedParams};
   const result = await addScoreAsync([provider], currentParams);
   const toStoreParams = {id: scoreId, params: storedParams};
-  return graph.pushWithResult(action(meta(`${i18n.t('tdp:core.lineup.scorecmds.add')} ${scoreName}`, cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], toStoreParams), result);
+  return graph.pushWithResult(action(meta(i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], toStoreParams), result);
 }
 
 export function removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]) {
-  return action(meta(`${i18n.t('tdp:core.lineup.scorecmds.remove')} ${scoreName}`, cat.data, op.remove), CMD_REMOVE_SCORE, removeScoreImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.scorecmds.remove', {scoreName}), cat.data, op.remove), CMD_REMOVE_SCORE, removeScoreImpl, [provider], {
     id: scoreId,
     params,
     columnId

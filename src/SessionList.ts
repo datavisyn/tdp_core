@@ -281,9 +281,9 @@ export class PersistentSessionList extends ASessionList {
       const myworkspaces = data.filter((d) => d.creator === me);
       const otherworkspaces = data.filter((d) => d.creator !== me);
 
-      const publicTitle = i18n.t('tdp:core.SessionList.status') as string;
-      const privateTitle = i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string
-      const unknownText = i18n.t('tdp:core.SessionList.unknown')
+      const publicTitle = i18n.t('tdp:core.SessionList.status');
+      const privateTitle = i18n.t('tdp:core.SessionList.status', {context: 'private'});
+      const unknownText = i18n.t('tdp:core.SessionList.unknown');
 
       if (this.mode === 'table') {
         {
