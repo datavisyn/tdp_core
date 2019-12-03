@@ -32,8 +32,8 @@
     "redhat_packages.txt"
   ],
   "engines": {
-    "npm": ">= 3",
-    "node": ">= 6",
+    "npm": ">= 6.12",
+    "node": ">= 12.13",
     "iojs": ">= 3"
   },
   "scripts": {
@@ -43,7 +43,7 @@
     "predist": "echo hybrid",
     "dist": "npm run dist:web && npm run dist:python",
     "compile": "tsc",
-    "lint": "tslint -c tslint.json -p .",
+    "lint": "tslint -c tslint.json -p . 'src/**/*.ts?(x)' 'tests/**/*.ts?(x)'",
     "docs": "npm run docs:web && npm run docs:python",
     "prebuild": "echo hybrid",
     "posttest": "echo hybrid",
@@ -75,24 +75,27 @@
     "prebuild:web": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test:web"
   },
   "dependencies": {
-    "@types/d3": "3.5.36",
+    "@types/d3": "~3.5.36",
     "@types/select2": "4.0.41",
-    "d3": "3.5.17",
+    "d3": "~3.5.17",
     "lineupjs": "github:lineupjs/lineupjs#develop",
     "phovea_clue": "^2.2.0",
-    "select2": "4.0.4",
+    "select2": "~4.0.5",
     "select2-bootstrap-theme": "0.1.0-beta.9",
-    "@types/jquery": "2.0.33",
-    "jquery": "3.1.1"
+    "@types/jquery": "~3.3.6",
+    "jquery": "~3.3.1"
   },
   "main": "build/tdp_core.js",
   "devDependencies": {
     "@types/jasmine": "2.5.47",
     "awesome-typescript-loader": "3.1.2",
+    "cache-loader": "1.2.0",
     "css-loader": "0.28.0",
-    "extract-loader": "0.1.0",
     "extract-text-webpack-plugin": "2.1.0",
+    "extract-loader": "0.1.0",
+    "ifdef-loader": "2.0.0",
     "file-loader": "0.11.1",
+    "fork-ts-checker-webpack-plugin": "0.4.1",
     "html-loader": "0.4.5",
     "imports-loader": "0.7.1",
     "jasmine": "2.5.3",
@@ -110,17 +113,14 @@
     "raw-loader": "0.5.1",
     "sass-loader": "6.0.7",
     "style-loader": "0.16.1",
+    "thread-loader": "1.1.2",
+    "ts-loader": "4.0.1",
     "tslib": "1.9.0",
     "tslint": "5.9.1",
     "typedoc": "0.11.1",
-    "typescript": "2.7.2",
+    "typescript": "2.8.1",
     "url-loader": "0.5.8",
     "webpack": "2.3.3",
-    "webpack-dev-server": "2.4.2",
-    "cache-loader": "1.2.0",
-    "ifdef-loader": "2.0.0",
-    "fork-ts-checker-webpack-plugin": "0.4.1",
-    "thread-loader": "1.1.2",
-    "ts-loader": "4.0.1"
+    "webpack-dev-server": "2.4.2"
   }
 }
