@@ -63,7 +63,7 @@
     "test:python": "test ! $(find tests -name \"*.py\") || python setup.py test",
     "predist:web": "npm run build:web && npm run docs:web",
     "dist:web": "mkdirp dist && cd build && tar cvzf ../dist/tdp_core.tar.gz *",
-    "dist:python": "python setup.py bdist_egg",
+    "dist:python": "python setup.py sdist bdist_wheel",
     "predocker": "npm run build",
     "docker": "docker build -t tdp_core -f deploy/Dockerfile .",
     "docs:web": "typedoc --options typedoc.json src/**.ts",
