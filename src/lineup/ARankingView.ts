@@ -1,4 +1,4 @@
-import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
+import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IDataRow} from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -8,7 +8,7 @@ import {saveNamedSet} from '../storage';
 import {showErrorModalDialog} from '../dialogs';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
-import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
+import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions, IColumnOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
@@ -149,7 +149,7 @@ export interface IARankingViewOptions {
   itemRowHeight: number | ((row: any, index: number) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
-  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
+  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
 }
 
 /**
@@ -280,7 +280,7 @@ export abstract class ARankingView extends AView {
         defaultHeight: 18,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? 70 : f(item.v, item.i);
+          return isGroup(item) ? 70 : f((<Partial<IDataRow & IGroupItem>>item).v, (<Partial<IDataRow & IGroupItem>>item).i);
         }
       });
     }
@@ -493,14 +493,14 @@ export abstract class ARankingView extends AView {
     // flag that it is a score but it also a reload function
     colDesc._score = true;
 
-    const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+    const ids = this.selectionHelper.rowIdsAsSet(<number[]>this.provider.getRankings()[0].getOrder());
     const data = score.compute(ids, this.itemIDType, args);
 
     const r = this.addColumn(colDesc, data, -1, position);
 
     // use _score function to reload the score
     colDesc._score = () => {
-      const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+      const ids = this.selectionHelper.rowIdsAsSet(<number[]>this.provider.getRankings()[0].getOrder());
       const data = score.compute(ids, this.itemIDType, args);
       return r.reload(data);
     };
@@ -574,9 +574,9 @@ export abstract class ARankingView extends AView {
       const cols = this.getColumnDescs(columns);
       // compatibility since visible is now a supported feature, so rename ones
       for (const col of cols) {
-        if (col.visible != null) {
-          (<any>col).initialColumn = col.visible;
-          delete col.visible;
+        if ((<IColumnOptions>col).visible != null) {
+          (<any>col).initialColumn = (<IColumnOptions>col).visible;
+          delete (<IColumnOptions>col).visible;
         }
       }
       deriveColors(cols);

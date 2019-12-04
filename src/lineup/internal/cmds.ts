@@ -4,7 +4,7 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
-import {NumberColumn, createMappingFunction, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn} from 'lineupjs';
+import {NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 
 
@@ -14,6 +14,7 @@ enum LineUpTrackAndUntrackActions {
   filter = 'filter',
   rendererType = 'rendererType',
   groupRenderer = 'groupRenderer',
+  summaryRenderer = 'summaryRenderer',
   sortMethod = 'sortMethod',
   ChangedFilter = 'Changed.filter',
   width = 'width',
@@ -204,8 +205,13 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   }
   ignoreNext = `${parameter.prop}Changed`;
   if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
-    bak = source.getMapping().dump();
-    source.setMapping(createMappingFunction(parameter.value));
+    bak = source.getMapping().toJSON();
+    if (parameter.value.type.includes('linear')) {
+      parameter.value.type = 'linear';
+    }
+    const availableMappingFunctions = mappingFunctions();
+    const selectedMappingFunction = mappingFunctions()[parameter.value.type];
+    source.setMapping(new selectedMappingFunction(parameter.value));
   } else if (source) {
     // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
     switch (parameter.prop) {
@@ -366,6 +372,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.filter);
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.rendererType);
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.groupRenderer);
+  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.summaryRenderer);
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.sortMethod);
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
@@ -418,11 +425,10 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
       if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, lineup)) {
         return;
       }
-      // console.log(col.fqpath, 'mapping', old.dump(), newValue.dump());
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(setColumn(lineup, rid, path, 'mapping', newValue.dump()), {
-        inverse: setColumn(lineup, rid, path, 'mapping', old.dump())
+      graph.pushWithResult(setColumn(lineup, rid, path, 'mapping', newValue.toJSON()), {
+        inverse: setColumn(lineup, rid, path, 'mapping', old.toJSON())
       });
     });
   } else if (col instanceof ScriptColumn) {
@@ -434,7 +440,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
 
 
 function untrackColumn(col: Column) {
-  col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
+  col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);

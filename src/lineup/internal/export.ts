@@ -73,7 +73,7 @@ export function exportLogic(type: 'custom' | ExportType, onlySelected: boolean, 
     return customizeDialog(provider).then((r) => convertRanking(provider, r.order, r.columns, r.type, r.name));
   } else {
     const ranking = provider.getFirstRanking();
-    const order = onlySelected ? provider.getSelection() : ranking!.getOrder();
+    const order = onlySelected ? provider.getSelection() : (<number[]>ranking!.getOrder());
     const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
     return Promise.resolve(convertRanking(provider, order, columns, type, ranking.getLabel()));
   }
@@ -173,10 +173,10 @@ function customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
             break;
           case 'not':
             const selected = new Set(provider.getSelection());
-            order = ranking.getOrder().filter((d) => !selected.has(d));
+            order = (<number[]>ranking.getOrder()).filter((d) => !selected.has(d));
             break;
           default:
-            order = ranking.getOrder();
+            order = <number[]>ranking.getOrder();
         }
 
         const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));

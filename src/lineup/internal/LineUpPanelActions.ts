@@ -257,7 +257,7 @@ export default class LineUpPanelActions extends EventHandler {
 
   private appendSaveRanking() {
     const listener = (ranking: Ranking) => {
-      this.saveRankingDialog(ranking.getOrder());
+      this.saveRankingDialog(<number[]>ranking.getOrder());
     };
 
     return this.createMarkup('Save List of Entities', 'fa fa-save', listener);
