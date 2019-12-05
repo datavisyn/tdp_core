@@ -94,7 +94,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
-    const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''}
+    const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''};
     return this.setHint(visible, hintMessage || i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
   }
 
