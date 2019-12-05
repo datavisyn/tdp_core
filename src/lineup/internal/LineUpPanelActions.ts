@@ -138,7 +138,7 @@ export default class LineUpPanelActions extends EventHandler {
       <div class="lu-adder">${this.search ? `<button class="fa fa-plus" title="${i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton')}"></button>` : ''}
       </div>`);
 
-    if (!this.isTopMode) { // top mode doesn't need collapse feature
+    if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
       this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="${i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton')}"></a>`);
       this.node.querySelector('a')!.addEventListener('click', (evt) => {
         evt.preventDefault();
@@ -149,8 +149,12 @@ export default class LineUpPanelActions extends EventHandler {
 
     const buttons = this.node.querySelector('section');
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
-    buttons.appendChild(this.appendSaveRanking());
-    buttons.appendChild(this.appendDownload());
+    if (this.options.enableSaveRanking) {
+      buttons.appendChild(this.appendSaveRanking());
+    }
+    if (this.options.enableDownload) {
+      buttons.appendChild(this.appendDownload());
+    }
     if (this.options.enableZoom) {
       buttons.appendChild(this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
       buttons.appendChild(this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
@@ -331,11 +335,13 @@ export default class LineUpPanelActions extends EventHandler {
     }
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
-    const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [
-      this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false))
-    ];
+    const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
-    if (loadedScorePlugins.length > 0) {
+    if (this.options.enableAddingDatabaseColumns) {
+      items.push(this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
+    }
+
+    if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
       items.push({
         text: i18n.t('tdp:core.lineup.LineupPanelActions.parameterizedScores'),
         children: loadedScorePlugins.map((score) => {
@@ -354,36 +360,49 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
 
-    const scoreDescs = this.getColumnDescription(descs, true);
-    if (scoreDescs.length > 0) {
-      items.push({
-        text: i18n.t('tdp:core.lineup.LineupPanelActions.previouslyAddedColumns'),
-        children: scoreDescs
-      });
+    if (this.options.enableAddingPreviousColumns) {
+      const scoreDescs = this.getColumnDescription(descs, true);
+      if (scoreDescs.length > 0) {
+        items.push({
+          text: i18n.t('tdp:core.lineup.LineupPanelActions.previouslyAddedColumns'),
+          children: scoreDescs
+        });
+      }
     }
 
-    const combiningColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.combiningColumns'), [
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum')))},
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination')))},
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(i18n.t('tdp:core.lineup.LineupPanelActions.nested')))},
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc())},
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.imposition'), id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
-    ]);
-
-    const supportColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.supportColumns'), [
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(i18n.t('tdp:core.lineup.LineupPanelActions.group')))},
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc())},
-      {text: i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
-    ]);
-
-    items.push({
+    const specialColumnsOption = {
       text: i18n.t('tdp:core.lineup.LineupPanelActions.specialColumns'),
-      children: [
-        combiningColumns,
-        supportColumns,
-        ...metaDataOptions
-      ]
-    });
+      children: []
+    };
+
+    if (this.options.enableAddingCombiningColumns) {
+      const combiningColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.combiningColumns'), [
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(i18n.t('tdp:core.lineup.LineupPanelActions.nested')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc())},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.imposition'), id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
+      ]);
+      specialColumnsOption.children.push(combiningColumns);
+    }
+
+    if (this.options.enableAddingSupportColumns) {
+      const supportColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.supportColumns'), [
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(i18n.t('tdp:core.lineup.LineupPanelActions.group')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+      ]);
+      specialColumnsOption.children.push(supportColumns);
+    }
+
+    if (this.options.enableAddingMetaDataColumns) {
+      specialColumnsOption.children.push(...metaDataOptions);
+    }
+
+    // Only add special columns option if there are any items available
+    if (specialColumnsOption.children.length > 0) {
+      items.push(specialColumnsOption);
+    }
 
     this.search.data = items;
   }

@@ -74,10 +74,10 @@ abstract class ASessionList {
     });
     $enter.select('a[data-action="select"]').on('click', (d) => {
       stopEvent();
-      if (!canWrite(d)) {
-        manager.cloneLocal(d);
-      } else {
+      if (canWrite(d)) {
         manager.loadGraph(d);
+      } else {
+        manager.cloneLocal(d);
       }
       return false;
     });
@@ -309,11 +309,19 @@ export class PersistentSessionList extends ASessionList {
         {
           const $tr = $parent.select('#session_others tbody').selectAll('tr').data(otherworkspaces);
 
-          const $trEnter = $tr.enter().append('tr').html(`
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>${ASessionList.createButton('clone')}</td>`);
+          const $trEnter = $tr.enter().append('tr').html((d) => {
+            let actions = '';
+            if(canWrite(d)) {
+              actions += ASessionList.createButton('select');
+            }
+            actions += ASessionList.createButton('clone');
+
+            return `
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>${actions}</td>`;
+          });
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('td').text((d) => d.name);
@@ -346,11 +354,19 @@ export class PersistentSessionList extends ASessionList {
         {
           const $tr = $parent.select('#session_others').selectAll('div').data(otherworkspaces);
 
-          const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html(`
+          const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html((d) => {
+            let actions = '';
+            if(canWrite(d)) {
+              actions += ASessionList.createButton('select');
+            }
+            actions += ASessionList.createButton('clone');
+
+            return `
               <span></span>
               <span></span>
               <span></span>
-              <span>${ASessionList.createButton('clone')}</span>`);
+              <span>${actions}</span>`;
+          });
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('span').text((d) => d.name);

@@ -58,15 +58,78 @@ export interface IARankingViewOptions {
    * @default true
    */
   enableOverviewMode: boolean | 'active';
+
   /**
    * enable zoom button
    * @default true
    */
   enableZoom: boolean;
 
+  /**
+   * enable download data button
+   * @default true
+   */
+  enableDownload: boolean;
+
+  /**
+   * enable save list of entities button
+   * @default true
+   */
+  enableSaveRanking: boolean;
+
+  /**
+   * enable collapsing button of side panel
+   * @default true
+   */
+  enableSidePanelCollapsing: boolean;
+
+  /**
+   * enable side panel
+   * @default 'collapsed'
+   */
   enableSidePanel: boolean | 'collapsed' | 'top';
 
+  /**
+   * enable add columns button
+   * @default true
+   */
   enableAddingColumns: boolean;
+
+  /**
+   * enable support columns in the add column dialog
+   * @default true
+   */
+  enableAddingSupportColumns: boolean;
+
+  /**
+   * enable combining columns in the add column dialog
+   * @default true
+   */
+  enableAddingCombiningColumns: boolean;
+
+  /**
+   * enable score columns in the add column dialog
+   * @default true
+   */
+  enableAddingScoreColumns: boolean;
+
+  /**
+   * enable previously created columns in the add column dialog
+   * @default true
+   */
+  enableAddingPreviousColumns: boolean;
+
+  /**
+   * enable database columns in the add column dialog
+   * @default true
+   */
+  enableAddingDatabaseColumns: boolean;
+
+  /**
+   * enable meta data score columns in the add column dialog
+   * @default true
+   */
+  enableAddingMetaDataColumns: boolean;
 
   enableHeaderSummary: boolean;
 
@@ -144,8 +207,17 @@ export abstract class ARankingView extends AView {
     subType: {key: '', value: ''},
     enableOverviewMode: true,
     enableZoom: true,
+    enableDownload: true,
+    enableSaveRanking: true,
     enableAddingColumns: true,
     enableAddingColumnGrouping: false,
+    enableAddingSupportColumns: true,
+    enableAddingCombiningColumns: true,
+    enableAddingScoreColumns: true,
+    enableAddingPreviousColumns: true,
+    enableAddingDatabaseColumns: true,
+    enableAddingMetaDataColumns: true,
+    enableSidePanelCollapsing: true,
     enableSidePanel: 'collapsed',
     enableHeaderSummary: true,
     enableStripedBackground: false,
