@@ -413,7 +413,7 @@ export default class LineUpPanelActions extends EventHandler {
       return {text, children};
     }
     return {
-      text: `${text} &hellip;`,
+      text: i18n.t('tdp:core.lineup.LineupPanelActions.columnTitle', {text}),
       id: `group_${text}`,
       action: () => {
         // choooser dialog

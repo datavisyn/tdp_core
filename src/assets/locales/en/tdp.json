@@ -228,6 +228,7 @@
         "imposition": "Imposition",
         "supportColumns": "Support Columns",
         "group": "Group",
+        "columnTitle": "{{text}} &hellip;",
         "groupInformation": "Group Information",
         "selectionCheckbox": "Selection Checkbox",
         "aggregateGroup": "Aggregate Group",
