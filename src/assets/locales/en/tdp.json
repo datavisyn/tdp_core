@@ -37,8 +37,8 @@
     "FormMap": {
       "badgeTitle": "{{text}} items remaining after filtering",
       "apply": "Apply",
-      "selectMe": "Select me...",
-      "select": "Select...",
+      "selectMe": "Select me &hellip;",
+      "select": "Select &hellip;",
       "remove": "Remove"
     },
 
@@ -160,7 +160,7 @@
       "status": "Public (everyone can see it)",
       "status_private": "Private",
       "unknown": "Unknown",
-      "loadingText": "Loading...",
+      "loadingText": "Loading &hellip;",
       "name": "Name",
       "creator": "Creator",
       "access": "Access",
@@ -205,7 +205,7 @@
       },
 
       "LineupPanelActions": {
-        "searchPlaceholder": "Add Column...",
+        "searchPlaceholder": "Add Column &hellip;",
         "addColumnButton": "Add Column",
         "collapseButton": "(Un)Collapse",
         "zoomIn": "Zoom In",
@@ -270,7 +270,7 @@
       "noHttpsMessagePart2": " to open the website in a separate window:",
 
       "tableDownloadButton": "Download Table as Spreadsheet",
-      "busyMessage": "Preparing awesome stuff for you...",
+      "busyMessage": "Preparing awesome stuff for you &hellip;",
       "defaultHint": "No data found for the given {{name}}",
       "defaultHint_unknown": "No data found for the given Unknown",
       "noMappingFoundHint": "No mapping found for the given {{name}} to {{id}}",
