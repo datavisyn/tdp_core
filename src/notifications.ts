@@ -43,14 +43,11 @@ export function successfullyDeleted(type: string, name: string) {
 }
 
 let errorAlertHandler = (error: any) => {
-  const config = require('tdp_publicdb/tdp_publicdb/config.json');
-  const statementTimeout = 'statement_timeout';
-  const getConfiguredTimeout = config[statementTimeout].match(/\d+/);
   if (error instanceof Response || error.response instanceof Response) {
     const xhr: Response = error instanceof Response ? error : error.response;
     return xhr.text().then((body: string) => {
       if (xhr.status === 408) {
-        body = `Your data request could not be completed within ${getConfiguredTimeout} minutes. Therefore, it was cancelled.
+        body = `Your data request could not be completed. Therefore, it was cancelled.
         This problem might have been caused by requesting too much data at once.
         In case of any questions, please contact the administrator.`;
       }
