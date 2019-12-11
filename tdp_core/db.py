@@ -138,9 +138,7 @@ class WrappedSession(object):
     :param kwargs: args for this query
     :return: list of dicts
     """
-    parsed = to_query(sql, self._supports_array_parameter, kwargs)
-    _log.info('%s (%s)', parsed, kwargs)
-    result = self._session.execute(parsed, kwargs)
+    result = self.execute(sql, **kwargs)
     columns = result.keys()
     return [{c: r[c] for c in columns} for r in result]
 
