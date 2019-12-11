@@ -44,8 +44,8 @@ export function successfullyDeleted(type: string, name: string) {
 
 let errorAlertHandler = (error: any) => {
   const config = require('tdp_publicdb/tdp_publicdb/config.json');
-  const statement_timeout = 'statement_timeout';
-  const getConfiguredTimeout = config[statement_timeout].match(/\d+/);
+  const statementTimeout = 'statement_timeout';
+  const getConfiguredTimeout = config[statementTimeout].match(/\d+/);
   if (error instanceof Response || error.response instanceof Response) {
     const xhr: Response = error instanceof Response ? error : error.response;
     return xhr.text().then((body: string) => {
