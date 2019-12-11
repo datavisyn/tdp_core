@@ -2,8 +2,6 @@
  * Created by Samuel Gratzl
  */
 
-const config = require("tdp_publicdb/tdp_publicdb/config.json");
-
 export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';
 
 export const DEFAULT_SUCCESS_AUTO_HIDE = 5000;
@@ -45,14 +43,16 @@ export function successfullyDeleted(type: string, name: string) {
 }
 
 let errorAlertHandler = (error: any) => {
-  const getConfiguredTimeout = config['statement_timeout'].match(/\d+/);
+  const config = require('tdp_publicdb/tdp_publicdb/config.json');
+  const statement_timeout = 'statement_timeout';
+  const getConfiguredTimeout = config[statement_timeout].match(/\d+/);
   if (error instanceof Response || error.response instanceof Response) {
     const xhr: Response = error instanceof Response ? error : error.response;
     return xhr.text().then((body: string) => {
-      if (xhr.status == 408) {
+      if (xhr.status === 408) {
         body = `Your data request could not be completed within ${getConfiguredTimeout} minutes. Therefore, it was cancelled.
         This problem might have been caused by requesting too much data at once.
-        In case of any questions, please contact the administrator.`
+        In case of any questions, please contact the administrator.`;
       }
       if (xhr.status !== 400) {
         body = `${body}<hr>
