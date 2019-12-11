@@ -127,9 +127,14 @@ class WrappedSession(object):
     :param kwargs: additional args to replace
     :return: the session result
     """
+    import sqlalchemy
     parsed = to_query(sql, self._supports_array_parameter, kwargs)
     _log.info('%s (%s)', parsed, kwargs)
-    return self._session.execute(parsed, kwargs)
+    try:
+      return self._session.execute(parsed, kwargs)
+    except sqlalchemy.exc.OperationalError as error:
+      abort(408, error.message)
+
 
   def run(self, sql, **kwargs):
     """
