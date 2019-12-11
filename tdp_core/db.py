@@ -135,7 +135,6 @@ class WrappedSession(object):
     except sqlalchemy.exc.OperationalError as error:
       abort(408, error.message)
 
-
   def run(self, sql, **kwargs):
     """
     runs the given sql statement, in contrast to execute the result will be converted to a list of dicts
