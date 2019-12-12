@@ -18,7 +18,7 @@
     "savedNotification": "{{type}} \"{{name}}\" successfully saved",
     "deletedNotification": "{{type}} \"{{name}}\" successfully deleted",
     "requestedUrl": "The requested URL was:",
-    "errorNotification": "<strong>Error {{status}} ({{statusText}})</strong>: {{body}}",
+    "errorNotification": "<strong>Error {{status}} ({{statusText}})</strong>: {{- body}}",
 
     "ViewWrapper": {
       "showHelp": "Show Help",
