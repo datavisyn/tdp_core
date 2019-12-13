@@ -11,3 +11,4 @@ export {IFormMapDesc, convertRow2MultiMap, IFormMultiMap, IFormRow} from './elem
 export {IButtonElementDesc} from './elements/FormButton';
 export {default as FormDialog} from './FormDialog';
 export {nameLookupDesc} from './elements/builder';
+export {default as FormCheckboxList} from './elements/FormCheckboxList';

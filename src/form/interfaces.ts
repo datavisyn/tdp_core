@@ -56,7 +56,12 @@ export enum FormElementType {
      * a checkbox
      * @see IRadioElementDesc
      */
-  RADIO = 'FormRadio'
+  RADIO = 'FormRadio',
+
+  /**
+   * a list of checkboxes rendered in a Bootstrap dropdown
+   */
+  FORM_CHECKBOX_LIST = 'FormCheckboxList'
 }
 
 /**
