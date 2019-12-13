@@ -265,10 +265,11 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
     for arg in view.arguments:
       info = view.get_argument_info(arg)
       lookup_key = arg
+
       if lookup_key not in arguments:
-        if (arg + u'[]') in arguments:
+        if (arg + u'[]') in arguments:  # check if we can find the lookup key with array form
           lookup_key = (arg + u'[]')
-        elif not info or not info.list_as_tuple:
+        else:
           _log.warn(u'missing argument "%s": "%s"', view.query, arg)
           abort(400, u'missing argument: ' + arg)
       parser = info.type if info and info.type is not None else lambda x: x
