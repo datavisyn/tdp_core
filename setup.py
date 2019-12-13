@@ -39,6 +39,7 @@ def to_version(v):
   now = datetime.datetime.utcnow()
   return v.replace('SNAPSHOT', now.strftime('%Y%m%d-%H%M%S'))
 
+
 setup(
   name=pkg['name'].lower(),
   version=to_version(pkg['version']),
