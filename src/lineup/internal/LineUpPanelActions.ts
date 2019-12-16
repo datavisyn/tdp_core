@@ -175,7 +175,7 @@ class LineUpPanelAddColumnButton implements ILineUpPanelButton {
 
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('lu-adder', 'once');
+    this.node.classList.add('lu-adder');
 
     this.node.addEventListener('mouseleave', () => {
       this.node.classList.remove('once');
@@ -188,10 +188,7 @@ class LineUpPanelAddColumnButton implements ILineUpPanelButton {
     button.addEventListener('click', (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
-      // if (!this.collapse) {
-      //   return;
-      // }
-      //this.node.classList.add('once');
+      this.node.classList.add('once');
       (<HTMLElement>this.search.node.querySelector('input'))!.focus();
       this.search.focus();
     });

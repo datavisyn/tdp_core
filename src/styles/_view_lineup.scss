@@ -119,8 +119,6 @@ $lu_assets: '~lineupjs/src/assets';
     display: flex;
     flex-direction: column;
     position: relative;
-    min-width: 20em;
-    overflow: hidden;
 
     %lu-panel-button {
       background: #fff;
@@ -249,6 +247,7 @@ $lu_assets: '~lineupjs/src/assets';
       .collapse-button {
         width: 2.5em;
         position: relative;
+        margin-right: 0;
 
         &::before {
           content: $fa-var-arrow-left;
@@ -260,7 +259,7 @@ $lu_assets: '~lineupjs/src/assets';
         flex-direction: column;
         margin-right: 0;
         min-width: 0;
-        align-self: flex-start
+        align-self: flex-start;
       }
 
       .tab-content {
@@ -273,7 +272,6 @@ $lu_assets: '~lineupjs/src/assets';
         flex-direction: column;
         position: relative;
         border: none;
-        margin-top: 3em;
 
         &:not(.once) .lu-search {
           display: none;
