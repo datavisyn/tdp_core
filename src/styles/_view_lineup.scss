@@ -144,10 +144,7 @@ $lu_assets: '~lineupjs/src/assets';
     }
 
     >header {
-      align-self: flex-end;
       display: flex;
-      flex-wrap: wrap;
-      max-width: 19em;
 
       .lu-adder {
         margin-top: 1em;
@@ -178,11 +175,12 @@ $lu_assets: '~lineupjs/src/assets';
       }
     }
 
-    >a {
+    .collapse-button {
       @extend %lu-panel-button;
-      width: 2em;
+      // width: 2em;
       height: 2em;
-      position: absolute;
+      // position: absolute;
+      margin-right: 1em;
 
       &::before {
         @include fa-icon();
@@ -248,11 +246,9 @@ $lu_assets: '~lineupjs/src/assets';
       display: flex;
       flex-direction: column;
 
-      >a {
+      .collapse-button {
         width: 2.5em;
-        order: 1;
         position: relative;
-        align-self: flex-start;
 
         &::before {
           content: $fa-var-arrow-left;
@@ -260,7 +256,6 @@ $lu_assets: '~lineupjs/src/assets';
       }
 
       header {
-        order: 2;
         width: auto;
         flex-direction: column;
         margin-right: 0;
@@ -273,7 +268,6 @@ $lu_assets: '~lineupjs/src/assets';
       }
 
       .lu-adder {
-        order: 0;
         padding: 0;
         display: flex;
         flex-direction: column;

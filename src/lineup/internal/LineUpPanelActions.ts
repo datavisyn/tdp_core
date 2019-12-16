@@ -1,5 +1,5 @@
 
-import {SidePanel, spaceFillingRule, IGroupSearchItem, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isSupportType, Column} from 'lineupjs';
+import {SidePanel, spaceFillingRule, IGroupSearchItem, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isSupportType, Column, IItem} from 'lineupjs';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -41,6 +41,40 @@ export function wrap(score: IPluginDesc): IScoreLoader {
     }
   };
 }
+
+class LineUpSearchBoxProvider {
+
+  private searchBoxes: SearchBox<ISearchOption>[] = [];
+
+  private idType: IDType | null = null;
+
+  constructor(private provider: LocalDataProvider, private options: any) {
+
+  }
+
+  get length(): number {
+    return this.searchBoxes.length;
+  }
+
+  createSearchBox(): SearchBox<ISearchOption> {
+    const searchBox = new SearchBox<ISearchOption>({
+      placeholder: 'Add Column...'
+    });
+
+    searchBox.on(SearchBox.EVENT_SELECT, (item) => {
+      item.action();
+    });
+
+    this.searchBoxes = [...this.searchBoxes, searchBox];
+
+    return searchBox;
+  }
+
+  update(items: (ISearchOption | IGroupSearchItem<ISearchOption>)[]) {
+    this.searchBoxes.forEach((searchBox) => searchBox.data = items);
+  }
+}
+
 
 interface ILineUpPanelButton {
   readonly node: HTMLElement;
@@ -136,6 +170,38 @@ class LineUpPanelDownloadButton implements ILineUpPanelButton {
 
 }
 
+class LineUpPanelAddColumnButton implements ILineUpPanelButton {
+  readonly node: HTMLElement;
+
+  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
+    this.node = parent.ownerDocument.createElement('div');
+    this.node.classList.add('lu-adder', 'once');
+
+    this.node.addEventListener('mouseleave', () => {
+      this.node.classList.remove('once');
+    });
+
+    const button = this.node.ownerDocument.createElement('button');
+    button.classList.add('fa', 'fa-plus');
+    button.title = 'Add Column';
+
+    button.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      // if (!this.collapse) {
+      //   return;
+      // }
+      //this.node.classList.add('once');
+      (<HTMLElement>this.search.node.querySelector('input'))!.focus();
+      this.search.focus();
+    });
+
+    this.node.appendChild(button);
+    this.node.appendChild(this.search.node);
+  }
+}
+
+
 class LineUpPanelTabContainer {
 
   readonly node: HTMLElement;
@@ -171,7 +237,7 @@ class LineUpSidePanelTab extends ALineUpPanelTab {
 
   readonly panel: SidePanel | null;
 
-  constructor(parent: HTMLElement, ctx: any, doc = document) {
+  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document) {
     super(parent);
     this.node.classList.add('active', 'default');
     this.node.id = 'side-panel-default';
@@ -180,10 +246,12 @@ class LineUpSidePanelTab extends ALineUpPanelTab {
       chooser: false
     });
 
+    this.node.appendChild(this.search.node);
     this.node.appendChild(this.panel.node);
   }
 
 }
+
 
 export default class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
@@ -202,7 +270,7 @@ export default class LineUpPanelActions extends EventHandler {
 
   private idType: IDType | null = null;
 
-  private readonly search: SearchBox<ISearchOption> | null;
+  private readonly searchBoxProvider: LineUpSearchBoxProvider;
 
   readonly panel: SidePanel | null;
   readonly node: HTMLElement; // wrapper node
@@ -224,17 +292,9 @@ export default class LineUpPanelActions extends EventHandler {
 
     this.header = new LineUpPanelHeader(this.node);
 
-    // this.options.enableSidePanel = 'top';
+    this.searchBoxProvider = new LineUpSearchBoxProvider(provider, options);
 
-    if (options.enableAddingColumns) {
-      this.search = new SearchBox<ISearchOption>({
-        placeholder: 'Add Column...'
-      });
-      this.search.on(SearchBox.EVENT_SELECT, (item) => {
-        this.node.querySelector('.lu-adder')!.classList.remove('once');
-        item.action();
-      });
-    }
+    // this.options.enableSidePanel = 'top';
 
     if (this.options.enableSidePanel === 'top') {
       this.node.classList.add('lu-side-panel-top');
@@ -243,7 +303,7 @@ export default class LineUpPanelActions extends EventHandler {
 
       this.tabContainer = new LineUpPanelTabContainer(this.node);
 
-      const sidePanel = new LineUpSidePanelTab(this.node, ctx, doc);
+      const sidePanel = new LineUpSidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
       this.tabContainer.addTab(sidePanel);
 
       this.body = sidePanel.node; // TODO remove
@@ -275,21 +335,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   set collapse(value: boolean) {
-    // this.switchButton(value);
     this.node.classList.toggle('collapsed', value);
-  }
-
-  private switchButton(value: boolean) {
-    const addColumnButton = this.header.node.querySelector('.lu-adder');
-    const addColumnInput = this.body.querySelector('.lu-adder');
-
-    if (value && addColumnInput.contains(this.search.node)) {
-      addColumnInput.removeChild(this.search.node);
-      addColumnButton.appendChild(this.search.node);
-    } else if (!value) {
-      addColumnButton.removeChild(this.search.node);
-      addColumnInput.appendChild(this.search.node);
-    }
   }
 
   hide() {
@@ -309,20 +355,22 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private init() {
-    const luAdder = `<div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}</div>`;
-    this.header.node.insertAdjacentHTML('afterbegin', luAdder);
-    this.body.insertAdjacentHTML('afterbegin', luAdder);
+    const buttons = this.header.node;
+
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
-      this.node.insertAdjacentHTML('afterbegin', `<a href="#side-panel-default" class="hello active"  title="(Un)Collapse"></a>`);
-      this.node.querySelector('a')!.addEventListener('click', (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        $('.hello').tab('show');
+      const listener = () => {
         this.collapse = !this.collapse;
-      });
+      };
+
+      const collapseButton =  new LineUpPanelButton(buttons, this.provider, '(Un)Collapse', 'collapse-button', listener);
+      this.header.addButton(collapseButton);
     }
 
-    const buttons = this.header.node;
+    if (this.options.enableAddingColumns) {
+      const addColumnButton =  new LineUpPanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
+      this.header.addButton(addColumnButton);
+    }
+
     this.appendExtraButtons(buttons);
 
     if(!this.isTopMode) {
@@ -369,29 +417,6 @@ export default class LineUpPanelActions extends EventHandler {
       const overviewButton = new LineUpPanelButton(buttons, this.provider, 'En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed
       this.header.addButton(overviewButton);
-    }
-
-    const addColumnButton = <HTMLElement>this.node.querySelector('.lu-adder')!;
-    // console.log(addColumnButton)
-    // console.log(AddInput)
-    addColumnButton.addEventListener('mouseleave', () => {
-      addColumnButton.classList.remove('once');
-    });
-
-    if (this.search) {
-      this.header.node.querySelector('.lu-adder').appendChild(this.search.node);
-      this.body.querySelector('.lu-adder').appendChild(this.search.node);
-      addColumnButton.appendChild(this.search.node);
-      this.node.querySelector('.lu-adder button')!.addEventListener('click', (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        if (!this.collapse) {
-          return;
-        }
-        addColumnButton.classList.add('once');
-        (<HTMLElement>this.search.node.querySelector('input'))!.focus();
-        this.search.focus();
-      });
     }
   }
 
@@ -492,9 +517,10 @@ export default class LineUpPanelActions extends EventHandler {
   async updateChooser(idType: IDType, descs: IColumnDesc[]) {
     this.idType = idType;
 
-    if (!this.search) {
+    if (this.searchBoxProvider.length === 0) {
       return;
     }
+
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
@@ -566,7 +592,7 @@ export default class LineUpPanelActions extends EventHandler {
       items.push(specialColumnsOption);
     }
 
-    this.search.data = items;
+    this.searchBoxProvider.update(items);
   }
 
   private groupedDialog(text: string, children: ISearchOption[]): ISearchOption | IGroupSearchItem<ISearchOption> {
