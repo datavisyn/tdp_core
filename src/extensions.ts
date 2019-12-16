@@ -16,6 +16,7 @@ export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
+export const EXTENSION_POINT_TDP_LINEUP_PANEL_TAB = 'tdpLineupPanelTab';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
 export const EXTENSION_POINT_TDP_INSTANT_VIEW = 'tdpInstantView';
 export const EXTENSION_POINT_TDP_APP_EXTENSION = 'tdpAppExtension';
@@ -198,14 +199,14 @@ export interface IView extends IEventHandler {
   /**
    * optional natural size used when stacking the view on top of each other
    */
-  readonly naturalSize?: [number, number]|'auto';
+  readonly naturalSize?: [number, number] | 'auto';
 
   /**
    * initialized this view
    * @param {HTMLElement} params place to put parameter forms
    * @param {(name: string, value: any, previousValue: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes
    */
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => PromiseLike<any>): PromiseLike<any>|undefined;
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => PromiseLike<any>): PromiseLike<any> | undefined;
 
   /**
    * changes the input selection as given to the constructor of this class
@@ -297,7 +298,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * optional security check to show only certain views
    */
-  security?: string|((user: IUser)=>boolean);
+  security?: string | ((user: IUser) => boolean);
 
   /**
    * a lot of topics/tags describing this view
@@ -307,7 +308,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * a link to an external help page
    */
-  helpUrl?: string | { url: string, linkText: string, title: string };
+  helpUrl?: string | {url: string, linkText: string, title: string};
   /**
    * as an alternative an help text shown as pop up
    */

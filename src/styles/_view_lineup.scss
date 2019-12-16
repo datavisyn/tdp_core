@@ -11,21 +11,21 @@
     line-height: 1;
   }
 
-  > div {
+  >div {
     flex: 1 1 auto;
     position: relative;
   }
 
   &.overview-detail {
-    > div {
+    >div {
       display: flex;
       flex-direction: column;
 
-      > header {
+      >header {
         flex: 0 0 auto;
       }
 
-      > div {
+      >div {
         flex: 1 1 auto;
         position: relative;
       }
@@ -47,7 +47,7 @@
     margin: 0;
   }
 
-  &.lu-filter-table > div:first-of-type > * {
+  &.lu-filter-table>div:first-of-type>* {
     flex: 0 0 auto;
   }
 }
@@ -64,7 +64,7 @@
   left: 0;
   overflow: auto;
 
-  > header {
+  >header {
     padding-bottom: 1px; // no idea otherwise scrollbar
   }
 
@@ -87,14 +87,14 @@ $lu_assets: '~lineupjs/src/assets';
   }
 
   .tdp-ranking-export-form-handle {
-    > span {
+    >span {
       visibility: hidden;
       padding: 0 0.5em 0 1em;
       cursor: grab;
     }
 
-    &:hover > span,
-    &.dragging > span {
+    &:hover>span,
+    &.dragging>span {
       visibility: visible;
     }
 
@@ -105,7 +105,7 @@ $lu_assets: '~lineupjs/src/assets';
     }
   }
 
-  .lu-side-panel > main > section::before {
+  .lu-side-panel>main>section::before {
     content: 'Column Summaries';
   }
 
@@ -113,10 +113,14 @@ $lu_assets: '~lineupjs/src/assets';
     height: 19px;
   }
 
+  //////////////////////
+  /////////////////////
   .tdp-view-lineup.lu-side-panel {
-    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
     position: relative;
-
+    min-width: 20em;
+    overflow: hidden;
 
     %lu-panel-button {
       background: #fff;
@@ -131,41 +135,54 @@ $lu_assets: '~lineupjs/src/assets';
       }
     }
 
-    > section {
-      flex: 0 0 auto;
-      display: flex;
-      justify-content: flex-end;
-      margin-right: 1em;
-      flex-wrap: wrap;
-
-      button {
-        @extend %lu-panel-button;
-      }
+    .lu-side-panel>main>section>div {
+      flex: 1;
     }
 
-    label, input {
+    aside {
+      border-left: 0;
+    }
+
+    >header {
+      align-self: flex-end;
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 19em;
+
+      .lu-adder {
+        margin-top: 1em;
+        display: none;
+      }
+
+      a,
+      button {
+        @extend %lu-panel-button;
+        height: 2em;
+      }
+
+    }
+
+    label,
+    input {
       font-weight: normal;
       margin: 0;
     }
 
-    > div.lu-adder {
+    .lu-adder {
       margin-top: 1em;
 
-      > button {
+      button {
         @extend %lu-panel-button;
 
         display: none;
       }
     }
 
-    > a {
+    >a {
       @extend %lu-panel-button;
-
-      position: absolute;
-      left: 0;
-      top: 0;
       width: 2em;
       height: 2em;
+      position: absolute;
 
       &::before {
         @include fa-icon();
@@ -207,48 +224,56 @@ $lu_assets: '~lineupjs/src/assets';
     }
 
     .download-data-dropdown {
+
       // show the number of selected rows after the element
       li[data-num-selected-rows]::after {
-        content: ' (' attr(data-num-selected-rows) ')';
+        content: ' ('attr(data-num-selected-rows) ')';
         display: inline;
       }
 
       // hide the dropdown-header and the next list point (= download link), if no rows are selected
       // note that this only works for a *single* link as after the header list item!
       li[data-num-selected-rows='0'],
-      li[data-num-selected-rows='0'] + li {
+      li[data-num-selected-rows='0']+li {
         display: none;
       }
     }
 
+    ////////////////////
+    ////////////////////
+
     &.collapsed {
       max-width: 3em;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
 
-      > a {
-        width: 100%;
+      >a {
+        width: 2.5em;
         order: 1;
+        position: relative;
+        align-self: flex-start;
 
         &::before {
           content: $fa-var-arrow-left;
         }
       }
 
-      > section {
-        order: 3;
+      header {
+        order: 2;
+        width: auto;
         flex-direction: column;
         margin-right: 0;
+        min-width: 0;
+        align-self: flex-start
       }
 
-      > div,
-      > .lu-stats,
-      > header,
-      > main {
+      .tab-content {
         display: none;
       }
 
-      > div.lu-adder {
-        order: 2;
+      .lu-adder {
+        order: 0;
         padding: 0;
         display: flex;
         flex-direction: column;
@@ -260,7 +285,7 @@ $lu_assets: '~lineupjs/src/assets';
           display: none;
         }
 
-        > button {
+        button {
           display: block;
         }
 
@@ -280,7 +305,7 @@ $lu_assets: '~lineupjs/src/assets';
           left: -15em;
           z-index: 2;
 
-          > ul {
+          ul {
             max-height: 50vh;
           }
         }
@@ -292,10 +317,16 @@ $lu_assets: '~lineupjs/src/assets';
     }
   }
 
-  .lu-sidepanel-top-form {
+  //////////////////////////////////////////////////
+  //////////////////////////////////////////////////
+
+
+
+
+  .lu-side-panel-top-form {
     display: flex;
 
-    > p {
+    p {
       flex: 1 1 0;
     }
   }
@@ -308,7 +339,7 @@ $lu_assets: '~lineupjs/src/assets';
     width: unset;
     float: right;
 
-    > section {
+    header {
       flex-direction: row;
       max-width: unset;
     }
@@ -318,7 +349,7 @@ $lu_assets: '~lineupjs/src/assets';
       margin-left: 1em;
     }
 
-    > div.lu-adder {
+    >div.lu-adder {
       margin-top: 0;
 
       &.once .lu-search {

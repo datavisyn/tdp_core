@@ -5,13 +5,13 @@ import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin'
 import {editDialog} from '../../storage';
 import {
   IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
-  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
+  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc, EXTENSION_POINT_TDP_LINEUP_PANEL_TAB
 } from '../../extensions';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {exportLogic} from './export';
 import {lazyDialogModule} from '../../dialogs';
-
+import * as $ from 'jquery';
 export interface ISearchOption {
   text: string;
   id: string;
@@ -39,6 +39,17 @@ export function wrap(score: IPluginDesc): IScoreLoader {
     }
   };
 }
+/**
+ * Basic markup of the side panel
+ * Adds functionality of tabs
+ */
+const sidePanelTemplate = `
+<header>
+</header>
+<main class="tab-content">
+   <div class="tab-pane active default" id="side-panel-default"></div>
+
+</main>`;
 
 export default class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
@@ -61,11 +72,16 @@ export default class LineUpPanelActions extends EventHandler {
 
   readonly panel: SidePanel | null;
   readonly node: HTMLElement;
+
+  private readonly header: HTMLElement;
+  private readonly body: HTMLElement;
+
   private overview: HTMLElement;
   private wasCollapsed = false;
 
   constructor(protected readonly provider: LocalDataProvider, ctx: any, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
+    this.node = doc.createElement('aside');
 
     if (options.enableAddingColumns) {
       this.search = new SearchBox<ISearchOption>({
@@ -76,21 +92,27 @@ export default class LineUpPanelActions extends EventHandler {
         item.action();
       });
     }
-
+    let lineUpSidePanel;
     if (this.options.enableSidePanel !== 'top') {
       this.panel = new SidePanel(ctx, doc, {
         chooser: false
       });
-      this.node = this.panel.node;
+      this.node.classList.add('lu-side-panel');
+      this.node.insertAdjacentHTML('afterbegin', sidePanelTemplate);
+      lineUpSidePanel = this.panel.node;
     } else {
-      this.node = doc.createElement('div');
-      this.node.classList.add('lu-side-panel', 'lu-side-panel-top');
+      lineUpSidePanel = doc.createElement('div');
+      lineUpSidePanel.classList.add('lu-side-panel', 'lu-side-panel-top');
     }
-    this.node.classList.add('tdp-view-lineup');
-    this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
+    this.header = this.node.querySelector('header');
+    this.body = this.node.querySelector('.default');
+    this.body.appendChild(lineUpSidePanel);
 
+    this.node.classList.add('tdp-view-lineup');
     this.init();
+    this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
   }
+
 
   forceCollapse() {
     this.wasCollapsed = this.collapse;
@@ -112,7 +134,21 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   set collapse(value: boolean) {
+    this.switchButton(value);
     this.node.classList.toggle('collapsed', value);
+  }
+
+  switchButton(value: boolean) {
+    const addColumnButton = this.header.querySelector('.lu-adder');
+    const addColumnInput = this.body.querySelector('.lu-adder');
+
+    if (value && addColumnInput.contains(this.search.node)) {
+      addColumnInput.removeChild(this.search.node);
+      addColumnButton.appendChild(this.search.node);
+    } else if (!value) {
+      addColumnButton.removeChild(this.search.node);
+      addColumnInput.appendChild(this.search.node);
+    }
   }
 
   hide() {
@@ -132,26 +168,35 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private init() {
-    this.node.insertAdjacentHTML('afterbegin', `
-      <section></section>
-      <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
-      </div>`);
-
+    const luAdder = `
+  <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}</div>`
+    this.header.insertAdjacentHTML('afterbegin', luAdder);
+    this.node.querySelector('.lu-side-panel').insertAdjacentHTML('afterbegin', luAdder);
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
-      this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="(Un)Collapse"></a>`);
+      this.node.insertAdjacentHTML('afterbegin', `<a href="#side-panel-default" class="hello active"  title="(Un)Collapse"></a>`);
       this.node.querySelector('a')!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
+        $('.hello').tab('show');
         this.collapse = !this.collapse;
       });
     }
 
-    const buttons = this.node.querySelector('section');
+    const buttons = this.header;
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
-    if(this.options.enableSaveRanking) {
+    this.appendExtraTabs().forEach((b) => {
+      b.href = '#b';
+      this.header.appendChild(b);
+      const div = document.createElement('div');
+      div.classList.add('tab-pane');
+      div.id = 'b';
+      div.innerText = 'hello from second tab';
+      this.body.parentElement.appendChild(div);
+    });
+    if (this.options.enableSaveRanking) {
       buttons.appendChild(this.appendSaveRanking());
     }
-    if(this.options.enableDownload) {
+    if (this.options.enableDownload) {
       buttons.appendChild(this.appendDownload());
     }
     if (this.options.enableZoom) {
@@ -162,29 +207,57 @@ export default class LineUpPanelActions extends EventHandler {
       buttons.appendChild(this.appendOverviewButton());
     }
 
-    const header = <HTMLElement>this.node.querySelector('.lu-adder')!;
-
-    header.addEventListener('mouseleave', () => {
-      header.classList.remove('once');
+    const addColumnButton = <HTMLElement>this.node.querySelector('.lu-adder')!;
+    // console.log(addColumnButton)
+    // console.log(AddInput)
+    addColumnButton.addEventListener('mouseleave', () => {
+      addColumnButton.classList.remove('once');
     });
 
     if (this.search) {
-      header.appendChild(this.search.node);
-
+      addColumnButton.appendChild(this.search.node);
       this.node.querySelector('.lu-adder button')!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
         if (!this.collapse) {
           return;
         }
-        header.classList.add('once');
+        addColumnButton.classList.add('once');
         (<HTMLElement>this.search.node.querySelector('input'))!.focus();
         this.search.focus();
       });
     }
   }
+  private createTabMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void, extraOptions?) {
+    const b = this.node.ownerDocument.createElement('a');
+    b.className = linkClass;
+    b.setAttribute('data-toggle', 'tab');
+    b.href = '#b';
+    b.title = title;
+    b.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      evt.preventDefault();
+      const openTab = () => {
+        $('.fa-calculator').tab('show');
+        this.collapse = false;
+      }
+      const openDefaultTab = () => {
+        if (this.node.querySelector('#b').classList.contains('active')) {
+          $('.hello').tab('show');
+          return;
+        }
+        $('.fa-calculator').tab('show');
+      }
+      this.collapse ? openTab() : openDefaultTab()
+      const first = this.provider.getRankings()[0];
+      if (first) {
+        onClick(first);
+      }
+    });
+    return b;
+  }
 
-  private createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
+  private createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void, extraOptions?) {
     const b = this.node.ownerDocument.createElement('button');
     b.className = linkClass;
     b.title = title;
@@ -272,6 +345,16 @@ export default class LineUpPanelActions extends EventHandler {
       return this.createMarkup(button.title, 'fa ' + button.cssClass, listener);
     });
   }
+  private appendExtraTabs() {
+    const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
+    console.log(buttons)
+    return buttons.map((button) => {
+      const listener = () => {
+        button.load().then((p) => p.factory(p.desc, this.node));
+      };
+      return this.createTabMarkup(button.title, 'fa ' + button.cssClass, listener);
+    });
+  }
 
   private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
     const doc = this.node.ownerDocument;
@@ -336,7 +419,7 @@ export default class LineUpPanelActions extends EventHandler {
 
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
-    if(this.options.enableAddingDatabaseColumns) {
+    if (this.options.enableAddingDatabaseColumns) {
       items.push(this.groupedDialog('Database Columns', this.getColumnDescription(descs, false)));
     }
 
@@ -359,7 +442,7 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
 
-    if(this.options.enableAddingPreviousColumns) {
+    if (this.options.enableAddingPreviousColumns) {
       const scoreDescs = this.getColumnDescription(descs, true);
       if (scoreDescs.length > 0) {
         items.push({
@@ -374,18 +457,18 @@ export default class LineUpPanelActions extends EventHandler {
       children: []
     };
 
-    if(this.options.enableAddingCombiningColumns) {
+    if (this.options.enableAddingCombiningColumns) {
       const combiningColumns = this.groupedDialog('Combining Columns', [
-        { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
-        { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
-        { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-        { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
-        { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+        {text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum'))},
+        {text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination'))},
+        {text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested'))},
+        {text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc())},
+        {text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
       ]);
       specialColumnsOption.children.push(combiningColumns);
     }
 
-    if(this.options.enableAddingSupportColumns) {
+    if (this.options.enableAddingSupportColumns) {
       const supportColumns = this.groupedDialog('Support Columns', [
         {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
         {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
@@ -394,22 +477,22 @@ export default class LineUpPanelActions extends EventHandler {
       specialColumnsOption.children.push(supportColumns);
     }
 
-    if(this.options.enableAddingMetaDataColumns) {
+    if (this.options.enableAddingMetaDataColumns) {
       specialColumnsOption.children.push(...metaDataOptions);
     }
 
     // Only add special columns option if there are any items available
-    if(specialColumnsOption.children.length > 0) {
+    if (specialColumnsOption.children.length > 0) {
       items.push(specialColumnsOption);
     }
 
     this.search.data = items;
   }
 
-  private groupedDialog(text: string, children: ISearchOption[]):ISearchOption | IGroupSearchItem<ISearchOption> {
+  private groupedDialog(text: string, children: ISearchOption[]): ISearchOption | IGroupSearchItem<ISearchOption> {
     const viaDialog = this.options.enableAddingColumnGrouping;
     if (!viaDialog) {
-      return { text, children };
+      return {text, children};
     }
     return {
       text: `${text} &hellip;`,
