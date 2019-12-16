@@ -102,7 +102,22 @@ class LineUpPanelHeader {
 class LineUpPanelButton implements ILineUpPanelButton {
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, linkClass: string, onClick: (ranking: Ranking) => void, extraOptions?) {
+  constructor(parent: HTMLElement, title: string, linkClass: string, onClick: () => void) {
+    this.node = parent.ownerDocument.createElement('button');
+    this.node.className = linkClass;
+    this.node.title = title;
+    this.node.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      evt.preventDefault();
+      onClick();
+    });
+  }
+}
+
+class LineUpPanelRankingButton implements ILineUpPanelButton {
+  readonly node: HTMLElement;
+
+  constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
     this.node = parent.ownerDocument.createElement('button');
     this.node.className = linkClass;
     this.node.title = title;
@@ -203,41 +218,83 @@ class LineUpPanelTabContainer {
 
   readonly node: HTMLElement;
 
-  private tabs: ALineUpPanelTab[] = [];
+  private tabs: LineUpPanelTab[] = [];
+
+  private currentTab: LineUpPanelTab;
 
   constructor(parent: HTMLElement) {
     this.node = parent.ownerDocument.createElement('main');
     this.node.classList.add('tab-content');
     parent.appendChild(this.node);
-
   }
 
-  addTab(tab: ALineUpPanelTab) {
+  private get defaultTab(): LineUpPanelTab {
+    return this.tabs[0];
+  }
+
+  addTab(tab: LineUpPanelTab) {
     this.tabs = [...this.tabs, tab];
     this.node.appendChild(tab.node);
   }
 
-}
+  toggle(tab: LineUpPanelTab) {
+    if(this.currentTab === tab) {
+      this.hide(tab);
 
-abstract class ALineUpPanelTab {
+    } else {
+      this.show(tab);
+    }
+  }
 
-  readonly node: HTMLElement;
+  show(tab: LineUpPanelTab) {
+    if(this.currentTab) {
+      this.currentTab.hide();
+    }
 
-  constructor(parent: HTMLElement) {
-    this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('tab-pane');
+    tab.show();
+    this.currentTab = tab;
+  }
+
+  hide(tab: LineUpPanelTab) {
+    tab.hide();
+    this.defaultTab.show();
+    this.currentTab = this.defaultTab;
   }
 
 }
 
-class LineUpSidePanelTab extends ALineUpPanelTab {
+
+interface ILineUpPanelTabOptions {
+  width: string;
+}
+
+class LineUpPanelTab {
+
+  readonly node: HTMLElement;
+
+  constructor(parent: HTMLElement, options?: Partial<ILineUpPanelTabOptions>) {
+    this.node = parent.ownerDocument.createElement('div');
+    this.node.classList.add('tab-pane');
+
+    const o = Object.assign({}, options);
+    this.node.style.width = o.width || null;
+  }
+
+  show() {
+    this.node.classList.add('active');
+  }
+
+  hide() {
+    this.node.classList.remove('active');
+  }
+}
+
+class LineUpSidePanelTab extends LineUpPanelTab {
 
   readonly panel: SidePanel | null;
 
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document) {
     super(parent);
-    this.node.classList.add('active', 'default');
-    this.node.id = 'side-panel-default';
 
     this.panel = new SidePanel(ctx, doc, {
       chooser: false
@@ -275,9 +332,6 @@ export default class LineUpPanelActions extends EventHandler {
   private readonly header: LineUpPanelHeader;
   private readonly tabContainer: LineUpPanelTabContainer;
 
-
-  private body: HTMLElement;
-
   private overview: HTMLElement;
   private wasCollapsed = false;
 
@@ -297,14 +351,12 @@ export default class LineUpPanelActions extends EventHandler {
       this.node.classList.add('lu-side-panel-top');
 
     } else {
+      const sidePanel = new LineUpSidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
+      this.panel = sidePanel.panel;
 
       this.tabContainer = new LineUpPanelTabContainer(this.node);
-
-      const sidePanel = new LineUpSidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
       this.tabContainer.addTab(sidePanel);
-
-      this.body = sidePanel.node; // TODO remove
-      this.panel = sidePanel.panel;
+      this.tabContainer.show(sidePanel);
     }
 
     this.init();
@@ -359,7 +411,7 @@ export default class LineUpPanelActions extends EventHandler {
         this.collapse = !this.collapse;
       };
 
-      const collapseButton =  new LineUpPanelButton(buttons, this.provider, '(Un)Collapse', 'collapse-button', listener);
+      const collapseButton =  new LineUpPanelButton(buttons, '(Un)Collapse', 'collapse-button', listener);
       this.header.addButton(collapseButton);
     }
 
@@ -370,17 +422,6 @@ export default class LineUpPanelActions extends EventHandler {
 
     this.appendExtraButtons(buttons);
 
-    if(!this.isTopMode) {
-      this.appendExtraTabs().forEach((b) => {
-        b.href = '#b';
-        this.header.node.appendChild(b);
-        const div = document.createElement('div');
-        div.classList.add('tab-pane');
-        div.id = 'b';
-        this.body.parentElement.appendChild(div);
-      });
-    }
-
     if (this.options.enableSaveRanking) {
       const listener = (ranking: Ranking) => {
         editDialog(null, (name, description, sec) => {
@@ -388,7 +429,7 @@ export default class LineUpPanelActions extends EventHandler {
         });
       };
 
-      const saveRankingButton =  new LineUpPanelButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
+      const saveRankingButton =  new LineUpPanelRankingButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
       this.header.addButton(saveRankingButton);
     }
 
@@ -398,10 +439,10 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableZoom) {
-      const zoomInButton = new LineUpPanelButton(buttons, this.provider, 'Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
+      const zoomInButton = new LineUpPanelButton(buttons, 'Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
       this.header.addButton(zoomInButton);
 
-      const zoomOutButton = new LineUpPanelButton(buttons, this.provider, 'Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
+      const zoomOutButton = new LineUpPanelButton(buttons, 'Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
       this.header.addButton(zoomOutButton);
     }
 
@@ -411,39 +452,16 @@ export default class LineUpPanelActions extends EventHandler {
         this.overview.classList.toggle('fa-list');
         this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
       };
-      const overviewButton = new LineUpPanelButton(buttons, this.provider, 'En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+      const overviewButton = new LineUpPanelButton(buttons, 'En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed
       this.header.addButton(overviewButton);
     }
-  }
 
-  private createTabMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void, extraOptions?) {
-    const b = this.node.ownerDocument.createElement('a');
-    b.className = linkClass;
-    b.setAttribute('data-toggle', 'tab');
-    b.href = '#b';
-    b.title = title;
-    b.addEventListener('click', (evt) => {
-      evt.stopPropagation();
-      evt.preventDefault();
-      const openTab = () => {
-        $('.fa-calculator').tab('show');
-        this.collapse = false;
-      }
-      const openDefaultTab = () => {
-        if (this.node.querySelector('#b').classList.contains('active')) {
-          $('.hello').tab('show');
-          return;
-        }
-        $('.fa-calculator').tab('show');
-      }
-      this.collapse ? openTab() : openDefaultTab()
-      const first = this.provider.getRankings()[0];
-      if (first) {
-        onClick(first);
-      }
-    });
-    return b;
+    if(!this.isTopMode) {
+      this.appendExtraTabs(buttons).forEach((button: LineUpPanelButton) => {
+        this.header.addButton(button);
+      });
+    }
   }
 
   setViolation(violation?: string) {
@@ -461,18 +479,41 @@ export default class LineUpPanelActions extends EventHandler {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
 
-      const luButton =  new LineUpPanelButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
+      const luButton =  new LineUpPanelRankingButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
       this.header.addButton(luButton);
     });
   }
 
-  private appendExtraTabs() {
-    const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
-    return buttons.map((button) => {
+  private appendExtraTabs(buttons: HTMLElement) {
+    const plugins = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
+    return plugins.map((plugin) => {
+      const tab = new LineUpPanelTab(this.tabContainer.node, plugin.tabWidth);
+      this.tabContainer.addTab(tab);
+
+      let isLoaded = false;
+
       const listener = () => {
-        button.load().then((p) => p.factory(p.desc, this.node, this.provider));
+        if(isLoaded) {
+          if(this.collapse) {
+            this.collapse = false; // expand side panel
+            this.tabContainer.show(tab);
+
+          } else {
+            this.tabContainer.toggle(tab);
+          }
+
+        } else {
+          plugin.load().then((p) => {
+            p.factory(tab.node, this.provider, p.desc);
+
+            this.collapse = false; // expand side panel
+            this.tabContainer.show(tab);
+
+            isLoaded = true;
+          });
+        }
       };
-      return this.createTabMarkup(button.title, 'fa ' + button.cssClass, listener);
+      return new LineUpPanelButton(buttons, plugin.title, 'fa ' + plugin.cssClass, listener);
     });
   }
 
