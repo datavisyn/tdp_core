@@ -115,7 +115,7 @@ $lu_assets: '~lineupjs/src/assets';
 
   //////////////////////
   /////////////////////
-  .tdp-view-lineup.lu-side-panel {
+  .lu-side-panel-wrapper {
     display: flex;
     flex-direction: column;
     position: relative;
@@ -331,7 +331,7 @@ $lu_assets: '~lineupjs/src/assets';
     }
   }
 
-  .lu-side-panel-top.tdp-view-lineup.lu-side-panel.collapsed {
+  .lu-side-panel-top.lu-side-panel-wrapper.collapsed {
     display: inline-flex;
     flex-direction: row;
     z-index: 100;

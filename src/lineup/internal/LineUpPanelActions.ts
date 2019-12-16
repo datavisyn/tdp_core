@@ -12,6 +12,8 @@ import {IARankingViewOptions} from '../ARankingView';
 import {exportLogic} from './export';
 import {lazyDialogModule} from '../../dialogs';
 import * as $ from 'jquery';
+import {threadId} from 'worker_threads';
+
 export interface ISearchOption {
   text: string;
   id: string;
@@ -39,17 +41,69 @@ export function wrap(score: IPluginDesc): IScoreLoader {
     }
   };
 }
-/**
- * Basic markup of the side panel
- * Adds functionality of tabs
- */
-const sidePanelTemplate = `
-<header>
-</header>
-<main class="tab-content">
-   <div class="tab-pane active default" id="side-panel-default"></div>
 
-</main>`;
+class LineUpPanelHeader {
+
+  readonly node: HTMLElement;
+
+  constructor(parent: HTMLElement) {
+    this.node = parent.ownerDocument.createElement('header');
+    parent.appendChild(this.node);
+  }
+
+
+
+}
+
+
+class LineUpPanelTabContainer {
+
+  readonly node: HTMLElement;
+
+  private tabs: ALineUpPanelTab[] = [];
+
+  constructor(parent: HTMLElement) {
+    this.node = parent.ownerDocument.createElement('main');
+    this.node.classList.add('tab-content');
+    parent.appendChild(this.node);
+
+  }
+
+  addTab(tab: ALineUpPanelTab) {
+    this.tabs = [...this.tabs, tab];
+    this.node.appendChild(tab.node);
+  }
+
+}
+
+abstract class ALineUpPanelTab {
+
+  readonly node: HTMLElement;
+
+  constructor(parent: HTMLElement) {
+    this.node = parent.ownerDocument.createElement('div');
+    this.node.classList.add('tab-pane');
+  }
+
+}
+
+class LineUpSidePanelTab extends ALineUpPanelTab {
+
+  readonly panel: SidePanel | null;
+
+  constructor(parent: HTMLElement, ctx: any, doc = document) {
+    super(parent);
+    this.node.classList.add('active', 'default');
+    this.node.id = 'side-panel-default';
+
+    this.panel = new SidePanel(ctx, doc, {
+      chooser: false
+    });
+
+    this.node.appendChild(this.panel.node);
+  }
+
+}
 
 export default class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
@@ -71,17 +125,26 @@ export default class LineUpPanelActions extends EventHandler {
   private readonly search: SearchBox<ISearchOption> | null;
 
   readonly panel: SidePanel | null;
-  readonly node: HTMLElement;
+  readonly node: HTMLElement; // wrapper node
 
-  private readonly header: HTMLElement;
-  private readonly body: HTMLElement;
+  private readonly header: LineUpPanelHeader;
+  private readonly tabContainer: LineUpPanelTabContainer;
+
+
+  private body: HTMLElement;
 
   private overview: HTMLElement;
   private wasCollapsed = false;
 
   constructor(protected readonly provider: LocalDataProvider, ctx: any, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
+
     this.node = doc.createElement('aside');
+    this.node.classList.add('lu-side-panel-wrapper');
+
+    this.header = new LineUpPanelHeader(this.node);
+
+    // this.options.enableSidePanel = 'top';
 
     if (options.enableAddingColumns) {
       this.search = new SearchBox<ISearchOption>({
@@ -92,23 +155,21 @@ export default class LineUpPanelActions extends EventHandler {
         item.action();
       });
     }
-    let lineUpSidePanel;
-    if (this.options.enableSidePanel !== 'top') {
-      this.panel = new SidePanel(ctx, doc, {
-        chooser: false
-      });
-      this.node.classList.add('lu-side-panel');
-      this.node.insertAdjacentHTML('afterbegin', sidePanelTemplate);
-      lineUpSidePanel = this.panel.node;
-    } else {
-      lineUpSidePanel = doc.createElement('div');
-      lineUpSidePanel.classList.add('lu-side-panel', 'lu-side-panel-top');
-    }
-    this.header = this.node.querySelector('header');
-    this.body = this.node.querySelector('.default');
-    this.body.appendChild(lineUpSidePanel);
 
-    this.node.classList.add('tdp-view-lineup');
+    if (this.options.enableSidePanel === 'top') {
+      this.node.classList.add('lu-side-panel-top');
+
+    } else {
+
+      this.tabContainer = new LineUpPanelTabContainer(this.node);
+
+      const sidePanel = new LineUpSidePanelTab(this.node, ctx, doc);
+      this.tabContainer.addTab(sidePanel);
+
+      this.body = sidePanel.node; // TODO remove
+      this.panel = sidePanel.panel;
+    }
+
     this.init();
     this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
   }
@@ -134,12 +195,12 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   set collapse(value: boolean) {
-    this.switchButton(value);
+    // this.switchButton(value);
     this.node.classList.toggle('collapsed', value);
   }
 
-  switchButton(value: boolean) {
-    const addColumnButton = this.header.querySelector('.lu-adder');
+  private switchButton(value: boolean) {
+    const addColumnButton = this.header.node.querySelector('.lu-adder');
     const addColumnInput = this.body.querySelector('.lu-adder');
 
     if (value && addColumnInput.contains(this.search.node)) {
@@ -168,10 +229,9 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private init() {
-    const luAdder = `
-  <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}</div>`
-    this.header.insertAdjacentHTML('afterbegin', luAdder);
-    this.node.querySelector('.lu-side-panel').insertAdjacentHTML('afterbegin', luAdder);
+    const luAdder = `<div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}</div>`;
+    this.header.node.insertAdjacentHTML('afterbegin', luAdder);
+    this.body.insertAdjacentHTML('afterbegin', luAdder);
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
       this.node.insertAdjacentHTML('afterbegin', `<a href="#side-panel-default" class="hello active"  title="(Un)Collapse"></a>`);
       this.node.querySelector('a')!.addEventListener('click', (evt) => {
@@ -182,17 +242,20 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
 
-    const buttons = this.header;
+    const buttons = this.header.node;
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
-    this.appendExtraTabs().forEach((b) => {
-      b.href = '#b';
-      this.header.appendChild(b);
-      const div = document.createElement('div');
-      div.classList.add('tab-pane');
-      div.id = 'b';
-      div.innerText = 'hello from second tab';
-      this.body.parentElement.appendChild(div);
-    });
+
+    if(!this.isTopMode) {
+      this.appendExtraTabs().forEach((b) => {
+        b.href = '#b';
+        this.header.node.appendChild(b);
+        const div = document.createElement('div');
+        div.classList.add('tab-pane');
+        div.id = 'b';
+        this.body.parentElement.appendChild(div);
+      });
+    }
+
     if (this.options.enableSaveRanking) {
       buttons.appendChild(this.appendSaveRanking());
     }
@@ -215,6 +278,8 @@ export default class LineUpPanelActions extends EventHandler {
     });
 
     if (this.search) {
+      this.header.node.querySelector('.lu-adder').appendChild(this.search.node);
+      this.body.querySelector('.lu-adder').appendChild(this.search.node);
       addColumnButton.appendChild(this.search.node);
       this.node.querySelector('.lu-adder button')!.addEventListener('click', (evt) => {
         evt.preventDefault();
@@ -347,10 +412,9 @@ export default class LineUpPanelActions extends EventHandler {
   }
   private appendExtraTabs() {
     const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
-    console.log(buttons)
     return buttons.map((button) => {
       const listener = () => {
-        button.load().then((p) => p.factory(p.desc, this.node));
+        button.load().then((p) => p.factory(p.desc, this.node, this.provider));
       };
       return this.createTabMarkup(button.title, 'fa ' + button.cssClass, listener);
     });
@@ -553,6 +617,7 @@ export default class LineUpPanelActions extends EventHandler {
       });
   }
 }
+
 
 function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
   if (!target) {
