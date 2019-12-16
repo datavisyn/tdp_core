@@ -1,4 +1,4 @@
-image: caleydo/phovea_circleci_python:v1.0
+image: caleydo/phovea_circleci_python:v3.0
 
 variables:
   GIT_DEPTH: "1"
