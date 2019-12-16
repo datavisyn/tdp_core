@@ -269,7 +269,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       if lookup_key not in arguments:
         if (arg + u'[]') in arguments:  # check if we can find the lookup key with array form
           lookup_key = (arg + u'[]')
-        else:
+        elif not info or not info.list_as_tuple:
           _log.warn(u'missing argument "%s": "%s"', view.query, arg)
           abort(400, u'missing argument: ' + arg)
       parser = info.type if info and info.type is not None else lambda x: x
@@ -278,7 +278,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
           vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
           value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
         elif info and info.list_as_tuple:
-          vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key)
+          vs = arguments.getlist(lookup_key) if hasattr(arguments, 'getlist') else arguments.get(lookup_key, [])
           if len(vs) == 0:
             value = "(1, null)"
           else:
