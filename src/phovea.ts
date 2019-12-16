@@ -112,5 +112,5 @@ export default function (registry: IRegistry) {
   formElements(FormElementType.BUTTON, () => System.import('./form/elements/FormButton'));
   formElements(FormElementType.CHECKBOX, () => System.import('./form/elements/FormCheckBox'));
   formElements(FormElementType.RADIO, () => System.import('./form/elements/FormRadio'));
-  formElements(FormElementType.FORM_CHECKBOX_LIST, () => System.import('./internal/form/FormCheckboxList'));
+  formElements(FormElementType.FORM_CHECKBOX_LIST, () => System.import('./form/elements/FormCheckboxList'));
 }
