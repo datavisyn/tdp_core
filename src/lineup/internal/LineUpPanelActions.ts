@@ -42,19 +42,99 @@ export function wrap(score: IPluginDesc): IScoreLoader {
   };
 }
 
+interface ILineUpPanelButton {
+  readonly node: HTMLElement;
+}
+
 class LineUpPanelHeader {
 
   readonly node: HTMLElement;
+
+  private buttons: ILineUpPanelButton[] = [];
 
   constructor(parent: HTMLElement) {
     this.node = parent.ownerDocument.createElement('header');
     parent.appendChild(this.node);
   }
 
-
+  addButton(button: ILineUpPanelButton) {
+    this.buttons = [...this.buttons, button];
+    this.node.appendChild(button.node);
+  }
 
 }
 
+
+class LineUpPanelButton implements ILineUpPanelButton {
+  readonly node: HTMLElement;
+
+  constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, linkClass: string, onClick: (ranking: Ranking) => void, extraOptions?) {
+    this.node = parent.ownerDocument.createElement('button');
+    this.node.className = linkClass;
+    this.node.title = title;
+    this.node.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      evt.preventDefault();
+      const first = this.provider.getRankings()[0];
+      if (first) {
+        onClick(first);
+      }
+    });
+  }
+}
+
+class LineUpPanelDownloadButton implements ILineUpPanelButton {
+  readonly node: HTMLElement;
+
+  constructor(parent: HTMLElement, private provider: LocalDataProvider, isTopMode: boolean) {
+    this.node = parent.ownerDocument.createElement('div');
+    this.node.classList.add('btn-group', 'download-data-dropdown');
+    this.node.innerHTML = `
+      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
+      </button>
+      <ul class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
+        <li class="dropdown-header">Download All Rows</li>
+        <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
+        <li class="dropdown-header" data-num-selected-rows="0">Download Selected Rows Only</li>
+        <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
+      </ul>
+    `;
+
+    // Listen for row selection and update number of selected rows
+    // Show/hide some dropdown menu points accordingly using CSS
+    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.download-menu', (indices: number[]) => {
+      (<HTMLElement>this.node.querySelector('[data-num-selected-rows]')).dataset.numSelectedRows = indices.length.toString();
+    });
+
+    const links = Array.from(this.node.querySelectorAll('a'));
+    for (const link of links) {
+      link.onclick = (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        const type = link.dataset.t;
+        const onlySelected = link.dataset.s === 's';
+        exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
+          this.downloadFile(content, mimeType, name);
+        });
+      };
+    }
+  }
+
+  private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
+    const doc = this.node.ownerDocument;
+    const downloadLink = doc.createElement('a');
+    const blob = new Blob([content], {type: mimeType});
+    downloadLink.href = URL.createObjectURL(blob);
+    (<any>downloadLink).download = name;
+
+    doc.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+  }
+
+}
 
 class LineUpPanelTabContainer {
 
@@ -243,7 +323,7 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     const buttons = this.header.node;
-    this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
+    this.appendExtraButtons(buttons);
 
     if(!this.isTopMode) {
       this.appendExtraTabs().forEach((b) => {
@@ -257,17 +337,38 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableSaveRanking) {
-      buttons.appendChild(this.appendSaveRanking());
+      const listener = (ranking: Ranking) => {
+        editDialog(null, (name, description, sec) => {
+          this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, ranking.getOrder(), name, description, sec);
+        });
+      };
+
+      const saveRankingButton =  new LineUpPanelButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
+      this.header.addButton(saveRankingButton);
     }
+
     if (this.options.enableDownload) {
-      buttons.appendChild(this.appendDownload());
+      const downloadButton = new LineUpPanelDownloadButton(buttons, this.provider, this.isTopMode);
+      this.header.addButton(downloadButton);
     }
+
     if (this.options.enableZoom) {
-      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
-      buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
+      const zoomInButton = new LineUpPanelButton(buttons, this.provider, 'Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
+      this.header.addButton(zoomInButton);
+
+      const zoomOutButton = new LineUpPanelButton(buttons, this.provider, 'Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
+      this.header.addButton(zoomOutButton);
     }
+
     if (this.options.enableOverviewMode) {
-      buttons.appendChild(this.appendOverviewButton());
+      const listener = () => {
+        const selected = this.overview.classList.toggle('fa-th-list');
+        this.overview.classList.toggle('fa-list');
+        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
+      };
+      const overviewButton = new LineUpPanelButton(buttons, this.provider, 'En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+      this.overview = overviewButton.node; // TODO might be removed
+      this.header.addButton(overviewButton);
     }
 
     const addColumnButton = <HTMLElement>this.node.querySelector('.lu-adder')!;
@@ -293,6 +394,7 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
   }
+
   private createTabMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void, extraOptions?) {
     const b = this.node.ownerDocument.createElement('a');
     b.className = linkClass;
@@ -322,30 +424,6 @@ export default class LineUpPanelActions extends EventHandler {
     return b;
   }
 
-  private createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void, extraOptions?) {
-    const b = this.node.ownerDocument.createElement('button');
-    b.className = linkClass;
-    b.title = title;
-    b.addEventListener('click', (evt) => {
-      evt.stopPropagation();
-      evt.preventDefault();
-      const first = this.provider.getRankings()[0];
-      if (first) {
-        onClick(first);
-      }
-    });
-    return b;
-  }
-
-  private appendOverviewButton() {
-    const listener = () => {
-      const selected = this.overview.classList.toggle('fa-th-list');
-      this.overview.classList.toggle('fa-list');
-      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
-    };
-    return this.overview = this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
-  }
-
   setViolation(violation?: string) {
     if (violation) {
       this.overview.dataset.violation = violation;
@@ -354,62 +432,18 @@ export default class LineUpPanelActions extends EventHandler {
     }
   }
 
-  private appendDownload() {
-    const node = this.node.ownerDocument.createElement('div');
-    node.classList.add('btn-group', 'download-data-dropdown');
-    node.innerHTML = `
-      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
-      </button>
-      <ul class="dropdown-menu dropdown-menu-${this.isTopMode ? 'left' : 'right'}">
-        <li class="dropdown-header">Download All Rows</li>
-        <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li class="dropdown-header" data-num-selected-rows="0">Download Selected Rows Only</li>
-        <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li role="separator" class="divider"></li>
-        <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
-      </ul>
-    `;
-
-    // Listen for row selection and update number of selected rows
-    // Show/hide some dropdown menu points accordingly using CSS
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.download-menu', (indices: number[]) => {
-      (<HTMLElement>node.querySelector('[data-num-selected-rows]')).dataset.numSelectedRows = indices.length.toString();
-    });
-
-    const links = Array.from(node.querySelectorAll('a'));
-    for (const link of links) {
-      link.onclick = (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        const type = link.dataset.t;
-        const onlySelected = link.dataset.s === 's';
-        exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
-          this.downloadFile(content, mimeType, name);
-        });
-      };
-    }
-
-
-    return node;
-  }
-
-  private appendSaveRanking() {
-    const listener = (ranking: Ranking) => {
-      this.saveRankingDialog(ranking.getOrder());
-    };
-
-    return this.createMarkup('Save List of Entities', 'fa fa-save', listener);
-  }
-
-  private appendExtraButtons() {
+  private appendExtraButtons(parent: HTMLElement) {
     const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_RANKING_BUTTON);
     return buttons.map((button) => {
       const listener = () => {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
-      return this.createMarkup(button.title, 'fa ' + button.cssClass, listener);
+
+      const luButton =  new LineUpPanelButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
+      this.header.addButton(luButton);
     });
   }
+
   private appendExtraTabs() {
     const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
     return buttons.map((button) => {
@@ -417,24 +451,6 @@ export default class LineUpPanelActions extends EventHandler {
         button.load().then((p) => p.factory(p.desc, this.node, this.provider));
       };
       return this.createTabMarkup(button.title, 'fa ' + button.cssClass, listener);
-    });
-  }
-
-  private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
-    const doc = this.node.ownerDocument;
-    const downloadLink = doc.createElement('a');
-    const blob = new Blob([content], {type: mimeType});
-    downloadLink.href = URL.createObjectURL(blob);
-    (<any>downloadLink).download = name;
-
-    doc.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
-  }
-
-  protected saveRankingDialog(order: number[]) {
-    editDialog(null, (name, description, sec) => {
-      this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec);
     });
   }
 
