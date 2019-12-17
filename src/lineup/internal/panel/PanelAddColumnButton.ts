@@ -1,8 +1,8 @@
 import {SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
-import {ILineUpPanelButton} from './LineUpPanelButton';
+import {IPanelButton} from './PanelButton';
 
-export default class LineUpPanelAddColumnButton implements ILineUpPanelButton {
+export default class PanelAddColumnButton implements IPanelButton {
   readonly node: HTMLElement;
 
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {

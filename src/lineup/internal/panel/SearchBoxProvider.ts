@@ -1,7 +1,7 @@
 import {SearchBox, LocalDataProvider, IGroupSearchItem} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 
-export default class LineUpSearchBoxProvider {
+export default class SearchBoxProvider {
 
   private searchBoxes: SearchBox<ISearchOption>[] = [];
 

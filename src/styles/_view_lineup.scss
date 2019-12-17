@@ -159,7 +159,7 @@ $lu_assets: '~lineupjs/src/assets';
       }
 
       button.active {
-        color: orange;
+        color: #ffa500
       }
     }
 
@@ -265,6 +265,10 @@ $lu_assets: '~lineupjs/src/assets';
         margin-right: 0;
         min-width: 0;
         align-self: flex-start;
+
+        button.active {
+          color: unset;
+        }
       }
 
       .tab-content {

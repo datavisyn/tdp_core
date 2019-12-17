@@ -10,14 +10,14 @@ import {
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {lazyDialogModule} from '../../dialogs';
-import LineUpPanelButton, {ILineUpPanelButton} from './panel/LineUpPanelButton';
-import LineUpPanelTabContainer from './panel/LineUpPanelTabContainer';
-import LineUpPanelDownloadButton from './panel/LineUpPanelDownloadButton';
-import {LineUpPanelTab, LineUpSidePanelTab} from './panel/LineUpPanelTab';
-import LineUpSearchBoxProvider from './panel/LineUpSearchBoxProvider';
-import LineUpPanelHeader from './panel/LineUpPanelHeader';
-import LineUpPanelRankingButton from './panel/LineupPanelRankingButton';
-import LineUpPanelAddColumnButton from './panel/LineUpPanelAddColumnButton';
+import PanelButton, {IPanelButton, PanelNavButton} from './panel/PanelButton';
+import PanelTabContainer from './panel/PanelTabContainer';
+import PanelDownloadButton from './panel/PanelDownloadButton';
+import {PanelTab, SidePanelTab} from './panel/PanelTab';
+import SearchBoxProvider from './panel/SearchBoxProvider';
+import PanelHeader from './panel/PanelHeader';
+import PanelRankingButton from './panel/PanelRankingButton';
+import PanelAddColumnButton from './panel/PanelAddColumnButton';
 
 export interface ISearchOption {
   text: string;
@@ -64,13 +64,13 @@ export default class LineUpPanelActions extends EventHandler {
 
   private idType: IDType | null = null;
 
-  private readonly searchBoxProvider: LineUpSearchBoxProvider;
+  private readonly searchBoxProvider: SearchBoxProvider;
 
   readonly panel: SidePanel | null;
   readonly node: HTMLElement; // wrapper node
 
-  private readonly header: LineUpPanelHeader;
-  private readonly tabContainer: LineUpPanelTabContainer;
+  private readonly header: PanelHeader;
+  private readonly tabContainer: PanelTabContainer;
 
   private overview: HTMLElement;
   private wasCollapsed = false;
@@ -81,9 +81,9 @@ export default class LineUpPanelActions extends EventHandler {
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
 
-    this.header = new LineUpPanelHeader(this.node);
+    this.header = new PanelHeader(this.node);
 
-    this.searchBoxProvider = new LineUpSearchBoxProvider(provider, options);
+    this.searchBoxProvider = new SearchBoxProvider(provider, options);
 
     // this.options.enableSidePanel = 'top';
 
@@ -91,10 +91,10 @@ export default class LineUpPanelActions extends EventHandler {
       this.node.classList.add('lu-side-panel-top');
 
     } else {
-      const sidePanel = new LineUpSidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
+      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
       this.panel = sidePanel.panel;
 
-      this.tabContainer = new LineUpPanelTabContainer(this.node);
+      this.tabContainer = new PanelTabContainer(this.node);
       this.tabContainer.addTab(sidePanel);
       this.tabContainer.show(sidePanel);
     }
@@ -151,12 +151,12 @@ export default class LineUpPanelActions extends EventHandler {
         this.collapse = !this.collapse;
       };
 
-      const collapseButton = new LineUpPanelButton(buttons, '(Un)Collapse', 'collapse-button', listener);
+      const collapseButton = new PanelButton(buttons, '(Un)Collapse', 'collapse-button', listener);
       this.header.addButton(collapseButton);
     }
 
     if (this.options.enableAddingColumns) {
-      const addColumnButton = new LineUpPanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
+      const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
       this.header.addButton(addColumnButton);
     }
 
@@ -169,20 +169,20 @@ export default class LineUpPanelActions extends EventHandler {
         });
       };
 
-      const saveRankingButton = new LineUpPanelRankingButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
+      const saveRankingButton = new PanelRankingButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
       this.header.addButton(saveRankingButton);
     }
 
     if (this.options.enableDownload) {
-      const downloadButton = new LineUpPanelDownloadButton(buttons, this.provider, this.isTopMode);
+      const downloadButton = new PanelDownloadButton(buttons, this.provider, this.isTopMode);
       this.header.addButton(downloadButton);
     }
 
     if (this.options.enableZoom) {
-      const zoomInButton = new LineUpPanelButton(buttons, 'Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
+      const zoomInButton = new PanelButton(buttons, 'Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
       this.header.addButton(zoomInButton);
 
-      const zoomOutButton = new LineUpPanelButton(buttons, 'Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
+      const zoomOutButton = new PanelButton(buttons, 'Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
       this.header.addButton(zoomOutButton);
     }
 
@@ -192,13 +192,13 @@ export default class LineUpPanelActions extends EventHandler {
         this.overview.classList.toggle('fa-list');
         this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
       };
-      const overviewButton = new LineUpPanelButton(buttons, 'En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+      const overviewButton = new PanelButton(buttons, 'En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed
       this.header.addButton(overviewButton);
     }
 
     if (!this.isTopMode) {
-      this.appendExtraTabs(buttons).forEach((button: LineUpPanelButton) => {
+      this.appendExtraTabs(buttons).forEach((button: PanelButton) => {
         this.header.addButton(button);
       });
     }
@@ -219,7 +219,7 @@ export default class LineUpPanelActions extends EventHandler {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
 
-      const luButton = new LineUpPanelRankingButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
+      const luButton = new PanelRankingButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
       this.header.addButton(luButton);
     });
   }
@@ -227,7 +227,7 @@ export default class LineUpPanelActions extends EventHandler {
   private appendExtraTabs(buttons: HTMLElement) {
     const plugins = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
     return plugins.map((plugin) => {
-      const tab = new LineUpPanelTab(this.tabContainer.node, plugin.tabWidth);
+      const tab = new PanelTab(this.tabContainer.node, plugin.tabWidth);
       this.tabContainer.addTab(tab);
 
       let isLoaded = false;
@@ -253,7 +253,7 @@ export default class LineUpPanelActions extends EventHandler {
           });
         }
       };
-      return new LineUpPanelButton(buttons, plugin.title, 'fa ' + plugin.cssClass, listener);
+      return new PanelNavButton(buttons, tab.node, plugin.title, 'fa ' + plugin.cssClass, listener);
     });
   }
 

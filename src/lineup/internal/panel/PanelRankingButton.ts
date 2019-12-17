@@ -1,8 +1,7 @@
-import {ILineUpPanelButton} from './LineUpPanelButton';
-
+import {IPanelButton} from './PanelButton';
 import {LocalDataProvider, Ranking} from 'lineupjs';
 
-export default class LineUpPanelRankingButton implements ILineUpPanelButton {
+export default class PanelRankingButton implements IPanelButton {
   readonly node: HTMLElement;
 
   constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, linkClass: string, onClick: (ranking: Ranking) => void) {

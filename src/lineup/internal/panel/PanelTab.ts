@@ -1,15 +1,15 @@
 import {SidePanel, SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 
-interface ILineUpPanelTabOptions {
+interface IPanelTabOptions {
   width: string;
 }
 
-export class LineUpPanelTab {
+export class PanelTab {
 
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, options?: Partial<ILineUpPanelTabOptions>) {
+  constructor(parent: HTMLElement, options?: Partial<IPanelTabOptions>) {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
 
@@ -26,7 +26,7 @@ export class LineUpPanelTab {
   }
 }
 
-export class LineUpSidePanelTab extends LineUpPanelTab {
+export class SidePanelTab extends PanelTab {
 
   readonly panel: SidePanel | null;
 

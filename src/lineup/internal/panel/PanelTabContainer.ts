@@ -1,12 +1,12 @@
-import {LineUpPanelTab} from './LineUpPanelTab';
+import {PanelTab} from './PanelTab';
 
-export default class LineUpPanelTabContainer {
+export default class PanelTabContainer {
 
   readonly node: HTMLElement;
 
-  private tabs: LineUpPanelTab[] = [];
+  private tabs: PanelTab[] = [];
 
-  private currentTab: LineUpPanelTab;
+  private currentTab: PanelTab;
 
   constructor(parent: HTMLElement) {
     this.node = parent.ownerDocument.createElement('main');
@@ -14,16 +14,16 @@ export default class LineUpPanelTabContainer {
     parent.appendChild(this.node);
   }
 
-  private get defaultTab(): LineUpPanelTab {
+  private get defaultTab(): PanelTab {
     return this.tabs[0];
   }
 
-  addTab(tab: LineUpPanelTab) {
+  addTab(tab: PanelTab) {
     this.tabs = [...this.tabs, tab];
     this.node.appendChild(tab.node);
   }
 
-  toggle(tab: LineUpPanelTab) {
+  toggle(tab: PanelTab) {
     if (this.currentTab === tab) {
       this.hide(tab);
 
@@ -32,7 +32,7 @@ export default class LineUpPanelTabContainer {
     }
   }
 
-  show(tab: LineUpPanelTab) {
+  show(tab: PanelTab) {
     if (this.currentTab) {
       this.currentTab.hide();
     }
@@ -41,7 +41,7 @@ export default class LineUpPanelTabContainer {
     this.currentTab = tab;
   }
 
-  hide(tab: LineUpPanelTab) {
+  hide(tab: PanelTab) {
     tab.hide();
     this.defaultTab.show();
     this.currentTab = this.defaultTab;
