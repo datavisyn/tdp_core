@@ -9,8 +9,15 @@ import {
 } from '../../extensions';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
-import {exportLogic} from './export';
 import {lazyDialogModule} from '../../dialogs';
+import LineUpPanelButton, {ILineUpPanelButton} from './panel/LineUpPanelButton';
+import LineUpPanelTabContainer from './panel/LineUpPanelTabContainer';
+import LineUpPanelDownloadButton from './panel/LineUpPanelDownloadButton';
+import {LineUpPanelTab, LineUpSidePanelTab} from './panel/LineUpPanelTab';
+import LineUpSearchBoxProvider from './panel/LineUpSearchBoxProvider';
+import LineUpPanelHeader from './panel/LineUpPanelHeader';
+import LineUpPanelRankingButton from './panel/LineupPanelRankingButton';
+import LineUpPanelAddColumnButton from './panel/LineUpPanelAddColumnButton';
 
 export interface ISearchOption {
   text: string;
@@ -39,274 +46,6 @@ export function wrap(score: IPluginDesc): IScoreLoader {
     }
   };
 }
-
-class LineUpSearchBoxProvider {
-
-  private searchBoxes: SearchBox<ISearchOption>[] = [];
-
-  private idType: IDType | null = null;
-
-  constructor(private provider: LocalDataProvider, private options: any) {
-
-  }
-
-  get length(): number {
-    return this.searchBoxes.length;
-  }
-
-  createSearchBox(): SearchBox<ISearchOption> {
-    const searchBox = new SearchBox<ISearchOption>({
-      placeholder: 'Add Column...'
-    });
-
-    searchBox.on(SearchBox.EVENT_SELECT, (item) => {
-      item.action();
-    });
-
-    this.searchBoxes = [...this.searchBoxes, searchBox];
-
-    return searchBox;
-  }
-
-  update(items: (ISearchOption | IGroupSearchItem<ISearchOption>)[]) {
-    this.searchBoxes.forEach((searchBox) => searchBox.data = items);
-  }
-}
-
-
-interface ILineUpPanelButton {
-  readonly node: HTMLElement;
-}
-
-class LineUpPanelHeader {
-
-  readonly node: HTMLElement;
-
-  private buttons: ILineUpPanelButton[] = [];
-
-  constructor(parent: HTMLElement) {
-    this.node = parent.ownerDocument.createElement('header');
-    parent.appendChild(this.node);
-  }
-
-  addButton(button: ILineUpPanelButton) {
-    this.buttons = [...this.buttons, button];
-    this.node.appendChild(button.node);
-  }
-
-}
-
-
-class LineUpPanelButton implements ILineUpPanelButton {
-  readonly node: HTMLElement;
-
-  constructor(parent: HTMLElement, title: string, linkClass: string, onClick: () => void) {
-    this.node = parent.ownerDocument.createElement('button');
-    this.node.className = linkClass;
-    this.node.title = title;
-    this.node.addEventListener('click', (evt) => {
-      evt.stopPropagation();
-      evt.preventDefault();
-      onClick();
-    });
-  }
-  public highlight() {
-    this.node.style.color = 'orange';
-  }
-}
-
-class LineUpPanelRankingButton implements ILineUpPanelButton {
-  readonly node: HTMLElement;
-
-  constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
-    this.node = parent.ownerDocument.createElement('button');
-    this.node.className = linkClass;
-    this.node.title = title;
-    this.node.addEventListener('click', (evt) => {
-      evt.stopPropagation();
-      evt.preventDefault();
-      const first = this.provider.getRankings()[0];
-      if (first) {
-        onClick(first);
-      }
-    });
-  }
-}
-
-class LineUpPanelDownloadButton implements ILineUpPanelButton {
-  readonly node: HTMLElement;
-
-  constructor(parent: HTMLElement, private provider: LocalDataProvider, isTopMode: boolean) {
-    this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('btn-group', 'download-data-dropdown');
-    this.node.innerHTML = `
-      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
-      </button>
-      <ul class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
-        <li class="dropdown-header">Download All Rows</li>
-        <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li class="dropdown-header" data-num-selected-rows="0">Download Selected Rows Only</li>
-        <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li role="separator" class="divider"></li>
-        <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
-      </ul>
-    `;
-
-    // Listen for row selection and update number of selected rows
-    // Show/hide some dropdown menu points accordingly using CSS
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.download-menu', (indices: number[]) => {
-      (<HTMLElement>this.node.querySelector('[data-num-selected-rows]')).dataset.numSelectedRows = indices.length.toString();
-    });
-
-    const links = Array.from(this.node.querySelectorAll('a'));
-    for (const link of links) {
-      link.onclick = (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        const type = link.dataset.t;
-        const onlySelected = link.dataset.s === 's';
-        exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
-          this.downloadFile(content, mimeType, name);
-        });
-      };
-    }
-  }
-
-  private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
-    const doc = this.node.ownerDocument;
-    const downloadLink = doc.createElement('a');
-    const blob = new Blob([content], {type: mimeType});
-    downloadLink.href = URL.createObjectURL(blob);
-    (<any>downloadLink).download = name;
-
-    doc.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
-  }
-
-}
-
-class LineUpPanelAddColumnButton implements ILineUpPanelButton {
-  readonly node: HTMLElement;
-
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
-    this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('lu-adder');
-
-    this.node.addEventListener('mouseleave', () => {
-      this.node.classList.remove('once');
-    });
-
-    const button = this.node.ownerDocument.createElement('button');
-    button.classList.add('fa', 'fa-plus');
-    button.title = 'Add Column';
-
-    button.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      evt.stopPropagation();
-      this.node.classList.add('once');
-      (<HTMLElement>this.search.node.querySelector('input'))!.focus();
-      this.search.focus();
-    });
-
-    this.node.appendChild(button);
-    this.node.appendChild(this.search.node);
-  }
-}
-
-
-class LineUpPanelTabContainer {
-
-  readonly node: HTMLElement;
-
-  private tabs: LineUpPanelTab[] = [];
-
-  private currentTab: LineUpPanelTab;
-
-  constructor(parent: HTMLElement) {
-    this.node = parent.ownerDocument.createElement('main');
-    this.node.classList.add('tab-content');
-    parent.appendChild(this.node);
-  }
-
-  private get defaultTab(): LineUpPanelTab {
-    return this.tabs[0];
-  }
-
-  addTab(tab: LineUpPanelTab) {
-    this.tabs = [...this.tabs, tab];
-    this.node.appendChild(tab.node);
-  }
-
-  toggle(tab: LineUpPanelTab) {
-    if (this.currentTab === tab) {
-      this.hide(tab);
-
-    } else {
-      this.show(tab);
-    }
-  }
-
-  show(tab: LineUpPanelTab) {
-    if (this.currentTab) {
-      this.currentTab.hide();
-    }
-
-    tab.show();
-    this.currentTab = tab;
-  }
-
-  hide(tab: LineUpPanelTab) {
-    tab.hide();
-    this.defaultTab.show();
-    this.currentTab = this.defaultTab;
-  }
-
-}
-
-
-interface ILineUpPanelTabOptions {
-  width: string;
-}
-
-class LineUpPanelTab {
-
-  readonly node: HTMLElement;
-
-  constructor(parent: HTMLElement, cssClass: string, options?: Partial<ILineUpPanelTabOptions>) {
-    this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('tab-pane', cssClass);
-
-    const o = Object.assign({}, options);
-    this.node.style.width = o.width || null;
-  }
-
-  show() {
-    this.node.classList.add('active');
-  }
-
-  hide() {
-    this.node.classList.remove('active');
-  }
-}
-
-class LineUpSidePanelTab extends LineUpPanelTab {
-
-  readonly panel: SidePanel | null;
-
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document) {
-    super(parent);
-
-    this.panel = new SidePanel(ctx, doc, {
-      chooser: false
-    });
-
-    this.node.appendChild(this.search.node);
-    this.node.appendChild(this.panel.node);
-  }
-
-}
-
 
 export default class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
@@ -488,7 +227,7 @@ export default class LineUpPanelActions extends EventHandler {
   private appendExtraTabs(buttons: HTMLElement) {
     const plugins = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
     return plugins.map((plugin) => {
-      const tab = new LineUpPanelTab(this.tabContainer.node, 'fa ' + plugin.cssClass, plugin.tabWidth);
+      const tab = new LineUpPanelTab(this.tabContainer.node, plugin.tabWidth);
       this.tabContainer.addTab(tab);
 
       let isLoaded = false;

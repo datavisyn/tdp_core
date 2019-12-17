@@ -119,7 +119,8 @@ $lu_assets: '~lineupjs/src/assets';
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow:hidden;
+    overflow: hidden;
+
     %lu-panel-button {
       background: #fff;
       border: 1px solid #ddd;
@@ -151,12 +152,15 @@ $lu_assets: '~lineupjs/src/assets';
         display: none;
       }
 
-      a,
+      .collapse-button,
       button {
         @extend %lu-panel-button;
         height: 2em;
       }
 
+      button.active {
+        color: orange;
+      }
     }
 
     label,
