@@ -11,8 +11,6 @@ import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {exportLogic} from './export';
 import {lazyDialogModule} from '../../dialogs';
-import * as $ from 'jquery';
-import {threadId} from 'worker_threads';
 
 export interface ISearchOption {
   text: string;
@@ -111,6 +109,9 @@ class LineUpPanelButton implements ILineUpPanelButton {
       evt.preventDefault();
       onClick();
     });
+  }
+  public highlight() {
+    this.node.style.color = 'orange';
   }
 }
 
@@ -238,7 +239,7 @@ class LineUpPanelTabContainer {
   }
 
   toggle(tab: LineUpPanelTab) {
-    if(this.currentTab === tab) {
+    if (this.currentTab === tab) {
       this.hide(tab);
 
     } else {
@@ -247,7 +248,7 @@ class LineUpPanelTabContainer {
   }
 
   show(tab: LineUpPanelTab) {
-    if(this.currentTab) {
+    if (this.currentTab) {
       this.currentTab.hide();
     }
 
@@ -272,9 +273,9 @@ class LineUpPanelTab {
 
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, options?: Partial<ILineUpPanelTabOptions>) {
+  constructor(parent: HTMLElement, cssClass: string, options?: Partial<ILineUpPanelTabOptions>) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('tab-pane');
+    this.node.classList.add('tab-pane', cssClass);
 
     const o = Object.assign({}, options);
     this.node.style.width = o.width || null;
@@ -411,12 +412,12 @@ export default class LineUpPanelActions extends EventHandler {
         this.collapse = !this.collapse;
       };
 
-      const collapseButton =  new LineUpPanelButton(buttons, '(Un)Collapse', 'collapse-button', listener);
+      const collapseButton = new LineUpPanelButton(buttons, '(Un)Collapse', 'collapse-button', listener);
       this.header.addButton(collapseButton);
     }
 
     if (this.options.enableAddingColumns) {
-      const addColumnButton =  new LineUpPanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
+      const addColumnButton = new LineUpPanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
       this.header.addButton(addColumnButton);
     }
 
@@ -429,7 +430,7 @@ export default class LineUpPanelActions extends EventHandler {
         });
       };
 
-      const saveRankingButton =  new LineUpPanelRankingButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
+      const saveRankingButton = new LineUpPanelRankingButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
       this.header.addButton(saveRankingButton);
     }
 
@@ -457,7 +458,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.header.addButton(overviewButton);
     }
 
-    if(!this.isTopMode) {
+    if (!this.isTopMode) {
       this.appendExtraTabs(buttons).forEach((button: LineUpPanelButton) => {
         this.header.addButton(button);
       });
@@ -479,7 +480,7 @@ export default class LineUpPanelActions extends EventHandler {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
 
-      const luButton =  new LineUpPanelRankingButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
+      const luButton = new LineUpPanelRankingButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
       this.header.addButton(luButton);
     });
   }
@@ -487,14 +488,14 @@ export default class LineUpPanelActions extends EventHandler {
   private appendExtraTabs(buttons: HTMLElement) {
     const plugins = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
     return plugins.map((plugin) => {
-      const tab = new LineUpPanelTab(this.tabContainer.node, plugin.tabWidth);
+      const tab = new LineUpPanelTab(this.tabContainer.node, 'fa ' + plugin.cssClass, plugin.tabWidth);
       this.tabContainer.addTab(tab);
 
       let isLoaded = false;
 
       const listener = () => {
-        if(isLoaded) {
-          if(this.collapse) {
+        if (isLoaded) {
+          if (this.collapse) {
             this.collapse = false; // expand side panel
             this.tabContainer.show(tab);
 

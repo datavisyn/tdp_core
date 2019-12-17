@@ -119,7 +119,7 @@ $lu_assets: '~lineupjs/src/assets';
     display: flex;
     flex-direction: column;
     position: relative;
-
+    overflow:hidden;
     %lu-panel-button {
       background: #fff;
       border: 1px solid #ddd;
@@ -142,7 +142,9 @@ $lu_assets: '~lineupjs/src/assets';
     }
 
     >header {
-      display: flex;
+      margin-bottom: 1em;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(2.8em, 1fr));
 
       .lu-adder {
         margin-top: 1em;
@@ -175,10 +177,9 @@ $lu_assets: '~lineupjs/src/assets';
 
     .collapse-button {
       @extend %lu-panel-button;
-      // width: 2em;
+      grid-row: 1/3;
       height: 2em;
-      // position: absolute;
-      margin-right: 1em;
+      margin-right: 0.5em;
 
       &::before {
         @include fa-icon();
@@ -243,9 +244,9 @@ $lu_assets: '~lineupjs/src/assets';
       min-width: 0;
       display: flex;
       flex-direction: column;
+      overflow: visible;
 
       .collapse-button {
-        width: 2.5em;
         position: relative;
         margin-right: 0;
 
