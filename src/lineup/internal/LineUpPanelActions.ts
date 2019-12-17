@@ -227,7 +227,7 @@ export default class LineUpPanelActions extends EventHandler {
   private appendExtraTabs(buttons: HTMLElement) {
     const plugins = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
     return plugins.map((plugin) => {
-      const tab = new PanelTab(this.tabContainer.node, plugin.tabWidth);
+      const tab = new PanelTab(this.tabContainer.node, plugin.options);
       this.tabContainer.addTab(tab);
 
       let isLoaded = false;

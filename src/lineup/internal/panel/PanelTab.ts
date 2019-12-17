@@ -2,7 +2,7 @@ import {SidePanel, SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 
 interface IPanelTabOptions {
-  width: string;
+  tabWidth: string;
 }
 
 export class PanelTab {
@@ -14,7 +14,7 @@ export class PanelTab {
     this.node.classList.add('tab-pane');
 
     const o = Object.assign({}, options);
-    this.node.style.width = o.width || null;
+    this.node.style.width = o.tabWidth || null;
   }
 
   show() {
