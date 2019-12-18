@@ -16,7 +16,7 @@ import LineUpColors from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
-import {addLazyColumn} from './internal/column';
+import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 import {ISecureItem} from 'phovea_core/src/security';
 
@@ -475,7 +475,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number) {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return addLazyColumn(colDesc, data, this.provider, position, () => {
@@ -484,7 +484,7 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  private addScoreColumn(score: IScore<any>, position?: number) {
+  private addScoreColumn(score: IScore<any>, position?: number): ILazyLoadedColumn {
     const args = typeof this.options.additionalComputeScoreParameter === 'function' ? this.options.additionalComputeScoreParameter() : this.options.additionalComputeScoreParameter;
 
     const colDesc = score.createDesc(args);
@@ -526,7 +526,7 @@ export abstract class ARankingView extends AView {
    * @param {IScore<any>} score
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
-  addTrackedScoreColumn(score: IScore<any>, position?: number) {
+  addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn> {
     return this.withoutTracking(() => this.addScoreColumn(score, position));
   }
 
@@ -539,7 +539,7 @@ export abstract class ARankingView extends AView {
    * @param {string} columnId
    * @returns {Promise<boolean>}
    */
-  removeTrackedScoreColumn(columnId: string) {
+  removeTrackedScoreColumn(columnId: string): Promise<boolean> {
     return this.withoutTracking(() => {
       const column = this.provider.find(columnId);
       return column.removeMe();
