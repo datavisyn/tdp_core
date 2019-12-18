@@ -471,7 +471,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 }
 
-function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
+export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
   if (!target) {
     return [];
   }
