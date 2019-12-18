@@ -1,4 +1,4 @@
-import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions } from 'lineupjs';
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions} from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -19,6 +19,7 @@ import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 import {ISecureItem} from 'phovea_core/src/security';
+import i18n from 'phovea_core/src/i18n';
 
 export {IRankingWrapper} from './internal/ranking';
 export {LocalDataProvider as DataProvider} from 'lineupjs';
@@ -471,7 +472,7 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, sec: Partial<ISecureItem>) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
-    successfullySaved('List of Entities', name);
+    successfullySaved(i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
@@ -627,7 +628,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected setLineUpData(rows: IRow[]) {
-    this.setHint(rows.length === 0, 'No data found for selection and parameter.');
+    this.setHint(rows.length === 0, i18n.t('tdp:core.lineup.RankingView.notFoundHint'));
     this.provider.setData(rows);
     this.selectionHelper.rows = rows;
     this.selectionHelper.setItemSelection(this.getItemSelection());
@@ -650,7 +651,7 @@ export abstract class ARankingView extends AView {
   updateLineUpStats() {
     const showStats = (total: number, selected = 0, shown = 0) => {
       const name = shown === 1 ? this.options.itemName : this.options.itemNamePlural;
-      return `Showing ${shown} ${total > 0 ? `of ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} selected` : ''}`;
+      return `${i18n.t('tdp:core.lineup.RankingView.showing')} ${shown} ${total > 0 ? `${i18n.t('tdp:core.lineup.RankingView.of')} ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} ${i18n.t('tdp:core.lineup.RankingView.selected')}` : ''}`;
     };
 
     const selected = this.provider.getSelection().length;

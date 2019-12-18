@@ -18,6 +18,7 @@ import {
 import {on as globalOn, off as globalOff} from 'phovea_core/src/event';
 import {fromNow} from './internal/utils';
 import {successfullyDeleted, successfullySaved} from './notifications';
+import i18n from 'phovea_core/src/i18n';
 
 export {isPublic} from './internal/EditProvenanceGraphMenu';
 
@@ -38,15 +39,15 @@ abstract class ASessionList {
   protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
     switch (type) {
       case 'delete':
-        return `<a href="#" data-action="delete" title="Delete Session" ><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">Delete</span></a>`;
+        return `<a href="#" data-action="delete" title="${i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">${i18n.t('tdp:core.SessionList.delete')}</span></a>`;
       case 'select':
-        return `<a href="#" data-action="select" title="Continue Session"><i class="fa fa-folder-open" aria-hidden="true"></i><span class="sr-only">Continue</span></a>`;
+        return `<a href="#" data-action="select" title="${i18n.t('tdp:core.SessionList.continueSession')}"><i class="fa fa-folder-open" aria-hidden="true"></i><span class="sr-only">${i18n.t('tdp:core.SessionList.continue')}</span></a>`;
       case 'clone':
-        return `<a href="#" data-action="clone" title="Clone to Temporary Session"><i class="fa fa-clone" aria-hidden="true"></i><span class="sr-only">Clone to Temporary Session</span></a>`;
+        return `<a href="#" data-action="clone" title="${i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i><span class="sr-only">${i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
       case 'persist':
-        return `<a href="#" data-action="persist" title="Persist Session"><i class="fa fa-cloud" aria-hidden="true"></i><span class="sr-only">Persist Session</span></a>`;
+        return `<a href="#" data-action="persist" title="${i18n.t('tdp:core.SessionList.persistSession')}"><i class="fa fa-cloud" aria-hidden="true"></i><span class="sr-only">${i18n.t('tdp:core.SessionList.persistSession')}</span></a>`;
       case 'edit':
-        return `<a href="#" data-action="edit" title="Edit Session Details"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">Edit Session Details</span></a>`;
+        return `<a href="#" data-action="edit" title="${i18n.t('tdp:core.SessionList.editSession')}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">${i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
     }
   }
 
@@ -58,10 +59,10 @@ abstract class ASessionList {
 
     $enter.select('a[data-action="delete"]').on('click', async function (d) {
       stopEvent();
-      const deleteIt = await areyousure(`Are you sure to delete session: "${d.name}"`);
+      const deleteIt = await areyousure(i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
       if (deleteIt) {
         await manager.delete(d);
-        successfullyDeleted('Session', d.name);
+        successfullyDeleted(i18n.t('tdp:core.SessionList.session'), d.name);
         const tr = this.parentElement.parentElement;
         tr.remove();
       }
@@ -84,15 +85,15 @@ abstract class ASessionList {
       stopEvent();
       const nameTd = <HTMLElement>this.parentElement.parentElement.firstElementChild;
       const publicI = <HTMLElement>this.parentElement.parentElement.children[1].firstElementChild;
-      editProvenanceGraphMetaData(d, {button: 'Edit'}).then((extras) => {
+      editProvenanceGraphMetaData(d, {button: i18n.t('tdp:core.SessionList.edit')}).then((extras) => {
         if (extras !== null) {
           Promise.resolve(manager.editGraphMetaData(d, extras))
             .then((desc) => {
               //update the name
               nameTd.innerText = desc.name;
-              successfullySaved('Session', desc.name);
+              successfullySaved(i18n.t('tdp:core.SessionList.session'), desc.name);
               publicI.className = isPublic(desc) ? 'fa fa-users' : 'fa fa-user';
-              publicI.setAttribute('title', isPublic(d) ? 'Public (everyone can see it)' : 'Private');
+              publicI.setAttribute('title', isPublic(d) ? i18n.t('tdp:core.SessionList.status') : i18n.t('tdp:core.SessionList.status', {context: 'private'}));
             })
             .catch(showErrorModalDialog);
         }
@@ -114,7 +115,7 @@ abstract class ASessionList {
     return select(this.parent).classed('menuTable', true).html(`
       <div class="loading">
         <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        <span class="sr-only">Loading...</span>
+        <span class="sr-only">${i18n.t('tdp:core.SessionList.loadingText')}</span>
       </div>`);
   }
 
@@ -154,9 +155,9 @@ export class TemporarySessionList extends ASessionList {
     const table = `<table class="table table-striped table-hover table-bordered table-condensed">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Date</th>
-        <th>Actions</th>
+        <th>${i18n.t('tdp:core.SessionList.name')}</th>
+        <th>${i18n.t('tdp:core.SessionList.date')}</th>
+        <th>${i18n.t('tdp:core.SessionList.actions')}</th>
       </tr>
     </thead>
     <tbody>
@@ -167,9 +168,7 @@ export class TemporarySessionList extends ASessionList {
 
     //replace loading
     const $table = $parent.html(`<p>
-      A temporary session will only be stored in your local browser cache.
-      It is not possible to share a link to states of this session with others.
-      Only the ${KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} most recent sessions will be stored.
+     ${i18n.t('tdp:core.SessionList.sessionMessage', {latest: KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES})}
     </p><div>${this.mode === 'table' ? table : list}</div>`);
 
     const updateTable = (data: IProvenanceGraphDataDescription[]) => {
@@ -181,9 +180,9 @@ export class TemporarySessionList extends ASessionList {
           <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</td>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('td').text((d) => d.name).attr('class', (d) => isPublic(d) ? 'public' : 'private');
+      $tr.select('td').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18n.t('tdp:core.SessionList.status') as string : i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('td:nth-of-type(2)')
-        .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
+        .text((d) => d.ts ? fromNow(d.ts) : i18n.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
       $tr.exit().remove();
@@ -198,9 +197,9 @@ export class TemporarySessionList extends ASessionList {
           <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</span>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('span').text((d) => d.name).attr('class', (d) => isPublic(d) ? 'public' : 'private');
+      $tr.select('span').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18n.t('tdp:core.SessionList.status') as string : i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('span:nth-of-type(2)')
-        .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
+        .text((d) => d.ts ? fromNow(d.ts) : i18n.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
       $tr.exit().remove();
@@ -232,10 +231,10 @@ export class PersistentSessionList extends ASessionList {
     const tableMine = `<table class="table table-striped table-hover table-bordered table-condensed">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Access</th>
-                    <th>Date</th>
-                    <th>Actions</th>
+                    <th>${i18n.t('tdp:core.SessionList.name')}</th>
+                    <th>${i18n.t('tdp:core.SessionList.access')}</th>
+                    <th>${i18n.t('tdp:core.SessionList.date')}</th>
+                    <th>${i18n.t('tdp:core.SessionList.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,10 +244,10 @@ export class PersistentSessionList extends ASessionList {
     const tablePublic = `<table class="table table-striped table-hover table-bordered table-condensed">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Creator</th>
-                    <th>Date</th>
-                    <th>Actions</th>
+                    <th>${i18n.t('tdp:core.SessionList.name')}</th>
+                    <th>${i18n.t('tdp:core.SessionList.creator')}</th>
+                    <th>${i18n.t('tdp:core.SessionList.date')}</th>
+                    <th>${i18n.t('tdp:core.SessionList.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -257,13 +256,11 @@ export class PersistentSessionList extends ASessionList {
               </table>`;
 
     $parent.html(`<p>
-     The persistent session will be stored on the server.
-     By default, sessions are private, meaning that only the creator has access to it.
-     If the status is set to public, others can also see the session and access certain states by opening a shared link.
+    ${i18n.t('tdp:core.SessionList.paragraphText')}
     </p>
         <ul class="nav nav-tabs" role="tablist">
-          <li class="active" role="presentation"><a href="#session_mine" class="active"><i class="fa fa-user"></i> My Sessions</a></li>
-          <li role="presentation"><a href="#session_others"><i class="fa fa-users"></i> Other Sessions</a></li>
+          <li class="active" role="presentation"><a href="#session_mine" class="active"><i class="fa fa-user"></i> ${i18n.t('tdp:core.SessionList.mySessions')}</a></li>
+          <li role="presentation"><a href="#session_others"><i class="fa fa-users"></i> ${i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
         </ul>
         <div class="tab-content">
             <div id="session_mine" class="tab-pane active">
@@ -284,6 +281,10 @@ export class PersistentSessionList extends ASessionList {
       const myworkspaces = data.filter((d) => d.creator === me);
       const otherworkspaces = data.filter((d) => d.creator !== me);
 
+      const publicTitle = i18n.t('tdp:core.SessionList.status');
+      const privateTitle = i18n.t('tdp:core.SessionList.status', {context: 'private'});
+      const unknownText = i18n.t('tdp:core.SessionList.unknown');
+
       if (this.mode === 'table') {
         {
           const $tr = $parent.select('#session_mine tbody').selectAll('tr').data(myworkspaces);
@@ -298,9 +299,9 @@ export class PersistentSessionList extends ASessionList {
           $tr.select('td').text((d) => d.name);
           $tr.select('td:nth-of-type(2) i')
             .attr('class', (d) => isPublic(d) ? 'fa fa-users' : 'fa fa-user')
-            .attr('title', (d) => isPublic(d) ? 'Public (everyone can see it)' : 'Private');
+            .attr('title', (d) => isPublic(d) ? publicTitle : privateTitle);
           $tr.select('td:nth-of-type(3)')
-            .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
+            .text((d) => d.ts ? fromNow(d.ts) : unknownText)
             .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
           $tr.exit().remove();
@@ -343,9 +344,9 @@ export class PersistentSessionList extends ASessionList {
           $tr.select('span').text((d) => d.name);
           $tr.select('span:nth-of-type(2) i')
             .attr('class', (d) => isPublic(d) ? 'fa fa-users' : 'fa fa-user')
-            .attr('title', (d) => isPublic(d) ? 'Public (everyone can see it)' : 'Private');
+            .attr('title', (d) => isPublic(d) ? publicTitle : privateTitle);
           $tr.select('span:nth-of-type(3)')
-            .text((d) => d.ts ? fromNow(d.ts) : 'Unknown')
+            .text((d) => d.ts ? fromNow(d.ts) : unknownText)
             .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
           $tr.exit().remove();
@@ -370,7 +371,7 @@ export class PersistentSessionList extends ASessionList {
           this.registerActionListener(manager, $trEnter);
           $tr.select('span').text((d) => d.name);
           $tr.select('span:nth-of-type(2)').text((d) => d.creator);
-          $tr.select('span:nth-of-type(3)').text((d) => d.ts ? new Date(d.ts).toUTCString() : 'Unknown');
+          $tr.select('span:nth-of-type(3)').text((d) => d.ts ? new Date(d.ts).toUTCString() : unknownText);
 
           $tr.exit().remove();
         }
