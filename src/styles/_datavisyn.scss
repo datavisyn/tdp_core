@@ -80,18 +80,7 @@ nav .navbar-nav {
 }
 
 
-/*
-.#{$tdp-css-prefix}-busy {
-  &::before {
-    @include datavisyn-font();
-    animation: #{$datavisyn_css_prefix}-pulse 2s infinite alternate ease;
-    content: 'd';
-    font-size: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    background: radial-gradient(circle at center, black 0%, black 10%, white 12%, white 10%);
-  }
+
+.#{$tdp-css-prefix}-busy::before, .phovea-busy {
+  background: rgba(255, 255, 255, 0.26) url('~tdp_core/src/assets/icons/datavisyn_loading_icon_color_800px.gif') center center / 10% no-repeat;
 }
-*/
