@@ -1,6 +1,6 @@
 import {SearchBox, LocalDataProvider, IGroupSearchItem} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
-
+import i18n from 'phovea_core/src/i18n';
 export default class SearchBoxProvider {
 
   private searchBoxes: SearchBox<ISearchOption>[] = [];
@@ -15,7 +15,7 @@ export default class SearchBoxProvider {
 
   createSearchBox(): SearchBox<ISearchOption> {
     const searchBox = new SearchBox<ISearchOption>({
-      placeholder: 'Add Column...'
+      placeholder: i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder')
     });
 
     searchBox.on(SearchBox.EVENT_SELECT, (item) => {
