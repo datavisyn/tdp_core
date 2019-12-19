@@ -32,7 +32,7 @@ export class SidePanelTab extends PanelTab {
 
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document) {
     super(parent);
-
+    this.node.classList.add('default');
     this.panel = new SidePanel(ctx, doc, {
       chooser: false
     });

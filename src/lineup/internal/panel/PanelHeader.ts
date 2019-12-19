@@ -1,5 +1,6 @@
 import {IPanelButton} from './PanelButton';
 
+
 export default class PanelHeader {
 
   readonly node: HTMLElement;
@@ -14,5 +15,12 @@ export default class PanelHeader {
   addButton(button: IPanelButton) {
     this.buttons = [...this.buttons, button];
     this.node.appendChild(button.node);
+  }
+
+  removeHighlighting() {
+    const highlightedButton = this.buttons.find((button) => button.node.classList.contains('active'));
+    if (highlightedButton) {
+      highlightedButton.node.classList.remove('active');
+    }
   }
 }

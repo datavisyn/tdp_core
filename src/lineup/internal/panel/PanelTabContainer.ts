@@ -32,6 +32,13 @@ export default class PanelTabContainer {
     }
   }
 
+  showDefault() {
+    const openedTab = this.tabs.find((tab) => tab.node.classList.contains('tab-pane') && tab.node.classList.contains('active'));
+    if (openedTab) {
+      this.hide(openedTab);
+    }
+  }
+
   show(tab: PanelTab) {
     if (this.currentTab) {
       this.currentTab.hide();

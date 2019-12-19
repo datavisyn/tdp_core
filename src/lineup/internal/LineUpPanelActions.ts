@@ -104,6 +104,10 @@ export default class LineUpPanelActions extends EventHandler {
     this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
   }
 
+  removeButtonHighlighting() {
+    this.tabContainer.showDefault();
+    this.header.removeHighlighting();
+  }
 
   forceCollapse() {
     this.wasCollapsed = this.collapse;
@@ -126,6 +130,10 @@ export default class LineUpPanelActions extends EventHandler {
 
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
+    if (value) {
+      this.removeButtonHighlighting();
+    }
+
   }
 
   hide() {
@@ -246,7 +254,6 @@ export default class LineUpPanelActions extends EventHandler {
         } else {
           plugin.load().then((p) => {
             p.factory(tab.node, this.provider, p.desc);
-
             this.collapse = false; // expand side panel
             this.tabContainer.show(tab);
 
