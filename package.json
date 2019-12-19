@@ -76,14 +76,14 @@
   },
   "dependencies": {
     "@types/d3": "~3.5.36",
+    "@types/jquery": "~3.3.6",
     "@types/select2": "4.0.41",
     "d3": "~3.5.17",
+    "jquery": "~3.3.1",
     "lineupjs": "github:lineupjs/lineupjs#develop",
     "phovea_clue": "github:phovea/phovea_clue#develop",
     "select2": "~4.0.5",
-    "select2-bootstrap-theme": "0.1.0-beta.9",
-    "@types/jquery": "~3.3.6",
-    "jquery": "~3.3.1"
+    "select2-bootstrap-theme": "0.1.0-beta.9"
   },
   "main": "build/tdp_core.js",
   "devDependencies": {

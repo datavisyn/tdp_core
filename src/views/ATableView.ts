@@ -5,6 +5,7 @@ import {IRow} from '../rest';
 import {ISelection, IViewContext} from './';
 import {AView} from './AView';
 import {jsonArray2xlsx} from '../internal/xlsx';
+import i18n from 'phovea_core/src/i18n';
 
 export interface ISortItem<T> {
   node: HTMLElement;
@@ -170,7 +171,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
     (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
     rightTableHeader.insertAdjacentHTML('beforeend',
-      `<a href="#" title="Download Table as Spreadsheet"><i class="fa fa-download"></i></a>`);
+      `<a href="#" title="${i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fa fa-download"></i></a>`);
     (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
@@ -318,8 +319,8 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
   const headerContent = columns.join(separator);
   const bodyContent = rows.map((row) => {
     return row.map((text) => {
-        return hasMultilines(text) || text.includes(separator) ? `"${text.replace(/\t/g,':')}"` : text;
-      }).join(separator);
+      return hasMultilines(text) || text.includes(separator) ? `"${text.replace(/\t/g, ':')}"` : text;
+    }).join(separator);
   }).join('\n');
   const content = `${headerContent}\n${bodyContent}`;
   return content;

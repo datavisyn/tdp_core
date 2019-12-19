@@ -18,6 +18,7 @@ import SearchBoxProvider from './panel/SearchBoxProvider';
 import PanelHeader from './panel/PanelHeader';
 import PanelRankingButton from './panel/PanelRankingButton';
 import PanelAddColumnButton from './panel/PanelAddColumnButton';
+import i18n from 'phovea_core/src/i18n';
 
 export interface ISearchOption {
   text: string;
@@ -151,7 +152,7 @@ export default class LineUpPanelActions extends EventHandler {
         this.collapse = !this.collapse;
       };
 
-      const collapseButton = new PanelButton(buttons, '(Un)Collapse', 'collapse-button', listener);
+      const collapseButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton'), 'collapse-button', listener);
       this.header.addButton(collapseButton);
     }
 
@@ -169,7 +170,7 @@ export default class LineUpPanelActions extends EventHandler {
         });
       };
 
-      const saveRankingButton = new PanelRankingButton(buttons, this.provider, 'Save List of Entities', 'fa fa-save', listener);
+      const saveRankingButton = new PanelRankingButton(buttons, this.provider, i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
       this.header.addButton(saveRankingButton);
     }
 
@@ -179,10 +180,10 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableZoom) {
-      const zoomInButton = new PanelButton(buttons, 'Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
+      const zoomInButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
       this.header.addButton(zoomInButton);
 
-      const zoomOutButton = new PanelButton(buttons, 'Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
+      const zoomOutButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
       this.header.addButton(zoomOutButton);
     }
 
@@ -192,7 +193,7 @@ export default class LineUpPanelActions extends EventHandler {
         this.overview.classList.toggle('fa-list');
         this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
       };
-      const overviewButton = new PanelButton(buttons, 'En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+      const overviewButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed
       this.header.addButton(overviewButton);
     }
@@ -304,12 +305,12 @@ export default class LineUpPanelActions extends EventHandler {
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
     if (this.options.enableAddingDatabaseColumns) {
-      items.push(this.groupedDialog('Database Columns', this.getColumnDescription(descs, false)));
+      items.push(this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
       items.push({
-        text: 'Parameterized Scores',
+        text: i18n.t('tdp:core.lineup.LineupPanelActions.parameterizedScores'),
         children: loadedScorePlugins.map((score) => {
           return {
             text: score.text,
@@ -330,14 +331,14 @@ export default class LineUpPanelActions extends EventHandler {
       const scoreDescs = this.getColumnDescription(descs, true);
       if (scoreDescs.length > 0) {
         items.push({
-          text: 'Previously Added Columns',
+          text: i18n.t('tdp:core.lineup.LineupPanelActions.previouslyAddedColumns'),
           children: scoreDescs
         });
       }
     }
 
     const specialColumnsOption = {
-      text: 'Special Columns',
+      text: i18n.t('tdp:core.lineup.LineupPanelActions.specialColumns'),
       children: []
     };
 
@@ -353,10 +354,10 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableAddingSupportColumns) {
-      const supportColumns = this.groupedDialog('Support Columns', [
-        {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
-        {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
-        {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+      const supportColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.supportColumns'), [
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(i18n.t('tdp:core.lineup.LineupPanelActions.group')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
       ]);
       specialColumnsOption.children.push(supportColumns);
     }
@@ -379,12 +380,12 @@ export default class LineUpPanelActions extends EventHandler {
       return {text, children};
     }
     return {
-      text: `${text} &hellip;`,
+      text: i18n.t('tdp:core.lineup.LineupPanelActions.columnTitle', {text}),
       id: `group_${text}`,
       action: () => {
         // choooser dialog
         lazyDialogModule().then((dialogs) => {
-          const dialog = new dialogs.FormDialog(`Add ${text} &hellip;`, 'Add Column');
+          const dialog = new dialogs.FormDialog(i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
           dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">
               ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}
@@ -438,8 +439,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 }
 
-
-function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
+export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
   if (!target) {
     return [];
   }
