@@ -173,8 +173,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     return this.ranking.runWithoutTracking(() => f(this.data));
   }
 
-  protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn>;
-  protected addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn[]>;
+  protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn[]>;
+  protected addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
   protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn|ILazyLoadedColumn[]> {
     if (typeof score !== 'string') {
       return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
