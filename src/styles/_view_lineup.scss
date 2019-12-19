@@ -118,9 +118,6 @@ $lu_assets: '~lineupjs/src/assets';
   .lu-side-panel-wrapper {
     display: flex;
     flex-direction: column;
-    position: relative;
-    overflow-x: hidden;
-    overflow-y: scroll;
 
     %lu-panel-button {
       background: #fff;
@@ -178,6 +175,11 @@ $lu_assets: '~lineupjs/src/assets';
 
         display: none;
       }
+    }
+
+    .tab-content {
+      display: flex;
+      flex-direction: column;
     }
 
     .collapse-button {
