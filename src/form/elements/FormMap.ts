@@ -15,6 +15,7 @@ import * as session from 'phovea_core/src/session';
 import {resolveImmediately} from 'phovea_core/src';
 import {ISelect3Options, default as Select3, IdTextPair} from './Select3';
 import {IPluginDesc} from 'phovea_core/src/plugin';
+import i18n from 'phovea_core/src/i18n';
 
 export interface ISubDesc {
   name: string;
@@ -29,23 +30,23 @@ export interface ISubSelectDesc extends ISubDesc {
   /**
    * teh data, a promise of the data or a function computing the data or promise
    */
-  optionsData: ISelectOptions|(() => ISelectOptions);
+  optionsData: ISelectOptions | (() => ISelectOptions);
 }
 export interface ISubSelect2Desc extends ISubDesc {
   type: FormElementType.SELECT2;
-  optionsData?: ISelectOptions|(() => ISelectOptions);
-  return?: 'text'|'id';
+  optionsData?: ISelectOptions | (() => ISelectOptions);
+  return?: 'text' | 'id';
   multiple?: boolean;
   ajax?: any;
 }
 
 export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
   type: FormElementType.SELECT3;
-  return?: 'text'|'id';
+  return?: 'text' | 'id';
   name: string;
 }
 
-declare type ISubDescs = ISubInputDesc|ISubSelectDesc|ISubSelect2Desc|ISubSelect3Desc;
+declare type ISubDescs = ISubInputDesc | ISubSelectDesc | ISubSelect2Desc | ISubSelect3Desc;
 
 /**
  * Add specific options for input form elements
@@ -57,7 +58,7 @@ export interface IFormMapDesc extends IFormElementDesc {
   options?: {
     badgeProvider?: (value: IFormRow[], ...dependent: IFormElement[]) => Promise<string> | string;
 
-    entries: (ISubDescs[])|((...dependent: IFormElement[])=>(ISubDescs[]));
+    entries: (ISubDescs[]) | ((...dependent: IFormElement[]) => (ISubDescs[]));
 
     /**
      * whether an element can just be selected once
@@ -79,7 +80,7 @@ export interface IFormRow {
 }
 
 function hasInlineParent(node: HTMLElement) {
-  while(node.parentElement) {
+  while (node.parentElement) {
     node = node.parentElement;
     if (node.classList.contains('parameters')) {
       return node.classList.contains('form-inline');
@@ -94,7 +95,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   private rows: IFormRow[] = [];
 
   private inline: boolean;
-  private inlineOnChange: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
+  private inlineOnChange: (formElement: IFormElement, value: any, data: any, previousValue: any) => void;
 
   /**
    * Constructor
@@ -109,7 +110,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
   private updateBadge() {
     const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
     resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-      this.$node.select('span.badge').html(text).attr('title', `${text} items remaining after filtering`);
+      this.$node.select('span.badge').html(text).attr('title', i18n.t('tdp:core.FormMap.badgeTitle', {text}) as string);
     });
   }
 
@@ -124,7 +125,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     session.store(this.sessionKey, this.value);
   }
 
-  protected getStoredValue<T>(defaultValue:T): T {
+  protected getStoredValue<T>(defaultValue: T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
@@ -163,7 +164,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           <div class="dropdown-menu" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="btn btn-default btn-sm right">Apply</button>
+                <button class="btn btn-default btn-sm right">${i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
@@ -245,7 +246,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     const desc = entries.find((d) => d.value === row.key);
     const defaultSelection = this.elementDesc.options.defaultSelection !== false;
 
-    function mapOptions(d: any|string) {
+    function mapOptions(d: any | string) {
       const value = typeof d === 'string' || !d ? d : (d.value || d.id);
       const name = typeof d === 'string' || !d ? d : (d.name || d.text);
       return `<option value="${value}">${name}</option>`;
@@ -262,7 +263,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
         });
         resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
-          parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">Select me...</option>` : '') + values.map(mapOptions).join('');
+          parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">${i18n.t('tdp:core.FormMap.selectMe')}</option>` : '') + values.map(mapOptions).join('');
           if (initialValue) {
             (<HTMLSelectElement>parent.firstElementChild).selectedIndex = values.map((d) => typeof d === 'string' ? d : d.value).indexOf(initialValue);
           } else if (defaultSelection) {
@@ -285,7 +286,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           const s = parent.firstElementChild;
           const $s = (<any>$(s));
           // merge only the default options if we have no local data
-          $s.select2(mixin({}, desc.ajax ? DEFAULT_AJAX_OPTIONS: DEFAULT_OPTIONS, desc));
+          $s.select2(mixin({}, desc.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, desc));
           if (initialValue) {
             $s.val(initially).trigger('change');
           } else if (!defaultSelection && that.elementDesc.options.uniqueKeys) {
@@ -386,12 +387,12 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       row.innerHTML = `
         <div class="col-sm-5">
           <select class="form-control map-selector">
-            <option value="">Select...</option>
+            <option value="">${i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
         <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-default btn-sm" title="Remove"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-1"><button class="btn btn-default btn-sm" title="${i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
 
       const valueElem = <HTMLElement>row.querySelector('.col-sm-6');
       if (d.key) { // has value
@@ -484,13 +485,13 @@ function isEqual(a: IFormRow[], b: IFormRow[]) {
   if (a.length !== b.length) {
     return false;
   }
-  return a.every((ai,i) => {
+  return a.every((ai, i) => {
     const bi = b[i];
     return ai.key === bi.key && ai.value === bi.value;
   });
 }
 
-export declare type IFormMultiMap = { [key: string]: any | any[] };
+export declare type IFormMultiMap = {[key: string]: any | any[]};
 
 export function convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap {
   if (!rows) {
