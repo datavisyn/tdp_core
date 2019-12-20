@@ -78,7 +78,7 @@
     "@types/jquery": "~3.3.6",
     "@types/select2": "4.0.41",
     "d3": "~3.5.17",
-    "jquery": "~3.3.1",
+    "jquery": "~3.4.0",
     "lineupjs": "^3.2.2",
     "phovea_clue": "^3.0.0",
     "select2": "~4.0.5",
