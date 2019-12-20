@@ -74,7 +74,6 @@ const webpackloaders = [
       options: Object.assign({include: includeFeature}, preCompilerFlags)
     }]
   },
-  {test: /\.json$/, use: 'json-loader'},
   {
     test: /\.(png|jpg)$/,
     loader: 'url-loader',
@@ -163,6 +162,7 @@ function injectRegistry(entry) {
  */
 function generateWebpack(options) {
   let base = {
+    node: false,
     entry: injectRegistry(options.entries),
     output: {
       path: resolve(__dirname, 'build'),
@@ -197,7 +197,7 @@ function generateWebpack(options) {
     ],
     externals: [],
     module: {
-      loaders: webpackloaders.slice()
+      rules: webpackloaders.slice()
     },
     devServer: {
       proxy: {
@@ -242,7 +242,7 @@ function generateWebpack(options) {
     // base.plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
   } else if (options.isDev) {
     // switch to def settings
-    base.module.loaders.find((d) => d.use === tsLoader).use = tsLoaderDev;
+    base.module.rules.find((d) => d.use === tsLoader).use = tsLoaderDev;
     base.plugins.push(new ForkTsCheckerWebpackPlugin({checkSyntacticErrors: true, tsconfig: './tsconfig_dev.json'}));
   }
 
@@ -269,11 +269,11 @@ function generateWebpack(options) {
 
     // ignore extra modules
     (options.ignore || []).forEach(function (d) {
-      base.module.loaders.push({test: new RegExp(d), loader: 'null-loader'}); // use null loader
+      base.module.rules.push({test: new RegExp(d), loader: 'null-loader'}); // use null loader
     });
     // ingore phovea module registry calls
     (options.modules || []).forEach(function (m) {
-      base.module.loaders.push({
+      base.module.rules.push({
         test: new RegExp('.*[\\\\/]' + m + '[\\\\/]phovea_registry.js'),
         loader: 'null-loader'
       }); // use null loader
@@ -286,11 +286,11 @@ function generateWebpack(options) {
       allChunks: true // there seems to be a bug in dynamically loaded chunk styles are not loaded, workaround: extract all styles from all chunks
     });
     base.plugins.push(p);
-    base.module.loaders[0] = {
+    base.module.rules[0] = {
       test: /\.scss$/,
       loader: p.extract(['css-loader', 'sass-loader'])
     };
-    base.module.loaders[1] = {
+    base.module.rules[1] = {
       test: /\.css$/,
       loader: p.extract(['css-loader'])
     };
@@ -299,33 +299,34 @@ function generateWebpack(options) {
     // create manifest
     // base.plugins.push(new webpack.optimize.AppCachePlugin());
   }
-  if (options.commons) {
-    // build a commons plugin
-    base.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-      // The order of this array matters
-      name: 'common',
-      filename: 'common.js',
-      minChunks: 2
-    }));
-  }
-  if (options.vendor) {
-    (Array.isArray(options.vendor) ? options.vendor : [options.vendor]).forEach((reg) => {
-      base.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-        async: true,
-        children: true,
-        deepChildren: true,
-        minChunks: (module, count) => new RegExp(reg, 'i').test(module.resource) && count >= 2
-      }));
-    });
-  }
+  // if (options.commons) {
+  //   // build a commons plugin
+  //   base.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+  //     // The order of this array matters
+  //     name: 'common',
+  //     filename: 'common.js',
+  //     minChunks: 2
+  //   }));
+  // }
+  // if (options.vendor) {
+  //   (Array.isArray(options.vendor) ? options.vendor : [options.vendor]).forEach((reg) => {
+  //     base.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+  //       async: true,
+  //       children: true,
+  //       deepChildren: true,
+  //       minChunks: (module, count) => new RegExp(reg, 'i').test(module.resource) && count >= 2
+  //     }));
+  //   });
+  // }
   if (options.min) {
     // use a minifier
     base.plugins.push(
       new webpack.LoaderOptionsPlugin({
         minimize: true,
         debug: false
-      }),
-      new webpack.optimize.UglifyJsPlugin());
+      })
+      // , new webpack.optimize.UglifyJsPlugin());
+    );
   } else {
     // generate source maps
     base.devtool = 'inline-source-map';
