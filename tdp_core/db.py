@@ -299,7 +299,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
           value = parser(arguments.get(lookup_key))
         kwargs[arg] = value
       except ValueError as verr:
-        abort(400, u'invalid argument for: ' + arg + ' - ' + unicode(verr.message))
+        abort(400, u'invalid argument for: ' + arg + ' - ' + str(verr.message))
 
   if extra_sql_argument is not None:
     kwargs.update(extra_sql_argument)
@@ -476,7 +476,7 @@ def derive_columns(table_name, engine, columns=None):
           template += u""" AND {col} <> ''"""
         template += u""" ORDER BY {col} ASC"""
         cats = s.execute(template.format(col=col, table=table_name))
-        columns[col]['categories'] = [unicode(r['cat']) for r in cats if r['cat'] is not None]
+        columns[col]['categories'] = [str(r['cat']) for r in cats if r['cat'] is not None]
 
   return columns
 

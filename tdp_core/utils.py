@@ -38,5 +38,5 @@ def clean_query(query):
     return 'custom function'
   import re
   q = query.strip()
-  q_clean = re.sub('(\s)+', ' ', q)
+  q_clean = re.sub(r'(\s)+', r' ', q)
   return q_clean

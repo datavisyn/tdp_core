@@ -29,7 +29,7 @@ def _gen():
   base['paths'] = OrderedDict(sorted(base['paths'].items(), key=lambda t: t[0]))
 
   with io.open(path.join(here, 'swagger', 'view.tmpl.yml'), 'r', encoding='utf-8') as f:
-    template = Template(unicode(f.read()))
+    template = Template(str(f.read()))
 
   tags = base['tags']
 

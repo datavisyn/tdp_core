@@ -136,7 +136,7 @@ class DBView(object):
     if self.security is None and check_default_security is False:
       return True
     if isinstance(self.security, str):
-      role = unicode(self.security)
+      role = str(self.security)
       return current_user().has_role(role)
     if callable(self.security):
       return self.security(current_user())

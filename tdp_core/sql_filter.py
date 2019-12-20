@@ -105,9 +105,9 @@ def filter_logic(view, args):
         where_clause[real_key].extend(ids)
 
   def to_clause(k, v):
-    l = len(v)
+    length = len(v)
     kp = k.replace('.', '_')
-    if l == 1:  # single value
+    if length == 1:  # single value
       operator = '='
       if kp.startswith('lt_'):
         # keep the 'lt_' for kp to distinguish from the others ('lte_', 'gt_', 'gte_') in the created sub_query
