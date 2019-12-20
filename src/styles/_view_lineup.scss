@@ -243,9 +243,6 @@ $lu_assets: '~lineupjs/src/assets';
       }
     }
 
-    ////////////////////
-    ////////////////////
-
     &.collapsed {
       max-width: 3em;
       min-width: 0;
@@ -321,11 +318,6 @@ $lu_assets: '~lineupjs/src/assets';
     }
   }
 
-  //////////////////////////////////////////////////
-  //////////////////////////////////////////////////
-
-
-
 
   .lu-side-panel-top-form {
     display: flex;
@@ -353,7 +345,7 @@ $lu_assets: '~lineupjs/src/assets';
       margin-left: 1em;
     }
 
-    >div.lu-adder {
+    div.lu-adder {
       margin-top: 0;
 
       &.once .lu-search {

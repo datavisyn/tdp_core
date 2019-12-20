@@ -9,18 +9,6 @@ import {encodeParams} from 'phovea_core/src/ajax';
 
 
 
-/**
- * Checks wether the given function of type IAccessorFunc, i.e. of an AScoreAccessorProxy.
- * Beware: coding horrors await beyond this function header.
- * @param accessor
- */
-export function isProxyAccessor(accessor: any): accessor is IAccessorFunc<string | number> {
-  if (accessor && typeof (accessor) === 'function' && accessor.length === 1) {
-    return accessor.toString() === '(row) => this.access(row.v)';
-  }
-  return false;
-}
-
 export interface IAccessorFunc<T> {
   (row: IDataRow): T;
 }
