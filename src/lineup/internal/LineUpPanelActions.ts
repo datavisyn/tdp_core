@@ -86,8 +86,6 @@ export default class LineUpPanelActions extends EventHandler {
 
     this.searchBoxProvider = new SearchBoxProvider(provider, options);
 
-    // this.options.enableSidePanel = 'top';
-
     if (this.options.enableSidePanel === 'top') {
       this.node.classList.add('lu-side-panel-top');
 
@@ -104,7 +102,7 @@ export default class LineUpPanelActions extends EventHandler {
     this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
   }
 
-  removeButtonHighlighting() {
+  removeTabButtonHighlighting() {
     this.tabContainer.showDefault();
     this.header.removeHighlighting();
   }
@@ -130,8 +128,8 @@ export default class LineUpPanelActions extends EventHandler {
 
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
-    if (value) {
-      this.removeButtonHighlighting();
+    if (value && this.options.enableSidePanel !== 'top') {
+      this.removeTabButtonHighlighting();
     }
 
   }

@@ -334,10 +334,13 @@ $lu_assets: '~lineupjs/src/assets';
     max-width: unset;
     width: unset;
     float: right;
+    border-left: none;
 
     header {
+      display: flex;
       flex-direction: row;
       max-width: unset;
+      margin-bottom: 0;
     }
 
     .gap {
