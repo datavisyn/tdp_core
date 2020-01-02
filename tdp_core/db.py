@@ -266,7 +266,7 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
       lookup_key = arg
 
       if lookup_key not in arguments:
-        if (arg + '[]') in arguments:
+        if (arg + '[]') in arguments:  # check if we can find the lookup key with array form
           lookup_key = (arg + '[]')
         elif not info or not info.list_as_tuple:
           _log.warn('missing argument "%s": "%s"', view.query, arg)
