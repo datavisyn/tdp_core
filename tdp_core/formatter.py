@@ -16,7 +16,9 @@ def _format_csv(array_of_dicts):
 
 
 def _format_json_decimal(obj):
-  return jsonify(obj, double_precision=15)
+  # The Pandas JSON module has been deprecated and removed. The JSON that is used in _util.py_ of phovea_server does not support double_precision.
+  # return jsonify(obj, double_precision=15)
+  return jsonify(obj)
 
 
 def formatter(view_name):
