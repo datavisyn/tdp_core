@@ -1,24 +1,27 @@
 import {randomId} from 'phovea_core/src';
 import {ALL_ALL_NONE_NONE, ALL_ALL_READ_NONE, ALL_ALL_READ_READ, ANONYMOUS_USER, currentUser, decode, EPermission, ISecureItem, Permission, encode} from 'phovea_core/src/security';
+import i18n from 'phovea_core/src/i18n';
 
 const MIN = 60;
 const HOUR = MIN * 60;
 const DAY = HOUR * 24;
 
-const areas: [number, string | ((d: number) => string)][] = [
-  [-1, 'in the future'],
-  [43, 'a few seconds ago'],
-  [44, '44 seconds ago'],
-  [89, 'a minute ago'],
-  [44 * MIN, (d) => `${Math.ceil(d / MIN)} minutes ago`],
-  [89 * MIN, 'an hour ago'],
-  [21 * HOUR, (d) => `${Math.ceil(d / HOUR)} hours ago`],
-  [35 * HOUR, 'a day ago'],
-  [25 * DAY, (d) => `${Math.ceil(d / DAY)} days ago`],
-  [45 * DAY, 'a month ago'],
-  [319 * DAY, (d) => `${Math.ceil(d / DAY / 30)} months ago`],
-  [547 * DAY, (d) => 'a year ago']
-];
+const getAreas: () => [number, string | ((d: number) => string)][] = () => {
+  return [
+    [-1, i18n.t('tdp:core.utilsInternal.future')],
+    [43, i18n.t('tdp:core.utilsInternal.fewSecondsAgo')],
+    [44, i18n.t('tdp:core.utilsInternal.secondsAgo')],
+    [89, i18n.t('tdp:core.utilsInternal.minute')],
+    [44 * MIN, (d) => i18n.t('tdp:core.utilsInternal.minute', {count: Math.ceil(d / MIN)})],
+    [89 * MIN, i18n.t('tdp:core.utilsInternal.hour')],
+    [21 * HOUR, (d) => i18n.t('tdp:core.utilsInternal.hour', {count: Math.ceil(d / HOUR)})],
+    [35 * HOUR, i18n.t('tdp:core.utilsInternal.day')],
+    [25 * DAY, (d) => i18n.t('tdp:core.utilsInternal.day', {count: Math.ceil(d / DAY)})],
+    [45 * DAY, i18n.t('tdp:core.utilsInternal.month')],
+    [319 * DAY, (d) => i18n.t('tdp:core.utilsInternal.month', {count: Math.ceil(d / DAY / 30)})],
+    [547 * DAY, (d) => i18n.t('tdp:core.utilsInternal.hour')]
+  ];
+};
 
 /**
  * see http://momentjs.com/docs/#/displaying/fromnow/
@@ -29,16 +32,16 @@ export function fromNow(date: Date | number) {
   const now = Date.now();
   const deltaInSeconds = Math.floor((now - (typeof date === 'number' ? date : date.getTime())) / 1000);
 
-  const area = areas.find((d) => deltaInSeconds <= d[0]);
+  const area = getAreas().find((d) => deltaInSeconds <= d[0]);
   if (area) {
     const formatter = area[1];
     return typeof formatter === 'string' ? formatter : formatter(deltaInSeconds);
   }
-  return 'far far away';
+  return i18n.t('tdp:core.utilsInternal.farAway');
 }
 
 export function notAllowedText(notAllowed: boolean | string) {
-  return (typeof notAllowed === 'string' ? notAllowed : 'Not Allowed, please contact your system administrator');
+  return (typeof notAllowed === 'string' ? notAllowed : i18n.t('tdp:core.utilsInternal.notAllowed'));
 }
 
 
@@ -70,69 +73,69 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
   div.classList.add('radio');
   div.innerHTML = `
     <label class="radio-inline">
-      <input type="radio" name="permission_public" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> Private
+      <input type="radio" name="permission_public" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${i18n.t('tdp:core.utilsInternal.private')}
     </label>
     <label class="radio-inline">
-      <input type="radio" name="permission_public" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-users"></i> Public (everybody can see and use it)
+      <input type="radio" name="permission_public" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-users"></i> ${i18n.t('tdp:core.utilsInternal.publicMsg')}
     </label>
-    <button type="button" name="permission_advanced" class="btn btn-default btn-xs pull-right">Advanced</button>
+    <button type="button" name="permission_advanced" class="btn btn-default btn-xs pull-right">${i18n.t('tdp:core.utilsInternal.advanced')}</button>
     ${o.extra}
     <div class="tdp-permissions">
       <div class="tdp-permissions-entry">
-        <label>Public</label>
+        <label>${i18n.t('tdp:core.utilsInternal.public')}</label>
         <span></span>
         <div class="btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary ${!permission.others.has(EPermission.READ) ? 'active' : ''}">
-            <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> No Permission
+            <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${i18n.t('tdp:core.utilsInternal.noPermission')}
           </label>
           <label class="btn btn-primary ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'active' : ''}">
-            <input type="radio" name="permission_others" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+            <input type="radio" name="permission_others" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> ${i18n.t('tdp:core.utilsInternal.read')}
           </label>
           <label class="btn btn-primary ${permission.others.has(EPermission.WRITE) ? 'active' : ''}">
-            <input type="radio" name="permission_others" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+            <input type="radio" name="permission_others" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> ${i18n.t('tdp:core.utilsInternal.write')}
           </label>
         </div>
       </div>
       <p class="help-block">
-        define which are the default permissions for other users to access this item
+      ${i18n.t('tdp:core.utilsInternal.definePermissions')}
       </p>
       <div class="tdp-permissions-entry">
-        <label for="permission_group_name_${id}">Group</label>
+        <label for="permission_group_name_${id}">${i18n.t('tdp:core.utilsInternal.group')}</label>
         <select id="permission_group_name_${id}" name="permission_group_name" class="form-control input-sm">
           ${roles.map((d) => `<option value="${d}" ${item && item.group === d ? 'selected' : ''}>${d}</option>`).join('')}
         </select>
         <div class="btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary ${!permission.group.has(EPermission.READ) ? 'active' : ''}">
-            <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> No Permission
+            <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${i18n.t('tdp:core.utilsInternal.noPermission')}
           </label>
           <label class="btn btn-primary ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'active' : ''}">
-            <input type="radio" name="permission_group" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+            <input type="radio" name="permission_group" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> ${i18n.t('tdp:core.utilsInternal.read')}
           </label>
           <label class="btn btn-primary ${permission.group.has(EPermission.WRITE) ? 'active' : ''}">
-            <input type="radio" name="permission_group" value="write" autocomplete="off" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+            <input type="radio" name="permission_group" value="write" autocomplete="off" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> ${i18n.t('tdp:core.utilsInternal.write')}
           </label>
         </div>
       </div>
       <p class="help-block">
-        specify a group / role which you are part of that should have extra rights, such as a group of administrators
+      ${i18n.t('tdp:core.utilsInternal.specifyRole')}
       </p>
       <div class="tdp-permissions-entry">
-        <label for="permission_buddies_name_${id}">Buddies</label>
-        <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="list of usernames separated by semicolon" value="${item && item.buddies ? item.buddies.join(';') : ''}">
+        <label for="permission_buddies_name_${id}">${i18n.t('tdp:core.utilsInternal.buddies')}</label>
+        <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="${i18n.t('tdp:core.utilsInternal.buddiesPlaceholder')}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
         <div class="btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary ${!permission.buddies.has(EPermission.READ) ? 'active' : ''}">
-            <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> No Permission
+            <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${i18n.t('tdp:core.utilsInternal.noPermission')}
           </label>
           <label class="btn btn-primary ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'active' : ''}">
-            <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> Read
+            <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> ${i18n.t('tdp:core.utilsInternal.read')}
           </label>
           <label class="btn btn-primary ${permission.buddies.has(EPermission.WRITE) ? 'active' : ''}">
-            <input type="radio" name="permission_buddies" value="write" autocomplete="off" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> Write
+            <input type="radio" name="permission_buddies" value="write" autocomplete="off" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> ${i18n.t('tdp:core.utilsInternal.write')}
           </label>
         </div>
       </div>
       <p class="help-block">
-        Buddies are a list of user names that can have advanced rights, such as backup administrators
+      ${i18n.t('tdp:core.utilsInternal.buddiesDescription')}
       </p>
     </div>`;
 

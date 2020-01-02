@@ -5,7 +5,7 @@ import {resolveIds} from '../resolve';
 import {parse, none} from 'phovea_core/src/range';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
 import {DEFAULT_SELECTION_NAME} from '../../extensions';
-
+import i18n from 'phovea_core/src/i18n';
 
 export interface IProxyViewOptions {
   /**
@@ -218,11 +218,10 @@ export default class MessagingProxyView extends AView {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.node.innerHTML = `
-        <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em"><strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.
-            However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.
-            Please use the following <a href="${url}" target="_blank" rel="noopener" class="alert-link">link</a> to open the website in a separate window:
-            <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
-        </div></p><p></p>`;
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
+       <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
+   </div></p><p></p>`;
     this.fire(MessagingProxyView.EVENT_LOADING_FINISHED);
   }
 }

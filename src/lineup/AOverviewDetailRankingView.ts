@@ -8,6 +8,7 @@ import {IRow} from '../rest';
 import {debounce} from 'phovea_core/src';
 import {LocalDataProvider} from 'lineupjs';
 import OverviewColumn from './internal/OverviewColumn';
+import i18n from 'phovea_core/src/i18n';
 
 export abstract class AOverviewDetailRankingView extends ARankingView {
 
@@ -68,8 +69,8 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
     };
 
     const r = root(verticalSplit(1,
-      view(overviewView).name('Overview').hideHeader(),
-      view(lineupView).name('Detail Table').hideHeader()));
+      view(overviewView).name(i18n.t('tdp:core.lineup.OverviewDetailRanking.overview')).hideHeader(),
+      view(lineupView).name(i18n.t('tdp:core.lineup.OverviewDetailRanking.detailTable')).hideHeader()));
     this.node.insertAdjacentElement('afterbegin', r.node);
 
     r.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, () => {
@@ -140,6 +141,6 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
     this.overviewColumn.setOverview(rows, name);
   }
 
-  protected abstract buildOverview(): Promise<any>|void;
+  protected abstract buildOverview(): Promise<any> | void;
   protected abstract updateOverview(rows: IRow[], width: number, height: number, focus?: {name: string, rows: IRow[]}): void;
 }

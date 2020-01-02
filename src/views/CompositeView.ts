@@ -23,6 +23,7 @@ import {
 } from 'phovea_ui/src/layout/builder';
 import AView from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
+import i18n from 'phovea_core/src/i18n';
 
 interface IElementDesc {
   key: string;
@@ -32,9 +33,9 @@ interface IElementDesc {
 }
 
 interface ILinkedSelection {
-  fromKey: string|'_input'|'_item';
-  toKey: string|'_item';
-  mode: 'item'|'input';
+  fromKey: string | '_input' | '_item';
+  toKey: string | '_item';
+  mode: 'item' | 'input';
 }
 
 export interface ICompositeLayout {
@@ -173,7 +174,7 @@ export default class CompositeView extends EventHandler implements IView {
       this.idType = resolve(context.desc.idtype);
     }
 
-    this.root = root(view('No views defined'));
+    this.root = root(view(i18n.t('tdp:core.views.noViews')));
     this.root.node.classList.add('tdp-view', 'composite-view');
     parent.appendChild(this.root.node);
   }
@@ -231,7 +232,7 @@ export default class CompositeView extends EventHandler implements IView {
       const helper = this.node.ownerDocument.createElement('div');
       const links = setup.linkedSelections;
 
-      let debounceItemSelection: (...args: any[])=>void;
+      let debounceItemSelection: (...args: any[]) => void;
       {
         let selection: ISelection;
         let old: ISelection;
@@ -308,8 +309,8 @@ export default class CompositeView extends EventHandler implements IView {
 
   private buildLayout(views: Map<string, ViewBuilder>, keys: string[]) {
 
-    const buildImpl = (layout: string|ICompositeLayout) => {
-      const l: string|ICompositeLayout = typeof layout === 'string' ? layout : Object.assign({
+    const buildImpl = (layout: string | ICompositeLayout) => {
+      const l: string | ICompositeLayout = typeof layout === 'string' ? layout : Object.assign({
         type: <'vsplit'>'vsplit',
         ratios: keys.map(() => 1 / keys.length),
         keys
