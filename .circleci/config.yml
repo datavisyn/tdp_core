@@ -3,9 +3,7 @@ jobs:
   build:
     working_directory: ~/phovea
     docker:
-      - image: circleci/python:3.7-node-browsers
-        environment:
-          NODE_VERSION: "12.13"
+      - image: circleci/python:3.7-buster-node-browsers # for node version see Dockerfile on https://hub.docker.com/r/circleci/python
     steps:
       - checkout
       - run:
