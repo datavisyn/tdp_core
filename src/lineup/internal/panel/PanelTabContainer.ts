@@ -23,23 +23,23 @@ export default class PanelTabContainer {
     this.node.appendChild(tab.node);
   }
 
-  toggle(tab: PanelTab) {
+  toggleTab(tab: PanelTab) {
     if (this.currentTab === tab) {
-      this.hide(tab);
+      this.hideTab(tab);
 
     } else {
-      this.show(tab);
+      this.showTab(tab);
     }
   }
 
   showDefault() {
     const openedTab = this.tabs.find((tab) => tab.node.classList.contains('tab-pane') && tab.node.classList.contains('active'));
     if (openedTab) {
-      this.hide(openedTab);
+      this.hideTab(openedTab);
     }
   }
 
-  show(tab: PanelTab) {
+  showTab(tab: PanelTab) {
     if (this.currentTab) {
       this.currentTab.hide();
     }
@@ -48,9 +48,17 @@ export default class PanelTabContainer {
     this.currentTab = tab;
   }
 
-  hide(tab: PanelTab) {
+  hideTab(tab: PanelTab) {
     tab.hide();
     this.defaultTab.show();
     this.currentTab = this.defaultTab;
+  }
+
+  showCurrentTab() {
+    this.currentTab.show();
+  }
+
+  hideCurrentTab() {
+    this.currentTab.hide();
   }
 }

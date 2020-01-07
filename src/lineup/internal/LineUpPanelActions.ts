@@ -95,7 +95,7 @@ export default class LineUpPanelActions extends EventHandler {
 
       this.tabContainer = new PanelTabContainer(this.node);
       this.tabContainer.addTab(sidePanel);
-      this.tabContainer.show(sidePanel);
+      this.tabContainer.showTab(sidePanel);
     }
 
     this.init();
@@ -136,10 +136,12 @@ export default class LineUpPanelActions extends EventHandler {
 
   hide() {
     this.node.style.display = 'none';
+    this.tabContainer.hideCurrentTab(); //inform the tab content that the sidepanel is collapsed
   }
 
   show() {
     this.node.style.display = 'flex';
+    this.tabContainer.showCurrentTab();//inform the tab content that the sidepanel is collapsed
   }
 
   private get isTopMode() {
@@ -243,17 +245,17 @@ export default class LineUpPanelActions extends EventHandler {
         if (isLoaded) {
           if (this.collapse) {
             this.collapse = false; // expand side panel
-            this.tabContainer.show(tab);
+            this.tabContainer.showTab(tab);
 
           } else {
-            this.tabContainer.toggle(tab);
+            this.tabContainer.toggleTab(tab);
           }
 
         } else {
           plugin.load().then((p) => {
-            p.factory(tab.node, this.provider, p.desc);
+            p.factory(tab.node, this.provider, p.desc, tab.events);
             this.collapse = false; // expand side panel
-            this.tabContainer.show(tab);
+            this.tabContainer.showTab(tab);
 
             isLoaded = true;
           });
