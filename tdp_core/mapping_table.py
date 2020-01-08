@@ -15,7 +15,6 @@ class SQLMappingTable(object):
 
   def __call__(self, ids):
     # ensure strings
-    ids = [unicode(i) for i in ids]
 
     if self._integer_ids:  # convert to integer ids
       ids = [int(i) for i in ids]

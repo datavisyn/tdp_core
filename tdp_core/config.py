@@ -17,7 +17,7 @@ def _config(path):
 
   if plugin is None:
     _log.error('404: config key "{}" not found'.format(key))
-    abort(404, u'config key "{}" not found'.format(key))
+    abort(404, 'config key "{}" not found'.format(key))
 
   path[0] = plugin.configKey
   return jsonify(get_config('.'.join(path)))
