@@ -8,11 +8,11 @@ import * as $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
 import {api2absURL} from 'phovea_core/src/ajax';
 import AFormElement from './AFormElement';
-import {IForm} from '../interfaces';
-import {IFormSelectDesc} from './FormSelect';
+import {IForm, IFormElementDesc} from '../interfaces';
 import {IPluginDesc} from 'phovea_core/src/plugin';
+import {Options} from 'select2';
 
-declare type IFormSelect2Options = Select2Options & {
+declare type IFormSelect2Options = Options & {
   return?: 'text'|'id';
   data?: ISelect2Option[] | ((dependents: any)=>ISelect2Option[]);
 };
@@ -20,7 +20,7 @@ declare type IFormSelect2Options = Select2Options & {
 /**
  * Add specific options for select form elements
  */
-export interface IFormSelect2 extends IFormSelectDesc {
+export interface IFormSelect2 extends IFormElementDesc {
   /**
    * Additional options
    */
@@ -133,7 +133,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
    * Builds the jQuery select2
    */
   private buildSelect2($select: d3.Selection<any>, options: IFormSelect2Options, data?: ISelect2Option[]) {
-    const select2Options: Select2Options = {};
+    const select2Options: Options = {};
 
     let initialValue: string[] = [];
     const defaultVal: any = this.getStoredValue(null);
