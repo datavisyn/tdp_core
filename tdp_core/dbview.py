@@ -45,6 +45,7 @@ class DBView(object):
     self.table = None
     self.security = None
     self.assign_ids = False
+    self.no_cache = False
 
   def needs_to_fill_up_columns(self):
     return self.columns_filled_up is False and self.table is not None
@@ -62,6 +63,7 @@ class DBView(object):
       r['filters'] = list(self.filters.keys())
     if self.queries:
       r['queries'] = {k: clean_query(v) for k, v in self.queries.items()}
+    r['no_cache'] = self.no_cache
     return r
 
   def is_valid_filter(self, key):
@@ -177,6 +179,7 @@ class DBViewBuilder(object):
     self.v.filters = view.filters.copy()
     self.v.valid_replacements = view.valid_replacements.copy()
     self.v.security = view.security
+    self.v.no_cache = view.no_cache
     return self
 
   def description(self, desc, summary=None):
@@ -374,6 +377,13 @@ class DBViewBuilder(object):
     :return: self
     """
     self.v.security = security_check
+    return self
+
+  def no_cache(self):
+    """
+    adds a no-cache header to the response to avoid client caching of the response
+    """
+    self.v.no_cache = True
     return self
 
   def build(self):
