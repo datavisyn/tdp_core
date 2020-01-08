@@ -132,7 +132,7 @@ class WrappedSession(object):
     try:
       return self._session.execute(parsed, kwargs)
     except sqlalchemy.exc.OperationalError as error:
-      abort(408, error.message)
+      abort(408, error)
 
   def run(self, sql, **kwargs):
     """
