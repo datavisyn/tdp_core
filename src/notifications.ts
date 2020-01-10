@@ -49,7 +49,7 @@ let errorAlertHandler = (error: any) => {
     const xhr: Response = error instanceof Response ? error : error.response;
     return xhr.text().then((body: string) => {
       if (xhr.status === 408) {
-        body = i18n.t('ordino_public:core.timeoutMessage');
+        body = i18n.t('tdp:core.timeoutMessage');
       }
       if (xhr.status !== 400) {
         body = `${body}<hr>
