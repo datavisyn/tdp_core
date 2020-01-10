@@ -19,7 +19,7 @@
     "deletedNotification": "{{type}} \"{{name}}\" successfully deleted",
     "requestedUrl": "The requested URL was:",
     "errorNotification": "<strong>Error {{status}} ({{statusText}})</strong>: {{- body}}",
-    "timeoutMessage": "Your data request could not be completed. Therefore, it was cancelled. This problem might have been caused by requesting too much data at once. In case of any questions, please contact the administrator. ",
+    "timeoutMessage": "Your data request could not be completed. Therefore, it was cancelled. This problem might have been caused by requesting too much data at once. In case of any questions, please contact the administrator.",
 
     "ViewWrapper": {
       "showHelp": "Show Help",
