@@ -39,6 +39,7 @@ def phovea(registry):
                   })
   registry.append('mapping_provider', 'tdp_core', 'tdp_core.mapping_table')
   registry.append('greenifier', 'psycopg2', 'tdp_core.sql_use_gevent', {})
+  registry.append('json-encoder', 'bytes-to-string-encoder', 'tdp_core.bytes_to_string_encoder', {})
   # generator-phovea:end
   pass
 

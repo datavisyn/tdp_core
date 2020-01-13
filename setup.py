@@ -3,7 +3,7 @@
 # Copyright (c) The Caleydo Team. All rights reserved.
 # Licensed under the new BSD license, available at http://caleydo.org/license
 ###############################################################################
-from __future__ import with_statement, print_function
+
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
@@ -26,18 +26,19 @@ with open(path.join(here, 'package.json'), encoding='utf-8') as json_data:
 def packaged(*files):
   r = {}
   global pkg
-  r[pkg['name'].encode('ascii')] = list(files)
+  r[pkg['name']] = list(files)
   return r
 
 
 def requirements(file):
-  return [r.strip().encode('ascii') for r in read_it(file).strip().split('\n') if not r.startswith('-e git+https://')]
+  return [r.strip() for r in read_it(file).strip().split('\n') if not r.startswith('-e git+https://')]
 
 
 def to_version(v):
   import datetime
   now = datetime.datetime.utcnow()
   return v.replace('SNAPSHOT', now.strftime('%Y%m%d-%H%M%S'))
+
 
 setup(
   name=pkg['name'].lower(),
@@ -64,8 +65,7 @@ setup(
     # Pick your license as you wish (should match "license" above)
     'License :: OSI Approved :: ' + ('BSD License' if pkg['license'] == 'BSD-3-Clause' else pkg['license']),
     'Programming Language :: Python',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3.4'
+    'Programming Language :: Python :: 3.7'
   ],
 
   # You can just specify the packages manually here if your project is
