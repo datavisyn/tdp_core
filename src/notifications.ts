@@ -48,6 +48,9 @@ let errorAlertHandler = (error: any) => {
   if (error instanceof Response || error.response instanceof Response) {
     const xhr: Response = error instanceof Response ? error : error.response;
     return xhr.text().then((body: string) => {
+      if (xhr.status === 408) {
+        body = i18n.t('tdp:core.timeoutMessage');
+      }
       if (xhr.status !== 400) {
         body = `${body}<hr>
         ${i18n.t('tdp:core.requestedUrl')}<br><a href="${xhr.url}" target="_blank" rel="noopener" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;

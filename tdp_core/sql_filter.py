@@ -10,7 +10,7 @@ def _replace_named_sets_in_ids(v):
   :param v:
   :return:
   """
-  import storage
+  from . import storage
   import phovea_server.plugin
 
   manager = phovea_server.plugin.lookup('idmanager')
@@ -75,7 +75,7 @@ def filter_logic(view, args):
   processed_args = MultiDict()
   extra_args = dict()
   where_clause = {}
-  for k, v in args.lists():
+  for k, v in list(args.lists()):
     if k.endswith('[]'):
       k = k[:-2]
     if k.startswith('filter_'):
@@ -84,7 +84,7 @@ def filter_logic(view, args):
       processed_args.setlist(k, v)
 
   # handle special namedset4 filter types by resolve them and and the real ids as filter
-  for k, v in where_clause.items():
+  for k, v in list(where_clause.items()):
     if k.startswith('namedset4'):
       del where_clause[k]  # delete value
       real_key = k[9:]  # remove the namedset4 part
@@ -135,7 +135,7 @@ def filter_logic(view, args):
     sub_query = view.get_filter_subquery(k)
     return sub_query.format(operator=operator, value=':' + kp)
 
-  for key in where_clause.keys():
+  for key in list(where_clause.keys()):
     # key: is the attribute/column, but for greater and less filters it also includes one of the filter prefixes ('lt_', 'lte_', 'gt_', or 'gte_')
     original_key = key  # is a copy of key, to keep the possible greater ('gt_', 'gte_') or less ('lt_', 'lte_') filter prefix
 
@@ -153,7 +153,9 @@ def filter_logic(view, args):
 
     # check if key (attribute/column) does exist in view
     if not view.is_valid_filter(key):
-      raise RuntimeError('Invalid filter key detected, "' + original_key + '"')
+      _log.warn('invalid filter key detected for view "%s" and key "%s"', view.query, key)
+      del where_clause[key]
+      # raise RuntimeError('Invalid filter key detected, "' + original_key + '"')
 
     # check if column type is number for one of the greater ('gt' and 'gte') or less ('lt' and 'lte') filters
     column_type = view.columns.get(key, {}).get('type')
@@ -175,7 +177,7 @@ def filter_logic(view, args):
 
   where_default_clause = []
   where_group_clauses = {group: [] for group in view.filter_groups()}
-  for k, v in where_clause.items():
+  for k, v in list(where_clause.items()):
     if len(v) <= 0:
       continue
     clause = to_clause(k, v)
@@ -191,7 +193,7 @@ def filter_logic(view, args):
   replacements['where'] = (' WHERE ' + ' AND '.join(c for c, _ in where_default_clause)) if where_default_clause else ''
   # unique joins
   replacements['joins'] = ' '.join(set(j for _, j in where_default_clause if j is not None))
-  for group, v in where_group_clauses.items():
+  for group, v in list(where_group_clauses.items()):
     replacements['and_' + group + '_where'] = (' AND ' + ' AND '.join(c for c, _ in v)) if v else ''
     replacements[group + '_where'] = (' WHERE ' + ' AND '.join(c for c, _ in v)) if v else ''
     replacements[group + '_joins'] = ' '.join(set(j for _, j in v if j is not None))
