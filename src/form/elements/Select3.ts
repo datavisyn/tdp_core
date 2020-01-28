@@ -255,9 +255,8 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
       multiple: this.options.multiple,
       placeholder: this.options.placeholder,
       tags: Boolean(this.options.validate), // only if a validate method is there
-      ajax: Object.assign({}, { // also override ajax options
-        delay: this.options.queryDelay,
-        cache: this.options.cacheResults
+      ajax: Object.assign(this.select2Options.ajax, { // also override ajax options
+        delay: this.options.queryDelay
       })
     });
 
