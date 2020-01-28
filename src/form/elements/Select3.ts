@@ -147,6 +147,12 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
    * @default ' '
    */
   defaultTokenSeparator: string;
+
+  /**
+   * query delay
+   * @default 250
+   */
+  queryDelay: number;
 }
 
 /**
@@ -198,7 +204,8 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     tokenSeparators: /[\s\n\r;,]+/gm,
     defaultTokenSeparator: ' ',
     id: null,
-    name: null
+    name: null,
+    queryDelay: 250
   };
 
   private readonly select2Options: Select2Options = <any>{
@@ -213,7 +220,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     ajax: {
       url: '',
       dataType: 'json',
-      delay: 250,
+      delay: this.options.queryDelay,
       cache: true,
       transport: this.searchImpl.bind(this)
     }
@@ -238,13 +245,20 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
 
   constructor(options: Partial<ISelect3Options<T>> = {}) {
     super();
+    // merge the default options with the given options
     Object.assign(this.options, options);
+
+    // merge our default select2Options
     Object.assign(this.select2Options, {
       width: this.options.width,
       minimumInputLength: this.options.minimumInputLength,
       multiple: this.options.multiple,
       placeholder: this.options.placeholder,
-      tags: Boolean(this.options.validate) // only if a validate method is there
+      tags: Boolean(this.options.validate), // only if a validate method is there
+      ajax: Object.assign({}, { // also override ajax options
+        delay: this.options.queryDelay,
+        cache: this.options.cacheResults
+      })
     });
 
     this.node = this.options.document.createElement('div');
