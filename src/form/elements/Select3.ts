@@ -149,7 +149,7 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
   defaultTokenSeparator: string;
 
   /**
-   * query delay
+   * Configures the time span how long to wait after a user has stopped typing before sending the AJAX request.
    * @default 250
    */
   queryDelay: number;
