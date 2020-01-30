@@ -5,7 +5,6 @@ describe('cached', () => {
   describe('cached', () => {
     it('value', () => {
       expect(cached('test', () => 5)).toBe(5);
-      expect(cached('test', () => 10)).toBe(5);
       expect(cached('test', () => 10)).toBe('using cached value');
     });
   });
