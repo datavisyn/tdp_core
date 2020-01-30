@@ -7,7 +7,7 @@ from typing import List, Dict
 import alembic.command
 import alembic.config
 from os import path
-from argparse import ArgumentTypeError, Action, REMAINDER
+from argparse import REMAINDER
 
 
 __author__ = 'Datavisyn'
@@ -72,7 +72,6 @@ class DBMigration(object):
 
     # Parse the options (incl. validation)
     options = cmd_parser.parser.parse_args(arguments)
-    options.raiseerr = True
 
     # Retrieve engine
     engine = engines.engine(self.db_key)
@@ -113,7 +112,7 @@ class DBMigrationManager(object):
       _log.info('DBMigration found: %s', p.id)
 
       # Check if configKey is set, otherwise use the plugin configuration
-      config = configview(p.configKey) if p.configKey else {}
+      config = configview(p.configKey) if hasattr(p, 'configKey') else {}
 
       # Priority of assignments: Configuration File -> Plugin Definition
       id = config.get('id') or (p.id if hasattr(p, 'id') else None)
@@ -152,27 +151,6 @@ class DBMigrationManager(object):
 db_migration_manager = DBMigrationManager()
 
 
-def parse_migration(item: str) -> DBMigration:
-  """
-  Parses an argparse value by retrieving the DBMigration instance from the db_migration_manager.
-  """
-  if len(db_migration_manager) == 0:
-    raise ArgumentTypeError('No migrations available')
-  if item not in db_migration_manager:
-    raise ArgumentTypeError('Must be one of the following options: {}'.format(', '.join(db_migration_manager.ids)))
-  return db_migration_manager[item]
-
-
-class StoreAllMigrationsAction(Action):
-  """
-  argparse Action which stores all migrations from the db_migration_manager in the destination variable.
-  """
-  def __call__(self, parser, args, values, option_string=None):
-    if len(db_migration_manager) == 0:
-      parser.error('No migrations available')
-    setattr(args, self.dest, db_migration_manager.migrations)
-
-
 def create_migration_command(parser):
   """
   Creates a migration command used by the 'command' extension point.
@@ -185,20 +163,9 @@ def create_migration_command(parser):
 
   command_parser = subparsers.add_parser('exec', help='Execute command on migration(s)')
 
-  selection_parser = command_parser.add_mutually_exclusive_group(required=True)
-
-  selection_parser.add_argument('-I', '--id',
-                                dest='migrations',
-                                metavar='<migration-id>',
-                                action='append',
-                                type=parse_migration,
-                                help='ID of the migration defined in the registry')
-
-  selection_parser.add_argument('-A', '--all',
-                                dest='migrations',
-                                nargs=0,
-                                action=StoreAllMigrationsAction,
-                                help='Use all migrations defined in the registry')
+  command_parser.add_argument('id',
+                              choices=db_migration_manager.ids + ['all'],
+                              help='ID of the migration, or all of them')
 
   command_parser.add_argument('command',
                               nargs=REMAINDER,
@@ -211,15 +178,14 @@ def create_migration_command(parser):
       else:
         print('Available migrations: {}'.format(', '.join(str(migration) for migration in db_migration_manager.migrations)))
     elif args.action == 'exec':
-      # TODO: For some reason, the migrations can only be executed for a single id.
-      # When using multiple ids, alembic doesn't do anything in the 2nd, 3rd, ... migration.
-      if len(args.migrations) > 1:
+      if args.id == 'all':
+        # TODO: For some reason, the migrations can only be executed for a single id.
+        # When using multiple ids, alembic doesn't do anything in the 2nd, 3rd, ... migration.
         print('Currently, only single migrations are supported. Please execute the command for each migration individually as we are working on a fix.')
         return
 
-      for migration in args.migrations:
-        # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
-        # Therefore, args.command might be None and we simply pass an empty array as alternative
-        migration.execute(args.command or [])
+      # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
+      # Therefore, args.command might be empty and we simply pass None to trigger the error message
+      db_migration_manager[args.id].execute(args.command if len(args.command) > 0 else None)
 
   return lambda args: lambda: execute(args)
