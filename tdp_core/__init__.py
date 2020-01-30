@@ -40,7 +40,15 @@ def phovea(registry):
   registry.append('mapping_provider', 'tdp_core', 'tdp_core.mapping_table')
   registry.append('greenifier', 'psycopg2', 'tdp_core.sql_use_gevent', {})
   registry.append('json-encoder', 'bytes-to-string-encoder', 'tdp_core.bytes_to_string_encoder', {})
-  registry.append('command', 'migrate-db', 'tdp_core.dbmigration', {'factory': 'create_migration_command'})
+
+  # DB-Migration plugins
+  registry.append('command', 'db-migration', 'tdp_core.dbmigration', {'factory': 'create_migration_command'})
+  registry.append('json-encoder', 'db-migration-encoder', 'tdp_core.dbmigration_api', {'factory': 'create_migration_encoder'})
+  registry.append('namespace', 'db-migration-api', 'tdp_core.dbmigration_api',
+                  {
+                      'factory': 'create_migration_api',
+                      'namespace': '/api/tdp/db-migration'
+                  })
   # generator-phovea:end
   pass
 

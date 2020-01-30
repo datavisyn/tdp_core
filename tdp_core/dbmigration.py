@@ -3,15 +3,16 @@ import logging
 from phovea_server.config import view as configview
 from phovea_server.plugin import list as list_plugins
 from .db import configs as engines
-from typing import List, Dict, Optional
+from typing import List, Dict
 import alembic.command
 import alembic.config
 from os import path
-from argparse import REMAINDER, ArgumentTypeError
+from argparse import ArgumentTypeError, Action, REMAINDER
 
 
 __author__ = 'Datavisyn'
 _log = logging.getLogger(__name__)
+
 alembic_cfg = alembic.config.Config(path.join(path.abspath(path.dirname(__file__)), 'dbmigration.ini'))
 
 
@@ -42,12 +43,18 @@ class DBMigration(object):
       missing_fields.append('dbKey')
 
     if len(missing_fields) > 0:
-      raise ValueError('No {} defined for DBMigration {} - is your configuration up to date?'.format(', '.join(missing_fields), self.id))
+      raise ValueError('No {} defined for DBMigration {} - is your configuration up to date?'.format(', '.join(missing_fields), self.id or '<UNKNOWN>'))
 
     # Automatically upgrade to head (if enabled)
     if self.auto_upgrade:
       _log.info('Upgrading database {}'.format(self.id))
       self.execute(['upgrade', 'head'])
+
+  def __repr__(self) -> str:
+    return f'DBMigration({self.id})'
+
+  def __str__(self) -> str:
+    return self.id
 
   def execute(self, arguments: List[str]) -> bool:
     """
@@ -65,6 +72,7 @@ class DBMigration(object):
 
     # Parse the options (incl. validation)
     options = cmd_parser.parser.parse_args(arguments)
+    options.raiseerr = True
 
     # Retrieve engine
     engine = engines.engine(self.db_key)
@@ -73,7 +81,7 @@ class DBMigration(object):
     alembic_cfg.cmd_opts = options
     alembic_cfg.set_main_option('script_location', self.script_location)
     alembic_cfg.set_main_option('sqlalchemy.url', str(engine.url))
-    alembic_cfg.set_main_option('migration_id', self.db_key)
+    alembic_cfg.set_main_option('migration_id', self.id)
 
     # Run the command
     cmd_parser.run_cmd(alembic_cfg, options)
@@ -97,23 +105,22 @@ class DBMigrationManager(object):
   """
 
   def __init__(self):
-    self._initialized: bool = False
     self._migrations: Dict[str, DBMigration] = dict()
 
-    _log.info("Initializing DBMigrationManager")
+    _log.info('Initializing DBMigrationManager')
 
     for p in list_plugins('tdp-sql-database-migration'):
-      _log.info("DBMigration found: %s", p.id)
+      _log.info('DBMigration found: %s', p.id)
 
       # Check if configKey is set, otherwise use the plugin configuration
       config = configview(p.configKey) if p.configKey else {}
 
       # Priority of assignments: Configuration File -> Plugin Definition
       id = config.get('id') or (p.id if hasattr(p, 'id') else None)
-      script_location = config.get('scriptLocation') or (p.scriptLocation if hasattr(p, 'scriptLocation') else None)
       db_key = config.get('dbKey') or (p.dbKey if hasattr(p, 'dbKey') else None)
+      script_location = config.get('scriptLocation') or (p.scriptLocation if hasattr(p, 'scriptLocation') else None)
       auto_upgrade = config.get('autoUpgrade') if type(config.get('autoUpgrade')) == bool else \
-          (p.autoUpgrade if hasattr(p, 'autoUpgrade') and type(p.autoUpgrade) == bool else None)
+          (p.autoUpgrade if hasattr(p, 'autoUpgrade') and type(p.autoUpgrade) == bool else False)
 
       # Create new migration
       migration = DBMigration(id, db_key, script_location, auto_upgrade)
@@ -121,39 +128,98 @@ class DBMigrationManager(object):
       # Store migration
       self._migrations[migration.id] = migration
 
-  def get_migration(self, id: str) -> Optional[DBMigration]:
-    return self._migrations.get(id)
+  def __contains__(self, item):
+    return item in self._migrations
 
-  def get_available_migrations(self) -> List[str]:
+  def __getitem__(self, item):
+    if item not in self:
+      raise NotImplementedError('missing db migration: ' + item)
+    return self._migrations[item]
+
+  def __len__(self):
+    return len(self._migrations)
+
+  @property
+  def ids(self) -> List[str]:
     return list(self._migrations.keys())
+
+  @property
+  def migrations(self) -> List[DBMigration]:
+    return list(self._migrations.values())
 
 
 # Global migration manager
 db_migration_manager = DBMigrationManager()
 
 
-def parse_migration(value: str) -> DBMigration:
+def parse_migration(item: str) -> DBMigration:
   """
-  Parses a value by retrieving the DBMigration instance from the db_migration_manager.
+  Parses an argparse value by retrieving the DBMigration instance from the db_migration_manager.
   """
-  possible_values = db_migration_manager.get_available_migrations()
-  if len(possible_values) == 0:
-    raise ArgumentTypeError("No migrations available")
-  if value not in possible_values:
-    raise ArgumentTypeError("Must be one of the following options: {}".format(', '.join(possible_values)))
-  return db_migration_manager.get_migration(value)
+  if len(db_migration_manager) == 0:
+    raise ArgumentTypeError('No migrations available')
+  if item not in db_migration_manager:
+    raise ArgumentTypeError('Must be one of the following options: {}'.format(', '.join(db_migration_manager.ids)))
+  return db_migration_manager[item]
+
+
+class StoreAllMigrationsAction(Action):
+  """
+  argparse Action which stores all migrations from the db_migration_manager in the destination variable.
+  """
+  def __call__(self, parser, args, values, option_string=None):
+    if len(db_migration_manager) == 0:
+      parser.error('No migrations available')
+    setattr(args, self.dest, db_migration_manager.migrations)
 
 
 def create_migration_command(parser):
   """
-  Creates a new command used by the 'command' extension point.
+  Creates a migration command used by the 'command' extension point.
   """
-  parser.add_argument('migration',
-                      type=parse_migration,
-                      help='ID of the migration defined in the registry')
+  # Either require individual ids or all flag
 
-  parser.add_argument('migration_parameters',
-                      nargs=REMAINDER,
-                      help='Parameters passed to the execution of the migration')
+  subparsers = parser.add_subparsers(dest='action', required=True)
 
-  return lambda args: lambda: args.migration.execute(args.migration_parameters)
+  subparsers.add_parser('list', help='List all available migrations')
+
+  command_parser = subparsers.add_parser('exec', help='Execute command on migration(s)')
+
+  selection_parser = command_parser.add_mutually_exclusive_group(required=True)
+
+  selection_parser.add_argument('-I', '--id',
+                                dest='migrations',
+                                metavar='<migration-id>',
+                                action='append',
+                                type=parse_migration,
+                                help='ID of the migration defined in the registry')
+
+  selection_parser.add_argument('-A', '--all',
+                                dest='migrations',
+                                nargs=0,
+                                action=StoreAllMigrationsAction,
+                                help='Use all migrations defined in the registry')
+
+  command_parser.add_argument('command',
+                              nargs=REMAINDER,
+                              help='Command executed by the migration')
+
+  def execute(args):
+    if args.action == 'list':
+      if(len(db_migration_manager) == 0):
+        print('No migrations found')
+      else:
+        print('Available migrations: {}'.format(', '.join(str(migration) for migration in db_migration_manager.migrations)))
+    elif args.action == 'exec':
+      # TODO: For some reason, the migrations can only be executed for a single id.
+      # When using multiple ids, alembic doesn't do anything in the 2nd, 3rd, ... migration.
+      if len(args.migrations) > 1:
+        print('Currently, only single migrations are supported. Please execute the command for each migration individually as we are working on a fix.')
+        return
+
+      for migration in args.migrations:
+        # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
+        # Therefore, args.command might be None and we simply pass an empty array as alternative
+        migration.execute(args.command or [])
+
+  return lambda args: lambda: execute(args)
