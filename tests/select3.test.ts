@@ -1,4 +1,4 @@
-/// <reference types="jasmine" />
+/// <reference types="jest" />
 import {splitEscaped} from '../src/form/elements/Select3';
 
 describe('select3', () => {

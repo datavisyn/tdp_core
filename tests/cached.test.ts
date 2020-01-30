@@ -1,4 +1,4 @@
-/// <reference types="jasmine" />
+/// <reference types="jest" />
 import cached, {cachedLazy} from '../src/cached';
 
 describe('cached', () => {
