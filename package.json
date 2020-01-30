@@ -36,6 +36,8 @@
     "node": ">= 12.13"
   },
   "scripts": {
+    "clean": "rimraf build dist && npm run clean:compile",
+    "clean:compile": "rimraf src/**/*.map src/**/*.js src/**/*.d.ts tests/**/*.js tests/**/*.map tests/**/*.d.ts demo/**/*.js demo/**/*.map demo/**/*.d.ts",
     "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules",
     "pretest": "echo hybrid",
     "test": "npm run test:web && npm run test:python",
@@ -46,7 +48,7 @@
     "docs": "npm run docs:web && npm run docs:python",
     "prebuild": "echo hybrid",
     "posttest": "echo hybrid",
-    "test:watch": "karma start --autoWatch=true --singleRun=false",
+    "test:watch": "jest --watch",
     "build:dev": "webpack",
     "build": "npm run build:web && npm run build:python",
     "start": "webpack-dev-server --inline",
@@ -58,7 +60,7 @@
     "pretest:web": "npm run compile",
     "pretest:python": "npm run check",
     "posttest:web": "npm run lint",
-    "test:web": "test ! $(find tests -name \"*.ts\") || karma start",
+    "test:web": "test ! $(find tests -name \"*.ts\") || jest",
     "test:python": "test ! $(find tests -name \"*.py\") || python setup.py test",
     "predist:web": "npm run build:web && npm run docs:web",
     "dist:web": "mkdirp dist && cd build && tar cvzf ../dist/tdp_core.tar.gz *",
