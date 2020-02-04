@@ -245,6 +245,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
 
   constructor(options: Partial<ISelect3Options<T>> = {}) {
     super();
+    const placeholder = options.placeholder || this.options.placeholder;
     // merge the default options with the given options
     Object.assign(this.options, options);
 
@@ -253,7 +254,8 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
       width: this.options.width,
       minimumInputLength: this.options.minimumInputLength,
       multiple: this.options.multiple,
-      placeholder: this.options.placeholder,
+      placeholder,
+      dropdownParent: $('.modal'),
       tags: Boolean(this.options.validate), // only if a validate method is there
       ajax: Object.assign(this.select2Options.ajax, { // also override ajax options
         delay: this.options.queryDelay
