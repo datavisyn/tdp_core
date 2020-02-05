@@ -198,7 +198,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
     source.setMapping(createMappingFunction(parameter.value));
   } else if (source) {
     bak = source[`get${prop}`]();
-    source[`set${prop}`].call(source, parameter.value);
+    source[`set${prop}`].call(source, parseToRegex(parameter.value));//parse serialized regular expression
   }
 
   return waitForSorted({
@@ -322,24 +322,52 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     if (ignore(`${property}Changed`, lineupViewWrapper)) {
       return;
     }
-    // console.log(source, property, old, newValue);
+    const newParsedValue = parseFromRegex(newValue);//Parse regex object to string to be properly stored from provenance graph
     if (source instanceof Column) {
       // assert ALineUpView and update the stats
       lineupViewWrapper.value.getInstance().updateLineUpStats();
 
       const rid = rankingId(provider, source.findMyRanker());
       const path = source.fqpath;
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newParsedValue), {
         inverse: setColumn(lineupViewWrapper, rid, path, property, old)
       });
     } else if (source instanceof Ranking) {
       const rid = rankingId(provider, source);
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newParsedValue), {
         inverse: setColumn(lineupViewWrapper, rid, null, property, old)
       });
     }
   };
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(f, delayed) : f);
+}
+
+
+/**
+ * Parses regex to an object
+ * It is necessary since the provenance graph mutates the data with  JSON.stringify()
+ * JSON.stringify when applied to a regular expression returns an empty object
+ */
+function parseFromRegex(value: RegExp | string): string | IRegexFilter {
+  if (!(value instanceof RegExp)) {
+    return value;
+  }
+  return {value: value.toString(), isRegex: true};
+}
+
+interface IRegexFilter {
+  value: string;
+  isRegex: boolean;
+}
+
+function parseToRegex(filter: string | IRegexFilter) {
+  if (!(<IRegexFilter>filter).isRegex) {
+    return filter as string;
+  }
+  const serializedRegexParser = /^\/(.+)\/(\w+)?$/;
+  const matches = serializedRegexParser.exec((<IRegexFilter>filter).value);
+  const [, regexString, regexFlags] = matches;
+  return new RegExp(regexString, regexFlags);
 }
 
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
