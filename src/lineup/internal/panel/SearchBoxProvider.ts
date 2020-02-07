@@ -5,10 +5,6 @@ export default class SearchBoxProvider {
 
   private searchBoxes: SearchBox<ISearchOption>[] = [];
 
-  constructor(private provider: LocalDataProvider, private options: any) {
-
-  }
-
   get length(): number {
     return this.searchBoxes.length;
   }
