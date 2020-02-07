@@ -11,9 +11,9 @@ export default class PanelRankingButton implements IPanelButton {
     this.node.addEventListener('click', (evt) => {
       evt.stopPropagation();
       evt.preventDefault();
-      const first = this.provider.getRankings()[0];
-      if (first) {
-        onClick(first);
+      const firstRanking = this.provider.getRankings()[0];
+      if (firstRanking) {
+        onClick(firstRanking);
       }
     });
   }
