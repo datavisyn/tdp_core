@@ -1,6 +1,8 @@
 import {IPanelButton} from './PanelButton';
 
-
+/**
+ * The panel header contains a list of panel buttons.
+ */
 export default class PanelHeader {
 
   readonly node: HTMLElement;
@@ -12,6 +14,10 @@ export default class PanelHeader {
     parent.appendChild(this.node);
   }
 
+  /**
+   * Add a panel button to this header
+   * @param button Panel button instance to add
+   */
   addButton(button: IPanelButton) {
     this.buttons = [...this.buttons, button];
     this.node.appendChild(button.node);
