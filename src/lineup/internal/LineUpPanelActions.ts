@@ -350,12 +350,12 @@ export default class LineUpPanelActions extends EventHandler {
     };
 
     if (this.options.enableAddingCombiningColumns) {
-      const combiningColumns = this.groupedDialog('Combining Columns', [
-        {text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum'))},
-        {text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination'))},
-        {text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested'))},
-        {text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc())},
-        {text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
+      const combiningColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.combiningColumns'), [
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(i18n.t('tdp:core.lineup.LineupPanelActions.nested')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc())},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.imposition'), id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
       ]);
       specialColumnsOption.children.push(combiningColumns);
     }
