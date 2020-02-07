@@ -110,7 +110,7 @@ def _json2xlsx():
 
   def to_value(v, coltype):
     if coltype == 'date':
-      if isinstance(v, int) or isinstance(v, int):
+      if isinstance(v, int):
         return datetime.fromtimestamp(v)
       return dateutil.parser.parse(v)
     return v
