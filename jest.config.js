@@ -27,7 +27,7 @@ module.exports = {
     "src",
     "../"
   ],
-  transformIgnorePatterns: [`../node_modules/(?!${pluginsToTransform})`],
+  transformIgnorePatterns: [`../node_modules/(?!${pluginsToTransform}).+\\.js$`],
   globals: {
     "__VERSION__": "TEST_VERSION",
     "__APP_CONTEXT__": "TEST_CONTEXT"
