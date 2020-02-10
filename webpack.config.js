@@ -9,7 +9,7 @@ const resolve = require('path').resolve;
 const pkg = require('./package.json');
 const webpack = require('webpack');
 const fs = require('fs');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const buildInfo = require('./buildInfo.js');
 
@@ -281,18 +281,39 @@ function generateWebpack(options) {
   }
   if (!options.bundle || options.isApp) {
     // extract the included css file to own file
-    const p = new ExtractTextPlugin({
+    const p = new MiniCssExtractPlugin({
       filename: (options.isApp || options.moduleBundle ? 'style' : pkg.name) + (options.min && !options.nosuffix ? '.min' : '') + '.css',
       allChunks: true // there seems to be a bug in dynamically loaded chunk styles are not loaded, workaround: extract all styles from all chunks
     });
     base.plugins.push(p);
     base.module.rules[0] = {
       test: /\.scss$/,
-      loader: p.extract(['css-loader', 'sass-loader'])
+      use: [
+        {
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+            publicPath: (resourcePath, context) => {
+              return path.relative(path.dirname(resourcePath), context) + '/';
+            },
+          },
+        },
+        'css-loader',
+        'sass-loader',
+      ],
     };
     base.module.rules[1] = {
       test: /\.css$/,
-      loader: p.extract(['css-loader'])
+      use: [
+        {
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+            publicPath: (resourcePath, context) => {
+              return path.relative(path.dirname(resourcePath), context) + '/';
+            },
+          },
+        },
+        'css-loader',
+      ],
     };
   }
   if (options.isApp) {
@@ -325,7 +346,7 @@ function generateWebpack(options) {
         minimize: true,
         debug: false
       })
-      // , new webpack.optimize.UglifyJsPlugin());
+      //, new webpack.optimize.UglifyJsPlugin());
     );
   } else {
     // generate source maps
