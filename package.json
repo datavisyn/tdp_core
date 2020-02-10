@@ -82,7 +82,7 @@
     "d3": "~3.5.17",
     "jquery": "~3.3.1",
     "lineupjs": "github:lineupjs/lineupjs#develop",
-    "phovea_clue": "github:phovea/phovea_clue#stoiber/testing_with_jest",
+    "phovea_clue": "github:phovea/phovea_clue#stoiber/webpack4",
     "select2": "~4.0.5",
     "select2-bootstrap-theme": "0.1.0-beta.9"
   },
