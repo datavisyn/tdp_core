@@ -1,11 +1,12 @@
-/// <reference types="jasmine" />
+/// <reference types="jest" />
 import cached, {cachedLazy} from '../src/cached';
 
 describe('cached', () => {
   describe('cached', () => {
     it('value', () => {
       expect(cached('test', () => 5)).toBe(5);
-      expect(cached('test', () => 10)).toBe(5, 'using cached value');
+      // expect(cached('test', () => 10)).toBe('using cached value');
+      expect(cached('test', () => 10)).toBe(5);
     });
   });
   describe('cachedLazy', () => {

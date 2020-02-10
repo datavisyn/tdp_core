@@ -75,7 +75,7 @@ const webpackloaders = [
     }]
   },
   {
-    test: /\.(png|jpg|jpeg|gif)$/,
+    test: /\.(png|jpg|gif|webp)$/,
     loader: 'url-loader',
     options: {
       limit: 10000 // inline <= 10kb
