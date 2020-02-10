@@ -9,6 +9,7 @@ const resolve = require('path').resolve;
 const pkg = require('./package.json');
 const webpack = require('webpack');
 const fs = require('fs');
+const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const buildInfo = require('./buildInfo.js');
