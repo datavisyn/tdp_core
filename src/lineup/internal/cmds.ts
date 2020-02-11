@@ -345,7 +345,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
 }
 
 /**
- * Seralize RegExp objects from LineUp string columns as plain object
+ * Serialize RegExp objects from LineUp string columns as plain object
  * that can be stored in the provenance graph
  */
 interface IRegExpFilter {
@@ -384,11 +384,11 @@ function stringifyRegExp(value: string | RegExp): string | IRegExpFilter {
  * In case a string is passed to this function no deserialization is applied.
  *
  * @param filter Filter as string or plain object matching the IRegExpFilter
- * @returns {string | RegExp} Returns the input string or the restored RegExp object
+ * @returns {string | RegExp| null} Returns the input string or the restored RegExp object
  */
 function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
-  if (!(<IRegExpFilter>filter).isRegExp) {
-    return filter as string;
+  if (filter === null || !(<IRegExpFilter>filter).isRegExp) {
+    return <string | null>filter;
   }
 
   const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
