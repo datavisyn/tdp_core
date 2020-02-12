@@ -1,8 +1,14 @@
 // test dependencies that require transformation
-const pluginsToTransform = [
-  'phovea_clue',
-  'lineupjs'
+let pluginsToTransform = [
+  'tdp_*',
+  'phovea_*'
 ].join('|');
+
+if(pluginsToTransform.length > 0) {
+ /**  Attention: Negative Lookahead! This regex adds the specified repos to a whitelist that holds plugins that are excluded from the transformIgnorePatterns.
+  * This means that pluginsToTransform should contain all repos that export ts files. They can only be handled by the transformation. */
+    pluginsToTransform = `(?!${pluginsToTransform})`;
+}
 
 /**
  * TODO check if we can process inline webpack loaders (e.g. as found in https://github.com/phovea/phovea_ui/blob/master/src/_bootstrap.ts)
@@ -25,9 +31,10 @@ module.exports = {
   ],
   modulePaths: [
     "src",
+    "../node_modules",
     "../"
   ],
-  transformIgnorePatterns: [`../node_modules/(?!${pluginsToTransform}).+\\.js$`],
+  transformIgnorePatterns: [`../node_modules/${pluginsToTransform}`],
   globals: {
     "__VERSION__": "TEST_VERSION",
     "__APP_CONTEXT__": "TEST_CONTEXT"
