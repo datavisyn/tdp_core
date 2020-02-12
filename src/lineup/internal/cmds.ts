@@ -184,7 +184,10 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
-  const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
+  let prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
+  if (prop === 'RendererType') {
+    prop = 'Renderer';
+  }
 
   let bak = null;
   const waitForSorted = dirtyRankingWaiter(ranking);
@@ -192,7 +195,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   if (parameter.path) {
     source = ranking.findByPath(parameter.path);
   }
-  ignoreNext = `${parameter.prop}Changed`;
+  // ignoreNext = `${parameter.prop}Changed`;
   if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
     bak = source.getMapping().dump();
     source.setMapping(createMappingFunction(parameter.value));
@@ -347,6 +350,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
   recordPropertyChange(col, provider, lineup, graph, 'filter');
   recordPropertyChange(col, provider, lineup, graph, 'rendererType');
   recordPropertyChange(col, provider, lineup, graph, 'groupRenderer');
+  recordPropertyChange(col, provider, lineup, graph, 'summaryRenderer');
   recordPropertyChange(col, provider, lineup, graph, 'sortMethod');
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
@@ -415,7 +419,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
 
 
 function untrackColumn(col: Column) {
-  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'sortMethod'), null);
+  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'summaryRenderer', 'sortMethod'), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
