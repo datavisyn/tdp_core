@@ -8,9 +8,14 @@ import {showErrorModalDialog} from '../../dialogs';
 import {extent, min, max} from 'd3';
 import {list as listPlugins} from 'phovea_core/src/plugin';
 
+export interface ILazyLoadedColumn {
+  col: Column;
+  loaded: Promise<Column>;
+  reload: (data: Promise<IScoreRow<any>[]>) => Promise<Column>;
+}
 
 function extentByType(type: string, rows: any, acc: (d: any) => any): [number, number] {
-  switch(type) {
+  switch (type) {
     case 'numbers':
       return [min(rows, (d) => min(acc(d))), max(rows, (d) => max(acc(d)))];
     case 'boxplot':
@@ -20,12 +25,12 @@ function extentByType(type: string, rows: any, acc: (d: any) => any): [number, n
   }
 }
 
-export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & { pushDesc(col: IColumnDesc): void }, position: number, done?: () => void): { col: Column, loaded: Promise<Column>, reload: (data: Promise<IScoreRow<any>[]>) => Promise<Column> } {
+export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & {pushDesc(col: IColumnDesc): void}, position: number, done?: () => void): ILazyLoadedColumn {
   const ranking = provider.getLastRanking();
   const accessor = createAccessor(colDesc);
 
   // generate a unique column
-  (<any>colDesc).column = colDesc.scoreID || `dC${colDesc.label.replace(/\s+/,'')}`;
+  (<any>colDesc).column = colDesc.scoreID || `dC${colDesc.label.replace(/\s+/, '')}`;
 
   provider.pushDesc(colDesc);
   //mark as lazy loaded
@@ -83,7 +88,7 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
   return {col, loaded, reload};
 }
 
-function markLoaded(provider: IDataProvider, colDesc: any, loaded: boolean) {
+function markLoaded(provider: IDataProvider, colDesc: any, loaded: boolean): void {
   // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
   provider.getRankings().forEach((ranking) => {
     const columns = ranking.flatColumns.filter((rankCol) => rankCol.desc === colDesc);

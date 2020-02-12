@@ -9,6 +9,7 @@ import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../extensions';
 import {get as getPlugin} from 'phovea_core/src/plugin';
 import {IServerColumnDesc} from '../rest';
 import {IFormElementDesc} from '../form';
+import {ILazyLoadedColumn} from '../lineup/internal/column';
 
 interface IEmbeddedRanking extends ARankingView {
   rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
@@ -51,7 +52,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     class EmbeddedRankingView extends ARankingView implements IEmbeddedRanking {
       private triggerScoreReload = false;
 
-      protected loadColumnDesc() : Promise<IServerColumnDesc> {
+      protected loadColumnDesc(): Promise<IServerColumnDesc> {
         return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns, idType: this.idType.name}));
       }
 
@@ -172,9 +173,9 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
     return this.ranking.runWithoutTracking(() => f(this.data));
   }
 
-  protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number);
-  protected addTrackedScoreColumn(score: IScore<any>, position?: number);
-  protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number) {
+  protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn[]>;
+  protected addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
+  protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn|ILazyLoadedColumn[]> {
     if (typeof score !== 'string') {
       return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
     }

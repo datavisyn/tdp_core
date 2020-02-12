@@ -20,6 +20,7 @@ import 'phovea_ui/src/_font-awesome';
 import {list as listPlugins} from 'phovea_core/src/plugin';
 import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
 import TourManager from './tour/TourManager';
+import i18n, {initI18n} from 'phovea_core/src/i18n';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
@@ -94,26 +95,31 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
-    this.tourManager = new TourManager({
-      doc: document,
-      header: () => this.header,
-      app: () => this.app
+
+    initI18n().then(() => { //Initialize i18n and then load application
+      this.tourManager = new TourManager({
+        doc: document,
+        header: () => this.header,
+        app: () => this.app
+      });
+
+      mixin(this.options, {
+        showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
+      }, options);
+
+      this.build(document.body, {replaceBody: false});
+
+      if (this.tourManager.hasTours()) {
+        const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
+
+        button.dataset.toggle = 'modal';
+        button.tabIndex = -1;
+        button.dataset.target = `#${this.tourManager.chooser.id}`;
+        button.onclick = (evt) => {
+          evt.preventDefault();
+        };
+      }
     });
-    mixin(this.options, {
-      showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
-    }, options);
-
-    this.build(document.body, {replaceBody: false});
-
-    if (this.tourManager.hasTours()) {
-      const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
-      button.dataset.toggle = 'modal';
-      button.tabIndex = -1;
-      button.dataset.target = `#${this.tourManager.chooser.id}`;
-      button.onclick = (evt) => {
-        evt.preventDefault();
-      };
-    }
   }
 
   protected createHeader(parent: HTMLElement) {
@@ -136,7 +142,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       if (typeof this.options.showResearchDisclaimer === 'function') {
         this.options.showResearchDisclaimer(aboutDialogBody);
       } else {
-        aboutDialogBody.insertAdjacentHTML('afterbegin', '<div class="alert alert-warning" role="alert"><strong>Disclaimer</strong> This software is <strong>for research purposes only</strong>.</span></div>');
+        aboutDialogBody.insertAdjacentHTML('afterbegin', `<div class="alert alert-warning" role="alert">${i18n.t('tdp:core.disclaimerMessage')}</span></div>`);
       }
     }
 
@@ -187,7 +193,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
-    graph.catch((error: { graph: string }) => {
+    graph.catch((error: {graph: string}) => {
       showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 

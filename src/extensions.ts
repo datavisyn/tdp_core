@@ -102,11 +102,16 @@ export interface IScoreLoader {
 }
 
 export interface IScoreLoaderExtension {
-  factory(desc: IPluginDesc, extraArgs: object): Promise<IScoreLoader[]>;
+  factory(desc: IScoreLoaderExtensionDesc, extraArgs: object): Promise<IScoreLoader[]>;
 }
 
 export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   idtype: string;
+
+  /**
+   * view group hint
+   */
+  readonly group?: {name: string, order: number};
 
   load(): Promise<IPlugin & IScoreLoaderExtension>;
 }

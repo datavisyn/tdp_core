@@ -11,6 +11,7 @@ import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {exportLogic} from './export';
 import {lazyDialogModule} from '../../dialogs';
+import i18n from 'phovea_core/src/i18n';
 
 export interface ISearchOption {
   text: string;
@@ -69,7 +70,7 @@ export default class LineUpPanelActions extends EventHandler {
 
     if (options.enableAddingColumns) {
       this.search = new SearchBox<ISearchOption>({
-        placeholder: 'Add Column...'
+        placeholder: i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder')
       });
       this.search.on(SearchBox.EVENT_SELECT, (item) => {
         this.node.querySelector('.lu-adder')!.classList.remove('once');
@@ -134,11 +135,11 @@ export default class LineUpPanelActions extends EventHandler {
   private init() {
     this.node.insertAdjacentHTML('afterbegin', `
       <section></section>
-      <div class="lu-adder">${this.search ? '<button class="fa fa-plus" title="Add Column"></button>' : ''}
+      <div class="lu-adder">${this.search ? `<button class="fa fa-plus" title="${i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton')}"></button>` : ''}
       </div>`);
 
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
-      this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="(Un)Collapse"></a>`);
+      this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="${i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton')}"></a>`);
       this.node.querySelector('a')!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -148,15 +149,15 @@ export default class LineUpPanelActions extends EventHandler {
 
     const buttons = this.node.querySelector('section');
     this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
-    if(this.options.enableSaveRanking) {
+    if (this.options.enableSaveRanking) {
       buttons.appendChild(this.appendSaveRanking());
     }
-    if(this.options.enableDownload) {
+    if (this.options.enableDownload) {
       buttons.appendChild(this.appendDownload());
     }
     if (this.options.enableZoom) {
-      buttons.appendChild(this.createMarkup('Zoom In', 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
-      buttons.appendChild(this.createMarkup('Zoom Out', 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
+      buttons.appendChild(this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
+      buttons.appendChild(this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
     }
     if (this.options.enableOverviewMode) {
       buttons.appendChild(this.appendOverviewButton());
@@ -205,7 +206,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.overview.classList.toggle('fa-list');
       this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
     };
-    return this.overview = this.createMarkup('En/Disable Overview', this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+    return this.overview = this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
   }
 
   setViolation(violation?: string) {
@@ -220,15 +221,15 @@ export default class LineUpPanelActions extends EventHandler {
     const node = this.node.ownerDocument.createElement('div');
     node.classList.add('btn-group', 'download-data-dropdown');
     node.innerHTML = `
-      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Data">
+      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
       </button>
       <ul class="dropdown-menu dropdown-menu-${this.isTopMode ? 'left' : 'right'}">
-        <li class="dropdown-header">Download All Rows</li>
-        <li><a href="#" data-s="a" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
-        <li class="dropdown-header" data-num-selected-rows="0">Download Selected Rows Only</li>
-        <li><a href="#" data-s="s" data-t="xlsx">Microsoft Excel (xlsx)</a></li>
+        <li class="dropdown-header">${i18n.t('tdp:core.lineup.LineupPanelActions.downloadAll')}</li>
+        <li><a href="#" data-s="a" data-t="xlsx">${i18n.t('tdp:core.lineup.LineupPanelActions.excel')}</a></li>
+        <li class="dropdown-header" data-num-selected-rows="0">${i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</li>
+        <li><a href="#" data-s="s" data-t="xlsx">${i18n.t('tdp:core.lineup.LineupPanelActions.excel')}</a></li>
         <li role="separator" class="divider"></li>
-        <li><a href="#" data-s="s" data-t="custom">Customize &hellip;</a></li>
+        <li><a href="#" data-s="s" data-t="custom">${i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a></li>
       </ul>
     `;
 
@@ -260,7 +261,7 @@ export default class LineUpPanelActions extends EventHandler {
       this.saveRankingDialog(<number[]>ranking.getOrder());
     };
 
-    return this.createMarkup('Save List of Entities', 'fa fa-save', listener);
+    return this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
   }
 
   private appendExtraButtons() {
@@ -336,13 +337,13 @@ export default class LineUpPanelActions extends EventHandler {
 
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
-    if(this.options.enableAddingDatabaseColumns) {
-      items.push(this.groupedDialog('Database Columns', this.getColumnDescription(descs, false)));
+    if (this.options.enableAddingDatabaseColumns) {
+      items.push(this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
       items.push({
-        text: 'Parameterized Scores',
+        text: i18n.t('tdp:core.lineup.LineupPanelActions.parameterizedScores'),
         children: loadedScorePlugins.map((score) => {
           return {
             text: score.text,
@@ -359,65 +360,65 @@ export default class LineUpPanelActions extends EventHandler {
       });
     }
 
-    if(this.options.enableAddingPreviousColumns) {
+    if (this.options.enableAddingPreviousColumns) {
       const scoreDescs = this.getColumnDescription(descs, true);
       if (scoreDescs.length > 0) {
         items.push({
-          text: 'Previously Added Columns',
+          text: i18n.t('tdp:core.lineup.LineupPanelActions.previouslyAddedColumns'),
           children: scoreDescs
         });
       }
     }
 
     const specialColumnsOption = {
-      text: 'Special Columns',
+      text: i18n.t('tdp:core.lineup.LineupPanelActions.specialColumns'),
       children: []
     };
 
-    if(this.options.enableAddingCombiningColumns) {
-      const combiningColumns = this.groupedDialog('Combining Columns', [
-        { text: 'Weighted Sum', id: 'weightedSum', action: () => this.addColumn(createStackDesc('Weighted Sum')) },
-        { text: 'Scripted Combination', id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc('Scripted Combination')) },
-        { text: 'Nested', id: 'nested', action: () => this.addColumn(createNestedDesc('Nested')) },
-        { text: 'Min/Max/Mean Combination', id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
-        { text: 'Imposition', id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+    if (this.options.enableAddingCombiningColumns) {
+      const combiningColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.combiningColumns'), [
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(i18n.t('tdp:core.lineup.LineupPanelActions.nested')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc())},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.imposition'), id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
       ]);
       specialColumnsOption.children.push(combiningColumns);
     }
 
-    if(this.options.enableAddingSupportColumns) {
-      const supportColumns = this.groupedDialog('Support Columns', [
-        {text: 'Group Information', id: 'group', action: () => this.addColumn(createGroupDesc('Group'))},
-        {text: 'Selection Checkbox', id: 'selection', action: () => this.addColumn(createSelectionDesc())},
-        {text: 'Aggregate Group', id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+    if (this.options.enableAddingSupportColumns) {
+      const supportColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.supportColumns'), [
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(i18n.t('tdp:core.lineup.LineupPanelActions.group')))},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+        {text: i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
       ]);
       specialColumnsOption.children.push(supportColumns);
     }
 
-    if(this.options.enableAddingMetaDataColumns) {
+    if (this.options.enableAddingMetaDataColumns) {
       specialColumnsOption.children.push(...metaDataOptions);
     }
 
     // Only add special columns option if there are any items available
-    if(specialColumnsOption.children.length > 0) {
+    if (specialColumnsOption.children.length > 0) {
       items.push(specialColumnsOption);
     }
 
     this.search.data = items;
   }
 
-  private groupedDialog(text: string, children: ISearchOption[]):ISearchOption | IGroupSearchItem<ISearchOption> {
+  private groupedDialog(text: string, children: ISearchOption[]): ISearchOption | IGroupSearchItem<ISearchOption> {
     const viaDialog = this.options.enableAddingColumnGrouping;
     if (!viaDialog) {
-      return { text, children };
+      return {text, children};
     }
     return {
-      text: `${text} &hellip;`,
+      text: i18n.t('tdp:core.lineup.LineupPanelActions.columnTitle', {text}),
       id: `group_${text}`,
       action: () => {
         // choooser dialog
         lazyDialogModule().then((dialogs) => {
-          const dialog = new dialogs.FormDialog(`Add ${text} &hellip;`, 'Add Column');
+          const dialog = new dialogs.FormDialog(i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
           dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">
               ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}
@@ -471,7 +472,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 }
 
-function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
+export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
   if (!target) {
     return [];
   }
