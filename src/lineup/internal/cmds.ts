@@ -323,7 +323,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       return;
     }
 
-    const newSerializedValue = stringifyRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+    const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
 
     if (source instanceof Column) {
       // assert ALineUpView and update the stats
@@ -372,7 +372,7 @@ interface IRegExpFilter {
  * @param value Input string or RegExp object
  * @returns {string | IRegExpFilter} Returns the input string or a plain `IRegExpFilter` object
  */
-function stringifyRegExp(value: string | RegExp): string | IRegExpFilter {
+function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
   if (!(value instanceof RegExp)) {
     return value;
   }
