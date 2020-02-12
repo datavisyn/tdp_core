@@ -198,7 +198,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
     source.setMapping(createMappingFunction(parameter.value));
   } else if (source) {
     bak = source[`get${prop}`]();
-    source[`set${prop}`].call(source, parameter.value);
+    source[`set${prop}`].call(source, restoreRegExp(parameter.value)); // restore serialized regular expression before passing to LineUp
   }
 
   return waitForSorted({
@@ -322,24 +322,79 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     if (ignore(`${property}Changed`, lineupViewWrapper)) {
       return;
     }
-    // console.log(source, property, old, newValue);
+
+    const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+
     if (source instanceof Column) {
       // assert ALineUpView and update the stats
       lineupViewWrapper.value.getInstance().updateLineUpStats();
 
       const rid = rankingId(provider, source.findMyRanker());
       const path = source.fqpath;
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newSerializedValue), {
         inverse: setColumn(lineupViewWrapper, rid, path, property, old)
       });
     } else if (source instanceof Ranking) {
       const rid = rankingId(provider, source);
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newSerializedValue), {
         inverse: setColumn(lineupViewWrapper, rid, null, property, old)
       });
     }
   };
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(f, delayed) : f);
+}
+
+/**
+ * Serialize RegExp objects from LineUp string columns as plain object
+ * that can be stored in the provenance graph
+ */
+interface IRegExpFilter {
+  /**
+   * RegExp as string
+   */
+  value: string;
+  /**
+   * Flag to indicate the value should be restored as RegExp
+   */
+  isRegExp: boolean;
+}
+
+/**
+ * Serializes RegExp objects to an IRegexFilter object, which can be stored in the provenance graph.
+ * In case a string is passed to this function no serialization is applied.
+ *
+ * Background information:
+ * The serialization step is necessary, because RegExp objects are converted into an empty object `{}` on `JSON.stringify`.
+ * ```
+ * JSON.stringify(/^123$/gm); // result: {}
+ * ```
+ *
+ * @param value Input string or RegExp object
+ * @returns {string | IRegExpFilter} Returns the input string or a plain `IRegExpFilter` object
+ */
+function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
+  if (!(value instanceof RegExp)) {
+    return value;
+  }
+  return {value: value.toString(), isRegExp: true};
+}
+
+/**
+ * Restores a RegExp object from a given IRegExpFilter object.
+ * In case a string is passed to this function no deserialization is applied.
+ *
+ * @param filter Filter as string or plain object matching the IRegExpFilter
+ * @returns {string | RegExp| null} Returns the input string or the restored RegExp object
+ */
+function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
+  if (filter === null || !(<IRegExpFilter>filter).isRegExp) {
+    return <string | null>filter;
+  }
+
+  const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
+  const matches = serializedRegexParser.exec((<IRegExpFilter>filter).value);
+  const [_full, regexString, regexFlags] = matches;
+  return new RegExp(regexString, regexFlags);
 }
 
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
