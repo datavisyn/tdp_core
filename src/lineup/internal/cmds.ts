@@ -184,7 +184,7 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
-  let prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
+  const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
 
   let bak = null;
   const waitForSorted = dirtyRankingWaiter(ranking);
@@ -209,6 +209,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         break;
     }
   }
+
   return waitForSorted({
     inverse: setColumn(inputs[0], parameter.rid, parameter.path, parameter.prop, bak)
   });
