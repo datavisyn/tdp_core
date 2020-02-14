@@ -185,9 +185,6 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   let prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
-  if (prop === 'RendererType') {
-    prop = 'Renderer';
-  }
 
   let bak = null;
   const waitForSorted = dirtyRankingWaiter(ranking);
