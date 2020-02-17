@@ -38,6 +38,10 @@ export class PanelTab {
     this.node.classList.remove('active');
     this.events.fire(PanelTabEvents.HIDE_PANEL);
   }
+
+  isClosed() {
+    return !this.node.classList.contains('active')
+  }
 }
 
 export class SidePanelTab extends PanelTab {

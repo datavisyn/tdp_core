@@ -261,7 +261,7 @@ export default class LineUpPanelActions extends EventHandler {
           });
         }
       };
-      return new PanelNavButton(buttons, tab.node, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
+      return new PanelNavButton(buttons, tab, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
     });
   }
 

@@ -1,3 +1,4 @@
+import {PanelTab} from './PanelTab';
 /**
  * Interface for the LineUp panel button
  */
@@ -33,27 +34,30 @@ export default class PanelButton implements IPanelButton {
   }
 }
 
+/**
+ * HTML button with a custom title, CSS class, an onClick function
+ * Acts as tab header/button and highlights itself when clicked depending on if the tab body is open or closed
+ */
 export class PanelNavButton implements IPanelButton {
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, private readonly tabNode: HTMLElement, title: string, linkClass: string, onClick: () => void) {
+  /**
+ * Constructor of the PanelButton
+ * @param parent The parent HTML DOM element
+ * @param tab The tab it is connected to
+ * @param title String that is used for the title attribute
+ * @param linkClass CSS classes to apply
+ * @param onClick Function that should be executed on button click
+ */
+  constructor(parent: HTMLElement, private readonly tab: PanelTab, title: string, linkClass: string, onClick: () => void) {
     this.node = parent.ownerDocument.createElement('button');
     this.node.className = linkClass;
     this.node.title = title;
     this.node.addEventListener('click', (evt) => {
       evt.stopPropagation();
       evt.preventDefault();
-      this.highlight();
+      this.node.classList.toggle('active', this.tab.isClosed())
       onClick();
     });
-  }
-  private highlight() {
-    if (!this.tabNode.classList.contains('active')) {
-      this.node.classList.add('active');
-
-    } else {
-      this.node.classList.remove('active');
-    }
-
   }
 }
