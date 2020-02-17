@@ -29,17 +29,17 @@ export class PanelTab {
     this.node.style.width = o.width + 'em' || null;
   }
 
-  show() {
+  public show() {
     this.node.classList.add('active');
     this.events.fire(PanelTabEvents.SHOW_PANEL);
   }
 
-  hide() {
+  public hide() {
     this.node.classList.remove('active');
     this.events.fire(PanelTabEvents.HIDE_PANEL);
   }
 
-  isClosed() {
+  public isClosed() {
     return !this.node.classList.contains('active')
   }
 }

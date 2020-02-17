@@ -2,10 +2,17 @@ import {LocalDataProvider} from 'lineupjs';
 import {exportLogic} from '../export';
 import {IPanelButton} from './PanelButton';
 import i18n from 'phovea_core/src/i18n';
-export default class PanelDownloadButton implements IPanelButton {
+
+
+/**
+ * An HTML div element tha contains 2 children:
+ * A button that toggles a dropdown to download select/all rows of the ranking
+ * A dropwdown HTMLUListElement
+ */
+export default class PanelDownloadButtonContainer implements IPanelButton {
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, private provider: LocalDataProvider, isTopMode: boolean) {
+  constructor(parent: HTMLElement, private provider: LocalDataProvider, isTopMode:boolean) {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('btn-group', 'download-data-dropdown');
     this.node.innerHTML = `

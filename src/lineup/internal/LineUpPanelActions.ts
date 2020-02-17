@@ -12,13 +12,13 @@ import {IARankingViewOptions} from '../ARankingView';
 import {lazyDialogModule} from '../../dialogs';
 import PanelButton, {IPanelButton, PanelNavButton} from './panel/PanelButton';
 import PanelTabContainer from './panel/PanelTabContainer';
-import PanelDownloadButton from './panel/PanelDownloadButton';
 import {PanelTab, SidePanelTab, IPanelTabDesc} from './panel/PanelTab';
 import SearchBoxProvider from './panel/SearchBoxProvider';
 import PanelHeader from './panel/PanelHeader';
 import PanelRankingButton from './panel/PanelRankingButton';
 import PanelAddColumnButton from './panel/PanelAddColumnButton';
 import i18n from 'phovea_core/src/i18n';
+import PanelDownloadButtonContainer from './panel/PanelDownloadButtonContainer'
 
 export interface ISearchOption {
   text: string;
@@ -183,8 +183,8 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableDownload) {
-      const downloadButton = new PanelDownloadButton(buttons, this.provider, this.isTopMode);
-      this.header.addButton(downloadButton);
+      const downloadButtonContainer = new PanelDownloadButtonContainer(buttons, this.provider, this.isTopMode);
+      this.header.addButton(downloadButtonContainer);
     }
 
     if (this.options.enableZoom) {
