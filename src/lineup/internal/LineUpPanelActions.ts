@@ -5,7 +5,7 @@ import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin'
 import {editDialog} from '../../storage';
 import {
   IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
-  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc, EXTENSION_POINT_TDP_LINEUP_PANEL_TAB
+  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc, EP_TDP_CORE_LINEUP_PANEL_TAB, IPanelTabExtensionDesc
 } from '../../extensions';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
@@ -13,7 +13,7 @@ import {lazyDialogModule} from '../../dialogs';
 import PanelButton, {IPanelButton, PanelNavButton} from './panel/PanelButton';
 import PanelTabContainer from './panel/PanelTabContainer';
 import PanelDownloadButton from './panel/PanelDownloadButton';
-import {PanelTab, SidePanelTab} from './panel/PanelTab';
+import {PanelTab, SidePanelTab, IPanelTabDesc} from './panel/PanelTab';
 import SearchBoxProvider from './panel/SearchBoxProvider';
 import PanelHeader from './panel/PanelHeader';
 import PanelRankingButton from './panel/PanelRankingButton';
@@ -234,9 +234,9 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private appendExtraTabs(buttons: HTMLElement) {
-    const plugins = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_LINEUP_PANEL_TAB);
+    const plugins = <IPanelTabExtensionDesc[]>listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB);
     return plugins.map((plugin) => {
-      const tab = new PanelTab(this.tabContainer.node, plugin.options);
+      const tab = new PanelTab(this.tabContainer.node, plugin.tabDesc);
       this.tabContainer.addTab(tab);
 
       let isLoaded = false;
@@ -261,7 +261,7 @@ export default class LineUpPanelActions extends EventHandler {
           });
         }
       };
-      return new PanelNavButton(buttons, tab.node, plugin.title, 'fa ' + plugin.cssClass, listener);
+      return new PanelNavButton(buttons, tab.node, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
     });
   }
 

@@ -2,8 +2,8 @@ import {SidePanel, SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 import {EventHandler} from 'phovea_core/src/event';
 
-export interface IPanelTabOptions {
-  tabWidth: string;
+export interface IPanelTabDesc {
+  width: string;
 }
 
 export class PanelTabEvents extends EventHandler {
@@ -19,14 +19,14 @@ export class PanelTab {
   readonly node: HTMLElement;
   readonly events: PanelTabEvents;
 
-  constructor(parent: HTMLElement, options?: Partial<IPanelTabOptions>) {
+  constructor(parent: HTMLElement, options?: IPanelTabDesc) {
     this.events = new PanelTabEvents();
 
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
 
     const o = Object.assign({}, options);
-    this.node.style.width = o.tabWidth || null;
+    this.node.style.width = o.width + 'em' || null;
   }
 
   show() {

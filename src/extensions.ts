@@ -6,9 +6,10 @@ import {IEventHandler} from 'phovea_core/src/event';
 import {IScore, IAdditionalColumnDesc} from './lineup';
 import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
-import {IColumnDesc, Column} from 'lineupjs';
+import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
+import {IPanelTabDesc} from './lineup/internal/panel/PanelTab';
 
 export * from './tour/extensions';
 
@@ -16,13 +17,22 @@ export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
-export const EXTENSION_POINT_TDP_LINEUP_PANEL_TAB = 'tdpLineupPanelTab';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
 export const EXTENSION_POINT_TDP_INSTANT_VIEW = 'tdpInstantView';
 export const EXTENSION_POINT_TDP_APP_EXTENSION = 'tdpAppExtension';
 // filter extensions
 export const EXTENSION_POINT_TDP_LIST_FILTERS = 'tdpListFilters';
 export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
+
+/**
+ * Register a new tab to the LineupSidePanel.
+ * Consists of a button/header to open the tab content and the tab content itself
+ * @factoryParam {HTMLElement} parent The node of the tab content created through the extension point
+ * @factoryParam {LocalDataProvider} provider The data of the current ranking
+ * @factoryParam {IPanelTabExtensionDesc} desc The phovea extension point description
+ * @factoryParam {PanelTabEvents} events Listen when the tab closes or opens
+ */
+export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
 
 /**
  * Register new form elements for the form builder. Form elements must implement the `IFormElement`.
@@ -137,6 +147,23 @@ export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 
+export interface IPanelTabExtension {
+  desc: IPanelTabExtensionDesc;
+  factory(parent: HTMLElement, provider: LocalDataProvider, desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
+}
+
+export interface IPanelTabExtensionDesc extends IPluginDesc {
+  /**
+   * @param headerCssClass css class for the button/header of the LineupSidePanel tab
+   * @param headerTitle title of the above button/header
+   * @param tabDesc description of the tab e.g { width:'40' }
+   */
+  headerCssClass: string;
+  headerTitle: string;
+  tabDesc: IPanelTabDesc;
+
+  load(): Promise<IPlugin & IPanelTabExtension>;
+}
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;
   factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
