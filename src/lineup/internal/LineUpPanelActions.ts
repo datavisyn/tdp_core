@@ -18,7 +18,7 @@ import PanelHeader from './panel/PanelHeader';
 import PanelRankingButton from './panel/PanelRankingButton';
 import PanelAddColumnButton from './panel/PanelAddColumnButton';
 import i18n from 'phovea_core/src/i18n';
-import PanelDownloadButtonContainer from './panel/PanelDownloadButtonContainer'
+import PanelDownloadButtonContainer from './panel/PanelDownloadButtonContainer';
 
 export interface ISearchOption {
   text: string;

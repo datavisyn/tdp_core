@@ -40,7 +40,7 @@ export class PanelTab {
   }
 
   public isClosed() {
-    return !this.node.classList.contains('active')
+    return !this.node.classList.contains('active');
   }
 }
 

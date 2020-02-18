@@ -41,7 +41,7 @@ export default class PanelButton implements IPanelButton {
 export class PanelNavButton implements IPanelButton {
   readonly node: HTMLElement;
 
-  /**
+/**
  * Constructor of the PanelButton
  * @param parent The parent HTML DOM element
  * @param tab The tab it is connected to
@@ -56,7 +56,7 @@ export class PanelNavButton implements IPanelButton {
     this.node.addEventListener('click', (evt) => {
       evt.stopPropagation();
       evt.preventDefault();
-      this.node.classList.toggle('active', this.tab.isClosed())
+      this.node.classList.toggle('active', this.tab.isClosed());
       onClick();
     });
   }
