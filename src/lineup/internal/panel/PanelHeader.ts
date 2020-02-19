@@ -11,15 +11,18 @@ export default class PanelHeader {
   private buttons: IPanelButton[] = [];
   private navTabs: PanelNavButton[] = [];
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, isTopMode: boolean) {
     this.node = parent.ownerDocument.createElement('header');
     parent.appendChild(this.node);
     this.buttonGroupNode = this.node.ownerDocument.createElement('div');
-    this.navGroupNode = this.node.ownerDocument.createElement('ul');
     this.buttonGroupNode.classList.add('button-group');
-    this.navGroupNode.className = 'nav nav-tabs';
+    if (!isTopMode) {
+      this.navGroupNode = this.node.ownerDocument.createElement('ul');
+      this.navGroupNode.className = 'nav nav-tabs';
+      this.node.appendChild(this.navGroupNode);
+    }
+
     this.node.appendChild(this.buttonGroupNode);
-    this.node.appendChild(this.navGroupNode);
   }
 
   /**

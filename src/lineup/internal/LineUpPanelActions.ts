@@ -82,7 +82,7 @@ export default class LineUpPanelActions extends EventHandler {
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
 
-    this.header = new PanelHeader(this.node);
+    this.header = new PanelHeader(this.node, this.options.enableSidePanel === 'top');
 
     this.searchBoxProvider = new SearchBoxProvider();
 

@@ -139,9 +139,10 @@ $lu_assets: "~lineupjs/src/assets";
     }
 
     > header {
-      margin-bottom: 1em;
-      // display: grid;
-      // grid-template-columns: repeat(auto-fill, minmax(2.8em, 1fr));
+      & > :not(.collapsed) {
+        margin-bottom: 1em;
+      }
+
       .button-group {
         display: flex;
         margin-bottom: 0.5em;
@@ -354,7 +355,7 @@ $lu_assets: "~lineupjs/src/assets";
     float: right;
     border-left: none;
 
-    header {
+    > header > .button-group {
       display: flex;
       flex-direction: row;
       max-width: unset;
