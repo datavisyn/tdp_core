@@ -2,13 +2,21 @@ import {SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 import {IPanelButton} from './PanelButton';
 import i18n from 'phovea_core/src/i18n';
+
+/**
+ * Div HTMLElement that contains a button and a SearchBox.
+ * The SearchBox is by default hidden and can bit toggled by the button
+ */
 export default class PanelAddColumnButton implements IPanelButton {
   readonly node: HTMLElement;
-
+  /**
+   *
+   * @param parent The parent HTML DOM element
+   * @param search LIneup SearchBox instance
+   */
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('lu-adder');
-
     this.node.addEventListener('mouseleave', () => {
       this.node.classList.remove('once');
     });

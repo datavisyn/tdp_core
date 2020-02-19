@@ -7,20 +7,25 @@ export default class PanelHeader {
 
   readonly node: HTMLElement;
   readonly buttonGroupNode: HTMLElement;
-  readonly navGroupNode: HTMLElement;
+  readonly navTabsNode: HTMLElement;
   private buttons: IPanelButton[] = [];
   private navTabs: PanelNavButton[] = [];
-
+  /**
+   *
+   * @param parent The parent HTML DOM element
+   * @param isTopMode Is top mode
+   */
   constructor(parent: HTMLElement, isTopMode: boolean) {
     this.node = parent.ownerDocument.createElement('header');
     parent.appendChild(this.node);
     this.buttonGroupNode = this.node.ownerDocument.createElement('div');
     this.buttonGroupNode.classList.add('button-group');
     this.node.appendChild(this.buttonGroupNode);
+    //No nav-tabs when on top mode
     if (!isTopMode) {
-      this.navGroupNode = this.node.ownerDocument.createElement('ul');
-      this.navGroupNode.className = 'nav nav-tabs';
-      this.node.appendChild(this.navGroupNode);
+      this.navTabsNode = this.node.ownerDocument.createElement('ul');
+      this.navTabsNode.className = 'nav nav-tabs';
+      this.node.appendChild(this.navTabsNode);
     }
   }
 
@@ -34,11 +39,11 @@ export default class PanelHeader {
   }
 
   /**
-   * Add a PanelNavTab to this header
+   * Ad nav-tab to the nav-tabs
    * @param button Panel button instance to add
    */
   addNav(nav: PanelNavButton) {
     this.navTabs = [...this.navTabs, nav];
-    this.navGroupNode.appendChild(nav.node);
+    this.navTabsNode.appendChild(nav.node);
   }
 }

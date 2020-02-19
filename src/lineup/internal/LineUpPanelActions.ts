@@ -151,7 +151,7 @@ export default class LineUpPanelActions extends EventHandler {
 
   private init() {
     const buttons = this.header.buttonGroupNode;
-    const navs = this.header.navGroupNode;
+    const navs = this.header.navTabsNode;
 
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
       const listener = () => {
@@ -217,7 +217,7 @@ export default class LineUpPanelActions extends EventHandler {
     };
     const lineupNavButton = new PanelNavButton(header.node, sidePanelTab, 'Lineup Config', 'fa fa-adjust lineup-nav', listener, true);
 
-    header.navGroupNode.appendChild(lineupNavButton.node);
+    header.navTabsNode.appendChild(lineupNavButton.node);
   }
 
   setViolation(violation?: string) {
