@@ -8,7 +8,9 @@ import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form';
 import {encodeParams} from 'phovea_core/src/ajax';
 
 
-
+/**
+ * Interface for AScoreAccessorProxy
+ */
 export interface IAccessorFunc<T> {
   (row: IDataRow): T;
 }
