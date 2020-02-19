@@ -1,4 +1,4 @@
-import {IPanelButton} from './PanelButton';
+import {IPanelButton, PanelNavButton} from './PanelButton';
 
 /**
  * The panel header contains a list of panel buttons.
@@ -6,12 +6,20 @@ import {IPanelButton} from './PanelButton';
 export default class PanelHeader {
 
   readonly node: HTMLElement;
-
+  readonly buttonGroupNode: HTMLElement;
+  readonly navGroupNode: HTMLElement;
   private buttons: IPanelButton[] = [];
+  private navTabs: PanelNavButton[] = [];
 
   constructor(parent: HTMLElement) {
     this.node = parent.ownerDocument.createElement('header');
     parent.appendChild(this.node);
+    this.buttonGroupNode = this.node.ownerDocument.createElement('div');
+    this.navGroupNode = this.node.ownerDocument.createElement('ul');
+    this.buttonGroupNode.classList.add('button-group');
+    this.navGroupNode.className = 'nav nav-tabs';
+    this.node.appendChild(this.buttonGroupNode);
+    this.node.appendChild(this.navGroupNode);
   }
 
   /**
@@ -20,13 +28,15 @@ export default class PanelHeader {
    */
   addButton(button: IPanelButton) {
     this.buttons = [...this.buttons, button];
-    this.node.appendChild(button.node);
+    this.buttonGroupNode.appendChild(button.node);
   }
 
-  removeHighlighting() {
-    const highlightedButton = this.buttons.find((button) => button.node.classList.contains('active'));
-    if (highlightedButton) {
-      highlightedButton.node.classList.remove('active');
-    }
+  /**
+   * Add a PanelNavTab to this header
+   * @param button Panel button instance to add
+   */
+  addNav(nav: PanelNavButton) {
+    this.navTabs = [...this.navTabs, nav];
+    this.navGroupNode.appendChild(nav.node);
   }
 }

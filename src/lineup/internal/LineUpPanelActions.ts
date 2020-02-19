@@ -92,7 +92,7 @@ export default class LineUpPanelActions extends EventHandler {
     } else {
       const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
       this.panel = sidePanel.panel;
-
+      this.appendLineUpNav(this.header, sidePanel);
       this.tabContainer = new PanelTabContainer(this.node);
       this.tabContainer.addTab(sidePanel);
       this.tabContainer.showTab(sidePanel);
@@ -100,11 +100,6 @@ export default class LineUpPanelActions extends EventHandler {
 
     this.init();
     this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
-  }
-
-  removeTabButtonHighlighting() {
-    this.tabContainer.showDefault();
-    this.header.removeHighlighting();
   }
 
   forceCollapse() {
@@ -129,7 +124,9 @@ export default class LineUpPanelActions extends EventHandler {
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
     if (value && this.options.enableSidePanel !== 'top') {
-      this.removeTabButtonHighlighting();
+      this.tabContainer.hideCurrentTab();
+    } else if (this.options.enableSidePanel !== 'top') {
+      this.tabContainer.showCurrentTab();
     }
 
   }
@@ -153,7 +150,8 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private init() {
-    const buttons = this.header.node;
+    const buttons = this.header.buttonGroupNode;
+    const navs = this.header.navGroupNode;
 
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
       const listener = () => {
@@ -207,10 +205,19 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (!this.isTopMode) {
-      this.appendExtraTabs(buttons).forEach((button: PanelButton) => {
-        this.header.addButton(button);
+      this.appendExtraTabs(navs).forEach((nav: PanelNavButton) => {
+        this.header.addNav(nav);
       });
     }
+  }
+
+  appendLineUpNav(header, sidePanelTab: PanelTab) {
+    const listener = () => {
+      this.tabContainer.showTab(sidePanelTab);
+    };
+    const lineupNavButton = new PanelNavButton(header.node, sidePanelTab, 'Lineup Config', 'fa fa-adjust lineup-nav', listener, true);
+
+    header.navGroupNode.appendChild(lineupNavButton.node);
   }
 
   setViolation(violation?: string) {
@@ -233,7 +240,7 @@ export default class LineUpPanelActions extends EventHandler {
     });
   }
 
-  private appendExtraTabs(buttons: HTMLElement) {
+  private appendExtraTabs(navs: HTMLElement) {
     const plugins = <IPanelTabExtensionDesc[]>listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB);
     return plugins.map((plugin) => {
       const tab = new PanelTab(this.tabContainer.node, plugin.tabDesc);
@@ -248,7 +255,7 @@ export default class LineUpPanelActions extends EventHandler {
             this.tabContainer.showTab(tab);
 
           } else {
-            this.tabContainer.toggleTab(tab);
+            this.tabContainer.showTab(tab);
           }
 
         } else {
@@ -261,7 +268,7 @@ export default class LineUpPanelActions extends EventHandler {
           });
         }
       };
-      return new PanelNavButton(buttons, tab, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
+      return new PanelNavButton(navs, tab, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
     });
   }
 

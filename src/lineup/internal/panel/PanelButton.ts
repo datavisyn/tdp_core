@@ -41,22 +41,21 @@ export default class PanelButton implements IPanelButton {
 export class PanelNavButton implements IPanelButton {
   readonly node: HTMLElement;
 
-/**
- * Constructor of the PanelButton
- * @param parent The parent HTML DOM element
- * @param tab The tab it is connected to
- * @param title String that is used for the title attribute
- * @param linkClass CSS classes to apply
- * @param onClick Function that should be executed on button click
- */
-  constructor(parent: HTMLElement, private readonly tab: PanelTab, title: string, linkClass: string, onClick: () => void) {
-    this.node = parent.ownerDocument.createElement('button');
-    this.node.className = linkClass;
-    this.node.title = title;
+  /**
+   * Constructor of the PanelButton
+   * @param parent The parent HTML DOM element
+   * @param tab The tab it is connected to
+   * @param title String that is used for the title attribute
+   * @param linkClass CSS classes to apply
+   * @param onClick Function that should be executed on button click
+   */
+  constructor(parent: HTMLElement, private readonly tab: PanelTab, title: string, linkClass: string, onClick: () => void, defaultActive?) {
+
+    this.node = parent.ownerDocument.createElement('li');
+    this.node.className = defaultActive ? 'active' : ' ';
+    this.node.insertAdjacentHTML('afterbegin', `<a class= "${linkClass}" title="${title}" data-toggle="tab"></a>`);
     this.node.addEventListener('click', (evt) => {
-      evt.stopPropagation();
       evt.preventDefault();
-      this.node.classList.toggle('active', this.tab.isClosed());
       onClick();
     });
   }
