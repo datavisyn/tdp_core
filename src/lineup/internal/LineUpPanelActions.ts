@@ -92,7 +92,7 @@ export default class LineUpPanelActions extends EventHandler {
     } else {
       const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
       this.panel = sidePanel.panel;
-      this.appendLineUpNav(this.header, sidePanel);
+      this.appendLineUpPanelNavButton(this.header, sidePanel);
       this.tabContainer = new PanelTabContainer(this.node);
       this.tabContainer.addTab(sidePanel);
       this.tabContainer.showTab(sidePanel);
@@ -215,12 +215,15 @@ export default class LineUpPanelActions extends EventHandler {
     }
   }
 
-  appendLineUpNav(header, sidePanelTab: PanelTab) {
+  /**
+   * Append LineUp PanelNavButton to the nav-tabs
+   */
+  appendLineUpPanelNavButton(header: PanelHeader, sidePanelTab: PanelTab) {
     const listener = () => {
       this.tabContainer.showTab(sidePanelTab);
     };
-    const lineupNavButton = new PanelNavButton(header.node, 'Lineup Config', 'fa fa-adjust lineup-nav', listener, true);
 
+    const lineupNavButton = new PanelNavButton(header.node, 'Lineup Config', 'fa fa-adjust lineup-nav', listener, true);
     header.navTabsNode.appendChild(lineupNavButton.node);
   }
 
