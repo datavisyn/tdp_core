@@ -5,9 +5,7 @@ import i18n from 'phovea_core/src/i18n';
 
 
 /**
- * An HTML div element tha contains 2 children:
- * A button that toggles a dropdown to download select/all rows of the ranking
- * A dropwdown HTMLUListElement with download links
+ * A button dropdown to download selected/all rows of the ranking
  */
 export default class PanelDownloadButtonContainer implements IPanelButton {
   readonly node: HTMLElement;

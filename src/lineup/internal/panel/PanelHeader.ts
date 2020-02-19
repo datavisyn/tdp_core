@@ -21,6 +21,7 @@ export default class PanelHeader {
     this.buttonGroupNode = this.node.ownerDocument.createElement('div');
     this.buttonGroupNode.classList.add('button-group');
     this.node.appendChild(this.buttonGroupNode);
+
     //No nav-tabs when on top mode
     if (!isTopMode) {
       this.navTabsNode = this.node.ownerDocument.createElement('ul');
@@ -39,7 +40,7 @@ export default class PanelHeader {
   }
 
   /**
-   * Ad nav-tab to the nav-tabs
+   * Add nav-tab to the nav-tabs
    * @param button Panel button instance to add
    */
   addNav(nav: PanelNavButton) {
