@@ -50,7 +50,7 @@ export class PanelNavButton implements IPanelButton {
    * @param onClick Function that should be executed on button click
    * @param defaultNavTab Should PanelNavButton be default active  nav-tab
    */
-  constructor(parent: HTMLElement, private readonly tab: PanelTab, title: string, linkClass: string, onClick: () => void, defaultNavTab?: boolean) {
+  constructor(parent: HTMLElement, title: string, linkClass: string, onClick: () => void, defaultNavTab?: boolean) {
 
     this.node = parent.ownerDocument.createElement('li');
     this.node.className = defaultNavTab ? 'active' : ' ';

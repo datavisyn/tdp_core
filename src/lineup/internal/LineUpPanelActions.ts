@@ -123,22 +123,26 @@ export default class LineUpPanelActions extends EventHandler {
 
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
-    if (value && this.options.enableSidePanel !== 'top') {
-      this.tabContainer.hideCurrentTab();
-    } else if (this.options.enableSidePanel !== 'top') {
-      this.tabContainer.showCurrentTab();
-    }
 
+    if (value) {
+      this.tabContainer.hideCurrentTab(); //Hide the active PanelTab --> Inform its content to stop updating
+    } else {
+      this.tabContainer.showCurrentTab(); //Show the last active PanelTab --> Inform its content to start updating again
+    }
   }
 
   hide() {
     this.node.style.display = 'none';
-    this.tabContainer.hideCurrentTab(); //inform the tab content that the sidepanel is collapsed
+
+    //Hide the active PanelTab and inform its content to stop updating
+    this.tabContainer.hideCurrentTab();
   }
 
   show() {
     this.node.style.display = 'flex';
-    this.tabContainer.showCurrentTab();//inform the tab content that the sidepanel is collapsed
+
+    //Show the last active PanelTab and inform its content to start updating again
+    this.tabContainer.showCurrentTab();
   }
 
   private get isTopMode() {
@@ -215,7 +219,7 @@ export default class LineUpPanelActions extends EventHandler {
     const listener = () => {
       this.tabContainer.showTab(sidePanelTab);
     };
-    const lineupNavButton = new PanelNavButton(header.node, sidePanelTab, 'Lineup Config', 'fa fa-adjust lineup-nav', listener, true);
+    const lineupNavButton = new PanelNavButton(header.node, 'Lineup Config', 'fa fa-adjust lineup-nav', listener, true);
 
     header.navTabsNode.appendChild(lineupNavButton.node);
   }
@@ -268,7 +272,7 @@ export default class LineUpPanelActions extends EventHandler {
           });
         }
       };
-      return new PanelNavButton(navs, tab, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
+      return new PanelNavButton(navs, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
     });
   }
 

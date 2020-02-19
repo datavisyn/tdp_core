@@ -1,5 +1,9 @@
 import {PanelTab} from './PanelTab';
 
+/**
+ * The PanelTabContainer contains an array of PanelTabs
+ * Exposes methods to toggle between PanelTabs
+ */
 export default class PanelTabContainer {
 
   readonly node: HTMLElement;
@@ -8,38 +12,37 @@ export default class PanelTabContainer {
 
   private currentTab: PanelTab;
 
+  /**
+   * @param parent The parent HTML DOM element
+   */
   constructor(parent: HTMLElement) {
     this.node = parent.ownerDocument.createElement('main');
     this.node.classList.add('tab-content');
     parent.appendChild(this.node);
   }
 
+  /**
+   * Find default/active tab
+   * @returns A PanelTab instance
+   */
   private get defaultTab(): PanelTab {
-    return this.tabs[0];
+    return this.tabs.find((tab) => tab.isDefault());
   }
 
-  addTab(tab: PanelTab) {
+  /**
+   * Method to add a new PanelTab
+   * @param tab New PanelTab instance
+   */
+  public addTab(tab: PanelTab) {
     this.tabs = [...this.tabs, tab];
     this.node.appendChild(tab.node);
   }
 
-  toggleTab(tab: PanelTab) {
-    if (this.currentTab === tab) {
-      this.hideTab(tab);
-
-    } else {
-      this.showTab(tab);
-    }
-  }
-
-  showDefault() {
-    const openedTab = this.tabs.find((tab) => tab.node.classList.contains('tab-pane') && tab.node.classList.contains('active'));
-    if (openedTab) {
-      this.hideTab(openedTab);
-    }
-  }
-
-  showTab(tab: PanelTab) {
+  /**
+   * Close currentTab and show new PanelTab
+   * @param tab A PanelTab instance
+   */
+  public showTab(tab: PanelTab) {
     if (this.currentTab) {
       this.currentTab.hide();
     }
@@ -47,18 +50,17 @@ export default class PanelTabContainer {
     tab.show();
     this.currentTab = tab;
   }
-
-  hideTab(tab: PanelTab) {
-    tab.hide();
-    this.defaultTab.show();
-    this.currentTab = this.defaultTab;
-  }
-
-  showCurrentTab() {
+  /**
+   * Show last opened PanelTab
+   * Used when the LineUpPanelActions reopens to show the last open PanelTab
+   */
+  public showCurrentTab() {
     this.currentTab.show();
   }
-
-  hideCurrentTab() {
+  /**
+   * Hide currentTab
+   */
+  public hideCurrentTab() {
     this.currentTab.hide();
   }
 }
