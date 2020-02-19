@@ -16,13 +16,12 @@ export default class PanelHeader {
     parent.appendChild(this.node);
     this.buttonGroupNode = this.node.ownerDocument.createElement('div');
     this.buttonGroupNode.classList.add('button-group');
+    this.node.appendChild(this.buttonGroupNode);
     if (!isTopMode) {
       this.navGroupNode = this.node.ownerDocument.createElement('ul');
       this.navGroupNode.className = 'nav nav-tabs';
       this.node.appendChild(this.navGroupNode);
     }
-
-    this.node.appendChild(this.buttonGroupNode);
   }
 
   /**
