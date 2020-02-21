@@ -3,7 +3,7 @@ import logging
 from phovea_server.ns import Namespace, abort
 from .security import tdp_login_required
 from phovea_server.util import jsonify
-from .dbmigration import db_migration_manager, DBMigration, DBMigrationManager
+from .dbmigration import get_db_migration_manager, DBMigration, DBMigrationManager
 
 
 __author__ = 'Datavisyn'
@@ -35,15 +35,15 @@ def create_migration_encoder():
 
 
 def _get_migration_by_id(id: str) -> DBMigration:
-  if id not in db_migration_manager:
+  if id not in get_db_migration_manager():
     abort(404, 'No migration with id {} found'.format(id))
-  return db_migration_manager[id]
+  return get_db_migration_manager()[id]
 
 
 @app.route('/')
 @tdp_login_required
 def list_migrations():
-  return jsonify(db_migration_manager), 200
+  return jsonify(get_db_migration_manager()), 200
 
 
 @app.route('/<string:id>')

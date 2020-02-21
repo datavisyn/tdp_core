@@ -1,7 +1,8 @@
 import logging
+import re
 
 from phovea_server.config import view as configview
-from phovea_server.plugin import list as list_plugins
+from phovea_server.plugin import list as list_plugins, lookup, AExtensionDesc
 from .db import configs as engines
 from typing import List, Dict
 import alembic.command
@@ -33,6 +34,7 @@ class DBMigration(object):
     self.db_key: str = db_key
     self.script_location: str = script_location
     self.auto_upgrade: bool = auto_upgrade
+    self.custom_commands: Dict[str, str] = dict()
 
     missing_fields = []
     if not self.id:
@@ -45,6 +47,9 @@ class DBMigration(object):
     if len(missing_fields) > 0:
       raise ValueError('No {} defined for DBMigration {} - is your configuration up to date?'.format(', '.join(missing_fields), self.id or '<UNKNOWN>'))
 
+    # Because we can't easily pass "-1" as npm argument, we add a custom command for that without the space
+    self.add_custom_command('downgrade-(\d+)', 'downgrade -{}')
+
     # Automatically upgrade to head (if enabled)
     if self.auto_upgrade:
       _log.info('Upgrading database {}'.format(self.id))
@@ -56,7 +61,38 @@ class DBMigration(object):
   def __str__(self) -> str:
     return self.id
 
-  def execute(self, arguments: List[str]) -> bool:
+  def add_custom_command(self, pattern: str, target: str):
+    """
+    Adds a custom command to the migration.
+
+    :param str pattern: Regex pattern of the command. Can include capture groups which will be used to format the target string.
+    :param str target: Target pattern for the command. Can include .format placeholders such as {} or {0} which will be replaced by the captured group.
+
+    Example usage: Rewriting the command 'downgrade-<number>' to 'downgrade -<number>'
+    can be done with the pattern 'downgrade-(\d+)' and the target 'downgrade -{}'.
+    """
+    self.custom_commands[pattern] = target
+
+  def remove_custom_command(self, origin: str):
+    self.custom_commands.pop(origin, None)
+
+  def get_custom_command(self, arguments: List[str]) -> List[str]:
+    """
+    Returns the rewritten command if it matches the pattern of a custom command.
+    :param List[str] arguments: Argument to rewrite.
+    """
+    # Join the list with spaces
+    arguments = ' '.join(arguments)
+    # For all the command patterns we have ..
+    for key, value in self.custom_commands.items():
+      # .. check if we can match the command pattern with the given string
+      matched = re.match(f"{key}$", arguments)
+      if matched:
+        # If we have a match, call format with the captured groups and split by ' '
+        return value.format(*matched.groups()).split(' ')
+    return None
+
+  def execute(self, arguments: List[str] = []) -> bool:
     """
     Executes a command on the migration object.
     :param List[str] arguments: Arguments for the underlying Alembic instance. See https://alembic.sqlalchemy.org/en/latest/api/ for details.
@@ -66,6 +102,12 @@ class DBMigration(object):
     # Check if engine exists
     if self.db_key not in engines:
       raise ValueError('No engine called {} found for DBMigration {} - aborting migration'.format(self.db_key, self.id))
+
+    # Rewrite command if possible
+    rewritten_arguments = self.get_custom_command(arguments)
+    if rewritten_arguments:
+      _log.info(f"Command {' '.join(arguments)} was rewritten to {' '.join(rewritten_arguments)}")
+      arguments = rewritten_arguments
 
     # Setup an alembic command line parser to parse the arguments
     cmd_parser = alembic.config.CommandLine()
@@ -103,12 +145,12 @@ class DBMigrationManager(object):
    - Plugin configuration
   """
 
-  def __init__(self):
+  def __init__(self, plugins: List[AExtensionDesc] = []):
     self._migrations: Dict[str, DBMigration] = dict()
 
     _log.info('Initializing DBMigrationManager')
 
-    for p in list_plugins('tdp-sql-database-migration'):
+    for p in plugins:
       _log.info('DBMigration found: %s', p.id)
 
       # Check if configKey is set, otherwise use the plugin configuration
@@ -147,15 +189,19 @@ class DBMigrationManager(object):
     return list(self._migrations.values())
 
 
-# Global migration manager
-db_migration_manager = DBMigrationManager()
+def get_db_migration_manager():
+  return lookup('db-migration-manager')
+
+
+def create_migration_manager():
+  return DBMigrationManager(list_plugins('tdp-sql-database-migration'))
 
 
 def create_migration_command(parser):
   """
   Creates a migration command used by the 'command' extension point.
   """
-  # Either require individual ids or all flag
+  db_migration_manager = get_db_migration_manager()
 
   subparsers = parser.add_subparsers(dest='action', required=True)
 
@@ -163,6 +209,7 @@ def create_migration_command(parser):
 
   command_parser = subparsers.add_parser('exec', help='Execute command on migration(s)')
 
+  # Either require individual ids or all flag
   command_parser.add_argument('id',
                               choices=db_migration_manager.ids + ['all'],
                               help='ID of the migration, or all of them')
