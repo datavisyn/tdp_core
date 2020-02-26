@@ -41,7 +41,7 @@ def phovea(registry):
   registry.append('greenifier', 'psycopg2', 'tdp_core.sql_use_gevent', {})
   registry.append('json-encoder', 'bytes-to-string-encoder', 'tdp_core.bytes_to_string_encoder', {})
 
-  # DB-Migration plugins
+  # DB migration plugins
   registry.append('manager', 'db-migration-manager', 'tdp_core.dbmigration', {'singleton': True, 'factory': 'create_migration_manager'})
   registry.append('command', 'db-migration', 'tdp_core.dbmigration', {'factory': 'create_migration_command'})
   registry.append('json-encoder', 'db-migration-encoder', 'tdp_core.dbmigration_api', {'factory': 'create_migration_encoder'})
