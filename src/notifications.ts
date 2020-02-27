@@ -21,7 +21,7 @@ export function pushNotification(level: 'success' | 'info' | 'warning' | 'danger
   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
   ${msg}</div>`);
 
-  const alert = parent.lastElementChild!;
+  const alert = parent.firstElementChild!;
   // fix link color
   Array.from(alert.querySelectorAll('a')).forEach((a: HTMLElement) => a.classList.add('alert-link'));
   // try creating a slide down animation

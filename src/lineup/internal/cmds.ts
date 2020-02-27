@@ -197,8 +197,17 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
     bak = source.getMapping().dump();
     source.setMapping(createMappingFunction(parameter.value));
   } else if (source) {
-    bak = source[`get${prop}`]();
-    source[`set${prop}`].call(source, restoreRegExp(parameter.value)); // restore serialized regular expression before passing to LineUp
+    // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
+    switch (parameter.prop) {
+      case 'rendererType':
+        bak = source[`getRenderer`]();
+        source[`setRenderer`].call(source, parameter.value);
+        break;
+      default:
+        bak = source[`get${prop}`]();
+        source[`set${prop}`].call(source, restoreRegExp(parameter.value)); // restore serialized regular expression before passing to LineUp
+        break;
+    }
   }
 
   return waitForSorted({
@@ -402,6 +411,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
   recordPropertyChange(col, provider, lineup, graph, 'filter');
   recordPropertyChange(col, provider, lineup, graph, 'rendererType');
   recordPropertyChange(col, provider, lineup, graph, 'groupRenderer');
+  recordPropertyChange(col, provider, lineup, graph, 'summaryRenderer');
   recordPropertyChange(col, provider, lineup, graph, 'sortMethod');
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
@@ -470,7 +480,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
 
 
 function untrackColumn(col: Column) {
-  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'sortMethod'), null);
+  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'summaryRenderer', 'sortMethod'), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
