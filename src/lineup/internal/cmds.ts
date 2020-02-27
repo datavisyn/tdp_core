@@ -13,7 +13,7 @@ import i18n from 'phovea_core/src/i18n';
 enum LineUpTrackAndUntrackActions {
   metaData = 'metaData',
   filter = 'filter',
-  rendererType = 'rendererType',
+  rendererType = 'rendererType', // important: the corresponding functions in LineUp are called `getRenderer` and `setRenderer` (see `setColumnImpl()` below)
   groupRenderer = 'groupRenderer',
   summaryRenderer = 'summaryRenderer',
   sortMethod = 'sortMethod',
@@ -216,7 +216,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   } else if (source) {
     // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
     switch (parameter.prop) {
-      case 'rendererType':
+      case LineUpTrackAndUntrackActions.rendererType:
         bak = source[`getRenderer`]();
         source[`setRenderer`].call(source, parameter.value);
         break;
