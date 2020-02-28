@@ -130,6 +130,12 @@ $lu_assets: "~lineupjs/src/assets";
       }
     }
 
+    &:not(.collapsed) {
+      .shortcut-nav {
+        display: none; // hide navTab that doesn't have class `shortcut-nav` in collapsed mode
+      }
+    }
+
     .lu-side-panel > main > section > div {
       flex: 1;
     }
@@ -139,24 +145,9 @@ $lu_assets: "~lineupjs/src/assets";
     }
 
     > header {
-      & > :not(.collapsed) {
-        margin-bottom: 1em;
-      }
-
-      .button-group {
-        display: flex;
-        margin-bottom: 0.5em;
-      }
-
-      ul.nav-tabs {
-        display: flex;
-
-        & > li > a {
-          color: black;
-          padding: 5px 8.5px;
-          cursor: pointer;
-        }
-      }
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0.5em;
 
       .lu-adder {
         margin-top: 1em;
@@ -184,11 +175,6 @@ $lu_assets: "~lineupjs/src/assets";
 
         display: none;
       }
-    }
-
-    .tab-content {
-      display: flex;
-      flex-direction: column;
     }
 
     .collapse-button {
@@ -237,9 +223,10 @@ $lu_assets: "~lineupjs/src/assets";
     }
 
     .download-data-dropdown {
+
       // show the number of selected rows after the element
       li[data-num-selected-rows]::after {
-        content: " (" attr(data-num-selected-rows) ")";
+        content: " ("attr(data-num-selected-rows) ")";
         display: inline;
       }
 
@@ -248,6 +235,41 @@ $lu_assets: "~lineupjs/src/assets";
       li[data-num-selected-rows="0"],
       li[data-num-selected-rows="0"] + li {
         display: none;
+      }
+    }
+
+    > main {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      ul.nav-tabs {
+        display: flex;
+
+        & > li {
+          &:only-child() {
+            display: none;
+          }
+
+          > a {
+            color: black;
+            padding: 5px 8.5px;
+            cursor: pointer;
+            text-align-last: center;
+          }
+        }
+      }
+
+      .tab-content {
+        margin-top: 0.5em;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: auto;
+      }
+
+      .tab-pane.default {
+        overflow: hidden;
       }
     }
 
@@ -268,30 +290,23 @@ $lu_assets: "~lineupjs/src/assets";
       }
 
       > header {
+        // Add margin before the first shortcut-nav
+
+        > button:not(.shortcut-nav) + .shortcut-nav {
+          margin-top: 1em;
+        }
+
         margin-right: 0;
         min-width: 0;
         align-self: flex-start;
-        width: auto;
+        max-width: 100%;
         flex-direction: column;
-        .button-group {
-          display: flex;
-          flex-direction: column;
-        }
-        .nav-tabs {
-          margin-top: 1em;
 
-          li {
-            > a {
-              margin-right: 0px;
-              @extend %lu-panel-button;
-            }
-          }
-          .lineup-nav {
-            display: none; //hide lineup tab when sidePanel is collapsed
-          }
-        }
+        display: flex;
+        flex-direction: column;
       }
-      .tab-content {
+
+      > main {
         display: none;
       }
 
@@ -355,7 +370,7 @@ $lu_assets: "~lineupjs/src/assets";
     float: right;
     border-left: none;
 
-    > header > .button-group {
+    > header {
       display: flex;
       flex-direction: row;
       max-width: unset;

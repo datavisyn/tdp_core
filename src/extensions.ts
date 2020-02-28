@@ -154,13 +154,17 @@ export interface IPanelTabExtension {
 
 export interface IPanelTabExtensionDesc extends IPluginDesc {
   /**
-   * @param headerCssClass css class for the button/header of the LineupSidePanel tab
-   * @param headerTitle title of the above button/header
-   * @param tabDesc description of the tab e.g { width:'40' }
+   * @param CssClass css class for the button/header of the LineupSidePanel tab
+   * @param title title of the above button/header
+   * @param order position of tab `0 , 10, 20, ...` to order the tabs
+   * @param width width of the sidePanel
+   * @param shortcut add button in collapsed mode to access PanelTab @default false
    */
-  headerCssClass: string;
-  headerTitle: string;
-  tabDesc: IPanelTabDesc;
+  cssClass: string;
+  title: string;
+  order: number;
+  width: string;
+  shortcut?: boolean;
 
   load(): Promise<IPlugin & IPanelTabExtension>;
 }

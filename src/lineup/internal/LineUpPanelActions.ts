@@ -12,7 +12,7 @@ import {IARankingViewOptions} from '../ARankingView';
 import {lazyDialogModule} from '../../dialogs';
 import PanelButton, {IPanelButton, PanelNavButton} from './panel/PanelButton';
 import PanelTabContainer from './panel/PanelTabContainer';
-import {PanelTab, SidePanelTab, IPanelTabDesc} from './panel/PanelTab';
+import {PanelTab, SidePanelTab} from './panel/PanelTab';
 import SearchBoxProvider from './panel/SearchBoxProvider';
 import PanelHeader from './panel/PanelHeader';
 import PanelRankingButton from './panel/PanelRankingButton';
@@ -31,6 +31,7 @@ export const rule = spaceFillingRule({
   rowHeight: 18,
   groupPadding: 5
 });
+
 
 /**
  * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
@@ -78,23 +79,33 @@ export default class LineUpPanelActions extends EventHandler {
 
   constructor(protected readonly provider: LocalDataProvider, ctx: any, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
-
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
 
-    this.header = new PanelHeader(this.node, this.options.enableSidePanel === 'top');
+    this.header = new PanelHeader(this.node);
 
     this.searchBoxProvider = new SearchBoxProvider();
 
     if (this.options.enableSidePanel === 'top') {
       this.node.classList.add('lu-side-panel-top');
-
     } else {
-      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
+
+      const options = {
+        cssClass: 'fa fa-sliders',
+        title: 'Ranking Configuration',
+        width: '21em',
+        order: 0
+      };
+
+      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc, options);
       this.panel = sidePanel.panel;
-      this.appendLineUpPanelNavButton(this.header, sidePanel);
+
+      const listener = () => {
+        this.tabContainer.showTab(sidePanel);
+      };
       this.tabContainer = new PanelTabContainer(this.node);
-      this.tabContainer.addTab(sidePanel);
+      const lineupNavButton = new PanelNavButton(this.tabContainer.node, listener, options, true);
+      this.tabContainer.addTab(sidePanel, lineupNavButton);
       this.tabContainer.showTab(sidePanel);
     }
 
@@ -154,8 +165,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private init() {
-    const buttons = this.header.buttonGroupNode;
-    const navs = this.header.navTabsNode;
+    const buttons = this.header.node;
 
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
       const listener = () => {
@@ -209,22 +219,8 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (!this.isTopMode) {
-      this.appendExtraTabs(navs).forEach((nav: PanelNavButton) => {
-        this.header.addNav(nav);
-      });
+      this.appendExtraTabs();
     }
-  }
-
-  /**
-   * Append LineUp PanelNavButton to the nav-tabs
-   */
-  appendLineUpPanelNavButton(header: PanelHeader, sidePanelTab: PanelTab) {
-    const listener = () => {
-      this.tabContainer.showTab(sidePanelTab);
-    };
-
-    const lineupNavButton = new PanelNavButton(header.node, 'Lineup Config', 'fa fa-adjust lineup-nav', listener, true);
-    header.navTabsNode.appendChild(lineupNavButton.node);
   }
 
   setViolation(violation?: string) {
@@ -247,13 +243,11 @@ export default class LineUpPanelActions extends EventHandler {
     });
   }
 
-  private appendExtraTabs(navs: HTMLElement) {
+  private appendExtraTabs() {
     const plugins = <IPanelTabExtensionDesc[]>listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB);
-    return plugins.map((plugin) => {
-      const tab = new PanelTab(this.tabContainer.node, plugin.tabDesc);
-      this.tabContainer.addTab(tab);
-
+    plugins.forEach((plugin) => {
       let isLoaded = false;
+      const tab = new PanelTab(this.tabContainer.node, plugin);
 
       const listener = () => {
         if (isLoaded) {
@@ -264,18 +258,28 @@ export default class LineUpPanelActions extends EventHandler {
           } else {
             this.tabContainer.showTab(tab);
           }
-
         } else {
           plugin.load().then((p) => {
             p.factory(tab.node, this.provider, p.desc, tab.events);
             this.collapse = false; // expand side panel
             this.tabContainer.showTab(tab);
-
             isLoaded = true;
           });
         }
       };
-      return new PanelNavButton(navs, plugin.headerTitle, 'fa ' + plugin.headerCssClass, listener);
+      const nav = new PanelNavButton(this.tabContainer.node, listener, plugin);
+      // if shortcut===true create button on the header to open tab
+      // manually add the `active` class to the corresponding  PanelNavButton
+      if (plugin.shortcut) {
+
+        const onClick = () => {
+          listener();
+          nav.setActive();
+        };
+        const button = new PanelButton(this.header.node, plugin.title, 'fa ' + plugin.cssClass + ' shortcut-nav', onClick);
+        this.header.addButton(button);
+      }
+      this.tabContainer.addTab(tab, nav);
     });
   }
 

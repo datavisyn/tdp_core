@@ -6,10 +6,32 @@ import {EventHandler} from 'phovea_core/src/event';
  * Interface for the options parameter of PanelTab
  */
 export interface IPanelTabDesc {
+
   /**
-   * Width of the PanelTab (unit is "em")
+   * Width of the SidePanel
    */
   width: string;
+
+  /**
+   * Css class for PanelNavButton of the PanelTab
+   */
+  cssClass: string;
+
+  /**
+   * Title and Text content for the PanelNavButton of the PanelTab.
+   */
+  title: string;
+
+  /**
+   * Used to sort the PanelNavButtons
+   */
+  order: number;
+
+  /**
+   * Show PanelNavButton in collapsed mode
+   * @default false
+   */
+  shortcut?: boolean;
 }
 
 /**
@@ -25,29 +47,28 @@ export class PanelTabEvents extends EventHandler {
 
 /**
  * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
- * Exposes `show()`, `hide()`, `isClosed()` methods
  */
 export class PanelTab {
 
   readonly node: HTMLElement;
   readonly events: PanelTabEvents;
+  readonly width: string;
   /**
-   *
+   * @param
    * @param parent The parent HTML DOM element
    * @param options Extra styles to apply to the PanelTab
    */
-  constructor(parent: HTMLElement, options?: IPanelTabDesc) {
+  constructor(parent: HTMLElement, options: IPanelTabDesc) {
     this.events = new PanelTabEvents();
-
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
-
+    this.node.setAttribute('role', 'tabpanel');
     const o = Object.assign({}, options);
-    this.node.style.width = o.width + 'em' || null;
+    this.width = o.width;
   }
+
   /**
    * Show self/ add active class
-   * Fire `SHOW_PANEL` event
    */
   public show() {
     this.node.classList.add('active');
@@ -56,23 +77,10 @@ export class PanelTab {
 
   /**
    * Hide self/ remove active class
-   * Fire `HIDE_PANEL` event
    */
   public hide() {
     this.node.classList.remove('active');
     this.events.fire(PanelTabEvents.HIDE_PANEL);
-  }
-  /**
-   * Is the tab active/open
-   */
-  public isClosed() {
-    return !this.node.classList.contains('active');
-  }
-  /**
-   * Is currentTab default active/ open tab
-   */
-  isDefault() {
-    return !this.node.classList.contains('default');
   }
 }
 
@@ -90,8 +98,8 @@ export class SidePanelTab extends PanelTab {
    * @param ctx Ctx
    * @param doc Document
    */
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document) {
-    super(parent);
+  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document, options: IPanelTabDesc) {
+    super(parent, options);
     this.node.classList.add('default');
     this.panel = new SidePanel(ctx, doc, {
       chooser: false

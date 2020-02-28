@@ -1,4 +1,4 @@
-import {PanelTab} from './PanelTab';
+import {PanelTab, IPanelTabDesc} from './PanelTab';
 /**
  * Interface for the LineUp panel button
  */
@@ -40,24 +40,34 @@ export default class PanelButton implements IPanelButton {
  */
 export class PanelNavButton implements IPanelButton {
   readonly node: HTMLElement;
+  readonly order: number;
 
   /**
    * Constructor of the PanelButton
    * @param parent The parent HTML DOM element
-   * @param tab The tab it is connected to
-   * @param title String that is used for the title attribute
-   * @param linkClass CSS classes to apply
    * @param onClick Function that should be executed on button click
-   * @param defaultNavTab Should PanelNavButton be default active  nav-tab
+   * @param setParentWidth callback to pass set the width of the parent
+   * @param options Options to customize the PanelNavButton
+   * @param defaultNavTab Should this PanelNavButton be the default active navButton
    */
-  constructor(parent: HTMLElement, title: string, linkClass: string, onClick: () => void, defaultNavTab?: boolean) {
-
+  constructor(parent: HTMLElement, onClick: () => void, options: IPanelTabDesc, defaultNavTab?: boolean) {
     this.node = parent.ownerDocument.createElement('li');
     this.node.className = defaultNavTab ? 'active' : ' ';
-    this.node.insertAdjacentHTML('afterbegin', `<a class= "${linkClass}" title="${title}" data-toggle="tab"></a>`);
+    this.node.insertAdjacentHTML('afterbegin', `<a role="tab"  class="fa ${options.cssClass} " title="${options.title}" data-toggle="tab">&nbsp;<span>${options.title || ''}</span></a>`);
     this.node.addEventListener('click', (evt) => {
       evt.preventDefault();
       onClick();
     });
+  }
+
+  /**
+   * When you click the shortcut button in collapsed mode focus on the navButton
+   */
+  setActive() {
+    const navButtons = Array.from(this.node.parentElement.children);
+    for (const nav of navButtons) {
+      nav.classList.remove('active');
+    }
+    this.node.classList.add('active');
   }
 }
