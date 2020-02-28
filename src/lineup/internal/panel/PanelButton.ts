@@ -53,6 +53,7 @@ export class PanelNavButton implements IPanelButton {
   constructor(parent: HTMLElement, onClick: () => void, options: IPanelTabDesc, defaultNavTab?: boolean) {
     this.node = parent.ownerDocument.createElement('li');
     this.node.className = defaultNavTab ? 'active' : ' ';
+    this.order = options.order;
     this.node.insertAdjacentHTML('afterbegin', `<a role="tab"  class="fa ${options.cssClass} " title="${options.title}" data-toggle="tab">&nbsp;<span>${options.title || ''}</span></a>`);
     this.node.addEventListener('click', (evt) => {
       evt.preventDefault();
