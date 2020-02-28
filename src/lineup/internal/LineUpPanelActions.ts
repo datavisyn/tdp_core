@@ -135,9 +135,10 @@ export default class LineUpPanelActions extends EventHandler {
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
 
-    if (value) {
+    //When this.options.enableSidePanel === 'top' `this.collapsed=true` gets called. Attempting to open the PanelTab produces an error.
+    if (value && this.options.enableSidePanel !== 'top') {
       this.tabContainer.hideCurrentTab(); //Hide the active PanelTab --> Inform its content to stop updating
-    } else {
+    } else if (this.options.enableSidePanel !== 'top') {
       this.tabContainer.showCurrentTab(); //Show the last active PanelTab --> Inform its content to start updating again
     }
   }
