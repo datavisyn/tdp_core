@@ -100,12 +100,8 @@ export default class LineUpPanelActions extends EventHandler {
       const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc, options);
       this.panel = sidePanel.panel;
 
-      const listener = () => {
-        this.tabContainer.showTab(sidePanel);
-      };
       this.tabContainer = new PanelTabContainer(this.node);
-      const lineupNavButton = new PanelNavButton(this.tabContainer.node, listener, options, true);
-      this.tabContainer.addTab(sidePanel, lineupNavButton);
+      this.tabContainer.addTab(sidePanel);
       this.tabContainer.showTab(sidePanel);
     }
 
@@ -250,15 +246,13 @@ export default class LineUpPanelActions extends EventHandler {
       let isLoaded = false;
       const tab = new PanelTab(this.tabContainer.node, plugin);
 
-      const listener = () => {
+      const onClick = () => {
         if (isLoaded) {
           if (this.collapse) {
             this.collapse = false; // expand side panel
-            this.tabContainer.showTab(tab);
-
-          } else {
-            this.tabContainer.showTab(tab);
           }
+          this.tabContainer.showTab(tab);
+
         } else {
           plugin.load().then((p) => {
             p.factory(tab.node, this.provider, p.desc, tab.events);
@@ -268,19 +262,12 @@ export default class LineUpPanelActions extends EventHandler {
           });
         }
       };
-      const nav = new PanelNavButton(this.tabContainer.node, listener, plugin);
-      // if shortcut===true create button on the header to open tab
-      // manually add the `active` class to the corresponding  PanelNavButton
-      if (plugin.shortcut) {
 
-        const onClick = () => {
-          listener();
-          nav.setActive();
-        };
-        const button = new PanelButton(this.header.node, plugin.title, 'fa ' + plugin.cssClass + ' shortcut-nav', onClick);
-        this.header.addButton(button);
+      if (plugin.shortcut) {
+        this.header.addButton(tab.getShortcutButton());
       }
-      this.tabContainer.addTab(tab, nav);
+
+      this.tabContainer.addTab(tab, onClick);
     });
   }
 

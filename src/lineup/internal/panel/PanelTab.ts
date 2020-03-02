@@ -1,6 +1,7 @@
 import {SidePanel, SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 import {EventHandler} from 'phovea_core/src/event';
+import PanelButton, {PanelNavButton} from './PanelButton';
 
 /**
  * Interface for the options parameter of PanelTab
@@ -53,12 +54,15 @@ export class PanelTab {
   readonly node: HTMLElement;
   readonly events: PanelTabEvents;
   readonly width: string;
+
+  private navButton: PanelNavButton;
+
   /**
    * @param
    * @param parent The parent HTML DOM element
    * @param options Extra styles to apply to the PanelTab
    */
-  constructor(parent: HTMLElement, options: IPanelTabDesc) {
+  constructor(parent: HTMLElement, private options: IPanelTabDesc) {
     this.events = new PanelTabEvents();
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
@@ -72,6 +76,7 @@ export class PanelTab {
    */
   public show() {
     this.node.classList.add('active');
+    this.navButton.setActive(true);
     this.events.fire(PanelTabEvents.SHOW_PANEL);
   }
 
@@ -80,7 +85,23 @@ export class PanelTab {
    */
   public hide() {
     this.node.classList.remove('active');
+    this.navButton.setActive(false);
     this.events.fire(PanelTabEvents.HIDE_PANEL);
+  }
+
+  getNavButton(listener): PanelNavButton {
+    // Note: `document.body` is used only for `parent.ownerDocument.createElement()` inside the button
+    this.navButton = new PanelNavButton(document.body, listener, this.options);
+    return this.navButton;
+  }
+
+  getShortcutButton(): PanelButton {
+    const onClick = () => {
+      this.navButton.click();
+    };
+
+    // Note: `document.body` is used only for `parent.ownerDocument.createElement()` inside the button
+    return new PanelButton(document.body, this.options.title, 'fa ' + this.options.cssClass + ' shortcut-nav', onClick);
   }
 }
 

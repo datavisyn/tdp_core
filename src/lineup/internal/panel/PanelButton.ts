@@ -46,29 +46,30 @@ export class PanelNavButton implements IPanelButton {
    * Constructor of the PanelButton
    * @param parent The parent HTML DOM element
    * @param onClick Function that should be executed on button click
-   * @param setParentWidth callback to pass set the width of the parent
    * @param options Options to customize the PanelNavButton
-   * @param defaultNavTab Should this PanelNavButton be the default active navButton
    */
-  constructor(parent: HTMLElement, onClick: () => void, options: IPanelTabDesc, defaultNavTab?: boolean) {
+  constructor(parent: HTMLElement, onClick: () => void, options: IPanelTabDesc) {
     this.node = parent.ownerDocument.createElement('li');
-    this.node.className = defaultNavTab ? 'active' : ' ';
     this.order = options.order;
-    this.node.insertAdjacentHTML('afterbegin', `<a role="tab"  class="fa ${options.cssClass} " title="${options.title}" data-toggle="tab">&nbsp;<span>${options.title || ''}</span></a>`);
-    this.node.addEventListener('click', (evt) => {
+    this.node.insertAdjacentHTML('afterbegin', `<a role="tab" class="fa ${options.cssClass} " title="${options.title}" data-toggle="tab">&nbsp;<span>${options.title || ''}</span></a>`);
+    this.node.querySelector('a').addEventListener('click', (evt) => {
       evt.preventDefault();
       onClick();
     });
   }
 
   /**
-   * When you click the shortcut button in collapsed mode focus on the navButton
+   * Set the active class to this button
+   * @param isActive Toggle the class
    */
-  setActive() {
-    const navButtons = Array.from(this.node.parentElement.children);
-    for (const nav of navButtons) {
-      nav.classList.remove('active');
-    }
-    this.node.classList.add('active');
+  setActive(isActive: boolean) {
+    this.node.classList.toggle('active', isActive);
+  }
+
+  /**
+   * Trigger click event on anchor element.
+   */
+  click() {
+    this.node.querySelector('a').click();
   }
 }

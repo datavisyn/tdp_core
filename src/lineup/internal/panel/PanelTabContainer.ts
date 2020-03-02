@@ -35,15 +35,15 @@ class PanelTabHeader {
    * Add nav-tab to the nav-tabs in the correct order.
    * @param button PanelNavButton instance to add
    */
-  addNav(nav: PanelNavButton) {
-    const sameOrderNav = this.navButtons.find((n) => n.order === nav.order); // find nav with same order
-    this.navButtons = [...this.navButtons, nav].sort((nav1, nav2) => nav1.order - nav2.order);
-    this.node.appendChild(nav.node);
-    const nextSibling = sameOrderNav || this.getNextSibling(this.navButtons, nav); // if same order property append new nav before it
+  addNavButton(button: PanelNavButton) {
+    const sameOrderNav = this.navButtons.find((n) => n.order === button.order); // find nav with same order
+    this.navButtons = [...this.navButtons, button].sort((nav1, nav2) => nav1.order - nav2.order);
+    this.node.appendChild(button.node);
+    const nextSibling = sameOrderNav || this.getNextSibling(this.navButtons, button); // if same order property append new nav before it
     if (nextSibling) {
-      this.node.insertBefore(nav.node, nextSibling.node);
+      this.node.insertBefore(button.node, nextSibling.node);
     } else {
-      this.node.appendChild(nav.node);
+      this.node.appendChild(button.node);
     }
   }
 }
@@ -68,10 +68,12 @@ export default class PanelTabContainer {
   constructor(parent: HTMLElement) {
     this.parent = parent;
     this.node = parent.ownerDocument.createElement('main');
-    this.tabContentNode = this.node.ownerDocument.createElement('div');
 
+    this.tabContentNode = this.node.ownerDocument.createElement('div');
     this.tabContentNode.classList.add('tab-content');
+
     this.tabHeader = new PanelTabHeader(this.node);
+
     this.node.appendChild(this.tabContentNode);
     parent.appendChild(this.node);
   }
@@ -87,10 +89,16 @@ export default class PanelTabContainer {
   /**
    * Method to add a new PanelTab
    * @param tab New PanelTab instance
+   * @param onClick Optional function that is executed on the tab; Important: You must call `tabContainer.showTab()` yourself!
    */
-  public addTab(tab: PanelTab, nav: PanelNavButton) {
+  public addTab(tab: PanelTab, onClick?: () => void) {
     this.tabs = [...this.tabs, tab];
-    this.tabHeader.addNav(nav);
+
+    const listener = (onClick) ? onClick : () => {
+      this.showTab(tab);
+    };
+
+    this.tabHeader.addNavButton(tab.getNavButton(listener));
     this.tabContentNode.appendChild(tab.node);
   }
 
@@ -115,6 +123,7 @@ export default class PanelTabContainer {
   public showCurrentTab() {
     this.currentTab.show();
   }
+
   /**
    * Hide currentTab
    */
