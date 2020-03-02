@@ -45,6 +45,7 @@ class DBView(object):
     self.table = None
     self.security = None
     self.assign_ids = False
+    self.no_cache = False
 
   def needs_to_fill_up_columns(self):
     return self.columns_filled_up is False and self.table is not None
@@ -52,18 +53,17 @@ class DBView(object):
   def dump(self, name):
     from collections import OrderedDict
     r = OrderedDict(name=name, description=self.description, type=self.query_type)
-    if self.idtype:
-      r['idType'] = self.idtype
+    r['idType'] = self.idtype
     r['query'] = clean_query(self.query)
     args = [a for a in self.arguments]
     args.extend(self.replacements)
     r['arguments'] = args
-    if self.columns:
-      r['columns'] = self.columns.values()
+    r['columns'] = list(self.columns.values()) if self.columns else []  # some views have no columns -> return empty array
     if self.filters:
-      r['filters'] = self.filters.keys()
+      r['filters'] = list(self.filters.keys())
     if self.queries:
       r['queries'] = {k: clean_query(v) for k, v in self.queries.items()}
+    r['no_cache'] = self.no_cache
     return r
 
   def is_valid_filter(self, key):
@@ -92,7 +92,7 @@ class DBView(object):
     return None
 
   def filter_groups(self):
-    r = set([v.group for v in self.filters.values()])
+    r = set([v.group for v in list(self.filters.values())])
     if None in r:
       r.remove(None)
     return r
@@ -119,7 +119,7 @@ class DBView(object):
         return False
     if isinstance(v, REGEX_TYPE):
       return v.match(value)
-    _log.info(u'unknown %s %s %s', key, value, v)
+    _log.info('unknown %s %s %s', key, value, v)
     return True
 
   def is_valid_argument(self, key):
@@ -138,7 +138,7 @@ class DBView(object):
     if self.security is None and check_default_security is False:
       return True
     if isinstance(self.security, str):
-      role = unicode(self.security)
+      role = str(self.security)
       return current_user().has_role(role)
     if callable(self.security):
       return self.security(current_user())
@@ -179,6 +179,7 @@ class DBViewBuilder(object):
     self.v.filters = view.filters.copy()
     self.v.valid_replacements = view.valid_replacements.copy()
     self.v.security = view.security
+    self.v.no_cache = view.no_cache
     return self
 
   def description(self, desc, summary=None):
@@ -256,7 +257,7 @@ class DBViewBuilder(object):
     :param join: additional join to inject
     :return:
     """
-    for key in keys:
+    for key in list(keys):
       self.filter(key, alias=alias, table=table, group=group, join=join)
     return self
 
@@ -272,7 +273,7 @@ class DBViewBuilder(object):
     :return: self
     """
     if table is not None:
-      alias = u'{}.{}'.format(table, key)
+      alias = '{}.{}'.format(table, key)
     if alias is not None:
       replacement = alias + ' {operator} {value}'
     self.v.filters[key] = DBFilterData(group, replacement, join)
@@ -378,6 +379,13 @@ class DBViewBuilder(object):
     self.v.security = security_check
     return self
 
+  def no_cache(self):
+    """
+    adds a no-cache header to the response to avoid client caching of the response
+    """
+    self.v.no_cache = True
+    return self
+
   def build(self):
     """
     builds the query and end this builder
@@ -409,7 +417,7 @@ def inject_where_clause(builder, clause):
   index = lower.find(' where ')
   if index >= 0:
     index += len(' where ')  # get the end
-    builder.query(u'{} ({}) AND {}'.format(query[:index], clause, query[index:]))
+    builder.query('{} ({}) AND {}'.format(query[:index], clause, query[index:]))
   else:
     before = -1
     for before_q in [' order by', ' group by', ' limit', ' offset']:
@@ -420,7 +428,7 @@ def inject_where_clause(builder, clause):
       # append
       builder.append(' WHERE ').append(clause)
     else:
-      builder.query(u'{} WHERE {} {}'.format(query[:index], clause, query[index:]))
+      builder.query('{} WHERE {} {}'.format(query[:index], clause, query[index:]))
   return builder
 
 
@@ -443,18 +451,18 @@ def inject_where(builder):
 
   if where >= 0:
     if before < 0:
-      builder.append(u' {and_where}')
+      builder.append(' {and_where}')
     else:
-      builder.query(u'{} {{and_where}} {}'.format(query[:before], query[before:]))
+      builder.query('{} {{and_where}} {}'.format(query[:before], query[before:]))
     builder.replace('and_where')
     query = builder.v.query
-    builder.query(u'{} {{joins}} {}'.format(query[:where], query[where:]))
+    builder.query('{} {{joins}} {}'.format(query[:where], query[where:]))
     builder.replace('joins')
   else:
     if before < 0:
       builder.append('{joins} {where}')
     else:
-      builder.query(u'{} {{joins}} {{where}} {}'.format(query[:before], query[before:]))
+      builder.query('{} {{joins}} {{where}} {}'.format(query[:before], query[before:]))
     builder.replace('where')
     builder.replace('joins')
   return builder
@@ -477,16 +485,16 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
   if prefix is None:
     prefix = table
 
-  queries[prefix + '_items'] = DBViewBuilder('lookup').idtype(idtype).table(table).query(u"""
+  queries[prefix + '_items'] = DBViewBuilder('lookup').idtype(idtype).table(table).query("""
         SELECT {id}, {{column}} AS text
         FROM {table} WHERE LOWER({{column}}) LIKE :query
         ORDER BY {{column}} ASC""".format(id=id_query, table=table)).replace('column', columns).assign_ids().call(call_function).call(limit_offset).arg('query').build()
 
-  queries[prefix + '_items_verify'] = DBViewBuilder('helper').idtype(idtype).table(table).query(u"""
+  queries[prefix + '_items_verify'] = DBViewBuilder('helper').idtype(idtype).table(table).query("""
         SELECT {id}, {name} AS text
         FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).filter(name_column, 'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
 
-  queries[prefix + '_unique'] = DBViewBuilder('lookup').query(u"""
+  queries[prefix + '_unique'] = DBViewBuilder('lookup').query("""
         SELECT d as id, d as text
         FROM (
           SELECT distinct {{column}} AS d
@@ -494,7 +502,7 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
           ) as t
         ORDER BY d ASC""".format(table=table)).replace('column', columns).call(limit_offset).arg('query').build()
 
-  queries[prefix + '_unique_all'] = DBViewBuilder('helper').query(u"""
+  queries[prefix + '_unique_all'] = DBViewBuilder('helper').query("""
         SELECT distinct {{column}} AS text
         FROM {table} ORDER BY {{column}} ASC """.format(table=table)).replace('column', columns).build()
 

@@ -43,6 +43,12 @@
     ],
     "ignores": [],
     "today": "Sun, 06 Nov 2016 15:02:36 GMT",
-    "clientOnly": false
+    "clientOnly": false,
+    "promptValues": {
+      "authorName": "datavisyn",
+      "authorEmail": "contact@datavisyn.io",
+      "authorUrl": "https://www.datavisyn.io",
+      "githubAccount": "datavisyn"
+    }
   }
 }

@@ -11,9 +11,10 @@ import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
-import {resolveIds} from './resolve';
+import {resolveIds, resolveAllNames, resolveAllIds, resolveNames} from './resolve';
 import {DEFAULT_SELECTION_NAME} from '../extensions';
 import {IForm} from '../form/interfaces';
+import i18n from 'phovea_core/src/i18n';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -76,12 +77,13 @@ export abstract class AView extends EventHandler implements IView {
     if (!value || !busyMessage) {
       delete this.node.dataset.busy;
     } else if (busyMessage) {
-      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : 'Preparing awesome stuff for you...';
+      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : i18n.t('tdp:core.views.busyMessage');
     }
   }
 
   protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
-    const defaultHintMessage = `No data found for the given ${this.selection.idtype ? this.selection.idtype.name : 'Unknown'}`;
+    const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'};
+    const defaultHintMessage = i18n.t('tdp:core.views.defaultHint', {...conditionalData});
     this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;
@@ -91,7 +93,8 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
-    return this.setHint(visible, hintMessage || `No mapping found for the given ${this.selection.idtype ? this.selection.idtype.name : 'Unknown'} to ${this.idType ? this.idType.name : ''}`, 'hint-mapping');
+    const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''};
+    return this.setHint(visible, hintMessage || i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
   }
 
   /*final*/
@@ -115,7 +118,7 @@ export abstract class AView extends EventHandler implements IView {
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
 
 
-    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean)=>void = <any>onParameterChange;
+    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean) => void = <any>onParameterChange;
 
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
@@ -258,12 +261,38 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   /**
-   * resolve the name of the current input selection
+   * resolve the id of the current input selection
    * @returns {Promise<string[]>}
    */
   protected resolveSelection(idType = this.idType): Promise<string[]> {
     return resolveIds(this.selection.idtype, this.selection.range, idType);
   }
+
+  /**
+   * resolve the name of the current input selection
+   * @returns {Promise<string[]>}
+   */
+  protected resolveSelectionByName(idType = this.idType): Promise<string[]> {
+    return resolveNames(this.selection.idtype, this.selection.range, idType);
+  }
+
+  /**
+   * resolve the ids of the current input selection to all 1:n related names, not just the first one like `resolveSelection` does
+   * @returns {Promise<string[]>}
+   */
+  protected resolveMultipleSelections(idType = this.idType): Promise<string[][]> {
+    return resolveAllIds(this.selection.idtype, this.selection.range, idType);
+  }
+
+  /**
+   * resolve the names of the current input selection to all 1:n related names, not just the first one like `resolveSelectionByName` does
+   * @returns {Promise<string[]>}
+   */
+  protected resolveMultipleSelectionsByName(idType = this.idType): Promise<string[][]> {
+    return resolveAllNames(this.selection.idtype, this.selection.range, idType);
+  }
+
+
 
   setItemSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
     const current = this.itemSelections.get(name);

@@ -6,6 +6,7 @@
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
 import {NumberColumn, createMappingFunction, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
+import i18n from 'phovea_core/src/i18n';
 
 
 const CMD_SET_SORTING_CRITERIA = 'lineupSetRankingSortCriteria';
@@ -96,7 +97,7 @@ export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) 
 }
 
 export function addRanking(provider: IObjectRef<any>, index: number, dump?: any) {
-  return action(meta(dump ? 'Add Ranking' : 'Remove Ranking', cat.layout, dump ? op.create : op.remove), CMD_ADD_RANKING, addRankingImpl, [provider], {
+  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addRanking') : i18n.t('tdp:core.lineup.cmds.removeRanking'), cat.layout, dump ? op.create : op.remove), CMD_ADD_RANKING, addRankingImpl, [provider], {
     index,
     dump
   });
@@ -122,7 +123,7 @@ export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], para
 
 
 export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any) {
-  return action(meta('Change Sort Criteria', cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
     rid,
     value
   });
@@ -152,7 +153,7 @@ export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: 
 
 
 export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true) {
-  return action(meta('Change Sort Criteria', cat.layout, op.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
     rid,
     columns,
     isSorting
@@ -174,7 +175,7 @@ export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter:
 }
 
 export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
-  return action(meta('Change Group Criteria', cat.layout, op.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), cat.layout, op.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
     rid,
     columns
   });
@@ -196,8 +197,17 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
     bak = source.getMapping().dump();
     source.setMapping(createMappingFunction(parameter.value));
   } else if (source) {
-    bak = source[`get${prop}`]();
-    source[`set${prop}`].call(source, parameter.value);
+    // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
+    switch (parameter.prop) {
+      case 'rendererType':
+        bak = source[`getRenderer`]();
+        source[`setRenderer`].call(source, parameter.value);
+        break;
+      default:
+        bak = source[`get${prop}`]();
+        source[`set${prop}`].call(source, restoreRegExp(parameter.value)); // restore serialized regular expression before passing to LineUp
+        break;
+    }
   }
 
   return waitForSorted({
@@ -208,14 +218,14 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
 export interface IViewProvider {
   data: LocalDataProvider;
 
-  getInstance(): { updateLineUpStats() };
+  getInstance(): {updateLineUpStats()};
 }
 
 export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, prop: string, value: any) {
   // assert ALineUpView and update the stats
   provider.value.getInstance().updateLineUpStats();
 
-  return action(meta(`Set Property ${prop}`, cat.layout, op.update), CMD_SET_COLUMN, setColumnImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.setProperty', {prop}), cat.layout, op.update), CMD_SET_COLUMN, setColumnImpl, [provider], {
     rid,
     path,
     prop,
@@ -273,7 +283,7 @@ export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parame
 }
 
 export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, dump: any) {
-  return action(meta(dump ? 'Add Column' : 'Remove Column', cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
+  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addColumn') : i18n.t('tdp:core.lineup.cmds.removeColumn'), cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
     rid,
     path,
     index,
@@ -282,7 +292,7 @@ export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path
 }
 
 export function moveColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, moveTo: number) {
-  return action(meta('Move Column', cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.moveColumn'), cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
     rid,
     path,
     index,
@@ -321,19 +331,21 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     if (ignore(`${property}Changed`, lineupViewWrapper)) {
       return;
     }
-    // console.log(source, property, old, newValue);
+
+    const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+
     if (source instanceof Column) {
       // assert ALineUpView and update the stats
       lineupViewWrapper.value.getInstance().updateLineUpStats();
 
       const rid = rankingId(provider, source.findMyRanker());
       const path = source.fqpath;
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newSerializedValue), {
         inverse: setColumn(lineupViewWrapper, rid, path, property, old)
       });
     } else if (source instanceof Ranking) {
       const rid = rankingId(provider, source);
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newSerializedValue), {
         inverse: setColumn(lineupViewWrapper, rid, null, property, old)
       });
     }
@@ -341,11 +353,65 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(f, delayed) : f);
 }
 
+/**
+ * Serialize RegExp objects from LineUp string columns as plain object
+ * that can be stored in the provenance graph
+ */
+interface IRegExpFilter {
+  /**
+   * RegExp as string
+   */
+  value: string;
+  /**
+   * Flag to indicate the value should be restored as RegExp
+   */
+  isRegExp: boolean;
+}
+
+/**
+ * Serializes RegExp objects to an IRegexFilter object, which can be stored in the provenance graph.
+ * In case a string is passed to this function no serialization is applied.
+ *
+ * Background information:
+ * The serialization step is necessary, because RegExp objects are converted into an empty object `{}` on `JSON.stringify`.
+ * ```
+ * JSON.stringify(/^123$/gm); // result: {}
+ * ```
+ *
+ * @param value Input string or RegExp object
+ * @returns {string | IRegExpFilter} Returns the input string or a plain `IRegExpFilter` object
+ */
+function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
+  if (!(value instanceof RegExp)) {
+    return value;
+  }
+  return {value: value.toString(), isRegExp: true};
+}
+
+/**
+ * Restores a RegExp object from a given IRegExpFilter object.
+ * In case a string is passed to this function no deserialization is applied.
+ *
+ * @param filter Filter as string or plain object matching the IRegExpFilter
+ * @returns {string | RegExp| null} Returns the input string or the restored RegExp object
+ */
+function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
+  if (filter === null || !(<IRegExpFilter>filter).isRegExp) {
+    return <string | null>filter;
+  }
+
+  const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
+  const matches = serializedRegexParser.exec((<IRegExpFilter>filter).value);
+  const [_full, regexString, regexFlags] = matches;
+  return new RegExp(regexString, regexFlags);
+}
+
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
   recordPropertyChange(col, provider, lineup, graph, 'metaData');
   recordPropertyChange(col, provider, lineup, graph, 'filter');
   recordPropertyChange(col, provider, lineup, graph, 'rendererType');
   recordPropertyChange(col, provider, lineup, graph, 'groupRenderer');
+  recordPropertyChange(col, provider, lineup, graph, 'summaryRenderer');
   recordPropertyChange(col, provider, lineup, graph, 'sortMethod');
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
@@ -414,7 +480,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
 
 
 function untrackColumn(col: Column) {
-  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'sortMethod'), null);
+  col.on(suffix('Changed.filter', 'metaData', 'filter', 'width', 'rendererType', 'groupRenderer', 'summaryRenderer', 'sortMethod'), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
@@ -468,7 +534,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
   });
   ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column: Column, index: number) => {
     untrackColumn(column);
-    if(ignore(Ranking.EVENT_REMOVE_COLUMN, lineup)) {
+    if (ignore(Ranking.EVENT_REMOVE_COLUMN, lineup)) {
       return;
     }
     // console.log(ranking, 'removeColumn', column, index);
@@ -479,7 +545,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
     });
   });
   ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (_, index: number, oldIndex: number) => {
-    if(ignore(Ranking.EVENT_MOVE_COLUMN, lineup)) {
+    if (ignore(Ranking.EVENT_MOVE_COLUMN, lineup)) {
       return;
     }
     // console.log(col.fqpath, 'addColumn', column, index);

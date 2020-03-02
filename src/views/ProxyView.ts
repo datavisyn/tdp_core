@@ -8,6 +8,7 @@ import {IViewContext, ISelection} from './interfaces';
 import {FormElementType, IFormSelectElement, IFormSelectOption} from '../form';
 import AD3View from './AD3View';
 import {getProxyUrl} from '../rest';
+import i18n from 'phovea_core/src/i18n';
 
 export const FORM_ID_SELECTED_ITEM = 'externalItem';
 
@@ -119,7 +120,7 @@ export default class ProxyView extends AD3View {
       .then((names) => Promise.all<any>([names, this.getSelectionSelectData(names)]))
       .then((args: any[]) => {
         const names = <string[]>args[0]; // use names to get the last selected element
-        const data = <{ value: string, name: string, data: any }[]>args[1];
+        const data = <{value: string, name: string, data: any}[]>args[1];
         const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(FORM_ID_SELECTED_ITEM);
 
         // backup entry and restore the selectedIndex by value afterwards again,
@@ -178,12 +179,12 @@ export default class ProxyView extends AD3View {
     if (this.options.openExternally) {
       this.setBusy(false);
       this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-      Please <a href="${url}" class="alert-link" target="_blank" rel="noopener">click here
-      to open the external application</a> in a new browser tab.</div></p>`;
+      ${i18n.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${i18n.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}</a>
+      ${i18n.t('tdp:core.views.newTab')}</div></p>`;
       return;
     }
 
-    this.openExternally.innerHTML = `The web page below is directly loaded from <a href="${url}" target="_blank"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url: `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
     this.$node.append('iframe')
@@ -197,8 +198,8 @@ export default class ProxyView extends AD3View {
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
-    const to = this.options.idtype ? resolve(this.options.idtype).name : 'Unknown';
-    this.$node.html(`<p>Cannot map <i>${this.selection.idtype.name}</i> ('${selectedItemId}') to <i>${to}</i>.</p>`);
+    const to = this.options.idtype ? resolve(this.options.idtype).name : i18n.t('tdp:core.views.unknown');
+    this.$node.html(`<p>${i18n.t('tdp:core.views.cannotMap', {name: this.selection.idtype.name, selectedItemId, to})}</p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
@@ -214,11 +215,10 @@ export default class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-        <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em"><strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.
-            However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.
-            Please use the following <a href="${url}" target="_blank" class="alert-link">link</a> to open the website in a separate window:
-            <br><br><a href="${url}" target="_blank" class="alert-link">${url}</a>
-        </div></p><p></p>`);
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
+       <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
+   </div></p><p></p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }

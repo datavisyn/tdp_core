@@ -1,5 +1,6 @@
-import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI} from 'phovea_core/src/ajax';
+import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI, MAX_URL_LENGTH} from 'phovea_core/src/ajax';
 import {IScoreRow} from './lineup';
+import {IDTypeLike} from 'phovea_core/src/idtype';
 
 export const REST_NAMESPACE = '/tdp';
 export const REST_DB_NAMESPACE = `${REST_NAMESPACE}/db`;
@@ -39,18 +40,29 @@ export function getTDPDatabases(): Promise<IDatabaseDesc[]> {
   return getAPIJSON(`${REST_DB_NAMESPACE}/`);
 }
 
-export interface IViewDesc {
+export interface IServerColumnDesc {
+
+  /**
+   * idType of the DBView, can be null
+   */
+  idType: IDTypeLike | null;
+
+  /**
+   * list of columns within this view, can be empty
+   */
+  columns: IServerColumn[];
+}
+
+export interface IDatabaseViewDesc extends IServerColumnDesc {
   name: string;
   description: string;
   arguments: string[];
   query: string;
-  columns?: IServerColumn[];
-  idType?: string;
   filters?: string[];
   queries?: { [name: string]: string };
 }
 
-export function getTDPViews(database: string): Promise<Readonly<IViewDesc>[]> {
+export function getTDPViews(database: string): Promise<Readonly<IDatabaseViewDesc>[]> {
   return getAPIJSON(`${REST_DB_NAMESPACE}/${database}/`);
 }
 
@@ -72,7 +84,46 @@ export interface IParams {
   [key: string]: string | number | boolean | string[] | number[] | boolean[];
 }
 
-const TOO_LONG_URL = 4096;
+/**
+ * Interface that contains all possible filters for the database API
+ */
+export interface IAllFilters {
+  /**
+   * column values have to be equal to the filter value (string, numerical)
+   */
+  normal: IParams;
+
+  /**
+   * less than filter, column values have to be lower than the filter value (numerical only)
+   */
+  lt: IParams;
+
+  /**
+   * less than equlas filter, column values have to be lower or equal to the filter value (numerical only)
+   */
+  lte: IParams;
+
+  /**
+   * greater than filter, column values have to be higher than the filter value (numerical only)
+   */
+  gt: IParams;
+
+  /**
+   * greater than equals filter, column values have to be higher or equal to the filter value (numerical only)
+   */
+  gte: IParams;
+}
+
+/**
+ * Define empty filter object for use as function default parameter
+ */
+const emptyFilters: IAllFilters = {
+  normal:{},
+  lt:{},
+  lte:{},
+  gt:{},
+  gte:{}
+};
 
 function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}, assignIds: boolean = false) {
   const mmethod = method === 'none' ? '' : `/${method}`;
@@ -82,7 +133,7 @@ function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter
 
   const url = `${REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
   const encoded = encodeParams(params);
-  if (encoded && (url.length + encoded.length > TOO_LONG_URL)) {
+  if (encoded && (url.length + encoded.length > MAX_URL_LENGTH)) {
     // use post instead
     return sendAPI(url, params, 'POST');
   }
@@ -113,12 +164,41 @@ export function getTDPRows(database: string, view: string, params: IParams = {},
   return getTDPDataImpl(database, view, 'none', params, assignIds);
 }
 
-function prefixFilter(filters: IParams) {
+/**
+ * Add a prefix to the keys of all given URL parameters
+ * @param params URL parameter
+ * @param prefix The prefix for the parameter keys (default is `filter`)
+ */
+function prefixFilter(params: IParams, prefix: string = 'filter') {
   const r: IParams = {};
-  Object.keys(filters).map((key) => r[key.startsWith('filter_') ? key : `filter_${key}`] = filters[key]);
+  Object.keys(params).map((key) => r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = params[key]);
   return r;
 }
 
+/**
+ * Merges the "regular" parameters with filter parameters for the URL.
+ * Filter parameters are prefixed accordingly to be accepted by the backend.
+ *
+ * @param params URL parameters
+ * @param filters URL filter parameters
+ */
+function mergeParamAndAllFilters(params: IParams, filters: IAllFilters) {
+  const normal = prefixFilter(filters.normal);
+  const lt = prefixFilter(filters.lt, 'filter_lt');
+  const lte = prefixFilter(filters.lte, 'filter_lte');
+  const gt = prefixFilter(filters.gt, 'filter_gt');
+  const gte = prefixFilter(filters.gte, 'filter_gte');
+
+  return Object.assign({}, params, normal, lt, lte, gt, gte);
+}
+
+/**
+ * Merges the "regular" parameters with filter parameters for the URL.
+ * Filter parameters are prefixed accordingly to be accepted by the backend.
+ *
+ * @param params URL parameters
+ * @param filters URL filter parameters
+ */
 export function mergeParamAndFilters(params: IParams, filters: IParams) {
   return Object.assign({}, params, prefixFilter(filters));
 }
@@ -137,6 +217,19 @@ export function getTDPFilteredRows(database: string, view: string, params: IPara
 }
 
 /**
+ * query the TDP rest api to read data with additional given filters
+ * @param {string} database the database connector key
+ * @param {string} view the view id
+ * @param {IParams} params additional parameters
+ * @param {IAllFilters} filters object that contains all filter options
+ * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
+ * @returns {Promise<IRow[]>}
+ */
+export function getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IAllFilters = emptyFilters, assignIds: boolean = false): Promise<IRow[]> {
+  return getTDPDataImpl(database, view, 'filter', mergeParamAndAllFilters(params, filters), assignIds);
+}
+
+/**
  * query the TDP rest api to read a score
  * @param {string} database the database connector key
  * @param {string} view the view id
@@ -145,7 +238,19 @@ export function getTDPFilteredRows(database: string, view: string, params: IPara
  * @returns {Promise<IScoreRow<T>[]>}
  */
 export function getTDPScore<T>(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<IScoreRow<T>[]> {
-  return getTDPDataImpl(database, view, 'score', Object.assign({}, params, prefixFilter(filters)));
+  return getTDPDataImpl(database, view, 'score', mergeParamAndFilters(params, filters));
+}
+
+/**
+ * query the TDP rest api to read a score
+ * @param {string} database the database connector key
+ * @param {string} view the view id
+ * @param {IParams} params additional parameters
+ * @param {IAllFilters} filters object that contains all filter options
+ * @returns {Promise<IScoreRow<T>[]>}
+ */
+export function getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<IScoreRow<T>[]> {
+  return getTDPDataImpl(database, view, 'score', mergeParamAndAllFilters(params, filters));
 }
 
 /**
@@ -157,7 +262,19 @@ export function getTDPScore<T>(database: string, view: string, params: IParams =
  * @returns {Promise<number>}
  */
 export function getTDPCount(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<number> {
-  return getTDPDataImpl(database, view, 'count', Object.assign({}, params, prefixFilter(filters)));
+  return getTDPDataImpl(database, view, 'count', mergeParamAndFilters(params, filters));
+}
+
+/**
+ * query the TDP rest api to compute the number of rows matching this query
+ * @param {string} database the database connector key
+ * @param {string} view the view id
+ * @param {IParams} params additional parameters
+ * @param {IAllFilters} filters object that contains all filter options
+ * @returns {Promise<number>}
+ */
+export function getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<number> {
+  return getTDPDataImpl(database, view, 'count', mergeParamAndAllFilters(params, filters));
 }
 
 export interface ILookupItem {
@@ -216,19 +333,12 @@ export interface IServerColumn {
   max?: number;
 }
 
-export interface IViewDescription {
-  /**
-   * list of columns within this view
-   */
-  columns: IServerColumn[];
-}
-
 /**
  * queries the server side column information of the given view
  * @param {string} database
  * @param {string} view
- * @returns {Promise<Readonly<IViewDescription>>}
+ * @returns {Promise<Readonly<IDatabaseViewDesc>>}
  */
-export function getTDPDesc(database: string, view: string): Promise<Readonly<IViewDescription>> {
+export function getTDPDesc(database: string, view: string): Promise<Readonly<IDatabaseViewDesc>> {
   return getTDPDataImpl(database, view, 'desc');
 }

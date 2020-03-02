@@ -3,13 +3,19 @@
  */
 import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, CategoricalColumn, toCategories} from 'lineupjs';
 import {createAccessor} from './utils';
-import {IScoreRow} from '../../extensions';
+import {IScoreRow, EP_TDP_CORE_SCORE_COLUMN_PATCHER, IScoreColumnPatcherExtensionDesc} from '../../extensions';
 import {showErrorModalDialog} from '../../dialogs';
 import {extent, min, max} from 'd3';
+import {list as listPlugins} from 'phovea_core/src/plugin';
 
+export interface ILazyLoadedColumn {
+  col: Column;
+  loaded: Promise<Column>;
+  reload: (data: Promise<IScoreRow<any>[]>) => Promise<Column>;
+}
 
 function extentByType(type: string, rows: any, acc: (d: any) => any): [number, number] {
-  switch(type) {
+  switch (type) {
     case 'numbers':
       return [min(rows, (d) => min(acc(d))), max(rows, (d) => max(acc(d)))];
     case 'boxplot':
@@ -19,12 +25,12 @@ function extentByType(type: string, rows: any, acc: (d: any) => any): [number, n
   }
 }
 
-export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & { pushDesc(col: IColumnDesc): void }, position: number, done?: () => void): { col: Column, loaded: Promise<Column>, reload: (data: Promise<IScoreRow<any>[]>) => Promise<Column> } {
+export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & {pushDesc(col: IColumnDesc): void}, position: number, done?: () => void): ILazyLoadedColumn {
   const ranking = provider.getLastRanking();
   const accessor = createAccessor(colDesc);
 
   // generate a unique column
-  (<any>colDesc).column = colDesc.scoreID || `dC${colDesc.label.replace(/\s+/,'')}`;
+  (<any>colDesc).column = colDesc.scoreID || `dC${colDesc.label.replace(/\s+/, '')}`;
 
   provider.pushDesc(colDesc);
   //mark as lazy loaded
@@ -54,9 +60,9 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
     });
 
   // success
-  const loaded = data.then((rows: IScoreRow<any>[]) => {
+  const loaded = data.then(async (rows: IScoreRow<any>[]) => {
     accessor.setRows(rows);
-    patchColumn(colDesc, rows, col);
+    await patchColumn(colDesc, rows, col);
     markLoaded(provider, colDesc, true);
 
     if (done) {
@@ -71,18 +77,18 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
 
     newData.catch(showErrorModalDialog);
     // success
-    return newData.then((rows: IScoreRow<any>[]) => {
-        accessor.setRows(rows);
-        patchColumn(colDesc, rows, col);
-        markLoaded(provider, colDesc, true);
-        return col;
+    return newData.then(async (rows: IScoreRow<any>[]) => {
+      accessor.setRows(rows);
+      await patchColumn(colDesc, rows, col);
+      markLoaded(provider, colDesc, true);
+      return col;
     });
   };
 
   return {col, loaded, reload};
 }
 
-function markLoaded(provider: IDataProvider, colDesc: any, loaded: boolean) {
+function markLoaded(provider: IDataProvider, colDesc: any, loaded: boolean): void {
   // find all columns with the same descriptions (generated snapshots) to set their `setLoaded` value
   provider.getRankings().forEach((ranking) => {
     const columns = ranking.flatColumns.filter((rankCol) => rankCol.desc === colDesc);
@@ -94,7 +100,7 @@ function markLoaded(provider: IDataProvider, colDesc: any, loaded: boolean) {
   (<any>colDesc).lazyLoaded = !loaded;
 }
 
-function patchColumn(colDesc: any, rows: IScoreRow<any>[], col: Column) {
+async function patchColumn(colDesc: any, rows: IScoreRow<any>[], col: Column): Promise<void> {
   if (colDesc.type === 'number' || colDesc.type === 'boxplot' || colDesc.type === 'numbers') {
     const ncol = <NumberColumn | BoxPlotColumn | NumbersColumn>col;
     if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
@@ -134,4 +140,10 @@ function patchColumn(colDesc: any, rows: IScoreRow<any>[], col: Column) {
     ccol.lookup.clear();
     categories.forEach((c) => ccol.lookup.set(c.name, c));
   }
+
+  // Await all patchers to complete before returning
+  await Promise.all(listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER).map(async (pluginDesc: IScoreColumnPatcherExtensionDesc) => {
+    const plugin = await pluginDesc.load();
+    plugin.factory(pluginDesc, colDesc, rows, col);
+  }));
 }

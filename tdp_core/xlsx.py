@@ -1,12 +1,13 @@
 from phovea_server.ns import Namespace, request, abort, Response
 from phovea_server.util import jsonify
 from openpyxl import Workbook, load_workbook
-from openpyxl.worksheet.write_only import WriteOnlyCell
+from openpyxl.cell import WriteOnlyCell
 from openpyxl.styles import Font
 from tempfile import NamedTemporaryFile
 from datetime import datetime
 import dateutil.parser
 import logging
+
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ def to_type(cell):
   if cell.data_type in _types:
     return _types[cell.data_type]
   v = cell.value
-  if isinstance(v, int) or isinstance(v, long):
+  if isinstance(v, int) or isinstance(v, int):
     return 'int'
   if isinstance(v, float):
     return 'float'
@@ -64,7 +65,7 @@ def _xlsx2json():
     rows = []
     rows.append(convert_row(cols, ws_first_row))
     for row in ws_rows:
-      rows.append(convert_row(cols, row))
+      rows.append(str(convert_row(cols, row)))
 
     return dict(title=ws.title, columns=cols, rows=rows)
 
@@ -84,7 +85,7 @@ def _xlsx2json_array():
   wb = load_workbook(file, read_only=True)
 
   def convert_row(row):
-    return [unicode(_convert_value(cell.value)) for cell in row]
+    return [_convert_value(cell.value) for cell in row]
 
   if not wb.worksheets:
     return jsonify([])
@@ -109,7 +110,7 @@ def _json2xlsx():
 
   def to_value(v, coltype):
     if coltype == 'date':
-      if isinstance(v, int) or isinstance(v, long):
+      if isinstance(v, int):
         return datetime.fromtimestamp(v)
       return dateutil.parser.parse(v)
     return v
@@ -117,11 +118,10 @@ def _json2xlsx():
   for sheet in data.get('sheets', []):
     ws = wb.create_sheet(title=sheet['title'])
     cols = sheet['columns']
-
     ws.append(to_header(col['name']) for col in cols)
 
     for row in sheet['rows']:
-      ws.append(to_value(row.get(col['name'], None), col['type']) for col in cols)
+      ws.append(str(to_value(row.get(col['name'], None), col['type'])) for col in cols)
 
   with NamedTemporaryFile() as tmp:
     wb.save(tmp.name)

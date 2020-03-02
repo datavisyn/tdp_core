@@ -22,3 +22,5 @@ node_modules/
 /tests/**/*.js
 *.map
 *.css
+/.cache-loader
+package-lock.json

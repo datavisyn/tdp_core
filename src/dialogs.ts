@@ -4,17 +4,18 @@
 
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui/src/dialogs';
+import i18n from 'phovea_core/src/i18n';
 
 export {setGlobalErrorTemplate} from 'phovea_ui/src/errors';
 
 export {errorAlert as showErrorModalDialog} from './notifications';
 
 export interface IDialogModule {
-  generateDialog(title: string, primaryBtnText?: string): Dialog;
+  generateDialog(title: string, primaryBtnText?: string, additionalCSSClasses?: string): Dialog;
 
   areyousure(msg?: string, options?: IAreYouSureOptions | string): Promise<boolean>;
 
-  FormDialog: {new(title: string, primaryBtnText?: string, formId?: string): FormDialog};
+  FormDialog: {new(title: string, primaryBtnText?: string, formId?: string, additionalCSSClasses?: string): FormDialog};
 }
 
 export function lazyDialogModule(): Promise<IDialogModule> {
@@ -26,25 +27,25 @@ export function lazyDialogModule(): Promise<IDialogModule> {
  * @param {CLUEGraphManager} manager
  * @param {string} id session id
  */
-export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string) {
+export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses: string = '') {
   lazyDialogModule().then(({generateDialog}) => {
-    const dialog = generateDialog('Session Not Found!', 'Create New Temporary Session');
+    const dialog = generateDialog(i18n.t('tdp:core.sessionNotFound'), i18n.t('tdp:core.newSession'), additionalCSSClasses);
     // append bg-danger to the dialog parent element
     dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
     dialog.body.innerHTML = `
         <p>
-            The requested session <strong>"${id}"</strong> was not found or is not accessible.
+           ${i18n.t('tdp:core.notAccessibleMessage', {id})}
         </p>
         <p>
-            Possible reasons are that you
-            <ul>
-                <li>requested a <i>temporary session</i> that is already expired</li>
-                <li>tried to access a <i>temporary session</i> of another user</li>
-                <li>tried to access a <i>private persistent session</i> of another user</li>
-            </ul>
+        ${i18n.t('tdp:core.possibleReasons')}
+        <ul>
+            <li>${i18n.t('tdp:core.possibleReason1')}</li>
+            <li>${i18n.t('tdp:core.possibleReason2')}</li>
+            <li>${i18n.t('tdp:core.possibleReason3')}</li>
+        </ul>
         </p>
         <p>
-            In the latter two cases, please contact the original owner of the session to create a public persistent session.
+          ${i18n.t('tdp:core.contactOwnerMessage')}
         </p>`;
     dialog.onSubmit(() => {
       dialog.hide();
