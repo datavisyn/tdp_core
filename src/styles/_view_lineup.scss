@@ -250,6 +250,7 @@ $lu_assets: "~lineupjs/src/assets";
           &:only-child() {
             border: 1px solid white; // overlay the parent element's border
             width: 100%;
+
             & > a {
               display: none;
             }
@@ -260,6 +261,13 @@ $lu_assets: "~lineupjs/src/assets";
             padding: 5px 8.5px;
             cursor: pointer;
             text-align-last: center;
+            display: flex;
+            align-items: center;
+            text-align-last: auto;
+
+            & > i {
+              align-self: flex-start;
+            }
           }
         }
       }

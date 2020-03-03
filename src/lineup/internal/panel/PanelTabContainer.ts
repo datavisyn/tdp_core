@@ -21,7 +21,6 @@ class PanelTabHeader {
   }
 
   /**
-   *
    * @param navTabs NavTabs array sorted according to their order property
    * @param nav New nav being added to the NavTabs
    */
@@ -55,8 +54,8 @@ class PanelTabHeader {
 export default class PanelTabContainer {
 
   readonly node: HTMLElement;
-  private parent: HTMLElement;
   readonly tabContentNode: HTMLElement;
+  private parent: HTMLElement;
   private tabs: PanelTab[] = [];
   private tabHeader: PanelTabHeader;
   private currentTab: PanelTab;

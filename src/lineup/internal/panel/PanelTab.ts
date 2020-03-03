@@ -71,7 +71,7 @@ export class PanelTab {
   }
 
   /**
-   * Show self/ add active class
+   * Show this tab and fire the `PanelTabEvents.SHOW_PANEL` event.
    */
   public show() {
     this.node.classList.add('active');
@@ -80,7 +80,7 @@ export class PanelTab {
   }
 
   /**
-   * Hide self/ remove active class
+   * Hide this tab and fire the `PanelTabEvents.HIDE_PANEL` event.
    */
   public hide() {
     this.node.classList.remove('active');
@@ -115,7 +115,7 @@ export class SidePanelTab extends PanelTab {
   /**
    * @param parent The parent HTML DOM element
    * @param search LineUp SearchBox
-   * @param ctx Ctx
+   * @param ctx LineUp context
    * @param doc Document
    */
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document, options: IPanelTabDesc) {
