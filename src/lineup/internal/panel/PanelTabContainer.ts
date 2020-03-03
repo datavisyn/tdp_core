@@ -110,7 +110,7 @@ export default class PanelTabContainer {
       this.currentTab.hide();
     }
 
-    this.resizeNode(tab.width);
+    this.resizeNode(tab.options.width);
     tab.show();
     this.currentTab = tab;
   }
