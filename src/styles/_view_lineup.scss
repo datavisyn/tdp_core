@@ -248,7 +248,11 @@ $lu_assets: "~lineupjs/src/assets";
 
         & > li {
           &:only-child() {
-            display: none;
+            border: 1px solid white; // overlay the parent element's border
+            width: 100%;
+            & > a {
+              display: none;
+            }
           }
 
           > a {
