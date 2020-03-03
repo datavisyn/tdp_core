@@ -59,7 +59,7 @@ export class PanelTab {
     title: 'Ranking Configuration',
     width: '21em',
     order: 0
-  }
+  };
   private navButton: PanelNavButton;
 
   /**
@@ -71,7 +71,7 @@ export class PanelTab {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
     this.node.setAttribute('role', 'tabpanel');
-    mixin(this.options, options)
+    mixin(this.options, options);
   }
 
   /**
