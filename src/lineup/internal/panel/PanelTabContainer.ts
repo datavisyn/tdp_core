@@ -49,7 +49,7 @@ class PanelTabHeader {
 
 
 /**
- * The PanelTabContainer creates tab able nav buttons that toggle their corresponding PanelTab
+ * The PanelTabContainer creates tab able nav buttons that toggle their corresponding PanelTab.
  */
 export default class PanelTabContainer {
 
@@ -62,7 +62,7 @@ export default class PanelTabContainer {
 
 
   /**
-   * @param parent The parent HTML DOM element
+   * @param parent The parent HTML DOM element.
    */
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -78,17 +78,17 @@ export default class PanelTabContainer {
   }
 
   /**
-   * Resize the Panel to fit the content of the new tab
-   * @param width width the PanelTabContainer should have;
+   * Resize the Panel to fit the content of the new tab.
+   * @param width width the PanelTabContainer should have.
    */
   resizeNode(width: string) {
     this.parent.style.width = width;
   }
 
   /**
-   * Method to add a new PanelTab
-   * @param tab New PanelTab instance
-   * @param onClick Optional function that is executed on the tab; Important: You must call `tabContainer.showTab()` yourself!
+   * Method to add a new PanelTab.
+   * @param tab New PanelTab instance.
+   * @param onClick Optional function that is executed on the tab; Important: You must call `tabContainer.showTab()` yourself!.
    */
   public addTab(tab: PanelTab, onClick?: () => void) {
     this.tabs = [...this.tabs, tab];
@@ -102,8 +102,8 @@ export default class PanelTabContainer {
   }
 
   /**
-   * Close currentTab and show new PanelTab
-   * @param tab A PanelTab instance
+   * Close currentTab and show new PanelTab.
+   * @param tab A PanelTab instance.
    */
   public showTab(tab: PanelTab) {
     if (this.currentTab) {
@@ -116,15 +116,15 @@ export default class PanelTabContainer {
   }
 
   /**
-   * Show last opened PanelTab
-   * Used when the LineUpPanelActions reopens to show the last open PanelTab
+   * Show last opened PanelTab.
+   * Used when the LineUpPanelActions reopens to show the last open PanelTab.
    */
   public showCurrentTab() {
     this.currentTab.show();
   }
 
   /**
-   * Hide currentTab
+   * Hide currentTab.
    */
   public hideCurrentTab() {
     this.currentTab.hide();
