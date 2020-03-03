@@ -154,7 +154,7 @@ export interface IPanelTabExtension {
 
 export interface IPanelTabExtensionDesc extends IPluginDesc {
   /**
-   * Css class for the PanelNavButton of the PanelTab
+   * CSS class for the PanelNavButton of the PanelTab
    */
   cssClass: string;
 

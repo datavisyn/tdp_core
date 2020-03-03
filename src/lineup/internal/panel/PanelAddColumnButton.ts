@@ -5,14 +5,14 @@ import i18n from 'phovea_core/src/i18n';
 
 /**
  * Div HTMLElement that contains a button and a SearchBox.
- * The SearchBox is by default hidden and can bit toggled by the button
+ * The SearchBox is hidden by default and can be toggled by the button.
  */
 export default class PanelAddColumnButton implements IPanelButton {
   readonly node: HTMLElement;
   /**
    *
    * @param parent The parent HTML DOM element
-   * @param search LIneup SearchBox instance
+   * @param search LineUp SearchBox instance
    */
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
     this.node = parent.ownerDocument.createElement('div');

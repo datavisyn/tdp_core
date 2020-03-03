@@ -10,8 +10,8 @@ export default class PanelHeader {
 
   /**
    *
-   * @param parent The parent HTML DOM element
-   * @param isTopMode Is top mode
+   * @param parent The parent HTML DOM element.
+   * @param isTopMode Is the SidePanel collapsed or not.
    */
   constructor(parent: HTMLElement) {
     this.node = parent.ownerDocument.createElement('header');

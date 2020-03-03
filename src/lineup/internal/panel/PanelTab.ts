@@ -14,7 +14,7 @@ export interface IPanelTabDesc {
   width: string;
 
   /**
-   * Css class for PanelNavButton of the PanelTab
+   * CSS class for PanelNavButton of the PanelTab
    */
   cssClass: string;
 
@@ -24,7 +24,7 @@ export interface IPanelTabDesc {
   title: string;
 
   /**
-   * Used to sort the PanelNavButtons
+   * Define the sort order of the PanelNavButtons
    */
   order: number;
 
@@ -58,7 +58,6 @@ export class PanelTab {
   private navButton: PanelNavButton;
 
   /**
-   * @param
    * @param parent The parent HTML DOM element
    * @param options Extra styles to apply to the PanelTab
    */
