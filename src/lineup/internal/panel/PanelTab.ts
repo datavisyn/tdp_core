@@ -2,6 +2,7 @@ import {SidePanel, SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 import {EventHandler} from 'phovea_core/src/event';
 import PanelButton, {PanelNavButton} from './PanelButton';
+import {mixin} from 'phovea_core/src/index';
 
 /**
  * Interface for the options parameter of PanelTab
@@ -53,21 +54,24 @@ export class PanelTab {
 
   readonly node: HTMLElement;
   readonly events: PanelTabEvents;
-  readonly width: string;
-
+  readonly options: IPanelTabDesc = {
+    cssClass: 'fa fa-sliders',
+    title: 'Ranking Configuration',
+    width: '21em',
+    order: 0
+  }
   private navButton: PanelNavButton;
 
   /**
    * @param parent The parent HTML DOM element
    * @param options Extra styles to apply to the PanelTab
    */
-  constructor(parent: HTMLElement, private options: IPanelTabDesc) {
+  constructor(parent: HTMLElement, options?: IPanelTabDesc) {
     this.events = new PanelTabEvents();
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
     this.node.setAttribute('role', 'tabpanel');
-    const o = Object.assign({}, options);
-    this.width = o.width;
+    mixin(this.options, options)
   }
 
   /**
@@ -118,7 +122,7 @@ export class SidePanelTab extends PanelTab {
    * @param ctx LineUp context
    * @param doc Document
    */
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document, options: IPanelTabDesc) {
+  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document, options?: IPanelTabDesc) {
     super(parent, options);
     this.node.classList.add('default');
     this.panel = new SidePanel(ctx, doc, {

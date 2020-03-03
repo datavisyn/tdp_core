@@ -90,16 +90,8 @@ export default class LineUpPanelActions extends EventHandler {
       this.node.classList.add('lu-side-panel-top');
     } else {
 
-      const options = {
-        cssClass: 'fa fa-sliders',
-        title: 'Ranking Configuration',
-        width: '21em',
-        order: 0
-      };
-
-      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc, options);
+      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
       this.panel = sidePanel.panel;
-
       this.tabContainer = new PanelTabContainer(this.node);
       this.tabContainer.addTab(sidePanel);
       this.tabContainer.showTab(sidePanel);
