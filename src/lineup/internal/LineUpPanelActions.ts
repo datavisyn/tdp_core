@@ -1,5 +1,5 @@
 
-import {SidePanel, spaceFillingRule, IGroupSearchItem, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isSupportType, Column, IItem} from 'lineupjs';
+import {SidePanel, spaceFillingRule, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isSupportType, Column, IItem} from 'lineupjs';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -10,7 +10,7 @@ import {
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {lazyDialogModule} from '../../dialogs';
-import PanelButton, {IPanelButton, PanelNavButton} from './panel/PanelButton';
+import PanelButton from './panel/PanelButton';
 import PanelTabContainer from './panel/PanelTabContainer';
 import {PanelTab, SidePanelTab} from './panel/PanelTab';
 import SearchBoxProvider from './panel/SearchBoxProvider';
@@ -18,7 +18,7 @@ import PanelHeader from './panel/PanelHeader';
 import PanelRankingButton from './panel/PanelRankingButton';
 import PanelAddColumnButton from './panel/PanelAddColumnButton';
 import i18n from 'phovea_core/src/i18n';
-import PanelDownloadButtonContainer from './panel/PanelDownloadButtonContainer';
+import PanelDownloadButton from './panel/PanelDownloadButton';
 
 export interface ISearchOption {
   text: string;
@@ -192,7 +192,7 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableDownload) {
-      const downloadButtonContainer = new PanelDownloadButtonContainer(buttons, this.provider, this.isTopMode);
+      const downloadButtonContainer = new PanelDownloadButton(buttons, this.provider, this.isTopMode);
       this.header.addButton(downloadButtonContainer);
     }
 

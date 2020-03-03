@@ -7,7 +7,7 @@ import i18n from 'phovea_core/src/i18n';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
-export default class PanelDownloadButtonContainer implements IPanelButton {
+export default class PanelDownloadButton implements IPanelButton {
   readonly node: HTMLElement;
 
   constructor(parent: HTMLElement, private provider: LocalDataProvider, isTopMode:boolean) {
