@@ -233,7 +233,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private appendExtraTabs() {
-    const plugins = <IPanelTabExtensionDesc[]>listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB);
+    const plugins = <IPanelTabExtensionDesc[]>listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB).sort((a, b) => a.order - b.order);
     plugins.forEach((plugin) => {
       let isLoaded = false;
       const tab = new PanelTab(this.tabContainer.node, plugin);

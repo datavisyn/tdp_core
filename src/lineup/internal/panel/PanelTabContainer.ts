@@ -4,8 +4,8 @@ import {PanelNavButton} from './PanelButton';
 
 
 /**
- * Acts as the navigation to the TabPanels
- * Allows the addition in the correct order of PanelNavButtons
+ * The header of the PanelTab
+ * Contains the PanelNavButtons that toggle the PanelTab
  */
 class PanelTabHeader {
   public node: HTMLElement;
@@ -21,29 +21,11 @@ class PanelTabHeader {
   }
 
   /**
-   * @param navTabs NavTabs array sorted according to their order property
-   * @param nav New nav being added to the NavTabs
-   */
-  getNextSibling(sortedNavTabs: PanelNavButton[], nav: PanelNavButton): PanelNavButton | null {
-    const navTabsLength = sortedNavTabs.length;
-    const navIndex = sortedNavTabs.findIndex((n) => n.order === nav.order);
-    return navIndex === navTabsLength - 1 ? null : sortedNavTabs[navIndex + 1];
-  }
-
-  /**
-   * Add nav-tab to the nav-tabs in the correct order.
+   * Append PanelNavButtons to PanelTabHeader
    * @param button PanelNavButton instance to add
    */
   addNavButton(button: PanelNavButton) {
-    const sameOrderNav = this.navButtons.find((n) => n.order === button.order); // find nav with same order
-    this.navButtons = [...this.navButtons, button].sort((nav1, nav2) => nav1.order - nav2.order);
     this.node.appendChild(button.node);
-    const nextSibling = sameOrderNav || this.getNextSibling(this.navButtons, button); // if same order property append new nav before it
-    if (nextSibling) {
-      this.node.insertBefore(button.node, nextSibling.node);
-    } else {
-      this.node.appendChild(button.node);
-    }
   }
 }
 
