@@ -131,25 +131,25 @@ export default class LineUpPanelActions extends EventHandler {
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
 
-    //When this.options.enableSidePanel === 'top' `this.collapsed=true` gets called. Attempting to open the PanelTab produces an error.
+    // When this.options.enableSidePanel === 'top' `this.collapsed=true` gets called. Attempting to open the PanelTab produces an error.
     if (value && this.options.enableSidePanel !== 'top') {
-      this.tabContainer.hideCurrentTab(); //Hide the active PanelTab --> Inform its content to stop updating
+      this.tabContainer.hideCurrentTab(); // Hide the active PanelTab --> Inform its content to stop updating
     } else if (this.options.enableSidePanel !== 'top') {
-      this.tabContainer.showCurrentTab(); //Show the last active PanelTab --> Inform its content to start updating again
+      this.tabContainer.showCurrentTab(); // Show the last active PanelTab --> Inform its content to start updating again
     }
   }
 
   hide() {
     this.node.style.display = 'none';
 
-    //Hide the active PanelTab and inform its content to stop updating
+    // Hide the active PanelTab and inform its content to stop updating
     this.tabContainer.hideCurrentTab();
   }
 
   show() {
     this.node.style.display = 'flex';
 
-    //Show the last active PanelTab and inform its content to start updating again
+    // Show the last active PanelTab and inform its content to start updating again
     this.tabContainer.showCurrentTab();
   }
 
@@ -462,10 +462,10 @@ export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
     if (idtype === target.id) {
       return true;
     }
-    //lookup the targets and check if our target is part of it
+    // lookup the targets and check if our target is part of it
     return resolve(idtype).getCanBeMappedTo().then((mappables: IDType[]) => mappables.some((d) => d.id === target.id));
   }
-  //check which idTypes can be mapped to the target one
+  // check which idTypes can be mapped to the target one
   return Promise.all(idTypes.map(canBeMappedTo)).then((mappable: boolean[]) => {
     const valid = idTypes.filter((d, i) => mappable[i]);
     return all.filter((d) => valid.indexOf(d.idtype) >= 0);
