@@ -2,7 +2,6 @@ import {SidePanel, SearchBox} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 import {EventHandler} from 'phovea_core/src/event';
 import PanelButton, {PanelNavButton} from './PanelButton';
-import {mixin} from 'phovea_core/src/index';
 
 /**
  * Interface for the options parameter of PanelTab
@@ -71,7 +70,7 @@ export class PanelTab {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
     this.node.setAttribute('role', 'tabpanel');
-    mixin(this.options, options);
+    Object.assign(this.options, options);
   }
 
   /**
