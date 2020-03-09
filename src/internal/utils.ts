@@ -219,7 +219,7 @@ export function permissionForm(item?: ISecureItem, options: Partial<IPermissionF
       const buddies = toSet(data.get('permission_buddies').toString());
       const buddiesName = data.get('permission_buddies_name').toString().split(';').map((d) => d.trim()).filter((d) => d.length > 0);
       return {
-        permissions: encode(new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]), group, others, buddies),
+        permissions: encode(new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]), <Set<EPermission>>group, <Set<EPermission>>others, <Set<EPermission>>buddies),
         group: groupName,
         buddies: buddiesName
       };
