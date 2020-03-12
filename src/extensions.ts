@@ -9,6 +9,7 @@ import {IDType} from 'phovea_core/src/idtype';
 import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
+import {PanelTabEvents} from './lineup/internal/panel/PanelTab';
 
 export * from './tour/extensions';
 
@@ -148,7 +149,7 @@ export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
 
 export interface IPanelTabExtension {
   desc: IPanelTabExtensionDesc;
-  factory(parent: HTMLElement, provider: LocalDataProvider, desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
+  factory(parent: HTMLElement, provider: LocalDataProvider, desc: IRankingButtonExtensionDesc, events: PanelTabEvents, extraArgs?: object): Promise<IScoreParam>;
 }
 
 export interface IPanelTabExtensionDesc extends IPluginDesc {

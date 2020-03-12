@@ -19,6 +19,7 @@ import PanelRankingButton from './panel/PanelRankingButton';
 import PanelAddColumnButton from './panel/PanelAddColumnButton';
 import i18n from 'phovea_core/src/i18n';
 import PanelDownloadButton from './panel/PanelDownloadButton';
+import {IPanelTabExtension} from '../../extensions';
 
 export interface ISearchOption {
   text: string;
@@ -246,7 +247,7 @@ export default class LineUpPanelActions extends EventHandler {
           this.tabContainer.showTab(tab);
 
         } else {
-          plugin.load().then((p) => {
+          plugin.load().then((p: IPanelTabExtension) => {
             p.factory(tab.node, this.provider, p.desc, tab.events);
             this.collapse = false; // expand side panel
             this.tabContainer.showTab(tab);
