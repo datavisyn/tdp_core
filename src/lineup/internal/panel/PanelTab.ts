@@ -48,7 +48,7 @@ export class PanelTab extends EventHandler {
   readonly options: IPanelTabDesc = {
     cssClass: 'fa fa-sliders',
     title: 'Ranking Configuration',
-    width: '21em',
+    width: '23em',
     order: 0
   };
   private navButton: PanelNavButton;
