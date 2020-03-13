@@ -11,7 +11,7 @@ import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {lazyDialogModule} from '../../dialogs';
 import PanelButton from './panel/PanelButton';
-import PanelTabContainer from './panel/PanelTabContainer';
+import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
 import {PanelTab, SidePanelTab} from './panel/PanelTab';
 import SearchBoxProvider from './panel/SearchBoxProvider';
 import PanelHeader from './panel/PanelHeader';
@@ -73,7 +73,7 @@ export default class LineUpPanelActions extends EventHandler {
   readonly node: HTMLElement; // wrapper node
 
   private readonly header: PanelHeader;
-  private readonly tabContainer: PanelTabContainer;
+  private readonly tabContainer: ITabContainer;
 
   private overview: HTMLElement;
   private wasCollapsed = false;
@@ -89,8 +89,9 @@ export default class LineUpPanelActions extends EventHandler {
 
     if (this.options.enableSidePanel === 'top') {
       this.node.classList.add('lu-side-panel-top');
-    } else {
+      this.tabContainer = new NullTabContainer(); // tab container without functionality
 
+    } else {
       const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
       this.panel = sidePanel.panel;
       this.tabContainer = new PanelTabContainer(this.node);
@@ -124,11 +125,10 @@ export default class LineUpPanelActions extends EventHandler {
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
 
-    // When this.options.enableSidePanel === 'top' `this.collapsed=true` gets called. Attempting to open the PanelTab produces an error.
-    if (value && this.options.enableSidePanel !== 'top') {
-      this.tabContainer.hideCurrentTab(); // Hide the active PanelTab --> Inform its content to stop updating
-    } else if (this.options.enableSidePanel !== 'top') {
-      this.tabContainer.showCurrentTab(); // Show the last active PanelTab --> Inform its content to start updating again
+    if(value) {
+      this.tabContainer.hideCurrentTab(); // Hide the active PanelTab and inform its content to stop updating
+    } else {
+      this.tabContainer.showCurrentTab(); // Show the last active PanelTab and inform its content to start updating again
     }
   }
 

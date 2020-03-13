@@ -28,14 +28,100 @@ class PanelTabHeader {
   }
 }
 
+export interface ITabContainer {
+
+  /**
+   * HTMLElement of the tab container
+   */
+  readonly node: HTMLElement;
+
+  /**
+   * Resize the Panel to fit the content of the new tab.
+   * @param width width the PanelTabContainer should have.
+   */
+  resizeNode(width: string): void;
+
+  /**
+   * Method to add a new PanelTab.
+   * @param tab New PanelTab instance.
+   * @param onClick Optional function that is executed on the tab; Important: You must call `tabContainer.showTab()` yourself!.
+   */
+  addTab(tab: PanelTab, onClick?: () => void): void;
+
+  /**
+   * Close currentTab and show new PanelTab.
+   * @param tab A PanelTab instance.
+   */
+  showTab(tab: PanelTab): void;
+
+  /**
+   * Show last opened PanelTab.
+   * Used when the LineUpPanelActions reopens to show the last open PanelTab.
+   */
+  showCurrentTab(): void;
+
+  /**
+   * Hide currentTab.
+   */
+  hideCurrentTab(): void;
+}
+
+/**
+ * The NullTabContainer does not have any functionality.
+ * The public functions have no operation and the public properties are dummy HTMLElements.
+ */
+export class NullTabContainer implements ITabContainer {
+  readonly node: HTMLElement = null;
+
+  /**
+   * Resize the Panel to fit the content of the new tab.
+   * @param width width the PanelTabContainer should have.
+   */
+  resizeNode(width: string): void {
+    // noop
+  }
+
+  /**
+   * Method to add a new PanelTab.
+   * @param tab New PanelTab instance.
+   * @param onClick Optional function that is executed on the tab; Important: You must call `tabContainer.showTab()` yourself!.
+   */
+  addTab(tab: PanelTab, onClick?: () => void): void {
+    // noop
+  }
+
+  /**
+   * Close currentTab and show new PanelTab.
+   * @param tab A PanelTab instance.
+   */
+  showTab(tab: PanelTab): void {
+    // noop
+  }
+
+  /**
+   * Show last opened PanelTab.
+   * Used when the LineUpPanelActions reopens to show the last open PanelTab.
+   */
+  showCurrentTab(): void {
+    // noop
+  }
+
+  /**
+   * Hide currentTab.
+   */
+  hideCurrentTab(): void {
+    // noop
+  }
+}
 
 /**
  * The PanelTabContainer creates tab able nav buttons that toggle their corresponding PanelTab.
  */
-export default class PanelTabContainer {
+export class PanelTabContainer implements ITabContainer {
 
   readonly node: HTMLElement;
-  readonly tabContentNode: HTMLElement;
+
+  private readonly tabContentNode: HTMLElement;
   private parent: HTMLElement;
   private tabs: PanelTab[] = [];
   private tabHeader: PanelTabHeader;
@@ -62,7 +148,7 @@ export default class PanelTabContainer {
    * Resize the Panel to fit the content of the new tab.
    * @param width width the PanelTabContainer should have.
    */
-  resizeNode(width: string) {
+  resizeNode(width: string): void {
     this.parent.style.width = width;
   }
 
@@ -71,7 +157,7 @@ export default class PanelTabContainer {
    * @param tab New PanelTab instance.
    * @param onClick Optional function that is executed on the tab; Important: You must call `tabContainer.showTab()` yourself!.
    */
-  public addTab(tab: PanelTab, onClick?: () => void) {
+  addTab(tab: PanelTab, onClick?: () => void): void {
     this.tabs = [...this.tabs, tab];
 
     const listener = (onClick) ? onClick : () => {
@@ -86,7 +172,7 @@ export default class PanelTabContainer {
    * Close currentTab and show new PanelTab.
    * @param tab A PanelTab instance.
    */
-  public showTab(tab: PanelTab) {
+  showTab(tab: PanelTab): void {
     if (this.currentTab) {
       this.currentTab.hide();
     }
@@ -100,14 +186,14 @@ export default class PanelTabContainer {
    * Show last opened PanelTab.
    * Used when the LineUpPanelActions reopens to show the last open PanelTab.
    */
-  public showCurrentTab() {
+  showCurrentTab(): void {
     this.currentTab.show();
   }
 
   /**
    * Hide currentTab.
    */
-  public hideCurrentTab() {
+  hideCurrentTab(): void {
     this.currentTab.hide();
   }
 }
