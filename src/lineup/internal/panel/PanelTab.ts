@@ -65,7 +65,7 @@ export class PanelTab {
    * @param parent The parent HTML DOM element
    * @param options Extra styles to apply to the PanelTab
    */
-  constructor(parent: HTMLElement, options?: IPanelTabDesc) {
+  constructor(private parent: HTMLElement, options?: IPanelTabDesc) {
     this.events = new PanelTabEvents();
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
@@ -92,8 +92,7 @@ export class PanelTab {
   }
 
   getNavButton(listener): PanelNavButton {
-    // Note: `document.body` is used only for `parent.ownerDocument.createElement()` inside the button
-    this.navButton = new PanelNavButton(document.body, listener, this.options);
+    this.navButton = new PanelNavButton(this.parent, listener, this.options);
     return this.navButton;
   }
 
@@ -102,8 +101,7 @@ export class PanelTab {
       this.navButton.click();
     };
 
-    // Note: `document.body` is used only for `parent.ownerDocument.createElement()` inside the button
-    return new PanelButton(document.body, this.options.title, 'fa ' + this.options.cssClass + ' shortcut-nav', onClick);
+    return new PanelButton(this.parent, this.options.title, 'fa ' + this.options.cssClass + ' shortcut-nav', onClick);
   }
 }
 
