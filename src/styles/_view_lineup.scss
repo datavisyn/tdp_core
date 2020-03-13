@@ -104,6 +104,10 @@ $lu_assets: "~lineupjs/src/assets";
     }
   }
 
+  .lu-side-panel {
+    width: 100%;
+  }
+
   .lu-side-panel > main > section::before {
     content: "Column Summaries";
   }
@@ -115,6 +119,7 @@ $lu_assets: "~lineupjs/src/assets";
   .lu-side-panel-wrapper {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 
     %lu-panel-button {
       background: #fff;
@@ -273,15 +278,20 @@ $lu_assets: "~lineupjs/src/assets";
       }
 
       .tab-content {
+        position: relative;
         margin-top: 0.5em;
         display: flex;
         flex-direction: column;
         flex: 1;
-        overflow: auto;
       }
 
-      .tab-pane.default {
-        overflow: hidden;
+      .tab-pane {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        overflow-y: auto;
       }
     }
 
