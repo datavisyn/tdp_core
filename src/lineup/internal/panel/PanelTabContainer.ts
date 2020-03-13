@@ -9,7 +9,6 @@ import {PanelNavButton} from './PanelButton';
  */
 class PanelTabHeader {
   public node: HTMLElement;
-  public navButtons: PanelNavButton[] = [];
 
   /**
    * @param parent The parent HTML DOM element
