@@ -248,7 +248,7 @@ export default class LineUpPanelActions extends EventHandler {
 
         } else {
           plugin.load().then((p: IPanelTabExtension) => {
-            p.factory(tab.node, this.provider, p.desc, tab.events);
+            p.factory(p.desc, tab, this.provider);
             this.collapse = false; // expand side panel
             this.tabContainer.showTab(tab);
             isLoaded = true;

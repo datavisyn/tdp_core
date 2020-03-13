@@ -9,7 +9,7 @@ import {IDType} from 'phovea_core/src/idtype';
 import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
-import {PanelTabEvents} from './lineup/internal/panel/PanelTab';
+import {PanelTab} from './lineup/internal/panel/PanelTab';
 
 export * from './tour/extensions';
 
@@ -27,10 +27,6 @@ export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
 /**
  * Register a new tab to the LineupSidePanel.
  * Consists of a button/header to open the tab content and the tab content itself
- * @factoryParam {HTMLElement} parent The node of the tab content created through the extension point
- * @factoryParam {LocalDataProvider} provider The data of the current ranking
- * @factoryParam {IPanelTabExtensionDesc} desc The phovea extension point description
- * @factoryParam {PanelTabEvents} events Listen when the tab closes or opens
  */
 export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
 
@@ -149,7 +145,14 @@ export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
 
 export interface IPanelTabExtension {
   desc: IPanelTabExtensionDesc;
-  factory(parent: HTMLElement, provider: LocalDataProvider, desc: IRankingButtonExtensionDesc, events: PanelTabEvents, extraArgs?: object): Promise<IScoreParam>;
+
+  /**
+   * Create and attach a new LineUp side panel
+   * @param tab PanelTab instance to attach the HTMLElement and listen to events
+   * @param provider The data of the current ranking
+   * @param desc The phovea extension point description
+   */
+  factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
 }
 
 export interface IPanelTabExtensionDesc extends IPluginDesc {
@@ -181,6 +184,7 @@ export interface IPanelTabExtensionDesc extends IPluginDesc {
 
   load(): Promise<IPlugin & IPanelTabExtension>;
 }
+
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;
   factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
