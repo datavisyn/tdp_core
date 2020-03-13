@@ -21,7 +21,7 @@ export default class SearchBoxProvider {
    * Create a new LineUp SearchBox. The instance is added to the internal list and returned.
    * @returns A new LineUp SearchBox instance
    */
-  createSearchBox(options?: Partial<ISearchBoxOptions<ISearchOption>>): SearchBox<ISearchOption> {
+  createSearchBox(options: Partial<ISearchBoxOptions<ISearchOption>> = {}): SearchBox<ISearchOption> {
     const mergedOptions = Object.assign({
       placeholder: i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder')
     }, options);
