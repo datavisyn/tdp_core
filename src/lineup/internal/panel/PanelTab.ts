@@ -2,6 +2,7 @@ import {SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHea
 import {ISearchOption} from '../LineUpPanelActions';
 import {EventHandler} from 'phovea_core/src/event';
 import PanelButton, {PanelNavButton} from './PanelButton';
+import i18n from 'phovea_core/src/i18n';
 
 /**
  * Interface for the options parameter of PanelTab
@@ -47,7 +48,7 @@ export class PanelTab extends EventHandler {
   readonly node: HTMLElement;
   readonly options: IPanelTabDesc = {
     cssClass: 'fa fa-sliders',
-    title: 'Ranking Configuration',
+    title: i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
     width: '23em',
     order: 0
   };
