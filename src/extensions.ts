@@ -6,9 +6,10 @@ import {IEventHandler} from 'phovea_core/src/event';
 import {IAdditionalColumnDesc} from './lineup';
 import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
-import {IColumnDesc, Column} from 'lineupjs';
+import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
+import {PanelTab} from './lineup/internal/panel/PanelTab';
 
 export * from './tour/extensions';
 
@@ -22,6 +23,12 @@ export const EXTENSION_POINT_TDP_APP_EXTENSION = 'tdpAppExtension';
 // filter extensions
 export const EXTENSION_POINT_TDP_LIST_FILTERS = 'tdpListFilters';
 export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
+
+/**
+ * Register a new tab to the LineupSidePanel.
+ * Consists of a button/header to open the tab content and the tab content itself
+ */
+export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
 
 /**
  * Register new form elements for the form builder. Form elements must implement the `IFormElement`.
@@ -134,6 +141,48 @@ export interface IScoreColumnPatcherExtension {
 
 export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
+}
+
+export interface IPanelTabExtension {
+  desc: IPanelTabExtensionDesc;
+
+  /**
+   * Create and attach a new LineUp side panel
+   * @param tab PanelTab instance to attach the HTMLElement and listen to events
+   * @param provider The data of the current ranking
+   * @param desc The phovea extension point description
+   */
+  factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
+}
+
+export interface IPanelTabExtensionDesc extends IPluginDesc {
+  /**
+   * CSS class for the PanelNavButton of the PanelTab
+   */
+  cssClass: string;
+
+  /**
+   * Title attribute PanelNavButton
+   */
+  title: string;
+
+  /**
+   * Customize the PanelNavButtons' position (recommended to use multiples of 10)
+   */
+  order: number;
+
+  /**
+   * Width of the PanelTab
+   */
+  width: string;
+
+  /**
+   * If true a shortcut button is appended to the SidePanel header in collapsed mode
+   * @default false
+   */
+  shortcut?: boolean;
+
+  load(): Promise<IPlugin & IPanelTabExtension>;
 }
 
 export interface IRankingButtonExtension {
@@ -302,7 +351,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * optional security check to show only certain views
    */
-  security?: string|((user: IUser)=>boolean);
+  security?: string|((user: IUser) => boolean);
 
   /**
    * a lot of topics/tags describing this view
@@ -312,7 +361,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * a link to an external help page
    */
-  helpUrl?: string | { url: string, linkText: string, title: string };
+  helpUrl?: string | {url: string, linkText: string, title: string};
   /**
    * as an alternative an help text shown as pop up
    */
