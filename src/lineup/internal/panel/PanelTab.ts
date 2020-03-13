@@ -1,4 +1,4 @@
-import {SidePanel, SearchBox} from 'lineupjs';
+import {SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 import {EventHandler} from 'phovea_core/src/event';
 import PanelButton, {PanelNavButton} from './PanelButton';
@@ -121,7 +121,7 @@ export class SidePanelTab extends PanelTab {
    * @param ctx LineUp context
    * @param doc Document
    */
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: any, doc = document, options?: IPanelTabDesc) {
+  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, doc = document, options?: IPanelTabDesc) {
     super(parent, options);
     this.node.classList.add('default');
     this.panel = new SidePanel(ctx, doc, {
