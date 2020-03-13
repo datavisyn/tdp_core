@@ -36,23 +36,15 @@ export interface IPanelTabDesc {
 }
 
 /**
- * Events for PanelTab for when its showed/hidden
+ * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
  */
-export class PanelTabEvents extends EventHandler {
+export class PanelTab extends EventHandler {
 
   static readonly SHOW_PANEL = 'showPanel';
 
   static readonly HIDE_PANEL = 'hidePanel';
 
-}
-
-/**
- * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
- */
-export class PanelTab {
-
   readonly node: HTMLElement;
-  readonly events: PanelTabEvents;
   readonly options: IPanelTabDesc = {
     cssClass: 'fa fa-sliders',
     title: 'Ranking Configuration',
@@ -66,7 +58,8 @@ export class PanelTab {
    * @param options Extra styles to apply to the PanelTab
    */
   constructor(private parent: HTMLElement, options?: IPanelTabDesc) {
-    this.events = new PanelTabEvents();
+    super();
+
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tab-pane');
     this.node.setAttribute('role', 'tabpanel');
@@ -74,21 +67,21 @@ export class PanelTab {
   }
 
   /**
-   * Show this tab and fire the `PanelTabEvents.SHOW_PANEL` event.
+   * Show this tab and fire the `PanelTab.SHOW_PANEL` event.
    */
   public show() {
     this.node.classList.add('active');
     this.navButton.setActive(true);
-    this.events.fire(PanelTabEvents.SHOW_PANEL);
+    this.fire(PanelTab.SHOW_PANEL);
   }
 
   /**
-   * Hide this tab and fire the `PanelTabEvents.HIDE_PANEL` event.
+   * Hide this tab and fire the `PanelTab.HIDE_PANEL` event.
    */
   public hide() {
     this.node.classList.remove('active');
     this.navButton.setActive(false);
-    this.events.fire(PanelTabEvents.HIDE_PANEL);
+    this.fire(PanelTab.HIDE_PANEL);
   }
 
   getNavButton(listener): PanelNavButton {
