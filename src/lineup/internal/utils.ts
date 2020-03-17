@@ -7,12 +7,20 @@ import {IDataRow} from 'lineupjs';
 import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form';
 import {encodeParams} from 'phovea_core/src/ajax';
 
+
+/**
+ * Interface for AScoreAccessorProxy
+ */
+export interface IAccessorFunc<T> {
+  (row: IDataRow): T;
+}
+
 export class AScoreAccessorProxy<T> {
   /**
    * the accessor for the score column
    * @param row
    */
-  readonly accessor = (row: IDataRow) => this.access(row.v);
+  readonly accessor: IAccessorFunc<T> = (row: IDataRow) => this.access(row.v);
   private readonly scores = new Map<string, T>();
 
   constructor(private readonly missingValue: T = null) {
@@ -64,7 +72,7 @@ export function createAccessor(colDesc: any): AScoreAccessorProxy<any> {
  * converts the given filter object to request params
  * @param filter input filter
  */
-export function toFilter(filter: IFormMultiMap|IFormRow[]): IParams {
+export function toFilter(filter: IFormMultiMap | IFormRow[]): IParams {
   if (Array.isArray(filter)) {
     //map first
     return toFilter(convertRow2MultiMap(filter));
@@ -101,12 +109,13 @@ export function toFilterString(filter: IFormMultiMap, key2name?: Map<string, str
     const label = key2name && key2name.has(d) ? key2name.get(d) : d;
     const vn = Array.isArray(v) ? '["' + v.map(toString).join('","') + '"]' : '"' + toString(v) + '"';
     return `${label}=${vn}`;
-  }).join(' & ');}
+  }).join(' & ');
+}
 
 /**
  * generator for a FormMap compatible badgeProvider based on the given database url
  */
-export function previewFilterHint(database: string, view: string, extraParams?: ()=>any): (rows: IFormRow[])=>Promise<string> {
+export function previewFilterHint(database: string, view: string, extraParams?: () => any): (rows: IFormRow[]) => Promise<string> {
   let total: Promise<number> = null;
   const cache = new Map<string, Promise<number>>();
 

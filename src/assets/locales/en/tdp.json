@@ -206,6 +206,7 @@
       },
 
       "LineupPanelActions": {
+        "rankingPanelTabTitle": "Ranking Configuration",
         "searchPlaceholder": "Add Column &hellip;",
         "addColumnButton": "Add Column",
         "collapseButton": "(Un)Collapse",
