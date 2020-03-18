@@ -549,7 +549,7 @@ export abstract class ARankingView extends AView {
 
   /**
    * load the table description from the server
-   * @returns {Promise<IViewDescription>} the column descriptions
+   * @returns {Promise<IServerColumnDesc>} the column descriptions
    */
   protected abstract loadColumnDesc(): Promise<IServerColumnDesc>;
 
