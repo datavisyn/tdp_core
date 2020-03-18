@@ -11,184 +11,6 @@
     line-height: 1;
   }
 
-  %lu-panel-button {
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    cursor: pointer;
-    z-index: 1;
-    color: #000;
-
-    &:hover {
-      background-color: #eaeaea;
-    }
-  }
-
-  .lu-side-panel {
-    flex: 0 0 auto;
-    position: relative;
-
-    > section {
-      flex: 0 0 auto;
-      display: flex;
-      justify-content: flex-end;
-      margin-right: 1em;
-      flex-wrap: wrap;
-
-      button {
-        @extend %lu-panel-button;
-      }
-    }
-
-    label, input {
-      font-weight: normal;
-      margin: 0;
-    }
-
-    > div.lu-adder {
-      margin-top: 1em;
-
-      > button {
-        @extend %lu-panel-button;
-
-        display: none;
-      }
-    }
-
-    > a {
-      @extend %lu-panel-button;
-
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 2em;
-      height: 2em;
-
-      &::before {
-        @include fa-icon();
-        content: $fa-var-arrow-right;
-      }
-    }
-
-    button[data-violation] {
-      position: relative;
-      color: #FFD700;
-
-      &::before {
-        content: $fa-var-exclamation-triangle;
-      }
-
-      &::after {
-        content: attr(data-violation);
-        color: black;
-        text-align: left;
-        background: lighten(#FFD700, 45%);
-        hyphens: manual;
-        padding: 5px;
-        width: 12em;
-        position: absolute;
-        right: 0;
-        top: 100%;
-        z-index: 100;
-        pointer-events: none;
-        opacity: 0;
-        display: none;
-        transition: visibility 0s ease 0.3s, opacity 0.3s ease 0s;
-      }
-
-      &:hover::after {
-        opacity: 1;
-        display: block;
-        transition-delay: 0s, 0.3s;
-      }
-    }
-
-    .download-data-dropdown {
-      // show the number of selected rows after the element
-      li[data-num-selected-rows]::after {
-        content: ' (' attr(data-num-selected-rows) ')';
-        display: inline;
-      }
-
-      // hide the dropdown-header and the next list point (= download link), if no rows are selected
-      // note that this only works for a *single* link as after the header list item!
-      li[data-num-selected-rows='0'],
-      li[data-num-selected-rows='0'] + li {
-        display: none;
-      }
-    }
-
-    &.collapsed {
-      max-width: 3em;
-      min-width: 0;
-
-      > a {
-        width: 100%;
-        order: 1;
-
-        &::before {
-          content: $fa-var-arrow-left;
-        }
-      }
-
-      > section {
-        order: 3;
-        flex-direction: column;
-        margin-right: 0;
-      }
-
-      > div,
-      > .lu-stats,
-      > header,
-      > main {
-        display: none;
-      }
-
-      > div.lu-adder {
-        order: 2;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        border: none;
-        margin-top: 3em;
-
-        &:not(.once) .lu-search {
-          display: none;
-        }
-
-        > button {
-          display: block;
-        }
-
-        &.once::before {
-          content: '';
-          top: -10px;
-          left: -15em;
-          right: 0;
-          bottom: -10px;
-          position: absolute;
-        }
-
-        &.once .lu-search {
-          position: absolute;
-          top: 1.8em;
-          width: 17.5em;
-          left: -15em;
-          z-index: 2;
-
-          > ul {
-            max-height: 50vh;
-          }
-        }
-      }
-
-      .gap {
-        margin-top: 1em;
-      }
-    }
-  }
-
   > div {
     flex: 1 1 auto;
     position: relative;
@@ -218,14 +40,6 @@
       overflow: auto;
     }
   }
-
-  .lu-hierarchy .lu-hierarchy-adder {
-    display: flex; // override `body[data-clue='E'] footer` from CLUE
-  }
-
-  .lu-side-panel-entry[data-type="categorical"] {
-    margin-bottom: 45px;
-  }
 }
 
 .lu-dialog {
@@ -242,7 +56,7 @@
   display: none;
 }
 
-.lineup-engine, .le {
+.lineup-engine {
   position: absolute;
   top: 0;
   right: 0;
@@ -262,7 +76,6 @@
 $lu_assets: '~lineupjs/src/assets';
 
 @at-root {
-
   .tdp-ranking-export-form {
     user-select: none;
     -moz-user-select: none;
@@ -291,11 +104,320 @@ $lu_assets: '~lineupjs/src/assets';
     }
   }
 
+  .lu-side-panel {
+    width: 100%;
+  }
+
   .lu-side-panel > main > section::before {
     content: 'Column Summaries';
   }
 
   .lu-hierarchy .lu-search::before {
     height: 19px;
+  }
+
+  .lu-side-panel-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    %lu-panel-button {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 0px;
+      padding: 5px 10px;
+      cursor: pointer;
+      z-index: 1;
+      color: #000;
+
+      &:hover {
+        background-color: #eaeaea;
+      }
+    }
+
+    &:not(.collapsed) {
+      .shortcut-nav {
+        display: none; // hide navTab that doesn't have class `shortcut-nav` in collapsed mode
+      }
+    }
+
+    .lu-side-panel > main > section > div {
+      flex: 1;
+    }
+
+    aside {
+      border-left: 0;
+    }
+
+    > header {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0.5em;
+
+      .lu-adder {
+        margin-top: 1em;
+        display: none;
+      }
+
+      .collapse-button,
+      button {
+        @extend %lu-panel-button;
+        height: 2em;
+      }
+    }
+
+    label,
+    input {
+      font-weight: normal;
+      margin: 0;
+    }
+
+    .lu-adder {
+      margin-top: 1em;
+
+      button {
+        @extend %lu-panel-button;
+
+        display: none;
+      }
+    }
+
+    .collapse-button {
+      @extend %lu-panel-button;
+      grid-row: 1/3;
+      height: 2em;
+      margin-right: 0.5em;
+
+      &::before {
+        @include fa-icon();
+        content: $fa-var-arrow-right;
+      }
+    }
+
+    button[data-violation] {
+      position: relative;
+      color: #ffd700;
+
+      &::before {
+        content: $fa-var-exclamation-triangle;
+      }
+
+      &::after {
+        content: attr(data-violation);
+        color: black;
+        text-align: left;
+        background: lighten(#ffd700, 45%);
+        hyphens: manual;
+        padding: 5px;
+        width: 12em;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 100;
+        pointer-events: none;
+        opacity: 0;
+        display: none;
+        transition: visibility 0s ease 0.3s, opacity 0.3s ease 0s;
+      }
+
+      &:hover::after {
+        opacity: 1;
+        display: block;
+        transition-delay: 0s, 0.3s;
+      }
+    }
+
+    .download-data-dropdown {
+
+      // show the number of selected rows after the element
+      li[data-num-selected-rows]::after {
+        content: ' ('attr(data-num-selected-rows) ')';
+        display: inline;
+      }
+
+      // hide the dropdown-header and the next list point (= download link), if no rows are selected
+      // note that this only works for a *single* link as after the header list item!
+      li[data-num-selected-rows='0'],
+      li[data-num-selected-rows='0'] + li {
+        display: none;
+      }
+    }
+
+    > main {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      ul.nav-tabs {
+        display: flex;
+
+        & > li {
+          &:only-child() {
+            border: 1px solid white; // overlay the parent element's border
+            width: 100%;
+
+            & > a {
+              display: none;
+            }
+          }
+
+          > a {
+            color: black;
+            padding: 5px 8.5px;
+            cursor: pointer;
+            text-align-last: center;
+            display: flex;
+            align-items: center;
+            text-align-last: auto;
+
+            & > i {
+              align-self: flex-start;
+            }
+          }
+        }
+      }
+
+      .tab-content {
+        position: relative;
+        margin-top: 0.5em;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+
+      .tab-pane {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        overflow-y: auto;
+      }
+    }
+
+    &.collapsed {
+      max-width: 3em;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: visible;
+
+      .collapse-button {
+        position: relative;
+        margin-right: 0;
+
+        &::before {
+          content: $fa-var-arrow-left;
+        }
+      }
+
+      > header {
+        // Add margin before the first shortcut-nav
+
+        > button:not(.shortcut-nav) + .shortcut-nav {
+          margin-top: 1em;
+        }
+
+        margin-right: 0;
+        min-width: 0;
+        align-self: flex-start;
+        max-width: 100%;
+        flex-direction: column;
+
+        display: flex;
+        flex-direction: column;
+      }
+
+      > main {
+        display: none;
+      }
+
+      .lu-adder {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        border: none;
+
+        &:not(.once) .lu-search {
+          display: none;
+        }
+
+        button {
+          display: block;
+        }
+
+        &.once::before {
+          content: '';
+          top: -30px;
+          left: -20em;
+          right: 0;
+          bottom: -50vh;
+          position: absolute;
+        }
+
+        &.once .lu-search {
+          position: absolute;
+          top: 1.8em;
+          width: 17.5em;
+          left: -15em;
+          z-index: 2;
+
+          ul {
+            max-height: 50vh;
+          }
+        }
+      }
+
+      .gap {
+        margin-top: 1em;
+      }
+    }
+  }
+
+  .lu-side-panel-top-form {
+    display: flex;
+
+    p {
+      flex: 1 1 0;
+    }
+  }
+
+  .lu-side-panel-top.lu-side-panel-wrapper.collapsed {
+    display: inline-flex;
+    flex-direction: row;
+    z-index: 100;
+    max-width: unset;
+    width: unset;
+    float: right;
+    border-left: none;
+
+    > header {
+      display: flex;
+      flex-direction: row;
+      max-width: unset;
+      margin-bottom: 0;
+    }
+
+    .gap {
+      margin-top: unset;
+      margin-left: 1em;
+    }
+
+    div.lu-adder {
+      margin-top: 0;
+
+      &.once .lu-search {
+        left: -1.2em;
+      }
+
+      &.once::before {
+        content: '';
+        top: -10px;
+        left: -2.5em;
+        right: -15em;
+        bottom: -3em;
+        position: absolute;
+      }
+    }
   }
 }
