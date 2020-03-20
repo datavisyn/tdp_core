@@ -1,7 +1,8 @@
 // test dependencies that require transformation
 let pluginsToTransform = [
   'tdp_*',
-  'phovea_*'
+  'phovea_*',
+  'lineupjs'
 ].join('|');
 
 if(pluginsToTransform.length > 0) {
@@ -20,7 +21,6 @@ module.exports = {
     "\\.xml$": "jest-raw-loader"
   },
   testRegex: "(.*(test|spec))\\.(tsx?)$",
-  testURL: "http://localhost/",
   moduleFileExtensions: [
     "ts",
     "tsx",
@@ -34,10 +34,16 @@ module.exports = {
     "../node_modules",
     "../"
   ],
-  transformIgnorePatterns: [`../node_modules/${pluginsToTransform}`],
+  transformIgnorePatterns: [`../node_modules/${pluginsToTransform}`, `node_modules/${pluginsToTransform}`],
   globals: {
     "__VERSION__": "TEST_VERSION",
-    "__APP_CONTEXT__": "TEST_CONTEXT"
+    "__APP_CONTEXT__": "TEST_CONTEXT",
+    'ts-jest': {
+      // has to be set to true, otherwise i18n import fails
+      "tsConfig": {
+        "esModuleInterop": true,
+      }
+    }
   },
   moduleNameMapper: {
     "^.+\\.(css|less|scss|sass)$": "identity-obj-proxy",
