@@ -3,7 +3,7 @@
  */
 
 import AFormElement from './AFormElement';
-import {IForm} from '../interfaces';
+import {IForm, IFormElementDesc} from '../interfaces';
 import {IFormSelectDesc} from './FormSelect';
 import Select3, {IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
@@ -17,7 +17,7 @@ declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
 /**
  * Add specific options for select form elements
  */
-export interface IFormSelect3 extends IFormSelectDesc {
+export interface IFormSelect3 extends IFormElementDesc {
   /**
    * Additional options
    */
