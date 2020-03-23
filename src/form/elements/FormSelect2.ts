@@ -4,7 +4,7 @@
 
 import 'select2';
 import * as d3 from 'd3';
-import * as $ from 'jquery';
+import $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
 import {api2absURL} from 'phovea_core/src/ajax';
 import AFormElement from './AFormElement';
