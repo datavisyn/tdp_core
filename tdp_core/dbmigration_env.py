@@ -26,6 +26,13 @@ migration_id = config.get_main_option('migration_id')
 if not migration_id:
     raise ValueError('No migration_id in main configuration')
 
+# Additional configuration to be passed to context.configure
+additional_configuration = {}
+# Add the version_table_schema parameter if it exists
+version_table_schema = config.get_main_option('version_table_schema')
+if version_table_schema:
+    additional_configuration['version_table_schema'] = version_table_schema
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -42,7 +49,12 @@ def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
     # include_schemas because https://stackoverflow.com/questions/26275041/alembic-sqlalchemy-does-not-detect-existing-tables
     context.configure(
-        url=url, target_metadata=target_metadata, literal_binds=True, include_schemas=True, version_table='{}_alembic_version'.format(migration_id)
+        url=url, 
+        target_metadata=target_metadata, 
+        literal_binds=True, 
+        include_schemas=True, 
+        version_table='{}_alembic_version'.format(migration_id),
+        **additional_configuration
     )
 
     with context.begin_transaction():
@@ -64,7 +76,11 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, include_schemas=True, version_table='{}_alembic_version'.format(migration_id)
+            connection=connection, 
+            target_metadata=target_metadata, 
+            include_schemas=True, 
+            version_table='{}_alembic_version'.format(migration_id),
+            **additional_configuration
         )
 
         with context.begin_transaction():

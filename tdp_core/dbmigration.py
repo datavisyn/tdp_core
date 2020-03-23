@@ -22,13 +22,14 @@ class DBMigration(object):
   DBMigration object stores the required arguments to execute commands using Alembic.
   """
 
-  def __init__(self, id: str, db_url: str, script_location: str, auto_upgrade: bool=False):
+  def __init__(self, id: str, db_url: str, script_location: str, *, auto_upgrade: bool=False, version_table_schema: str=None):
     """
     Initializes a new migration object and optionally carries out an upgrade.
     :param str id: ID of the migration object
     :param str db_url: DB connection url
     :param str script_location: Location of the base directory (containing env.py and the versions directory)
     :param bool auto_upgrade: True if the migration should automatically upgrade the database to head
+    :param str version_table_schema: Schema of the alembic version table
     """
     if not id or not db_url or not script_location:
       raise ValueError('Empty id or db_url or script_location')
@@ -37,6 +38,7 @@ class DBMigration(object):
     self.db_url: str = db_url
     self.script_location: str = script_location
     self.auto_upgrade: bool = auto_upgrade
+    self.version_table_schema: str = version_table_schema
     self.custom_commands: Dict[str, str] = dict()
 
     # Because we can't easily pass "-1" as npm argument, we add a custom command for that without the space
@@ -109,6 +111,8 @@ class DBMigration(object):
     alembic_cfg.set_main_option('script_location', self.script_location)
     alembic_cfg.set_main_option('sqlalchemy.url', self.db_url)
     alembic_cfg.set_main_option('migration_id', self.id)
+    if self.version_table_schema:
+      alembic_cfg.set_main_option('version_table_schema', self.version_table_schema)
 
     # Run the command
     cmd_parser.run_cmd(alembic_cfg, options)
@@ -127,6 +131,7 @@ class DBMigrationManager(object):
      - Either dbKey or dbUrl is required, with dbUrl having precedence
    - scriptLocation: Location of the alembic root folder (passed to DBManager)
    - autoUpgrade: Flag which auto-upgrades to the latest revision (passed to DBManager)
+   - versionTableSchema: Schema of the alembic version table (passed to DBManager)
 
   The keys are retrieved from the following sources (in order):
    - File configuration at configKey
@@ -149,6 +154,7 @@ class DBMigrationManager(object):
       db_key = config.get('dbKey') or (p.dbKey if hasattr(p, 'dbKey') else None)
       db_url = config.get('dbUrl') or (p.dbUrl if hasattr(p, 'dbUrl') else None)
       script_location = config.get('scriptLocation') or (p.scriptLocation if hasattr(p, 'scriptLocation') else None)
+      version_table_schema = config.get('versionTableSchema') or (p.versionTableSchema if hasattr(p, 'versionTableSchema') else None)
       auto_upgrade = config.get('autoUpgrade') if type(config.get('autoUpgrade')) == bool else \
           (p.autoUpgrade if hasattr(p, 'autoUpgrade') and type(p.autoUpgrade) == bool else False)
 
@@ -175,7 +181,7 @@ class DBMigrationManager(object):
         db_url = str(engines.engine(db_key).url)
 
       # Create new migration
-      migration = DBMigration(id, db_url, script_location, auto_upgrade)
+      migration = DBMigration(id, db_url, script_location, auto_upgrade=auto_upgrade, version_table_schema=version_table_schema)
 
       # Store migration
       self._migrations[migration.id] = migration
