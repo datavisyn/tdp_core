@@ -49,10 +49,10 @@ def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
     # include_schemas because https://stackoverflow.com/questions/26275041/alembic-sqlalchemy-does-not-detect-existing-tables
     context.configure(
-        url=url, 
-        target_metadata=target_metadata, 
-        literal_binds=True, 
-        include_schemas=True, 
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        include_schemas=True,
         version_table='{}_alembic_version'.format(migration_id),
         **additional_configuration
     )
@@ -76,9 +76,9 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, 
-            target_metadata=target_metadata, 
-            include_schemas=True, 
+            connection=connection,
+            target_metadata=target_metadata,
+            include_schemas=True,
             version_table='{}_alembic_version'.format(migration_id),
             **additional_configuration
         )

@@ -86,9 +86,9 @@
       "hour": "an hour ago",
       "hour_plural": "{{count}} hours ago",
       "day": "a day ago",
-      "day_plural": "{{}} days ago",
+      "day_plural": "{{count}} days ago",
       "month": "a month ago",
-      "month_plural": "{{}} months ago",
+      "month_plural": "{{count}} months ago",
       "year": "a year ago",
       "farAway": "far far away",
 
@@ -206,6 +206,7 @@
       },
 
       "LineupPanelActions": {
+        "rankingPanelTabTitle": "Ranking Configuration",
         "searchPlaceholder": "Add Column &hellip;",
         "addColumnButton": "Add Column",
         "collapseButton": "(Un)Collapse",

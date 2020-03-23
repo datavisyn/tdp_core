@@ -167,7 +167,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
       return;
     }
     const node = <HTMLSelectElement>this.$select.node();
-    const $options = this.$select.selectAll(() => node.children).data(options);
+    const $options = this.$select.selectAll(() => <HTMLElement[]>Array.from(node.children)).data(options);
     $options.enter()
       .append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
 

@@ -22,7 +22,7 @@ class DBMigration(object):
   DBMigration object stores the required arguments to execute commands using Alembic.
   """
 
-  def __init__(self, id: str, db_url: str, script_location: str, *, auto_upgrade: bool=False, version_table_schema: str=None):
+  def __init__(self, id: str, db_url: str, script_location: str, *, auto_upgrade: bool = False, version_table_schema: str = None):
     """
     Initializes a new migration object and optionally carries out an upgrade.
     :param str id: ID of the migration object
@@ -42,7 +42,7 @@ class DBMigration(object):
     self.custom_commands: Dict[str, str] = dict()
 
     # Because we can't easily pass "-1" as npm argument, we add a custom command for that without the space
-    self.add_custom_command('downgrade-(\d+)', 'downgrade -{}')
+    self.add_custom_command(r'downgrade-(\d+)', 'downgrade -{}')
 
     # Automatically upgrade to head (if enabled)
     if self.auto_upgrade:
@@ -56,7 +56,7 @@ class DBMigration(object):
     return self.id
 
   def add_custom_command(self, pattern: str, target: str):
-    """
+    r"""
     Adds a custom command to the migration.
 
     :param str pattern: Regex pattern of the command. Can include capture groups which will be used to format the target string.
