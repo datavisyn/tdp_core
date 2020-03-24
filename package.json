@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git@github.com:datavisyn/tdp_core.git"
   },
-  "private": true,
+  "private": false,
   "files": [
     "src",
     "index.js",
