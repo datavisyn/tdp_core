@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "author": {
     "name": "datavisyn",
     "email": "contact@datavisyn.io",
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git@github.com:datavisyn/tdp_core.git"
   },
-  "private": true,
+  "private": false,
   "files": [
     "src",
     "index.js",
