@@ -368,7 +368,7 @@ $lu_assets: '~lineupjs/src/assets';
           left: -15em;
           z-index: 2;
 
-          ul {
+          > ul {
             max-height: 50vh;
           }
         }
