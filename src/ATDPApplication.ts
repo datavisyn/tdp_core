@@ -91,6 +91,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   protected app: Promise<T> = null;
   protected header: AppHeader;
+  protected loginMenu: LoginMenu;
   protected tourManager: TourManager;
 
   constructor(options: Partial<ITDPOptions> = {}) {
@@ -169,14 +170,14 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     // trigger bootstrap loading
     lazyBootstrap();
 
-    const loginMenu = new LoginMenu(this.header, {
+    this.loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
       loginForm: this.options.loginForm,
       watch: true
     });
-    loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
+    this.loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
       // reopen after logged out
-      loginMenu.forceShowDialog();
+      this.loginMenu.forceShowDialog();
     });
 
     const provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
@@ -225,13 +226,13 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     let forceShowLoginDialogTimeout: any = -1;
     // INITIAL LOGIC
-    loginMenu.on(LoginMenu.EVENT_LOGGED_IN, () => {
+    this.loginMenu.on(LoginMenu.EVENT_LOGGED_IN, () => {
       clearTimeout(forceShowLoginDialogTimeout);
       initSession();
     });
     if (!isLoggedIn()) {
       //wait 1sec before the showing the login dialog to give the auto login mechanism a chance
-      forceShowLoginDialogTimeout = setTimeout(() => loginMenu.forceShowDialog(), 1000);
+      forceShowLoginDialogTimeout = setTimeout(() => this.loginMenu.forceShowDialog(), 1000);
     } else {
       initSession();
     }
