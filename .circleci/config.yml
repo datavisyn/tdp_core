@@ -67,7 +67,7 @@ jobs:
             npm run dist
       - store_artifacts:
           path: dist
-          prefix: dist
+          destination: dist
 workflows:
   version: 2
 #  build-nightly:

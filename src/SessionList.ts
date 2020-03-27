@@ -4,7 +4,7 @@
 
 import {areyousure} from 'phovea_ui/src/dialogs';
 import {select, Selection, event} from 'd3';
-import * as $ from 'jquery';
+import $ from 'jquery';
 import {currentUserNameOrAnonymous, canWrite} from 'phovea_core/src/security';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {IProvenanceGraphDataDescription, op} from 'phovea_core/src/provenance';

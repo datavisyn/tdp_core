@@ -4,7 +4,7 @@
 
 import 'select2';
 import {event as d3event} from 'd3';
-import * as $ from 'jquery';
+import $ from 'jquery';
 import AFormElement, {toData} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
