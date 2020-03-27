@@ -206,7 +206,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     } else if (this.instancePromise) {
       this.instancePromise.then(() => this.destroyInstance());
     }
-    this.node.remove();
+    this.visible = false;
   }
 
   matchesIDType(idType: IDType) {
