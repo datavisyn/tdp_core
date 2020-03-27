@@ -5,11 +5,11 @@
  **************************************************************************** */
 
 //allow sass modules
-declare module "*.scss" {
+declare module '*.scss' {
   const content:string;
   export default content;
 }
-declare module "*.css" {
+declare module '*.css' {
   const content:string;
   export default content;
 }
@@ -20,7 +20,7 @@ declare module "*.gif";
 declare module "*.webp";
 declare module "*.svg";
 //allow html dependencies
-declare module "*.html" {
+declare module '*.html' {
   const content:string;
   export default content;
 }
@@ -29,15 +29,15 @@ declare module "*.xml" {
   export default content;
 }
 //allow json dependencies
-declare module "*.json";
+declare module '*.json';
 //allow file dependencies
-declare module "file-loader!*";
+declare module 'file-loader!*';
 //allow file dependencies
-declare module "raw-loader!*";
+declare module 'raw-loader!*';
 //allow url dependencies
-declare module "url-loader!*";
+declare module 'url-loader!*';
 //allow html dependencies
-declare module "imports-loader!*";
+declare module 'imports-loader!*';
 
 
 //define System.import as understood by webpack2

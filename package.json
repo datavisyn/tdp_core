@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "9.0.1-SNAPSHOT",
+  "version": "9.1.1-SNAPSHOT",
   "author": {
     "name": "datavisyn",
     "email": "contact@datavisyn.io",
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git@github.com:datavisyn/tdp_core.git"
   },
-  "private": true,
+  "private": false,
   "files": [
     "src",
     "index.js",
@@ -73,7 +73,10 @@
     "build:web": "webpack --env prod",
     "predist:python": "npm run build:python && npm run docs:python",
     "prebuild:python": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test:python",
-    "prebuild:web": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test:web"
+    "prebuild:web": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test:web",
+    "db-migration:base": "docker-compose run api python phovea_server/__main__.py --env dev db-migration",
+    "db-migration": "npm run db-migration:base exec --",
+    "db-migration:list": "npm run db-migration:base list --"
   },
   "dependencies": {
     "@types/d3": "~3.5.36",
