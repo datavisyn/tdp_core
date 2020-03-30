@@ -394,11 +394,11 @@ interface IRegExpFilter {
  * ```
  * JSON.stringify(/^123$/gm); // result: {}
  * ```
- *
+ * @internal
  * @param value Input string or RegExp object
  * @returns {string | IRegExpFilter} Returns the input string or a plain `IRegExpFilter` object
  */
-function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
+export function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
   if (!(value instanceof RegExp)) {
     return value;
   }
@@ -409,10 +409,11 @@ function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
  * Restores a RegExp object from a given IRegExpFilter object.
  * In case a string is passed to this function no deserialization is applied.
  *
+ * @internal
  * @param filter Filter as string or plain object matching the IRegExpFilter
  * @returns {string | RegExp| null} Returns the input string or the restored RegExp object
  */
-function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
+export function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
   if (filter === null || !(<IRegExpFilter>filter).isRegExp) {
     return <string | null>filter;
   }
