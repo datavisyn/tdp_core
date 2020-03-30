@@ -349,7 +349,9 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       return;
     }
 
-    const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+    if(property === 'filter') {
+      newValue = serializeLineUpFilter(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+    }
 
     if (source instanceof Column) {
       // assert ALineUpView and update the stats
@@ -357,12 +359,12 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
 
       const rid = rankingId(provider, source.findMyRanker());
       const path = source.fqpath;
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newSerializedValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newValue), {
         inverse: setColumn(lineupViewWrapper, rid, path, property, old)
       });
     } else if (source instanceof Ranking) {
       const rid = rankingId(provider, source);
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newSerializedValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newValue), {
         inverse: setColumn(lineupViewWrapper, rid, null, property, old)
       });
     }
@@ -386,23 +388,59 @@ interface IRegExpFilter {
 }
 
 /**
- * Serializes RegExp objects to an IRegexFilter object, which can be stored in the provenance graph.
- * In case a string is passed to this function no serialization is applied.
+ * This interface combines the `IStringFilter` from `StringColumn`
+ * and `ICategoricalFilter` from `ICategoricalColumn`.
+ */
+interface ILineUpStringFilter {
+  /**
+   * Filter value
+   */
+  filter: string[] | string | RegExp | null;
+
+  /**
+   * Filter for missing values
+   */
+  filterMissing: boolean;
+}
+
+/**
+ * Similar to the `ILineUpStringFilter`, but the RegExp is replaced with `IRegExpFilter`
+ */
+interface ISerializableLineUpFilter {
+  /**
+   * Filter value
+   * Note that the RegExp is replaced with IRegExpFilter (compared to the `ILineUpStringFilter` interface)
+   */
+  filter: string[] | string | IRegExpFilter | null;
+
+  /**
+   * Filter for missing values
+   */
+  filterMissing: boolean;
+}
+
+/**
+ * Serializes LineUp string filter, which can contain RegExp objects to an IRegexFilter object.
+ * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
  *
  * Background information:
  * The serialization step is necessary, because RegExp objects are converted into an empty object `{}` on `JSON.stringify`.
  * ```
  * JSON.stringify(/^123$/gm); // result: {}
  * ```
+ *
  * @internal
- * @param value Input string or RegExp object
- * @returns {string | IRegExpFilter} Returns the input string or a plain `IRegExpFilter` object
+ * @param filter LineUp filter object
+ * @returns Returns the `ISerializableLineUpFilter` object
  */
-export function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
-  if (!(value instanceof RegExp)) {
-    return value;
-  }
-  return {value: value.toString(), isRegExp: true};
+export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializableLineUpFilter {
+  return {
+    filter: {
+      value: filter.filter.toString(),
+      isRegExp: (filter.filter instanceof RegExp)
+    },
+    filterMissing: filter.filterMissing
+  };
 }
 
 /**
