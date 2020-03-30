@@ -168,17 +168,23 @@ class DBMigrationManager(object):
         missing_fields.append('dbUrl or dbKey')
 
       if len(missing_fields) > 0:
-        raise ValueError('No {} defined for DBMigration {} - is your configuration up to date?'.format(', '.join(missing_fields), id or '<UNKNOWN>'))
+        _log.critical('No {} defined for DBMigration {} - is your configuration up to date?'.format(', '.join(missing_fields), id or '<UNKNOWN>'))
+        continue
 
       if db_key and db_url:
         _log.info(f'Both dbKey and dbUrl defined for DBMigration {id} - falling back to dbUrl')
       elif db_key:
         # Check if engine exists
         if db_key not in engines:
-          raise ValueError(f'No engine called {db_key} found for DBMigration {id} - is your configuration up to date?')
+          _log.critical(f'No engine called {db_key} found for DBMigration {id} - is your configuration up to date?')
+          continue
 
         # Retrieve engine and store string as db url
-        db_url = str(engines.engine(db_key).url)
+        try:
+          db_url = str(engines.engine(db_key).url)
+        except Exception as e:
+          _log.critical(f'Error retrieving URL from engine {db_key}: {str(e)}')
+          continue
 
       # Create new migration
       migration = DBMigration(id, db_url, script_location, auto_upgrade=auto_upgrade, version_table_schema=version_table_schema)
