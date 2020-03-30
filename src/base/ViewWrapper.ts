@@ -120,17 +120,27 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   set visible(visible: boolean) {
-    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
-    if (visible && this.instance == null && selection && this.match(selection)) {
-      //lazy init
-      this.createView(selection);
-    }
-    if (visible) {
-      this.node.classList.remove('hidden');
-      this.update();
-    } else {
-      this.node.classList.add('hidden');
-    }
+    (async () => { // wrap function body into an immediately invoked function expression which is async to be awaitable
+      const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+
+      let created = false;
+
+      if (visible && this.instance == null && selection && this.match(selection)) {
+        //lazy init
+        await this.createView(selection);
+        created = true;
+      }
+
+      if (visible) {
+        this.node.classList.remove('hidden');
+      } else {
+        this.node.classList.add('hidden');
+      }
+
+      if (!created) { // if the view was just created we don't need to call update again
+        this.update();
+      }
+    })();
   }
 
   get visible() {
@@ -206,7 +216,7 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
     } else if (this.instancePromise) {
       this.instancePromise.then(() => this.destroyInstance());
     }
-    this.visible = false;
+    this.node.remove();
   }
 
   matchesIDType(idType: IDType) {
@@ -339,8 +349,8 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   update() {
-    if (this.visible && this.instance && typeof (<any>this.instance).update === 'function' && this.node.getBoundingClientRect().width > 0) {
-      (<any>this.instance!).update();
+    if (this.visible && this.instance && typeof (<any>this.instance).forceUpdate === 'function') {
+      (<any>this.instance!).forceUpdate();
     }
   }
 
