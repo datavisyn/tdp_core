@@ -428,6 +428,9 @@ interface ISerializableLineUpFilter {
   filterMissing: boolean;
 }
 
+/**
+ *  Filter value
+ */
 type ILineUpStringFilterValue = string[] | string | null;
 
 /**
@@ -459,16 +462,12 @@ export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializabl
 /**
  * Restores a RegExp object from a given IRegExpFilter object.
  * In case a string is passed to this function no deserialization is applied.
- *
- * @internal
  * @param filter Filter as string or plain object matching the IRegExpFilter
  * @returns Returns the input string or the restored RegExp object
  */
 export function restoreRegExp(filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing = false): ILineUpStringFilter {
-
   const isIRegExpFilter = ((filter: IRegExpFilter | ISerializableLineUpFilter): filter is IRegExpFilter => filter.hasOwnProperty('isRegExp'));
   const isISerializableLineUpFilter = (filter: IRegExpFilter | ISerializableLineUpFilter): filter is ISerializableLineUpFilter => filter.hasOwnProperty('filterMissing');
-
   if (filter === null || typeof filter === 'string' || Array.isArray(filter)) {
     return {filter: <string | null>filter, filterMissing};
   } else if (isIRegExpFilter(filter)) {
