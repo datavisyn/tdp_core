@@ -462,17 +462,26 @@ export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializabl
  *
  * @internal
  * @param filter Filter as string or plain object matching the IRegExpFilter
- * @returns {string | RegExp| null} Returns the input string or the restored RegExp object
+ * @returns Returns the input string or the restored RegExp object
  */
-export function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
-  if (filter === null || !(<IRegExpFilter>filter).isRegExp) {
-    return <string | null>filter;
-  }
+export function restoreRegExp(filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing = false): ILineUpStringFilter {
 
-  const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
-  const matches = serializedRegexParser.exec((<IRegExpFilter>filter).value);
-  const [_full, regexString, regexFlags] = matches;
-  return new RegExp(regexString, regexFlags);
+  const isIRegExpFilter = ((filter: IRegExpFilter | ISerializableLineUpFilter): filter is IRegExpFilter => filter.hasOwnProperty('isRegExp'));
+  const isISerializableLineUpFilter = (filter: IRegExpFilter | ISerializableLineUpFilter): filter is ISerializableLineUpFilter => filter.hasOwnProperty('filterMissing');
+
+  if (filter === null || typeof filter === 'string' || Array.isArray(filter)) {
+    return {filter: <string | null>filter, filterMissing};
+  } else if (isIRegExpFilter(filter)) {
+    if (filter.isRegExp) {
+      const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
+      const matches = serializedRegexParser.exec(filter.value as string);
+      const [_full, regexString, regexFlags] = matches;
+      return {filter: new RegExp(regexString, regexFlags), filterMissing};
+    }
+    return restoreRegExp(filter.value, filterMissing);
+  } else if (isISerializableLineUpFilter(filter)) {
+    return restoreRegExp(filter.filter, filter.filterMissing);
+  }
 }
 
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
