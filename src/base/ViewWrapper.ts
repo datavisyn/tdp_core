@@ -120,27 +120,20 @@ export default class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   set visible(visible: boolean) {
-    (async () => { // wrap function body into an immediately invoked function expression which is async to be awaitable
-      const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
 
-      let created = false;
+    if (visible) {
+      this.node.classList.remove('hidden');
+    } else {
+      this.node.classList.add('hidden');
+    }
 
-      if (visible && this.instance == null && selection && this.match(selection)) {
-        //lazy init
-        await this.createView(selection);
-        created = true;
-      }
-
-      if (visible) {
-        this.node.classList.remove('hidden');
-      } else {
-        this.node.classList.add('hidden');
-      }
-
-      if (!created) { // if the view was just created we don't need to call update again
-        this.update();
-      }
-    })();
+    if (visible && this.instance == null && selection && this.match(selection)) {
+      //lazy init
+      this.createView(selection);
+    } else {
+      this.update();  // if the view was just created we don't need to call update again
+    }
   }
 
   get visible() {
