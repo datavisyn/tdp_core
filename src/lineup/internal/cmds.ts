@@ -229,7 +229,9 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         break;
       default:
         bak = source[`get${prop}`]();
-        source[`set${prop}`].call(source, restoreRegExp(parameter.value)); // restore serialized regular expression before passing to LineUp
+        // restore serialized regular expression before passing to LineUp
+        const value = parameter.prop === 'filter' && serialize(parameter.value) ? restoreRegExp(parameter.value) : parameter.value;
+        source[`set${prop}`].call(source, value);
         break;
     }
   }
@@ -356,8 +358,8 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       return;
     }
 
-    if(property === 'filter') {
-      newValue = serializeLineUpFilter(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+    if (property === 'filter') {
+      newValue = serialize(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
     }
 
     if (source instanceof Column) {
