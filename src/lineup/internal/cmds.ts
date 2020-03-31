@@ -389,7 +389,7 @@ interface IRegExpFilter {
   /**
    * RegExp as string
    */
-  value: string;
+  value: ILineUpStringFilterValue;
   /**
    * Flag to indicate the value should be restored as RegExp
    */
@@ -429,6 +429,7 @@ interface ISerializableLineUpFilter {
 }
 
 type ILineUpStringFilterValue = string[] | string | null;
+
 /**
  * Serializes LineUp string filter, which can contain RegExp objects to an IRegexFilter object.
  * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
@@ -444,10 +445,12 @@ type ILineUpStringFilterValue = string[] | string | null;
  * @returns Returns the `ISerializableLineUpFilter` object
  */
 export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializableLineUpFilter {
+  const value = filter.filter;
+  const isRegexp = value instanceof RegExp;
   return {
     filter: {
-      value: filter.filter.toString(),
-      isRegExp: (filter.filter instanceof RegExp)
+      value: isRegexp ? value.toString() : value as ILineUpStringFilterValue,
+      isRegExp: isRegexp
     },
     filterMissing: filter.filterMissing
   };
