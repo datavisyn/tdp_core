@@ -404,7 +404,7 @@ interface ILineUpStringFilter {
   /**
    * Filter value
    */
-  filter: string[] | string | RegExp | null;
+  filter: ILineUpStringFilterValue | RegExp;
 
   /**
    * Filter for missing values
@@ -420,7 +420,7 @@ interface ISerializableLineUpFilter {
    * Filter value
    * Note that the RegExp is replaced with IRegExpFilter (compared to the `ILineUpStringFilter` interface)
    */
-  filter: string[] | string | IRegExpFilter | null;
+  filter: ILineUpStringFilterValue | IRegExpFilter;
 
   /**
    * Filter for missing values
@@ -428,6 +428,7 @@ interface ISerializableLineUpFilter {
   filterMissing: boolean;
 }
 
+type ILineUpStringFilterValue = string[] | string | null;
 /**
  * Serializes LineUp string filter, which can contain RegExp objects to an IRegexFilter object.
  * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
