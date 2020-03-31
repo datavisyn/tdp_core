@@ -193,6 +193,13 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
   });
 }
 
+/**
+ * Check if filter has the `filter` property
+ * Necessary since number columns filter has properties `min`, `max` and no filter property,
+ * @param filter
+ */
+const serialize = (filter: any) => filter.hasOwnProperty('filter');
+
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
