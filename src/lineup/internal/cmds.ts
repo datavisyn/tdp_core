@@ -38,8 +38,16 @@ let ignoreNext: string = null;
  */
 const temporaryUntracked = new Set<string>();
 
-
-function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
+/**
+ * Check if the given event should be ignored.
+ * Events are ignored when the event name is:
+ * 1. stored in the `ignoreNext`; the variable is set to `null` in this function call
+ * 2. or listed in the `temporaryUntracked`
+ * @param event The event name
+ * @param lineup The object reference on the LineUp provider instance
+ * @returns Returns `true` if the event should be ignored. Otherwise returns `false`.
+ */
+function ignore(event: string, lineup: IObjectRef<IViewProvider>): boolean {
   if (ignoreNext === event) {
     ignoreNext = null;
     return true;
@@ -51,7 +59,7 @@ function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
  * tracks whether the ranking was dirty and in case it is waits for the ranking to be ordered again
  * @param ranking
  */
-function dirtyRankingWaiter(ranking: Ranking) {
+function dirtyRankingWaiter(ranking: Ranking): (undo: ICmdResult) => ICmdResult | Promise<ICmdResult> {
   let waiter: Promise<void> | null = null;
 
   ranking.on(`${Ranking.EVENT_DIRTY_ORDER}.track`, () => {
@@ -235,7 +243,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
 export interface IViewProvider {
   data: LocalDataProvider;
 
-  getInstance(): {updateLineUpStats()};
+  getInstance(): { updateLineUpStats() };
 }
 
 export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, prop: string, value: any) {
@@ -317,34 +325,53 @@ export function moveColumn(provider: IObjectRef<IViewProvider>, rid: number, pat
   });
 }
 
-function delayedCall(callback: (old: any, newValue: any) => void, timeToDelay = 100, thisCallback = this) {
+/**
+ * Wrap the callback with a function that delays the execution of the callback.
+ * @param callback The provenance function that should be delayed
+ * @param timeToDelay Number of milliseconds that callback call should be delayed (default = 100 ms)
+ * @param thisCallback Provide a different `this` context for the callback
+ */
+function delayedCall(callback: (oldValue: any, newValue: any) => void, timeToDelay = 100, thisCallback = this): (oldValue: any, newValue: any) => void {
   let tm = -1;
-  let oldest = null;
+  let oldestValue = null;
 
   function callbackImpl(newValue) {
-    callback.call(thisCallback, oldest, newValue);
-    oldest = null;
+    callback.call(thisCallback, oldestValue, newValue);
+    oldestValue = null;
     tm = -1;
   }
 
-  return (old: any, newValue: any) => {
+  return (oldValue: any, newValue: any) => {
     if (tm >= 0) {
       clearTimeout(tm);
       tm = -1;
     } else {
-      oldest = old;
+      oldestValue = oldValue;
     }
     tm = self.setTimeout(callbackImpl.bind(this, newValue), timeToDelay);
   };
 }
 
-function rankingId(provider: LocalDataProvider, ranking: Ranking) {
+/**
+ * Returns the ID of the current ranking
+ * @param provider LineUp local data provider
+ * @param ranking LineUp ranking
+ */
+function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
   return provider.getRankings().indexOf(ranking);
 }
 
-
-function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1) {
-  const f = (old: any, newValue: any) => {
+/**
+ * Adds an event listener for the given source and property. The tracking call can be delayed by some milliseconds.
+ * @param source The column or ranking that is tracked
+ * @param provider LineUp local data provider
+ * @param lineupViewWrapper The object reference on the LineUp provider instance
+ * @param graph The provenance graph where the events should be tracked into
+ * @param property The name of the property that is tracked
+ * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
+ */
+function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1): void {
+  const func = (old: any, newValue: any) => {
     if (ignore(`${property}Changed`, lineupViewWrapper)) {
       return;
     }
@@ -367,7 +394,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       });
     }
   };
-  source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(f, delayed) : f);
+  source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(func, delayed) : func);
 }
 
 /**
@@ -423,6 +450,13 @@ function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
   return new RegExp(regexString, regexFlags);
 }
 
+/**
+ * Adds the event listeners to track column events in the provenance graph.
+ * @param provider LineUp local data provider
+ * @param lineup The object reference on the LineUp provider instance
+ * @param graph The provenance graph where the events should be tracked into
+ * @param col The column instance that should be tracked
+ */
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.metaData);
   recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.filter);
@@ -476,6 +510,7 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
     if (col instanceof StackColumn) {
       recordPropertyChange(col, provider, lineup, graph, 'weights', 100);
     }
+
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
       if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, lineup)) {
@@ -487,14 +522,19 @@ function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvid
         inverse: setColumn(lineup, rid, path, 'mapping', old.toJSON())
       });
     });
+
   } else if (col instanceof ScriptColumn) {
     recordPropertyChange(col, provider, lineup, graph, 'script');
+
   } else if (col instanceof OrdinalColumn) {
     recordPropertyChange(col, provider, lineup, graph, 'mapping');
   }
 }
 
-
+/**
+ * Removes the event listener from the provided column
+ * @param col Column
+ */
 function untrackColumn(col: Column) {
   col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
 
@@ -508,7 +548,14 @@ function untrackColumn(col: Column) {
   }
 }
 
-function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking) {
+/**
+ * Adds the event listeners to ranking events and adds event listeners for all columns of that ranking.
+ * @param provider LineUp local data provider
+ * @param lineup The object reference on the LineUp provider instance
+ * @param graph The provenance graph where the events should be tracked into
+ * @param ranking The current ranking that should be tracked
+ */
+function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking): void {
   ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
     if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, lineup)) {
       return;
@@ -518,6 +565,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: setSortCriteria(lineup, rid, old.map(toSortObject))
     });
   });
+
   ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
     if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, lineup)) {
       return;
@@ -527,6 +575,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: setSortCriteria(lineup, rid, old.map(toSortObject), false)
     });
   });
+
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
     if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, lineup)) {
       return;
@@ -536,6 +585,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: setGroupCriteria(lineup, rid, old.map((c) => c.fqpath))
     });
   });
+
   ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
     trackColumn(provider, lineup, graph, column);
     if (ignore(Ranking.EVENT_ADD_COLUMN, lineup)) {
@@ -548,6 +598,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: addColumn(lineup, rid, null, index, null)
     });
   });
+
   ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column: Column, index: number) => {
     untrackColumn(column);
     if (ignore(Ranking.EVENT_REMOVE_COLUMN, lineup)) {
@@ -560,6 +611,7 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: addColumn(lineup, rid, null, index, d)
     });
   });
+
   ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (_, index: number, oldIndex: number) => {
     if (ignore(Ranking.EVENT_MOVE_COLUMN, lineup)) {
       return;
@@ -570,21 +622,29 @@ function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvi
       inverse: moveColumn(lineup, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
     });
   });
+
   ranking.children.forEach(trackColumn.bind(this, provider, lineup, graph));
 }
 
+/**
+ * Removes the event listener for ranking events from the provided ranking
+ * @param ranking LineUp Ranking
+ */
 function untrackRanking(ranking: Ranking) {
   ranking.on(suffix('.track', Ranking.EVENT_SORT_CRITERIA_CHANGED, Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, Ranking.EVENT_GROUP_CRITERIA_CHANGED, Ranking.EVENT_ADD_COLUMN, Ranking.EVENT_REMOVE_COLUMN, Ranking.EVENT_MOVE_COLUMN), null);
   ranking.children.forEach(untrackColumn);
 }
 
 /**
- * clueifies lineup
- * @param lineup the object ref on the lineup provider instance
- * @param graph
+ * Clueifies the given LineUp instance. Adds event listeners to track add and remove rankings
+ * from the local data provider and adds event listeners for ranking events.
+ * @param lineup The object reference on the LineUp provider instance
+ * @param graph The provenance graph where the events should be tracked into
+ * @returns Returns a promise that is waiting for the object reference (LineUp instance)
  */
-export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph) {
+export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph): Promise<void> {
   const p = await resolveImmediately((await lineup.v).data);
+
   p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_ADD_RANKING, lineup)) {
       return;
@@ -595,6 +655,7 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
     });
     trackRanking(p, lineup, graph, ranking);
   });
+
   p.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_REMOVE_RANKING, lineup)) {
       return;
@@ -605,25 +666,44 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
     });
     untrackRanking(ranking);
   });
+
+  // track further ranking event
   p.getRankings().forEach(trackRanking.bind(this, p, lineup, graph));
 }
 
-export async function untrack(lineup: IObjectRef<IViewProvider>) {
+/**
+ * Removes the event listener for adding and removing a ranking from the provided LineUp instance.
+ * @param lineup The object reference on the LineUp provider instance
+ * @returns Returns a promise that is waiting for the object reference (LineUp instance)
+ */
+export async function untrack(lineup: IObjectRef<IViewProvider>): Promise<void> {
   const p = await resolveImmediately((await lineup.v).data);
   p.on([`${LocalDataProvider.EVENT_ADD_RANKING}.track`, `${LocalDataProvider.EVENT_REMOVE_RANKING}.track`], null);
   p.getRankings().forEach(untrackRanking);
 }
 
-export function withoutTracking<T>(lineup: IObjectRef<IViewProvider>, fun: () => T): PromiseLike<T> {
+/**
+ * Execute a given LineUp function without being tracked by the provenance graph
+ * @param lineup The object reference on the LineUp provider instance
+ * @param func Function that is executed without provenance tracking
+ * @returns Returns a promise that is waiting for the object reference (LineUp instance)
+ */
+export function withoutTracking<T>(lineup: IObjectRef<IViewProvider>, func: () => T): PromiseLike<T> {
   return lineup.v.then((d) => resolveImmediately(d.data)).then((p) => {
     temporaryUntracked.add(lineup.hash);
-    const r = fun();
+    const r = func();
     temporaryUntracked.delete(lineup.hash);
     return r;
   });
 }
 
-function suffix(suffix: string, ...prefix: string[]) {
+/**
+ * Adds a given suffix to the list of following parameters (prefix)
+ * @param suffix Suffix string that is appended to each prefix
+ * @param prefix Multiple parameters that should get the suffix
+ * @returns List of combined prefixes with suffixes
+ */
+function suffix(suffix: string, ...prefix: string[]): string[] {
   return prefix.map((p) => `${p}${suffix}`);
 }
 
