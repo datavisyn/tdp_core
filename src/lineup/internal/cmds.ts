@@ -371,7 +371,7 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
  * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
  */
 function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1): void {
-  const func = (old: any, newValue: any) => {
+  const func = (oldValue: any, newValue: any) => {
     if (ignore(`${property}Changed`, objectRef)) {
       return;
     }
@@ -385,15 +385,17 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       const rid = rankingId(provider, source.findMyRanker());
       const path = source.fqpath;
       graph.pushWithResult(setColumn(objectRef, rid, path, property, newSerializedValue), {
-        inverse: setColumn(objectRef, rid, path, property, old)
+        inverse: setColumn(objectRef, rid, path, property, oldValue)
       });
+
     } else if (source instanceof Ranking) {
       const rid = rankingId(provider, source);
       graph.pushWithResult(setColumn(objectRef, rid, null, property, newSerializedValue), {
-        inverse: setColumn(objectRef, rid, null, property, old)
+        inverse: setColumn(objectRef, rid, null, property, oldValue)
       });
     }
   };
+
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(func, delayed) : func);
 }
 
