@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {serializeLineUpFilter, restoreRegExp} from '../../../src/lineup/internal/cmds';
+import {serializeLineUpFilter, restoreLineUpFilter} from '../../../src/lineup/internal/cmds';
 
 // The following tests worked with LineUp v3.
 // With LineUp v4 the filter object changed
@@ -36,53 +36,49 @@ describe('Serialize LineUp v4 filter for provenance graph', () => {
     expect(serializeLineUpFilter(lineUpFilter)).toMatchObject({filter: {value: ['chromosome', 'gender'], isRegExp: false}, filterMissing: false});
   });
 
-  it('filter as null', () => {
-    const lineUpFilter = {filter: null, filterMissing: false};
-    expect(serializeLineUpFilter(lineUpFilter)).toMatchObject({filter: {value: null, isRegExp: false}, filterMissing: false});
-  });
-
   it('filter as null and use regular expression true', () => {
-    const lineUpFilter = {filter: /null/, filterMissing: false};
-    expect(serializeLineUpFilter(lineUpFilter)).toMatchObject({filter: {value: /null/, isRegExp: true}, filterMissing: false});
+    const lineUpFilter = {filter: null, filterMissing: true};
+    expect(serializeLineUpFilter(lineUpFilter)).toMatchObject({filter: {value: null, isRegExp: false}, filterMissing: true});
   });
 });
 
 
 describe('Restore LineUp filter from provenance graph', () => {
   it('filter as string', () => {
-    expect(restoreRegExp('abc')).toMatchObject({filter: 'abc', filterMissing: false});
-    expect(restoreRegExp('abc').hasOwnProperty('filterMissing')).toBeTruthy();
+    expect(restoreLineUpFilter('abc')).toMatchObject({filter: 'abc', filterMissing: false});
+    expect(restoreLineUpFilter('abc').hasOwnProperty('filterMissing')).toBeTruthy();
   });
 
-  it('filter as null', () => {
-    expect(restoreRegExp(null)).toMatchObject({filter: null, filterMissing: false});
+  it('filter as null and `filterMissing: true`', () => {
+    const fromGraphFilter = {filter: {value: null, isRegExp: false}, filterMissing: true};
+    expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: null, filterMissing: true});
   });
 
   it('filter as IRegExpFilter with `value:abc`, `isRegexp:false`', () => {
-    expect(restoreRegExp({value: 'abc', isRegExp: false})).toMatchObject({filter: 'abc', filterMissing: false});
+    expect(restoreLineUpFilter({value: 'abc', isRegExp: false})).toMatchObject({filter: 'abc', filterMissing: false});
   });
 
   it('filter as IRegExpFilter with `value:null`, `isRegexp:false`', () => {
-    expect(restoreRegExp({value: null, isRegExp: false})).toMatchObject({filter: null, filterMissing: false});
+    expect(restoreLineUpFilter({value: null, isRegExp: false})).toMatchObject({filter: null, filterMissing: false});
   });
 
   it('filter as IRegExpFilter with `value:/^abc/gm`, `isRegexp:true`', () => {
-    expect(restoreRegExp({value: '/^abc/gm', isRegExp: true})).toMatchObject({filter: /^abc/gm, filterMissing: false});
+    expect(restoreLineUpFilter({value: '/^abc/gm', isRegExp: true})).toMatchObject({filter: /^abc/gm, filterMissing: false});
   });
 
   it('filter as ISerializableLineUpFilter', () => {
     const fromGraphFilter = {filter: {value: '/abc$/gm', isRegExp: true}, filterMissing: false};
-    expect(restoreRegExp(fromGraphFilter)).toMatchObject({filter: /abc$/gm, filterMissing: false});
+    expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: /abc$/gm, filterMissing: false});
   });
 
   it('filter as ISerializableLineUpFilter with property `filterMissing: true`', () => {
     const fromGraphFilter = {filter: {value: '/abc$/gm', isRegExp: true}, filterMissing: true};
-    expect(restoreRegExp(fromGraphFilter)).toMatchObject({filter: /abc$/gm, filterMissing: true});
+    expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: /abc$/gm, filterMissing: true});
   });
 
   it('filter as ISerializableLineUpFilter with property `value: null`', () => {
     const fromGraphFilter = {filter: {value: null, isRegExp: false}, filterMissing: true};
-    expect(restoreRegExp(fromGraphFilter)).toMatchObject({filter: null, filterMissing: true});
+    expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: null, filterMissing: true});
   });
 });
 
