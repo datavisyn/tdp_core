@@ -230,7 +230,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
       case 'filter':
         bak = source[`get${prop}`]();
         // restore serialized regular expression before passing to LineUp
-        const value = isSerializedFilter(parameter.value) ? restoreRegExp(parameter.value) : parameter.value;
+        const value = isSerializedFilter(parameter.value) ? restoreLineUpFilter(parameter.value) : parameter.value;
         source[`set${prop}`].call(source, value);
         break;
       default:
@@ -469,11 +469,14 @@ export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializabl
  * @param filter Filter as string or plain object matching the IRegExpFilter
  * @returns Returns the input string or the restored RegExp object
  */
-export function restoreRegExp(filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing = false): ILineUpStringFilter {
+export function restoreLineUpFilter(filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing = false): ILineUpStringFilter {
+  const isSimpleFilter = (filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter): filter is ILineUpStringFilterValue => filter === null || typeof filter === 'string' || Array.isArray(filter);
   const isIRegExpFilter = ((filter: IRegExpFilter | ISerializableLineUpFilter): filter is IRegExpFilter => filter.hasOwnProperty('isRegExp'));
   const isISerializableLineUpFilter = (filter: IRegExpFilter | ISerializableLineUpFilter): filter is ISerializableLineUpFilter => filter.hasOwnProperty('filterMissing');
-  if (filter === null || typeof filter === 'string' || Array.isArray(filter)) {
-    return {filter: <string | null>filter, filterMissing};
+
+  if (isSimpleFilter(filter)) {
+    return {filter, filterMissing};
+
   } else if (isIRegExpFilter(filter)) {
     if (filter.isRegExp) {
       const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
@@ -481,9 +484,11 @@ export function restoreRegExp(filter: ILineUpStringFilterValue | IRegExpFilter |
       const [_full, regexString, regexFlags] = matches;
       return {filter: new RegExp(regexString, regexFlags), filterMissing};
     }
-    return restoreRegExp(filter.value, filterMissing);
+
+    return restoreLineUpFilter(filter.value, filterMissing);
+
   } else if (isISerializableLineUpFilter(filter)) {
-    return restoreRegExp(filter.filter, filter.filterMissing);
+    return restoreLineUpFilter(filter.filter, filter.filterMissing);
   }
 }
 
