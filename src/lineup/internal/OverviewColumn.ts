@@ -18,9 +18,9 @@ export default class OverviewColumn extends BooleanColumn {
     super(id, Object.assign(desc, {
       label: i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection')
     }));
-    // (<OverviewColumn>this).setDefaultRenderer('boolean');
-    // (<OverviewColumn>this).setDefaultGroupRenderer('boolean');
-    // (<OverviewColumn>this).setDefaultSummaryRenderer('categorical');
+    (<OverviewColumn>this).setDefaultRenderer('boolean');
+    (<OverviewColumn>this).setDefaultGroupRenderer('boolean');
+    (<OverviewColumn>this).setDefaultSummaryRenderer('categorical');
     (<OverviewColumn>this).setWidthImpl(0); // hide
   }
 
