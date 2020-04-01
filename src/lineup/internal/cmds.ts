@@ -193,13 +193,6 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
   });
 }
 
-/**
- * Check if filter has the `filter` property
- * Necessary since number columns filter has properties `min`, `max` and no filter property,
- * @param filter
- */
-const isSerializedFilter = (filter: any) => filter && filter.hasOwnProperty('filter');
-
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
@@ -436,6 +429,16 @@ interface ISerializableLineUpFilter {
  *  Filter value
  */
 type ILineUpStringFilterValue = string[] | string | null;
+
+
+/**
+ * Check if filter has the `filter` property
+ * Necessary since number columns filter has properties `min`, `max` and no filter property,
+ * @param filter
+ */
+function isSerializedFilter(filter: any): ISerializableLineUpFilter {
+  return filter && filter.hasOwnProperty('filter');
+}
 
 /**
  * Serializes LineUp string filter, which can contain RegExp objects to an IRegexFilter object.
