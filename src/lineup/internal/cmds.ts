@@ -198,7 +198,7 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
  * Necessary since number columns filter has properties `min`, `max` and no filter property,
  * @param filter
  */
-const serialize = (filter: any) => filter.hasOwnProperty('filter');
+const isSerializedFilter = (filter: any) => filter.hasOwnProperty('filter');
 
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
@@ -230,7 +230,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
       default:
         bak = source[`get${prop}`]();
         // restore serialized regular expression before passing to LineUp
-        const value = parameter.prop === 'filter' && serialize(parameter.value) ? restoreRegExp(parameter.value) : parameter.value;
+        const value = parameter.prop === 'filter' && isSerializedFilter(parameter.value) ? restoreRegExp(parameter.value) : parameter.value;
         source[`set${prop}`].call(source, value);
         break;
     }
@@ -359,7 +359,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     }
 
     if (property === 'filter') {
-      newValue = serialize(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
+      newValue = isSerializedFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
     }
 
     if (source instanceof Column) {
