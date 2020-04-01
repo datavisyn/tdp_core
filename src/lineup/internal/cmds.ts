@@ -4,7 +4,7 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
-import {NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
+import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
 
@@ -638,12 +638,21 @@ function untrackRanking(ranking: Ranking) {
 /**
  * Clueifies the given LineUp instance. Adds event listeners to track add and remove rankings
  * from the local data provider and adds event listeners for ranking events.
+ * @param lineup: The LineUp instance
  * @param objectRef The object reference that contains the LineUp data provider
  * @param graph The provenance graph where the events should be tracked into
  * @returns Returns a promise that is waiting for the object reference (LineUp instance)
  */
-export async function clueify(objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph): Promise<void> {
+export async function clueify(lineup: EngineRenderer | TaggleRenderer, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph): Promise<void> {
   const p = await resolveImmediately((await objectRef.v).data);
+
+  lineup.on(`${EngineRenderer.EVENT_DIALOG_OPENED}.track`, (dialog: ADialog) => {
+    console.log('dialog opened', dialog);
+  });
+
+  lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (dialog: ADialog, action: 'cancel' | 'confirm') => {
+    console.log('dialog closed', dialog, action);
+  });
 
   p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
