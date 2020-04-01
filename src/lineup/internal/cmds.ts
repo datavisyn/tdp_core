@@ -44,15 +44,15 @@ const temporaryUntracked = new Set<string>();
  * 1. stored in the `ignoreNext`; the variable is set to `null` in this function call
  * 2. or listed in the `temporaryUntracked`
  * @param event The event name
- * @param lineup The object reference on the LineUp provider instance
+ * @param objectRef The object reference that contains the LineUp data provider
  * @returns Returns `true` if the event should be ignored. Otherwise returns `false`.
  */
-function ignore(event: string, lineup: IObjectRef<IViewProvider>): boolean {
+function ignore(event: string, objectRef: IObjectRef<IViewProvider>): boolean {
   if (ignoreNext === event) {
     ignoreNext = null;
     return true;
   }
-  return temporaryUntracked.has(lineup.hash);
+  return temporaryUntracked.has(objectRef.hash);
 }
 
 /**
@@ -365,14 +365,14 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
  * Adds an event listener for the given source and property. The tracking call can be delayed by some milliseconds.
  * @param source The column or ranking that is tracked
  * @param provider LineUp local data provider
- * @param lineupViewWrapper The object reference on the LineUp provider instance
+ * @param objectRef The object reference that contains the LineUp data provider
  * @param graph The provenance graph where the events should be tracked into
  * @param property The name of the property that is tracked
  * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
  */
-function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1): void {
+function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1): void {
   const func = (old: any, newValue: any) => {
-    if (ignore(`${property}Changed`, lineupViewWrapper)) {
+    if (ignore(`${property}Changed`, objectRef)) {
       return;
     }
 
@@ -380,17 +380,17 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
 
     if (source instanceof Column) {
       // assert ALineUpView and update the stats
-      lineupViewWrapper.value.getInstance().updateLineUpStats();
+      objectRef.value.getInstance().updateLineUpStats();
 
       const rid = rankingId(provider, source.findMyRanker());
       const path = source.fqpath;
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newSerializedValue), {
-        inverse: setColumn(lineupViewWrapper, rid, path, property, old)
+      graph.pushWithResult(setColumn(objectRef, rid, path, property, newSerializedValue), {
+        inverse: setColumn(objectRef, rid, path, property, old)
       });
     } else if (source instanceof Ranking) {
       const rid = rankingId(provider, source);
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newSerializedValue), {
-        inverse: setColumn(lineupViewWrapper, rid, null, property, old)
+      graph.pushWithResult(setColumn(objectRef, rid, null, property, newSerializedValue), {
+        inverse: setColumn(objectRef, rid, null, property, old)
       });
     }
   };
@@ -453,81 +453,81 @@ function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
 /**
  * Adds the event listeners to track column events in the provenance graph.
  * @param provider LineUp local data provider
- * @param lineup The object reference on the LineUp provider instance
+ * @param objectRef The object reference that contains the LineUp data provider
  * @param graph The provenance graph where the events should be tracked into
  * @param col The column instance that should be tracked
  */
-function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
-  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.metaData);
-  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.filter);
-  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.rendererType);
-  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.groupRenderer);
-  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.summaryRenderer);
-  recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.sortMethod);
+function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.metaData);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod);
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
   if (col instanceof CompositeColumn) {
     col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
-      trackColumn(provider, lineup, graph, column);
-      if (ignore(CompositeColumn.EVENT_ADD_COLUMN, lineup)) {
+      trackColumn(provider, objectRef, graph, column);
+      if (ignore(CompositeColumn.EVENT_ADD_COLUMN, objectRef)) {
         return;
       }
       // console.log(col.fqpath, 'addColumn', column, index);
       const d = provider.dumpColumn(column);
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(addColumn(lineup, rid, path, index, d), {
-        inverse: addColumn(lineup, rid, path, index, null)
+      graph.pushWithResult(addColumn(objectRef, rid, path, index, d), {
+        inverse: addColumn(objectRef, rid, path, index, null)
       });
     });
     col.on(`${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, (column, index: number) => {
       untrackColumn(column);
-      if (ignore(CompositeColumn.EVENT_REMOVE_COLUMN, lineup)) {
+      if (ignore(CompositeColumn.EVENT_REMOVE_COLUMN, objectRef)) {
         return;
       }
       // console.log(col.fqpath, 'addColumn', column, index);
       const d = provider.dumpColumn(column);
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(addColumn(lineup, rid, path, index, null), {
-        inverse: addColumn(lineup, rid, path, index, d)
+      graph.pushWithResult(addColumn(objectRef, rid, path, index, null), {
+        inverse: addColumn(objectRef, rid, path, index, d)
       });
     });
 
     col.on(`${CompositeColumn.EVENT_MOVE_COLUMN}.track`, (column, index: number, oldIndex: number) => {
-      if (ignore(CompositeColumn.EVENT_MOVE_COLUMN, lineup)) {
+      if (ignore(CompositeColumn.EVENT_MOVE_COLUMN, objectRef)) {
         return;
       }
       // console.log(col.fqpath, 'addColumn', column, index);
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(moveColumn(lineup, rid, path, oldIndex, index), {
-        inverse: moveColumn(lineup, rid, path, index, oldIndex > index ? oldIndex + 1 : oldIndex)
+      graph.pushWithResult(moveColumn(objectRef, rid, path, oldIndex, index), {
+        inverse: moveColumn(objectRef, rid, path, index, oldIndex > index ? oldIndex + 1 : oldIndex)
       });
     });
-    col.children.forEach(trackColumn.bind(this, provider, lineup, graph));
+    col.children.forEach(trackColumn.bind(this, provider, objectRef, graph));
 
     if (col instanceof StackColumn) {
-      recordPropertyChange(col, provider, lineup, graph, 'weights', 100);
+      recordPropertyChange(col, provider, objectRef, graph, 'weights', 100);
     }
 
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
-      if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, lineup)) {
+      if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, objectRef)) {
         return;
       }
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(setColumn(lineup, rid, path, 'mapping', newValue.toJSON()), {
-        inverse: setColumn(lineup, rid, path, 'mapping', old.toJSON())
+      graph.pushWithResult(setColumn(objectRef, rid, path, 'mapping', newValue.toJSON()), {
+        inverse: setColumn(objectRef, rid, path, 'mapping', old.toJSON())
       });
     });
 
   } else if (col instanceof ScriptColumn) {
-    recordPropertyChange(col, provider, lineup, graph, 'script');
+    recordPropertyChange(col, provider, objectRef, graph, 'script');
 
   } else if (col instanceof OrdinalColumn) {
-    recordPropertyChange(col, provider, lineup, graph, 'mapping');
+    recordPropertyChange(col, provider, objectRef, graph, 'mapping');
   }
 }
 
@@ -551,79 +551,79 @@ function untrackColumn(col: Column) {
 /**
  * Adds the event listeners to ranking events and adds event listeners for all columns of that ranking.
  * @param provider LineUp local data provider
- * @param lineup The object reference on the LineUp provider instance
+ * @param objectRef The object reference that contains the LineUp data provider
  * @param graph The provenance graph where the events should be tracked into
  * @param ranking The current ranking that should be tracked
  */
-function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking): void {
+function trackRanking(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking): void {
   ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, lineup)) {
+    if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, objectRef)) {
       return;
     }
     const rid = rankingId(provider, ranking);
-    graph.pushWithResult(setSortCriteria(lineup, rid, newValue.map(toSortObject)), {
-      inverse: setSortCriteria(lineup, rid, old.map(toSortObject))
+    graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject)), {
+      inverse: setSortCriteria(objectRef, rid, old.map(toSortObject))
     });
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, lineup)) {
+    if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, objectRef)) {
       return;
     }
     const rid = rankingId(provider, ranking);
-    graph.pushWithResult(setSortCriteria(lineup, rid, newValue.map(toSortObject), false), {
-      inverse: setSortCriteria(lineup, rid, old.map(toSortObject), false)
+    graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject), false), {
+      inverse: setSortCriteria(objectRef, rid, old.map(toSortObject), false)
     });
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
-    if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, lineup)) {
+    if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, objectRef)) {
       return;
     }
     const rid = rankingId(provider, ranking);
-    graph.pushWithResult(setGroupCriteria(lineup, rid, newValue.map((c) => c.fqpath)), {
-      inverse: setGroupCriteria(lineup, rid, old.map((c) => c.fqpath))
+    graph.pushWithResult(setGroupCriteria(objectRef, rid, newValue.map((c) => c.fqpath)), {
+      inverse: setGroupCriteria(objectRef, rid, old.map((c) => c.fqpath))
     });
   });
 
   ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
-    trackColumn(provider, lineup, graph, column);
-    if (ignore(Ranking.EVENT_ADD_COLUMN, lineup)) {
+    trackColumn(provider, objectRef, graph, column);
+    if (ignore(Ranking.EVENT_ADD_COLUMN, objectRef)) {
       return;
     }
     // console.log(ranking, 'addColumn', column, index);
     const d = provider.dumpColumn(column);
     const rid = rankingId(provider, ranking);
-    graph.pushWithResult(addColumn(lineup, rid, null, index, d), {
-      inverse: addColumn(lineup, rid, null, index, null)
+    graph.pushWithResult(addColumn(objectRef, rid, null, index, d), {
+      inverse: addColumn(objectRef, rid, null, index, null)
     });
   });
 
   ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column: Column, index: number) => {
     untrackColumn(column);
-    if (ignore(Ranking.EVENT_REMOVE_COLUMN, lineup)) {
+    if (ignore(Ranking.EVENT_REMOVE_COLUMN, objectRef)) {
       return;
     }
     // console.log(ranking, 'removeColumn', column, index);
     const d = provider.dumpColumn(column);
     const rid = rankingId(provider, ranking);
-    graph.pushWithResult(addColumn(lineup, rid, null, index, null), {
-      inverse: addColumn(lineup, rid, null, index, d)
+    graph.pushWithResult(addColumn(objectRef, rid, null, index, null), {
+      inverse: addColumn(objectRef, rid, null, index, d)
     });
   });
 
   ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (_, index: number, oldIndex: number) => {
-    if (ignore(Ranking.EVENT_MOVE_COLUMN, lineup)) {
+    if (ignore(Ranking.EVENT_MOVE_COLUMN, objectRef)) {
       return;
     }
     // console.log(col.fqpath, 'addColumn', column, index);
     const rid = rankingId(provider, ranking);
-    graph.pushWithResult(moveColumn(lineup, rid, null, oldIndex, index), {
-      inverse: moveColumn(lineup, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
+    graph.pushWithResult(moveColumn(objectRef, rid, null, oldIndex, index), {
+      inverse: moveColumn(objectRef, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
     });
   });
 
-  ranking.children.forEach(trackColumn.bind(this, provider, lineup, graph));
+  ranking.children.forEach(trackColumn.bind(this, provider, objectRef, graph));
 }
 
 /**
@@ -638,61 +638,61 @@ function untrackRanking(ranking: Ranking) {
 /**
  * Clueifies the given LineUp instance. Adds event listeners to track add and remove rankings
  * from the local data provider and adds event listeners for ranking events.
- * @param lineup The object reference on the LineUp provider instance
+ * @param objectRef The object reference that contains the LineUp data provider
  * @param graph The provenance graph where the events should be tracked into
  * @returns Returns a promise that is waiting for the object reference (LineUp instance)
  */
-export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph): Promise<void> {
-  const p = await resolveImmediately((await lineup.v).data);
+export async function clueify(objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph): Promise<void> {
+  const p = await resolveImmediately((await objectRef.v).data);
 
   p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
-    if (ignore(LocalDataProvider.EVENT_ADD_RANKING, lineup)) {
+    if (ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
       return;
     }
     const d = ranking.dump(p.toDescRef);
-    graph.pushWithResult(addRanking(lineup, index, d), {
-      inverse: addRanking(lineup, index, null)
+    graph.pushWithResult(addRanking(objectRef, index, d), {
+      inverse: addRanking(objectRef, index, null)
     });
-    trackRanking(p, lineup, graph, ranking);
+    trackRanking(p, objectRef, graph, ranking);
   });
 
   p.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}.track`, (ranking: Ranking, index: number) => {
-    if (ignore(LocalDataProvider.EVENT_REMOVE_RANKING, lineup)) {
+    if (ignore(LocalDataProvider.EVENT_REMOVE_RANKING, objectRef)) {
       return;
     }
     const d = ranking.dump(p.toDescRef);
-    graph.pushWithResult(addRanking(lineup, index, null), {
-      inverse: addRanking(lineup, index, d)
+    graph.pushWithResult(addRanking(objectRef, index, null), {
+      inverse: addRanking(objectRef, index, d)
     });
     untrackRanking(ranking);
   });
 
   // track further ranking event
-  p.getRankings().forEach(trackRanking.bind(this, p, lineup, graph));
+  p.getRankings().forEach(trackRanking.bind(this, p, objectRef, graph));
 }
 
 /**
  * Removes the event listener for adding and removing a ranking from the provided LineUp instance.
- * @param lineup The object reference on the LineUp provider instance
+ * @param objectRef The object reference that contains the LineUp data provider
  * @returns Returns a promise that is waiting for the object reference (LineUp instance)
  */
-export async function untrack(lineup: IObjectRef<IViewProvider>): Promise<void> {
-  const p = await resolveImmediately((await lineup.v).data);
+export async function untrack(objectRef: IObjectRef<IViewProvider>): Promise<void> {
+  const p = await resolveImmediately((await objectRef.v).data);
   p.on([`${LocalDataProvider.EVENT_ADD_RANKING}.track`, `${LocalDataProvider.EVENT_REMOVE_RANKING}.track`], null);
   p.getRankings().forEach(untrackRanking);
 }
 
 /**
  * Execute a given LineUp function without being tracked by the provenance graph
- * @param lineup The object reference on the LineUp provider instance
+ * @param objectRef The object reference that contains the LineUp data provider
  * @param func Function that is executed without provenance tracking
  * @returns Returns a promise that is waiting for the object reference (LineUp instance)
  */
-export function withoutTracking<T>(lineup: IObjectRef<IViewProvider>, func: () => T): PromiseLike<T> {
-  return lineup.v.then((d) => resolveImmediately(d.data)).then((p) => {
-    temporaryUntracked.add(lineup.hash);
+export function withoutTracking<T>(objectRef: IObjectRef<IViewProvider>, func: () => T): PromiseLike<T> {
+  return objectRef.v.then((d) => resolveImmediately(d.data)).then((p) => {
+    temporaryUntracked.add(objectRef.hash);
     const r = func();
-    temporaryUntracked.delete(lineup.hash);
+    temporaryUntracked.delete(objectRef.hash);
     return r;
   });
 }
