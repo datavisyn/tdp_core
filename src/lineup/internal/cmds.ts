@@ -198,7 +198,7 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
  * Necessary since number columns filter has properties `min`, `max` and no filter property,
  * @param filter
  */
-const isSerializedFilter = (filter: any) => filter.hasOwnProperty('filter');
+const isSerializedFilter = (filter: any) => filter && filter.hasOwnProperty('filter');
 
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
