@@ -227,11 +227,15 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         bak = source[`getRenderer`]();
         source[`setRenderer`].call(source, parameter.value);
         break;
-      default:
+      case 'filter':
         bak = source[`get${prop}`]();
         // restore serialized regular expression before passing to LineUp
-        const value = parameter.prop === 'filter' && isSerializedFilter(parameter.value) ? restoreRegExp(parameter.value) : parameter.value;
+        const value = isSerializedFilter(parameter.value) ? restoreRegExp(parameter.value) : parameter.value;
         source[`set${prop}`].call(source, value);
+        break;
+      default:
+        bak = source[`get${prop}`]();
+        source[`set${prop}`].call(source, parameter.value);
         break;
     }
   }
