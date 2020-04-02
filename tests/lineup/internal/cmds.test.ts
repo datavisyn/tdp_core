@@ -54,15 +54,15 @@ describe('Restore LineUp filter from provenance graph', () => {
     expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: null, filterMissing: true});
   });
 
-  it('filter as IRegExpFilter with `value:abc`, `isRegexp:false`', () => {
+  it('filter as IRegExpFilter with `value: abc`, `isRegexp: false`', () => {
     expect(restoreLineUpFilter({value: 'abc', isRegExp: false})).toMatchObject({filter: 'abc', filterMissing: false});
   });
 
-  it('filter as IRegExpFilter with `value:null`, `isRegexp:false`', () => {
+  it('filter as IRegExpFilter with `value: null`, `isRegexp: false`', () => {
     expect(restoreLineUpFilter({value: null, isRegExp: false})).toMatchObject({filter: null, filterMissing: false});
   });
 
-  it('filter as IRegExpFilter with `value:/^abc/gm`, `isRegexp:true`', () => {
+  it('filter as IRegExpFilter with `value: /^abc/gm`, `isRegexp: true`', () => {
     expect(restoreLineUpFilter({value: '/^abc/gm', isRegExp: true})).toMatchObject({filter: /^abc/gm, filterMissing: false});
   });
 
@@ -79,6 +79,12 @@ describe('Restore LineUp filter from provenance graph', () => {
   it('filter as ISerializableLineUpFilter with property `value: null`', () => {
     const fromGraphFilter = {filter: {value: null, isRegExp: false}, filterMissing: true};
     expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: null, filterMissing: true});
+  });
+
+  it('unknown filter format throws error', () => {
+    expect(() => {
+      restoreLineUpFilter(<any>123456789); // typecast to pass unknown format
+    }).toThrowError(new Error('Unknown LineUp filter format. Unable to restore the given filter.'));
   });
 });
 

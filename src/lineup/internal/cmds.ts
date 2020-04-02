@@ -492,7 +492,10 @@ export function restoreLineUpFilter(filter: ILineUpStringFilterValue | IRegExpFi
 
   } else if (isISerializableLineUpFilter(filter)) {
     return restoreLineUpFilter(filter.filter, filter.filterMissing);
+
   }
+
+  throw new Error('Unknown LineUp filter format. Unable to restore the given filter.');
 }
 
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
