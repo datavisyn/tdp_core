@@ -16,12 +16,12 @@ export default class OverviewColumn extends BooleanColumn {
 
   constructor(id: string, desc: IBooleanColumnDesc) {
     super(id, Object.assign(desc, {
-      label: i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection')
+      label: i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection'),
+      renderer: 'boolean',
+      groupRenderer: 'boolean',
+      summaryRenderer: 'categorical'
     }));
-    (<OverviewColumn>this).setDefaultRenderer('boolean');
-    (<OverviewColumn>this).setDefaultGroupRenderer('boolean');
-    (<OverviewColumn>this).setDefaultSummaryRenderer('categorical');
-    (<OverviewColumn>this).setWidthImpl(0); // hide
+    this.setWidthImpl(0); // hide
   }
 
   getValue(row: IDataRow) {
