@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {serializeLineUpFilter, restoreLineUpFilter} from '../../../src/lineup/internal/cmds';
+import {serializeLineUpFilter, restoreLineUpFilter} from '../../../../src/lineup/internal/cmds/filter';
 
 // The following tests worked with LineUp v3.
 // With LineUp v4 the filter object changed

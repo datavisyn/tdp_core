@@ -7,6 +7,7 @@ import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'ph
 import {NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
+import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter} from './cmds/filter';
 
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
@@ -376,126 +377,6 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     }
   };
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(f, delayed) : f);
-}
-
-/**
- * Serialize RegExp objects from LineUp string columns as plain object
- * that can be stored in the provenance graph
- */
-interface IRegExpFilter {
-  /**
-   * RegExp as string
-   */
-  value: ILineUpStringFilterValue;
-  /**
-   * Flag to indicate the value should be restored as RegExp
-   */
-  isRegExp: boolean;
-}
-
-/**
- * This interface combines the `IStringFilter` from `StringColumn`
- * and `ICategoricalFilter` from `ICategoricalColumn`.
- */
-interface ILineUpStringFilter {
-  /**
-   * Filter value
-   */
-  filter: ILineUpStringFilterValue | RegExp;
-
-  /**
-   * Filter for missing values
-   */
-  filterMissing: boolean;
-}
-
-/**
- * Similar to the `ILineUpStringFilter`, but the RegExp is replaced with `IRegExpFilter`
- */
-interface ISerializableLineUpFilter {
-  /**
-   * Filter value
-   * Note that the RegExp is replaced with IRegExpFilter (compared to the `ILineUpStringFilter` interface)
-   */
-  filter: ILineUpStringFilterValue | IRegExpFilter;
-
-  /**
-   * Filter for missing values
-   */
-  filterMissing: boolean;
-}
-
-/**
- *  Filter value
- */
-type ILineUpStringFilterValue = string[] | string | null;
-
-
-/**
- * Check if filter has the `filter` property
- * Necessary since number columns filter has properties `min`, `max` and no filter property,
- * @param filter
- */
-function isSerializedFilter(filter: any): ISerializableLineUpFilter {
-  return filter && filter.hasOwnProperty('filter');
-}
-
-/**
- * Serializes LineUp string filter, which can contain RegExp objects to an IRegexFilter object.
- * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
- *
- * Background information:
- * The serialization step is necessary, because RegExp objects are converted into an empty object `{}` on `JSON.stringify`.
- * ```
- * JSON.stringify(/^123$/gm); // result: {}
- * ```
- *
- * @internal
- * @param filter LineUp filter object
- * @returns Returns the `ISerializableLineUpFilter` object
- */
-export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializableLineUpFilter {
-  const value = filter.filter;
-  const isRegexp = value instanceof RegExp;
-  return {
-    filter: {
-      value: isRegexp ? value.toString() : value as ILineUpStringFilterValue,
-      isRegExp: isRegexp
-    },
-    filterMissing: filter.filterMissing
-  };
-}
-
-/**
- * Restores a RegExp object from a given IRegExpFilter object.
- * In case a string is passed to this function no deserialization is applied.
- * @param filter Filter as string or plain object matching the IRegExpFilter
- * @returns Returns the input string or the restored RegExp object
- */
-export function restoreLineUpFilter(filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing = false): ILineUpStringFilter {
-  const isSimpleFilter = (filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter): filter is ILineUpStringFilterValue => filter === null || typeof filter === 'string' || Array.isArray(filter);
-  const isIRegExpFilter = ((filter: IRegExpFilter | ISerializableLineUpFilter): filter is IRegExpFilter => filter.hasOwnProperty('isRegExp'));
-  const isISerializableLineUpFilter = (filter: IRegExpFilter | ISerializableLineUpFilter): filter is ISerializableLineUpFilter => filter.hasOwnProperty('filterMissing');
-
-  if (isSimpleFilter(filter)) {
-    return {filter, filterMissing};
-
-  } else if (isIRegExpFilter(filter)) {
-    if (filter.isRegExp) {
-      const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
-      const matches = serializedRegexParser.exec(filter.value as string);
-      const [_full, regexString, regexFlags] = matches;
-      return {filter: new RegExp(regexString, regexFlags), filterMissing};
-    }
-
-    return restoreLineUpFilter(filter.value, filterMissing);
-
-  } else if (isISerializableLineUpFilter(filter)) {
-    return restoreLineUpFilter(filter.filter, filter.filterMissing);
-
-  }
-
-  throw new Error('Unknown LineUp filter format. Unable to restore the given filter.');
 }
 
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
