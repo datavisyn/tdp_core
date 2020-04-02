@@ -370,30 +370,44 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
  * @param property The name of the property that is tracked
  * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
  */
-function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1): void {
+function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1, bufferLivePreviewActions?): void {
   const func = (oldValue: any, newValue: any) => {
-    if (ignore(`${property}Changed`, objectRef)) {
-      return;
+    const run = (initialState?) => {
+      if (ignore(`${property}Changed`, objectRef)) {
+        return;
+      }
+      const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+      if (JSON.stringify(initialState) === JSON.stringify(newSerializedValue)) {
+        return;
+      }
+      if (source instanceof Column) {
+        // assert ALineUpView and update the stats
+        objectRef.value.getInstance().updateLineUpStats();
+
+        const rid = rankingId(provider, source.findMyRanker());
+        const path = source.fqpath;
+        graph.pushWithResult(setColumn(objectRef, rid, path, property, newSerializedValue), {
+          inverse: setColumn(objectRef, rid, path, property, oldValue)
+        });
+
+      } else if (source instanceof Ranking) {
+        const rid = rankingId(provider, source);
+        graph.pushWithResult(setColumn(objectRef, rid, null, property, newSerializedValue), {
+          inverse: setColumn(objectRef, rid, null, property, oldValue)
+        });
+      }
+    };
+
+    if (bufferLivePreviewActions) {
+
+      const action = {
+        name: property,
+        run: (value) => run(value)
+      };
+      return bufferLivePreviewActions(action, oldValue);
     }
 
-    const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
-
-    if (source instanceof Column) {
-      // assert ALineUpView and update the stats
-      objectRef.value.getInstance().updateLineUpStats();
-
-      const rid = rankingId(provider, source.findMyRanker());
-      const path = source.fqpath;
-      graph.pushWithResult(setColumn(objectRef, rid, path, property, newSerializedValue), {
-        inverse: setColumn(objectRef, rid, path, property, oldValue)
-      });
-
-    } else if (source instanceof Ranking) {
-      const rid = rankingId(provider, source);
-      graph.pushWithResult(setColumn(objectRef, rid, null, property, newSerializedValue), {
-        inverse: setColumn(objectRef, rid, null, property, oldValue)
-      });
-    }
+    run();
   };
 
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(func, delayed) : func);
@@ -459,18 +473,18 @@ function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
  * @param graph The provenance graph where the events should be tracked into
  * @param col The column instance that should be tracked
  */
-function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
+function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column, bufferLivePreviewActions) {
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.metaData);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter, null, bufferLivePreviewActions);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType, null, bufferLivePreviewActions);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer, null, bufferLivePreviewActions);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferLivePreviewActions);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod, null, bufferLivePreviewActions);
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
   if (col instanceof CompositeColumn) {
     col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
-      trackColumn(provider, objectRef, graph, column);
+      trackColumn(provider, objectRef, graph, column, bufferLivePreviewActions);
       if (ignore(CompositeColumn.EVENT_ADD_COLUMN, objectRef)) {
         return;
       }
@@ -526,7 +540,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
     });
 
   } else if (col instanceof ScriptColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'script');
+    recordPropertyChange(col, provider, objectRef, graph, 'script', bufferLivePreviewActions);
 
   } else if (col instanceof OrdinalColumn) {
     recordPropertyChange(col, provider, objectRef, graph, 'mapping');
@@ -557,39 +571,120 @@ function untrackColumn(col: Column) {
  * @param graph The provenance graph where the events should be tracked into
  * @param ranking The current ranking that should be tracked
  */
-function trackRanking(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking): void {
-  ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, objectRef)) {
+function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking): void {
+
+  const initialStates = new Map<string, string>();
+  const bufferedActions = new Map<string, {name: string, run: (oldValue) => void}>();
+  let openDialog;
+
+  const bufferLivePreviewActions = (action, initialValue) => {
+    bufferedActions.set(action.name, action);
+    if (initialStates.has(action.name)) {
       return;
     }
-    const rid = rankingId(provider, ranking);
-    graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject)), {
-      inverse: setSortCriteria(objectRef, rid, old.map(toSortObject))
-    });
+    initialStates.set(action.name, initialValue);
+  };
+  lineup.on(`${EngineRenderer.EVENT_DIALOG_OPENED}.track`, (dialog: ADialog, b) => {
+
+    openDialog = true;
+    console.log('dialog open', dialog);
+    bufferedActions.clear();
+    initialStates.clear();
+
+  });
+
+  lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (dialog, dialogAction: 'cancel' | 'confirm') => {
+    openDialog = false;
+    if (dialogAction === 'confirm' && bufferedActions.size) {
+      bufferedActions.forEach((action, name) => {
+        action.run(initialStates.get(name));
+      });
+    }
+    bufferedActions.clear();
+    initialStates.clear();
+  });
+
+
+  ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
+    const run = (initialState?) => {
+      if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, objectRef)) {
+        return;
+      }
+
+      if (initialState && JSON.stringify(initialState.map(toSortObject)) === JSON.stringify(newValue.map(toSortObject))) {
+        return;
+      }
+
+      const rid = rankingId(provider, ranking);
+      graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject)), {
+        inverse: setSortCriteria(objectRef, rid, old.map(toSortObject))
+      });
+    };
+    if (openDialog) {
+
+      const action = {
+        name: 'sortCriteria',
+        run: (value) => run(value)
+      };
+      return bufferLivePreviewActions(action, old);
+    } else {
+      run();
+    }
+
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, objectRef)) {
-      return;
+    const run = (initialState?) => {
+      if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, objectRef)) {
+        return;
+      }
+      if (initialState && JSON.stringify(initialState.map(toSortObject)) === JSON.stringify(newValue.map(toSortObject))) {
+        return;
+      }
+      const rid = rankingId(provider, ranking);
+      graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject), false), {
+        inverse: setSortCriteria(objectRef, rid, old.map(toSortObject), false)
+      });
+    };
+    if (openDialog) {
+
+      const action = {
+        name: 'groupSortCriteria',
+        run: (value) => run(value)
+      };
+      return bufferLivePreviewActions(action, old);
+    } else {
+      run();
     }
-    const rid = rankingId(provider, ranking);
-    graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject), false), {
-      inverse: setSortCriteria(objectRef, rid, old.map(toSortObject), false)
-    });
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
-    if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, objectRef)) {
-      return;
+    const run = (initialState?) => {
+      if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, objectRef)) {
+        return;
+      }
+      if (initialState && JSON.stringify(initialState.map(toSortObject)) === JSON.stringify(newValue.map(toSortObject))) {
+        return;
+      }
+      const rid = rankingId(provider, ranking);
+      graph.pushWithResult(setGroupCriteria(objectRef, rid, newValue.map((c) => c.fqpath)), {
+        inverse: setGroupCriteria(objectRef, rid, old.map((c) => c.fqpath))
+      });
+    };
+    if (openDialog) {
+
+      const action = {
+        name: 'groupCriteria',
+        run: (value) => run(value)
+      };
+      return bufferLivePreviewActions(action, old);
+    } else {
+      run();
     }
-    const rid = rankingId(provider, ranking);
-    graph.pushWithResult(setGroupCriteria(objectRef, rid, newValue.map((c) => c.fqpath)), {
-      inverse: setGroupCriteria(objectRef, rid, old.map((c) => c.fqpath))
-    });
   });
 
   ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
-    trackColumn(provider, objectRef, graph, column);
+    trackColumn(provider, objectRef, graph, column, bufferLivePreviewActions);
     if (ignore(Ranking.EVENT_ADD_COLUMN, objectRef)) {
       return;
     }
@@ -625,7 +720,7 @@ function trackRanking(provider: LocalDataProvider, objectRef: IObjectRef<IViewPr
     });
   });
 
-  ranking.children.forEach(trackColumn.bind(this, provider, objectRef, graph));
+  ranking.children.forEach((col) => trackColumn(provider, objectRef, graph, col, bufferLivePreviewActions));
 }
 
 /**
@@ -648,14 +743,6 @@ function untrackRanking(ranking: Ranking) {
 export async function clueify(lineup: EngineRenderer | TaggleRenderer, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph): Promise<void> {
   const p = await resolveImmediately((await objectRef.v).data);
 
-  lineup.on(`${EngineRenderer.EVENT_DIALOG_OPENED}.track`, (dialog: ADialog) => {
-    console.log('dialog opened', dialog);
-  });
-
-  lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (dialog: ADialog, action: 'cancel' | 'confirm') => {
-    console.log('dialog closed', dialog, action);
-  });
-
   p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
       return;
@@ -664,7 +751,7 @@ export async function clueify(lineup: EngineRenderer | TaggleRenderer, objectRef
     graph.pushWithResult(addRanking(objectRef, index, d), {
       inverse: addRanking(objectRef, index, null)
     });
-    trackRanking(p, objectRef, graph, ranking);
+    trackRanking(lineup, p, objectRef, graph, ranking);
   });
 
   p.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}.track`, (ranking: Ranking, index: number) => {
@@ -679,7 +766,7 @@ export async function clueify(lineup: EngineRenderer | TaggleRenderer, objectRef
   });
 
   // track further ranking event
-  p.getRankings().forEach(trackRanking.bind(this, p, objectRef, graph));
+  p.getRankings().forEach(trackRanking.bind(this, lineup, p, objectRef, graph));
 }
 
 /**
