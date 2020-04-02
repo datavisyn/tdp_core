@@ -220,7 +220,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         bak = source[`getRenderer`]();
         source[`setRenderer`].call(source, parameter.value);
         break;
-      case 'filter':
+      case LineUpTrackAndUntrackActions.filter:
         bak = source[`get${prop}`]();
         // restore serialized regular expression before passing to LineUp
         const value = isSerializedFilter(parameter.value) ? restoreLineUpFilter(parameter.value) : parameter.value;
@@ -355,7 +355,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       return;
     }
 
-    if (property === 'filter') {
+    if (property === LineUpTrackAndUntrackActions.filter) {
       newValue = isSerializedFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
     }
 
