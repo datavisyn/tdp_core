@@ -81,6 +81,11 @@ describe('Restore LineUp filter from provenance graph', () => {
     expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: null, filterMissing: true});
   });
 
+  it('filter as RegExp `filterMissing: false', () => {
+    const fromGraphFilter = {filter: /abc/, filterMissing: false};
+    expect(restoreLineUpFilter(<any>fromGraphFilter)).toMatchObject({filter: /abc/, filterMissing: false});
+  });
+
   it('unknown filter format throws error', () => {
     expect(() => {
       restoreLineUpFilter(<any>123456789); // typecast to pass unknown format
