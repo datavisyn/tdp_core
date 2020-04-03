@@ -18,7 +18,7 @@ interface IRegExpFilter {
  * This interface combines the `IStringFilter` from `StringColumn`
  * and `ICategoricalFilter` from `ICategoricalColumn`.
  */
-interface ILineUpStringFilter {
+export interface ILineUpStringFilter {
   /**
    * Filter value
    */
@@ -59,7 +59,7 @@ type ILineUpStringFilterValue = string[] | string | null;
  *
  * @param filter Any value that could be a filter
  */
-export function isSerializedFilter(filter: any): ISerializableLineUpFilter {
+export function isSerializedFilter(filter: any): filter is ISerializableLineUpFilter | ILineUpStringFilter {
   return filter && filter.hasOwnProperty('filter');
 }
 
@@ -99,10 +99,10 @@ export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializabl
  * @param filterMissing The flag indicates if missing values should be filtered (default = `false`)
  * @returns Returns the input string or the restored RegExp object
  */
-export function restoreLineUpFilter(filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing = false): ILineUpStringFilter {
-  const isSimpleFilter = (filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter): filter is ILineUpStringFilterValue => filter === null || typeof filter === 'string' || Array.isArray(filter);
-  const isIRegExpFilter = ((filter: IRegExpFilter | ISerializableLineUpFilter): filter is IRegExpFilter => filter.hasOwnProperty('isRegExp'));
-  const isISerializableLineUpFilter = (filter: IRegExpFilter | ISerializableLineUpFilter): filter is ISerializableLineUpFilter => filter.hasOwnProperty('filterMissing');
+export function restoreLineUpFilter(filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter | ILineUpStringFilter, filterMissing = false): ILineUpStringFilter {
+  const isSimpleFilter = (filter: ILineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter | ILineUpStringFilter): filter is ILineUpStringFilterValue => filter === null || typeof filter === 'string' || Array.isArray(filter) || filter instanceof RegExp;
+  const isIRegExpFilter = ((filter: IRegExpFilter | ISerializableLineUpFilter | ILineUpStringFilter): filter is IRegExpFilter => filter.hasOwnProperty('isRegExp'));
+  const isISerializableLineUpFilter = (filter: IRegExpFilter | ISerializableLineUpFilter | ILineUpStringFilter): filter is ISerializableLineUpFilter => filter.hasOwnProperty('filterMissing');
 
   if (isSimpleFilter(filter)) {
     return {filter, filterMissing};

@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {serializeLineUpFilter, restoreLineUpFilter} from '../../../../src/lineup/internal/cmds/filter';
+import {serializeLineUpFilter, restoreLineUpFilter, ILineUpStringFilter} from '../../../../src/lineup/internal/cmds/filter';
 
 // The following tests worked with LineUp v3.
 // With LineUp v4 the filter object changed
@@ -83,7 +83,7 @@ describe('Restore LineUp filter from provenance graph', () => {
 
   it('filter as RegExp `filterMissing: false', () => {
     const fromGraphFilter = {filter: /abc/, filterMissing: false};
-    expect(restoreLineUpFilter(<any>fromGraphFilter)).toMatchObject({filter: /abc/, filterMissing: false});
+    expect(restoreLineUpFilter(fromGraphFilter)).toMatchObject({filter: /abc/, filterMissing: false});
   });
 
   it('unknown filter format throws error', () => {
