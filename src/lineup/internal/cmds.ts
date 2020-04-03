@@ -604,7 +604,6 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
   // buffer it and execute when the confirm button is clicked on the dialog.
   // If a dialog contains multiple actions like the visualization dialog save all three actions and execute on confirm.
   const bufferLivePreviewActions = (action: IBufferedAction, initialValue: any) => {
-    console.log('Current Actions', bufferedActions);
     bufferedActions.set(action.name, action);
     if (initialStates.has(action.name)) {
       return;
@@ -681,7 +680,6 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
-    console.log('here')
     const execute = (initialState: Column[] = []) => {
       if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, objectRef)) {
         return;
