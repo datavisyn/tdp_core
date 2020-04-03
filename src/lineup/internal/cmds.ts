@@ -7,6 +7,7 @@ import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'ph
 import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
+import {isEqual} from 'lodash';
 
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
@@ -243,7 +244,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
 export interface IViewProvider {
   data: LocalDataProvider;
 
-  getInstance(): { updateLineUpStats() };
+  getInstance(): {updateLineUpStats()};
 }
 
 export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, prop: string, value: any) {
@@ -370,14 +371,14 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
  * @param property The name of the property that is tracked
  * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
  */
-function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1, bufferLivePreviewActions?): void {
+function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1, bufferLivePreviewActions?: bufferLivePreviewActions): void {
   const func = (oldValue: any, newValue: any) => {
-    const run = (initialState?) => {
+    const execute = (initialState?: any) => {
       if (ignore(`${property}Changed`, objectRef)) {
         return;
       }
       const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
-      if (JSON.stringify(initialState) === JSON.stringify(newSerializedValue)) {
+      if (initialState !== undefined && isEqual(initialState, newSerializedValue)) {
         return;
       }
       if (source instanceof Column) {
@@ -399,15 +400,15 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     };
 
     if (bufferLivePreviewActions) {
-
       const action = {
         name: property,
-        run: (value) => run(value)
+        execute
       };
+
       return bufferLivePreviewActions(action, oldValue);
     }
 
-    run();
+    execute();
   };
 
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(func, delayed) : func);
@@ -473,7 +474,7 @@ function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
  * @param graph The provenance graph where the events should be tracked into
  * @param col The column instance that should be tracked
  */
-function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column, bufferLivePreviewActions) {
+function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column, bufferLivePreviewActions: bufferLivePreviewActions) {
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.metaData);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter, null, bufferLivePreviewActions);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType, null, bufferLivePreviewActions);
@@ -540,7 +541,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
     });
 
   } else if (col instanceof ScriptColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'script', bufferLivePreviewActions);
+    recordPropertyChange(col, provider, objectRef, graph, 'script', null, bufferLivePreviewActions);
 
   } else if (col instanceof OrdinalColumn) {
     recordPropertyChange(col, provider, objectRef, graph, 'mapping');
@@ -565,6 +566,21 @@ function untrackColumn(col: Column) {
 }
 
 /**
+ * Save the buffered action so it can be executed when dialog is confirmed
+ */
+interface IBufferedAction {
+  /**
+   * Name of the action, i.e:, `filter`
+   */
+  name: string;
+  /**
+   * Push action to provenance graph
+   */
+  execute: (initialValue?: unknown) => void;
+}
+
+type bufferLivePreviewActions = (action: IBufferedAction, initialValue: any) => void;
+/**
  * Adds the event listeners to ranking events and adds event listeners for all columns of that ranking.
  * @param provider LineUp local data provider
  * @param objectRef The object reference that contains the LineUp data provider
@@ -573,45 +589,59 @@ function untrackColumn(col: Column) {
  */
 function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking): void {
 
+  // First time an action is buffered save the initial value of the ranking and compare it to the final action.
+  // If there is no difference between final action state and initial state before opening the dialog, don't execute.
   const initialStates = new Map<string, string>();
-  const bufferedActions = new Map<string, {name: string, run: (oldValue) => void}>();
-  let openDialog;
+  const bufferedActions = new Map<string, IBufferedAction>();
+  let openDialog: boolean;
 
-  const bufferLivePreviewActions = (action, initialValue) => {
+  const emptyBufferedActions = () => {
+    bufferedActions.clear();
+    initialStates.clear();
+  };
+
+  // Pass callback to actions that have a live preview. Instead of pushing said actions directly to the provenance graph,
+  // buffer it and execute when the confirm button is clicked on the dialog.
+  // If a dialog contains multiple actions like the visualization dialog save all three actions and execute on confirm.
+  const bufferLivePreviewActions = (action: IBufferedAction, initialValue: any) => {
+    console.log('Current Actions', bufferedActions);
     bufferedActions.set(action.name, action);
     if (initialStates.has(action.name)) {
       return;
     }
     initialStates.set(action.name, initialValue);
   };
-  lineup.on(`${EngineRenderer.EVENT_DIALOG_OPENED}.track`, (dialog: ADialog, b) => {
 
+  const bufferOrExecute = (action: IBufferedAction, initialValue: ISortCriteria[] | Column[], buffer: boolean) => {
+    return buffer ? bufferLivePreviewActions(action, initialValue) : action.execute();
+  };
+
+  // Empty any buffered actions and set `openDialog:true`.Necessary for actions that have a popup dialog and none.
+  lineup.on(`${EngineRenderer.EVENT_DIALOG_OPENED}.track`, () => {
     openDialog = true;
-    console.log('dialog open', dialog);
-    bufferedActions.clear();
-    initialStates.clear();
-
+    emptyBufferedActions();
   });
 
-  lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (dialog, dialogAction: 'cancel' | 'confirm') => {
-    openDialog = false;
+  lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (_, dialogAction: 'cancel' | 'confirm') => {
     if (dialogAction === 'confirm' && bufferedActions.size) {
+      console.log('Closing', bufferedActions);
       bufferedActions.forEach((action, name) => {
-        action.run(initialStates.get(name));
+        action.execute(initialStates.get(name));
       });
     }
-    bufferedActions.clear();
-    initialStates.clear();
+    emptyBufferedActions();
+    openDialog = false;
   });
 
 
   ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    const run = (initialState?) => {
+
+    const execute = (initialState: ISortCriteria[] = []) => {
       if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, objectRef)) {
         return;
       }
 
-      if (initialState && JSON.stringify(initialState.map(toSortObject)) === JSON.stringify(newValue.map(toSortObject))) {
+      if (isEqual(initialState.map(toSortObject), newValue.map(toSortObject))) {
         return;
       }
 
@@ -620,25 +650,21 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
         inverse: setSortCriteria(objectRef, rid, old.map(toSortObject))
       });
     };
-    if (openDialog) {
 
-      const action = {
-        name: 'sortCriteria',
-        run: (value) => run(value)
-      };
-      return bufferLivePreviewActions(action, old);
-    } else {
-      run();
-    }
+    const action = {
+      name: 'sortCriteria',
+      execute
+    };
 
+    bufferOrExecute(action, old, openDialog);
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    const run = (initialState?) => {
+    const execute = (initialState: ISortCriteria[] = []) => {
       if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, objectRef)) {
         return;
       }
-      if (initialState && JSON.stringify(initialState.map(toSortObject)) === JSON.stringify(newValue.map(toSortObject))) {
+      if (isEqual(initialState.map(toSortObject), newValue.map(toSortObject))) {
         return;
       }
       const rid = rankingId(provider, ranking);
@@ -646,24 +672,22 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
         inverse: setSortCriteria(objectRef, rid, old.map(toSortObject), false)
       });
     };
-    if (openDialog) {
+    const action = {
+      name: 'groupSortCriteria',
+      execute
+    };
 
-      const action = {
-        name: 'groupSortCriteria',
-        run: (value) => run(value)
-      };
-      return bufferLivePreviewActions(action, old);
-    } else {
-      run();
-    }
+    bufferOrExecute(action, old, openDialog);
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
-    const run = (initialState?) => {
+    console.log('here')
+    const execute = (initialState: Column[] = []) => {
       if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, objectRef)) {
         return;
       }
-      if (initialState && JSON.stringify(initialState.map(toSortObject)) === JSON.stringify(newValue.map(toSortObject))) {
+
+      if (isEqual(initialState, newValue)) {
         return;
       }
       const rid = rankingId(provider, ranking);
@@ -671,16 +695,12 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
         inverse: setGroupCriteria(objectRef, rid, old.map((c) => c.fqpath))
       });
     };
-    if (openDialog) {
+    const action = {
+      name: 'groupCriteria',
+      execute
+    };
 
-      const action = {
-        name: 'groupCriteria',
-        run: (value) => run(value)
-      };
-      return bufferLivePreviewActions(action, old);
-    } else {
-      run();
-    }
+    bufferOrExecute(action, old, openDialog);
   });
 
   ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
