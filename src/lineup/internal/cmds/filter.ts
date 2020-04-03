@@ -55,9 +55,9 @@ type ILineUpStringFilterValue = string[] | string | null;
 /**
  * This type guard checks if a given parameter has the `filter` property.
  * Necessary since number columns filter has properties `min`, `max` and no filter property,
- * @interal
- *
+ * @internal
  * @param filter Any value that could be a filter
+ * @returns Returns true if filter should be serialized/restored or false if not.
  */
 export function isSerializedFilter(filter: any): filter is ISerializableLineUpFilter | ILineUpStringFilter {
   return filter && filter.hasOwnProperty('filter');
