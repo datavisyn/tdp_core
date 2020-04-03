@@ -40,7 +40,7 @@ function isIRegExpFilter(filter: any): filter is IRegExpFilter {
  * This interface combines the `IStringFilter` from `StringColumn`
  * and `ICategoricalFilter` from `ICategoricalColumn`.
  */
-export interface ILineUpStringFilter {
+interface ILineUpStringFilter {
   /**
    * Filter value
    */
@@ -51,6 +51,18 @@ export interface ILineUpStringFilter {
    */
   filterMissing: boolean;
 }
+
+/**
+ * This type guard checks if the `filter` parameter matches the `isLineUpStringFilter` type.
+ *
+ * @internal
+ * @param filter Any value that could be a filter
+ * @returns Returns true if filter should be serialized/restored or false if not.
+ */
+export function isLineUpStringFilter(filter: any): filter is ILineUpStringFilter {
+  return filter && filter.hasOwnProperty('filter') && (isLineUpStringFilterValue(filter.filter) || filter.filter instanceof RegExp) && filter.hasOwnProperty('filterMissing');
+}
+
 
 /**
  * Similar to the `ILineUpStringFilter`, but the RegExp is replaced with `IRegExpFilter`
@@ -108,6 +120,25 @@ export function serializeLineUpFilter(filter: ILineUpStringFilter): ISerializabl
 }
 
 /**
+ * Coverts a RegExp string to a RegExp instance
+ *
+ * @internal
+ * @param value RegExp string
+ * @returns The RegExp instance
+ */
+export function restoreRegExp(value: string): RegExp {
+  const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
+  const matches = serializedRegexParser.exec(value);
+
+  if(matches === null) {
+    throw new Error('Unable to parse regular expression from string. The string does not seem to be a valid RegExp.');
+  }
+
+  const [_full, regexString, regexFlags] = matches;
+  return new RegExp(regexString, regexFlags);
+}
+
+/**
  * Restores filter values from the provenance graph and returns an `ILineUpStringFilter`
  * which can be passed to the LineUp instance (using LineUp > 4.0.0).
  *
@@ -125,14 +156,14 @@ export function restoreLineUpFilter(filter: LineUpStringFilterValue | IRegExpFil
   if (isLineUpStringFilterValue(filter)) {
     return {filter, filterMissing};
 
-  } else if (isIRegExpFilter(filter)) {
-    if (filter.isRegExp) {
-      const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
-      const matches = serializedRegexParser.exec(filter.value as string);
-      const [_full, regexString, regexFlags] = matches;
-      return {filter: new RegExp(regexString, regexFlags), filterMissing};
+  } else if (isIRegExpFilter(filter) && filter.isRegExp === true) {
+    if(typeof filter.value === 'string') {
+      return {filter: restoreRegExp(filter.value), filterMissing};
     }
 
+    throw new Error('Wrong type of filter value. Unable to restore RegExp instance from the given filter value.');
+
+  } else if (isIRegExpFilter(filter) && filter.isRegExp === false) {
     return restoreLineUpFilter(filter.value, filterMissing);
 
   } else if (isSerializedFilter(filter)) {

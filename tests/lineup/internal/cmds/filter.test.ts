@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {serializeLineUpFilter, restoreLineUpFilter, ILineUpStringFilter} from '../../../../src/lineup/internal/cmds/filter';
+import {serializeLineUpFilter, restoreLineUpFilter, isSerializedFilter, isLineUpStringFilter, restoreRegExp} from '../../../../src/lineup/internal/cmds/filter';
 
 // The following tests worked with LineUp v3.
 // With LineUp v4 the filter object changed
@@ -15,6 +15,55 @@ import {serializeLineUpFilter, restoreLineUpFilter, ILineUpStringFilter} from '.
 //     expect(serializeRegExp(/abc/gm)).not.toMatchObject({value: '/abc/gm', isRegExp: false});
 //   });
 // });
+
+describe('Type guard isLineUpStringFilter', () => {
+  it('isLineUpStringFilter with string', () => {
+    expect(isLineUpStringFilter({filter: 'abc', filterMissing: false})).toBe(true);
+  });
+
+  it('isLineUpStringFilter with string[]', () => {
+    expect(isLineUpStringFilter({filter: ['abc', 'def'], filterMissing: false})).toBe(true);
+  });
+
+  it('isLineUpStringFilter with null', () => {
+    expect(isLineUpStringFilter({filter: null, filterMissing: false})).toBe(true);
+  });
+
+  it('isLineUpStringFilter with RegExp', () => {
+    expect(isLineUpStringFilter({filter: /abc/gm, filterMissing: false})).toBe(true);
+  });
+});
+
+describe('Type guard isSerializedFilter', () => {
+  it('isSerializedFilter with string', () => {
+    expect(isSerializedFilter({filter: {value: 'abc', isRegExp: false}, filterMissing: false})).toBe(true);
+  });
+
+  it('isSerializedFilter with string[]', () => {
+    expect(isSerializedFilter({filter: {value: ['abc', 'def'], isRegExp: false}, filterMissing: false})).toBe(true);
+  });
+
+  it('isSerializedFilter with null', () => {
+    expect(isSerializedFilter({filter: {value: null, isRegExp: false}, filterMissing: false})).toBe(true);
+  });
+
+  it('isSerializedFilter with RegExp', () => {
+    expect(isSerializedFilter({filter: {value: '/abc/gm', isRegExp: true}, filterMissing: false})).toBe(true);
+  });
+});
+
+describe('Restore RegExp from string', () => {
+  it('valid RegExp string', () => {
+    expect(restoreRegExp('/abc/gm').toString()).toBe('/abc/gm');
+    expect(restoreRegExp('/def/gm').toString()).not.toBe('/abc/gm');
+  });
+
+  it('invalid RegExp string', () => {
+    expect(() => {
+      restoreRegExp('invalid regexp string').toString();
+    }).toThrow(new Error('Unable to parse regular expression from string. The string does not seem to be a valid RegExp.'));
+  });
+});
 
 describe('Serialize LineUp v4 filter for provenance graph', () => {
   it('filter as string', () => {

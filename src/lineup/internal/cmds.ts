@@ -7,7 +7,7 @@ import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'ph
 import {NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
-import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, ILineUpStringFilter} from './cmds/filter';
+import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
 
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
@@ -357,7 +357,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     }
 
     if (property === LineUpTrackAndUntrackActions.filter) {
-      newValue = isSerializedFilter(newValue) ? serializeLineUpFilter(newValue as ILineUpStringFilter) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
+      newValue = isLineUpStringFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
     }
 
     if (source instanceof Column) {
