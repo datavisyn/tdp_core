@@ -113,8 +113,16 @@ $lu_assets: '~lineupjs/src/assets';
     content: 'Column Summaries';
   }
 
-  .lu-hierarchy .lu-search::before {
-    height: 19px;
+  .lu-hierarchy {
+    footer.lu-hierarchy-adder {
+      // the phovea_clue selector `body[data-clue='E'] footer` hides this footer
+      // so we must override it and display it explicitly
+      display: flex;
+    }
+
+    .lu-search::before {
+      height: 19px;
+    }
   }
 
   .lu-side-panel-wrapper {
