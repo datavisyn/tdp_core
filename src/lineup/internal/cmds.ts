@@ -7,6 +7,7 @@ import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'ph
 import {NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
+import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
 
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
@@ -220,9 +221,15 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         bak = source[`getRenderer`]();
         source[`setRenderer`].call(source, parameter.value);
         break;
+      case LineUpTrackAndUntrackActions.filter:
+        bak = source[`get${prop}`]();
+        // restore serialized regular expression before passing to LineUp
+        const value = isSerializedFilter(parameter.value) ? restoreLineUpFilter(parameter.value) : parameter.value;
+        source[`set${prop}`].call(source, value);
+        break;
       default:
         bak = source[`get${prop}`]();
-        source[`set${prop}`].call(source, restoreRegExp(parameter.value)); // restore serialized regular expression before passing to LineUp
+        source[`set${prop}`].call(source, parameter.value);
         break;
     }
   }
@@ -349,7 +356,9 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       return;
     }
 
-    const newSerializedValue = serializeRegExp(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+    if (property === LineUpTrackAndUntrackActions.filter) {
+      newValue = isLineUpStringFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
+    }
 
     if (source instanceof Column) {
       // assert ALineUpView and update the stats
@@ -357,70 +366,17 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
 
       const rid = rankingId(provider, source.findMyRanker());
       const path = source.fqpath;
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newSerializedValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, path, property, newValue), {
         inverse: setColumn(lineupViewWrapper, rid, path, property, old)
       });
     } else if (source instanceof Ranking) {
       const rid = rankingId(provider, source);
-      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newSerializedValue), {
+      graph.pushWithResult(setColumn(lineupViewWrapper, rid, null, property, newValue), {
         inverse: setColumn(lineupViewWrapper, rid, null, property, old)
       });
     }
   };
   source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(f, delayed) : f);
-}
-
-/**
- * Serialize RegExp objects from LineUp string columns as plain object
- * that can be stored in the provenance graph
- */
-interface IRegExpFilter {
-  /**
-   * RegExp as string
-   */
-  value: string;
-  /**
-   * Flag to indicate the value should be restored as RegExp
-   */
-  isRegExp: boolean;
-}
-
-/**
- * Serializes RegExp objects to an IRegexFilter object, which can be stored in the provenance graph.
- * In case a string is passed to this function no serialization is applied.
- *
- * Background information:
- * The serialization step is necessary, because RegExp objects are converted into an empty object `{}` on `JSON.stringify`.
- * ```
- * JSON.stringify(/^123$/gm); // result: {}
- * ```
- *
- * @param value Input string or RegExp object
- * @returns {string | IRegExpFilter} Returns the input string or a plain `IRegExpFilter` object
- */
-function serializeRegExp(value: string | RegExp): string | IRegExpFilter {
-  if (!(value instanceof RegExp)) {
-    return value;
-  }
-  return {value: value.toString(), isRegExp: true};
-}
-
-/**
- * Restores a RegExp object from a given IRegExpFilter object.
- * In case a string is passed to this function no deserialization is applied.
- *
- * @param filter Filter as string or plain object matching the IRegExpFilter
- * @returns {string | RegExp| null} Returns the input string or the restored RegExp object
- */
-function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
-  if (filter === null || !(<IRegExpFilter>filter).isRegExp) {
-    return <string | null>filter;
-  }
-
-  const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
-  const matches = serializedRegexParser.exec((<IRegExpFilter>filter).value);
-  const [_full, regexString, regexFlags] = matches;
-  return new RegExp(regexString, regexFlags);
 }
 
 function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
