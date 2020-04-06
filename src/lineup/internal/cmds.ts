@@ -373,7 +373,7 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
  */
 function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1, bufferLivePreviewActions?: bufferLivePreviewActions): void {
   const func = (oldValue: any, newValue: any) => {
-    const execute = (initialState?: any) => {
+    const execute = (initialState = oldValue) => {
       if (ignore(`${property}Changed`, objectRef)) {
         return;
       }
@@ -381,6 +381,8 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       if (initialState !== undefined && isEqual(initialState, newSerializedValue)) {
         return;
       }
+      // push to the prov graph with initial state as oldValue
+      oldValue = initialState !== undefined ? initialState : oldValue;
       if (source instanceof Column) {
         // assert ALineUpView and update the stats
         objectRef.value.getInstance().updateLineUpStats();
@@ -388,13 +390,13 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
         const rid = rankingId(provider, source.findMyRanker());
         const path = source.fqpath;
         graph.pushWithResult(setColumn(objectRef, rid, path, property, newSerializedValue), {
-          inverse: setColumn(objectRef, rid, path, property, oldValue)
+          inverse: setColumn(objectRef, rid, path, property, initialState)
         });
 
       } else if (source instanceof Ranking) {
         const rid = rankingId(provider, source);
         graph.pushWithResult(setColumn(objectRef, rid, null, property, newSerializedValue), {
-          inverse: setColumn(objectRef, rid, null, property, oldValue)
+          inverse: setColumn(objectRef, rid, null, property, initialState || oldValue)
         });
       }
     };
@@ -623,7 +625,6 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
 
   lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (_, dialogAction: 'cancel' | 'confirm') => {
     if (dialogAction === 'confirm' && bufferedActions.size) {
-      console.log('Closing', bufferedActions);
       bufferedActions.forEach((action, name) => {
         action.execute(initialStates.get(name));
       });
@@ -635,7 +636,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
 
   ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
 
-    const execute = (initialState: ISortCriteria[] = []) => {
+    const execute = (initialState: ISortCriteria[] = old) => {
       if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, objectRef)) {
         return;
       }
@@ -646,7 +647,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
 
       const rid = rankingId(provider, ranking);
       graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject)), {
-        inverse: setSortCriteria(objectRef, rid, old.map(toSortObject))
+        inverse: setSortCriteria(objectRef, rid, initialState.map(toSortObject))
       });
     };
 
@@ -659,7 +660,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-    const execute = (initialState: ISortCriteria[] = []) => {
+    const execute = (initialState: ISortCriteria[] = old) => {
       if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, objectRef)) {
         return;
       }
@@ -668,7 +669,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
       }
       const rid = rankingId(provider, ranking);
       graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject), false), {
-        inverse: setSortCriteria(objectRef, rid, old.map(toSortObject), false)
+        inverse: setSortCriteria(objectRef, rid, initialState.map(toSortObject), false)
       });
     };
     const action = {
@@ -680,7 +681,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
-    const execute = (initialState: Column[] = []) => {
+    const execute = (initialState: Column[] = old) => {
       if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, objectRef)) {
         return;
       }
@@ -690,7 +691,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
       }
       const rid = rankingId(provider, ranking);
       graph.pushWithResult(setGroupCriteria(objectRef, rid, newValue.map((c) => c.fqpath)), {
-        inverse: setGroupCriteria(objectRef, rid, old.map((c) => c.fqpath))
+        inverse: setGroupCriteria(objectRef, rid, initialState.map((c) => c.fqpath))
       });
     };
     const action = {
