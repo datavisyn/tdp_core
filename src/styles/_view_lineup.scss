@@ -11,13 +11,15 @@
     line-height: 1;
   }
 
-  > div {
+  // Select only first div containing the `lineup-engine`.
+  // Don't select the `div.lu-backdrop` element
+  > div:first-child() {
     flex: 1 1 auto;
     position: relative;
   }
 
   &.overview-detail {
-    > div {
+    > div:first-child() {
       display: flex;
       flex-direction: column;
 
