@@ -378,7 +378,7 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
  * @param property The name of the property that is tracked
  * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
  */
-function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1, bufferLivePreviewActions?: bufferLivePreviewActions): void {
+function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1, bufferOrExecute?: bufferOrExecute): void {
   const func = (oldValue: any, newValue: any) => {
     const execute = (initialState = oldValue) => {
       if (ignore(`${property}Changed`, objectRef)) {
@@ -388,7 +388,6 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       if (property === LineUpTrackAndUntrackActions.filter) {
         newValue = isLineUpStringFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
       }
-
       if (initialState !== undefined && isEqual(initialState, newValue)) {
         return;
       }
@@ -413,13 +412,13 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       }
     };
 
-    if (bufferLivePreviewActions) {
+    if (bufferOrExecute) {
       const action = {
         name: property,
         execute
       };
 
-      return bufferLivePreviewActions(action, oldValue);
+      return bufferOrExecute(action, oldValue);
     }
 
     execute();
@@ -435,18 +434,18 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
  * @param graph The provenance graph where the events should be tracked into
  * @param col The column instance that should be tracked
  */
-function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column, bufferLivePreviewActions: bufferLivePreviewActions) {
+function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column, bufferOrExecute: bufferOrExecute) {
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.metaData);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter, null, bufferLivePreviewActions);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType, null, bufferLivePreviewActions);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer, null, bufferLivePreviewActions);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferLivePreviewActions);
-  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod, null, bufferLivePreviewActions);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter, null, bufferOrExecute);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType, null, bufferOrExecute);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer, null, bufferOrExecute);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferOrExecute);
+  recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod, null, bufferOrExecute);
   //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
 
   if (col instanceof CompositeColumn) {
     col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
-      trackColumn(provider, objectRef, graph, column, bufferLivePreviewActions);
+      trackColumn(provider, objectRef, graph, column, bufferOrExecute);
       if (ignore(CompositeColumn.EVENT_ADD_COLUMN, objectRef)) {
         return;
       }
@@ -502,7 +501,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
     });
 
   } else if (col instanceof ScriptColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'script', null, bufferLivePreviewActions);
+    recordPropertyChange(col, provider, objectRef, graph, 'script', null, bufferOrExecute);
 
   } else if (col instanceof OrdinalColumn) {
     recordPropertyChange(col, provider, objectRef, graph, 'mapping');
@@ -540,7 +539,7 @@ interface IBufferedAction {
   execute: (initialValue?: unknown) => void;
 }
 
-type bufferLivePreviewActions = (action: IBufferedAction, initialValue: any) => void;
+type bufferOrExecute = (action: IBufferedAction, initialValue: any, buffer?: boolean) => void;
 /**
  * Adds the event listeners to ranking events and adds event listeners for all columns of that ranking.
  * @param provider LineUp local data provider
@@ -572,7 +571,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     initialStates.set(action.name, initialValue);
   };
 
-  const bufferOrExecute = (action: IBufferedAction, initialValue: ISortCriteria[] | Column[], buffer: boolean) => {
+  const bufferOrExecute = (action: IBufferedAction, initialValue: any, buffer: boolean = openDialog) => {
     return buffer ? bufferLivePreviewActions(action, initialValue) : action.execute();
   };
 
@@ -662,7 +661,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
   });
 
   ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
-    trackColumn(provider, objectRef, graph, column, bufferLivePreviewActions);
+    trackColumn(provider, objectRef, graph, column, bufferOrExecute);
     if (ignore(Ranking.EVENT_ADD_COLUMN, objectRef)) {
       return;
     }
@@ -698,7 +697,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     });
   });
 
-  ranking.children.forEach((col) => trackColumn(provider, objectRef, graph, col, bufferLivePreviewActions));
+  ranking.children.forEach((col) => trackColumn(provider, objectRef, graph, col, bufferOrExecute));
 }
 
 /**
@@ -720,7 +719,6 @@ function untrackRanking(ranking: Ranking) {
  */
 export async function clueify(lineup: EngineRenderer | TaggleRenderer, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph): Promise<void> {
   const p = await resolveImmediately((await objectRef.v).data);
-
   p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
       return;
