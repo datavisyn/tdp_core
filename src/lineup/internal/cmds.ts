@@ -540,6 +540,7 @@ interface IBufferedAction {
 }
 
 type bufferOrExecute = (action: IBufferedAction, initialValue: any, buffer?: boolean) => void;
+
 /**
  * Adds the event listeners to ranking events and adds event listeners for all columns of that ranking.
  * @param provider LineUp local data provider
@@ -549,20 +550,25 @@ type bufferOrExecute = (action: IBufferedAction, initialValue: any, buffer?: boo
  */
 function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking): void {
 
+  // Map containing the initial state/value (before the dialog was opened) of the actions that are buffered.
+  // Use this initial value to compare it to the last saved action. So if you open the filter dialog and the final result
+  // is the same as it was before the dialog was opened, don't execute this action.
+  const initialStates = new Map<string, string>();
+
   // First time an action is buffered save the initial value of the ranking and compare it to the final action.
   // If there is no difference between final action state and initial state before opening the dialog, don't execute.
-  const initialStates = new Map<string, string>();
   const bufferedActions = new Map<string, IBufferedAction>();
   let openDialog: boolean;
 
+// When dialog is closed empty the buffered actions.
   const emptyBufferedActions = () => {
     bufferedActions.clear();
     initialStates.clear();
   };
 
-  // Pass callback to actions that have a live preview. Instead of pushing said actions directly to the provenance graph,
-  // buffer it and execute when the confirm button is clicked on the dialog.
-  // If a dialog contains multiple actions like the visualization dialog save all three actions and execute on confirm.
+  // Save the onclick callback and the initial value of the actions that have a live preview.
+  // Execute the callback when the dialog is confirmed passing the initial value as the old state.
+  // If a dialog contains multiple actions like the visualization dialog, save all three actions and execute all three on confirm.
   const bufferLivePreviewActions = (action: IBufferedAction, initialValue: any) => {
     bufferedActions.set(action.name, action);
     if (initialStates.has(action.name)) {
@@ -570,7 +576,8 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     }
     initialStates.set(action.name, initialValue);
   };
-
+  // If there has been a dialog opened (`openDialog===true`) buffer the current action and execute if dialog is confirmed.
+  // Otherwise execute action immediately.
   const bufferOrExecute = (action: IBufferedAction, initialValue: any, buffer: boolean = openDialog) => {
     return buffer ? bufferLivePreviewActions(action, initialValue) : action.execute();
   };
