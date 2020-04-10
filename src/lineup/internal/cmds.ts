@@ -10,7 +10,6 @@ import i18n from 'phovea_core/src/i18n';
 import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
 import {isEqual} from 'lodash';
 
-
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 enum LineUpTrackAndUntrackActions {
   metaData = 'metaData',
@@ -338,6 +337,7 @@ export function moveColumn(provider: IObjectRef<IViewProvider>, rid: number, pat
  * @param callback The provenance function that should be delayed
  * @param timeToDelay Number of milliseconds that callback call should be delayed (default = 100 ms)
  * @param thisCallback Provide a different `this` context for the callback
+ * @returns Returns a function that wraps the callback with a setTimeout call to delay the execution
  */
 function delayedCall(callback: (oldValue: any, newValue: any) => void, timeToDelay = 100, thisCallback = this): (oldValue: any, newValue: any) => void {
   let tm = -1;
@@ -377,9 +377,11 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking): number {
  * @param graph The provenance graph where the events should be tracked into
  * @param property The name of the property that is tracked
  * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
+ * @param bufferOrExecute Function that immediately executes the action or buffers LineUp live preview events and executes them when a dialog is confirmed
  */
 function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1, bufferOrExecute?: bufferOrExecute): void {
-  const func = (oldValue: any, newValue: any) => {
+  const eventListenerFunction = (oldValue: any, newValue: any) => {
+    // wrap the execution in a separate function to buffer it if the `bufferOrExecute` is set
     const execute = (initialState = oldValue) => {
       if (ignore(`${property}Changed`, objectRef)) {
         return;
@@ -421,10 +423,10 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       return bufferOrExecute(action, oldValue);
     }
 
-    execute();
+    execute(); // execute immediately
   };
 
-  source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(func, delayed) : func);
+  source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
 }
 
 /**
@@ -433,8 +435,9 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
  * @param objectRef The object reference that contains the LineUp data provider
  * @param graph The provenance graph where the events should be tracked into
  * @param col The column instance that should be tracked
+ * @param bufferOrExecute Function that immediately executes the action or buffers LineUp live preview events and executes them when a dialog is confirmed
  */
-function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column, bufferOrExecute: bufferOrExecute) {
+function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column, bufferOrExecute: bufferOrExecute): void {
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.metaData);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter, null, bufferOrExecute);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType, null, bufferOrExecute);
@@ -530,16 +533,17 @@ function untrackColumn(col: Column) {
  */
 interface IBufferedAction {
   /**
-   * Name of the action, i.e:, `filter`
+   * Name of the action, i.e., `filter`
    */
   name: string;
+
   /**
    * Push action to provenance graph
    */
   execute: (initialValue?: unknown) => void;
 }
 
-type bufferOrExecute = (action: IBufferedAction, initialValue: any, buffer?: boolean) => void;
+type bufferOrExecute = (action: IBufferedAction, initialValue: any, isActionBuffered?: boolean) => void;
 
 /**
  * Adds the event listeners to ranking events and adds event listeners for all columns of that ranking.
@@ -552,15 +556,17 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
 
   // Map containing the initial state/value (before the dialog was opened) of the actions that are buffered.
   // Use this initial value to compare it to the last saved action. So if you open the filter dialog and the final result
-  // is the same as it was before the dialog was opened, don't execute this action.
+  // is the same as it was before the dialog was opened, do not execute this action.
   const initialStates = new Map<string, string>();
 
   // First time an action is buffered save the initial value of the ranking and compare it to the final action.
   // If there is no difference between final action state and initial state before opening the dialog, don't execute.
   const bufferedActions = new Map<string, IBufferedAction>();
-  let openDialog: boolean;
 
-// When dialog is closed empty the buffered actions.
+  // Is there any dialog open?
+  let isDialogOpen: boolean = false;
+
+  // When dialog is closed empty the buffered actions
   const emptyBufferedActions = () => {
     bufferedActions.clear();
     initialStates.clear();
@@ -576,26 +582,28 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     }
     initialStates.set(action.name, initialValue);
   };
-  // If there has been a dialog opened (`openDialog===true`) buffer the current action and execute if dialog is confirmed.
+
+  // If there has been a dialog opened (`isDialogOpen === true`) buffer the current action and execute if dialog is confirmed.
   // Otherwise execute action immediately.
-  const bufferOrExecute = (action: IBufferedAction, initialValue: any, buffer: boolean = openDialog) => {
-    return buffer ? bufferLivePreviewActions(action, initialValue) : action.execute();
+  const bufferOrExecute = (action: IBufferedAction, initialValue: any, isActionBuffered: boolean = isDialogOpen) => {
+    return isActionBuffered ? bufferLivePreviewActions(action, initialValue) : action.execute();
   };
 
-  // Empty any buffered actions and set `openDialog:true`.Necessary for actions that have a popup dialog and none.
+  // Empty any buffered actions and set `isDialogOpen = true`. Necessary for actions that have a popup dialog and none (e.g., sort, group by).
   lineup.on(`${EngineRenderer.EVENT_DIALOG_OPENED}.track`, () => {
-    openDialog = true;
+    isDialogOpen = true;
     emptyBufferedActions();
   });
 
-  lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (_, dialogAction: 'cancel' | 'confirm') => {
-    if (dialogAction === 'confirm' && bufferedActions.size) {
+  lineup.on(`${EngineRenderer.EVENT_DIALOG_CLOSED}.track`, (_dialog, dialogAction: 'cancel' | 'confirm') => {
+    if (dialogAction === 'confirm' && bufferedActions.size > 0) {
       bufferedActions.forEach((action, name) => {
         action.execute(initialStates.get(name));
       });
     }
+
     emptyBufferedActions();
-    openDialog = false;
+    isDialogOpen = false;
   });
 
 
@@ -621,7 +629,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
       execute
     };
 
-    bufferOrExecute(action, old, openDialog);
+    bufferOrExecute(action, old, isDialogOpen);
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
@@ -629,20 +637,23 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
       if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, objectRef)) {
         return;
       }
+
       if (isEqual(initialState.map(toSortObject), newValue.map(toSortObject))) {
         return;
       }
+
       const rid = rankingId(provider, ranking);
       graph.pushWithResult(setSortCriteria(objectRef, rid, newValue.map(toSortObject), false), {
         inverse: setSortCriteria(objectRef, rid, initialState.map(toSortObject), false)
       });
     };
+
     const action = {
       name: 'groupSortCriteria',
       execute
     };
 
-    bufferOrExecute(action, old, openDialog);
+    bufferOrExecute(action, old, isDialogOpen);
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
@@ -654,25 +665,30 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
       if (isEqual(initialState, newValue)) {
         return;
       }
+
       const rid = rankingId(provider, ranking);
       graph.pushWithResult(setGroupCriteria(objectRef, rid, newValue.map((c) => c.fqpath)), {
         inverse: setGroupCriteria(objectRef, rid, initialState.map((c) => c.fqpath))
       });
     };
+
     const action = {
       name: 'groupCriteria',
       execute
     };
 
-    bufferOrExecute(action, old, openDialog);
+    bufferOrExecute(action, old, isDialogOpen);
   });
 
   ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column: Column, index: number) => {
     trackColumn(provider, objectRef, graph, column, bufferOrExecute);
+
     if (ignore(Ranking.EVENT_ADD_COLUMN, objectRef)) {
       return;
     }
+
     // console.log(ranking, 'addColumn', column, index);
+
     const d = provider.dumpColumn(column);
     const rid = rankingId(provider, ranking);
     graph.pushWithResult(addColumn(objectRef, rid, null, index, d), {
@@ -682,10 +698,13 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
 
   ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column: Column, index: number) => {
     untrackColumn(column);
+
     if (ignore(Ranking.EVENT_REMOVE_COLUMN, objectRef)) {
       return;
     }
+
     // console.log(ranking, 'removeColumn', column, index);
+
     const d = provider.dumpColumn(column);
     const rid = rankingId(provider, ranking);
     graph.pushWithResult(addColumn(objectRef, rid, null, index, null), {
@@ -697,7 +716,9 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     if (ignore(Ranking.EVENT_MOVE_COLUMN, objectRef)) {
       return;
     }
+
     // console.log(col.fqpath, 'addColumn', column, index);
+
     const rid = rankingId(provider, ranking);
     graph.pushWithResult(moveColumn(objectRef, rid, null, oldIndex, index), {
       inverse: moveColumn(objectRef, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
