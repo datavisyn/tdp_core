@@ -124,8 +124,15 @@ export function addRanking(provider: IObjectRef<any>, index: number, dump?: any)
   });
 }
 
-function toSortObject(v) {
-  return {asc: v.asc, col: v.col ? v.col.fqpath : null};
+/**
+ * Create an object structure from the LineUp sort event listener that can stored in a provenance graph
+ * @param v Object from LineUp sort event listener
+ */
+function toSortObject(v: any) {
+  return {
+    asc: v.asc,
+    col: v.col ? v.col.fqpath : null
+  };
 }
 
 export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
@@ -608,12 +615,13 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
 
 
   ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
-
+    // wrap the execution in a function to buffer it if a dialog is open
     const execute = (initialState: ISortCriteria[] = old) => {
       if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, objectRef)) {
         return;
       }
 
+      // cancel the execution if nothing has changed
       if (isEqual(initialState.map(toSortObject), newValue.map(toSortObject))) {
         return;
       }
@@ -633,11 +641,13 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
+    // wrap the execution in a function to buffer it if a dialog is open
     const execute = (initialState: ISortCriteria[] = old) => {
       if (ignore(Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED, objectRef)) {
         return;
       }
 
+      // cancel the execution if nothing has changed
       if (isEqual(initialState.map(toSortObject), newValue.map(toSortObject))) {
         return;
       }
@@ -657,11 +667,13 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
   });
 
   ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
+    // wrap the execution in a function to buffer it if a dialog is open
     const execute = (initialState: Column[] = old) => {
       if (ignore(Ranking.EVENT_GROUP_CRITERIA_CHANGED, objectRef)) {
         return;
       }
 
+      // cancel the execution if nothing has changed
       if (isEqual(initialState, newValue)) {
         return;
       }
