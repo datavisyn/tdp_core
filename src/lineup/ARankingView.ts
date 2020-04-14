@@ -293,6 +293,11 @@ export abstract class ARankingView extends AView {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
+    // LineUp creates an element with class `lu-backdrop` that fades out all content when a dialog is opened.
+    // Append `lu-backdrop` one level higher so fading effect can be applied also to the sidePanel when a dialog is opened.
+    const luBackdrop = this.node.querySelector('.lu-backdrop');
+    this.node.appendChild(luBackdrop);
+
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
       this.saveNamedSet(order, name, description, sec);
@@ -608,7 +613,7 @@ export abstract class ARankingView extends AView {
       this.builtLineUp(this.provider);
 
       //record after the initial one
-      clueify(this.context.ref, this.context.graph);
+      clueify(this.taggle, this.context.ref, this.context.graph);
       this.setBusy(false);
     }).catch(showErrorModalDialog)
       .catch((error) => {
