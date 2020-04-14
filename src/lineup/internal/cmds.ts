@@ -613,9 +613,13 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     isDialogOpen = false;
   });
 
-// Close all dialogs when clicking on an action in the provenance graph tree in order
-// to execute the action instead of buffering it as is the case when a dialog is open
+  // Close all dialogs before executing any provenance action or run the provenance chain
+  // (otherwise actions would be buffered while a dialog is open and result in a wrong application state)
   graph.on('run_chain', () => {
+    lineup.ctx.dialogManager.removeAll();
+  });
+
+  graph.on('execute', () => {
     lineup.ctx.dialogManager.removeAll();
   });
 
