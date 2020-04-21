@@ -302,12 +302,20 @@ $lu_assets: '~lineupjs/src/assets';
         bottom: 0;
         right: 0;
         left: 0;
-        overflow-y: auto; // make tab pane scrollable for long content
-      }
+        flex-direction: column;
 
-      // default = LineUp Ranking Configuration tab
-      .tab-pane.default {
-        overflow-y: hidden; // disable scrolling of tab pane, as only the column filters are scrollable
+        // Add scrollbar to SidePanel higher in the node tree
+        .lu-side-panel-main {
+          overflow-y: auto;
+
+          .lu-side-panel-ranking-main {
+            overflow: visible;
+          }
+        }
+
+        &.active {
+          display: flex;
+        }
       }
     }
 
