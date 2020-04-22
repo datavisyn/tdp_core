@@ -3,7 +3,7 @@
  */
 
 
-import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
+import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult, ActionNode} from 'phovea_core/src/provenance';
 import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
@@ -622,7 +622,11 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     lineup.ctx.dialogManager.removeAll();
   });
 
-  graph.on('execute', () => {
+  graph.on('execute', (_event, action: ActionNode) => {
+    if (Object.values(LineUpCmds).some((cmd) => action.f_id === cmd)) { // avoid closing dialogs when the action comes from LineUp
+      return;
+    }
+
     lineup.ctx.dialogManager.removeAll();
   });
 
