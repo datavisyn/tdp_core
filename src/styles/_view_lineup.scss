@@ -7,7 +7,8 @@
   flex-direction: row;
   height: 100%;
 
-  .lu-row, .le-tr {
+  .lu-row,
+  .le-tr {
     line-height: 1;
   }
 
@@ -302,19 +303,21 @@ $lu_assets: '~lineupjs/src/assets';
         bottom: 0;
         right: 0;
         left: 0;
-        flex-direction: column;
+        overflow: auto;
+
+        &.active {
+          display: flex;
+          flex-direction: column;
+        }
 
         // Add scrollbar to SidePanel higher in the node tree
         .lu-side-panel-main {
           overflow-y: auto;
+          overflow-x: hidden;
 
           .lu-side-panel-ranking-main {
             overflow: visible;
           }
-        }
-
-        &.active {
-          display: flex;
         }
       }
     }
