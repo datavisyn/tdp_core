@@ -622,11 +622,15 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     lineup.ctx.dialogManager.removeAll();
   });
 
+  // Close dialogs also when executing new provenance actions
   graph.on('execute', (_event, action: ActionNode) => {
-    if (Object.values(LineUpCmds).some((cmd) => action.f_id === cmd)) { // avoid closing dialogs when the action comes from LineUp
+    // Dialogs do not need to be closed for LineUp actions, since the dialog events are handled
+    // separately for each ranking above (see EVENT_DIALOG_CLOSED and EVENT_DIALOG_OPENED).
+    if (Object.values(LineUpCmds).some((cmd) => action.f_id === cmd)) {
       return;
     }
 
+    // close open dialogs if a non-LineUp action occurs, to avoid side effects
     lineup.ctx.dialogManager.removeAll();
   });
 
