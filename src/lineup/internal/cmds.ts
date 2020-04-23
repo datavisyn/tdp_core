@@ -3,7 +3,7 @@
  */
 
 
-import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
+import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult, ActionNode} from 'phovea_core/src/provenance';
 import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
@@ -22,13 +22,16 @@ enum LineUpTrackAndUntrackActions {
   width = 'width',
 }
 
-const CMD_SET_SORTING_CRITERIA = 'lineupSetRankingSortCriteria';
-const CMD_SET_SORTING_CRITERIAS = 'lineupSetSortCriteria';
-const CMD_SET_GROUP_CRITERIA = 'lineupSetGroupCriteria';
-const CMD_ADD_RANKING = 'lineupAddRanking';
-const CMD_SET_COLUMN = 'lineupSetColumn';
-const CMD_ADD_COLUMN = 'lineupAddColumn';
-const CMD_MOVE_COLUMN = 'lineupMoveColumn';
+// Actions that originate from LineUp
+enum LineUpCmds {
+  CMD_SET_SORTING_CRITERIA = 'lineupSetRankingSortCriteria',
+  CMD_SET_SORTING_CRITERIAS = 'lineupSetSortCriteria',
+  CMD_SET_GROUP_CRITERIA = 'lineupSetGroupCriteria',
+  CMD_ADD_RANKING = 'lineupAddRanking',
+  CMD_SET_COLUMN = 'lineupSetColumn',
+  CMD_ADD_COLUMN = 'lineupAddColumn',
+  CMD_MOVE_COLUMN = 'lineupMoveColumn',
+}
 
 //TODO better solution
 let ignoreNext: string = null;
@@ -118,7 +121,7 @@ export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) 
 }
 
 export function addRanking(provider: IObjectRef<any>, index: number, dump?: any) {
-  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addRanking') : i18n.t('tdp:core.lineup.cmds.removeRanking'), cat.layout, dump ? op.create : op.remove), CMD_ADD_RANKING, addRankingImpl, [provider], {
+  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addRanking') : i18n.t('tdp:core.lineup.cmds.removeRanking'), cat.layout, dump ? op.create : op.remove), LineUpCmds.CMD_ADD_RANKING, addRankingImpl, [provider], {
     index,
     dump
   });
@@ -151,7 +154,7 @@ export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], para
 
 
 export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), LineUpCmds.CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
     rid,
     value
   });
@@ -181,7 +184,7 @@ export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: 
 
 
 export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), LineUpCmds.CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
     rid,
     columns,
     isSorting
@@ -203,7 +206,7 @@ export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter:
 }
 
 export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), cat.layout, op.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), cat.layout, op.update), LineUpCmds.CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
     rid,
     columns
   });
@@ -264,7 +267,7 @@ export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path
   // assert ALineUpView and update the stats
   provider.value.getInstance().updateLineUpStats();
 
-  return action(meta(i18n.t('tdp:core.lineup.cmds.setProperty', {prop}), cat.layout, op.update), CMD_SET_COLUMN, setColumnImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.setProperty', {prop}), cat.layout, op.update), LineUpCmds.CMD_SET_COLUMN, setColumnImpl, [provider], {
     rid,
     path,
     prop,
@@ -322,7 +325,7 @@ export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parame
 }
 
 export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, dump: any) {
-  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addColumn') : i18n.t('tdp:core.lineup.cmds.removeColumn'), cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
+  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addColumn') : i18n.t('tdp:core.lineup.cmds.removeColumn'), cat.layout, dump ? op.create : op.remove), LineUpCmds.CMD_ADD_COLUMN, addColumnImpl, [provider], {
     rid,
     path,
     index,
@@ -331,7 +334,7 @@ export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path
 }
 
 export function moveColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, moveTo: number) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.moveColumn'), cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.moveColumn'), cat.layout, op.update), LineUpCmds.CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
     rid,
     path,
     index,
@@ -619,7 +622,15 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     lineup.ctx.dialogManager.removeAll();
   });
 
-  graph.on('execute', () => {
+  // Close dialogs also when executing new provenance actions
+  graph.on('execute', (_event, action: ActionNode) => {
+    // Dialogs do not need to be closed for LineUp actions, since the dialog events are handled
+    // separately for each ranking above (see EVENT_DIALOG_CLOSED and EVENT_DIALOG_OPENED).
+    if (Object.values(LineUpCmds).some((cmd) => action.f_id === cmd)) {
+      return;
+    }
+
+    // close open dialogs if a non-LineUp action occurs, to avoid side effects
     lineup.ctx.dialogManager.removeAll();
   });
 
