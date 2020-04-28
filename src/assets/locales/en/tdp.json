@@ -267,7 +267,7 @@
     },
 
     "views": {
-      "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.Please use the following",
+      "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application. Please use the following",
       "link": "link",
       "noHttpsMessagePart2": " to open the website in a separate window:",
 
@@ -280,7 +280,7 @@
 
       "toOption": " to {{id}}",
       "noMappingFound": "No mapping found from the given gene {{name}}",
-      "please": "PLease",
+      "please": "Please",
       "externalApplication": "the external application",
       "openExternally": "click here to open {{name}}",
       "newTab": "in a new browser tab.",
