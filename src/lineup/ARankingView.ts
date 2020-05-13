@@ -268,7 +268,7 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const taggleOptions: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+    const taggleOptions: ITaggleOptions = mixin(defaultOptions(), this.options.customOptions, <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
       labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
