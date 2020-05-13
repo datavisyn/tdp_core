@@ -3,7 +3,7 @@
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
   "version": "9.1.1-SNAPSHOT",
   "author": {
-    "name": "datavisyn",
+    "name": "datavisyn GmbH",
     "email": "contact@datavisyn.io",
     "url": "https://www.datavisyn.io"
   },
