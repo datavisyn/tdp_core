@@ -268,16 +268,16 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+    const taggleOptions: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
       labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
-      config.rowHeight = this.options.itemRowHeight;
+      taggleOptions.rowHeight = this.options.itemRowHeight;
     } else if (typeof this.options.itemRowHeight === 'function') {
       const f = this.options.itemRowHeight;
-      config.dynamicHeight = () => ({
+      taggleOptions.dynamicHeight = () => ({
         defaultHeight: 18,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
@@ -289,7 +289,7 @@ export abstract class ARankingView extends AView {
 
 
     const lineupParent = <HTMLElement>this.node.firstElementChild!;
-    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, config) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, taggleOptions) : new TaggleRenderer(this.provider, lineupParent, Object.assign(taggleOptions, {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
