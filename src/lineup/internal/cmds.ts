@@ -27,7 +27,7 @@ let ignoreNext: string = null;
 const temporaryUntracked = new Set<string>();
 
 
-function ignore(event: string, lineup: IObjectRef<IViewProvider>) {
+function ignore(event: string, lineup: IObjectRef<IViewProviderLocal>) {
   if (ignoreNext === event) {
     ignoreNext = null;
     return true;
@@ -215,13 +215,13 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   });
 }
 
-export interface IViewProvider {
+export interface IViewProviderLocal {
   data: LocalDataProvider;
 
   getInstance(): {updateLineUpStats()};
 }
 
-export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, prop: string, value: any) {
+export function setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any) {
   // assert ALineUpView and update the stats
   provider.value.getInstance().updateLineUpStats();
 
@@ -233,7 +233,7 @@ export function setColumn(provider: IObjectRef<IViewProvider>, rid: number, path
   });
 }
 
-export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
+export async function addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   let parent: Ranking | CompositeColumn = ranking;
@@ -259,7 +259,7 @@ export async function addColumnImpl(inputs: IObjectRef<IViewProvider>[], paramet
   });
 }
 
-export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
+export async function moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   let parent: Ranking | CompositeColumn = ranking;
@@ -282,7 +282,7 @@ export async function moveColumnImpl(inputs: IObjectRef<IViewProvider>[], parame
   });
 }
 
-export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, dump: any) {
+export function addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any) {
   return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addColumn') : i18n.t('tdp:core.lineup.cmds.removeColumn'), cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
     rid,
     path,
@@ -291,7 +291,7 @@ export function addColumn(provider: IObjectRef<IViewProvider>, rid: number, path
   });
 }
 
-export function moveColumn(provider: IObjectRef<IViewProvider>, rid: number, path: string, index: number, moveTo: number) {
+export function moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number) {
   return action(meta(i18n.t('tdp:core.lineup.cmds.moveColumn'), cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
     rid,
     path,
@@ -326,7 +326,7 @@ function rankingId(provider: LocalDataProvider, ranking: Ranking) {
 }
 
 
-function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, lineupViewWrapper: IObjectRef<IViewProvider>, graph: ProvenanceGraph, property: string, delayed = -1) {
+function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvider, lineupViewWrapper: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph, property: string, delayed = -1) {
   const f = (old: any, newValue: any) => {
     if (ignore(`${property}Changed`, lineupViewWrapper)) {
       return;
@@ -406,7 +406,7 @@ function restoreRegExp(filter: string | IRegExpFilter): string | RegExp {
   return new RegExp(regexString, regexFlags);
 }
 
-function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, col: Column) {
+function trackColumn(provider: LocalDataProvider, lineup: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph, col: Column) {
   recordPropertyChange(col, provider, lineup, graph, 'metaData');
   recordPropertyChange(col, provider, lineup, graph, 'filter');
   recordPropertyChange(col, provider, lineup, graph, 'rendererType');
@@ -492,7 +492,7 @@ function untrackColumn(col: Column) {
   }
 }
 
-function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph, ranking: Ranking) {
+function trackRanking(provider: LocalDataProvider, lineup: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph, ranking: Ranking) {
   ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
     if (ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, lineup)) {
       return;
@@ -567,7 +567,7 @@ function untrackRanking(ranking: Ranking) {
  * @param lineup the object ref on the lineup provider instance
  * @param graph
  */
-export async function clueify(lineup: IObjectRef<IViewProvider>, graph: ProvenanceGraph) {
+export async function clueify(lineup: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph) {
   const p = await resolveImmediately((await lineup.v).data);
   p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_ADD_RANKING, lineup)) {
@@ -592,13 +592,13 @@ export async function clueify(lineup: IObjectRef<IViewProvider>, graph: Provenan
   p.getRankings().forEach(trackRanking.bind(this, p, lineup, graph));
 }
 
-export async function untrack(lineup: IObjectRef<IViewProvider>) {
+export async function untrack(lineup: IObjectRef<IViewProviderLocal>) {
   const p = await resolveImmediately((await lineup.v).data);
   p.on([`${LocalDataProvider.EVENT_ADD_RANKING}.track`, `${LocalDataProvider.EVENT_REMOVE_RANKING}.track`], null);
   p.getRankings().forEach(untrackRanking);
 }
 
-export function withoutTracking<T>(lineup: IObjectRef<IViewProvider>, fun: () => T): PromiseLike<T> {
+export function withoutTracking<T>(lineup: IObjectRef<IViewProviderLocal>, fun: () => T): PromiseLike<T> {
   return lineup.v.then((d) => resolveImmediately(d.data)).then((p) => {
     temporaryUntracked.add(lineup.hash);
     const r = fun();
