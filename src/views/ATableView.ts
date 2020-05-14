@@ -4,7 +4,7 @@ import {showErrorModalDialog} from '../dialogs';
 import {IRow} from '../rest';
 import {ISelection, IViewContext} from './';
 import {AView} from './AView';
-import {jsonArray2xlsx} from '../internal/xlsx';
+import {jsonArray2xlsx} from '../utils/xlsx';
 import i18n from 'phovea_core/src/i18n';
 
 export interface ISortItem<T> {

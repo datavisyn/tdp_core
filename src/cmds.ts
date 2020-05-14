@@ -1,1 +1,1 @@
-export {initSession, setParameter} from './internal/cmds';
+export {initSession, setParameter} from './utils/cmds';

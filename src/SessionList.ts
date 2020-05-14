@@ -14,13 +14,13 @@ import {
   GLOBAL_EVENT_MANIPULATED,
   editProvenanceGraphMetaData, isPersistent, isPublic,
   persistProvenanceGraphMetaData
-} from './internal/EditProvenanceGraphMenu';
+} from './utils/EditProvenanceGraphMenu';
 import {on as globalOn, off as globalOff} from 'phovea_core/src/event';
-import {fromNow} from './internal/utils';
+import {fromNow} from './utils/utils';
 import {successfullyDeleted, successfullySaved} from './notifications';
 import i18n from 'phovea_core/src/i18n';
 
-export {isPublic} from './internal/EditProvenanceGraphMenu';
+export {isPublic} from './utils/EditProvenanceGraphMenu';
 
 abstract class ASessionList {
   private handler: () => void;

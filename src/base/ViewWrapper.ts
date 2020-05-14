@@ -15,14 +15,14 @@ import {ISelection, IView, IViewContext, IViewPluginDesc, DEFAULT_SELECTION_NAME
 import ObjectNode, {cat, ref} from 'phovea_core/src/provenance/ObjectNode';
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {canAccess} from '../views/findViews';
-import {notAllowedText} from '../internal/utils';
+import {notAllowedText} from '../utils/utils';
 import {lazyDialogModule} from '../dialogs';
 import {createContext, isSameSelection, matchLength} from '../views/interfaces';
 import {AView} from '../views/AView';
 import {resolveImmediately} from 'phovea_core/src';
 import {none} from 'phovea_core/src/range';
 import {IDType, resolve} from 'phovea_core/src/idtype';
-import {setParameter} from '../internal/cmds';
+import {setParameter} from '../utils/cmds';
 import {startViewTour} from '../tour/extensions';
 import i18n from 'phovea_core/src/i18n';
 
