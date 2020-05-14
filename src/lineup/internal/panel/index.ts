@@ -1,8 +1,14 @@
 export * from './PanelAddColumnButton';
+export {default as PanelAddColumnButton} from './PanelAddColumnButton';
 export * from './PanelButton';
+export {default as PanelButton} from './PanelButton';
 export * from './PanelDownloadButton';
+export {default as PanelDownloadButton} from './PanelDownloadButton';
 export * from './PanelHeader';
+export {default as PanelHeader} from './PanelHeader';
 export * from './PanelRankingButton';
+export {default as PanelRankingButton} from './PanelRankingButton';
 export * from './PanelTab';
 export * from './PanelTabContainer';
 export * from './SearchBoxProvider';
+export {default as SearchBoxProvider} from './SearchBoxProvider';
