@@ -4,7 +4,7 @@ import {getProxyUrl} from '../rest';
 import SelectionChooser, {ISelectionChooserOptions} from './SelectionChooser';
 import i18n from 'phovea_core/src/i18n';
 
-export interface IProxyViewOptions extends Partial<ISelectionChooserOptions> {
+export interface IProxyViewChooserOptions extends Partial<ISelectionChooserOptions> {
   /**
    * site name
    */
@@ -39,7 +39,7 @@ export interface IProxyViewOptions extends Partial<ISelectionChooserOptions> {
 }
 
 export default class ChooserProxyView extends AView {
-  protected options: IProxyViewOptions = {
+  protected options: IProxyViewChooserOptions = {
     name: null,
     proxy: null,
     site: null,
@@ -54,7 +54,7 @@ export default class ChooserProxyView extends AView {
 
   readonly naturalSize = [1280, 800];
 
-  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
+  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewChooserOptions> = {}) {
     super(context, selection, parent);
     Object.assign(this.options, context.desc, options);
     this.chooser = new SelectionChooser((id) => this.getParameterElement(id), this.options.idtype, this.options);

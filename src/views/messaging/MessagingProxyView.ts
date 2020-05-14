@@ -7,7 +7,7 @@ import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from 
 import {DEFAULT_SELECTION_NAME} from '../../extensions';
 import i18n from 'phovea_core/src/i18n';
 
-export interface IProxyViewOptions {
+export interface IPartialProxyViewOptions {
   /**
    * direct loading of an iframe site
    */
@@ -24,7 +24,7 @@ export interface IProxyViewOptions {
 }
 
 export default class MessagingProxyView extends AView {
-  protected options: IProxyViewOptions = {
+  protected options: IPartialProxyViewOptions = {
     site: null,
     idtype: null,
     itemIDType: null
@@ -35,7 +35,7 @@ export default class MessagingProxyView extends AView {
   private iframeWindow: Window | null = null;
   private messageQueue: ITDPMessage[] = [];
 
-  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
+  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IPartialProxyViewOptions> = {}) {
     super(context, selection, parent);
     Object.assign(this.options, context.desc, options);
   }
