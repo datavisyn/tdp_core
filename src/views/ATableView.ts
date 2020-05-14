@@ -1,6 +1,6 @@
 import {debounce} from 'phovea_core/src';
 import {parse} from 'phovea_core/src/range';
-import {showErrorModalDialog} from '../dialogs';
+import {errorAlert} from '../notifications';
 import {IRow} from '../rest';
 import {ISelection, IViewContext} from './';
 import {AView} from './AView';
@@ -111,7 +111,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     return Promise.resolve(this.loadRows()).then((rows) => {
       this.renderTable(rows);
       this.setBusy(false);
-    }).catch(showErrorModalDialog)
+    }).catch(errorAlert)
       .catch((error) => {
         console.error(error);
         this.setBusy(false);

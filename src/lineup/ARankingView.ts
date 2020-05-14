@@ -5,7 +5,7 @@ import {EViewMode, IViewContext, ISelection} from '../views';
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
-import {showErrorModalDialog} from '../dialogs';
+import {errorAlert} from '../notifications';
 import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
 import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
@@ -14,7 +14,7 @@ import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
-import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
+import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/adapterUtils';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
@@ -608,7 +608,7 @@ export abstract class ARankingView extends AView {
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
-    }).catch(showErrorModalDialog)
+    }).catch(errorAlert)
       .catch((error) => {
         console.error(error);
         this.setBusy(false);

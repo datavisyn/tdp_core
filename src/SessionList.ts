@@ -9,7 +9,7 @@ import {currentUserNameOrAnonymous, canWrite} from 'phovea_core/src/security';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {IProvenanceGraphDataDescription, op} from 'phovea_core/src/provenance';
 import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
-import {showErrorModalDialog} from './dialogs';
+import {errorAlert} from './notifications';
 import {
   GLOBAL_EVENT_MANIPULATED,
   editProvenanceGraphMetaData, isPersistent, isPublic,
@@ -95,7 +95,7 @@ abstract class ASessionList {
               publicI.className = isPublic(desc) ? 'fa fa-users' : 'fa fa-user';
               publicI.setAttribute('title', isPublic(d) ? i18n.t('tdp:core.SessionList.status') : i18n.t('tdp:core.SessionList.status', {context: 'private'}));
             })
-            .catch(showErrorModalDialog);
+            .catch(errorAlert);
         }
       });
       return false;
@@ -104,7 +104,7 @@ abstract class ASessionList {
       stopEvent();
       persistProvenanceGraphMetaData(d).then((extras: any) => {
         if (extras !== null) {
-          manager.importExistingGraph(d, extras, true).catch(showErrorModalDialog);
+          manager.importExistingGraph(d, extras, true).catch(errorAlert);
         }
       });
       return false;
