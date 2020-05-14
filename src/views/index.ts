@@ -1,9 +1,25 @@
+export * from './messaging';
 
-
+export * from './AD3View';
+export {default as AD3View} from './AD3View';
+export * from './AInstantView';
+export {default as AInstantView} from './AInstantView';
+export * from './AStartList';
+export {default as AStartList} from './AStartList';
+export * from './ATableView';
+export {default as ATableView} from './ATableView';
+export * from './AView';
 export {default as AView} from './AView';
-// export {default as ARankingView} from './ARankingView';
-// export {default as AStartList} from './AStartList';
-// export {default as AD3View} from './AD3View';
-export {ISelection, IViewContext, IViewPluginDesc, IView, IViewPlugin, EViewMode, toViewPluginDesc, createContext, isSameSelection, matchLength, showAsSmallMultiple, willShowChooser} from './interfaces';
-export {resolveId, resolveIds, resolveIdToNames} from './resolve';
+export * from './ChooserProxyView';
+export {default as ChooserProxyView} from './ChooserProxyView';
+export * from './CompositeView';
+export {default as CompositeView} from './CompositeView';
+export * from './findViews';
 export {default as findViews} from './findViews';
+export * from './interfaces';
+export * from './ProxyView';
+export {default as ProxyView} from './ProxyView';
+export * from './resolve';
+export * from './SelectionChooser';
+export {default as SelectionChooser} from './SelectionChooser';
+export * from './tooltip';
