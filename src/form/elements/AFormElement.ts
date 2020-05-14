@@ -7,6 +7,8 @@ import {EventHandler} from 'phovea_core/src/event';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import * as session from 'phovea_core/src/session';
 import {IPluginDesc} from 'phovea_core/src/plugin';
+import {get} from 'phovea_core/src/plugin';
+import {EP_TDP_CORE_FORM_ELEMENT} from '../../extensions';
 
 /**
  * Abstract form element class that is used as parent class for other form elements
@@ -205,6 +207,24 @@ export function toData(value: any) {
     return value.map(toData);
   }
   return (value != null && value.data !== undefined) ? value.data : value;
+}
+
+/**
+ * Factory method to create form elements for the phovea extension type `tdpFormElement`.
+ * An element is found when `desc.type` is matching the extension id.
+ *
+ * @param form the form to which the element will be appended
+ * @param $parent parent D3 selection element
+ * @param elementDesc form element description
+ */
+export function createFormElement(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement> {
+  const plugin = get(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
+  if(!plugin) {
+    throw new Error('unknown form element type: ' + elementDesc.type);
+  }
+  return plugin.load().then((p) => {
+    return p.factory(form, <any>elementDesc, p.desc);
+  });
 }
 
 export default AFormElement;
