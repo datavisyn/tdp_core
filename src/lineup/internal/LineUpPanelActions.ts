@@ -1,5 +1,5 @@
 
-import {SidePanel, spaceFillingRule, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
+import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
@@ -27,13 +27,6 @@ export interface ISearchOption {
   action(): void;
 }
 
-export const rule = spaceFillingRule({
-  groupHeight: 70,
-  rowHeight: 18,
-  groupPadding: 5
-});
-
-
 /**
  * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
  * @param score
@@ -53,7 +46,7 @@ export function wrap(score: IPluginDesc): IScoreLoader {
 export default class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
-  static readonly EVENT_RULE_CHANGED = 'ruleChanged';
+  static readonly EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
   /**
    * @deprecated
@@ -80,6 +73,7 @@ export default class LineUpPanelActions extends EventHandler {
 
   constructor(protected readonly provider: LocalDataProvider, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
+
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
 
@@ -201,7 +195,7 @@ export default class LineUpPanelActions extends EventHandler {
       const listener = () => {
         const selected = this.overview.classList.toggle('fa-th-list');
         this.overview.classList.toggle('fa-list');
-        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
+        this.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, selected);
       };
       const overviewButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed

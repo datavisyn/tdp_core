@@ -1,4 +1,4 @@
-import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IDataRow} from 'lineupjs';
+import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IDataRow, spaceFillingRule} from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -15,7 +15,7 @@ import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
-import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
+import LineUpPanelActions from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 import {ISecureItem} from 'phovea_core/src/security';
@@ -268,20 +268,20 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+    const taggleOptions: ITaggleOptions = mixin(defaultOptions(), this.options.customOptions, <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
       labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
-      config.rowHeight = this.options.itemRowHeight;
+      taggleOptions.rowHeight = this.options.itemRowHeight;
     } else if (typeof this.options.itemRowHeight === 'function') {
       const f = this.options.itemRowHeight;
-      config.dynamicHeight = () => ({
-        defaultHeight: 18,
+      taggleOptions.dynamicHeight = () => ({
+        defaultHeight: taggleOptions.rowHeight,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? 70 : f((<Partial<IDataRow & IGroupItem>>item).v, (<Partial<IDataRow & IGroupItem>>item).i);
+          return isGroup(item) ? taggleOptions.groupHeight : f((<Partial<IDataRow & IGroupItem>>item).v, (<Partial<IDataRow & IGroupItem>>item).i);
         }
       });
     }
@@ -289,7 +289,7 @@ export abstract class ARankingView extends AView {
 
 
     const lineupParent = <HTMLElement>this.node.firstElementChild!;
-    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, config) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, taggleOptions) : new TaggleRenderer(this.provider, lineupParent, Object.assign(taggleOptions, {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
@@ -315,13 +315,15 @@ export abstract class ARankingView extends AView {
       this.taggle.zoomIn();
     });
     if (this.options.enableOverviewMode) {
-      this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
-        updateLodRules(this.taggle.style, rule != null, config);
-        (<TaggleRenderer>this.taggle).switchRule(rule);
+      const rule = spaceFillingRule(taggleOptions);
+
+      this.panel.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event: any, isOverviewActive: boolean) => {
+        updateLodRules(this.taggle.style, isOverviewActive, taggleOptions);
+        (<TaggleRenderer>this.taggle).switchRule(isOverviewActive ? rule : null);
       });
+
       if (this.options.enableOverviewMode === 'active') {
-        updateLodRules(this.taggle.style, true, config);
-        (<TaggleRenderer>this.taggle).switchRule(rule);
+        this.panel.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, true);
       }
     }
 
