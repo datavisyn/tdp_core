@@ -1,7 +1,7 @@
 import {IStoredNamedSet} from './interfaces';
 import {FormDialog} from 'phovea_ui/src/dialogs';
 import {ISecureItem} from 'phovea_core/src/security';
-import {permissionForm} from '../internal/utils';
+import {permissionForm} from '../utils/utils';
 import i18n from 'phovea_core/src/i18n';
 
 export default function editDialog(namedSet: IStoredNamedSet, result: (name: string, description: string, sec: Partial<ISecureItem>) => void) {

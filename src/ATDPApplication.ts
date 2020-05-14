@@ -11,7 +11,7 @@ import LoginMenu from 'phovea_clue/src/menu/LoginMenu';
 import {isLoggedIn} from 'phovea_core/src/security';
 import ACLUEWrapper from 'phovea_clue/src/ACLUEWrapper';
 import {loadProvenanceGraphVis, loadStoryVis} from 'phovea_clue/src/vis_loader';
-import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
+import EditProvenanceGraphMenu from './utils/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
 import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';

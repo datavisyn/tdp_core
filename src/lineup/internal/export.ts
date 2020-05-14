@@ -1,7 +1,7 @@
 import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from 'lineupjs';
 import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
-import {json2xlsx} from '../../internal/xlsx';
+import {json2xlsx} from '../../utils/xlsx';
 import i18n from 'phovea_core/src/i18n';
 
 function isDateColumn(column: Column) {
