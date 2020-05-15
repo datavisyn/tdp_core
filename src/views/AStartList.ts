@@ -1,7 +1,7 @@
 
 
-import ARankingView, {IARankingViewOptions} from './ARankingView';
-import {ENamedSetType, INamedSet} from '../storage';
+import ARankingView, {IARankingViewOptions} from '../lineup/ARankingView';
+import {ENamedSetType, INamedSet} from '../storage/interfaces';
 import {ISelection, IViewContext} from './interfaces';
 import {IParams} from '../rest';
 import {retrieve} from 'phovea_core/src/session';

@@ -2,8 +2,6 @@ import {ISelectionAdapter} from './ISelectionAdapter';
 import SingleSelectionAdapter, {ISingleSelectionAdapter} from './internal/SingleSelectionAdapter';
 import MultiSelectionAdapter, {IMultiSelectionAdapter} from './internal/MultiSelectionAdapter';
 
-export {ISelectionAdapter, ISelectionColumn, IContext} from './ISelectionAdapter';
-
 
 /**
  * create a single selection adapter, i.e. that one selected item results in one additional column in LineUp

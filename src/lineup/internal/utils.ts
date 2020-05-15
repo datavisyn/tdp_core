@@ -4,7 +4,7 @@
 import {IScoreRow} from '../../extensions';
 import {getTDPCount, IParams, IRow} from '../../rest';
 import {IDataRow} from 'lineupjs';
-import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form';
+import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form/elements/FormMap';
 import {encodeParams} from 'phovea_core/src/ajax';
 
 

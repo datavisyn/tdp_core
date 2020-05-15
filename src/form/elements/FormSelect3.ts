@@ -4,7 +4,6 @@
 
 import AFormElement from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
-import {IFormSelectDesc} from './FormSelect';
 import Select3, {IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
 import {IPluginDesc} from 'phovea_core/src/plugin';

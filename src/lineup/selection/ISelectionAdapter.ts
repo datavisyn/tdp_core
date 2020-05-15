@@ -1,5 +1,5 @@
 import {Column, IColumnDesc} from 'lineupjs';
-import {ISelection} from '../../views';
+import {ISelection} from '../../extensions';
 import {IScoreRow} from '../../extensions';
 
 export interface ISelectionColumn {

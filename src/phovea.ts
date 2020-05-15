@@ -4,7 +4,7 @@
  * Licensed under the new BSD license, available at http://caleydo.org/license
  **************************************************************************** */
 import {IRegistry, asResource} from 'phovea_core/src/plugin';
-import {FormElementType} from './form';
+import {FormElementType} from './form/interfaces';
 import {EP_TDP_CORE_FORM_ELEMENT} from './extensions';
 import {EP_PHOVEA_CORE_LOCALE, ILocaleEPDesc} from 'phovea_core/src/extensions';
 
@@ -21,24 +21,24 @@ export default function (registry: IRegistry) {
     registry.push(EP_TDP_CORE_FORM_ELEMENT, id, loader, options);
   }
 
-  actionFunction('tdpInitSession', 'initSessionImpl', () => System.import('./internal/cmds'), {
+  actionFunction('tdpInitSession', 'initSessionImpl', () => System.import('./utils/cmds'), {
     analytics: {
       category: 'session',
       action: 'init'
     }
   });
-  actionFunction('tdpSetParameter', 'setParameterImpl', () => System.import('./internal/cmds'), {
+  actionFunction('tdpSetParameter', 'setParameterImpl', () => System.import('./utils/cmds'), {
     analytics: {
       category: 'view',
       action: 'setParameter'
     }
   });
-  actionCompressor('tdpCompressSetParameter', 'compressSetParameter', '(tdpSetParameter)', () => System.import('./internal/cmds'));
+  actionCompressor('tdpCompressSetParameter', 'compressSetParameter', '(tdpSetParameter)', () => System.import('./utils/cmds'));
 
   // compatibility
-  actionFunction('targidInitSession', 'initSessionImpl', () => System.import('./internal/cmds'));
-  actionFunction('targidSetParameter', 'setParameterImpl', () => System.import('./internal/cmds'));
-  actionCompressor('targidCompressSetParameter', 'compressSetParameterOld', '(targidSetParameter)', () => System.import('./internal/cmds'));
+  actionFunction('targidInitSession', 'initSessionImpl', () => System.import('./utils/cmds'));
+  actionFunction('targidSetParameter', 'setParameterImpl', () => System.import('./utils/cmds'));
+  actionCompressor('targidCompressSetParameter', 'compressSetParameterOld', '(targidSetParameter)', () => System.import('./utils/cmds'));
 
 
   actionFunction('tdpAddScore', 'addScoreImpl', () => System.import('./lineup/internal/scorecmds'), {

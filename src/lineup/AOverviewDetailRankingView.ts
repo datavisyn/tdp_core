@@ -2,7 +2,7 @@
 
 import {LayoutContainerEvents} from 'phovea_ui/src/layout';
 import ARankingView, {IARankingViewOptions} from './ARankingView';
-import {ISelection, IViewContext} from '../views';
+import {ISelection, IViewContext} from '../extensions';
 import {ISplitLayoutContainer, root, verticalSplit, view} from 'phovea_ui/src/layout';
 import {IRow} from '../rest';
 import {debounce} from 'phovea_core/src';

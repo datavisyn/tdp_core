@@ -17,7 +17,6 @@ import {
 import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import Range from 'phovea_core/src/range/Range';
 import {currentUser, isLoggedIn} from 'phovea_core/src/security';
-import {resolveImmediately} from 'phovea_core/src';
 
 export interface IDiscoveredView {
   enabled: boolean;

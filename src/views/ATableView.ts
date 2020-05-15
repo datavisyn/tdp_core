@@ -2,7 +2,7 @@ import {debounce} from 'phovea_core/src';
 import {parse} from 'phovea_core/src/range';
 import {errorAlert} from '../notifications';
 import {IRow} from '../rest';
-import {ISelection, IViewContext} from './';
+import {ISelection, IViewContext} from './interfaces';
 import {AView} from './AView';
 import {jsonArray2xlsx} from '../utils/xlsx';
 import i18n from 'phovea_core/src/i18n';

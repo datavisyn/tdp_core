@@ -12,8 +12,6 @@ import {errorAlert} from '../notifications';
 import {EXTENSION_POINT_TDP_LIST_FILTERS} from '../extensions';
 import {Selection, select, event as d3event} from 'd3';
 import {
-  ALL_NONE_NONE,
-  ALL_READ_READ,
   canWrite,
   currentUserNameOrAnonymous,
   EEntity,

@@ -1,6 +1,7 @@
 import {randomId} from 'phovea_core/src';
 import {IDType, IDTypeLike, resolve} from 'phovea_core/src/idtype';
-import {FormElementType, IFormElement, IFormElementDesc, IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption} from '../form';
+import {IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption} from '../form/elements/FormSelect';
+import {FormElementType, IFormElement, IFormElementDesc} from '../form/interfaces';
 import {ISelection} from './interfaces';
 import i18n from 'phovea_core/src/i18n';
 

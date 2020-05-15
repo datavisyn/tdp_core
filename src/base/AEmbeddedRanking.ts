@@ -1,14 +1,14 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
 import {ProvenanceGraph, cat} from 'phovea_core/src/provenance';
 import {none, parse} from 'phovea_core/src/range';
-import {ARankingView, IARankingViewOptions} from '../lineup';
+import {ARankingView, IARankingViewOptions} from '../lineup/ARankingView';
 import {IInitialRankingOptions} from '../lineup/desc';
 import {IViewProviderLocal} from '../lineup/internal/cmds';
 import {resolve} from 'phovea_core/src/idtype';
 import {EXTENSION_POINT_TDP_SCORE_IMPL, IScore} from '../extensions';
 import {get as getPlugin} from 'phovea_core/src/plugin';
 import {IServerColumnDesc, IRow} from '../rest';
-import {IFormElementDesc} from '../form';
+import {IFormElementDesc} from '../form/interfaces';
 import {ILazyLoadedColumn} from '../lineup/internal/column';
 
 interface IEmbeddedRanking extends ARankingView {

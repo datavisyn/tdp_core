@@ -1,7 +1,7 @@
 import {IPluginDesc} from 'phovea_core/src/plugin';
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import {IObjectRef} from 'phovea_core/src/provenance';
-import {IViewPlugin, IViewPluginDesc, IView, IViewClass, IViewContext, ISelection} from '../extensions';
+import {IViewPluginDesc, IViewContext, ISelection} from '../extensions';
 export {IViewPlugin, IViewPluginDesc, IView, IViewClass, IViewContext, ISelection} from '../extensions';
 
 /**

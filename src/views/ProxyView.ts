@@ -5,7 +5,8 @@
 import {mixin} from 'phovea_core/src';
 import {resolve} from 'phovea_core/src/idtype';
 import {IViewContext, ISelection} from './interfaces';
-import {FormElementType, IFormSelectElement, IFormSelectOption} from '../form';
+import {FormElementType} from '../form/interfaces';
+import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
 import AD3View from './AD3View';
 import {getProxyUrl} from '../rest';
 import i18n from 'phovea_core/src/i18n';

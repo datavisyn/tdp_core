@@ -1,6 +1,7 @@
 import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions} from 'lineupjs';
 import {AView} from '../views/AView';
-import {EViewMode, IViewContext, ISelection} from '../views';
+import {IViewContext, ISelection} from '../extensions';
+import {EViewMode} from '../views/interfaces';
 
 import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
@@ -11,10 +12,10 @@ import {IScore, IScoreRow} from '../extensions';
 import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
-import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
+import {debounce, mixin} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
-import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/adapterUtils';
+import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/ISelectionAdapter';
 import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';

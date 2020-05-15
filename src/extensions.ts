@@ -3,7 +3,7 @@ import {IUser} from 'phovea_core/src/security';
 import {IObjectRef, ProvenanceGraph} from 'phovea_core/src/provenance';
 import Range from 'phovea_core/src/range/Range';
 import {IEventHandler} from 'phovea_core/src/event';
-import {IAdditionalColumnDesc} from './lineup';
+import {IAdditionalColumnDesc} from './lineup/desc';
 import {RangeLike} from 'phovea_core/src/range';
 import {IDType} from 'phovea_core/src/idtype';
 import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';

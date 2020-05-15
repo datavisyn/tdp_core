@@ -8,7 +8,7 @@ import {get as getPlugin} from 'phovea_core/src/plugin';
 import {Column} from 'lineupjs';
 import {IScore} from '../../extensions';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../extensions';
-import {externalize, resolveExternalized} from '../../storage';
+import {externalize, resolveExternalized} from '../../storage/internal/attachment';
 import i18n from 'phovea_core/src/i18n';
 
 export const CMD_ADD_SCORE = 'tdpAddScore';
