@@ -11,8 +11,6 @@ import {EViewMode} from './views/interfaces';
 import {AppHeader} from 'phovea_ui/src/header';
 import {PanelTab} from './lineup/internal/panel/PanelTab';
 
-export * from './tour/extensions';
-
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
