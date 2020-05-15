@@ -1,5 +1,5 @@
 import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI, MAX_URL_LENGTH} from 'phovea_core/src/ajax';
-import {IScoreRow} from './lineup';
+import {IScoreRow} from './extensions';
 import {IDTypeLike} from 'phovea_core/src/idtype';
 
 export const REST_NAMESPACE = '/tdp';

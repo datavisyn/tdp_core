@@ -6,7 +6,7 @@ import {ISelection} from '../../views';
 import {IDType} from 'phovea_core/src/idtype';
 import {list as rlist} from 'phovea_core/src/range';
 import {EventHandler} from 'phovea_core/src/event';
-import {IRow} from '../';
+import {IRow} from '../../rest';
 import {LocalDataProvider} from 'lineupjs';
 
 

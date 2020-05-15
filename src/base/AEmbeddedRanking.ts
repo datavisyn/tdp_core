@@ -1,13 +1,13 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
 import {ProvenanceGraph, cat} from 'phovea_core/src/provenance';
 import {none, parse} from 'phovea_core/src/range';
-import {ARankingView, IARankingViewOptions, IRow, IScore} from '../lineup';
+import {ARankingView, IARankingViewOptions} from '../lineup';
 import {IInitialRankingOptions} from '../lineup/desc';
-import {IViewProvider} from '../lineup/internal/cmds';
+import {IViewProviderLocal} from '../lineup/internal/cmds';
 import {resolve} from 'phovea_core/src/idtype';
-import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../extensions';
+import {EXTENSION_POINT_TDP_SCORE_IMPL, IScore} from '../extensions';
 import {get as getPlugin} from 'phovea_core/src/plugin';
-import {IServerColumnDesc} from '../rest';
+import {IServerColumnDesc, IRow} from '../rest';
 import {IFormElementDesc} from '../form';
 import {ILazyLoadedColumn} from '../lineup/internal/column';
 
@@ -16,7 +16,7 @@ interface IEmbeddedRanking extends ARankingView {
   runWithoutTracking<T>(f: () => T): Promise<T>;
 }
 
-export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider {
+export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderLocal {
   private ranking: IEmbeddedRanking;
 
   /**

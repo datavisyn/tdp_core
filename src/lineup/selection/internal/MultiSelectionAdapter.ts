@@ -4,7 +4,7 @@
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
 import {set_diff} from '../../internal/LineUpSelectionHelper';
-import {IScoreRow} from '../../';
+import {IScoreRow} from '../../../extensions';
 import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
 import {resolveImmediately} from 'phovea_core/src';
 

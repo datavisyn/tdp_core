@@ -4,7 +4,7 @@
 import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
-import {IScoreRow} from '../../';
+import {IScoreRow} from '../../../extensions';
 import {resolveImmediately} from 'phovea_core/src';
 
 export interface ISingleSelectionAdapter {

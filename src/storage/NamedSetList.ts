@@ -8,7 +8,7 @@ import editDialog from './editDialog';
 import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
 import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
 import {list as listPlugins} from 'phovea_core/src/plugin';
-import {showErrorModalDialog} from '../dialogs';
+import {errorAlert} from '../notifications';
 import {EXTENSION_POINT_TDP_LIST_FILTERS} from '../extensions';
 import {Selection, select, event as d3event} from 'd3';
 import {
@@ -185,7 +185,7 @@ export default class NamedSetList {
 
   protected list(): Promise<INamedSet[]> {
     return listNamedSets(this.idType)
-      .catch(showErrorModalDialog)
+      .catch(errorAlert)
       .catch((error) => {
         console.error(error);
         return [];

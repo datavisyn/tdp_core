@@ -1,8 +1,8 @@
 /**
  * Created by sam on 13.02.2017.
  */
-import {IRow, IScoreRow} from '../';
-import {getTDPCount, IParams} from '../../rest';
+import {IScoreRow} from '../../extensions';
+import {getTDPCount, IParams, IRow} from '../../rest';
 import {IDataRow} from 'lineupjs';
 import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form';
 import {encodeParams} from 'phovea_core/src/ajax';

@@ -5,12 +5,12 @@
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
 import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
 import {PropertyHandler} from 'phovea_core/src';
-import {showErrorModalDialog, lazyDialogModule} from '../dialogs';
+import {lazyDialogModule} from '../dialogs';
 import {IProvenanceGraphDataDescription} from 'phovea_core/src/provenance';
 import {mixin, randomId} from 'phovea_core/src';
-import {ALL_READ_NONE, ALL_READ_READ, EEntity, hasPermission, ISecureItem} from 'phovea_core/src/security';
+import {EEntity, hasPermission, ISecureItem} from 'phovea_core/src/security';
 import {IEvent, fire as globalFire} from 'phovea_core/src/event';
-import {DEFAULT_SUCCESS_AUTO_HIDE, pushNotification} from '../notifications';
+import {DEFAULT_SUCCESS_AUTO_HIDE, pushNotification, errorAlert} from '../notifications';
 import {TemporarySessionList, PersistentSessionList} from '../SessionList';
 import {permissionForm} from './utils';
 import i18n from 'phovea_core/src/i18n';
@@ -98,7 +98,7 @@ export default class EditProvenanceGraphMenu {
               this.node.querySelector('a span').innerHTML = desc.name;
               globalFire(GLOBAL_EVENT_MANIPULATED);
             })
-            .catch(showErrorModalDialog);
+            .catch(errorAlert);
         }
       });
       return false;
@@ -153,7 +153,7 @@ export default class EditProvenanceGraphMenu {
       }
       persistProvenanceGraphMetaData(this.graph.desc).then((extras: any) => {
         if (extras !== null) {
-          Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(showErrorModalDialog).then(() => {
+          Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(errorAlert).then(() => {
             this.updateGraphMetaData(this.graph);
             const p = new PropertyHandler(location.hash);
             const hash = new Map<string, string>();
@@ -185,7 +185,7 @@ export default class EditProvenanceGraphMenu {
           if (deleteIt) {
             Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
               this.manager.startFromScratch();
-            }).catch(showErrorModalDialog);
+            }).catch(errorAlert);
           }
         });
       return false;
