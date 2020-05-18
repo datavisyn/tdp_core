@@ -1,11 +1,10 @@
 import logging
 import re
-import sys
 
 from phovea_server.config import view as configview
 from phovea_server.plugin import list as list_plugins, lookup, AExtensionDesc
 from .db import configs as engines
-from typing import List, Dict
+from typing import List, Dict, Optional
 import alembic.command
 import alembic.config
 from os import path
@@ -40,7 +39,7 @@ class DBMigration(object):
     self.db_url: str = db_url
     self.script_location: str = script_location
     self.auto_upgrade: bool = auto_upgrade
-    self.version_table_schema: str = version_table_schema
+    self.version_table_schema: Optional[str] = version_table_schema
     self.custom_commands: Dict[str, str] = dict()
 
     # Because we can't easily pass "-1" as npm argument, we add a custom command for that without the space
@@ -52,7 +51,7 @@ class DBMigration(object):
       try:
         self.execute(['upgrade', 'head'])
         _log.info(f'Successfully upgraded database {self.id}')
-      except:
+      except Exception:
         _log.exception(f'Error upgrading database {self.id}')
 
   def __repr__(self) -> str:
@@ -76,7 +75,7 @@ class DBMigration(object):
   def remove_custom_command(self, origin: str):
     self.custom_commands.pop(origin, None)
 
-  def get_custom_command(self, arguments: List[str] = []) -> List[str]:
+  def get_custom_command(self, arguments: List[str] = []) -> Optional[List[str]]:
     """
     Returns the rewritten command if it matches the pattern of a custom command.
     :param List[str] arguments: Argument to rewrite.
@@ -120,14 +119,6 @@ class DBMigration(object):
     if self.version_table_schema:
       alembic_cfg.set_main_option('version_table_schema', self.version_table_schema)
 
-    # Before running a command, make sure that the dbmigration_env is not a cached module.
-    # Alembic works by importing this file which automatically executes the context setup and
-    # the call to dbmigration_env#run_migrations_online().
-    # When the module is imported multiple times (i.e. by multiple migrations), this import step
-    # is cached by python, such that the migration is not executed again.
-    # The simple fix is to remove the cached module from sys.modules to force a new import.
-    if 'tdp_core.dbmigration_env' in sys.modules:
-      del sys.modules['tdp_core.dbmigration_env']
     # Run the command
     cmd_parser.run_cmd(alembic_cfg, options)
 
@@ -198,8 +189,8 @@ class DBMigrationManager(object):
         # Retrieve engine and store string as db url
         try:
           db_url = str(engines.engine(db_key).url)
-        except Exception as e:
-          _log.error(f'Error retrieving URL from engine {db_key}: {str(e)}')
+        except Exception:
+          _log.exception(f'Error retrieving URL from engine {db_key}')
           continue
 
       # Create new migration
@@ -265,8 +256,7 @@ def create_migration_command(parser):
         print('Available migrations: {}'.format(', '.join(str(migration) for migration in db_migration_manager.migrations)))
     elif args.action == 'exec':
       if args.id == 'all':
-        # TODO: For some reason, the migrations can only be executed for a single id.
-        # When using multiple ids, alembic doesn't do anything in the 2nd, 3rd, ... migration.
+        # TODO
         print('Currently, only single migrations are supported. Please execute the command for each migration individually as we are working on a fix.')
         return
 
