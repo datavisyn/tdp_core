@@ -4,8 +4,6 @@ import i18n from 'phovea_core/src/i18n';
  * Created by Samuel Gratzl
  */
 
-export {setGlobalErrorTemplate, showErrorModalDialog} from 'phovea_ui/src/errors';
-
 export const DEFAULT_SUCCESS_AUTO_HIDE = 5000;
 export const DEFAULT_ERROR_AUTO_HIDE = -1; // not
 
