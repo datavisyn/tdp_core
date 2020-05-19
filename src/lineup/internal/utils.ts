@@ -4,7 +4,7 @@
 import {IScoreRow} from '../../extensions';
 import {getTDPCount, IParams, IRow} from '../../rest';
 import {IDataRow} from 'lineupjs';
-import {convertRow2MultiMap, IFormMultiMap, IFormRow} from '../../form/elements/FormMap';
+import {IFormMultiMap, IFormRow, FormMap} from '../../form/elements/FormMap';
 import {encodeParams} from 'phovea_core/src/ajax';
 
 
@@ -75,7 +75,7 @@ export function createAccessor(colDesc: any): AScoreAccessorProxy<any> {
 export function toFilter(filter: IFormMultiMap | IFormRow[]): IParams {
   if (Array.isArray(filter)) {
     //map first
-    return toFilter(convertRow2MultiMap(filter));
+    return toFilter(FormMap.convertRow2MultiMap(filter));
   }
   const clean = (v: any) => {
     if (Array.isArray(v)) {

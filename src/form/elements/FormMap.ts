@@ -5,9 +5,9 @@
 import 'select2';
 import {event as d3event} from 'd3';
 import $ from 'jquery';
-import {AFormElement, toData} from './AFormElement';
+import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
-import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
+import {ISelectOptions, IFormSelectOption, FormSelect} from './FormSelect';
 import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
 import {mixin} from 'phovea_core/src';
 import {IFormElement} from '..';
@@ -225,11 +225,11 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       $(this.$node.node()).on('hidden.bs.dropdown', () => {
         const v = this.value;
         const previous = this.previousValue;
-        if (isEqual(v, previous)) {
+        if (this.isEqual(v, previous)) {
           return;
         }
         this.previousValue = v;
-        this.inlineOnChange(this, v, toData(v), previous);
+        this.inlineOnChange(this, v, AFormElement.toData(v), previous);
       });
     }
 
@@ -262,7 +262,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           row.value = this.value;
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
         });
-        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
+        FormSelect.resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">${i18n.t('tdp:core.FormMap.selectMe')}</option>` : '') + values.map(mapOptions).join('');
           if (initialValue) {
             (<HTMLSelectElement>parent.firstElementChild).selectedIndex = values.map((d) => typeof d === 'string' ? d : d.value).indexOf(initialValue);
@@ -276,7 +276,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       case FormElementType.SELECT2:
         parent.insertAdjacentHTML('afterbegin', `<select class="form-control" style="width: 100%"></select>`);
 
-        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
+        FormSelect.resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
           // in case of ajax but have default value
           if (desc.ajax && values.length === 0 && initialValue) {
@@ -465,7 +465,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
    * @param v
    */
   set value(v: IFormRow[]) {
-    if (isEqual(v, this.value)) {
+    if (this.isEqual(v, this.value)) {
       return;
     }
     this.rows = v;
@@ -479,43 +479,44 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     // open dropdown
     $(this.$node.select('.dropdown-menu').node()).show();
   }
-}
 
-function isEqual(a: IFormRow[], b: IFormRow[]) {
-  if (a.length !== b.length) {
-    return false;
+  isEqual(a: IFormRow[], b: IFormRow[]) {
+    if (a.length !== b.length) {
+      return false;
+    }
+    return a.every((ai, i) => {
+      const bi = b[i];
+      return ai.key === bi.key && ai.value === bi.value;
+    });
   }
-  return a.every((ai, i) => {
-    const bi = b[i];
-    return ai.key === bi.key && ai.value === bi.value;
-  });
+
+  static convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap {
+    if (!rows) {
+      return {};
+    }
+    const map = new Map<string, any[]>();
+    rows.forEach((row) => {
+      if (!map.has(row.key)) {
+        map.set(row.key, []);
+      }
+      const v = map.get(row.key);
+      if (Array.isArray(row.value)) {
+        v.push(...row.value);
+      } else {
+        v.push(row.value);
+      }
+    });
+    const r: IFormMultiMap = {};
+    map.forEach((v, k) => {
+      if (v.length === 1) {
+        r[k] = v[0];
+      } else {
+        r[k] = v;
+      }
+    });
+    return r;
+  }
 }
 
 export declare type IFormMultiMap = {[key: string]: any | any[]};
 
-export function convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap {
-  if (!rows) {
-    return {};
-  }
-  const map = new Map<string, any[]>();
-  rows.forEach((row) => {
-    if (!map.has(row.key)) {
-      map.set(row.key, []);
-    }
-    const v = map.get(row.key);
-    if (Array.isArray(row.value)) {
-      v.push(...row.value);
-    } else {
-      v.push(row.value);
-    }
-  });
-  const r: IFormMultiMap = {};
-  map.forEach((v, k) => {
-    if (v.length === 1) {
-      r[k] = v[0];
-    } else {
-      r[k] = v;
-    }
-  });
-  return r;
-}

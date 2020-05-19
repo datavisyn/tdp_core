@@ -8,7 +8,7 @@ import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
 import {none} from 'phovea_core/src/range';
 import {IFormElementDesc} from '../form/interfaces';
 import {FormBuilder} from '../form/FormBuilder';
-import {toData} from '../form/elements/AFormElement';
+import {AFormElement} from '../form/elements/AFormElement';
 import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
@@ -62,7 +62,7 @@ export abstract class AView extends EventHandler implements IView {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
     parent.appendChild(this.node);
-    if (isRegex(context.desc.idtype)) {
+    if (this.isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
     } else {
       this.idType = resolve(context.desc.idtype);
@@ -179,7 +179,7 @@ export abstract class AView extends EventHandler implements IView {
 
   protected getParameterData(name: string): any {
     const value = this.getParameter(name);
-    return toData(value);
+    return AFormElement.toData(value);
   }
 
   protected async changeParameter(name: string, value: any) {
@@ -345,9 +345,10 @@ export abstract class AView extends EventHandler implements IView {
   destroy() {
     this.node.remove();
   }
+
+  isRegex(v: string) {
+    // cheap test for regex
+    return v.includes('*') || v.includes('.') || v.includes('|');
+  }
 }
 
-function isRegex(v: string) {
-  // cheap test for regex
-  return v.includes('*') || v.includes('.') || v.includes('|');
-}

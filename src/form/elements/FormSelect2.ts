@@ -215,7 +215,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
         const values = Array.isArray(v) ? v : [v];
         r = values.map((d: any) => d.value || d.id);
         const old = <ISelect2Option[]>this.value;
-        if (sameIds(old.map((d) => d.id), r)) {
+        if (FormSelect2.sameIds(old.map((d) => d.id), r)) {
           return;
         }
       } else {
@@ -245,19 +245,19 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     this.$jqSelect.select2('open');
   }
 
+  /**
+   * compare array independent of the order
+   * @param a
+   * @param b
+   * @returns {boolean}
+   */
+  static sameIds(a: string[], b: string[]) {
+    if (a.length !== b.length) {
+      return false;
+    }
+    const bids = new Set(b);
+    // all of a contained in b
+    return a.every((d) => bids.has(d));
+  }
 }
 
-/**
- * compare array independent of the order
- * @param a
- * @param b
- * @returns {boolean}
- */
-function sameIds(a: string[], b: string[]) {
-  if (a.length !== b.length) {
-    return false;
-  }
-  const bids = new Set(b);
-  // all of a contained in b
-  return a.every((d) => bids.has(d));
-}

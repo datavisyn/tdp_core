@@ -6,11 +6,6 @@ import {array_diff} from '../../internal/LineUpSelectionHelper';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
 import {resolveImmediately} from 'phovea_core/src/internal/promise';
 
-export function patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
-  desc.selectedId = selectedId;
-  return desc;
-}
-
 export abstract class ABaseSelectionAdapter {
 
   protected addDynamicColumns(context: IContext, _ids: number[], ids: string[]) {
@@ -89,4 +84,9 @@ export abstract class ABaseSelectionAdapter {
   }
 
   protected abstract createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<ISelectionColumn[]>;
+
+  static patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
+    desc.selectedId = selectedId;
+    return desc;
+  }
 }

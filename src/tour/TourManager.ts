@@ -1,4 +1,4 @@
-import {resolveTours, ITourContext} from './Tour';
+import {ITourContext} from './Tour';
 import {Tour} from './Tour';
 import {IStep, GLOBAL_EVENT_START_TOUR} from './extensions';
 import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
@@ -104,7 +104,7 @@ export class TourManager {
     this.stepCount = context.doc.createElement('div');
     this.stepCount.classList.add('tdp-tour-step-count');
 
-    this.tours = resolveTours();
+    this.tours = Tour.resolveTours();
     this.chooser = context.doc.createElement('div');
     this.chooser.classList.add('modal', 'fade');
     this.chooser.tabIndex = -1;

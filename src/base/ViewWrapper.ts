@@ -71,7 +71,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
      <main></main>
      <div class="preview-image">
         <div></div>
-        <span>${!this.allowed ? notAllowedText(plugin.securityNotAllowedText) : selectionText(plugin.selection, plugin.idtype)}</span>
+        <span>${!this.allowed ? notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
     </div>`;
     this.node.classList.add('view', 'disabled-view');
     this.content = <HTMLElement>this.node.querySelector('main');
@@ -220,7 +220,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   get idType() {
     const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
-    return selection && selection.idtype ? selection.idtype : guessIDType(this.plugin); // TODO: better IDType strategy than guessIDType?
+    return selection && selection.idtype ? selection.idtype : ViewWrapper.guessIDType(this.plugin); // TODO: better IDType strategy than guessIDType?
   }
 
   private destroyInstance() {
@@ -347,34 +347,34 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   dumpReference() {
     return this.ref.id;
   }
-}
 
-
-function selectionText(selection: any, idType: string) {
-  const label = idType.includes('*') || idType.includes('(') ? 'item' : resolve(idType).name;
-  switch (String(selection)) {
-    case '':
-    case 'none':
-    case '0':
-      return i18n.t('tdp:core.ViewWrapper.selectionTextNone', {label});
-    case 'any':
-      return i18n.t('tdp:core.ViewWrapper.selectionTextAny', {label});
-    case 'single':
-    case '1':
-      return i18n.t('tdp:core.ViewWrapper.selectionTextOne', {label});
-    case 'small_multiple':
-    case 'multiple':
-    case 'some':
-    case 'chooser':
-      return i18n.t('tdp:core.ViewWrapper.selectionTextMultiple', {label});
-    case '2':
-      return i18n.t('tdp:core.ViewWrapper.selectionTextTwo', {label});
-    default:
-      console.error('unknown selector: ', selection, idType);
-      return i18n.t('tdp:core.ViewWrapper.selectionTextDefault', {selection});
+  selectionText(selection: any, idType: string) {
+    const label = idType.includes('*') || idType.includes('(') ? 'item' : resolve(idType).name;
+    switch (String(selection)) {
+      case '':
+      case 'none':
+      case '0':
+        return i18n.t('tdp:core.ViewWrapper.selectionTextNone', {label});
+      case 'any':
+        return i18n.t('tdp:core.ViewWrapper.selectionTextAny', {label});
+      case 'single':
+      case '1':
+        return i18n.t('tdp:core.ViewWrapper.selectionTextOne', {label});
+      case 'small_multiple':
+      case 'multiple':
+      case 'some':
+      case 'chooser':
+        return i18n.t('tdp:core.ViewWrapper.selectionTextMultiple', {label});
+      case '2':
+        return i18n.t('tdp:core.ViewWrapper.selectionTextTwo', {label});
+      default:
+        console.error('unknown selector: ', selection, idType);
+        return i18n.t('tdp:core.ViewWrapper.selectionTextDefault', {selection});
+    }
   }
-}
 
-export function guessIDType(v: IViewPluginDesc): IDType | null {
-  return v.idtype.includes('*') ? null : resolve(v.idtype);
+  static guessIDType(v: IViewPluginDesc): IDType | null {
+    return v.idtype.includes('*') ? null : resolve(v.idtype);
+  }
+
 }

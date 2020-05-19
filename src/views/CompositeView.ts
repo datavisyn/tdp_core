@@ -168,7 +168,7 @@ export class CompositeView extends EventHandler implements IView {
     super();
     Object.assign(this.options, options);
 
-    if (isRegex(context.desc.idtype)) {
+    if (this.isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
     } else {
       this.idType = resolve(context.desc.idtype);
@@ -496,9 +496,8 @@ export class CompositeView extends EventHandler implements IView {
     });
   }
 
-}
-
-function isRegex(v: string) {
-  // cheap test for regex
-  return v.includes('*') || v.includes('.') || v.includes('|');
+  isRegex(v: string) {
+    // cheap test for regex
+    return v.includes('*') || v.includes('.') || v.includes('|');
+  }
 }

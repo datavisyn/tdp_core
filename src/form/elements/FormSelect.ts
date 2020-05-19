@@ -111,7 +111,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
       this.fire(FormSelect.EVENT_CHANGE, this.value, this.$select);
     });
 
-    const data = resolveData(options.optionsData);
+    const data = FormSelect.resolveData(options.optionsData);
 
     const values = this.handleDependent((values) => {
       data(values).then((items) => {
@@ -150,7 +150,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    * @param data
    */
   updateOptionElements(data: (string|IFormSelectOption|IFormSelectOptionGroup)[]) {
-    const options = data.map(toOption);
+    const options = data.map(FormSelect.toOption);
 
     const isGroup = (d: IFormSelectOption|IFormSelectOptionGroup): d is IFormSelectOptionGroup => {
       return Array.isArray((<any>d).children);
@@ -222,34 +222,35 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   focus() {
     (<HTMLSelectElement>this.$select.node()).focus();
   }
+
+  static toOption(d: string|IFormSelectOption|IFormSelectOptionGroup): IFormSelectOption|IFormSelectOptionGroup {
+    if (typeof d === 'string') {
+      return {name: d, value: d, data: d};
+    }
+    return d;
+  }
+
+  static resolveData(data?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption|IFormSelectOptionGroup)[]>) {
+    if (data === undefined) {
+      return () => resolveImmediately([]);
+    }
+    if (Array.isArray(data)) {
+      return () => resolveImmediately(data.map(this.toOption));
+    }
+    if (data instanceof Promise) {
+      return () => data.then((r) => r.map(this.toOption));
+    }
+    //assume it is a function
+    return (dependents: any[]) => {
+      const r = data(dependents);
+      if (r instanceof Promise) {
+        return r.then((r) => r.map(this.toOption));
+      }
+      if (Array.isArray(r)) {
+        return resolveImmediately(r.map(this.toOption));
+      }
+      return resolveImmediately(r);
+    };
+  }
 }
 
-function toOption(d: string|IFormSelectOption|IFormSelectOptionGroup): IFormSelectOption|IFormSelectOptionGroup {
-  if (typeof d === 'string') {
-    return {name: d, value: d, data: d};
-  }
-  return d;
-}
-
-export function resolveData(data?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption|IFormSelectOptionGroup)[]>) {
-  if (data === undefined) {
-    return () => resolveImmediately([]);
-  }
-  if (Array.isArray(data)) {
-    return () => resolveImmediately(data.map(toOption));
-  }
-  if (data instanceof Promise) {
-    return () => data.then((r) => r.map(toOption));
-  }
-  //assume it is a function
-  return (dependents: any[]) => {
-    const r = data(dependents);
-    if (r instanceof Promise) {
-      return r.then((r) => r.map(toOption));
-    }
-    if (Array.isArray(r)) {
-      return resolveImmediately(r.map(toOption));
-    }
-    return resolveImmediately(r);
-  };
-}

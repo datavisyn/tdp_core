@@ -11,9 +11,7 @@ import {IProvenanceGraphDataDescription, op} from 'phovea_core/src/provenance';
 import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import {errorAlert} from './notifications';
 import {
-  GLOBAL_EVENT_MANIPULATED,
-  editProvenanceGraphMetaData, isPersistent, isPublic,
-  persistProvenanceGraphMetaData
+  GLOBAL_EVENT_MANIPULATED, EditProvenanceGraphMenu
 } from './utils/EditProvenanceGraphMenu';
 import {on as globalOn, off as globalOff} from 'phovea_core/src/event';
 import {fromNow} from './utils/utils';
@@ -83,15 +81,15 @@ abstract class ASessionList {
       stopEvent();
       const nameTd = <HTMLElement>this.parentElement.parentElement.firstElementChild;
       const publicI = <HTMLElement>this.parentElement.parentElement.children[1].firstElementChild;
-      editProvenanceGraphMetaData(d, {button: i18n.t('tdp:core.SessionList.edit')}).then((extras) => {
+      EditProvenanceGraphMenu.editProvenanceGraphMetaData(d, {button: i18n.t('tdp:core.SessionList.edit')}).then((extras) => {
         if (extras !== null) {
           Promise.resolve(manager.editGraphMetaData(d, extras))
             .then((desc) => {
               //update the name
               nameTd.innerText = desc.name;
               successfullySaved(i18n.t('tdp:core.SessionList.session'), desc.name);
-              publicI.className = isPublic(desc) ? 'fa fa-users' : 'fa fa-user';
-              publicI.setAttribute('title', isPublic(d) ? i18n.t('tdp:core.SessionList.status') : i18n.t('tdp:core.SessionList.status', {context: 'private'}));
+              publicI.className = EditProvenanceGraphMenu.isPublic(desc) ? 'fa fa-users' : 'fa fa-user';
+              publicI.setAttribute('title', EditProvenanceGraphMenu.isPublic(d) ? i18n.t('tdp:core.SessionList.status') : i18n.t('tdp:core.SessionList.status', {context: 'private'}));
             })
             .catch(errorAlert);
         }
@@ -100,7 +98,7 @@ abstract class ASessionList {
     });
     $enter.select('a[data-action="persist"]').on('click', (d) => {
       stopEvent();
-      persistProvenanceGraphMetaData(d).then((extras: any) => {
+      EditProvenanceGraphMenu.persistProvenanceGraphMetaData(d).then((extras: any) => {
         if (extras !== null) {
           manager.importExistingGraph(d, extras, true).catch(errorAlert);
         }
@@ -130,7 +128,7 @@ function byDateDesc(a: any, b: any) {
 export class TemporarySessionList extends ASessionList {
 
   protected async getData(manager: CLUEGraphManager) {
-    let workspaces = (await manager.list()).filter((d) => !isPersistent(d)).sort(byDateDesc);
+    let workspaces = (await manager.list()).filter((d) => !EditProvenanceGraphMenu.isPersistent(d)).sort(byDateDesc);
 
     // cleanup up temporary ones
     if (workspaces.length > KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
@@ -178,7 +176,7 @@ export class TemporarySessionList extends ASessionList {
           <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</td>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('td').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18n.t('tdp:core.SessionList.status') as string : i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
+      $tr.select('td').text((d) => d.name).attr('class', (d) => EditProvenanceGraphMenu.isPublic(d) ? i18n.t('tdp:core.SessionList.status') as string : i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('td:nth-of-type(2)')
         .text((d) => d.ts ? fromNow(d.ts) : i18n.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
@@ -195,7 +193,7 @@ export class TemporarySessionList extends ASessionList {
           <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</span>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('span').text((d) => d.name).attr('class', (d) => isPublic(d) ? i18n.t('tdp:core.SessionList.status') as string : i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
+      $tr.select('span').text((d) => d.name).attr('class', (d) => EditProvenanceGraphMenu.isPublic(d) ? i18n.t('tdp:core.SessionList.status') as string : i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('span:nth-of-type(2)')
         .text((d) => d.ts ? fromNow(d.ts) : i18n.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
@@ -216,7 +214,7 @@ export class TemporarySessionList extends ASessionList {
 export class PersistentSessionList extends ASessionList {
 
   protected async getData(manager: CLUEGraphManager) {
-    return (await manager.list()).filter((d) => isPersistent(d)).sort(byDateDesc);
+    return (await manager.list()).filter((d) => EditProvenanceGraphMenu.isPersistent(d)).sort(byDateDesc);
   }
 
   protected async build(manager: CLUEGraphManager) {
@@ -296,8 +294,8 @@ export class PersistentSessionList extends ASessionList {
           this.registerActionListener(manager, $trEnter);
           $tr.select('td').text((d) => d.name);
           $tr.select('td:nth-of-type(2) i')
-            .attr('class', (d) => isPublic(d) ? 'fa fa-users' : 'fa fa-user')
-            .attr('title', (d) => isPublic(d) ? publicTitle : privateTitle);
+            .attr('class', (d) => EditProvenanceGraphMenu.isPublic(d) ? 'fa fa-users' : 'fa fa-user')
+            .attr('title', (d) => EditProvenanceGraphMenu.isPublic(d) ? publicTitle : privateTitle);
           $tr.select('td:nth-of-type(3)')
             .text((d) => d.ts ? fromNow(d.ts) : unknownText)
             .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
@@ -341,8 +339,8 @@ export class PersistentSessionList extends ASessionList {
           this.registerActionListener(manager, $trEnter);
           $tr.select('span').text((d) => d.name);
           $tr.select('span:nth-of-type(2) i')
-            .attr('class', (d) => isPublic(d) ? 'fa fa-users' : 'fa fa-user')
-            .attr('title', (d) => isPublic(d) ? publicTitle : privateTitle);
+            .attr('class', (d) => EditProvenanceGraphMenu.isPublic(d) ? 'fa fa-users' : 'fa fa-user')
+            .attr('title', (d) => EditProvenanceGraphMenu.isPublic(d) ? publicTitle : privateTitle);
           $tr.select('span:nth-of-type(3)')
             .text((d) => d.ts ? fromNow(d.ts) : unknownText)
             .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);

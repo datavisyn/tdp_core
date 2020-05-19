@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
+import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
 import {IScoreRow} from '../../../extensions';
@@ -49,7 +49,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISe
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
     return resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [{
-      desc: patchDesc(desc, _id),
+      desc: ABaseSelectionAdapter.patchDesc(desc, _id),
       data: this.adapter.loadData(_id, id),
       id: _id
     }]);

@@ -5,7 +5,7 @@ import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
 import {set_diff} from '../../internal/LineUpSelectionHelper';
 import {IScoreRow} from '../../../extensions';
-import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
+import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {resolveImmediately} from 'phovea_core/src';
 
 export interface IMultiSelectionAdapter {
@@ -51,7 +51,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISel
       if (descs.length <= 0) {
         return [];
       }
-      descs.forEach((d) => patchDesc(d, _id));
+      descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, _id));
 
       const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
       const dynamicColumnIDs = new Set<string>(usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`));

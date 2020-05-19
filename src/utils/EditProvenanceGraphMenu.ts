@@ -30,7 +30,7 @@ export class EditProvenanceGraphMenu {
   updateGraphMetaData(graph: ProvenanceGraph) {
     this.node.querySelector('span.session-name').innerHTML = graph.desc.name;
     const syncIcon = this.node.querySelector('.sync-indicator');
-    const persisted = isPersistent(graph.desc);
+    const persisted = EditProvenanceGraphMenu.isPersistent(graph.desc);
     const persistAction = (<HTMLLinkElement>this.node.querySelector('a[data-action="persist"]').parentElement);
     if (persisted) {
       syncIcon.classList.remove('fa-clock-o');
@@ -90,7 +90,7 @@ export class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      editProvenanceGraphMetaData(this.graph.desc, {permission: isPersistent(this.graph.desc)}).then((extras) => {
+      EditProvenanceGraphMenu.editProvenanceGraphMetaData(this.graph.desc, {permission: EditProvenanceGraphMenu.isPersistent(this.graph.desc)}).then((extras) => {
         if (extras !== null) {
           Promise.resolve(manager.editGraphMetaData(this.graph.desc, extras))
             .then((desc) => {
@@ -148,10 +148,10 @@ export class EditProvenanceGraphMenu {
     (<HTMLLinkElement>li.querySelector('a[data-action="persist"]')).addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
-      if (!this.graph || isPersistent(this.graph.desc)) {
+      if (!this.graph || EditProvenanceGraphMenu.isPersistent(this.graph.desc)) {
         return false;
       }
-      persistProvenanceGraphMetaData(this.graph.desc).then((extras: any) => {
+      EditProvenanceGraphMenu.persistProvenanceGraphMetaData(this.graph.desc).then((extras: any) => {
         if (extras !== null) {
           Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(errorAlert).then(() => {
             this.updateGraphMetaData(this.graph);
@@ -245,71 +245,72 @@ export class EditProvenanceGraphMenu {
 
     return li;
   }
-}
 
-export function isPersistent(d: IProvenanceGraphDataDescription) {
-  return d.local === false || d.local === undefined;
-}
+  static isPersistent(d: IProvenanceGraphDataDescription) {
+    return d.local === false || d.local === undefined;
+  }
 
-export function persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
-  const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
-  return editProvenanceGraphMetaData(d, {
-    title: `<i class="fa fa-cloud"></i> ${i18n.t('tdp:core.EditProvenanceMenu.persistSession')}`,
-    button: `<i class="fa fa-cloud"></i> ${i18n.t('tdp:core.EditProvenanceMenu.persist')}`,
-    name
-  });
-}
-
-export function isPublic(d: ISecureItem) {
-  return hasPermission(d, EEntity.OTHERS);
-}
-
-export function editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
-  args = mixin({
-    button: 'Edit',
-    title: `<i class="fa fa-edit" aria-hidden="true"></i>${i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
-    permission: true,
-    name: d.name
-  }, args);
-  return lazyDialogModule().then(({FormDialog}) => {
-    const dialog = new FormDialog(args.title, args.button);
-    const prefix = 'd' + randomId();
-    const permissions = permissionForm(d, {
-      extra: `<div class="help-block">
-      ${i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
-    </div>`
+  static persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
+    const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
+    return EditProvenanceGraphMenu.editProvenanceGraphMetaData(d, {
+      title: `<i class="fa fa-cloud"></i> ${i18n.t('tdp:core.EditProvenanceMenu.persistSession')}`,
+      button: `<i class="fa fa-cloud"></i> ${i18n.t('tdp:core.EditProvenanceMenu.persist')}`,
+      name
     });
-    dialog.form.innerHTML = `
-        <div class="form-group">
-          <label for="${prefix}_name">${i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
-          <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
-        </div>
-        <div class="form-group">
-          <label for="${prefix}_desc">${i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
-          <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
-        </div>
-        <div class="checkbox">
-          <label class="radio-inline">
-            <input type="checkbox" name="${prefix}_agree" required="required">
-            ${i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${i18n.t('tdp:core.EditProvenanceMenu.dialog')}.
-          </label>
-        </div>
-    `;
-    dialog.form.lastElementChild!.insertAdjacentElement('beforebegin', permissions.node);
-    return new Promise((resolve) => {
-      dialog.onHide(() => {
-        resolve(null);
+  }
+
+  static isPublic(d: ISecureItem) {
+    return hasPermission(d, EEntity.OTHERS);
+  }
+
+  static editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
+    args = mixin({
+      button: 'Edit',
+      title: `<i class="fa fa-edit" aria-hidden="true"></i>${i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
+      permission: true,
+      name: d.name
+    }, args);
+    return lazyDialogModule().then(({FormDialog}) => {
+      const dialog = new FormDialog(args.title, args.button);
+      const prefix = 'd' + randomId();
+      const permissions = permissionForm(d, {
+        extra: `<div class="help-block">
+        ${i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
+      </div>`
       });
-      dialog.onSubmit(() => {
-        const extras = Object.assign({
-          name: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_name`)).value,
-          description: (<HTMLTextAreaElement>dialog.body.querySelector(`#${prefix}_desc`)).value,
-        }, args.permission ? permissions.resolve(new FormData(dialog.form)) : d.permissions);
-        resolve(extras);
-        dialog.hide();
-        return false;
+      dialog.form.innerHTML = `
+          <div class="form-group">
+            <label for="${prefix}_name">${i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
+            <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
+          </div>
+          <div class="form-group">
+            <label for="${prefix}_desc">${i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
+            <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
+          </div>
+          <div class="checkbox">
+            <label class="radio-inline">
+              <input type="checkbox" name="${prefix}_agree" required="required">
+              ${i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${i18n.t('tdp:core.EditProvenanceMenu.dialog')}.
+            </label>
+          </div>
+      `;
+      dialog.form.lastElementChild!.insertAdjacentElement('beforebegin', permissions.node);
+      return new Promise((resolve) => {
+        dialog.onHide(() => {
+          resolve(null);
+        });
+        dialog.onSubmit(() => {
+          const extras = Object.assign({
+            name: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_name`)).value,
+            description: (<HTMLTextAreaElement>dialog.body.querySelector(`#${prefix}_desc`)).value,
+          }, args.permission ? permissions.resolve(new FormData(dialog.form)) : d.permissions);
+          resolve(extras);
+          dialog.hide();
+          return false;
+        });
+        dialog.show();
       });
-      dialog.show();
     });
-  });
+  }
+
 }

@@ -92,6 +92,4 @@ export class InstantViewWrapper {
       this.node.classList.toggle('single-view', views.length === 1);
     });
   }
-
-
 }

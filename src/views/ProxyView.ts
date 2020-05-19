@@ -223,9 +223,8 @@ export class ProxyView extends AD3View {
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
-}
 
-
-export function create(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
-  return new ProxyView(context, selection, parent, options);
+  static create(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
+    return new ProxyView(context, selection, parent, options);
+  }
 }

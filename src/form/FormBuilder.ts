@@ -5,8 +5,8 @@
 import * as d3 from 'd3';
 import {randomId} from 'phovea_core/src/index';
 import {IFormElement, IFormElementDesc, IForm} from './interfaces';
-import {createFormElement} from './elements/AFormElement';
-import {Form, updateElementDesc} from './elements/Form';
+import {AFormElement} from './elements/AFormElement';
+import {Form} from './elements/Form';
 
 /**
  * Builds a form from a given collection of form elements
@@ -38,9 +38,9 @@ export class FormBuilder {
    * @param elementDesc
    */
   appendElement(elementDesc: IFormElementDesc) {
-    const desc = updateElementDesc(elementDesc, this.formId);
+    const desc = Form.updateElementDesc(elementDesc, this.formId);
 
-    const elementPromise = createFormElement(this.form, desc);
+    const elementPromise = AFormElement.createFormElement(this.form, desc);
     this.elementPromises.push(elementPromise);
   }
 

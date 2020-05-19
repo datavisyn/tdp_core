@@ -101,10 +101,10 @@ export class Tour {
   previous(context: ITourContext) {
     return this.jumpTo(this.current - 1, context);
   }
-}
 
-export function resolveTours() {
-  const tours = <ITDPTourExtensionDesc[]>list(EXTENSION_POINT_TDP_TOUR);
+  static resolveTours() {
+    const tours = <ITDPTourExtensionDesc[]>list(EXTENSION_POINT_TDP_TOUR);
 
-  return tours.map((d) => new Tour(d));
+    return tours.map((d) => new Tour(d));
+  }
 }
