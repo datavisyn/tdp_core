@@ -20,8 +20,6 @@ import {fromNow} from './utils/utils';
 import {successfullyDeleted, successfullySaved} from './notifications';
 import i18n from 'phovea_core/src/i18n';
 
-export {isPublic} from './utils/EditProvenanceGraphMenu';
-
 abstract class ASessionList {
   private handler: () => void;
 

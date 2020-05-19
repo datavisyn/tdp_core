@@ -22,9 +22,6 @@ import {successfullySaved} from '../notifications';
 import {ISecureItem} from 'phovea_core/src/security';
 import i18n from 'phovea_core/src/i18n';
 
-export {IRankingWrapper} from './internal/ranking';
-export {LocalDataProvider as DataProvider} from 'lineupjs';
-
 export interface IARankingViewOptions {
   /**
    * name of a single item in LineUp

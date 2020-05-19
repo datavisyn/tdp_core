@@ -22,8 +22,6 @@ import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './exten
 import {TourManager} from './tour/TourManager';
 import i18n, {initI18n} from 'phovea_core/src/i18n';
 
-export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
-
 export interface ITDPOptions {
   /**
    * alternative login formular
