@@ -10,7 +10,7 @@ export interface ITourContext {
   hide(finished?: boolean): void;
 }
 
-export default class Tour {
+export class Tour {
   private current: number = -1;
 
   private steps: IStep[] = [];

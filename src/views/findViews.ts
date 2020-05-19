@@ -30,7 +30,7 @@ export interface IDiscoveredView {
  * @param {Range} selection the current input selection
  * @returns {Promise<IDiscoveredView[]>} list of views and whether the current selection count matches their requirements
  */
-export default function findViews(idType: IDType, selection: Range): Promise<IDiscoveredView[]> {
+export function findViews(idType: IDType, selection: Range): Promise<IDiscoveredView[]> {
   const selectionLength = selection.isNone ? 0 : selection.dim(0).length;
 
   function bySelection(p: any) {

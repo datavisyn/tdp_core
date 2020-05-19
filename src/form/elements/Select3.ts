@@ -167,7 +167,7 @@ export function highlightMatch(match: string, p1: string, offset: number): strin
   return match !== '' ? `<mark>${p1}</mark>` : '';
 }
 
-export default class Select3<T extends IdTextPair> extends EventHandler {
+export class Select3<T extends IdTextPair> extends EventHandler {
   /**
    * event fired when the selection changes the argument is an array of ISelection objects
    * @see ISelection

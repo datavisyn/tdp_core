@@ -10,7 +10,7 @@ export interface IRadioElementDesc extends IFormElementDesc {
   };
 }
 
-export default class FormRadio extends AFormElement<IRadioElementDesc> {
+export class FormRadio extends AFormElement<IRadioElementDesc> {
 
   /**
    * Constructor

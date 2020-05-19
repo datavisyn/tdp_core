@@ -1,5 +1,5 @@
 import {resolveTours, ITourContext} from './Tour';
-import Tour from './Tour';
+import {Tour} from './Tour';
 import {IStep, GLOBAL_EVENT_START_TOUR} from './extensions';
 import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
 import {AppHeader} from 'phovea_ui/src/header';
@@ -22,7 +22,7 @@ interface IBoundingBox {
   height: number;
 }
 
-export default class TourManager {
+export class TourManager {
 
   private readonly keyListener = (evt: KeyboardEvent) => {
     if (evt.which === 27) { // esc

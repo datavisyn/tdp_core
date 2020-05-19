@@ -5,7 +5,7 @@
 import 'select2';
 import {event as d3event} from 'd3';
 import $ from 'jquery';
-import AFormElement, {toData} from './AFormElement';
+import {AFormElement, toData} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
 import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
@@ -13,7 +13,7 @@ import {mixin} from 'phovea_core/src';
 import {IFormElement} from '..';
 import * as session from 'phovea_core/src/session';
 import {resolveImmediately} from 'phovea_core/src';
-import {ISelect3Options, default as Select3, IdTextPair} from './Select3';
+import {ISelect3Options, Select3, IdTextPair} from './Select3';
 import {IPluginDesc} from 'phovea_core/src/plugin';
 import i18n from 'phovea_core/src/i18n';
 
@@ -89,7 +89,7 @@ function hasInlineParent(node: HTMLElement) {
   return false;
 }
 
-export default class FormMap extends AFormElement<IFormMapDesc> {
+export class FormMap extends AFormElement<IFormMapDesc> {
 
   private $group: d3.Selection<any>;
   private rows: IFormRow[] = [];

@@ -5,7 +5,7 @@ import {LocalDataProvider, Ranking} from 'lineupjs';
  * Plain HTML button with a custom title, CSS class and an onClick function.
  * Injects through the onClick callback the current ranking.
  */
-export default class PanelRankingButton implements IPanelButton {
+export class PanelRankingButton implements IPanelButton {
   readonly node: HTMLElement;
 
   constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, linkClass: string, onClick: (ranking: Ranking) => void) {

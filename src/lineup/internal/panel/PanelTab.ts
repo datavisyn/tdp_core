@@ -1,7 +1,7 @@
 import {SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
 import {EventHandler} from 'phovea_core/src/event';
-import PanelButton, {PanelNavButton} from './PanelButton';
+import {PanelButton, PanelNavButton} from './PanelButton';
 import i18n from 'phovea_core/src/i18n';
 
 /**

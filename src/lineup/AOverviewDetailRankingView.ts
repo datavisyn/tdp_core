@@ -1,13 +1,13 @@
 
 
 import {LayoutContainerEvents} from 'phovea_ui/src/layout';
-import ARankingView, {IARankingViewOptions} from './ARankingView';
+import {ARankingView, IARankingViewOptions} from './ARankingView';
 import {ISelection, IViewContext} from '../extensions';
 import {ISplitLayoutContainer, root, verticalSplit, view} from 'phovea_ui/src/layout';
 import {IRow} from '../rest';
 import {debounce} from 'phovea_core/src';
 import {LocalDataProvider} from 'lineupjs';
-import OverviewColumn from './internal/OverviewColumn';
+import {OverviewColumn} from './internal/OverviewColumn';
 import i18n from 'phovea_core/src/i18n';
 
 export abstract class AOverviewDetailRankingView extends ARankingView {

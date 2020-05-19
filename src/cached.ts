@@ -11,7 +11,7 @@ const values = new Map<string, any>();
  * @param creator the function to create in case the values not yet cached
  * @return {any}
  */
-export default function cached<T>(key: string, creator: () => T) {
+export function cached<T>(key: string, creator: () => T) {
   if (values.has(key)) {
     return values.get(key);
   }

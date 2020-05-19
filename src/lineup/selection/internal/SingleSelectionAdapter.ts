@@ -25,7 +25,7 @@ export interface ISingleSelectionAdapter {
   loadData(_id: number, id: string): Promise<IScoreRow<any>[]>;
 }
 
-export default class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
+export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
   constructor(private readonly adapter: ISingleSelectionAdapter) {
     super();
   }

@@ -11,7 +11,7 @@ import LoginMenu from 'phovea_clue/src/menu/LoginMenu';
 import {isLoggedIn} from 'phovea_core/src/security';
 import ACLUEWrapper from 'phovea_clue/src/wrapper/ACLUEWrapper';
 import {loadProvenanceGraphVis, loadStoryVis} from 'phovea_clue/src/vis/vis_loader';
-import EditProvenanceGraphMenu from './utils/EditProvenanceGraphMenu';
+import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './dialogs';
 import {mixin} from 'phovea_core/src';
 import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
@@ -19,7 +19,7 @@ import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import 'phovea_ui/src/_font-awesome';
 import {list as listPlugins} from 'phovea_core/src/plugin';
 import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
-import TourManager from './tour/TourManager';
+import {TourManager} from './tour/TourManager';
 import i18n, {initI18n} from 'phovea_core/src/i18n';
 
 export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
@@ -288,5 +288,3 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    */
   protected abstract initSessionImpl(app: T);
 }
-
-export default ATDPApplication;

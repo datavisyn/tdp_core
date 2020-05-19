@@ -20,7 +20,7 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
   };
 }
 
-export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
+export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
 
   private $input: d3.Selection<any>;
 

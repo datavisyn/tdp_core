@@ -90,5 +90,3 @@ export abstract class ABaseSelectionAdapter {
 
   protected abstract createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<ISelectionColumn[]>;
 }
-
-export default ABaseSelectionAdapter;

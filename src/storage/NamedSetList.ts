@@ -4,7 +4,7 @@
 
 import {IDType} from 'phovea_core/src/idtype';
 import {areyousure} from 'phovea_ui/src/dialogs';
-import editDialog from './editDialog';
+import {editDialog} from './editDialog';
 import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
 import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
 import {list as listPlugins} from 'phovea_core/src/plugin';
@@ -20,7 +20,7 @@ import {
 import {successfullySaved, successfullyDeleted} from '../notifications';
 import i18n from 'phovea_core/src/i18n';
 
-export default class NamedSetList {
+export class NamedSetList {
   readonly node: HTMLElement;
 
   private data: INamedSet[] = [];

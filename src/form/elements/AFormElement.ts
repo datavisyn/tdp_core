@@ -226,5 +226,3 @@ export function createFormElement(form: IForm, elementDesc: IFormElementDesc): P
     return p.factory(form, <any>elementDesc, p.desc);
   });
 }
-
-export default AFormElement;

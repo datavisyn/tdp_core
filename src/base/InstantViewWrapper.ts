@@ -14,7 +14,7 @@ import loadBootstrap from 'phovea_ui/src/_lazyBootstrap';
 import {IInstanceViewExtensionDesc, IItemSelection} from '../extensions';
 import {findInstantViews} from '../views/findViews';
 
-export default class InstantViewWrapper {
+export class InstantViewWrapper {
   readonly node: HTMLElement;
 
   private selection: IItemSelection;

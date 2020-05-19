@@ -3,7 +3,7 @@
  */
 import {FormDialog as Dialog} from 'phovea_ui/src/dialogs';
 import {randomId} from 'phovea_core/src';
-import FormBuilder from './FormBuilder';
+import {FormBuilder} from './FormBuilder';
 import {IFormElementDesc, IForm} from './interfaces';
 import {select} from 'd3';
 
@@ -11,7 +11,7 @@ import {select} from 'd3';
  * a utililty dialog to show a dialog modal using a FormBuilder
  * @see FormBuilder
  */
-export default class FormDialog extends Dialog {
+export class FormDialog extends Dialog {
   readonly builder: FormBuilder;
 
   /**

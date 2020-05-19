@@ -18,5 +18,3 @@ export class AInstantView implements IInstantView {
     this.node.remove();
   }
 }
-
-export default AInstantView;

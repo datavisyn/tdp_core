@@ -34,7 +34,7 @@ export interface IMultiSelectionAdapter {
   loadData(_id: number, id: string, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[]>[];
 }
 
-export default class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
+export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
   constructor(private readonly adapter: IMultiSelectionAdapter) {
     super();
   }

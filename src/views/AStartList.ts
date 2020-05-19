@@ -1,6 +1,6 @@
 
 
-import ARankingView, {IARankingViewOptions} from '../lineup/ARankingView';
+import {ARankingView, IARankingViewOptions} from '../lineup/ARankingView';
 import {ENamedSetType, INamedSet} from '../storage/interfaces';
 import {ISelection, IViewContext} from './interfaces';
 import {IParams} from '../rest';
@@ -57,5 +57,3 @@ export abstract class AStartList extends ARankingView {
     return filter;
   }
 }
-
-export default AStartList;

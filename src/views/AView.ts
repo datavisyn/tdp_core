@@ -7,7 +7,7 @@ import {EventHandler} from 'phovea_core/src/event';
 import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
 import {none} from 'phovea_core/src/range';
 import {IFormElementDesc} from '../form/interfaces';
-import FormBuilder from '../form/FormBuilder';
+import {FormBuilder} from '../form/FormBuilder';
 import {toData} from '../form/elements/AFormElement';
 import {
   EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
@@ -346,8 +346,6 @@ export abstract class AView extends EventHandler implements IView {
     this.node.remove();
   }
 }
-
-export default AView;
 
 function isRegex(v: string) {
   // cheap test for regex

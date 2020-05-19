@@ -12,7 +12,7 @@ export interface IPanelButton {
 /**
  * Plain HTML button with a custom title, CSS class and an onClick function
  */
-export default class PanelButton implements IPanelButton {
+export class PanelButton implements IPanelButton {
   readonly node: HTMLElement;
 
   /**

@@ -4,7 +4,7 @@
 
 import * as d3 from 'd3';
 import * as session from 'phovea_core/src/session';
-import AFormElement from './AFormElement';
+import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import {resolveImmediately} from 'phovea_core/src';
 import {IPluginDesc} from 'phovea_core/src/plugin';
@@ -55,7 +55,7 @@ export interface IFormSelectElement extends IFormElement {
  * Select form element instance
  * Propagates the changes from the DOM select element using the internal `change` event
  */
-export default class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSelectElement {
+export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSelectElement {
 
   private $select: d3.Selection<any>;
 

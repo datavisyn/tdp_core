@@ -6,7 +6,7 @@ import {ITable, ITableColumn} from 'phovea_core/src/table';
 import {ICategoricalValueTypeDesc, INumberValueTypeDesc, IValueTypeDesc} from 'phovea_core/src/datatype';
 import {IRow, IServerColumnDesc} from '../rest';
 
-export default class PhoveaDataAdapter {
+export class PhoveaDataAdapter {
   private readonly data: Promise<ITable>;
 
   constructor(private readonly datasetId: string) {

@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import cached, {cachedLazy} from '../src/cached';
+import {cached, cachedLazy} from '../src/cached';
 
 describe('cached', () => {
   describe('cached', () => {

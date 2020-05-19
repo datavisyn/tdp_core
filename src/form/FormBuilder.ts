@@ -11,7 +11,7 @@ import {Form, updateElementDesc} from './elements/Form';
 /**
  * Builds a form from a given collection of form elements
  */
-export default class FormBuilder {
+export class FormBuilder {
 
   /**
    * The form that will be build

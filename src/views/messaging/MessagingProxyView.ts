@@ -1,4 +1,4 @@
-import AView from '../AView';
+import {AView} from '../AView';
 import {IViewContext, ISelection} from '../interfaces';
 import {resolve} from 'phovea_core/src/idtype';
 import {resolveIds} from '../resolve';
@@ -23,7 +23,7 @@ export interface IPartialProxyViewOptions {
   itemIDType: string;
 }
 
-export default class MessagingProxyView extends AView {
+export class MessagingProxyView extends AView {
   protected options: IPartialProxyViewOptions = {
     site: null,
     idtype: null,

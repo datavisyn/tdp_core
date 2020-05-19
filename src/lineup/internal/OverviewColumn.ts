@@ -7,7 +7,7 @@ import i18n from 'phovea_core/src/i18n';
 /**
  * extra column for highlighting and filtering
  */
-export default class OverviewColumn extends BooleanColumn {
+export class OverviewColumn extends BooleanColumn {
   static readonly GROUP_TRUE = {name: i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'), color: 'white'};
   static readonly GROUP_FALSE = {name: i18n.t('tdp:core.lineup.OverviewColumn.rest'), color: '#AAAAAA'};
 

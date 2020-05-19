@@ -2,7 +2,7 @@ import {Ranking} from 'lineupjs';
 import {scale} from 'd3';
 import {array_diff} from './LineUpSelectionHelper';
 
-export default class LineUpColors {
+export class LineUpColors {
   /**
    * Map that assigns each selection ID a color, which is used as color for columns
    */

@@ -325,5 +325,3 @@ function parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
   const content = `${headerContent}\n${bodyContent}`;
   return content;
 }
-
-export default ATableView;

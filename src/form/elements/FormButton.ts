@@ -8,7 +8,7 @@ export interface IButtonElementDesc extends IFormElementDesc {
   iconClass?: string;
 }
 
-export default class FormButton extends EventHandler implements IFormElement {
+export class FormButton extends EventHandler implements IFormElement {
   private $button: d3.Selection<HTMLButtonElement>;
   private $node: d3.Selection<any>;
   private clicked: boolean = false;

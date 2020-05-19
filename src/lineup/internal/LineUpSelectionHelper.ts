@@ -37,7 +37,7 @@ export function set_diff<T>(set1: Set<T>, set2: Set<T>): Set<T> {
   return diff;
 }
 
-export default class LineUpSelectionHelper extends EventHandler {
+export class LineUpSelectionHelper extends EventHandler {
   static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';
 
   private _rows: IRow[] = [];

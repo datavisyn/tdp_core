@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
 import {api2absURL} from 'phovea_core/src/ajax';
-import AFormElement from './AFormElement';
+import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
 import {IPluginDesc} from 'phovea_core/src/plugin';
 
@@ -71,7 +71,7 @@ export const DEFAULT_AJAX_OPTIONS = Object.assign({
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
  */
-export default class FormSelect2 extends AFormElement<IFormSelect2> {
+export class FormSelect2 extends AFormElement<IFormSelect2> {
 
   private $select: d3.Selection<any>;
 

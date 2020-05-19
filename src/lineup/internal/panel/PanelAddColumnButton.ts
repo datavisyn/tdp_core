@@ -7,7 +7,7 @@ import i18n from 'phovea_core/src/i18n';
  * Div HTMLElement that contains a button and a SearchBox.
  * The SearchBox is hidden by default and can be toggled by the button.
  */
-export default class PanelAddColumnButton implements IPanelButton {
+export class PanelAddColumnButton implements IPanelButton {
   readonly node: HTMLElement;
   /**
    *

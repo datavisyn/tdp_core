@@ -1,7 +1,7 @@
-import AView from './AView';
+import {AView }from './AView';
 import {IViewContext, ISelection} from './interfaces';
 import {getProxyUrl} from '../rest';
-import SelectionChooser, {ISelectionChooserOptions} from './SelectionChooser';
+import {SelectionChooser, ISelectionChooserOptions} from './SelectionChooser';
 import i18n from 'phovea_core/src/i18n';
 
 export interface IProxyViewChooserOptions extends Partial<ISelectionChooserOptions> {
@@ -38,7 +38,7 @@ export interface IProxyViewChooserOptions extends Partial<ISelectionChooserOptio
   openExternally: boolean;
 }
 
-export default class ChooserProxyView extends AView {
+export class ChooserProxyView extends AView {
   protected options: IProxyViewChooserOptions = {
     name: null,
     proxy: null,

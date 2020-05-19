@@ -4,7 +4,7 @@ import {ISecureItem} from 'phovea_core/src/security';
 import {permissionForm} from '../utils/utils';
 import i18n from 'phovea_core/src/i18n';
 
-export default function editDialog(namedSet: IStoredNamedSet, result: (name: string, description: string, sec: Partial<ISecureItem>) => void) {
+export function editDialog(namedSet: IStoredNamedSet, result: (name: string, description: string, sec: Partial<ISecureItem>) => void) {
   const isCreate = namedSet === null;
   const title = isCreate ? i18n.t('tdp:core.editDialog.save') : i18n.t('tdp:core.editDialog.edit');
   const dialog = new FormDialog(title + i18n.t('tdp:core.editDialog.listOfEntities'), title, 'namedset_form');

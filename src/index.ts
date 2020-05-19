@@ -10,9 +10,7 @@ export * from './utils';
 export * from './views';
 
 export * from './ATDPApplication';
-export {default as ATDPApplication} from './ATDPApplication';
 export * from './cached';
-export {default as cached} from './cached';
 export * from './constants';
 export * from './dialogs';
 export * from './extensions';

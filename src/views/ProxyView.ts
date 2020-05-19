@@ -7,7 +7,7 @@ import {resolve} from 'phovea_core/src/idtype';
 import {IViewContext, ISelection} from './interfaces';
 import {FormElementType} from '../form/interfaces';
 import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
-import AD3View from './AD3View';
+import {AD3View} from './AD3View';
 import {getProxyUrl} from '../rest';
 import i18n from 'phovea_core/src/i18n';
 
@@ -25,7 +25,7 @@ export interface IProxyViewOptions {
 /**
  * helper view for proxying an existing external website using an iframe
  */
-export default class ProxyView extends AD3View {
+export class ProxyView extends AD3View {
   protected options: IProxyViewOptions = {
     /**
      * proxy key - will be redirected through a local server proxy

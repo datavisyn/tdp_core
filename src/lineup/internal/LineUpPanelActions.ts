@@ -10,15 +10,15 @@ import {
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
 import {lazyDialogModule} from '../../dialogs';
-import PanelButton from './panel/PanelButton';
+import {PanelButton} from './panel/PanelButton';
 import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
 import {PanelTab, SidePanelTab} from './panel/PanelTab';
-import SearchBoxProvider from './panel/SearchBoxProvider';
-import PanelHeader from './panel/PanelHeader';
-import PanelRankingButton from './panel/PanelRankingButton';
-import PanelAddColumnButton from './panel/PanelAddColumnButton';
+import {SearchBoxProvider} from './panel/SearchBoxProvider';
+import {PanelHeader} from './panel/PanelHeader';
+import {PanelRankingButton} from './panel/PanelRankingButton';
+import {PanelAddColumnButton} from './panel/PanelAddColumnButton';
 import i18n from 'phovea_core/src/i18n';
-import PanelDownloadButton from './panel/PanelDownloadButton';
+import {PanelDownloadButton} from './panel/PanelDownloadButton';
 import {IPanelTabExtension} from '../../extensions';
 
 export interface ISearchOption {
@@ -50,7 +50,7 @@ export function wrap(score: IPluginDesc): IScoreLoader {
   };
 }
 
-export default class LineUpPanelActions extends EventHandler {
+export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
   static readonly EVENT_RULE_CHANGED = 'ruleChanged';

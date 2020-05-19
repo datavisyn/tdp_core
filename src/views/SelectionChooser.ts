@@ -22,7 +22,7 @@ export interface ISelectionChooserOptions {
 /**
  * helper class for chooser logic
  */
-export default class SelectionChooser {
+export class SelectionChooser {
 
   private static readonly INVALID_MAPPING = {
     name: 'Invalid',

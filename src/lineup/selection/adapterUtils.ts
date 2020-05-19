@@ -1,6 +1,6 @@
 import {ISelectionAdapter} from './ISelectionAdapter';
-import SingleSelectionAdapter, {ISingleSelectionAdapter} from './internal/SingleSelectionAdapter';
-import MultiSelectionAdapter, {IMultiSelectionAdapter} from './internal/MultiSelectionAdapter';
+import {SingleSelectionAdapter, ISingleSelectionAdapter} from './internal/SingleSelectionAdapter';
+import {MultiSelectionAdapter, IMultiSelectionAdapter} from './internal/MultiSelectionAdapter';
 
 
 /**

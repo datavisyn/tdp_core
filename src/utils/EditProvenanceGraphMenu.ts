@@ -18,7 +18,7 @@ import i18n from 'phovea_core/src/i18n';
 declare const __DEBUG__;
 export const GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
 
-export default class EditProvenanceGraphMenu {
+export class EditProvenanceGraphMenu {
   readonly node: HTMLLIElement;
   private graph: ProvenanceGraph = null;
 

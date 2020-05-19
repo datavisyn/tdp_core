@@ -7,16 +7,16 @@ import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
 import {errorAlert} from '../notifications';
-import LineUpSelectionHelper from './internal/LineUpSelectionHelper';
+import {LineUpSelectionHelper} from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow} from '../extensions';
 import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {debounce, mixin} from 'phovea_core/src';
-import LineUpColors from './internal/LineUpColors';
+import {LineUpColors} from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/ISelectionAdapter';
-import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
+import {LineUpPanelActions, rule} from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 import {ISecureItem} from 'phovea_core/src/security';
@@ -677,5 +677,3 @@ export abstract class ARankingView extends AView {
   }
 
 }
-
-export default ARankingView;

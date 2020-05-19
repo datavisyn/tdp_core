@@ -21,7 +21,7 @@ import {
   verticalStackedLineUp,
   view, ViewBuilder
 } from 'phovea_ui/src/layout/builder';
-import AView from './AView';
+import {AView} from './AView';
 import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
 import i18n from 'phovea_core/src/i18n';
 
@@ -147,7 +147,7 @@ class WrapperView implements ILayoutView {
 }
 
 
-export default class CompositeView extends EventHandler implements IView {
+export class CompositeView extends EventHandler implements IView {
   private readonly options: Readonly<IACompositeViewOptions> = {
     showHeaders: false
   };

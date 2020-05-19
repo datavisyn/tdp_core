@@ -2,9 +2,9 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import AFormElement from './AFormElement';
+import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
-import Select3, {IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
+import {Select3, IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
 import {IPluginDesc} from 'phovea_core/src/plugin';
 
@@ -27,7 +27,7 @@ export interface IFormSelect3 extends IFormElementDesc {
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
  */
-export default class FormSelect3 extends AFormElement<IFormSelect3> {
+export class FormSelect3 extends AFormElement<IFormSelect3> {
 
   private readonly isMultiple: boolean;
 

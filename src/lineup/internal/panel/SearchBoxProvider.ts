@@ -6,7 +6,7 @@ import i18n from 'phovea_core/src/i18n';
  * The SearchBoxProvider allows creating multiple LineUp SearchBoxes and stores them internally in a list.
  * All created search boxes can be updated simultaneously with a list of searchable items.
  */
-export default class SearchBoxProvider {
+export class SearchBoxProvider {
 
   /**
    * List of created LineUp SearchBoxes

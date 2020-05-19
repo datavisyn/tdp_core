@@ -27,7 +27,7 @@ import {startViewTour} from '../tour/extensions';
 import i18n from 'phovea_core/src/i18n';
 
 
-export default class ViewWrapper extends EventHandler implements IViewProvider {
+export class ViewWrapper extends EventHandler implements IViewProvider {
   static readonly EVENT_VIEW_INITIALIZED = 'viewInitialized';
   static readonly EVENT_VIEW_CREATED = 'viewCreated';
 
