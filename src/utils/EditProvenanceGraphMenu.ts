@@ -3,7 +3,7 @@
  */
 
 import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
-import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
+import {CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 import {PropertyHandler} from 'phovea_core/src';
 import {lazyDialogModule} from '../dialogs';
 import {IProvenanceGraphDataDescription} from 'phovea_core/src/provenance';

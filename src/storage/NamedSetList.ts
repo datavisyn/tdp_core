@@ -3,7 +3,7 @@
  */
 
 import {IDType} from 'phovea_core/src/idtype';
-import {areyousure} from 'phovea_ui/src/dialogs';
+import {FormDialog} from 'phovea_ui/src/dialogs';
 import {editDialog} from './editDialog';
 import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
 import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
@@ -131,7 +131,7 @@ export class NamedSetList {
           return;
         }
 
-        const deleteIt = await areyousure(i18n.t('tdp:core.NamedSetList.dialogText', {name: namedSet.name}),
+        const deleteIt = await FormDialog.areyousure(i18n.t('tdp:core.NamedSetList.dialogText', {name: namedSet.name}),
           {title: i18n.t('tdp:core.NamedSetList.deleteSet')}
         );
         if (deleteIt) {

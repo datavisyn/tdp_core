@@ -2,7 +2,7 @@
  * Created by Holger Stitz on 18.08.2016.
  */
 
-import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
+import {CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui/src/dialogs';
 import i18n from 'phovea_core/src/i18n';
 

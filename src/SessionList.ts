@@ -2,11 +2,11 @@
  * Created by Holger Stitz on 27.07.2016.
  */
 
-import {areyousure} from 'phovea_ui/src/dialogs';
+import {FormDialog} from 'phovea_ui/src/dialogs';
 import {select, Selection, event} from 'd3';
 import $ from 'jquery';
 import {currentUserNameOrAnonymous, canWrite} from 'phovea_core/src/security';
-import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
+import {CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 import {IProvenanceGraphDataDescription, op} from 'phovea_core/src/provenance';
 import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
 import {errorAlert} from './notifications';
@@ -55,7 +55,7 @@ abstract class ASessionList {
 
     $enter.select('a[data-action="delete"]').on('click', async function (d) {
       stopEvent();
-      const deleteIt = await areyousure(i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
+      const deleteIt = await FormDialog.areyousure(i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
       if (deleteIt) {
         await manager.delete(d);
         successfullyDeleted(i18n.t('tdp:core.SessionList.session'), d.name);
