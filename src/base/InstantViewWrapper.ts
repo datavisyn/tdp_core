@@ -10,7 +10,8 @@
  *********************************************************/
 
 
-import {loadBootstrap} from 'phovea_ui/dist/_lazyBootstrap';
+import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
 import {IInstanceViewExtensionDesc, IItemSelection} from '../extensions';
 import {findInstantViews} from '../views/findViews';
 
@@ -42,7 +43,7 @@ export class InstantViewWrapper {
     ul.insertAdjacentHTML('beforeend', `<li role="presentation"><a href="#instantView_${view.id}" aria-controls="instantView_${view.id}" role="tab" data-toggle="tab">${view.name}</a></li>`);
     ul.lastElementChild.firstElementChild!.addEventListener('click', (evt) => {
       evt.preventDefault();
-      loadBootstrap().then(($) => $(evt.currentTarget).tab('show'));
+      import('jquery').then((jquery) => $(evt.currentTarget).tab('show'));
       if (body.classList.contains('tdp-busy')) {
         // need to load
         view.load().then((r) => {

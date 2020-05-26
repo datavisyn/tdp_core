@@ -3,7 +3,9 @@
  */
 
 import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, EventHandler, PluginRegistry} from 'phovea_core';
-import {AppHeaderLink, AppHeader, loadBootstrap} from 'phovea_ui';
+import {AppHeaderLink, AppHeader} from 'phovea_ui';
+import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
 import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
 import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
 import {showProveanceGraphNotFoundDialog} from './dialogs';
@@ -157,8 +159,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.header.wait();
 
     // trigger bootstrap loading
-    loadBootstrap();
-
+    import('jquery');
     this.loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
       loginForm: this.options.loginForm,
