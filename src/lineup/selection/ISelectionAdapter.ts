@@ -1,6 +1,6 @@
 import {Column, IColumnDesc} from 'lineupjs';
-import {ISelection} from '../../extensions';
-import {IScoreRow} from '../../extensions';
+import {ISelection} from '../../base/interfaces';
+import {IScoreRow} from '../../base/interfaces';
 
 export interface ISelectionColumn {
   readonly id: number;

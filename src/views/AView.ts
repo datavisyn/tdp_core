@@ -7,12 +7,11 @@ import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUti
 import {IFormElementDesc} from '../form/interfaces';
 import {FormBuilder} from '../form/FormBuilder';
 import {AFormElement} from '../form/elements/AFormElement';
-import {
-  EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
+import {ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
   VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
 } from './interfaces';
 import {resolveIds, resolveAllNames, resolveAllIds, resolveNames} from './resolve';
-import {DEFAULT_SELECTION_NAME} from '../extensions';
+import {DEFAULT_SELECTION_NAME, EViewMode} from '../base/interfaces';
 import {IForm} from '../form/interfaces';
 
 declare const __DEBUG__;

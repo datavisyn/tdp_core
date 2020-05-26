@@ -1,7 +1,7 @@
 import {IPlugin, EventHandler} from 'phovea_core';
 import {Placement, PopperOptions} from 'popper.js';
 import {AppHeader} from 'phovea_ui';
-import {IViewPluginDesc, IView, ISelection} from '../extensions';
+import {IViewPluginDesc, IView, ISelection} from '../base/interfaces';
 
 export const GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
 

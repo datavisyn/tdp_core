@@ -1,19 +1,19 @@
 /// <reference types="jest" />
-import {cached, cachedLazy} from '../src/cached';
+import {ValueCache} from '../src/base/ValueCache';
 
 describe('cached', () => {
   describe('cached', () => {
     it('value', () => {
-      expect(cached('test', () => 5)).toBe(5);
+      expect(ValueCache.getInstance().cached('test', () => 5)).toBe(5);
       // expect(cached('test', () => 10)).toBe('using cached value');
-      expect(cached('test', () => 10)).toBe(5);
+      expect(ValueCache.getInstance().cached('test', () => 10)).toBe(5);
     });
   });
   describe('cachedLazy', () => {
     it('value', () => {
-      expect(typeof cachedLazy('testLazy', () => 5)).toBe('function');
-      expect(cachedLazy('testLazy', () => 5)()).toBe(5);
-      expect(cachedLazy('testLazy', () => 10)()).toBe(5);
+      expect(typeof ValueCache.getInstance().cachedLazy('testLazy', () => 5)).toBe('function');
+      expect(ValueCache.getInstance().cachedLazy('testLazy', () => 5)()).toBe(5);
+      expect(ValueCache.getInstance().cachedLazy('testLazy', () => 10)()).toBe(5);
     });
   });
 });

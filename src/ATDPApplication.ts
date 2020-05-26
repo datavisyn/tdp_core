@@ -8,10 +8,11 @@ import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
 import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
 import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
-import {showProveanceGraphNotFoundDialog} from './dialogs';
-import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
+import {showProveanceGraphNotFoundDialog} from './base/dialogs';
+import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './base/constants';
 import 'phovea_ui/dist/webpack/_font-awesome';
-import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
+import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
+import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
 
 

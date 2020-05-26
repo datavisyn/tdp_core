@@ -2,9 +2,9 @@
  * Created by sam on 13.02.2017.
  */
 
-import {ISelection} from '../../views';
+import {ISelection} from '../../base';
 import {EventHandler, IDType, Range} from 'phovea_core';
-import {IRow} from '../../rest';
+import {IRow} from '../../base/rest';
 import {LocalDataProvider} from 'lineupjs';
 
 

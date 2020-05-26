@@ -5,8 +5,8 @@
 
 import {IObjectRef, ObjectRefUtils, I18nextManager, ActionMetaData, PluginRegistry, ProvenanceGraph, ActionNode, ActionUtils} from 'phovea_core';
 import {Column} from 'lineupjs';
-import {IScore} from '../../extensions';
-import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../extensions';
+import {IScore} from '../../base/interfaces';
+import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../base/extensions';
 import {externalize, resolveExternalized} from '../../storage/internal/attachment';
 
 

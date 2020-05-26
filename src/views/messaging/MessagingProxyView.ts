@@ -3,7 +3,7 @@ import {IViewContext, ISelection} from '../interfaces';
 import {IDTypeManager, ParseRangeUtils, Range, I18nextManager, EventHandler} from 'phovea_core';
 import {resolveIds} from '../resolve';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
-import {DEFAULT_SELECTION_NAME} from '../../extensions';
+import {DEFAULT_SELECTION_NAME} from '../../base/interfaces';
 
 export interface IPartialProxyViewOptions {
   /**

@@ -1,152 +1,23 @@
 import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions} from 'lineupjs';
 import {AView} from '../views/AView';
-import {IViewContext, ISelection} from '../extensions';
-import {EViewMode} from '../views/interfaces';
-
-import {IDTypeManager, IDTypeLike, BaseUtils, ISecureItem, I18nextManager} from 'phovea_core';
+import {IViewContext, ISelection} from '../base/interfaces';
+import {EViewMode} from '../base/interfaces';
+import {IDTypeManager, BaseUtils, ISecureItem, I18nextManager} from 'phovea_core';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
-import {errorAlert} from '../notifications';
+import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {LineUpSelectionHelper} from './internal/LineUpSelectionHelper';
-import {IScore, IScoreRow} from '../extensions';
-import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
+import {IScore, IScoreRow, IAdditionalColumnDesc} from '../base/interfaces';
+import {createInitialRanking, deriveColumns, IInitialRankingOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
 import {LineUpColors} from './internal/LineUpColors';
-import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
+import {IRow, IServerColumn, IServerColumnDesc} from '../base/rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/ISelectionAdapter';
 import {LineUpPanelActions, rule} from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
-import {successfullySaved} from '../notifications';
-
-export interface IARankingViewOptions {
-  /**
-   * name of a single item in LineUp
-   * @default item
-   */
-  itemName: string | (() => string);
-  /**
-   * plural version of before
-   * @default items
-   */
-  itemNamePlural: string | (() => string);
-  /**
-   * the idtype of the shown items
-   */
-  itemIDType: IDTypeLike | null;
-
-  /**
-   * custom argument (or callback function) to pass to scores dialogs
-   */
-  additionalScoreParameter: object | (() => object);
-  /**
-   * custom argument (or callback function) to pass to scores computations
-   */
-  additionalComputeScoreParameter: object | (() => object);
-  /**
-   * additional attributes for stored named sets
-   */
-  subType: {key: string, value: string};
-
-  /**
-   * enable taggle overview mode switcher
-   * @default true
-   */
-  enableOverviewMode: boolean | 'active';
-
-  /**
-   * enable zoom button
-   * @default true
-   */
-  enableZoom: boolean;
-
-  /**
-   * enable download data button
-   * @default true
-   */
-  enableDownload: boolean;
-
-  /**
-   * enable save list of entities button
-   * @default true
-   */
-  enableSaveRanking: boolean;
-
-  /**
-   * enable collapsing button of side panel
-   * @default true
-   */
-  enableSidePanelCollapsing: boolean;
-
-  /**
-   * enable side panel
-   * @default 'collapsed'
-   */
-  enableSidePanel: boolean | 'collapsed' | 'top';
-
-  /**
-   * enable add columns button
-   * @default true
-   */
-  enableAddingColumns: boolean;
-
-  /**
-   * enable support columns in the add column dialog
-   * @default true
-   */
-  enableAddingSupportColumns: boolean;
-
-  /**
-   * enable combining columns in the add column dialog
-   * @default true
-   */
-  enableAddingCombiningColumns: boolean;
-
-  /**
-   * enable score columns in the add column dialog
-   * @default true
-   */
-  enableAddingScoreColumns: boolean;
-
-  /**
-   * enable previously created columns in the add column dialog
-   * @default true
-   */
-  enableAddingPreviousColumns: boolean;
-
-  /**
-   * enable database columns in the add column dialog
-   * @default true
-   */
-  enableAddingDatabaseColumns: boolean;
-
-  /**
-   * enable meta data score columns in the add column dialog
-   * @default true
-   */
-  enableAddingMetaDataColumns: boolean;
-
-  enableHeaderSummary: boolean;
-
-  enableHeaderRotation: boolean;
-
-  /**
-   * enable that the regular columns are added via a choser dialog
-   * @default false
-   */
-  enableAddingColumnGrouping: boolean;
-
-  /**
-   * enable alternating pattern background
-   * @default false
-   */
-  enableStripedBackground: boolean;
-
-  itemRowHeight: number | ((row: any, index: number) => number) | null;
-
-  customOptions: Partial<ITaggleOptions>;
-  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
-}
+import {NotificationHandler} from '../base/NotificationHandler';
+import {IARankingViewOptions} from './IARankingViewOptions';
 
 /**
  * base class for views based on LineUp
@@ -467,7 +338,7 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, sec: Partial<ISecureItem>) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
-    successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
+    NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
@@ -603,7 +474,7 @@ export abstract class ARankingView extends AView {
       //record after the initial one
       clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
-    }).catch(errorAlert)
+    }).catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
         console.error(error);
         this.setBusy(false);

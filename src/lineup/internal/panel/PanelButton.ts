@@ -1,4 +1,4 @@
-import {PanelTab, IPanelTabDesc} from './PanelTab';
+import {IPanelTabDesc} from './IPanelTabDesc';
 /**
  * Interface for the LineUp panel button
  */

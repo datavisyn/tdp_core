@@ -1,6 +1,6 @@
 import {BaseUtils, ParseRangeUtils, I18nextManager} from 'phovea_core';
-import {errorAlert} from '../notifications';
-import {IRow} from '../rest';
+import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
+import {IRow} from '../base/rest';
 import {ISelection, IViewContext} from './interfaces';
 import {AView} from './AView';
 import {jsonArray2xlsx} from '../utils/xlsx';
@@ -109,7 +109,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     return Promise.resolve(this.loadRows()).then((rows) => {
       this.renderTable(rows);
       this.setBusy(false);
-    }).catch(errorAlert)
+    }).catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
         console.error(error);
         this.setBusy(false);

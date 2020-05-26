@@ -1,5 +1,5 @@
 import {IDType, IDTypeManager, ParseRangeUtils, RangeLike, UserSession, ISecureItem, Ajax, AppContext, Permission} from 'phovea_core';
-import {REST_NAMESPACE as TDP_NAMESPACE} from '../rest';
+import {REST_NAMESPACE as TDP_NAMESPACE} from '../base/rest';
 import {ENamedSetType, IStoredNamedSet} from './interfaces';
 
 

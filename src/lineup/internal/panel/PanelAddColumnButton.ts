@@ -1,5 +1,5 @@
 import {SearchBox} from 'lineupjs';
-import {ISearchOption} from '../LineUpPanelActions';
+import {ISearchOption} from './ISearchOption';
 import {IPanelButton} from './PanelButton';
 import {I18nextManager} from 'phovea_core';
 

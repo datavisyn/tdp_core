@@ -7,10 +7,9 @@ export * from './Form';
 export * from './FormButton';
 export * from './FormCheckBox';
 export * from './FormInputText';
-export * from './FormMap';
-export * from './FormRadio';
 export * from './FormSelect';
 export * from './FormSelect2';
 export * from './FormSelect3';
+export * from './FormRadio';
 export * from './Select3';
-
+export * from './FormMap';

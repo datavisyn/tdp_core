@@ -1,9 +1,10 @@
 
 
-import {ARankingView, IARankingViewOptions} from '../lineup/ARankingView';
+import {ARankingView} from '../lineup/ARankingView';
+import {IARankingViewOptions} from '../lineup/IARankingViewOptions';
 import {ENamedSetType, INamedSet} from '../storage/interfaces';
 import {ISelection, IViewContext} from './interfaces';
-import {IParams} from '../rest';
+import {IParams} from '../base/rest';
 import {UserSession} from 'phovea_core';
 
 export interface IAStartListOptions extends IARankingViewOptions {

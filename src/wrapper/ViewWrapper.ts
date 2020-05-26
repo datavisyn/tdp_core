@@ -9,12 +9,12 @@
  *
  *********************************************************/
 
-import {EventHandler, ObjectRefUtils, ObjectNode, ProvenanceGraph, ResolveNow, Range, IDType, IDTypeManager, I18nextManager} from 'phovea_core';
+import {EventHandler, ObjectRefUtils, ObjectNode, ProvenanceGraph, ResolveNow, Range, IDType, IDTypeManager, I18nextManager, NodeUtils} from 'phovea_core';
 import {IViewProvider} from '../lineup/internal/scorecmds';
-import {ISelection, IView, IViewContext, IViewPluginDesc, DEFAULT_SELECTION_NAME} from '../extensions';
+import {ISelection, IView, IViewContext, IViewPluginDesc, DEFAULT_SELECTION_NAME} from '../base/interfaces';
 import {canAccess} from '../views/findViews';
 import {notAllowedText} from '../utils/utils';
-import {lazyDialogModule} from '../dialogs';
+import {lazyDialogModule} from '../base/dialogs';
 import {createContext, isSameSelection, matchLength} from '../views/interfaces';
 import {AView} from '../views/AView';
 import {setParameter} from '../utils/cmds';
@@ -228,7 +228,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   private onParameterChange(name: string, value: any, previousValue: any, isInitialization: boolean) {
     if (isInitialization) {
-      if (this.ref.createdBy) {
+      if (NodeUtils.createdBy(this.ref)) {
         // executing during replay
         return;
       }

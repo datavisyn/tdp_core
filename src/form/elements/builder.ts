@@ -1,4 +1,4 @@
-import {getTDPLookupUrl, IParams} from '../../rest';
+import {getTDPLookupUrl, IParams} from '../../base/rest';
 import {FormElementType, IFormElementDesc} from '../interfaces';
 
 export interface INameLookupOptions {

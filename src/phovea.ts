@@ -5,7 +5,7 @@
  **************************************************************************** */
 import {IRegistry, PluginRegistry, LocaleExtensionPointDesc, ILocaleEPDesc} from 'phovea_core';
 import {FormElementType} from './form/interfaces';
-import {EP_TDP_CORE_FORM_ELEMENT} from './extensions';
+import {EP_TDP_CORE_FORM_ELEMENT} from './base/extensions';
 
 export default function (registry: IRegistry) {
   function actionFunction(id: string, factory: string, loader: () => any, options?: {}) {

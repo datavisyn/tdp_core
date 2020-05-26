@@ -11,9 +11,11 @@ import {IDType} from 'phovea_core';
 import {IViewPluginDesc, matchLength, showAsSmallMultiple, toViewPluginDesc} from './interfaces';
 import {
   EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW,
-  EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, IGroupData, IInstanceViewExtensionDesc,
+  EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS
+} from '../base/extensions';
+import {IGroupData, IInstanceViewExtensionDesc,
   IViewGroupExtensionDesc
-} from '../extensions';
+} from '../base/interfaces';
 import {IPluginDesc, PluginRegistry, Range, UserSession, IDTypeManager} from 'phovea_core';
 
 

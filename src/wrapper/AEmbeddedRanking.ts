@@ -1,10 +1,12 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
 import {ProvenanceGraph, ParseRangeUtils, PluginRegistry, IDTypeManager, ObjectRefUtils, Range} from 'phovea_core';
-import {ARankingView, IARankingViewOptions} from '../lineup/ARankingView';
+import {ARankingView} from '../lineup/ARankingView';
+import {IARankingViewOptions} from '../lineup/IARankingViewOptions';
 import {IInitialRankingOptions} from '../lineup/desc';
 import {IViewProviderLocal} from '../lineup/internal/cmds';
-import {EXTENSION_POINT_TDP_SCORE_IMPL, IScore} from '../extensions';
-import {IServerColumnDesc, IRow} from '../rest';
+import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../base/extensions';
+import {IScore} from '../base/interfaces';
+import {IServerColumnDesc, IRow} from '../base/rest';
 import {IFormElementDesc} from '../form/interfaces';
 import {ILazyLoadedColumn} from '../lineup/internal/column';
 

@@ -7,7 +7,7 @@ import {IViewContext, ISelection} from './interfaces';
 import {FormElementType} from '../form/interfaces';
 import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
 import {AD3View} from './AD3View';
-import {getProxyUrl} from '../rest';
+import {getProxyUrl} from '../base/rest';
 
 export const FORM_ID_SELECTED_ITEM = 'externalItem';
 

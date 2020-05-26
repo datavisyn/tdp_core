@@ -12,7 +12,7 @@
 
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
-import {IInstanceViewExtensionDesc, IItemSelection} from '../extensions';
+import {IInstanceViewExtensionDesc, IItemSelection} from '../base/interfaces';
 import {findInstantViews} from '../views/findViews';
 
 export class InstantViewWrapper {

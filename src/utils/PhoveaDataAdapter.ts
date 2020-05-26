@@ -3,7 +3,7 @@
  */
 import {ITable, ITableColumn, DataCache} from 'phovea_core';
 import {ICategoricalValueTypeDesc, INumberValueTypeDesc, IValueTypeDesc} from 'phovea_core';
-import {IRow, IServerColumnDesc} from '../rest';
+import {IRow, IServerColumnDesc} from '../base/rest';
 
 export class PhoveaDataAdapter {
   private readonly data: Promise<ITable>;

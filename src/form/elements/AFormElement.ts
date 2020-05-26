@@ -5,7 +5,7 @@
 import {Selection} from 'd3';
 import {EventHandler, UserSession, IPluginDesc, PluginRegistry} from 'phovea_core';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
-import {EP_TDP_CORE_FORM_ELEMENT} from '../../extensions';
+import {EP_TDP_CORE_FORM_ELEMENT} from '../../base/extensions';
 
 /**
  * Abstract form element class that is used as parent class for other form elements

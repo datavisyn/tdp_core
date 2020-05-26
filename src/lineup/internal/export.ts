@@ -1,5 +1,5 @@
 import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from 'lineupjs';
-import {lazyDialogModule} from '../../dialogs';
+import {lazyDialogModule} from '../../base/dialogs';
 import {BaseUtils, I18nextManager} from 'phovea_core';
 import {json2xlsx} from '../../utils/xlsx';
 

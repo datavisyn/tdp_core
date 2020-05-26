@@ -3,8 +3,8 @@
  */
 import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../../desc';
-import {IScoreRow} from '../../../extensions';
+import {IAdditionalColumnDesc} from '../../../base/interfaces';
+import {IScoreRow} from '../../../base/interfaces';
 import {ResolveNow} from 'phovea_core';
 
 export interface ISingleSelectionAdapter {

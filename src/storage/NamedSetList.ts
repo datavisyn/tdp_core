@@ -8,14 +8,14 @@ import {editDialog} from './editDialog';
 import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
 import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
 import {PluginRegistry, I18nextManager} from 'phovea_core';
-import {errorAlert} from '../notifications';
-import {EXTENSION_POINT_TDP_LIST_FILTERS} from '../extensions';
+import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
+import {EXTENSION_POINT_TDP_LIST_FILTERS} from '../base/extensions';
 import {Selection, select, event as d3event} from 'd3';
 import {
   UserSession,
   EEntity
 } from 'phovea_core';
-import {successfullySaved, successfullyDeleted} from '../notifications';
+import {NotificationHandler} from '../base/NotificationHandler';
 
 export class NamedSetList {
   readonly node: HTMLElement;
@@ -60,7 +60,7 @@ export class NamedSetList {
       }, sec);
 
       const editedSet = await editNamedSet(namedSet.id, params);
-      successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.namedSet'), name);
+      NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.namedSet'), name);
       this.replace(namedSet, editedSet);
     });
   }
@@ -133,7 +133,7 @@ export class NamedSetList {
         );
         if (deleteIt) {
           await deleteNamedSet(namedSet.id);
-          successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dashboard'), namedSet.name);
+          NotificationHandler.successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dashboard'), namedSet.name);
           this.remove(namedSet);
         }
       });
@@ -180,7 +180,7 @@ export class NamedSetList {
 
   protected list(): Promise<INamedSet[]> {
     return listNamedSets(this.idType)
-      .catch(errorAlert)
+      .catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
         console.error(error);
         return [];

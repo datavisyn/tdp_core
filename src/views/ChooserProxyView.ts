@@ -1,6 +1,6 @@
 import {AView }from './AView';
 import {IViewContext, ISelection} from './interfaces';
-import {getProxyUrl} from '../rest';
+import {getProxyUrl} from '../base/rest';
 import {SelectionChooser, ISelectionChooserOptions} from './SelectionChooser';
 import {I18nextManager} from 'phovea_core';
 

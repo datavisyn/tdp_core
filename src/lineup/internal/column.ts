@@ -3,8 +3,9 @@
  */
 import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, CategoricalColumn, toCategories} from 'lineupjs';
 import {createAccessor} from './utils';
-import {IScoreRow, EP_TDP_CORE_SCORE_COLUMN_PATCHER, IScoreColumnPatcherExtensionDesc} from '../../extensions';
-import {errorAlert} from '../../notifications';
+import {IScoreRow,IScoreColumnPatcherExtensionDesc} from '../../base/interfaces';
+import {EP_TDP_CORE_SCORE_COLUMN_PATCHER} from '../../base/extensions';
+import {ErrorAlertHandler} from '../../base/ErrorAlertHandler';
 import {extent, min, max} from 'd3';
 import {PluginRegistry} from 'phovea_core';
 
@@ -54,7 +55,7 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
 
   // error handling
   data
-    .catch(errorAlert)
+    .catch(ErrorAlertHandler.getInstance().errorAlert)
     .catch(() => {
       ranking.remove(col);
     });
@@ -75,7 +76,7 @@ export function addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, pro
     accessor.clear();
     markLoaded(provider, colDesc, false);
 
-    newData.catch(errorAlert);
+    newData.catch(ErrorAlertHandler.getInstance().errorAlert);
     // success
     return newData.then(async (rows: IScoreRow<any>[]) => {
       accessor.setRows(rows);

@@ -2,15 +2,14 @@
  * Created by Samuel Gratzl on 28.02.2017.
  */
 
-import {ProvenanceGraph, PropertyHandler, IProvenanceGraphDataDescription, BaseUtils, EEntity, Permission, UserSession, ISecureItem, IEvent, EventHandler, I18nextManager} from 'phovea_core';
+import {ProvenanceGraph, PropertyHandler, IProvenanceGraphDataDescription, BaseUtils, EEntity, UserSession, ISecureItem, IEvent, EventHandler, I18nextManager} from 'phovea_core';
 import {CLUEGraphManager} from 'phovea_clue';
-import {lazyDialogModule} from '../dialogs';
-import {DEFAULT_SUCCESS_AUTO_HIDE, pushNotification, errorAlert} from '../notifications';
-import {TemporarySessionList, PersistentSessionList} from '../SessionList';
-import {permissionForm} from './utils';
+import {lazyDialogModule} from '../base/dialogs';
+import {NotificationHandler} from '../base/NotificationHandler';
+import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
+import {TemporarySessionList, PersistentSessionList} from './SessionList';
+import {ProvenanceGraphMenuUtils} from './ProvenanceGraphMenuUtils';
 
-declare const __DEBUG__;
-export const GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
 
 export class EditProvenanceGraphMenu {
   readonly node: HTMLLIElement;
@@ -24,7 +23,7 @@ export class EditProvenanceGraphMenu {
   updateGraphMetaData(graph: ProvenanceGraph) {
     this.node.querySelector('span.session-name').innerHTML = graph.desc.name;
     const syncIcon = this.node.querySelector('.sync-indicator');
-    const persisted = EditProvenanceGraphMenu.isPersistent(graph.desc);
+    const persisted = ProvenanceGraphMenuUtils.isPersistent(graph.desc);
     const persistAction = (<HTMLLinkElement>this.node.querySelector('a[data-action="persist"]').parentElement);
     if (persisted) {
       syncIcon.classList.remove('fa-clock-o');
@@ -84,15 +83,15 @@ export class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      EditProvenanceGraphMenu.editProvenanceGraphMetaData(this.graph.desc, {permission: EditProvenanceGraphMenu.isPersistent(this.graph.desc)}).then((extras) => {
+      ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(this.graph.desc, {permission: ProvenanceGraphMenuUtils.isPersistent(this.graph.desc)}).then((extras) => {
         if (extras !== null) {
           Promise.resolve(manager.editGraphMetaData(this.graph.desc, extras))
             .then((desc) => {
               //update the name
               this.node.querySelector('a span').innerHTML = desc.name;
-              EventHandler.getInstance().fire(GLOBAL_EVENT_MANIPULATED);
+              EventHandler.getInstance().fire(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED);
             })
-            .catch(errorAlert);
+            .catch(ErrorAlertHandler.getInstance().errorAlert);
         }
       });
       return false;
@@ -142,12 +141,12 @@ export class EditProvenanceGraphMenu {
     (<HTMLLinkElement>li.querySelector('a[data-action="persist"]')).addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
-      if (!this.graph || EditProvenanceGraphMenu.isPersistent(this.graph.desc)) {
+      if (!this.graph || ProvenanceGraphMenuUtils.isPersistent(this.graph.desc)) {
         return false;
       }
-      EditProvenanceGraphMenu.persistProvenanceGraphMetaData(this.graph.desc).then((extras: any) => {
+      ProvenanceGraphMenuUtils.persistProvenanceGraphMetaData(this.graph.desc).then((extras: any) => {
         if (extras !== null) {
-          Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(errorAlert).then(() => {
+          Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(ErrorAlertHandler.getInstance().errorAlert).then(() => {
             this.updateGraphMetaData(this.graph);
             const p = new PropertyHandler(location.hash);
             const hash = new Map<string, string>();
@@ -157,10 +156,10 @@ export class EditProvenanceGraphMenu {
             hash.set('clue_graph', `clue_graph=${encodeURIComponent(this.graph.desc.id)}`);
             hash.set('clue_state', `clue_state=${this.graph.act.id}`);
             const url = `${location.href.replace(location.hash, '')}#${Array.from(hash.values()).join('&')}`;
-            pushNotification('success', `${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successNotification', {name: this.graph.desc.name})}
+            NotificationHandler.pushNotification('success', `${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successNotification', {name: this.graph.desc.name})}
             <br>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.urlToShare')} <br>
             <a href="${url}" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.currentLink')}">${url}</a>`, -1);
-            EventHandler.getInstance().fire(GLOBAL_EVENT_MANIPULATED);
+            EventHandler.getInstance().fire(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED);
           });
         }
       });
@@ -179,7 +178,7 @@ export class EditProvenanceGraphMenu {
           if (deleteIt) {
             Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
               this.manager.startFromScratch();
-            }).catch(errorAlert);
+            }).catch(ErrorAlertHandler.getInstance().errorAlert);
           }
         });
       return false;
@@ -209,7 +208,7 @@ export class EditProvenanceGraphMenu {
         li.appendChild(helper);
         helper.click();
         helper.remove();
-        pushNotification('success', I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successMessage', {name: this.graph.desc.name}), DEFAULT_SUCCESS_AUTO_HIDE);
+        NotificationHandler.pushNotification('success', I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successMessage', {name: this.graph.desc.name}), NotificationHandler.DEFAULT_SUCCESS_AUTO_HIDE);
       };
       a.readAsDataURL(blob);
       return false;
@@ -238,73 +237,6 @@ export class EditProvenanceGraphMenu {
     });
 
     return li;
-  }
-
-  static isPersistent(d: IProvenanceGraphDataDescription) {
-    return d.local === false || d.local === undefined;
-  }
-
-  static persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
-    const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
-    return EditProvenanceGraphMenu.editProvenanceGraphMetaData(d, {
-      title: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persistSession')}`,
-      button: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persist')}`,
-      name
-    });
-  }
-
-  static isPublic(d: ISecureItem) {
-    return UserSession.getInstance().hasPermission(d, EEntity.OTHERS);
-  }
-
-  static editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
-    args = BaseUtils.mixin({
-      button: 'Edit',
-      title: `<i class="fa fa-edit" aria-hidden="true"></i>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
-      permission: true,
-      name: d.name
-    }, args);
-    return lazyDialogModule().then(({FormDialog}) => {
-      const dialog = new FormDialog(args.title, args.button);
-      const prefix = 'd' + BaseUtils.randomId();
-      const permissions = permissionForm(d, {
-        extra: `<div class="help-block">
-        ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
-      </div>`
-      });
-      dialog.form.innerHTML = `
-          <div class="form-group">
-            <label for="${prefix}_name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
-            <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
-          </div>
-          <div class="form-group">
-            <label for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
-            <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
-          </div>
-          <div class="checkbox">
-            <label class="radio-inline">
-              <input type="checkbox" name="${prefix}_agree" required="required">
-              ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.
-            </label>
-          </div>
-      `;
-      dialog.form.lastElementChild!.insertAdjacentElement('beforebegin', permissions.node);
-      return new Promise((resolve) => {
-        dialog.onHide(() => {
-          resolve(null);
-        });
-        dialog.onSubmit(() => {
-          const extras = Object.assign({
-            name: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_name`)).value,
-            description: (<HTMLTextAreaElement>dialog.body.querySelector(`#${prefix}_desc`)).value,
-          }, args.permission ? permissions.resolve(new FormData(dialog.form)) : d.permissions);
-          resolve(extras);
-          dialog.hide();
-          return false;
-        });
-        dialog.show();
-      });
-    });
   }
 
 }

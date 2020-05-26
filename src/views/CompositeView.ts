@@ -9,7 +9,8 @@ import {
 } from 'phovea_ui';
 import {BuilderUtils, ViewBuilder} from 'phovea_ui';
 import {AView} from './AView';
-import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
+import {ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
+import {EViewMode} from '../base/interfaces';
 
 
 interface IElementDesc {

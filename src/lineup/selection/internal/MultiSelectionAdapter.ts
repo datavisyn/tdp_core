@@ -2,9 +2,9 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../../desc';
+import {IAdditionalColumnDesc} from '../../../base/interfaces';
 import {set_diff} from '../../internal/LineUpSelectionHelper';
-import {IScoreRow} from '../../../extensions';
+import {IScoreRow} from '../../../base/interfaces';
 import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {ResolveNow} from 'phovea_core';
 

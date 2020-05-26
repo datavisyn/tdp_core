@@ -1,6 +1,6 @@
 import {Ajax, AppContext} from 'phovea_core';
-import {IScoreRow} from './extensions';
-import {IDTypeLike} from 'phovea_core/src/idtype';
+import {IScoreRow} from './interfaces';
+import {IDTypeLike} from 'phovea_core';
 
 export const REST_NAMESPACE = '/tdp';
 export const REST_DB_NAMESPACE = `${REST_NAMESPACE}/db`;

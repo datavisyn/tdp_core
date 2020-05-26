@@ -3,7 +3,7 @@
  */
 
 import {IObjectRef, ProvenanceGraph, ActionMetaData, ActionUtils, ObjectRefUtils, ActionNode, I18nextManager, UserSession} from 'phovea_core';
-import {lastOnly} from 'phovea_clue';
+import {Compression} from 'phovea_clue';
 
 //old name
 export const CMD_INIT_SESSION = 'tdpInitSession';
@@ -56,12 +56,12 @@ export function setParameter(view: IObjectRef<IParameterAble>, name: string, val
 }
 
 export function compressSetParameter(path: ActionNode[]) {
-  return lastOnly(path, CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
+  return Compression.lastOnly(path, CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
 }
 
 /**
  * @deprecated
  */
 export function compressSetParameterOld(path: ActionNode[]) {
-  return lastOnly(path, 'targidSetParameter', (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
+  return Compression.lastOnly(path, 'targidSetParameter', (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
 }

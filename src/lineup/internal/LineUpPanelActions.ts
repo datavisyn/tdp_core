@@ -3,11 +3,11 @@ import {SidePanel, spaceFillingRule, IGroupSearchItem, LocalDataProvider, create
 import {IDType, IDTypeManager, IPlugin, IPluginDesc, PluginRegistry, EventHandler, I18nextManager} from 'phovea_core';
 import {editDialog} from '../../storage';
 import {
-  IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
-  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc, EP_TDP_CORE_LINEUP_PANEL_TAB, IPanelTabExtensionDesc
-} from '../../extensions';
-import {IARankingViewOptions} from '../ARankingView';
-import {lazyDialogModule} from '../../dialogs';
+  EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
+  EP_TDP_CORE_LINEUP_PANEL_TAB
+} from '../../base/extensions';
+import {IARankingViewOptions} from '../IARankingViewOptions';
+import {lazyDialogModule} from '../../base/dialogs';
 import {PanelButton} from './panel/PanelButton';
 import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
 import {PanelTab, SidePanelTab} from './panel/PanelTab';
@@ -16,13 +16,55 @@ import {PanelHeader} from './panel/PanelHeader';
 import {PanelRankingButton} from './panel/PanelRankingButton';
 import {PanelAddColumnButton} from './panel/PanelAddColumnButton';
 import {PanelDownloadButton} from './panel/PanelDownloadButton';
-import {IPanelTabExtension} from '../../extensions';
+import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension} from '../../base/interfaces';
+import {ISearchOption} from './panel/ISearchOption';
 
-export interface ISearchOption {
-  text: string;
-  id: string;
-  action(): void;
+
+
+export interface IPanelTabExtension {
+  desc: IPanelTabExtensionDesc;
+
+  /**
+   * Create and attach a new LineUp side panel
+   * @param tab PanelTab instance to attach the HTMLElement and listen to events
+   * @param provider The data of the current ranking
+   * @param desc The phovea extension point description
+   */
+  factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
 }
+
+export interface IPanelTabExtensionDesc extends IPluginDesc {
+  /**
+   * CSS class for the PanelNavButton of the PanelTab
+   */
+  cssClass: string;
+
+  /**
+   * Title attribute PanelNavButton
+   */
+  title: string;
+
+  /**
+   * Customize the PanelNavButtons' position (recommended to use multiples of 10)
+   */
+  order: number;
+
+  /**
+   * Width of the PanelTab
+   */
+  width: string;
+
+  /**
+   * If true a shortcut button is appended to the SidePanel header in collapsed mode
+   * @default false
+   */
+  shortcut?: boolean;
+
+  load(): Promise<IPlugin & IPanelTabExtension>;
+}
+
+
+
 
 export const rule = spaceFillingRule({
   groupHeight: 70,

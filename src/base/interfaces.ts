@@ -2,42 +2,26 @@ import {IPlugin, IPluginDesc} from 'phovea_core';
 import {IUser} from 'phovea_core';
 import {IObjectRef, ProvenanceGraph, Range} from 'phovea_core';
 import {IEventHandler} from 'phovea_core';
-import {IAdditionalColumnDesc} from './lineup/desc';
 import {RangeLike} from 'phovea_core';
 import {IDType} from 'phovea_core';
-import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
-import {EViewMode} from './views/interfaces';
+import {IColumnDesc, Column} from 'lineupjs';
 import {AppHeader} from 'phovea_ui';
-import {PanelTab} from './lineup/internal/panel/PanelTab';
 
-export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
-export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
-export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
-export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
-export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
-export const EXTENSION_POINT_TDP_INSTANT_VIEW = 'tdpInstantView';
-export const EXTENSION_POINT_TDP_APP_EXTENSION = 'tdpAppExtension';
-// filter extensions
-export const EXTENSION_POINT_TDP_LIST_FILTERS = 'tdpListFilters';
-export const EXTENSION_POINT_TDP_VIEW_GROUPS = 'tdpViewGroups';
+
+
+
+export interface IAdditionalColumnDesc extends IColumnDesc {
+  selectedId: number;
+  selectedSubtype?: string;
+  initialRanking: boolean;
+}
 
 /**
- * Register a new tab to the LineupSidePanel.
- * Consists of a button/header to open the tab content and the tab content itself
+ * mode of the view depending on the view state
  */
-export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
-
-/**
- * Register new form elements for the form builder. Form elements must implement the `IFormElement`.
- *
- * @registryParam {object} [parameter] The registry parameter depend on the form element. Hence, all defined parameters are passed to the form element as `pluginDesc`.
- *
- * @factoryParam {Form} form The form this element is a part of
- * @factoryParam {IFormElementDesc} elementDesc The form element description from the form builder
- * @factoryParam {IPluginDesc} pluginDesc The phovea extension point options
- * @factoryReturns {IFormElement} An instance of the form element
- */
-export const EP_TDP_CORE_FORM_ELEMENT = 'epTdpCoreFormElement';
+export enum EViewMode {
+  FOCUS, CONTEXT, HIDDEN
+}
 
 /**
  * a score item
@@ -120,8 +104,6 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreLoaderExtension>;
 }
 
-export const EP_TDP_CORE_SCORE_COLUMN_PATCHER = 'epTdpCoreScoreColumnPatcher';
-
 /**
  * Extension to patch a LineUp column generated as score.
  */
@@ -140,47 +122,7 @@ export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 
-export interface IPanelTabExtension {
-  desc: IPanelTabExtensionDesc;
 
-  /**
-   * Create and attach a new LineUp side panel
-   * @param tab PanelTab instance to attach the HTMLElement and listen to events
-   * @param provider The data of the current ranking
-   * @param desc The phovea extension point description
-   */
-  factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
-}
-
-export interface IPanelTabExtensionDesc extends IPluginDesc {
-  /**
-   * CSS class for the PanelNavButton of the PanelTab
-   */
-  cssClass: string;
-
-  /**
-   * Title attribute PanelNavButton
-   */
-  title: string;
-
-  /**
-   * Customize the PanelNavButtons' position (recommended to use multiples of 10)
-   */
-  order: number;
-
-  /**
-   * Width of the PanelTab
-   */
-  width: string;
-
-  /**
-   * If true a shortcut button is appended to the SidePanel header in collapsed mode
-   * @default false
-   */
-  shortcut?: boolean;
-
-  load(): Promise<IPlugin & IPanelTabExtension>;
-}
 
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;

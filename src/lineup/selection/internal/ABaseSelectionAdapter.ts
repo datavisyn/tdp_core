@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {IAdditionalColumnDesc} from '../../desc';
+import {IAdditionalColumnDesc} from '../../../base/interfaces';
 import {array_diff} from '../../internal/LineUpSelectionHelper';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
 import {ResolveNow} from 'phovea_core';

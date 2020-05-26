@@ -84,6 +84,7 @@
     "d3": "~3.5.17",
     "jquery": "~3.4.1",
     "lineupjs": "github:lineupjs/lineupjs#develop",
+    "madge": "^3.9.0",
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9"
   },

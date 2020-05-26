@@ -5,13 +5,8 @@
 import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
 import {extent} from 'd3';
 import {IAnyVector, ValueTypeUtils} from 'phovea_core';
-import {IServerColumn} from '../rest';
-
-export interface IAdditionalColumnDesc extends IColumnDesc {
-  selectedId: number;
-  selectedSubtype?: string;
-  initialRanking: boolean;
-}
+import {IServerColumn} from '../base/rest';
+import {IAdditionalColumnDesc} from '../base/interfaces';
 
 export interface IColumnOptions {
   /**

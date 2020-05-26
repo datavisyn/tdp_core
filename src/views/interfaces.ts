@@ -1,13 +1,8 @@
 import {IPluginDesc, ProvenanceGraph, IObjectRef} from 'phovea_core';
-import {IViewPluginDesc, IViewContext, ISelection} from '../extensions';
-export {IViewPlugin, IViewPluginDesc, IView, IViewClass, IViewContext, ISelection} from '../extensions';
+import {IViewPluginDesc, IViewContext, ISelection} from '../base/interfaces';
+export {IViewPlugin, IViewPluginDesc, IView, IViewClass, IViewContext, ISelection} from '../base/interfaces';
 
-/**
- * mode of the view depending on the view state
- */
-export enum EViewMode {
-  FOCUS, CONTEXT, HIDDEN
-}
+
 
 
 export function toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
