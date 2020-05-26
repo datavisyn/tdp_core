@@ -5,11 +5,9 @@
 import 'select2';
 import * as d3 from 'd3';
 import $ from 'jquery';
-import {mixin} from 'phovea_core/src/index';
-import {api2absURL} from 'phovea_core/src/ajax';
+import {BaseUtils, AppContext, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
-import {IPluginDesc} from 'phovea_core/src/plugin';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text'|'id';
@@ -45,7 +43,7 @@ export const DEFAULT_OPTIONS = {
 
 export const DEFAULT_AJAX_OPTIONS = Object.assign({
   ajax: {
-    url: api2absURL('url_needed'), // URL
+    url: AppContext.getInstance().api2absURL('url_needed'), // URL
     dataType: 'json',
     delay: 250,
     cache: true,
@@ -156,7 +154,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       select2Options.multiple = true;
       select2Options.allowClear = true;
     }
-    mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
+    BaseUtils.mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
 
     this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial

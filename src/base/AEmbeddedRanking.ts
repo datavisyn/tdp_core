@@ -1,12 +1,9 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
-import {ProvenanceGraph, cat} from 'phovea_core/src/provenance';
-import {none, parse} from 'phovea_core/src/range';
+import {ProvenanceGraph, ParseRangeUtils, PluginRegistry, IDTypeManager, ObjectRefUtils, Range} from 'phovea_core';
 import {ARankingView, IARankingViewOptions} from '../lineup/ARankingView';
 import {IInitialRankingOptions} from '../lineup/desc';
 import {IViewProviderLocal} from '../lineup/internal/cmds';
-import {resolve} from 'phovea_core/src/idtype';
 import {EXTENSION_POINT_TDP_SCORE_IMPL, IScore} from '../extensions';
-import {get as getPlugin} from 'phovea_core/src/plugin';
 import {IServerColumnDesc, IRow} from '../rest';
 import {IFormElementDesc} from '../form/interfaces';
 import {ILazyLoadedColumn} from '../lineup/internal/column';
@@ -33,8 +30,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
   }
 
   protected buildRanking(graph: ProvenanceGraph, refKey: string, options: Partial<IARankingViewOptions> = {}) {
-    const ref = graph.findOrAddObject(this, refKey, cat.visual);
-    const idtype = resolve('_dummy');
+    const ref = graph.findOrAddObject(this, refKey, ObjectRefUtils.category.visual);
+    const idtype = IDTypeManager.getInstance().resolveIdType('_dummy');
     const context = {
       graph,
       ref,
@@ -44,7 +41,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     };
     const selection = {
       idtype,
-      range: none()
+      range: Range.none()
     };
 
     const that = this;
@@ -155,7 +152,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', null);
     this.ranking.setItemSelection({
       idtype: this.ranking.itemIDType,
-      range: parse(rows.map((d) => d._id))
+      range: ParseRangeUtils.parseRangeLike(rows.map((d) => d._id))
     });
     lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection: number[]) => {
       const rows = selection.map((d) => lineup.data[d]);
@@ -180,7 +177,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
       return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
     }
 
-    const pluginDesc = getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, score);
+    const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, score);
     return pluginDesc.load().then((plugin) => {
       const instance: IScore<any> | IScore<any>[] = plugin.factory(scoreParams, pluginDesc);
       const scores = Array.isArray(instance) ? instance : [instance];

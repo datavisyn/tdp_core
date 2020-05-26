@@ -1,7 +1,6 @@
-import {IPlugin} from 'phovea_core/src/plugin';
+import {IPlugin, EventHandler} from 'phovea_core';
 import {Placement, PopperOptions} from 'popper.js';
-import {fire} from 'phovea_core/src/event';
-import {AppHeader} from 'phovea_ui/src/header';
+import {AppHeader} from 'phovea_ui';
 import {IViewPluginDesc, IView, ISelection} from '../extensions';
 
 export const GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
@@ -90,7 +89,7 @@ export interface IStep {
 }
 
 export function startTour(tourId: string, context: any = {}) {
-  fire(GLOBAL_EVENT_START_TOUR, tourId, context);
+  EventHandler.getInstance().fire(GLOBAL_EVENT_START_TOUR, tourId, context);
 }
 
 export interface IViewTourContext {

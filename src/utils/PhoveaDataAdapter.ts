@@ -1,16 +1,15 @@
 /**
  * Created by Samuel Gratzl on 20.09.2017.
  */
-import {get} from 'phovea_core/src/data';
-import {ITable, ITableColumn} from 'phovea_core/src/table';
-import {ICategoricalValueTypeDesc, INumberValueTypeDesc, IValueTypeDesc} from 'phovea_core/src/datatype';
+import {ITable, ITableColumn, DataCache} from 'phovea_core';
+import {ICategoricalValueTypeDesc, INumberValueTypeDesc, IValueTypeDesc} from 'phovea_core';
 import {IRow, IServerColumnDesc} from '../rest';
 
 export class PhoveaDataAdapter {
   private readonly data: Promise<ITable>;
 
   constructor(private readonly datasetId: string) {
-    this.data = <any>get(datasetId);
+    this.data = <any>DataCache.getInstance().get(datasetId);
   }
 
   async getDesc(): Promise<IServerColumnDesc> {

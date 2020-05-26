@@ -2,9 +2,9 @@
  * Created by Holger Stitz on 18.08.2016.
  */
 
-import {CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
-import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui/src/dialogs';
-import i18n from 'phovea_core/src/i18n';
+import {CLUEGraphManager} from 'phovea_clue';
+import {IAreYouSureOptions, Dialog, FormDialog} from 'phovea_ui';
+import {I18nextManager} from 'phovea_core';
 
 export interface IDialogModule {
   generateDialog(title: string, primaryBtnText?: string, additionalCSSClasses?: string): Dialog;
@@ -25,23 +25,23 @@ export function lazyDialogModule(): Promise<IDialogModule> {
  */
 export function showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses: string = '') {
   lazyDialogModule().then(({generateDialog}) => {
-    const dialog = generateDialog(i18n.t('tdp:core.sessionNotFound'), i18n.t('tdp:core.newSession'), additionalCSSClasses);
+    const dialog = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'), I18nextManager.getInstance().i18n.t('tdp:core.newSession'), additionalCSSClasses);
     // append bg-danger to the dialog parent element
     dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
     dialog.body.innerHTML = `
         <p>
-           ${i18n.t('tdp:core.notAccessibleMessage', {id})}
+           ${I18nextManager.getInstance().i18n.t('tdp:core.notAccessibleMessage', {id})}
         </p>
         <p>
-        ${i18n.t('tdp:core.possibleReasons')}
+        ${I18nextManager.getInstance().i18n.t('tdp:core.possibleReasons')}
         <ul>
-            <li>${i18n.t('tdp:core.possibleReason1')}</li>
-            <li>${i18n.t('tdp:core.possibleReason2')}</li>
-            <li>${i18n.t('tdp:core.possibleReason3')}</li>
+            <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason1')}</li>
+            <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason2')}</li>
+            <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason3')}</li>
         </ul>
         </p>
         <p>
-          ${i18n.t('tdp:core.contactOwnerMessage')}
+          ${I18nextManager.getInstance().i18n.t('tdp:core.contactOwnerMessage')}
         </p>`;
     dialog.onSubmit(() => {
       dialog.hide();

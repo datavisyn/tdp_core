@@ -5,7 +5,7 @@ import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../desc';
 import {IScoreRow} from '../../../extensions';
-import {resolveImmediately} from 'phovea_core/src';
+import {ResolveNow} from 'phovea_core';
 
 export interface ISingleSelectionAdapter {
   /**
@@ -48,7 +48,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISe
   }
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
-    return resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [{
+    return ResolveNow.resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [{
       desc: ABaseSelectionAdapter.patchDesc(desc, _id),
       data: this.adapter.loadData(_id, id),
       id: _id

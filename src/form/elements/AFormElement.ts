@@ -3,11 +3,8 @@
  */
 
 import {Selection} from 'd3';
-import {EventHandler} from 'phovea_core/src/event';
+import {EventHandler, UserSession, IPluginDesc, PluginRegistry} from 'phovea_core';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
-import * as session from 'phovea_core/src/session';
-import {IPluginDesc} from 'phovea_core/src/plugin';
-import {get} from 'phovea_core/src/plugin';
 import {EP_TDP_CORE_FORM_ELEMENT} from '../../extensions';
 
 /**
@@ -44,18 +41,18 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     if (!this.elementDesc.useSession) {
       return;
     }
-    session.store(`${this.id}_value`, this.value);
+    UserSession.getInstance().store(`${this.id}_value`, this.value);
   }
 
   protected getStoredValue<T>(defaultValue:T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return session.retrieve(`${this.id}_value`, defaultValue);
+    return  UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
   }
 
   protected hasStoredValue(): boolean {
-    return session.has(`${this.id}_value`);
+    return  UserSession.getInstance().has(`${this.id}_value`);
   }
 
   isRequired() {
@@ -168,7 +165,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     const dependElements = (this.elementDesc.dependsOn || []).map((depOn) => this.form.getElementById(depOn));
 
     dependElements.forEach((depElem) => {
-      depElem.on(AFormElement.EVENT_CHANGE, () => {
+      EventHandler.getInstance().on(AFormElement.EVENT_CHANGE, () => {
         const values = dependElements.map((d) => d.value);
         if(onDependentChange) {
           onDependentChange(values);
@@ -217,7 +214,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * @param elementDesc form element description
    */
   static createFormElement(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement> {
-    const plugin = get(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
+    const plugin = PluginRegistry.getInstance().getPlugin(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
     if(!plugin) {
       throw new Error('unknown form element type: ' + elementDesc.type);
     }

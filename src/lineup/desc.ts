@@ -4,8 +4,7 @@
 
 import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
 import {extent} from 'd3';
-import {IAnyVector} from 'phovea_core/src/vector';
-import {VALUE_TYPE_CATEGORICAL, VALUE_TYPE_INT, VALUE_TYPE_REAL, VALUE_TYPE_STRING} from 'phovea_core/src/datatype';
+import {IAnyVector, ValueTypeUtils} from 'phovea_core';
 import {IServerColumn} from '../rest';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
@@ -162,15 +161,15 @@ export function deriveCol(col: IAnyVector): IColumnDesc {
   }
   const val = desc.value;
   switch (val.type) {
-    case VALUE_TYPE_STRING:
+    case ValueTypeUtils.VALUE_TYPE_STRING:
       r.type = 'string';
       break;
-    case VALUE_TYPE_CATEGORICAL:
+    case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
       r.type = 'categorical';
       r.categories = desc.categories;
       break;
-    case VALUE_TYPE_REAL:
-    case VALUE_TYPE_INT:
+    case ValueTypeUtils.VALUE_TYPE_REAL:
+    case ValueTypeUtils.VALUE_TYPE_INT:
       r.type = 'number';
       r.domain = val.range;
       break;

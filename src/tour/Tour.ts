@@ -1,6 +1,6 @@
-import {list} from 'phovea_core/src/plugin';
+import {PluginRegistry} from 'phovea_core';
 import {EXTENSION_POINT_TDP_TOUR, ITDPTourExtensionDesc, IStep} from './extensions';
-import {AppHeader} from 'phovea_ui/src/header';
+import {AppHeader} from 'phovea_ui';
 
 export interface ITourContext {
   app(): Promise<any>; // the TDP app
@@ -103,7 +103,7 @@ export class Tour {
   }
 
   static resolveTours() {
-    const tours = <ITDPTourExtensionDesc[]>list(EXTENSION_POINT_TDP_TOUR);
+    const tours = <ITDPTourExtensionDesc[]>PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_TOUR);
 
     return tours.map((d) => new Tour(d));
   }

@@ -3,7 +3,7 @@ import {AView} from '../views/AView';
 import {IViewContext, ISelection} from '../extensions';
 import {EViewMode} from '../views/interfaces';
 
-import {resolve, IDTypeLike} from 'phovea_core/src/idtype';
+import {IDTypeManager, IDTypeLike, BaseUtils, ISecureItem, I18nextManager} from 'phovea_core';
 import {clueify, withoutTracking, untrack} from './internal/cmds';
 import {saveNamedSet} from '../storage';
 import {errorAlert} from '../notifications';
@@ -12,15 +12,12 @@ import {IScore, IScoreRow} from '../extensions';
 import {createInitialRanking, IAdditionalColumnDesc, deriveColumns, IInitialRankingOptions} from './desc';
 import {IRankingWrapper, wrapRanking} from './internal/ranking';
 import {pushScoreAsync} from './internal/scorecmds';
-import {debounce, mixin} from 'phovea_core/src';
 import {LineUpColors} from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/ISelectionAdapter';
 import {LineUpPanelActions, rule} from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
-import {ISecureItem} from 'phovea_core/src/security';
-import i18n from 'phovea_core/src/i18n';
 
 export interface IARankingViewOptions {
   /**
@@ -179,13 +176,13 @@ export abstract class ARankingView extends AView {
    * clears and rebuilds this lineup instance from scratch
    * @returns {Promise<any[]>} promise when done
    */
-  protected rebuild = debounce(() => this.rebuildImpl(), 100);
+  protected rebuild = BaseUtils.debounce(() => this.rebuildImpl(), 100);
 
   /**
    * similar to rebuild but just loads new data and keep the columns
    * @returns {Promise<any[]>} promise when done
    */
-  protected reloadData = debounce(() => this.reloadDataImpl(), 100);
+  protected reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
 
   /**
    * promise resolved when everything is built
@@ -246,11 +243,11 @@ export abstract class ARankingView extends AView {
 
     // variants for deriving the item name
     const idTypeNames = options.itemIDType ? {
-      itemName: resolve(options.itemIDType).name,
-      itemNamePlural: resolve(options.itemIDType).name
+      itemName: IDTypeManager.getInstance().resolveIdType(options.itemIDType).name,
+      itemNamePlural: IDTypeManager.getInstance().resolveIdType(options.itemIDType).name
     } : {};
     const names = options.itemName ? {itemNamePlural: typeof options.itemName === 'function' ? () => `${(<any>options.itemName)()}s` : `${options.itemName}s`} : {};
-    mixin(this.options, idTypeNames, names, options);
+    BaseUtils.mixin(this.options, idTypeNames, names, options);
 
 
     this.node.classList.add('lineup', 'lu-taggle', 'lu');
@@ -266,7 +263,7 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+    const config: ITaggleOptions = BaseUtils.mixin(defaultOptions(), <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
       labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
@@ -374,7 +371,7 @@ export abstract class ARankingView extends AView {
    * @returns {IDType}
    */
   get itemIDType() {
-    return this.options.itemIDType ? resolve(this.options.itemIDType) : null;
+    return this.options.itemIDType ? IDTypeManager.getInstance().resolveIdType(this.options.itemIDType) : null;
   }
 
   protected parameterChanged(name: string): PromiseLike<any> | void {
@@ -470,7 +467,7 @@ export abstract class ARankingView extends AView {
   private async saveNamedSet(order: number[], name: string, description: string, sec: Partial<ISecureItem>) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
-    successfullySaved(i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
+    successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
@@ -626,7 +623,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected setLineUpData(rows: IRow[]) {
-    this.setHint(rows.length === 0, i18n.t('tdp:core.lineup.RankingView.notFoundHint'));
+    this.setHint(rows.length === 0, I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.notFoundHint'));
     this.provider.setData(rows);
     this.selectionHelper.rows = rows;
     this.selectionHelper.setItemSelection(this.getItemSelection());
@@ -649,7 +646,7 @@ export abstract class ARankingView extends AView {
   updateLineUpStats() {
     const showStats = (total: number, selected = 0, shown = 0) => {
       const name = shown === 1 ? this.options.itemName : this.options.itemNamePlural;
-      return `${i18n.t('tdp:core.lineup.RankingView.showing')} ${shown} ${total > 0 ? `${i18n.t('tdp:core.lineup.RankingView.of')} ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} ${i18n.t('tdp:core.lineup.RankingView.selected')}` : ''}`;
+      return `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.showing')} ${shown} ${total > 0 ? `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.of')} ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.selected')}` : ''}`;
     };
 
     const selected = this.provider.getSelection().length;

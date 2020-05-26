@@ -10,7 +10,7 @@
  *********************************************************/
 
 
-import {loadBootstrap} from 'phovea_ui/src/_lazyBootstrap';
+import {loadBootstrap} from 'phovea_ui/dist/_lazyBootstrap';
 import {IInstanceViewExtensionDesc, IItemSelection} from '../extensions';
 import {findInstantViews} from '../views/findViews';
 

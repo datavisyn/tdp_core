@@ -1,6 +1,5 @@
 import $ from 'jquery';
-import {debounce} from 'phovea_core/src';
-import {EventHandler} from 'phovea_core/src/event';
+import {EventHandler, BaseUtils} from 'phovea_core';
 import 'select2';
 
 export interface IdTextPair {
@@ -235,7 +234,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
   private readonly cacheItem = new Map<string, ISelect3Item<T>>();
 
   // debounce since "clear" is removing one by one
-  private onChange = debounce(() => {
+  private onChange = BaseUtils.debounce(() => {
     const next = this.value;
     if (this.options.equalValues(this.previousValue, next)) {
       return;

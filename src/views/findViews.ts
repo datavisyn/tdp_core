@@ -7,16 +7,15 @@
  */
 
 
-import IDType from 'phovea_core/src/idtype/IDType';
+import {IDType} from 'phovea_core';
 import {IViewPluginDesc, matchLength, showAsSmallMultiple, toViewPluginDesc} from './interfaces';
 import {
   EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW,
   EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, IGroupData, IInstanceViewExtensionDesc,
   IViewGroupExtensionDesc
 } from '../extensions';
-import {IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
-import Range from 'phovea_core/src/range/Range';
-import {currentUser, isLoggedIn} from 'phovea_core/src/security';
+import {IPluginDesc, PluginRegistry, Range, UserSession, IDTypeManager} from 'phovea_core';
+
 
 export interface IDiscoveredView {
   enabled: boolean;
@@ -37,7 +36,7 @@ export function findViews(idType: IDType, selection: Range): Promise<IDiscovered
     return (matchLength(p.selection, selectionLength) || (showAsSmallMultiple(p) && selectionLength > 1));
   }
 
-  return findViewBase(idType, listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
+  return findViewBase(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
     return r.map(toViewPluginDesc).map((v) => {
       const access = canAccess(v);
       const selection = bySelection(v);
@@ -52,7 +51,7 @@ export function findViews(idType: IDType, selection: Range): Promise<IDiscovered
 }
 
 export function findAllViews(idType?: IDType): Promise<IDiscoveredView[]> {
-  return findViewBase(idType || null, listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
+  return findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
     return r.map(toViewPluginDesc).map((v) => {
       const access = canAccess(v);
       const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
@@ -67,7 +66,7 @@ export function findAllViews(idType?: IDType): Promise<IDiscoveredView[]> {
 
 async function findViewBase(idType: IDType | null, views: IPluginDesc[], hasSelection: boolean) {
   const byTypeChecker = async () => {
-    const mappedTypes = await idType.getCanBeMappedTo();
+    const mappedTypes = await IDTypeManager.getInstance().getCanBeMappedTo(idType);
     const all = [idType].concat(mappedTypes);
 
     return (p: any) => {
@@ -81,7 +80,7 @@ async function findViewBase(idType: IDType | null, views: IPluginDesc[], hasSele
 
 
   // execute extension filters
-  const filters = await Promise.all(listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load()));
+  const filters = await Promise.all(PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load()));
 
   function extensionFilters(p: IPluginDesc) {
     const f = p.filter || {};
@@ -103,7 +102,7 @@ export function canAccess(p: any) {
     security = (user) => user.roles.indexOf(role) >= 0;
   }
   if (typeof security === 'function') {
-    const user = currentUser();
+    const user = UserSession.getInstance().currentUser();
     if (!user) {
       return false;
     }
@@ -111,7 +110,7 @@ export function canAccess(p: any) {
   }
   if (typeof security === 'boolean') {
     if (security === true) { // if security is set on a view with a boolean flag check if the user is at least logged in
-      return isLoggedIn();
+      return UserSession.getInstance().isLoggedIn();
     }
     return true; // security is disabled - the resource is publicly available, the user can access it
   }
@@ -119,7 +118,7 @@ export function canAccess(p: any) {
 }
 
 export function findInstantViews(idType: IDType): Promise<IInstanceViewExtensionDesc[]> {
-  return findViewBase(idType, listPlugins(EXTENSION_POINT_TDP_INSTANT_VIEW), false).then((r) => r.filter(canAccess));
+  return findViewBase(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_INSTANT_VIEW), false).then((r) => r.filter(canAccess));
 }
 
 function caseInsensitiveCompare(a: string, b: string) {
@@ -127,7 +126,7 @@ function caseInsensitiveCompare(a: string, b: string) {
 }
 
 export function resolveGroupData() {
-  const plugins = <IViewGroupExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_VIEW_GROUPS);
+  const plugins = <IViewGroupExtensionDesc[]>PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW_GROUPS);
   const r = new Map<string, IGroupData>();
   plugins.forEach((plugin) => {
     (plugin.groups || []).forEach((g) => {

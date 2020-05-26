@@ -1,11 +1,9 @@
 import {AView} from '../AView';
 import {IViewContext, ISelection} from '../interfaces';
-import {resolve} from 'phovea_core/src/idtype';
+import {IDTypeManager, ParseRangeUtils, Range, I18nextManager, EventHandler} from 'phovea_core';
 import {resolveIds} from '../resolve';
-import {parse, none} from 'phovea_core/src/range';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
 import {DEFAULT_SELECTION_NAME} from '../../extensions';
-import i18n from 'phovea_core/src/i18n';
 
 export interface IPartialProxyViewOptions {
   /**
@@ -44,7 +42,7 @@ export class MessagingProxyView extends AView {
     if (!this.options.itemIDType) {
       return null;
     }
-    return resolve(this.options.itemIDType);
+    return IDTypeManager.getInstance().resolveIdType(this.options.itemIDType);
   }
 
   protected initImpl() {
@@ -89,9 +87,9 @@ export class MessagingProxyView extends AView {
         const payload = (<ITDPSetItemSelectionMessage>msg).payload;
         const name = payload.name || DEFAULT_SELECTION_NAME;
         const ids: string[] = payload.ids;
-        const idType = payload.idType ? resolve(payload.idType) : this.itemIDType;
+        const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
         if (!ids || ids.length === 0) {
-          this.setItemSelection({idtype: idType, range: none()}, name);
+          this.setItemSelection({idtype: idType, range: Range.none()}, name);
         }
 
         if (!idType) {
@@ -99,7 +97,7 @@ export class MessagingProxyView extends AView {
           return;
         }
         idType.map(ids).then((r) => {
-          this.setItemSelection({idtype: idType, range: parse(r)}, name);
+          this.setItemSelection({idtype: idType, range: ParseRangeUtils.parseRangeLike(r)}, name);
         });
         return;
       }
@@ -218,10 +216,10 @@ export class MessagingProxyView extends AView {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.node.innerHTML = `
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
-    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${I18nextManager.getInstance().i18n.t('tdp:core.views.link')}</a> ${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart2')}
        <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
    </div></p><p></p>`;
-    this.fire(MessagingProxyView.EVENT_LOADING_FINISHED);
+    EventHandler.getInstance().fire(MessagingProxyView.EVENT_LOADING_FINISHED);
   }
 }

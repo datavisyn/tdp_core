@@ -2,18 +2,12 @@
  * Created by Samuel Gratzl on 28.02.2017.
  */
 
-import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
-import {CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
-import {PropertyHandler} from 'phovea_core/src';
+import {ProvenanceGraph, PropertyHandler, IProvenanceGraphDataDescription, BaseUtils, EEntity, Permission, UserSession, ISecureItem, IEvent, EventHandler, I18nextManager} from 'phovea_core';
+import {CLUEGraphManager} from 'phovea_clue';
 import {lazyDialogModule} from '../dialogs';
-import {IProvenanceGraphDataDescription} from 'phovea_core/src/provenance';
-import {mixin, randomId} from 'phovea_core/src';
-import {EEntity, hasPermission, ISecureItem} from 'phovea_core/src/security';
-import {IEvent, fire as globalFire} from 'phovea_core/src/event';
 import {DEFAULT_SUCCESS_AUTO_HIDE, pushNotification, errorAlert} from '../notifications';
 import {TemporarySessionList, PersistentSessionList} from '../SessionList';
 import {permissionForm} from './utils';
-import i18n from 'phovea_core/src/i18n';
 
 declare const __DEBUG__;
 export const GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
@@ -69,19 +63,19 @@ export class EditProvenanceGraphMenu {
 
     li.innerHTML = `
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><i class="fa fa-folder-open-o" aria-hidden="true"></i> <i class="fa fa-save sync-indicator" aria-hidden="true"></i> <span>${i18n.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
+             aria-expanded="false"><i class="fa fa-folder-open-o" aria-hidden="true"></i> <i class="fa fa-save sync-indicator" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
           <ul class="dropdown-menu">
-            <li class="dropdown-label"><i class="fa fa-clock-o" aria-hidden="true"></i> <span class="session-name">${i18n.t('tdp:core.EditProvenanceMenu.sessionName')}</span></li>
+            <li class="dropdown-label"><i class="fa fa-clock-o" aria-hidden="true"></i> <span class="session-name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionName')}</span></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="edit" title="${i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fa fa-edit" aria-hidden="true"></i> ${i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a></li>
-            <li><a href="#" data-action="clone" title="${i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i> ${i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}</a></li>
+            <li><a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fa fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a></li>
+            <li><a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="open" title="${i18n.t('tdp:core.EditProvenanceMenu.openSession')}"><i class="fa fa-folder-open-o" aria-hidden="true"></i> ${i18n.t('tdp:core.EditProvenanceMenu.openExisting')}</a></li>
-            <li><a href="#" data-action="persist" title="${i18n.t('tdp:core.EditProvenanceMenu.saveSession')}"><i class="fa fa-save" aria-hidden="true"></i> ${i18n.t('tdp:core.EditProvenanceMenu.saveSession')}</a></li>
-            <li><a href="#" data-action="delete" title="${i18n.t('tdp:core.EditProvenanceMenu.delete')}"><i class="fa fa-trash" aria-hidden="true"></i> ${i18n.t('tdp:core.EditProvenanceMenu.delete')}</a></li>
+            <li><a href="#" data-action="open" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession')}"><i class="fa fa-folder-open-o" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}</a></li>
+            <li><a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}"><i class="fa fa-save" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}</a></li>
+            <li><a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}"><i class="fa fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="import" title="${i18n.t('tdp:core.EditProvenanceMenu.importGraph')}"><i class="fa fa-upload" aria-hidden="true"></i> ${i18n.t('tdp:core.EditProvenanceMenu.importSession')}</a></li>
-            <li><a href="#" data-action="export" title="${i18n.t('tdp:core.EditProvenanceMenu.exportGraph')}"><i class="fa fa-download" aria-hidden="true"></i> ${i18n.t('tdp:core.EditProvenanceMenu.exportSession')}</a></li>
+            <li><a href="#" data-action="import" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importGraph')}"><i class="fa fa-upload" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importSession')}</a></li>
+            <li><a href="#" data-action="export" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportGraph')}"><i class="fa fa-download" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportSession')}</a></li>
           </ul>`;
 
     (<HTMLLinkElement>li.querySelector('a[data-action="edit"]')).addEventListener('click', (event) => {
@@ -96,7 +90,7 @@ export class EditProvenanceGraphMenu {
             .then((desc) => {
               //update the name
               this.node.querySelector('a span').innerHTML = desc.name;
-              globalFire(GLOBAL_EVENT_MANIPULATED);
+              EventHandler.getInstance().fire(GLOBAL_EVENT_MANIPULATED);
             })
             .catch(errorAlert);
         }
@@ -120,16 +114,16 @@ export class EditProvenanceGraphMenu {
 
       lazyDialogModule()
         .then(({generateDialog}) => {
-          const dialog = generateDialog(i18n.t('tdp:core.EditProvenanceMenu.openSession'), i18n.t('tdp:core.EditProvenanceMenu.open'));
+          const dialog = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.open'));
           dialog.body.classList.add('tdp-session-dialog');
           dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
             <div role="tab" class="collapsed">
-            <h4>${i18n.t('tdp:core.EditProvenanceMenu.temporarySessions')}</h4>
+            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.temporarySessions')}</h4>
             <div role="tabpanel" data-session="t">
             </div>
           </div>
           <div role="tab" class="collapsed">
-            <h4>${i18n.t('tdp:core.EditProvenanceMenu.persistentSessions')}</h4>
+            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persistentSessions')}</h4>
             <div role="tabpanel" data-session="p">
             </div>
           </div>`;
@@ -163,10 +157,10 @@ export class EditProvenanceGraphMenu {
             hash.set('clue_graph', `clue_graph=${encodeURIComponent(this.graph.desc.id)}`);
             hash.set('clue_state', `clue_state=${this.graph.act.id}`);
             const url = `${location.href.replace(location.hash, '')}#${Array.from(hash.values()).join('&')}`;
-            pushNotification('success', `${i18n.t('tdp:core.EditProvenanceMenu.successNotification', {name: this.graph.desc.name})}
-            <br>${i18n.t('tdp:core.EditProvenanceMenu.urlToShare')} <br>
-            <a href="${url}" title="${i18n.t('tdp:core.EditProvenanceMenu.currentLink')}">${url}</a>`, -1);
-            globalFire(GLOBAL_EVENT_MANIPULATED);
+            pushNotification('success', `${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successNotification', {name: this.graph.desc.name})}
+            <br>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.urlToShare')} <br>
+            <a href="${url}" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.currentLink')}">${url}</a>`, -1);
+            EventHandler.getInstance().fire(GLOBAL_EVENT_MANIPULATED);
           });
         }
       });
@@ -180,7 +174,7 @@ export class EditProvenanceGraphMenu {
         return false;
       }
       lazyDialogModule()
-        .then(({areyousure}) => areyousure(i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
+        .then(({areyousure}) => areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
         .then((deleteIt) => {
           if (deleteIt) {
             Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
@@ -215,7 +209,7 @@ export class EditProvenanceGraphMenu {
         li.appendChild(helper);
         helper.click();
         helper.remove();
-        pushNotification('success', i18n.t('tdp:core.EditProvenanceMenu.successMessage', {name: this.graph.desc.name}), DEFAULT_SUCCESS_AUTO_HIDE);
+        pushNotification('success', I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successMessage', {name: this.graph.desc.name}), DEFAULT_SUCCESS_AUTO_HIDE);
       };
       a.readAsDataURL(blob);
       return false;
@@ -226,8 +220,8 @@ export class EditProvenanceGraphMenu {
       event.stopPropagation();
       //import dialog
       lazyDialogModule().then(({generateDialog}) => {
-        const d = generateDialog(i18n.t('tdp:core.EditProvenanceMenu.selectFile'), i18n.t('tdp:core.EditProvenanceMenu.upload'));
-        d.body.innerHTML = `<input type="file" placeholder="${i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
+        const d = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
+        d.body.innerHTML = `<input type="file" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
         (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
           const file = (<HTMLInputElement>evt.target).files[0];
           const reader = new FileReader();
@@ -253,44 +247,44 @@ export class EditProvenanceGraphMenu {
   static persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
     const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
     return EditProvenanceGraphMenu.editProvenanceGraphMetaData(d, {
-      title: `<i class="fa fa-cloud"></i> ${i18n.t('tdp:core.EditProvenanceMenu.persistSession')}`,
-      button: `<i class="fa fa-cloud"></i> ${i18n.t('tdp:core.EditProvenanceMenu.persist')}`,
+      title: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persistSession')}`,
+      button: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persist')}`,
       name
     });
   }
 
   static isPublic(d: ISecureItem) {
-    return hasPermission(d, EEntity.OTHERS);
+    return UserSession.getInstance().hasPermission(d, EEntity.OTHERS);
   }
 
   static editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
-    args = mixin({
+    args = BaseUtils.mixin({
       button: 'Edit',
-      title: `<i class="fa fa-edit" aria-hidden="true"></i>${i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
+      title: `<i class="fa fa-edit" aria-hidden="true"></i>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
       permission: true,
       name: d.name
     }, args);
     return lazyDialogModule().then(({FormDialog}) => {
       const dialog = new FormDialog(args.title, args.button);
-      const prefix = 'd' + randomId();
+      const prefix = 'd' + BaseUtils.randomId();
       const permissions = permissionForm(d, {
         extra: `<div class="help-block">
-        ${i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
+        ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
       </div>`
       });
       dialog.form.innerHTML = `
           <div class="form-group">
-            <label for="${prefix}_name">${i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
+            <label for="${prefix}_name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
             <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
           </div>
           <div class="form-group">
-            <label for="${prefix}_desc">${i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
+            <label for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
             <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
           </div>
           <div class="checkbox">
             <label class="radio-inline">
               <input type="checkbox" name="${prefix}_agree" required="required">
-              ${i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${i18n.t('tdp:core.EditProvenanceMenu.dialog')}.
+              ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.
             </label>
           </div>
       `;

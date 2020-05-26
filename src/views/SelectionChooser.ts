@@ -1,9 +1,7 @@
-import {randomId} from 'phovea_core/src';
-import {IDType, IDTypeLike, resolve} from 'phovea_core/src/idtype';
+import {BaseUtils, IDType, IDTypeLike, IDTypeManager, I18nextManager} from 'phovea_core';
 import {IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption} from '../form/elements/FormSelect';
 import {FormElementType, IFormElement, IFormElementDesc} from '../form/interfaces';
 import {ISelection} from './interfaces';
-import i18n from 'phovea_core/src/i18n';
 
 export interface ISelectionChooserOptions {
   /**
@@ -46,11 +44,11 @@ export class SelectionChooser {
 
   constructor(private readonly accessor: (id: string) => IFormElement, targetIDType?: IDTypeLike, options: Partial<ISelectionChooserOptions> = {}) {
     Object.assign(this.options, options);
-    this.target = targetIDType ? resolve(targetIDType) : null;
-    this.readAble = options.readableIDType ? resolve(options.readableIDType) : null;
-    this.readableTargetIDType = options.readableTargetIDType ? resolve(options.readableTargetIDType) : null;
+    this.target = targetIDType ? IDTypeManager.getInstance().resolveIdType(targetIDType) : null;
+    this.readAble = options.readableIDType ? IDTypeManager.getInstance().resolveIdType(options.readableIDType) : null;
+    this.readableTargetIDType = options.readableTargetIDType ? IDTypeManager.getInstance().resolveIdType(options.readableTargetIDType) : null;
 
-    this.formID = `forms.chooser.select.${this.target ? this.target.id : randomId(4)}`;
+    this.formID = `forms.chooser.select.${this.target ? this.target.id : BaseUtils.randomId(4)}`;
     this.desc = {
       type: FormElementType.SELECT,
       label: this.options.label,
@@ -87,7 +85,7 @@ export class SelectionChooser {
     const sourceNames = await source.unmap(sourceIds);
 
     const readAble = this.readAble || null;
-    const readAbleNames = !readAble || readAble === source ? null : await source.mapToFirstName(sourceIds, readAble);
+    const readAbleNames = !readAble || readAble === source ? null : await IDTypeManager.getInstance().mapToFirstName(source, sourceIds, readAble);
     const labels = readAbleNames ? (this.options.appendOriginalLabel ? readAbleNames.map((d, i) => `${d} (${sourceNames[i]})`) : readAbleNames) : sourceNames;
 
     const target = this.target || source;
@@ -99,7 +97,7 @@ export class SelectionChooser {
       }));
     }
 
-    const targetIds = await source.mapToID(sourceIds, target);
+    const targetIds = await IDTypeManager.getInstance().mapToID(source, sourceIds, target);
     const targetIdsFlat = (<number[]>[]).concat(...targetIds);
     const targetNames = await target.unmap(targetIdsFlat);
 
@@ -117,7 +115,7 @@ export class SelectionChooser {
     // the readableTargetIDType provides the possibility to add an extra IDType to map the actual options to instead of the target IDs
     const readAbleSubOptions: string[] = [];
     if (this.readableTargetIDType) {
-      const optionsIDs: string[] = await target.mapNameToFirstName(targetNames, this.readableTargetIDType);
+      const optionsIDs: string[] = await IDTypeManager.getInstance().mapNameToFirstName(target, targetNames, this.readableTargetIDType);
       readAbleSubOptions.push(...optionsIDs);
     }
 
@@ -135,7 +133,7 @@ export class SelectionChooser {
         return <IFormSelectOptionGroup>{
           name,
           children: [{
-            name: i18n.t('tdp:core.views.formSelectName'),
+            name: I18nextManager.getInstance().i18n.t('tdp:core.views.formSelectName'),
             value: '',
             data: SelectionChooser.INVALID_MAPPING
           }]

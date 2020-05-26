@@ -4,7 +4,7 @@ import {ARankingView, IARankingViewOptions} from '../lineup/ARankingView';
 import {ENamedSetType, INamedSet} from '../storage/interfaces';
 import {ISelection, IViewContext} from './interfaces';
 import {IParams} from '../rest';
-import {retrieve} from 'phovea_core/src/session';
+import {UserSession} from 'phovea_core';
 
 export interface IAStartListOptions extends IARankingViewOptions {
   namedSet: INamedSet;
@@ -49,7 +49,7 @@ export abstract class AStartList extends ARankingView {
     // TODO can't remember why the all exception
     if(this.namedSet.subTypeKey && validFilterKey(this.namedSet.subTypeKey) && this.namedSet.subTypeValue !== 'all') {
       if(this.namedSet.subTypeFromSession) {
-        filter[this.namedSet.subTypeKey] = retrieve(this.namedSet.subTypeKey, this.namedSet.subTypeValue);
+        filter[this.namedSet.subTypeKey] = UserSession.getInstance().retrieve(this.namedSet.subTypeKey, this.namedSet.subTypeValue);
       } else {
         filter[this.namedSet.subTypeKey] = this.namedSet.subTypeValue;
       }

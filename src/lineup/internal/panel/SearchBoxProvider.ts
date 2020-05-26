@@ -1,6 +1,6 @@
-import {SearchBox, LocalDataProvider, IGroupSearchItem, ISearchBoxOptions} from 'lineupjs';
+import {SearchBox, IGroupSearchItem, ISearchBoxOptions} from 'lineupjs';
 import {ISearchOption} from '../LineUpPanelActions';
-import i18n from 'phovea_core/src/i18n';
+import {I18nextManager} from 'phovea_core';
 
 /**
  * The SearchBoxProvider allows creating multiple LineUp SearchBoxes and stores them internally in a list.
@@ -23,7 +23,7 @@ export class SearchBoxProvider {
    */
   createSearchBox(options: Partial<ISearchBoxOptions<ISearchOption>> = {}): SearchBox<ISearchOption> {
     const mergedOptions = Object.assign({
-      placeholder: i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder')
+      placeholder: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder')
     }, options);
 
     const searchBox = new SearchBox<ISearchOption>(mergedOptions);

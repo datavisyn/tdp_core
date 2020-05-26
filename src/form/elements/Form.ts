@@ -3,7 +3,7 @@
  */
 
 import * as d3 from 'd3';
-import {randomId} from 'phovea_core/src/index';
+import {BaseUtils} from 'phovea_core';
 import {IFormElement, IForm, IFormElementDesc} from '../interfaces';
 
 /**
@@ -26,7 +26,7 @@ export class Form implements IForm {
    * @param $parent Node that the form should be attached to
    * @param formId unique form id
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = randomId()) {
+  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
     this.$node = $parent.append('form').attr('id', this.formId);
   }
 

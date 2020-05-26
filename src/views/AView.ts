@@ -3,9 +3,7 @@
  */
 
 import {select} from 'd3';
-import {EventHandler} from 'phovea_core/src/event';
-import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
-import {none} from 'phovea_core/src/range';
+import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils} from 'phovea_core';
 import {IFormElementDesc} from '../form/interfaces';
 import {FormBuilder} from '../form/FormBuilder';
 import {AFormElement} from '../form/elements/AFormElement';
@@ -16,7 +14,6 @@ import {
 import {resolveIds, resolveAllNames, resolveAllIds, resolveNames} from './resolve';
 import {DEFAULT_SELECTION_NAME} from '../extensions';
 import {IForm} from '../form/interfaces';
-import i18n from 'phovea_core/src/i18n';
 
 declare const __DEBUG__;
 export {resolveIds, resolveId, resolveIdToNames} from './resolve';
@@ -57,7 +54,7 @@ export abstract class AView extends EventHandler implements IView {
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
     this.selections.set(DEFAULT_SELECTION_NAME, selection);
-    this.itemSelections.set(DEFAULT_SELECTION_NAME, {idtype: null, range: none()});
+    this.itemSelections.set(DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
 
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
@@ -65,7 +62,7 @@ export abstract class AView extends EventHandler implements IView {
     if (this.isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
     } else {
-      this.idType = resolve(context.desc.idtype);
+      this.idType = IDTypeManager.getInstance().resolveIdType(context.desc.idtype);
     }
   }
 
@@ -79,13 +76,13 @@ export abstract class AView extends EventHandler implements IView {
     if (!value || !busyMessage) {
       delete this.node.dataset.busy;
     } else if (busyMessage) {
-      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : i18n.t('tdp:core.views.busyMessage');
+      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : I18nextManager.getInstance().i18n.t('tdp:core.views.busyMessage');
     }
   }
 
   protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
     const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'};
-    const defaultHintMessage = i18n.t('tdp:core.views.defaultHint', {...conditionalData});
+    const defaultHintMessage = I18nextManager.getInstance().i18n.t('tdp:core.views.defaultHint', {...conditionalData});
     this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;
@@ -96,7 +93,7 @@ export abstract class AView extends EventHandler implements IView {
 
   protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
     const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''};
-    return this.setHint(visible, hintMessage || i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
+    return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
   }
 
   /*final*/
@@ -307,7 +304,7 @@ export abstract class AView extends EventHandler implements IView {
     if (selection.idtype) {
       if (name === DEFAULT_SELECTION_NAME) {
         if (selection.range.isNone) {
-          selection.idtype.clear(defaultSelectionType);
+          selection.idtype.clear(SelectionUtils.defaultSelectionType);
         } else {
           selection.idtype.select(selection.range);
         }
@@ -335,7 +332,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   getItemSelection(name: string = DEFAULT_SELECTION_NAME) {
-    return this.itemSelections.get(name) || {idtype: null, range: none()};
+    return this.itemSelections.get(name) || {idtype: null, range: Range.none()};
   }
 
   modeChanged(mode: EViewMode) {

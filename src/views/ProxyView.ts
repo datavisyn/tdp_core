@@ -2,14 +2,12 @@
  * Created by Holger Stitz on 07.09.2016.
  */
 
-import {mixin} from 'phovea_core/src';
-import {resolve} from 'phovea_core/src/idtype';
+import {BaseUtils, IDTypeManager, I18nextManager} from 'phovea_core';
 import {IViewContext, ISelection} from './interfaces';
 import {FormElementType} from '../form/interfaces';
 import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
 import {AD3View} from './AD3View';
 import {getProxyUrl} from '../rest';
-import i18n from 'phovea_core/src/i18n';
 
 export const FORM_ID_SELECTED_ITEM = 'externalItem';
 
@@ -53,7 +51,7 @@ export class ProxyView extends AD3View {
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
     super(context, selection, parent);
-    mixin(this.options, context.desc, options);
+    BaseUtils.mixin(this.options, context.desc, options);
     this.$node.classed('proxy_view', true);
 
     this.openExternally = parent.ownerDocument.createElement('p');
@@ -169,7 +167,7 @@ export class ProxyView extends AD3View {
 
     this.setBusy(true);
 
-    const args = mixin(this.options.extra, {[this.options.argument]: selectedItemId});
+    const args = BaseUtils.mixin(this.options.extra, {[this.options.argument]: selectedItemId});
     const url = this.createUrl(args);
 
     if (ProxyView.isNoNSecurePage(url)) {
@@ -180,12 +178,12 @@ export class ProxyView extends AD3View {
     if (this.options.openExternally) {
       this.setBusy(false);
       this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-      ${i18n.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${i18n.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}</a>
-      ${i18n.t('tdp:core.views.newTab')}</div></p>`;
+      ${I18nextManager.getInstance().i18n.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${I18nextManager.getInstance().i18n.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}</a>
+      ${I18nextManager.getInstance().i18n.t('tdp:core.views.newTab')}</div></p>`;
       return;
     }
 
-    this.openExternally.innerHTML = `${i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
     this.$node.append('iframe')
@@ -199,8 +197,8 @@ export class ProxyView extends AD3View {
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
-    const to = this.options.idtype ? resolve(this.options.idtype).name : i18n.t('tdp:core.views.unknown');
-    this.$node.html(`<p>${i18n.t('tdp:core.views.cannotMap', {name: this.selection.idtype.name, selectedItemId, to})}</p>`);
+    const to = this.options.idtype ? IDTypeManager.getInstance().resolveIdType(this.options.idtype).name : I18nextManager.getInstance().i18n.t('tdp:core.views.unknown');
+    this.$node.html(`<p>${I18nextManager.getInstance().i18n.t('tdp:core.views.cannotMap', {name: this.selection.idtype.name, selectedItemId, to})}</p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
@@ -216,8 +214,8 @@ export class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
-    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${I18nextManager.getInstance().i18n.t('tdp:core.views.link')}</a> ${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart2')}
        <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
    </div></p><p></p>`);
     this.openExternally.innerHTML = ``;

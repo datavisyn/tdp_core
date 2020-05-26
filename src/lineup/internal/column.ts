@@ -6,7 +6,7 @@ import {createAccessor} from './utils';
 import {IScoreRow, EP_TDP_CORE_SCORE_COLUMN_PATCHER, IScoreColumnPatcherExtensionDesc} from '../../extensions';
 import {errorAlert} from '../../notifications';
 import {extent, min, max} from 'd3';
-import {list as listPlugins} from 'phovea_core/src/plugin';
+import {PluginRegistry} from 'phovea_core';
 
 export interface ILazyLoadedColumn {
   col: Column;
@@ -142,7 +142,7 @@ async function patchColumn(colDesc: any, rows: IScoreRow<any>[], col: Column): P
   }
 
   // Await all patchers to complete before returning
-  await Promise.all(listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER).map(async (pluginDesc: IScoreColumnPatcherExtensionDesc) => {
+  await Promise.all(PluginRegistry.getInstance().listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER).map(async (pluginDesc: IScoreColumnPatcherExtensionDesc) => {
     const plugin = await pluginDesc.load();
     plugin.factory(pluginDesc, colDesc, rows, col);
   }));

@@ -1,4 +1,4 @@
-import {resolveImmediately} from 'phovea_core/src';
+import {ResolveNow} from 'phovea_core';
 import {getAttachment, addAttachment} from '../rest';
 
 const ATTACHMENT_PREFIX = '@attachment:';
@@ -22,7 +22,7 @@ export function needToExternalize(data: object) {
  */
 export function externalize(data: object): PromiseLike<string | object> {
   if (!needToExternalize(data)) {
-    return resolveImmediately(data);
+    return ResolveNow.resolveImmediately(data);
   }
   return addAttachment(data).then((id) => `${ATTACHMENT_PREFIX}${id}`);
 }
@@ -34,7 +34,7 @@ export function externalize(data: object): PromiseLike<string | object> {
  */
 export function resolveExternalized(attachment: string | object): PromiseLike<object> {
   if (typeof attachment !== 'string' || !attachment.startsWith(ATTACHMENT_PREFIX)) {
-    return resolveImmediately(<object>attachment);
+    return ResolveNow.resolveImmediately(<object>attachment);
   }
   const id = attachment.substring(ATTACHMENT_PREFIX.length);
   return getAttachment(id);

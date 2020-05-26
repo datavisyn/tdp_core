@@ -3,9 +3,7 @@
  */
 
 import {ISelection} from '../../views';
-import {IDType} from 'phovea_core/src/idtype';
-import {list as rlist} from 'phovea_core/src/range';
-import {EventHandler} from 'phovea_core/src/event';
+import {EventHandler, IDType, Range} from 'phovea_core';
 import {IRow} from '../../rest';
 import {LocalDataProvider} from 'lineupjs';
 
@@ -95,7 +93,7 @@ export class LineUpSelectionHelper extends EventHandler {
     });
 
 
-    const uids = rlist(this.orderedSelectedIndices.map((i) => this._rows[i]._id));
+    const uids = Range.list(this.orderedSelectedIndices.map((i) => this._rows[i]._id));
     //console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
 
     const idType = this.idType();
@@ -129,7 +127,7 @@ export class LineUpSelectionHelper extends EventHandler {
       ids = indices.map((i) => this._rows[i]._id);
     }
     ids.sort((a, b) => a - b); // sort by number
-    return rlist(ids);
+    return Range.list(ids);
   }
 
   setItemSelection(sel: ISelection) {

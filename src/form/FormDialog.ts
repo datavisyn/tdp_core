@@ -1,8 +1,8 @@
 /**
  * Created by Samuel Gratzl on 07.06.2017.
  */
-import {FormDialog as Dialog} from 'phovea_ui/src/dialogs';
-import {randomId} from 'phovea_core/src';
+import {FormDialog as Dialog} from 'phovea_ui';
+import {BaseUtils} from 'phovea_core';
 import {FormBuilder} from './FormBuilder';
 import {IFormElementDesc, IForm} from './interfaces';
 import {select} from 'd3';
@@ -19,7 +19,7 @@ export class FormDialog extends Dialog {
    * @param {string} primaryButton name of the primary button
    * @param {string} formId form id to use to avoid conflicts
    */
-  constructor(title: string, primaryButton: string, formId = 'form' + randomId(5)) {
+  constructor(title: string, primaryButton: string, formId = 'form' + BaseUtils.randomId(5)) {
     super(title, primaryButton, formId);
     this.body.innerHTML = ''; //clear old form since the form builder brings its own
     this.builder = new FormBuilder(select(this.body), formId);

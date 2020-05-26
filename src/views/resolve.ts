@@ -1,16 +1,15 @@
-import IDType from 'phovea_core/src/idtype/IDType';
-import {resolve} from 'phovea_core/src/idtype';
-import Range from 'phovea_core/src/range/Range';
+import {IDType, IDTypeManager, Range} from 'phovea_core';
+
 
 export function resolveIdToNames(fromIDType: IDType, id: number, toIDType: IDType | string = null): Promise<string[][]> {
-  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
   if (fromIDType.id === target.id) {
     // same just unmap to name
     return fromIDType.unmap([id]).then((names) => [names]);
   }
 
   // assume mappable
-  return fromIDType.mapToName([id], target).then((names) => names);
+  return IDTypeManager.getInstance().mapToName(fromIDType, [id], target).then((names) => names);
 }
 
 /**
@@ -22,14 +21,14 @@ export function resolveIdToNames(fromIDType: IDType, id: number, toIDType: IDTyp
  * @returns a Promise to the matching id of the toIDtype
  */
 export function resolveId(fromIDType: IDType, id: number, toIDtype: IDType | string = null): Promise<string> {
-  const target = toIDtype === null ? fromIDType : resolve(toIDtype);
+  const target = toIDtype === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDtype);
   if (fromIDType.id === target.id) {
     // same just unmap to name
     return fromIDType.unmap([id]).then((names) => names[0]);
   }
 
   // assume mappable
-  return fromIDType.mapToFirstName([id], target).then((names) => names[0]);
+  return IDTypeManager.getInstance().mapToFirstName(fromIDType, [id], target).then((names) => names[0]);
 }
 
 /**
@@ -41,13 +40,13 @@ export function resolveId(fromIDType: IDType, id: number, toIDtype: IDType | str
  * @returns a Promise to the matching id of the toIDtype
  */
 export function resolveIds(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[]> {
-  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
   if (fromIDType.id === target.id) {
     // same just unmap to name
     return fromIDType.unmap(ids);
   }
   // assume mappable
-  return fromIDType.mapToFirstName(ids, target);
+  return IDTypeManager.getInstance().mapToFirstName(fromIDType, ids, target);
 }
 
 /**
@@ -59,14 +58,14 @@ export function resolveIds(fromIDType: IDType, ids: Range | number[], toIDType: 
  * @returns a Promise to the matching id of the toIDtype
  */
 export function resolveNames(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[]> {
-  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
   if (fromIDType.id === target.id) {
     // same just unmap to name
     return fromIDType.unmap(ids);
   }
   // assume mappable
   return fromIDType.unmap(ids).then((names) => {
-    return fromIDType.mapNameToFirstName(names, target);
+    return IDTypeManager.getInstance().mapNameToFirstName(fromIDType, names, target);
   });
 
 }
@@ -81,14 +80,14 @@ export function resolveNames(fromIDType: IDType, ids: Range | number[], toIDType
  * @returns a Promise to the matching id of the toIDtype
  */
 export function resolveAllNames(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[][]> {
-  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
   if (fromIDType.id === target.id) {
     // same just unmap to name
     return fromIDType.unmap(ids).then((ids) => [ids]);
   }
   // assume mappable
   return fromIDType.unmap(ids).then((names) => {
-    return fromIDType.mapNameToName(names, target);
+    return IDTypeManager.getInstance().mapNameToName(fromIDType, names, target);
   });
 }
 
@@ -102,11 +101,11 @@ export function resolveAllNames(fromIDType: IDType, ids: Range | number[], toIDT
  * @returns a Promise to the matching id of the toIDtype
  */
 export function resolveAllIds(fromIDType: IDType, ids: Range | number[], toIDType: IDType | string = null): Promise<string[][]> {
-  const target = toIDType === null ? fromIDType : resolve(toIDType);
+  const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
   if (fromIDType.id === target.id) {
     // same just unmap to name
     return fromIDType.unmap(ids).then((ids) => [ids]);
   }
   // assume mappable
-  return fromIDType.mapToName(ids, target);
+  return IDTypeManager.getInstance().mapToName(fromIDType, ids, target);
 }

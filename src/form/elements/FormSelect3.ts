@@ -6,7 +6,7 @@ import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
 import {Select3, IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {IPluginDesc, EventHandler} from 'phovea_core';
 
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
   return?: 'text' | 'id';
@@ -70,7 +70,7 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   init() {
     super.init();
 
-    this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
+    EventHandler.getInstance().on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);
     });
   }

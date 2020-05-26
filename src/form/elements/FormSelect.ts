@@ -3,11 +3,9 @@
  */
 
 import * as d3 from 'd3';
-import * as session from 'phovea_core/src/session';
+import {UserSession, ResolveNow, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
-import {resolveImmediately} from 'phovea_core/src';
-import {IPluginDesc} from 'phovea_core/src/plugin';
 
 
 export interface IFormSelectOption {
@@ -73,14 +71,14 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     if (!this.elementDesc.useSession) {
       return;
     }
-    session.store(`${this.id}_selectedIndex`, this.getSelectedIndex());
+    UserSession.getInstance().store(`${this.id}_selectedIndex`, this.getSelectedIndex());
   }
 
   protected getStoredValue<T>(defaultValue:T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return session.retrieve(`${this.id}_selectedIndex`, defaultValue);
+    return UserSession.getInstance().retrieve(`${this.id}_selectedIndex`, defaultValue);
   }
 
   /**
@@ -232,10 +230,10 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
 
   static resolveData(data?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption|IFormSelectOptionGroup)[]>) {
     if (data === undefined) {
-      return () => resolveImmediately([]);
+      return () => ResolveNow.resolveImmediately([]);
     }
     if (Array.isArray(data)) {
-      return () => resolveImmediately(data.map(this.toOption));
+      return () => ResolveNow.resolveImmediately(data.map(this.toOption));
     }
     if (data instanceof Promise) {
       return () => data.then((r) => r.map(this.toOption));
@@ -247,9 +245,9 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
         return r.then((r) => r.map(this.toOption));
       }
       if (Array.isArray(r)) {
-        return resolveImmediately(r.map(this.toOption));
+        return ResolveNow.resolveImmediately(r.map(this.toOption));
       }
-      return resolveImmediately(r);
+      return ResolveNow.resolveImmediately(r);
     };
   }
 }

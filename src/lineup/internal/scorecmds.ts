@@ -3,13 +3,12 @@
  */
 
 
-import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ActionNode} from 'phovea_core/src/provenance';
-import {get as getPlugin} from 'phovea_core/src/plugin';
+import {IObjectRef, ObjectRefUtils, I18nextManager, ActionMetaData, PluginRegistry, ProvenanceGraph, ActionNode, ActionUtils} from 'phovea_core';
 import {Column} from 'lineupjs';
 import {IScore} from '../../extensions';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../extensions';
 import {externalize, resolveExternalized} from '../../storage/internal/attachment';
-import i18n from 'phovea_core/src/i18n';
+
 
 export const CMD_ADD_SCORE = 'tdpAddScore';
 export const CMD_REMOVE_SCORE = 'tdpRemoveScore';
@@ -24,7 +23,7 @@ export interface IViewProvider {
 
 async function addScoreLogic(waitForScore: boolean, inputs: IObjectRef<IViewProvider>[], parameter: any) {
   const scoreId: string = parameter.id;
-  const pluginDesc = getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
+  const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
   const plugin = await pluginDesc.load();
   const view = await inputs[0].v.then((vi) => vi.getInstance());
   const params = await resolveExternalized(parameter.params);
@@ -35,7 +34,7 @@ async function addScoreLogic(waitForScore: boolean, inputs: IObjectRef<IViewProv
   const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
 
   return {
-    inverse: removeScore(inputs[0], i18n.t('tdp:core.lineup.scorecmds.score'), scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id))
+    inverse: removeScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id))
   };
 }
 
@@ -55,12 +54,12 @@ export async function removeScoreImpl(inputs: IObjectRef<IViewProvider>[], param
   columnIds.forEach((id) => view.removeTrackedScoreColumn(id));
 
   return {
-    inverse: addScore(inputs[0], i18n.t('tdp:core.lineup.scorecmds.score'), parameter.id, parameter.params)
+    inverse: addScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), parameter.id, parameter.params)
   };
 }
 
 export function addScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
-  return action(meta(i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), ObjectRefUtils.category.data, ObjectRefUtils.operation.create), CMD_ADD_SCORE, addScoreImpl, [provider], {
     id: scoreId,
     params
   });
@@ -71,11 +70,11 @@ export async function pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRe
   const currentParams = {id: scoreId, params, storedParams};
   const result = await addScoreAsync([provider], currentParams);
   const toStoreParams = {id: scoreId, params: storedParams};
-  return graph.pushWithResult(action(meta(i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), cat.data, op.create), CMD_ADD_SCORE, addScoreImpl, [provider], toStoreParams), result);
+  return graph.pushWithResult(ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), ObjectRefUtils.category.data, ObjectRefUtils.operation.create), CMD_ADD_SCORE, addScoreImpl, [provider], toStoreParams), result);
 }
 
 export function removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]) {
-  return action(meta(i18n.t('tdp:core.lineup.scorecmds.remove', {scoreName}), cat.data, op.remove), CMD_REMOVE_SCORE, removeScoreImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.remove', {scoreName}), ObjectRefUtils.category.data, ObjectRefUtils.operation.remove), CMD_REMOVE_SCORE, removeScoreImpl, [provider], {
     id: scoreId,
     params,
     columnId

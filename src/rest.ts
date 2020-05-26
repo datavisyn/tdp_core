@@ -1,4 +1,4 @@
-import {api2absURL, getAPIData, getAPIJSON, encodeParams, sendAPI, MAX_URL_LENGTH} from 'phovea_core/src/ajax';
+import {Ajax, AppContext} from 'phovea_core';
 import {IScoreRow} from './extensions';
 import {IDTypeLike} from 'phovea_core/src/idtype';
 
@@ -37,7 +37,7 @@ export interface IDatabaseDesc {
 
 
 export function getTDPDatabases(): Promise<IDatabaseDesc[]> {
-  return getAPIJSON(`${REST_DB_NAMESPACE}/`);
+  return AppContext.getInstance().getAPIJSON(`${REST_DB_NAMESPACE}/`);
 }
 
 export interface IServerColumnDesc {
@@ -63,7 +63,7 @@ export interface IDatabaseViewDesc extends IServerColumnDesc {
 }
 
 export function getTDPViews(database: string): Promise<Readonly<IDatabaseViewDesc>[]> {
-  return getAPIJSON(`${REST_DB_NAMESPACE}/${database}/`);
+  return AppContext.getInstance().getAPIJSON(`${REST_DB_NAMESPACE}/${database}/`);
 }
 
 /**
@@ -73,11 +73,11 @@ export function getTDPViews(database: string): Promise<Readonly<IDatabaseViewDes
  * @returns {string} the url to the used for iframes
  */
 export function getProxyUrl(proxy: string, args: any) {
-  return api2absURL(`${REST_NAMESPACE}/proxy/${proxy}`, args);
+  return AppContext.getInstance().api2absURL(`${REST_NAMESPACE}/proxy/${proxy}`, args);
 }
 
 export function getTDPProxyData(proxy: string, args: any, type: string = 'json') {
-  return getAPIData(`${REST_NAMESPACE}/proxy/${proxy}`, args, type);
+  return AppContext.getInstance().getAPIData(`${REST_NAMESPACE}/proxy/${proxy}`, args, type);
 }
 
 export interface IParams {
@@ -132,12 +132,12 @@ function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter
   }
 
   const url = `${REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
-  const encoded = encodeParams(params);
-  if (encoded && (url.length + encoded.length > MAX_URL_LENGTH)) {
+  const encoded = Ajax.encodeParams(params);
+  if (encoded && (url.length + encoded.length > Ajax.MAX_URL_LENGTH)) {
     // use post instead
-    return sendAPI(url, params, 'POST');
+    return AppContext.getInstance().sendAPI(url, params, 'POST');
   }
-  return getAPIJSON(url, params);
+  return AppContext.getInstance().getAPIJSON(url, params);
 }
 
 /**
@@ -289,7 +289,7 @@ export interface ILookupResult {
 }
 
 export function getTDPLookupUrl(database: string, view: string, params: IParams = {}) {
-  return api2absURL(`${REST_DB_NAMESPACE}/${database}/${view}/lookup`, params);
+  return AppContext.getInstance().api2absURL(`${REST_DB_NAMESPACE}/${database}/${view}/lookup`, params);
 }
 /**
  * lookup utility function as used for auto completion within select2 form elements

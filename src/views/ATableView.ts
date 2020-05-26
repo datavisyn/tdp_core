@@ -1,11 +1,9 @@
-import {debounce} from 'phovea_core/src';
-import {parse} from 'phovea_core/src/range';
+import {BaseUtils, ParseRangeUtils, I18nextManager} from 'phovea_core';
 import {errorAlert} from '../notifications';
 import {IRow} from '../rest';
 import {ISelection, IViewContext} from './interfaces';
 import {AView} from './AView';
 import {jsonArray2xlsx} from '../utils/xlsx';
-import i18n from 'phovea_core/src/i18n';
 
 export interface ISortItem<T> {
   node: HTMLElement;
@@ -46,13 +44,13 @@ export abstract class ATableView<T extends IRow> extends AView {
    * clears and rebuilds this lineup instance from scratch
    * @returns {Promise<any[]>} promise when done
    */
-  protected rebuild = debounce(() => this.rebuildImpl(), 100);
+  protected rebuild = BaseUtils.debounce(() => this.rebuildImpl(), 100);
 
   /**
    * similar to rebuild but just loads new data and keep the columns
    * @returns {Promise<any[]>} promise when done
    */
-  protected reloadData = debounce(() => this.reloadDataImpl(), 100);
+  protected reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
 
   /**
    * promise resolved when everything is built
@@ -147,7 +145,7 @@ export abstract class ATableView<T extends IRow> extends AView {
           evt.stopPropagation();
           this.setItemSelection({
             idtype: this.itemIDType,
-            range: parse([row._id])
+            range: ParseRangeUtils.parseRangeLike([row._id])
           });
         };
       }
@@ -171,7 +169,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
     (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
     rightTableHeader.insertAdjacentHTML('beforeend',
-      `<a href="#" title="${i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fa fa-download"></i></a>`);
+      `<a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fa fa-download"></i></a>`);
     (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();

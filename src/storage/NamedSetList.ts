@@ -2,23 +2,20 @@
  * Created by Holger Stitz on 27.07.2016.
  */
 
-import {IDType} from 'phovea_core/src/idtype';
-import {FormDialog} from 'phovea_ui/src/dialogs';
+import {IDType} from 'phovea_core';
+import {FormDialog} from 'phovea_ui';
 import {editDialog} from './editDialog';
 import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
 import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
-import {list as listPlugins} from 'phovea_core/src/plugin';
+import {PluginRegistry, I18nextManager} from 'phovea_core';
 import {errorAlert} from '../notifications';
 import {EXTENSION_POINT_TDP_LIST_FILTERS} from '../extensions';
 import {Selection, select, event as d3event} from 'd3';
 import {
-  canWrite,
-  currentUserNameOrAnonymous,
-  EEntity,
-  hasPermission
-} from 'phovea_core/src/security';
+  UserSession,
+  EEntity
+} from 'phovea_core';
 import {successfullySaved, successfullyDeleted} from '../notifications';
-import i18n from 'phovea_core/src/i18n';
 
 export class NamedSetList {
   readonly node: HTMLElement;
@@ -39,9 +36,9 @@ export class NamedSetList {
 
   private async build() {
     this.node.innerHTML = `
-      <section class="predefined-named-sets"><header>${ i18n.t('tdp:core.NamedSetList.predefinedSets')}</header><ul class="loading"></ul></section>
-      <section class="custom-named-sets"><header> ${i18n.t('tdp:core.NamedSetList.mySets')}</header><ul class="loading"></ul></section>
-      <section class="other-named-sets"><header> ${i18n.t('tdp:core.NamedSetList.publicSets')}</header><ul class="loading"></ul></section>`;
+      <section class="predefined-named-sets"><header>${ I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.predefinedSets')}</header><ul class="loading"></ul></section>
+      <section class="custom-named-sets"><header> ${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.mySets')}</header><ul class="loading"></ul></section>
+      <section class="other-named-sets"><header> ${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.publicSets')}</header><ul class="loading"></ul></section>`;
 
     this.filter = await this.findFilters();
     const data = await this.list();
@@ -53,7 +50,7 @@ export class NamedSetList {
   }
 
   private edit(namedSet: IStoredNamedSet) {
-    if (!canWrite(namedSet)) {
+    if (!UserSession.getInstance().canWrite(namedSet)) {
       return;
     }
     editDialog(namedSet, async (name, description, sec) => {
@@ -63,7 +60,7 @@ export class NamedSetList {
       }, sec);
 
       const editedSet = await editNamedSet(namedSet.id, params);
-      successfullySaved(i18n.t('tdp:core.NamedSetList.namedSet'), name);
+      successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.namedSet'), name);
       this.replace(namedSet, editedSet);
     });
   }
@@ -71,7 +68,7 @@ export class NamedSetList {
   update() {
     const data = this.data.filter((datum) => this.filter({[datum.subTypeKey]: datum.subTypeValue}));
     const predefinedNamedSets = data.filter((d) => d.type !== ENamedSetType.NAMEDSET);
-    const me = currentUserNameOrAnonymous();
+    const me = UserSession.getInstance().currentUserNameOrAnonymous();
     const customNamedSets = data.filter((d) => d.type === ENamedSetType.NAMEDSET && d.creator === me);
     const otherNamedSets = data.filter((d) => d.type === ENamedSetType.NAMEDSET && d.creator !== me);
 
@@ -110,8 +107,8 @@ export class NamedSetList {
     $enter.append('a')
       .classed('edit', true)
       .attr('href', '#')
-      .html(`<i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="sr-only"> ${i18n.t('tdp:core.NamedSetList.edit')}</span>`)
-      .attr('title', i18n.t('tdp:core.NamedSetList.edit') as string)
+      .html(`<i class="fa fa-pencil-square-o" aria-hidden="true"></i> <span class="sr-only"> ${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.edit')}</span>`)
+      .attr('title', I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.edit') as string)
       .on('click', (namedSet: IStoredNamedSet) => {
         // prevent changing the hash (href)
         (<Event>d3event).preventDefault();
@@ -121,22 +118,22 @@ export class NamedSetList {
     $enter.append('a')
       .classed('delete', true)
       .attr('href', '#')
-      .html(`<i class="fa fa-trash" aria-hidden="true"></i> <span class="sr-only">${i18n.t('tdp:core.NamedSetList.delete')}</span>`)
-      .attr('title', i18n.t('tdp:core.NamedSetList.delete') as string)
+      .html(`<i class="fa fa-trash" aria-hidden="true"></i> <span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.delete')}</span>`)
+      .attr('title', I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.delete') as string)
       .on('click', async (namedSet: IStoredNamedSet) => {
         // prevent changing the hash (href)
         (<Event>d3event).preventDefault();
 
-        if (!canWrite(namedSet)) {
+        if (!UserSession.getInstance().canWrite(namedSet)) {
           return;
         }
 
-        const deleteIt = await FormDialog.areyousure(i18n.t('tdp:core.NamedSetList.dialogText', {name: namedSet.name}),
-          {title: i18n.t('tdp:core.NamedSetList.deleteSet')}
+        const deleteIt = await FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dialogText', {name: namedSet.name}),
+          {title: I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.deleteSet')}
         );
         if (deleteIt) {
           await deleteNamedSet(namedSet.id);
-          successfullyDeleted(i18n.t('tdp:core.NamedSetList.dashboard'), namedSet.name);
+          successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dashboard'), namedSet.name);
           this.remove(namedSet);
         }
       });
@@ -144,16 +141,16 @@ export class NamedSetList {
     //update
     $options.select('a.goto').text((d) => d.name)
       .attr('title', (d) => {
-        const extendedData = d.type === ENamedSetType.NAMEDSET ? {context: 'extended', creator: (<IStoredNamedSet>d).creator, public: hasPermission(<IStoredNamedSet>d, EEntity.OTHERS)} : {};
-        return i18n.t('tdp:core.NamedSetList.title', {name: d.name, description: d.description, ...extendedData}) as string; // i18next context feature
+        const extendedData = d.type === ENamedSetType.NAMEDSET ? {context: 'extended', creator: (<IStoredNamedSet>d).creator, public: UserSession.getInstance().hasPermission(<IStoredNamedSet>d, EEntity.OTHERS)} : {};
+        return I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.title', {name: d.name, description: d.description, ...extendedData}) as string; // i18next context feature
       });
-    $options.select('a.delete').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d));
-    $options.select('a.edit').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d));
+    $options.select('a.delete').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d));
+    $options.select('a.edit').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d));
     $options.select('a.public')
-      .classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !canWrite(d))
+      .classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d))
       .html((d) => {
-        const isPublic = d.type === ENamedSetType.NAMEDSET && hasPermission(<IStoredNamedSet>d, EEntity.OTHERS);
-        const publicOrPrivate = i18n.t('tdp:core.NamedSetList.status', {context: isPublic ? '' : 'private'});
+        const isPublic = d.type === ENamedSetType.NAMEDSET && UserSession.getInstance().hasPermission(<IStoredNamedSet>d, EEntity.OTHERS);
+        const publicOrPrivate = I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.status', {context: isPublic ? '' : 'private'});
         return `<i class="fa ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${publicOrPrivate}"></i> <span class="sr-only">${publicOrPrivate}</span>`;
       });
 
@@ -176,7 +173,7 @@ export class NamedSetList {
   }
 
   protected findFilters() {
-    return Promise.all(listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load())).then((filters) => {
+    return Promise.all(PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load())).then((filters) => {
       return (metaData: object) => filters.every((f) => f.factory(metaData));
     });
   }

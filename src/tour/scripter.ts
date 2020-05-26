@@ -1,11 +1,11 @@
-import {resolveIn} from 'phovea_core/src';
+import {BaseUtils} from 'phovea_core';
 
 /**
  * returns a promise waiting for X milliseconds
  * @param timeMs
  */
 export function wait(timeMs: number): Promise<any> {
-  return resolveIn(timeMs);
+  return BaseUtils.resolveIn(timeMs);
 }
 
 /**

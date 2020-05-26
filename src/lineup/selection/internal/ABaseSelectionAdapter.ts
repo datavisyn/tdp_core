@@ -4,7 +4,7 @@
 import {IAdditionalColumnDesc} from '../../desc';
 import {array_diff} from '../../internal/LineUpSelectionHelper';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
-import {resolveImmediately} from 'phovea_core/src/internal/promise';
+import {ResolveNow} from 'phovea_core';
 
 export abstract class ABaseSelectionAdapter {
 
@@ -37,7 +37,7 @@ export abstract class ABaseSelectionAdapter {
     if (this.waitingForSelection) {
       return this.waitingForSelection;
     }
-    return this.waitingForSelection = resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
+    return this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
       this.waitingForSelection = null;
     });
   }
@@ -49,7 +49,7 @@ export abstract class ABaseSelectionAdapter {
     if (this.waitingForParameter) {
       return this.waitingForParameter;
     }
-    return this.waitingForParameter = resolveImmediately(waitForIt).then(() => {
+    return this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt).then(() => {
       if (this.waitingForSelection) {
         return; // abort selection more important
       }

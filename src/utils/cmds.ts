@@ -2,10 +2,8 @@
  * Created by sam on 03.03.2017.
  */
 
-import {IObjectRef, ProvenanceGraph, action, meta, op, cat, ActionNode} from 'phovea_core/src/provenance';
-import * as session from 'phovea_core/src/session';
-import {lastOnly} from 'phovea_clue/src/compress';
-import i18n from 'phovea_core/src/i18n';
+import {IObjectRef, ProvenanceGraph, ActionMetaData, ActionUtils, ObjectRefUtils, ActionNode, I18nextManager, UserSession} from 'phovea_core';
+import {lastOnly} from 'phovea_clue';
 
 //old name
 export const CMD_INIT_SESSION = 'tdpInitSession';
@@ -21,10 +19,10 @@ export function initSessionImpl(_inputs: IObjectRef<any>[], parameters: object) 
   const old = {};
   // clear the session as part of it?
   Object.keys(parameters).forEach((key) => {
-    old[key] = session.retrieve(key, null);
+    old[key] = UserSession.getInstance().retrieve(key, null);
     const value = parameters[key];
     if (value !== null) {
-      session.store(key, parameters[key]);
+      UserSession.getInstance().store(key, parameters[key]);
     }
   });
   return {
@@ -33,7 +31,7 @@ export function initSessionImpl(_inputs: IObjectRef<any>[], parameters: object) 
 }
 
 export function initSession(map: object) {
-  return action(meta(i18n.t('tdp:core.initializeSession'), cat.custom, op.update), CMD_INIT_SESSION, initSessionImpl, [], map);
+  return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.initializeSession'), ObjectRefUtils.category.custom, ObjectRefUtils.operation.update), CMD_INIT_SESSION, initSessionImpl, [], map);
 }
 
 export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, graph: ProvenanceGraph) {
@@ -50,7 +48,7 @@ export async function setParameterImpl(inputs: IObjectRef<any>[], parameter, gra
 
 export function setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any) {
   //assert view
-  return action(meta(i18n.t('tdp:core.setParameter', {name}), cat.visual, op.update), CMD_SET_PARAMETER, setParameterImpl, [view], {
+  return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.setParameter', {name}), ObjectRefUtils.category.visual, ObjectRefUtils.operation.update), CMD_SET_PARAMETER, setParameterImpl, [view], {
     name,
     value,
     previousValue

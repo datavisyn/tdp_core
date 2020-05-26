@@ -1,4 +1,3 @@
-import {Ranking} from 'lineupjs';
 import {scale} from 'd3';
 import {array_diff} from './LineUpSelectionHelper';
 

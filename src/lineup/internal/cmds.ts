@@ -3,10 +3,8 @@
  */
 
 
-import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult} from 'phovea_core/src/provenance';
+import {IObjectRef, ProvenanceGraph, ICmdResult, ResolveNow, I18nextManager, ObjectRefUtils, ActionMetaData, ActionUtils} from 'phovea_core';
 import {NumberColumn, createMappingFunction, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn} from 'lineupjs';
-import {resolveImmediately} from 'phovea_core/src';
-import i18n from 'phovea_core/src/i18n';
 
 
 const CMD_SET_SORTING_CRITERIA = 'lineupSetRankingSortCriteria';
@@ -67,7 +65,7 @@ function dirtyRankingWaiter(ranking: Ranking) {
 }
 
 export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
   const index: number = parameter.index;
 
   if (!parameter.dump) { // remove
@@ -97,7 +95,7 @@ export async function addRankingImpl(inputs: IObjectRef<any>[], parameter: any) 
 }
 
 export function addRanking(provider: IObjectRef<any>, index: number, dump?: any) {
-  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addRanking') : i18n.t('tdp:core.lineup.cmds.removeRanking'), cat.layout, dump ? op.create : op.remove), CMD_ADD_RANKING, addRankingImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addRanking') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeRanking'), ObjectRefUtils.category.layout, dump ? ObjectRefUtils.operation.create : ObjectRefUtils.operation.remove), CMD_ADD_RANKING, addRankingImpl, [provider], {
     index,
     dump
   });
@@ -108,7 +106,7 @@ function toSortObject(v) {
 }
 
 export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const bak = toSortObject(ranking.getSortCriteria());
   ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
@@ -123,14 +121,14 @@ export async function setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], para
 
 
 export function setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta( I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), CMD_SET_SORTING_CRITERIA, setRankingSortCriteriaImpl, [provider], {
     rid,
     value
   });
 }
 
 export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
 
   const waitForSorted = dirtyRankingWaiter(ranking);
@@ -153,7 +151,7 @@ export async function setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: 
 
 
 export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), cat.layout, op.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta( I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), CMD_SET_SORTING_CRITERIAS, setSortCriteriaImpl, [provider], {
     rid,
     columns,
     isSorting
@@ -161,7 +159,7 @@ export function setSortCriteria(provider: IObjectRef<any>, rid: number, columns:
 }
 
 export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const current = ranking.getGroupCriteria().map((d) => d.fqpath);
   const columns = parameter.columns.map((p) => ranking.findByPath(p));
@@ -175,14 +173,14 @@ export async function setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter:
 }
 
 export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), cat.layout, op.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta( I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
     rid,
     columns
   });
 }
 
 export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
-  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
 
@@ -225,7 +223,7 @@ export function setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number,
   // assert ALineUpView and update the stats
   provider.value.getInstance().updateLineUpStats();
 
-  return action(meta(i18n.t('tdp:core.lineup.cmds.setProperty', {prop}), cat.layout, op.update), CMD_SET_COLUMN, setColumnImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta( I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.setProperty', {prop}), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), CMD_SET_COLUMN, setColumnImpl, [provider], {
     rid,
     path,
     prop,
@@ -234,7 +232,7 @@ export function setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number,
 }
 
 export async function addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any) {
-  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   let parent: Ranking | CompositeColumn = ranking;
 
@@ -260,7 +258,7 @@ export async function addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], pa
 }
 
 export async function moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any) {
-  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
   let parent: Ranking | CompositeColumn = ranking;
   const waitForSorted = dirtyRankingWaiter(ranking);
@@ -283,7 +281,7 @@ export async function moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], p
 }
 
 export function addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any) {
-  return action(meta(dump ? i18n.t('tdp:core.lineup.cmds.addColumn') : i18n.t('tdp:core.lineup.cmds.removeColumn'), cat.layout, dump ? op.create : op.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addColumn') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeColumn'), ObjectRefUtils.category.layout, dump ? ObjectRefUtils.operation.create : ObjectRefUtils.operation.remove), CMD_ADD_COLUMN, addColumnImpl, [provider], {
     rid,
     path,
     index,
@@ -292,7 +290,7 @@ export function addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number,
 }
 
 export function moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.moveColumn'), cat.layout, op.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
+  return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.moveColumn'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), CMD_MOVE_COLUMN, moveColumnImpl, [provider], {
     rid,
     path,
     index,
@@ -568,7 +566,7 @@ function untrackRanking(ranking: Ranking) {
  * @param graph
  */
 export async function clueify(lineup: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph) {
-  const p = await resolveImmediately((await lineup.v).data);
+  const p = await ResolveNow.resolveImmediately((await lineup.v).data);
   p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
     if (ignore(LocalDataProvider.EVENT_ADD_RANKING, lineup)) {
       return;
@@ -593,13 +591,13 @@ export async function clueify(lineup: IObjectRef<IViewProviderLocal>, graph: Pro
 }
 
 export async function untrack(lineup: IObjectRef<IViewProviderLocal>) {
-  const p = await resolveImmediately((await lineup.v).data);
+  const p = await ResolveNow.resolveImmediately((await lineup.v).data);
   p.on([`${LocalDataProvider.EVENT_ADD_RANKING}.track`, `${LocalDataProvider.EVENT_REMOVE_RANKING}.track`], null);
   p.getRankings().forEach(untrackRanking);
 }
 
 export function withoutTracking<T>(lineup: IObjectRef<IViewProviderLocal>, fun: () => T): PromiseLike<T> {
-  return lineup.v.then((d) => resolveImmediately(d.data)).then((p) => {
+  return lineup.v.then((d) => ResolveNow.resolveImmediately(d.data)).then((p) => {
     temporaryUntracked.add(lineup.hash);
     const r = fun();
     temporaryUntracked.delete(lineup.hash);

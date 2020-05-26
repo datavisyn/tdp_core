@@ -1,14 +1,13 @@
-import {IPlugin, IPluginDesc} from 'phovea_core/src/plugin';
-import {IUser} from 'phovea_core/src/security';
-import {IObjectRef, ProvenanceGraph} from 'phovea_core/src/provenance';
-import Range from 'phovea_core/src/range/Range';
-import {IEventHandler} from 'phovea_core/src/event';
+import {IPlugin, IPluginDesc} from 'phovea_core';
+import {IUser} from 'phovea_core';
+import {IObjectRef, ProvenanceGraph, Range} from 'phovea_core';
+import {IEventHandler} from 'phovea_core';
 import {IAdditionalColumnDesc} from './lineup/desc';
-import {RangeLike} from 'phovea_core/src/range';
-import {IDType} from 'phovea_core/src/idtype';
+import {RangeLike} from 'phovea_core';
+import {IDType} from 'phovea_core';
 import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
 import {EViewMode} from './views/interfaces';
-import {AppHeader} from 'phovea_ui/src/header';
+import {AppHeader} from 'phovea_ui';
 import {PanelTab} from './lineup/internal/panel/PanelTab';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';

@@ -5,7 +5,7 @@ import {IScoreRow} from '../../extensions';
 import {getTDPCount, IParams, IRow} from '../../rest';
 import {IDataRow} from 'lineupjs';
 import {IFormMultiMap, IFormRow, FormMap} from '../../form/elements/FormMap';
-import {encodeParams} from 'phovea_core/src/ajax';
+import {Ajax} from 'phovea_core';
 
 
 /**
@@ -132,7 +132,7 @@ export function previewFilterHint(database: string, view: string, extraParams?: 
     if (extraParams) {
       Object.assign(param, extraParams());
     }
-    const key = `${encodeParams(param)}@${encodeParams(filter)}`;
+    const key = `${Ajax.encodeParams(param)}@${Ajax.encodeParams(filter)}`;
     if (!cache.has(key)) {
       cache.set(key, getTDPCount(database, view, param, filter));
     }
