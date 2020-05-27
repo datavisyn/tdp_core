@@ -111,9 +111,8 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
 
-      DialogUtils.lazyDialogModule()
-        .then(({generateDialog}) => {
-          const dialog = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.open'));
+      import('phovea_ui/src/components/dialogs').then(({Dialog}) => {
+          const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.open'));
           dialog.body.classList.add('tdp-session-dialog');
           dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
             <div role="tab" class="collapsed">
@@ -172,8 +171,9 @@ export class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      DialogUtils.lazyDialogModule()
-        .then(({areyousure}) => areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
+      import('phovea_ui/src/components/dialogs')
+        .then(({FormDialog}) =>
+        FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
         .then((deleteIt) => {
           if (deleteIt) {
             Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
@@ -218,8 +218,8 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
       //import dialog
-      DialogUtils.lazyDialogModule().then(({generateDialog}) => {
-        const d = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
+      import('phovea_ui/src/components/dialogs').then(({Dialog}) => {
+        const d = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
         d.body.innerHTML = `<input type="file" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
         (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
           const file = (<HTMLInputElement>evt.target).files[0];

@@ -15,9 +15,6 @@ export interface IDialogModule {
 }
 
 export class DialogUtils {
-  static lazyDialogModule(): Promise<IDialogModule> {
-    return import('phovea_ui/src/dialogs');
-  }
 
   /**
    * utility dialog when a session was not found
@@ -25,8 +22,8 @@ export class DialogUtils {
    * @param {string} id session id
    */
   static showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses: string = '') {
-    DialogUtils.lazyDialogModule().then(({generateDialog}) => {
-      const dialog = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'), I18nextManager.getInstance().i18n.t('tdp:core.newSession'), additionalCSSClasses);
+    import('phovea_ui/src/components/dialogs').then(({Dialog}) => {
+      const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'), I18nextManager.getInstance().i18n.t('tdp:core.newSession'), additionalCSSClasses);
       // append bg-danger to the dialog parent element
       dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
       dialog.body.innerHTML = `

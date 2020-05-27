@@ -9,7 +9,7 @@ export class ProvenanceGraphMenuUtils {
     static isPersistent(d: IProvenanceGraphDataDescription) {
         return d.local === false || d.local === undefined;
       }
-    
+
       static persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
         const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
         return ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, {
@@ -18,11 +18,11 @@ export class ProvenanceGraphMenuUtils {
           name
         });
       }
-    
+
       static isPublic(d: ISecureItem) {
         return UserSession.getInstance().hasPermission(d, EEntity.OTHERS);
       }
-    
+
       static editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
         args = BaseUtils.mixin({
           button: 'Edit',
@@ -30,7 +30,7 @@ export class ProvenanceGraphMenuUtils {
           permission: true,
           name: d.name
         }, args);
-        return DialogUtils.lazyDialogModule().then(({FormDialog}) => {
+        return import('phovea_ui/src/components/dialogs').then(({FormDialog}) => {
           const dialog = new FormDialog(args.title, args.button);
           const prefix = 'd' + BaseUtils.randomId();
           const permissions = TDPApplicationUtils.permissionForm(d, {
