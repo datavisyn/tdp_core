@@ -3,7 +3,7 @@
  * Copyright (c) The Caleydo Team. All rights reserved.
  * Licensed under the new BSD license, available at http://caleydo.org/license
  **************************************************************************** */
-import {IRegistry, PluginRegistry, LocaleExtensionPointDesc, ILocaleEPDesc} from 'phovea_core';
+import {IRegistry, PluginRegistry, EP_PHOVEA_CORE_LOCALE, ILocaleEPDesc} from 'phovea_core';
 import {FormElementType} from './form/interfaces';
 import {EP_TDP_CORE_FORM_ELEMENT} from './base/extensions';
 
@@ -113,7 +113,7 @@ export default function (registry: IRegistry) {
   formElements(FormElementType.CHECKBOX, () => System.import('./form/elements/FormCheckBox'));
   formElements(FormElementType.RADIO, () => System.import('./form/elements/FormRadio'));
 
-  registry.push(LocaleExtensionPointDesc.EP_PHOVEA_CORE_LOCALE, 'tdpCoreLocaleEN', function () {
+  registry.push(EP_PHOVEA_CORE_LOCALE, 'tdpCoreLocaleEN', function () {
     return System.import('./assets/locales/en/tdp.json').then(PluginRegistry.getInstance().asResource);
   }, <ILocaleEPDesc>{
     ns: 'tdp',
