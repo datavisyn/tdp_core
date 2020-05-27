@@ -20,82 +20,82 @@ export default function (registry: IRegistry) {
     registry.push(EP_TDP_CORE_FORM_ELEMENT, id, loader, options);
   }
 
-  actionFunction('tdpInitSession', 'initSessionImpl', () => import('./utils/cmds'), {
+  actionFunction('tdpInitSession', 'initSessionImpl', () => import('./utils/TDPApplicationUtils'), {
     analytics: {
       category: 'session',
       action: 'init'
     }
   });
-  actionFunction('tdpSetParameter', 'setParameterImpl', () => import('./utils/cmds'), {
+  actionFunction('tdpSetParameter', 'setParameterImpl', () => import('./utils/TDPApplicationUtils'), {
     analytics: {
       category: 'view',
       action: 'setParameter'
     }
   });
-  actionCompressor('tdpCompressSetParameter', 'compressSetParameter', '(tdpSetParameter)', () => import('./utils/cmds'));
+  actionCompressor('tdpCompressSetParameter', 'compressSetParameter', '(tdpSetParameter)', () => import('./utils/TDPApplicationUtils'));
 
   // compatibility
-  actionFunction('targidInitSession', 'initSessionImpl', () => import('./utils/cmds'));
-  actionFunction('targidSetParameter', 'setParameterImpl', () => import('./utils/cmds'));
-  actionCompressor('targidCompressSetParameter', 'compressSetParameterOld', '(targidSetParameter)', () => import('./utils/cmds'));
+  actionFunction('targidInitSession', 'initSessionImpl', () => import('./utils/TDPApplicationUtils'));
+  actionFunction('targidSetParameter', 'setParameterImpl', () => import('./utils/TDPApplicationUtils'));
+  actionCompressor('targidCompressSetParameter', 'compressSetParameterOld', '(targidSetParameter)', () => import('./utils/TDPApplicationUtils'));
 
 
-  actionFunction('tdpAddScore', 'addScoreImpl', () => import('./lineup/internal/scorecmds'), {
+  actionFunction('tdpAddScore', 'addScoreImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'score',
       action: 'add'
     }
   });
-  actionFunction('tdpRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/scorecmds'), {
+  actionFunction('tdpRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'score',
       action: 'remove'
     }
   });
-  actionCompressor('tdpScoreCompressor', 'compress', '(tdpAddScore|tdpRemoveScore)', () => import('./lineup/internal/scorecmds'));
+  actionCompressor('tdpScoreCompressor', 'compress', '(tdpAddScore|tdpRemoveScore)', () => import('./lineup/internal/ScoreUtils'));
 
   // compatibility
-  actionFunction('ordinoAddScore', 'addScoreImpl', () => import('./lineup/internal/scorecmds'));
-  actionFunction('ordinoRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/scorecmds'));
-  actionCompressor('ordinoScoreCompressor', 'compressComp', '(ordinoAddScore|ordinoRemoveScore)', () => import('./lineup/internal/scorecmds'));
+  actionFunction('ordinoAddScore', 'addScoreImpl', () => import('./lineup/internal/ScoreUtils'));
+  actionFunction('ordinoRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/ScoreUtils'));
+  actionCompressor('ordinoScoreCompressor', 'compressComp', '(ordinoAddScore|ordinoRemoveScore)', () => import('./lineup/internal/ScoreUtils'));
 
-  actionFunction('lineupAddRanking', 'addRankingImpl', () => import('./lineup/internal/cmds'), {
+  actionFunction('lineupAddRanking', 'addRankingImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'lineup',
       action: 'addRanking'
     }
   });
-  actionFunction('lineupSetRankingSortCriteria', 'setRankingSortCriteriaImpl', () => import('./lineup/internal/cmds'), {
+  actionFunction('lineupSetRankingSortCriteria', 'setRankingSortCriteriaImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'lineup',
       action: 'setRankingSortCriteria'
     }
   });
-  actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => import('./lineup/internal/cmds'), {
+  actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'lineup',
       action: 'setSortCriteria'
     }
   });
-  actionFunction('lineupSetGroupCriteria', 'setGroupCriteriaImpl', () => import('./lineup/internal/cmds'), {
+  actionFunction('lineupSetGroupCriteria', 'setGroupCriteriaImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'lineup',
       action: 'setGroupCriteria'
     }
   });
-  actionFunction('lineupSetColumn', 'setColumnImpl', () => import('./lineup/internal/cmds'), {
+  actionFunction('lineupSetColumn', 'setColumnImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'lineup',
       action: 'setColumn'
     }
   });
-  actionFunction('lineupAddColumn', 'addColumnImpl', () => import('./lineup/internal/cmds'), {
+  actionFunction('lineupAddColumn', 'addColumnImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'lineup',
       action: 'addColumn'
     }
   });
-  actionFunction('lineupMoveColumn', 'moveColumnImpl', () => import('./lineup/internal/cmds'), {
+  actionFunction('lineupMoveColumn', 'moveColumnImpl', () => import('./lineup/internal/ScoreUtils'), {
     analytics: {
       category: 'lineup',
       action: 'moveColumn'
