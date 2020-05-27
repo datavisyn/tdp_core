@@ -9,8 +9,9 @@ import {
 } from 'phovea_ui';
 import {BuilderUtils, ViewBuilder} from 'phovea_ui';
 import {AView} from './AView';
-import {ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
+import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
+import {ViewUtils} from './ViewUtils';
 
 
 interface IElementDesc {
@@ -45,9 +46,6 @@ export interface IACompositeViewOptions {
 }
 
 declare const __DEBUG__: boolean;
-
-export const VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
-export const VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB = 'setActiveTab';
 
 
 export interface ICompositeInfo {
@@ -136,6 +134,10 @@ class WrapperView implements ILayoutView {
 
 
 export class CompositeView extends EventHandler implements IView {
+
+  public static readonly VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
+  public static readonly VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB = 'setActiveTab';
+
   private readonly options: Readonly<IACompositeViewOptions> = {
     showHeaders: false
   };
@@ -252,8 +254,8 @@ export class CompositeView extends EventHandler implements IView {
         }
         instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
         instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
-        instance.on(VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
-        instance.on(VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB, setActiveTab);
+        instance.on(CompositeView.VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
+        instance.on(CompositeView.VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB, setActiveTab);
         this.childrenLookup.set(d.key, instance);
 
         this.children.push(new WrapperView(instance, d.key));
@@ -391,7 +393,7 @@ export class CompositeView extends EventHandler implements IView {
   }
 
   setInputSelection(selection: ISelection) {
-    if (isSameSelection(this.selection, selection)) {
+    if (ViewUtils.isSameSelection(this.selection, selection)) {
       return;
     }
     this.selection = selection;

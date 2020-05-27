@@ -3,9 +3,6 @@ import {Placement, PopperOptions} from 'popper.js';
 import {AppHeader} from 'phovea_ui';
 import {IViewPluginDesc, IView, ISelection} from '../base/interfaces';
 
-export const GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
-
-export const EXTENSION_POINT_TDP_TOUR = 'tdpTour';
 
 export interface ITDPTourExtensionDesc {
   id: string;
@@ -88,9 +85,6 @@ export interface IStep {
   allowUserInteraction?: boolean;
 }
 
-export function startTour(tourId: string, context: any = {}) {
-  EventHandler.getInstance().fire(GLOBAL_EVENT_START_TOUR, tourId, context);
-}
 
 export interface IViewTourContext {
   plugin: IViewPluginDesc;
@@ -99,11 +93,3 @@ export interface IViewTourContext {
   selection: ISelection;
 }
 
-/**
- * start a view help tour
- * @param tourId the tour id to start
- * @param context view context as extra tour context
- */
-export function startViewTour(tourId: string, context: IViewTourContext) {
-  startTour(tourId, context);
-}

@@ -3,21 +3,22 @@ import {AView} from '../views/AView';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
 import {IDTypeManager, BaseUtils, ISecureItem, I18nextManager} from 'phovea_core';
-import {clueify, withoutTracking, untrack} from './internal/cmds';
-import {saveNamedSet} from '../storage';
+import {LinupTrackingManager} from './internal/cmds';
+import {RestStorageUtils} from '../storage';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {LineUpSelectionHelper} from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow, IAdditionalColumnDesc} from '../base/interfaces';
-import {createInitialRanking, deriveColumns, IInitialRankingOptions} from './desc';
-import {IRankingWrapper, wrapRanking} from './internal/ranking';
-import {pushScoreAsync} from './internal/scorecmds';
+import {ColumnDescUtils, IInitialRankingOptions} from './desc';
+import {IRankingWrapper} from './internal/IRankingWrapper';
+import {ScoreUtils} from './internal/ScoreUtils';
 import {LineUpColors} from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../base/rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection/ISelectionAdapter';
-import {LineUpPanelActions, rule} from './internal/LineUpPanelActions';
-import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
+import {LineUpPanelActions} from './internal/LineUpPanelActions';
+import {LazyColumn, ILazyLoadedColumn} from './internal/column';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {IARankingViewOptions} from './IARankingViewOptions';
+import {LineupUtils} from './internal/utils';
 
 /**
  * base class for views based on LineUp
@@ -180,7 +181,7 @@ export abstract class ARankingView extends AView {
         (<TaggleRenderer>this.taggle).switchRule(rule);
       });
       if (this.options.enableOverviewMode === 'active') {
-        (<TaggleRenderer>this.taggle).switchRule(rule);
+        (<TaggleRenderer>this.taggle).switchRule(LineUpPanelActions.rule);
       }
     }
 
@@ -337,7 +338,7 @@ export abstract class ARankingView extends AView {
 
   private async saveNamedSet(order: number[], name: string, description: string, sec: Partial<ISecureItem>) {
     const ids = this.selectionHelper.rowIdsAsSet(order);
-    const namedSet = await saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
+    const namedSet = await RestStorageUtils.saveNamedSet(name, this.itemIDType, ids, this.options.subType, description, sec);
     NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
@@ -345,7 +346,7 @@ export abstract class ARankingView extends AView {
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
-    return addLazyColumn(colDesc, data, this.provider, position, () => {
+    return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
       this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
     });
@@ -385,7 +386,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected async withoutTracking<T>(f: () => T): Promise<T> {
-    return this.built.then(() => withoutTracking(this.context.ref, f));
+    return this.built.then(() => LinupTrackingManager.getInstance().withoutTracking(this.context.ref, f));
   }
 
   /**
@@ -398,7 +399,7 @@ export abstract class ARankingView extends AView {
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
-    return pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
+    return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
   }
 
   /**
@@ -431,7 +432,7 @@ export abstract class ARankingView extends AView {
    * @returns {IAdditionalColumnDesc[]}
    */
   protected getColumnDescs(columns: IServerColumn[]): IAdditionalColumnDesc[] {
-    return deriveColumns(columns);
+    return ColumnDescUtils.deriveColumns(columns);
   }
 
   private getColumns(): Promise<IAdditionalColumnDesc[]> {
@@ -462,7 +463,7 @@ export abstract class ARankingView extends AView {
       this.setLineUpData(rows);
       this.createInitialRanking(this.provider);
       const ranking = this.provider.getLastRanking();
-      this.customizeRanking(wrapRanking(this.provider, ranking));
+      this.customizeRanking(LineupUtils.wrapRanking(this.provider, ranking));
     }).then(() => {
       if (this.selectionAdapter) {
         // init first time
@@ -472,7 +473,7 @@ export abstract class ARankingView extends AView {
       this.builtLineUp(this.provider);
 
       //record after the initial one
-      clueify(this.context.ref, this.context.graph);
+      LinupTrackingManager.getInstance().clueify(this.context.ref, this.context.graph);
       this.setBusy(false);
     }).catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
@@ -486,7 +487,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
-    createInitialRanking(lineup, options);
+    ColumnDescUtils.createInitialRanking(lineup, options);
   }
 
   protected customizeRanking(ranking: IRankingWrapper) {
@@ -533,7 +534,7 @@ export abstract class ARankingView extends AView {
    */
   protected clear() {
     //reset
-    return untrack(this.context.ref).then(() => {
+    return LinupTrackingManager.getInstance().untrack(this.context.ref).then(() => {
       this.provider.clearRankings();
       this.provider.clearSelection();
       this.provider.clearData();

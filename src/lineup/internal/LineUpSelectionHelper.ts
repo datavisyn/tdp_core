@@ -6,34 +6,8 @@ import {ISelection} from '../../base';
 import {EventHandler, IDType, Range} from 'phovea_core';
 import {IRow} from '../../base/rest';
 import {LocalDataProvider} from 'lineupjs';
+import {LineupUtils} from './utils';
 
-
-/**
- * Returns the all items that are not in the given two arrays
- * TODO improve performance of diff algorithm
- * @param array1
- * @param array2
- * @returns {any}
- */
-export function array_diff<T>(array1: T[], array2: T[]) {
-  return array1.filter((elm) => array2.indexOf(elm) === -1);
-}
-
-/**
- * Returns all elements from set1 which are not in set2
- * @param set1
- * @param set2
- * @returns Set<T>
- */
-export function set_diff<T>(set1: Set<T>, set2: Set<T>): Set<T> {
-  const diff = new Set<T>();
-  set1.forEach((elem) => {
-    if (!set2.has(elem)) {
-      diff.add(elem);
-    }
-  });
-  return diff;
-}
 
 export class LineUpSelectionHelper extends EventHandler {
   static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';
@@ -79,8 +53,8 @@ export class LineUpSelectionHelper extends EventHandler {
 
   private onMultiSelectionChanged(indices: number[]) {
     // compute the difference
-    const diffAdded = array_diff(indices, this.orderedSelectedIndices);
-    const diffRemoved = array_diff(this.orderedSelectedIndices, indices);
+    const diffAdded = LineupUtils.array_diff(indices, this.orderedSelectedIndices);
+    const diffRemoved = LineupUtils.array_diff(this.orderedSelectedIndices, indices);
 
     // remove elements within, but preserve order
     diffRemoved.forEach((d) => {

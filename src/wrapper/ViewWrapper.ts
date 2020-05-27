@@ -10,15 +10,14 @@
  *********************************************************/
 
 import {EventHandler, ObjectRefUtils, ObjectNode, ProvenanceGraph, ResolveNow, Range, IDType, IDTypeManager, I18nextManager, NodeUtils} from 'phovea_core';
-import {IViewProvider} from '../lineup/internal/scorecmds';
-import {ISelection, IView, IViewContext, IViewPluginDesc, DEFAULT_SELECTION_NAME} from '../base/interfaces';
-import {canAccess} from '../views/findViews';
-import {notAllowedText} from '../utils/utils';
-import {lazyDialogModule} from '../base/dialogs';
-import {createContext, isSameSelection, matchLength} from '../views/interfaces';
+import {IViewProvider} from '../lineup/internal/ScoreUtils';
+import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
+import {FindViewUtils} from '../views/FindViewUtils';
+import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';
+import {DialogUtils} from '../base/dialogs';
+import {ViewUtils} from '../views/ViewUtils';
 import {AView} from '../views/AView';
-import {setParameter} from '../utils/cmds';
-import {startViewTour} from '../tour/extensions';
+import {TourUtils} from '../tour/TourUtils';
 
 
 export class ViewWrapper extends EventHandler implements IViewProvider {
@@ -41,7 +40,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
    */
   private context: IViewContext;
 
-  private listenerItemSelect = (_event: any, oldSelection: ISelection, newSelection: ISelection, name: string = DEFAULT_SELECTION_NAME) => {
+  private listenerItemSelect = (_event: any, oldSelection: ISelection, newSelection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) => {
     this.fire(AView.EVENT_ITEM_SELECT, oldSelection, newSelection, name);
   }
 
@@ -53,11 +52,11 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document, private readonly viewOptionGenerator: () => any = () => ({})) {
     super();
 
-    this.preInstanceItemSelections.set(DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
+    this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
 
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
-    this.allowed = canAccess(plugin);
+    this.allowed = FindViewUtils.canAccess(plugin);
     this.node.innerHTML = `
      <header>
         <div class="parameters form-inline"></div>
@@ -65,7 +64,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
      <main></main>
      <div class="preview-image">
         <div></div>
-        <span>${!this.allowed ? notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
+        <span>${!this.allowed ? TDPApplicationUtils.notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
     </div>`;
     this.node.classList.add('view', 'disabled-view');
     this.content = <HTMLElement>this.node.querySelector('main');
@@ -76,7 +75,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
-        lazyDialogModule().then((dialogs) => {
+        DialogUtils.lazyDialogModule().then((dialogs) => {
           const d = dialogs.generateDialog(plugin.name, I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.close'));
           d.body.innerHTML = plugin.helpText;
           d.show();
@@ -94,11 +93,11 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
-        startViewTour(plugin.helpTourId, {
+        TourUtils.startViewTour(plugin.helpTourId, {
           plugin,
           node: this.node,
           instance: this.instance,
-          selection: this.inputSelections.get(DEFAULT_SELECTION_NAME)
+          selection: this.inputSelections.get(AView.DEFAULT_SELECTION_NAME)
         });
       });
     }
@@ -114,7 +113,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   set visible(visible: boolean) {
-    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+    const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
     if (visible && this.instance == null && selection && this.match(selection)) {
       //lazy init
       this.createView(selection);
@@ -152,19 +151,19 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
         return; // already built race condition
       }
       // create provenance reference
-      this.context = createContext(this.graph, this.plugin, this.ref);
+      this.context = ViewUtils.createContext(this.graph, this.plugin, this.ref);
       this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
       this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
       return this.instancePromise = ResolveNow.resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
         this.inputSelections.forEach((v, k) => {
-          if (k !== DEFAULT_SELECTION_NAME) { // already handled
+          if (k !== AView.DEFAULT_SELECTION_NAME) { // already handled
             this.instance.setInputSelection(v, k);
           }
         });
 
         const idType = this.instance.itemIDType;
         if (idType) {
-          const selection = this.preInstanceItemSelections.get(DEFAULT_SELECTION_NAME);
+          const selection = this.preInstanceItemSelections.get(AView.DEFAULT_SELECTION_NAME);
           if (selection.idtype) {
             this.instance.setItemSelection(selection);
           } else {
@@ -176,7 +175,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
         }
 
         this.preInstanceItemSelections.forEach((v, k) => {
-          if (k !== DEFAULT_SELECTION_NAME) { // already handed
+          if (k !== AView.DEFAULT_SELECTION_NAME) { // already handed
             this.instance.setItemSelection(v, k);
           }
         });
@@ -204,7 +203,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   matchesIDType(idType: IDType) {
-    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+    const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
     if (selection) {
       return selection.idtype === idType;
     }
@@ -213,7 +212,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   get idType() {
-    const selection = this.inputSelections.get(DEFAULT_SELECTION_NAME);
+    const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
     return selection && selection.idtype ? selection.idtype : ViewWrapper.guessIDType(this.plugin); // TODO: better IDType strategy than guessIDType?
   }
 
@@ -232,11 +231,11 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
         // executing during replay
         return;
       }
-      return this.context.graph.pushWithResult(setParameter(this.ref, name, value, previousValue), {
-        inverse: setParameter(this.ref, name, previousValue, value)
+      return this.context.graph.pushWithResult(TDPApplicationUtils.setParameter(this.ref, name, value, previousValue), {
+        inverse: TDPApplicationUtils.setParameter(this.ref, name, previousValue, value)
       });
     }
-    return this.context.graph.push(setParameter(this.ref, name, value, previousValue));
+    return this.context.graph.push(TDPApplicationUtils.setParameter(this.ref, name, value, previousValue));
   }
 
   getParameter(name: string) {
@@ -261,11 +260,11 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     return this.setInputSelection(selection);
   }
 
-  setInputSelection(selection?: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+  setInputSelection(selection?: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
     const current = this.inputSelections.get(name);
-    const isDefault = name === DEFAULT_SELECTION_NAME;
+    const isDefault = name === AView.DEFAULT_SELECTION_NAME;
 
-    if (isSameSelection(current, selection)) {
+    if (ViewUtils.isSameSelection(current, selection)) {
       return;
     }
     this.inputSelections.set(name, selection);
@@ -295,7 +294,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   private match(selection: ISelection) {
-    return matchLength(this.plugin.selection, selection.range.dim(0).length);
+    return ViewUtils.matchLength(this.plugin.selection, selection.range.dim(0).length);
   }
 
   /**
@@ -305,7 +304,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     return this.getInputSelection();
   }
 
-  getInputSelection(name: string = DEFAULT_SELECTION_NAME) {
+  getInputSelection(name: string = AView.DEFAULT_SELECTION_NAME) {
     return this.inputSelections.get(name);
   }
 
@@ -313,14 +312,14 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     return this.instance ? this.instance.itemIDType : null;
   }
 
-  getItemSelection(name: string = DEFAULT_SELECTION_NAME): ISelection {
+  getItemSelection(name: string = AView.DEFAULT_SELECTION_NAME): ISelection {
     if (this.instance) {
       return this.instance.getItemSelection(name);
     }
     return this.preInstanceItemSelections.get(name);
   }
 
-  setItemSelection(sel: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+  setItemSelection(sel: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
     if (this.instance) {
       this.instancePromise.then((v) => {
         EventHandler.getInstance().off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);

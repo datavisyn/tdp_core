@@ -3,13 +3,12 @@
  */
 
 import {BaseUtils, IDTypeManager, I18nextManager} from 'phovea_core';
-import {IViewContext, ISelection} from './interfaces';
+import {IViewContext, ISelection} from '../base/interfaces';
 import {FormElementType} from '../form/interfaces';
 import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
 import {AD3View} from './AD3View';
-import {getProxyUrl} from '../base/rest';
+import {RestBaseUtils} from '../base/rest';
 
-export const FORM_ID_SELECTED_ITEM = 'externalItem';
 
 export interface IProxyViewOptions {
   proxy?: string;
@@ -24,6 +23,9 @@ export interface IProxyViewOptions {
  * helper view for proxying an existing external website using an iframe
  */
 export class ProxyView extends AD3View {
+
+  public static readonly FORM_ID_SELECTED_ITEM = 'externalItem';
+
   protected options: IProxyViewOptions = {
     /**
      * proxy key - will be redirected through a local server proxy
@@ -80,7 +82,7 @@ export class ProxyView extends AD3View {
   protected createUrl(args: any) {
     //use internal proxy
     if (this.options.proxy) {
-      return getProxyUrl(this.options.proxy, args);
+      return RestBaseUtils.getProxyUrl(this.options.proxy, args);
     }
     if (this.options.site) {
       return this.options.site.replace(/{([^}]+)}/gi, (match, variable) => args[variable]);
@@ -92,7 +94,7 @@ export class ProxyView extends AD3View {
     return super.getParameterFormDescs().concat([{
       type: FormElementType.SELECT,
       label: 'Show',
-      id: FORM_ID_SELECTED_ITEM,
+      id: ProxyView.FORM_ID_SELECTED_ITEM,
       options: {
         optionsData: [],
       },
@@ -120,7 +122,7 @@ export class ProxyView extends AD3View {
       .then((args: any[]) => {
         const names = <string[]>args[0]; // use names to get the last selected element
         const data = <{value: string, name: string, data: any}[]>args[1];
-        const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(FORM_ID_SELECTED_ITEM);
+        const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(ProxyView.FORM_ID_SELECTED_ITEM);
 
         // backup entry and restore the selectedIndex by value afterwards again,
         // because the position of the selected element might change
@@ -151,7 +153,7 @@ export class ProxyView extends AD3View {
   }
 
   protected updateProxyView() {
-    this.loadProxyPage(this.getParameter(FORM_ID_SELECTED_ITEM).value);
+    this.loadProxyPage(this.getParameter(ProxyView.FORM_ID_SELECTED_ITEM).value);
   }
 
   protected loadProxyPage(selectedItemId: string) {

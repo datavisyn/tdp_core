@@ -1,13 +1,13 @@
 
 import {SidePanel, spaceFillingRule, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
 import {IDType, IDTypeManager, IPlugin, IPluginDesc, PluginRegistry, EventHandler, I18nextManager} from 'phovea_core';
-import {editDialog} from '../../storage';
+import {StoreUtils} from '../../storage/StoreUtils';
 import {
   EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   EP_TDP_CORE_LINEUP_PANEL_TAB
 } from '../../base/extensions';
 import {IARankingViewOptions} from '../IARankingViewOptions';
-import {lazyDialogModule} from '../../base/dialogs';
+import {DialogUtils} from '../../base/dialogs';
 import {PanelButton} from './panel/PanelButton';
 import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
 import {PanelTab, SidePanelTab} from './panel/PanelTab';
@@ -18,6 +18,7 @@ import {PanelAddColumnButton} from './panel/PanelAddColumnButton';
 import {PanelDownloadButton} from './panel/PanelDownloadButton';
 import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension} from '../../base/interfaces';
 import {ISearchOption} from './panel/ISearchOption';
+import {LineupUtils} from './utils';
 
 
 
@@ -64,31 +65,6 @@ export interface IPanelTabExtensionDesc extends IPluginDesc {
 }
 
 
-
-
-export const rule = spaceFillingRule({
-  groupHeight: 70,
-  rowHeight: 18,
-  groupPadding: 5
-});
-
-
-/**
- * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
- * @param score
- * @returns {IScoreLoader}
- */
-export function wrap(score: IPluginDesc): IScoreLoader {
-  return {
-    text: score.name,
-    id: score.id,
-    scoreId: score.id,
-    factory(extraArgs: object, count: number) {
-      return score.load().then((p) => Promise.resolve(p.factory(score, extraArgs, count)));
-    }
-  };
-}
-
 export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
@@ -103,6 +79,12 @@ export class LineUpPanelActions extends EventHandler {
    * @type {string}
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
+
+  static readonly rule = spaceFillingRule({
+    groupHeight: 70,
+    rowHeight: 18,
+    groupPadding: 5
+  });
 
   private idType: IDType | null = null;
 
@@ -214,7 +196,7 @@ export class LineUpPanelActions extends EventHandler {
 
     if (this.options.enableSaveRanking) {
       const listener = (ranking: Ranking) => {
-        editDialog(null, (name, description, sec) => {
+        StoreUtils.editDialog(null, (name, description, sec) => {
           this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, ranking.getOrder(), name, description, sec);
         });
       };
@@ -240,7 +222,7 @@ export class LineUpPanelActions extends EventHandler {
       const listener = () => {
         const selected = this.overview.classList.toggle('fa-th-list');
         this.overview.classList.toggle('fa-list');
-        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
+        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? LineUpPanelActions.rule : null);
       };
       const overviewButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed
@@ -334,7 +316,7 @@ export class LineUpPanelActions extends EventHandler {
 
     // Load meta data plugins
     const metaDataOptions = await Promise.all(metaDataPluginPromises);
-    const loadedScorePlugins = ordinoScores.map((desc) => wrap(desc));
+    const loadedScorePlugins = ordinoScores.map((desc) => LineupUtils.wrap(desc));
     return {metaDataOptions, loadedScorePlugins};
   }
 
@@ -429,7 +411,7 @@ export class LineUpPanelActions extends EventHandler {
       id: `group_${text}`,
       action: () => {
         // choooser dialog
-        lazyDialogModule().then((dialogs) => {
+        DialogUtils.lazyDialogModule().then((dialogs) => {
           const dialog = new dialogs.FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
           dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">

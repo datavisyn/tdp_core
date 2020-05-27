@@ -4,6 +4,6 @@
 
 //export * from './internal/internal';
 export * from './interfaces';
-export * from './editDialog';
+export * from './StoreUtils';
 export * from './rest';
 export * from './NamedSetList';

@@ -4,7 +4,7 @@
 
 import {ProvenanceGraph, PropertyHandler, IProvenanceGraphDataDescription, BaseUtils, EEntity, UserSession, ISecureItem, IEvent, EventHandler, I18nextManager} from 'phovea_core';
 import {CLUEGraphManager} from 'phovea_clue';
-import {lazyDialogModule} from '../base/dialogs';
+import {DialogUtils} from '../base/dialogs';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {TemporarySessionList, PersistentSessionList} from './SessionList';
@@ -111,7 +111,7 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
 
-      lazyDialogModule()
+      DialogUtils.lazyDialogModule()
         .then(({generateDialog}) => {
           const dialog = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.open'));
           dialog.body.classList.add('tdp-session-dialog');
@@ -172,7 +172,7 @@ export class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      lazyDialogModule()
+      DialogUtils.lazyDialogModule()
         .then(({areyousure}) => areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
         .then((deleteIt) => {
           if (deleteIt) {
@@ -218,7 +218,7 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
       //import dialog
-      lazyDialogModule().then(({generateDialog}) => {
+      DialogUtils.lazyDialogModule().then(({generateDialog}) => {
         const d = generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
         d.body.innerHTML = `<input type="file" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
         (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {

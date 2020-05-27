@@ -1,6 +1,6 @@
 import {IProvenanceGraphDataDescription, I18nextManager, EEntity, ISecureItem, UserSession, BaseUtils} from 'phovea_core';
-import {lazyDialogModule} from '../base/dialogs';
-import {permissionForm} from './utils';
+import {DialogUtils} from '../base/dialogs';
+import {TDPApplicationUtils} from './TDPApplicationUtils';
 
 export class ProvenanceGraphMenuUtils {
 
@@ -30,10 +30,10 @@ export class ProvenanceGraphMenuUtils {
           permission: true,
           name: d.name
         }, args);
-        return lazyDialogModule().then(({FormDialog}) => {
+        return DialogUtils.lazyDialogModule().then(({FormDialog}) => {
           const dialog = new FormDialog(args.title, args.button);
           const prefix = 'd' + BaseUtils.randomId();
-          const permissions = permissionForm(d, {
+          const permissions = TDPApplicationUtils.permissionForm(d, {
             extra: `<div class="help-block">
             ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
           </div>`

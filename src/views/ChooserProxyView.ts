@@ -1,6 +1,6 @@
 import {AView }from './AView';
-import {IViewContext, ISelection} from './interfaces';
-import {getProxyUrl} from '../base/rest';
+import {IViewContext, ISelection} from '../base/interfaces';
+import {RestBaseUtils} from '../base/rest';
 import {SelectionChooser, ISelectionChooserOptions} from './SelectionChooser';
 import {I18nextManager} from 'phovea_core';
 
@@ -100,7 +100,7 @@ export class ChooserProxyView extends AView {
   protected createUrl(args: any) {
     //use internal proxy
     if (this.options.proxy) {
-      return getProxyUrl(this.options.proxy, args);
+      return RestBaseUtils.getProxyUrl(this.options.proxy, args);
     }
     if (this.options.site) {
       return this.options.site.replace(/{([^}]+)}/gi, (match, variable) => args[variable]);

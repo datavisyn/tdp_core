@@ -172,8 +172,6 @@ export interface IViewContext {
   readonly ref: IObjectRef<any>;
 }
 
-export const DEFAULT_SELECTION_NAME = 'default';
-
 export interface IView extends IEventHandler {
   /**
    * the node of this view

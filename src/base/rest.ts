@@ -2,9 +2,6 @@ import {Ajax, AppContext} from 'phovea_core';
 import {IScoreRow} from './interfaces';
 import {IDTypeLike} from 'phovea_core';
 
-export const REST_NAMESPACE = '/tdp';
-export const REST_DB_NAMESPACE = `${REST_NAMESPACE}/db`;
-
 /**
  * common interface for a row as used in LineUp
  */
@@ -35,11 +32,6 @@ export interface IDatabaseDesc {
   readonly description: string;
 }
 
-
-export function getTDPDatabases(): Promise<IDatabaseDesc[]> {
-  return AppContext.getInstance().getAPIJSON(`${REST_DB_NAMESPACE}/`);
-}
-
 export interface IServerColumnDesc {
 
   /**
@@ -60,24 +52,6 @@ export interface IDatabaseViewDesc extends IServerColumnDesc {
   query: string;
   filters?: string[];
   queries?: { [name: string]: string };
-}
-
-export function getTDPViews(database: string): Promise<Readonly<IDatabaseViewDesc>[]> {
-  return AppContext.getInstance().getAPIJSON(`${REST_DB_NAMESPACE}/${database}/`);
-}
-
-/**
- * return the website url based on the registered proxy page
- * @param {string} proxy proxy page identifier
- * @param args additional arguments
- * @returns {string} the url to the used for iframes
- */
-export function getProxyUrl(proxy: string, args: any) {
-  return AppContext.getInstance().api2absURL(`${REST_NAMESPACE}/proxy/${proxy}`, args);
-}
-
-export function getTDPProxyData(proxy: string, args: any, type: string = 'json') {
-  return AppContext.getInstance().getAPIData(`${REST_NAMESPACE}/proxy/${proxy}`, args, type);
 }
 
 export interface IParams {
@@ -125,158 +99,6 @@ const emptyFilters: IAllFilters = {
   gte:{}
 };
 
-function getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}, assignIds: boolean = false) {
-  const mmethod = method === 'none' ? '' : `/${method}`;
-  if (assignIds) {
-    params._assignids = true; // assign globally ids on the server side
-  }
-
-  const url = `${REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
-  const encoded = Ajax.encodeParams(params);
-  if (encoded && (url.length + encoded.length > Ajax.MAX_URL_LENGTH)) {
-    // use post instead
-    return AppContext.getInstance().sendAPI(url, params, 'POST');
-  }
-  return AppContext.getInstance().getAPIJSON(url, params);
-}
-
-/**
- * query the TDP rest api to read data
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
- * @returns {Promise<T[]>}
- */
-export function getTDPData<T>(database: string, view: string, params: IParams = {}, assignIds: boolean = false): Promise<T[]> {
-  return getTDPDataImpl(database, view, 'none', params, assignIds);
-}
-
-/**
- * query the TDP rest api to read data
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
- * @returns {Promise<IRow[]>}
- */
-export function getTDPRows(database: string, view: string, params: IParams = {}, assignIds: boolean = false): Promise<IRow[]> {
-  return getTDPDataImpl(database, view, 'none', params, assignIds);
-}
-
-/**
- * Add a prefix to the keys of all given URL parameters
- * @param params URL parameter
- * @param prefix The prefix for the parameter keys (default is `filter`)
- */
-function prefixFilter(params: IParams, prefix: string = 'filter') {
-  const r: IParams = {};
-  Object.keys(params).map((key) => r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = params[key]);
-  return r;
-}
-
-/**
- * Merges the "regular" parameters with filter parameters for the URL.
- * Filter parameters are prefixed accordingly to be accepted by the backend.
- *
- * @param params URL parameters
- * @param filters URL filter parameters
- */
-function mergeParamAndAllFilters(params: IParams, filters: IAllFilters) {
-  const normal = prefixFilter(filters.normal);
-  const lt = prefixFilter(filters.lt, 'filter_lt');
-  const lte = prefixFilter(filters.lte, 'filter_lte');
-  const gt = prefixFilter(filters.gt, 'filter_gt');
-  const gte = prefixFilter(filters.gte, 'filter_gte');
-
-  return Object.assign({}, params, normal, lt, lte, gt, gte);
-}
-
-/**
- * Merges the "regular" parameters with filter parameters for the URL.
- * Filter parameters are prefixed accordingly to be accepted by the backend.
- *
- * @param params URL parameters
- * @param filters URL filter parameters
- */
-export function mergeParamAndFilters(params: IParams, filters: IParams) {
-  return Object.assign({}, params, prefixFilter(filters));
-}
-
-/**
- * query the TDP rest api to read data with additional given filters
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {IParams} filters filters to use
- * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
- * @returns {Promise<IRow[]>}
- */
-export function getTDPFilteredRows(database: string, view: string, params: IParams, filters: IParams, assignIds: boolean = false): Promise<IRow[]> {
-  return getTDPDataImpl(database, view, 'filter', mergeParamAndFilters(params, filters), assignIds);
-}
-
-/**
- * query the TDP rest api to read data with additional given filters
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {IAllFilters} filters object that contains all filter options
- * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
- * @returns {Promise<IRow[]>}
- */
-export function getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IAllFilters = emptyFilters, assignIds: boolean = false): Promise<IRow[]> {
-  return getTDPDataImpl(database, view, 'filter', mergeParamAndAllFilters(params, filters), assignIds);
-}
-
-/**
- * query the TDP rest api to read a score
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {IParams} filters filters to use
- * @returns {Promise<IScoreRow<T>[]>}
- */
-export function getTDPScore<T>(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<IScoreRow<T>[]> {
-  return getTDPDataImpl(database, view, 'score', mergeParamAndFilters(params, filters));
-}
-
-/**
- * query the TDP rest api to read a score
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {IAllFilters} filters object that contains all filter options
- * @returns {Promise<IScoreRow<T>[]>}
- */
-export function getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<IScoreRow<T>[]> {
-  return getTDPDataImpl(database, view, 'score', mergeParamAndAllFilters(params, filters));
-}
-
-/**
- * query the TDP rest api to compute the number of rows matching this query
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {IParams} filters filters to use
- * @returns {Promise<number>}
- */
-export function getTDPCount(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<number> {
-  return getTDPDataImpl(database, view, 'count', mergeParamAndFilters(params, filters));
-}
-
-/**
- * query the TDP rest api to compute the number of rows matching this query
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {IAllFilters} filters object that contains all filter options
- * @returns {Promise<number>}
- */
-export function getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<number> {
-  return getTDPDataImpl(database, view, 'count', mergeParamAndAllFilters(params, filters));
-}
-
 export interface ILookupItem {
   _id: number;
   id: string;
@@ -288,20 +110,6 @@ export interface ILookupResult {
   more: boolean;
 }
 
-export function getTDPLookupUrl(database: string, view: string, params: IParams = {}) {
-  return AppContext.getInstance().api2absURL(`${REST_DB_NAMESPACE}/${database}/${view}/lookup`, params);
-}
-/**
- * lookup utility function as used for auto completion within select2 form elements
- * @param {string} database the database connector key
- * @param {string} view the view id
- * @param {IParams} params additional parameters
- * @param {boolean} assignIds
- * @returns {Promise<Readonly<ILookupResult>>}
- */
-export function getTDPLookup(database: string, view: string, params: IParams = {}, assignIds: boolean = false): Promise<Readonly<ILookupResult>> {
-  return getTDPDataImpl(database, view, 'lookup', params, assignIds);
-}
 
 export interface IServerColumn {
   /**
@@ -333,12 +141,207 @@ export interface IServerColumn {
   max?: number;
 }
 
-/**
- * queries the server side column information of the given view
- * @param {string} database
- * @param {string} view
- * @returns {Promise<Readonly<IDatabaseViewDesc>>}
- */
-export function getTDPDesc(database: string, view: string): Promise<Readonly<IDatabaseViewDesc>> {
-  return getTDPDataImpl(database, view, 'desc');
+export class RestBaseUtils {
+
+  public static readonly REST_NAMESPACE = '/tdp';
+  public static readonly REST_DB_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/db`;
+
+  private static getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}, assignIds: boolean = false) {
+    const mmethod = method === 'none' ? '' : `/${method}`;
+    if (assignIds) {
+      params._assignids = true; // assign globally ids on the server side
+    }
+  
+    const url = `${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
+    const encoded = Ajax.encodeParams(params);
+    if (encoded && (url.length + encoded.length > Ajax.MAX_URL_LENGTH)) {
+      // use post instead
+      return AppContext.getInstance().sendAPI(url, params, 'POST');
+    }
+    return AppContext.getInstance().getAPIJSON(url, params);
+  }
+
+  /**
+   * Add a prefix to the keys of all given URL parameters
+   * @param params URL parameter
+   * @param prefix The prefix for the parameter keys (default is `filter`)
+   */
+  private static prefixFilter(params: IParams, prefix: string = 'filter') {
+    const r: IParams = {};
+    Object.keys(params).map((key) => r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = params[key]);
+    return r;
+  }
+
+  /**
+   * Merges the "regular" parameters with filter parameters for the URL.
+   * Filter parameters are prefixed accordingly to be accepted by the backend.
+   *
+   * @param params URL parameters
+   * @param filters URL filter parameters
+   */
+  private static mergeParamAndAllFilters(params: IParams, filters: IAllFilters) {
+    const normal = RestBaseUtils.prefixFilter(filters.normal);
+    const lt = RestBaseUtils.prefixFilter(filters.lt, 'filter_lt');
+    const lte = RestBaseUtils.prefixFilter(filters.lte, 'filter_lte');
+    const gt = RestBaseUtils.prefixFilter(filters.gt, 'filter_gt');
+    const gte = RestBaseUtils.prefixFilter(filters.gte, 'filter_gte');
+
+    return Object.assign({}, params, normal, lt, lte, gt, gte);
+  }
+
+  /**
+   * queries the server side column information of the given view
+   * @param {string} database
+   * @param {string} view
+   * @returns {Promise<Readonly<IDatabaseViewDesc>>}
+   */
+  static getTDPDesc(database: string, view: string): Promise<Readonly<IDatabaseViewDesc>> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'desc');
+  }
+
+  static getTDPDatabases(): Promise<IDatabaseDesc[]> {
+    return AppContext.getInstance().getAPIJSON(`${RestBaseUtils.REST_DB_NAMESPACE}/`);
+  }
+  static getTDPViews(database: string): Promise<Readonly<IDatabaseViewDesc>[]> {
+    return AppContext.getInstance().getAPIJSON(`${RestBaseUtils.REST_DB_NAMESPACE}/${database}/`);
+  }
+
+  /**
+   * return the website url based on the registered proxy page
+   * @param {string} proxy proxy page identifier
+   * @param args additional arguments
+   * @returns {string} the url to the used for iframes
+   */
+  static getProxyUrl(proxy: string, args: any) {
+    return AppContext.getInstance().api2absURL(`${RestBaseUtils.REST_NAMESPACE}/proxy/${proxy}`, args);
+  }
+
+  static getTDPProxyData(proxy: string, args: any, type: string = 'json') {
+    return AppContext.getInstance().getAPIData(`${RestBaseUtils.REST_NAMESPACE}/proxy/${proxy}`, args, type);
+  }
+
+  /**
+   * query the TDP rest api to read data
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
+   * @returns {Promise<T[]>}
+   */
+  static getTDPData<T>(database: string, view: string, params: IParams = {}, assignIds: boolean = false): Promise<T[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'none', params, assignIds);
+  }
+
+  /**
+   * query the TDP rest api to read data
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
+   * @returns {Promise<IRow[]>}
+   */
+  static getTDPRows(database: string, view: string, params: IParams = {}, assignIds: boolean = false): Promise<IRow[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'none', params, assignIds);
+  }
+
+
+  /**
+   * Merges the "regular" parameters with filter parameters for the URL.
+   * Filter parameters are prefixed accordingly to be accepted by the backend.
+   *
+   * @param params URL parameters
+   * @param filters URL filter parameters
+   */
+  static mergeParamAndFilters(params: IParams, filters: IParams) {
+    return Object.assign({}, params, RestBaseUtils.prefixFilter(filters));
+  }
+
+  /**
+   * query the TDP rest api to read data with additional given filters
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {IParams} filters filters to use
+   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
+   * @returns {Promise<IRow[]>}
+   */
+  static getTDPFilteredRows(database: string, view: string, params: IParams, filters: IParams, assignIds: boolean = false): Promise<IRow[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'filter', RestBaseUtils.mergeParamAndFilters(params, filters), assignIds);
+  }
+
+  /**
+   * query the TDP rest api to read data with additional given filters
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {IAllFilters} filters object that contains all filter options
+   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
+   * @returns {Promise<IRow[]>}
+   */
+  static getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IAllFilters = emptyFilters, assignIds: boolean = false): Promise<IRow[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'filter', RestBaseUtils.mergeParamAndAllFilters(params, filters), assignIds);
+  }
+
+  /**
+   * query the TDP rest api to read a score
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {IParams} filters filters to use
+   * @returns {Promise<IScoreRow<T>[]>}
+   */
+  static getTDPScore<T>(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<IScoreRow<T>[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'score', RestBaseUtils.mergeParamAndFilters(params, filters));
+  }
+
+  /**
+   * query the TDP rest api to read a score
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {IAllFilters} filters object that contains all filter options
+   * @returns {Promise<IScoreRow<T>[]>}
+   */
+  static getTDPScoreWithLessGreater<T>(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<IScoreRow<T>[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'score', RestBaseUtils.mergeParamAndAllFilters(params, filters));
+  }
+
+  /**
+   * query the TDP rest api to compute the number of rows matching this query
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {IParams} filters filters to use
+   * @returns {Promise<number>}
+   */
+  static getTDPCount(database: string, view: string, params: IParams = {}, filters: IParams = {}): Promise<number> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'count', RestBaseUtils.mergeParamAndFilters(params, filters));
+  }
+
+  /**
+   * query the TDP rest api to compute the number of rows matching this query
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {IAllFilters} filters object that contains all filter options
+   * @returns {Promise<number>}
+   */
+  static getTDPCountWithLessGreater(database: string, view: string, params: IParams = {}, filters: IAllFilters = emptyFilters): Promise<number> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'count', RestBaseUtils.mergeParamAndAllFilters(params, filters));
+  }
+
+  static getTDPLookupUrl(database: string, view: string, params: IParams = {}) {
+    return AppContext.getInstance().api2absURL(`${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}/lookup`, params);
+  }
+  /**
+   * lookup utility function as used for auto completion within select2 form elements
+   * @param {string} database the database connector key
+   * @param {string} view the view id
+   * @param {IParams} params additional parameters
+   * @param {boolean} assignIds
+   * @returns {Promise<Readonly<ILookupResult>>}
+   */
+  static getTDPLookup(database: string, view: string, params: IParams = {}, assignIds: boolean = false): Promise<Readonly<ILookupResult>> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'lookup', params, assignIds);
+  }
 }

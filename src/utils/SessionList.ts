@@ -7,14 +7,14 @@ import {select, Selection, event} from 'd3';
 import $ from 'jquery';
 import {UserSession, IProvenanceGraphDataDescription, EventHandler, I18nextManager} from 'phovea_core';
 import {CLUEGraphManager} from 'phovea_clue';
-import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from '../base/constants';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
-import {fromNow} from './utils';
+import {TDPApplicationUtils} from './TDPApplicationUtils';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {ProvenanceGraphMenuUtils} from './ProvenanceGraphMenuUtils';
 
 
 abstract class ASessionList {
+
   private handler: () => void;
 
   constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
@@ -123,13 +123,15 @@ function byDateDesc(a: any, b: any) {
  */
 export class TemporarySessionList extends ASessionList {
 
+  public static readonly KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES = 10;
+
   protected async getData(manager: CLUEGraphManager) {
     let workspaces = (await manager.list()).filter((d) => !ProvenanceGraphMenuUtils.isPersistent(d)).sort(byDateDesc);
 
     // cleanup up temporary ones
-    if (workspaces.length > KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
-      const toDelete = workspaces.slice(KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
-      workspaces = workspaces.slice(0, KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
+    if (workspaces.length > TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
+      const toDelete = workspaces.slice(TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
+      workspaces = workspaces.slice(0, TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
       Promise.all(toDelete.map((d) => manager.delete(d))).catch((error) => {
         console.warn('cannot delete old graphs:', error);
       });
@@ -160,7 +162,7 @@ export class TemporarySessionList extends ASessionList {
 
     //replace loading
     const $table = $parent.html(`<p>
-     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.sessionMessage', {latest: KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES})}
+     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.sessionMessage', {latest: TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES})}
     </p><div>${this.mode === 'table' ? table : list}</div>`);
 
     const updateTable = (data: IProvenanceGraphDataDescription[]) => {
@@ -174,7 +176,7 @@ export class TemporarySessionList extends ASessionList {
       this.registerActionListener(manager, $trEnter);
       $tr.select('td').text((d) => d.name).attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') as string : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('td:nth-of-type(2)')
-        .text((d) => d.ts ? fromNow(d.ts) : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)
+        .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
       $tr.exit().remove();
@@ -191,7 +193,7 @@ export class TemporarySessionList extends ASessionList {
       this.registerActionListener(manager, $trEnter);
       $tr.select('span').text((d) => d.name).attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') as string : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
       $tr.select('span:nth-of-type(2)')
-        .text((d) => d.ts ? fromNow(d.ts) : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)
+        .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)
         .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
       $tr.exit().remove();
@@ -293,7 +295,7 @@ export class PersistentSessionList extends ASessionList {
             .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fa fa-users' : 'fa fa-user')
             .attr('title', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle);
           $tr.select('td:nth-of-type(3)')
-            .text((d) => d.ts ? fromNow(d.ts) : unknownText)
+            .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText)
             .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
           $tr.exit().remove();
@@ -338,7 +340,7 @@ export class PersistentSessionList extends ASessionList {
             .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fa fa-users' : 'fa fa-user')
             .attr('title', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle);
           $tr.select('span:nth-of-type(3)')
-            .text((d) => d.ts ? fromNow(d.ts) : unknownText)
+            .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText)
             .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
 
           $tr.exit().remove();

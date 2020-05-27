@@ -30,46 +30,48 @@ export interface ISelect2Option {
   data?: any;
 }
 
-export const DEFAULT_OPTIONS = {
-  placeholder: 'Start typing...',
-  theme: 'bootstrap',
-  minimumInputLength: 0,
-  //selectOnClose: true,
-  //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
-  escapeMarkup: (markup) => markup,
-  templateResult: (item: any) => item.text,
-  templateSelection: (item: any) => item.text
-};
-
-export const DEFAULT_AJAX_OPTIONS = Object.assign({
-  ajax: {
-    url: AppContext.getInstance().api2absURL('url_needed'), // URL
-    dataType: 'json',
-    delay: 250,
-    cache: true,
-    data: (params: any) => {
-      return {
-        query: params.term === undefined ? '': params.term, // search term from select2
-        page: params.page === undefined ? 0: params.page
-      };
-    },
-    processResults: (data, params) => {
-      params.page = params.page === undefined ? 0: params.page;
-      return {
-        results: data.items,
-        pagination: { // indicate infinite scrolling
-          more: data.more
-        }
-      };
-    }
-  }
-}, DEFAULT_OPTIONS);
-
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
  */
 export class FormSelect2 extends AFormElement<IFormSelect2> {
+
+  public static readonly DEFAULT_OPTIONS = {
+    placeholder: 'Start typing...',
+    theme: 'bootstrap',
+    minimumInputLength: 0,
+    //selectOnClose: true,
+    //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
+    escapeMarkup: (markup) => markup,
+    templateResult: (item: any) => item.text,
+    templateSelection: (item: any) => item.text
+  };
+
+  public static readonly DEFAULT_AJAX_OPTIONS = Object.assign({
+    ajax: {
+      url: AppContext.getInstance().api2absURL('url_needed'), // URL
+      dataType: 'json',
+      delay: 250,
+      cache: true,
+      data: (params: any) => {
+        return {
+          query: params.term === undefined ? '': params.term, // search term from select2
+          page: params.page === undefined ? 0: params.page
+        };
+      },
+      processResults: (data, params) => {
+        params.page = params.page === undefined ? 0: params.page;
+        return {
+          results: data.items,
+          pagination: { // indicate infinite scrolling
+            more: data.more
+          }
+        };
+      }
+    }
+  }, FormSelect2.DEFAULT_OPTIONS);
+  
+
 
   private $select: d3.Selection<any>;
 
@@ -154,7 +156,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       select2Options.multiple = true;
       select2Options.allowClear = true;
     }
-    BaseUtils.mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
+    BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
 
     this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial

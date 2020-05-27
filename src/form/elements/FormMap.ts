@@ -8,7 +8,7 @@ import $ from 'jquery';
 import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import {ISelectOptions, IFormSelectOption, FormSelect} from './FormSelect';
-import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
+import {FormSelect2} from './FormSelect2';
 import {BaseUtils, UserSession, ResolveNow, IPluginDesc, I18nextManager, EventHandler} from 'phovea_core';
 import {IFormElement} from '..';
 import {ISelect3Options, Select3, IdTextPair} from './Select3';
@@ -282,7 +282,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           const s = parent.firstElementChild;
           const $s = (<any>$(s));
           // merge only the default options if we have no local data
-          $s.select2(BaseUtils.mixin({}, desc.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, desc));
+          $s.select2(BaseUtils.mixin({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
           if (initialValue) {
             $s.val(initially).trigger('change');
           } else if (!defaultSelection && that.elementDesc.options.uniqueKeys) {

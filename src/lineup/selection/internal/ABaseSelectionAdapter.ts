@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 import {IAdditionalColumnDesc} from '../../../base/interfaces';
-import {array_diff} from '../../internal/LineUpSelectionHelper';
+import {LineupUtils} from '../../internal/utils';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
 import {ResolveNow} from 'phovea_core';
 
@@ -67,8 +67,8 @@ export abstract class ABaseSelectionAdapter {
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
     // compute the difference
-    const diffAdded = array_diff(selectedIds, lineupColIds);
-    const diffRemoved = array_diff(lineupColIds, selectedIds);
+    const diffAdded = LineupUtils.array_diff(selectedIds, lineupColIds);
+    const diffRemoved = LineupUtils.array_diff(lineupColIds, selectedIds);
 
     // remove deselected columns
     if (diffRemoved.length > 0) {

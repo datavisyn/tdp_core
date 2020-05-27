@@ -4,8 +4,8 @@
 
 import {IDType} from 'phovea_core';
 import {FormDialog} from 'phovea_ui';
-import {editDialog} from './editDialog';
-import {listNamedSets, deleteNamedSet, editNamedSet} from './rest';
+import {StoreUtils} from './StoreUtils';
+import {RestStorageUtils} from './rest';
 import {INamedSet, IStoredNamedSet, ENamedSetType} from './interfaces';
 import {PluginRegistry, I18nextManager} from 'phovea_core';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
@@ -53,13 +53,13 @@ export class NamedSetList {
     if (!UserSession.getInstance().canWrite(namedSet)) {
       return;
     }
-    editDialog(namedSet, async (name, description, sec) => {
+    StoreUtils.editDialog(namedSet, async (name, description, sec) => {
       const params = Object.assign({
         name,
         description
       }, sec);
 
-      const editedSet = await editNamedSet(namedSet.id, params);
+      const editedSet = await RestStorageUtils.editNamedSet(namedSet.id, params);
       NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.namedSet'), name);
       this.replace(namedSet, editedSet);
     });
@@ -132,7 +132,7 @@ export class NamedSetList {
           {title: I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.deleteSet')}
         );
         if (deleteIt) {
-          await deleteNamedSet(namedSet.id);
+          await RestStorageUtils.deleteNamedSet(namedSet.id);
           NotificationHandler.successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dashboard'), namedSet.name);
           this.remove(namedSet);
         }
@@ -179,7 +179,7 @@ export class NamedSetList {
   }
 
   protected list(): Promise<INamedSet[]> {
-    return listNamedSets(this.idType)
+    return RestStorageUtils.listNamedSets(this.idType)
       .catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
         console.error(error);

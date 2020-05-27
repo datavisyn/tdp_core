@@ -1,9 +1,9 @@
 import {AView} from '../AView';
-import {IViewContext, ISelection} from '../interfaces';
+import {IViewContext, ISelection} from '../../base/interfaces';
 import {IDTypeManager, ParseRangeUtils, Range, I18nextManager, EventHandler} from 'phovea_core';
-import {resolveIds} from '../resolve';
+import {ResolveUtils} from '../ResolveUtils';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
-import {DEFAULT_SELECTION_NAME} from '../../base/interfaces';
+
 
 export interface IPartialProxyViewOptions {
   /**
@@ -63,7 +63,7 @@ export class MessagingProxyView extends AView {
     iframe.onload = () => {
       this.iframeWindow = iframe.contentWindow;
       // send initial selection
-      this.sendInputSelectionMessage(DEFAULT_SELECTION_NAME);
+      this.sendInputSelectionMessage(AView.DEFAULT_SELECTION_NAME);
 
       // send queued messages
       this.messageQueue.splice(0, this.messageQueue.length).forEach((msg) => this.sendMessage(msg));
@@ -85,7 +85,7 @@ export class MessagingProxyView extends AView {
     switch (msg.type) {
       case 'tdpSetItemSelection': {
         const payload = (<ITDPSetItemSelectionMessage>msg).payload;
-        const name = payload.name || DEFAULT_SELECTION_NAME;
+        const name = payload.name || AView.DEFAULT_SELECTION_NAME;
         const ids: string[] = payload.ids;
         const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
         if (!ids || ids.length === 0) {
@@ -119,12 +119,12 @@ export class MessagingProxyView extends AView {
     window.removeEventListener('message', this.onWindowMessage);
   }
 
-  protected selectionChanged(name: string = DEFAULT_SELECTION_NAME) {
+  protected selectionChanged(name: string = AView.DEFAULT_SELECTION_NAME) {
     super.selectionChanged(name);
     return this.sendInputSelectionMessage(name);
   }
 
-  protected itemSelectionChanged(name: string = DEFAULT_SELECTION_NAME) {
+  protected itemSelectionChanged(name: string = AView.DEFAULT_SELECTION_NAME) {
     super.itemSelectionChanged(name);
     return this.sendItemSelectionMessage(name);
   }
@@ -140,7 +140,7 @@ export class MessagingProxyView extends AView {
     }
 
     const selection = this.getInputSelection(name);
-    return resolveIds(selection.idtype, selection.range).then((ids) => {
+    return ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
       if (!ids || ids.length === 0) {
         this.setNoMappingFoundHint(true);
         return;
@@ -180,7 +180,7 @@ export class MessagingProxyView extends AView {
       return;
     }
 
-    return resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
+    return ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
       this.sendMessage({
         type: 'tdpSetItemSelection', payload: {
           name,

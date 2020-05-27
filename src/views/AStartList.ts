@@ -3,7 +3,7 @@
 import {ARankingView} from '../lineup/ARankingView';
 import {IARankingViewOptions} from '../lineup/IARankingViewOptions';
 import {ENamedSetType, INamedSet} from '../storage/interfaces';
-import {ISelection, IViewContext} from './interfaces';
+import {ISelection, IViewContext} from '../base/interfaces';
 import {IParams} from '../base/rest';
 import {UserSession} from 'phovea_core';
 

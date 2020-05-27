@@ -3,7 +3,7 @@
  */
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../../base/interfaces';
-import {set_diff} from '../../internal/LineUpSelectionHelper';
+import {LineupUtils} from '../../internal/utils';
 import {IScoreRow} from '../../../base/interfaces';
 import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {ResolveNow} from 'phovea_core';
@@ -59,7 +59,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISel
       const selectedElements = new Set<string>(descs.map((desc) => `${_id}_${desc.selectedSubtype}`));
 
       // Check which items are new and should therefore be added as columns
-      const addedParameters = set_diff(selectedElements, dynamicColumnIDs);
+      const addedParameters = LineupUtils.set_diff(selectedElements, dynamicColumnIDs);
 
       if (addedParameters.size <= 0) {
         return [];
@@ -89,7 +89,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISel
     const dynamicColumnSubtypes = new Set<string>(usedCols.map((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype));
 
     // check which parameters have been removed
-    const removedParameters = Array.from(set_diff(dynamicColumnSubtypes, selectedElements));
+    const removedParameters = Array.from(LineupUtils.set_diff(dynamicColumnSubtypes, selectedElements));
 
     context.remove([].concat(...removedParameters.map((param) => {
       return usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === param);

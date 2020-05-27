@@ -2,11 +2,10 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 
-import {ISelection, IViewContext} from './interfaces';
+import {ISelection, IViewContext} from '../base/interfaces';
 import {AView} from './AView';
 import {select, Selection} from 'd3';
 
-export {resolveIds, resolveId, resolveIdToNames} from './AView';
 
 /**
  * utiltity view to work with the node using d3

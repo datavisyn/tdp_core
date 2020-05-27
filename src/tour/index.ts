@@ -1,4 +1,4 @@
 export * from './extensions';
-export * from './scripter';
+export * from './TourUtils';
 export * from './Tour';
 export * from './TourManager';

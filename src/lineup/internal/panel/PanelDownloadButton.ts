@@ -1,5 +1,5 @@
 import {LocalDataProvider} from 'lineupjs';
-import {exportLogic} from '../export';
+import {ExportUtils} from '../ExportUtils';
 import {IPanelButton} from './PanelButton';
 import {I18nextManager} from 'phovea_core';
 
@@ -39,7 +39,7 @@ export class PanelDownloadButton implements IPanelButton {
         evt.stopPropagation();
         const type = link.dataset.t;
         const onlySelected = link.dataset.s === 's';
-        exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
+        ExportUtils.exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
           this.downloadFile(content, mimeType, name);
         });
       };

@@ -1,7 +1,7 @@
 import {BaseUtils, IDType, IDTypeLike, IDTypeManager, I18nextManager} from 'phovea_core';
 import {IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption} from '../form/elements/FormSelect';
 import {FormElementType, IFormElement, IFormElementDesc} from '../form/interfaces';
-import {ISelection} from './interfaces';
+import {ISelection} from '../base/interfaces';
 
 export interface ISelectionChooserOptions {
   /**

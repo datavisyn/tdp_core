@@ -13,7 +13,7 @@
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
 import {IInstanceViewExtensionDesc, IItemSelection} from '../base/interfaces';
-import {findInstantViews} from '../views/findViews';
+import {FindViewUtils} from '../views/FindViewUtils';
 
 export class InstantViewWrapper {
   readonly node: HTMLElement;
@@ -78,7 +78,7 @@ export class InstantViewWrapper {
     this.selection = selection;
 
     const start = this.selection.idtype;
-    findInstantViews(this.selection.idtype).then((views) => {
+    FindViewUtils.findInstantViews(this.selection.idtype).then((views) => {
       if (start !== this.selection.idtype) {
         // changed in the meanwhile
         return;

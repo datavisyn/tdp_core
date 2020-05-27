@@ -1,9 +1,10 @@
 import {ITourContext} from './Tour';
 import {Tour} from './Tour';
-import {IStep, GLOBAL_EVENT_START_TOUR} from './extensions';
+import {IStep} from './extensions';
 import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
 import {AppHeader} from 'phovea_ui';
 import {EventHandler, I18nextManager} from 'phovea_core';
+import {TourUtils} from './TourUtils';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';
@@ -146,7 +147,7 @@ export class TourManager {
     document.body.appendChild(this.chooser);
 
     // listen to events
-    EventHandler.getInstance().on(GLOBAL_EVENT_START_TOUR, (_, tourId) => {
+    EventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_START_TOUR, (_, tourId) => {
       const tour = this.tours.find((d) => d.id === tourId);
       if (tour) {
         this.showTour(tour);

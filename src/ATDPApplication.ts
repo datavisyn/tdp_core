@@ -8,12 +8,12 @@ import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
 import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
 import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
-import {showProveanceGraphNotFoundDialog} from './base/dialogs';
-import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './base/constants';
+import {DialogUtils} from './base/dialogs';
 import 'phovea_ui/dist/webpack/_font-awesome';
 import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
 import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
+import {TemporarySessionList} from './utils/SessionList';
 
 
 export interface ITDPOptions {
@@ -186,7 +186,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
     graph.catch((error: {graph: string}) => {
-      showProveanceGraphNotFoundDialog(clueManager, error.graph);
+      DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
     graph.then((graph) => {
@@ -256,8 +256,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   private cleanUpOld(manager: MixedStorageProvenanceGraphManager) {
     const workspaces = manager.listLocalSync().sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
     // cleanup up temporary ones
-    if (workspaces.length > KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
-      const toDelete = workspaces.slice(KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
+    if (workspaces.length > TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
+      const toDelete = workspaces.slice(TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
       Promise.all(toDelete.map((d) => manager.delete(d))).catch((error) => {
         console.warn('cannot delete old graphs:', error);
       });
