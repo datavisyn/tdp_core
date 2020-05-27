@@ -16,7 +16,7 @@ export interface IDialogModule {
 
 export class DialogUtils {
   static lazyDialogModule(): Promise<IDialogModule> {
-    return System.import('phovea_ui/src/dialogs');
+    return import('phovea_ui/src/dialogs');
   }
 
   /**
