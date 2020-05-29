@@ -114,8 +114,8 @@ export class ExportUtils {
 
 
   private static customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
-    return DialogUtils.lazyDialogModule().then((dialogs) => {
-      const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+    return import('phovea_ui/src/components/dialogs').then(({FormDialog}) => {
+      const dialog = new FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
 
       const id = `e${BaseUtils.randomId(3)}`;
       const ranking = provider.getFirstRanking();

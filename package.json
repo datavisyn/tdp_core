@@ -70,7 +70,7 @@
     "prebuild:web": "node -e \"process.exit(process.env.PHOVEA_SKIP_TESTS === undefined?1:0)\" || npm run test:web",
     "predist:python": "npm run build:python && npm run docs:python",
     "publish:python": "twine upload --repository-url https://upload.pypi.org/legacy/ dist/*",
-    "dist:web": "mkdir dist && cd build && tar cvzf ../dist/tdp_core.tar.gz *",
+    "dist:web": "mkdir lib && cd dist && tar cvzf ../lib/tdp_core.tar.gz *",
     "predocker": "npm run build",
     "docker": "docker build -t tdp_core -f deploy/Dockerfile .",
     "db-migration:base": "docker-compose run api python phovea_server/__main__.py --env dev db-migration",
@@ -85,6 +85,7 @@
     "jquery": "~3.4.1",
     "lineupjs": "github:lineupjs/lineupjs#develop",
     "madge": "^3.9.0",
+    "phovea_clue": "github:phovea/phovea_clue#vstoiber/refactoring",
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9"
   },

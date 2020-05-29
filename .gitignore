@@ -2,7 +2,6 @@
 /.tscache
 /.idea
 /build/
-/dist/
 *.egg-info/
 *.egg
 *.py[cod]

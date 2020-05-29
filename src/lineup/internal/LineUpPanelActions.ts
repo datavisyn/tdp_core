@@ -411,8 +411,8 @@ export class LineUpPanelActions extends EventHandler {
       id: `group_${text}`,
       action: () => {
         // choooser dialog
-        DialogUtils.lazyDialogModule().then((dialogs) => {
-          const dialog = new dialogs.FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
+        import('phovea_ui/src/components/dialogs').then(({FormDialog}) => {
+          const dialog = new FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
           dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">
               ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}

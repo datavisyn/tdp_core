@@ -75,8 +75,8 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
-        DialogUtils.lazyDialogModule().then((dialogs) => {
-          const d = dialogs.generateDialog(plugin.name, I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.close'));
+        import('phovea_ui/src/components/dialogs').then(({Dialog}) => {
+          const d = Dialog.generateDialog(plugin.name, I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.close'));
           d.body.innerHTML = plugin.helpText;
           d.show();
           d.hideOnSubmit();
