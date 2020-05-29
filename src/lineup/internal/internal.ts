@@ -6,6 +6,4 @@ export * from './LineUpPanelActions';
 export * from './LineUpSelectionHelper';
 export * from './LineUpColors';
 export * from './OverviewColumn';
-export * from './IRankingWrapper';
 export * from './ScoreUtils';
-export * from './utils';

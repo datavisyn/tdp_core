@@ -9,7 +9,7 @@ import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {LineUpSelectionHelper} from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow, IAdditionalColumnDesc} from '../base/interfaces';
 import {ColumnDescUtils, IInitialRankingOptions} from './desc';
-import {IRankingWrapper} from './internal/IRankingWrapper';
+import {IRankingWrapper} from './IRankingWrapper';
 import {ScoreUtils} from './internal/ScoreUtils';
 import {LineUpColors} from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../base/rest';
@@ -18,7 +18,7 @@ import {LineUpPanelActions} from './internal/LineUpPanelActions';
 import {LazyColumn, ILazyLoadedColumn} from './internal/column';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {IARankingViewOptions} from './IARankingViewOptions';
-import {LineupUtils} from './internal/utils';
+import {LineupUtils} from './utils';
 
 /**
  * base class for views based on LineUp

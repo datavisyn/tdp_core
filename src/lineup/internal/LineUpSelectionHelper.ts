@@ -6,7 +6,7 @@ import {ISelection} from '../../base';
 import {EventHandler, IDType, Range} from 'phovea_core';
 import {IRow} from '../../base/rest';
 import {LocalDataProvider} from 'lineupjs';
-import {LineupUtils} from './utils';
+import {LineupUtils} from '../utils';
 
 
 export class LineUpSelectionHelper extends EventHandler {

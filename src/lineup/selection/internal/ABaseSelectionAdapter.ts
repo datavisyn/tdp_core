@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 import {IAdditionalColumnDesc} from '../../../base/interfaces';
-import {LineupUtils} from '../../internal/utils';
+import {LineupUtils} from '../../utils';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
 import {ResolveNow} from 'phovea_core';
 

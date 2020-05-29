@@ -4,18 +4,11 @@
 
 
 import {IObjectRef, ObjectRefUtils, I18nextManager, ActionMetaData, PluginRegistry, ProvenanceGraph, ActionNode, ActionUtils} from 'phovea_core';
-import {Column} from 'lineupjs';
 import {IScore} from '../../base/interfaces';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../base/extensions';
 import {AttachemntUtils} from '../../storage/internal/attachment';
+import {IViewProvider} from '../IViewProvider';
 
-
-export interface IViewProvider {
-  getInstance(): {
-    addTrackedScoreColumn(score: IScore<any>): Promise<{col: Column, loaded: Promise<Column>}>;
-    removeTrackedScoreColumn(columnId: string);
-  };
-}
 
 export class ScoreUtils {
 

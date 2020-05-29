@@ -18,7 +18,7 @@ import {PanelAddColumnButton} from './panel/PanelAddColumnButton';
 import {PanelDownloadButton} from './panel/PanelDownloadButton';
 import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension} from '../../base/interfaces';
 import {ISearchOption} from './panel/ISearchOption';
-import {LineupUtils} from './utils';
+import {LineupUtils} from '../utils';
 
 
 

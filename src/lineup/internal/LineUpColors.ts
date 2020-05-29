@@ -1,5 +1,5 @@
 import {scale} from 'd3';
-import {LineupUtils} from './utils';
+import {LineupUtils} from '../utils';
 
 export class LineUpColors {
   /**

@@ -10,7 +10,7 @@
  *********************************************************/
 
 import {EventHandler, ObjectRefUtils, ObjectNode, ProvenanceGraph, ResolveNow, Range, IDType, IDTypeManager, I18nextManager, NodeUtils} from 'phovea_core';
-import {IViewProvider} from '../lineup/internal/ScoreUtils';
+import {IViewProvider} from '../lineup/IViewProvider';
 import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
 import {FindViewUtils} from '../views/FindViewUtils';
 import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';

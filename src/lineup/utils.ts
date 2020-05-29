@@ -1,12 +1,12 @@
 /**
  * Created by sam on 13.02.2017.
  */
-import {IScoreRow} from '../../base/interfaces';
-import {RestBaseUtils, IParams, IRow} from '../../base/rest';
+import {IScoreRow} from '../base/interfaces';
+import {RestBaseUtils, IParams, IRow} from '../base/rest';
 import {IDataRow} from 'lineupjs';
-import {IFormMultiMap, IFormRow, FormMap} from '../../form/elements/FormMap';
+import {IFormMultiMap, IFormRow, FormMap} from '../form/elements/FormMap';
 import {Ajax, IPluginDesc} from 'phovea_core';
-import {IScoreLoader} from '../../base/interfaces';
+import {IScoreLoader} from '../base/interfaces';
 import {Ranking, LocalDataProvider} from 'lineupjs';
 import {IRankingWrapper} from './IRankingWrapper';
 

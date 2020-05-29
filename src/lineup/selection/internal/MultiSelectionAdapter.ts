@@ -3,7 +3,7 @@
  */
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
 import {IAdditionalColumnDesc} from '../../../base/interfaces';
-import {LineupUtils} from '../../internal/utils';
+import {LineupUtils} from '../../utils';
 import {IScoreRow} from '../../../base/interfaces';
 import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {ResolveNow} from 'phovea_core';
