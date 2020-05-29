@@ -1,4 +1,4 @@
-import { LineupUtils } from '../../internal/utils';
+import { LineupUtils } from '../../utils';
 import { ResolveNow } from 'phovea_core';
 export class ABaseSelectionAdapter {
     constructor() {

@@ -9,7 +9,7 @@
  *
  *********************************************************/
 import { EventHandler, ObjectNode, ProvenanceGraph, IDType } from 'phovea_core';
-import { IViewProvider } from '../lineup/internal/ScoreUtils';
+import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc } from '../base/interfaces';
 export declare class ViewWrapper extends EventHandler implements IViewProvider {
     readonly plugin: IViewPluginDesc;

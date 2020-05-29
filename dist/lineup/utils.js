@@ -1,5 +1,5 @@
-import { RestBaseUtils } from '../../base/rest';
-import { FormMap } from '../../form/elements/FormMap';
+import { RestBaseUtils } from '../base/rest';
+import { FormMap } from '../form/elements/FormMap';
 import { Ajax } from 'phovea_core';
 import { Ranking } from 'lineupjs';
 export class AScoreAccessorProxy {

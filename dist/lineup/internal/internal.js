@@ -7,5 +7,4 @@ export * from './LineUpSelectionHelper';
 export * from './LineUpColors';
 export * from './OverviewColumn';
 export * from './ScoreUtils';
-export * from './utils';
 //# sourceMappingURL=internal.js.map

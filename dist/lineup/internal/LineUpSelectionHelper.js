@@ -3,7 +3,7 @@
  */
 import { EventHandler, Range } from 'phovea_core';
 import { LocalDataProvider } from 'lineupjs';
-import { LineupUtils } from './utils';
+import { LineupUtils } from '../utils';
 export class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType) {
         super();

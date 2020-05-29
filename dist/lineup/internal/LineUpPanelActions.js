@@ -10,7 +10,7 @@ import { PanelHeader } from './panel/PanelHeader';
 import { PanelRankingButton } from './panel/PanelRankingButton';
 import { PanelAddColumnButton } from './panel/PanelAddColumnButton';
 import { PanelDownloadButton } from './panel/PanelDownloadButton';
-import { LineupUtils } from './utils';
+import { LineupUtils } from '../utils';
 export class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();

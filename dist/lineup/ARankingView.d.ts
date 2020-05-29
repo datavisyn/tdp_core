@@ -4,7 +4,7 @@ import { IViewContext, ISelection } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
 import { IScore, IAdditionalColumnDesc } from '../base/interfaces';
 import { IInitialRankingOptions } from './desc';
-import { IRankingWrapper } from './internal/IRankingWrapper';
+import { IRankingWrapper } from './IRankingWrapper';
 import { IRow, IServerColumn, IServerColumnDesc } from '../base/rest';
 import { ISelectionAdapter } from './selection/ISelectionAdapter';
 import { ILazyLoadedColumn } from './internal/column';

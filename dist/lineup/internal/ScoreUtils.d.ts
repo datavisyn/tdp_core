@@ -2,17 +2,7 @@
  * Created by Samuel Gratzl on 18.05.2016.
  */
 import { IObjectRef, ProvenanceGraph, ActionNode } from 'phovea_core';
-import { Column } from 'lineupjs';
-import { IScore } from '../../base/interfaces';
-export interface IViewProvider {
-    getInstance(): {
-        addTrackedScoreColumn(score: IScore<any>): Promise<{
-            col: Column;
-            loaded: Promise<Column>;
-        }>;
-        removeTrackedScoreColumn(columnId: string): any;
-    };
-}
+import { IViewProvider } from '../IViewProvider';
 export declare class ScoreUtils {
     static readonly CMD_ADD_SCORE = "tdpAddScore";
     static readonly CMD_REMOVE_SCORE = "tdpRemoveScore";

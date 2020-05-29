@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-/// <reference types="d3" />
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc } from '../interfaces';
 import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';

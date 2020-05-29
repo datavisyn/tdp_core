@@ -12,7 +12,7 @@ import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LazyColumn } from './internal/column';
 import { NotificationHandler } from '../base/NotificationHandler';
-import { LineupUtils } from './internal/utils';
+import { LineupUtils } from './utils';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.

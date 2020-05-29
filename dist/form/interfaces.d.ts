@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-/// <reference types="d3" />
 import { IEventHandler } from 'phovea_core';
 /**
  * List of all available for elements that the form builder can handle

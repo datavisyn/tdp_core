@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-/// <reference types="d3" />
 import 'select2';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
