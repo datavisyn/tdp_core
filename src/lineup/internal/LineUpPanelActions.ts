@@ -7,7 +7,6 @@ import {
   EP_TDP_CORE_LINEUP_PANEL_TAB
 } from '../../base/extensions';
 import {IARankingViewOptions} from '../IARankingViewOptions';
-import {DialogUtils} from '../../base/dialogs';
 import {PanelButton} from './panel/PanelButton';
 import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
 import {PanelTab, SidePanelTab} from './panel/PanelTab';
@@ -303,8 +302,8 @@ export class LineUpPanelActions extends EventHandler {
 
   private async resolveScores(idType: IDType) {
     // load plugins, which need to be checked if the IDTypes are mappable
-    const ordinoScores: IPluginDesc[] = await LineUpPanelActions.findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
-    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await LineUpPanelActions.findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
+    const ordinoScores: IPluginDesc[] = await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
+    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
     const metaDataPluginPromises: Promise<IGroupSearchItem<any>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
@@ -463,25 +462,5 @@ export class LineUpPanelActions extends EventHandler {
           this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
         }
       });
-  }
-
-  static findMappablePlugins(target: IDType, all: IPluginDesc[]) {
-    if (!target) {
-      return [];
-    }
-    const idTypes = Array.from(new Set<string>(all.map((d) => d.idtype)));
-
-    function canBeMappedTo(idtype: string) {
-      if (idtype === target.id) {
-        return true;
-      }
-      // lookup the targets and check if our target is part of it
-      return IDTypeManager.getInstance().getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype)).then((mappables: IDType[]) => mappables.some((d) => d.id === target.id));
-    }
-    // check which idTypes can be mapped to the target one
-    return Promise.all(idTypes.map(canBeMappedTo)).then((mappable: boolean[]) => {
-      const valid = idTypes.filter((d, i) => mappable[i]);
-      return all.filter((d) => valid.indexOf(d.idtype) >= 0);
-    });
   }
 }

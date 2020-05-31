@@ -183,8 +183,8 @@ export class LineUpPanelActions extends EventHandler {
     }
     async resolveScores(idType) {
         // load plugins, which need to be checked if the IDTypes are mappable
-        const ordinoScores = await LineUpPanelActions.findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
-        const metaDataPluginDescs = await LineUpPanelActions.findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
+        const ordinoScores = await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
+        const metaDataPluginDescs = await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
         const metaDataPluginPromises = metaDataPluginDescs
             .map((plugin) => plugin.load()
             .then((loadedPlugin) => loadedPlugin.factory(plugin))
@@ -322,24 +322,6 @@ export class LineUpPanelActions extends EventHandler {
             else {
                 this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.id, params);
             }
-        });
-    }
-    static findMappablePlugins(target, all) {
-        if (!target) {
-            return [];
-        }
-        const idTypes = Array.from(new Set(all.map((d) => d.idtype)));
-        function canBeMappedTo(idtype) {
-            if (idtype === target.id) {
-                return true;
-            }
-            // lookup the targets and check if our target is part of it
-            return IDTypeManager.getInstance().getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype)).then((mappables) => mappables.some((d) => d.id === target.id));
-        }
-        // check which idTypes can be mapped to the target one
-        return Promise.all(idTypes.map(canBeMappedTo)).then((mappable) => {
-            const valid = idTypes.filter((d, i) => mappable[i]);
-            return all.filter((d) => valid.indexOf(d.idtype) >= 0);
         });
     }
 }

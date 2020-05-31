@@ -82,5 +82,4 @@ export declare class LineUpPanelActions extends EventHandler {
     private groupedDialog;
     private buildMetaDataDescriptions;
     private scoreColumnDialog;
-    static findMappablePlugins(target: IDType, all: IPluginDesc[]): any[] | Promise<IPluginDesc[]>;
 }
