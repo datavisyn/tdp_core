@@ -169,7 +169,7 @@ export class LinupTrackingManager {
       ranking.setGroupSortCriteria(columns);
     }
     return waitForSorted({
-      inverse: this.setSortCriteria(inputs[0], parameter.rid, current.map(this.toSortObject), parameter.isSorting)
+      inverse: this.setSortCriteria(inputs[0], parameter.rid, current.map(this.toSortObject, this), parameter.isSorting)
     });
   }
 
@@ -501,8 +501,8 @@ export class LinupTrackingManager {
         return;
       }
       const rid = this.rankingId(provider, ranking);
-      graph.pushWithResult(this.setSortCriteria(lineup, rid, newValue.map(this.toSortObject)), {
-        inverse: this.setSortCriteria(lineup, rid, old.map(this.toSortObject))
+      graph.pushWithResult(this.setSortCriteria(lineup, rid, newValue.map(this.toSortObject, this)), {
+        inverse: this.setSortCriteria(lineup, rid, old.map(this.toSortObject, this))
       });
     });
     ranking.on(`${Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED}.track`, (old: ISortCriteria[], newValue: ISortCriteria[]) => {
@@ -510,8 +510,8 @@ export class LinupTrackingManager {
         return;
       }
       const rid = this.rankingId(provider, ranking);
-      graph.pushWithResult(this.setSortCriteria(lineup, rid, newValue.map(this.toSortObject), false), {
-        inverse: this.setSortCriteria(lineup, rid, old.map(this.toSortObject), false)
+      graph.pushWithResult(this.setSortCriteria(lineup, rid, newValue.map(this.toSortObject, this), false), {
+        inverse: this.setSortCriteria(lineup, rid, old.map(this.toSortObject, this), false)
       });
     });
     ranking.on(`${Ranking.EVENT_GROUP_CRITERIA_CHANGED}.track`, (old: Column[], newValue: Column[]) => {
