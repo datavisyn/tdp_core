@@ -1,4 +1,4 @@
-import {BaseUtils, EventHandler} from 'phovea_core';
+import {BaseUtils, GlobalEventHandler} from 'phovea_core';
 import {IViewTourContext} from './extensions';
 
 export class TourUtils {
@@ -17,7 +17,7 @@ export class TourUtils {
 
 
   static startTour(tourId: string, context: any = {}) {
-    EventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_START_TOUR, tourId, context);
+    GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_START_TOUR, tourId, context);
   }
 
   /**

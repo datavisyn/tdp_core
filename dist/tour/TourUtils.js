@@ -1,4 +1,4 @@
-import { BaseUtils, EventHandler } from 'phovea_core';
+import { BaseUtils, GlobalEventHandler } from 'phovea_core';
 export class TourUtils {
     /**
      * start a view help tour
@@ -9,7 +9,7 @@ export class TourUtils {
         TourUtils.startTour(tourId, context);
     }
     static startTour(tourId, context = {}) {
-        EventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_START_TOUR, tourId, context);
+        GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_START_TOUR, tourId, context);
     }
     /**
      * returns a promise waiting for X milliseconds

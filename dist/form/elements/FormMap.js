@@ -8,7 +8,7 @@ import { AFormElement } from './AFormElement';
 import { FormElementType } from '../interfaces';
 import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
-import { BaseUtils, UserSession, ResolveNow, I18nextManager, EventHandler } from 'phovea_core';
+import { BaseUtils, UserSession, ResolveNow, I18nextManager } from 'phovea_core';
 import { Select3 } from './Select3';
 function hasInlineParent(node) {
     while (node.parentElement) {
@@ -239,7 +239,7 @@ export class FormMap extends AFormElement {
                     select3.value = [];
                 }
                 that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
-                EventHandler.getInstance().on(Select3.EVENT_SELECT, (evt, prev, next) => {
+                select3.on(Select3.EVENT_SELECT, (evt, prev, next) => {
                     row.value = next;
                     this.fire(FormMap.EVENT_CHANGE, next);
                 });

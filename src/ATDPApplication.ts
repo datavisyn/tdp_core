@@ -2,7 +2,7 @@
  * Created by sam on 03.03.2017.
  */
 
-import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, EventHandler, PluginRegistry} from 'phovea_core';
+import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry} from 'phovea_core';
 import {AppHeaderLink, AppHeader} from 'phovea_ui';
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
@@ -125,7 +125,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       showOptionsLink: this.options.showOptionsLink,
       appLink: new AppHeaderLink(this.options.name, (event) => {
         event.preventDefault();
-        EventHandler.getInstance().fire(ATDPApplication.EVENT_OPEN_START_MENU);
+        this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
         return false;
       })
     });
@@ -145,7 +145,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   protected buildImpl(body: HTMLElement) {
     this.header = this.createHeader(<HTMLElement>body.querySelector('div.box'));
 
-    EventHandler.getInstance().on('jumped_to,loaded_graph', () => this.header.ready());
+    this.on('jumped_to,loaded_graph', () => this.header.ready());
     //load all available provenance graphs
     const manager = new MixedStorageProvenanceGraphManager({
       prefix: this.options.prefix,

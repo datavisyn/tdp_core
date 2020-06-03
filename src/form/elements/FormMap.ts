@@ -326,7 +326,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           select3.value = [];
         }
         that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
-        EventHandler.getInstance().on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
+        select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
           row.value = next;
           this.fire(FormMap.EVENT_CHANGE, next);
         });

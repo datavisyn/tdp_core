@@ -5,7 +5,7 @@
 import {FormDialog} from 'phovea_ui';
 import {select, Selection, event} from 'd3';
 import $ from 'jquery';
-import {UserSession, IProvenanceGraphDataDescription, EventHandler, I18nextManager} from 'phovea_core';
+import {UserSession, IProvenanceGraphDataDescription, GlobalEventHandler, I18nextManager} from 'phovea_core';
 import {CLUEGraphManager} from 'phovea_clue';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {TDPApplicationUtils} from './TDPApplicationUtils';
@@ -19,13 +19,13 @@ abstract class ASessionList {
 
   constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
     this.build(graphManager).then((update) => {
-      this.handler = () => update();
-      EventHandler.getInstance().on(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
+     this.handler = () => update();
+      GlobalEventHandler.getInstance().on(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
     });
   }
 
   destroy() {
-    EventHandler.getInstance().off(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
+    GlobalEventHandler.getInstance().off(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
   }
 
   protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {

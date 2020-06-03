@@ -130,7 +130,7 @@ export class AFormElement extends EventHandler {
         const showIf = this.elementDesc.showIf;
         const dependElements = (this.elementDesc.dependsOn || []).map((depOn) => this.form.getElementById(depOn));
         dependElements.forEach((depElem) => {
-            EventHandler.getInstance().on(AFormElement.EVENT_CHANGE, () => {
+            depElem.on(AFormElement.EVENT_CHANGE, () => {
                 const values = dependElements.map((d) => d.value);
                 if (onDependentChange) {
                     onDependentChange(values);

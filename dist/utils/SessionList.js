@@ -4,7 +4,7 @@
 import { FormDialog } from 'phovea_ui';
 import { select, event } from 'd3';
 import $ from 'jquery';
-import { UserSession, EventHandler, I18nextManager } from 'phovea_core';
+import { UserSession, GlobalEventHandler, I18nextManager } from 'phovea_core';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { TDPApplicationUtils } from './TDPApplicationUtils';
 import { NotificationHandler } from '../base/NotificationHandler';
@@ -15,11 +15,11 @@ class ASessionList {
         this.mode = mode;
         this.build(graphManager).then((update) => {
             this.handler = () => update();
-            EventHandler.getInstance().on(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
+            GlobalEventHandler.getInstance().on(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
         });
     }
     destroy() {
-        EventHandler.getInstance().off(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
+        GlobalEventHandler.getInstance().off(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
     }
     static createButton(type) {
         switch (type) {

@@ -3,7 +3,6 @@
  */
 import { AFormElement } from './AFormElement';
 import { Select3 } from './Select3';
-import { EventHandler } from 'phovea_core';
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
@@ -40,7 +39,7 @@ export class FormSelect3 extends AFormElement {
      */
     init() {
         super.init();
-        EventHandler.getInstance().on(Select3.EVENT_SELECT, (evt, prev, next) => {
+        this.select3.on(Select3.EVENT_SELECT, (evt, prev, next) => {
             this.fire(FormSelect3.EVENT_CHANGE, next);
         });
     }

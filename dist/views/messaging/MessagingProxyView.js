@@ -1,5 +1,5 @@
 import { AView } from '../AView';
-import { IDTypeManager, ParseRangeUtils, Range, I18nextManager, EventHandler } from 'phovea_core';
+import { IDTypeManager, ParseRangeUtils, Range, I18nextManager } from 'phovea_core';
 import { ResolveUtils } from '../ResolveUtils';
 export class MessagingProxyView extends AView {
     constructor(context, selection, parent, options = {}) {
@@ -173,7 +173,7 @@ export class MessagingProxyView extends AView {
     <a href="${url}" target="_blank" rel="noopener" class="alert-link">${I18nextManager.getInstance().i18n.t('tdp:core.views.link')}</a> ${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart2')}
        <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
    </div></p><p></p>`;
-        EventHandler.getInstance().fire(MessagingProxyView.EVENT_LOADING_FINISHED);
+        this.fire(MessagingProxyView.EVENT_LOADING_FINISHED);
     }
 }
 //# sourceMappingURL=MessagingProxyView.js.map

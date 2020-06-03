@@ -151,7 +151,7 @@ export class ViewWrapper extends EventHandler {
                         this.instance.setItemSelection(v, k);
                     }
                 });
-                EventHandler.getInstance().on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
+                this.instance.on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
                 this.preInstanceParameter.forEach((value, key) => {
                     this.instance.setParameter(key, value);
                 });
@@ -186,7 +186,7 @@ export class ViewWrapper extends EventHandler {
         this.instance.destroy();
         this.content.innerHTML = '';
         this.node.querySelector('header div.parameters').innerHTML = '';
-        EventHandler.getInstance().off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
+        this.instance.off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
         this.instance = null;
         this.instancePromise = null;
     }
@@ -279,9 +279,9 @@ export class ViewWrapper extends EventHandler {
     setItemSelection(sel, name = AView.DEFAULT_SELECTION_NAME) {
         if (this.instance) {
             this.instancePromise.then((v) => {
-                EventHandler.getInstance().off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
+                v.off(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
                 v.setItemSelection(sel, name);
-                EventHandler.getInstance().on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
+                v.on(AView.EVENT_ITEM_SELECT, this.listenerItemSelect);
             });
             return;
         }

@@ -70,7 +70,7 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   init() {
     super.init();
 
-    EventHandler.getInstance().on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
+    this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);
     });
   }

@@ -2,9 +2,8 @@
  * Created by Samuel Gratzl on 28.02.2017.
  */
 
-import {ProvenanceGraph, PropertyHandler, IProvenanceGraphDataDescription, BaseUtils, EEntity, UserSession, ISecureItem, IEvent, EventHandler, I18nextManager} from 'phovea_core';
+import {ProvenanceGraph, PropertyHandler, IEvent, GlobalEventHandler, I18nextManager} from 'phovea_core';
 import {CLUEGraphManager} from 'phovea_clue';
-import {DialogUtils} from '../base/dialogs';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {TemporarySessionList, PersistentSessionList} from './SessionList';
@@ -89,7 +88,7 @@ export class EditProvenanceGraphMenu {
             .then((desc) => {
               //update the name
               this.node.querySelector('a span').innerHTML = desc.name;
-              EventHandler.getInstance().fire(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED);
+              GlobalEventHandler.getInstance().fire(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED);
             })
             .catch(ErrorAlertHandler.getInstance().errorAlert);
         }
@@ -158,7 +157,7 @@ export class EditProvenanceGraphMenu {
             NotificationHandler.pushNotification('success', `${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successNotification', {name: this.graph.desc.name})}
             <br>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.urlToShare')} <br>
             <a href="${url}" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.currentLink')}">${url}</a>`, -1);
-            EventHandler.getInstance().fire(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED);
+            GlobalEventHandler.getInstance().fire(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED);
           });
         }
       });
