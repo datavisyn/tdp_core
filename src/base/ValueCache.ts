@@ -13,11 +13,11 @@ export class ValueCache {
    * @return {any}
    */
   public cached<T>(key: string, creator: () => T) {
-    if (this.values.has(key)) {
-      return this.values.get(key);
+    if (ValueCache.getInstance().values.has(key)) {
+      return ValueCache.getInstance().values.get(key);
     }
     const v = creator();
-    this.values.set(key, v);
+    ValueCache.getInstance().values.set(key, v);
     return v;
   }
 
@@ -28,7 +28,7 @@ export class ValueCache {
    * @returns {() => T}
    */
   public cachedLazy<T>(key: string, creator: () => T): (() => T)  {
-    return () => this.cached(key, creator);
+    return () => ValueCache.getInstance().cached(key, creator);
   }
   private static instance: ValueCache;
 

@@ -17,15 +17,15 @@ export class ErrorAlertHandler {
                     return Promise.reject(error);
                 });
             }
-            NotificationHandler.pushNotification('danger', this.errorMessage(error), NotificationHandler.DEFAULT_ERROR_AUTO_HIDE);
+            NotificationHandler.pushNotification('danger', ErrorAlertHandler.getInstance().errorMessage(error), NotificationHandler.DEFAULT_ERROR_AUTO_HIDE);
             return Promise.reject(error);
         };
     }
     setErrorAlertHandler(f) {
-        this.errorAlertHandler = f;
+        ErrorAlertHandler.getInstance().errorAlertHandler = f;
     }
     errorAlert(error) {
-        return this.errorAlertHandler(error);
+        return ErrorAlertHandler.getInstance().errorAlertHandler(error);
     }
     errorMessage(error) {
         if (error instanceof Response || error.response instanceof Response) {

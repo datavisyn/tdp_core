@@ -19,16 +19,16 @@ export class ErrorAlertHandler {
         return Promise.reject(error);
       });
     }
-    NotificationHandler.pushNotification('danger', this.errorMessage(error), NotificationHandler.DEFAULT_ERROR_AUTO_HIDE);
+    NotificationHandler.pushNotification('danger', ErrorAlertHandler.getInstance().errorMessage(error), NotificationHandler.DEFAULT_ERROR_AUTO_HIDE);
     return Promise.reject(error);
   };
 
   public setErrorAlertHandler(f: (error: any) => Promise<never>) {
-    this.errorAlertHandler = f;
+    ErrorAlertHandler.getInstance().errorAlertHandler = f;
   }
 
   public errorAlert(error: any) {
-    return this.errorAlertHandler(error);
+    return ErrorAlertHandler.getInstance().errorAlertHandler(error);
   }
 
   public errorMessage(error: any) {

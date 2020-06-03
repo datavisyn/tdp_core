@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 18.05.2016.
  */
-import { IObjectRef, ProvenanceGraph, ICmdResult } from 'phovea_core';
+import { IObjectRef, ProvenanceGraph } from 'phovea_core';
 import { LocalDataProvider } from 'lineupjs';
 export interface IViewProviderLocal {
     data: LocalDataProvider;
@@ -22,26 +22,24 @@ export declare class LinupTrackingManager {
      * @param ranking
      */
     private dirtyRankingWaiter;
-    addRankingImpl(inputs: IObjectRef<any>[], parameter: any): Promise<{
-        inverse: import("phovea_core").IAction;
-    }>;
-    addRanking(provider: IObjectRef<any>, index: number, dump?: any): import("phovea_core").IAction;
+    addRankingImpl(inputs: IObjectRef<any>[], parameter: any): any;
+    addRanking(provider: IObjectRef<any>, index: number, dump?: any): any;
     private toSortObject;
-    setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-    setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): import("phovea_core").IAction;
-    setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
+    setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): any;
+    setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): any;
+    setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): any;
     setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {
         asc: boolean;
         col: string;
-    }[], isSorting?: boolean): import("phovea_core").IAction;
-    setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-    setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): import("phovea_core").IAction;
-    setColumnImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-    setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): import("phovea_core").IAction;
-    addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): Promise<ICmdResult>;
-    moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): Promise<ICmdResult>;
-    addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any): import("phovea_core").IAction;
-    moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number): import("phovea_core").IAction;
+    }[], isSorting?: boolean): any;
+    setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): any;
+    setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): any;
+    setColumnImpl(inputs: IObjectRef<any>[], parameter: any): any;
+    setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): any;
+    addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): any;
+    moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): any;
+    addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any): any;
+    moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number): any;
     private delayedCall;
     private rankingId;
     private recordPropertyChange;
