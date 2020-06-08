@@ -88,6 +88,10 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
         }
       }
 
+      protected builtLineUp(lineup: LocalDataProvider) {
+        that.builtLineUp(lineup);
+      }
+
       protected setLineUpData(rows: IRow[]) {
         super.setLineUpData(rows);
         // maybe trigger a score reload if needed
@@ -147,6 +151,10 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProvider 
   }
 
   protected initialized() {
+    // hook
+  }
+
+  protected builtLineUp(lineup: LocalDataProvider) {
     // hook
   }
 
