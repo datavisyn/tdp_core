@@ -147,7 +147,7 @@ export interface IARankingViewOptions {
    */
   enableStripedBackground: boolean;
 
-  itemRowHeight: number | ((row: any, index: number) => number) | null;
+  itemRowHeight: number | ((item: IGroupItem) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
   customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
@@ -281,7 +281,7 @@ export abstract class ARankingView extends AView {
         defaultHeight: taggleOptions.rowHeight,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? taggleOptions.groupHeight : f((<Partial<IDataRow & IGroupItem>>item).v, (<Partial<IDataRow & IGroupItem>>item).i);
+          return isGroup(item) ? taggleOptions.groupHeight : f(item);
         }
       });
     }
