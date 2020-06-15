@@ -128,8 +128,6 @@ async function patchColumn(colDesc: any, rows: IScoreRow<any>[], col: Column): P
       (<any>ncol).originalLabels = (<any>colDesc).labels = columns;
     }
     (<any>ncol)._dataLength = (<any>colDesc).dataLength = rows[0].score.length;
-
-    ncol.setSplicer({length: rows[0].score.length, splice: (d) => d});
   }
 
   if (colDesc.type === 'categorical' && (<any>rows)._categories) {
