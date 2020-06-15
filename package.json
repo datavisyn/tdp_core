@@ -84,7 +84,7 @@
     "@types/select2": "4.0.44",
     "d3": "~3.5.17",
     "jquery": "~3.4.1",
-    "lineupjs": "github:lineupjs/lineupjs#lineup-v4",
+    "lineupjs": "github:lineupjs/lineupjs#develop",
     "phovea_clue": "github:phovea/phovea_clue#develop",
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
