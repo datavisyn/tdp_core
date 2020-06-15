@@ -134,12 +134,12 @@ export class LineupUtils {
         };
     }
     /**
-   * Returns the all items that are not in the given two arrays
-   * TODO improve performance of diff algorithm
-   * @param array1
-   * @param array2
-   * @returns {any}
-   */
+     * Returns the all items that are not in the given two arrays
+     * TODO improve performance of diff algorithm
+     * @param array1
+     * @param array2
+     * @returns {any}
+     */
     static array_diff(array1, array2) {
         return array1.filter((elm) => array2.indexOf(elm) === -1);
     }

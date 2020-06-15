@@ -90,10 +90,10 @@ export class ViewUtils {
     }
 }
 /**
-* event when one or more elements are selected for the next level
-* @type {string}
-* @argument selection {ISelection}
-*/
+ * event when one or more elements are selected for the next level
+ * @type {string}
+ * @argument selection {ISelection}
+ */
 ViewUtils.VIEW_EVENT_ITEM_SELECT = 'select';
 ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
 ViewUtils.VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';

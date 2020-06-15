@@ -151,7 +151,6 @@ export class RestBaseUtils {
     if (assignIds) {
       params._assignids = true; // assign globally ids on the server side
     }
-  
     const url = `${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
     const encoded = Ajax.encodeParams(params);
     if (encoded && (url.length + encoded.length > Ajax.MAX_URL_LENGTH)) {

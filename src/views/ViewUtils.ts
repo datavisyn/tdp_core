@@ -4,7 +4,7 @@ import {IViewPluginDesc, IViewContext, ISelection} from '../base/interfaces';
 
 export class ViewUtils {
 
-    /**
+  /**
    * event when one or more elements are selected for the next level
    * @type {string}
    * @argument selection {ISelection}

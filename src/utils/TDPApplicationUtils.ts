@@ -41,7 +41,7 @@ export class TDPApplicationUtils {
       [319 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month', {count: Math.ceil(d / TDPApplicationUtils.DAY / 30)})],
       [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour')]
     ];
-  };
+  }
 
   /**
    * see http://momentjs.com/docs/#/displaying/fromnow/
@@ -250,7 +250,7 @@ export class TDPApplicationUtils {
       inverse: TDPApplicationUtils.initSession(old)
     };
   }
-  
+
   static initSession(map: object) {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.initializeSession'), ObjectRefUtils.category.custom, ObjectRefUtils.operation.update), TDPApplicationUtils.CMD_INIT_SESSION, TDPApplicationUtils.initSessionImpl, [], map);
   }
@@ -260,12 +260,11 @@ export class TDPApplicationUtils {
     const name = parameter.name;
     const value = parameter.value;
     const previousValue = parameter.previousValue === undefined ? view.getParameter(name) : parameter.previousValue;
-  
     view.setParameterImpl(name, value);
     return {
       inverse: TDPApplicationUtils.setParameter(inputs[0], name, previousValue, value)
     };
-  }  
+  }
 
   static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any) {
     //assert view
@@ -275,8 +274,8 @@ export class TDPApplicationUtils {
       previousValue
     });
   }
-  
+
   static compressSetParameter(path: ActionNode[]) {
     return Compression.lastOnly(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
-  }  
+  }
 }

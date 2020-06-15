@@ -70,7 +70,6 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       }
     }
   }, FormSelect2.DEFAULT_OPTIONS);
-  
 
 
   private $select: d3.Selection<any>;

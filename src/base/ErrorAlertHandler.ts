@@ -21,7 +21,7 @@ export class ErrorAlertHandler {
     }
     NotificationHandler.pushNotification('danger', ErrorAlertHandler.getInstance().errorMessage(error), NotificationHandler.DEFAULT_ERROR_AUTO_HIDE);
     return Promise.reject(error);
-  };
+  }
 
   public setErrorAlertHandler(f: (error: any) => Promise<never>) {
     ErrorAlertHandler.getInstance().errorAlertHandler = f;

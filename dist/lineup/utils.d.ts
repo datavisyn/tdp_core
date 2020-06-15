@@ -52,12 +52,12 @@ export declare class LineupUtils {
      */
     static previewFilterHint(database: string, view: string, extraParams?: () => any): (rows: IFormRow[]) => Promise<string>;
     /**
-   * Returns the all items that are not in the given two arrays
-   * TODO improve performance of diff algorithm
-   * @param array1
-   * @param array2
-   * @returns {any}
-   */
+     * Returns the all items that are not in the given two arrays
+     * TODO improve performance of diff algorithm
+     * @param array1
+     * @param array2
+     * @returns {any}
+     */
     static array_diff<T>(array1: T[], array2: T[]): T[];
     /**
      * Returns all elements from set1 which are not in set2
