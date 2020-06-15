@@ -4,12 +4,11 @@
 
 import 'select2';
 import * as d3 from 'd3';
-import * as $ from 'jquery';
+import $ from 'jquery';
 import {mixin} from 'phovea_core/src/index';
 import {api2absURL} from 'phovea_core/src/ajax';
 import AFormElement from './AFormElement';
-import {IForm} from '../interfaces';
-import {IFormSelectDesc} from './FormSelect';
+import {IForm, IFormElementDesc} from '../interfaces';
 import {IPluginDesc} from 'phovea_core/src/plugin';
 
 declare type IFormSelect2Options = Select2Options & {
@@ -20,7 +19,7 @@ declare type IFormSelect2Options = Select2Options & {
 /**
  * Add specific options for select form elements
  */
-export interface IFormSelect2 extends IFormSelectDesc {
+export interface IFormSelect2 extends IFormElementDesc {
   /**
    * Additional options
    */

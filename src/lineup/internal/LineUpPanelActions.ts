@@ -1,17 +1,25 @@
 
-import {SidePanel, spaceFillingRule, IGroupSearchItem, SearchBox, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, isSupportType, Column} from 'lineupjs';
+import {SidePanel, spaceFillingRule, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
 import {IDType, resolve} from 'phovea_core/src/idtype';
 import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
 import {editDialog} from '../../storage';
 import {
   IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
-  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc
+  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc, EP_TDP_CORE_LINEUP_PANEL_TAB, IPanelTabExtensionDesc
 } from '../../extensions';
 import {EventHandler} from 'phovea_core/src/event';
 import {IARankingViewOptions} from '../ARankingView';
-import {exportLogic} from './export';
 import {lazyDialogModule} from '../../dialogs';
+import PanelButton from './panel/PanelButton';
+import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
+import {PanelTab, SidePanelTab} from './panel/PanelTab';
+import SearchBoxProvider from './panel/SearchBoxProvider';
+import PanelHeader from './panel/PanelHeader';
+import PanelRankingButton from './panel/PanelRankingButton';
+import PanelAddColumnButton from './panel/PanelAddColumnButton';
 import i18n from 'phovea_core/src/i18n';
+import PanelDownloadButton from './panel/PanelDownloadButton';
+import {IPanelTabExtension} from '../../extensions';
 
 export interface ISearchOption {
   text: string;
@@ -24,6 +32,7 @@ export const rule = spaceFillingRule({
   rowHeight: 18,
   groupPadding: 5
 });
+
 
 /**
  * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
@@ -58,39 +67,40 @@ export default class LineUpPanelActions extends EventHandler {
 
   private idType: IDType | null = null;
 
-  private readonly search: SearchBox<ISearchOption> | null;
+  private readonly searchBoxProvider: SearchBoxProvider;
 
   readonly panel: SidePanel | null;
-  readonly node: HTMLElement;
+  readonly node: HTMLElement; // wrapper node
+
+  private readonly header: PanelHeader;
+  private readonly tabContainer: ITabContainer;
+
   private overview: HTMLElement;
   private wasCollapsed = false;
 
-  constructor(protected readonly provider: LocalDataProvider, ctx: any, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
+  constructor(protected readonly provider: LocalDataProvider, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
+    this.node = doc.createElement('aside');
+    this.node.classList.add('lu-side-panel-wrapper');
 
-    if (options.enableAddingColumns) {
-      this.search = new SearchBox<ISearchOption>({
-        placeholder: i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder')
-      });
-      this.search.on(SearchBox.EVENT_SELECT, (item) => {
-        this.node.querySelector('.lu-adder')!.classList.remove('once');
-        item.action();
-      });
-    }
+    this.header = new PanelHeader(this.node);
 
-    if (this.options.enableSidePanel !== 'top') {
-      this.panel = new SidePanel(ctx, doc, {
-        chooser: false
-      });
-      this.node = this.panel.node;
+    this.searchBoxProvider = new SearchBoxProvider();
+
+    if (this.options.enableSidePanel === 'top') {
+      this.node.classList.add('lu-side-panel-top');
+      this.tabContainer = new NullTabContainer(); // tab container without functionality
+
     } else {
-      this.node = doc.createElement('div');
-      this.node.classList.add('lu-side-panel', 'lu-side-panel-top');
+      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
+      this.panel = sidePanel.panel;
+      this.tabContainer = new PanelTabContainer(this.node);
+      this.tabContainer.addTab(sidePanel);
+      this.tabContainer.showTab(sidePanel);
     }
-    this.node.classList.add('tdp-view-lineup');
-    this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
 
     this.init();
+    this.collapse = options.enableSidePanel === 'top' || options.enableSidePanel === 'collapsed';
   }
 
   forceCollapse() {
@@ -114,14 +124,26 @@ export default class LineUpPanelActions extends EventHandler {
 
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
+
+    if(value) {
+      this.tabContainer.hideCurrentTab(); // Hide the active PanelTab and inform its content to stop updating
+    } else {
+      this.tabContainer.showCurrentTab(); // Show the last active PanelTab and inform its content to start updating again
+    }
   }
 
   hide() {
     this.node.style.display = 'none';
+
+    // Hide the active PanelTab and inform its content to stop updating
+    this.tabContainer.hideCurrentTab();
   }
 
   show() {
     this.node.style.display = 'flex';
+
+    // Show the last active PanelTab and inform its content to start updating again
+    this.tabContainer.showCurrentTab();
   }
 
   private get isTopMode() {
@@ -133,80 +155,62 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private init() {
-    this.node.insertAdjacentHTML('afterbegin', `
-      <section></section>
-      <div class="lu-adder">${this.search ? `<button class="fa fa-plus" title="${i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton')}"></button>` : ''}
-      </div>`);
+    const buttons = this.header.node;
 
     if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
-      this.node.insertAdjacentHTML('afterbegin', `<a href="#" title="${i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton')}"></a>`);
-      this.node.querySelector('a')!.addEventListener('click', (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
+      const listener = () => {
         this.collapse = !this.collapse;
-      });
+      };
+
+      const collapseButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton'), 'collapse-button', listener);
+      this.header.addButton(collapseButton);
     }
 
-    const buttons = this.node.querySelector('section');
-    this.appendExtraButtons().forEach((b) => buttons.appendChild(b));
+    if (this.options.enableAddingColumns) {
+      const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
+      this.header.addButton(addColumnButton);
+    }
+
+    this.appendExtraButtons(buttons);
+
     if (this.options.enableSaveRanking) {
-      buttons.appendChild(this.appendSaveRanking());
+      const listener = (ranking: Ranking) => {
+        editDialog(null, (name, description, sec) => {
+          this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, ranking.getOrder(), name, description, sec);
+        });
+      };
+
+      const saveRankingButton = new PanelRankingButton(buttons, this.provider, i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
+      this.header.addButton(saveRankingButton);
     }
+
     if (this.options.enableDownload) {
-      buttons.appendChild(this.appendDownload());
+      const downloadButtonContainer = new PanelDownloadButton(buttons, this.provider, this.isTopMode);
+      this.header.addButton(downloadButtonContainer);
     }
+
     if (this.options.enableZoom) {
-      buttons.appendChild(this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)));
-      buttons.appendChild(this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)));
+      const zoomInButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
+      this.header.addButton(zoomInButton);
+
+      const zoomOutButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
+      this.header.addButton(zoomOutButton);
     }
+
     if (this.options.enableOverviewMode) {
-      buttons.appendChild(this.appendOverviewButton());
+      const listener = () => {
+        const selected = this.overview.classList.toggle('fa-th-list');
+        this.overview.classList.toggle('fa-list');
+        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
+      };
+      const overviewButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+      this.overview = overviewButton.node; // TODO might be removed
+      this.header.addButton(overviewButton);
     }
 
-    const header = <HTMLElement>this.node.querySelector('.lu-adder')!;
-
-    header.addEventListener('mouseleave', () => {
-      header.classList.remove('once');
-    });
-
-    if (this.search) {
-      header.appendChild(this.search.node);
-
-      this.node.querySelector('.lu-adder button')!.addEventListener('click', (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        if (!this.collapse) {
-          return;
-        }
-        header.classList.add('once');
-        (<HTMLElement>this.search.node.querySelector('input'))!.focus();
-        this.search.focus();
-      });
+    if (!this.isTopMode) {
+      this.appendExtraTabs();
     }
-  }
-
-  private createMarkup(title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
-    const b = this.node.ownerDocument.createElement('button');
-    b.className = linkClass;
-    b.title = title;
-    b.addEventListener('click', (evt) => {
-      evt.stopPropagation();
-      evt.preventDefault();
-      const first = this.provider.getRankings()[0];
-      if (first) {
-        onClick(first);
-      }
-    });
-    return b;
-  }
-
-  private appendOverviewButton() {
-    const listener = () => {
-      const selected = this.overview.classList.toggle('fa-th-list');
-      this.overview.classList.toggle('fa-list');
-      this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
-    };
-    return this.overview = this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
   }
 
   setViolation(violation?: string) {
@@ -217,78 +221,46 @@ export default class LineUpPanelActions extends EventHandler {
     }
   }
 
-  private appendDownload() {
-    const node = this.node.ownerDocument.createElement('div');
-    node.classList.add('btn-group', 'download-data-dropdown');
-    node.innerHTML = `
-      <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
-      </button>
-      <ul class="dropdown-menu dropdown-menu-${this.isTopMode ? 'left' : 'right'}">
-        <li class="dropdown-header">${i18n.t('tdp:core.lineup.LineupPanelActions.downloadAll')}</li>
-        <li><a href="#" data-s="a" data-t="xlsx">${i18n.t('tdp:core.lineup.LineupPanelActions.excel')}</a></li>
-        <li class="dropdown-header" data-num-selected-rows="0">${i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</li>
-        <li><a href="#" data-s="s" data-t="xlsx">${i18n.t('tdp:core.lineup.LineupPanelActions.excel')}</a></li>
-        <li role="separator" class="divider"></li>
-        <li><a href="#" data-s="s" data-t="custom">${i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a></li>
-      </ul>
-    `;
-
-    // Listen for row selection and update number of selected rows
-    // Show/hide some dropdown menu points accordingly using CSS
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.download-menu', (indices: number[]) => {
-      (<HTMLElement>node.querySelector('[data-num-selected-rows]')).dataset.numSelectedRows = indices.length.toString();
-    });
-
-    const links = Array.from(node.querySelectorAll('a'));
-    for (const link of links) {
-      link.onclick = (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        const type = link.dataset.t;
-        const onlySelected = link.dataset.s === 's';
-        exportLogic(<any>type, onlySelected, this.provider).then(({content, mimeType, name}) => {
-          this.downloadFile(content, mimeType, name);
-        });
-      };
-    }
-
-
-    return node;
-  }
-
-  private appendSaveRanking() {
-    const listener = (ranking: Ranking) => {
-      this.saveRankingDialog(ranking.getOrder());
-    };
-
-    return this.createMarkup(i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
-  }
-
-  private appendExtraButtons() {
+  private appendExtraButtons(parent: HTMLElement) {
     const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_RANKING_BUTTON);
     return buttons.map((button) => {
       const listener = () => {
         button.load().then((p) => this.scoreColumnDialog(p));
       };
-      return this.createMarkup(button.title, 'fa ' + button.cssClass, listener);
+
+      const luButton = new PanelRankingButton(parent, this.provider, button.title, 'fa ' + button.cssClass, listener);
+      this.header.addButton(luButton);
     });
   }
 
-  private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
-    const doc = this.node.ownerDocument;
-    const downloadLink = doc.createElement('a');
-    const blob = new Blob([content], {type: mimeType});
-    downloadLink.href = URL.createObjectURL(blob);
-    (<any>downloadLink).download = name;
+  private appendExtraTabs() {
+    const plugins = <IPanelTabExtensionDesc[]>listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB).sort((a, b) => a.order - b.order);
+    plugins.forEach((plugin) => {
+      let isLoaded = false;
+      const tab = new PanelTab(this.tabContainer.node, plugin);
 
-    doc.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
-  }
+      const onClick = () => {
+        if (isLoaded) {
+          if (this.collapse) {
+            this.collapse = false; // expand side panel
+          }
+          this.tabContainer.showTab(tab);
 
-  protected saveRankingDialog(order: number[]) {
-    editDialog(null, (name, description, sec) => {
-      this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec);
+        } else {
+          plugin.load().then((p: IPanelTabExtension) => {
+            p.factory(p.desc, tab, this.provider);
+            this.collapse = false; // expand side panel
+            this.tabContainer.showTab(tab);
+            isLoaded = true;
+          });
+        }
+      };
+
+      if (plugin.shortcut) {
+        this.header.addButton(tab.getShortcutButton());
+      }
+
+      this.tabContainer.addTab(tab, onClick);
     });
   }
 
@@ -330,9 +302,10 @@ export default class LineUpPanelActions extends EventHandler {
   async updateChooser(idType: IDType, descs: IColumnDesc[]) {
     this.idType = idType;
 
-    if (!this.search) {
+    if (this.searchBoxProvider.length === 0) {
       return;
     }
+
     const {metaDataOptions, loadedScorePlugins} = await this.resolveScores(this.idType);
 
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
@@ -404,7 +377,7 @@ export default class LineUpPanelActions extends EventHandler {
       items.push(specialColumnsOption);
     }
 
-    this.search.data = items;
+    this.searchBoxProvider.update(items);
   }
 
   private groupedDialog(text: string, children: ISearchOption[]): ISearchOption | IGroupSearchItem<ISearchOption> {
@@ -482,10 +455,10 @@ export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
     if (idtype === target.id) {
       return true;
     }
-    //lookup the targets and check if our target is part of it
+    // lookup the targets and check if our target is part of it
     return resolve(idtype).getCanBeMappedTo().then((mappables: IDType[]) => mappables.some((d) => d.id === target.id));
   }
-  //check which idTypes can be mapped to the target one
+  // check which idTypes can be mapped to the target one
   return Promise.all(idTypes.map(canBeMappedTo)).then((mappable: boolean[]) => {
     const valid = idTypes.filter((d, i) => mappable[i]);
     return all.filter((d) => valid.indexOf(d.idtype) >= 0);

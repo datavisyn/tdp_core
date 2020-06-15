@@ -1,4 +1,4 @@
-import * as $ from 'jquery';
+import $ from 'jquery';
 import {debounce} from 'phovea_core/src';
 import {EventHandler} from 'phovea_core/src/event';
 import 'select2';

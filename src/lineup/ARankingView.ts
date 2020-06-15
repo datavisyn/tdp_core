@@ -190,6 +190,11 @@ export abstract class ARankingView extends AView {
   protected reloadData = debounce(() => this.reloadDataImpl(), 100);
 
   /**
+   * updates the list of available columns in the side panel
+   */
+  protected updatePanelChooser = debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
+
+  /**
    * promise resolved when everything is built
    * @type {any}
    */
@@ -294,6 +299,10 @@ export abstract class ARankingView extends AView {
     }));
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
+    // When a new column desc is added to the provider, update the panel chooser
+    this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
+    // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
+    // this.provider.on(LocalDataProvider.EVENT_REMOVE_DESC, () => this.updatePanelChooser());
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
       this.saveNamedSet(order, name, description, sec);
     });
@@ -481,7 +490,6 @@ export abstract class ARankingView extends AView {
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
-      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
     });
   }
 
@@ -588,8 +596,6 @@ export abstract class ARankingView extends AView {
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];
       columns.forEach((c) => this.provider.pushDesc(c));
-
-      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
 
       const rows: IRow[] = r[1];
 
