@@ -4,6 +4,7 @@
 
 
 import {IEventHandler} from 'phovea_core';
+import * as d3 from 'd3';
 
 /**
  * List of all available for elements that the form builder can handle

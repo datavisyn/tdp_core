@@ -9,9 +9,10 @@ import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import {ISelectOptions, IFormSelectOption, FormSelect} from './FormSelect';
 import {FormSelect2} from './FormSelect2';
-import {BaseUtils, UserSession, ResolveNow, IPluginDesc, I18nextManager, EventHandler} from 'phovea_core';
+import {BaseUtils, UserSession, ResolveNow, IPluginDesc, I18nextManager} from 'phovea_core';
 import {IFormElement} from '..';
 import {ISelect3Options, Select3, IdTextPair} from './Select3';
+import * as d3 from 'd3';
 
 export interface ISubDesc {
   name: string;

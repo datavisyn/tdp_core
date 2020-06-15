@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-/// <reference types="d3" />
 import 'select2';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
@@ -9,6 +8,7 @@ import { ISelectOptions } from './FormSelect';
 import { IPluginDesc } from 'phovea_core';
 import { IFormElement } from '..';
 import { ISelect3Options, IdTextPair } from './Select3';
+import * as d3 from 'd3';
 export interface ISubDesc {
     name: string;
     value: string;

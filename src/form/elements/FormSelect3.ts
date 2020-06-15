@@ -6,7 +6,8 @@ import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
 import {Select3, IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
-import {IPluginDesc, EventHandler} from 'phovea_core';
+import {IPluginDesc} from 'phovea_core';
+import * as d3 from 'd3';
 
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
   return?: 'text' | 'id';

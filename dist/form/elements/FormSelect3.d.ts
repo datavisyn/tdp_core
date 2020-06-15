@@ -1,12 +1,12 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-/// <reference types="d3" />
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc } from '../interfaces';
 import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
 import { ISelect2Option } from './FormSelect2';
 import { IPluginDesc } from 'phovea_core';
+import * as d3 from 'd3';
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
     return?: 'text' | 'id';
     data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);
