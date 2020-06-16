@@ -110,7 +110,7 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
 
-      import('phovea_ui/src/components/dialogs').then(({Dialog}) => {
+      import('phovea_ui/dist/components/dialogs').then(({Dialog}) => {
           const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.open'));
           dialog.body.classList.add('tdp-session-dialog');
           dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
@@ -170,7 +170,7 @@ export class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      import('phovea_ui/src/components/dialogs')
+      import('phovea_ui/dist/components/dialogs')
         .then(({FormDialog}) =>
         FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
         .then((deleteIt) => {
@@ -217,7 +217,7 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
       //import dialog
-      import('phovea_ui/src/components/dialogs').then(({Dialog}) => {
+      import('phovea_ui/dist/components/dialogs').then(({Dialog}) => {
         const d = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
         d.body.innerHTML = `<input type="file" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
         (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {

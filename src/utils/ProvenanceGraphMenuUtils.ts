@@ -30,7 +30,7 @@ export class ProvenanceGraphMenuUtils {
           permission: true,
           name: d.name
         }, args);
-        return import('phovea_ui/src/components/dialogs').then(({FormDialog}) => {
+        return import('phovea_ui/dist/components/dialogs').then(({FormDialog}) => {
           const dialog = new FormDialog(args.title, args.button);
           const prefix = 'd' + BaseUtils.randomId();
           const permissions = TDPApplicationUtils.permissionForm(d, {

@@ -9,7 +9,7 @@ export class DialogUtils {
      * @param {string} id session id
      */
     static showProveanceGraphNotFoundDialog(manager, id, additionalCSSClasses = '') {
-        import('phovea_ui/src/components/dialogs').then(({ Dialog }) => {
+        import('phovea_ui/dist/components/dialogs').then(({ Dialog }) => {
             const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'), I18nextManager.getInstance().i18n.t('tdp:core.newSession'), additionalCSSClasses);
             // append bg-danger to the dialog parent element
             dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');

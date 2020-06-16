@@ -114,7 +114,7 @@ export class ExportUtils {
 
 
   private static customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
-    return import('phovea_ui/src/components/dialogs').then(({FormDialog}) => {
+    return import('phovea_ui/dist/components/dialogs').then(({FormDialog}) => {
       const dialog = new FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
 
       const id = `e${BaseUtils.randomId(3)}`;
