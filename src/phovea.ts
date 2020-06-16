@@ -20,98 +20,98 @@ export default function (registry: IRegistry) {
     registry.push(EP_TDP_CORE_FORM_ELEMENT, id, loader, options);
   }
 
-  actionFunction('tdpInitSession', 'initSessionImpl', () => import('./utils/TDPApplicationUtils'), {
+  actionFunction('tdpInitSession', 'initSessionImpl', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils), {
     analytics: {
       category: 'session',
       action: 'init'
     }
   });
-  actionFunction('tdpSetParameter', 'setParameterImpl', () => import('./utils/TDPApplicationUtils'), {
+  actionFunction('tdpSetParameter', 'setParameterImpl', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils), {
     analytics: {
       category: 'view',
       action: 'setParameter'
     }
   });
-  actionCompressor('tdpCompressSetParameter', 'compressSetParameter', '(tdpSetParameter)', () => import('./utils/TDPApplicationUtils'));
+  actionCompressor('tdpCompressSetParameter', 'compressSetParameter', '(tdpSetParameter)', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils));
 
   // compatibility
-  actionFunction('targidInitSession', 'initSessionImpl', () => import('./utils/TDPApplicationUtils'));
-  actionFunction('targidSetParameter', 'setParameterImpl', () => import('./utils/TDPApplicationUtils'));
-  actionCompressor('targidCompressSetParameter', 'compressSetParameterOld', '(targidSetParameter)', () => import('./utils/TDPApplicationUtils'));
+  actionFunction('targidInitSession', 'initSessionImpl', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils));
+  actionFunction('targidSetParameter', 'setParameterImpl', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils));
+  actionCompressor('targidCompressSetParameter', 'compressSetParameterOld', '(targidSetParameter)', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils));
 
 
-  actionFunction('tdpAddScore', 'addScoreImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('tdpAddScore', 'addScoreImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'score',
       action: 'add'
     }
   });
-  actionFunction('tdpRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('tdpRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'score',
       action: 'remove'
     }
   });
-  actionCompressor('tdpScoreCompressor', 'compress', '(tdpAddScore|tdpRemoveScore)', () => import('./lineup/internal/ScoreUtils'));
+  actionCompressor('tdpScoreCompressor', 'compress', '(tdpAddScore|tdpRemoveScore)', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils));
 
   // compatibility
-  actionFunction('ordinoAddScore', 'addScoreImpl', () => import('./lineup/internal/ScoreUtils'));
-  actionFunction('ordinoRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/ScoreUtils'));
-  actionCompressor('ordinoScoreCompressor', 'compressComp', '(ordinoAddScore|ordinoRemoveScore)', () => import('./lineup/internal/ScoreUtils'));
+  actionFunction('ordinoAddScore', 'addScoreImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils));
+  actionFunction('ordinoRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils));
+  actionCompressor('ordinoScoreCompressor', 'compressComp', '(ordinoAddScore|ordinoRemoveScore)', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils));
 
-  actionFunction('lineupAddRanking', 'addRankingImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('lineupAddRanking', 'addRankingImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'lineup',
       action: 'addRanking'
     }
   });
-  actionFunction('lineupSetRankingSortCriteria', 'setRankingSortCriteriaImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('lineupSetRankingSortCriteria', 'setRankingSortCriteriaImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'lineup',
       action: 'setRankingSortCriteria'
     }
   });
-  actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'lineup',
       action: 'setSortCriteria'
     }
   });
-  actionFunction('lineupSetGroupCriteria', 'setGroupCriteriaImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('lineupSetGroupCriteria', 'setGroupCriteriaImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'lineup',
       action: 'setGroupCriteria'
     }
   });
-  actionFunction('lineupSetColumn', 'setColumnImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('lineupSetColumn', 'setColumnImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'lineup',
       action: 'setColumn'
     }
   });
-  actionFunction('lineupAddColumn', 'addColumnImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('lineupAddColumn', 'addColumnImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'lineup',
       action: 'addColumn'
     }
   });
-  actionFunction('lineupMoveColumn', 'moveColumnImpl', () => import('./lineup/internal/ScoreUtils'), {
+  actionFunction('lineupMoveColumn', 'moveColumnImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
     analytics: {
       category: 'lineup',
       action: 'moveColumn'
     }
   });
 
-  formElements(FormElementType.SELECT, () => import('./form/elements/FormSelect'));
-  formElements(FormElementType.SELECT2, () => import('./form/elements/FormSelect2'), {selection: 'single'});
-  formElements(FormElementType.SELECT2_MULTIPLE, () => import('./form/elements/FormSelect2'), {selection: 'multiple'});
-  formElements(FormElementType.SELECT3, () => import('./form/elements/FormSelect3'), {selection: 'single'});
-  formElements(FormElementType.SELECT3_MULTIPLE, () => import('./form/elements/FormSelect3'), {selection: 'multiple'});
-  formElements(FormElementType.INPUT_TEXT, () => import('./form/elements/FormInputText'));
-  formElements(FormElementType.MAP, () => import('./form/elements/FormMap'));
-  formElements(FormElementType.BUTTON, () => import('./form/elements/FormButton'));
-  formElements(FormElementType.CHECKBOX, () => import('./form/elements/FormCheckBox'));
-  formElements(FormElementType.RADIO, () => import('./form/elements/FormRadio'));
+  formElements(FormElementType.SELECT, () => import('./form/elements/FormSelect').then((f) => f.FormSelect));
+  formElements(FormElementType.SELECT2, () => import('./form/elements/FormSelect2').then((f) => f.FormSelect2), {selection: 'single'});
+  formElements(FormElementType.SELECT2_MULTIPLE, () => import('./form/elements/FormSelect2').then((f) => f.FormSelect2), {selection: 'multiple'});
+  formElements(FormElementType.SELECT3, () => import('./form/elements/FormSelect3').then((f) => f.FormSelect3), {selection: 'single'});
+  formElements(FormElementType.SELECT3_MULTIPLE, () => import('./form/elements/FormSelect3').then((f) => f.FormSelect3), {selection: 'multiple'});
+  formElements(FormElementType.INPUT_TEXT, () => import('./form/elements/FormInputText').then((f) => f.FormInputText));
+  formElements(FormElementType.MAP, () => import('./form/elements/FormMap').then((f) => f.FormMap));
+  formElements(FormElementType.BUTTON, () => import('./form/elements/FormButton').then((f) => f.FormButton));
+  formElements(FormElementType.CHECKBOX, () => import('./form/elements/FormCheckBox').then((f) => f.FormCheckBox));
+  formElements(FormElementType.RADIO, () => import('./form/elements/FormRadio').then((f) => f.FormRadio));
 
   registry.push(EP_PHOVEA_CORE_LOCALE, 'tdpCoreLocaleEN', function () {
     return import('./assets/locales/en/tdp.json').then(PluginRegistry.getInstance().asResource);
