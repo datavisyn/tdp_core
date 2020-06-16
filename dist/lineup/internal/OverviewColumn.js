@@ -9,11 +9,12 @@ import { I18nextManager } from 'phovea_core';
 export class OverviewColumn extends BooleanColumn {
     constructor(id, desc) {
         super(id, Object.assign(desc, {
-            label: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection')
+            label: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection'),
+            renderer: 'boolean',
+            groupRenderer: 'boolean',
+            summaryRenderer: 'categorical'
         }));
         this.overviewSelection = new Set();
-        this.setDefaultRenderer('boolean');
-        this.setDefaultGroupRenderer('boolean');
         this.setWidthImpl(0); // hide
     }
     getValue(row) {

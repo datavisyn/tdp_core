@@ -1,5 +1,6 @@
 import { SidePanel, LocalDataProvider, IColumnDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
-import { IDType, IPlugin, IPluginDesc, EventHandler } from 'phovea_core';
+import { IDType } from 'phovea_core';
+import { IPlugin, IPluginDesc, EventHandler } from 'phovea_core';
 import { IARankingViewOptions } from '../IARankingViewOptions';
 import { PanelTab } from './panel/PanelTab';
 export interface IPanelTabExtension {
@@ -41,7 +42,7 @@ export declare class LineUpPanelActions extends EventHandler {
     private readonly options;
     static readonly EVENT_ZOOM_OUT = "zoomOut";
     static readonly EVENT_ZOOM_IN = "zoomIn";
-    static readonly EVENT_RULE_CHANGED = "ruleChanged";
+    static readonly EVENT_TOGGLE_OVERVIEW = "toggleOverview";
     static readonly EVENT_SAVE_NAMED_SET = "saveNamedSet";
     /**
      * @deprecated
@@ -52,7 +53,6 @@ export declare class LineUpPanelActions extends EventHandler {
      * @type {string}
      */
     static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = "addTrackedScoreColumn";
-    static readonly rule: import("lineupjs").IRule;
     private idType;
     private readonly searchBoxProvider;
     readonly panel: SidePanel | null;
@@ -83,3 +83,4 @@ export declare class LineUpPanelActions extends EventHandler {
     private buildMetaDataDescriptions;
     private scoreColumnDialog;
 }
+export declare function findMappablePlugins(target: IDType, all: IPluginDesc[]): any[] | Promise<IPluginDesc[]>;

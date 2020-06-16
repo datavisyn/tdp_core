@@ -81,7 +81,7 @@ export class ExportUtils {
       return ExportUtils.customizeDialog(provider).then((r) => ExportUtils.convertRanking(provider, r.order, r.columns, r.type, r.name));
     } else {
       const ranking = provider.getFirstRanking();
-      const order = onlySelected ? provider.getSelection() : ranking!.getOrder();
+      const order = onlySelected ? provider.getSelection() : (<number[]>ranking!.getOrder());
       const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
       return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, type, ranking.getLabel()));
     }
@@ -160,13 +160,10 @@ export class ExportUtils {
       `;
 
       ExportUtils.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.checkbox');
-
-
-      return new Promise<IExportData>((resolve) => {
+        return new Promise<IExportData>((resolve) => {
         dialog.onSubmit(() => {
           const data = new FormData(dialog.form);
           dialog.hide();
-
           const rows = data.get('rows').toString();
           let order: number[];
           switch (rows) {
@@ -175,10 +172,10 @@ export class ExportUtils {
               break;
             case 'not':
               const selected = new Set(provider.getSelection());
-              order = ranking.getOrder().filter((d) => !selected.has(d));
+              order = (<number[]>ranking.getOrder()).filter((d) => !selected.has(d));
               break;
             default:
-              order = ranking.getOrder();
+              order = <number[]>ranking.getOrder();
           }
 
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
@@ -204,19 +201,16 @@ export class ExportUtils {
 
   static resortAble(base: HTMLElement, elementSelector: string) {
     const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
-
     const enable = (item: HTMLElement) => {
       item.classList.add('dragging');
       base.classList.add('dragging');
       let prevBB: DOMRect | ClientRect;
       let nextBB: DOMRect | ClientRect;
-
       const update = () => {
         prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
         nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
       };
       update();
-
       base.onmouseup = base.onmouseleave = () => {
         item.classList.remove('dragging');
         base.classList.remove('dragging');

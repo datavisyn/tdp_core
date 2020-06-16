@@ -39,6 +39,10 @@ export declare abstract class ARankingView extends AView {
      */
     protected reloadData: (...args: any[]) => void;
     /**
+     * updates the list of available columns in the side panel
+     */
+    protected updatePanelChooser: (...args: any[]) => void;
+    /**
      * promise resolved when everything is built
      * @type {any}
      */

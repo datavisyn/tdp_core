@@ -1,27 +1,23 @@
-@import './vars';
-@import '~font-awesome/scss/variables';
-@import '~font-awesome/scss/mixins';
+@import "./vars";
+@import "~font-awesome/scss/variables";
+@import "~font-awesome/scss/mixins";
 
 &.lineup {
   display: flex;
   flex-direction: row;
   height: 100%;
 
-  .lu-row,
-  .le-tr {
+  .lu-row {
     line-height: 1;
   }
 
-  // Select only first div containing the `lineup-engine`.
-  // Do not select the `div.lu-backdrop` element,
-  // which is moved one level up in the DOM tree in ARankingView.ts
-  > div:first-child() {
+  > div {
     flex: 1 1 auto;
     position: relative;
   }
 
   &.overview-detail {
-    > div:first-child() {
+    > div {
       display: flex;
       flex-direction: column;
 
@@ -77,7 +73,7 @@
   }
 }
 
-$lu_assets: '~lineupjs/src/assets';
+$lu_assets: "~lineupjs/src/assets";
 
 @at-root {
   .tdp-ranking-export-form {
@@ -110,23 +106,14 @@ $lu_assets: '~lineupjs/src/assets';
 
   .lu-side-panel {
     width: 100%;
-    height: 100%;
   }
 
   .lu-side-panel > main > section::before {
-    content: 'Column Summaries';
+    content: "Column Summaries";
   }
 
-  .lu-hierarchy {
-    footer.lu-hierarchy-adder {
-      // the phovea_clue selector `body[data-clue='E'] footer` hides this footer
-      // so we must override it and display it explicitly
-      display: flex;
-    }
-
-    .lu-search::before {
-      height: 19px;
-    }
+  .lu-hierarchy .lu-search::before {
+    height: 19px;
   }
 
   .lu-side-panel-wrapper {
@@ -243,14 +230,14 @@ $lu_assets: '~lineupjs/src/assets';
 
       // show the number of selected rows after the element
       li[data-num-selected-rows]::after {
-        content: ' ('attr(data-num-selected-rows) ')';
+        content: " ("attr(data-num-selected-rows) ")";
         display: inline;
       }
 
       // hide the dropdown-header and the next list point (= download link), if no rows are selected
       // note that this only works for a *single* link as after the header list item!
-      li[data-num-selected-rows='0'],
-      li[data-num-selected-rows='0'] + li {
+      li[data-num-selected-rows="0"],
+      li[data-num-selected-rows="0"] + li {
         display: none;
       }
     }
@@ -303,22 +290,7 @@ $lu_assets: '~lineupjs/src/assets';
         bottom: 0;
         right: 0;
         left: 0;
-        overflow: auto;
-
-        &.active {
-          display: flex;
-          flex-direction: column;
-        }
-
-        // Add scrollbar to SidePanel higher in the node tree
-        .lu-side-panel-main {
-          overflow-y: auto;
-          overflow-x: hidden;
-
-          .lu-side-panel-ranking-main {
-            overflow: visible;
-          }
-        }
+        overflow-y: auto;
       }
     }
 
@@ -375,7 +347,7 @@ $lu_assets: '~lineupjs/src/assets';
         }
 
         &.once::before {
-          content: '';
+          content: "";
           top: -30px;
           left: -20em;
           right: 0;
@@ -439,7 +411,7 @@ $lu_assets: '~lineupjs/src/assets';
       }
 
       &.once::before {
-        content: '';
+        content: "";
         top: -10px;
         left: -2.5em;
         right: -15em;

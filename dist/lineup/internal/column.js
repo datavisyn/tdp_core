@@ -110,7 +110,6 @@ export class LazyColumn {
                 ncol.originalLabels = colDesc.labels = columns;
             }
             ncol._dataLength = colDesc.dataLength = rows[0].score.length;
-            ncol.setSplicer({ length: rows[0].score.length, splice: (d) => d });
         }
         if (colDesc.type === 'categorical' && rows._categories) {
             const ccol = col;

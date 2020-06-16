@@ -1,4 +1,4 @@
-import {ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions} from 'lineupjs';
+import {ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData} from 'lineupjs';
 import {IDTypeLike} from 'phovea_core';
 
 
@@ -125,8 +125,8 @@ export interface IARankingViewOptions {
    */
   enableStripedBackground: boolean;
 
-  itemRowHeight: number | ((row: any, index: number) => number) | null;
+  itemRowHeight: number | ((item: IGroupItem | IGroupData) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
-  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions>;
+  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
 }

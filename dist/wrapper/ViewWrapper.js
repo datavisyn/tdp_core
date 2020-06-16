@@ -89,16 +89,18 @@ export class ViewWrapper extends EventHandler {
     }
     set visible(visible) {
         const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
+        if (visible) {
+            this.node.classList.remove('hidden');
+        }
+        else {
+            this.node.classList.add('hidden');
+        }
         if (visible && this.instance == null && selection && this.match(selection)) {
             //lazy init
             this.createView(selection);
         }
-        if (visible) {
-            this.node.classList.remove('hidden');
-            this.update();
-        }
         else {
-            this.node.classList.add('hidden');
+            this.update(); // if the view was just created we don't need to call update again
         }
     }
     get visible() {
@@ -288,8 +290,8 @@ export class ViewWrapper extends EventHandler {
         this.preInstanceItemSelections.set(name, sel);
     }
     update() {
-        if (this.visible && this.instance && typeof this.instance.update === 'function' && this.node.getBoundingClientRect().width > 0) {
-            this.instance.update();
+        if (this.visible && this.instance && typeof this.instance.forceUpdate === 'function') {
+            this.instance.forceUpdate();
         }
     }
     dumpReference() {

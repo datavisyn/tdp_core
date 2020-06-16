@@ -1,6 +1,6 @@
-import { spaceFillingRule, createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc } from 'lineupjs';
-import { IDTypeManager, PluginRegistry, EventHandler, I18nextManager } from 'phovea_core';
-import { StoreUtils } from '../../storage/StoreUtils';
+import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc } from 'lineupjs';
+import { EventHandler, I18nextManager, PluginRegistry, IDTypeManager } from 'phovea_core';
+import { StoreUtils } from '../../storage';
 import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB } from '../../base/extensions';
 import { PanelButton } from './panel/PanelButton';
 import { PanelTabContainer, NullTabContainer } from './panel/PanelTabContainer';
@@ -113,7 +113,7 @@ export class LineUpPanelActions extends EventHandler {
             const listener = () => {
                 const selected = this.overview.classList.toggle('fa-th-list');
                 this.overview.classList.toggle('fa-list');
-                this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? LineUpPanelActions.rule : null);
+                this.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, selected);
             };
             const overviewButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
             this.overview = overviewButton.node; // TODO might be removed
@@ -183,8 +183,8 @@ export class LineUpPanelActions extends EventHandler {
     }
     async resolveScores(idType) {
         // load plugins, which need to be checked if the IDTypes are mappable
-        const ordinoScores = await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
-        const metaDataPluginDescs = await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
+        const ordinoScores = await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
+        const metaDataPluginDescs = await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
         const metaDataPluginPromises = metaDataPluginDescs
             .map((plugin) => plugin.load()
             .then((loadedPlugin) => loadedPlugin.factory(plugin))
@@ -273,7 +273,7 @@ export class LineUpPanelActions extends EventHandler {
             id: `group_${text}`,
             action: () => {
                 // choooser dialog
-                import('phovea_ui/src/components/dialogs').then(({ FormDialog }) => {
+                import('phovea_ui/dist/components/dialogs').then(({ FormDialog }) => {
                     const dialog = new FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', { text }), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
                     dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">
@@ -327,7 +327,7 @@ export class LineUpPanelActions extends EventHandler {
 }
 LineUpPanelActions.EVENT_ZOOM_OUT = 'zoomOut';
 LineUpPanelActions.EVENT_ZOOM_IN = 'zoomIn';
-LineUpPanelActions.EVENT_RULE_CHANGED = 'ruleChanged';
+LineUpPanelActions.EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
 LineUpPanelActions.EVENT_SAVE_NAMED_SET = 'saveNamedSet';
 /**
  * @deprecated
@@ -338,9 +338,22 @@ LineUpPanelActions.EVENT_ADD_SCORE_COLUMN = 'addScoreColumn';
  * @type {string}
  */
 LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
-LineUpPanelActions.rule = spaceFillingRule({
-    groupHeight: 70,
-    rowHeight: 18,
-    groupPadding: 5
-});
+export function findMappablePlugins(target, all) {
+    if (!target) {
+        return [];
+    }
+    const idTypes = Array.from(new Set(all.map((d) => d.idtype)));
+    function canBeMappedTo(idtype) {
+        if (idtype === target.id) {
+            return true;
+        }
+        // lookup the targets and check if our target is part of it
+        return IDTypeManager.getInstance().getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype)).then((mappables) => mappables.some((d) => d.id === target.id));
+    }
+    // check which idTypes can be mapped to the target one
+    return Promise.all(idTypes.map(canBeMappedTo)).then((mappable) => {
+        const valid = idTypes.filter((d, i) => mappable[i]);
+        return all.filter((d) => valid.indexOf(d.idtype) >= 0);
+    });
+}
 //# sourceMappingURL=LineUpPanelActions.js.map
