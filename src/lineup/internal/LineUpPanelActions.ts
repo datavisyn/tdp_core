@@ -1,7 +1,8 @@
 
-import {SidePanel, spaceFillingRule, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
-import {IDType, IDTypeManager, IPlugin, IPluginDesc, PluginRegistry, EventHandler, I18nextManager} from 'phovea_core';
-import {StoreUtils} from '../../storage/StoreUtils';
+import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
+import {IDType} from 'phovea_core';
+import {IPlugin, IPluginDesc, EventHandler, I18nextManager, PluginRegistry, IDTypeManager} from 'phovea_core';
+import {StoreUtils} from '../../storage';
 import {
   EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   EP_TDP_CORE_LINEUP_PANEL_TAB
@@ -18,7 +19,6 @@ import {PanelDownloadButton} from './panel/PanelDownloadButton';
 import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension} from '../../base/interfaces';
 import {ISearchOption} from './panel/ISearchOption';
 import {LineupUtils} from '../utils';
-
 
 
 export interface IPanelTabExtension {
@@ -67,7 +67,7 @@ export interface IPanelTabExtensionDesc extends IPluginDesc {
 export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
-  static readonly EVENT_RULE_CHANGED = 'ruleChanged';
+  static readonly EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
   /**
    * @deprecated
@@ -78,12 +78,6 @@ export class LineUpPanelActions extends EventHandler {
    * @type {string}
    */
   static readonly EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
-
-  static readonly rule = spaceFillingRule({
-    groupHeight: 70,
-    rowHeight: 18,
-    groupPadding: 5
-  });
 
   private idType: IDType | null = null;
 
@@ -100,6 +94,7 @@ export class LineUpPanelActions extends EventHandler {
 
   constructor(protected readonly provider: LocalDataProvider, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
+
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
 
@@ -221,7 +216,7 @@ export class LineUpPanelActions extends EventHandler {
       const listener = () => {
         const selected = this.overview.classList.toggle('fa-th-list');
         this.overview.classList.toggle('fa-list');
-        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? LineUpPanelActions.rule : null);
+        this.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, selected);
       };
       const overviewButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed
@@ -302,8 +297,8 @@ export class LineUpPanelActions extends EventHandler {
 
   private async resolveScores(idType: IDType) {
     // load plugins, which need to be checked if the IDTypes are mappable
-    const ordinoScores: IPluginDesc[] = await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
-    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await IDTypeManager.getInstance().findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
+    const ordinoScores: IPluginDesc[] = await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
+    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
     const metaDataPluginPromises: Promise<IGroupSearchItem<any>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
@@ -410,7 +405,7 @@ export class LineUpPanelActions extends EventHandler {
       id: `group_${text}`,
       action: () => {
         // choooser dialog
-        import('phovea_ui/src/components/dialogs').then(({FormDialog}) => {
+        import('phovea_ui/dist/components/dialogs').then(({FormDialog}) => {
           const dialog = new FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
           dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">
@@ -463,4 +458,24 @@ export class LineUpPanelActions extends EventHandler {
         }
       });
   }
+}
+
+export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
+  if (!target) {
+    return [];
+  }
+  const idTypes = Array.from(new Set<string>(all.map((d) => d.idtype)));
+
+  function canBeMappedTo(idtype: string) {
+    if (idtype === target.id) {
+      return true;
+    }
+    // lookup the targets and check if our target is part of it
+    return IDTypeManager.getInstance().getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype)).then((mappables: IDType[]) => mappables.some((d) => d.id === target.id));
+  }
+  // check which idTypes can be mapped to the target one
+  return Promise.all(idTypes.map(canBeMappedTo)).then((mappable: boolean[]) => {
+    const valid = idTypes.filter((d, i) => mappable[i]);
+    return all.filter((d) => valid.indexOf(d.idtype) >= 0);
+  });
 }

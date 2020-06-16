@@ -4,7 +4,7 @@ import re
 from phovea_server.config import view as configview
 from phovea_server.plugin import list as list_plugins, lookup, AExtensionDesc
 from .db import configs as engines
-from typing import List, Dict
+from typing import List, Dict, Optional
 import alembic.command
 import alembic.config
 from os import path
@@ -14,6 +14,7 @@ from argparse import REMAINDER
 __author__ = 'Datavisyn'
 _log = logging.getLogger(__name__)
 
+global_cfg = configview('tdp_core.migrations')
 alembic_cfg = alembic.config.Config(path.join(path.abspath(path.dirname(__file__)), 'dbmigration.ini'))
 
 
@@ -38,7 +39,7 @@ class DBMigration(object):
     self.db_url: str = db_url
     self.script_location: str = script_location
     self.auto_upgrade: bool = auto_upgrade
-    self.version_table_schema: str = version_table_schema
+    self.version_table_schema: Optional[str] = version_table_schema
     self.custom_commands: Dict[str, str] = dict()
 
     # Because we can't easily pass "-1" as npm argument, we add a custom command for that without the space
@@ -46,8 +47,12 @@ class DBMigration(object):
 
     # Automatically upgrade to head (if enabled)
     if self.auto_upgrade:
-      _log.info('Upgrading database {}'.format(self.id))
-      self.execute(['upgrade', 'head'])
+      _log.info(f'Upgrading database {self.id}')
+      try:
+        self.execute(['upgrade', 'head'])
+        _log.info(f'Successfully upgraded database {self.id}')
+      except Exception:
+        _log.exception(f'Error upgrading database {self.id}')
 
   def __repr__(self) -> str:
     return f'DBMigration({self.id})'
@@ -70,7 +75,7 @@ class DBMigration(object):
   def remove_custom_command(self, origin: str):
     self.custom_commands.pop(origin, None)
 
-  def get_custom_command(self, arguments: List[str] = []) -> List[str]:
+  def get_custom_command(self, arguments: List[str] = []) -> Optional[List[str]]:
     """
     Returns the rewritten command if it matches the pattern of a custom command.
     :param List[str] arguments: Argument to rewrite.
@@ -130,7 +135,7 @@ class DBMigrationManager(object):
    - dbUrl: URL of the db connection used for the migration (passed to DBManager)
      - Either dbKey or dbUrl is required, with dbUrl having precedence
    - scriptLocation: Location of the alembic root folder (passed to DBManager)
-   - autoUpgrade: Flag which auto-upgrades to the latest revision (passed to DBManager)
+   - autoUpgrade: Flag which auto-upgrades to the latest revision (passed to DBManager). Defaults to config key 'tdp_core.migrations.autoUpgrade', or True if not configured.
    - versionTableSchema: Schema of the alembic version table (passed to DBManager)
 
   The keys are retrieved from the following sources (in order):
@@ -142,6 +147,8 @@ class DBMigrationManager(object):
     self._migrations: Dict[str, DBMigration] = dict()
 
     _log.info('Initializing DBMigrationManager')
+
+    auto_upgrade_default = global_cfg.getboolean('autoUpgrade', default=True)
 
     for p in plugins:
       _log.info('DBMigration found: %s', p.id)
@@ -156,7 +163,7 @@ class DBMigrationManager(object):
       script_location = config.get('scriptLocation') or (p.scriptLocation if hasattr(p, 'scriptLocation') else None)
       version_table_schema = config.get('versionTableSchema') or (p.versionTableSchema if hasattr(p, 'versionTableSchema') else None)
       auto_upgrade = config.get('autoUpgrade') if type(config.get('autoUpgrade')) == bool else \
-          (p.autoUpgrade if hasattr(p, 'autoUpgrade') and type(p.autoUpgrade) == bool else False)
+          (p.autoUpgrade if hasattr(p, 'autoUpgrade') and type(p.autoUpgrade) == bool else auto_upgrade_default)
 
       # Validate the plugin description
       missing_fields = []
@@ -168,7 +175,7 @@ class DBMigrationManager(object):
         missing_fields.append('dbUrl or dbKey')
 
       if len(missing_fields) > 0:
-        _log.critical('No {} defined for DBMigration {} - is your configuration up to date?'.format(', '.join(missing_fields), id or '<UNKNOWN>'))
+        _log.error('No {} defined for DBMigration {} - is your configuration up to date?'.format(', '.join(missing_fields), id or '<UNKNOWN>'))
         continue
 
       if db_key and db_url:
@@ -176,14 +183,14 @@ class DBMigrationManager(object):
       elif db_key:
         # Check if engine exists
         if db_key not in engines:
-          _log.critical(f'No engine called {db_key} found for DBMigration {id} - is your configuration up to date?')
+          _log.error(f'No engine called {db_key} found for DBMigration {id} - is your configuration up to date?')
           continue
 
         # Retrieve engine and store string as db url
         try:
           db_url = str(engines.engine(db_key).url)
-        except Exception as e:
-          _log.critical(f'Error retrieving URL from engine {db_key}: {str(e)}')
+        except Exception:
+          _log.exception(f'Error retrieving URL from engine {db_key}')
           continue
 
       # Create new migration
@@ -249,8 +256,7 @@ def create_migration_command(parser):
         print('Available migrations: {}'.format(', '.join(str(migration) for migration in db_migration_manager.migrations)))
     elif args.action == 'exec':
       if args.id == 'all':
-        # TODO: For some reason, the migrations can only be executed for a single id.
-        # When using multiple ids, alembic doesn't do anything in the 2nd, 3rd, ... migration.
+        # TODO
         print('Currently, only single migrations are supported. Please execute the command for each migration individually as we are working on a fix.')
         return
 

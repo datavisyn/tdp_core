@@ -14,7 +14,6 @@ import {IViewProvider} from '../lineup/IViewProvider';
 import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
 import {FindViewUtils} from '../views/FindViewUtils';
 import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';
-import {DialogUtils} from '../base/dialogs';
 import {ViewUtils} from '../views/ViewUtils';
 import {AView} from '../views/AView';
 import {TourUtils} from '../tour/TourUtils';
@@ -114,15 +113,18 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   set visible(visible: boolean) {
     const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
+
+    if (visible) {
+      this.node.classList.remove('hidden');
+    } else {
+      this.node.classList.add('hidden');
+    }
+
     if (visible && this.instance == null && selection && this.match(selection)) {
       //lazy init
       this.createView(selection);
-    }
-    if (visible) {
-      this.node.classList.remove('hidden');
-      this.update();
     } else {
-      this.node.classList.add('hidden');
+      this.update();  // if the view was just created we don't need to call update again
     }
   }
 
@@ -332,8 +334,8 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   update() {
-    if (this.visible && this.instance && typeof (<any>this.instance).update === 'function' && this.node.getBoundingClientRect().width > 0) {
-      (<any>this.instance!).update();
+    if (this.visible && this.instance && typeof (<any>this.instance).forceUpdate === 'function') {
+      (<any>this.instance!).forceUpdate();
     }
   }
 

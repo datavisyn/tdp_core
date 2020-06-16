@@ -2,7 +2,7 @@
  * Created by sam on 13.02.2017.
  */
 
-import {LocalDataProvider, createSelectionDesc, createAggregateDesc, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
+import {LocalDataProvider, createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
 import {extent} from 'd3';
 import {IAnyVector, ValueTypeUtils} from 'phovea_core';
 import {IServerColumn} from '../base/rest';
@@ -264,14 +264,14 @@ export class ColumnDescUtils {
         children: [],
         label: c.name!,
         name: c.name!,
-        color: Column.DEFAULT_COLOR,
+        color: DEFAULT_COLOR,
         value: 0
       }, lookup.get(c.name!) || {}, c);
       lookup.set(c.name!, item);
 
       if (!lookup.has(p)) {
         // create proxy
-        lookup.set(p, {name: p, children: [], label: p, value: 0, color: Column.DEFAULT_COLOR});
+        lookup.set(p, {name: p, children: [], label: p, value: 0, color: DEFAULT_COLOR});
       }
       lookup.get(p)!.children.push(item);
     });

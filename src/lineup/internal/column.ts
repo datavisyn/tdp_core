@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 12.09.2017.
  */
-import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, CategoricalColumn, toCategories} from 'lineupjs';
+import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, toCategories} from 'lineupjs';
 import {LineupUtils} from '../utils';
 import {IScoreRow,IScoreColumnPatcherExtensionDesc} from '../../base/interfaces';
 import {EP_TDP_CORE_SCORE_COLUMN_PATCHER} from '../../base/extensions';
@@ -129,8 +129,6 @@ export class LazyColumn {
         (<any>ncol).originalLabels = (<any>colDesc).labels = columns;
       }
       (<any>ncol)._dataLength = (<any>colDesc).dataLength = rows[0].score.length;
-
-      ncol.setSplicer({length: rows[0].score.length, splice: (d) => d});
     }
 
     if (colDesc.type === 'categorical' && (<any>rows)._categories) {

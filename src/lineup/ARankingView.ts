@@ -1,14 +1,15 @@
-import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions} from 'lineupjs';
+
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, spaceFillingRule, updateLodRules} from 'lineupjs';
 import {AView} from '../views/AView';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
 import {IDTypeManager, BaseUtils, ISecureItem, I18nextManager} from 'phovea_core';
-import {LinupTrackingManager} from './internal/cmds';
+import {LineupTrackingManager} from './internal/cmds';
 import {RestStorageUtils} from '../storage';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {LineUpSelectionHelper} from './internal/LineUpSelectionHelper';
 import {IScore, IScoreRow, IAdditionalColumnDesc} from '../base/interfaces';
-import {ColumnDescUtils, IInitialRankingOptions} from './desc';
+import {ColumnDescUtils, IInitialRankingOptions, IColumnOptions} from './desc';
 import {IRankingWrapper} from './IRankingWrapper';
 import {ScoreUtils} from './internal/ScoreUtils';
 import {LineUpColors} from './internal/LineUpColors';
@@ -19,7 +20,6 @@ import {LazyColumn, ILazyLoadedColumn} from './internal/column';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {IARankingViewOptions} from './IARankingViewOptions';
 import {LineupUtils} from './utils';
-
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -55,6 +55,11 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<any[]>} promise when done
    */
   protected reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
+
+  /**
+   * updates the list of available columns in the side panel
+   */
+  protected updatePanelChooser = BaseUtils.debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
 
   /**
    * promise resolved when everything is built
@@ -135,20 +140,20 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config: ITaggleOptions = BaseUtils.mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+    const taggleOptions: ITaggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
       labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
-      config.rowHeight = this.options.itemRowHeight;
+      taggleOptions.rowHeight = this.options.itemRowHeight;
     } else if (typeof this.options.itemRowHeight === 'function') {
       const f = this.options.itemRowHeight;
-      config.dynamicHeight = () => ({
-        defaultHeight: 18,
+      taggleOptions.dynamicHeight = () => ({
+        defaultHeight: taggleOptions.rowHeight,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? 70 : f(item.v, item.i);
+          return f(item) ?? (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
         }
       });
     }
@@ -156,11 +161,20 @@ export abstract class ARankingView extends AView {
 
 
     const lineupParent = <HTMLElement>this.node.firstElementChild!;
-    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, config) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, taggleOptions) : new TaggleRenderer(this.provider, lineupParent, Object.assign(taggleOptions, {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
+    // LineUp creates an element with class `lu-backdrop` that fades out all content when a dialog is opened.
+    // Append `lu-backdrop` one level higher so fading effect can be applied also to the sidePanel when a dialog is opened.
+    const luBackdrop = this.node.querySelector('.lu-backdrop');
+    this.node.appendChild(luBackdrop);
+
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
+    // When a new column desc is added to the provider, update the panel chooser
+    this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
+    // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
+    // this.provider.on(LocalDataProvider.EVENT_REMOVE_DESC, () => this.updatePanelChooser());
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
       this.saveNamedSet(order, name, description, sec);
     });
@@ -177,11 +191,15 @@ export abstract class ARankingView extends AView {
       this.taggle.zoomIn();
     });
     if (this.options.enableOverviewMode) {
-      this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
-        (<TaggleRenderer>this.taggle).switchRule(rule);
+      const rule = spaceFillingRule(taggleOptions);
+
+      this.panel.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event: any, isOverviewActive: boolean) => {
+        updateLodRules(this.taggle.style, isOverviewActive, taggleOptions);
+        (<TaggleRenderer>this.taggle).switchRule(isOverviewActive ? rule : null);
       });
+
       if (this.options.enableOverviewMode === 'active') {
-        (<TaggleRenderer>this.taggle).switchRule(LineUpPanelActions.rule);
+        this.panel.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, true);
       }
     }
 
@@ -348,7 +366,6 @@ export abstract class ARankingView extends AView {
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
-      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
     });
   }
 
@@ -359,14 +376,14 @@ export abstract class ARankingView extends AView {
     // flag that it is a score but it also a reload function
     colDesc._score = true;
 
-    const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+    const ids = this.selectionHelper.rowIdsAsSet(<number[]>this.provider.getRankings()[0].getOrder());
     const data = score.compute(ids, this.itemIDType, args);
 
     const r = this.addColumn(colDesc, data, -1, position);
 
     // use _score function to reload the score
     colDesc._score = () => {
-      const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+      const ids = this.selectionHelper.rowIdsAsSet(<number[]>this.provider.getRankings()[0].getOrder());
       const data = score.compute(ids, this.itemIDType, args);
       return r.reload(data);
     };
@@ -386,7 +403,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected async withoutTracking<T>(f: () => T): Promise<T> {
-    return this.built.then(() => LinupTrackingManager.getInstance().withoutTracking(this.context.ref, f));
+    return this.built.then(() => LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f));
   }
 
   /**
@@ -440,9 +457,9 @@ export abstract class ARankingView extends AView {
       const cols = this.getColumnDescs(columns);
       // compatibility since visible is now a supported feature, so rename ones
       for (const col of cols) {
-        if (col.visible != null) {
-          (<any>col).initialColumn = col.visible;
-          delete col.visible;
+        if ((<IColumnOptions>col).visible != null) {
+          (<any>col).initialColumn = (<IColumnOptions>col).visible;
+          delete (<IColumnOptions>col).visible;
         }
       }
       deriveColors(cols);
@@ -455,8 +472,6 @@ export abstract class ARankingView extends AView {
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];
       columns.forEach((c) => this.provider.pushDesc(c));
-
-      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
 
       const rows: IRow[] = r[1];
 
@@ -473,7 +488,7 @@ export abstract class ARankingView extends AView {
       this.builtLineUp(this.provider);
 
       //record after the initial one
-      LinupTrackingManager.getInstance().clueify(this.context.ref, this.context.graph);
+      LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
       this.setBusy(false);
     }).catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
@@ -534,7 +549,7 @@ export abstract class ARankingView extends AView {
    */
   protected clear() {
     //reset
-    return LinupTrackingManager.getInstance().untrack(this.context.ref).then(() => {
+    return LineupTrackingManager.getInstance().untrack(this.context.ref).then(() => {
       this.provider.clearRankings();
       this.provider.clearSelection();
       this.provider.clearData();

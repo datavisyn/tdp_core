@@ -16,10 +16,11 @@ export class OverviewColumn extends BooleanColumn {
 
   constructor(id: string, desc: IBooleanColumnDesc) {
     super(id, Object.assign(desc, {
-      label: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection')
+      label: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection'),
+      renderer: 'boolean',
+      groupRenderer: 'boolean',
+      summaryRenderer: 'categorical'
     }));
-    this.setDefaultRenderer('boolean');
-    this.setDefaultGroupRenderer('boolean');
     this.setWidthImpl(0); // hide
   }
 
@@ -29,7 +30,7 @@ export class OverviewColumn extends BooleanColumn {
 
   setOverview(rows?: any[], name = I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.focus')) {
     this.currentOverview = {name, rows};
-    this.fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, this.overviewSelection = new Set<any>(rows || []));
+    (<OverviewColumn>this).fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, this.overviewSelection = new Set<any>(rows || []));
   }
 
   getOverview() {
