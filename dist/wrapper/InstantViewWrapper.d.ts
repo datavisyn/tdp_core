@@ -9,7 +9,7 @@
  *
  *********************************************************/
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
-import 'imports-loader?jQuery=jquery!bootstrap-sass/assets/javascripts/bootstrap.js';
+import 'bootstrap-sass/assets/javascripts/bootstrap.js';
 import { IInstanceViewExtensionDesc, IItemSelection } from '../base/interfaces';
 export declare class InstantViewWrapper {
     readonly node: HTMLElement;
