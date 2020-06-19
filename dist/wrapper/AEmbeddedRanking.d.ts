@@ -7,7 +7,7 @@ import { IScore } from '../base/interfaces';
 import { IRow } from '../base/rest';
 import { IFormElementDesc } from '../form/interfaces';
 import { ILazyLoadedColumn } from '../lineup/internal/column';
-interface IEmbeddedRanking extends ARankingView {
+export interface IEmbeddedRanking extends ARankingView {
     rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
     runWithoutTracking<T>(f: () => T): Promise<T>;
 }
@@ -38,4 +38,3 @@ export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewP
      */
     protected getParameterFormDescs(): IFormElementDesc[];
 }
-export {};
