@@ -4,8 +4,7 @@
 
 import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry} from 'phovea_core';
 import {AppHeaderLink, AppHeader} from 'phovea_ui';
-import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
-import 'bootstrap-sass/assets/javascripts/bootstrap.js';
+import 'phovea_ui/dist/webpack/_bootstrap';
 import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
 import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
 import {DialogUtils} from './base/dialogs';

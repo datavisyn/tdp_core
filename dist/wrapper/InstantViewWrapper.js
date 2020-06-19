@@ -8,8 +8,7 @@
  * Proprietary and confidential. No warranty.
  *
  *********************************************************/
-import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
-import 'bootstrap-sass/assets/javascripts/bootstrap.js';
+import 'phovea_ui/dist/webpack/_bootstrap';
 import { FindViewUtils } from '../views/FindViewUtils';
 export class InstantViewWrapper {
     constructor(doc = document) {

@@ -3,8 +3,7 @@
  */
 import { ProvenanceGraph } from 'phovea_core';
 import { AppHeader } from 'phovea_ui';
-import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
-import 'bootstrap-sass/assets/javascripts/bootstrap.js';
+import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ACLUEWrapper } from 'phovea_clue';
 import 'phovea_ui/dist/webpack/_font-awesome';
 import { TourManager } from './tour/TourManager';
