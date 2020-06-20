@@ -11,12 +11,12 @@ export interface IParameterAble {
     setParameterImpl(name: string, value: any): any;
 }
 export declare class TDPApplicationUtils {
-    private static readonly MIN;
-    private static readonly HOUR;
-    private static readonly DAY;
-    private static readonly CMD_INIT_SESSION;
-    private static readonly CMD_SET_PARAMETER;
-    private static readonly getAreas;
+    static readonly MIN = 60;
+    static readonly HOUR: number;
+    static readonly DAY: number;
+    static readonly CMD_INIT_SESSION = "tdpInitSession";
+    static readonly CMD_SET_PARAMETER = "tdpSetParameter";
+    static readonly getAreas: () => [number, string | ((d: number) => string)][];
     /**
      * see http://momentjs.com/docs/#/displaying/fromnow/
      * @param {Date} date

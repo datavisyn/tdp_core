@@ -19,14 +19,14 @@ export interface IParameterAble {
 
 export class TDPApplicationUtils {
 
-  private static readonly MIN = 60;
-  private static readonly HOUR = TDPApplicationUtils.MIN * 60;
-  private static readonly DAY = TDPApplicationUtils.HOUR * 24;
+  static readonly MIN = 60;
+  static readonly HOUR = TDPApplicationUtils.MIN * 60;
+  static readonly DAY = TDPApplicationUtils.HOUR * 24;
   //old name
-  private static readonly CMD_INIT_SESSION = 'tdpInitSession';
-  private static readonly CMD_SET_PARAMETER = 'tdpSetParameter';
+  static readonly CMD_INIT_SESSION = 'tdpInitSession';
+  static readonly CMD_SET_PARAMETER = 'tdpSetParameter';
 
-  private static readonly getAreas: () => [number, string | ((d: number) => string)][] = () => {
+  static readonly getAreas: () => [number, string | ((d: number) => string)][] = () => {
     return [
       [-1, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.future')],
       [43, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.fewSecondsAgo')],
