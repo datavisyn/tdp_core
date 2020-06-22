@@ -221,6 +221,12 @@ export class TDPApplicationUtils {
     static compressSetParameter(path) {
         return Compression.lastOnly(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p) => `${p.requires[0].id}_${p.parameter.name}`);
     }
+    /**
+     * @deprecated
+     */
+    static compressSetParameterOld(path) {
+        return Compression.lastOnly(path, 'targidSetParameter', (p) => `${p.requires[0].id}_${p.parameter.name}`);
+    }
 }
 TDPApplicationUtils.MIN = 60;
 TDPApplicationUtils.HOUR = TDPApplicationUtils.MIN * 60;

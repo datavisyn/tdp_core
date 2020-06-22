@@ -40,4 +40,8 @@ export declare class TDPApplicationUtils {
     }>;
     static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("phovea_core").IAction;
     static compressSetParameter(path: ActionNode[]): ActionNode[];
+    /**
+     * @deprecated
+     */
+    static compressSetParameterOld(path: ActionNode[]): ActionNode[];
 }
