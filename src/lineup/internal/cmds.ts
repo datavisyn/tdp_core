@@ -4,7 +4,7 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult, ActionNode} from 'phovea_core/src/provenance';
-import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
+import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, EAggregationState, IOrderedGroup} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
 import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
@@ -31,6 +31,7 @@ enum LineUpCmds {
   CMD_SET_COLUMN = 'lineupSetColumn',
   CMD_ADD_COLUMN = 'lineupAddColumn',
   CMD_MOVE_COLUMN = 'lineupMoveColumn',
+  CMD_SET_AGGREGATION = 'lineupSetAggregation'
 }
 
 //TODO better solution
@@ -209,6 +210,30 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
   return action(meta(i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), cat.layout, op.update), LineUpCmds.CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
     rid,
     columns
+  });
+}
+
+export function setAggregation(provider: IObjectRef<any>, rid: number, groups: IOrderedGroup | IOrderedGroup[], value: boolean) {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeAggregation'), cat.layout, op.update), LineUpCmds.CMD_SET_AGGREGATION, setAggregationImpl, [provider], {
+    rid,
+    groups,
+    value
+  });
+}
+
+export async function setAggregationImpl(inputs: IObjectRef<any>[], parameter: any) {
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const ranking = p.getRankings()[parameter.rid];
+
+  const waitForAggregated = dirtyRankingWaiter(ranking);
+  const groups = Array.isArray(parameter.groups) ? parameter.groups : [parameter.groups];
+  ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
+
+  p.aggregateAllOf(ranking, parameter.value, groups);
+  const inverseValue = !parameter.value;
+
+  return waitForAggregated({
+    inverse: setAggregation(inputs[0], parameter.rid, parameter.groups, inverseValue)
   });
 }
 
@@ -754,6 +779,20 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     const rid = rankingId(provider, ranking);
     graph.pushWithResult(moveColumn(objectRef, rid, null, oldIndex, index), {
       inverse: moveColumn(objectRef, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
+    });
+  });
+
+  provider.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, (ranking: any, groups: IOrderedGroup | IOrderedGroup[], action: boolean | -1 | 0) => {
+    if (ignore(LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED, objectRef)) {
+      return;
+    }
+
+    const rid = rankingId(provider, ranking);
+    const newValue = typeof action === 'boolean' ? action : (action === -1 ? false : true);
+    const old = !newValue;
+
+    graph.pushWithResult(setAggregation(objectRef, rid, groups, newValue), {
+      inverse: setAggregation(objectRef, rid, groups, old)
     });
   });
 
