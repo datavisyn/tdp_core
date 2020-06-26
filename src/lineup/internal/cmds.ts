@@ -4,7 +4,7 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult, ActionNode} from 'phovea_core/src/provenance';
-import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, EAggregationState, IOrderedGroup} from 'lineupjs';
+import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, EAggregationState, IOrderedGroup, IGroup} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
 import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
@@ -213,27 +213,57 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
   });
 }
 
-export function setAggregation(provider: IObjectRef<any>, rid: number, groups: IOrderedGroup | IOrderedGroup[], value: boolean) {
-  return action(meta(i18n.t('tdp:core.lineup.cmds.changeAggregation'), cat.layout, op.update), LineUpCmds.CMD_SET_AGGREGATION, setAggregationImpl, [provider], {
+interface IAggregationParameter {
+  /**
+   * Ranking ID
+   */
+  rid: number;
+  
+  /**
+   * Single or multiple group names
+   */
+  group: string | string[];
+
+  /**
+   * Aggregation value
+   */
+  value: number;
+}
+
+export function setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number) {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeAggregation'), cat.layout, op.update), LineUpCmds.CMD_SET_AGGREGATION, setAggregationImpl, [provider], <IAggregationParameter>{
     rid,
-    groups,
+    group,
     value
   });
 }
 
-export async function setAggregationImpl(inputs: IObjectRef<any>[], parameter: any) {
+export async function setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter) {
   const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
   const ranking = p.getRankings()[parameter.rid];
 
   const waitForAggregated = dirtyRankingWaiter(ranking);
-  const groups = Array.isArray(parameter.groups) ? parameter.groups : [parameter.groups];
   ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
 
-  p.aggregateAllOf(ranking, parameter.value, groups);
-  const inverseValue = !parameter.value;
+  let inverseValue: number;
+
+  if (Array.isArray(parameter.group)) {
+    // use `filter()` for multiple groups
+    const groups = ranking.getFlatGroups().filter((d) => parameter.group.includes(d.name));
+    inverseValue = groups.map((group) => p.getTopNAggregated(ranking, group))[0]; // TODO: avoid `previousTopN[0]`; requires support for `number[]` in LineUp `setTopNAggregated()`
+    p.setTopNAggregated(ranking, groups, parameter.value);
+
+  } else {
+    // use `find()` to avoid unnecessary iterations for single groups
+    const group = ranking.getFlatGroups().find((d) => d.name === parameter.group);
+    inverseValue = p.getTopNAggregated(ranking, group); // default = -1 if group === undefined (see LineUp code)
+    if (group) {
+      p.setTopNAggregated(ranking, group, parameter.value);
+    }
+  }
 
   return waitForAggregated({
-    inverse: setAggregation(inputs[0], parameter.rid, parameter.groups, inverseValue)
+    inverse: setAggregation(inputs[0], parameter.rid, parameter.group, inverseValue)
   });
 }
 
@@ -782,17 +812,17 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     });
   });
 
-  provider.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, (ranking: any, groups: IOrderedGroup | IOrderedGroup[], action: boolean | -1 | 0) => {
+  provider.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, (ranking: Ranking, groups: IGroup | IGroup[], previousTopN: number | number[], currentTopN: number) => {
     if (ignore(LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED, objectRef)) {
       return;
     }
 
     const rid = rankingId(provider, ranking);
-    const newValue = typeof action === 'boolean' ? action : (action === -1 ? false : true);
-    const old = !newValue;
+    const groupNames = Array.isArray(groups) ? groups.map((g) => g.name) : groups.name;
+    const old = Array.isArray(previousTopN) ? previousTopN[0] : previousTopN; // TODO: avoid `previousTopN[0]`; requires support for `number[]` in LineUp `setTopNAggregated()`
 
-    graph.pushWithResult(setAggregation(objectRef, rid, groups, newValue), {
-      inverse: setAggregation(objectRef, rid, groups, old)
+    graph.pushWithResult(setAggregation(objectRef, rid, groupNames, currentTopN), {
+      inverse: setAggregation(objectRef, rid, groupNames, old) 
     });
   });
 
