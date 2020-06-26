@@ -4,10 +4,10 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult, ActionNode} from 'phovea_core/src/provenance';
-import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
+import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
-import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
+import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter, restoreGroupByValue, serializeGroupByValue} from './cmds/filter';
 import {isEqual} from 'lodash';
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
@@ -20,6 +20,7 @@ enum LineUpTrackAndUntrackActions {
   sortMethod = 'sortMethod',
   ChangedFilter = 'Changed.filter',
   width = 'width',
+  grouping = 'grouping'
 }
 
 // Actions that originate from LineUp
@@ -245,6 +246,18 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         const value = isSerializedFilter(parameter.value) ? restoreLineUpFilter(parameter.value) : parameter.value;
         source[`set${prop}`].call(source, value);
         break;
+      case LineUpTrackAndUntrackActions.grouping:
+        if (source instanceof NumberColumn) {
+          bak = source[`getGroupThresholds`]();
+          source[`setGroupThresholds`].call(source, parameter.value);
+        } else if (source instanceof StringColumn) {
+          bak = source[`getGroupCriteria`]();
+          source[`setGroupCriteria`].call(source, restoreGroupByValue(parameter.value));
+        } else if (source instanceof DateColumn) {
+          bak = source[`getDateGrouper`]();
+          source[`setDateGrouper`].call(source, parameter.value);
+        }
+        break;
       default:
         bak = source[`get${prop}`]();
         source[`set${prop}`].call(source, parameter.value);
@@ -400,6 +413,10 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       if (property === LineUpTrackAndUntrackActions.filter) {
         newValue = isLineUpStringFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
       }
+
+      if (property === LineUpTrackAndUntrackActions.grouping && source instanceof StringColumn) {
+        newValue = serializeGroupByValue(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+      }
       if (initialState !== undefined && isEqual(initialState, newValue)) {
         return;
       }
@@ -502,6 +519,9 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
     }
 
   } else if (col instanceof NumberColumn) {
+
+    recordPropertyChange(col, provider, objectRef, graph, 'grouping', null, bufferOrExecute);
+
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
       if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, objectRef)) {
         return;
@@ -518,6 +538,9 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
 
   } else if (col instanceof OrdinalColumn) {
     recordPropertyChange(col, provider, objectRef, graph, 'mapping');
+
+  } else if (col instanceof StringColumn || col instanceof DateColumn) {
+    recordPropertyChange(col, provider, objectRef, graph, 'grouping', null, bufferOrExecute);
   }
 }
 
@@ -533,8 +556,11 @@ function untrackColumn(col: Column) {
     col.children.forEach(untrackColumn);
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);
+    col.on(`${NumberColumn.EVENT_GROUPING_CHANGED}.track`, null);
   } else if (col instanceof ScriptColumn) {
     col.on(`${ScriptColumn.EVENT_SCRIPT_CHANGED}.track`, null);
+  } else if (col instanceof StringColumn || col instanceof DateColumn) {
+    col.on(`${StringColumn.EVENT_GROUPING_CHANGED}.track`, null);
   }
 }
 
