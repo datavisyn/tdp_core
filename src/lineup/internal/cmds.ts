@@ -218,7 +218,7 @@ interface IAggregationParameter {
    * Ranking ID
    */
   rid: number;
-  
+
   /**
    * Single or multiple group names
    */
@@ -822,7 +822,7 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     const old = Array.isArray(previousTopN) ? previousTopN[0] : previousTopN; // TODO: avoid `previousTopN[0]`; requires support for `number[]` in LineUp `setTopNAggregated()`
 
     graph.pushWithResult(setAggregation(objectRef, rid, groupNames, currentTopN), {
-      inverse: setAggregation(objectRef, rid, groupNames, old) 
+      inverse: setAggregation(objectRef, rid, groupNames, old)
     });
   });
 
