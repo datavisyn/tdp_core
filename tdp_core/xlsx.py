@@ -44,7 +44,7 @@ def _xlsx2json():
   if not file:
     abort(403, 'missing file')
 
-  wb = load_workbook(file, read_only=True)
+  wb = load_workbook(file, read_only=True, data_only=True)
 
   def convert_row(row, cols):
     result = {}
@@ -82,7 +82,7 @@ def _xlsx2json_array():
   if not file:
     abort(403, 'missing file')
 
-  wb = load_workbook(file, read_only=True)
+  wb = load_workbook(file, read_only=True, data_only=True)
 
   def convert_row(row):
     return [_convert_value(cell.value) for cell in row]
