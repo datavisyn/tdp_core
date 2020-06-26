@@ -227,10 +227,10 @@ interface IAggregationParameter {
   /**
    * Aggregation value
    */
-  value: number;
+  value: number | number[];
 }
 
-export function setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number) {
+export function setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]) {
   return action(meta(i18n.t('tdp:core.lineup.cmds.changeAggregation'), cat.layout, op.update), LineUpCmds.CMD_SET_AGGREGATION, setAggregationImpl, [provider], <IAggregationParameter>{
     rid,
     group,
@@ -245,12 +245,12 @@ export async function setAggregationImpl(inputs: IObjectRef<any>[], parameter: I
   const waitForAggregated = dirtyRankingWaiter(ranking);
   ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
 
-  let inverseValue: number;
+  let inverseValue: number | number[];
 
   if (Array.isArray(parameter.group)) {
     // use `filter()` for multiple groups
     const groups = ranking.getFlatGroups().filter((d) => parameter.group.includes(d.name));
-    inverseValue = groups.map((group) => p.getTopNAggregated(ranking, group))[0]; // TODO: avoid `previousTopN[0]`; requires support for `number[]` in LineUp `setTopNAggregated()`
+    inverseValue = groups.map((group) => p.getTopNAggregated(ranking, group));
     p.setTopNAggregated(ranking, groups, parameter.value);
 
   } else {
@@ -819,10 +819,9 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
 
     const rid = rankingId(provider, ranking);
     const groupNames = Array.isArray(groups) ? groups.map((g) => g.name) : groups.name;
-    const old = Array.isArray(previousTopN) ? previousTopN[0] : previousTopN; // TODO: avoid `previousTopN[0]`; requires support for `number[]` in LineUp `setTopNAggregated()`
 
     graph.pushWithResult(setAggregation(objectRef, rid, groupNames, currentTopN), {
-      inverse: setAggregation(objectRef, rid, groupNames, old)
+      inverse: setAggregation(objectRef, rid, groupNames, previousTopN)
     });
   });
 
