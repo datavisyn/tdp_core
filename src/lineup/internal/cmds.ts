@@ -4,7 +4,7 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult, ActionNode} from 'phovea_core/src/provenance';
-import {EngineRenderer, TaggleRenderer, ADialog, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
+import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, EAggregationState, IOrderedGroup, IGroup} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
 import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
@@ -31,6 +31,7 @@ enum LineUpCmds {
   CMD_SET_COLUMN = 'lineupSetColumn',
   CMD_ADD_COLUMN = 'lineupAddColumn',
   CMD_MOVE_COLUMN = 'lineupMoveColumn',
+  CMD_SET_AGGREGATION = 'lineupSetAggregation'
 }
 
 //TODO better solution
@@ -209,6 +210,60 @@ export function setGroupCriteria(provider: IObjectRef<any>, rid: number, columns
   return action(meta(i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), cat.layout, op.update), LineUpCmds.CMD_SET_GROUP_CRITERIA, setGroupCriteriaImpl, [provider], {
     rid,
     columns
+  });
+}
+
+interface IAggregationParameter {
+  /**
+   * Ranking ID
+   */
+  rid: number;
+
+  /**
+   * Single or multiple group names
+   */
+  group: string | string[];
+
+  /**
+   * Aggregation value
+   */
+  value: number | number[];
+}
+
+export function setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]) {
+  return action(meta(i18n.t('tdp:core.lineup.cmds.changeAggregation'), cat.layout, op.update), LineUpCmds.CMD_SET_AGGREGATION, setAggregationImpl, [provider], <IAggregationParameter>{
+    rid,
+    group,
+    value
+  });
+}
+
+export async function setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter) {
+  const p: LocalDataProvider = await resolveImmediately((await inputs[0].v).data);
+  const ranking = p.getRankings()[parameter.rid];
+
+  const waitForAggregated = dirtyRankingWaiter(ranking);
+  ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
+
+  let inverseValue: number | number[];
+
+  if (Array.isArray(parameter.group)) {
+    // use `filter()` for multiple groups
+    const groups = ranking.getFlatGroups().filter((d) => parameter.group.includes(d.name));
+    inverseValue = groups.map((group) => p.getTopNAggregated(ranking, group));
+    p.setTopNAggregated(ranking, groups, parameter.value);
+
+  } else {
+    // use `find()` to avoid unnecessary iterations for single groups
+    const group = ranking.getFlatGroups().find((d) => d.name === parameter.group);
+    inverseValue = p.getTopNAggregated(ranking, group); // default = -1 if group === undefined (see LineUp code)
+    if (group) {
+      p.setTopNAggregated(ranking, group, parameter.value);
+    }
+  }
+
+  return waitForAggregated({
+    inverse: setAggregation(inputs[0], parameter.rid, parameter.group, inverseValue)
   });
 }
 
@@ -754,6 +809,19 @@ function trackRanking(lineup: EngineRenderer | TaggleRenderer, provider: LocalDa
     const rid = rankingId(provider, ranking);
     graph.pushWithResult(moveColumn(objectRef, rid, null, oldIndex, index), {
       inverse: moveColumn(objectRef, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
+    });
+  });
+
+  provider.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, (ranking: Ranking, groups: IGroup | IGroup[], previousTopN: number | number[], currentTopN: number) => {
+    if (ignore(LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED, objectRef)) {
+      return;
+    }
+
+    const rid = rankingId(provider, ranking);
+    const groupNames = Array.isArray(groups) ? groups.map((g) => g.name) : groups.name;
+
+    graph.pushWithResult(setAggregation(objectRef, rid, groupNames, currentTopN), {
+      inverse: setAggregation(objectRef, rid, groupNames, previousTopN)
     });
   });
 
