@@ -240,13 +240,16 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         bak = source[`getRenderer`]();
         source[`setRenderer`].call(source, parameter.value);
         break;
+
       case LineUpTrackAndUntrackActions.filter:
         bak = source[`get${prop}`]();
         // restore serialized regular expression before passing to LineUp
         const value = isSerializedFilter(parameter.value) ? restoreLineUpFilter(parameter.value) : parameter.value;
         source[`set${prop}`].call(source, value);
         break;
+
       case LineUpTrackAndUntrackActions.grouping:
+        // call different column methods dependending on column type
         if (source instanceof NumberColumn) {
           bak = source[`getGroupThresholds`]();
           source[`setGroupThresholds`].call(source, parameter.value);
@@ -258,6 +261,7 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
           source[`setDateGrouper`].call(source, parameter.value);
         }
         break;
+
       default:
         bak = source[`get${prop}`]();
         source[`set${prop}`].call(source, parameter.value);
@@ -417,6 +421,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       if (property === LineUpTrackAndUntrackActions.grouping && source instanceof StringColumn) {
         newValue = serializeGroupByValue(newValue); // serialize possible RegExp object to be properly stored as provenance graph
       }
+
       if (initialState !== undefined && isEqual(initialState, newValue)) {
         return;
       }
@@ -487,6 +492,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
         inverse: addColumn(objectRef, rid, path, index, null)
       });
     });
+
     col.on(`${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, (column, index: number) => {
       untrackColumn(column);
       if (ignore(CompositeColumn.EVENT_REMOVE_COLUMN, objectRef)) {
@@ -512,6 +518,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
         inverse: moveColumn(objectRef, rid, path, index, oldIndex > index ? oldIndex + 1 : oldIndex)
       });
     });
+
     col.children.forEach(trackColumn.bind(this, provider, objectRef, graph));
 
     if (col instanceof StackColumn) {
@@ -554,11 +561,14 @@ function untrackColumn(col: Column) {
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
     col.children.forEach(untrackColumn);
+
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);
     col.on(`${NumberColumn.EVENT_GROUPING_CHANGED}.track`, null);
+
   } else if (col instanceof ScriptColumn) {
     col.on(`${ScriptColumn.EVENT_SCRIPT_CHANGED}.track`, null);
+
   } else if (col instanceof StringColumn || col instanceof DateColumn) {
     col.on(`${StringColumn.EVENT_GROUPING_CHANGED}.track`, null);
   }
