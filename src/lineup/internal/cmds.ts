@@ -12,13 +12,14 @@ import {isEqual} from 'lodash';
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 enum LineUpTrackAndUntrackActions {
+  ChangedSuffix = 'Changed.track', // used as suffix in `untrack()`
+
   metaData = 'metaData',
   filter = 'filter',
   rendererType = 'rendererType', // important: the corresponding functions in LineUp are called `getRenderer` and `setRenderer` (see `setColumnImpl()` below)
   groupRenderer = 'groupRenderer',
   summaryRenderer = 'summaryRenderer',
   sortMethod = 'sortMethod',
-  ChangedFilter = 'Changed.filter',
   width = 'width',
   grouping = 'grouping', // important: the corresponding functions in LineUp vary on the column type (see `setColumnImpl()` below)
   mapping = 'mapping',
@@ -462,7 +463,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     execute(); // execute immediately
   };
 
-  source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
+  source.on(suffix(LineUpTrackAndUntrackActions.ChangedSuffix, property), delayed > 0 ? delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
 }
 
 /**
@@ -560,7 +561,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
  * @param col Column
  */
 function untrackColumn(col: Column) {
-  col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
+  col.on(suffix(LineUpTrackAndUntrackActions.ChangedSuffix, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
