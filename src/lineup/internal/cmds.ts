@@ -20,7 +20,7 @@ enum LineUpTrackAndUntrackActions {
   sortMethod = 'sortMethod',
   ChangedFilter = 'Changed.filter',
   width = 'width',
-  grouping = 'grouping'
+  grouping = 'grouping', // important: the corresponding functions in LineUp vary on the column type (see `setColumnImpl()` below)
 }
 
 // Actions that originate from LineUp
@@ -418,7 +418,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
         newValue = isLineUpStringFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
       }
 
-      if (property === LineUpTrackAndUntrackActions.grouping && source instanceof StringColumn) {
+      if (property === LineUpTrackAndUntrackActions.grouping && source instanceof StringColumn) { // only string columns can be grouped by RegExp
         newValue = serializeGroupByValue(newValue); // serialize possible RegExp object to be properly stored as provenance graph
       }
 
@@ -527,7 +527,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
 
   } else if (col instanceof NumberColumn) {
 
-    recordPropertyChange(col, provider, objectRef, graph, 'grouping', null, bufferOrExecute);
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
 
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
       if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, objectRef)) {
@@ -547,7 +547,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
     recordPropertyChange(col, provider, objectRef, graph, 'mapping');
 
   } else if (col instanceof StringColumn || col instanceof DateColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'grouping', null, bufferOrExecute);
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
   }
 }
 
