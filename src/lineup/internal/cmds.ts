@@ -21,6 +21,8 @@ enum LineUpTrackAndUntrackActions {
   ChangedFilter = 'Changed.filter',
   width = 'width',
   grouping = 'grouping', // important: the corresponding functions in LineUp vary on the column type (see `setColumnImpl()` below)
+  mapping = 'mapping',
+  script = 'script'
 }
 
 // Actions that originate from LineUp
@@ -224,8 +226,10 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   if (parameter.path) {
     source = ranking.findByPath(parameter.path);
   }
+
   ignoreNext = `${parameter.prop}Changed`;
-  if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
+
+  if (parameter.prop === LineUpTrackAndUntrackActions.mapping && source instanceof Column && isMapAbleColumn(source)) {
     bak = source.getMapping().toJSON();
     if (parameter.value.type.includes('linear')) {
       parameter.value.type = 'linear';
@@ -476,7 +480,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer, null, bufferOrExecute);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferOrExecute);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod, null, bufferOrExecute);
-  //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
+  //recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.width, 100);
 
   if (col instanceof CompositeColumn) {
     col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
@@ -535,16 +539,16 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
       }
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(setColumn(objectRef, rid, path, 'mapping', newValue.toJSON()), {
-        inverse: setColumn(objectRef, rid, path, 'mapping', old.toJSON())
+      graph.pushWithResult(setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, newValue.toJSON()), {
+        inverse: setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, old.toJSON())
       });
     });
 
   } else if (col instanceof ScriptColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'script', null, bufferOrExecute);
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.script, null, bufferOrExecute);
 
   } else if (col instanceof OrdinalColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'mapping');
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.mapping);
 
   } else if (col instanceof StringColumn || col instanceof DateColumn) {
     recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
