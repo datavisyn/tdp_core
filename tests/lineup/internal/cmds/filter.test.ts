@@ -1,5 +1,6 @@
 /// <reference types="jest" />
-import {serializeLineUpFilter, restoreLineUpFilter, isSerializedFilter, isLineUpStringFilter, restoreRegExp} from '../../../../src/lineup/internal/cmds/filter';
+import {serializeLineUpFilter, restoreLineUpFilter, isSerializedFilter, isLineUpStringFilter, restoreRegExp, serializeGroupByValue, restoreGroupByValue} from '../../../../src/lineup/internal/cmds/filter';
+import {EStringGroupCriteriaType} from 'lineupjs';
 
 // The following tests worked with LineUp v3.
 // With LineUp v4 the filter object changed
@@ -134,6 +135,83 @@ describe('Restore LineUp filter from provenance graph', () => {
     expect(() => {
       restoreLineUpFilter(<any>123456789); // typecast to pass unknown format
     }).toThrowError(new Error('Unknown LineUp filter format. Unable to restore the given filter.'));
+  });
+});
+
+describe('Serialize LineUp `Group by` dialog\'s value', () => {
+  it('object with `value: []`, `type: value`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.value, values: []};
+    const expectedValue = groupByValue;
+
+    expect(serializeGroupByValue(groupByValue)).toMatchObject(expectedValue);
+  });
+
+  it('object with `value: [A, B]`, `type: startsWith`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.startsWith, values: ['A', 'B']};
+    const expectedValue = groupByValue;
+
+    expect(serializeGroupByValue(groupByValue)).toMatchObject(expectedValue);
+  });
+
+  it('object with `value: [/abc/, /efg/]`, `type: regex`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.regex, values: [/abc/, /efg/]};
+    const expectedValue = {type: EStringGroupCriteriaType.regex, values: ['/abc/', '/efg/']};
+    const incorrectValue = {type: EStringGroupCriteriaType.regex, values: []};
+
+    expect(serializeGroupByValue(groupByValue)).toMatchObject(expectedValue);
+    expect(serializeGroupByValue(groupByValue)).not.toMatchObject(incorrectValue);
+  });
+
+  it('object with `value: []`, `type: regex`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.regex, values: []};
+    const expectedValue = groupByValue;
+    const incorrectValue = {type: EStringGroupCriteriaType.regex, values: [/abc/]};
+
+    expect(serializeGroupByValue(groupByValue)).toMatchObject(expectedValue);
+    expect(serializeGroupByValue(groupByValue)).not.toMatchObject(incorrectValue);
+  });
+});
+
+describe('Restore LineUp `Group By` dialog\'s value from provenance graph', () => {
+  it('object with `value: []`, `type: value`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.value, values: []};
+    const expectedValue = groupByValue;
+
+    expect(restoreGroupByValue(groupByValue)).toMatchObject(expectedValue);
+  });
+
+  it('object with `value: [A, B]`, `type: startsWith`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.startsWith, values: ['A', 'B']};
+    const expectedValue = groupByValue;
+
+    expect(restoreGroupByValue(groupByValue)).toMatchObject(expectedValue);
+  });
+
+  it('object with `value: ["/abc/", "/efg/"]`, `type: regex`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.regex, values: ['/abc/', '/efg/']};
+    const expectedValue = {type: EStringGroupCriteriaType.regex, values: [/abc/, /efg/]};
+    const incorrectValue = groupByValue;
+
+    expect(restoreGroupByValue(groupByValue)).toMatchObject(expectedValue);
+    expect(restoreGroupByValue(groupByValue)).not.toMatchObject(incorrectValue);
+  });
+
+  it('object with `value: ["/^abc$/"]`, `type: regex`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.regex, values: ['/^abc$/']};
+    const expectedValue = {type: EStringGroupCriteriaType.regex, values: [/^abc$/]};
+    const incorrectValue = groupByValue;
+
+    expect(restoreGroupByValue(groupByValue)).toMatchObject(expectedValue);
+    expect(restoreGroupByValue(groupByValue)).not.toMatchObject(incorrectValue);
+  });
+
+  it('object with `value: []`, `type: regex`', () => {
+    const groupByValue = {type: EStringGroupCriteriaType.regex, values: []};
+    const expectedValue = groupByValue;
+    const incorrectValue = {type: EStringGroupCriteriaType.regex, values: [/abc/]};
+
+    expect(restoreGroupByValue(groupByValue)).toMatchObject(expectedValue);
+    expect(restoreGroupByValue(groupByValue)).not.toMatchObject(incorrectValue);
   });
 });
 
