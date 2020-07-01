@@ -72,6 +72,12 @@ export default function (registry: IRegistry) {
       action: 'setRankingSortCriteria'
     }
   });
+  actionFunction('lineupSetAggregation', 'setAggregationImpl', () => System.import('./lineup/internal/cmds'), {
+    analytics: {
+      category: 'lineup',
+      action: 'setAggregation'
+    }
+  });
   actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => System.import('./lineup/internal/cmds'), {
     analytics: {
       category: 'lineup',
