@@ -4,22 +4,26 @@
 
 
 import {IObjectRef, action, meta, cat, op, ProvenanceGraph, ICmdResult, ActionNode} from 'phovea_core/src/provenance';
-import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, EAggregationState, IOrderedGroup, IGroup} from 'lineupjs';
+import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, IGroup, StringColumn, DateColumn} from 'lineupjs';
 import {resolveImmediately} from 'phovea_core/src';
 import i18n from 'phovea_core/src/i18n';
-import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter} from './cmds/filter';
+import {isSerializedFilter, restoreLineUpFilter, serializeLineUpFilter, isLineUpStringFilter, restoreGroupByValue, serializeGroupByValue} from './cmds/filter';
 import {isEqual} from 'lodash';
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 enum LineUpTrackAndUntrackActions {
+  ChangedSuffix = 'Changed.track', // used as suffix in `untrack()`
+
   metaData = 'metaData',
   filter = 'filter',
   rendererType = 'rendererType', // important: the corresponding functions in LineUp are called `getRenderer` and `setRenderer` (see `setColumnImpl()` below)
   groupRenderer = 'groupRenderer',
   summaryRenderer = 'summaryRenderer',
   sortMethod = 'sortMethod',
-  ChangedFilter = 'Changed.filter',
   width = 'width',
+  grouping = 'grouping', // important: the corresponding functions in LineUp vary on the column type (see `setColumnImpl()` below)
+  mapping = 'mapping',
+  script = 'script'
 }
 
 // Actions that originate from LineUp
@@ -278,8 +282,10 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
   if (parameter.path) {
     source = ranking.findByPath(parameter.path);
   }
+
   ignoreNext = `${parameter.prop}Changed`;
-  if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
+
+  if (parameter.prop === LineUpTrackAndUntrackActions.mapping && source instanceof Column && isMapAbleColumn(source)) {
     bak = source.getMapping().toJSON();
     if (parameter.value.type.includes('linear')) {
       parameter.value.type = 'linear';
@@ -294,12 +300,28 @@ export async function setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
         bak = source[`getRenderer`]();
         source[`setRenderer`].call(source, parameter.value);
         break;
+
       case LineUpTrackAndUntrackActions.filter:
         bak = source[`get${prop}`]();
         // restore serialized regular expression before passing to LineUp
         const value = isSerializedFilter(parameter.value) ? restoreLineUpFilter(parameter.value) : parameter.value;
         source[`set${prop}`].call(source, value);
         break;
+
+      case LineUpTrackAndUntrackActions.grouping:
+        // call different column methods dependending on column type
+        if (source instanceof NumberColumn) {
+          bak = source[`getGroupThresholds`]();
+          source[`setGroupThresholds`].call(source, parameter.value);
+        } else if (source instanceof StringColumn) {
+          bak = source[`getGroupCriteria`]();
+          source[`setGroupCriteria`].call(source, restoreGroupByValue(parameter.value));
+        } else if (source instanceof DateColumn) {
+          bak = source[`getDateGrouper`]();
+          source[`setDateGrouper`].call(source, parameter.value);
+        }
+        break;
+
       default:
         bak = source[`get${prop}`]();
         source[`set${prop}`].call(source, parameter.value);
@@ -455,6 +477,11 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
       if (property === LineUpTrackAndUntrackActions.filter) {
         newValue = isLineUpStringFilter(newValue) ? serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
       }
+
+      if (property === LineUpTrackAndUntrackActions.grouping && source instanceof StringColumn) { // only string columns can be grouped by RegExp
+        newValue = serializeGroupByValue(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+      }
+
       if (initialState !== undefined && isEqual(initialState, newValue)) {
         return;
       }
@@ -491,7 +518,7 @@ function recordPropertyChange(source: Column | Ranking, provider: LocalDataProvi
     execute(); // execute immediately
   };
 
-  source.on(`${property}Changed.track`, delayed > 0 ? delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
+  source.on(suffix(LineUpTrackAndUntrackActions.ChangedSuffix, property), delayed > 0 ? delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
 }
 
 /**
@@ -509,7 +536,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer, null, bufferOrExecute);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferOrExecute);
   recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod, null, bufferOrExecute);
-  //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
+  //recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.width, 100);
 
   if (col instanceof CompositeColumn) {
     col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
@@ -525,6 +552,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
         inverse: addColumn(objectRef, rid, path, index, null)
       });
     });
+
     col.on(`${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, (column, index: number) => {
       untrackColumn(column);
       if (ignore(CompositeColumn.EVENT_REMOVE_COLUMN, objectRef)) {
@@ -550,6 +578,7 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
         inverse: moveColumn(objectRef, rid, path, index, oldIndex > index ? oldIndex + 1 : oldIndex)
       });
     });
+
     col.children.forEach(trackColumn.bind(this, provider, objectRef, graph));
 
     if (col instanceof StackColumn) {
@@ -557,22 +586,28 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
     }
 
   } else if (col instanceof NumberColumn) {
+
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
+
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
       if (ignore(NumberColumn.EVENT_MAPPING_CHANGED, objectRef)) {
         return;
       }
       const rid = rankingId(provider, col.findMyRanker());
       const path = col.fqpath;
-      graph.pushWithResult(setColumn(objectRef, rid, path, 'mapping', newValue.toJSON()), {
-        inverse: setColumn(objectRef, rid, path, 'mapping', old.toJSON())
+      graph.pushWithResult(setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, newValue.toJSON()), {
+        inverse: setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, old.toJSON())
       });
     });
 
   } else if (col instanceof ScriptColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'script', null, bufferOrExecute);
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.script, null, bufferOrExecute);
 
   } else if (col instanceof OrdinalColumn) {
-    recordPropertyChange(col, provider, objectRef, graph, 'mapping');
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.mapping);
+
+  } else if (col instanceof StringColumn || col instanceof DateColumn) {
+    recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
   }
 }
 
@@ -581,15 +616,21 @@ function trackColumn(provider: LocalDataProvider, objectRef: IObjectRef<IViewPro
  * @param col Column
  */
 function untrackColumn(col: Column) {
-  col.on(suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
+  col.on(suffix(LineUpTrackAndUntrackActions.ChangedSuffix, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
 
   if (col instanceof CompositeColumn) {
     col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
     col.children.forEach(untrackColumn);
+
   } else if (col instanceof NumberColumn) {
     col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);
+    col.on(`${NumberColumn.EVENT_GROUPING_CHANGED}.track`, null);
+
   } else if (col instanceof ScriptColumn) {
     col.on(`${ScriptColumn.EVENT_SCRIPT_CHANGED}.track`, null);
+
+  } else if (col instanceof StringColumn || col instanceof DateColumn) {
+    col.on(`${StringColumn.EVENT_GROUPING_CHANGED}.track`, null);
   }
 }
 
