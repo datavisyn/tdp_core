@@ -9,6 +9,20 @@ export interface IViewProviderLocal {
         updateLineUpStats(): any;
     };
 }
+interface IAggregationParameter {
+    /**
+     * Ranking ID
+     */
+    rid: number;
+    /**
+     * Single or multiple group names
+     */
+    group: string | string[];
+    /**
+     * Aggregation value
+     */
+    value: number | number[];
+}
 export declare class LineupTrackingManager {
     private ignoreNext;
     /**
@@ -47,6 +61,8 @@ export declare class LineupTrackingManager {
     }[], isSorting?: boolean): any;
     setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): any;
     setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): any;
+    setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]): any;
+    setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter): any;
     setColumnImpl(inputs: IObjectRef<any>[], parameter: any): any;
     setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): any;
     addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): any;
@@ -137,3 +153,4 @@ export declare class LineupTrackingManager {
     private static instance;
     static getInstance(): LineupTrackingManager;
 }
+export {};

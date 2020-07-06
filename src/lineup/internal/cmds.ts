@@ -3,21 +3,25 @@
  */
 
 import {IObjectRef, ProvenanceGraph, ICmdResult, ResolveNow, I18nextManager, ObjectRefUtils, ActionMetaData, ActionUtils, ActionNode} from 'phovea_core';
-import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions} from 'lineupjs';
+import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn, IGroup} from 'lineupjs';
 
 import {LineUpFilterUtils} from './lineUpFilter';
 import {isEqual} from 'lodash';
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 enum LineUpTrackAndUntrackActions {
+  ChangedSuffix = 'Changed.track', // used as suffix in `untrack()`
+
   metaData = 'metaData',
   filter = 'filter',
   rendererType = 'rendererType', // important: the corresponding functions in LineUp are called `getRenderer` and `setRenderer` (see `setColumnImpl()` below)
   groupRenderer = 'groupRenderer',
   summaryRenderer = 'summaryRenderer',
   sortMethod = 'sortMethod',
-  ChangedFilter = 'Changed.filter',
   width = 'width',
+  grouping = 'grouping', // important: the corresponding functions in LineUp vary on the column type (see `setColumnImpl()` below)
+  mapping = 'mapping',
+  script = 'script'
 }
 
 // Actions that originate from LineUp
@@ -29,6 +33,7 @@ enum LineUpCmds {
   CMD_SET_COLUMN = 'lineupSetColumn',
   CMD_ADD_COLUMN = 'lineupAddColumn',
   CMD_MOVE_COLUMN = 'lineupMoveColumn',
+  CMD_SET_AGGREGATION = 'lineupSetAggregation'
 }
 
 export interface IViewProviderLocal {
@@ -54,6 +59,23 @@ interface IBufferedAction {
 
 type bufferOrExecute = (action: IBufferedAction, initialValue: any, isActionBuffered?: boolean) => void;
 
+
+interface IAggregationParameter {
+  /**
+   * Ranking ID
+   */
+  rid: number;
+
+  /**
+   * Single or multiple group names
+   */
+  group: string | string[];
+
+  /**
+   * Aggregation value
+   */
+  value: number | number[];
+}
 
 export class LineupTrackingManager {
 
@@ -206,7 +228,6 @@ export class LineupTrackingManager {
     });
   }
 
-
   public setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true) {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout,  ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIAS, LineupTrackingManager.getInstance().setSortCriteriaImpl, [provider], {
       rid,
@@ -214,7 +235,6 @@ export class LineupTrackingManager {
       isSorting
     });
   }
-
   public async setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
     const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
@@ -229,10 +249,48 @@ export class LineupTrackingManager {
     });
   }
 
+
   public setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), ObjectRefUtils.category.layout,  ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_GROUP_CRITERIA, LineupTrackingManager.getInstance().setGroupCriteriaImpl, [provider], {
       rid,
       columns
+    });
+  }
+
+  public setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]) {
+    return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeAggregation'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_AGGREGATION, LineupTrackingManager.getInstance().setAggregationImpl, [provider], <IAggregationParameter>{
+      rid,
+      group,
+      value
+    });
+  }
+
+  public async setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter) {
+    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const ranking = p.getRankings()[parameter.rid];
+
+    const waitForAggregated = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
+    LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
+
+    let inverseValue: number | number[];
+
+    if (Array.isArray(parameter.group)) {
+      // use `filter()` for multiple groups
+      const groups = ranking.getFlatGroups().filter((d) => parameter.group.includes(d.name));
+      inverseValue = groups.map((group) => p.getTopNAggregated(ranking, group));
+      p.setTopNAggregated(ranking, groups, parameter.value);
+
+    } else {
+      // use `find()` to avoid unnecessary iterations for single groups
+      const group = ranking.getFlatGroups().find((d) => d.name === parameter.group);
+      inverseValue = p.getTopNAggregated(ranking, group); // default = -1 if group === undefined (see LineUp code)
+      if (group) {
+        p.setTopNAggregated(ranking, group, parameter.value);
+      }
+    }
+
+    return waitForAggregated({
+      inverse: LineupTrackingManager.getInstance().setAggregation(inputs[0], parameter.rid, parameter.group, inverseValue)
     });
   }
 
@@ -247,8 +305,10 @@ export class LineupTrackingManager {
     if (parameter.path) {
       source = ranking.findByPath(parameter.path);
     }
+
     LineupTrackingManager.getInstance().ignoreNext = `${parameter.prop}Changed`;
-    if (parameter.prop === 'mapping' && source instanceof Column && isMapAbleColumn(source)) {
+
+    if (parameter.prop === LineUpTrackAndUntrackActions.mapping && source instanceof Column && isMapAbleColumn(source)) {
       bak = source.getMapping().toJSON();
       if (parameter.value.type.includes('linear')) {
         parameter.value.type = 'linear';
@@ -263,19 +323,34 @@ export class LineupTrackingManager {
           bak = source[`getRenderer`]();
           source[`setRenderer`].call(source, parameter.value);
           break;
+
         case LineUpTrackAndUntrackActions.filter:
           bak = source[`get${prop}`]();
           // restore serialized regular expression before passing to LineUp
           const value = LineUpFilterUtils.isSerializedFilter(parameter.value) ? LineUpFilterUtils.restoreLineUpFilter(parameter.value) : parameter.value;
           source[`set${prop}`].call(source, value);
           break;
+
+        case LineUpTrackAndUntrackActions.grouping:
+          // call different column methods dependending on column type
+          if (source instanceof NumberColumn) {
+            bak = source[`getGroupThresholds`]();
+            source[`setGroupThresholds`].call(source, parameter.value);
+          } else if (source instanceof StringColumn) {
+            bak = source[`getGroupCriteria`]();
+            source[`setGroupCriteria`].call(source, LineUpFilterUtils.restoreGroupByValue(parameter.value));
+          } else if (source instanceof DateColumn) {
+            bak = source[`getDateGrouper`]();
+            source[`setDateGrouper`].call(source, parameter.value);
+          }
+          break;
+
         default:
           bak = source[`get${prop}`]();
           source[`set${prop}`].call(source, parameter.value);
           break;
       }
     }
-
     return waitForSorted({
       inverse: LineupTrackingManager.getInstance().setColumn(inputs[0], parameter.rid, parameter.path, parameter.prop, bak)
     });
@@ -418,6 +493,9 @@ export class LineupTrackingManager {
         if (property === LineUpTrackAndUntrackActions.filter) {
           newValue = LineUpFilterUtils.isLineUpStringFilter(newValue) ? LineUpFilterUtils.serializeLineUpFilter(newValue) : newValue; // serialize possible RegExp object to be properly stored as provenance graph
         }
+        if (property === LineUpTrackAndUntrackActions.grouping && source instanceof StringColumn) { // only string columns can be grouped by RegExp
+          newValue = LineUpFilterUtils.serializeGroupByValue(newValue); // serialize possible RegExp object to be properly stored as provenance graph
+        }
         if (initialState !== undefined && isEqual(initialState, newValue)) {
           return;
         }
@@ -454,7 +532,7 @@ export class LineupTrackingManager {
       execute(); // execute immediately
     };
 
-    source.on(`${property}Changed.track`, delayed > 0 ? LineupTrackingManager.getInstance().delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
+    source.on(LineupTrackingManager.getInstance().suffix(LineUpTrackAndUntrackActions.ChangedSuffix, property), delayed > 0 ? LineupTrackingManager.getInstance().delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
   }
 
   /**
@@ -472,7 +550,7 @@ export class LineupTrackingManager {
     LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer, null, bufferOrExecute);
     LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferOrExecute);
     LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod, null, bufferOrExecute);
-    //recordPropertyChange(col, provider, lineup, graph, 'width', 100);
+    //recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.width, 100);
 
     if (col instanceof CompositeColumn) {
       col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index: number) => {
@@ -520,22 +598,25 @@ export class LineupTrackingManager {
       }
 
     } else if (col instanceof NumberColumn) {
+      LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
       col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
         if (LineupTrackingManager.getInstance().ignore(NumberColumn.EVENT_MAPPING_CHANGED, objectRef)) {
           return;
         }
         const rid = LineupTrackingManager.getInstance().rankingId(provider, col.findMyRanker());
         const path = col.fqpath;
-        graph.pushWithResult(LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, 'mapping', newValue.toJSON()), {
-          inverse: LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, 'mapping', old.toJSON())
+        graph.pushWithResult(LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, newValue.toJSON()), {
+          inverse: LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, old.toJSON())
         });
       });
 
     } else if (col instanceof ScriptColumn) {
-      LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, 'script', null, bufferOrExecute);
+      LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.script, null, bufferOrExecute);
 
     } else if (col instanceof OrdinalColumn) {
-      LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, 'mapping');
+      LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.mapping);
+    } else if (col instanceof StringColumn || col instanceof DateColumn) {
+      LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
     }
   }
 
@@ -544,15 +625,18 @@ export class LineupTrackingManager {
    * @param col Column
    */
   private untrackColumn(col: Column) {
-    col.on(LineupTrackingManager.getInstance().suffix(LineUpTrackAndUntrackActions.ChangedFilter, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
+    col.on(LineupTrackingManager.getInstance().suffix(LineUpTrackAndUntrackActions.ChangedSuffix, LineUpTrackAndUntrackActions.metaData, LineUpTrackAndUntrackActions.filter, LineUpTrackAndUntrackActions.width, LineUpTrackAndUntrackActions.rendererType, LineUpTrackAndUntrackActions.groupRenderer, LineUpTrackAndUntrackActions.summaryRenderer, LineUpTrackAndUntrackActions.sortMethod), null);
 
     if (col instanceof CompositeColumn) {
       col.on([`${CompositeColumn.EVENT_ADD_COLUMN}.track`, `${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, `${CompositeColumn.EVENT_MOVE_COLUMN}.track`], null);
       col.children.forEach(LineupTrackingManager.getInstance().untrackColumn);
     } else if (col instanceof NumberColumn) {
       col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, null);
+      col.on(`${NumberColumn.EVENT_GROUPING_CHANGED}.track`, null);
     } else if (col instanceof ScriptColumn) {
       col.on(`${ScriptColumn.EVENT_SCRIPT_CHANGED}.track`, null);
+    } else if (col instanceof StringColumn || col instanceof DateColumn) {
+      col.on(`${StringColumn.EVENT_GROUPING_CHANGED}.track`, null);
     }
   }
 
@@ -755,6 +839,19 @@ export class LineupTrackingManager {
       const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
       graph.pushWithResult(LineupTrackingManager.getInstance().moveColumn(objectRef, rid, null, oldIndex, index), {
         inverse: LineupTrackingManager.getInstance().moveColumn(objectRef, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
+      });
+    });
+
+    provider.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, (ranking: Ranking, groups: IGroup | IGroup[], previousTopN: number | number[], currentTopN: number) => {
+      if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED, objectRef)) {
+        return;
+      }
+
+      const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
+      const groupNames = Array.isArray(groups) ? groups.map((g) => g.name) : groups.name;
+
+      graph.pushWithResult(LineupTrackingManager.getInstance().setAggregation(objectRef, rid, groupNames, currentTopN), {
+        inverse: LineupTrackingManager.getInstance().setAggregation(objectRef, rid, groupNames, previousTopN)
       });
     });
 

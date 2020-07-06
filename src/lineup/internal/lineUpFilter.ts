@@ -1,3 +1,5 @@
+import { IStringGroupCriteria } from 'lineupjs';
+
 /**
  * Basic LineUp string filter values
  */
@@ -49,6 +51,13 @@ interface ISerializableLineUpFilter {
    * Filter for missing values
    */
   filterMissing: boolean;
+}
+
+/**
+ * String column's group criterias as stored in the provenance graph.
+ */
+interface ISerializedStringGroupCriteria extends IStringGroupCriteria {
+  values: string[];
 }
 
 export class LineUpFilterUtils {
@@ -173,5 +182,36 @@ export class LineUpFilterUtils {
     }
 
     throw new Error('Unknown LineUp filter format. Unable to restore the given filter.');
+  }
+
+  /**
+   * Serializes LineUp StringColumn's `Group By` dialog's values, which can contain a RegExp objects to a string.
+   * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
+   * @param groupBy Value returned from the `Group By` dialog
+   */
+  static serializeGroupByValue(groupBy: IStringGroupCriteria) {
+    const {type, values} = groupBy;
+    if (type === 'regex') {
+      return {
+        type,
+        values: values.map((value) => value.toString())
+      };
+    }
+    return groupBy;
+  }
+
+  /**
+   * Restores LineUp StringColumn's Group By` dialog's values from the provenance graph and returns an `IStringGroupCriteria`.
+   * @param groupBy Value as saved in the provenance graph.
+   */
+  static restoreGroupByValue(groupBy: ISerializedStringGroupCriteria) {
+    const {type, values} = groupBy;
+    if (type === 'regex') {
+      return {
+        type,
+        values: values.map((value) => LineUpFilterUtils.restoreRegExp(value as string))
+      };
+    }
+    return groupBy;
   }
 }

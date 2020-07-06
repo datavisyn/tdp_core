@@ -62,6 +62,12 @@ export default function (registry) {
             action: 'setRankingSortCriteria'
         }
     });
+    actionFunction('lineupSetAggregation', 'setAggregationImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
+        analytics: {
+            category: 'lineup',
+            action: 'setAggregation'
+        }
+    });
     actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',

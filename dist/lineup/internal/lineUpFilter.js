@@ -110,5 +110,34 @@ export class LineUpFilterUtils {
         }
         throw new Error('Unknown LineUp filter format. Unable to restore the given filter.');
     }
+    /**
+     * Serializes LineUp StringColumn's `Group By` dialog's values, which can contain a RegExp objects to a string.
+     * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
+     * @param groupBy Value returned from the `Group By` dialog
+     */
+    static serializeGroupByValue(groupBy) {
+        const { type, values } = groupBy;
+        if (type === 'regex') {
+            return {
+                type,
+                values: values.map((value) => value.toString())
+            };
+        }
+        return groupBy;
+    }
+    /**
+     * Restores LineUp StringColumn's Group By` dialog's values from the provenance graph and returns an `IStringGroupCriteria`.
+     * @param groupBy Value as saved in the provenance graph.
+     */
+    static restoreGroupByValue(groupBy) {
+        const { type, values } = groupBy;
+        if (type === 'regex') {
+            return {
+                type,
+                values: values.map((value) => LineUpFilterUtils.restoreRegExp(value))
+            };
+        }
+        return groupBy;
+    }
 }
 //# sourceMappingURL=lineUpFilter.js.map

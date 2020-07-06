@@ -1,3 +1,4 @@
+import { IStringGroupCriteria } from 'lineupjs';
 /**
  * Basic LineUp string filter values
  */
@@ -43,6 +44,12 @@ interface ISerializableLineUpFilter {
      * Filter for missing values
      */
     filterMissing: boolean;
+}
+/**
+ * String column's group criterias as stored in the provenance graph.
+ */
+interface ISerializedStringGroupCriteria extends IStringGroupCriteria {
+    values: string[];
 }
 export declare class LineUpFilterUtils {
     /**
@@ -113,5 +120,19 @@ export declare class LineUpFilterUtils {
      * @returns Returns an `ILineUpStringFilter` which can be passed to LineUp
      */
     static restoreLineUpFilter(filter: LineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing?: boolean): ILineUpStringFilter;
+    /**
+     * Serializes LineUp StringColumn's `Group By` dialog's values, which can contain a RegExp objects to a string.
+     * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
+     * @param groupBy Value returned from the `Group By` dialog
+     */
+    static serializeGroupByValue(groupBy: IStringGroupCriteria): IStringGroupCriteria;
+    /**
+     * Restores LineUp StringColumn's Group By` dialog's values from the provenance graph and returns an `IStringGroupCriteria`.
+     * @param groupBy Value as saved in the provenance graph.
+     */
+    static restoreGroupByValue(groupBy: ISerializedStringGroupCriteria): ISerializedStringGroupCriteria | {
+        type: import("lineupjs").EStringGroupCriteriaType.regex;
+        values: RegExp[];
+    };
 }
 export {};

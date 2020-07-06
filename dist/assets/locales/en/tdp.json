@@ -183,7 +183,8 @@
         "setProperty": "Set Property {{prop}}",
         "addColumn": "Add Column",
         "removeColumn": "Remove Column",
-        "moveColumn": "Move Column"
+        "moveColumn": "Move Column",
+        "changeAggregation":"Change Aggregation"
       },
 
       "export": {
