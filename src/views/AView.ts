@@ -3,7 +3,7 @@
  */
 
 import {select} from 'd3';
-import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils} from 'phovea_core';
+import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils, WebpackEnv} from 'phovea_core';
 import {IFormElementDesc} from '../form/interfaces';
 import {FormBuilder} from '../form/FormBuilder';
 import {AFormElement} from '../form/elements/AFormElement';
@@ -13,7 +13,6 @@ import {ResolveUtils} from './ResolveUtils';
 import {EViewMode} from '../base/interfaces';
 import {IForm} from '../form/interfaces';
 
-declare const __DEBUG__;
 
 /**
  * base class for all views
@@ -163,7 +162,7 @@ export abstract class AView extends EventHandler implements IView {
   getParameter(name: string): any {
     const elem = this.getParameterElement(name);
     if (!elem) {
-      if (__DEBUG__ && this.params.length > 0) {
+      if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
         console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
       return this.paramsFallback.has(name) ? this.paramsFallback.get(name) : null;
@@ -191,7 +190,7 @@ export abstract class AView extends EventHandler implements IView {
   setParameter(name: string, value: any) {
     const elem = this.getParameterElement(name);
     if (!elem) {
-      if (__DEBUG__ && this.params.length > 0) {
+      if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
         console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
       this.paramsFallback.set(name, value);

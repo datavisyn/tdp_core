@@ -1,4 +1,4 @@
-import { BaseUtils, ResolveNow, EventHandler, IDTypeManager, Range, PluginRegistry, I18nextManager } from 'phovea_core';
+import { BaseUtils, ResolveNow, EventHandler, IDTypeManager, Range, PluginRegistry, I18nextManager, WebpackEnv } from 'phovea_core';
 import { LayoutContainerEvents } from 'phovea_ui';
 import { BuilderUtils } from 'phovea_ui';
 import { AView } from './AView';
@@ -264,7 +264,7 @@ export class CompositeView extends EventHandler {
         if (child) {
             return child.getParameter(rest);
         }
-        if (__DEBUG__) {
+        if (WebpackEnv.__DEBUG__) {
             console.warn('invalid parameter detected', name, this.context.desc);
         }
         return null;
@@ -275,7 +275,7 @@ export class CompositeView extends EventHandler {
         if (child) {
             return child.setParameter(rest, value);
         }
-        if (__DEBUG__) {
+        if (WebpackEnv.__DEBUG__) {
             console.warn('invalid parameter detected', name, this.context.desc);
         }
     }

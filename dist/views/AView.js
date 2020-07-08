@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 import { select } from 'd3';
-import { EventHandler, IDTypeManager, Range, I18nextManager, SelectionUtils } from 'phovea_core';
+import { EventHandler, IDTypeManager, Range, I18nextManager, SelectionUtils, WebpackEnv } from 'phovea_core';
 import { FormBuilder } from '../form/FormBuilder';
 import { AFormElement } from '../form/elements/AFormElement';
 import { ViewUtils } from './ViewUtils';
@@ -114,7 +114,7 @@ export class AView extends EventHandler {
     getParameter(name) {
         const elem = this.getParameterElement(name);
         if (!elem) {
-            if (__DEBUG__ && this.params.length > 0) {
+            if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
                 console.warn('invalid parameter detected use fallback', name, this.context.desc);
             }
             return this.paramsFallback.has(name) ? this.paramsFallback.get(name) : null;
@@ -138,7 +138,7 @@ export class AView extends EventHandler {
     setParameter(name, value) {
         const elem = this.getParameterElement(name);
         if (!elem) {
-            if (__DEBUG__ && this.params.length > 0) {
+            if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
                 console.warn('invalid parameter detected use fallback', name, this.context.desc);
             }
             this.paramsFallback.set(name, value);

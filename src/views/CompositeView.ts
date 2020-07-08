@@ -1,4 +1,4 @@
-import {BaseUtils, ResolveNow, EventHandler, IEvent, IDType, IDTypeManager, Range, PluginRegistry, I18nextManager} from 'phovea_core';
+import {BaseUtils, ResolveNow, EventHandler, IEvent, IDType, IDTypeManager, Range, PluginRegistry, I18nextManager, WebpackEnv} from 'phovea_core';
 import {
   IRootLayoutContainer,
   ISplitLayoutContainer,
@@ -44,8 +44,6 @@ export interface ICompositeViewPluginDesc extends IViewPluginDesc {
 export interface IACompositeViewOptions {
   showHeaders: boolean;
 }
-
-declare const __DEBUG__: boolean;
 
 
 export interface ICompositeInfo {
@@ -375,7 +373,7 @@ export class CompositeView extends EventHandler implements IView {
     if (child) {
       return child.getParameter(rest);
     }
-    if (__DEBUG__) {
+    if (WebpackEnv.__DEBUG__) {
       console.warn('invalid parameter detected', name, this.context.desc);
     }
     return null;
@@ -387,7 +385,7 @@ export class CompositeView extends EventHandler implements IView {
     if (child) {
       return child.setParameter(rest, value);
     }
-    if (__DEBUG__) {
+    if (WebpackEnv.__DEBUG__) {
       console.warn('invalid parameter detected', name, this.context.desc);
     }
   }
