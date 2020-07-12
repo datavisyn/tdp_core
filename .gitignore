@@ -19,7 +19,6 @@ __pycache__/
 node_modules/
 /src/**/*.js
 /tests/**/*.js
-*.map
 *.css
 /.cache-loader
 package-lock.json
