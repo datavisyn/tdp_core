@@ -483,7 +483,7 @@ def derive_columns(table_name, engine, columns=None):
             separated_categories = [category.split(separator) for category in categories]
             # flatten array
             categories = list(set([category for sublist in separated_categories for category in sublist]))
-            categories.sort() # sort list to avoid random order with each run
+            categories.sort()  # sort list to avoid random order with each run
         columns[col]['categories'] = categories
 
   return columns
