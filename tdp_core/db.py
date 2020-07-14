@@ -461,7 +461,7 @@ def derive_columns(table_name, engine, columns=None):
   # derive the missing domains and categories
   number_columns = [k for k, col in columns.items() if
                     col['type'] == 'number' and ('min' not in col or 'max' not in col)]
-  categorical_columns = [k for k, col in columns.items() if col['type'] == 'categorical' and 'categories' not in col]
+  categorical_columns = [k for k, col in columns.items() if (col['type'] == 'categorical' or col['type'] == 'set') and 'categories' not in col]
   if number_columns or categorical_columns:
     with session(engine) as s:
       if number_columns:
@@ -477,7 +477,14 @@ def derive_columns(table_name, engine, columns=None):
           template += """ AND {col} <> ''"""
         template += """ ORDER BY {col} ASC"""
         cats = s.execute(template.format(col=col, table=table_name))
-        columns[col]['categories'] = [str(r['cat']) for r in cats if r['cat'] is not None]
+        categories = [str(r['cat']) for r in cats if r['cat'] is not None]
+        if columns[col]['type'] == 'set':
+            separator = getattr(columns[col], 'separator', ';')
+            separated_categories = [category.split(separator) for category in categories]
+            # flatten array
+            categories = list(set([category for sublist in separated_categories for category in sublist]))
+            categories.sort()  # sort list to avoid random order with each run
+        columns[col]['categories'] = categories
 
   return columns
 
