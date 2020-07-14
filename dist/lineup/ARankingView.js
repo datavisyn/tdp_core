@@ -86,7 +86,8 @@ export class ARankingView extends AView {
             customProviderOptions: {
                 maxNestedSortingCriteria: Infinity,
                 maxGroupColumns: Infinity,
-                filterGlobally: true
+                filterGlobally: true,
+                propagateAggregationState: false
             }
         };
         // variants for deriving the item name

@@ -36,8 +36,7 @@
     "node": ">= 12.13"
   },
   "scripts": {
-    "clean": "rimraf build dist lib && npm run clean:compile",
-    "clean:compile": "rimraf src/**/*.map src/**/*.js src/**/*.d.ts tests/**/*.js tests/**/*.map tests/**/*.d.ts demo/**/*.js demo/**/*.map demo/**/*.d.ts",
+    "clean": "rimraf build dist lib",
     "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules",
     "compile": "tsc",
     "compile:watch": "tsc -w",
