@@ -98,7 +98,8 @@ export abstract class ARankingView extends AView {
     customProviderOptions: {
       maxNestedSortingCriteria: Infinity,
       maxGroupColumns: Infinity,
-      filterGlobally: true
+      filterGlobally: true,
+      propagateAggregationState: false
     }
   };
 
