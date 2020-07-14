@@ -167,8 +167,8 @@
       "access": "Access",
       "date": "Date",
       "actions": "Actions",
-      "sessionMessage": "A temporary session will only be stored in your local browser cache.It is not possible to share a link to states of this session with others. Only the {{latest}} most recent sessions will be stored.",
-      "paragraphText": "The persistent session will be stored on the server.By default, sessions are private, meaning that only the creator has access to it.If the status is set to public, others can also see the session and access certain states by opening a shared link.",
+      "sessionMessage": "A temporary session will only be stored in your local browser cache. It is not possible to share a link to states of this session with others. Only the {{latest}} most recent sessions will be stored.",
+      "paragraphText": "The persistent session will be stored on the server. By default, sessions are private, meaning that only the creator has access to it. If the status is set to public, others can also see the session and access certain states by opening a shared link.",
       "mySessions": "My Sessions",
       "otherSessions": "Other Sessions"
     },
