@@ -1,4 +1,4 @@
-import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IDataRow} from 'lineupjs';
+import {EngineRenderer, defaultOptions, updateLodRules, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IDataRow, spaceFillingRule} from 'lineupjs';
 import {AView} from '../views/AView';
 import {EViewMode, IViewContext, ISelection} from '../views';
 
@@ -15,7 +15,7 @@ import {debounce, mixin, resolveImmediately} from 'phovea_core/src';
 import LineUpColors from './internal/LineUpColors';
 import {IRow, IServerColumn, IServerColumnDesc} from '../rest';
 import {IContext, ISelectionAdapter, ISelectionColumn} from './selection';
-import LineUpPanelActions, {rule} from './internal/LineUpPanelActions';
+import LineUpPanelActions from './internal/LineUpPanelActions';
 import {addLazyColumn, ILazyLoadedColumn} from './internal/column';
 import {successfullySaved} from '../notifications';
 import {ISecureItem} from 'phovea_core/src/security';
@@ -147,7 +147,7 @@ export interface IARankingViewOptions {
    */
   enableStripedBackground: boolean;
 
-  itemRowHeight: number | ((row: any, index: number) => number) | null;
+  itemRowHeight: number | ((item: IGroupItem | IGroupData) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
   customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
@@ -190,6 +190,11 @@ export abstract class ARankingView extends AView {
   protected reloadData = debounce(() => this.reloadDataImpl(), 100);
 
   /**
+   * updates the list of available columns in the side panel
+   */
+  protected updatePanelChooser = debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
+
+  /**
    * promise resolved when everything is built
    * @type {any}
    */
@@ -226,7 +231,8 @@ export abstract class ARankingView extends AView {
     customProviderOptions: {
       maxNestedSortingCriteria: Infinity,
       maxGroupColumns: Infinity,
-      filterGlobally: true
+      filterGlobally: true,
+      propagateAggregationState: false
     }
   };
 
@@ -268,20 +274,20 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const config: ITaggleOptions = mixin(defaultOptions(), <Partial<ITaggleOptions>>{
+    const taggleOptions: ITaggleOptions = mixin(defaultOptions(), this.options.customOptions, <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
       labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
-      config.rowHeight = this.options.itemRowHeight;
+      taggleOptions.rowHeight = this.options.itemRowHeight;
     } else if (typeof this.options.itemRowHeight === 'function') {
       const f = this.options.itemRowHeight;
-      config.dynamicHeight = () => ({
-        defaultHeight: 18,
+      taggleOptions.dynamicHeight = () => ({
+        defaultHeight: taggleOptions.rowHeight,
         padding: () => 0,
         height: (item: IGroupItem | IGroupData) => {
-          return isGroup(item) ? 70 : f((<Partial<IDataRow & IGroupItem>>item).v, (<Partial<IDataRow & IGroupItem>>item).i);
+          return f(item) ?? (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
         }
       });
     }
@@ -289,7 +295,7 @@ export abstract class ARankingView extends AView {
 
 
     const lineupParent = <HTMLElement>this.node.firstElementChild!;
-    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, config) : new TaggleRenderer(this.provider, lineupParent, Object.assign(config, {
+    this.taggle = !this.options.enableOverviewMode ? new EngineRenderer(this.provider, lineupParent, taggleOptions) : new TaggleRenderer(this.provider, lineupParent, Object.assign(taggleOptions, {
       violationChanged: (_: IRule, violation: string) => this.panel.setViolation(violation)
     }));
 
@@ -299,6 +305,10 @@ export abstract class ARankingView extends AView {
     this.node.appendChild(luBackdrop);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
+    // When a new column desc is added to the provider, update the panel chooser
+    this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
+    // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
+    // this.provider.on(LocalDataProvider.EVENT_REMOVE_DESC, () => this.updatePanelChooser());
     this.panel.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
       this.saveNamedSet(order, name, description, sec);
     });
@@ -315,13 +325,15 @@ export abstract class ARankingView extends AView {
       this.taggle.zoomIn();
     });
     if (this.options.enableOverviewMode) {
-      this.panel.on(LineUpPanelActions.EVENT_RULE_CHANGED, (_event: any, rule: IRule) => {
-        updateLodRules(this.taggle.style, rule != null, config);
-        (<TaggleRenderer>this.taggle).switchRule(rule);
+      const rule = spaceFillingRule(taggleOptions);
+
+      this.panel.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event: any, isOverviewActive: boolean) => {
+        updateLodRules(this.taggle.style, isOverviewActive, taggleOptions);
+        (<TaggleRenderer>this.taggle).switchRule(isOverviewActive ? rule : null);
       });
+
       if (this.options.enableOverviewMode === 'active') {
-        updateLodRules(this.taggle.style, true, config);
-        (<TaggleRenderer>this.taggle).switchRule(rule);
+        this.panel.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, true);
       }
     }
 
@@ -488,7 +500,6 @@ export abstract class ARankingView extends AView {
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
-      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
     });
   }
 
@@ -595,8 +606,6 @@ export abstract class ARankingView extends AView {
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];
       columns.forEach((c) => this.provider.pushDesc(c));
-
-      this.panel.updateChooser(this.itemIDType, this.provider.getColumns());
 
       const rows: IRow[] = r[1];
 

@@ -167,8 +167,8 @@
       "access": "Access",
       "date": "Date",
       "actions": "Actions",
-      "sessionMessage": "A temporary session will only be stored in your local browser cache.It is not possible to share a link to states of this session with others. Only the {{latest}} most recent sessions will be stored.",
-      "paragraphText": "The persistent session will be stored on the server.By default, sessions are private, meaning that only the creator has access to it.If the status is set to public, others can also see the session and access certain states by opening a shared link.",
+      "sessionMessage": "A temporary session will only be stored in your local browser cache. It is not possible to share a link to states of this session with others. Only the {{latest}} most recent sessions will be stored.",
+      "paragraphText": "The persistent session will be stored on the server. By default, sessions are private, meaning that only the creator has access to it. If the status is set to public, others can also see the session and access certain states by opening a shared link.",
       "mySessions": "My Sessions",
       "otherSessions": "Other Sessions"
     },
@@ -183,7 +183,8 @@
         "setProperty": "Set Property {{prop}}",
         "addColumn": "Add Column",
         "removeColumn": "Remove Column",
-        "moveColumn": "Move Column"
+        "moveColumn": "Move Column",
+        "changeAggregation":"Change Aggregation"
       },
 
       "export": {
@@ -267,7 +268,7 @@
     },
 
     "views": {
-      "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server.However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application.Please use the following",
+      "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server. However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application. Please use the following",
       "link": "link",
       "noHttpsMessagePart2": " to open the website in a separate window:",
 
@@ -280,7 +281,7 @@
 
       "toOption": " to {{id}}",
       "noMappingFound": "No mapping found from the given gene {{name}}",
-      "please": "PLease",
+      "please": "Please",
       "externalApplication": "the external application",
       "openExternally": "click here to open {{name}}",
       "newTab": "in a new browser tab.",
