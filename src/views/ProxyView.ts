@@ -58,8 +58,8 @@ export default class ProxyView extends AD3View {
     this.openExternally = parent.ownerDocument.createElement('p');
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    super.init(params, onParameterChange);
+  async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
+    await super.init(params, onParameterChange);
 
     // inject stats
     const base = <HTMLElement>params.querySelector('form') || params;
