@@ -210,6 +210,10 @@ $lu_assets: '~lineupjs/src/assets';
       position: relative;
       color: #ffd700;
 
+      &:hover {
+        z-index: 2;
+      }
+
       &::before {
         content: $fa-var-exclamation-triangle;
       }
