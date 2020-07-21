@@ -45,8 +45,21 @@ export function click(elem: HTMLElement | string) {
   e.click();
 }
 
+export function doubleclick(elem: HTMLElement | string) {
+  const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
+  if (!e) {
+    return false;
+  }
+  const evt = new Event('dblclick');
+  e.dispatchEvent(evt);
+}
+
 export function clickSelector(this: { selector?: string}) {
   return click(this.selector);
+}
+
+export function doubleClickSelector(this: { selector?: string}) {
+  return doubleclick(this.selector);
 }
 
 /**
