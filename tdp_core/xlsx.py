@@ -121,7 +121,7 @@ def _json2xlsx():
     ws.append(to_header(col['name']) for col in cols)
 
     for row in sheet['rows']:
-      ws.append(str(to_value(row.get(col['name'], None), col['type'])) for col in cols)
+      ws.append(to_value(row.get(col['name'], None), col['type']) for col in cols)
 
   with NamedTemporaryFile() as tmp:
     wb.save(tmp.name)
