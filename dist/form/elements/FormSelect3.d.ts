@@ -3,7 +3,7 @@
  */
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc } from '../interfaces';
-import { IIdTextPair, ISelect3Item, ISelect3Options } from './Select3';
+import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
 import { ISelect2Option } from './FormSelect2';
 import { IPluginDesc } from 'phovea_core';
 import * as d3 from 'd3';
@@ -46,15 +46,15 @@ export declare class FormSelect3 extends AFormElement<IFormSelect3> {
     init(): void;
     /**
      * Returns the selected value or if nothing found `null`
-     * @returns {ISelect3Item<IIdTextPair> | string | (ISelect3Item<IIdTextPair> | string)[]}
+     * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
      */
-    get value(): (ISelect3Item<IIdTextPair> | string) | (ISelect3Item<IIdTextPair> | string)[];
+    get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[];
     hasValue(): boolean;
     /**
      * Select the option by value. If no value found, then the first option is selected.
      * @param v If string then compares to the option value property. Otherwise compares the object reference.
      */
-    set value(v: (ISelect3Item<IIdTextPair> | string) | (ISelect3Item<IIdTextPair> | string)[]);
+    set value(v: (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[]);
     focus(): void;
 }
 export {};

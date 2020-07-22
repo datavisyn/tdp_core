@@ -11,7 +11,7 @@ import {ISelectOptions, IFormSelectOption, FormSelect} from './FormSelect';
 import {FormSelect2} from './FormSelect2';
 import {BaseUtils, UserSession, ResolveNow, IPluginDesc, I18nextManager} from 'phovea_core';
 import {IFormElement} from '..';
-import {ISelect3Options, Select3, IIdTextPair} from './Select3';
+import {ISelect3Options, Select3, IdTextPair} from './Select3';
 import * as d3 from 'd3';
 
 export interface ISubDesc {
@@ -37,7 +37,7 @@ export interface ISubSelect2Desc extends ISubDesc {
   ajax?: any;
 }
 
-export interface ISubSelect3Desc extends Partial<ISelect3Options<IIdTextPair>>, ISubDesc {
+export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
   type: FormElementType.SELECT3;
   return?: 'text' | 'id';
   name: string;
@@ -327,7 +327,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           select3.value = [];
         }
         that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
-        select3.on(Select3.EVENT_SELECT, (evt, prev: IIdTextPair[], next: IIdTextPair[]) => {
+        select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
           row.value = next;
           this.fire(FormMap.EVENT_CHANGE, next);
         });

@@ -1,6 +1,6 @@
 import { EventHandler } from 'phovea_core';
 import 'select2';
-export interface IIdTextPair {
+export interface IdTextPair {
     id: string;
     text: string;
 }

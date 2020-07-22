@@ -4,7 +4,7 @@
 
 import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
-import {Select3, IIdTextPair, ISelect3Item, ISelect3Options} from './Select3';
+import {Select3, IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
 import {IPluginDesc} from 'phovea_core';
 import * as d3 from 'd3';
@@ -32,7 +32,7 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
 
   private readonly isMultiple: boolean;
 
-  private select3: Select3<IIdTextPair>;
+  private select3: Select3<IdTextPair>;
 
   /**
    * Constructor
@@ -71,19 +71,19 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   init() {
     super.init();
 
-    this.select3.on(Select3.EVENT_SELECT, (evt, prev: IIdTextPair[], next: IIdTextPair[]) => {
+    this.select3.on(Select3.EVENT_SELECT, (evt, prev: IdTextPair[], next: IdTextPair[]) => {
       this.fire(FormSelect3.EVENT_CHANGE, next);
     });
   }
 
   /**
    * Returns the selected value or if nothing found `null`
-   * @returns {ISelect3Item<IIdTextPair> | string | (ISelect3Item<IIdTextPair> | string)[]}
+   * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
    */
-  get value(): (ISelect3Item<IIdTextPair> | string) | (ISelect3Item<IIdTextPair> | string)[] {
+  get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[] {
     const returnValue = this.elementDesc.options.return;
     const returnFn = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
-    const value = <IIdTextPair[]>this.select3.value;
+    const value = <IdTextPair[]>this.select3.value;
 
     if (!value || value.length === 0) {
       return this.isMultiple ? [] : returnFn({id: '', text: ''});
@@ -100,8 +100,8 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
    * Select the option by value. If no value found, then the first option is selected.
    * @param v If string then compares to the option value property. Otherwise compares the object reference.
    */
-  set value(v: (ISelect3Item<IIdTextPair> | string) | (ISelect3Item<IIdTextPair> | string)[]) {
-    const toIIdTextPair = (d) => {
+  set value(v: (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[]) {
+    const toIdTextPair = (d) => {
       if (typeof d === 'string') {
         return {id: d, text: d};
       } else {
@@ -120,11 +120,11 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
 
     this.previousValue = this.select3.value;
     if (Array.isArray(v) && v.length > 0 && !this.isMultiple) { // an array of items or string (id or text)
-      this.select3.value = v.slice(0, 1).map(toIIdTextPair);
+      this.select3.value = v.slice(0, 1).map(toIdTextPair);
     } else if (Array.isArray(v) && v.length > 0 && this.isMultiple) {
-      this.select3.value = v.map(toIIdTextPair);
+      this.select3.value = v.map(toIdTextPair);
     } else if (!Array.isArray(v)) { // an item or string (id or text)
-      this.select3.value = [toIIdTextPair(v)];
+      this.select3.value = [toIdTextPair(v)];
     }
     this.updateStoredValue();
   }
