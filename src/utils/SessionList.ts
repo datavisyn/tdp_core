@@ -267,6 +267,8 @@ export class PersistentSessionList extends ASessionList {
 
     $parent.selectAll('ul.nav-tabs a').on('click', function () {
       (<Event>event).preventDefault();
+      // avoid Property 'tab' does not exist on type 'JQuery<any>'
+      // @ts-ignore
       $(this).tab('show');
     });
 
