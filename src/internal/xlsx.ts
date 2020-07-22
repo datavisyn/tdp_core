@@ -3,6 +3,7 @@ import {sendAPI, api2absURL, send} from 'phovea_core/src/ajax';
 export interface IXLSXColumn {
   name: string;
   type: 'string'|'float'|'int'|'date'|'boolean';
+  dateFormat?: string;
 }
 
 export interface IXLSXSheet {
@@ -14,7 +15,6 @@ export interface IXLSXSheet {
 export interface IXLSXJSONFile {
   sheets: IXLSXSheet[];
 }
-
 
 export function xlsx2json(file: File): Promise<IXLSXJSONFile> {
   const data = new FormData();
