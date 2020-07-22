@@ -1,3 +1,5 @@
+export * from './ISearchOption';
+export * from './IPanelTabDesc';
 export * from './PanelAddColumnButton';
 export * from './PanelTab';
 export * from './PanelButton';

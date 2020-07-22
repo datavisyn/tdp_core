@@ -2,7 +2,7 @@ import $ from 'jquery';
 import {EventHandler, BaseUtils} from 'phovea_core';
 import 'select2';
 
-export interface IdTextPair {
+export interface IIdTextPair {
   id: string;
   text: string;
 }

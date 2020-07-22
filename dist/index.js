@@ -1,3 +1,4 @@
+export * from './public';
 export * from './base';
 export * from './tour';
 export * from './form';

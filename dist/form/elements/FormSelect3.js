@@ -45,7 +45,7 @@ export class FormSelect3 extends AFormElement {
     }
     /**
      * Returns the selected value or if nothing found `null`
-     * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
+     * @returns {ISelect3Item<IIdTextPair> | string | (ISelect3Item<IIdTextPair> | string)[]}
      */
     get value() {
         const returnValue = this.elementDesc.options.return;
@@ -65,7 +65,7 @@ export class FormSelect3 extends AFormElement {
      * @param v If string then compares to the option value property. Otherwise compares the object reference.
      */
     set value(v) {
-        const toIdTextPair = (d) => {
+        const toIIdTextPair = (d) => {
             if (typeof d === 'string') {
                 return { id: d, text: d };
             }
@@ -83,13 +83,13 @@ export class FormSelect3 extends AFormElement {
         }
         this.previousValue = this.select3.value;
         if (Array.isArray(v) && v.length > 0 && !this.isMultiple) { // an array of items or string (id or text)
-            this.select3.value = v.slice(0, 1).map(toIdTextPair);
+            this.select3.value = v.slice(0, 1).map(toIIdTextPair);
         }
         else if (Array.isArray(v) && v.length > 0 && this.isMultiple) {
-            this.select3.value = v.map(toIdTextPair);
+            this.select3.value = v.map(toIIdTextPair);
         }
         else if (!Array.isArray(v)) { // an item or string (id or text)
-            this.select3.value = [toIdTextPair(v)];
+            this.select3.value = [toIIdTextPair(v)];
         }
         this.updateStoredValue();
     }

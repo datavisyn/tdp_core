@@ -7,7 +7,7 @@ import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { ISelectOptions } from './FormSelect';
 import { IPluginDesc } from 'phovea_core';
 import { IFormElement } from '..';
-import { ISelect3Options, IdTextPair } from './Select3';
+import { ISelect3Options, IIdTextPair } from './Select3';
 import * as d3 from 'd3';
 export interface ISubDesc {
     name: string;
@@ -30,7 +30,7 @@ export interface ISubSelect2Desc extends ISubDesc {
     multiple?: boolean;
     ajax?: any;
 }
-export interface ISubSelect3Desc extends Partial<ISelect3Options<IdTextPair>>, ISubDesc {
+export interface ISubSelect3Desc extends Partial<ISelect3Options<IIdTextPair>>, ISubDesc {
     type: FormElementType.SELECT3;
     return?: 'text' | 'id';
     name: string;
