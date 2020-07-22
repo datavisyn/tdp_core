@@ -13,7 +13,20 @@ import {AppHeader} from 'phovea_ui';
 export interface IAdditionalColumnDesc extends IColumnDesc {
   selectedId: number;
   selectedSubtype?: string;
+  /**
+   * defines if it should it be part of the initial ranking by default
+   */
   initialRanking: boolean;
+  /**
+   * adds the item to a parent group
+   * @parent the name of the parent group
+   * @order the rank of the current item in the group
+   */
+  group?: {parent: string, order?: number};
+}
+
+export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc): item is IAdditionalColumnDesc {
+  return (item as IAdditionalColumnDesc).selectedId !== undefined;
 }
 
 /**

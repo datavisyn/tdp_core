@@ -19,6 +19,7 @@ import {PanelDownloadButton} from './panel/PanelDownloadButton';
 import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension} from '../../base/interfaces';
 import {ISearchOption} from './panel/ISearchOption';
 import {LineupUtils} from '../utils';
+import {IAdditionalColumnDesc, isAdditionalColumnDesc} from '../../base/interfaces';
 
 
 export interface IPanelTabExtension {
@@ -285,10 +286,13 @@ export class LineUpPanelActions extends EventHandler {
     return typeof this.options.additionalScoreParameter === 'function' ? this.options.additionalScoreParameter() : this.options.additionalScoreParameter;
   }
 
-  private getColumnDescription(descs: IColumnDesc[], addScores: boolean) {
+  private getColumnDescription(descs: IAdditionalColumnDesc[] | IColumnDesc[], addScores: boolean) {
     return descs
       .filter((d) => Boolean((<any>d)._score) === addScores)
-      .map((d) => ({text: d.label, id: (<any>d).column, action: () => this.addColumn(d)}))
+      .map((d) => {
+        const group = isAdditionalColumnDesc(d) ? d.group : null;
+        return {text: d.label, id: (<any>d).column.toString(), action: () => this.addColumn(d), group};
+      })
       .sort((a, b) => a.text.localeCompare(b.text));
   }
 
@@ -316,7 +320,7 @@ export class LineUpPanelActions extends EventHandler {
     return {metaDataOptions, loadedScorePlugins};
   }
 
-  async updateChooser(idType: IDType, descs: IColumnDesc[]) {
+  async updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]) {
     this.idType = idType;
 
     if (this.searchBoxProvider.length === 0) {
@@ -328,7 +332,10 @@ export class LineUpPanelActions extends EventHandler {
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
     if (this.options.enableAddingDatabaseColumns) {
-      items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
+      const columnDesc = this.getColumnDescription(descs, false);
+      const [groupedItems, ungroupedItems] = this.groupColumnDescs(columnDesc);
+      items.push(this.groupedDialog('', ungroupedItems));
+      groupedItems.forEach((value, key) => items.push(this.groupedDialog(key, value.sort((a,b) => a.group.order - b.group.order))));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
@@ -395,6 +402,19 @@ export class LineUpPanelActions extends EventHandler {
     }
 
     this.searchBoxProvider.update(items);
+  }
+
+  private groupColumnDescs(columnDesc: {text: string, id: string, action: () => void, group: {parent: string, order?: number}}[]): [Map<string, any[]>, ISearchOption[]] {
+    const groupedItems = new Map<string, ISearchOption[]>();
+    const ungroupedItems = [];
+    columnDesc.map((item) => {
+      if(item.group) {
+        groupedItems.has(item.group.parent) ? groupedItems.set(item.group.parent, [...groupedItems.get(item.group.parent), item]) : groupedItems.set(item.group.parent, [item]);
+      } else {
+        ungroupedItems.push(item);
+      }
+    });
+    return [groupedItems, ungroupedItems];
   }
 
   private groupedDialog(text: string, children: ISearchOption[]): ISearchOption | IGroupSearchItem<ISearchOption> {
