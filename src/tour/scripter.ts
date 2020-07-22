@@ -33,7 +33,7 @@ export function waitFor(selector: string | (() => HTMLElement | null), maxWaitin
   });
 }
 
-export function waitForSelector(this: { selector?: string}) {
+export function waitForSelector(this: { selector?: string }) {
   return !this.selector ? Promise.resolve() : waitFor(this.selector);
 }
 
@@ -45,7 +45,11 @@ export function click(elem: HTMLElement | string) {
   e.click();
 }
 
-export function doubleclick(elem: HTMLElement | string) {
+export function clickSelector(this: { selector?: string}) {
+  return click(this.selector);
+}
+
+export function doubleClick(elem: HTMLElement | string) {
   const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
   if (!e) {
     return false;
@@ -54,12 +58,24 @@ export function doubleclick(elem: HTMLElement | string) {
   e.dispatchEvent(evt);
 }
 
-export function clickSelector(this: { selector?: string}) {
-  return click(this.selector);
+export function doubleClickSelector(this: { selector?: string}) {
+  return doubleClick(this.selector);
 }
 
-export function doubleClickSelector(this: { selector?: string}) {
-  return doubleclick(this.selector);
+export function submitForm(elem: HTMLFormElement | string) {
+  const e = typeof elem === 'string' ? document.querySelector<HTMLFormElement>(elem) : elem;
+  if (!e) {
+    return false;
+  }
+  const event = new Event('submit', <any>{
+    bubbles: true,
+    cancelable: true
+  });
+  e.dispatchEvent(event);
+}
+
+export function submitFormSelector(this: { selector?: string}) {
+  return submitForm(this.selector);
 }
 
 /**
