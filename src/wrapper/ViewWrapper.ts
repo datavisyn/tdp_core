@@ -104,7 +104,9 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     if (plugin.preview) {
       plugin.preview().then((previewImage) => {
         const image = <HTMLElement>this.node.querySelector('.preview-image > div');
+        /* tslint:disable:no-string-literal */
         image.style.backgroundImage = `url("${previewImage['default']}")`;
+        /* tslint:enable:no-string-literal */
       });
     }
 
