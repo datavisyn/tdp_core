@@ -335,7 +335,7 @@ export class LineUpPanelActions extends EventHandler {
       // Group the columns
       const [groupedItems, ungroupedItems] = this.groupColumnDescs(columnDesc);
       // First, add all the ungrouped columns
-      items.push(this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), ungroupedItems));
+      items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), ungroupedItems));
       const sortOrder = (a: number | null, b: number | null) => {
         // Return the group with the higher order
         return a === b ? 0 : (a != null && b != null ? a - b : (a != null ? -1 : 1));
@@ -348,7 +348,7 @@ export class LineUpPanelActions extends EventHandler {
           // If both groups have the same order, sort alphabetically
           return sortOrder(databaseColumnGroups?.[aKey]?.order, databaseColumnGroups?.[bKey]?.order) || aKey.localeCompare(bKey);
         })
-        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort(sortOrder))));
+        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a,b) => sortOrder(a.group?.order, b.group?.order)))));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
@@ -417,7 +417,7 @@ export class LineUpPanelActions extends EventHandler {
     this.searchBoxProvider.update(items);
   }
 
-  private groupColumnDescs(columnDesc: {text: string, id: string, action: () => void, group: {parent: string, order?: number}}[]): [Map<string, any[]>, ISearchOption[]] {
+  private groupColumnDescs(columnDesc: ISearchOption[]): [Map<string, ISearchOption[]>, ISearchOption[]] {
     const groupedItems = new Map<string, ISearchOption[]>();
     const ungroupedItems = [];
     columnDesc.map((item) => {
