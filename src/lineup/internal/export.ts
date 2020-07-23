@@ -1,12 +1,8 @@
-import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from 'lineupjs';
+import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType, isDateColumn} from 'lineupjs';
 import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
-import {json2xlsx, IXLSXColumn} from '../../internal/xlsx';
+import {json2xlsx} from '../../internal/xlsx';
 import i18n from 'phovea_core/src/i18n';
-
-function isDateColumn(column: Column) {
-  return column.desc.type === 'date';
-}
 
 function getColumnName(column: Column) {
   return column.label + (column.description ? '\n' + column.description : '');
@@ -60,13 +56,7 @@ export function exportxlsx(columns: Column[], rows: IDataRow[]) {
   return json2xlsx({
     sheets: [{
       title: 'LineUp',
-      columns: columns.map((d) => {
-        const col: IXLSXColumn = {name: getColumnName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')};
-        if(isDateColumn(d) && (d.desc as any).dateFormat) {
-          col.dateFormat = (d.desc as any).dateFormat;
-        }
-        return col;
-      }),
+      columns: columns.map((d) => ({name: getColumnName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
       rows: converted
     }]
   });

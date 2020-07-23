@@ -108,11 +108,11 @@ def _json2xlsx():
     c.font = bold
     return c
 
-  def to_value(v, coltype, date_format="%Y-%m-%d"):
+  def to_value(v, coltype):
     if coltype == 'date':
       if isinstance(v, int):
-        return datetime.fromtimestamp(v).strftime(date_format)
-      return dateutil.parser.parse(v).strftime(date_format)
+        return datetime.fromtimestamp(v)
+      return dateutil.parser.parse(v)
     return v
 
   for sheet in data.get('sheets', []):
@@ -121,7 +121,7 @@ def _json2xlsx():
     ws.append(to_header(col['name']) for col in cols)
 
     for row in sheet['rows']:
-      ws.append(to_value(row.get(col['name'], None), col['type'], col.get('dateFormat', "%Y-%m-%d")) for col in cols)
+      ws.append(to_value(row.get(col['name'], None), col['type']) for col in cols)
 
   with NamedTemporaryFile() as tmp:
     wb.save(tmp.name)
