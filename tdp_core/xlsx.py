@@ -109,7 +109,7 @@ def _json2xlsx():
       return WriteOnlyCell(ws, value=v)
     except ValueError:
       return WriteOnlyCell(ws, value=str(v))
-    
+
   def to_header(v):
     c = to_cell(v)
     c.font = bold
