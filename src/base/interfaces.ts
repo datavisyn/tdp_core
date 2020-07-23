@@ -28,10 +28,17 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
   initialRanking: boolean;
   /**
    * adds the item to a parent group
-   * @parent the name of the parent group
-   * @order the rank of the current item in the group
    */
-  group?: {parent: string, order?: number};
+  group?: {
+    /**
+     * the name of the parent group
+     */
+    parent: string,
+    /**
+     * the rank of the current item in the group
+     */
+    order?: number
+  };
 }
 
 export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc): item is IAdditionalColumnDesc {
