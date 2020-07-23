@@ -1,12 +1,8 @@
-import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from 'lineupjs';
+import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType, isDateColumn} from 'lineupjs';
 import {lazyDialogModule} from '../../dialogs';
 import {randomId} from 'phovea_core/src';
 import {json2xlsx} from '../../internal/xlsx';
 import i18n from 'phovea_core/src/i18n';
-
-function isDateColumn(column: Column) {
-  return column.desc.type === 'date';
-}
 
 function getColumnName(column: Column) {
   return column.label + (column.description ? '\n' + column.description : '');
