@@ -290,8 +290,7 @@ export class LineUpPanelActions extends EventHandler {
     return descs
       .filter((d) => Boolean((<any>d)._score) === addScores)
       .map((d) => {
-        const group = isAdditionalColumnDesc(d) ? d.group : null;
-        return {text: d.label, id: (<any>d).column.toString(), action: () => this.addColumn(d), group};
+        return {text: d.label, id: (<any>d).column.toString(), action: () => this.addColumn(d), group: isAdditionalColumnDesc(d) ? d.group : null};
       })
       .sort((a, b) => a.text.localeCompare(b.text));
   }
@@ -333,9 +332,23 @@ export class LineUpPanelActions extends EventHandler {
 
     if (this.options.enableAddingDatabaseColumns) {
       const columnDesc = this.getColumnDescription(descs, false);
+      // Group the columns
       const [groupedItems, ungroupedItems] = this.groupColumnDescs(columnDesc);
-      items.push(this.groupedDialog('', ungroupedItems));
-      groupedItems.forEach((value, key) => items.push(this.groupedDialog(key, value.sort((a,b) => a.group.order - b.group.order))));
+      // First, add all the ungrouped columns
+      items.push(this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), ungroupedItems));
+      const sortOrder = (a: number | null, b: number | null) => {
+        // Return the group with the higher order
+        return a === b ? 0 : (a != null && b != null ? a - b : (a != null ? -1 : 1));
+      };
+      // Then, add the grouped columns with the ordered group and ordered columns
+      Array.from(groupedItems.entries())
+        .sort(([aKey, aVal], [bKey, bVal]) => {
+          // Sort the groups first
+          const {databaseColumnGroups} = this.options;
+          // If both groups have the same order, sort alphabetically
+          return sortOrder(databaseColumnGroups?.[aKey]?.order, databaseColumnGroups?.[bKey]?.order) || aKey.localeCompare(bKey);
+        })
+        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort(sortOrder))));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {

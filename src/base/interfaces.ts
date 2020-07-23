@@ -11,10 +11,19 @@ import {AppHeader} from 'phovea_ui';
 
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
+  /**
+   * used internally to match selections to column
+   * @default -1
+   */
   selectedId: number;
+  /**
+   * used internally to match selections to multiple columns
+   * @default: undefined
+   */
   selectedSubtype?: string;
   /**
-   * defines if it should it be part of the initial ranking by default
+   * part of the initial ranking by default
+   * @default true
    */
   initialRanking: boolean;
   /**

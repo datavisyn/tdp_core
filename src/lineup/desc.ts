@@ -8,19 +8,13 @@ import {IAnyVector, ValueTypeUtils} from 'phovea_core';
 import {IServerColumn} from '../base/rest';
 import {IAdditionalColumnDesc} from '../base/interfaces';
 
-export interface IColumnOptions {
+export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'group'> {
   /**
    * visible by default
    * @default true
    * @deprecated use initialRanking
    */
   visible?: boolean;
-
-  /**
-   * part of the initial ranking by default
-   * @default true
-   */
-  initialRanking: boolean;
   /**
    * custom label instead of the column name
    * @default column
@@ -31,17 +25,6 @@ export interface IColumnOptions {
    * @default -1 = none
    */
   width: number;
-  /**
-   * used internally to match selections to column
-   * @default -1
-   */
-  selectedId: number;
-  /**
-   * used internally to match selections to multiple columns
-   * @default: undefined
-   */
-  selectedSubtype: string;
-
   /**
    * extra arguments
    */

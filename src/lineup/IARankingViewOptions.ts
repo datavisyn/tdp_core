@@ -104,6 +104,16 @@ export interface IARankingViewOptions {
   enableAddingDatabaseColumns: boolean;
 
   /**
+   * additional information regarding the group of a column
+   */
+  databaseColumnGroups: {[key: string]: {
+    /**
+     * the rank of the current group in the column selector
+     */
+    order?: number
+  }};
+
+  /**
    * enable meta data score columns in the add column dialog
    * @default true
    */
