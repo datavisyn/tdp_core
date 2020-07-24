@@ -103,17 +103,25 @@ def _json2xlsx():
 
   bold = Font(bold=True)
 
+  def to_cell(v):
+    # If the native value cannot be used as Excel value, used the stringified version instead.
+    try:
+      return WriteOnlyCell(ws, value=v)
+    except ValueError:
+      return WriteOnlyCell(ws, value=str(v))
+
   def to_header(v):
-    c = WriteOnlyCell(ws, value=v)
+    c = to_cell(v)
     c.font = bold
     return c
 
   def to_value(v, coltype):
     if coltype == 'date':
       if isinstance(v, int):
-        return datetime.fromtimestamp(v)
-      return dateutil.parser.parse(v)
-    return v
+        v = datetime.fromtimestamp(v)
+      else:
+        v = dateutil.parser.parse(v)
+    return to_cell(v)
 
   for sheet in data.get('sheets', []):
     ws = wb.create_sheet(title=sheet['title'])
