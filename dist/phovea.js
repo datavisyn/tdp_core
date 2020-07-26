@@ -133,7 +133,7 @@ export default function (registry) {
         factory: 'new FormRadio',
     });
     registry.push(EP_PHOVEA_CORE_LOCALE, 'tdpCoreLocaleEN', function () {
-        return import('./assets/locales/en/tdp.json').then(PluginRegistry.getInstance().asResource);
+        return import('./locales/en/tdp.json').then(PluginRegistry.getInstance().asResource);
     }, {
         ns: 'tdp',
     });

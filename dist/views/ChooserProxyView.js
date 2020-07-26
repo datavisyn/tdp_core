@@ -19,13 +19,13 @@ export class ChooserProxyView extends AView {
         this.chooser = new SelectionChooser((id) => this.getParameterElement(id), this.options.idtype, this.options);
         this.openExternally = parent.ownerDocument.createElement('p');
     }
-    init(params, onParameterChange) {
-        const p = super.init(params, onParameterChange);
+    async init(params, onParameterChange) {
+        const initResult = await super.init(params, onParameterChange);
         // inject stats
         const base = params.querySelector('form') || params;
         base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
         base.lastElementChild.appendChild(this.openExternally);
-        return p;
+        return initResult;
     }
     initImpl() {
         super.initImpl();

@@ -1,10 +1,7 @@
-import { isNumberColumn, isSupportType } from 'lineupjs';
+import { isNumberColumn, isSupportType, isDateColumn } from 'lineupjs';
 import { BaseUtils, I18nextManager } from 'phovea_core';
 import { XlsxUtils } from '../../utils/XlsxUtils';
 export class ExportUtils {
-    static isDateColumn(column) {
-        return column.desc.type === 'date';
-    }
     static getColumnName(column) {
         return column.label + (column.description ? '\n' + column.description : '');
     }
@@ -52,7 +49,7 @@ export class ExportUtils {
         return XlsxUtils.json2xlsx({
             sheets: [{
                     title: 'LineUp',
-                    columns: columns.map((d) => ({ name: ExportUtils.getColumnName(d), type: (isNumberColumn(d) ? 'float' : ExportUtils.isDateColumn(d) ? 'date' : 'string') })),
+                    columns: columns.map((d) => ({ name: ExportUtils.getColumnName(d), type: (isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string') })),
                     rows: converted
                 }]
         });
@@ -93,8 +90,8 @@ export class ExportUtils {
         }));
     }
     static customizeDialog(provider) {
-        return import('phovea_ui/dist/components/dialogs').then(({ FormDialog }) => {
-            const dialog = new FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+        return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
+            const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
             const id = `e${BaseUtils.randomId(3)}`;
             const ranking = provider.getFirstRanking();
             dialog.form.classList.add('tdp-ranking-export-form');

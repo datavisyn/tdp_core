@@ -21,7 +21,7 @@ export declare class ProxyView extends AD3View {
     private readonly openExternally;
     readonly naturalSize: number[];
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<IProxyViewOptions>);
-    init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<void>;
+    init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any>;
     protected initImpl(): Promise<void>;
     protected createUrl(args: any): string;
     protected getParameterFormDescs(): import("../form/interfaces").IFormElementDesc[];

@@ -1,7 +1,6 @@
 import { IDataRow, Column, LocalDataProvider } from 'lineupjs';
 export declare type ExportType = 'json' | 'csv' | 'tsv' | 'ssv' | 'xlsx';
 export declare class ExportUtils {
-    private static isDateColumn;
     private static getColumnName;
     static exportRanking(columns: Column[], rows: IDataRow[], separator: string): string;
     static exportJSON(columns: Column[], rows: IDataRow[]): string;

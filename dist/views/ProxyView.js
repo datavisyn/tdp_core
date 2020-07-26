@@ -36,13 +36,13 @@ export class ProxyView extends AD3View {
         this.$node.classed('proxy_view', true);
         this.openExternally = parent.ownerDocument.createElement('p');
     }
-    init(params, onParameterChange) {
-        super.init(params, onParameterChange);
+    async init(params, onParameterChange) {
+        const initResult = await super.init(params, onParameterChange);
         // inject stats
         const base = params.querySelector('form') || params;
         base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
         base.lastElementChild.appendChild(this.openExternally);
-        return Promise.resolve();
+        return initResult;
     }
     initImpl() {
         super.initImpl();
