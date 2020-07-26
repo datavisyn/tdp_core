@@ -4,10 +4,33 @@ import {AppHeader} from 'phovea_ui';
 import {TourUtils} from './TourUtils';
 
 export interface ITourContext {
-  app(): Promise<any>; // the TDP app
+  /**
+   * The TDP application
+   */
+  app(): Promise<any>;
+
+  /**
+   * The application header
+   */
   header(): AppHeader;
+
+  /**
+   * Set the number of steps
+   * @param count Total number of steps
+   */
   steps(count: number): void;
+
+  /**
+   * Show a given step
+   * @param stepNumber The step number
+   * @param step Step object
+   */
   show(stepNumber: number, step: IStep): void;
+
+  /**
+   * Hide the tour
+   * @param finished Flag whether the tour has finished
+   */
   hide(finished?: boolean): void;
 }
 
