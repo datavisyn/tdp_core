@@ -21,19 +21,24 @@ export class TourUtils {
   }
 
   /**
-   * returns a promise waiting for X milliseconds
-   * @param timeMs
+   * Wait for a given number of milliseconds, before resolving the promise and continuing.
+   *
+   * @param timeMs Waiting time in milliseconds
    */
   static wait(timeMs: number): Promise<any> {
     return BaseUtils.resolveIn(timeMs);
   }
 
   /**
-   * wait for at most maxWaitingTime till the selector is matched with a given polling frequency
-   * @param selector
-   * @param maxWaitingTime
-   * @param pollFrequencyMs
-   * @returns {Promise<HTMLElement | null>} the found element or null
+   * Wait for a DOM element to appear, before resolving the promise and continuing.
+   * The function will poll at most for `maxWaitingTime` with a `polling` frequency until the `selector` is matched.
+   *
+   * @param selector DOM selector
+   * @param maxWaitingTime Maximum waiting time in milliseconds
+   * @default maxWaitingTime 5000
+   * @param pollFrequencyMs Poll frequency in milliseconds
+   * @default pollFrequencyMs 500
+   * @returns {Promise<HTMLElement | null>} Resolves with the found element or `null`
    */
   static waitFor(selector: string | (() => HTMLElement | null), maxWaitingTime: number = 5000, pollFrequencyMs: number = 500): Promise<HTMLElement | null> {
     const s = typeof selector === 'function' ? selector : () =>  document.querySelector<HTMLElement>(selector);
@@ -53,10 +58,22 @@ export class TourUtils {
     });
   }
 
-  static waitForSelector(this: { selector?: string}) {
+  /**
+   * Wait for the given selector.
+   * This function can be passed directly to `preAction` or `postAction` of the step.
+   *
+   * @param this
+   */
+  static waitForSelector(this: { selector?: string }) {
     return !this.selector ? Promise.resolve() : TourUtils.waitFor(this.selector);
   }
 
+  /**
+   * Dispatches a click event on the given HTML element.
+   * In case of a string, the string is used as DOM selector to retrieve the HTML element.
+   *
+   * @param elem HTML element or DOM selector string
+   */
   static click(elem: HTMLElement | string) {
     const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
     if (!e) {
@@ -65,26 +82,74 @@ export class TourUtils {
     e.click();
   }
 
+  /**
+   * Dispatches a click event on the HTML element with the given DOM selector.
+   * This function can be passed directly to `preAction` or `postAction` of the step.
+   *
+   * @param this Context containing the current selector of the step
+   */
   static clickSelector(this: { selector?: string}) {
     return TourUtils.click(this.selector);
   }
 
   /**
-   * sets the value on the given element and also trigger a change event
+   * Dispatches a double click event on the given HTML element.
+   * In case of a string, the string is used as DOM selector to retrieve the HTML element.
+   *
+   * @param elem HTML element or DOM selector string
    */
-  static setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string, eventType: 'change'|'input' = 'change') {
-    const e = typeof elem === 'string' ? document.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(elem) : elem;
+  static doubleClick(elem: HTMLElement | string) {
+    const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
     if (!e) {
-      return;
+      return false;
     }
-    e.value = value;
-    return e.dispatchEvent(new Event(eventType, {
-      bubbles: true,
-      cancelable: true
-    }));
+    const evt = new Event('dblclick');
+    e.dispatchEvent(evt);
   }
 
+  /**
+   * Dispatches a double click event on the HTML element with the given DOM selector.
+   * This function can be passed directly to `preAction` or `postAction` of the step.
+   *
+   * @param this Context containing the current selector of the step
+   */
+  static doubleClickSelector(this: { selector?: string}) {
+    return TourUtils.doubleClick(this.selector);
+  }
 
+  /**
+   * Dispatches a submit event on the given HTML form element.
+   * In case of a string, the string is used as DOM selector to retrieve the HTML form element.
+   *
+   * @param elem HTML form element or DOM selector string
+   */
+  static submitForm(elem: HTMLFormElement | string) {
+    const e = typeof elem === 'string' ? document.querySelector<HTMLFormElement>(elem) : elem;
+    if (!e) {
+      return false;
+    }
+    const event = new Event('submit', <any>{
+      bubbles: true,
+      cancelable: true
+    });
+    e.dispatchEvent(event);
+  }
+
+  /**
+   * Dispatches a submit event on the HTML form element with the given DOM selector.
+   * This function can be passed directly to `preAction` or `postAction` of the step.
+   *
+   * @param this Context containing the current selector of the step
+   */
+  static submitFormSelector(this: { selector?: string}) {
+    return TourUtils.submitForm(this.selector);
+  }
+
+  /**
+   * Dispatches a key down event with the Enter key on the HTML element with the given DOM selector.
+   *
+   * @param elem HTML input element or DOM selector string
+   */
   static keyDownEnter(elem: HTMLElement | string) {
     const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
     if (!e) {
@@ -101,24 +166,60 @@ export class TourUtils {
     e.dispatchEvent(event);
   }
 
+  /**
+   * Sets the value on the given HTML element and dispatches a `change` or `input` event.
+   *
+   * @param elem HTML input element or DOM selector string
+   * @param value Value that should be entered or selected
+   * @param eventType Event type `change` or `input` that should be dispatched
+   * @default eventType change
+   */
+  static setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string, eventType: 'change'|'input' = 'change') {
+    const e = typeof elem === 'string' ? document.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(elem) : elem;
+    if (!e) {
+      return;
+    }
+    e.value = value;
+    return e.dispatchEvent(new Event(eventType, {
+      bubbles: true,
+      cancelable: true
+    }));
+  }
+
+  /**
+   * Sets the value on the given HTML element and dispatches a `change` or `input` event.
+   * This function can be passed directly to `preAction` or `postAction` of the step.
+   *
+   * @param value Value that should be entered or selected
+   * @param eventType Event type `change` or `input` that should be dispatched
+   * @default eventType change
+   */
   static setValueAndTriggerSelector(value: string, eventType: 'change'|'input' = 'change') {
     return function(this: {selector?: string}) {
       TourUtils.setValueAndTrigger(this.selector, value, eventType);
     };
   }
 
-  static toggleClass(elem: HTMLElement | string, clazz: string, toggle?: boolean) {
+  /**
+   * Toggles a CSS class on the given HTML element.
+   *
+   * @param elem HTML input element or DOM selector string
+   * @param clazz CSS class to toggle
+   * @param forceToggle If present adds or removes the given CSS class
+   */
+  static toggleClass(elem: HTMLElement | string, clazz: string, forceToggle?: boolean) {
     const e = typeof elem === 'string' ? document.querySelector<HTMLElement>(elem) : elem;
     if (!e) {
       return;
     }
-    e.classList.toggle(clazz, toggle);
+    e.classList.toggle(clazz, forceToggle);
   }
 
   /**
-   * intervall execute things will callback returns true
-   * @param callback
-   * @param interval
+   * Execute the callback function in the given interval until the function returns `true`.
+   *
+   * @param callback Function to execute. The polling is stopped once the function returns `true`.
+   * @param interval Pause in milliseconds between each function call
    */
   static ensure(callback: () => boolean, interval: number = 250) {
     if (!callback() || !TourUtils.isTourVisible()) {
@@ -133,8 +234,14 @@ export class TourUtils {
     id = self.setInterval(w, interval);
   }
 
-  static isTourVisible() {
+  /**
+   * Checks if a tour is visible. The visibility indicates whether the tour is active.
+   */
+  static isTourVisible(): boolean {
     const counter = document.querySelector<HTMLElement>('.tdp-tour-step-count')!;
     return counter.style.display === 'flex'; // visible -> active
   }
+
+
+
 }

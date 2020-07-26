@@ -1,5 +1,4 @@
-import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType} from 'lineupjs';
-import {DialogUtils} from '../../base/dialogs';
+import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType, isDateColumn} from 'lineupjs';
 import {BaseUtils, I18nextManager} from 'phovea_core';
 import {XlsxUtils} from '../../utils/XlsxUtils';
 
@@ -14,18 +13,14 @@ interface IExportData {
 
 export class ExportUtils {
 
-  private static isDateColumn(column: Column) {
-    return column.desc.type === 'date';
-  }
-
   private static getColumnName(column: Column) {
     return column.label + (column.description ? '\n' + column.description : '');
   }
-
+  
   static exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
     //optionally quote not numbers
     const escape = new RegExp(`["]`, 'g');
-
+  
     function quote(v: any, c?: Column) {
       if (v == null) {
         return '';
@@ -39,7 +34,7 @@ export class ExportUtils {
       }
       return l;
     }
-
+  
     const r: string[] = [];
     r.push(columns.map((d) => quote(ExportUtils.getColumnName(d))).join(separator));
     rows.forEach((row) => {
@@ -47,7 +42,7 @@ export class ExportUtils {
     });
     return r.join('\n');
   }
-
+  
   static exportJSON(columns: Column[], rows: IDataRow[]) {
     const converted = rows.map((row) => {
       const r: any = {};
@@ -58,7 +53,7 @@ export class ExportUtils {
     });
     return JSON.stringify(converted, null, 2);
   }
-
+  
   static exportxlsx(columns: Column[], rows: IDataRow[]) {
     const converted = rows.map((row) => {
       const r: any = {};
@@ -70,12 +65,12 @@ export class ExportUtils {
     return XlsxUtils.json2xlsx({
       sheets: [{
         title: 'LineUp',
-        columns: columns.map((d) => ({name: ExportUtils.getColumnName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : ExportUtils.isDateColumn(d) ? 'date' : 'string')})),
+        columns: columns.map((d) => ({name: ExportUtils.getColumnName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
         rows: converted
       }]
     });
   }
-
+  
   static exportLogic(type: 'custom' | ExportType, onlySelected: boolean, provider: LocalDataProvider) {
     if (type === 'custom') {
       return ExportUtils.customizeDialog(provider).then((r) => ExportUtils.convertRanking(provider, r.order, r.columns, r.type, r.name));
@@ -86,14 +81,14 @@ export class ExportUtils {
       return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, type, ranking.getLabel()));
     }
   }
-
+  
   private static toBlob(content: string, mimeType: string) {
     return new Blob([content], {type: mimeType});
   }
-
+  
   private static convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportType, name: string) {
     const rows = provider.viewRawRows(order);
-
+  
     const separators = {csv: ',', tsv: '\t', ssv: ';'};
     let content: Promise<Blob> | Blob;
     const mimeTypes = {csv: 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
@@ -111,19 +106,18 @@ export class ExportUtils {
       name: `${name}.${type === 'ssv' ? 'csv' : type}`
     }));
   }
-
-
+  
   private static customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
-    return import('phovea_ui/dist/components/dialogs').then(({FormDialog}) => {
-      const dialog = new FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
-
+    return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
+      const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+  
       const id = `e${BaseUtils.randomId(3)}`;
       const ranking = provider.getFirstRanking();
       dialog.form.classList.add('tdp-ranking-export-form');
-
+  
       const flat = ranking.flatColumns;
       const lookup = new Map(flat.map((d) => <[string, Column]>[d.id, d]));
-
+  
       dialog.form.innerHTML = `
         <div class="form-group">
           <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</label>
@@ -158,12 +152,15 @@ export class ExportUtils {
           </select>
         </div>
       `;
-
+  
       ExportUtils.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.checkbox');
-        return new Promise<IExportData>((resolve) => {
+  
+  
+      return new Promise<IExportData>((resolve) => {
         dialog.onSubmit(() => {
           const data = new FormData(dialog.form);
           dialog.hide();
+  
           const rows = data.get('rows').toString();
           let order: number[];
           switch (rows) {
@@ -177,9 +174,9 @@ export class ExportUtils {
             default:
               order = <number[]>ranking.getOrder();
           }
-
+  
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
-
+  
           resolve({
             type: <ExportType>data.get('type'),
             columns,
@@ -198,19 +195,22 @@ export class ExportUtils {
       });
     });
   }
-
+  
   static resortAble(base: HTMLElement, elementSelector: string) {
     const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
+  
     const enable = (item: HTMLElement) => {
       item.classList.add('dragging');
       base.classList.add('dragging');
       let prevBB: DOMRect | ClientRect;
       let nextBB: DOMRect | ClientRect;
+  
       const update = () => {
         prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
         nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
       };
       update();
+  
       base.onmouseup = base.onmouseleave = () => {
         item.classList.remove('dragging');
         base.classList.remove('dragging');
@@ -231,7 +231,7 @@ export class ExportUtils {
         evt.stopPropagation();
       };
     };
-
+  
     for (const item of items) {
       const handle = <HTMLElement>item.firstElementChild!;
       handle.onmousedown = () => {
