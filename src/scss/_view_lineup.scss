@@ -11,7 +11,7 @@
     line-height: 1;
   }
 
-  > div {
+  > div:first-of-type {
     flex: 1 1 auto;
     position: relative;
   }
