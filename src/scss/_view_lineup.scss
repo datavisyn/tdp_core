@@ -15,7 +15,7 @@
   // Select only first div containing the `lineup-engine`.
   // Do not select the `div.lu-backdrop` element,
   // which is moved one level up in the DOM tree in ARankingView.ts
-  > div:first-child() {
+  > div:first-of-type {
     flex: 1 1 auto;
     position: relative;
   }
