@@ -1,4 +1,4 @@
-import {PanelTab, IPanelTabDesc} from './PanelTab';
+import {IPanelTabDesc} from './IPanelTabDesc';
 /**
  * Interface for the LineUp panel button
  */
@@ -12,7 +12,7 @@ export interface IPanelButton {
 /**
  * Plain HTML button with a custom title, CSS class and an onClick function
  */
-export default class PanelButton implements IPanelButton {
+export class PanelButton implements IPanelButton {
   readonly node: HTMLElement;
 
   /**

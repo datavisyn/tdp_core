@@ -4,18 +4,15 @@
 
 import 'select2';
 import {event as d3event} from 'd3';
-import * as $ from 'jquery';
-import AFormElement, {toData} from './AFormElement';
+import $ from 'jquery';
+import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
-import {ISelectOptions, resolveData, IFormSelectOption} from './FormSelect';
-import {DEFAULT_OPTIONS, DEFAULT_AJAX_OPTIONS} from './FormSelect2';
-import {mixin} from 'phovea_core/src';
+import {ISelectOptions, IFormSelectOption, FormSelect} from './FormSelect';
+import {FormSelect2} from './FormSelect2';
+import {BaseUtils, UserSession, ResolveNow, IPluginDesc, I18nextManager} from 'phovea_core';
 import {IFormElement} from '..';
-import * as session from 'phovea_core/src/session';
-import {resolveImmediately} from 'phovea_core/src';
-import {ISelect3Options, default as Select3, IdTextPair} from './Select3';
-import {IPluginDesc} from 'phovea_core/src/plugin';
-import i18n from 'phovea_core/src/i18n';
+import {ISelect3Options, Select3, IdTextPair} from './Select3';
+import * as d3 from 'd3';
 
 export interface ISubDesc {
   name: string;
@@ -89,7 +86,7 @@ function hasInlineParent(node: HTMLElement) {
   return false;
 }
 
-export default class FormMap extends AFormElement<IFormMapDesc> {
+export class FormMap extends AFormElement<IFormMapDesc> {
 
   private $group: d3.Selection<any>;
   private rows: IFormRow[] = [];
@@ -109,8 +106,8 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
 
   private updateBadge() {
     const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
-    resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-      this.$node.select('span.badge').html(text).attr('title', i18n.t('tdp:core.FormMap.badgeTitle', {text}) as string);
+    ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
+      this.$node.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', {text}) as string);
     });
   }
 
@@ -122,14 +119,14 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     if (!this.elementDesc.useSession) {
       return;
     }
-    session.store(this.sessionKey, this.value);
+    UserSession.getInstance().store(this.sessionKey, this.value);
   }
 
   protected getStoredValue<T>(defaultValue: T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return session.retrieve(this.sessionKey, defaultValue);
+    return UserSession.getInstance().retrieve(this.sessionKey, defaultValue);
   }
 
   /**
@@ -164,7 +161,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           <div class="dropdown-menu" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="btn btn-default btn-sm right">${i18n.t('tdp:core.FormMap.apply')}</button>
+                <button class="btn btn-default btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
@@ -225,11 +222,11 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       $(this.$node.node()).on('hidden.bs.dropdown', () => {
         const v = this.value;
         const previous = this.previousValue;
-        if (isEqual(v, previous)) {
+        if (this.isEqual(v, previous)) {
           return;
         }
         this.previousValue = v;
-        this.inlineOnChange(this, v, toData(v), previous);
+        this.inlineOnChange(this, v, AFormElement.toData(v), previous);
       });
     }
 
@@ -262,8 +259,8 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           row.value = this.value;
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
         });
-        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
-          parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">${i18n.t('tdp:core.FormMap.selectMe')}</option>` : '') + values.map(mapOptions).join('');
+        FormSelect.resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
+          parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.selectMe')}</option>` : '') + values.map(mapOptions).join('');
           if (initialValue) {
             (<HTMLSelectElement>parent.firstElementChild).selectedIndex = values.map((d) => typeof d === 'string' ? d : d.value).indexOf(initialValue);
           } else if (defaultSelection) {
@@ -276,7 +273,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       case FormElementType.SELECT2:
         parent.insertAdjacentHTML('afterbegin', `<select class="form-control" style="width: 100%"></select>`);
 
-        resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
+        FormSelect.resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
           // in case of ajax but have default value
           if (desc.ajax && values.length === 0 && initialValue) {
@@ -286,7 +283,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
           const s = parent.firstElementChild;
           const $s = (<any>$(s));
           // merge only the default options if we have no local data
-          $s.select2(mixin({}, desc.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, desc));
+          $s.select2(BaseUtils.mixin({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
           if (initialValue) {
             $s.val(initially).trigger('change');
           } else if (!defaultSelection && that.elementDesc.options.uniqueKeys) {
@@ -387,12 +384,12 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
       row.innerHTML = `
         <div class="col-sm-5">
           <select class="form-control map-selector">
-            <option value="">${i18n.t('tdp:core.FormMap.select')}</option>
+            <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
         <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-default btn-sm" title="${i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-1"><button class="btn btn-default btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
 
       const valueElem = <HTMLElement>row.querySelector('.col-sm-6');
       if (d.key) { // has value
@@ -465,7 +462,7 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
    * @param v
    */
   set value(v: IFormRow[]) {
-    if (isEqual(v, this.value)) {
+    if (this.isEqual(v, this.value)) {
       return;
     }
     this.rows = v;
@@ -479,43 +476,44 @@ export default class FormMap extends AFormElement<IFormMapDesc> {
     // open dropdown
     $(this.$node.select('.dropdown-menu').node()).show();
   }
-}
 
-function isEqual(a: IFormRow[], b: IFormRow[]) {
-  if (a.length !== b.length) {
-    return false;
+  isEqual(a: IFormRow[], b: IFormRow[]) {
+    if (a.length !== b.length) {
+      return false;
+    }
+    return a.every((ai, i) => {
+      const bi = b[i];
+      return ai.key === bi.key && ai.value === bi.value;
+    });
   }
-  return a.every((ai, i) => {
-    const bi = b[i];
-    return ai.key === bi.key && ai.value === bi.value;
-  });
+
+  static convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap {
+    if (!rows) {
+      return {};
+    }
+    const map = new Map<string, any[]>();
+    rows.forEach((row) => {
+      if (!map.has(row.key)) {
+        map.set(row.key, []);
+      }
+      const v = map.get(row.key);
+      if (Array.isArray(row.value)) {
+        v.push(...row.value);
+      } else {
+        v.push(row.value);
+      }
+    });
+    const r: IFormMultiMap = {};
+    map.forEach((v, k) => {
+      if (v.length === 1) {
+        r[k] = v[0];
+      } else {
+        r[k] = v;
+      }
+    });
+    return r;
+  }
 }
 
 export declare type IFormMultiMap = {[key: string]: any | any[]};
 
-export function convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap {
-  if (!rows) {
-    return {};
-  }
-  const map = new Map<string, any[]>();
-  rows.forEach((row) => {
-    if (!map.has(row.key)) {
-      map.set(row.key, []);
-    }
-    const v = map.get(row.key);
-    if (Array.isArray(row.value)) {
-      v.push(...row.value);
-    } else {
-      v.push(row.value);
-    }
-  });
-  const r: IFormMultiMap = {};
-  map.forEach((v, k) => {
-    if (v.length === 1) {
-      r[k] = v[0];
-    } else {
-      r[k] = v;
-    }
-  });
-  return r;
-}

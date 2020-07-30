@@ -1,40 +1,9 @@
 import {SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
-import {ISearchOption} from '../LineUpPanelActions';
-import {EventHandler} from 'phovea_core/src/event';
-import PanelButton, {PanelNavButton} from './PanelButton';
-import i18n from 'phovea_core/src/i18n';
+import {ISearchOption} from './ISearchOption';
+import {EventHandler, I18nextManager} from 'phovea_core';
+import {PanelButton, PanelNavButton} from './PanelButton';
+import {IPanelTabDesc} from './IPanelTabDesc';
 
-/**
- * Interface for the options parameter of PanelTab
- */
-export interface IPanelTabDesc {
-
-  /**
-   * Width of the SidePanel
-   */
-  width: string;
-
-  /**
-   * CSS class for PanelNavButton of the PanelTab
-   */
-  cssClass: string;
-
-  /**
-   * Title and Text content for the PanelNavButton of the PanelTab.
-   */
-  title: string;
-
-  /**
-   * Define the sort order of the PanelNavButtons
-   */
-  order: number;
-
-  /**
-   * Show PanelNavButton in collapsed mode
-   * @default false
-   */
-  shortcut?: boolean;
-}
 
 /**
  * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
@@ -48,7 +17,7 @@ export class PanelTab extends EventHandler {
   readonly node: HTMLElement;
   readonly options: IPanelTabDesc = {
     cssClass: 'fa fa-sliders',
-    title: i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
+    title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
     width: '23em',
     order: 0
   };

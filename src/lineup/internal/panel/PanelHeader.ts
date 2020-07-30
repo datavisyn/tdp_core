@@ -3,7 +3,7 @@ import {IPanelButton} from './PanelButton';
 /**
  * The panel header contains a list of panel buttons.
  */
-export default class PanelHeader {
+export class PanelHeader {
 
   readonly node: HTMLElement;
   private buttons: IPanelButton[] = [];

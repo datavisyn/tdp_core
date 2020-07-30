@@ -1,9 +1,4 @@
-import {debounce} from 'phovea_core/src';
-import {resolveImmediately} from 'phovea_core/src';
-import {EventHandler, IEvent} from 'phovea_core/src/event';
-import {IDType, resolve} from 'phovea_core/src/idtype';
-import {getFactoryMethod} from 'phovea_core/src/plugin';
-import {none} from 'phovea_core/src/range';
+import {BaseUtils, ResolveNow, EventHandler, IEvent, IDType, IDTypeManager, Range, PluginRegistry, I18nextManager, WebpackEnv} from 'phovea_core';
 import {
   IRootLayoutContainer,
   ISplitLayoutContainer,
@@ -11,19 +6,13 @@ import {
   IView as ILayoutView,
   IViewLayoutContainer,
   LayoutContainerEvents
-} from 'phovea_ui/src/layout';
-import {
-  horizontalSplit,
-  horizontalStackedLineUp,
-  root,
-  tabbing,
-  verticalSplit,
-  verticalStackedLineUp,
-  view, ViewBuilder
-} from 'phovea_ui/src/layout/builder';
-import AView from './AView';
-import {EViewMode, ISelection, isSameSelection, IView, IViewContext, IViewPluginDesc} from './interfaces';
-import i18n from 'phovea_core/src/i18n';
+} from 'phovea_ui';
+import {BuilderUtils, ViewBuilder} from 'phovea_ui';
+import {AView} from './AView';
+import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
+import {EViewMode} from '../base/interfaces';
+import {ViewUtils} from './ViewUtils';
+
 
 interface IElementDesc {
   key: string;
@@ -55,11 +44,6 @@ export interface ICompositeViewPluginDesc extends IViewPluginDesc {
 export interface IACompositeViewOptions {
   showHeaders: boolean;
 }
-
-declare const __DEBUG__: boolean;
-
-export const VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
-export const VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB = 'setActiveTab';
 
 
 export interface ICompositeInfo {
@@ -147,7 +131,11 @@ class WrapperView implements ILayoutView {
 }
 
 
-export default class CompositeView extends EventHandler implements IView {
+export class CompositeView extends EventHandler implements IView {
+
+  public static readonly VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
+  public static readonly VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB = 'setActiveTab';
+
   private readonly options: Readonly<IACompositeViewOptions> = {
     showHeaders: false
   };
@@ -160,7 +148,7 @@ export default class CompositeView extends EventHandler implements IView {
   private readonly children: WrapperView[] = [];
   private readonly childrenLookup = new Map<string, IView>();
 
-  private readonly debounceUpdateEntryPoint = debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
+  private readonly debounceUpdateEntryPoint = BaseUtils.debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
 
   private itemSelection: ISelection;
 
@@ -168,13 +156,13 @@ export default class CompositeView extends EventHandler implements IView {
     super();
     Object.assign(this.options, options);
 
-    if (isRegex(context.desc.idtype)) {
+    if (this.isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
     } else {
-      this.idType = resolve(context.desc.idtype);
+      this.idType = IDTypeManager.getInstance().resolveIdType(context.desc.idtype);
     }
 
-    this.root = root(view(i18n.t('tdp:core.views.noViews')));
+    this.root = BuilderUtils.root(BuilderUtils.view(I18nextManager.getInstance().i18n.t('tdp:core.views.noViews')));
     this.root.node.classList.add('tdp-view', 'composite-view');
     parent.appendChild(this.root.node);
   }
@@ -226,7 +214,7 @@ export default class CompositeView extends EventHandler implements IView {
       }
     };
 
-    return resolveImmediately(this.createSetup()).then((setup) => {
+    return ResolveNow.resolveImmediately(this.createSetup()).then((setup) => {
       this.setup = setup;
 
       const helper = this.node.ownerDocument.createElement('div');
@@ -237,7 +225,7 @@ export default class CompositeView extends EventHandler implements IView {
         let selection: ISelection;
         let old: ISelection;
 
-        const debounced = debounce(() => {
+        const debounced = BaseUtils.debounce(() => {
           this.itemSelection = selection;
           const oo = old;
           old = null;
@@ -256,7 +244,7 @@ export default class CompositeView extends EventHandler implements IView {
       this.setup.elements.forEach((d) => {
         let s = this.selection;
         if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
-          s = {idtype: this.selection.idtype, range: none()};
+          s = {idtype: this.selection.idtype, range: Range.none()};
         }
         const instance = d.create(this.context, s, helper, d.options);
         if (links.length === 0 || links.some((l) => l.fromKey === d.key && l.toKey === '_item')) {
@@ -264,8 +252,8 @@ export default class CompositeView extends EventHandler implements IView {
         }
         instance.on(AView.EVENT_UPDATE_ENTRY_POINT, this.debounceUpdateEntryPoint);
         instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
-        instance.on(VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
-        instance.on(VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB, setActiveTab);
+        instance.on(CompositeView.VIEW_COMPOSITE_EVENT_CHANGE_RATIOS, updateRatios);
+        instance.on(CompositeView.VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB, setActiveTab);
         this.childrenLookup.set(d.key, instance);
 
         this.children.push(new WrapperView(instance, d.key));
@@ -291,17 +279,17 @@ export default class CompositeView extends EventHandler implements IView {
         });
       });
 
-      const resizedAfterUpdate = debounce(() => this.children.forEach((c) => c.resized()));
+      const resizedAfterUpdate = BaseUtils.debounce(() => this.children.forEach((c) => c.resized()));
 
       if (this.children.length === 1) {
         const first = this.children[0];
-        this.root.root = this.root.build(view(first).name(first.key).fixed());
+        this.root.root = this.root.build(BuilderUtils.view(first).name(first.key).fixed());
         this.root.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, resizedAfterUpdate);
         this.setBusy(false);
         return;
       }
 
-      const views = new Map(this.children.map((d) => <[string, ViewBuilder]>[d.key, view(d).name(d.key).fixed()]));
+      const views = new Map(this.children.map((d) => <[string, ViewBuilder]>[d.key, BuilderUtils.view(d).name(d.key).fixed()]));
       this.buildLayout(views, this.children.map((d) => d.key));
       this.root.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, resizedAfterUpdate);
     });
@@ -327,18 +315,18 @@ export default class CompositeView extends EventHandler implements IView {
         case 'hsplit':
           const firstH = buildImpl(l.keys[0]);
           const secondH = buildImpl(l.keys[1]);
-          return horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
+          return BuilderUtils.horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
         case 'hstack':
-          return horizontalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
+          return BuilderUtils.horizontalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
         case 'vstack':
-          return verticalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
+          return BuilderUtils.verticalStackedLineUp(...l.keys.map(buildImpl)).fixedLayout();
         case 'tabbing':
-          return tabbing(...l.keys.map(buildImpl)).fixedLayout();
+          return BuilderUtils.tabbing(...l.keys.map(buildImpl)).fixedLayout();
         // case 'vsplit':
         default: {
           const firstV = buildImpl(l.keys[0]);
           const secondV = buildImpl(l.keys[1]);
-          return verticalSplit(ratio[0], firstV, secondV).fixedLayout();
+          return BuilderUtils.verticalSplit(ratio[0], firstV, secondV).fixedLayout();
         }
       }
     };
@@ -385,7 +373,7 @@ export default class CompositeView extends EventHandler implements IView {
     if (child) {
       return child.getParameter(rest);
     }
-    if (__DEBUG__) {
+    if (WebpackEnv.__DEBUG__) {
       console.warn('invalid parameter detected', name, this.context.desc);
     }
     return null;
@@ -397,13 +385,13 @@ export default class CompositeView extends EventHandler implements IView {
     if (child) {
       return child.setParameter(rest, value);
     }
-    if (__DEBUG__) {
+    if (WebpackEnv.__DEBUG__) {
       console.warn('invalid parameter detected', name, this.context.desc);
     }
   }
 
   setInputSelection(selection: ISelection) {
-    if (isSameSelection(this.selection, selection)) {
+    if (ViewUtils.isSameSelection(this.selection, selection)) {
       return;
     }
     this.selection = selection;
@@ -474,7 +462,7 @@ export default class CompositeView extends EventHandler implements IView {
       return Promise.resolve(desc.loader()).then((instance) => (<ICompositeInfo>{
         key: desc.key,
         options: Object.assign({}, descOptions, this.options), // also pass the view options from the ViewWrapper to all views
-        create: getFactoryMethod(instance, desc.factory || 'create')
+        create: PluginRegistry.getInstance().getFactoryMethod(instance, desc.factory || 'create')
       }));
     };
 
@@ -496,9 +484,8 @@ export default class CompositeView extends EventHandler implements IView {
     });
   }
 
-}
-
-function isRegex(v: string) {
-  // cheap test for regex
-  return v.includes('*') || v.includes('.') || v.includes('|');
+  isRegex(v: string) {
+    // cheap test for regex
+    return v.includes('*') || v.includes('.') || v.includes('|');
+  }
 }

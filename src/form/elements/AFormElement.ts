@@ -3,10 +3,9 @@
  */
 
 import {Selection} from 'd3';
-import {EventHandler} from 'phovea_core/src/event';
+import {EventHandler, UserSession, IPluginDesc, PluginRegistry} from 'phovea_core';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
-import * as session from 'phovea_core/src/session';
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {EP_TDP_CORE_FORM_ELEMENT} from '../../base/extensions';
 
 /**
  * Abstract form element class that is used as parent class for other form elements
@@ -33,7 +32,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
     if (elementDesc.onInit) {
       this.on(AFormElement.EVENT_INITIAL_VALUE, (_evt, value: any, previousValue: any) => {
-        elementDesc.onInit(this, value, toData(value), previousValue);
+        elementDesc.onInit(this, value, AFormElement.toData(value), previousValue);
       });
     }
   }
@@ -42,18 +41,18 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     if (!this.elementDesc.useSession) {
       return;
     }
-    session.store(`${this.id}_value`, this.value);
+    UserSession.getInstance().store(`${this.id}_value`, this.value);
   }
 
   protected getStoredValue<T>(defaultValue:T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return session.retrieve(`${this.id}_value`, defaultValue);
+    return  UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
   }
 
   protected hasStoredValue(): boolean {
-    return session.has(`${this.id}_value`);
+    return  UserSession.getInstance().has(`${this.id}_value`);
   }
 
   isRequired() {
@@ -101,7 +100,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     const value = this.value;
     const old = this.previousValue;
     this.previousValue = value;
-    this.elementDesc.onChange(this, value, toData(value), old);
+    this.elementDesc.onChange(this, value, AFormElement.toData(value), old);
   }
 
   /**
@@ -198,13 +197,31 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   abstract set value(v: any);
 
   abstract focus();
-}
 
-export function toData(value: any) {
-  if (Array.isArray(value)) {
-    return value.map(toData);
+  static toData(value: any) {
+    if (Array.isArray(value)) {
+      return value.map(AFormElement.toData);
+    }
+    return (value != null && value.data !== undefined) ? value.data : value;
   }
-  return (value != null && value.data !== undefined) ? value.data : value;
+
+  /**
+   * Factory method to create form elements for the phovea extension type `tdpFormElement`.
+   * An element is found when `desc.type` is matching the extension id.
+   *
+   * @param form the form to which the element will be appended
+   * @param $parent parent D3 selection element
+   * @param elementDesc form element description
+   */
+  static createFormElement(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement> {
+    const plugin = PluginRegistry.getInstance().getPlugin(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
+    if(!plugin) {
+      throw new Error('unknown form element type: ' + elementDesc.type);
+    }
+    return plugin.load().then((p) => {
+      return p.factory(form, <any>elementDesc, p.desc);
+    });
+  }
 }
 
-export default AFormElement;
+

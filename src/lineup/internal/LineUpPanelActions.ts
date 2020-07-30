@@ -1,59 +1,73 @@
 
-import {SidePanel, spaceFillingRule, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
-import {IDType, resolve} from 'phovea_core/src/idtype';
-import {IPlugin, IPluginDesc, list as listPlugins} from 'phovea_core/src/plugin';
-import {editDialog} from '../../storage';
+import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
+import {IDType} from 'phovea_core';
+import {IPlugin, IPluginDesc, EventHandler, I18nextManager, PluginRegistry, IDTypeManager} from 'phovea_core';
+import {StoreUtils} from '../../storage';
 import {
-  IScoreLoader, EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
-  IScoreLoaderExtensionDesc, IRankingButtonExtension, IRankingButtonExtensionDesc, EP_TDP_CORE_LINEUP_PANEL_TAB, IPanelTabExtensionDesc
-} from '../../extensions';
-import {EventHandler} from 'phovea_core/src/event';
-import {IARankingViewOptions} from '../ARankingView';
-import {lazyDialogModule} from '../../dialogs';
-import PanelButton from './panel/PanelButton';
+  EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
+  EP_TDP_CORE_LINEUP_PANEL_TAB
+} from '../../base/extensions';
+import {IARankingViewOptions} from '../IARankingViewOptions';
+import {PanelButton} from './panel/PanelButton';
 import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
 import {PanelTab, SidePanelTab} from './panel/PanelTab';
-import SearchBoxProvider from './panel/SearchBoxProvider';
-import PanelHeader from './panel/PanelHeader';
-import PanelRankingButton from './panel/PanelRankingButton';
-import PanelAddColumnButton from './panel/PanelAddColumnButton';
-import i18n from 'phovea_core/src/i18n';
-import PanelDownloadButton from './panel/PanelDownloadButton';
-import {IPanelTabExtension} from '../../extensions';
+import {SearchBoxProvider} from './panel/SearchBoxProvider';
+import {PanelHeader} from './panel/PanelHeader';
+import {PanelRankingButton} from './panel/PanelRankingButton';
+import {PanelAddColumnButton} from './panel/PanelAddColumnButton';
+import {PanelDownloadButton} from './panel/PanelDownloadButton';
+import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension} from '../../base/interfaces';
+import {ISearchOption} from './panel/ISearchOption';
+import {LineupUtils} from '../utils';
 
-export interface ISearchOption {
-  text: string;
-  id: string;
-  action(): void;
+
+export interface IPanelTabExtension {
+  desc: IPanelTabExtensionDesc;
+
+  /**
+   * Create and attach a new LineUp side panel
+   * @param tab PanelTab instance to attach the HTMLElement and listen to events
+   * @param provider The data of the current ranking
+   * @param desc The phovea extension point description
+   */
+  factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
 }
 
-export const rule = spaceFillingRule({
-  groupHeight: 70,
-  rowHeight: 18,
-  groupPadding: 5
-});
+export interface IPanelTabExtensionDesc extends IPluginDesc {
+  /**
+   * CSS class for the PanelNavButton of the PanelTab
+   */
+  cssClass: string;
 
+  /**
+   * Title attribute PanelNavButton
+   */
+  title: string;
 
-/**
- * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
- * @param score
- * @returns {IScoreLoader}
- */
-export function wrap(score: IPluginDesc): IScoreLoader {
-  return {
-    text: score.name,
-    id: score.id,
-    scoreId: score.id,
-    factory(extraArgs: object, count: number) {
-      return score.load().then((p) => Promise.resolve(p.factory(score, extraArgs, count)));
-    }
-  };
+  /**
+   * Customize the PanelNavButtons' position (recommended to use multiples of 10)
+   */
+  order: number;
+
+  /**
+   * Width of the PanelTab
+   */
+  width: string;
+
+  /**
+   * If true a shortcut button is appended to the SidePanel header in collapsed mode
+   * @default false
+   */
+  shortcut?: boolean;
+
+  load(): Promise<IPlugin & IPanelTabExtension>;
 }
 
-export default class LineUpPanelActions extends EventHandler {
+
+export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
-  static readonly EVENT_RULE_CHANGED = 'ruleChanged';
+  static readonly EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
   /**
    * @deprecated
@@ -80,6 +94,7 @@ export default class LineUpPanelActions extends EventHandler {
 
   constructor(protected readonly provider: LocalDataProvider, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
+
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
 
@@ -162,7 +177,7 @@ export default class LineUpPanelActions extends EventHandler {
         this.collapse = !this.collapse;
       };
 
-      const collapseButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton'), 'collapse-button', listener);
+      const collapseButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton'), 'collapse-button', listener);
       this.header.addButton(collapseButton);
     }
 
@@ -175,12 +190,12 @@ export default class LineUpPanelActions extends EventHandler {
 
     if (this.options.enableSaveRanking) {
       const listener = (ranking: Ranking) => {
-        editDialog(null, (name, description, sec) => {
+        StoreUtils.editDialog(null, (name, description, sec) => {
           this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, ranking.getOrder(), name, description, sec);
         });
       };
 
-      const saveRankingButton = new PanelRankingButton(buttons, this.provider, i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
+      const saveRankingButton = new PanelRankingButton(buttons, this.provider, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
       this.header.addButton(saveRankingButton);
     }
 
@@ -190,10 +205,10 @@ export default class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableZoom) {
-      const zoomInButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
+      const zoomInButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'), 'fa fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN));
       this.header.addButton(zoomInButton);
 
-      const zoomOutButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
+      const zoomOutButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fa fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
       this.header.addButton(zoomOutButton);
     }
 
@@ -201,9 +216,9 @@ export default class LineUpPanelActions extends EventHandler {
       const listener = () => {
         const selected = this.overview.classList.toggle('fa-th-list');
         this.overview.classList.toggle('fa-list');
-        this.fire(LineUpPanelActions.EVENT_RULE_CHANGED, selected ? rule : null);
+        this.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, selected);
       };
-      const overviewButton = new PanelButton(buttons, i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
+      const overviewButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'), this.options.enableOverviewMode === 'active' ? 'fa fa-th-list' : 'fa fa-list', listener);
       this.overview = overviewButton.node; // TODO might be removed
       this.header.addButton(overviewButton);
     }
@@ -222,7 +237,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private appendExtraButtons(parent: HTMLElement) {
-    const buttons = <IRankingButtonExtensionDesc[]>listPlugins(EXTENSION_POINT_TDP_RANKING_BUTTON);
+    const buttons = <IRankingButtonExtensionDesc[]>PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_RANKING_BUTTON);
     return buttons.map((button) => {
       const listener = () => {
         button.load().then((p) => this.scoreColumnDialog(p));
@@ -234,7 +249,7 @@ export default class LineUpPanelActions extends EventHandler {
   }
 
   private appendExtraTabs() {
-    const plugins = <IPanelTabExtensionDesc[]>listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB).sort((a, b) => a.order - b.order);
+    const plugins = <IPanelTabExtensionDesc[]>PluginRegistry.getInstance().listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB).sort((a, b) => a.order - b.order);
     plugins.forEach((plugin) => {
       let isLoaded = false;
       const tab = new PanelTab(this.tabContainer.node, plugin);
@@ -282,8 +297,8 @@ export default class LineUpPanelActions extends EventHandler {
 
   private async resolveScores(idType: IDType) {
     // load plugins, which need to be checked if the IDTypes are mappable
-    const ordinoScores: IPluginDesc[] = await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE));
-    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await findMappablePlugins(idType, listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
+    const ordinoScores: IPluginDesc[] = await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
+    const metaDataPluginDescs = <IScoreLoaderExtensionDesc[]>await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
 
     const metaDataPluginPromises: Promise<IGroupSearchItem<any>>[] = metaDataPluginDescs
       .map((plugin: IScoreLoaderExtensionDesc) => plugin.load()
@@ -295,7 +310,7 @@ export default class LineUpPanelActions extends EventHandler {
 
     // Load meta data plugins
     const metaDataOptions = await Promise.all(metaDataPluginPromises);
-    const loadedScorePlugins = ordinoScores.map((desc) => wrap(desc));
+    const loadedScorePlugins = ordinoScores.map((desc) => LineupUtils.wrap(desc));
     return {metaDataOptions, loadedScorePlugins};
   }
 
@@ -311,12 +326,12 @@ export default class LineUpPanelActions extends EventHandler {
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
     if (this.options.enableAddingDatabaseColumns) {
-      items.push(this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
+      items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
       items.push({
-        text: i18n.t('tdp:core.lineup.LineupPanelActions.parameterizedScores'),
+        text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.parameterizedScores'),
         children: loadedScorePlugins.map((score) => {
           return {
             text: score.text,
@@ -337,33 +352,33 @@ export default class LineUpPanelActions extends EventHandler {
       const scoreDescs = this.getColumnDescription(descs, true);
       if (scoreDescs.length > 0) {
         items.push({
-          text: i18n.t('tdp:core.lineup.LineupPanelActions.previouslyAddedColumns'),
+          text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.previouslyAddedColumns'),
           children: scoreDescs
         });
       }
     }
 
     const specialColumnsOption = {
-      text: i18n.t('tdp:core.lineup.LineupPanelActions.specialColumns'),
+      text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.specialColumns'),
       children: []
     };
 
     if (this.options.enableAddingCombiningColumns) {
-      const combiningColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.combiningColumns'), [
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum')))},
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination')))},
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(i18n.t('tdp:core.lineup.LineupPanelActions.nested')))},
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc())},
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.imposition'), id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
+      const combiningColumns = this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.combiningColumns'), [
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum')))},
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination')))},
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.nested')))},
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc())},
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.imposition'), id: 'imposition', action: () => this.addColumn(createImpositionDesc())}
       ]);
       specialColumnsOption.children.push(combiningColumns);
     }
 
     if (this.options.enableAddingSupportColumns) {
-      const supportColumns = this.groupedDialog(i18n.t('tdp:core.lineup.LineupPanelActions.supportColumns'), [
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(i18n.t('tdp:core.lineup.LineupPanelActions.group')))},
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc())},
-        {text: i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
+      const supportColumns = this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.supportColumns'), [
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.group')))},
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc())},
+        {text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc())}
       ]);
       specialColumnsOption.children.push(supportColumns);
     }
@@ -386,12 +401,12 @@ export default class LineUpPanelActions extends EventHandler {
       return {text, children};
     }
     return {
-      text: i18n.t('tdp:core.lineup.LineupPanelActions.columnTitle', {text}),
+      text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.columnTitle', {text}),
       id: `group_${text}`,
       action: () => {
         // choooser dialog
-        lazyDialogModule().then((dialogs) => {
-          const dialog = new dialogs.FormDialog(i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
+        import('phovea_ui/dist/components/dialogs').then(({FormDialog}) => {
+          const dialog = new FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
           dialog.form.insertAdjacentHTML('beforeend', `
             <select name="column" class="form-control">
               ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}
@@ -456,7 +471,7 @@ export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
       return true;
     }
     // lookup the targets and check if our target is part of it
-    return resolve(idtype).getCanBeMappedTo().then((mappables: IDType[]) => mappables.some((d) => d.id === target.id));
+    return IDTypeManager.getInstance().getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype)).then((mappables: IDType[]) => mappables.some((d) => d.id === target.id));
   }
   // check which idTypes can be mapped to the target one
   return Promise.all(idTypes.map(canBeMappedTo)).then((mappable: boolean[]) => {

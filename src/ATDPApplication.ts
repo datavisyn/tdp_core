@@ -2,27 +2,18 @@
  * Created by sam on 03.03.2017.
  */
 
-import ProvenanceGraph from 'phovea_core/src/provenance/ProvenanceGraph';
-import {create as createHeader, AppHeaderLink, AppHeader} from 'phovea_ui/src/header';
-import {MixedStorageProvenanceGraphManager} from 'phovea_core/src/provenance';
-import CLUEGraphManager from 'phovea_clue/src/CLUEGraphManager';
-import * as cmode from 'phovea_clue/src/mode';
-import LoginMenu from 'phovea_clue/src/menu/LoginMenu';
-import {isLoggedIn} from 'phovea_core/src/security';
-import ACLUEWrapper from 'phovea_clue/src/ACLUEWrapper';
-import {loadProvenanceGraphVis, loadStoryVis} from 'phovea_clue/src/vis_loader';
-import EditProvenanceGraphMenu from './internal/EditProvenanceGraphMenu';
-import {showProveanceGraphNotFoundDialog} from './dialogs';
-import {mixin} from 'phovea_core/src';
-import lazyBootstrap from 'phovea_ui/src/_lazyBootstrap';
-import {KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES} from './constants';
-import 'phovea_ui/src/_font-awesome';
-import {list as listPlugins} from 'phovea_core/src/plugin';
-import {EXTENSION_POINT_TDP_APP_EXTENSION, IAppExtensionExtension} from './extensions';
-import TourManager from './tour/TourManager';
-import i18n, {initI18n} from 'phovea_core/src/i18n';
+import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry} from 'phovea_core';
+import {AppHeaderLink, AppHeader} from 'phovea_ui';
+import 'phovea_ui/dist/webpack/_bootstrap';
+import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
+import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
+import {DialogUtils} from './base/dialogs';
+import 'phovea_ui/dist/webpack/_font-awesome';
+import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
+import {IAppExtensionExtension} from './base/interfaces';
+import {TourManager} from './tour/TourManager';
+import {TemporarySessionList} from './utils/SessionList';
 
-export {default as CLUEGraphManager} from 'phovea_clue/src/CLUEGraphManager';
 
 export interface ITDPOptions {
   /**
@@ -91,19 +82,20 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   protected app: Promise<T> = null;
   protected header: AppHeader;
+  protected loginMenu: LoginMenu;
   protected tourManager: TourManager;
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
 
-    initI18n().then(() => { //Initialize i18n and then load application
+    I18nextManager.getInstance().initI18n().then(() => { //Initialize i18n and then load application
       this.tourManager = new TourManager({
         doc: document,
         header: () => this.header,
         app: () => this.app
       });
 
-      mixin(this.options, {
+      BaseUtils.mixin(this.options, {
         showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
       }, options);
 
@@ -124,7 +116,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
   protected createHeader(parent: HTMLElement) {
     //create the common header
-    const header = createHeader(parent, {
+    const header = AppHeader.create(parent, {
       showCookieDisclaimer: this.options.showCookieDisclaimer,
       showAboutLink: this.options.showAboutLink,
       showHelpLink: this.options.showHelpLink,
@@ -142,7 +134,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       if (typeof this.options.showResearchDisclaimer === 'function') {
         this.options.showResearchDisclaimer(aboutDialogBody);
       } else {
-        aboutDialogBody.insertAdjacentHTML('afterbegin', `<div class="alert alert-warning" role="alert">${i18n.t('tdp:core.disclaimerMessage')}</span></div>`);
+        aboutDialogBody.insertAdjacentHTML('afterbegin', `<div class="alert alert-warning" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.disclaimerMessage')}</span></div>`);
       }
     }
 
@@ -167,16 +159,15 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.header.wait();
 
     // trigger bootstrap loading
-    lazyBootstrap();
-
-    const loginMenu = new LoginMenu(this.header, {
+    import('jquery');
+    this.loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
       loginForm: this.options.loginForm,
       watch: true
     });
-    loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
+    this.loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
       // reopen after logged out
-      loginMenu.forceShowDialog();
+      this.loginMenu.forceShowDialog();
     });
 
     const provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
@@ -194,22 +185,22 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
 
     graph.catch((error: {graph: string}) => {
-      showProveanceGraphNotFoundDialog(clueManager, error.graph);
+      DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
     graph.then((graph) => {
-      cmode.createButton(modeSelector, {
+      ButtonModeSelector.createButton(modeSelector, {
         size: 'sm'
       });
       provenanceMenu.setGraph(graph);
     });
 
-    const provVis = loadProvenanceGraphVis(graph, content, {
+    const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
       thumbnails: false,
       provVisCollapsed: true,
       hideCLUEButtonsOnCollapse: true
     });
-    const storyVis = loadStoryVis(graph, content, main, {
+    const storyVis = VisLoader.loadStoryVis(graph, content, main, {
       thumbnails: false
     });
 
@@ -225,13 +216,13 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     let forceShowLoginDialogTimeout: any = -1;
     // INITIAL LOGIC
-    loginMenu.on(LoginMenu.EVENT_LOGGED_IN, () => {
+    this.loginMenu.on(LoginMenu.EVENT_LOGGED_IN, () => {
       clearTimeout(forceShowLoginDialogTimeout);
       initSession();
     });
-    if (!isLoggedIn()) {
+    if (!UserSession.getInstance().isLoggedIn()) {
       //wait 1sec before the showing the login dialog to give the auto login mechanism a chance
-      forceShowLoginDialogTimeout = setTimeout(() => loginMenu.forceShowDialog(), 1000);
+      forceShowLoginDialogTimeout = setTimeout(() => this.loginMenu.forceShowDialog(), 1000);
     } else {
       initSession();
     }
@@ -243,7 +234,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    * customize the using extension point
    */
   private customizeApp(content: HTMLElement, main: HTMLElement) {
-    const plugins = listPlugins(EXTENSION_POINT_TDP_APP_EXTENSION);
+    const plugins = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_APP_EXTENSION);
     if (plugins.length === 0) {
       return;
     }
@@ -264,8 +255,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   private cleanUpOld(manager: MixedStorageProvenanceGraphManager) {
     const workspaces = manager.listLocalSync().sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
     // cleanup up temporary ones
-    if (workspaces.length > KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
-      const toDelete = workspaces.slice(KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
+    if (workspaces.length > TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
+      const toDelete = workspaces.slice(TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
       Promise.all(toDelete.map((d) => manager.delete(d))).catch((error) => {
         console.warn('cannot delete old graphs:', error);
       });
@@ -287,5 +278,3 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    */
   protected abstract initSessionImpl(app: T);
 }
-
-export default ATDPApplication;

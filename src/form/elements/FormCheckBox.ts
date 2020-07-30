@@ -1,7 +1,7 @@
 import {IFormElementDesc, IForm} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {IPluginDesc} from 'phovea_core';
 
 export interface ICheckBoxElementDesc extends IFormElementDesc {
   options: {
@@ -20,7 +20,7 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
   };
 }
 
-export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
+export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
 
   private $input: d3.Selection<any>;
 

@@ -1,15 +1,10 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {IAdditionalColumnDesc} from '../../desc';
-import {array_diff} from '../../internal/LineUpSelectionHelper';
+import {IAdditionalColumnDesc} from '../../../base/interfaces';
+import {LineupUtils} from '../../utils';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
-import {resolveImmediately} from 'phovea_core/src/internal/promise';
-
-export function patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
-  desc.selectedId = selectedId;
-  return desc;
-}
+import {ResolveNow} from 'phovea_core';
 
 export abstract class ABaseSelectionAdapter {
 
@@ -42,7 +37,7 @@ export abstract class ABaseSelectionAdapter {
     if (this.waitingForSelection) {
       return this.waitingForSelection;
     }
-    return this.waitingForSelection = resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
+    return this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
       this.waitingForSelection = null;
     });
   }
@@ -54,7 +49,7 @@ export abstract class ABaseSelectionAdapter {
     if (this.waitingForParameter) {
       return this.waitingForParameter;
     }
-    return this.waitingForParameter = resolveImmediately(waitForIt).then(() => {
+    return this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt).then(() => {
       if (this.waitingForSelection) {
         return; // abort selection more important
       }
@@ -72,8 +67,8 @@ export abstract class ABaseSelectionAdapter {
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
     // compute the difference
-    const diffAdded = array_diff(selectedIds, lineupColIds);
-    const diffRemoved = array_diff(lineupColIds, selectedIds);
+    const diffAdded = LineupUtils.array_diff(selectedIds, lineupColIds);
+    const diffRemoved = LineupUtils.array_diff(lineupColIds, selectedIds);
 
     // remove deselected columns
     if (diffRemoved.length > 0) {
@@ -89,6 +84,9 @@ export abstract class ABaseSelectionAdapter {
   }
 
   protected abstract createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<ISelectionColumn[]>;
-}
 
-export default ABaseSelectionAdapter;
+  static patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
+    desc.selectedId = selectedId;
+    return desc;
+  }
+}

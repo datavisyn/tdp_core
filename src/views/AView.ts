@@ -3,44 +3,40 @@
  */
 
 import {select} from 'd3';
-import {EventHandler} from 'phovea_core/src/event';
-import {defaultSelectionType, IDType, resolve} from 'phovea_core/src/idtype';
-import {none} from 'phovea_core/src/range';
-import {IFormElementDesc, FormBuilder} from '../form';
-import {toData} from '../form/elements/AFormElement';
-import {
-  EViewMode, ISelection, isSameSelection, IView, IViewContext, VIEW_EVENT_ITEM_SELECT,
-  VIEW_EVENT_LOADING_FINISHED, VIEW_EVENT_UPDATE_ENTRY_POINT, VIEW_EVENT_UPDATE_SHARED
-} from './interfaces';
-import {resolveIds, resolveAllNames, resolveAllIds, resolveNames} from './resolve';
-import {DEFAULT_SELECTION_NAME} from '../extensions';
+import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils, WebpackEnv} from 'phovea_core';
+import {IFormElementDesc} from '../form/interfaces';
+import {FormBuilder} from '../form/FormBuilder';
+import {AFormElement} from '../form/elements/AFormElement';
+import {ISelection, IView, IViewContext} from '../base/interfaces';
+import {ViewUtils} from './ViewUtils';
+import {ResolveUtils} from './ResolveUtils';
+import {EViewMode} from '../base/interfaces';
 import {IForm} from '../form/interfaces';
-import i18n from 'phovea_core/src/i18n';
 
-declare const __DEBUG__;
-export {resolveIds, resolveId, resolveIdToNames} from './resolve';
 
 /**
  * base class for all views
  */
 export abstract class AView extends EventHandler implements IView {
 
+  public static readonly DEFAULT_SELECTION_NAME = 'default';
+
   /**
    * params(oldValue: ISelection, newSelection: ISelection)
    */
-  static readonly EVENT_ITEM_SELECT = VIEW_EVENT_ITEM_SELECT;
+  static readonly EVENT_ITEM_SELECT = ViewUtils.VIEW_EVENT_ITEM_SELECT;
   /**
    * params(namedSet: INamedSet)
    */
-  static readonly EVENT_UPDATE_ENTRY_POINT = VIEW_EVENT_UPDATE_ENTRY_POINT;
+  static readonly EVENT_UPDATE_ENTRY_POINT = ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT;
   /**
    * params()
    */
-  static readonly EVENT_LOADING_FINISHED = VIEW_EVENT_LOADING_FINISHED;
+  static readonly EVENT_LOADING_FINISHED = ViewUtils.VIEW_EVENT_LOADING_FINISHED;
   /**
    * params(name: string, oldValue: any, newValue: any)
    */
-  static readonly EVENT_UPDATE_SHARED = VIEW_EVENT_UPDATE_SHARED;
+  static readonly EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
 
 
   readonly idType: IDType;
@@ -55,16 +51,16 @@ export abstract class AView extends EventHandler implements IView {
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
-    this.selections.set(DEFAULT_SELECTION_NAME, selection);
-    this.itemSelections.set(DEFAULT_SELECTION_NAME, {idtype: null, range: none()});
+    this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
+    this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
 
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
     parent.appendChild(this.node);
-    if (isRegex(context.desc.idtype)) {
+    if (this.isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
     } else {
-      this.idType = resolve(context.desc.idtype);
+      this.idType = IDTypeManager.getInstance().resolveIdType(context.desc.idtype);
     }
   }
 
@@ -78,13 +74,13 @@ export abstract class AView extends EventHandler implements IView {
     if (!value || !busyMessage) {
       delete this.node.dataset.busy;
     } else if (busyMessage) {
-      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : i18n.t('tdp:core.views.busyMessage');
+      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : I18nextManager.getInstance().i18n.t('tdp:core.views.busyMessage');
     }
   }
 
   protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
     const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'};
-    const defaultHintMessage = i18n.t('tdp:core.views.defaultHint', {...conditionalData});
+    const defaultHintMessage = I18nextManager.getInstance().i18n.t('tdp:core.views.defaultHint', {...conditionalData});
     this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;
@@ -95,7 +91,7 @@ export abstract class AView extends EventHandler implements IView {
 
   protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
     const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''};
-    return this.setHint(visible, hintMessage || i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
+    return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
   }
 
   /*final*/
@@ -166,7 +162,7 @@ export abstract class AView extends EventHandler implements IView {
   getParameter(name: string): any {
     const elem = this.getParameterElement(name);
     if (!elem) {
-      if (__DEBUG__ && this.params.length > 0) {
+      if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
         console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
       return this.paramsFallback.has(name) ? this.paramsFallback.get(name) : null;
@@ -178,7 +174,7 @@ export abstract class AView extends EventHandler implements IView {
 
   protected getParameterData(name: string): any {
     const value = this.getParameter(name);
-    return toData(value);
+    return AFormElement.toData(value);
   }
 
   protected async changeParameter(name: string, value: any) {
@@ -194,7 +190,7 @@ export abstract class AView extends EventHandler implements IView {
   setParameter(name: string, value: any) {
     const elem = this.getParameterElement(name);
     if (!elem) {
-      if (__DEBUG__ && this.params.length > 0) {
+      if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
         console.warn('invalid parameter detected use fallback', name, this.context.desc);
       }
       this.paramsFallback.set(name, value);
@@ -230,19 +226,19 @@ export abstract class AView extends EventHandler implements IView {
     // hook
   }
 
-  setInputSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+  setInputSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
     const current = this.selections.get(name);
-    if (current && isSameSelection(current, selection)) {
+    if (current && ViewUtils.isSameSelection(current, selection)) {
       return;
     }
     this.selections.set(name, selection);
-    if (name === DEFAULT_SELECTION_NAME) {
+    if (name === AView.DEFAULT_SELECTION_NAME) {
       this.selection = selection;
     }
     return this.selectionChanged(name);
   }
 
-  protected getInputSelection(name: string = DEFAULT_SELECTION_NAME) {
+  protected getInputSelection(name: string = AView.DEFAULT_SELECTION_NAME) {
     return this.selections.get(name);
   }
 
@@ -253,7 +249,7 @@ export abstract class AView extends EventHandler implements IView {
   /**
    * hook triggerd when the input selection has changed
    */
-  protected selectionChanged(_name: string = DEFAULT_SELECTION_NAME) {
+  protected selectionChanged(_name: string = AView.DEFAULT_SELECTION_NAME) {
     // hook
   }
 
@@ -266,7 +262,7 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveSelection(idType = this.idType): Promise<string[]> {
-    return resolveIds(this.selection.idtype, this.selection.range, idType);
+    return ResolveUtils.resolveIds(this.selection.idtype, this.selection.range, idType);
   }
 
   /**
@@ -274,7 +270,7 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveSelectionByName(idType = this.idType): Promise<string[]> {
-    return resolveNames(this.selection.idtype, this.selection.range, idType);
+    return ResolveUtils.resolveNames(this.selection.idtype, this.selection.range, idType);
   }
 
   /**
@@ -282,7 +278,7 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveMultipleSelections(idType = this.idType): Promise<string[][]> {
-    return resolveAllIds(this.selection.idtype, this.selection.range, idType);
+    return ResolveUtils.resolveAllIds(this.selection.idtype, this.selection.range, idType);
   }
 
   /**
@@ -290,23 +286,23 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveMultipleSelectionsByName(idType = this.idType): Promise<string[][]> {
-    return resolveAllNames(this.selection.idtype, this.selection.range, idType);
+    return ResolveUtils.resolveAllNames(this.selection.idtype, this.selection.range, idType);
   }
 
 
 
-  setItemSelection(selection: ISelection, name: string = DEFAULT_SELECTION_NAME) {
+  setItemSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
     const current = this.itemSelections.get(name);
-    if (current && isSameSelection(current, selection)) {
+    if (current && ViewUtils.isSameSelection(current, selection)) {
       return;
     }
     const wasEmpty = current == null || current.idtype == null || current.range.isNone;
     this.itemSelections.set(name, selection);
     // propagate
     if (selection.idtype) {
-      if (name === DEFAULT_SELECTION_NAME) {
+      if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selection.range.isNone) {
-          selection.idtype.clear(defaultSelectionType);
+          selection.idtype.clear(SelectionUtils.defaultSelectionType);
         } else {
           selection.idtype.select(selection.range);
         }
@@ -329,12 +325,12 @@ export abstract class AView extends EventHandler implements IView {
   /**
    * hook when the item selection has changed
    */
-  protected itemSelectionChanged(_name: string = DEFAULT_SELECTION_NAME) {
+  protected itemSelectionChanged(_name: string = AView.DEFAULT_SELECTION_NAME) {
     // hook
   }
 
-  getItemSelection(name: string = DEFAULT_SELECTION_NAME) {
-    return this.itemSelections.get(name) || {idtype: null, range: none()};
+  getItemSelection(name: string = AView.DEFAULT_SELECTION_NAME) {
+    return this.itemSelections.get(name) || {idtype: null, range: Range.none()};
   }
 
   modeChanged(mode: EViewMode) {
@@ -344,11 +340,10 @@ export abstract class AView extends EventHandler implements IView {
   destroy() {
     this.node.remove();
   }
+
+  isRegex(v: string) {
+    // cheap test for regex
+    return v.includes('*') || v.includes('.') || v.includes('|');
+  }
 }
 
-export default AView;
-
-function isRegex(v: string) {
-  // cheap test for regex
-  return v.includes('*') || v.includes('.') || v.includes('|');
-}

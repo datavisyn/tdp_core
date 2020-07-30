@@ -1,4 +1,4 @@
-import {IInstantView, IInstantViewOptions, IItemSelection} from '../extensions';
+import {IInstantView, IInstantViewOptions, IItemSelection} from '../base/interfaces';
 
 export class AInstantView implements IInstantView {
   readonly node: HTMLElement;
@@ -18,5 +18,3 @@ export class AInstantView implements IInstantView {
     this.node.remove();
   }
 }
-
-export default AInstantView;

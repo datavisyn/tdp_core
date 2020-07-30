@@ -4,12 +4,10 @@
 
 import 'select2';
 import * as d3 from 'd3';
-import * as $ from 'jquery';
-import {mixin} from 'phovea_core/src/index';
-import {api2absURL} from 'phovea_core/src/ajax';
-import AFormElement from './AFormElement';
+import $ from 'jquery';
+import {BaseUtils, AppContext, IPluginDesc} from 'phovea_core';
+import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc} from '../interfaces';
-import {IPluginDesc} from 'phovea_core/src/plugin';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text'|'id';
@@ -32,46 +30,47 @@ export interface ISelect2Option {
   data?: any;
 }
 
-export const DEFAULT_OPTIONS = {
-  placeholder: 'Start typing...',
-  theme: 'bootstrap',
-  minimumInputLength: 0,
-  //selectOnClose: true,
-  //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
-  escapeMarkup: (markup) => markup,
-  templateResult: (item: any) => item.text,
-  templateSelection: (item: any) => item.text
-};
-
-export const DEFAULT_AJAX_OPTIONS = Object.assign({
-  ajax: {
-    url: api2absURL('url_needed'), // URL
-    dataType: 'json',
-    delay: 250,
-    cache: true,
-    data: (params: any) => {
-      return {
-        query: params.term === undefined ? '': params.term, // search term from select2
-        page: params.page === undefined ? 0: params.page
-      };
-    },
-    processResults: (data, params) => {
-      params.page = params.page === undefined ? 0: params.page;
-      return {
-        results: data.items,
-        pagination: { // indicate infinite scrolling
-          more: data.more
-        }
-      };
-    }
-  }
-}, DEFAULT_OPTIONS);
-
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
  */
-export default class FormSelect2 extends AFormElement<IFormSelect2> {
+export class FormSelect2 extends AFormElement<IFormSelect2> {
+
+  public static readonly DEFAULT_OPTIONS = {
+    placeholder: 'Start typing...',
+    theme: 'bootstrap',
+    minimumInputLength: 0,
+    //selectOnClose: true,
+    //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
+    escapeMarkup: (markup) => markup,
+    templateResult: (item: any) => item.text,
+    templateSelection: (item: any) => item.text
+  };
+
+  public static readonly DEFAULT_AJAX_OPTIONS = Object.assign({
+    ajax: {
+      url: AppContext.getInstance().api2absURL('url_needed'), // URL
+      dataType: 'json',
+      delay: 250,
+      cache: true,
+      data: (params: any) => {
+        return {
+          query: params.term === undefined ? '': params.term, // search term from select2
+          page: params.page === undefined ? 0: params.page
+        };
+      },
+      processResults: (data, params) => {
+        params.page = params.page === undefined ? 0: params.page;
+        return {
+          results: data.items,
+          pagination: { // indicate infinite scrolling
+            more: data.more
+          }
+        };
+      }
+    }
+  }, FormSelect2.DEFAULT_OPTIONS);
+
 
   private $select: d3.Selection<any>;
 
@@ -156,7 +155,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
       select2Options.multiple = true;
       select2Options.allowClear = true;
     }
-    mixin(select2Options, options.ajax ? DEFAULT_AJAX_OPTIONS : DEFAULT_OPTIONS, options, { data });
+    BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
 
     this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial
@@ -215,7 +214,7 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
         const values = Array.isArray(v) ? v : [v];
         r = values.map((d: any) => d.value || d.id);
         const old = <ISelect2Option[]>this.value;
-        if (sameIds(old.map((d) => d.id), r)) {
+        if (FormSelect2.sameIds(old.map((d) => d.id), r)) {
           return;
         }
       } else {
@@ -245,19 +244,19 @@ export default class FormSelect2 extends AFormElement<IFormSelect2> {
     this.$jqSelect.select2('open');
   }
 
+  /**
+   * compare array independent of the order
+   * @param a
+   * @param b
+   * @returns {boolean}
+   */
+  static sameIds(a: string[], b: string[]) {
+    if (a.length !== b.length) {
+      return false;
+    }
+    const bids = new Set(b);
+    // all of a contained in b
+    return a.every((d) => bids.has(d));
+  }
 }
 
-/**
- * compare array independent of the order
- * @param a
- * @param b
- * @returns {boolean}
- */
-function sameIds(a: string[], b: string[]) {
-  if (a.length !== b.length) {
-    return false;
-  }
-  const bids = new Set(b);
-  // all of a contained in b
-  return a.every((d) => bids.has(d));
-}

@@ -2,11 +2,11 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../../desc';
-import {set_diff} from '../../internal/LineUpSelectionHelper';
-import {IScoreRow} from '../../';
-import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
-import {resolveImmediately} from 'phovea_core/src';
+import {IAdditionalColumnDesc} from '../../../base/interfaces';
+import {LineupUtils} from '../../utils';
+import {IScoreRow} from '../../../base/interfaces';
+import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
+import {ResolveNow} from 'phovea_core';
 
 export interface IMultiSelectionAdapter {
   /**
@@ -34,7 +34,7 @@ export interface IMultiSelectionAdapter {
   loadData(_id: number, id: string, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[]>[];
 }
 
-export default class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
+export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
   constructor(private readonly adapter: IMultiSelectionAdapter) {
     super();
   }
@@ -47,11 +47,11 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
     const selectedSubTypes = this.adapter.getSelectedSubTypes();
-    return resolveImmediately(this.adapter.createDescs(_id, id, selectedSubTypes)).then((descs) => {
+    return ResolveNow.resolveImmediately(this.adapter.createDescs(_id, id, selectedSubTypes)).then((descs) => {
       if (descs.length <= 0) {
         return [];
       }
-      descs.forEach((d) => patchDesc(d, _id));
+      descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, _id));
 
       const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
       const dynamicColumnIDs = new Set<string>(usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`));
@@ -59,7 +59,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
       const selectedElements = new Set<string>(descs.map((desc) => `${_id}_${desc.selectedSubtype}`));
 
       // Check which items are new and should therefore be added as columns
-      const addedParameters = set_diff(selectedElements, dynamicColumnIDs);
+      const addedParameters = LineupUtils.set_diff(selectedElements, dynamicColumnIDs);
 
       if (addedParameters.size <= 0) {
         return [];
@@ -89,7 +89,7 @@ export default class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
     const dynamicColumnSubtypes = new Set<string>(usedCols.map((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype));
 
     // check which parameters have been removed
-    const removedParameters = Array.from(set_diff(dynamicColumnSubtypes, selectedElements));
+    const removedParameters = Array.from(LineupUtils.set_diff(dynamicColumnSubtypes, selectedElements));
 
     context.remove([].concat(...removedParameters.map((param) => {
       return usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === param);

@@ -2,24 +2,25 @@
  * a string column with optional alignment
  */
 import {Column, IDataRow, BooleanColumn, IBooleanColumnDesc} from 'lineupjs';
-import i18n from 'phovea_core/src/i18n';
+import {I18nextManager} from 'phovea_core';
 
 /**
  * extra column for highlighting and filtering
  */
-export default class OverviewColumn extends BooleanColumn {
-  static readonly GROUP_TRUE = {name: i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'), color: 'white'};
-  static readonly GROUP_FALSE = {name: i18n.t('tdp:core.lineup.OverviewColumn.rest'), color: '#AAAAAA'};
+export class OverviewColumn extends BooleanColumn {
+  static readonly GROUP_TRUE = {name: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'), color: 'white'};
+  static readonly GROUP_FALSE = {name: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.rest'), color: '#AAAAAA'};
 
   private overviewSelection = new Set<any>();
   private currentOverview: {name: string, rows: any[]};
 
   constructor(id: string, desc: IBooleanColumnDesc) {
     super(id, Object.assign(desc, {
-      label: i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection')
+      label: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection'),
+      renderer: 'boolean',
+      groupRenderer: 'boolean',
+      summaryRenderer: 'categorical'
     }));
-    this.setDefaultRenderer('boolean');
-    this.setDefaultGroupRenderer('boolean');
     this.setWidthImpl(0); // hide
   }
 
@@ -27,9 +28,9 @@ export default class OverviewColumn extends BooleanColumn {
     return this.overviewSelection.has(row.v);
   }
 
-  setOverview(rows?: any[], name = i18n.t('tdp:core.lineup.OverviewColumn.focus')) {
+  setOverview(rows?: any[], name = I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.focus')) {
     this.currentOverview = {name, rows};
-    this.fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, this.overviewSelection = new Set<any>(rows || []));
+    (<OverviewColumn>this).fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, this.overviewSelection = new Set<any>(rows || []));
   }
 
   getOverview() {
@@ -37,7 +38,7 @@ export default class OverviewColumn extends BooleanColumn {
   }
 
   get categoryLabels() {
-    return [i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'), i18n.t('tdp:core.lineup.OverviewColumn.rest')];
+    return [I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'), I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.rest')];
   }
 
   get categoryColors() {
