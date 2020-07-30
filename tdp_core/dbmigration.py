@@ -129,18 +129,18 @@ class DBMigrationManager(object):
   """
   DBMigrationManager retrieves all 'tdp-sql-database-migration' plugins and initializes DBMigration objects.
   The possible configuration keys for this extension point are:
-   - configKey: Key of the configuration entry (i.e. <app_name>.migration)
-   - id: ID of the migration for logging purposes (passed to DBManager)
-   - dbKey: Key of the engine used for the migration (passed to DBManager)
-   - dbUrl: URL of the db connection used for the migration (passed to DBManager)
-     - Either dbKey or dbUrl is required, with dbUrl having precedence
-   - scriptLocation: Location of the alembic root folder (passed to DBManager)
-   - autoUpgrade: Flag which auto-upgrades to the latest revision (passed to DBManager). Defaults to config key 'tdp_core.migrations.autoUpgrade', or True if not configured.
-   - versionTableSchema: Schema of the alembic version table (passed to DBManager)
+  - configKey: Key of the configuration entry (i.e. <app_name>.migration)
+  - id: ID of the migration for logging purposes (passed to DBManager)
+  - dbKey: Key of the engine used for the migration (passed to DBManager)
+  - dbUrl: URL of the db connection used for the migration (passed to DBManager)
+    - Either dbKey or dbUrl is required, with dbUrl having precedence
+  - scriptLocation: Location of the alembic root folder (passed to DBManager)
+  - autoUpgrade: Flag which auto-upgrades to the latest revision (passed to DBManager). Defaults to config key 'tdp_core.migrations.autoUpgrade', or True if not configured.
+  - versionTableSchema: Schema of the alembic version table (passed to DBManager)
 
   The keys are retrieved from the following sources (in order):
-   - File configuration at configKey
-   - Plugin configuration
+  - File configuration at configKey
+  - Plugin configuration
   """
 
   def __init__(self, plugins: List[AExtensionDesc] = []):
