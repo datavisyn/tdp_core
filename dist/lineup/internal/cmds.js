@@ -85,7 +85,7 @@ export class LineupTrackingManager {
             return waiter.then(() => undo); // locked until the resolver is executed (i.e. when the event dispatches)
         };
     }
-    async addRankingImpl(inputs, parameter) {
+    static async addRankingImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const index = parameter.index;
         if (!parameter.dump) { // remove
@@ -112,7 +112,7 @@ export class LineupTrackingManager {
         }));
     }
     addRanking(provider, index, dump) {
-        return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addRanking') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeRanking'), ObjectRefUtils.category.layout, dump ? ObjectRefUtils.operation.create : ObjectRefUtils.operation.remove), LineUpCmds.CMD_ADD_RANKING, LineupTrackingManager.getInstance().addRankingImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addRanking') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeRanking'), ObjectRefUtils.category.layout, dump ? ObjectRefUtils.operation.create : ObjectRefUtils.operation.remove), LineUpCmds.CMD_ADD_RANKING, LineupTrackingManager.addRankingImpl, [provider], {
             index,
             dump
         });
@@ -127,7 +127,7 @@ export class LineupTrackingManager {
             col: v.col ? v.col.fqpath : null
         };
     }
-    async setRankingSortCriteriaImpl(inputs, parameter) {
+    static async setRankingSortCriteriaImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const bak = LineupTrackingManager.getInstance().toSortObject(ranking.getSortCriteria());
@@ -140,12 +140,12 @@ export class LineupTrackingManager {
         });
     }
     setRankingSortCriteria(provider, rid, value) {
-        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIA, LineupTrackingManager.getInstance().setRankingSortCriteriaImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIA, LineupTrackingManager.setRankingSortCriteriaImpl, [provider], {
             rid,
             value
         });
     }
-    async setSortCriteriaImpl(inputs, parameter) {
+    static async setSortCriteriaImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
@@ -166,13 +166,13 @@ export class LineupTrackingManager {
         });
     }
     setSortCriteria(provider, rid, columns, isSorting = true) {
-        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIAS, LineupTrackingManager.getInstance().setSortCriteriaImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIAS, LineupTrackingManager.setSortCriteriaImpl, [provider], {
             rid,
             columns,
             isSorting
         });
     }
-    async setGroupCriteriaImpl(inputs, parameter) {
+    static async setGroupCriteriaImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const current = ranking.getGroupCriteria().map((d) => d.fqpath);
@@ -185,19 +185,19 @@ export class LineupTrackingManager {
         });
     }
     setGroupCriteria(provider, rid, columns) {
-        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_GROUP_CRITERIA, LineupTrackingManager.getInstance().setGroupCriteriaImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_GROUP_CRITERIA, LineupTrackingManager.setGroupCriteriaImpl, [provider], {
             rid,
             columns
         });
     }
     setAggregation(provider, rid, group, value) {
-        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeAggregation'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_AGGREGATION, LineupTrackingManager.getInstance().setAggregationImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeAggregation'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_AGGREGATION, LineupTrackingManager.setAggregationImpl, [provider], {
             rid,
             group,
             value
         });
     }
-    async setAggregationImpl(inputs, parameter) {
+    static async setAggregationImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const waitForAggregated = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
@@ -221,7 +221,7 @@ export class LineupTrackingManager {
             inverse: LineupTrackingManager.getInstance().setAggregation(inputs[0], parameter.rid, parameter.group, inverseValue)
         });
     }
-    async setColumnImpl(inputs, parameter) {
+    static async setColumnImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
@@ -282,14 +282,14 @@ export class LineupTrackingManager {
     setColumn(provider, rid, path, prop, value) {
         // assert ALineUpView and update the stats
         provider.value.getInstance().updateLineUpStats();
-        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.setProperty', { prop }), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_COLUMN, LineupTrackingManager.getInstance().setColumnImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.setProperty', { prop }), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_COLUMN, LineupTrackingManager.setColumnImpl, [provider], {
             rid,
             path,
             prop,
             value
         });
     }
-    async addColumnImpl(inputs, parameter) {
+    static async addColumnImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         let parent = ranking;
@@ -314,7 +314,7 @@ export class LineupTrackingManager {
             inverse: LineupTrackingManager.getInstance().addColumn(inputs[0], parameter.rid, parameter.path, index, parameter.dump || !bak ? null : p.dumpColumn(bak))
         });
     }
-    async moveColumnImpl(inputs, parameter) {
+    static async moveColumnImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         let parent = ranking;
@@ -336,7 +336,7 @@ export class LineupTrackingManager {
         });
     }
     addColumn(provider, rid, path, index, dump) {
-        return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addColumn') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeColumn'), ObjectRefUtils.category.layout, dump ? ObjectRefUtils.operation.create : ObjectRefUtils.operation.remove), LineUpCmds.CMD_ADD_COLUMN, LineupTrackingManager.getInstance().addColumnImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addColumn') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeColumn'), ObjectRefUtils.category.layout, dump ? ObjectRefUtils.operation.create : ObjectRefUtils.operation.remove), LineUpCmds.CMD_ADD_COLUMN, LineupTrackingManager.addColumnImpl, [provider], {
             rid,
             path,
             index,
@@ -344,7 +344,7 @@ export class LineupTrackingManager {
         });
     }
     moveColumn(provider, rid, path, index, moveTo) {
-        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.moveColumn'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_MOVE_COLUMN, LineupTrackingManager.getInstance().moveColumnImpl, [provider], {
+        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.moveColumn'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_MOVE_COLUMN, LineupTrackingManager.moveColumnImpl, [provider], {
             rid,
             path,
             index,

@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 18.05.2016.
  */
-import { IObjectRef, ProvenanceGraph } from 'phovea_core';
+import { IObjectRef, ProvenanceGraph, ICmdResult } from 'phovea_core';
 import { EngineRenderer, TaggleRenderer, LocalDataProvider } from 'lineupjs';
 export interface IViewProviderLocal {
     data: LocalDataProvider;
@@ -45,30 +45,32 @@ export declare class LineupTrackingManager {
      * @param ranking
      */
     private dirtyRankingWaiter;
-    addRankingImpl(inputs: IObjectRef<any>[], parameter: any): any;
-    addRanking(provider: IObjectRef<any>, index: number, dump?: any): any;
+    static addRankingImpl(inputs: IObjectRef<any>[], parameter: any): Promise<{
+        inverse: import("phovea_core").IAction;
+    }>;
+    addRanking(provider: IObjectRef<any>, index: number, dump?: any): import("phovea_core").IAction;
     /**
      * Create an object structure from the LineUp sort event listener that can stored in a provenance graph
      * @param v Object from LineUp sort event listener
      */
     private toSortObject;
-    setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): any;
-    setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): any;
-    setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): any;
+    static setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
+    setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): import("phovea_core").IAction;
+    static setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
     setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {
         asc: boolean;
         col: string;
-    }[], isSorting?: boolean): any;
-    setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): any;
-    setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): any;
+    }[], isSorting?: boolean): import("phovea_core").IAction;
+    static setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
+    setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): import("phovea_core").IAction;
     setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]): any;
-    setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter): any;
-    setColumnImpl(inputs: IObjectRef<any>[], parameter: any): any;
-    setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): any;
-    addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): any;
-    moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): any;
-    addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any): any;
-    moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number): any;
+    static setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter): any;
+    static setColumnImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
+    setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): import("phovea_core").IAction;
+    static addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): Promise<ICmdResult>;
+    static moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): Promise<ICmdResult>;
+    addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any): import("phovea_core").IAction;
+    moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number): import("phovea_core").IAction;
     /**
      * Wrap the callback with a function that delays the execution of the callback.
      * @param callback The provenance function that should be delayed
