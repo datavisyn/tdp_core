@@ -1,7 +1,7 @@
 /**
  * Created by Samuel Gratzl on 18.05.2016.
  */
-import { IObjectRef, ProvenanceGraph, ICmdResult } from 'phovea_core';
+import { IObjectRef, ProvenanceGraph, ICmdResult, IAction } from 'phovea_core';
 import { EngineRenderer, TaggleRenderer, LocalDataProvider } from 'lineupjs';
 export interface IViewProviderLocal {
     data: LocalDataProvider;
@@ -46,31 +46,31 @@ export declare class LineupTrackingManager {
      */
     private dirtyRankingWaiter;
     static addRankingImpl(inputs: IObjectRef<any>[], parameter: any): Promise<{
-        inverse: import("phovea_core").IAction;
+        inverse: IAction;
     }>;
-    addRanking(provider: IObjectRef<any>, index: number, dump?: any): import("phovea_core").IAction;
+    addRanking(provider: IObjectRef<any>, index: number, dump?: any): IAction;
     /**
      * Create an object structure from the LineUp sort event listener that can stored in a provenance graph
      * @param v Object from LineUp sort event listener
      */
     private toSortObject;
     static setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-    setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): import("phovea_core").IAction;
+    setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): IAction;
     static setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
     setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {
         asc: boolean;
         col: string;
-    }[], isSorting?: boolean): import("phovea_core").IAction;
+    }[], isSorting?: boolean): IAction;
     static setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-    setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): import("phovea_core").IAction;
-    setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]): any;
-    static setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter): any;
+    setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): IAction;
+    setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]): IAction;
+    static setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter): Promise<ICmdResult>;
     static setColumnImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-    setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): import("phovea_core").IAction;
+    setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): IAction;
     static addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): Promise<ICmdResult>;
     static moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): Promise<ICmdResult>;
-    addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any): import("phovea_core").IAction;
-    moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number): import("phovea_core").IAction;
+    addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any): IAction;
+    moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number): IAction;
     /**
      * Wrap the callback with a function that delays the execution of the callback.
      * @param callback The provenance function that should be delayed

@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 18.05.2016.
  */
 
-import {IObjectRef, ProvenanceGraph, ICmdResult, ResolveNow, I18nextManager, ObjectRefUtils, ActionMetaData, ActionUtils, ActionNode} from 'phovea_core';
+import {IObjectRef, ProvenanceGraph, ICmdResult, ResolveNow, I18nextManager, ObjectRefUtils, ActionMetaData, ActionUtils, ActionNode, IAction} from 'phovea_core';
 import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn, IGroup} from 'lineupjs';
 
 import {LineUpFilterUtils} from './lineUpFilter';
@@ -166,7 +166,7 @@ export class LineupTrackingManager {
     }));
   }
 
-  public addRanking(provider: IObjectRef<any>, index: number, dump?: any) {
+  public addRanking(provider: IObjectRef<any>, index: number, dump?: any): IAction {
     return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addRanking') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeRanking'), ObjectRefUtils.category.layout, dump ?  ObjectRefUtils.operation.create :  ObjectRefUtils.operation.remove), LineUpCmds.CMD_ADD_RANKING, LineupTrackingManager.addRankingImpl, [provider], {
       index,
       dump
@@ -199,7 +199,7 @@ export class LineupTrackingManager {
   }
 
 
-  public setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any) {
+  public setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): IAction {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout,  ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIA, LineupTrackingManager.setRankingSortCriteriaImpl, [provider], {
       rid,
       value
@@ -228,7 +228,7 @@ export class LineupTrackingManager {
     });
   }
 
-  public setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true) {
+  public setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {asc: boolean, col: string}[], isSorting = true): IAction {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout,  ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIAS, LineupTrackingManager.setSortCriteriaImpl, [provider], {
       rid,
       columns,
@@ -250,14 +250,14 @@ export class LineupTrackingManager {
   }
 
 
-  public setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]) {
+  public setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): IAction {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeGroupCriteria'), ObjectRefUtils.category.layout,  ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_GROUP_CRITERIA, LineupTrackingManager.setGroupCriteriaImpl, [provider], {
       rid,
       columns
     });
   }
 
-  public setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]) {
+  public setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]): IAction {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeAggregation'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_AGGREGATION, LineupTrackingManager.setAggregationImpl, [provider], <IAggregationParameter>{
       rid,
       group,
@@ -356,7 +356,7 @@ export class LineupTrackingManager {
     });
   }
 
-  public setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any) {
+  public setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): IAction {
     // assert ALineUpView and update the stats
     provider.value.getInstance().updateLineUpStats();
 
@@ -417,7 +417,7 @@ export class LineupTrackingManager {
     });
   }
 
-  public addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any) {
+  public addColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, dump: any): IAction {
     return ActionUtils.action(ActionMetaData.actionMeta(dump ? I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.addColumn') : I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.removeColumn'), ObjectRefUtils.category.layout, dump ?  ObjectRefUtils.operation.create :  ObjectRefUtils.operation.remove), LineUpCmds.CMD_ADD_COLUMN, LineupTrackingManager.addColumnImpl, [provider], {
       rid,
       path,
@@ -426,7 +426,7 @@ export class LineupTrackingManager {
     });
   }
 
-  public moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number) {
+  public moveColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, index: number, moveTo: number): IAction {
     return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.moveColumn'), ObjectRefUtils.category.layout,  ObjectRefUtils.operation.update), LineUpCmds.CMD_MOVE_COLUMN, LineupTrackingManager.moveColumnImpl, [provider], {
       rid,
       path,
