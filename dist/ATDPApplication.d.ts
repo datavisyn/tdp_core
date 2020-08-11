@@ -1,7 +1,7 @@
 /**
  * Created by sam on 03.03.2017.
  */
-import { ProvenanceGraph } from 'phovea_core';
+import { ProvenanceGraph, IMixedStorageProvenanceGraphManagerOptions } from 'phovea_core';
 import { AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ACLUEWrapper } from 'phovea_clue';
@@ -45,6 +45,10 @@ export interface ITDPOptions {
      * default: true
      */
     enableProvenanceUrlTracking?: boolean;
+    /**
+     * options passed to the IProvenanceGraphManager
+     */
+    provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
 }
 /**
  * base class for TDP based applications
