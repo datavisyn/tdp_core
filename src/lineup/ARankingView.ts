@@ -1,5 +1,5 @@
 
-import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, spaceFillingRule, updateLodRules} from 'lineupjs';
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, spaceFillingRule, updateLodRules, UIntTypedArray} from 'lineupjs';
 import {AView} from '../views/AView';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
@@ -376,11 +376,8 @@ export abstract class ARankingView extends AView {
     const colDesc = score.createDesc(args);
     // flag that it is a score but it also a reload function
     colDesc._score = true;
-    // `getOrder()` returns an Uint16Array instead of an array which is of type object
-    // resulting in Array.isArray(Uint16Array) failing.
-    // TODO find a more general solution.
-    const rawOrder = <number[] | Uint16Array>this.provider.getRankings()[0].getOrder();
-    const order = rawOrder instanceof Uint16Array ? Array.from(rawOrder) : rawOrder;
+    const rawOrder = <number[] | UIntTypedArray>this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+    const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
     const ids = this.selectionHelper.rowIdsAsSet(order);
     const data = score.compute(ids, this.itemIDType, args);
 
@@ -388,8 +385,8 @@ export abstract class ARankingView extends AView {
 
     // use _score function to reload the score
     colDesc._score = () => {
-      const rawOrder = <number[] | Uint16Array>this.provider.getRankings()[0].getOrder();
-      const order = rawOrder instanceof Uint16Array ? Array.from(rawOrder) : rawOrder;
+      const rawOrder = <number[] | UIntTypedArray>this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+      const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
       const ids = this.selectionHelper.rowIdsAsSet(order);
       const data = score.compute(ids, this.itemIDType, args);
       return r.reload(data);

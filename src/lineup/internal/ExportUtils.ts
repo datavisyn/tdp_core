@@ -1,4 +1,4 @@
-import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType, isDateColumn} from 'lineupjs';
+import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType, isDateColumn, UIntTypedArray} from 'lineupjs';
 import {BaseUtils, I18nextManager} from 'phovea_core';
 import {XlsxUtils} from '../../utils/XlsxUtils';
 
@@ -74,7 +74,13 @@ export class ExportUtils {
       return ExportUtils.customizeDialog(provider).then((r) => ExportUtils.convertRanking(provider, r.order, r.columns, r.type, r.name));
     } else {
       const ranking = provider.getFirstRanking();
-      const order = onlySelected ? provider.getSelection() : (<number[]>ranking!.getOrder());
+      let order: number[];
+      if(onlySelected) {
+        order = provider.getSelection();
+      } else {
+        const rawOrder = <number[] | UIntTypedArray>ranking!.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+        order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
+      }
       const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
       return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, type, ranking.getLabel()));
     }
@@ -162,7 +168,8 @@ export class ExportUtils {
               order = (<number[]>ranking.getOrder()).filter((d) => !selected.has(d));
               break;
             default:
-              order = <number[]>ranking.getOrder();
+              const rawOrder = <number[] | UIntTypedArray>ranking!.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+              order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
           }
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
           resolve({
