@@ -376,7 +376,7 @@ export abstract class ARankingView extends AView {
     const colDesc = score.createDesc(args);
     // flag that it is a score but it also a reload function
     colDesc._score = true;
-    //`getOrder()` returns Uint16Array instead of an array which is of type object
+    // `getOrder()` returns an Uint16Array instead of an array which is of type object
     // resulting in Array.isArray(Uint16Array) failing.
     // TODO find a more general solution.
     const rawOrder = <number[] | Uint16Array>this.provider.getRankings()[0].getOrder();

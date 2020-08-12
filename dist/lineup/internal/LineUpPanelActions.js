@@ -93,7 +93,7 @@ export class LineUpPanelActions extends EventHandler {
         if (this.options.enableSaveRanking) {
             const listener = (ranking) => {
                 StoreUtils.editDialog(null, (name, description, sec) => {
-                    // `getOrder()` returns Uint16Array instead of an array which is of type object
+                    // `getOrder()` returns an Uint16Array instead of an array which is of type object
                     // resulting in Array.isArray(Uint16Array) failing.
                     // TODO find a more general solution.
                     const rawOrder = ranking.getOrder();
