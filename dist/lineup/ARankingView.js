@@ -312,12 +312,19 @@ export class ARankingView extends AView {
         const colDesc = score.createDesc(args);
         // flag that it is a score but it also a reload function
         colDesc._score = true;
-        const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+        //`getOrder()` returns Uint16Array instead of an array which is of type object
+        // resulting in Array.isArray(Uint16Array) failing.
+        // TODO find a more general solution.
+        const rawOrder = this.provider.getRankings()[0].getOrder();
+        const order = rawOrder instanceof Uint16Array ? Array.from(rawOrder) : rawOrder;
+        const ids = this.selectionHelper.rowIdsAsSet(order);
         const data = score.compute(ids, this.itemIDType, args);
         const r = this.addColumn(colDesc, data, -1, position);
         // use _score function to reload the score
         colDesc._score = () => {
-            const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+            const rawOrder = this.provider.getRankings()[0].getOrder();
+            const order = rawOrder instanceof Uint16Array ? Array.from(rawOrder) : rawOrder;
+            const ids = this.selectionHelper.rowIdsAsSet(order);
             const data = score.compute(ids, this.itemIDType, args);
             return r.reload(data);
         };
