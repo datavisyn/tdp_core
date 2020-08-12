@@ -79,7 +79,7 @@ export class ExportUtils {
         order = provider.getSelection();
       } else {
         const rawOrder = <number[] | UIntTypedArray>ranking!.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
-        order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
+        order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
       }
       const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
       return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, type, ranking.getLabel()));
@@ -169,7 +169,7 @@ export class ExportUtils {
               break;
             default:
               const rawOrder = <number[] | UIntTypedArray>ranking!.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
-              order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
+              order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
           }
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
           resolve({
