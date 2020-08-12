@@ -312,12 +312,16 @@ export class ARankingView extends AView {
         const colDesc = score.createDesc(args);
         // flag that it is a score but it also a reload function
         colDesc._score = true;
-        const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+        const rawOrder = this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+        const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+        const ids = this.selectionHelper.rowIdsAsSet(order);
         const data = score.compute(ids, this.itemIDType, args);
         const r = this.addColumn(colDesc, data, -1, position);
         // use _score function to reload the score
         colDesc._score = () => {
-            const ids = this.selectionHelper.rowIdsAsSet(this.provider.getRankings()[0].getOrder());
+            const rawOrder = this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+            const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+            const ids = this.selectionHelper.rowIdsAsSet(order);
             const data = score.compute(ids, this.itemIDType, args);
             return r.reload(data);
         };
