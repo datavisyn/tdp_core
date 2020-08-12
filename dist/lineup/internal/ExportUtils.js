@@ -60,7 +60,14 @@ export class ExportUtils {
         }
         else {
             const ranking = provider.getFirstRanking();
-            const order = onlySelected ? provider.getSelection() : ranking.getOrder();
+            let order;
+            if (onlySelected) {
+                order = provider.getSelection();
+            }
+            else {
+                const rawOrder = ranking.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+                order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
+            }
             const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
             return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, type, ranking.getLabel()));
         }
@@ -147,7 +154,8 @@ export class ExportUtils {
                             order = ranking.getOrder().filter((d) => !selected.has(d));
                             break;
                         default:
-                            order = ranking.getOrder();
+                            const rawOrder = ranking.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+                            order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: find a more general solution
                     }
                     const columns = data.getAll('columns').map((d) => lookup.get(d.toString()));
                     resolve({
