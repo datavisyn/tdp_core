@@ -2,7 +2,7 @@
  * Created by sam on 03.03.2017.
  */
 
-import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry} from 'phovea_core';
+import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, IMixedStorageProvenanceGraphManagerOptions} from 'phovea_core';
 import {AppHeaderLink, AppHeader} from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
@@ -59,6 +59,10 @@ export interface ITDPOptions {
    * default: true
    */
   enableProvenanceUrlTracking?: boolean;
+  /**
+   * options passed to the IProvenanceGraphManager
+   */
+  provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
 }
 
 /**
@@ -149,7 +153,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const manager = new MixedStorageProvenanceGraphManager({
       prefix: this.options.prefix,
       storage: localStorage,
-      application: this.options.prefix
+      application: this.options.prefix,
+      ...(this.options.provenanceManagerOptions || {})
     });
 
     this.cleanUpOld(manager);

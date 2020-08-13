@@ -83,7 +83,8 @@ export class ATDPApplication extends ACLUEWrapper {
         const manager = new MixedStorageProvenanceGraphManager({
             prefix: this.options.prefix,
             storage: localStorage,
-            application: this.options.prefix
+            application: this.options.prefix,
+            ...(this.options.provenanceManagerOptions || {})
         });
         this.cleanUpOld(manager);
         const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);

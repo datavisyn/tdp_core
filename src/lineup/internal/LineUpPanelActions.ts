@@ -1,5 +1,5 @@
 
-import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
+import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer, UIntTypedArray} from 'lineupjs';
 import {IDType} from 'phovea_core';
 import {IPlugin, IPluginDesc, EventHandler, I18nextManager, PluginRegistry, IDTypeManager} from 'phovea_core';
 import {StoreUtils} from '../../storage';
@@ -191,7 +191,9 @@ export class LineUpPanelActions extends EventHandler {
     if (this.options.enableSaveRanking) {
       const listener = (ranking: Ranking) => {
         StoreUtils.editDialog(null, (name, description, sec) => {
-          this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, ranking.getOrder(), name, description, sec);
+          const rawOrder = <number[] | UIntTypedArray>this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
+          const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+          this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec);
         });
       };
 
