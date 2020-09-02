@@ -1,5 +1,3 @@
-@import './vars';
-
 .tdp-session-dialog {
   [data-menu="temporary"] > h4::before {
     @include fa-icon();

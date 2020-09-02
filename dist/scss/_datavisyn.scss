@@ -1,7 +1,7 @@
 @import '~phovea_ui/dist/scss/fonts/monda';
 @import '~font-awesome/scss/variables';
 @import '~font-awesome/scss/mixins';
-@import './vars';
+@import './abstracts/variables';
 
 $datavisyn_css_prefix: 'datavisyn' !default;
 $datavisyn_font_size_base: 14px !default;
