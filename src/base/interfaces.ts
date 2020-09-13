@@ -27,11 +27,11 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
    */
   initialRanking: boolean;
   /**
-   * adds the item to a parent group
+   * adds the column to a parent group in the Add Column chooser
    */
-  group?: {
+  chooserGroup?: {
     /**
-     * the name of the parent group
+     * the name of the parent group as defined in the `databaseColumnGroups` of the ranking.
      */
     parent: string,
     /**

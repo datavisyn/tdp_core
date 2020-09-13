@@ -8,7 +8,7 @@ import {IAnyVector, ValueTypeUtils} from 'phovea_core';
 import {IServerColumn} from '../base/rest';
 import {IAdditionalColumnDesc} from '../base/interfaces';
 
-export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'group'> {
+export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {
   /**
    * visible by default
    * @default true

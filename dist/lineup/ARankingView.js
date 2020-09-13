@@ -76,6 +76,7 @@ export class ARankingView extends AView {
             enableAddingScoreColumns: true,
             enableAddingPreviousColumns: true,
             enableAddingDatabaseColumns: true,
+            databaseColumnGroups: {},
             enableAddingMetaDataColumns: true,
             enableSidePanelCollapsing: true,
             enableSidePanel: 'collapsed',

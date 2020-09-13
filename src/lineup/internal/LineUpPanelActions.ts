@@ -290,7 +290,7 @@ export class LineUpPanelActions extends EventHandler {
     return descs
       .filter((d) => Boolean((<any>d)._score) === addScores)
       .map((d) => {
-        return {text: d.label, id: (<any>d).column.toString(), action: () => this.addColumn(d), group: isAdditionalColumnDesc(d) ? d.group : null};
+        return {text: d.label, id: (<any>d).column.toString(), action: () => this.addColumn(d), chooserGroup: isAdditionalColumnDesc(d) ? d.chooserGroup : null};
       })
       .sort((a, b) => a.text.localeCompare(b.text));
   }
@@ -348,7 +348,7 @@ export class LineUpPanelActions extends EventHandler {
           // If both groups have the same order, sort alphabetically
           return sortOrder(databaseColumnGroups?.[aKey]?.order, databaseColumnGroups?.[bKey]?.order) || aKey.localeCompare(bKey);
         })
-        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a,b) => sortOrder(a.group?.order, b.group?.order)))));
+        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a,b) => sortOrder(a.chooserGroup?.order, b.chooserGroup?.order)))));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
@@ -421,8 +421,8 @@ export class LineUpPanelActions extends EventHandler {
     const groupedItems = new Map<string, ISearchOption[]>();
     const ungroupedItems = [];
     columnDesc.map((item) => {
-      if(item.group) {
-        groupedItems.has(item.group.parent) ? groupedItems.set(item.group.parent, [...groupedItems.get(item.group.parent), item]) : groupedItems.set(item.group.parent, [item]);
+      if(item.chooserGroup) {
+        groupedItems.has(item.chooserGroup.parent) ? groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item]) : groupedItems.set(item.chooserGroup.parent, [item]);
       } else {
         ungroupedItems.push(item);
       }
