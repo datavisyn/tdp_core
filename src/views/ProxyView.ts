@@ -172,7 +172,7 @@ export class ProxyView extends AD3View {
     const args = BaseUtils.mixin(this.options.extra, {[this.options.argument]: selectedItemId});
     const url = this.createUrl(args);
 
-    if (1) {
+    if (ProxyView.isNoNSecurePage(url)) {
       this.showNoHttpsMessage(url);
       return;
     }
