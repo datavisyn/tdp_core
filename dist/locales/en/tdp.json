@@ -245,7 +245,7 @@
             }
         },
         "views": {
-            "noHttpsMessagePart1": "This page cannot be shown here.<br>Please click the following link to open it in a new browser tab: ",
+            "noHttpsMessage": "This page cannot be shown here.<br>Please click the following link to open it in a new browser tab: ",
             "tableDownloadButton": "Download Table as Spreadsheet",
             "busyMessage": "Preparing awesome stuff for you &hellip;",
             "defaultHint": "No data found for the given {{name}}",

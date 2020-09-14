@@ -106,7 +106,7 @@ export class ChooserProxyView extends AView {
     showNoHttpsMessage(url) {
         this.setBusy(false);
         this.node.innerHTML = `
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessage')}
     <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
    </div></p><p></p>`;
         this.openExternally.innerHTML = ``;

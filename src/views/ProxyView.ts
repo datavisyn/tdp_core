@@ -172,7 +172,7 @@ export class ProxyView extends AD3View {
     const args = BaseUtils.mixin(this.options.extra, {[this.options.argument]: selectedItemId});
     const url = this.createUrl(args);
 
-    if (ProxyView.isNoNSecurePage(url)) {
+    if (1) {
       this.showNoHttpsMessage(url);
       return;
     }
@@ -216,7 +216,7 @@ export class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart1')}
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessage')}
     <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
    </div></p><p></p>`);
     this.openExternally.innerHTML = ``;
