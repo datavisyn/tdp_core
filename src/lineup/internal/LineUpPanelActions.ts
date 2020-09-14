@@ -19,6 +19,7 @@ import {PanelDownloadButton} from './panel/PanelDownloadButton';
 import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension} from '../../base/interfaces';
 import {ISearchOption} from './panel/ISearchOption';
 import {LineupUtils} from '../utils';
+import {IAdditionalColumnDesc, isAdditionalColumnDesc} from '../../base/interfaces';
 
 
 export interface IPanelTabExtension {
@@ -285,10 +286,12 @@ export class LineUpPanelActions extends EventHandler {
     return typeof this.options.additionalScoreParameter === 'function' ? this.options.additionalScoreParameter() : this.options.additionalScoreParameter;
   }
 
-  private getColumnDescription(descs: IColumnDesc[], addScores: boolean) {
+  private getColumnDescription(descs: IAdditionalColumnDesc[] | IColumnDesc[], addScores: boolean) {
     return descs
       .filter((d) => Boolean((<any>d)._score) === addScores)
-      .map((d) => ({text: d.label, id: (<any>d).column, action: () => this.addColumn(d)}))
+      .map((d) => {
+        return {text: d.label, id: (<any>d).column.toString(), action: () => this.addColumn(d), chooserGroup: isAdditionalColumnDesc(d) ? d.chooserGroup : null};
+      })
       .sort((a, b) => a.text.localeCompare(b.text));
   }
 
@@ -316,7 +319,7 @@ export class LineUpPanelActions extends EventHandler {
     return {metaDataOptions, loadedScorePlugins};
   }
 
-  async updateChooser(idType: IDType, descs: IColumnDesc[]) {
+  async updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]) {
     this.idType = idType;
 
     if (this.searchBoxProvider.length === 0) {
@@ -328,7 +331,24 @@ export class LineUpPanelActions extends EventHandler {
     const items: (ISearchOption | IGroupSearchItem<ISearchOption>)[] = [];
 
     if (this.options.enableAddingDatabaseColumns) {
-      items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
+      const columnDesc = this.getColumnDescription(descs, false);
+      // Group the columns
+      const [groupedItems, ungroupedItems] = this.groupColumnDescs(columnDesc);
+      // First, add all the ungrouped columns
+      items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), ungroupedItems));
+      const sortOrder = (a: number | null, b: number | null) => {
+        // Return the group with the higher order
+        return a === b ? 0 : (a != null && b != null ? a - b : (a != null ? -1 : 1));
+      };
+      // Then, add the grouped columns with the ordered group and ordered columns
+      Array.from(groupedItems.entries())
+        .sort(([aKey, aVal], [bKey, bVal]) => {
+          // Sort the groups first
+          const {databaseColumnGroups} = this.options;
+          // If both groups have the same order, sort alphabetically
+          return sortOrder(databaseColumnGroups?.[aKey]?.order, databaseColumnGroups?.[bKey]?.order) || aKey.localeCompare(bKey);
+        })
+        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a,b) => sortOrder(a.chooserGroup?.order, b.chooserGroup?.order)))));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
@@ -395,6 +415,19 @@ export class LineUpPanelActions extends EventHandler {
     }
 
     this.searchBoxProvider.update(items);
+  }
+
+  private groupColumnDescs(columnDesc: ISearchOption[]): [Map<string, ISearchOption[]>, ISearchOption[]] {
+    const groupedItems = new Map<string, ISearchOption[]>();
+    const ungroupedItems = [];
+    columnDesc.map((item) => {
+      if(item.chooserGroup) {
+        groupedItems.has(item.chooserGroup.parent) ? groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item]) : groupedItems.set(item.chooserGroup.parent, [item]);
+      } else {
+        ungroupedItems.push(item);
+      }
+    });
+    return [groupedItems, ungroupedItems];
   }
 
   private groupedDialog(text: string, children: ISearchOption[]): ISearchOption | IGroupSearchItem<ISearchOption> {

@@ -104,6 +104,22 @@ export interface IARankingViewOptions {
   enableAddingDatabaseColumns: boolean;
 
   /**
+   * additional information regarding the group of a column
+   */
+  databaseColumnGroups: {
+    /**
+     * group label shown in the Add Column dialog.
+     * column descriptions need to define the `chooserGroup` property.
+     */
+    [key: string]: {
+      /**
+       * the rank of the current group in the column selector
+       */
+      order?: number
+    }
+  };
+
+  /**
    * enable meta data score columns in the add column dialog
    * @default true
    */

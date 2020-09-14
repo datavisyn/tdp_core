@@ -11,6 +11,7 @@ import { PanelRankingButton } from './panel/PanelRankingButton';
 import { PanelAddColumnButton } from './panel/PanelAddColumnButton';
 import { PanelDownloadButton } from './panel/PanelDownloadButton';
 import { LineupUtils } from '../utils';
+import { isAdditionalColumnDesc } from '../../base/interfaces';
 export class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();
@@ -176,7 +177,9 @@ export class LineUpPanelActions extends EventHandler {
     getColumnDescription(descs, addScores) {
         return descs
             .filter((d) => Boolean(d._score) === addScores)
-            .map((d) => ({ text: d.label, id: d.column, action: () => this.addColumn(d) }))
+            .map((d) => {
+            return { text: d.label, id: d.column.toString(), action: () => this.addColumn(d), chooserGroup: isAdditionalColumnDesc(d) ? d.chooserGroup : null };
+        })
             .sort((a, b) => a.text.localeCompare(b.text));
     }
     addColumn(desc) {
@@ -206,7 +209,25 @@ export class LineUpPanelActions extends EventHandler {
         const { metaDataOptions, loadedScorePlugins } = await this.resolveScores(this.idType);
         const items = [];
         if (this.options.enableAddingDatabaseColumns) {
-            items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), this.getColumnDescription(descs, false)));
+            const columnDesc = this.getColumnDescription(descs, false);
+            // Group the columns
+            const [groupedItems, ungroupedItems] = this.groupColumnDescs(columnDesc);
+            // First, add all the ungrouped columns
+            items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), ungroupedItems));
+            const sortOrder = (a, b) => {
+                // Return the group with the higher order
+                return a === b ? 0 : (a != null && b != null ? a - b : (a != null ? -1 : 1));
+            };
+            // Then, add the grouped columns with the ordered group and ordered columns
+            Array.from(groupedItems.entries())
+                .sort(([aKey, aVal], [bKey, bVal]) => {
+                var _a, _b;
+                // Sort the groups first
+                const { databaseColumnGroups } = this.options;
+                // If both groups have the same order, sort alphabetically
+                return sortOrder((_a = databaseColumnGroups === null || databaseColumnGroups === void 0 ? void 0 : databaseColumnGroups[aKey]) === null || _a === void 0 ? void 0 : _a.order, (_b = databaseColumnGroups === null || databaseColumnGroups === void 0 ? void 0 : databaseColumnGroups[bKey]) === null || _b === void 0 ? void 0 : _b.order) || aKey.localeCompare(bKey);
+            })
+                .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a, b) => { var _a, _b; return sortOrder((_a = a.chooserGroup) === null || _a === void 0 ? void 0 : _a.order, (_b = b.chooserGroup) === null || _b === void 0 ? void 0 : _b.order); }))));
         }
         if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
             items.push({
@@ -264,6 +285,19 @@ export class LineUpPanelActions extends EventHandler {
             items.push(specialColumnsOption);
         }
         this.searchBoxProvider.update(items);
+    }
+    groupColumnDescs(columnDesc) {
+        const groupedItems = new Map();
+        const ungroupedItems = [];
+        columnDesc.map((item) => {
+            if (item.chooserGroup) {
+                groupedItems.has(item.chooserGroup.parent) ? groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item]) : groupedItems.set(item.chooserGroup.parent, [item]);
+            }
+            else {
+                ungroupedItems.push(item);
+            }
+        });
+        return [groupedItems, ungroupedItems];
     }
     groupedDialog(text, children) {
         const viaDialog = this.options.enableAddingColumnGrouping;

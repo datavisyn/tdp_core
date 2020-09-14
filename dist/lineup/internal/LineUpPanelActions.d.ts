@@ -3,6 +3,7 @@ import { IDType } from 'phovea_core';
 import { IPlugin, IPluginDesc, EventHandler } from 'phovea_core';
 import { IARankingViewOptions } from '../IARankingViewOptions';
 import { PanelTab } from './panel/PanelTab';
+import { IAdditionalColumnDesc } from '../../base/interfaces';
 export interface IPanelTabExtension {
     desc: IPanelTabExtensionDesc;
     /**
@@ -78,7 +79,8 @@ export declare class LineUpPanelActions extends EventHandler {
     private getColumnDescription;
     private addColumn;
     private resolveScores;
-    updateChooser(idType: IDType, descs: IColumnDesc[]): Promise<void>;
+    updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]): Promise<void>;
+    private groupColumnDescs;
     private groupedDialog;
     private buildMetaDataDescriptions;
     private scoreColumnDialog;
