@@ -281,7 +281,6 @@
       "noMappingFound": "No mapping found from the given gene {{name}}",
       "please": "Please",
       "externalApplication": "the external application",
-      "openExternally": "click here to open {{name}}",
       "newTab": "in a new browser tab.",
       "isLoaded": "The web page below is directly loaded from",
       "unknown": "Unknown",

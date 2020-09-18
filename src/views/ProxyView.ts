@@ -179,9 +179,9 @@ export class ProxyView extends AD3View {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-      ${I18nextManager.getInstance().i18n.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${I18nextManager.getInstance().i18n.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}</a>
-      ${I18nextManager.getInstance().i18n.t('tdp:core.views.newTab')}</div></p>`;
+      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessage')}
+      <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+      </div></p>`;
       return;
     }
 
