@@ -179,7 +179,7 @@ export class ProxyView extends AD3View {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessage')}
+      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
       <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
       </div></p>`;
       return;
@@ -216,7 +216,7 @@ export class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessage')}
+    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
     <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
    </div></p><p></p>`);
     this.openExternally.innerHTML = ``;
