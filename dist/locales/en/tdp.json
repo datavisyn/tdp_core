@@ -51,7 +51,6 @@
             "exportSession": "Export Session",
             "temporarySessions": "Temporary Sessions",
             "persistentSessions": "Persistent Sessions",
-            "open": "open",
             "successNotification": "Session \"{{ name}}\" successfully persisted.",
             "urlToShare": "URL to share:",
             "currentLink": "Current persistent session link",
