@@ -206,7 +206,7 @@
                 "databaseColumns": "Database Columns",
                 "parameterizedScores": "Parameterized Scores",
                 "previouslyAddedColumns": "Previously Added Columns",
-                "combiningColumns": "Combining Columns",
+                "combiningColumns": "Combined Columns",
                 "weightedSum": "Weighted Sum",
                 "scriptedCombination": "Scripted Combination",
                 "nested": "Nested",
