@@ -268,7 +268,7 @@
     },
 
     "views": {
-      "proxyPageCannotBeShownHere": "This page cannot be shown here.<br>Please click the following link to open it in a new browser tab: ",
+      "proxyPageCannotBeShownHere": "This page cannot be shown here. Please click the following link to open it in a new browser tab: ",
 
       "tableDownloadButton": "Download Table as Spreadsheet",
       "busyMessage": "Preparing awesome stuff for you &hellip;",
@@ -279,9 +279,6 @@
 
       "toOption": " to {{id}}",
       "noMappingFound": "No mapping found from the given gene {{name}}",
-      "please": "Please",
-      "externalApplication": "the external application",
-      "newTab": "in a new browser tab.",
       "isLoaded": "The web page below is directly loaded from",
       "unknown": "Unknown",
       "cannotMap": "Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",
