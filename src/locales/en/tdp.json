@@ -67,6 +67,7 @@
       "selectFile": "Select File",
       "upload": "Upload",
       "fileToUpload": "Select File to Upload",
+      "persistSession": "Persist Session",
       "persist": "Persist",
       "editSessionDetails": "Edit Session Details",
       "save":"Save",
