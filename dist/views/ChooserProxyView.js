@@ -76,9 +76,9 @@ export class ChooserProxyView extends AView {
         }
         if (this.options.openExternally) {
             this.setBusy(false);
-            this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessage')}
-      <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
-      </div></p>`;
+            this.node.innerHTML = `<div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+      <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+      </div>`;
             return;
         }
         this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
@@ -106,9 +106,9 @@ export class ChooserProxyView extends AView {
     showNoHttpsMessage(url) {
         this.setBusy(false);
         this.node.innerHTML = `
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessage')}
-    <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
-   </div></p><p></p>`;
+    <div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+    </div>`;
         this.openExternally.innerHTML = ``;
         this.fire(ChooserProxyView.EVENT_LOADING_FINISHED);
     }

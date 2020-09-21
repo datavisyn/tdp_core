@@ -134,9 +134,9 @@ export class ChooserProxyView extends AView {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
-      <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
-      </div></p>`;
+      this.node.innerHTML = `<div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+      <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+      </div>`;
       return;
     }
 
@@ -169,9 +169,9 @@ export class ChooserProxyView extends AView {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.node.innerHTML = `
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 41em">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
-    <br><a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
-   </div></p><p></p>`;
+    <div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+    </div>`;
     this.openExternally.innerHTML = ``;
     this.fire(ChooserProxyView.EVENT_LOADING_FINISHED);
   }
