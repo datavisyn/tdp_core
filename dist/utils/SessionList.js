@@ -69,7 +69,7 @@ class ASessionList {
             stopEvent();
             const nameTd = this.parentElement.parentElement.firstElementChild;
             const publicI = this.parentElement.parentElement.children[1].firstElementChild;
-            ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, { button: I18nextManager.getInstance().i18n.t('tdp:core.SessionList.edit') }).then((extras) => {
+            ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, { button: I18nextManager.getInstance().i18n.t('tdp:core.SessionList.save') }).then((extras) => {
                 if (extras !== null) {
                     Promise.resolve(manager.editGraphMetaData(d, extras))
                         .then((desc) => {
