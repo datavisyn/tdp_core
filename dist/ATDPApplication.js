@@ -27,7 +27,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showHelpLink: false,
             showOptionsLink: false,
             showReportBugLink: true,
-            enableProvenanceUrlTracking: false
+            enableProvenanceUrlTracking: true
         };
         this.app = null;
         I18nextManager.getInstance().initI18n().then(() => {

@@ -87,7 +87,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showHelpLink: false,
     showOptionsLink: false,
     showReportBugLink: true,
-    enableProvenanceUrlTracking: false
+    enableProvenanceUrlTracking: true
   };
 
   protected app: Promise<T> = null;
