@@ -49,6 +49,11 @@ export interface ITDPOptions {
      * options passed to the IProvenanceGraphManager
      */
     provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+    /**
+     * Wheather to show or hide the Analysis Session Managment menu.
+     * @default: true
+     */
+    enableProvenanceMenu?: boolean;
 }
 /**
  * base class for TDP based applications

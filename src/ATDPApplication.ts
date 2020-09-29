@@ -63,6 +63,12 @@ export interface ITDPOptions {
    * options passed to the IProvenanceGraphManager
    */
   provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+
+  /**
+   * Wheather to show or hide the Analysis Session Managment menu.
+   * @default: true
+   */
+  enableProvenanceMenu?: boolean;
 }
 
 /**
@@ -81,7 +87,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showHelpLink: false,
     showOptionsLink: false,
     showReportBugLink: true,
-    enableProvenanceUrlTracking: true
+    enableProvenanceUrlTracking: false
   };
 
   protected app: Promise<T> = null;
@@ -174,8 +180,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       // reopen after logged out
       this.loginMenu.forceShowDialog();
     });
+    let provenanceMenu: EditProvenanceGraphMenu | null;
 
-    const provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
+    if (this.options.enableProvenanceMenu) {
+      provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
+    }
 
     const modeSelector = body.querySelector('header');
     modeSelector.classList.add('collapsed');
@@ -197,7 +206,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       ButtonModeSelector.createButton(modeSelector, {
         size: 'sm'
       });
-      provenanceMenu.setGraph(graph);
+      provenanceMenu?.setGraph(graph);
     });
 
     const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
