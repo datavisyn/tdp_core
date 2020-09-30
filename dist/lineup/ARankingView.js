@@ -194,6 +194,9 @@ export class ARankingView extends AView {
     update() {
         this.taggle.update();
     }
+    getTaggle() {
+        return this.taggle;
+    }
     /**
      * create the selection adapter used to map input selections to LineUp columns
      * @default no columns are created
