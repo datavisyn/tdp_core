@@ -38,37 +38,38 @@ export interface ITDPOptions {
   showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
-   * show/hide the options link
-   * default: false
+   * Show/hide the options link
+   * @default: false
    */
   showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
-   * show/hide the bug report link
-   * default: true
+   * Show/hide the bug report link
+   * @default: true
    */
   showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
-   * show help link true or the url to link
-   * default: false
+   * Show help link (`true`) or the url to link
+   * @default: false
    */
   showHelpLink: boolean | string;
+
+  /**
+   * Show/hide the `Analysis Session Managment` menu in the header
+   * @default: true
+   */
+  showProvenanceMenu?: boolean;
 
   /**
    * default: true
    */
   enableProvenanceUrlTracking?: boolean;
+
   /**
    * options passed to the IProvenanceGraphManager
    */
   provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
-
-  /**
-   * Wheather to show or hide the Analysis Session Managment menu.
-   * @default: true
-   */
-  enableProvenanceMenu?: boolean;
 }
 
 /**
@@ -182,7 +183,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     });
     let provenanceMenu: EditProvenanceGraphMenu | null;
 
-    if (this.options.enableProvenanceMenu) {
+    if (this.options.showProvenanceMenu) {
       provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
     }
 
