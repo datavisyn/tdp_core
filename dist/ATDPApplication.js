@@ -27,6 +27,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showHelpLink: false,
             showOptionsLink: false,
             showReportBugLink: true,
+            showProvenanceMenu: true,
             enableProvenanceUrlTracking: true
         };
         this.app = null;
@@ -101,7 +102,7 @@ export class ATDPApplication extends ACLUEWrapper {
             this.loginMenu.forceShowDialog();
         });
         let provenanceMenu;
-        if (this.options.enableProvenanceMenu) {
+        if (this.options.showProvenanceMenu) {
             provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
         }
         const modeSelector = body.querySelector('header');
