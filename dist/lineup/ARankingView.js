@@ -194,6 +194,9 @@ export class ARankingView extends AView {
     update() {
         this.taggle.update();
     }
+    /**
+     * Returns the LineUp/Taggle instance of this ranking
+     */
     getTaggle() {
         return this.taggle;
     }

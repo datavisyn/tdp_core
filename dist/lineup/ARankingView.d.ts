@@ -68,6 +68,9 @@ export declare abstract class ARankingView extends AView {
      */
     init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<void>;
     update(): void;
+    /**
+     * Returns the LineUp/Taggle instance of this ranking
+     */
     getTaggle(): EngineRenderer | TaggleRenderer;
     /**
      * create the selection adapter used to map input selections to LineUp columns

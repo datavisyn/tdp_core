@@ -241,7 +241,10 @@ export abstract class ARankingView extends AView {
     this.taggle.update();
   }
 
-  getTaggle() {
+  /**
+   * Returns the LineUp/Taggle instance of this ranking
+   */
+  getTaggle(): EngineRenderer | TaggleRenderer {
     return this.taggle;
   }
 
