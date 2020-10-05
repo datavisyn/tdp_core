@@ -202,7 +202,7 @@
         "tsv": "TSV (tab separated)",
         "csvColon": "CSV (semicolon separated)",
         "json": "JSON",
-        "excel": "Microsoft Excel (xlsx)"
+        "excel": "Microsoft Excel format (xlsx)"
       },
 
       "LineupPanelActions": {
@@ -215,14 +215,14 @@
         "toggleOverview": "En/Disable Overview",
         "downloadData": "Download Data",
         "downloadAll": "Download All",
-        "excel": "Microsoft Excel (xlsx)",
+        "excel": "Microsoft Excel format (xlsx)",
         "downloadSelectedRows": "Download Selected Rows Only",
         "customize": "Customize&hellip;",
         "saveEntities": "Save List of Entities",
         "databaseColumns": "Database Columns",
         "parameterizedScores": "Parameterized Scores",
         "previouslyAddedColumns": "Previously Added Columns",
-        "combiningColumns": "Combining Columns",
+        "combiningColumns": "Combined Columns",
         "weightedSum": "Weighted Sum",
         "scriptedCombination": "Scripted Combination",
         "nested": "Nested",
