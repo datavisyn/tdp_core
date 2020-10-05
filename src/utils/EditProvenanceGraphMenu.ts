@@ -111,7 +111,7 @@ export class EditProvenanceGraphMenu {
       event.stopPropagation();
 
       import('phovea_ui/dist/components/dialogs').then(({Dialog}) => {
-          const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.open'));
+          const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'));
           dialog.body.classList.add('tdp-session-dialog');
           dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
             <div role="tab" class="collapsed">
