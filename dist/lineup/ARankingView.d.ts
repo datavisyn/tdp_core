@@ -1,4 +1,4 @@
-import { LocalDataProvider } from 'lineupjs';
+import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
@@ -68,6 +68,10 @@ export declare abstract class ARankingView extends AView {
      */
     init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<void>;
     update(): void;
+    /**
+     * Returns the LineUp/Taggle instance of this ranking
+     */
+    getTaggle(): EngineRenderer | TaggleRenderer;
     /**
      * create the selection adapter used to map input selections to LineUp columns
      * @default no columns are created
