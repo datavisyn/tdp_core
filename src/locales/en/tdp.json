@@ -203,7 +203,7 @@
         "tsv": "TSV (tab separated)",
         "csvColon": "CSV (semicolon separated)",
         "json": "JSON",
-        "excel": "Save in Microsoft Excel format (xlsx)"
+        "excel": "Microsoft Excel format (xlsx)"
       },
 
       "LineupPanelActions": {
@@ -216,7 +216,7 @@
         "toggleOverview": "En/Disable Overview",
         "downloadData": "Download Data",
         "downloadAll": "Download All",
-        "excel": "Save in Microsoft Excel format (xlsx)",
+        "excel": "Microsoft Excel format (xlsx)",
         "downloadSelectedRows": "Download Selected Rows Only",
         "customize": "Customize&hellip;",
         "saveEntities": "Save List of Entities",
