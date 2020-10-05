@@ -37,7 +37,7 @@ abstract class ASessionList {
       case 'clone':
         return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
       case 'persist':
-        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.persistSession')}"><i class="fa fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.persistSession')}</span></a>`;
+        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fa fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
       case 'edit':
         return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
     }

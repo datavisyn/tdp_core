@@ -141,7 +141,7 @@
             "editSession": "Edit Session",
             "continueSession": "Continue Session",
             "cloneToTemporary": "Clone to Temporary Session",
-            "persistSession": "Persist Session",
+            "saveSession": "Save Session",
             "editSessionDetails": "Edit Session Details",
             "deleteIt": "Are you sure to delete session: \"{{name}}\"",
             "session": "Session",
