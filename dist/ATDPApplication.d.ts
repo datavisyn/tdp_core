@@ -27,20 +27,25 @@ export interface ITDPOptions {
     showResearchDisclaimer: boolean | ((content: HTMLElement) => void);
     showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
     /**
-     * show/hide the options link
-     * default: false
+     * Show/hide the options link
+     * @default: false
      */
     showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
     /**
-     * show/hide the bug report link
-     * default: true
+     * Show/hide the bug report link
+     * @default: true
      */
     showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
     /**
-     * show help link true or the url to link
-     * default: false
+     * Show help link (`true`) or the url to link
+     * @default: false
      */
     showHelpLink: boolean | string;
+    /**
+     * Show/hide the `Analysis Session Managment` menu in the header
+     * @default: true
+     */
+    showProvenanceMenu?: boolean;
     /**
      * default: true
      */

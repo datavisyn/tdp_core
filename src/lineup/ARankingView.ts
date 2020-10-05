@@ -242,6 +242,13 @@ export abstract class ARankingView extends AView {
   }
 
   /**
+   * Returns the LineUp/Taggle instance of this ranking
+   */
+  getTaggle(): EngineRenderer | TaggleRenderer {
+    return this.taggle;
+  }
+
+  /**
    * create the selection adapter used to map input selections to LineUp columns
    * @default no columns are created
    * @returns {ISelectionAdapter}

@@ -245,9 +245,7 @@
             }
         },
         "views": {
-            "noHttpsMessagePart1": "<strong>Security Information: </strong>This website uses HTTPS to secure your communication with our server. However, the requested external website doesn't support HTTPS and thus cannot be directly embedded in this application. Please use the following",
-            "link": "link",
-            "noHttpsMessagePart2": " to open the website in a separate window:",
+            "proxyPageCannotBeShownHere": "This page cannot be shown here. Please click the following link to open it in a new browser tab: ",
             "tableDownloadButton": "Download Table as Spreadsheet",
             "busyMessage": "Preparing awesome stuff for you &hellip;",
             "defaultHint": "No data found for the given {{name}}",
@@ -256,10 +254,6 @@
             "noMappingFoundHint_unknown": "No mapping found for the given Unknown to {{id}}",
             "toOption": " to {{id}}",
             "noMappingFound": "No mapping found from the given gene {{name}}",
-            "please": "Please",
-            "externalApplication": "the external application",
-            "openExternally": "click here to open {{name}}",
-            "newTab": "in a new browser tab.",
             "isLoaded": "The web page below is directly loaded from",
             "unknown": "Unknown",
             "cannotMap": "Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",
