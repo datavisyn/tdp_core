@@ -56,7 +56,7 @@ export class ExportUtils {
     const converted = rows.map((row) => {
       const r: any = {};
       for (const col of columns) {
-        r[ExportUtils.getColumnName(col)] = isNumberColumn(col) ? col.getRawNumber(row) : col.getValue(row);
+        r[ExportUtils.getColumnName(col)] = isNumberColumn(col) ? col.getRawNumber(row) : col.getExportValue(row, 'text');
       }
       return r;
     });

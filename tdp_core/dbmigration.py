@@ -51,7 +51,8 @@ class DBMigration(object):
       try:
         self.execute(['upgrade', 'head'])
         _log.info(f'Successfully upgraded database {self.id}')
-      except Exception:
+      # As alembic is actually a commandline tool, it sometimes uses sys.exit (https://github.com/sqlalchemy/alembic/blob/master/alembic/util/messaging.py#L63)
+      except (SystemExit, alembic.util.exc.CommandError):
         _log.exception(f'Error upgrading database {self.id}')
 
   def __repr__(self) -> str:

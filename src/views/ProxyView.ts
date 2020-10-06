@@ -179,9 +179,9 @@ export class ProxyView extends AD3View {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-      ${I18nextManager.getInstance().i18n.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${I18nextManager.getInstance().i18n.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}</a>
-      ${I18nextManager.getInstance().i18n.t('tdp:core.views.newTab')}</div></p>`;
+      this.node.innerHTML = `<div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+      <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+      </div>`;
       return;
     }
 
@@ -216,10 +216,9 @@ export class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart1')}
-    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${I18nextManager.getInstance().i18n.t('tdp:core.views.link')}</a> ${I18nextManager.getInstance().i18n.t('tdp:core.views.noHttpsMessagePart2')}
-       <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
-   </div></p><p></p>`);
+    <div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+    </div>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }

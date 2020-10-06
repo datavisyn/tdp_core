@@ -3,4 +3,7 @@
     @include fa-icon();
     content: $fa-var-clock-o;
   }
+  & + .modal-footer {
+    display: none;
+  }
 }

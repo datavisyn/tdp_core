@@ -26,6 +26,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showHelpLink: false,
             showOptionsLink: false,
             showReportBugLink: true,
+            showProvenanceMenu: true,
             enableProvenanceUrlTracking: true
         };
         this.app = null;
@@ -99,7 +100,10 @@ export class ATDPApplication extends ACLUEWrapper {
             // reopen after logged out
             this.loginMenu.forceShowDialog();
         });
-        const provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
+        let provenanceMenu;
+        if (this.options.showProvenanceMenu) {
+            provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
+        }
         const modeSelector = body.querySelector('header');
         modeSelector.classList.add('collapsed');
         modeSelector.classList.add('clue-modeselector');
@@ -115,7 +119,7 @@ export class ATDPApplication extends ACLUEWrapper {
             ButtonModeSelector.createButton(modeSelector, {
                 size: 'sm'
             });
-            provenanceMenu.setGraph(graph);
+            provenanceMenu === null || provenanceMenu === void 0 ? void 0 : provenanceMenu.setGraph(graph);
         });
         const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
             thumbnails: false,

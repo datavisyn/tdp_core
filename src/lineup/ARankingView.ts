@@ -88,6 +88,7 @@ export abstract class ARankingView extends AView {
     enableAddingScoreColumns: true,
     enableAddingPreviousColumns: true,
     enableAddingDatabaseColumns: true,
+    databaseColumnGroups: {},
     enableAddingMetaDataColumns: true,
     enableSidePanelCollapsing: true,
     enableSidePanel: 'collapsed',
@@ -238,6 +239,13 @@ export abstract class ARankingView extends AView {
 
   update() {
     this.taggle.update();
+  }
+
+  /**
+   * Returns the LineUp/Taggle instance of this ranking
+   */
+  getTaggle(): EngineRenderer | TaggleRenderer {
+    return this.taggle;
   }
 
   /**
