@@ -35,10 +35,8 @@ export declare class TDPApplicationUtils {
         inverse: import("phovea_core").IAction;
     };
     static initSession(map: object): import("phovea_core").IAction;
-    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): Promise<{
-        inverse: import("phovea_core").IAction;
-    }>;
-    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("phovea_core").IAction;
+    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): any;
+    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): any;
     static compressSetParameter(path: ActionNode[]): ActionNode[];
     /**
      * @deprecated

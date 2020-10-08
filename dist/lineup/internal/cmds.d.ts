@@ -64,7 +64,9 @@ export declare class LineupTrackingManager {
     static setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
     setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): IAction;
     setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]): IAction;
-    static setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter): Promise<ICmdResult>;
+    static setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter): Promise<{
+        inverse: IAction;
+    }>;
     static setColumnImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
     setColumn(provider: IObjectRef<IViewProviderLocal>, rid: number, path: string, prop: string, value: any): IAction;
     static addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any): Promise<ICmdResult>;

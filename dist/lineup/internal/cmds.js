@@ -200,8 +200,13 @@ export class LineupTrackingManager {
     static async setAggregationImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
-        const waitForAggregated = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
         LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
+        let resolver;
+        const waiter = new Promise((resolve) => resolver = resolve);
+        p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, () => {
+            p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, null); // disable
+            resolver(); // resolve waiter promise
+        });
         let inverseValue;
         if (Array.isArray(parameter.group)) {
             // use `filter()` for multiple groups
@@ -217,9 +222,9 @@ export class LineupTrackingManager {
                 p.setTopNAggregated(ranking, group, parameter.value);
             }
         }
-        return waitForAggregated({
+        return waiter.then(() => ({
             inverse: LineupTrackingManager.getInstance().setAggregation(inputs[0], parameter.rid, parameter.group, inverseValue)
-        });
+        }));
     }
     static async setColumnImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
