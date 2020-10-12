@@ -3,7 +3,7 @@ import { BaseUtils, I18nextManager } from 'phovea_core';
 import { XlsxUtils } from '../../utils/XlsxUtils';
 export class ExportUtils {
     static getColumnName(column) {
-        return column.label + (column.description ? '\n' + column.description : '');
+        return column.label + (column.desc.summary ? ' - ' + column.desc.summary : '') + (column.description ? '\n' + column.description : '');
     }
     static exportRanking(columns, rows, separator) {
         //optionally quote not numbers
