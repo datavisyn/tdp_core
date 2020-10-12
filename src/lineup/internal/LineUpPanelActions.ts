@@ -438,17 +438,6 @@ export class LineUpPanelActions extends EventHandler {
       return {text, children};
     }
 
-    const CHOOSER_COLUMNS = 'chooser_columns';
-    const formDesc = {
-      type: FormElementType.SELECT2_MULTIPLE,
-      label: 'Columns',
-      id: CHOOSER_COLUMNS,
-      required: true,
-      options: {
-        placeholder: 'Start typing...',
-        data: children
-      },
-    };
     return {
       text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.columnTitle', {text}),
       id: `group_${text}`,
@@ -456,8 +445,24 @@ export class LineUpPanelActions extends EventHandler {
         // choooser dialog
         const dialogTitle = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text});
         const dialogButton = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addButton');
+
         const dialog = new FormDialog(dialogTitle, dialogButton);
+
+        const CHOOSER_COLUMNS = 'chooser_columns';
+
+        const formDesc = {
+          type: FormElementType.SELECT2_MULTIPLE,
+          label: 'Columns',
+          id: CHOOSER_COLUMNS,
+          required: true,
+          options: {
+            placeholder: 'Start typing...',
+            data: children
+          },
+        };
+
         dialog.append(formDesc);
+
         dialog.showAsPromise((form: IForm) => {
           const data = <any>form.getElementData();
           const columns = data[CHOOSER_COLUMNS];
