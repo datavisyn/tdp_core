@@ -12,6 +12,8 @@ import { PanelAddColumnButton } from './panel/PanelAddColumnButton';
 import { PanelDownloadButton } from './panel/PanelDownloadButton';
 import { LineupUtils } from '../utils';
 import { isAdditionalColumnDesc } from '../../base/interfaces';
+import { FormElementType } from '../../form/interfaces';
+import { FormDialog } from '../../form';
 export class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();
@@ -309,24 +311,28 @@ export class LineUpPanelActions extends EventHandler {
             id: `group_${text}`,
             action: () => {
                 // choooser dialog
-                import('phovea_ui/dist/components/dialogs').then(({ FormDialog }) => {
-                    const dialog = new FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', { text }), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
-                    dialog.form.insertAdjacentHTML('beforeend', `
-            <select name="column" class="form-control">
-              ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}
-            </select>
-          `);
-                    dialog.onSubmit(() => {
-                        const data = dialog.getFormData();
-                        const selectedId = data.get('column');
-                        const child = children.find((d) => d.id === selectedId);
-                        if (child) {
-                            child.action();
-                        }
-                        return false;
+                const dialogTitle = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', { text });
+                const dialogButton = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addButton');
+                const dialog = new FormDialog(dialogTitle, dialogButton);
+                const CHOOSER_COLUMNS = 'chooser_columns';
+                const formDesc = {
+                    type: FormElementType.SELECT2_MULTIPLE,
+                    label: 'Columns',
+                    id: CHOOSER_COLUMNS,
+                    required: true,
+                    options: {
+                        placeholder: 'Start typing...',
+                        data: children
+                    },
+                };
+                dialog.append(formDesc);
+                dialog.showAsPromise((form) => {
+                    const data = form.getElementData();
+                    const columns = data[CHOOSER_COLUMNS];
+                    columns.forEach((column) => {
+                        const child = children.find((c) => c.id === column.id);
+                        child.action();
                     });
-                    dialog.hideOnSubmit();
-                    dialog.show();
                 });
             }
         };

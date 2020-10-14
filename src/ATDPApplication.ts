@@ -38,27 +38,34 @@ export interface ITDPOptions {
   showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
-   * show/hide the options link
-   * default: false
+   * Show/hide the options link
+   * @default: false
    */
   showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
-   * show/hide the bug report link
-   * default: true
+   * Show/hide the bug report link
+   * @default: true
    */
   showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
-   * show help link true or the url to link
-   * default: false
+   * Show help link (`true`) or the url to link
+   * @default: false
    */
   showHelpLink: boolean | string;
+
+  /**
+   * Show/hide the `Analysis Session Managment` menu in the header
+   * @default: true
+   */
+  showProvenanceMenu?: boolean;
 
   /**
    * default: true
    */
   enableProvenanceUrlTracking?: boolean;
+
   /**
    * options passed to the IProvenanceGraphManager
    */
@@ -81,6 +88,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showHelpLink: false,
     showOptionsLink: false,
     showReportBugLink: true,
+    showProvenanceMenu: true,
     enableProvenanceUrlTracking: true
   };
 
@@ -174,8 +182,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       // reopen after logged out
       this.loginMenu.forceShowDialog();
     });
+    let provenanceMenu: EditProvenanceGraphMenu | null;
 
-    const provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
+    if (this.options.showProvenanceMenu) {
+      provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
+    }
 
     const modeSelector = body.querySelector('header');
     modeSelector.classList.add('collapsed');
@@ -197,7 +208,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       ButtonModeSelector.createButton(modeSelector, {
         size: 'sm'
       });
-      provenanceMenu.setGraph(graph);
+      provenanceMenu?.setGraph(graph);
     });
 
     const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {

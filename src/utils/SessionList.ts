@@ -5,7 +5,7 @@
 import {FormDialog} from 'phovea_ui';
 import {select, Selection, event} from 'd3';
 import $ from 'jquery';
-import {UserSession, IProvenanceGraphDataDescription, GlobalEventHandler, I18nextManager} from 'phovea_core';
+import {UserSession, IProvenanceGraphDataDescription, GlobalEventHandler, I18nextManager, UniqueIdManager} from 'phovea_core';
 import {CLUEGraphManager} from 'phovea_clue';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {TDPApplicationUtils} from './TDPApplicationUtils';
@@ -37,7 +37,7 @@ abstract class ASessionList {
       case 'clone':
         return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
       case 'persist':
-        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.persistSession')}"><i class="fa fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.persistSession')}</span></a>`;
+        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fa fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
       case 'edit':
         return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
     }
@@ -217,6 +217,10 @@ export class PersistentSessionList extends ASessionList {
 
   protected async build(manager: CLUEGraphManager) {
 
+    const uniqueId = UniqueIdManager.getInstance().uniqueId();
+    const mySessionsTabId = `session_mine_${uniqueId}`;
+    const otherSessionsTabId = `session_others_${uniqueId}`;
+
     const $parent = this.createLoader();
 
     //select and sort by date desc
@@ -253,14 +257,14 @@ export class PersistentSessionList extends ASessionList {
     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.paragraphText')}
     </p>
         <ul class="nav nav-tabs" role="tablist">
-          <li class="active" role="presentation"><a href="#session_mine" class="active"><i class="fa fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
-          <li role="presentation"><a href="#session_others"><i class="fa fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
+          <li class="active" role="presentation"><a href="#${mySessionsTabId}" class="active"><i class="fa fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
+          <li role="presentation"><a href="#${otherSessionsTabId}"><i class="fa fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
         </ul>
         <div class="tab-content">
-            <div id="session_mine" class="tab-pane active">
+            <div id="${mySessionsTabId}" class="tab-pane active">
                 ${this.mode === 'table' ? tableMine : ''}
             </div>
-            <div id="session_others" class="tab-pane">
+            <div id="${otherSessionsTabId}" class="tab-pane">
                 ${this.mode === 'table' ? tablePublic : ''}
             </div>
        </div>`);
@@ -283,7 +287,7 @@ export class PersistentSessionList extends ASessionList {
 
       if (this.mode === 'table') {
         {
-          const $tr = $parent.select('#session_mine tbody').selectAll('tr').data(myworkspaces);
+          const $tr = $parent.select(`#${mySessionsTabId} tbody`).selectAll('tr').data(myworkspaces);
 
           const $trEnter = $tr.enter().append('tr').html(`
             <td></td>
@@ -303,7 +307,7 @@ export class PersistentSessionList extends ASessionList {
           $tr.exit().remove();
         }
         {
-          const $tr = $parent.select('#session_others tbody').selectAll('tr').data(otherworkspaces);
+          const $tr = $parent.select(`#${otherSessionsTabId} tbody`).selectAll('tr').data(otherworkspaces);
 
           const $trEnter = $tr.enter().append('tr').html((d) => {
             let actions = '';
@@ -348,7 +352,7 @@ export class PersistentSessionList extends ASessionList {
           $tr.exit().remove();
         }
         {
-          const $tr = $parent.select('#session_others').selectAll('div').data(otherworkspaces);
+          const $tr = $parent.select(`#${otherSessionsTabId}`).selectAll('div').data(otherworkspaces);
 
           const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html((d) => {
             let actions = '';
