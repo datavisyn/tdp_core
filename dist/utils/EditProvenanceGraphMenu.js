@@ -108,7 +108,7 @@ export class EditProvenanceGraphMenu {
             </div>
           </div>
           <div role="tab" class="collapsed">
-            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persistentSessions')}</h4>
+            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.savedSessions')}</h4>
             <div role="tabpanel" data-session="p">
             </div>
           </div>`;
