@@ -150,6 +150,7 @@
       "deleteSession": "Delete Session",
       "continue": "Continue",
       "edit": "Edit",
+      "save": "Save",
       "editSession": "Edit Session",
       "continueSession": "Continue Session",
       "cloneToTemporary": "Clone to Temporary Session",
