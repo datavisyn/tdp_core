@@ -4,7 +4,8 @@
 import { IViewContext, ISelection } from '../base/interfaces';
 import { IFormSelectOption } from '../form/elements/FormSelect';
 import { AD3View } from './AD3View';
-export interface IProxyViewOptions {
+import { ISelectionChooserOptions, SelectionChooser } from './SelectionChooser';
+export interface IProxyViewOptions extends Partial<ISelectionChooserOptions> {
     proxy?: string;
     site?: string;
     argument: string;
@@ -17,6 +18,7 @@ export interface IProxyViewOptions {
  */
 export declare class ProxyView extends AD3View {
     static readonly FORM_ID_SELECTED_ITEM = "externalItem";
+    protected readonly chooser: SelectionChooser;
     protected options: IProxyViewOptions;
     private readonly openExternally;
     readonly naturalSize: number[];
@@ -24,10 +26,9 @@ export declare class ProxyView extends AD3View {
     init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any>;
     protected initImpl(): Promise<void>;
     protected createUrl(args: any): string;
-    protected getParameterFormDescs(): import("../form/interfaces").IFormElementDesc[];
     protected parameterChanged(name: string): void;
+    protected getParameterFormDescs(): import("..").IFormElementDesc[];
     protected selectionChanged(): void;
-    protected updateSelectedItemSelect(forceUseLastSelection?: boolean): Promise<void>;
     protected getSelectionSelectData(names: string[]): Promise<IFormSelectOption[]>;
     protected updateProxyView(): void;
     protected loadProxyPage(selectedItemId: string): void;

@@ -4,13 +4,13 @@
 
 import {BaseUtils, IDTypeManager, I18nextManager} from 'phovea_core';
 import {IViewContext, ISelection} from '../base/interfaces';
-import {FormElementType} from '../form/interfaces';
-import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
+import { IFormSelectOption} from '../form/elements/FormSelect';
 import {AD3View} from './AD3View';
 import {RestBaseUtils} from '../base/rest';
+import {ISelectionChooserOptions, SelectionChooser} from './SelectionChooser';
 
 
-export interface IProxyViewOptions {
+export interface IProxyViewOptions extends Partial<ISelectionChooserOptions> {
   proxy?: string;
   site?: string;
   argument: string;
@@ -26,6 +26,7 @@ export class ProxyView extends AD3View {
 
   public static readonly FORM_ID_SELECTED_ITEM = 'externalItem';
 
+  protected readonly chooser: SelectionChooser;
   protected options: IProxyViewOptions = {
     /**
      * proxy key - will be redirected through a local server proxy
@@ -55,7 +56,7 @@ export class ProxyView extends AD3View {
     super(context, selection, parent);
     BaseUtils.mixin(this.options, context.desc, options);
     this.$node.classed('proxy_view', true);
-
+    this.chooser = new SelectionChooser((id) => this.getParameterElement(id), this.options.idtype, this.options);
     this.openExternally = parent.ownerDocument.createElement('p');
   }
 
@@ -73,10 +74,9 @@ export class ProxyView extends AD3View {
   protected initImpl() {
     super.initImpl();
     // update the selection first, then update the proxy view
-    return this.updateSelectedItemSelect()
-      .then(() => {
-        this.updateProxyView();
-      });
+    return this.chooser.init(this.selection).then(() => {
+      this.updateProxyView();
+    });
   }
 
   protected createUrl(args: any) {
@@ -90,57 +90,22 @@ export class ProxyView extends AD3View {
     return null;
   }
 
-  protected getParameterFormDescs() {
-    return super.getParameterFormDescs().concat([{
-      type: FormElementType.SELECT,
-      label: 'Show',
-      id: ProxyView.FORM_ID_SELECTED_ITEM,
-      options: {
-        optionsData: [],
-      },
-      useSession: true
-    }]);
-  }
 
   protected parameterChanged(name: string) {
     super.parameterChanged(name);
     this.updateProxyView();
   }
 
+  protected getParameterFormDescs() {
+    return super.getParameterFormDescs().concat([this.chooser.desc]);
+  }
+
   protected selectionChanged() {
     super.selectionChanged();
     // update the selection first, then update the proxy view
-    this.updateSelectedItemSelect(true) // true = force use last selection
-      .then(() => {
-        this.updateProxyView();
-      });
-  }
-
-  protected updateSelectedItemSelect(forceUseLastSelection = false) {
-    return this.resolveSelection()
-      .then((names) => Promise.all<any>([names, this.getSelectionSelectData(names)]))
-      .then((args: any[]) => {
-        const names = <string[]>args[0]; // use names to get the last selected element
-        const data = <{value: string, name: string, data: any}[]>args[1];
-        const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(ProxyView.FORM_ID_SELECTED_ITEM);
-
-        // backup entry and restore the selectedIndex by value afterwards again,
-        // because the position of the selected element might change
-        const bak = selectedItemSelect.value || data[selectedItemSelect.getSelectedIndex()];
-        selectedItemSelect.updateOptionElements(data);
-
-        // select last item from incoming `selection.range`
-        if (forceUseLastSelection) {
-          selectedItemSelect.value = data.filter((d) => d.value === names[names.length - 1])[0];
-
-          // otherwise try to restore the backup
-        } else if (bak !== null) {
-          selectedItemSelect.value = bak;
-        }
-
-        // just show if there is more than one
-        selectedItemSelect.setVisible(data.length > 1);
-      });
+    this.chooser.update(this.selection).then(() => {
+      this.updateProxyView();
+    });
   }
 
   protected getSelectionSelectData(names: string[]): Promise<IFormSelectOption[]> {
@@ -153,7 +118,7 @@ export class ProxyView extends AD3View {
   }
 
   protected updateProxyView() {
-    this.loadProxyPage(this.getParameter(ProxyView.FORM_ID_SELECTED_ITEM).value);
+    this.loadProxyPage(this.chooser.chosen().name);
   }
 
   protected loadProxyPage(selectedItemId: string) {

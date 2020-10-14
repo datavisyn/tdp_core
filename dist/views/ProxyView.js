@@ -2,9 +2,9 @@
  * Created by Holger Stitz on 07.09.2016.
  */
 import { BaseUtils, IDTypeManager, I18nextManager } from 'phovea_core';
-import { FormElementType } from '../form/interfaces';
 import { AD3View } from './AD3View';
 import { RestBaseUtils } from '../base/rest';
+import { SelectionChooser } from './SelectionChooser';
 /**
  * helper view for proxying an existing external website using an iframe
  */
@@ -34,6 +34,7 @@ export class ProxyView extends AD3View {
         this.naturalSize = [1280, 800];
         BaseUtils.mixin(this.options, context.desc, options);
         this.$node.classed('proxy_view', true);
+        this.chooser = new SelectionChooser((id) => this.getParameterElement(id), this.options.idtype, this.options);
         this.openExternally = parent.ownerDocument.createElement('p');
     }
     async init(params, onParameterChange) {
@@ -47,8 +48,7 @@ export class ProxyView extends AD3View {
     initImpl() {
         super.initImpl();
         // update the selection first, then update the proxy view
-        return this.updateSelectedItemSelect()
-            .then(() => {
+        return this.chooser.init(this.selection).then(() => {
             this.updateProxyView();
         });
     }
@@ -62,50 +62,18 @@ export class ProxyView extends AD3View {
         }
         return null;
     }
-    getParameterFormDescs() {
-        return super.getParameterFormDescs().concat([{
-                type: FormElementType.SELECT,
-                label: 'Show',
-                id: ProxyView.FORM_ID_SELECTED_ITEM,
-                options: {
-                    optionsData: [],
-                },
-                useSession: true
-            }]);
-    }
     parameterChanged(name) {
         super.parameterChanged(name);
         this.updateProxyView();
     }
+    getParameterFormDescs() {
+        return super.getParameterFormDescs().concat([this.chooser.desc]);
+    }
     selectionChanged() {
         super.selectionChanged();
         // update the selection first, then update the proxy view
-        this.updateSelectedItemSelect(true) // true = force use last selection
-            .then(() => {
+        this.chooser.update(this.selection).then(() => {
             this.updateProxyView();
-        });
-    }
-    updateSelectedItemSelect(forceUseLastSelection = false) {
-        return this.resolveSelection()
-            .then((names) => Promise.all([names, this.getSelectionSelectData(names)]))
-            .then((args) => {
-            const names = args[0]; // use names to get the last selected element
-            const data = args[1];
-            const selectedItemSelect = this.getParameterElement(ProxyView.FORM_ID_SELECTED_ITEM);
-            // backup entry and restore the selectedIndex by value afterwards again,
-            // because the position of the selected element might change
-            const bak = selectedItemSelect.value || data[selectedItemSelect.getSelectedIndex()];
-            selectedItemSelect.updateOptionElements(data);
-            // select last item from incoming `selection.range`
-            if (forceUseLastSelection) {
-                selectedItemSelect.value = data.filter((d) => d.value === names[names.length - 1])[0];
-                // otherwise try to restore the backup
-            }
-            else if (bak !== null) {
-                selectedItemSelect.value = bak;
-            }
-            // just show if there is more than one
-            selectedItemSelect.setVisible(data.length > 1);
         });
     }
     getSelectionSelectData(names) {
@@ -116,7 +84,7 @@ export class ProxyView extends AD3View {
         return Promise.resolve(names.map((d) => ({ value: d, name: d, data: d })));
     }
     updateProxyView() {
-        this.loadProxyPage(this.getParameter(ProxyView.FORM_ID_SELECTED_ITEM).value);
+        this.loadProxyPage(this.chooser.chosen().name);
     }
     loadProxyPage(selectedItemId) {
         if (selectedItemId === null) {
