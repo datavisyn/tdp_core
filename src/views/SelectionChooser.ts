@@ -100,15 +100,13 @@ export class SelectionChooser {
     const targetIds = await IDTypeManager.getInstance().mapToID(source, sourceIds, target);
     const targetIdsFlat = (<number[]>[]).concat(...targetIds);
     const targetNames = await target.unmap(targetIdsFlat);
-
-
-    if (target === readAble && targetIds.every((d) => d.length === 1)) {
+    if (target === readAble && targetIds.every((d) => d.length <= 1)) {
       // keep it simple target = readable and single hit - so just show flat
       return targetIds.map((d, i) => ({
         value: String(d[0]),
         name: labels[i],
         data: {id: d[0], name: targetNames[i], label: labels[i]}
-      }));
+      })).sort((a, b) => a.name .localeCompare(b.name));
     }
 
     // in case of either 1:n mappings or when the target IDType and the readable IDType are different the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).

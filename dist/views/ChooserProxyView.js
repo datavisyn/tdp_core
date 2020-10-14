@@ -63,7 +63,6 @@ export class ChooserProxyView extends AView {
         this.setNoMappingFoundHint(false);
         const selectedItemId = this.chooser.chosen();
         if ((selectedItemId === null || selectedItemId === void 0 ? void 0 : selectedItemId.id) == null) {
-            const to = this.options.idtype ? I18nextManager.getInstance().i18n.t('tdp:core.views.toOption', { id: this.options.idtype }) : '';
             this.setNoMappingFoundHint(true);
             return;
         }
