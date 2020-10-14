@@ -276,8 +276,6 @@
       "noMappingFoundHint": "No mapping found for the given {{name}} to {{id}}",
       "noMappingFoundHint_unknown": "No mapping found for the given Unknown to {{id}}",
 
-      "toOption": " to {{id}}",
-      "noMappingFound": "No mapping found from the given gene {{name}}",
       "isLoaded": "The web page below is directly loaded from",
       "unknown": "Unknown",
       "cannotMap": "Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",

@@ -61,9 +61,15 @@ svg {
 
     &[data-hint]::after {
       position: absolute;
-      top: 1em;
-      left: 1em;
-      right: 1em;
+      top: 20px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      width:40%;
+      color: #31708f;
+      background-color: #d9edf7;
+      padding: 15px;
+      border: 1px solid  #bce8f1;
+      border-radius: 4px;
       text-align: center;
       content: attr(data-hint);
       z-index: 10;
