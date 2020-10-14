@@ -1,6 +1,6 @@
-@import "./vars";
-@import "~font-awesome/scss/variables";
-@import "~font-awesome/scss/mixins";
+@import './vars';
+@import '~font-awesome/scss/variables';
+@import '~font-awesome/scss/mixins';
 
 svg {
   // generic axes styles
@@ -45,8 +45,7 @@ svg {
     }
   }
 
-  &:not(.tdp-busy).tdp-hint,
-  &:not(.tdp-busy).tdp-hint-mapping {
+  &:not(.tdp-busy).tdp-hint, &:not(.tdp-busy).tdp-hint-mapping {
     &::before {
       @include fa-icon();
       $nothing: 50pt;
@@ -85,8 +84,8 @@ svg {
     content: $fa-var-chain-broken;
   }
 
-  @import "./view_lineup";
-  @import "./view_table";
-  @import "./view_composite";
-  @import "./view_proxy";
+  @import './view_lineup';
+  @import './view_table';
+  @import './view_composite';
+  @import './view_proxy';
 }
