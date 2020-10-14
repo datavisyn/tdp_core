@@ -20,6 +20,8 @@ import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IR
 import {ISearchOption} from './panel/ISearchOption';
 import {LineupUtils} from '../utils';
 import {IAdditionalColumnDesc, isAdditionalColumnDesc} from '../../base/interfaces';
+import {FormElementType, IForm} from '../../form/interfaces';
+import {FormDialog} from '../../form';
 
 
 export interface IPanelTabExtension {
@@ -141,7 +143,7 @@ export class LineUpPanelActions extends EventHandler {
   set collapse(value: boolean) {
     this.node.classList.toggle('collapsed', value);
 
-    if(value) {
+    if (value) {
       this.tabContainer.hideCurrentTab(); // Hide the active PanelTab and inform its content to stop updating
     } else {
       this.tabContainer.showCurrentTab(); // Show the last active PanelTab and inform its content to start updating again
@@ -348,7 +350,7 @@ export class LineUpPanelActions extends EventHandler {
           // If both groups have the same order, sort alphabetically
           return sortOrder(databaseColumnGroups?.[aKey]?.order, databaseColumnGroups?.[bKey]?.order) || aKey.localeCompare(bKey);
         })
-        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a,b) => sortOrder(a.chooserGroup?.order, b.chooserGroup?.order)))));
+        .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a, b) => sortOrder(a.chooserGroup?.order, b.chooserGroup?.order)))));
     }
 
     if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
@@ -421,7 +423,7 @@ export class LineUpPanelActions extends EventHandler {
     const groupedItems = new Map<string, ISearchOption[]>();
     const ungroupedItems = [];
     columnDesc.map((item) => {
-      if(item.chooserGroup) {
+      if (item.chooserGroup) {
         groupedItems.has(item.chooserGroup.parent) ? groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item]) : groupedItems.set(item.chooserGroup.parent, [item]);
       } else {
         ungroupedItems.push(item);
@@ -435,29 +437,39 @@ export class LineUpPanelActions extends EventHandler {
     if (!viaDialog) {
       return {text, children};
     }
+
     return {
       text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.columnTitle', {text}),
       id: `group_${text}`,
       action: () => {
         // choooser dialog
-        import('phovea_ui/dist/components/dialogs').then(({FormDialog}) => {
-          const dialog = new FormDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text}), I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'));
-          dialog.form.insertAdjacentHTML('beforeend', `
-            <select name="column" class="form-control">
-              ${children.map((d) => `<option value="${d.id}">${d.text}</option>`).join('')}
-            </select>
-          `);
-          dialog.onSubmit(() => {
-            const data = dialog.getFormData();
-            const selectedId = data.get('column');
-            const child = children.find((d) => d.id === selectedId);
-            if (child) {
-              child.action();
-            }
-            return false;
+        const dialogTitle = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text});
+        const dialogButton = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addButton');
+
+        const dialog = new FormDialog(dialogTitle, dialogButton);
+
+        const CHOOSER_COLUMNS = 'chooser_columns';
+
+        const formDesc = {
+          type: FormElementType.SELECT2_MULTIPLE,
+          label: 'Columns',
+          id: CHOOSER_COLUMNS,
+          required: true,
+          options: {
+            placeholder: 'Start typing...',
+            data: children
+          },
+        };
+
+        dialog.append(formDesc);
+
+        dialog.showAsPromise((form: IForm) => {
+          const data = <any>form.getElementData();
+          const columns = data[CHOOSER_COLUMNS];
+          columns.forEach((column) => {
+            const child = children.find((c) => c.id === column.id);
+            child.action();
           });
-          dialog.hideOnSubmit();
-          dialog.show();
         });
       }
     };
