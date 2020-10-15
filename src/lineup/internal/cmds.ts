@@ -271,12 +271,11 @@ export class LineupTrackingManager {
 
     LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
 
-    let resolver: () => void;
-    const waiter = new Promise<void>((resolve) => resolver = resolve);
-
-    p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, () => {
-      p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, null); // disable
-      resolver(); // resolve waiter promise
+    const waiter = new Promise<void>((resolve) => {
+      p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, () => {
+         p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, null); // disable
+         resolve(); // resolve promise
+      });
     });
 
     let inverseValue: number | number[];
