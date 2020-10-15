@@ -5,7 +5,7 @@ export class ProvenanceGraphMenuUtils {
         return d.local === false || d.local === undefined;
     }
     static persistProvenanceGraphMetaData(d) {
-        const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
+        const name = d.name.startsWith('Temporary') ? `Saved ${d.name.slice(10)}` : d.name;
         return ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, {
             title: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}`,
             button: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save')}`,
