@@ -8,8 +8,8 @@
   }
 }
 
-$step-color: black;
-$step-border: black;
+$step-color: black !default;
+$step-border: black !default;
 
 
 .tdp-tour-backdrop-blocker {

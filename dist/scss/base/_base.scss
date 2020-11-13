@@ -52,7 +52,7 @@ li[data-header=optionsLink] {
 }
 
 .toast-container {
-  $move_animation: 0.5s;
+  $move_animation: 0.5s !default;
 
   position: fixed;
   top: 0;

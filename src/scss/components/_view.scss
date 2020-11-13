@@ -44,7 +44,7 @@ svg {
   &:not(.tdp-busy).tdp-hint, &:not(.tdp-busy).tdp-hint-mapping {
     &::before {
       @include fa-icon();
-      $nothing: 50pt;
+      $nothing: 50pt !default;
       position: absolute;
       content: $fa-var-eye-slash;
       top: 50%;
