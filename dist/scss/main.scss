@@ -9,7 +9,7 @@
 
 @import './vendors/select2';
 @import './vendors/select3';
-
+@import './vendors/lineup';
 
 @import './components/form_builder';
 @import './components/button_group';
@@ -20,7 +20,3 @@
 @import './components/permissions';
 @import './components/view';
 @import './components/view_wrapper';
-
-
-$lu_assets: '~lineupjs/src/assets';
-@import '~lineupjs/src/styles/lineup';
