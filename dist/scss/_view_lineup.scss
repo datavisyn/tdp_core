@@ -72,7 +72,7 @@
     padding-bottom: 1px; // no idea otherwise scrollbar
   }
 
-  footer {
+  footer:not(.lu-resize-helper) {
     display: block !important;
   }
 }
