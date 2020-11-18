@@ -29,7 +29,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div');
+    this.$node = $formNode.append('div').classed('form-group', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 
