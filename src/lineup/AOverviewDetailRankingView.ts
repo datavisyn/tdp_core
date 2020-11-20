@@ -1,14 +1,15 @@
 
 
-import {LayoutContainerEvents} from 'phovea_ui/src/layout';
-import ARankingView, {IARankingViewOptions} from './ARankingView';
-import {ISelection, IViewContext} from '../views';
-import {ISplitLayoutContainer, root, verticalSplit, view} from 'phovea_ui/src/layout';
-import {IRow} from '../rest';
-import {debounce} from 'phovea_core/src';
+import {LayoutContainerEvents} from 'phovea_ui';
+import {ARankingView} from './ARankingView';
+import {IARankingViewOptions} from './IARankingViewOptions';
+import {ISelection, IViewContext} from '../base/interfaces';
+import {ISplitLayoutContainer, BuilderUtils} from 'phovea_ui';
+import {IRow} from '../base/rest';
+import {BaseUtils, I18nextManager} from 'phovea_core';
 import {LocalDataProvider} from 'lineupjs';
-import OverviewColumn from './internal/OverviewColumn';
-import i18n from 'phovea_core/src/i18n';
+import {OverviewColumn} from './internal/OverviewColumn';
+
 
 export abstract class AOverviewDetailRankingView extends ARankingView {
 
@@ -18,8 +19,8 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
   private lineup: LocalDataProvider;
   private overviewColumn: OverviewColumn;
 
-  protected readonly triggerOverviewUpdateDelayed = debounce(() => this.triggerOverviewUpdate(), 100);
-  protected readonly triggerUpdateDelayed = debounce(() => this.update(), 100);
+  protected readonly triggerOverviewUpdateDelayed = BaseUtils.debounce(() => this.triggerOverviewUpdate(), 100);
+  protected readonly triggerUpdateDelayed = BaseUtils.debounce(() => this.update(), 100);
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
     super(context, selection, parent, options);
@@ -68,9 +69,9 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
       visible: true
     };
 
-    const r = root(verticalSplit(1,
-      view(overviewView).name(i18n.t('tdp:core.lineup.OverviewDetailRanking.overview')).hideHeader(),
-      view(lineupView).name(i18n.t('tdp:core.lineup.OverviewDetailRanking.detailTable')).hideHeader()));
+    const r = BuilderUtils.root(BuilderUtils.verticalSplit(1,
+      BuilderUtils.view(overviewView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.overview')).hideHeader(),
+      BuilderUtils.view(lineupView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.detailTable')).hideHeader()));
     this.node.insertAdjacentElement('afterbegin', r.node);
 
     r.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, () => {

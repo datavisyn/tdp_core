@@ -1,10 +1,11 @@
 
 
-import ARankingView, {IARankingViewOptions} from './ARankingView';
-import {ENamedSetType, INamedSet} from '../storage';
-import {ISelection, IViewContext} from './interfaces';
-import {IParams} from '../rest';
-import {retrieve} from 'phovea_core/src/session';
+import {ARankingView} from '../lineup/ARankingView';
+import {IARankingViewOptions} from '../lineup/IARankingViewOptions';
+import {ENamedSetType, INamedSet} from '../storage/interfaces';
+import {ISelection, IViewContext} from '../base/interfaces';
+import {IParams} from '../base/rest';
+import {UserSession} from 'phovea_core';
 
 export interface IAStartListOptions extends IARankingViewOptions {
   namedSet: INamedSet;
@@ -49,7 +50,7 @@ export abstract class AStartList extends ARankingView {
     // TODO can't remember why the all exception
     if(this.namedSet.subTypeKey && validFilterKey(this.namedSet.subTypeKey) && this.namedSet.subTypeValue !== 'all') {
       if(this.namedSet.subTypeFromSession) {
-        filter[this.namedSet.subTypeKey] = retrieve(this.namedSet.subTypeKey, this.namedSet.subTypeValue);
+        filter[this.namedSet.subTypeKey] = UserSession.getInstance().retrieve(this.namedSet.subTypeKey, this.namedSet.subTypeValue);
       } else {
         filter[this.namedSet.subTypeKey] = this.namedSet.subTypeValue;
       }
@@ -57,5 +58,3 @@ export abstract class AStartList extends ARankingView {
     return filter;
   }
 }
-
-export default AStartList;

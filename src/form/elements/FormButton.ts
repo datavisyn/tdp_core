@@ -1,13 +1,12 @@
 import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
-import {EventHandler} from 'phovea_core/src/event';
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {EventHandler, IPluginDesc} from 'phovea_core';
 
 export interface IButtonElementDesc extends IFormElementDesc {
   onClick: () => void;
   iconClass?: string;
 }
 
-export default class FormButton extends EventHandler implements IFormElement {
+export class FormButton extends EventHandler implements IFormElement {
   private button: HTMLElement;
   private node: HTMLElement;
   private clicked: boolean = false;

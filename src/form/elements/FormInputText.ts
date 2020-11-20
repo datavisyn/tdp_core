@@ -2,9 +2,9 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import AFormElement from './AFormElement';
+import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm} from '../interfaces';
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {IPluginDesc} from 'phovea_core';
 
 
 /**
@@ -29,7 +29,7 @@ export interface IFormInputTextDesc extends IFormElementDesc {
   };
 }
 
-export default class FormInputText extends AFormElement<IFormInputTextDesc> {
+export class FormInputText extends AFormElement<IFormInputTextDesc> {
 
   private input: HTMLInputElement;
 

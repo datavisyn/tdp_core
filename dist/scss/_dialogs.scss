@@ -1,0 +1,11 @@
+@import "./vars";
+
+.tdp-session-dialog {
+  [data-menu="temporary"] > h4::before {
+    @include fa-icon();
+    content: $fa-var-clock-o;
+  }
+  & + .modal-footer {
+    display: none;
+  }
+}

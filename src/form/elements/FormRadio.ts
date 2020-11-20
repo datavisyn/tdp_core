@@ -2,7 +2,7 @@ import {IFormElementDesc, IForm} from '../interfaces';
 import {select} from 'd3';
 import {AFormElement} from './AFormElement';
 import {IFormSelectOption} from './FormSelect';
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {IPluginDesc} from 'phovea_core';
 
 export interface IRadioElementDesc extends IFormElementDesc {
   options: {
@@ -10,7 +10,7 @@ export interface IRadioElementDesc extends IFormElementDesc {
   };
 }
 
-export default class FormRadio extends AFormElement<IRadioElementDesc> {
+export class FormRadio extends AFormElement<IRadioElementDesc> {
 
   /**
    * Constructor
@@ -23,6 +23,7 @@ export default class FormRadio extends AFormElement<IRadioElementDesc> {
     super(form, Object.assign({options: { buttons: [] }}, elementDesc), pluginDesc);
 
     this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('form-group');
     parentElement.appendChild(this.node);
 
     this.build();

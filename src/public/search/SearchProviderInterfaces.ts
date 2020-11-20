@@ -1,5 +1,4 @@
-import {IPluginDesc} from 'phovea_core/src/plugin';
-import {IDType} from 'phovea_core/src/idtype';
+import {IPluginDesc, IDType} from 'phovea_core';
 
 /**
  * a search result

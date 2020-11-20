@@ -1,6 +1,5 @@
-import * as $ from 'jquery';
-import {debounce} from 'phovea_core/src';
-import {EventHandler} from 'phovea_core/src/event';
+import $ from 'jquery';
+import {EventHandler, BaseUtils} from 'phovea_core';
 import 'select2';
 
 export interface IdTextPair {
@@ -155,19 +154,62 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
   queryDelay: number;
 }
 
-/**
- * Replacer function that styles the found match, offset 0 means no match
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
- * @param match The matched substring
- * @param p1 The nth parenthesized submatch string
- * @param offset The offset of the matched substring
- * @returns {string} The replacement string
- */
-export function highlightMatch(match: string, p1: string, offset: number): string {
-  return match !== '' ? `<mark>${p1}</mark>` : '';
+export class Select3Utils {
+  /**
+   * Replacer function that styles the found match, offset 0 means no match
+   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+   * @param match The matched substring
+   * @param p1 The nth parenthesized submatch string
+   * @param offset The offset of the matched substring
+   * @returns {string} The replacement string
+   */
+  static highlightMatch(match: string, p1: string, offset: number): string {
+    return match !== '' ? `<mark>${p1}</mark>` : '';
+  }
+
+
+  static splitEscaped(value: string, reg: RegExp, unescape: boolean) {
+    const elems = value.split(reg);
+    const seps = value.match(reg) || [];
+    const r: string[] = [];
+
+    while (elems.length > 0) {
+      const elem = elems.shift();
+      const sep = seps.shift();
+      if (elem.endsWith('\\') && elems.length > 0) {
+        // next one is an escaped split so merge again together
+        const next = elems.shift();
+        const full = (unescape ? elem.slice(0, elem.length - 1) : elem) + sep + next;
+        elems.unshift(full); // readd again
+        continue;
+      }
+      r.push(elem);
+    }
+    return r;
+  }
+
+  /**
+   * escape the given string to be used as regex
+   * @see https://github.com/lodash/lodash/blob/4.1.2-npm-packages/lodash.escaperegexp/index.js
+   * @param {string} re the text to be used as regex
+   * @returns {string} the escaped text
+   */
+  static escapeRegex(re: string) {
+    const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+    const reHasRegExpChar = RegExp(reRegExpChar.source);
+    return (re && reHasRegExpChar.test(re)) ? re.replace(reRegExpChar, '\\$&') : re;
+  }
+
+  static equalArrays<T extends IdTextPair>(a: T[], b: T[]) {
+    if (a.length !== b.length) {
+      return false;
+    }
+    return a.every((ai, i) => ai.id === b[i].id && ai.text === b[i].text);
+  }
+
 }
 
-export default class Select3<T extends IdTextPair> extends EventHandler {
+export class Select3<T extends IdTextPair> extends EventHandler {
   /**
    * event fired when the selection changes the argument is an array of ISelection objects
    * @see ISelection
@@ -189,17 +231,17 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     group: (items) => items,
     format: (item: ISelect3Item<T>, node: HTMLElement, mode: 'result' | 'selection', currentSearchQuery?: RegExp) => {
       if (mode === 'result' && currentSearchQuery) {
-        return item.text.replace(currentSearchQuery!, highlightMatch);
+        return item.text.replace(currentSearchQuery!, Select3Utils.highlightMatch);
       }
       return item.text;
     },
     formatGroup: (group: ISelect3Group<T>, node: HTMLElement, currentSearchQuery?: RegExp) => {
       if (currentSearchQuery) {
-        return group.text.replace(currentSearchQuery!, highlightMatch);
+        return group.text.replace(currentSearchQuery!, Select3Utils.highlightMatch);
       }
       return group.text;
     },
-    equalValues: equalArrays,
+    equalValues: Select3Utils.equalArrays,
     cacheResults: true,
     tokenSeparators: /[\s\n\r;,]+/gm,
     defaultTokenSeparator: ' ',
@@ -235,7 +277,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
   private readonly cacheItem = new Map<string, ISelect3Item<T>>();
 
   // debounce since "clear" is removing one by one
-  private onChange = debounce(() => {
+  private onChange = BaseUtils.debounce(() => {
     const next = this.value;
     if (this.options.equalValues(this.previousValue, next)) {
       return;
@@ -286,7 +328,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
       if (!value) {
         return;
       }
-      const data = splitEscaped(value, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
+      const data = Select3Utils.splitEscaped(value, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
       this.setSearchQuery(data);
       evt.preventDefault();
       evt.stopPropagation();
@@ -356,7 +398,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     const f = new FileReader();
     f.addEventListener('load', () => {
       const v = String(f.result);
-      const data = splitEscaped(v, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
+      const data = Select3Utils.splitEscaped(v, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
       this.setSearchQuery(data);
     });
     f.readAsText(file, 'utf-8');
@@ -392,7 +434,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
 
   private searchImpl(x: { data: { q: string, page: number } }, success: (data: ISearchResult<T>) => void, failure: () => void) {
     const q = x.data.q;
-    this.lastSearchQuery = new RegExp(`(${escapeRegex(q)})`, 'im');
+    this.lastSearchQuery = new RegExp(`(${Select3Utils.escapeRegex(q)})`, 'im');
     if (x.data.page === undefined) {
       x.data.page = 0; // init properly otherwise select2 will assume 1 instead of zero based
     }
@@ -471,7 +513,7 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
     if (term.length === 0) {
       return query;
     }
-    const arr = splitEscaped(term, this.options.tokenSeparators, true);
+    const arr = Select3Utils.splitEscaped(term, this.options.tokenSeparators, true);
     //filter to valid (non empty) entries
     const valid = Array.from(new Set(arr.map((a) => a.trim().toLowerCase()).filter((a) => a.length > 0)));
 
@@ -530,43 +572,4 @@ export default class Select3<T extends IdTextPair> extends EventHandler {
   focus() {
     this.$select.select2('open');
   }
-}
-
-export function splitEscaped(value: string, reg: RegExp, unescape: boolean) {
-  const elems = value.split(reg);
-  const seps = value.match(reg) || [];
-  const r: string[] = [];
-
-  while (elems.length > 0) {
-    const elem = elems.shift();
-    const sep = seps.shift();
-    if (elem.endsWith('\\') && elems.length > 0) {
-      // next one is an escaped split so merge again together
-      const next = elems.shift();
-      const full = (unescape ? elem.slice(0, elem.length - 1) : elem) + sep + next;
-      elems.unshift(full); // readd again
-      continue;
-    }
-    r.push(elem);
-  }
-  return r;
-}
-
-/**
- * escape the given string to be used as regex
- * @see https://github.com/lodash/lodash/blob/4.1.2-npm-packages/lodash.escaperegexp/index.js
- * @param {string} re the text to be used as regex
- * @returns {string} the escaped text
- */
-function escapeRegex(re: string) {
-  const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
-  const reHasRegExpChar = RegExp(reRegExpChar.source);
-  return (re && reHasRegExpChar.test(re)) ? re.replace(reRegExpChar, '\\$&') : re;
-}
-
-export function equalArrays<T extends IdTextPair>(a: T[], b: T[]) {
-  if (a.length !== b.length) {
-    return false;
-  }
-  return a.every((ai, i) => ai.id === b[i].id && ai.text === b[i].text);
 }

@@ -1,16 +1,40 @@
-import {list} from 'phovea_core/src/plugin';
-import {EXTENSION_POINT_TDP_TOUR, ITDPTourExtensionDesc, IStep} from './extensions';
-import {AppHeader} from 'phovea_ui/src/header';
+import {PluginRegistry} from 'phovea_core';
+import {ITDPTourExtensionDesc, IStep} from './extensions';
+import {AppHeader} from 'phovea_ui';
+import {TourUtils} from './TourUtils';
 
 export interface ITourContext {
-  app(): Promise<any>; // the TDP app
+  /**
+   * The TDP application
+   */
+  app(): Promise<any>;
+
+  /**
+   * The application header
+   */
   header(): AppHeader;
+
+  /**
+   * Set the number of steps
+   * @param count Total number of steps
+   */
   steps(count: number): void;
+
+  /**
+   * Show a given step
+   * @param stepNumber The step number
+   * @param step Step object
+   */
   show(stepNumber: number, step: IStep): void;
+
+  /**
+   * Hide the tour
+   * @param finished Flag whether the tour has finished
+   */
   hide(finished?: boolean): void;
 }
 
-export default class Tour {
+export class Tour {
   private current: number = -1;
 
   private steps: IStep[] = [];
@@ -101,10 +125,10 @@ export default class Tour {
   previous(context: ITourContext) {
     return this.jumpTo(this.current - 1, context);
   }
-}
 
-export function resolveTours() {
-  const tours = <ITDPTourExtensionDesc[]>list(EXTENSION_POINT_TDP_TOUR);
+  static resolveTours() {
+    const tours = <ITDPTourExtensionDesc[]>PluginRegistry.getInstance().listPlugins(TourUtils.EXTENSION_POINT_TDP_TOUR);
 
-  return tours.map((d) => new Tour(d));
+    return tours.map((d) => new Tour(d));
+  }
 }

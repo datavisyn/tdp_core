@@ -2,30 +2,8 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import {randomId} from 'phovea_core/src/index';
+import {BaseUtils} from 'phovea_core';
 import {IFormElement, IForm, IFormElementDesc} from '../interfaces';
-
-/**
- * Creates a copy of the element description and modifies the description:
- * - generate a unique id based on the form id
- * - add css class for bootstrap theme
- *
- * @param desc form element desc
- * @param formId id of the form the element will be append to
- */
-export function updateElementDesc(desc: IFormElementDesc, formId: string): IFormElementDesc {
-    const elementDesc = Object.assign({}, desc); // create copy
-
-    // inject formId into form element id
-    const uid = elementDesc.id + '_' + formId;
-
-    elementDesc.attributes = elementDesc.attributes || {};
-    elementDesc.attributes.id = uid; // add id as attribute
-    elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
-    elementDesc.attributes.clazz += ' form-control';
-
-    return elementDesc;
-}
 
 /**
  * Builds a form from a given collection of form elements
@@ -47,7 +25,7 @@ export class Form implements IForm {
    * @param parentElement Node that the form should be attached to
    * @param formId unique form id
    */
-  constructor(parentElement: HTMLElement, private readonly formId = randomId()) {
+  constructor(parentElement: HTMLElement, private readonly formId = BaseUtils.randomId()) {
     this.node = parentElement.ownerDocument.createElement('form');
     this.node.setAttribute('id', this.formId);
     parentElement.appendChild(this.node);
@@ -120,5 +98,27 @@ export class Form implements IForm {
     return Array.from(this.elements.values())
       .map((d) => d.validate()) // perform validation on each element (returns array of boolean values)
       .every((d) => d); // return true if every validation was truthy
+  }
+
+  /**
+   * Creates a copy of the element description and modifies the description:
+   * - generate a unique id based on the form id
+   * - add css class for bootstrap theme
+   *
+   * @param desc form element desc
+   * @param formId id of the form the element will be append to
+   */
+  static updateElementDesc(desc: IFormElementDesc, formId: string): IFormElementDesc {
+    const elementDesc = Object.assign({}, desc); // create copy
+
+    // inject formId into form element id
+    const uid = elementDesc.id + '_' + formId;
+
+    elementDesc.attributes = elementDesc.attributes || {};
+    elementDesc.attributes.id = uid; // add id as attribute
+    elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
+    elementDesc.attributes.clazz += ' form-control';
+
+    return elementDesc;
   }
 }

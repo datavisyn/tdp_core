@@ -1,41 +1,44 @@
-import {resolveImmediately} from 'phovea_core/src';
-import {getAttachment, addAttachment} from '../rest';
+import {ResolveNow} from 'phovea_core';
+import {RestStorageUtils} from '../rest';
 
-const ATTACHMENT_PREFIX = '@attachment:';
-const MAX_INPLACE_SIZE = 10e3; // 10k
+export class AttachemntUtils {
 
-/**
- * checks whether the given object should be externalized
- * @param {Object} data
- * @returns {boolean}
- */
-export function needToExternalize(data: object) {
-  //use a JSON file size heuristics
-  const size = JSON.stringify(data).length;
-  return size >= MAX_INPLACE_SIZE;
-}
+  public static readonly ATTACHMENT_PREFIX = '@attachment:';
+  public static readonly MAX_INPLACE_SIZE = 10e3; // 10k
 
-/**
- * externalizes the given object if needed
- * @param {Object} data
- * @returns {PromiseLike<string | Object>} the data to store
- */
-export function externalize(data: object): PromiseLike<string | object> {
-  if (!needToExternalize(data)) {
-    return resolveImmediately(data);
+  /**
+   * checks whether the given object should be externalized
+   * @param {Object} data
+   * @returns {boolean}
+   */
+  static needToExternalize(data: object) {
+    //use a JSON file size heuristics
+    const size = JSON.stringify(data).length;
+    return size >= AttachemntUtils.MAX_INPLACE_SIZE;
   }
-  return addAttachment(data).then((id) => `${ATTACHMENT_PREFIX}${id}`);
-}
 
-/**
- * inverse operation of @see externalize
- * @param {string | Object} attachment
- * @returns {PromiseLike<Object>}
- */
-export function resolveExternalized(attachment: string | object): PromiseLike<object> {
-  if (typeof attachment !== 'string' || !attachment.startsWith(ATTACHMENT_PREFIX)) {
-    return resolveImmediately(<object>attachment);
+  /**
+   * externalizes the given object if needed
+   * @param {Object} data
+   * @returns {PromiseLike<string | Object>} the data to store
+   */
+  static externalize(data: object): PromiseLike<string | object> {
+    if (!AttachemntUtils.needToExternalize(data)) {
+      return ResolveNow.resolveImmediately(data);
+    }
+    return RestStorageUtils.addAttachment(data).then((id) => `${AttachemntUtils.ATTACHMENT_PREFIX}${id}`);
   }
-  const id = attachment.substring(ATTACHMENT_PREFIX.length);
-  return getAttachment(id);
+
+  /**
+   * inverse operation of @see externalize
+   * @param {string | Object} attachment
+   * @returns {PromiseLike<Object>}
+   */
+  static resolveExternalized(attachment: string | object): PromiseLike<object> {
+    if (typeof attachment !== 'string' || !attachment.startsWith(AttachemntUtils.ATTACHMENT_PREFIX)) {
+      return ResolveNow.resolveImmediately(<object>attachment);
+    }
+    const id = attachment.substring(AttachemntUtils.ATTACHMENT_PREFIX.length);
+    return RestStorageUtils.getAttachment(id);
+  }
 }

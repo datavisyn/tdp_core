@@ -3,11 +3,9 @@
  */
 
 import {select} from 'd3';
-import * as session from 'phovea_core/src/session';
-import AFormElement from './AFormElement';
+import {UserSession, ResolveNow, IPluginDesc} from 'phovea_core';
+import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
-import {resolveImmediately} from 'phovea_core/src';
-import {IPluginDesc} from 'phovea_core/src/plugin';
 
 
 export interface IFormSelectOption {
@@ -55,7 +53,7 @@ export interface IFormSelectElement extends IFormElement {
  * Select form element instance
  * Propagates the changes from the DOM select element using the internal `change` event
  */
-export default class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSelectElement {
+export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSelectElement {
 
   private selectElement: HTMLSelectElement;
 
@@ -80,14 +78,14 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
     if (!this.elementDesc.useSession) {
       return;
     }
-    session.store(`${this.id}_selectedIndex`, this.getSelectedIndex());
+    UserSession.getInstance().store(`${this.id}_selectedIndex`, this.getSelectedIndex());
   }
 
   protected getStoredValue<T>(defaultValue:T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return session.retrieve(`${this.id}_selectedIndex`, defaultValue);
+    return UserSession.getInstance().retrieve(`${this.id}_selectedIndex`, defaultValue);
   }
 
   /**
@@ -115,7 +113,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
       this.fire(FormSelect.EVENT_CHANGE, this.value, this.selectElement);
     });
 
-    const data = resolveData(options.optionsData);
+    const data = FormSelect.resolveData(options.optionsData);
 
     const values = this.handleDependent((values) => {
       data(values).then((items) => {
@@ -154,7 +152,7 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
    * @param data
    */
   updateOptionElements(data: (string|IFormSelectOption|IFormSelectOptionGroup)[]) {
-    const options = data.map(toOption);
+    const options = data.map(FormSelect.toOption);
 
     const isGroup = (d: IFormSelectOption|IFormSelectOptionGroup): d is IFormSelectOptionGroup => {
       return Array.isArray((<any>d).children);
@@ -227,34 +225,34 @@ export default class FormSelect extends AFormElement<IFormSelectDesc> implements
   focus() {
     this.selectElement.focus();
   }
-}
 
-function toOption(d: string|IFormSelectOption|IFormSelectOptionGroup): IFormSelectOption|IFormSelectOptionGroup {
-  if (typeof d === 'string') {
-    return {name: d, value: d, data: d};
+  static toOption(d: string|IFormSelectOption|IFormSelectOptionGroup): IFormSelectOption|IFormSelectOptionGroup {
+    if (typeof d === 'string') {
+      return {name: d, value: d, data: d};
+    }
+    return d;
   }
-  return d;
-}
 
-export function resolveData(data?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption|IFormSelectOptionGroup)[]>) {
-  if (data === undefined) {
-    return () => resolveImmediately([]);
-  }
-  if (Array.isArray(data)) {
-    return () => resolveImmediately(data.map(toOption));
-  }
-  if (data instanceof Promise) {
-    return () => data.then((r) => r.map(toOption));
-  }
-  //assume it is a function
-  return (dependents: any[]) => {
-    const r = data(dependents);
-    if (r instanceof Promise) {
-      return r.then((r) => r.map(toOption));
+  static resolveData(data?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption|IFormSelectOptionGroup)[]>) {
+    if (data === undefined) {
+      return () => ResolveNow.resolveImmediately([]);
     }
-    if (Array.isArray(r)) {
-      return resolveImmediately(r.map(toOption));
+    if (Array.isArray(data)) {
+      return () => ResolveNow.resolveImmediately(data.map(this.toOption));
     }
-    return resolveImmediately(r);
-  };
+    if (data instanceof Promise) {
+      return () => data.then((r) => r.map(this.toOption));
+    }
+    //assume it is a function
+    return (dependents: any[]) => {
+      const r = data(dependents);
+      if (r instanceof Promise) {
+        return r.then((r) => r.map(this.toOption));
+      }
+      if (Array.isArray(r)) {
+        return ResolveNow.resolveImmediately(r.map(this.toOption));
+      }
+      return ResolveNow.resolveImmediately(r);
+    };
+  }
 }

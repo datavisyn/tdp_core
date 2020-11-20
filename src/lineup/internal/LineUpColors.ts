@@ -1,8 +1,7 @@
-import {Ranking} from 'lineupjs';
 import {scale} from 'd3';
-import {array_diff} from './LineUpSelectionHelper';
+import {LineupUtils} from '../utils';
 
-export default class LineUpColors {
+export class LineUpColors {
   /**
    * Map that assigns each selection ID a color, which is used as color for columns
    */
@@ -17,7 +16,7 @@ export default class LineUpColors {
     let color = '';
     if (!this.colorMap.has(id)) {
       const usedColors = Array.from(this.colorMap.values()).map((item) => item.color);
-      color = array_diff(this.colors, usedColors)[0];
+      color = LineupUtils.array_diff(this.colors, usedColors)[0];
       this.colorMap.set(id, {color, items: 1});
     } else {
       const value = this.colorMap.get(id);

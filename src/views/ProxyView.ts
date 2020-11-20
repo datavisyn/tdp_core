@@ -2,15 +2,13 @@
  * Created by Holger Stitz on 07.09.2016.
  */
 
-import {mixin} from 'phovea_core/src';
-import {resolve} from 'phovea_core/src/idtype';
-import {IViewContext, ISelection} from './interfaces';
-import {FormElementType, IFormSelectElement, IFormSelectOption} from '../form';
-import AD3View from './AD3View';
-import {getProxyUrl} from '../rest';
-import i18n from 'phovea_core/src/i18n';
+import {BaseUtils, IDTypeManager, I18nextManager} from 'phovea_core';
+import {IViewContext, ISelection} from '../base/interfaces';
+import {FormElementType} from '../form/interfaces';
+import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
+import {AD3View} from './AD3View';
+import {RestBaseUtils} from '../base/rest';
 
-export const FORM_ID_SELECTED_ITEM = 'externalItem';
 
 export interface IProxyViewOptions {
   proxy?: string;
@@ -24,7 +22,10 @@ export interface IProxyViewOptions {
 /**
  * helper view for proxying an existing external website using an iframe
  */
-export default class ProxyView extends AD3View {
+export class ProxyView extends AD3View {
+
+  public static readonly FORM_ID_SELECTED_ITEM = 'externalItem';
+
   protected options: IProxyViewOptions = {
     /**
      * proxy key - will be redirected through a local server proxy
@@ -52,21 +53,21 @@ export default class ProxyView extends AD3View {
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
     super(context, selection, parent);
-    mixin(this.options, context.desc, options);
+    BaseUtils.mixin(this.options, context.desc, options);
     this.$node.classed('proxy_view', true);
 
     this.openExternally = parent.ownerDocument.createElement('p');
   }
 
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
-    super.init(params, onParameterChange);
+  async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
+    const initResult = await super.init(params, onParameterChange);
 
     // inject stats
     const base = <HTMLElement>params.querySelector('form') || params;
     base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
     base.lastElementChild!.appendChild(this.openExternally);
 
-    return Promise.resolve();
+    return initResult;
   }
 
   protected initImpl() {
@@ -81,7 +82,7 @@ export default class ProxyView extends AD3View {
   protected createUrl(args: any) {
     //use internal proxy
     if (this.options.proxy) {
-      return getProxyUrl(this.options.proxy, args);
+      return RestBaseUtils.getProxyUrl(this.options.proxy, args);
     }
     if (this.options.site) {
       return this.options.site.replace(/{([^}]+)}/gi, (match, variable) => args[variable]);
@@ -93,7 +94,7 @@ export default class ProxyView extends AD3View {
     return super.getParameterFormDescs().concat([{
       type: FormElementType.SELECT,
       label: 'Show',
-      id: FORM_ID_SELECTED_ITEM,
+      id: ProxyView.FORM_ID_SELECTED_ITEM,
       options: {
         optionsData: [],
       },
@@ -121,7 +122,7 @@ export default class ProxyView extends AD3View {
       .then((args: any[]) => {
         const names = <string[]>args[0]; // use names to get the last selected element
         const data = <{value: string, name: string, data: any}[]>args[1];
-        const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(FORM_ID_SELECTED_ITEM);
+        const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(ProxyView.FORM_ID_SELECTED_ITEM);
 
         // backup entry and restore the selectedIndex by value afterwards again,
         // because the position of the selected element might change
@@ -152,7 +153,7 @@ export default class ProxyView extends AD3View {
   }
 
   protected updateProxyView() {
-    this.loadProxyPage(this.getParameter(FORM_ID_SELECTED_ITEM).value);
+    this.loadProxyPage(this.getParameter(ProxyView.FORM_ID_SELECTED_ITEM).value);
   }
 
   protected loadProxyPage(selectedItemId: string) {
@@ -168,7 +169,7 @@ export default class ProxyView extends AD3View {
 
     this.setBusy(true);
 
-    const args = mixin(this.options.extra, {[this.options.argument]: selectedItemId});
+    const args = BaseUtils.mixin(this.options.extra, {[this.options.argument]: selectedItemId});
     const url = this.createUrl(args);
 
     if (ProxyView.isNoNSecurePage(url)) {
@@ -178,13 +179,13 @@ export default class ProxyView extends AD3View {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML = `<p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">
-      ${i18n.t('tdp:core.views.please')} <a href="${url}" class="alert-link" target="_blank" rel="noopener">${i18n.t('tdp:core.views.openExternally', {name: '$t(tdp:core.views.externalApplication)'})}</a>
-      ${i18n.t('tdp:core.views.newTab')}</div></p>`;
+      this.node.innerHTML = `<div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+      <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+      </div>`;
       return;
     }
 
-    this.openExternally.innerHTML = `${i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
     this.$node.append('iframe')
@@ -198,8 +199,8 @@ export default class ProxyView extends AD3View {
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
-    const to = this.options.idtype ? resolve(this.options.idtype).name : i18n.t('tdp:core.views.unknown');
-    this.$node.html(`<p>${i18n.t('tdp:core.views.cannotMap', {name: this.selection.idtype.name, selectedItemId, to})}</p>`);
+    const to = this.options.idtype ? IDTypeManager.getInstance().resolveIdType(this.options.idtype).name : I18nextManager.getInstance().i18n.t('tdp:core.views.unknown');
+    this.$node.html(`<p>${I18nextManager.getInstance().i18n.t('tdp:core.views.cannotMap', {name: this.selection.idtype.name, selectedItemId, to})}</p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
@@ -215,16 +216,14 @@ export default class ProxyView extends AD3View {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.$node.html(`
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
-    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
-       <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
-   </div></p><p></p>`);
+    <div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+    </div>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }
-}
 
-
-export function create(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
-  return new ProxyView(context, selection, parent, options);
+  static create(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
+    return new ProxyView(context, selection, parent, options);
+  }
 }

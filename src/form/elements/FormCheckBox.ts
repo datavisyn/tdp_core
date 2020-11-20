@@ -1,6 +1,6 @@
 import {IFormElementDesc, IForm} from '../interfaces';
 import {AFormElement} from './AFormElement';
-import {IPluginDesc} from 'phovea_core/src/plugin';
+import {IPluginDesc} from 'phovea_core';
 
 export interface ICheckBoxElementDesc extends IFormElementDesc {
   options: {
@@ -19,7 +19,7 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
   };
 }
 
-export default class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
+export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
 
   private inputElement: HTMLInputElement;
 

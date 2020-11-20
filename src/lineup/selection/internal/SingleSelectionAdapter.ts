@@ -1,11 +1,11 @@
 /**
  * Created by Samuel Gratzl on 29.01.2016.
  */
-import {ABaseSelectionAdapter, patchDesc} from './ABaseSelectionAdapter';
+import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
 import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../../desc';
-import {IScoreRow} from '../../';
-import {resolveImmediately} from 'phovea_core/src';
+import {IAdditionalColumnDesc} from '../../../base/interfaces';
+import {IScoreRow} from '../../../base/interfaces';
+import {ResolveNow} from 'phovea_core';
 
 export interface ISingleSelectionAdapter {
   /**
@@ -25,7 +25,7 @@ export interface ISingleSelectionAdapter {
   loadData(_id: number, id: string): Promise<IScoreRow<any>[]>;
 }
 
-export default class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
+export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
   constructor(private readonly adapter: ISingleSelectionAdapter) {
     super();
   }
@@ -48,8 +48,8 @@ export default class SingleSelectionAdapter extends ABaseSelectionAdapter implem
   }
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
-    return resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [{
-      desc: patchDesc(desc, _id),
+    return ResolveNow.resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [{
+      desc: ABaseSelectionAdapter.patchDesc(desc, _id),
       data: this.adapter.loadData(_id, id),
       id: _id
     }]);

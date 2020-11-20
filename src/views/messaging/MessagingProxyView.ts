@@ -1,13 +1,11 @@
-import AView from '../AView';
-import {IViewContext, ISelection} from '../interfaces';
-import {resolve} from 'phovea_core/src/idtype';
-import {resolveIds} from '../resolve';
-import {parse, none} from 'phovea_core/src/range';
+import {AView} from '../AView';
+import {IViewContext, ISelection} from '../../base/interfaces';
+import {IDTypeManager, ParseRangeUtils, Range, I18nextManager} from 'phovea_core';
+import {ResolveUtils} from '../ResolveUtils';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
-import {DEFAULT_SELECTION_NAME} from '../../extensions';
-import i18n from 'phovea_core/src/i18n';
 
-export interface IProxyViewOptions {
+
+export interface IPartialProxyViewOptions {
   /**
    * direct loading of an iframe site
    */
@@ -23,8 +21,8 @@ export interface IProxyViewOptions {
   itemIDType: string;
 }
 
-export default class MessagingProxyView extends AView {
-  protected options: IProxyViewOptions = {
+export class MessagingProxyView extends AView {
+  protected options: IPartialProxyViewOptions = {
     site: null,
     idtype: null,
     itemIDType: null
@@ -35,7 +33,7 @@ export default class MessagingProxyView extends AView {
   private iframeWindow: Window | null = null;
   private messageQueue: ITDPMessage[] = [];
 
-  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IProxyViewOptions> = {}) {
+  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IPartialProxyViewOptions> = {}) {
     super(context, selection, parent);
     Object.assign(this.options, context.desc, options);
   }
@@ -44,7 +42,7 @@ export default class MessagingProxyView extends AView {
     if (!this.options.itemIDType) {
       return null;
     }
-    return resolve(this.options.itemIDType);
+    return IDTypeManager.getInstance().resolveIdType(this.options.itemIDType);
   }
 
   protected initImpl() {
@@ -65,7 +63,7 @@ export default class MessagingProxyView extends AView {
     iframe.onload = () => {
       this.iframeWindow = iframe.contentWindow;
       // send initial selection
-      this.sendInputSelectionMessage(DEFAULT_SELECTION_NAME);
+      this.sendInputSelectionMessage(AView.DEFAULT_SELECTION_NAME);
 
       // send queued messages
       this.messageQueue.splice(0, this.messageQueue.length).forEach((msg) => this.sendMessage(msg));
@@ -87,11 +85,11 @@ export default class MessagingProxyView extends AView {
     switch (msg.type) {
       case 'tdpSetItemSelection': {
         const payload = (<ITDPSetItemSelectionMessage>msg).payload;
-        const name = payload.name || DEFAULT_SELECTION_NAME;
+        const name = payload.name || AView.DEFAULT_SELECTION_NAME;
         const ids: string[] = payload.ids;
-        const idType = payload.idType ? resolve(payload.idType) : this.itemIDType;
+        const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
         if (!ids || ids.length === 0) {
-          this.setItemSelection({idtype: idType, range: none()}, name);
+          this.setItemSelection({idtype: idType, range: Range.none()}, name);
         }
 
         if (!idType) {
@@ -99,7 +97,7 @@ export default class MessagingProxyView extends AView {
           return;
         }
         idType.map(ids).then((r) => {
-          this.setItemSelection({idtype: idType, range: parse(r)}, name);
+          this.setItemSelection({idtype: idType, range: ParseRangeUtils.parseRangeLike(r)}, name);
         });
         return;
       }
@@ -121,12 +119,12 @@ export default class MessagingProxyView extends AView {
     window.removeEventListener('message', this.onWindowMessage);
   }
 
-  protected selectionChanged(name: string = DEFAULT_SELECTION_NAME) {
+  protected selectionChanged(name: string = AView.DEFAULT_SELECTION_NAME) {
     super.selectionChanged(name);
     return this.sendInputSelectionMessage(name);
   }
 
-  protected itemSelectionChanged(name: string = DEFAULT_SELECTION_NAME) {
+  protected itemSelectionChanged(name: string = AView.DEFAULT_SELECTION_NAME) {
     super.itemSelectionChanged(name);
     return this.sendItemSelectionMessage(name);
   }
@@ -142,7 +140,7 @@ export default class MessagingProxyView extends AView {
     }
 
     const selection = this.getInputSelection(name);
-    return resolveIds(selection.idtype, selection.range).then((ids) => {
+    return ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
       if (!ids || ids.length === 0) {
         this.setNoMappingFoundHint(true);
         return;
@@ -182,7 +180,7 @@ export default class MessagingProxyView extends AView {
       return;
     }
 
-    return resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
+    return ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
       this.sendMessage({
         type: 'tdpSetItemSelection', payload: {
           name,
@@ -218,10 +216,9 @@ export default class MessagingProxyView extends AView {
   private showNoHttpsMessage(url: string) {
     this.setBusy(false);
     this.node.innerHTML = `
-    <p><div class="alert alert-info center-block" role="alert" style="max-width: 40em">${i18n.t('tdp:core.views.noHttpsMessagePart1')}
-    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${i18n.t('tdp:core.views.link')}</a> ${i18n.t('tdp:core.views.noHttpsMessagePart2')}
-       <br><br><a href="${url}" target="_blank" rel="noopener" class="alert-link"></a>
-   </div></p><p></p>`;
+    <div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+    <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
+    </div>`;
     this.fire(MessagingProxyView.EVENT_LOADING_FINISHED);
   }
 }
