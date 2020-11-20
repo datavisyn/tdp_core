@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-import * as d3 from 'd3';
 import { IFormElement, IForm, IFormElementDesc } from '../interfaces';
 /**
  * Builds a form from a given collection of form elements
@@ -11,34 +10,28 @@ export declare class Form implements IForm {
     /**
      * DOM node for the form itself
      */
-    private readonly $node;
+    readonly node: HTMLElement;
     /**
      * Map of all appended form elements with the element id as key
      */
     private readonly elements;
     /**
      * Constructor
-     * @param $parent Node that the form should be attached to
+     * @param parentElement Node that the form should be attached to
      * @param formId unique form id
      */
-    constructor($parent: d3.Selection<any>, formId?: string);
+    constructor(parentElement: HTMLElement, formId?: string);
     /**
      * Append a form element and builds it
-     * Note: The initialization of the element must be done using `initAllElements()`
+     * Note: The initialization of the element must be done using `initializeAllElements`
      * @param element Form element
      */
     appendElement(element: IFormElement): void;
     /**
-     * Append multiple form element at once and and build them
-     * Note: The initialization of the element must be done using `initAllElements()`
-     * @param element Form element
-     */
-    appendElements(elements: IFormElement[]): void;
-    /**
      * Initialize all elements of this form
      * At this stage it is possible to reference dependencies to other form fields
      */
-    initAllElements(): void;
+    initializeAllElements(): void;
     /**
      * number of form elements
      */

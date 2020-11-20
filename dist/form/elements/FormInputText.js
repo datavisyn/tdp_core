@@ -6,24 +6,27 @@ export class FormInputText extends AFormElement {
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form, elementDesc, pluginDesc) {
+    constructor(form, parentElement, elementDesc, pluginDesc) {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
+        this.node = parentElement.ownerDocument.createElement('div');
+        this.node.classList.add('form-group');
+        parentElement.appendChild(this.node);
+        this.build();
     }
     /**
      * Build the label and input element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode) {
-        this.addChangeListener();
-        this.$node = $formNode.append('div').classed('form-group', true);
-        this.setVisible(this.elementDesc.visible);
-        this.appendLabel();
-        this.$input = this.$node.append('input').attr('type', (this.elementDesc.options || {}).type || 'text');
-        this.setAttributes(this.$input, this.elementDesc.attributes);
+    build() {
+        super.build();
+        this.input = this.node.ownerDocument.createElement('input');
+        this.input.setAttribute('type', (this.elementDesc.options || {}).type || 'text');
+        this.node.appendChild(this.input);
+        this.setAttributes(this.input, this.elementDesc.attributes);
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event
@@ -31,19 +34,19 @@ export class FormInputText extends AFormElement {
     init() {
         super.init();
         if ((this.elementDesc.options || {}).type === 'number' && (this.elementDesc.options || {}).step) {
-            this.$input.attr('step', this.elementDesc.options.step);
+            this.input.setAttribute('step', this.elementDesc.options.step);
         }
         const defaultValue = (this.elementDesc.options || {}).type === 'number' ? '0' : '';
         const defaultText = this.getStoredValue(defaultValue);
         this.previousValue = defaultText;
-        this.$input.property('value', defaultText);
+        this.input.value = defaultText;
         if (this.hasStoredValue()) {
             this.fire(FormInputText.EVENT_INITIAL_VALUE, defaultText, defaultValue);
         }
         this.handleDependent();
         // propagate change action with the data of the selected option
-        this.$input.on('change.propagate', () => {
-            this.fire(FormInputText.EVENT_CHANGE, this.value, this.$input);
+        this.input.addEventListener('change.propagate', () => {
+            this.fire(FormInputText.EVENT_CHANGE, this.value, this.input);
         });
     }
     /**
@@ -51,19 +54,19 @@ export class FormInputText extends AFormElement {
      * @returns {string}
      */
     get value() {
-        return this.$input.property('value');
+        return this.input.value;
     }
     /**
      * Sets the value
      * @param v
      */
     set value(v) {
-        this.$input.property('value', v);
+        this.input.value = v;
         this.previousValue = v; // force old value change
         this.updateStoredValue();
     }
     focus() {
-        this.$input.node().focus();
+        this.input.focus();
     }
 }
 //# sourceMappingURL=FormInputText.js.map

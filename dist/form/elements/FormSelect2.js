@@ -13,28 +13,30 @@ export class FormSelect2 extends AFormElement {
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form, elementDesc, pluginDesc) {
+    constructor(form, parentElement, elementDesc, pluginDesc) {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
         this.listener = () => {
             this.fire(FormSelect2.EVENT_CHANGE, this.value, this.$jqSelect);
         };
+        this.node = parentElement.ownerDocument.createElement('div');
+        this.node.classList.add('form-group');
+        parentElement.appendChild(this.node);
         this.isMultiple = (pluginDesc.selection === 'multiple');
+        this.build();
     }
     /**
      * Build the label and select element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode) {
-        this.addChangeListener();
-        this.$node = $formNode.append('div').classed('form-group', true);
-        this.setVisible(this.elementDesc.visible);
-        this.appendLabel();
-        this.$select = this.$node.append('select');
-        this.setAttributes(this.$select, this.elementDesc.attributes);
+    build() {
+        super.build();
+        this.selectElement = this.node.ownerDocument.createElement('select');
+        this.node.appendChild(this.selectElement);
+        this.setAttributes(this.selectElement, this.elementDesc.attributes);
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event
@@ -46,14 +48,14 @@ export class FormSelect2 extends AFormElement {
         });
         const df = this.elementDesc.options.data;
         const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
-        this.buildSelect2(this.$select, this.elementDesc.options || {}, data);
+        this.buildSelect2(this.selectElement, this.elementDesc.options || {}, data);
         // propagate change action with the data of the selected option
         this.$jqSelect.on('change.propagate', this.listener);
     }
     /**
      * Builds the jQuery select2
      */
-    buildSelect2($select, options, data) {
+    buildSelect2(selectElement, options, data) {
         const select2Options = {};
         let initialValue = [];
         const defaultVal = this.getStoredValue(null);
@@ -77,7 +79,7 @@ export class FormSelect2 extends AFormElement {
             select2Options.allowClear = true;
         }
         BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
-        this.$jqSelect = $($select.node()).select2(select2Options).val(initialValue).trigger('change');
+        this.$jqSelect = $(selectElement).select2(select2Options).val(initialValue).trigger('change');
         // force the old value from initial
         this.previousValue = this.resolveValue(this.$jqSelect.select2('data'));
         if (defaultVal) {

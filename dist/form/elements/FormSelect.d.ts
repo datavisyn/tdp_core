@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-import * as d3 from 'd3';
 import { IPluginDesc } from 'phovea_core';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement } from '../interfaces';
@@ -45,21 +44,21 @@ export interface IFormSelectElement extends IFormElement {
  */
 export declare class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSelectElement {
     readonly pluginDesc: IPluginDesc;
-    private $select;
+    private selectElement;
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form: IForm, elementDesc: IFormSelectDesc, pluginDesc: IPluginDesc);
+    constructor(form: IForm, parentElement: HTMLElement, elementDesc: IFormSelectDesc, pluginDesc: IPluginDesc);
     protected updateStoredValue(): void;
     protected getStoredValue<T>(defaultValue: T): T;
     /**
      * Build the label and select element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode: d3.Selection<any>): void;
+    protected build(): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

@@ -8,7 +8,6 @@ import { ISelectOptions } from './FormSelect';
 import { IPluginDesc } from 'phovea_core';
 import { IFormElement } from '..';
 import { ISelect3Options, IdTextPair } from './Select3';
-import * as d3 from 'd3';
 export interface ISubDesc {
     name: string;
     value: string;
@@ -63,26 +62,26 @@ export interface IFormRow {
 }
 export declare class FormMap extends AFormElement<IFormMapDesc> {
     readonly pluginDesc: IPluginDesc;
-    private $group;
+    private groupElement;
     private rows;
-    private inline;
-    private inlineOnChange;
+    private readonly inline;
+    private readonly inlineOnChange;
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form: IForm, elementDesc: IFormMapDesc, pluginDesc: IPluginDesc);
+    constructor(form: IForm, parentElement: HTMLElement, elementDesc: IFormMapDesc, pluginDesc: IPluginDesc);
     private updateBadge;
     private get sessionKey();
     protected updateStoredValue(): void;
     protected getStoredValue<T>(defaultValue: T): T;
     /**
      * Build the label and input element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode: d3.Selection<any>): void;
+    protected build(): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

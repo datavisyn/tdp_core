@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-import * as d3 from 'd3';
 import { IFormElementDesc, IForm } from './interfaces';
 /**
  * Builds a form from a given collection of form elements
@@ -18,10 +17,10 @@ export declare class FormBuilder {
     private readonly elementPromises;
     /**
      * Constructor
-     * @param $parent Node that the form should be attached to
+     * @param parentElement DOM element that the form should be attached to
      * @param formId unique form id
      */
-    constructor($parent: d3.Selection<any>, formId?: string);
+    constructor(parentElement: HTMLElement, formId?: string);
     /**
      * Creates a form element instance from a form element description and
      * appends it to the form

@@ -11,28 +11,29 @@ export class FormSelect3 extends AFormElement {
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form, elementDesc, pluginDesc) {
+    constructor(form, parentElement, elementDesc, pluginDesc) {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
+        this.node = parentElement.ownerDocument.createElement('div');
+        this.node.classList.add('form-group');
+        parentElement.appendChild(this.node);
         this.isMultiple = (pluginDesc.selection === 'multiple');
+        this.build();
     }
     /**
      * Build the label and select element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode) {
-        this.addChangeListener();
-        this.$node = $formNode.append('div').classed('form-group', true);
-        this.setVisible(this.elementDesc.visible);
-        this.appendLabel();
+    build() {
+        super.build();
         const options = Object.assign(this.elementDesc.options, { multiple: this.isMultiple });
         this.select3 = new Select3(options);
-        this.$node.node().appendChild(this.select3.node);
+        this.node.appendChild(this.select3.node);
         this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
-        this.setAttributes(this.$node.select('.select3'), this.elementDesc.attributes);
+        this.setAttributes(this.node.querySelector('.select3'), this.elementDesc.attributes);
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event

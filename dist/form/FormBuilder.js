@@ -10,16 +10,16 @@ import { Form } from './elements/Form';
 export class FormBuilder {
     /**
      * Constructor
-     * @param $parent Node that the form should be attached to
+     * @param parentElement DOM element that the form should be attached to
      * @param formId unique form id
      */
-    constructor($parent, formId = BaseUtils.randomId()) {
+    constructor(parentElement, formId = BaseUtils.randomId()) {
         this.formId = formId;
         /**
          * Map of all future elements
          */
         this.elementPromises = [];
-        this.form = new Form($parent, formId);
+        this.form = new Form(parentElement, formId);
     }
     /**
      * Creates a form element instance from a form element description and
@@ -28,8 +28,12 @@ export class FormBuilder {
      */
     appendElement(elementDesc) {
         const desc = Form.updateElementDesc(elementDesc, this.formId);
-        const elementPromise = AFormElement.createFormElement(this.form, desc);
+        const elementPromise = AFormElement.createFormElement(this.form, this.form.node, desc);
         this.elementPromises.push(elementPromise);
+        // append element to form once it is loaded
+        elementPromise.then((element) => {
+            this.form.appendElement(element);
+        });
     }
     /**
      * Append multiple elements at once to the form
@@ -49,9 +53,8 @@ export class FormBuilder {
     build() {
         // initialize when all elements are loaded
         return Promise.all(this.elementPromises)
-            .then((elements) => {
-            this.form.appendElements(elements);
-            this.form.initAllElements();
+            .then(() => {
+            this.form.initializeAllElements();
             return this.form;
         });
     }

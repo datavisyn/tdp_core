@@ -1,7 +1,6 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
-import { Selection } from 'd3';
 import { EventHandler, IPluginDesc } from 'phovea_core';
 import { IFormElementDesc, IForm, IFormElement } from '../interfaces';
 /**
@@ -14,7 +13,7 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
     static readonly EVENT_CHANGE = "change";
     static readonly EVENT_INITIAL_VALUE = "initial";
     readonly id: string;
-    protected $node: Selection<any>;
+    protected node: HTMLElement;
     protected previousValue: any;
     /**
      * Constructor
@@ -31,32 +30,24 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
     protected hasValue(): boolean;
     isVisible(): boolean;
     /**
-     * Set the visibility of an form element (default = true)
+     * Set the visibility of an form element
      * @param visible
      */
-    setVisible(visible?: boolean): void;
+    setVisible(visible: boolean): void;
     protected addChangeListener(): void;
     protected triggerValueChanged(): void;
-    /**
-     * Build the current element and add the DOM element to the form DOM element.
-     * The implementation of this function must set the `$node` property!
-     */
-    abstract build($formNode: Selection<any>): any;
+    protected build(): void;
     /**
      * Initialize dependent form fields, bind the change listener, and propagate the selection by firing a change event
      */
     init(): void;
     /**
-     * Append a label to the node element if `hideLabel = false` in the element description
-     */
-    protected appendLabel(): void;
-    /**
      * Set a list of object properties and values to a given node
      * Note: Use `clazz` instead of the attribute `class` (which is a reserved keyword in JavaScript)
-     * @param $node
+     * @param node
      * @param attributes Plain JS object with key as attribute name and the value as attribute value
      */
-    protected setAttributes($node: Selection<any>, attributes: {
+    protected setAttributes(node: HTMLElement, attributes: {
         [key: string]: any;
     }): void;
     protected handleDependent(onDependentChange?: (values: any[]) => void): any[];
@@ -77,8 +68,8 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
      * An element is found when `desc.type` is matching the extension id.
      *
      * @param form the form to which the element will be appended
-     * @param $parent parent D3 selection element
+     * @param parentElement parent DOM element
      * @param elementDesc form element description
      */
-    static createFormElement(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement>;
+    static createFormElement(form: IForm, parentElement: HTMLElement, elementDesc: IFormElementDesc): Promise<IFormElement>;
 }

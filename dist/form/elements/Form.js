@@ -8,39 +8,32 @@ import { BaseUtils } from 'phovea_core';
 export class Form {
     /**
      * Constructor
-     * @param $parent Node that the form should be attached to
+     * @param parentElement Node that the form should be attached to
      * @param formId unique form id
      */
-    constructor($parent, formId = BaseUtils.randomId()) {
+    constructor(parentElement, formId = BaseUtils.randomId()) {
         this.formId = formId;
         /**
          * Map of all appended form elements with the element id as key
          */
         this.elements = new Map();
-        this.$node = $parent.append('form').attr('id', this.formId);
+        this.node = parentElement.ownerDocument.createElement('form');
+        this.node.setAttribute('id', this.formId);
+        parentElement.appendChild(this.node);
     }
     /**
      * Append a form element and builds it
-     * Note: The initialization of the element must be done using `initAllElements()`
+     * Note: The initialization of the element must be done using `initializeAllElements`
      * @param element Form element
      */
     appendElement(element) {
-        element.build(this.$node);
         this.elements.set(element.id, element);
-    }
-    /**
-     * Append multiple form element at once and and build them
-     * Note: The initialization of the element must be done using `initAllElements()`
-     * @param element Form element
-     */
-    appendElements(elements) {
-        elements.forEach((element) => this.appendElement(element));
     }
     /**
      * Initialize all elements of this form
      * At this stage it is possible to reference dependencies to other form fields
      */
-    initAllElements() {
+    initializeAllElements() {
         this.elements.forEach((element) => element.init());
     }
     /**
