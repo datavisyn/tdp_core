@@ -14,7 +14,7 @@ interface IExportData {
 export class ExportUtils {
 
   private static getColumnName(column: Column) {
-    return column.label + (column.description ? '\n' + column.description : '');
+    return column.label + (column.desc.summary ? ' - ' + column.desc.summary : '') + (column.description ? '\n' + column.description : '');
   }
 
   static exportRanking(columns: Column[], rows: IDataRow[], separator: string) {

@@ -269,8 +269,14 @@ export class LineupTrackingManager {
     const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
 
-    const waitForAggregated = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
     LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
+
+    const waiter = new Promise<void>((resolve) => {
+      p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, () => {
+         p.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, null); // disable
+         resolve(); // resolve promise
+      });
+    });
 
     let inverseValue: number | number[];
 
@@ -289,9 +295,9 @@ export class LineupTrackingManager {
       }
     }
 
-    return waitForAggregated({
+    return waiter.then(() => ({
       inverse: LineupTrackingManager.getInstance().setAggregation(inputs[0], parameter.rid, parameter.group, inverseValue)
-    });
+    }));
   }
 
   static async setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
