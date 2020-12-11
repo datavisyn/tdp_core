@@ -54,22 +54,25 @@ export class ExportUtils {
                 }]
         });
     }
-    static exportLogic(type, onlySelected, provider) {
-        if (type === 'custom') {
-            return ExportUtils.customizeDialog(provider).then((r) => ExportUtils.convertRanking(provider, r.order, r.columns, r.type, r.name));
+    static exportLogic(format, rows, orderedRowIndices, provider) {
+        if (format === 'custom') {
+            return ExportUtils.customizeDialog(orderedRowIndices, provider).then((r) => ExportUtils.convertRanking(provider, r.order, r.columns, r.type, r.name));
         }
         else {
             const ranking = provider.getFirstRanking();
             let order;
-            if (onlySelected) {
-                order = provider.getSelection();
-            }
-            else {
-                const rawOrder = ranking.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
-                order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+            switch (rows) {
+                case 'selected':
+                    order = orderedRowIndices.selected;
+                    break;
+                case 'filtered':
+                    order = orderedRowIndices.filtered;
+                    break;
+                default:
+                    order = orderedRowIndices.all;
             }
             const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
-            return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, type, ranking.getLabel()));
+            return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, format, ranking.getLabel()));
         }
     }
     static toBlob(content, mimeType) {
@@ -96,7 +99,7 @@ export class ExportUtils {
             name: `${name}.${type === 'ssv' ? 'csv' : type}`
         }));
     }
-    static customizeDialog(provider) {
+    static customizeDialog(orderedRowIndices, provider) {
         return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
             const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
             const id = `e${BaseUtils.randomId(3)}`;
@@ -119,9 +122,9 @@ export class ExportUtils {
         </div>
         <div class="form-group">
           <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</label>
-          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${ranking.getOrder().length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${provider.getSelection().length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="not">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.notSelectedRows')} (${ranking.getOrder().length - provider.getSelection().length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label></div>
         </div>
         <div class="form-group">
           <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportName')}</label>
@@ -147,15 +150,13 @@ export class ExportUtils {
                     let order;
                     switch (rows) {
                         case 'selected':
-                            order = provider.getSelection();
+                            order = orderedRowIndices.selected;
                             break;
-                        case 'not':
-                            const selected = new Set(provider.getSelection());
-                            order = ranking.getOrder().filter((d) => !selected.has(d));
+                        case 'filtered':
+                            order = orderedRowIndices.filtered;
                             break;
                         default:
-                            const rawOrder = ranking.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
-                            order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+                            order = orderedRowIndices.all;
                     }
                     const columns = data.getAll('columns').map((d) => lookup.get(d.toString()));
                     resolve({

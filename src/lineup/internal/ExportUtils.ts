@@ -2,10 +2,34 @@ import {IDataRow, Column, isNumberColumn, LocalDataProvider, isSupportType, isDa
 import {BaseUtils, I18nextManager} from 'phovea_core';
 import {XlsxUtils} from '../../utils/XlsxUtils';
 
-export declare type ExportType = 'json' | 'csv' | 'tsv' | 'ssv' | 'xlsx';
+export declare type ExportFormat = 'json' | 'csv' | 'tsv' | 'ssv' | 'xlsx';
+export declare type ExportRows = 'all' | 'filtered' | 'selected';
+
+/**
+ * Store the ordered row indices
+ */
+export interface IOrderedRowIndices {
+  /**
+   * All row indices from the data provider.
+   * Indices are not sorting (= sorting of input data)!
+   */
+  all: number[];
+
+  /**
+   * Indices of the selected rows.
+   * Indices are sorted by the *first* ranking.
+   */
+  selected: number[];
+
+  /**
+   * Indices of the filtered rows.
+   * Indices are sorted and filtered by the *first* ranking.
+   */
+  filtered: number[];
+}
 
 interface IExportData {
-  type: ExportType;
+  type: ExportFormat;
   columns: Column[];
   order: number[];
   name: string;
@@ -69,20 +93,27 @@ export class ExportUtils {
     });
   }
 
-  static exportLogic(type: 'custom' | ExportType, onlySelected: boolean, provider: LocalDataProvider) {
-    if (type === 'custom') {
-      return ExportUtils.customizeDialog(provider).then((r) => ExportUtils.convertRanking(provider, r.order, r.columns, r.type, r.name));
+  static exportLogic(format: 'custom' | ExportFormat, rows: 'custom' | ExportRows, orderedRowIndices: IOrderedRowIndices, provider: LocalDataProvider) {
+    if (format === 'custom') {
+      return ExportUtils.customizeDialog(orderedRowIndices, provider).then((r) => ExportUtils.convertRanking(provider, r.order, r.columns, r.type, r.name));
+
     } else {
       const ranking = provider.getFirstRanking();
       let order: number[];
-      if(onlySelected) {
-        order = provider.getSelection();
-      } else {
-        const rawOrder = <number[] | UIntTypedArray>ranking!.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
-        order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+
+      switch(rows) {
+        case 'selected':
+          order = orderedRowIndices.selected;
+          break;
+        case 'filtered':
+          order = orderedRowIndices.filtered;
+          break;
+        default:
+          order = orderedRowIndices.all;
       }
+
       const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
-      return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, type, ranking.getLabel()));
+      return Promise.resolve(ExportUtils.convertRanking(provider, order, columns, format, ranking.getLabel()));
     }
   }
 
@@ -90,7 +121,7 @@ export class ExportUtils {
     return new Blob([content], {type: mimeType});
   }
 
-  private static convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportType, name: string) {
+  private static convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportFormat, name: string) {
     const rows = provider.viewRawRows(order);
     const separators = {csv: ',', tsv: '\t', ssv: ';'};
     let content: Promise<Blob> | Blob;
@@ -110,7 +141,7 @@ export class ExportUtils {
     }));
   }
 
-  private static customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
+  private static customizeDialog(orderedRowIndices:IOrderedRowIndices, provider: LocalDataProvider): Promise<IExportData> {
     return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
       const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
       const id = `e${BaseUtils.randomId(3)}`;
@@ -133,9 +164,9 @@ export class ExportUtils {
         </div>
         <div class="form-group">
           <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</label>
-          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${ranking.getOrder().length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${provider.getSelection().length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="not">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.notSelectedRows')} (${ranking.getOrder().length - provider.getSelection().length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label></div>
         </div>
         <div class="form-group">
           <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportName')}</label>
@@ -152,35 +183,43 @@ export class ExportUtils {
           </select>
         </div>
       `;
+
       ExportUtils.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.checkbox');
+
       return new Promise<IExportData>((resolve) => {
         dialog.onSubmit(() => {
           const data = new FormData(dialog.form);
+
           dialog.hide();
+
           const rows = data.get('rows').toString();
           let order: number[];
-          switch (rows) {
+
+          switch(rows) {
             case 'selected':
-              order = provider.getSelection();
+              order = orderedRowIndices.selected;
               break;
-            case 'not':
-              const selected = new Set(provider.getSelection());
-              order = (<number[]>ranking.getOrder()).filter((d) => !selected.has(d));
+            case 'filtered':
+              order = orderedRowIndices.filtered;
               break;
             default:
-              const rawOrder = <number[] | UIntTypedArray>ranking!.getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
-              order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+              order = orderedRowIndices.all;
           }
+
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
+
           resolve({
-            type: <ExportType>data.get('type'),
+            type: <ExportFormat>data.get('type'),
             columns,
             order,
             name: <string>data.get('name')
           });
+
           return false;
         });
+
         dialog.show();
+
         setTimeout(() => {
           const first = <HTMLElement>dialog.form.querySelector('input, select, textarea');
           if (first) {
