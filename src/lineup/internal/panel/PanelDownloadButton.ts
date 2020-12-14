@@ -73,6 +73,7 @@ export class PanelDownloadButton implements IPanelButton {
         switch(link.dataset.format) {
           case 'custom':
             promise = this.customizeDialog(provider);
+            break;
 
           default:
             const ranking = provider.getFirstRanking();
