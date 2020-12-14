@@ -1,8 +1,37 @@
-import {EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking} from 'lineupjs';
-import {ExportFormat, ExportRows, ExportUtils, IOrderedRowIndices} from '../ExportUtils';
+import {Column, EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking, isSupportType} from 'lineupjs';
+import {ExportFormat, ExportUtils} from '../ExportUtils';
 import {IPanelButton} from './PanelButton';
-import {I18nextManager} from 'phovea_core';
+import {BaseUtils, I18nextManager} from 'phovea_core';
 
+/**
+ * Store the ordered row indices
+ */
+interface IOrderedRowIndices {
+  /**
+   * All row indices from the data provider.
+   * Indices are not sorting (= sorting of input data)!
+   */
+  all: number[];
+
+  /**
+   * Indices of the selected rows.
+   * Indices are sorted by the *first* ranking.
+   */
+  selected: number[];
+
+  /**
+   * Indices of the filtered rows.
+   * Indices are sorted and filtered by the *first* ranking.
+   */
+  filtered: number[];
+}
+
+interface IExportData {
+  type: ExportFormat;
+  columns: Column[];
+  order: number[];
+  name: string;
+}
 
 /**
  * A button dropdown to download selected/all rows of the ranking
@@ -39,7 +68,38 @@ export class PanelDownloadButton implements IPanelButton {
         evt.preventDefault();
         evt.stopPropagation();
 
-        ExportUtils.exportLogic(<ExportFormat>link.dataset.format, <ExportRows>link.dataset.rows, this.orderedRowIndices, this.provider)
+        let promise;
+
+        switch(link.dataset.format) {
+          case 'custom':
+            promise = this.customizeDialog(provider);
+
+          default:
+            const ranking = provider.getFirstRanking();
+            const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
+
+            let order: number[];
+            switch(link.dataset.rows) {
+              case 'selected':
+                order = this.orderedRowIndices.selected;
+                break;
+              case 'filtered':
+                order = this.orderedRowIndices.filtered;
+                break;
+              default:
+                order = this.orderedRowIndices.all;
+            }
+
+            promise = Promise.resolve({
+              order,
+              columns,
+              type: <ExportFormat>link.dataset.format,
+              name: ranking.getLabel()
+            });
+        }
+
+        return promise
+          .then((r) => this.convertRanking(provider, r.order, r.columns, r.type, r.name))
           .then(({content, mimeType, name}) => {
             this.downloadFile(content, mimeType, name);
           });
@@ -114,6 +174,120 @@ export class PanelDownloadButton implements IPanelButton {
     this.provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking: Ranking, _index: number) => {
       // TODO: implement support for multiple rankings; currently, only the first ranking is supported
       this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, null);
+    });
+  }
+
+  private convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportFormat, name: string) {
+    const rows = provider.viewRawRows(order);
+    const separators = {csv: ',', tsv: '\t', ssv: ';'};
+    let content: Promise<Blob> | Blob;
+    const mimeTypes = {csv: 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+    const mimeType = mimeTypes[type];
+
+    function toBlob(content: string, mimeType: string) {
+      return new Blob([content], {type: mimeType});
+    }
+
+    if (type in separators) {
+      content = toBlob(ExportUtils.exportRanking(columns, rows, separators[type]), mimeType);
+    } else if (type === 'xlsx') {
+      content = ExportUtils.exportXLSX(columns, rows);
+    } else { // json
+      content = toBlob(ExportUtils.exportJSON(columns, rows), mimeType);
+    }
+    return Promise.resolve(content).then((c) => ({
+      content: c,
+      mimeType: mimeTypes[type],
+      name: `${name}.${type === 'ssv' ? 'csv' : type}`
+    }));
+  }
+
+  private customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
+    return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
+      const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+      const id = `e${BaseUtils.randomId(3)}`;
+      const ranking = provider.getFirstRanking();
+      dialog.form.classList.add('tdp-ranking-export-form');
+      const flat = ranking.flatColumns;
+      const lookup = new Map(flat.map((d) => <[string, Column]>[d.id, d]));
+      dialog.form.innerHTML = `
+        <div class="form-group">
+          <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</label>
+          ${flat.map((col) => `
+            <div class="checkbox tdp-ranking-export-form-handle">
+            <span class="fa fa-sort"></span>
+            <label>
+              <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
+              ${col.label}
+            </label>
+          </div>
+          `).join('')}
+        </div>
+        <div class="form-group">
+          <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</label>
+          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${this.orderedRowIndices.all.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${this.orderedRowIndices.filtered.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${this.orderedRowIndices.selected.length})</label></div>
+        </div>
+        <div class="form-group">
+          <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportName')}</label>
+          <input class="form-control" id="name_${id}" name="name" value="Export" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.nameOfExported')}">
+        </div>
+        <div class="form-group">
+          <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormatCapital')}</label>
+          <select class="form-control" id="type_${id}" name="type" required placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}">
+          <option value="csv" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
+          <option value="tsv">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
+          <option value="ssv">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
+          <option value="json">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
+          <option value="xlsx">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
+          </select>
+        </div>
+      `;
+
+      ExportUtils.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.checkbox');
+
+      return new Promise<IExportData>((resolve) => {
+        dialog.onSubmit(() => {
+          const data = new FormData(dialog.form);
+
+          dialog.hide();
+
+          const rows = data.get('rows').toString();
+          let order: number[];
+
+          switch(rows) {
+            case 'selected':
+              order = this.orderedRowIndices.selected;
+              break;
+            case 'filtered':
+              order = this.orderedRowIndices.filtered;
+              break;
+            default:
+              order = this.orderedRowIndices.all;
+          }
+
+          const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
+
+          resolve({
+            type: <ExportFormat>data.get('type'),
+            columns,
+            order,
+            name: <string>data.get('name')
+          });
+
+          return false;
+        });
+
+        dialog.show();
+
+        setTimeout(() => {
+          const first = <HTMLElement>dialog.form.querySelector('input, select, textarea');
+          if (first) {
+            first.focus();
+          }
+        }, 250); // till dialog is visible
+      });
     });
   }
 
