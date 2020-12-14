@@ -243,23 +243,29 @@ $lu_assets: '~lineupjs/src/assets';
       }
     }
 
-    .download-data-dropdown {
-      @mixin download_num_rows_indicator($attr_name) {
-        // show the number of selected rows after the link element
-        a[#{$attr_name}]::after {
-          content: ' ('attr(#{$attr_name}) ')';
-          display: inline;
-        }
-
-        // hide the list item, if the number of rows is '0'
-        li[#{$attr_name}='0'] {
-          display: none;
-        }
+    @mixin num_rows_indicator($attr_name) {
+      // show the number of selected rows after the link element
+      a[#{$attr_name}]::after {
+        content: ' ('attr(#{$attr_name}) ')';
+        display: inline;
       }
 
-      @include download_num_rows_indicator('data-num-all-rows');
-      @include download_num_rows_indicator('data-num-selected-rows');
-      @include download_num_rows_indicator('data-num-filtered-rows');
+      // hide the list item, if the number of rows is '0'
+      li[#{$attr_name}='0'] {
+        display: none;
+      }
+    }
+
+    .save-named-set-dropdown {
+      @include num_rows_indicator('data-num-all-rows');
+      @include num_rows_indicator('data-num-selected-rows');
+      @include num_rows_indicator('data-num-filtered-rows');
+    }
+
+    .download-data-dropdown {
+      @include num_rows_indicator('data-num-all-rows');
+      @include num_rows_indicator('data-num-selected-rows');
+      @include num_rows_indicator('data-num-filtered-rows');
     }
 
     > main {

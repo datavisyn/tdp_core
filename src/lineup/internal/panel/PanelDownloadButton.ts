@@ -2,29 +2,7 @@ import {Column, EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Rankin
 import {ExportFormat, ExportUtils} from '../ExportUtils';
 import {IPanelButton} from './PanelButton';
 import {BaseUtils, I18nextManager} from 'phovea_core';
-
-/**
- * Store the ordered row indices
- */
-interface IOrderedRowIndices {
-  /**
-   * All row indices from the data provider.
-   * Indices are not sorting (= sorting of input data)!
-   */
-  all: number[];
-
-  /**
-   * Indices of the selected rows.
-   * Indices are sorted by the *first* ranking.
-   */
-  selected: number[];
-
-  /**
-   * Indices of the filtered rows.
-   * Indices are sorted and filtered by the *first* ranking.
-   */
-  filtered: number[];
-}
+import {LineUpOrderedRowIndicies} from './LineUpOrderedRowIndicies';
 
 interface IExportData {
   type: ExportFormat;
@@ -39,13 +17,7 @@ interface IExportData {
 export class PanelDownloadButton implements IPanelButton {
   readonly node: HTMLElement;
 
-  private orderedRowIndices: IOrderedRowIndices = {
-    all: [], // indices are not sorting (= sorting of input data)
-    selected: [], // indices are sorted by the first ranking
-    filtered: [] // indices are sorted and filtered by the first ranking
-  };
-
-  constructor(parent: HTMLElement, private provider: LocalDataProvider, isTopMode:boolean) {
+  constructor(parent: HTMLElement, provider: LocalDataProvider, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode:boolean) {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('btn-group', 'download-data-dropdown');
     this.node.innerHTML = `
@@ -61,7 +33,17 @@ export class PanelDownloadButton implements IPanelButton {
       </ul>
     `;
 
-    this.addLineUpEventListner();
+    lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_ALL, (_event, order: number[]) => {
+      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-all-rows]')).forEach((element) => element.dataset.numAllRows = order.length.toString());
+    });
+
+    lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, (_event, order: number[]) => {
+      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-selected-rows]')).forEach((element) => element.dataset.numSelectedRows = order.length.toString());
+    });
+
+    lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, (_event, order: number[]) => {
+      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-filtered-rows]')).forEach((element) => element.dataset.numFilteredRows = order.length.toString());
+    });
 
     this.node.querySelectorAll('a').forEach((link) => {
       link.onclick = (evt) => {
@@ -72,7 +54,7 @@ export class PanelDownloadButton implements IPanelButton {
 
         switch(link.dataset.format) {
           case 'custom':
-            promise = this.customizeDialog(provider);
+            promise = this.customizeDialog(provider, lineupOrderRowIndices);
             break;
 
           default:
@@ -82,13 +64,13 @@ export class PanelDownloadButton implements IPanelButton {
             let order: number[];
             switch(link.dataset.rows) {
               case 'selected':
-                order = this.orderedRowIndices.selected;
+                order = lineupOrderRowIndices.selected;
                 break;
               case 'filtered':
-                order = this.orderedRowIndices.filtered;
+                order = lineupOrderRowIndices.filtered;
                 break;
               default:
-                order = this.orderedRowIndices.all;
+                order = lineupOrderRowIndices.all;
             }
 
             promise = Promise.resolve({
@@ -105,76 +87,6 @@ export class PanelDownloadButton implements IPanelButton {
             this.downloadFile(content, mimeType, name);
           });
       };
-    });
-  }
-
-  private updateNumRowsAttributes() {
-    (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-all-rows]')).forEach((element) => element.dataset.numAllRows = this.orderedRowIndices.all.length.toString());
-    (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-selected-rows]')).forEach((element) => element.dataset.numSelectedRows = this.orderedRowIndices.selected.length.toString());
-    (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-filtered-rows]')).forEach((element) => element.dataset.numFilteredRows = this.orderedRowIndices.filtered.length.toString());
-  }
-
-  /**
-   * Add event listener to LineUp data provider and
-   * update the number of rows in the dataset attributes for different row types.
-   */
-  private addLineUpEventListner() {
-    const eventSuffix = '.download-menu';
-
-
-    this.provider.on(LocalDataProvider.EVENT_DATA_CHANGED + eventSuffix, (rows: IDataRow[]) => {
-      this.orderedRowIndices.all = rows.map((d) => d.i);
-      this.updateNumRowsAttributes();
-    });
-
-    this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + eventSuffix, (_indices: number[]) => {
-      // NOTE: the `indices` does not reflect the sorting of the (first) ranking, instead the ids are always ordered ascending
-      const order = Array.from(this.provider.getFirstRanking().getOrder()); // use order of the first ranking
-      this.orderedRowIndices.selected = this.provider.getSelection()
-        .sort((a, b) => {
-          const aIndex = order.indexOf(a);
-          const bIndex = order.indexOf(b);
-          return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
-        });
-
-      this.updateNumRowsAttributes();
-    });
-
-    // wait until (first) ranking is added to data provider
-    this.provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking: Ranking, _index: number) => {
-      // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-      this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous: number[], current: number[], _previousGroups: IOrderedGroup[], _currentGroups: IOrderedGroup[], dirtyReason: EDirtyReason[]) => {
-        // update filtered rows on filter and sort events
-        if(dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
-          // no rows are filtered -> reset array
-          if(current.length === this.orderedRowIndices.all.length) {
-            this.orderedRowIndices.filtered = [];
-
-          // some rows are filtered
-          } else {
-            // NOTE: `current` contains always the *sorted* and *filtered* row indices of the (first) ranking!
-            this.orderedRowIndices.filtered = (current instanceof Uint8Array || current instanceof Uint16Array || current instanceof Uint32Array) ? Array.from(current) : current; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
-          }
-        }
-
-        // update sorting of selected rows
-        if(dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
-          const order = this.provider.getFirstRanking().getOrder(); // use order of the first ranking
-          this.orderedRowIndices.selected = this.provider.getSelection()
-            .sort((a, b) => {
-              const aIndex = order.indexOf(a);
-              const bIndex = order.indexOf(b);
-              return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
-            });
-        }
-
-        this.updateNumRowsAttributes();
-      });
-    });
-
-    this.provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking: Ranking, _index: number) => {
-      // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-      this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, null);
     });
   }
 
@@ -203,7 +115,7 @@ export class PanelDownloadButton implements IPanelButton {
     }));
   }
 
-  private customizeDialog(provider: LocalDataProvider): Promise<IExportData> {
+  private customizeDialog(provider: LocalDataProvider, orderedRowIndices: LineUpOrderedRowIndicies): Promise<IExportData> {
     return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
       const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
       const id = `e${BaseUtils.randomId(3)}`;
@@ -226,9 +138,9 @@ export class PanelDownloadButton implements IPanelButton {
         </div>
         <div class="form-group">
           <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</label>
-          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${this.orderedRowIndices.all.length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${this.orderedRowIndices.filtered.length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${this.orderedRowIndices.selected.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label></div>
+          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label></div>
         </div>
         <div class="form-group">
           <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportName')}</label>
@@ -259,13 +171,13 @@ export class PanelDownloadButton implements IPanelButton {
 
           switch(rows) {
             case 'selected':
-              order = this.orderedRowIndices.selected;
+              order = orderedRowIndices.selected;
               break;
             case 'filtered':
-              order = this.orderedRowIndices.filtered;
+              order = orderedRowIndices.filtered;
               break;
             default:
-              order = this.orderedRowIndices.all;
+              order = orderedRowIndices.all;
           }
 
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));

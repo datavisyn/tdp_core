@@ -1,6 +1,5 @@
 import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc } from 'lineupjs';
 import { EventHandler, I18nextManager, PluginRegistry, IDTypeManager } from 'phovea_core';
-import { StoreUtils } from '../../storage';
 import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB } from '../../base/extensions';
 import { PanelButton } from './panel/PanelButton';
 import { PanelTabContainer, NullTabContainer } from './panel/PanelTabContainer';
@@ -14,6 +13,8 @@ import { LineupUtils } from '../utils';
 import { isAdditionalColumnDesc } from '../../base/interfaces';
 import { FormElementType } from '../../form/interfaces';
 import { FormDialog } from '../../form';
+import { PanelSaveNamedSetButton } from './panel/PanelSaveNamedSetButton';
+import { LineUpOrderedRowIndicies } from './panel/LineUpOrderedRowIndicies';
 export class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();
@@ -93,19 +94,16 @@ export class LineUpPanelActions extends EventHandler {
             this.header.addButton(addColumnButton);
         }
         this.appendExtraButtons(buttons);
+        const lineupOrderRowIndices = new LineUpOrderedRowIndicies(this.provider); // save state of all, selected, and filtered rows
         if (this.options.enableSaveRanking) {
-            const listener = (ranking) => {
-                StoreUtils.editDialog(null, (name, description, sec) => {
-                    const rawOrder = this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
-                    const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
-                    this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec);
-                });
-            };
-            const saveRankingButton = new PanelRankingButton(buttons, this.provider, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities'), 'fa fa-save', listener);
-            this.header.addButton(saveRankingButton);
+            const saveRankingButtonContainer = new PanelSaveNamedSetButton(buttons, lineupOrderRowIndices, this.isTopMode);
+            saveRankingButtonContainer.on(PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET, (_event, order, name, description, sec) => {
+                this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec); // forward event
+            });
+            this.header.addButton(saveRankingButtonContainer);
         }
         if (this.options.enableDownload) {
-            const downloadButtonContainer = new PanelDownloadButton(buttons, this.provider, this.isTopMode);
+            const downloadButtonContainer = new PanelDownloadButton(buttons, this.provider, lineupOrderRowIndices, this.isTopMode);
             this.header.addButton(downloadButtonContainer);
         }
         if (this.options.enableZoom) {
