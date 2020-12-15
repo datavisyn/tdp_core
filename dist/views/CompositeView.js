@@ -31,7 +31,7 @@ class WrapperView {
         return [0, 0];
     }
     createParams(hideHeader) {
-        const parent = this.node.closest('section');
+        const parent = this.node.closest('.layout-container-wrapper');
         const header = parent.querySelector('header');
         if (hideHeader) {
             header.innerHTML = '';

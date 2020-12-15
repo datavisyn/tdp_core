@@ -93,7 +93,7 @@ class WrapperView implements ILayoutView {
   }
 
   createParams(hideHeader: boolean) {
-    const parent = this.node.closest('section');
+    const parent = this.node.closest('.layout-container-wrapper');
     const header = parent.querySelector('header');
     if (hideHeader) {
       header.innerHTML = '';
