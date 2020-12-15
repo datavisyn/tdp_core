@@ -10,7 +10,7 @@ export class PanelDownloadButton {
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('btn-group', 'download-data-dropdown');
         this.node.innerHTML = `
-    <button type="button" class="dropdown-toggle fa fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
+    <button type="button" class="dropdown-toggle fas fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
     </button>
     <ul class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
       <li class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAll')}</li>

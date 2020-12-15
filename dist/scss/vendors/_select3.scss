@@ -48,8 +48,8 @@
       opacity: 0.5;
 
       &::after {
-        @include fa-icon();
-        content: $fa-var-spinner;
+        @extend .fas;
+        content: fa-content($fa-var-spinner);
         animation: fa-spin 2s infinite linear;
       }
     }
@@ -59,8 +59,8 @@
     position: relative;
 
     &::after {
-      @include fa-icon();
-      content: $fa-var-spinner;
+      @extend .fas;
+      content: fa-content($fa-var-spinner);
       position: absolute;
       right: 0;
       margin: 8px 6px 0 0;
