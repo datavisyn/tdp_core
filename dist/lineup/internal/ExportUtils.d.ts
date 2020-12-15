@@ -1,5 +1,4 @@
 import { IDataRow, Column } from 'lineupjs';
-export declare type ExportFormat = 'json' | 'csv' | 'tsv' | 'ssv' | 'xlsx';
 export declare class ExportUtils {
     private static getColumnName;
     static exportRanking(columns: Column[], rows: IDataRow[], separator: string): string;

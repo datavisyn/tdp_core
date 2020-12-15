@@ -1,6 +1,22 @@
 import { EDirtyReason, LocalDataProvider, Ranking, isSupportType } from 'lineupjs';
 import { ExportUtils } from '../ExportUtils';
 import { BaseUtils, I18nextManager } from 'phovea_core';
+var EExportFormat;
+(function (EExportFormat) {
+    EExportFormat["JSON"] = "json";
+    EExportFormat["CSV"] = "csv";
+    EExportFormat["TSV"] = "tsv";
+    EExportFormat["SSV"] = "ssv";
+    EExportFormat["XLSX"] = "xlsx";
+})(EExportFormat || (EExportFormat = {}));
+var EExportMimeTypes;
+(function (EExportMimeTypes) {
+    EExportMimeTypes["JSON"] = "application/json";
+    EExportMimeTypes["CSV"] = "text/csv";
+    EExportMimeTypes["TSV"] = "text/tab-separated-values";
+    EExportMimeTypes["SSV"] = "text/csv";
+    EExportMimeTypes["XLSX"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+})(EExportMimeTypes || (EExportMimeTypes = {}));
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
@@ -129,8 +145,7 @@ export class PanelDownloadButton {
         const rows = provider.viewRawRows(order);
         const separators = { csv: ',', tsv: '\t', ssv: ';' };
         let content;
-        const mimeTypes = { csv: 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
-        const mimeType = mimeTypes[type];
+        const mimeType = EExportMimeTypes[type];
         function toBlob(content, mimeType) {
             return new Blob([content], { type: mimeType });
         }
@@ -145,7 +160,7 @@ export class PanelDownloadButton {
         }
         return Promise.resolve(content).then((c) => ({
             content: c,
-            mimeType: mimeTypes[type],
+            mimeType: EExportMimeTypes[type],
             name: `${name}.${type === 'ssv' ? 'csv' : type}`
         }));
     }

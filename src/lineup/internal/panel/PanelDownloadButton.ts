@@ -1,5 +1,5 @@
 import {Column, EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking, isSupportType} from 'lineupjs';
-import {ExportFormat, ExportUtils} from '../ExportUtils';
+import {ExportUtils} from '../ExportUtils';
 import {IPanelButton} from './PanelButton';
 import {BaseUtils, I18nextManager} from 'phovea_core';
 
@@ -26,8 +26,24 @@ interface IOrderedRowIndices {
   filtered: number[];
 }
 
+enum EExportFormat {
+  JSON = 'json',
+  CSV = 'csv',
+  TSV = 'tsv',
+  SSV = 'ssv',
+  XLSX = 'xlsx'
+}
+
+enum EExportMimeTypes {
+  JSON = 'application/json',
+  CSV = 'text/csv',
+  TSV = 'text/tab-separated-values',
+  SSV = 'text/csv',
+  XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+}
+
 interface IExportData {
-  type: ExportFormat;
+  type: EExportFormat;
   columns: Column[];
   order: number[];
   name: string;
@@ -94,7 +110,7 @@ export class PanelDownloadButton implements IPanelButton {
             promise = Promise.resolve({
               order,
               columns,
-              type: <ExportFormat>link.dataset.format,
+              type: <EExportFormat>link.dataset.format,
               name: ranking.getLabel()
             });
         }
@@ -178,12 +194,11 @@ export class PanelDownloadButton implements IPanelButton {
     });
   }
 
-  private convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: ExportFormat, name: string) {
+  private convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: EExportFormat, name: string) {
     const rows = provider.viewRawRows(order);
     const separators = {csv: ',', tsv: '\t', ssv: ';'};
     let content: Promise<Blob> | Blob;
-    const mimeTypes = {csv: 'text/csv', tsv: 'text/tab-separated-values', ssv: 'text/csv', json: 'application/json', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
-    const mimeType = mimeTypes[type];
+    const mimeType = EExportMimeTypes[type];
 
     function toBlob(content: string, mimeType: string) {
       return new Blob([content], {type: mimeType});
@@ -198,7 +213,7 @@ export class PanelDownloadButton implements IPanelButton {
     }
     return Promise.resolve(content).then((c) => ({
       content: c,
-      mimeType: mimeTypes[type],
+      mimeType: EExportMimeTypes[type],
       name: `${name}.${type === 'ssv' ? 'csv' : type}`
     }));
   }
@@ -271,7 +286,7 @@ export class PanelDownloadButton implements IPanelButton {
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
 
           resolve({
-            type: <ExportFormat>data.get('type'),
+            type: <EExportFormat>data.get('type'),
             columns,
             order,
             name: <string>data.get('name')
