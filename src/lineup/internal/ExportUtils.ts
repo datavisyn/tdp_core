@@ -1,8 +1,6 @@
 import {IDataRow, Column, isNumberColumn, isDateColumn} from 'lineupjs';
 import {XlsxUtils} from '../../utils/XlsxUtils';
 
-export declare type ExportFormat = 'json' | 'csv' | 'tsv' | 'ssv' | 'xlsx';
-
 export class ExportUtils {
 
   private static getColumnName(column: Column) {
