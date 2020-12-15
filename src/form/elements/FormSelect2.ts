@@ -2,6 +2,7 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
+import 'select2';
 import * as d3 from 'd3';
 import $ from 'jquery';
 import {BaseUtils, AppContext, IPluginDesc} from 'phovea_core';
