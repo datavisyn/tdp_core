@@ -214,6 +214,7 @@
         "zoomIn": "Zoom In",
         "zoomOut": "Zoom Out",
         "toggleOverview": "En/Disable Overview",
+        "downloadData": "Download Data",
         "downloadAsExcel": "Download as Microsoft Excel format (xlsx)",
         "downloadEntireList": "Entire List",
         "downloadFilteredRows": "Currently Filtered Rows",
