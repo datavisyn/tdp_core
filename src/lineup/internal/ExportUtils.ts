@@ -106,7 +106,7 @@ export class ExportUtils {
 
   private static exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
     //optionally quote not numbers
-    const escape = new RegExp(`[']`, 'g');
+    const escape = new RegExp(`["]`, 'g');
     function quote(v: any, c?: Column) {
       if (v == null) {
         return '';
@@ -116,7 +116,7 @@ export class ExportUtils {
         return '';
       }
       if ((l.includes('\n') || l.includes(separator)) && (!c || !isNumberColumn(c))) {
-        return `'${l.replace(escape, '''')}'`;
+        return `"${l.replace(escape, '""')}"`;
       }
       return l;
     }

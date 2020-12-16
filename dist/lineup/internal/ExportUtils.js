@@ -32,7 +32,7 @@ export class ExportUtils {
     }
     static exportRanking(columns, rows, separator) {
         //optionally quote not numbers
-        const escape = new RegExp(`[']`, 'g');
+        const escape = new RegExp(`["]`, 'g');
         function quote(v, c) {
             if (v == null) {
                 return '';
@@ -42,7 +42,7 @@ export class ExportUtils {
                 return '';
             }
             if ((l.includes('\n') || l.includes(separator)) && (!c || !isNumberColumn(c))) {
-                return `'${l.replace(escape, '', '')}'`;
+                return `"${l.replace(escape, '""')}"`;
             }
             return l;
         }
