@@ -1,13 +1,110 @@
 import {IDataRow, Column, isNumberColumn, isDateColumn} from 'lineupjs';
 import {XlsxUtils} from '../../utils/XlsxUtils';
 
+
+export interface IExportFormat {
+  name: string;
+  separator: string;
+  mimeType: string;
+  fileExtension: string;
+  getRankingContent(columns: Column[], rows: IDataRow[]): Promise<Blob>;
+}
+
 export class ExportUtils {
+
+  private static EXPORT_FORMAT: { [key:string]: IExportFormat } = {
+    JSON: {
+      name: "json",
+      separator: null,
+      mimeType: "application/json",
+      fileExtension: ".json",
+      getRankingContent(columns: Column[], rows: IDataRow[]) {
+        const content = ExportUtils.exportJSON(columns, rows);
+        const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.JSON.mimeType);
+        return Promise.resolve(blob);
+      },
+    },
+    CSV: {
+      name: "csv",
+      separator: ",",
+      mimeType: "text/csv",
+      fileExtension: ".csv",
+      getRankingContent(columns: Column[], rows: IDataRow[]) {
+        const content = ExportUtils.exportRanking(columns, rows, ExportUtils.EXPORT_FORMAT.CSV.separator);
+        const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.CSV.mimeType);
+        return Promise.resolve(blob);
+      },
+    },
+    TSV: {
+      name: "tsv",
+      separator: "\t",
+      mimeType: "text/tab-separated-values",
+      fileExtension: ".tsv",
+      getRankingContent(columns: Column[], rows: IDataRow[]) {
+        const content = ExportUtils.exportRanking(columns, rows, ExportUtils.EXPORT_FORMAT.TSV.separator);
+        const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.TSV.mimeType);
+        return Promise.resolve(blob);
+      },
+    },
+    SSV: {
+      name: "ssv",
+      separator: ";",
+      mimeType: "text/csv",
+      fileExtension: ".csv",
+      getRankingContent(columns: Column[], rows: IDataRow[]) {
+        const content = ExportUtils.exportRanking(columns, rows, ExportUtils.EXPORT_FORMAT.SSV.separator);
+        const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.SSV.mimeType);
+        return Promise.resolve(blob);
+      },
+    },
+    XLSX: {
+      name: "xlsx",
+      separator: null,
+      mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      fileExtension: ".xlsx",
+      getRankingContent(columns: Column[], rows: IDataRow[]) {
+        return ExportUtils.exportXLSX(columns, rows); // returns a Promise<Blob>
+      },
+    },
+  };
+
+  /**
+   * Returns an IExportFormat object for the given format.
+   * If no format is registered the return value is `null`.
+   *
+   * @param format Export format as string
+   */
+  static getExportFormat(format: string) {
+    switch(format) {
+      case 'json':
+      case 'JSON':
+        return ExportUtils.EXPORT_FORMAT.JSON;
+
+      case 'csv':
+      case 'CSV':
+        return ExportUtils.EXPORT_FORMAT.CSV;
+
+      case 'tsv':
+      case 'TSV':
+        return ExportUtils.EXPORT_FORMAT.TSV;
+
+      case 'ssv':
+      case 'SSV':
+        return ExportUtils.EXPORT_FORMAT.SSV;
+
+      case 'xlsx':
+      case 'XLSX':
+        return ExportUtils.EXPORT_FORMAT.XLSX;
+    }
+
+    return null;
+  }
 
   private static getColumnName(column: Column) {
     return column.label + (column.desc.summary ? ' - ' + column.desc.summary : '') + (column.description ? '\n' + column.description : '');
   }
 
-  static exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
+  private static exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
     //optionally quote not numbers
     const escape = new RegExp(`["]`, 'g');
     function quote(v: any, c?: Column) {
@@ -31,7 +128,7 @@ export class ExportUtils {
     return r.join('\n');
   }
 
-  static exportJSON(columns: Column[], rows: IDataRow[]) {
+  private static exportJSON(columns: Column[], rows: IDataRow[]) {
     const converted = rows.map((row) => {
       const r: any = {};
       for (const col of columns) {
@@ -42,7 +139,7 @@ export class ExportUtils {
     return JSON.stringify(converted, null, 2);
   }
 
-  static exportXLSX(columns: Column[], rows: IDataRow[]) {
+  private static exportXLSX(columns: Column[], rows: IDataRow[]) {
     const converted = rows.map((row) => {
       const r: any = {};
       for (const col of columns) {
@@ -59,44 +156,7 @@ export class ExportUtils {
     });
   }
 
-  static resortAble(base: HTMLElement, elementSelector: string) {
-    const items = <HTMLElement[]>Array.from(base.querySelectorAll(elementSelector));
-    const enable = (item: HTMLElement) => {
-      item.classList.add('dragging');
-      base.classList.add('dragging');
-      let prevBB: DOMRect | ClientRect;
-      let nextBB: DOMRect | ClientRect;
-      const update = () => {
-        prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
-        nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
-      };
-      update();
-      base.onmouseup = base.onmouseleave = () => {
-        item.classList.remove('dragging');
-        base.classList.remove('dragging');
-        base.onmouseleave = base.onmouseup = base.onmousemove = null;
-      };
-      base.onmousemove = (evt) => {
-        const y = evt.clientY;
-        if (prevBB && y < (prevBB.top + prevBB.height / 2)) {
-          // move up
-          item.parentElement!.insertBefore(item, item.previousElementSibling);
-          update();
-        } else if (nextBB && y > (nextBB.top + nextBB.height / 2)) {
-          // move down
-          item.parentElement!.insertBefore(item.nextElementSibling, item);
-          update();
-        }
-        evt.preventDefault();
-        evt.stopPropagation();
-      };
-    };
-
-    for (const item of items) {
-      const handle = <HTMLElement>item.firstElementChild!;
-      handle.onmousedown = () => {
-        enable(item);
-      };
-    }
+  private static toBlob(content: string, mimeType: string) {
+    return new Blob([content], {type: mimeType});
   }
 }

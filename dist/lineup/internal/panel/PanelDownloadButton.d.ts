@@ -7,7 +7,7 @@ import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 export declare class PanelDownloadButton implements IPanelButton {
     readonly node: HTMLElement;
     constructor(parent: HTMLElement, provider: LocalDataProvider, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode: boolean);
-    private convertRanking;
     private customizeDialog;
+    private resortAble;
     private downloadFile;
 }

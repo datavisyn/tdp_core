@@ -86,6 +86,10 @@ $lu_assets: '~lineupjs/src/assets';
 
     .radio {
       margin-left: 1em;
+
+      &[data-num-rows='0'] {
+        display: none;
+      }
     }
   }
 
