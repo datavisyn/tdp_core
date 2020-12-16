@@ -85,10 +85,10 @@ export class ExportUtils {
 }
 ExportUtils.EXPORT_FORMAT = {
     JSON: {
-        name: "json",
+        name: 'json',
         separator: null,
-        mimeType: "application/json",
-        fileExtension: ".json",
+        mimeType: 'application/json',
+        fileExtension: '.json',
         getRankingContent(columns, rows) {
             const content = ExportUtils.exportJSON(columns, rows);
             const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.JSON.mimeType);
@@ -96,10 +96,10 @@ ExportUtils.EXPORT_FORMAT = {
         },
     },
     CSV: {
-        name: "csv",
-        separator: ",",
-        mimeType: "text/csv",
-        fileExtension: ".csv",
+        name: 'csv',
+        separator: ',',
+        mimeType: 'text/csv',
+        fileExtension: '.csv',
         getRankingContent(columns, rows) {
             const content = ExportUtils.exportRanking(columns, rows, ExportUtils.EXPORT_FORMAT.CSV.separator);
             const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.CSV.mimeType);
@@ -107,10 +107,10 @@ ExportUtils.EXPORT_FORMAT = {
         },
     },
     TSV: {
-        name: "tsv",
-        separator: "\t",
-        mimeType: "text/tab-separated-values",
-        fileExtension: ".tsv",
+        name: 'tsv',
+        separator: '\t',
+        mimeType: 'text/tab-separated-values',
+        fileExtension: '.tsv',
         getRankingContent(columns, rows) {
             const content = ExportUtils.exportRanking(columns, rows, ExportUtils.EXPORT_FORMAT.TSV.separator);
             const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.TSV.mimeType);
@@ -118,10 +118,10 @@ ExportUtils.EXPORT_FORMAT = {
         },
     },
     SSV: {
-        name: "ssv",
-        separator: ";",
-        mimeType: "text/csv",
-        fileExtension: ".csv",
+        name: 'ssv',
+        separator: ';',
+        mimeType: 'text/csv',
+        fileExtension: '.csv',
         getRankingContent(columns, rows) {
             const content = ExportUtils.exportRanking(columns, rows, ExportUtils.EXPORT_FORMAT.SSV.separator);
             const blob = ExportUtils.toBlob(content, ExportUtils.EXPORT_FORMAT.SSV.mimeType);
@@ -129,10 +129,10 @@ ExportUtils.EXPORT_FORMAT = {
         },
     },
     XLSX: {
-        name: "xlsx",
+        name: 'xlsx',
         separator: null,
-        mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        fileExtension: ".xlsx",
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        fileExtension: '.xlsx',
         getRankingContent(columns, rows) {
             return ExportUtils.exportXLSX(columns, rows); // returns a Promise<Blob>
         },
