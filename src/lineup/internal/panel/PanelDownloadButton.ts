@@ -105,7 +105,7 @@ export class PanelDownloadButton implements IPanelButton {
               .then((blob) => ({ // wait for blob then transform object
                 content: blob,
                 mimeType: r.type.mimeType,
-                name: `${r.name}.${r.type.fileExtension}`,
+                name: `${r.name}${r.type.fileExtension}`,
               }));
           })
           .then(({content, mimeType, name}) => {
