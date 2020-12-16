@@ -1,12 +1,12 @@
 import { EDirtyReason, LocalDataProvider, Ranking, isSupportType } from 'lineupjs';
 import { ExportUtils } from '../ExportUtils';
 import { BaseUtils, I18nextManager } from 'phovea_core';
-export const ExportFormat = {
-    JSON: { name: 'json', separator: null, mimeType: 'application/json', fileExtension: '.json', getRankingContent: function (columns, rows) { return ExportUtils.exportJSON(columns, rows); } },
-    CSV: { name: 'csv', separator: ',', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent: function (columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
-    TSV: { name: 'tsv', separator: '\t', mimeType: 'text/tab-separated-values', fileExtension: '.tsv', getRankingContent: function (columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
-    SSV: { name: 'ssv', separator: ';', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent: function (columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
-    XLSX: { name: 'xlsx', separator: null, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileExtension: '.xlsx', getRankingContent: function (columns, rows) { return ExportUtils.exportJSON(columns, rows); } },
+export const EXPORT_FORMAT = {
+    JSON: { name: 'json', separator: null, mimeType: 'application/json', fileExtension: '.json', getRankingContent(columns, rows) { return ExportUtils.exportJSON(columns, rows); } },
+    CSV: { name: 'csv', separator: ',', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent(columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
+    TSV: { name: 'tsv', separator: '\t', mimeType: 'text/tab-separated-values', fileExtension: '.tsv', getRankingContent(columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
+    SSV: { name: 'ssv', separator: ';', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent(columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
+    XLSX: { name: 'xlsx', separator: null, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileExtension: '.xlsx', getRankingContent(columns, rows) { return ExportUtils.exportJSON(columns, rows); } }
 };
 /**
  * A button dropdown to download selected/all rows of the ranking
@@ -60,7 +60,7 @@ export class PanelDownloadButton {
                         promise = Promise.resolve({
                             order,
                             columns,
-                            type: ExportFormat[link.dataset.format.toUpperCase()],
+                            type: EXPORT_FORMAT[link.dataset.format.toUpperCase()],
                             name: ranking.getLabel()
                         });
                 }
@@ -207,7 +207,7 @@ export class PanelDownloadButton {
                     }
                     const columns = data.getAll('columns').map((d) => lookup.get(d.toString()));
                     resolve({
-                        type: ExportFormat[data.get('type')],
+                        type: EXPORT_FORMAT[data.get('type')],
                         columns,
                         order,
                         name: data.get('name')

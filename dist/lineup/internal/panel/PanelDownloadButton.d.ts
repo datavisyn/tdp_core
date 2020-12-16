@@ -7,7 +7,7 @@ export interface IExportFormat {
     fileExtension: string;
     getRankingContent(columns: Column[], rows: IDataRow[]): string;
 }
-export declare const ExportFormat: {
+export declare const EXPORT_FORMAT: {
     JSON: IExportFormat;
     CSV: IExportFormat;
     TSV: IExportFormat;

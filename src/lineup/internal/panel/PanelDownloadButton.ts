@@ -34,13 +34,13 @@ export interface IExportFormat {
   getRankingContent(columns: Column[], rows: IDataRow[]): string;
 }
 
-export const ExportFormat = {
-  JSON: <IExportFormat>{name: 'json', separator: null, mimeType: 'application/json', fileExtension: '.json', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportJSON(columns, rows);}},
-  CSV: <IExportFormat>{name: 'csv', separator: ',', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportRanking(columns, rows, this.separator);}},
-  TSV: <IExportFormat>{name: 'tsv', separator: '\t', mimeType: 'text/tab-separated-values', fileExtension: '.tsv', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportRanking(columns, rows, this.separator);}},
-  SSV: <IExportFormat>{name: 'ssv', separator: ';', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportRanking(columns, rows, this.separator);}},
-  XLSX: <IExportFormat>{name: 'xlsx', separator: null, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileExtension: '.xlsx', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportJSON(columns, rows);}},
-}
+export const EXPORT_FORMAT = {
+  JSON: <IExportFormat>{name: 'json', separator: null, mimeType: 'application/json', fileExtension: '.json', getRankingContent(columns: Column[], rows: IDataRow[]) { return ExportUtils.exportJSON(columns, rows);}},
+  CSV: <IExportFormat>{name: 'csv', separator: ',', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent(columns: Column[], rows: IDataRow[]) { return ExportUtils.exportRanking(columns, rows, this.separator);}},
+  TSV: <IExportFormat>{name: 'tsv', separator: '\t', mimeType: 'text/tab-separated-values', fileExtension: '.tsv', getRankingContent(columns: Column[], rows: IDataRow[]) { return ExportUtils.exportRanking(columns, rows, this.separator);}},
+  SSV: <IExportFormat>{name: 'ssv', separator: ';', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent(columns: Column[], rows: IDataRow[]) { return ExportUtils.exportRanking(columns, rows, this.separator);}},
+  XLSX: <IExportFormat>{name: 'xlsx', separator: null, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileExtension: '.xlsx', getRankingContent(columns: Column[], rows: IDataRow[]) { return ExportUtils.exportJSON(columns, rows);}}
+};
 
 interface IExportData {
   type: IExportFormat;
@@ -110,7 +110,7 @@ export class PanelDownloadButton implements IPanelButton {
             promise = Promise.resolve({
               order,
               columns,
-              type: ExportFormat[link.dataset.format.toUpperCase()],
+              type: EXPORT_FORMAT[link.dataset.format.toUpperCase()],
               name: ranking.getLabel()
             });
         }
@@ -202,7 +202,6 @@ export class PanelDownloadButton implements IPanelButton {
       return new Blob([content], {type: mimeType});
     }
     content = toBlob(type.getRankingContent(columns, rows), mimeType);
-    
     return Promise.resolve(content).then((c) => ({
       content: c,
       mimeType: type.mimeType,
@@ -278,7 +277,7 @@ export class PanelDownloadButton implements IPanelButton {
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
 
           resolve({
-            type: ExportFormat[<string>data.get('type')],
+            type: EXPORT_FORMAT[<string>data.get('type')],
             columns,
             order,
             name: <string>data.get('name')
