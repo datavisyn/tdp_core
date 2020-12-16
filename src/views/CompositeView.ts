@@ -7,7 +7,7 @@ import {
   IViewLayoutContainer,
   LayoutContainerEvents
 } from 'phovea_ui';
-import {BuilderUtils, ViewBuilder} from 'phovea_ui';
+import {BuilderUtils, ViewBuilder, LAYOUT_CONTAINER_WRAPPER} from 'phovea_ui';
 import {AView} from './AView';
 import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
@@ -93,7 +93,7 @@ class WrapperView implements ILayoutView {
   }
 
   createParams(hideHeader: boolean) {
-    const parent = this.node.closest('.layout-container-wrapper');
+    const parent = this.node.closest(`.${LAYOUT_CONTAINER_WRAPPER}`);
     const header = parent.querySelector('header');
     if (hideHeader) {
       header.innerHTML = '';
