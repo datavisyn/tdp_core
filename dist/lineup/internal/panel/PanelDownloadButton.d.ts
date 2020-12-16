@@ -1,5 +1,19 @@
-import { LocalDataProvider } from 'lineupjs';
+import { Column, IDataRow, LocalDataProvider } from 'lineupjs';
 import { IPanelButton } from './PanelButton';
+export interface IExportFormat {
+    name: string;
+    separator: string;
+    mimeType: string;
+    fileExtension: string;
+    getRankingContent(columns: Column[], rows: IDataRow[]): string;
+}
+export declare const ExportFormat: {
+    JSON: IExportFormat;
+    CSV: IExportFormat;
+    TSV: IExportFormat;
+    SSV: IExportFormat;
+    XLSX: IExportFormat;
+};
 /**
  * A button dropdown to download selected/all rows of the ranking
  */

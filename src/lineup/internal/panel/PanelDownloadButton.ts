@@ -26,24 +26,24 @@ interface IOrderedRowIndices {
   filtered: number[];
 }
 
-enum EExportFormat {
-  JSON = 'json',
-  CSV = 'csv',
-  TSV = 'tsv',
-  SSV = 'ssv',
-  XLSX = 'xlsx'
+export interface IExportFormat {
+  name: string;
+  separator: string;
+  mimeType: string;
+  fileExtension: string;
+  getRankingContent(columns: Column[], rows: IDataRow[]): string;
 }
 
-enum EExportMimeTypes {
-  JSON = 'application/json',
-  CSV = 'text/csv',
-  TSV = 'text/tab-separated-values',
-  SSV = 'text/csv',
-  XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+export const ExportFormat = {
+  JSON: <IExportFormat>{name: 'json', separator: null, mimeType: 'application/json', fileExtension: '.json', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportJSON(columns, rows);}},
+  CSV: <IExportFormat>{name: 'csv', separator: ',', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportRanking(columns, rows, this.separator);}},
+  TSV: <IExportFormat>{name: 'tsv', separator: '\t', mimeType: 'text/tab-separated-values', fileExtension: '.tsv', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportRanking(columns, rows, this.separator);}},
+  SSV: <IExportFormat>{name: 'ssv', separator: ';', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportRanking(columns, rows, this.separator);}},
+  XLSX: <IExportFormat>{name: 'xlsx', separator: null, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileExtension: '.xlsx', getRankingContent: function(columns: Column[], rows: IDataRow[]){ return ExportUtils.exportJSON(columns, rows);}},
 }
 
 interface IExportData {
-  type: EExportFormat;
+  type: IExportFormat;
   columns: Column[];
   order: number[];
   name: string;
@@ -110,7 +110,7 @@ export class PanelDownloadButton implements IPanelButton {
             promise = Promise.resolve({
               order,
               columns,
-              type: <EExportFormat>link.dataset.format,
+              type: ExportFormat[link.dataset.format.toUpperCase()],
               name: ranking.getLabel()
             });
         }
@@ -194,27 +194,19 @@ export class PanelDownloadButton implements IPanelButton {
     });
   }
 
-  private convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: EExportFormat, name: string) {
+  private convertRanking(provider: LocalDataProvider, order: number[], columns: Column[], type: IExportFormat, name: string) {
     const rows = provider.viewRawRows(order);
-    const separators = {csv: ',', tsv: '\t', ssv: ';'};
     let content: Promise<Blob> | Blob;
-    const mimeType = EExportMimeTypes[type];
-
+    const mimeType = type.mimeType;
     function toBlob(content: string, mimeType: string) {
       return new Blob([content], {type: mimeType});
     }
-
-    if (type in separators) {
-      content = toBlob(ExportUtils.exportRanking(columns, rows, separators[type]), mimeType);
-    } else if (type === 'xlsx') {
-      content = ExportUtils.exportXLSX(columns, rows);
-    } else { // json
-      content = toBlob(ExportUtils.exportJSON(columns, rows), mimeType);
-    }
+    content = toBlob(type.getRankingContent(columns, rows), mimeType);
+    
     return Promise.resolve(content).then((c) => ({
       content: c,
-      mimeType: EExportMimeTypes[type],
-      name: `${name}.${type === 'ssv' ? 'csv' : type}`
+      mimeType: type.mimeType,
+      name: `${name}.${type.fileExtension}`
     }));
   }
 
@@ -252,11 +244,11 @@ export class PanelDownloadButton implements IPanelButton {
         <div class="form-group">
           <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormatCapital')}</label>
           <select class="form-control" id="type_${id}" name="type" required placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}">
-          <option value="csv" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
-          <option value="tsv">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
-          <option value="ssv">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
-          <option value="json">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
-          <option value="xlsx">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
+          <option value="CSV" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
+          <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
+          <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
+          <option value="JSON">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
+          <option value="XLSX">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
           </select>
         </div>
       `;
@@ -286,7 +278,7 @@ export class PanelDownloadButton implements IPanelButton {
           const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
 
           resolve({
-            type: <EExportFormat>data.get('type'),
+            type: ExportFormat[<string>data.get('type')],
             columns,
             order,
             name: <string>data.get('name')
