@@ -1,13 +1,6 @@
 import { EDirtyReason, LocalDataProvider, Ranking, isSupportType } from 'lineupjs';
 import { ExportUtils } from '../ExportUtils';
 import { BaseUtils, I18nextManager } from 'phovea_core';
-export const EXPORT_FORMAT = {
-    JSON: { name: 'json', separator: null, mimeType: 'application/json', fileExtension: '.json', getRankingContent(columns, rows) { return ExportUtils.exportJSON(columns, rows); } },
-    CSV: { name: 'csv', separator: ',', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent(columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
-    TSV: { name: 'tsv', separator: '\t', mimeType: 'text/tab-separated-values', fileExtension: '.tsv', getRankingContent(columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
-    SSV: { name: 'ssv', separator: ';', mimeType: 'text/csv', fileExtension: '.csv', getRankingContent(columns, rows) { return ExportUtils.exportRanking(columns, rows, this.separator); } },
-    XLSX: { name: 'xlsx', separator: null, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fileExtension: '.xlsx', getRankingContent(columns, rows) { return ExportUtils.exportJSON(columns, rows); } }
-};
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
@@ -60,12 +53,19 @@ export class PanelDownloadButton {
                         promise = Promise.resolve({
                             order,
                             columns,
-                            type: EXPORT_FORMAT[link.dataset.format.toUpperCase()],
+                            type: ExportUtils.getExportFormat(link.dataset.format),
                             name: ranking.getLabel()
                         });
                 }
                 return promise
-                    .then((r) => this.convertRanking(provider, r.order, r.columns, r.type, r.name))
+                    .then((r) => {
+                    return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order))
+                        .then((blob) => ({
+                        content: blob,
+                        mimeType: r.type.mimeType,
+                        name: `${r.name}.${r.type.fileExtension}`,
+                    }));
+                })
                     .then(({ content, mimeType, name }) => {
                     this.downloadFile(content, mimeType, name);
                 });
@@ -132,20 +132,6 @@ export class PanelDownloadButton {
             this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, null);
         });
     }
-    convertRanking(provider, order, columns, type, name) {
-        const rows = provider.viewRawRows(order);
-        let content;
-        const mimeType = type.mimeType;
-        function toBlob(content, mimeType) {
-            return new Blob([content], { type: mimeType });
-        }
-        content = toBlob(type.getRankingContent(columns, rows), mimeType);
-        return Promise.resolve(content).then((c) => ({
-            content: c,
-            mimeType: type.mimeType,
-            name: `${name}.${type.fileExtension}`
-        }));
-    }
     customizeDialog(provider) {
         return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
             const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
@@ -169,9 +155,9 @@ export class PanelDownloadButton {
         </div>
         <div class="form-group">
           <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</label>
-          <div class="radio"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${this.orderedRowIndices.all.length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${this.orderedRowIndices.filtered.length})</label></div>
-          <div class="radio"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${this.orderedRowIndices.selected.length})</label></div>
+          <div class="radio" data-num-rows="${this.orderedRowIndices.all.length}"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${this.orderedRowIndices.all.length})</label></div>
+          <div class="radio" data-num-rows="${this.orderedRowIndices.filtered.length}"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${this.orderedRowIndices.filtered.length})</label></div>
+          <div class="radio" data-num-rows="${this.orderedRowIndices.selected.length}"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${this.orderedRowIndices.selected.length})</label></div>
         </div>
         <div class="form-group">
           <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportName')}</label>
@@ -188,7 +174,7 @@ export class PanelDownloadButton {
           </select>
         </div>
       `;
-            ExportUtils.resortAble(dialog.form.firstElementChild, '.checkbox');
+            this.resortAble(dialog.form.firstElementChild, '.checkbox');
             return new Promise((resolve) => {
                 dialog.onSubmit(() => {
                     const data = new FormData(dialog.form);
@@ -207,7 +193,7 @@ export class PanelDownloadButton {
                     }
                     const columns = data.getAll('columns').map((d) => lookup.get(d.toString()));
                     resolve({
-                        type: EXPORT_FORMAT[data.get('type')],
+                        type: ExportUtils.getExportFormat(data.get('type')),
                         columns,
                         order,
                         name: data.get('name')
@@ -223,6 +209,46 @@ export class PanelDownloadButton {
                 }, 250); // till dialog is visible
             });
         });
+    }
+    resortAble(base, elementSelector) {
+        const items = Array.from(base.querySelectorAll(elementSelector));
+        const enable = (item) => {
+            item.classList.add('dragging');
+            base.classList.add('dragging');
+            let prevBB;
+            let nextBB;
+            const update = () => {
+                prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
+                nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
+            };
+            update();
+            base.onmouseup = base.onmouseleave = () => {
+                item.classList.remove('dragging');
+                base.classList.remove('dragging');
+                base.onmouseleave = base.onmouseup = base.onmousemove = null;
+            };
+            base.onmousemove = (evt) => {
+                const y = evt.clientY;
+                if (prevBB && y < (prevBB.top + prevBB.height / 2)) {
+                    // move up
+                    item.parentElement.insertBefore(item, item.previousElementSibling);
+                    update();
+                }
+                else if (nextBB && y > (nextBB.top + nextBB.height / 2)) {
+                    // move down
+                    item.parentElement.insertBefore(item.nextElementSibling, item);
+                    update();
+                }
+                evt.preventDefault();
+                evt.stopPropagation();
+            };
+        };
+        for (const item of items) {
+            const handle = item.firstElementChild;
+            handle.onmousedown = () => {
+                enable(item);
+            };
+        }
     }
     downloadFile(content, mimeType, name) {
         const doc = this.node.ownerDocument;
