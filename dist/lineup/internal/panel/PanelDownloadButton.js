@@ -66,7 +66,7 @@ export class PanelDownloadButton {
                         .then((blob) => ({
                         content: blob,
                         mimeType: r.type.mimeType,
-                        name: `${r.name}.${r.type.fileExtension}`,
+                        name: `${r.name}${r.type.fileExtension}`,
                     }));
                 })
                     .then(({ content, mimeType, name }) => {
