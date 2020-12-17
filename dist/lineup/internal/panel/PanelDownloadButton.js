@@ -94,8 +94,11 @@ export class PanelDownloadButton {
             this.updateNumRowsAttributes();
         });
         // wait until (first) ranking is added to data provider
-        this.provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking, _index) => {
+        this.provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking, index) => {
             // TODO: implement support for multiple rankings; currently, only the first ranking is supported
+            if (index > 0) {
+                return;
+            }
             this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous, current, _previousGroups, _currentGroups, dirtyReason) => {
                 // update filtered rows on filter and sort events
                 if (dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
@@ -117,8 +120,11 @@ export class PanelDownloadButton {
                 this.updateNumRowsAttributes();
             });
         });
-        this.provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking, _index) => {
+        this.provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking, index) => {
             // TODO: implement support for multiple rankings; currently, only the first ranking is supported
+            if (index > 0) {
+                return;
+            }
             this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, null);
         });
     }
