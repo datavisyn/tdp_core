@@ -14,6 +14,7 @@ export declare class PanelDownloadButton implements IPanelButton {
      * update the number of rows in the dataset attributes for different row types.
      */
     private addLineUpEventListner;
+    private sortValues;
     private customizeDialog;
     private resortAble;
     private downloadFile;

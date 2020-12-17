@@ -8,9 +8,21 @@ export class PanelDownloadButton {
     constructor(parent, provider, isTopMode) {
         this.provider = provider;
         this.orderedRowIndices = {
+            /**
+             * All row indices from the data provider.
+             * Indices are not sorting (= sorting of input data)!
+             */
             all: [],
+            /**
+             * Indices of the selected rows.
+             * Indices are sorted by the *first* ranking.
+             */
             selected: [],
-            filtered: [] // indices are sorted and filtered by the first ranking
+            /**
+             * Indices of the filtered rows.
+             * Indices are sorted and filtered by the *first* ranking.
+             */
+            filtered: []
         };
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('btn-group', 'download-data-dropdown');
@@ -38,21 +50,9 @@ export class PanelDownloadButton {
                         break;
                     default:
                         const ranking = provider.getFirstRanking();
-                        const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
-                        let order;
-                        switch (link.dataset.rows) {
-                            case 'selected':
-                                order = this.orderedRowIndices.selected;
-                                break;
-                            case 'filtered':
-                                order = this.orderedRowIndices.filtered;
-                                break;
-                            default:
-                                order = this.orderedRowIndices.all;
-                        }
                         promise = Promise.resolve({
-                            order,
-                            columns,
+                            order: this.orderedRowIndices[link.dataset.rows],
+                            columns: ranking.flatColumns.filter((c) => !isSupportType(c)),
                             type: ExportUtils.getExportFormat(link.dataset.format),
                             name: ranking.getLabel()
                         });
@@ -90,12 +90,7 @@ export class PanelDownloadButton {
         this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + eventSuffix, (_indices) => {
             // NOTE: the `indices` does not reflect the sorting of the (first) ranking, instead the ids are always ordered ascending
             const order = Array.from(this.provider.getFirstRanking().getOrder()); // use order of the first ranking
-            this.orderedRowIndices.selected = this.provider.getSelection()
-                .sort((a, b) => {
-                const aIndex = order.indexOf(a);
-                const bIndex = order.indexOf(b);
-                return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
-            });
+            this.orderedRowIndices.selected = this.sortValues(this.provider.getSelection(), order);
             this.updateNumRowsAttributes();
         });
         // wait until (first) ranking is added to data provider
@@ -116,13 +111,8 @@ export class PanelDownloadButton {
                 }
                 // update sorting of selected rows
                 if (dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
-                    const order = this.provider.getFirstRanking().getOrder(); // use order of the first ranking
-                    this.orderedRowIndices.selected = this.provider.getSelection()
-                        .sort((a, b) => {
-                        const aIndex = order.indexOf(a);
-                        const bIndex = order.indexOf(b);
-                        return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
-                    });
+                    const order = Array.from(this.provider.getFirstRanking().getOrder()); // use order of the first ranking
+                    this.orderedRowIndices.selected = this.sortValues(this.provider.getSelection(), order);
                 }
                 this.updateNumRowsAttributes();
             });
@@ -130,6 +120,13 @@ export class PanelDownloadButton {
         this.provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking, _index) => {
             // TODO: implement support for multiple rankings; currently, only the first ranking is supported
             this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, null);
+        });
+    }
+    sortValues(values, order) {
+        return values.sort((a, b) => {
+            const aIndex = order.indexOf(a);
+            const bIndex = order.indexOf(b);
+            return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
         });
     }
     customizeDialog(provider) {
@@ -179,23 +176,10 @@ export class PanelDownloadButton {
                 dialog.onSubmit(() => {
                     const data = new FormData(dialog.form);
                     dialog.hide();
-                    const rows = data.get('rows').toString();
-                    let order;
-                    switch (rows) {
-                        case 'selected':
-                            order = this.orderedRowIndices.selected;
-                            break;
-                        case 'filtered':
-                            order = this.orderedRowIndices.filtered;
-                            break;
-                        default:
-                            order = this.orderedRowIndices.all;
-                    }
-                    const columns = data.getAll('columns').map((d) => lookup.get(d.toString()));
                     resolve({
                         type: ExportUtils.getExportFormat(data.get('type')),
-                        columns,
-                        order,
+                        columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
+                        order: this.orderedRowIndices[data.get('rows').toString()],
                         name: data.get('name')
                     });
                     return false;
