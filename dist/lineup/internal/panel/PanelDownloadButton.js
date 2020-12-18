@@ -41,21 +41,9 @@ export class PanelDownloadButton {
                         break;
                     default:
                         const ranking = provider.getFirstRanking();
-                        const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
-                        let order;
-                        switch (link.dataset.rows) {
-                            case 'selected':
-                                order = lineupOrderRowIndices.selected;
-                                break;
-                            case 'filtered':
-                                order = lineupOrderRowIndices.filtered;
-                                break;
-                            default:
-                                order = lineupOrderRowIndices.all;
-                        }
                         promise = Promise.resolve({
-                            order,
-                            columns,
+                            order: lineupOrderRowIndices[link.dataset.rows],
+                            columns: ranking.flatColumns.filter((c) => !isSupportType(c)),
                             type: ExportUtils.getExportFormat(link.dataset.format),
                             name: ranking.getLabel()
                         });
@@ -122,23 +110,10 @@ export class PanelDownloadButton {
                 dialog.onSubmit(() => {
                     const data = new FormData(dialog.form);
                     dialog.hide();
-                    const rows = data.get('rows').toString();
-                    let order;
-                    switch (rows) {
-                        case 'selected':
-                            order = orderedRowIndices.selected;
-                            break;
-                        case 'filtered':
-                            order = orderedRowIndices.filtered;
-                            break;
-                        default:
-                            order = orderedRowIndices.all;
-                    }
-                    const columns = data.getAll('columns').map((d) => lookup.get(d.toString()));
                     resolve({
                         type: ExportUtils.getExportFormat(data.get('type')),
-                        columns,
-                        order,
+                        columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
+                        order: orderedRowIndices[data.get('rows').toString()],
                         name: data.get('name')
                     });
                     return false;

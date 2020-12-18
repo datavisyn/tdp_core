@@ -57,17 +57,15 @@ export class LineUpOrderedRowIndicies extends EventHandler {
         provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + eventSuffix, (_indices) => {
             // NOTE: the `indices` does not reflect the sorting of the (first) ranking, instead the ids are always ordered ascending
             const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
-            this._selected = provider.getSelection()
-                .sort((a, b) => {
-                const aIndex = order.indexOf(a);
-                const bIndex = order.indexOf(b);
-                return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
-            });
+            this._selected = this.sortValues(provider.getSelection(), order);
             this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
         });
         // wait until (first) ranking is added to data provider
-        provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking, _index) => {
+        provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking, index) => {
             // TODO: implement support for multiple rankings; currently, only the first ranking is supported
+            if (index > 0 || !provider.getFirstRanking()) {
+                return;
+            }
             provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous, current, _previousGroups, _currentGroups, dirtyReason) => {
                 // update filtered rows on filter and sort events
                 if (dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
@@ -84,20 +82,25 @@ export class LineUpOrderedRowIndicies extends EventHandler {
                 }
                 // update sorting of selected rows
                 if (dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
-                    const order = provider.getFirstRanking().getOrder(); // use order of the first ranking
-                    this._selected = provider.getSelection()
-                        .sort((a, b) => {
-                        const aIndex = order.indexOf(a);
-                        const bIndex = order.indexOf(b);
-                        return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
-                    });
+                    const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
+                    this._selected = this.sortValues(provider.getSelection(), order);
                     this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
                 }
             });
         });
-        provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking, _index) => {
+        provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking, index) => {
             // TODO: implement support for multiple rankings; currently, only the first ranking is supported
+            if (index > 0 || !provider.getFirstRanking()) {
+                return;
+            }
             provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, null);
+        });
+    }
+    sortValues(values, order) {
+        return values.sort((a, b) => {
+            const aIndex = order.indexOf(a);
+            const bIndex = order.indexOf(b);
+            return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
         });
     }
 }

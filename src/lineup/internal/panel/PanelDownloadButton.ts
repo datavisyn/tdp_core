@@ -1,4 +1,4 @@
-import {Column, EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking, isSupportType} from 'lineupjs';
+import {Column, LocalDataProvider, isSupportType} from 'lineupjs';
 import {ExportUtils, IExportFormat} from '../ExportUtils';
 import {IPanelButton} from './PanelButton';
 import {BaseUtils, I18nextManager} from 'phovea_core';
@@ -59,23 +59,9 @@ export class PanelDownloadButton implements IPanelButton {
 
           default:
             const ranking = provider.getFirstRanking();
-            const columns = ranking.flatColumns.filter((c) => !isSupportType(c));
-
-            let order: number[];
-            switch(link.dataset.rows) {
-              case 'selected':
-                order = lineupOrderRowIndices.selected;
-                break;
-              case 'filtered':
-                order = lineupOrderRowIndices.filtered;
-                break;
-              default:
-                order = lineupOrderRowIndices.all;
-            }
-
             promise = Promise.resolve({
-              order,
-              columns,
+              order: lineupOrderRowIndices[link.dataset.rows],
+              columns: ranking.flatColumns.filter((c) => !isSupportType(c)),
               type: ExportUtils.getExportFormat(link.dataset.format),
               name: ranking.getLabel()
             });
@@ -148,26 +134,10 @@ export class PanelDownloadButton implements IPanelButton {
 
           dialog.hide();
 
-          const rows = data.get('rows').toString();
-          let order: number[];
-
-          switch(rows) {
-            case 'selected':
-              order = orderedRowIndices.selected;
-              break;
-            case 'filtered':
-              order = orderedRowIndices.filtered;
-              break;
-            default:
-              order = orderedRowIndices.all;
-          }
-
-          const columns: Column[] = data.getAll('columns').map((d) => lookup.get(d.toString()));
-
           resolve({
             type: ExportUtils.getExportFormat(<string>data.get('type')),
-            columns,
-            order,
+            columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
+            order: orderedRowIndices[data.get('rows').toString()],
             name: <string>data.get('name')
           });
 
