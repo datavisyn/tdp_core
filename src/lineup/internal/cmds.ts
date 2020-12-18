@@ -145,7 +145,7 @@ export class LineupTrackingManager {
       LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_REMOVE_RANKING;
       p.removeRanking(ranking);
       return {
-        inverse: LineupTrackingManager.getInstance().addRanking(inputs[0], parameter.index, ranking.dump(p.toDescRef))
+        inverse: LineupTrackingManager.getInstance().addRanking(inputs[0], parameter.index, ranking.dump(p.toDescRef.bind(p)))
       };
     }
 
