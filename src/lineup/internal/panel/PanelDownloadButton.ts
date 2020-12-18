@@ -119,7 +119,7 @@ export class PanelDownloadButton implements IPanelButton {
     // wait until (first) ranking is added to data provider
     this.provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking: Ranking, index: number) => {
       // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-      if(index > 0) {
+      if(index > 0 || !this.provider.getFirstRanking()) {
         return;
       }
 
@@ -149,7 +149,7 @@ export class PanelDownloadButton implements IPanelButton {
 
     this.provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking: Ranking, index: number) => {
       // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-      if(index > 0) {
+      if(index > 0 || !this.provider.getFirstRanking()) {
         return;
       }
 

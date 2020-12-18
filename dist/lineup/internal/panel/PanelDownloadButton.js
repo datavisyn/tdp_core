@@ -96,7 +96,7 @@ export class PanelDownloadButton {
         // wait until (first) ranking is added to data provider
         this.provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking, index) => {
             // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-            if (index > 0) {
+            if (index > 0 || !this.provider.getFirstRanking()) {
                 return;
             }
             this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous, current, _previousGroups, _currentGroups, dirtyReason) => {
@@ -122,7 +122,7 @@ export class PanelDownloadButton {
         });
         this.provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking, index) => {
             // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-            if (index > 0) {
+            if (index > 0 || !this.provider.getFirstRanking()) {
                 return;
             }
             this.provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, null);
