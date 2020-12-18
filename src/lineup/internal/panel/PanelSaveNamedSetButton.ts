@@ -41,23 +41,10 @@ export class PanelSaveNamedSetButton extends EventHandler implements IPanelButto
 
     this.node.querySelectorAll('a').forEach((link) => {
       link.onclick = (evt) => {
-        // evt.preventDefault();
-        // evt.stopPropagation();
-
-        let order: number[];
-        switch(link.dataset.rows) {
-          case 'selected':
-            order = lineupOrderRowIndices.selected;
-            break;
-          case 'filtered':
-            order = lineupOrderRowIndices.filtered;
-            break;
-          default:
-            order = lineupOrderRowIndices.all;
-        }
-
+        evt.preventDefault();
+        evt.stopPropagation();
         StoreUtils.editDialog(null, (name, description, sec) => {
-          this.fire(PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET, order, name, description, sec);
+          this.fire(PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET, lineupOrderRowIndices[link.dataset.rows], name, description, sec);
         });
 
         return false;
