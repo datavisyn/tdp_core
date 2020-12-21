@@ -106,7 +106,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     super();
 
     BaseUtils.mixin(this.options, options);
-  
+
     const configPromise = ATDPApplication.initializeClientConfig(this.options);
 
     const i18nPromise = I18nextManager.getInstance().initI18n();
@@ -143,7 +143,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   public static loadClientConfig<T = any>(): Promise<T | null> {
     return Ajax.getJSON('/clientConfig.json').catch((e) => {
       // TODO: Do you want to print an error here, or should it fail silently?
-      console.error("Error parsing clientConfig.json", e);
+      console.error('Error parsing clientConfig.json', e);
       return null;
     });
   }
