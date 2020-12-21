@@ -105,6 +105,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
 
+    BaseUtils.mixin(this.options, options);
+  
     const configPromise = ATDPApplication.initializeClientConfig(this.options);
 
     const i18nPromise = I18nextManager.getInstance().initI18n();
@@ -118,7 +120,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
       BaseUtils.mixin(this.options, {
         showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
-      }, options);
+      });
 
       this.build(document.body, {replaceBody: false});
 
