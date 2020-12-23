@@ -98,7 +98,7 @@ export class ExportUtils {
     }
     static customizeDialog(provider) {
         return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
-            const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+            const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fas fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
             const id = `e${BaseUtils.randomId(3)}`;
             const ranking = provider.getFirstRanking();
             dialog.form.classList.add('tdp-ranking-export-form');
@@ -109,7 +109,7 @@ export class ExportUtils {
           <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</label>
           ${flat.map((col) => `
             <div class="checkbox tdp-ranking-export-form-handle">
-            <span class="fa fa-sort"></span>
+            <span class="fas fa-sort"></span>
             <label>
               <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
               ${col.label}

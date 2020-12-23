@@ -1,2 +1,2 @@
-$lu_assets: '~lineupjs/src/assets';
-@import '~lineupjs/src/styles/lineup';
+// use css because importing sass file from src requires font awesome v4 dependency
+@import '~lineupjs/build/LineUpJS.css';

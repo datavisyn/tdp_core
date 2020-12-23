@@ -197,8 +197,8 @@ $lu_assets: '~lineupjs/src/assets';
       margin-right: 0.5em;
 
       &::before {
-        @include fa-icon();
-        content: $fa-var-arrow-right;
+        @extend .fas;
+        content: fa-content($fa-var-arrow-right);
       }
     }
 
