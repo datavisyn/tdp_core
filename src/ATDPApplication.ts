@@ -138,7 +138,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   }
 
   /**
-   * Loads the client config from '/cientConfig.json' and parses it.
+   * Loads the client config from '/clientConfig.json' and parses it.
    */
   public static loadClientConfig<T = any>(): Promise<T | null> {
     return Ajax.getJSON('/clientConfig.json').catch((e) => {
