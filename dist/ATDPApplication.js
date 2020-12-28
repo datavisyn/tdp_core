@@ -7,7 +7,6 @@ import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader } from 'phovea_clue';
 import { EditProvenanceGraphMenu } from './utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './base/dialogs';
-import 'phovea_ui/dist/webpack/_font-awesome';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
