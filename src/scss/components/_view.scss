@@ -1,16 +1,3 @@
-svg {
-  // generic axes styles
-  path,
-  .axis path,
-  line,
-  .axis line {
-    fill: none;
-    stroke-width: 1;
-    stroke: black;
-    shape-rendering: crispEdges;
-  }
-}
-
 .#{$tdp-css-prefix}-view {
   &.multiple {
     overflow-y: auto;
