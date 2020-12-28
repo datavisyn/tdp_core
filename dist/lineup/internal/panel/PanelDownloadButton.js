@@ -1,41 +1,170 @@
-import { LocalDataProvider } from 'lineupjs';
+import { isSupportType } from 'lineupjs';
 import { ExportUtils } from '../ExportUtils';
-import { I18nextManager } from 'phovea_core';
+import { BaseUtils, I18nextManager } from 'phovea_core';
+import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
 export class PanelDownloadButton {
-    constructor(parent, provider, isTopMode) {
-        this.provider = provider;
+    constructor(parent, provider, lineupOrderRowIndices, isTopMode) {
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('btn-group', 'download-data-dropdown');
         this.node.innerHTML = `
-    <button type="button" class="dropdown-toggle fas fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
-    </button>
-    <ul class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
-      <li class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAll')}</li>
-      <li><a href="#" data-s="a" data-t="xlsx">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.excel')}</a></li>
-      <li class="dropdown-header" data-num-selected-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</li>
-      <li><a href="#" data-s="s" data-t="xlsx">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.excel')}</a></li>
-      <li role="separator" class="divider"></li>
-      <li><a href="#" data-s="s" data-t="custom">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a></li>
-    </ul>
-  `;
-        // Listen for row selection and update number of selected rows
-        // Show/hide some dropdown menu points accordingly using CSS
-        this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.download-menu', (indices) => {
-            this.node.querySelector('[data-num-selected-rows]').dataset.numSelectedRows = indices.length.toString();
+      <button type="button" class="dropdown-toggle fas fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
+      </button>
+      <ul class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
+        <li class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAsExcel')}</li>
+        <li data-num-all-rows="0"><a href="#" data-rows="all" data-format="xlsx" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadEntireList')}</a></li>
+        <li data-num-filtered-rows="0"><a href="#" data-rows="filtered" data-format="xlsx" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadFilteredRows')}</a></li>
+        <li data-num-selected-rows="0"><a href="#" data-rows="selected" data-format="xlsx" data-num-selected-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#" data-rows="custom" data-format="custom">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a></li>
+      </ul>
+    `;
+        lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_ALL, (_event, order) => {
+            this.node.querySelectorAll('[data-num-all-rows]').forEach((element) => element.dataset.numAllRows = order.length.toString());
         });
-        const links = Array.from(this.node.querySelectorAll('a'));
-        for (const link of links) {
+        lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, (_event, order) => {
+            this.node.querySelectorAll('[data-num-selected-rows]').forEach((element) => element.dataset.numSelectedRows = order.length.toString());
+        });
+        lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, (_event, order) => {
+            this.node.querySelectorAll('[data-num-filtered-rows]').forEach((element) => element.dataset.numFilteredRows = order.length.toString());
+        });
+        this.node.querySelectorAll('a').forEach((link) => {
             link.onclick = (evt) => {
                 evt.preventDefault();
                 evt.stopPropagation();
-                const type = link.dataset.t;
-                const onlySelected = link.dataset.s === 's';
-                ExportUtils.exportLogic(type, onlySelected, this.provider).then(({ content, mimeType, name }) => {
+                let promise;
+                switch (link.dataset.format) {
+                    case 'custom':
+                        promise = this.customizeDialog(provider, lineupOrderRowIndices);
+                        break;
+                    default:
+                        const ranking = provider.getFirstRanking();
+                        promise = Promise.resolve({
+                            order: lineupOrderRowIndices[link.dataset.rows],
+                            columns: ranking.flatColumns.filter((c) => !isSupportType(c)),
+                            type: ExportUtils.getExportFormat(link.dataset.format),
+                            name: ranking.getLabel()
+                        });
+                }
+                return promise
+                    .then((r) => {
+                    return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order))
+                        .then((blob) => ({
+                        content: blob,
+                        mimeType: r.type.mimeType,
+                        name: `${r.name}${r.type.fileExtension}`,
+                    }));
+                })
+                    .then(({ content, mimeType, name }) => {
                     this.downloadFile(content, mimeType, name);
                 });
+            };
+        });
+    }
+    customizeDialog(provider, orderedRowIndices) {
+        return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
+            const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+            const id = `e${BaseUtils.randomId(3)}`;
+            const ranking = provider.getFirstRanking();
+            dialog.form.classList.add('tdp-ranking-export-form');
+            const flat = ranking.flatColumns;
+            const lookup = new Map(flat.map((d) => [d.id, d]));
+            dialog.form.innerHTML = `
+        <div class="form-group">
+          <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</label>
+          ${flat.map((col) => `
+            <div class="checkbox tdp-ranking-export-form-handle">
+            <span class="fa fa-sort"></span>
+            <label>
+              <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
+              ${col.label}
+            </label>
+          </div>
+          `).join('')}
+        </div>
+        <div class="form-group">
+          <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</label>
+          <div class="radio" data-num-rows="${orderedRowIndices.all.length}"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label></div>
+          <div class="radio" data-num-rows="${orderedRowIndices.filtered.length}"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label></div>
+          <div class="radio" data-num-rows="${orderedRowIndices.selected.length}"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label></div>
+        </div>
+        <div class="form-group">
+          <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportName')}</label>
+          <input class="form-control" id="name_${id}" name="name" value="Export" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.nameOfExported')}">
+        </div>
+        <div class="form-group">
+          <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormatCapital')}</label>
+          <select class="form-control" id="type_${id}" name="type" required placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}">
+          <option value="CSV" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
+          <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
+          <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
+          <option value="JSON">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
+          <option value="XLSX">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
+          </select>
+        </div>
+      `;
+            this.resortAble(dialog.form.firstElementChild, '.checkbox');
+            return new Promise((resolve) => {
+                dialog.onSubmit(() => {
+                    const data = new FormData(dialog.form);
+                    dialog.hide();
+                    resolve({
+                        type: ExportUtils.getExportFormat(data.get('type')),
+                        columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
+                        order: orderedRowIndices[data.get('rows').toString()],
+                        name: data.get('name')
+                    });
+                    return false;
+                });
+                dialog.show();
+                setTimeout(() => {
+                    const first = dialog.form.querySelector('input, select, textarea');
+                    if (first) {
+                        first.focus();
+                    }
+                }, 250); // till dialog is visible
+            });
+        });
+    }
+    resortAble(base, elementSelector) {
+        const items = Array.from(base.querySelectorAll(elementSelector));
+        const enable = (item) => {
+            item.classList.add('dragging');
+            base.classList.add('dragging');
+            let prevBB;
+            let nextBB;
+            const update = () => {
+                prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
+                nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
+            };
+            update();
+            base.onmouseup = base.onmouseleave = () => {
+                item.classList.remove('dragging');
+                base.classList.remove('dragging');
+                base.onmouseleave = base.onmouseup = base.onmousemove = null;
+            };
+            base.onmousemove = (evt) => {
+                const y = evt.clientY;
+                if (prevBB && y < (prevBB.top + prevBB.height / 2)) {
+                    // move up
+                    item.parentElement.insertBefore(item, item.previousElementSibling);
+                    update();
+                }
+                else if (nextBB && y > (nextBB.top + nextBB.height / 2)) {
+                    // move down
+                    item.parentElement.insertBefore(item.nextElementSibling, item);
+                    update();
+                }
+                evt.preventDefault();
+                evt.stopPropagation();
+            };
+        };
+        for (const item of items) {
+            const handle = item.firstElementChild;
+            handle.onmousedown = () => {
+                enable(item);
             };
         }
     }

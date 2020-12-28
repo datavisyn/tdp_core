@@ -1,6 +1,6 @@
 import { BaseUtils, ResolveNow, EventHandler, IDTypeManager, Range, PluginRegistry, I18nextManager, WebpackEnv } from 'phovea_core';
 import { LayoutContainerEvents } from 'phovea_ui';
-import { BuilderUtils } from 'phovea_ui';
+import { BuilderUtils, LAYOUT_CONTAINER_WRAPPER } from 'phovea_ui';
 import { AView } from './AView';
 import { EViewMode } from '../base/interfaces';
 import { ViewUtils } from './ViewUtils';
@@ -31,7 +31,7 @@ class WrapperView {
         return [0, 0];
     }
     createParams(hideHeader) {
-        const parent = this.node.closest('section');
+        const parent = this.node.closest(`.${LAYOUT_CONTAINER_WRAPPER}`);
         const header = parent.querySelector('header');
         if (hideHeader) {
             header.innerHTML = '';
