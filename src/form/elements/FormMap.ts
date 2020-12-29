@@ -2,6 +2,7 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
+import 'select2';
 import {event as d3event} from 'd3';
 import $ from 'jquery';
 import {AFormElement} from './AFormElement';

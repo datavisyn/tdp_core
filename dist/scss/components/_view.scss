@@ -1,16 +1,3 @@
-svg {
-  // generic axes styles
-  path,
-  .axis path,
-  line,
-  .axis line {
-    fill: none;
-    stroke-width: 1;
-    stroke: black;
-    shape-rendering: crispEdges;
-  }
-}
-
 .#{$tdp-css-prefix}-view {
   &.multiple {
     overflow-y: auto;
@@ -43,10 +30,10 @@ svg {
 
   &:not(.tdp-busy).tdp-hint, &:not(.tdp-busy).tdp-hint-mapping {
     &::before {
-      @include fa-icon();
+      @extend .far;
+      content: fa-content($fa-var-eye-slash);
       $nothing: 50pt !default;
       position: absolute;
-      content: $fa-var-eye-slash;
       top: 50%;
       left: 50%;
       margin-left: -$nothing/2;
@@ -71,7 +58,7 @@ svg {
   }
 
   &:not(.tdp-busy).tdp-hint-mapping::before {
-    content: $fa-var-chain-broken;
+    content: $fa-var-unlink;
   }
 
   @import './view_lineup';

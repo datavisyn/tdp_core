@@ -1,11 +1,13 @@
 import { LocalDataProvider } from 'lineupjs';
 import { IPanelButton } from './PanelButton';
+import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
 export declare class PanelDownloadButton implements IPanelButton {
-    private provider;
     readonly node: HTMLElement;
-    constructor(parent: HTMLElement, provider: LocalDataProvider, isTopMode: boolean);
+    constructor(parent: HTMLElement, provider: LocalDataProvider, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode: boolean);
+    private customizeDialog;
+    private resortAble;
     private downloadFile;
 }

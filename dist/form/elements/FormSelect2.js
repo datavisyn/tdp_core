@@ -1,6 +1,7 @@
 /**
  * Created by Samuel Gratzl on 08.03.2017.
  */
+import 'select2';
 import $ from 'jquery';
 import { BaseUtils, AppContext } from 'phovea_core';
 import { AFormElement } from './AFormElement';

@@ -1,9 +1,3 @@
-// TODO: override variables
-// @import '../abstracts/variables';
-// @import '~font-awesome/scss/variables';
-// @import '~font-awesome/scss/mixins';
-
-
 article.#{$tdp-css-prefix}-view-wrapper {
   flex: 1 1 auto;
   border: 1px solid lightgray;
@@ -84,8 +78,8 @@ article.#{$tdp-css-prefix}-view-wrapper {
     z-index: 100;
 
     &::before {
-      @include fa-icon();
-      content: $fa-var-question-circle;
+      @extend .fas;
+      content: fa-content($fa-var-question-circle);
       margin-right: 0.3em;
     }
   }

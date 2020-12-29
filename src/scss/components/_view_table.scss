@@ -9,9 +9,9 @@
       cursor: pointer;
 
       &::before {
-        @include fa-icon();
         float: right;
-        content: $fa-var-sort;
+        @extend .fas;
+        content: fa-content($fa-var-sort);
       }
     }
 
@@ -28,19 +28,19 @@
     }
 
     &[data-sort=asc]::before {
-      content: $fa-var-sort-asc;
+      content: fa-content($fa-var-sort-alpha-down);
     }
 
     &[data-sort=asc][data-num]::before {
-      content: $fa-var-sort-numeric-asc;
+      content: fa-content($fa-var-sort-numeric-down);
     }
 
     &[data-sort=desc]::before {
-      content: $fa-var-sort-desc;
+      content: fa-content($fa-var-sort-alpha-up);
     }
 
     &[data-sort=desc][data-num]::before {
-      content: $fa-var-sort-numeric-desc;
+      content: fa-content($fa-var-sort-numeric-up);
     }
   }
 }
