@@ -43,7 +43,7 @@ export class PanelSaveNamedSetButton extends EventHandler implements IPanelButto
       link.onclick = (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
-        StoreUtils.editDialog(null, (name, description, sec) => {
+        StoreUtils.editDialog(null, I18nextManager.getInstance().i18n.t(`tdp:core.editDialog.listOfEntities.${link.dataset.rows}`), (name, description, sec) => {
           this.fire(PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET, lineupOrderRowIndices[link.dataset.rows], name, description, sec);
         });
 
