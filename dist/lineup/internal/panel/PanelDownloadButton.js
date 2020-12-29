@@ -31,9 +31,7 @@ export class PanelDownloadButton {
             this.node.querySelectorAll('[data-num-filtered-rows]').forEach((element) => element.dataset.numFilteredRows = order.length.toString());
         });
         this.node.querySelectorAll('a').forEach((link) => {
-            link.onclick = (evt) => {
-                evt.preventDefault();
-                evt.stopPropagation();
+            link.onclick = (_evt) => {
                 let promise;
                 switch (link.dataset.format) {
                     case 'custom':
@@ -48,7 +46,7 @@ export class PanelDownloadButton {
                             name: ranking.getLabel()
                         });
                 }
-                return promise
+                promise
                     .then((r) => {
                     return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order))
                         .then((blob) => ({
@@ -60,6 +58,7 @@ export class PanelDownloadButton {
                     .then(({ content, mimeType, name }) => {
                     this.downloadFile(content, mimeType, name);
                 });
+                return false;
             };
         });
     }

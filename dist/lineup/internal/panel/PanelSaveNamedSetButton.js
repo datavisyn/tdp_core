@@ -29,9 +29,7 @@ export class PanelSaveNamedSetButton extends EventHandler {
             this.node.querySelectorAll('[data-num-filtered-rows]').forEach((element) => element.dataset.numFilteredRows = order.length.toString());
         });
         this.node.querySelectorAll('a').forEach((link) => {
-            link.onclick = (evt) => {
-                evt.preventDefault();
-                evt.stopPropagation();
+            link.onclick = (_evt) => {
                 StoreUtils.editDialog(null, (name, description, sec) => {
                     this.fire(PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET, lineupOrderRowIndices[link.dataset.rows], name, description, sec);
                 });
