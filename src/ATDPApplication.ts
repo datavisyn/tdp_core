@@ -94,7 +94,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showReportBugLink: true,
     showProvenanceMenu: true,
     enableProvenanceUrlTracking: true,
-    clientConfig: null
+    clientConfig: {}
   };
 
   protected app: Promise<T> = null;
