@@ -72,18 +72,10 @@ nav .navbar-nav {
   }
 }
 
-/*
-.#{$tdp-css-prefix}-busy {
-  &::before {
-    @include datavisyn-font();
-    animation: #{$datavisyn_css_prefix}-pulse 2s infinite alternate ease;
-    content: 'd';
-    font-size: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    background: radial-gradient(circle at center, black 0%, black 10%, white 12%, white 10%);
+#headerAboutDialog {
+  .caleydoInfo .logo {
+    width: 40px; // override the logo size of the about dialog
+    // the image is imported directly in the TS file and used as img element
+    // customize the about dialog using the ATDPApplication config option `showAboutLink`
   }
 }
-*/
