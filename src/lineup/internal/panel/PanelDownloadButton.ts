@@ -46,10 +46,7 @@ export class PanelDownloadButton implements IPanelButton {
     });
 
     this.node.querySelectorAll('a').forEach((link) => {
-      link.onclick = (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-
+      link.onclick = (_evt) => {
         let promise: Promise<IExportData>;
 
         switch(link.dataset.format) {
@@ -67,7 +64,7 @@ export class PanelDownloadButton implements IPanelButton {
             });
         }
 
-        return promise
+        promise
           .then((r) => {
             return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order))
               .then((blob) => ({ // wait for blob then transform object
@@ -79,6 +76,8 @@ export class PanelDownloadButton implements IPanelButton {
           .then(({content, mimeType, name}) => {
             this.downloadFile(content, mimeType, name);
           });
+
+        return false;
       };
     });
   }
@@ -117,11 +116,11 @@ export class PanelDownloadButton implements IPanelButton {
         <div class="form-group">
           <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormatCapital')}</label>
           <select class="form-control" id="type_${id}" name="type" required placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}">
-          <option value="CSV" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
+          <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
           <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
           <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
           <option value="JSON">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
-          <option value="XLSX">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
+          <option value="XLSX" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
           </select>
         </div>
       `;
