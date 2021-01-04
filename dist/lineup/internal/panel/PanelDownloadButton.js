@@ -72,30 +72,32 @@ export class PanelDownloadButton {
             const lookup = new Map(flat.map((d) => [d.id, d]));
             dialog.form.innerHTML = `
         <div class="form-group">
-          <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</label>
+          <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
+          <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
+          <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
           ${flat.map((col) => `
             <div class="checkbox tdp-ranking-export-form-handle">
-            <span class="fa fa-sort"></span>
-            <label>
-              <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
-              ${col.label}
-            </label>
-          </div>
+              <i class="fas fa-grip-vertical"></i>
+              <label>
+                <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
+                ${col.label}
+              </label>
+            </div>
           `).join('')}
         </div>
         <div class="form-group">
-          <label>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</label>
+          <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
           <div class="radio" data-num-rows="${orderedRowIndices.all.length}"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label></div>
           <div class="radio" data-num-rows="${orderedRowIndices.filtered.length}"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label></div>
           <div class="radio" data-num-rows="${orderedRowIndices.selected.length}"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label></div>
         </div>
         <div class="form-group">
-          <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportName')}</label>
-          <input class="form-control" id="name_${id}" name="name" value="Export" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.nameOfExported')}">
+          <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
+          <input class="form-control" id="name_${id}" name="name" value="Export" required>
         </div>
         <div class="form-group">
-          <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormatCapital')}</label>
-          <select class="form-control" id="type_${id}" name="type" required placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}">
+          <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
+          <select class="form-control" id="type_${id}" name="type" required>
           <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
           <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
           <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
@@ -104,10 +106,18 @@ export class PanelDownloadButton {
           </select>
         </div>
       `;
+            dialog.form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+                checkbox.addEventListener('change', () => {
+                    dialog.form.querySelector('.error-columns').parentElement.classList.toggle('has-error', (dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0));
+                });
+            });
             this.resortAble(dialog.form.firstElementChild, '.checkbox');
             return new Promise((resolve) => {
                 dialog.onSubmit(() => {
                     const data = new FormData(dialog.form);
+                    if (data.getAll('columns').length === 0) {
+                        return false;
+                    }
                     dialog.hide();
                     resolve({
                         type: ExportUtils.getExportFormat(data.get('type')),
