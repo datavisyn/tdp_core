@@ -62,7 +62,6 @@ export class ATDPApplication extends ACLUEWrapper {
      */
     static loadClientConfig() {
         return Ajax.getJSON('/clientConfig.json').catch((e) => {
-            // TODO: Do you want to print an error here, or should it fail silently?
             console.error('Error parsing clientConfig.json', e);
             return null;
         });
