@@ -41,7 +41,7 @@ export class NamedSetList {
         if (!UserSession.getInstance().canWrite(namedSet)) {
             return;
         }
-        StoreUtils.editDialog(namedSet, async (name, description, sec) => {
+        StoreUtils.editDialog(namedSet, I18nextManager.getInstance().i18n.t(`tdp:core.editDialog.listOfEntities.default`), async (name, description, sec) => {
             const params = Object.assign({
                 name,
                 description

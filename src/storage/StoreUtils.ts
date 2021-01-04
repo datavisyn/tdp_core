@@ -5,10 +5,10 @@ import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';
 
 export class StoreUtils {
 
-  static editDialog(namedSet: IStoredNamedSet, result: (name: string, description: string, sec: Partial<ISecureItem>) => void) {
+  static editDialog(namedSet: IStoredNamedSet, entitiesTitle: string, result: (name: string, description: string, sec: Partial<ISecureItem>) => void) {
     const isCreate = namedSet === null;
     const title = isCreate ? I18nextManager.getInstance().i18n.t('tdp:core.editDialog.save') : I18nextManager.getInstance().i18n.t('tdp:core.editDialog.edit');
-    const dialog = new FormDialog(title + I18nextManager.getInstance().i18n.t('tdp:core.editDialog.listOfEntities'), title, 'namedset_form');
+    const dialog = new FormDialog(title + entitiesTitle, title, 'namedset_form');
 
     const permissions = TDPApplicationUtils.permissionForm(namedSet);
 
