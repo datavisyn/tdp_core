@@ -2,10 +2,10 @@ import { FormDialog } from 'phovea_ui';
 import { I18nextManager } from 'phovea_core';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 export class StoreUtils {
-    static editDialog(namedSet, result) {
+    static editDialog(namedSet, entitiesTitle, result) {
         const isCreate = namedSet === null;
         const title = isCreate ? I18nextManager.getInstance().i18n.t('tdp:core.editDialog.save') : I18nextManager.getInstance().i18n.t('tdp:core.editDialog.edit');
-        const dialog = new FormDialog(title + I18nextManager.getInstance().i18n.t('tdp:core.editDialog.listOfEntities'), title, 'namedset_form');
+        const dialog = new FormDialog(title + entitiesTitle, title, 'namedset_form');
         const permissions = TDPApplicationUtils.permissionForm(namedSet);
         dialog.form.innerHTML = `
       <p> ${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.dialog1')}</p>
