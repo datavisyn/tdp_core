@@ -11,6 +11,7 @@ import 'phovea_ui/dist/webpack/_font-awesome';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
+import { isEmpty } from 'lodash';
 /**
  * base class for TDP based applications
  */
@@ -29,7 +30,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showReportBugLink: true,
             showProvenanceMenu: true,
             enableProvenanceUrlTracking: true,
-            clientConfig: null
+            clientConfig: {}
         };
         this.app = null;
         BaseUtils.mixin(this.options, options);
@@ -57,12 +58,12 @@ export class ATDPApplication extends ACLUEWrapper {
         });
     }
     /**
-     * Loads the client config from '/cientConfig.json' and parses it.
+     * Loads the client config from '/clientConfig.json' and parses it.
      */
     static loadClientConfig() {
         return Ajax.getJSON('/clientConfig.json').catch((e) => {
             // TODO: Do you want to print an error here, or should it fail silently?
-            console.error("Error parsing clientConfig.json", e);
+            console.error('Error parsing clientConfig.json', e);
             return null;
         });
     }
@@ -71,6 +72,9 @@ export class ATDPApplication extends ACLUEWrapper {
      * @param options Options where the client config should be merged into.
      */
     static initializeClientConfig(options) {
+        if (isEmpty(options.clientConfig)) {
+            return Promise.resolve(options);
+        }
         return ATDPApplication.loadClientConfig().then((parsedConfig) => {
             options.clientConfig = BaseUtils.mixin((options === null || options === void 0 ? void 0 : options.clientConfig) || {}, parsedConfig || {});
             return options;
