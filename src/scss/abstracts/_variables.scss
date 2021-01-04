@@ -1,0 +1,47 @@
+
+
+// header navbar color (the inverse colors will be computed using sass `invert($color)`)
+$header-bg-color: #f0f0f0 !default;
+$header-border-color: #ddd !default;
+$header-link-color: #333 !default;
+$header-dropdown-link-color: $header-link-color !default;
+
+$select-color: orange !default;
+$select-color-bright: #ffdca3 !default;
+$hover-color: black !default;
+
+$hover-presentation-color: #f0bb00 !default;
+
+$core_colour: #f0f0f0 !default;
+$core_colour_text: #333 !default;
+$core_colour_selected: #ddd !default;
+$core_border: #ddd !default;
+
+$exploration-stage: $core_colour !default;
+$exploration-stage-hover: $core_colour_selected !default;
+
+$authoring-stage: $core_colour !default;
+$authoring-stage-hover: $core_colour_selected !default;
+$presentation-stage: $core_colour !default;
+$presentation-stage-hover: $core_colour_selected !default;
+
+$core_player: $authoring-stage !default;
+$core_duration: #D8D8D8 !default;
+
+$header-menu-bg-color: #ddd !default;
+$header-menu-color: #333 !default;
+
+$core_color_almost_black: black !default;
+
+$annotation_color: #009ACD !default;
+$annotation_color_hover: #006b90 !default;
+
+$anchor_color: #EE2329 !default;
+$anchor_color_hover: darken($anchor_color, 20%) !default;
+
+$select-data-color: orange !default;
+$hover-data-color: #ffc46b !default;
+
+$tdp-css-prefix: 'tdp' !default;
+
+$tdp-busy-background: rgba(255, 255, 255, 0.26) url('~phovea_ui/dist/assets/caleydo_c_anim.svg') no-repeat center center !default; // TODO: find a solution to use the Sass variable $bootstrapAssetDir from phovea_ui

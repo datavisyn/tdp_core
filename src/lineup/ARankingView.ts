@@ -502,6 +502,7 @@ export abstract class ARankingView extends AView {
       //record after the initial one
       LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
       this.setBusy(false);
+      this.update();
     }).catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
         console.error(error);
