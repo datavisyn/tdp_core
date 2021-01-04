@@ -3,6 +3,10 @@ $datavisyn_font_size_base: 14px !default;
 $datavisyn_line_height_base: 1 !default;
 $datavisyn_font: Monda !default;
 
+$datavisyn_loading_icon: rgba(255, 255, 255, 0.26) url('~tdp_core/dist/assets/icons/datavisyn_loading.gif') center center no-repeat;
+$phovea-loading-icon: $datavisyn_loading_icon; // IMPORTANT: no `!default` to always override the inital variable value
+$tdp-busy-background: $datavisyn_loading_icon; // IMPORTANT: no `!default` to always override the inital variable value
+
 @mixin datavisyn-font() {
   font: normal normal normal #{$datavisyn_font_size_base}/#{$datavisyn_line_height_base} $datavisyn_font; // shortening font declaration
   font-size: inherit; // can't have font-size inherit on line above, so need to override
