@@ -87,23 +87,42 @@ $lu_assets: '~lineupjs/src/assets';
         display: none;
       }
     }
+
+    [class^="error-"] {
+      display: none;
+    }
+
+    .has-error {
+      [class^="error-"] {
+        display: block;
+        color: #a94442;
+      }
+    }
+
+    .text-info {
+      color: #777777;
+    }
   }
 
   .tdp-ranking-export-form-handle {
-    > span {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.2em 0;
+
+    > i {
       visibility: hidden;
-      padding: 0 0.5em 0 1em;
       cursor: grab;
+      color: #777777;
     }
 
-    &:hover > span,
-    &.dragging > span {
+    &:hover > i,
+    &.dragging > i {
       visibility: visible;
     }
 
     &.dragging {
-      border: 1px solid lightgray;
-      border-radius: 3px;
+      background-color: $core_colour;
       cursor: grabbing;
     }
   }
