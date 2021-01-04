@@ -109,8 +109,13 @@
     "editDialog": {
       "save": "Save",
       "edit": "Edit",
-      "listOfEntities": " List of Entities",
-      "dialog1": "This dialog allows you to save the list of currently shown entities without any extra data. Afterwards, you can start new analyses using this entity subset by selecting it on the start page.",
+      "listOfEntities": {
+        "default": " List of Entities",
+        "all": " Entire List of Entities",
+        "filtered": " List of Currently Filtered Rows",
+        "selected": " List of Currently Selected Rows"
+      },
+      "dialog1": "This dialog allows you to save a list entities without any extra data. Afterwards, you can start new analyses using this entity subset by selecting it on the start page.",
       "dialog2": "However, if you want to save the entire analysis session and not only the list of entities, please use the dialog <i> Analysis Session Management </i> at the top.",
       "name": "Name",
       "description": "Description"
