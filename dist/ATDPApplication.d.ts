@@ -5,7 +5,6 @@ import { ProvenanceGraph, IMixedStorageProvenanceGraphManagerOptions } from 'pho
 import { AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ACLUEWrapper } from 'phovea_clue';
-import 'phovea_ui/dist/webpack/_font-awesome';
 import { TourManager } from './tour/TourManager';
 export interface ITDPOptions {
     /**
