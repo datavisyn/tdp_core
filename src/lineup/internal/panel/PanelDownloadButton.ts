@@ -117,11 +117,11 @@ export class PanelDownloadButton implements IPanelButton {
         <div class="form-group">
           <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormatCapital')}</label>
           <select class="form-control" id="type_${id}" name="type" required placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}">
-          <option value="CSV" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
+          <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
           <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
           <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
           <option value="JSON">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
-          <option value="XLSX">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
+          <option value="XLSX" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
           </select>
         </div>
       `;
