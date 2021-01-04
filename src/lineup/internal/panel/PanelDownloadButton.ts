@@ -46,10 +46,7 @@ export class PanelDownloadButton implements IPanelButton {
     });
 
     this.node.querySelectorAll('a').forEach((link) => {
-      link.onclick = (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-
+      link.onclick = (_evt) => {
         let promise: Promise<IExportData>;
 
         switch(link.dataset.format) {
@@ -67,7 +64,7 @@ export class PanelDownloadButton implements IPanelButton {
             });
         }
 
-        return promise
+        promise
           .then((r) => {
             return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order))
               .then((blob) => ({ // wait for blob then transform object
@@ -79,6 +76,8 @@ export class PanelDownloadButton implements IPanelButton {
           .then(({content, mimeType, name}) => {
             this.downloadFile(content, mimeType, name);
           });
+
+        return false;
       };
     });
   }
