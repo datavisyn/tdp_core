@@ -13,7 +13,7 @@ export class PanelTab extends EventHandler {
         super();
         this.parent = parent;
         this.options = {
-            cssClass: 'fa fa-sliders',
+            cssClass: 'fas fa-sliders-h',
             title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
             width: '23em',
             order: 0
@@ -47,7 +47,7 @@ export class PanelTab extends EventHandler {
         const onClick = () => {
             this.navButton.click();
         };
-        return new PanelButton(this.parent, this.options.title, 'fa ' + this.options.cssClass + ' shortcut-nav', onClick);
+        return new PanelButton(this.parent, this.options.title, 'fas ' + this.options.cssClass + ' shortcut-nav', onClick);
     }
 }
 PanelTab.SHOW_PANEL = 'showPanel';

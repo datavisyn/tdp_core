@@ -185,7 +185,7 @@ export class ProxyView extends AD3View {
       return;
     }
 
-    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
 
     //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
     this.$node.append('iframe')

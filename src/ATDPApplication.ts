@@ -2,17 +2,17 @@
  * Created by sam on 03.03.2017.
  */
 
-import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, IMixedStorageProvenanceGraphManagerOptions} from 'phovea_core';
+import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, IMixedStorageProvenanceGraphManagerOptions, Ajax} from 'phovea_core';
 import {AppHeaderLink, AppHeader} from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
 import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
 import {DialogUtils} from './base/dialogs';
-import 'phovea_ui/dist/webpack/_font-awesome';
 import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
 import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
 import {TemporarySessionList} from './utils/SessionList';
+import {isEmpty} from 'lodash';
 
 
 export interface ITDPOptions {
@@ -70,6 +70,10 @@ export interface ITDPOptions {
    * options passed to the IProvenanceGraphManager
    */
   provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+  /**
+   * Client configuration which is automatically populated by the '/clientConfig.json' on initialize.
+   */
+  clientConfig?: any;
 }
 
 /**
@@ -89,7 +93,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showOptionsLink: false,
     showReportBugLink: true,
     showProvenanceMenu: true,
-    enableProvenanceUrlTracking: true
+    enableProvenanceUrlTracking: true,
+    clientConfig: {}
   };
 
   protected app: Promise<T> = null;
@@ -100,7 +105,13 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
 
-    I18nextManager.getInstance().initI18n().then(() => { //Initialize i18n and then load application
+    BaseUtils.mixin(this.options, options);
+
+    const configPromise = ATDPApplication.initializeClientConfig(this.options);
+
+    const i18nPromise = I18nextManager.getInstance().initI18n();
+
+    Promise.all([configPromise, i18nPromise]).then(() => {
       this.tourManager = new TourManager({
         doc: document,
         header: () => this.header,
@@ -109,7 +120,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
       BaseUtils.mixin(this.options, {
         showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
-      }, options);
+      });
 
       this.build(document.body, {replaceBody: false});
 
@@ -123,6 +134,30 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
           evt.preventDefault();
         };
       }
+    });
+  }
+
+  /**
+   * Loads the client config from '/clientConfig.json' and parses it.
+   */
+  public static loadClientConfig<T = any>(): Promise<T | null> {
+    return Ajax.getJSON('/clientConfig.json').catch((e) => {
+      console.error('Error parsing clientConfig.json', e);
+      return null;
+    });
+  }
+
+  /**
+   * Loads the client config via `loadClientConfig` and automatically merges it into the options.
+   * @param options Options where the client config should be merged into.
+   */
+  public static initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions> {
+    if(isEmpty(options.clientConfig)) {
+      return Promise.resolve(options);
+    }
+    return ATDPApplication.loadClientConfig().then((parsedConfig) => {
+      options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
+      return options;
     });
   }
 

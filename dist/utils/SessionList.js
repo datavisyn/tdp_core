@@ -24,15 +24,15 @@ class ASessionList {
     static createButton(type) {
         switch (type) {
             case 'delete':
-                return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fa fa-trash" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.delete')}</span></a>`;
+                return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.delete')}</span></a>`;
             case 'select':
-                return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continueSession')}"><i class="fa fa-folder-open" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continue')}</span></a>`;
+                return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continueSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continue')}</span></a>`;
             case 'clone':
-                return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
+                return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
             case 'persist':
-                return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fa fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
+                return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
             case 'edit':
-                return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
+                return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fas fa-edit" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
         }
     }
     registerActionListener(manager, $enter) {
@@ -76,7 +76,7 @@ class ASessionList {
                         //update the name
                         nameTd.innerText = desc.name;
                         NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.session'), desc.name);
-                        publicI.className = ProvenanceGraphMenuUtils.isPublic(desc) ? 'fa fa-users' : 'fa fa-user';
+                        publicI.className = ProvenanceGraphMenuUtils.isPublic(desc) ? 'fas fa-users' : 'fas fa-user';
                         publicI.setAttribute('title', ProvenanceGraphMenuUtils.isPublic(d) ? I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', { context: 'private' }));
                     })
                         .catch(ErrorAlertHandler.getInstance().errorAlert);
@@ -97,7 +97,7 @@ class ASessionList {
     createLoader() {
         return select(this.parent).classed('menuTable', true).html(`
       <div class="loading">
-        <i class="fa fa-spinner fa-pulse fa-fw"></i>
+        <i class="fas fa-spinner fa-pulse fa-fw"></i>
         <span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.loadingText')}</span>
       </div>`);
     }
@@ -218,8 +218,8 @@ export class PersistentSessionList extends ASessionList {
     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.paragraphText')}
     </p>
         <ul class="nav nav-tabs" role="tablist">
-          <li class="active" role="presentation"><a href="#${mySessionsTabId}" class="active"><i class="fa fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
-          <li role="presentation"><a href="#${otherSessionsTabId}"><i class="fa fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
+          <li class="active" role="presentation"><a href="#${mySessionsTabId}" class="active"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
+          <li role="presentation"><a href="#${otherSessionsTabId}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
         </ul>
         <div class="tab-content">
             <div id="${mySessionsTabId}" class="tab-pane active">
@@ -253,7 +253,7 @@ export class PersistentSessionList extends ASessionList {
                     this.registerActionListener(manager, $trEnter);
                     $tr.select('td').text((d) => d.name);
                     $tr.select('td:nth-of-type(2) i')
-                        .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fa fa-users' : 'fa fa-user')
+                        .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fas fa-users' : 'fas fa-user')
                         .attr('title', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle);
                     $tr.select('td:nth-of-type(3)')
                         .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText)
@@ -292,7 +292,7 @@ export class PersistentSessionList extends ASessionList {
                     this.registerActionListener(manager, $trEnter);
                     $tr.select('span').text((d) => d.name);
                     $tr.select('span:nth-of-type(2) i')
-                        .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fa fa-users' : 'fa fa-user')
+                        .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fas fa-users' : 'fas fa-user')
                         .attr('title', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle);
                     $tr.select('span:nth-of-type(3)')
                         .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText)

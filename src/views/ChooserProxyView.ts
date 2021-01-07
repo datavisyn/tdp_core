@@ -140,7 +140,7 @@ export class ChooserProxyView extends AView {
       return;
     }
 
-    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
 
     const iframe = this.node.ownerDocument.createElement('iframe');
     iframe.src = url;

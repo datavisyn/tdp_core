@@ -1,0 +1,9 @@
+.tdp-session-dialog {
+  [data-menu="temporary"] > h4::before {
+    @extend .fas;
+    content: fa-content($fa-var-clock);
+  }
+  & + .modal-footer {
+    display: none;
+  }
+}
