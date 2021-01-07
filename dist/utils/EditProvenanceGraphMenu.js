@@ -50,11 +50,11 @@ export class EditProvenanceGraphMenu {
         const manager = this.manager;
         //add provenance graph management menu entry
         const li = parent.ownerDocument.createElement('li');
-        li.classList.add('dropdown');
+        li.classList.add('nav-item', 'dropdown');
         li.innerHTML = `
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+          <a href="#" class="nav-link dropdown-toggle" id="sessionDropdown" data-toggle="dropdown" role="button" aria-haspopup="true"
              aria-expanded="false"><i class="fas fa-folder-open" aria-hidden="true"></i> <i class="fas fa-save sync-indicator" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu" aria-labelledby="sessionDropdown">
             <li class="dropdown-label"><i class="fas fa-clock" aria-hidden="true"></i> <span class="session-name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionName')}</span></li>
             <li class="divider"></li>
             <li><a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a></li>
