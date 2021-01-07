@@ -145,7 +145,7 @@ export class LineupTrackingManager {
       LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_REMOVE_RANKING;
       p.removeRanking(ranking);
       return {
-        inverse: LineupTrackingManager.getInstance().addRanking(inputs[0], parameter.index, ranking.dump(p.toDescRef))
+        inverse: LineupTrackingManager.getInstance().addRanking(inputs[0], parameter.index, ranking.dump(p.toDescRef.bind(p)))
       };
     }
 
@@ -887,8 +887,8 @@ export class LineupTrackingManager {
       if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
         return;
       }
-      const d = ranking.dump(p.toDescRef);
-      graph.pushWithResult(LineupTrackingManager.getInstance().addRanking(objectRef, index, d), {
+      const rankingDump = ranking.dump(p.toDescRef.bind(p));
+      graph.pushWithResult(LineupTrackingManager.getInstance().addRanking(objectRef, index, rankingDump), {
         inverse: LineupTrackingManager.getInstance().addRanking(objectRef, index, null)
       });
       LineupTrackingManager.getInstance().trackRanking(lineup, p, objectRef, graph, ranking);
@@ -898,9 +898,9 @@ export class LineupTrackingManager {
       if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_REMOVE_RANKING, objectRef)) {
         return;
       }
-      const d = ranking.dump(p.toDescRef);
+      const rankingDump = ranking.dump(p.toDescRef.bind(p));
       graph.pushWithResult(LineupTrackingManager.getInstance().addRanking(objectRef, index, null), {
-        inverse: LineupTrackingManager.getInstance().addRanking(objectRef, index, d)
+        inverse: LineupTrackingManager.getInstance().addRanking(objectRef, index, rankingDump)
       });
       LineupTrackingManager.getInstance().untrackRanking(ranking);
     });

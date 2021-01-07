@@ -1,9 +1,3 @@
-// instead: import the CLUE styles separately
-@import "~phovea_clue/dist/scss/base";
-@import "~phovea_clue/dist/scss/annotation";
-@import "~phovea_clue/dist/scss/provvis";
-@import "~phovea_clue/dist/scss/storyvis";
-
 /**
  * All rules in this file override or directly extend the original clue styles
  */
@@ -84,21 +78,10 @@ div.stories {
 
 // overrides caleydo_clue/styles/provvis
 .provenance-layout-vis {
-
-  h2 i:last-of-type {
-    &:hover {
-      font-weight: 500;
-    }
-  }
-
   div.state {
 
     .toolbar {
       margin: .2em .5em;
-
-      i:hover {
-        font-weight: 500;
-      }
     }
 
     &.caleydo-select-selected {

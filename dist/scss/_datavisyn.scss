@@ -1,15 +1,17 @@
-@import '~phovea_ui/dist/scss/fonts/monda';
-@import '~font-awesome/scss/variables';
-@import '~font-awesome/scss/mixins';
-@import './vars';
-
 $datavisyn_css_prefix: 'datavisyn' !default;
 $datavisyn_font_size_base: 14px !default;
 $datavisyn_line_height_base: 1 !default;
-$dataviyn_font: Monda !default;
+$datavisyn_font: Monda !default;
+
+$phovea-brand-logo-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg'); // IMPORTANT: no `!default` to always override the inital variable value
+$phovea-brand-logo-width: 40px; // IMPORTANT: no `!default` to always override the inital variable value
+
+$datavisyn_loading_icon: rgba(255, 255, 255, 0.26) url('~tdp_core/dist/assets/icons/datavisyn_loading.gif') center center no-repeat;
+$phovea-loading-icon: $datavisyn_loading_icon; // IMPORTANT: no `!default` to always override the inital variable value
+$tdp-busy-background: $datavisyn_loading_icon; // IMPORTANT: no `!default` to always override the inital variable value
 
 @mixin datavisyn-font() {
-  font: normal normal normal #{$datavisyn_font_size_base}/#{$datavisyn_line_height_base} $dataviyn_font; // shortening font declaration
+  font: normal normal normal #{$datavisyn_font_size_base}/#{$datavisyn_line_height_base} $datavisyn_font; // shortening font declaration
   font-size: inherit; // can't have font-size inherit on line above, so need to override
   text-rendering: auto; // optimizelegibility throws things off #1094
   -webkit-font-smoothing: antialiased;
@@ -39,7 +41,7 @@ nav.navbar-inverse {
     &:before {
       height: 14px;
       width: 20px;
-      background: url('~tdp_core/src/assets/icons/datavisyn_logo.svg') no-repeat top left;
+      background: $phovea-brand-logo-url no-repeat top left;
       content: '';
       margin-top: -2px;
     }
@@ -72,19 +74,3 @@ nav .navbar-nav {
     opacity: 1;
   }
 }
-
-/*
-.#{$tdp-css-prefix}-busy {
-  &::before {
-    @include datavisyn-font();
-    animation: #{$datavisyn_css_prefix}-pulse 2s infinite alternate ease;
-    content: 'd';
-    font-size: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    background: radial-gradient(circle at center, black 0%, black 10%, white 12%, white 10%);
-  }
-}
-*/

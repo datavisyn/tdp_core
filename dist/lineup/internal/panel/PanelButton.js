@@ -34,7 +34,7 @@ export class PanelNavButton {
     constructor(parent, onClick, options) {
         this.node = parent.ownerDocument.createElement('li');
         this.order = options.order;
-        this.node.innerHTML = `<a role="tab" title="${options.title}" data-toggle="tab"><i class="fa ${options.cssClass}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
+        this.node.innerHTML = `<a role="tab" title="${options.title}" data-toggle="tab"><i class="fas ${options.cssClass}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
         this.node.querySelector('a').addEventListener('click', (evt) => {
             evt.preventDefault();
             onClick();

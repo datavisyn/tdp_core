@@ -37,10 +37,10 @@ export class TourManager {
       <div class="tdp-tour-step-dots">
       </div>
       <div class="btn-group" role="group">
-        <button type="button" data-switch="--" class="btn-xs btn btn-default"><i class="fa fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
-        <button type="button" data-switch="-" class="btn-xs btn btn-default"><i class="fa fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
-        <button type="button" data-switch="0" class="btn-xs btn btn-default"><i class="fa fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
-        <button type="button" data-switch="+" class="btn-xs btn btn-default"><i class="fa fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
+        <button type="button" data-switch="--" class="btn-xs btn btn-default"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
+        <button type="button" data-switch="-" class="btn-xs btn btn-default"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
+        <button type="button" data-switch="0" class="btn-xs btn btn-default"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
+        <button type="button" data-switch="+" class="btn-xs btn btn-default"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
       </div>
     </div>
     `;
@@ -88,7 +88,7 @@ export class TourManager {
             <div class="modal-body">
               <ul class="fa-ul">
                 ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}">
-                  <i class="fa-li fa ${finished.has(d.id) ? 'fa-check-square' : 'fa-square-o'}"></i>
+                  <i class="fa-li ${finished.has(d.id) ? 'fas fa-check-square' : 'far fa-square'}"></i>
                   <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-dismiss="modal" data-name="${d.name}">${d.name}</a>
                   ${d.description ? `<p>${d.description}</p>` : ''}
                 </li>`).join('')}
@@ -161,7 +161,7 @@ export class TourManager {
         const dots = this.step.querySelector('.tdp-tour-step-dots');
         dots.innerHTML = '';
         for (let i = 0; i < count; ++i) {
-            dots.insertAdjacentHTML('beforeend', `<div title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.jumpToStep', { step: i + 1 })}" data-step="${i}" class="fa fa-circle"></div>`);
+            dots.insertAdjacentHTML('beforeend', `<div title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.jumpToStep', { step: i + 1 })}" data-step="${i}" class="fas fa-circle"></div>`);
         }
         Array.from(this.step.querySelectorAll('.tdp-tour-step-dots div')).forEach((button) => {
             button.onclick = (evt) => {
@@ -228,7 +228,7 @@ export class TourManager {
         {
             this.step.querySelector('button[data-switch="--"]').disabled = stepNumber === 0;
             this.step.querySelector('button[data-switch="-"]').disabled = stepNumber === 0 || this.activeTour.desc.canJumpAround === false;
-            next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fa fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.finishButton')}` : `<i class="fa fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}`;
+            next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.finishButton')}` : `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}`;
             next.disabled = false;
             if (step.pageBreak === 'user' && this.activeTour.multiPage) {
                 next.disabled = true;

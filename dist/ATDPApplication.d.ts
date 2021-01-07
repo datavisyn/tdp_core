@@ -5,7 +5,6 @@ import { ProvenanceGraph, IMixedStorageProvenanceGraphManagerOptions } from 'pho
 import { AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ACLUEWrapper } from 'phovea_clue';
-import 'phovea_ui/dist/webpack/_font-awesome';
 import { TourManager } from './tour/TourManager';
 export interface ITDPOptions {
     /**
@@ -54,6 +53,10 @@ export interface ITDPOptions {
      * options passed to the IProvenanceGraphManager
      */
     provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+    /**
+     * Client configuration which is automatically populated by the '/clientConfig.json' on initialize.
+     */
+    clientConfig?: any;
 }
 /**
  * base class for TDP based applications
@@ -66,6 +69,15 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected loginMenu: LoginMenu;
     protected tourManager: TourManager;
     constructor(options?: Partial<ITDPOptions>);
+    /**
+     * Loads the client config from '/clientConfig.json' and parses it.
+     */
+    static loadClientConfig<T = any>(): Promise<T | null>;
+    /**
+     * Loads the client config via `loadClientConfig` and automatically merges it into the options.
+     * @param options Options where the client config should be merged into.
+     */
+    static initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions>;
     protected createHeader(parent: HTMLElement): AppHeader;
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;
