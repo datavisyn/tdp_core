@@ -16,7 +16,7 @@ export class FormRadio extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div');
+        this.$node = $formNode.append('div').classed('form-group', true);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel();
         const $label = this.$node.select('label');
