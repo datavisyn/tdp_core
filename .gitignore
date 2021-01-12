@@ -2,6 +2,8 @@
 /.tscache
 /.idea
 /build/
+/dist/
+/tsBuildInfoFile/
 /lib/
 *.egg-info/
 *.egg
