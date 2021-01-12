@@ -42,7 +42,7 @@ export class ATDPApplication extends ACLUEWrapper {
                 app: () => this.app
             });
             BaseUtils.mixin(this.options, {
-                showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
+                showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
             });
             this.build(document.body, { replaceBody: false });
             if (this.tourManager.hasTours()) {
