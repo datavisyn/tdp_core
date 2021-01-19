@@ -12,7 +12,6 @@ import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
 import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
 import {TemporarySessionList} from './utils/SessionList';
-import {isEmpty} from 'lodash';
 
 
 export interface ITDPOptions {
@@ -152,9 +151,6 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    * @param options Options where the client config should be merged into.
    */
   public static initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions> {
-    if(isEmpty(options.clientConfig)) {
-      return Promise.resolve(options);
-    }
     return ATDPApplication.loadClientConfig().then((parsedConfig) => {
       options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
       return options;
