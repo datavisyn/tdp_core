@@ -28,7 +28,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showReportBugLink: true,
             showProvenanceMenu: true,
             enableProvenanceUrlTracking: true,
-            clientConfig: {}
+            clientConfig: null
         };
         this.app = null;
         BaseUtils.mixin(this.options, options);
@@ -58,21 +58,25 @@ export class ATDPApplication extends ACLUEWrapper {
     /**
      * Loads the client config from '/clientConfig.json' and parses it.
      */
-    static loadClientConfig() {
+    static async loadClientConfig() {
         return Ajax.getJSON('/clientConfig.json').catch((e) => {
             console.error('Error parsing clientConfig.json', e);
             return null;
         });
     }
     /**
-     * Loads the client config via `loadClientConfig` and automatically merges it into the options.
+     * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
      * @param options Options where the client config should be merged into.
      */
-    static initializeClientConfig(options) {
-        return ATDPApplication.loadClientConfig().then((parsedConfig) => {
-            options.clientConfig = BaseUtils.mixin((options === null || options === void 0 ? void 0 : options.clientConfig) || {}, parsedConfig || {});
-            return options;
-        });
+    static async initializeClientConfig(options) {
+        // If the clientConfig is falsy, assume no client configuration should be loaded.
+        if (!(options === null || options === void 0 ? void 0 : options.clientConfig)) {
+            return null;
+        }
+        // Otherwise, load and merge the configuration into the existing one.
+        const parsedConfig = await ATDPApplication.loadClientConfig();
+        options.clientConfig = BaseUtils.mixin((options === null || options === void 0 ? void 0 : options.clientConfig) || {}, parsedConfig || {});
+        return options;
     }
     createHeader(parent) {
         //create the common header
