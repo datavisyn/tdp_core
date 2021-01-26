@@ -12,7 +12,6 @@ import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
 import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
 import {TemporarySessionList} from './utils/SessionList';
-import {isEmpty} from 'lodash';
 
 
 export interface ITDPOptions {
@@ -72,8 +71,10 @@ export interface ITDPOptions {
   provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
   /**
    * Client configuration which is automatically populated by the '/clientConfig.json' on initialize.
+   * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
+   * Passing falsy values disables the client configuration load.
    */
-  clientConfig?: any;
+  clientConfig?: Record<any, any> | null | undefined;
 }
 
 /**
@@ -94,7 +95,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showReportBugLink: true,
     showProvenanceMenu: true,
     enableProvenanceUrlTracking: true,
-    clientConfig: {}
+    clientConfig: null
   };
 
   protected app: Promise<T> = null;
@@ -140,7 +141,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   /**
    * Loads the client config from '/clientConfig.json' and parses it.
    */
-  public static loadClientConfig<T = any>(): Promise<T | null> {
+  public static async loadClientConfig<T = any>(): Promise<T | null> {
     return Ajax.getJSON('/clientConfig.json').catch((e) => {
       console.error('Error parsing clientConfig.json', e);
       return null;
@@ -148,17 +149,18 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   }
 
   /**
-   * Loads the client config via `loadClientConfig` and automatically merges it into the options.
+   * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
    * @param options Options where the client config should be merged into.
    */
-  public static initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions> {
-    if(isEmpty(options.clientConfig)) {
-      return Promise.resolve(options);
+  public static async initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions | null> {
+    // If the clientConfig is falsy, assume no client configuration should be loaded.
+    if(!options?.clientConfig) {
+      return null;
     }
-    return ATDPApplication.loadClientConfig().then((parsedConfig) => {
-      options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
-      return options;
-    });
+    // Otherwise, load and merge the configuration into the existing one.
+    const parsedConfig = await ATDPApplication.loadClientConfig();
+    options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
+    return options;
   }
 
   protected createHeader(parent: HTMLElement) {

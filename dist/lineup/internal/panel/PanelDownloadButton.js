@@ -68,15 +68,14 @@ export class PanelDownloadButton {
             const id = `e${BaseUtils.randomId(3)}`;
             const ranking = provider.getFirstRanking();
             dialog.form.classList.add('tdp-ranking-export-form');
-            const flat = ranking.flatColumns;
-            console.log(flat);
+            const flat = ranking.flatColumns.filter((c) => c.label.trim().length > 0);
             const lookup = new Map(flat.map((d) => [d.id, d]));
             dialog.form.innerHTML = `
         <div class="form-group">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
           <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
           <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
-          ${flat.filter((c) => c.label.trim().length > 0).map((col) => `
+          ${flat.map((col) => `
             <div class="checkbox tdp-ranking-export-form-handle">
               <i class="fas fa-grip-vertical"></i>
               <label>
