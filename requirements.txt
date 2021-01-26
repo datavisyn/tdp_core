@@ -6,4 +6,4 @@ flask-swagger-ui==3.36.0
 yamlreader==3.0.4
 alembic==1.4.3
 openpyxl~=3.0.5
-phovea_server>=release-7.0.0,<NaN.0.0
+-e git+https://github.com/phovea/phovea_server.git@release-7.0.0#egg=phovea_server
