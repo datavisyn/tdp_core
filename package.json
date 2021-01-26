@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "10.0.2-SNAPSHOT",
+  "version": "11.0.0",
   "author": {
     "name": "datavisyn GmbH",
     "email": "contact@datavisyn.io",
@@ -82,8 +82,8 @@
   "dependencies": {
     "d3": "~3.5.17",
     "jquery": "~3.5.1",
-    "lineupjs": "github:lineupjs/lineupjs#develop",
-    "phovea_clue": "github:phovea/phovea_clue#develop",
+    "lineupjs": "github:lineupjs/lineupjs#semver:^4.0.0",
+    "phovea_clue": "^release-7.0.0",
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "lodash": "~4.17.20"
