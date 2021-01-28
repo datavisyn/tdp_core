@@ -221,8 +221,14 @@ export class TourManager {
         this.backdropBlocker.style.display = step.allowUserInteraction ? null : 'block';
         const steps = this.step.querySelectorAll('.tdp-tour-step-dots div');
         Array.from(steps).forEach((button, i) => {
-            button.classList.toggle('fa-circle', i !== stepNumber);
-            button.classList.toggle('fa-circle-o', i === stepNumber);
+            if (i === stepNumber) {
+                button.classList.remove('fas', 'fa-circle');
+                button.classList.add('far', 'fa-circle');
+            }
+            else {
+                button.classList.remove('far', 'fa-circle');
+                button.classList.add('fas', 'fa-circle');
+            }
         });
         const next = this.step.querySelector('button[data-switch="+"]');
         {
