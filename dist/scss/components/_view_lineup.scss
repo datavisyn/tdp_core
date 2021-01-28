@@ -221,7 +221,7 @@ $lu_assets: '~lineupjs/src/assets';
 
       &::before {
         @extend .fas;
-        content: fa-content($fa-var-arrow-right);
+        content: fa-content($fa-var-arrow-left);
       }
     }
 
@@ -366,7 +366,7 @@ $lu_assets: '~lineupjs/src/assets';
         margin-right: 0;
 
         &::before {
-          content: $fa-var-arrow-left;
+          content: $fa-var-arrow-right;
         }
       }
 
