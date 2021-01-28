@@ -25,7 +25,8 @@ export class PanelAddColumnButton implements IPanelButton {
     button.classList.add('fas', 'fa-plus');
     button.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton');
 
-    button.addEventListener('click', (_evt) => {
+    button.addEventListener('click', (evt) => {
+      evt.preventDefault();
       this.node.classList.add('once');
       (<HTMLElement>this.search.node.querySelector('input'))!.focus();
       this.search.focus();
