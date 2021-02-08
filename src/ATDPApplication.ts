@@ -2,7 +2,7 @@
  * Created by sam on 03.03.2017.
  */
 
-import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, IMixedStorageProvenanceGraphManagerOptions} from 'phovea_core';
+import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, IMixedStorageProvenanceGraphManagerOptions, Ajax} from 'phovea_core';
 import {AppHeaderLink, AppHeader} from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
@@ -69,6 +69,12 @@ export interface ITDPOptions {
    * options passed to the IProvenanceGraphManager
    */
   provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+  /**
+   * Client configuration which is automatically populated by the '/clientConfig.json' on initialize.
+   * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
+   * Passing falsy values disables the client configuration load.
+   */
+  clientConfig?: Record<any, any> | null | undefined;
 }
 
 /**
@@ -88,7 +94,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showOptionsLink: false,
     showReportBugLink: true,
     showProvenanceMenu: true,
-    enableProvenanceUrlTracking: true
+    enableProvenanceUrlTracking: true,
+    clientConfig: null
   };
 
   protected app: Promise<T> = null;
@@ -99,7 +106,13 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
 
-    I18nextManager.getInstance().initI18n().then(() => { //Initialize i18n and then load application
+    BaseUtils.mixin(this.options, options);
+
+    const configPromise = ATDPApplication.initializeClientConfig(this.options);
+
+    const i18nPromise = I18nextManager.getInstance().initI18n();
+
+    Promise.all([configPromise, i18nPromise]).then(() => {
       this.tourManager = new TourManager({
         doc: document,
         header: () => this.header,
@@ -107,8 +120,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       });
 
       BaseUtils.mixin(this.options, {
-        showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
-      }, options);
+        showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
+      });
 
       this.build(document.body, {replaceBody: false});
 
@@ -123,6 +136,31 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
         };
       }
     });
+  }
+
+  /**
+   * Loads the client config from '/clientConfig.json' and parses it.
+   */
+  public static async loadClientConfig<T = any>(): Promise<T | null> {
+    return Ajax.getJSON('/clientConfig.json').catch((e) => {
+      console.error('Error parsing clientConfig.json', e);
+      return null;
+    });
+  }
+
+  /**
+   * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
+   * @param options Options where the client config should be merged into.
+   */
+  public static async initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions | null> {
+    // If the clientConfig is falsy, assume no client configuration should be loaded.
+    if(!options?.clientConfig) {
+      return null;
+    }
+    // Otherwise, load and merge the configuration into the existing one.
+    const parsedConfig = await ATDPApplication.loadClientConfig();
+    options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
+    return options;
   }
 
   protected createHeader(parent: HTMLElement) {

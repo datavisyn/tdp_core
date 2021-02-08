@@ -44,4 +44,4 @@ $hover-data-color: #ffc46b !default;
 
 $tdp-css-prefix: 'tdp' !default;
 
-$tdp-busy-background: rgba(255, 255, 255, 0.26) url('~phovea_ui/dist/assets/caleydo_c_anim.svg') no-repeat center center !default; // TODO: find a solution to use the Sass variable $bootstrapAssetDir from phovea_ui
+$tdp-busy-background: rgba(255, 255, 255, 0.26) url('~phovea_ui/dist/assets/caleydo_c_anim.svg') no-repeat center center !default; // TODO: find a solution to use the Sass variable $phovea-loading-icon-url from phovea_ui

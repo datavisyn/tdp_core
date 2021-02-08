@@ -272,8 +272,13 @@ export class TourManager {
 
     const steps = this.step.querySelectorAll('.tdp-tour-step-dots div');
     Array.from(steps).forEach((button: HTMLElement, i) => {
-      button.classList.toggle('fa-circle', i !== stepNumber);
-      button.classList.toggle('fa-circle-o', i === stepNumber);
+      if (i === stepNumber) {
+        button.classList.remove('fas', 'fa-circle');
+        button.classList.add('far', 'fa-circle');
+      } else {
+        button.classList.remove('far', 'fa-circle');
+        button.classList.add('fas', 'fa-circle');
+      }
     });
 
     const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');

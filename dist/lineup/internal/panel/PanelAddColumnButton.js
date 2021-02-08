@@ -19,7 +19,8 @@ export class PanelAddColumnButton {
         const button = this.node.ownerDocument.createElement('button');
         button.classList.add('fas', 'fa-plus');
         button.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton');
-        button.addEventListener('click', (_evt) => {
+        button.addEventListener('click', (evt) => {
+            evt.preventDefault();
             this.node.classList.add('once');
             this.search.node.querySelector('input').focus();
             this.search.focus();

@@ -53,6 +53,12 @@ export interface ITDPOptions {
      * options passed to the IProvenanceGraphManager
      */
     provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+    /**
+     * Client configuration which is automatically populated by the '/clientConfig.json' on initialize.
+     * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
+     * Passing falsy values disables the client configuration load.
+     */
+    clientConfig?: Record<any, any> | null | undefined;
 }
 /**
  * base class for TDP based applications
@@ -65,6 +71,15 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected loginMenu: LoginMenu;
     protected tourManager: TourManager;
     constructor(options?: Partial<ITDPOptions>);
+    /**
+     * Loads the client config from '/clientConfig.json' and parses it.
+     */
+    static loadClientConfig<T = any>(): Promise<T | null>;
+    /**
+     * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
+     * @param options Options where the client config should be merged into.
+     */
+    static initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions | null>;
     protected createHeader(parent: HTMLElement): AppHeader;
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;

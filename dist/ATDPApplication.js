@@ -1,7 +1,7 @@
 /**
  * Created by sam on 03.03.2017.
  */
-import { MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry } from 'phovea_core';
+import { MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, Ajax } from 'phovea_core';
 import { AppHeaderLink, AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader } from 'phovea_clue';
@@ -27,18 +27,22 @@ export class ATDPApplication extends ACLUEWrapper {
             showOptionsLink: false,
             showReportBugLink: true,
             showProvenanceMenu: true,
-            enableProvenanceUrlTracking: true
+            enableProvenanceUrlTracking: true,
+            clientConfig: null
         };
         this.app = null;
-        I18nextManager.getInstance().initI18n().then(() => {
+        BaseUtils.mixin(this.options, options);
+        const configPromise = ATDPApplication.initializeClientConfig(this.options);
+        const i18nPromise = I18nextManager.getInstance().initI18n();
+        Promise.all([configPromise, i18nPromise]).then(() => {
             this.tourManager = new TourManager({
                 doc: document,
                 header: () => this.header,
                 app: () => this.app
             });
             BaseUtils.mixin(this.options, {
-                showHelpLink: this.tourManager.hasTours() ? '#' : '' // use help button for tours
-            }, options);
+                showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
+            });
             this.build(document.body, { replaceBody: false });
             if (this.tourManager.hasTours()) {
                 const button = document.querySelector('[data-header="helpLink"] a');
@@ -50,6 +54,29 @@ export class ATDPApplication extends ACLUEWrapper {
                 };
             }
         });
+    }
+    /**
+     * Loads the client config from '/clientConfig.json' and parses it.
+     */
+    static async loadClientConfig() {
+        return Ajax.getJSON('/clientConfig.json').catch((e) => {
+            console.error('Error parsing clientConfig.json', e);
+            return null;
+        });
+    }
+    /**
+     * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
+     * @param options Options where the client config should be merged into.
+     */
+    static async initializeClientConfig(options) {
+        // If the clientConfig is falsy, assume no client configuration should be loaded.
+        if (!(options === null || options === void 0 ? void 0 : options.clientConfig)) {
+            return null;
+        }
+        // Otherwise, load and merge the configuration into the existing one.
+        const parsedConfig = await ATDPApplication.loadClientConfig();
+        options.clientConfig = BaseUtils.mixin((options === null || options === void 0 ? void 0 : options.clientConfig) || {}, parsedConfig || {});
+        return options;
     }
     createHeader(parent) {
         //create the common header

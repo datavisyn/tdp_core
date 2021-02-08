@@ -68,7 +68,7 @@ export class PanelDownloadButton {
             const id = `e${BaseUtils.randomId(3)}`;
             const ranking = provider.getFirstRanking();
             dialog.form.classList.add('tdp-ranking-export-form');
-            const flat = ranking.flatColumns;
+            const flat = ranking.flatColumns.filter((c) => c.label.trim().length > 0);
             const lookup = new Map(flat.map((d) => [d.id, d]));
             dialog.form.innerHTML = `
         <div class="form-group">
