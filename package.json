@@ -82,8 +82,8 @@
   "dependencies": {
     "d3": "~3.5.17",
     "jquery": "~3.5.1",
-    "lineupjs": "github:lineupjs/lineupjs#semver:^4.0.0",
-    "phovea_clue": "github:phovea/phovea_clue#release-7.0.0",
+    "lineupjs": "github:lineupjs/lineupjs#4.0.0",
+    "phovea_clue": "^7.0.0",
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "lodash": "~4.17.20"
