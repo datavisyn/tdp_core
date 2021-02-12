@@ -5,7 +5,6 @@ import { ProvenanceGraph, IMixedStorageProvenanceGraphManagerOptions } from 'pho
 import { AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ACLUEWrapper } from 'phovea_clue';
-import 'phovea_ui/dist/webpack/_font-awesome';
 import { TourManager } from './tour/TourManager';
 export interface ITDPOptions {
     /**
@@ -27,20 +26,25 @@ export interface ITDPOptions {
     showResearchDisclaimer: boolean | ((content: HTMLElement) => void);
     showAboutLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
     /**
-     * show/hide the options link
-     * default: false
+     * Show/hide the options link
+     * @default: false
      */
     showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
     /**
-     * show/hide the bug report link
-     * default: true
+     * Show/hide the bug report link
+     * @default: true
      */
     showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
     /**
-     * show help link true or the url to link
-     * default: false
+     * Show help link (`true`) or the url to link
+     * @default: false
      */
     showHelpLink: boolean | string;
+    /**
+     * Show/hide the `Analysis Session Managment` menu in the header
+     * @default: true
+     */
+    showProvenanceMenu?: boolean;
     /**
      * default: true
      */
@@ -49,6 +53,12 @@ export interface ITDPOptions {
      * options passed to the IProvenanceGraphManager
      */
     provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+    /**
+     * Client configuration which is automatically populated by the '/clientConfig.json' on initialize.
+     * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
+     * Passing falsy values disables the client configuration load.
+     */
+    clientConfig?: Record<any, any> | null | undefined;
 }
 /**
  * base class for TDP based applications
@@ -61,6 +71,15 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected loginMenu: LoginMenu;
     protected tourManager: TourManager;
     constructor(options?: Partial<ITDPOptions>);
+    /**
+     * Loads the client config from '/clientConfig.json' and parses it.
+     */
+    static loadClientConfig<T = any>(): Promise<T | null>;
+    /**
+     * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
+     * @param options Options where the client config should be merged into.
+     */
+    static initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions | null>;
     protected createHeader(parent: HTMLElement): AppHeader;
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;

@@ -11,10 +11,10 @@ export class ProvenanceGraphMenuUtils {
       }
 
       static persistProvenanceGraphMetaData(d: IProvenanceGraphDataDescription) {
-        const name = d.name.startsWith('Temporary') ? `Persistent ${d.name.slice(10)}` : d.name;
+        const name = d.name.startsWith('Temporary') ? `Saved ${d.name.slice(10)}` : d.name;
         return ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, {
-          title: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persistSession')}`,
-          button: `<i class="fa fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persist')}`,
+          title: `<i class="fas fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}`,
+          button: `<i class="fas fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save')}`,
           name
         });
       }
@@ -25,8 +25,8 @@ export class ProvenanceGraphMenuUtils {
 
       static editProvenanceGraphMetaData(d: IProvenanceGraphDataDescription, args: {button?: string, title?: string, permission?: boolean, name?: string} = {}) {
         args = BaseUtils.mixin({
-          button: 'Edit',
-          title: `<i class="fa fa-edit" aria-hidden="true"></i>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
+          button: I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save'),
+          title: `<i class="fas fa-edit" aria-hidden="true"></i>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
           permission: true,
           name: d.name
         }, args);

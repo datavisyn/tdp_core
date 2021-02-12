@@ -22,11 +22,13 @@ export interface ICompositeViewPluginDesc extends IViewPluginDesc {
     layout?: ICompositeLayout;
     linkedSelections: ILinkedSelection[];
 }
+export declare function isCompositeViewPluginDesc(desc: any): desc is ICompositeViewPluginDesc;
 export interface IACompositeViewOptions {
     showHeaders: boolean;
 }
 export interface ICompositeInfo {
     key: string;
+    desc: IElementDesc;
     create(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
     options?: any;
 }

@@ -83,10 +83,10 @@ export class TDPApplicationUtils {
     div.classList.add('radio');
     div.innerHTML = `
       <label class="radio-inline">
-        <input type="radio" name="permission_public" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}
+        <input type="radio" name="permission_public" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}
       </label>
       <label class="radio-inline">
-        <input type="radio" name="permission_public" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}
+        <input type="radio" name="permission_public" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}
       </label>
       <button type="button" name="permission_advanced" class="btn btn-default btn-xs pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
       ${o.extra}
@@ -96,13 +96,13 @@ export class TDPApplicationUtils {
           <span></span>
           <div class="btn-group btn-group-xs" data-toggle="buttons">
             <label class="btn btn-primary ${!permission.others.has(EPermission.READ) ? 'active' : ''}">
-              <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
+              <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <label class="btn btn-primary ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'active' : ''}">
-              <input type="radio" name="permission_others" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
+              <input type="radio" name="permission_others" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
             <label class="btn btn-primary ${permission.others.has(EPermission.WRITE) ? 'active' : ''}">
-              <input type="radio" name="permission_others" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
+              <input type="radio" name="permission_others" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
           </div>
         </div>
@@ -116,13 +116,13 @@ export class TDPApplicationUtils {
           </select>
           <div class="btn-group btn-group-xs" data-toggle="buttons">
             <label class="btn btn-primary ${!permission.group.has(EPermission.READ) ? 'active' : ''}">
-              <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
+              <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <label class="btn btn-primary ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'active' : ''}">
-              <input type="radio" name="permission_group" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
+              <input type="radio" name="permission_group" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
             <label class="btn btn-primary ${permission.group.has(EPermission.WRITE) ? 'active' : ''}">
-              <input type="radio" name="permission_group" value="write" autocomplete="off" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
+              <input type="radio" name="permission_group" value="write" autocomplete="off" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
           </div>
         </div>
@@ -134,13 +134,13 @@ export class TDPApplicationUtils {
           <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddiesPlaceholder')}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
           <div class="btn-group btn-group-xs" data-toggle="buttons">
             <label class="btn btn-primary ${!permission.buddies.has(EPermission.READ) ? 'active' : ''}">
-              <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fa fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
+              <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <label class="btn btn-primary ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'active' : ''}">
-              <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
+              <input type="radio" name="permission_buddies" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
             <label class="btn btn-primary ${permission.buddies.has(EPermission.WRITE) ? 'active' : ''}">
-              <input type="radio" name="permission_buddies" value="write" autocomplete="off" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fa fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
+              <input type="radio" name="permission_buddies" value="write" autocomplete="off" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}> <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
           </div>
         </div>

@@ -1,9 +1,12 @@
 import { BaseUtils, ResolveNow, EventHandler, IDTypeManager, Range, PluginRegistry, I18nextManager, WebpackEnv } from 'phovea_core';
 import { LayoutContainerEvents } from 'phovea_ui';
-import { BuilderUtils } from 'phovea_ui';
+import { BuilderUtils, LAYOUT_CONTAINER_WRAPPER } from 'phovea_ui';
 import { AView } from './AView';
 import { EViewMode } from '../base/interfaces';
 import { ViewUtils } from './ViewUtils';
+export function isCompositeViewPluginDesc(desc) {
+    return Array.isArray(desc.elements);
+}
 function prefix(key, rest) {
     return `${key}.${rest}`;
 }
@@ -31,7 +34,7 @@ class WrapperView {
         return [0, 0];
     }
     createParams(hideHeader) {
-        const parent = this.node.closest('section');
+        const parent = this.node.closest(`.${LAYOUT_CONTAINER_WRAPPER}`);
         const header = parent.querySelector('header');
         if (hideHeader) {
             header.innerHTML = '';
@@ -150,7 +153,15 @@ export class CompositeView extends EventHandler {
                 if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
                     s = { idtype: this.selection.idtype, range: Range.none() };
                 }
-                const instance = d.create(this.context, s, helper, d.options);
+                // Fix for nested CompositeViews:
+                // Previously, nested CompositeViews were not possible, i.e. when using a CompositeView as element of a CompositeView.
+                // This is due to the fact that the context given to the children of a CompositeView is the context of the CompositeView.
+                // This of course breaks when a child is a CompositeView, as it expects its "own" desc. When you give it the parent desc, it extracts
+                // the children from the parent causing an infinite loop as it receives itself as child.
+                // I have to admit that I do not know why we give it the desc of the CompositeView parent, and not its own.
+                // The fix is to override the desc with the child desc if it is a CompositeViewDesc, such that it receives the "correct" children.
+                const patchedContext = isCompositeViewPluginDesc(d.desc) ? { ...this.context, desc: d.desc } : this.context;
+                const instance = d.create(patchedContext, s, helper, d.options);
                 if (links.length === 0 || links.some((l) => l.fromKey === d.key && l.toKey === '_item')) {
                     instance.on(AView.EVENT_ITEM_SELECT, debounceItemSelection);
                 }
@@ -344,6 +355,7 @@ export class CompositeView extends EventHandler {
             const descOptions = desc.options || {};
             return Promise.resolve(desc.loader()).then((instance) => ({
                 key: desc.key,
+                desc,
                 options: Object.assign({}, descOptions, this.options),
                 create: PluginRegistry.getInstance().getFactoryMethod(instance, desc.factory || 'create')
             }));

@@ -11,9 +11,38 @@ import {AppHeader} from 'phovea_ui';
 
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
+  /**
+   * used internally to match selections to column
+   * @default -1
+   */
   selectedId: number;
+  /**
+   * used internally to match selections to multiple columns
+   * @default: undefined
+   */
   selectedSubtype?: string;
+  /**
+   * part of the initial ranking by default
+   * @default true
+   */
   initialRanking: boolean;
+  /**
+   * adds the column to a parent group in the Add Column chooser
+   */
+  chooserGroup?: {
+    /**
+     * the name of the parent group as defined in the `databaseColumnGroups` of the ranking.
+     */
+    parent: string,
+    /**
+     * the rank of the current item in the group
+     */
+    order?: number
+  };
+}
+
+export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc): item is IAdditionalColumnDesc {
+  return (item as IAdditionalColumnDesc).selectedId !== undefined;
 }
 
 /**

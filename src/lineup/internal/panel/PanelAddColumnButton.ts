@@ -22,12 +22,11 @@ export class PanelAddColumnButton implements IPanelButton {
     });
 
     const button = this.node.ownerDocument.createElement('button');
-    button.classList.add('fa', 'fa-plus');
+    button.classList.add('fas', 'fa-plus');
     button.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton');
 
     button.addEventListener('click', (evt) => {
       evt.preventDefault();
-      evt.stopPropagation();
       this.node.classList.add('once');
       (<HTMLElement>this.search.node.querySelector('input'))!.focus();
       this.search.focus();

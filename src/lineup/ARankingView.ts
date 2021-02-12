@@ -88,6 +88,7 @@ export abstract class ARankingView extends AView {
     enableAddingScoreColumns: true,
     enableAddingPreviousColumns: true,
     enableAddingDatabaseColumns: true,
+    databaseColumnGroups: {},
     enableAddingMetaDataColumns: true,
     enableSidePanelCollapsing: true,
     enableSidePanel: 'collapsed',
@@ -238,6 +239,13 @@ export abstract class ARankingView extends AView {
 
   update() {
     this.taggle.update();
+  }
+
+  /**
+   * Returns the LineUp/Taggle instance of this ranking
+   */
+  getTaggle(): EngineRenderer | TaggleRenderer {
+    return this.taggle;
   }
 
   /**
@@ -494,6 +502,7 @@ export abstract class ARankingView extends AView {
       //record after the initial one
       LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
       this.setBusy(false);
+      this.update();
     }).catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
         console.error(error);

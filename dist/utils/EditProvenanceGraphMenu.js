@@ -53,19 +53,19 @@ export class EditProvenanceGraphMenu {
         li.classList.add('dropdown');
         li.innerHTML = `
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><i class="fa fa-folder-open-o" aria-hidden="true"></i> <i class="fa fa-save sync-indicator" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
+             aria-expanded="false"><i class="fas fa-folder-open" aria-hidden="true"></i> <i class="fas fa-save sync-indicator" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
           <ul class="dropdown-menu">
-            <li class="dropdown-label"><i class="fa fa-clock-o" aria-hidden="true"></i> <span class="session-name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionName')}</span></li>
+            <li class="dropdown-label"><i class="fas fa-clock" aria-hidden="true"></i> <span class="session-name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionName')}</span></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fa fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a></li>
-            <li><a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}"><i class="fa fa-clone" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}</a></li>
+            <li><a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a></li>
+            <li><a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="open" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession')}"><i class="fa fa-folder-open-o" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}</a></li>
-            <li><a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}"><i class="fa fa-save" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}</a></li>
-            <li><a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}"><i class="fa fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}</a></li>
+            <li><a href="#" data-action="open" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}</a></li>
+            <li><a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}"><i class="fas fa-save" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}</a></li>
+            <li><a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}"><i class="fas fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-action="import" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importGraph')}"><i class="fa fa-upload" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importSession')}</a></li>
-            <li><a href="#" data-action="export" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportGraph')}"><i class="fa fa-download" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportSession')}</a></li>
+            <li><a href="#" data-action="import" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importGraph')}"><i class="fas fa-upload" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importSession')}</a></li>
+            <li><a href="#" data-action="export" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportGraph')}"><i class="fas fa-download" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportSession')}</a></li>
           </ul>`;
         li.querySelector('a[data-action="edit"]').addEventListener('click', (event) => {
             event.preventDefault();
@@ -99,7 +99,7 @@ export class EditProvenanceGraphMenu {
             event.preventDefault();
             event.stopPropagation();
             import('phovea_ui/dist/components/dialogs').then(({ Dialog }) => {
-                const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.open'));
+                const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'));
                 dialog.body.classList.add('tdp-session-dialog');
                 dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
             <div role="tab" class="collapsed">
@@ -108,7 +108,7 @@ export class EditProvenanceGraphMenu {
             </div>
           </div>
           <div role="tab" class="collapsed">
-            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.persistentSessions')}</h4>
+            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.savedSessions')}</h4>
             <div role="tabpanel" data-session="p">
             </div>
           </div>`;
