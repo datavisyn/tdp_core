@@ -164,6 +164,10 @@ export class TourManager {
     return this.tours.some((d) => d.canBeListed());
   }
 
+  getTours(): Readonly<Tour[]> {
+    return this.tours;
+  }
+
   private setHighlight(mask: IBoundingBox) {
     const fullAppHeight = this.backdrop.ownerDocument.body.scrollHeight; // full page height including scroll bars
     const fullAppWidth = this.backdrop.ownerDocument.body.scrollWidth; // full page width including scroll bars

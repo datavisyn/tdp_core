@@ -124,6 +124,9 @@ export class TourManager {
     hasTours() {
         return this.tours.some((d) => d.canBeListed());
     }
+    getTours() {
+        return this.tours;
+    }
     setHighlight(mask) {
         const fullAppHeight = this.backdrop.ownerDocument.body.scrollHeight; // full page height including scroll bars
         const fullAppWidth = this.backdrop.ownerDocument.body.scrollWidth; // full page width including scroll bars
