@@ -4,6 +4,7 @@ import {IViewTourContext} from './extensions';
 export class TourUtils {
 
   public static readonly GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
+  public static readonly GLOBAL_EVENT_END_TOUR = 'tdpEndTour';
   public static readonly EXTENSION_POINT_TDP_TOUR = 'tdpTour';
 
   /**
@@ -18,6 +19,10 @@ export class TourUtils {
 
   static startTour(tourId: string, context: any = {}) {
     GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_START_TOUR, tourId, context);
+  }
+
+  static endTour(finished: boolean = false) {
+    GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_END_TOUR, finished);
   }
 
   /**
