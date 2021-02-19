@@ -71,7 +71,7 @@ export class LineUpOrderedRowIndicies extends EventHandler {
 
     provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + eventSuffix, (_indices: number[]) => {
       // NOTE: the `indices` does not reflect the sorting of the (first) ranking, instead the ids are always ordered ascending
-      if(provider.getFirstRanking() != null){
+      if (provider.getFirstRanking() != null) {
         const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
         this._selected = this.sortValues(provider.getSelection(), order);
         this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
@@ -81,18 +81,18 @@ export class LineUpOrderedRowIndicies extends EventHandler {
     // wait until (first) ranking is added to data provider
     provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking: Ranking, index: number) => {
       // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-      if(index > 0 || !provider.getFirstRanking()) {
+      if (index > 0 || !provider.getFirstRanking()) {
         return;
       }
 
       provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous: number[], current: number[], _previousGroups: IOrderedGroup[], _currentGroups: IOrderedGroup[], dirtyReason: EDirtyReason[]) => {
         // update filtered rows on filter and sort events
-        if(dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
+        if (dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
           // no rows are filtered -> reset array
-          if(current.length === this._all.length) {
+          if (current.length === this._all.length) {
             this._filtered = [];
 
-          // some rows are filtered
+            // some rows are filtered
           } else {
             // NOTE: `current` contains always the *sorted* and *filtered* row indices of the (first) ranking!
             this._filtered = (current instanceof Uint8Array || current instanceof Uint16Array || current instanceof Uint32Array) ? Array.from(current) : current; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
@@ -101,7 +101,7 @@ export class LineUpOrderedRowIndicies extends EventHandler {
         }
 
         // update sorting of selected rows
-        if(dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
+        if (dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
           const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
           this._selected = this.sortValues(provider.getSelection(), order);
           this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
@@ -111,7 +111,7 @@ export class LineUpOrderedRowIndicies extends EventHandler {
 
     provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking: Ranking, index: number) => {
       // TODO: implement support for multiple rankings; currently, only the first ranking is supported
-      if(index > 0 || !provider.getFirstRanking()) {
+      if (index > 0 || !provider.getFirstRanking()) {
         return;
       }
 
