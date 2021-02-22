@@ -156,6 +156,10 @@ export class TourManager {
       }
     });
 
+    GlobalEventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_END_TOUR, (_,  finished) => {
+      this.hideTour(finished);
+    });
+
     // auto restart stored multi page tour
     this.continueTour();
   }

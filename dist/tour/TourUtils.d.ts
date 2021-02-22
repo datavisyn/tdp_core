@@ -1,6 +1,7 @@
 import { IViewTourContext } from './extensions';
 export declare class TourUtils {
     static readonly GLOBAL_EVENT_START_TOUR = "tdpStartTour";
+    static readonly GLOBAL_EVENT_END_TOUR = "tdpEndTour";
     static readonly EXTENSION_POINT_TDP_TOUR = "tdpTour";
     /**
      * start a view help tour
@@ -9,6 +10,7 @@ export declare class TourUtils {
      */
     static startViewTour(tourId: string, context: IViewTourContext): void;
     static startTour(tourId: string, context?: any): void;
+    static endTour(finished?: boolean): void;
     /**
      * Wait for a given number of milliseconds, before resolving the promise and continuing.
      *
