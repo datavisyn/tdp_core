@@ -69,10 +69,10 @@ export class TourManager {
       <div class="tdp-tour-step-dots">
       </div>
       <div class="btn-group" role="group">
-        <button type="button" data-switch="--" class="btn-xs btn btn-default"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
-        <button type="button" data-switch="-" class="btn-xs btn btn-default"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
-        <button type="button" data-switch="0" class="btn-xs btn btn-default"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
-        <button type="button" data-switch="+" class="btn-xs btn btn-default"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
+        <button type="button" data-switch="--" class="btn-sm btn btn-default"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
+        <button type="button" data-switch="-" class="btn-sm btn btn-default"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
+        <button type="button" data-switch="0" class="btn-sm btn btn-default"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
+        <button type="button" data-switch="+" class="btn-sm btn btn-default"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
       </div>
     </div>
     `;

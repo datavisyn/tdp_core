@@ -88,7 +88,7 @@ export class TDPApplicationUtils {
       <label class="radio-inline">
         <input type="radio" name="permission_public" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}
       </label>
-      <button type="button" name="permission_advanced" class="btn btn-default btn-xs pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
+      <button type="button" name="permission_advanced" class="btn btn-default btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
       ${o.extra}
       <div class="tdp-permissions">
         <div class="tdp-permissions-entry">
