@@ -46,7 +46,7 @@ export class TDPApplicationUtils {
         <div class="tdp-permissions-entry">
           <label>${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.public')}</label>
           <span></span>
-          <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-primary ${!permission.others.has(EPermission.READ) ? 'active' : ''}">
               <input type="radio" name="permission_others" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
@@ -66,7 +66,7 @@ export class TDPApplicationUtils {
           <select id="permission_group_name_${id}" name="permission_group_name" class="form-control input-sm">
             ${roles.map((d) => `<option value="${d}" ${item && item.group === d ? 'selected' : ''}>${d}</option>`).join('')}
           </select>
-          <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-primary ${!permission.group.has(EPermission.READ) ? 'active' : ''}">
               <input type="radio" name="permission_group" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
@@ -84,7 +84,7 @@ export class TDPApplicationUtils {
         <div class="tdp-permissions-entry">
           <label for="permission_buddies_name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddies')}</label>
           <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddiesPlaceholder')}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
-          <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-primary ${!permission.buddies.has(EPermission.READ) ? 'active' : ''}">
               <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
