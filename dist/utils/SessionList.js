@@ -125,7 +125,7 @@ export class TemporarySessionList extends ASessionList {
         const $parent = this.createLoader();
         //select and sort by date desc
         const workspaces = await this.getData(manager);
-        const table = `<table class="table table-striped table-hover table-bordered table-condensed">
+        const table = `<table class="table table-striped table-hover table-bordered table-sm">
     <thead>
       <tr>
         <th>${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.name')}</th>
@@ -188,7 +188,7 @@ export class PersistentSessionList extends ASessionList {
         const $parent = this.createLoader();
         //select and sort by date desc
         const workspaces = await this.getData(manager);
-        const tableMine = `<table class="table table-striped table-hover table-bordered table-condensed">
+        const tableMine = `<table class="table table-striped table-hover table-bordered table-sm">
                 <thead>
                   <tr>
                     <th>${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.name')}</th>
@@ -201,7 +201,7 @@ export class PersistentSessionList extends ASessionList {
 
                 </tbody>
               </table>`;
-        const tablePublic = `<table class="table table-striped table-hover table-bordered table-condensed">
+        const tablePublic = `<table class="table table-striped table-hover table-bordered table-sm">
                 <thead>
                   <tr>
                     <th>${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.name')}</th>
