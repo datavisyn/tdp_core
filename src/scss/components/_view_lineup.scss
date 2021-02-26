@@ -269,8 +269,8 @@ $lu_assets: '~lineupjs/src/assets';
         display: inline;
       }
 
-      // hide the list item, if the number of rows is '0'
-      li[#{$attr_name}='0'] {
+      // hide the link, if the number of rows is '0'
+      a[#{$attr_name}='0'] {
         display: none;
       }
     }
@@ -279,12 +279,22 @@ $lu_assets: '~lineupjs/src/assets';
       @include num_rows_indicator('data-num-all-rows');
       @include num_rows_indicator('data-num-selected-rows');
       @include num_rows_indicator('data-num-filtered-rows');
+
+      // hide caret icon of drop down
+      .dropdown-toggle::after {
+        content: none;
+      }
     }
 
     .download-data-dropdown {
       @include num_rows_indicator('data-num-all-rows');
       @include num_rows_indicator('data-num-selected-rows');
       @include num_rows_indicator('data-num-filtered-rows');
+
+      // hide caret icon of drop down
+      .dropdown-toggle::after {
+        content: none;
+      }
     }
 
     > main {
