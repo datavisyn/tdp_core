@@ -183,6 +183,11 @@ export class TDPApplicationUtils {
             }
         };
     }
+    /**
+     * Get key-value pairs from `parameters` and persist them in the session storage
+     * @param _inputs
+     * @param parameters
+     */
     static initSessionImpl(_inputs, parameters) {
         const old = {};
         // clear the session as part of it?
