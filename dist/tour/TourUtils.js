@@ -11,6 +11,9 @@ export class TourUtils {
     static startTour(tourId, context = {}) {
         GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_START_TOUR, tourId, context);
     }
+    static endTour(finished = false) {
+        GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_END_TOUR, finished);
+    }
     /**
      * Wait for a given number of milliseconds, before resolving the promise and continuing.
      *
@@ -220,5 +223,6 @@ export class TourUtils {
     }
 }
 TourUtils.GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
+TourUtils.GLOBAL_EVENT_END_TOUR = 'tdpEndTour';
 TourUtils.EXTENSION_POINT_TDP_TOUR = 'tdpTour';
 //# sourceMappingURL=TourUtils.js.map

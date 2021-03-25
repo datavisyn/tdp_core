@@ -221,8 +221,13 @@ $lu_assets: '~lineupjs/src/assets';
 
       &::before {
         @extend .fas;
-        content: fa-content($fa-var-arrow-left);
+        content: fa-content($fa-var-arrow-right);
       }
+    }
+
+    &.collapsed .collapse-button::before {
+      @extend .fas;
+      content: fa-content($fa-var-arrow-left);
     }
 
     button[data-violation] {
@@ -374,10 +379,6 @@ $lu_assets: '~lineupjs/src/assets';
       .collapse-button {
         position: relative;
         margin-right: 0;
-
-        &::before {
-          content: $fa-var-arrow-right;
-        }
       }
 
       > header {

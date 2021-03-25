@@ -118,11 +118,17 @@ export class TourManager {
                 console.warn('invalid tour to start:', tourId, this.tours.map((d) => d.id));
             }
         });
+        GlobalEventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_END_TOUR, (_, finished) => {
+            this.hideTour(finished);
+        });
         // auto restart stored multi page tour
         this.continueTour();
     }
     hasTours() {
         return this.tours.some((d) => d.canBeListed());
+    }
+    getTours() {
+        return this.tours;
     }
     setHighlight(mask) {
         const fullAppHeight = this.backdrop.ownerDocument.body.scrollHeight; // full page height including scroll bars

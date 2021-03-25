@@ -19,6 +19,7 @@ export declare class TourManager {
     private activeTourContext;
     constructor(context: ITourManagerContext);
     hasTours(): boolean;
+    getTours(): Readonly<Tour[]>;
     private setHighlight;
     private clearHighlight;
     private setFocusElement;
