@@ -34,7 +34,7 @@ export class ProvenanceGraphMenuUtils {
           const dialog = new FormDialog(args.title, args.button);
           const prefix = 'd' + BaseUtils.randomId();
           const permissions = TDPApplicationUtils.permissionForm(d, {
-            extra: `<div class="help-block">
+            extra: `<div class="form-text">
             ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
           </div>`
           });

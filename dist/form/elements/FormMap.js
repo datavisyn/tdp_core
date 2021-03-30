@@ -73,7 +73,7 @@ export class FormMap extends AFormElement {
             }
             this.$node.classed('dropdown', true);
             this.$node.html(`
-          <button class="btn btn-default dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge"></span>
             <span class="caret"></span>
@@ -81,7 +81,7 @@ export class FormMap extends AFormElement {
           <div class="dropdown-menu" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="btn btn-default btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
+                <button class="btn btn-secondary btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
@@ -108,7 +108,7 @@ export class FormMap extends AFormElement {
         }
         this.setAttributes(this.$group, this.elementDesc.attributes);
         // adapt default settings
-        this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-group-sm', true);
+        this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-control-sm', true);
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event
@@ -298,7 +298,7 @@ export class FormMap extends AFormElement {
           </select>
         </div>
         <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-default btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-1"><button class="btn btn-secondary btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
             const valueElem = row.querySelector('.col-sm-6');
             if (d.key) { // has value
                 this.addValueEditor(d, valueElem, entries);
