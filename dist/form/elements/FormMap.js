@@ -2,14 +2,13 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 import 'select2';
-import { event as d3event } from 'd3';
 import $ from 'jquery';
 import { AFormElement } from './AFormElement';
 import { FormElementType } from '../interfaces';
 import { FormSelect } from './FormSelect';
-import { FormSelect2 } from './FormSelect2';
 import { BaseUtils, UserSession, ResolveNow, I18nextManager } from 'phovea_core';
 import { Select3 } from './Select3';
+import { FormSelect2 } from './FormSelect2';
 function hasInlineParent(node) {
     while (node.parentElement) {
         node = node.parentElement;
@@ -23,18 +22,31 @@ export class FormMap extends AFormElement {
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form, elementDesc, pluginDesc) {
+    constructor(form, parentElement, elementDesc, pluginDesc) {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
         this.rows = [];
+        this.node = parentElement.ownerDocument.createElement('div');
+        this.node.classList.add('form-group');
+        parentElement.appendChild(this.node);
+        this.inline = hasInlineParent(this.node);
+        if (this.inline && this.elementDesc.onChange) {
+            //change the default onChange handler for the inline cas
+            this.inlineOnChange = this.elementDesc.onChange;
+            this.elementDesc.onChange = null;
+        }
+        this.build();
     }
     updateBadge() {
         const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
         ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-            this.$node.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }));
+            const span = this.node.querySelector('span.badge');
+            span.innerHTML = text;
+            span.setAttribute('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }));
         });
     }
     get sessionKey() {
@@ -54,25 +66,19 @@ export class FormMap extends AFormElement {
     }
     /**
      * Build the label and input element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode) {
+    build() {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed('form-group', true);
-        this.setVisible(this.elementDesc.visible);
-        this.inline = hasInlineParent(this.$node.node());
-        if (this.inline && this.elementDesc.onChange) {
-            //change the default onChange handler for the inline cas
-            this.inlineOnChange = this.elementDesc.onChange;
-            this.elementDesc.onChange = null;
+        if (this.elementDesc.visible === false) {
+            this.node.classList.add('hidden');
         }
         if (this.inline) {
             if (!this.elementDesc.options.badgeProvider) {
                 //default badge provider for inline
                 this.elementDesc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
             }
-            this.$node.classed('dropdown', true);
-            this.$node.html(`
+            this.node.classList.add('dropdown');
+            this.node.innerHTML = `
           <button class="btn btn-default dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge"></span>
@@ -84,31 +90,35 @@ export class FormMap extends AFormElement {
                 <button class="btn btn-default btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
-      `);
-            this.$node.select('button.right').on('click', () => {
-                d3event.preventDefault();
+      `;
+            this.node.querySelector('button.right').addEventListener('click', (event) => {
+                event.preventDefault();
             });
-            this.$group = this.$node.select('div.form-horizontal');
-            this.$group.on('click', () => {
+            this.groupElement = this.node.querySelector('div.form-horizontal');
+            this.groupElement.addEventListener('click', (event) => {
                 // stop click propagation to avoid closing the dropdown
-                d3event.stopPropagation();
+                event.stopPropagation();
             });
         }
         else {
             if (!this.elementDesc.hideLabel) {
-                const $label = this.$node.append('label').attr('for', this.elementDesc.attributes.id);
+                const label = this.node.ownerDocument.createElement('label');
+                label.setAttribute('for', this.elementDesc.attributes.id);
+                this.node.appendChild(label);
                 if (this.elementDesc.options.badgeProvider) {
-                    $label.html(`${this.elementDesc.label} <span class="badge"></span>`);
+                    label.innerHTML = `${this.elementDesc.label} <span class="badge"></span>`;
                 }
                 else {
-                    $label.text(this.elementDesc.label);
+                    label.innerText = this.elementDesc.label;
                 }
             }
-            this.$group = this.$node.append('div');
+            this.groupElement = this.node.ownerDocument.createElement('div');
+            this.node.appendChild(this.groupElement);
         }
-        this.setAttributes(this.$group, this.elementDesc.attributes);
+        this.setAttributes(this.groupElement, this.elementDesc.attributes);
         // adapt default settings
-        this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-group-sm', true);
+        this.groupElement.classList.add('form-horizontal', 'form-group-sm');
+        this.groupElement.classList.remove('form-control');
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event
@@ -133,7 +143,7 @@ export class FormMap extends AFormElement {
         this.buildMap();
         if (this.inline && this.inlineOnChange) {
             // trigger change on onChange listener just when the dialog is closed
-            $(this.$node.node()).on('hidden.bs.dropdown', () => {
+            $(this.node).on('hidden.bs.dropdown', () => {
                 const v = this.value;
                 const previous = this.previousValue;
                 if (this.isEqual(v, previous)) {
@@ -166,7 +176,7 @@ export class FormMap extends AFormElement {
                 // register on change listener
                 parent.firstElementChild.addEventListener('change', function () {
                     row.value = this.value;
-                    that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                    that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
                 });
                 FormSelect.resolveData(desc.optionsData)([]).then((values) => {
                     parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.selectMe')}</option>` : '') + values.map(mapOptions).join('');
@@ -177,7 +187,7 @@ export class FormMap extends AFormElement {
                         const first = values[0];
                         row.value = typeof first === 'string' || !first ? first : first.value;
                     }
-                    that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                    that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
                 });
                 break;
             case FormElementType.SELECT2:
@@ -204,7 +214,7 @@ export class FormMap extends AFormElement {
                         const first = values[0];
                         row.value = typeof first === 'string' || !first ? first : first.value;
                     }
-                    that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                    that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
                     // register on change listener use full select2 items
                     $s.on('change', function () {
                         const data = $s.select2('data');
@@ -225,7 +235,7 @@ export class FormMap extends AFormElement {
                                 row.value = row.value[0];
                             }
                         }
-                        that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                        that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
                     });
                 });
                 break;
@@ -238,7 +248,7 @@ export class FormMap extends AFormElement {
                 else if (!defaultSelection && that.elementDesc.options.uniqueKeys) {
                     select3.value = [];
                 }
-                that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
                 select3.on(Select3.EVENT_SELECT, (evt, prev, next) => {
                     row.value = next;
                     this.fire(FormMap.EVENT_CHANGE, next);
@@ -248,9 +258,9 @@ export class FormMap extends AFormElement {
                 parent.insertAdjacentHTML('afterbegin', `<input class="form-control" value="${initialValue || ''}">`);
                 parent.firstElementChild.addEventListener('change', function () {
                     row.value = this.value;
-                    that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                    that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
                 });
-                that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
         }
     }
     buildMap() {
@@ -265,7 +275,7 @@ export class FormMap extends AFormElement {
     }
     buildMapImpl(entries) {
         const that = this;
-        const group = this.$group.node();
+        const group = this.groupElement;
         group.innerHTML = ''; // remove all approach
         // filter to only valid entries
         const values = this.rows.filter((d) => !!d.key && entries.find((e) => e.value === d.key));
@@ -323,7 +333,7 @@ export class FormMap extends AFormElement {
                     children.splice(0, children.length - 1).forEach((d) => d.remove());
                     updateOptions();
                 }
-                that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
             });
             row.querySelector('select').addEventListener('change', function () {
                 if (!this.value) {
@@ -331,7 +341,7 @@ export class FormMap extends AFormElement {
                     row.remove();
                     that.rows.splice(that.rows.indexOf(d), 1);
                     updateOptions();
-                    that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
+                    that.fire(FormMap.EVENT_CHANGE, that.value, that.groupElement);
                     return;
                 }
                 if (d.key !== this.value) { // value changed
@@ -380,7 +390,7 @@ export class FormMap extends AFormElement {
     }
     focus() {
         // open dropdown
-        $(this.$node.select('.dropdown-menu').node()).show();
+        $(this.node.querySelector('.dropdown-menu')).show();
     }
     isEqual(a, b) {
         if (a.length !== b.length) {

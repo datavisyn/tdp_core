@@ -6,20 +6,22 @@ export interface IButtonElementDesc extends IFormElementDesc {
 }
 export declare class FormButton extends EventHandler implements IFormElement {
     readonly form: IForm;
-    readonly elementDesc: IButtonElementDesc;
+    readonly parentElement: HTMLElement;
+    readonly desc: IButtonElementDesc;
     readonly pluginDesc: IPluginDesc;
-    private $button;
-    private $node;
+    private button;
+    private node;
     private clicked;
     readonly type: FormElementType.BUTTON;
     readonly id: string;
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form: IForm, elementDesc: IButtonElementDesc, pluginDesc: IPluginDesc);
+    constructor(form: IForm, parentElement: HTMLElement, desc: IButtonElementDesc, pluginDesc: IPluginDesc);
     /**
      * Set the visibility of an form element - needed by IFormElement
      * @param visible
@@ -28,11 +30,7 @@ export declare class FormButton extends EventHandler implements IFormElement {
     get value(): boolean;
     set value(clicked: boolean);
     validate(): boolean;
-    /**
-     * Build the current element and add the DOM element to the form DOM element.
-     * @param $formNode The parent node this element will be attached to
-     */
-    build($formNode: any): void;
+    protected build(): void;
     init(): void;
     focus(): void;
 }

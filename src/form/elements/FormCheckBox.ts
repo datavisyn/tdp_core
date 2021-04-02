@@ -1,5 +1,4 @@
 import {IFormElementDesc, IForm} from '../interfaces';
-import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 import {IPluginDesc} from 'phovea_core';
 
@@ -22,37 +21,41 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
 
 export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
 
-  private $input: d3.Selection<any>;
+  private inputElement: HTMLInputElement;
 
   /**
    * Constructor
    * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(form: IForm, parentElement: HTMLElement, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
     super(form, Object.assign({options: { checked: true, unchecked: false}}, elementDesc), pluginDesc);
+
+    this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('checkbox');
+    parentElement.appendChild(this.node);
+
+    this.build();
   }
 
   /**
    * Build the label and input element
-   * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>) {
-    this.addChangeListener();
-
-    this.$node = $formNode.append('div').classed('checkbox', true);
-    this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
-
-    const $label = this.$node.select('label');
-    if ($label.empty()) {
-      this.$input = this.$node.append('input').attr('type', 'checkbox');
+  protected build() {
+    super.build();
+    const label = this.node.querySelector('label');
+    if (label) {
+      label.innerHTML = `<input type="checkbox">${label.innerText}`;
+      this.inputElement = label.querySelector('input');
     } else {
-      this.$input = $label.html(`<input type="checkbox">${$label.text()}`).select('input');
+      this.inputElement = this.node.ownerDocument.createElement('input');
+      this.inputElement.setAttribute('type', 'checkbox');
+      this.node.appendChild(this.inputElement);
     }
-    this.setAttributes(this.$input, this.elementDesc.attributes);
-    this.$input.classed('form-control', false); //remove falsy class again
+    this.setAttributes(this.inputElement, this.elementDesc.attributes);
+    this.inputElement.classList.remove('form-control'); // remove falsy class again
   }
 
   /**
@@ -64,7 +67,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     const options = this.elementDesc.options;
     const isChecked: boolean = options.isChecked != null? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
     this.previousValue = isChecked;
-    this.$input.property('checked', isChecked);
+    this.inputElement.checked = isChecked;
     if (this.hasStoredValue()) { // trigger if we have a stored value
       // TODO: using the new value `isChecked` may be wrong, because it's of type boolean and options.checked and options.unchecked could be anything --> this.getStoredValue(...) should probably be used instead
       this.fire(FormCheckBox.EVENT_INITIAL_VALUE, isChecked, options.unchecked); // store initial values as actions with results in the provenance graph
@@ -73,8 +76,8 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     this.handleDependent();
 
     // propagate change action with the data of the selected option
-    this.$input.on('change.propagate', () => {
-      this.fire(FormCheckBox.EVENT_CHANGE, this.value, this.$input);
+    this.inputElement.addEventListener('change.propagate', () => {
+      this.fire(FormCheckBox.EVENT_CHANGE, this.value, this.inputElement);
     });
   }
 
@@ -84,7 +87,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    */
   get value() {
     const options = this.elementDesc.options;
-    return this.$input.property('checked') ? options.checked : options.unchecked;
+    return this.inputElement.checked ? options.checked : options.unchecked;
   }
 
   /**
@@ -93,12 +96,12 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    */
   set value(v: any) {
     const options = this.elementDesc.options;
-    this.$input.property('value', v === options.checked);
+    this.inputElement.value = (v === options.checked).toString();
     this.previousValue = v === options.checked; // force old value change
     this.updateStoredValue();
   }
 
   focus() {
-    (<HTMLInputElement>this.$input.node()).focus();
+    this.inputElement.focus();
   }
 }

@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 
-import {select} from 'd3';
 import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils, WebpackEnv} from 'phovea_core';
 import {IFormElementDesc} from '../form/interfaces';
 import {FormBuilder} from '../form/FormBuilder';
@@ -109,7 +108,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
-    const builder = new FormBuilder(select(params));
+    const builder = new FormBuilder(params);
 
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
@@ -346,4 +345,3 @@ export abstract class AView extends EventHandler implements IView {
     return v.includes('*') || v.includes('.') || v.includes('|');
   }
 }
-

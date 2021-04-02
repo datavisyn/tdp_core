@@ -6,7 +6,6 @@ import { IForm, IFormElementDesc } from '../interfaces';
 import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
 import { ISelect2Option } from './FormSelect2';
 import { IPluginDesc } from 'phovea_core';
-import * as d3 from 'd3';
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
     return?: 'text' | 'id';
     data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);
@@ -31,15 +30,15 @@ export declare class FormSelect3 extends AFormElement<IFormSelect3> {
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form: IForm, elementDesc: IFormSelect3, pluginDesc: IPluginDesc);
+    constructor(form: IForm, parentElement: HTMLElement, elementDesc: IFormSelect3, pluginDesc: IPluginDesc);
     /**
      * Build the label and select element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode: d3.Selection<any>): void;
+    protected build(): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import {Selection} from 'd3';
 import {EventHandler, UserSession, IPluginDesc, PluginRegistry} from 'phovea_core';
 import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
 import {EP_TDP_CORE_FORM_ELEMENT} from '../../base/extensions';
@@ -16,7 +15,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
   readonly id: string;
 
-  protected $node: Selection<any>;
+  protected node: HTMLElement;
 
   protected previousValue: any = null;
 
@@ -64,7 +63,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
       return true;
     }
     const v = this.hasValue();
-    this.$node.classed('has-error', !v);
+    this.node.classList.toggle('has-error', !v);
     return v;
   }
 
@@ -73,15 +72,15 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   isVisible() {
-    return !this.$node.classed('hidden');
+    return !this.node.classList.toggle('hidden');
   }
 
   /**
-   * Set the visibility of an form element (default = true)
+   * Set the visibility of an form element
    * @param visible
    */
-  setVisible(visible: boolean = true) {
-    this.$node.classed('hidden', !visible);
+  setVisible(visible: boolean) {
+    this.node.classList.toggle('hidden', !visible);
   }
 
   protected addChangeListener() {
@@ -103,11 +102,20 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     this.elementDesc.onChange(this, value, AFormElement.toData(value), old);
   }
 
-  /**
-   * Build the current element and add the DOM element to the form DOM element.
-   * The implementation of this function must set the `$node` property!
-   */
-  abstract build($formNode: Selection<any>);
+  protected build() {
+    this.addChangeListener();
+
+    if (this.elementDesc.visible === false) {
+      this.node.classList.toggle('hidden', true);
+    }
+
+    if (!this.elementDesc.hideLabel) {
+      const label = this.node.ownerDocument.createElement('label');
+      label.setAttribute('for', this.elementDesc.attributes.id);
+      label.innerText = this.elementDesc.label;
+      this.node.appendChild(label);
+    }
+  }
 
   /**
    * Initialize dependent form fields, bind the change listener, and propagate the selection by firing a change event
@@ -117,41 +125,23 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   /**
-   * Append a label to the node element if `hideLabel = false` in the element description
-   */
-  protected appendLabel() {
-    if (this.elementDesc.hideLabel) {
-      return;
-    }
-    this.$node.append('label').attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
-  }
-
-  /**
    * Set a list of object properties and values to a given node
    * Note: Use `clazz` instead of the attribute `class` (which is a reserved keyword in JavaScript)
-   * @param $node
+   * @param node
    * @param attributes Plain JS object with key as attribute name and the value as attribute value
    */
-  protected setAttributes($node: Selection<any>, attributes: {[key: string]: any}) {
+  protected setAttributes(node: HTMLElement, attributes: {[key: string]: any}) {
     if (!attributes) {
       return;
     }
 
     Object.keys(attributes).forEach((key) => {
-      switch (key) {
-        case 'clazz':
-          const cssClasses = attributes[key].split(' '); // tokenize CSS classes at space
-          cssClasses.forEach((cssClass) => $node.classed(cssClass, true));
-          break;
-        default:
-          $node.attr(key, attributes[key]);
-          break;
-      }
+      node.setAttribute((key === 'clazz') ? 'class' : key, attributes[key]);
     });
 
     if (this.elementDesc.required && !this.elementDesc.showIf) {
       // auto enable just if there is no conditional viewing
-      $node.attr('required', 'required');
+      node.setAttribute('required', 'required');
     }
   }
 
@@ -171,7 +161,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
           onDependentChange(values);
         }
         if (showIf) {
-          this.$node.classed('hidden', !showIf(values));
+          this.node.classList.toggle('hidden', !showIf(values));
         }
       });
     });
@@ -179,7 +169,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     // initial values
     const values = dependElements.map((d) => d.value);
     if (showIf) {
-      this.$node.classed('hidden', !this.elementDesc.showIf(values));
+      this.node.classList.toggle('hidden', !this.elementDesc.showIf(values));
     }
     return values;
   }
@@ -210,10 +200,10 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * An element is found when `desc.type` is matching the extension id.
    *
    * @param form the form to which the element will be appended
-   * @param $parent parent D3 selection element
+   * @param parentElement parent DOM element
    * @param elementDesc form element description
    */
-  static createFormElement(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement> {
+  static createFormElement(form: IForm, parentElement: HTMLElement, elementDesc: IFormElementDesc): Promise<IFormElement> {
     const plugin = PluginRegistry.getInstance().getPlugin(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
     if(!plugin) {
       throw new Error('unknown form element type: ' + elementDesc.type);
@@ -223,5 +213,3 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     });
   }
 }
-
-

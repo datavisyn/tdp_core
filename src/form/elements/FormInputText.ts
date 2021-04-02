@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm} from '../interfaces';
 import {IPluginDesc} from 'phovea_core';
@@ -32,31 +31,36 @@ export interface IFormInputTextDesc extends IFormElementDesc {
 
 export class FormInputText extends AFormElement<IFormInputTextDesc> {
 
-  private $input: d3.Selection<any>;
+  private input: HTMLInputElement;
 
   /**
    * Constructor
    * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(form: IForm, parentElement: HTMLElement, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
     super(form, elementDesc, pluginDesc);
+
+    this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('form-group');
+    parentElement.appendChild(this.node);
+
+    this.build();
   }
 
   /**
    * Build the label and input element
-   * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>) {
-    this.addChangeListener();
+  protected build() {
+    super.build();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
-    this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
+    this.input = this.node.ownerDocument.createElement('input');
+    this.input.setAttribute('type', (this.elementDesc.options || {}).type || 'text');
+    this.node.appendChild(this.input);
 
-    this.$input = this.$node.append('input').attr('type', (this.elementDesc.options || {}).type || 'text');
-    this.setAttributes(this.$input, this.elementDesc.attributes);
+    this.setAttributes(this.input, this.elementDesc.attributes);
   }
 
   /**
@@ -66,13 +70,13 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
     super.init();
 
     if((this.elementDesc.options || {}).type === 'number' && (this.elementDesc.options || {}).step) {
-      this.$input.attr('step', this.elementDesc.options.step);
+      this.input.setAttribute('step', this.elementDesc.options.step);
     }
 
     const defaultValue = (this.elementDesc.options || {}).type === 'number' ? '0' : '';
     const defaultText = this.getStoredValue(defaultValue);
     this.previousValue = defaultText;
-    this.$input.property('value', defaultText);
+    this.input.value = defaultText;
     if (this.hasStoredValue()) {
       this.fire(FormInputText.EVENT_INITIAL_VALUE, defaultText, defaultValue);
     }
@@ -80,8 +84,8 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
     this.handleDependent();
 
     // propagate change action with the data of the selected option
-    this.$input.on('change.propagate', () => {
-      this.fire(FormInputText.EVENT_CHANGE, this.value, this.$input);
+    this.input.addEventListener('change.propagate', () => {
+      this.fire(FormInputText.EVENT_CHANGE, this.value, this.input);
     });
   }
 
@@ -90,7 +94,7 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
    * @returns {string}
    */
   get value() {
-    return this.$input.property('value');
+    return this.input.value;
   }
 
   /**
@@ -98,12 +102,12 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
    * @param v
    */
   set value(v: string) {
-    this.$input.property('value', v);
+    this.input.value = v;
     this.previousValue = v; // force old value change
     this.updateStoredValue();
   }
 
   focus() {
-    (<HTMLInputElement>this.$input.node()).focus();
+    this.input.focus();
   }
 }

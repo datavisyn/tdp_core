@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import * as d3 from 'd3';
 import {BaseUtils} from 'phovea_core';
 import {IFormElement, IFormElementDesc, IForm} from './interfaces';
 import {AFormElement} from './elements/AFormElement';
@@ -25,11 +24,11 @@ export class FormBuilder {
 
   /**
    * Constructor
-   * @param $parent Node that the form should be attached to
+   * @param parentElement DOM element that the form should be attached to
    * @param formId unique form id
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
-    this.form = new Form($parent, formId);
+  constructor(parentElement: HTMLElement, private readonly formId = BaseUtils.randomId()) {
+    this.form = new Form(parentElement, formId);
   }
 
   /**
@@ -40,8 +39,13 @@ export class FormBuilder {
   appendElement(elementDesc: IFormElementDesc) {
     const desc = Form.updateElementDesc(elementDesc, this.formId);
 
-    const elementPromise = AFormElement.createFormElement(this.form, desc);
+    const elementPromise = AFormElement.createFormElement(this.form, this.form.node, desc);
     this.elementPromises.push(elementPromise);
+
+    // append element to form once it is loaded
+    elementPromise.then((element: IFormElement) => {
+      this.form.appendElement(element);
+    });
   }
 
   /**
@@ -63,9 +67,8 @@ export class FormBuilder {
   build(): Promise<IForm> {
     // initialize when all elements are loaded
     return Promise.all(this.elementPromises)
-      .then((elements: IFormElement[]) => {
-        this.form.appendElements(elements);
-        this.form.initAllElements();
+      .then(() => {
+        this.form.initializeAllElements();
         return this.form;
       });
   }

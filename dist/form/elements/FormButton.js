@@ -1,26 +1,31 @@
-import * as d3 from 'd3';
 import { EventHandler } from 'phovea_core';
 export class FormButton extends EventHandler {
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form, elementDesc, pluginDesc) {
+    constructor(form, parentElement, desc, pluginDesc) {
         super();
         this.form = form;
-        this.elementDesc = elementDesc;
+        this.parentElement = parentElement;
+        this.desc = desc;
         this.pluginDesc = pluginDesc;
         this.clicked = false;
-        this.id = elementDesc.id;
+        this.id = desc.id;
+        this.node = parentElement.ownerDocument.createElement('div');
+        this.node.classList.add('form-group');
+        parentElement.appendChild(this.node);
+        this.build();
     }
     /**
      * Set the visibility of an form element - needed by IFormElement
      * @param visible
      */
     setVisible(visible) {
-        this.$node.classed('hidden', !visible);
+        this.node.classList.toggle('hidden', !visible);
     }
     get value() {
         return this.clicked;
@@ -31,26 +36,23 @@ export class FormButton extends EventHandler {
     validate() {
         return true;
     }
-    /**
-     * Build the current element and add the DOM element to the form DOM element.
-     * @param $formNode The parent node this element will be attached to
-     */
-    build($formNode) {
-        this.$node = $formNode.append('div').classed('form-group', true);
-        this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
-        this.$button.html(() => this.elementDesc.iconClass ? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
+    build() {
+        this.button = this.node.ownerDocument.createElement('button');
+        this.button.classList.toggle(this.desc.attributes.clazz, true);
+        this.button.innerHTML = this.desc.iconClass ? `<i class="${this.desc.iconClass}"></i> ${this.desc.label}` : this.desc.label;
+        this.node.appendChild(this.button);
     }
     init() {
-        this.$button.on('click', () => {
+        this.button.addEventListener('click', (event) => {
             this.value = true;
-            this.elementDesc.onClick();
-            d3.event.preventDefault();
-            d3.event.stopPropagation();
+            this.desc.onClick();
+            event.preventDefault();
+            event.stopPropagation();
         });
         // TODO doesn't support show if
     }
     focus() {
-        this.$button.node().focus();
+        this.button.focus();
     }
 }
 //# sourceMappingURL=FormButton.js.map

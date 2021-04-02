@@ -1,5 +1,4 @@
 import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
-import * as d3 from 'd3';
 import {EventHandler, IPluginDesc} from 'phovea_core';
 
 export interface IButtonElementDesc extends IFormElementDesc {
@@ -8,8 +7,8 @@ export interface IButtonElementDesc extends IFormElementDesc {
 }
 
 export class FormButton extends EventHandler implements IFormElement {
-  private $button: d3.Selection<HTMLButtonElement>;
-  private $node: d3.Selection<any>;
+  private button: HTMLElement;
+  private node: HTMLElement;
   private clicked: boolean = false;
 
   readonly type: FormElementType.BUTTON;
@@ -18,12 +17,18 @@ export class FormButton extends EventHandler implements IFormElement {
   /**
    * Constructor
    * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(readonly form: IForm, readonly elementDesc: IButtonElementDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(readonly form: IForm, readonly parentElement: HTMLElement, readonly desc: IButtonElementDesc, readonly pluginDesc: IPluginDesc) {
     super();
-    this.id = elementDesc.id;
+    this.id = desc.id;
+    this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('form-group');
+    parentElement.appendChild(this.node);
+
+    this.build();
   }
 
   /**
@@ -31,7 +36,7 @@ export class FormButton extends EventHandler implements IFormElement {
    * @param visible
    */
   setVisible(visible: boolean) {
-    this.$node.classed('hidden', !visible);
+    this.node.classList.toggle('hidden', !visible);
   }
 
   get value(): boolean {
@@ -46,27 +51,24 @@ export class FormButton extends EventHandler implements IFormElement {
     return true;
   }
 
-  /**
-   * Build the current element and add the DOM element to the form DOM element.
-   * @param $formNode The parent node this element will be attached to
-   */
-  build($formNode) {
-    this.$node = $formNode.append('div').classed('form-group', true);
-    this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
-    this.$button.html(() => this.elementDesc.iconClass? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
+  protected build() {
+    this.button = this.node.ownerDocument.createElement('button');
+    this.button.classList.toggle(this.desc.attributes.clazz, true);
+    this.button.innerHTML = this.desc.iconClass? `<i class="${this.desc.iconClass}"></i> ${this.desc.label}` : this.desc.label;
+    this.node.appendChild(this.button);
   }
 
   init() {
-    this.$button.on('click', () => {
+    this.button.addEventListener('click', (event) => {
       this.value = true;
-      this.elementDesc.onClick();
-      (<Event>d3.event).preventDefault();
-      (<Event>d3.event).stopPropagation();
+      this.desc.onClick();
+      event.preventDefault();
+      event.stopPropagation();
     });
     // TODO doesn't support show if
   }
 
   focus() {
-    (<HTMLButtonElement>this.$button.node()).focus();
+    this.button.focus();
   }
 }

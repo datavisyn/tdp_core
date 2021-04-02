@@ -1,5 +1,4 @@
 import { IFormElementDesc, IForm } from '../interfaces';
-import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IPluginDesc } from 'phovea_core';
 export interface ICheckBoxElementDesc extends IFormElementDesc {
@@ -20,19 +19,19 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
 }
 export declare class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     readonly pluginDesc: IPluginDesc;
-    private $input;
+    private inputElement;
     /**
      * Constructor
      * @param form The form this element is a part of
+     * @param parentElement The parent node this element will be attached to
      * @param elementDesc The form element description
      * @param pluginDesc The phovea extension point description
      */
-    constructor(form: IForm, elementDesc: ICheckBoxElementDesc, pluginDesc: IPluginDesc);
+    constructor(form: IForm, parentElement: HTMLElement, elementDesc: ICheckBoxElementDesc, pluginDesc: IPluginDesc);
     /**
      * Build the label and input element
-     * @param $formNode The parent node this element will be attached to
      */
-    build($formNode: d3.Selection<any>): void;
+    protected build(): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

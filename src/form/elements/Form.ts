@@ -2,7 +2,6 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 
-import * as d3 from 'd3';
 import {BaseUtils} from 'phovea_core';
 import {IFormElement, IForm, IFormElementDesc} from '../interfaces';
 
@@ -14,7 +13,7 @@ export class Form implements IForm {
   /**
    * DOM node for the form itself
    */
-  private readonly $node: d3.Selection<any>;
+  readonly node: HTMLElement;
 
   /**
    * Map of all appended form elements with the element id as key
@@ -23,37 +22,29 @@ export class Form implements IForm {
 
   /**
    * Constructor
-   * @param $parent Node that the form should be attached to
+   * @param parentElement Node that the form should be attached to
    * @param formId unique form id
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
-    this.$node = $parent.append('form').attr('id', this.formId);
+  constructor(parentElement: HTMLElement, private readonly formId = BaseUtils.randomId()) {
+    this.node = parentElement.ownerDocument.createElement('form');
+    this.node.setAttribute('id', this.formId);
+    parentElement.appendChild(this.node);
   }
 
   /**
    * Append a form element and builds it
-   * Note: The initialization of the element must be done using `initAllElements()`
+   * Note: The initialization of the element must be done using `initializeAllElements`
    * @param element Form element
    */
   appendElement(element: IFormElement) {
-    element.build(this.$node);
     this.elements.set(element.id, element);
-  }
-
-  /**
-   * Append multiple form element at once and and build them
-   * Note: The initialization of the element must be done using `initAllElements()`
-   * @param element Form element
-   */
-  appendElements(elements: IFormElement[]) {
-    elements.forEach((element) => this.appendElement(element));
   }
 
   /**
    * Initialize all elements of this form
    * At this stage it is possible to reference dependencies to other form fields
    */
-  initAllElements() {
+  initializeAllElements() {
     this.elements.forEach((element) => element.init());
   }
 

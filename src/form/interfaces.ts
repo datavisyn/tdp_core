@@ -4,7 +4,6 @@
 
 
 import {IEventHandler} from 'phovea_core';
-import * as d3 from 'd3';
 
 /**
  * List of all available for elements that the form builder can handle
@@ -147,24 +146,22 @@ export interface IFormElementDesc {
 
 export interface IForm {
   /**
+   * The DOM node of the form
+   */
+  node: HTMLElement;
+
+  /**
    * Append a form element and builds it
-   * Note: The initialization of the element must be done using `initAllElements()`
+   * Note: The initialization of the element must be done using `initializeAllElements`
    * @param element Form element
    */
   appendElement(element: IFormElement);
 
   /**
-   * Append multiple form element at once and build them
-   * Note: The initialization of the element must be done using `initAllElements()`
-   * @param element Form element
-   */
-  appendElements(element: IFormElement[]);
-
-  /**
    * Initialize all elements of this form
    * At this stage it is possible to reference dependencies to other form fields
    */
-  initAllElements();
+  initializeAllElements();
 
   /**
    * Retrieve element by identifer
@@ -209,12 +206,6 @@ export interface IFormElement extends IEventHandler {
    * Form element value
    */
   value: any;
-
-  /**
-   * Build the current element and add the DOM element to the form DOM element.
-   * @param $formNode The parent node this element will be attached to
-   */
-  build($formNode: d3.Selection<any>): void;
 
   /**
    * Initialize the current element

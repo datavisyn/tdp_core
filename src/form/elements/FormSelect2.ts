@@ -3,7 +3,6 @@
  */
 
 import 'select2';
-import * as d3 from 'd3';
 import $ from 'jquery';
 import {BaseUtils, AppContext, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
@@ -72,7 +71,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
   }, FormSelect2.DEFAULT_OPTIONS);
 
 
-  private $select: d3.Selection<any>;
+  private selectElement: HTMLElement;
 
   private $jqSelect: JQuery;
 
@@ -85,28 +84,32 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
   /**
    * Constructor
    * @param form The form this element is a part of
+   * @param parentElement The parent node this element will be attached to
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: IFormSelect2, readonly pluginDesc: IPluginDesc) {
-    super(form,elementDesc, pluginDesc);
+  constructor(form: IForm, parentElement: HTMLElement, elementDesc: IFormSelect2, readonly pluginDesc: IPluginDesc) {
+    super(form, elementDesc, pluginDesc);
+
+    this.node = parentElement.ownerDocument.createElement('div');
+    this.node.classList.add('form-group');
+    parentElement.appendChild(this.node);
 
     this.isMultiple = (pluginDesc.selection === 'multiple');
+
+    this.build();
   }
 
   /**
    * Build the label and select element
-   * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>) {
-    this.addChangeListener();
+  protected build() {
+    super.build();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
-    this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
+    this.selectElement = this.node.ownerDocument.createElement('select');
+    this.node.appendChild(this.selectElement);
 
-    this.$select = this.$node.append('select');
-    this.setAttributes(this.$select, this.elementDesc.attributes);
+    this.setAttributes(this.selectElement, this.elementDesc.attributes);
   }
 
   /**
@@ -120,7 +123,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     });
     const df = this.elementDesc.options.data;
     const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
-    this.buildSelect2(this.$select, this.elementDesc.options || {}, data);
+    this.buildSelect2(this.selectElement, this.elementDesc.options || {}, data);
 
 
     // propagate change action with the data of the selected option
@@ -130,7 +133,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
   /**
    * Builds the jQuery select2
    */
-  private buildSelect2($select: d3.Selection<any>, options: IFormSelect2Options, data?: ISelect2Option[]) {
+  private buildSelect2(selectElement: HTMLElement, options: IFormSelect2Options, data?: ISelect2Option[]) {
     const select2Options: Select2Options = {};
 
     let initialValue: string[] = [];
@@ -157,7 +160,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     }
     BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
 
-    this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
+    this.$jqSelect = (<any>$(selectElement)).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial
     this.previousValue = this.resolveValue(this.$jqSelect.select2('data'));
 
@@ -259,4 +262,3 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     return a.every((d) => bids.has(d));
   }
 }
-
