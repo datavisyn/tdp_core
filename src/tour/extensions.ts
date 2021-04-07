@@ -22,7 +22,7 @@ export interface ITDPTourExtensionDesc {
 
   /**
    * An optional preview callback function returning a URL promise
-   * The preview image should have 320x180 px
+   * The preview image should have 350x200 px
    * @returns {Promise<string>}
    */
    preview?: () => Promise<string>;
