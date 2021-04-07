@@ -3,8 +3,9 @@ $datavisyn_font_size_base: 14px !default;
 $datavisyn_line_height_base: 1 !default;
 $datavisyn_font: Monda !default;
 
-$phovea-brand-logo-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg'); // IMPORTANT: no `!default` to always override the inital variable value
-$phovea-brand-logo-width: 40px; // IMPORTANT: no `!default` to always override the inital variable value
+$phovea-navbar-logo-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg'); // IMPORTANT: no `!default` to always override the inital variable value
+$phovea-navbar-logo-width: 10px; // IMPORTANT: no `!default` to always override the inital variable value
+$phovea-navbar-logo-top: 4px; // IMPORTANT: no `!default` to always override the inital variable value
 
 $datavisyn_loading_icon: rgba(255, 255, 255, 0.26) url('~tdp_core/dist/assets/icons/datavisyn_loading.gif') center center no-repeat;
 $phovea-loading-icon: $datavisyn_loading_icon; // IMPORTANT: no `!default` to always override the inital variable value
@@ -26,30 +27,6 @@ $tdp-busy-background: $datavisyn_loading_icon; // IMPORTANT: no `!default` to al
   100% {
     transform: scale(1.2);
   }
-}
-
-nav.navbar,
-nav.navbar-inverse {
-
-  .navbar-brand.caleydo_app {
-    background: none;
-    padding-left: 0;
-    display: flex;
-    align-items: center;
-    margin-left: 0.8em;
-
-    &:before {
-      height: 14px;
-      width: 20px;
-      background: $phovea-brand-logo-url no-repeat top left;
-      content: '';
-      margin-top: -2px;
-    }
-  }
-}
-
-nav .navbar-nav {
-  margin-top: 0.2em;
 }
 
 .#{$datavisyn_css_prefix}-font {
