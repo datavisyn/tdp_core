@@ -96,20 +96,27 @@ export class PanelDownloadButton implements IPanelButton {
           <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
           <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
           ${flat.map((col) => `
-            <div class="checkbox tdp-ranking-export-form-handle">
+            <div class="checkbox custom-control custom-checkbox tdp-ranking-export-form-handle">
               <i class="fas fa-grip-vertical"></i>
-              <label>
-                <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
-                ${col.label}
-              </label>
+              <input type="checkbox" class="custom-control-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
+              <label class="custom-control-label" for="customCheck_${col.id}">${col.label}</label>
             </div>
           `).join('')}
         </div>
         <div class="form-group">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
-          <div class="radio" data-num-rows="${orderedRowIndices.all.length}"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label></div>
-          <div class="radio" data-num-rows="${orderedRowIndices.filtered.length}"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label></div>
-          <div class="radio" data-num-rows="${orderedRowIndices.selected.length}"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label></div>
+          <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.all.length}">
+            <input type="radio" id="customRadio1" name="rows" value="all" checked class="custom-control-input">
+            <label class="custom-control-label" for="customRadio1">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
+          </div>
+          <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.filtered.length}">
+            <input type="radio" id="customRadio2" name="rows" value="filtered" class="custom-control-input">
+            <label class="custom-control-label" for="customRadio2">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
+          </div>
+          <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.selected.length}">
+            <input type="radio" id="customRadio3" name="rows" value="selected" class="custom-control-input">
+            <label class="custom-control-label" for="customRadio3">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
+          </div>
         </div>
         <div class="form-group">
           <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
