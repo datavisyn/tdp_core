@@ -21,6 +21,13 @@ export interface ITDPTourExtensionDesc {
   description?: string;
 
   /**
+   * An optional preview callback function returning a URL promise
+   * The preview image should have 320x180 px
+   * @returns {Promise<string>}
+   */
+   preview?: () => Promise<string>;
+
+  /**
    * Set a level for the tour.
    * Note: Manual tours are only triggered on demand via event.
    */
@@ -128,4 +135,3 @@ export interface IViewTourContext {
   instance: IView | null;
   selection: ISelection;
 }
-
