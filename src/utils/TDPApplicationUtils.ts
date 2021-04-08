@@ -82,12 +82,15 @@ export class TDPApplicationUtils {
     const div = o.doc.createElement('div');
     div.classList.add('radio');
     div.innerHTML = `
-      <label class="radio-inline">
-        <input type="radio" name="permission_public" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="permission_public" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}
-      </label>
+      <div class="custom-control custom-radio custom-control-inline">
+          <input class="custom-control-input" type="radio" name="permission_public" id="inlineRadio1" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
+          <label class="custom-control-label" for="inlineRadio1"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
+      </div>
+      <div class="custom-control custom-radio custom-control-inline">
+          <input class="custom-control-input" type="radio" name="permission_public" id="inlineRadio2" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
+          <label class="custom-control-label" for="inlineRadio2"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
+      </div>
+
       <button type="button" name="permission_advanced" class="btn btn-secondary btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
       ${o.extra}
       <div class="tdp-permissions">
@@ -111,7 +114,7 @@ export class TDPApplicationUtils {
         </p>
         <div class="tdp-permissions-entry">
           <label for="permission_group_name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.group')}</label>
-          <select id="permission_group_name_${id}" name="permission_group_name" class="form-control input-sm">
+          <select id="permission_group_name_${id}" name="permission_group_name" class="form-control form-control-sm">
             ${roles.map((d) => `<option value="${d}" ${item && item.group === d ? 'selected' : ''}>${d}</option>`).join('')}
           </select>
           <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -131,7 +134,7 @@ export class TDPApplicationUtils {
         </p>
         <div class="tdp-permissions-entry">
           <label for="permission_buddies_name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddies')}</label>
-          <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control input-sm" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddiesPlaceholder')}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
+          <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control form-control-sm" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddiesPlaceholder')}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
           <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-primary ${!permission.buddies.has(EPermission.READ) ? 'active' : ''}">
               <input type="radio" name="permission_buddies" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
