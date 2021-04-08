@@ -379,7 +379,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     const renderRow = (d: IFormRow) => {
       this.rows.push(d);
       const row = group.ownerDocument.createElement('div');
-      row.classList.add('form-group');
+      row.classList.add('form-row');
       group.appendChild(row);
       row.innerHTML = `
         <div class="col-sm-5">
