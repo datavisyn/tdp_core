@@ -31,16 +31,18 @@ export class TDPApplicationUtils {
         const roles = user ? user.roles : UserUtils.ANONYMOUS_USER.roles;
         const permission = Permission.decode(item ? item.permissions : Permission.ALL_ALL_READ_NONE);
         const id = BaseUtils.randomId();
+        const inlineRadioID1 = `inlineRadio_${BaseUtils.randomId()}`;
+        const inlineRadioID2 = `inlineRadio_${BaseUtils.randomId()}`;
         const div = o.doc.createElement('div');
         div.classList.add('radio');
         div.innerHTML = `
       <div class="custom-control custom-radio custom-control-inline">
-          <input class="custom-control-input" type="radio" name="permission_public" id="inlineRadio1" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="custom-control-label" for="inlineRadio1"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
+          <input class="custom-control-input" type="radio" name="permission_public" id="${inlineRadioID1}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
+          <label class="custom-control-label" for="${inlineRadioID1}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
       </div>
       <div class="custom-control custom-radio custom-control-inline">
-          <input class="custom-control-input" type="radio" name="permission_public" id="inlineRadio2" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="custom-control-label" for="inlineRadio2"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
+          <input class="custom-control-input" type="radio" name="permission_public" id="${inlineRadioID2}" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
+          <label class="custom-control-label" for="${inlineRadioID2}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
       </div>
 
       <button type="button" name="permission_advanced" class="btn btn-secondary btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>

@@ -66,6 +66,9 @@ export class PanelDownloadButton {
         return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
             const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
             const id = `e${BaseUtils.randomId(3)}`;
+            const inlineRadioID1 = `inlineRadio_${BaseUtils.randomId()}`;
+            const inlineRadioID2 = `inlineRadio_${BaseUtils.randomId()}`;
+            const inlineRadioID3 = `inlineRadio_${BaseUtils.randomId()}`;
             const ranking = provider.getFirstRanking();
             dialog.form.classList.add('tdp-ranking-export-form');
             const flat = ranking.flatColumns.filter((c) => c.label.trim().length > 0);
@@ -86,16 +89,16 @@ export class PanelDownloadButton {
         <div class="form-group">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
           <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.all.length}">
-            <input type="radio" id="customRadio1" name="rows" value="all" checked class="custom-control-input">
-            <label class="custom-control-label" for="customRadio1">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
+            <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="custom-control-input">
+            <label class="custom-control-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
           </div>
           <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.filtered.length}">
-            <input type="radio" id="customRadio2" name="rows" value="filtered" class="custom-control-input">
-            <label class="custom-control-label" for="customRadio2">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
+            <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="custom-control-input">
+            <label class="custom-control-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
           </div>
           <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.selected.length}">
-            <input type="radio" id="customRadio3" name="rows" value="selected" class="custom-control-input">
-            <label class="custom-control-label" for="customRadio3">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
+            <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="custom-control-input">
+            <label class="custom-control-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
           </div>
         </div>
         <div class="form-group">
