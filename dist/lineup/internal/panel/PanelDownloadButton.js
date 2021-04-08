@@ -12,7 +12,7 @@ export class PanelDownloadButton {
         this.node.innerHTML = `
       <button type="button" class="dropdown-toggle fas fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
       </button>
-      <div class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
+      <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-right dropdown-menu-lg-left' : 'dropdown-menu-lg-right'}">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAsExcel')}</div>
         <a class="dropdown-item" href="#" data-rows="all" data-format="xlsx" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadEntireList')}</a>
         <a class="dropdown-item" href="#" data-rows="filtered" data-format="xlsx" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadFilteredRows')}</a>
