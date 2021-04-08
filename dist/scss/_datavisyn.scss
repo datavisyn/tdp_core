@@ -4,6 +4,4 @@ $phovea-navbar-logo-top: 4px; // IMPORTANT: no `!default` to always override the
 
 $phovea-about-dialog-logo-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg'); // IMPORTANT: no `!default` to always override the inital variable value
 
-$datavisyn_loading_icon: rgba(255, 255, 255, 0.26) url('~tdp_core/dist/assets/icons/datavisyn_loading.gif') center center no-repeat;
-$phovea-loading-icon: $datavisyn_loading_icon; // IMPORTANT: no `!default` to always override the inital variable value
-$tdp-busy-background: $datavisyn_loading_icon; // IMPORTANT: no `!default` to always override the inital variable value
+$phovea-loading-icon-url: url('~tdp_core/dist/assets/icons/datavisyn_loading.gif'); // IMPORTANT: no `!default` to always override the inital variable value
