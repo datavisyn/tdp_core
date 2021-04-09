@@ -161,7 +161,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           <div class="dropdown-menu" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="btn btn-secondary btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
+                <button class="dropdown-item btn btn-secondary btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
