@@ -563,8 +563,8 @@ export abstract class ARankingView extends AView {
   protected clear() {
     //reset
     return LineupTrackingManager.getInstance().untrack(this.context.ref).then(() => {
-      this.provider.clearRankings();
       this.provider.clearSelection();
+      this.provider.clearRankings();
       this.provider.clearData();
       this.provider.clearColumns();
     });

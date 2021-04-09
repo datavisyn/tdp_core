@@ -461,8 +461,8 @@ export class ARankingView extends AView {
     clear() {
         //reset
         return LineupTrackingManager.getInstance().untrack(this.context.ref).then(() => {
-            this.provider.clearRankings();
             this.provider.clearSelection();
+            this.provider.clearRankings();
             this.provider.clearData();
             this.provider.clearColumns();
         });

@@ -56,9 +56,11 @@ export class LineUpOrderedRowIndicies extends EventHandler {
         });
         provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED + eventSuffix, (_indices) => {
             // NOTE: the `indices` does not reflect the sorting of the (first) ranking, instead the ids are always ordered ascending
-            const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
-            this._selected = this.sortValues(provider.getSelection(), order);
-            this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
+            if (provider.getFirstRanking() != null) {
+                const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
+                this._selected = this.sortValues(provider.getSelection(), order);
+                this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
+            }
         });
         // wait until (first) ranking is added to data provider
         provider.on(LocalDataProvider.EVENT_ADD_RANKING, (_ranking, index) => {

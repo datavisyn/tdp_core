@@ -156,12 +156,20 @@ export class TourManager {
       }
     });
 
+    GlobalEventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_END_TOUR, (_,  finished) => {
+      this.hideTour(finished);
+    });
+
     // auto restart stored multi page tour
     this.continueTour();
   }
 
   hasTours() {
     return this.tours.some((d) => d.canBeListed());
+  }
+
+  getTours(): Readonly<Tour[]> {
+    return this.tours;
   }
 
   private setHighlight(mask: IBoundingBox) {
