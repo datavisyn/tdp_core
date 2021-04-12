@@ -25,9 +25,10 @@ export class Form implements IForm {
    * Constructor
    * @param $parent Node that the form should be attached to
    * @param formId unique form id
+   * @param formClass class attribute for form, e.g. for inline forms
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
-    this.$node = $parent.append('form').attr('id', this.formId);
+  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formClass = null) {
+    this.$node = $parent.append('form').attr('class', this.formClass).attr('id', this.formId);
   }
 
   /**

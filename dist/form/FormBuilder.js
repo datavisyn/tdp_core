@@ -12,14 +12,16 @@ export class FormBuilder {
      * Constructor
      * @param $parent Node that the form should be attached to
      * @param formId unique form id
+     * @param formClass class attribute for form, e.g. for inline forms
      */
-    constructor($parent, formId = BaseUtils.randomId()) {
+    constructor($parent, formId = BaseUtils.randomId(), formClass = null) {
         this.formId = formId;
+        this.formClass = formClass;
         /**
          * Map of all future elements
          */
         this.elementPromises = [];
-        this.form = new Form($parent, formId);
+        this.form = new Form($parent, formId, formClass);
     }
     /**
      * Creates a form element instance from a form element description and
