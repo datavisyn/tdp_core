@@ -8,6 +8,8 @@ from typing import List, Dict, Optional
 import alembic.command
 import alembic.config
 from os import path
+import os
+from sys import platform
 from argparse import REMAINDER
 
 
@@ -122,6 +124,16 @@ class DBMigration(object):
 
     # Run the command
     cmd_parser.run_cmd(alembic_cfg, options)
+
+    if options[0] == 'init':
+      with open(os.path.join(self.script_location, "env.py"), "w") as f:
+        f.write("import tdp_core.dbmigration_env  # NOQA\n\ntdp_core.dbmigration_env.run_migrations_online()")
+      os.remove(os.path.join(self.script_location, "env.py"))
+      os.remove(os.path.join(self.script_location, "alembic.ini"))
+        
+    if options[0] == 'revision' and "linux" in platform:
+      for fn in os.listdir(self.script_location):
+        os.chmod(os.path.join(self.script_location, fn), 0o0777))
 
     return True
 
