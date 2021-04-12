@@ -298,7 +298,7 @@ export class FormMap extends AFormElement {
           </select>
         </div>
         <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-secondary btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-1"><button class="btn btn-primary btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
             const valueElem = row.querySelector('.col-sm-6');
             if (d.key) { // has value
                 this.addValueEditor(d, valueElem, entries);
