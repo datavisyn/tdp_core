@@ -129,7 +129,7 @@ class DBMigration(object):
       with open(os.path.join(self.script_location, "env.py"), "w") as f:
         f.write("import tdp_core.dbmigration_env  # NOQA\n\ntdp_core.dbmigration_env.run_migrations_online()")
       os.remove(os.path.join(self.script_location, "env.py"))
-      os.remove(os.path.join(self.script_location, "alembic.ini"))
+      os.remove(os.path.join(self.script_location, "../alembic.ini"))
         
     if options[0] == 'revision' and "linux" in platform:
       for fn in os.listdir(self.script_location):
