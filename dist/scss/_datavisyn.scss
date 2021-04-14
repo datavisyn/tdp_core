@@ -1,7 +1,9 @@
-$phovea-navbar-logo-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg'); // IMPORTANT: no `!default` to always override the inital variable value
-$phovea-navbar-logo-width: 10px; // IMPORTANT: no `!default` to always override the inital variable value
-$phovea-navbar-logo-top: 4px; // IMPORTANT: no `!default` to always override the inital variable value
+@debug "Applying datavisyn theme";
 
-$phovea-about-dialog-logo-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg'); // IMPORTANT: no `!default` to always override the inital variable value
+$phovea-navbar-icon-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg') !default;
+$phovea-navbar-icon-width: 10px !default;
+$phovea-navbar-icon-top: 4px !default;
 
-$phovea-loading-icon-url: url('~tdp_core/dist/assets/icons/datavisyn_loading.gif'); // IMPORTANT: no `!default` to always override the inital variable value
+$phovea-about-dialog-icon-url: url('~tdp_core/dist/assets/icons/datavisyn_logo.svg') !default;
+
+$phovea-loading-icon-url: url('~tdp_core/dist/assets/icons/datavisyn_loading.gif') !default;
