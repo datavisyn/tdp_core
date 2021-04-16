@@ -76,11 +76,20 @@ export interface IFormRow {
   value: any;
 }
 
+/**
+ * Helper function to travserse the DOM tree up and
+ * looks for the following nested DOM constallation:
+ * `.parameters > .form-inline`
+ * If this constallation is found returns `true`.
+ * Otherwise returns `false`.
+ *
+ * @param node current node element
+ */
 function hasInlineParent(node: HTMLElement) {
   while (node.parentElement) {
     node = node.parentElement;
-    if (node.classList.contains('parameters')) {
-      return node.classList.contains('form-inline');
+    if (node.classList.contains('form-inline')) {
+      return node.parentElement.classList.contains('parameters');
     }
   }
   return false;

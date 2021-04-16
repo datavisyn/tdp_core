@@ -10,11 +10,20 @@ import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
 import { BaseUtils, UserSession, ResolveNow, I18nextManager } from 'phovea_core';
 import { Select3 } from './Select3';
+/**
+ * Helper function to travserse the DOM tree up and
+ * looks for the following nested DOM constallation:
+ * `.parameters > .form-inline`
+ * If this constallation is found returns `true`.
+ * Otherwise returns `false`.
+ *
+ * @param node current node element
+ */
 function hasInlineParent(node) {
     while (node.parentElement) {
         node = node.parentElement;
-        if (node.classList.contains('parameters')) {
-            return node.classList.contains('form-inline');
+        if (node.classList.contains('form-inline')) {
+            return node.parentElement.classList.contains('parameters');
         }
     }
     return false;
