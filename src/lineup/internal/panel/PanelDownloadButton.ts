@@ -99,26 +99,28 @@ export class PanelDownloadButton implements IPanelButton {
           <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
           <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
           ${flat.map((col) => `
-            <div class="checkbox custom-control custom-checkbox tdp-ranking-export-form-handle">
+            <div class="tdp-ranking-export-form-handle">
               <i class="fas fa-grip-vertical"></i>
-              <input type="checkbox" class="custom-control-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
-              <label class="custom-control-label" for="customCheck_${col.id}">${col.label}</label>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
+                <label class="form-check-label" for="customCheck_${col.id}">${col.label}</label>
+              </div>
             </div>
           `).join('')}
         </div>
         <div class="form-group">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
-          <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.all.length}">
-            <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="custom-control-input">
-            <label class="custom-control-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
+          <div class="radio form-check" data-num-rows="${orderedRowIndices.all.length}">
+            <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="form-check-input">
+            <label class="form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
           </div>
-          <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.filtered.length}">
-            <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="custom-control-input">
-            <label class="custom-control-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
+          <div class="radio form-check" data-num-rows="${orderedRowIndices.filtered.length}">
+            <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="form-check-input">
+            <label class="form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
           </div>
-          <div class="radio custom-control custom-radio" data-num-rows="${orderedRowIndices.selected.length}">
-            <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="custom-control-input">
-            <label class="custom-control-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
+          <div class="radio form-check" data-num-rows="${orderedRowIndices.selected.length}">
+            <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="form-check-input">
+            <label class="form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
           </div>
         </div>
         <div class="form-group">
@@ -143,7 +145,7 @@ export class PanelDownloadButton implements IPanelButton {
         });
       });
 
-      this.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.checkbox');
+      this.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.tdp-ranking-export-form-handle');
 
       return new Promise<IExportData>((resolve) => {
         dialog.onSubmit(() => {

@@ -34,18 +34,18 @@ export class TDPApplicationUtils {
         const inlineRadioID1 = `inlineRadio_${BaseUtils.randomId()}`;
         const inlineRadioID2 = `inlineRadio_${BaseUtils.randomId()}`;
         const div = o.doc.createElement('div');
-        div.classList.add('radio');
+        div.classList.add('form-group');
         div.innerHTML = `
-      <div class="custom-control custom-radio custom-control-inline">
-          <input class="custom-control-input" type="radio" name="permission_public" id="${inlineRadioID1}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="custom-control-label" for="${inlineRadioID1}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
+      <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="permission_public" id="${inlineRadioID1}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
+          <label class="form-check-label" for="${inlineRadioID1}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
       </div>
-      <div class="custom-control custom-radio custom-control-inline">
-          <input class="custom-control-input" type="radio" name="permission_public" id="${inlineRadioID2}" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="custom-control-label" for="${inlineRadioID2}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
+      <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="permission_public" id="${inlineRadioID2}" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
+          <label class="form-check-label" for="${inlineRadioID2}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
       </div>
 
-      <button type="button" name="permission_advanced" class="btn btn-primary btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
+      <button type="button" name="permission_advanced" class="btn btn-light btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
       ${o.extra}
       <div class="tdp-permissions">
         <div class="tdp-permissions-entry">

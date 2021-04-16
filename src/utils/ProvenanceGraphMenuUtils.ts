@@ -47,9 +47,9 @@ export class ProvenanceGraphMenuUtils {
                 <label for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
                 <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
               </div>
-                <div class="checkbox custom-control custom-checkbox custom-control-inline">
-                  <input type="checkbox"" id="customCheckbox1" name="${prefix}_agree" required="required" class="custom-control-input">
-                  <label class="radio-inline custom-control-label" for="customCheckbox1">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
+                <div class="checkbox form-check">
+                  <input type="checkbox"" id="customCheckbox1" name="${prefix}_agree" required="required" class="form-check-input">
+                  <label class="radio-inline form-check-label" for="customCheckbox1">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
               </div>
           `;
           dialog.form.lastElementChild!.insertAdjacentElement('beforebegin', permissions.node);
