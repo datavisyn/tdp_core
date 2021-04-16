@@ -19,7 +19,7 @@ export interface ISubInputDesc extends ISubDesc {
 export interface ISubSelectDesc extends ISubDesc {
     type: FormElementType.SELECT;
     /**
-     * teh data, a promise of the data or a function computing the data or promise
+     * the data, a promise of the data or a function computing the data or promise
      */
     optionsData: ISelectOptions | (() => ISelectOptions);
 }
