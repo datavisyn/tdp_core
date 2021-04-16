@@ -93,7 +93,7 @@ export class TDPApplicationUtils {
           <label class="custom-control-label" for="${inlineRadioID2}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
       </div>
 
-      <button type="button" name="permission_advanced" class="btn btn-secondary btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
+      <button type="button" name="permission_advanced" class="btn btn-primary btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
       ${o.extra}
       <div class="tdp-permissions">
         <div class="tdp-permissions-entry">
