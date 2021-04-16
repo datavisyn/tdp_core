@@ -82,15 +82,15 @@ export class FormMap extends AFormElement {
             }
             this.$node.classed('dropdown', true);
             this.$node.html(`
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn btn-white border-gray-3 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
-            <span class="badge"></span>
+            <span class="badge badge-pill badge-secondary"></span>
             <span class="caret"></span>
           </button>
           <div class="dropdown-menu" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-horizontal"></div>
             <div>
-                <button class="dropdown-item btn btn-secondary btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
+                <button class="dropdown-item btn btn-light btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
@@ -107,7 +107,7 @@ export class FormMap extends AFormElement {
             if (!this.elementDesc.hideLabel) {
                 const $label = this.$node.append('label').attr('for', this.elementDesc.attributes.id);
                 if (this.elementDesc.options.badgeProvider) {
-                    $label.html(`${this.elementDesc.label} <span class="badge"></span>`);
+                    $label.html(`${this.elementDesc.label} <span class="badge badge-pill badge-secondary"></span>`);
                 }
                 else {
                     $label.text(this.elementDesc.label);
@@ -307,7 +307,7 @@ export class FormMap extends AFormElement {
           </select>
         </div>
         <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-primary btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-1"><button class="btn btn-white btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
             const valueElem = row.querySelector('.col-sm-6');
             if (d.key) { // has value
                 this.addValueEditor(d, valueElem, entries);
