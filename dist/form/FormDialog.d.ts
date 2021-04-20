@@ -11,6 +11,11 @@ import { IFormElementDesc, IForm } from './interfaces';
 export declare class FormDialog extends Dialog {
     readonly builder: FormBuilder;
     /**
+     * Contains the `IForm` instance from the FormBuilder build process.
+     * The value is set in `showAsPromise()`. Otherwise this property is `null`.
+     */
+    formInstance: IForm | null;
+    /**
      * @param {string} title popup title
      * @param {string} primaryButton name of the primary button
      * @param {string} formId form id to use to avoid conflicts

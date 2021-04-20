@@ -17,6 +17,11 @@ export class FormDialog extends Dialog {
      */
     constructor(title, primaryButton, formId = 'form' + BaseUtils.randomId(5)) {
         super(title, primaryButton, formId);
+        /**
+         * Contains the `IForm` instance from the FormBuilder build process.
+         * The value is set in `showAsPromise()`. Otherwise this property is `null`.
+         */
+        this.formInstance = null;
         this.body.innerHTML = ''; //clear old form since the form builder brings its own
         this.builder = new FormBuilder(select(this.body), formId);
         this.onHide(() => {
@@ -51,9 +56,9 @@ export class FormDialog extends Dialog {
      * @returns {Promise<T>}
      */
     async showAsPromise(processData) {
-        const form = await this.builder.build();
+        this.formInstance = await this.builder.build();
         return new Promise((resolve) => {
-            this.onFormSubmit(form, (form) => {
+            this.onFormSubmit(this.formInstance, (form) => {
                 const data = processData(form);
                 if (data !== null) {
                     this.hide();
