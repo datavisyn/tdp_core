@@ -17,6 +17,11 @@ export class FormDialog extends Dialog {
      */
     constructor(title, primaryButton, formId = 'form' + BaseUtils.randomId(5)) {
         super(title, primaryButton, formId);
+        /**
+         * Contains the `IForm` instance from the FormBuilder build process.
+         * The value is set in `showAsPromise()`. Otherwise this property is `null`.
+         */
+        this.formInstance = null;
         this.body.innerHTML = ''; //clear old form since the form builder brings its own
         this.builder = new FormBuilder(select(this.body), formId);
         this.onHide(() => {

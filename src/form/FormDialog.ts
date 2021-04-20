@@ -13,7 +13,12 @@ import {select} from 'd3';
  */
 export class FormDialog extends Dialog {
   readonly builder: FormBuilder;
-  public formInstance: IForm;
+
+  /**
+   * Contains the `IForm` instance from the FormBuilder build process.
+   * The value is set in `showAsPromise()`. Otherwise this property is `null`.
+   */
+  public formInstance: IForm = null;
 
   /**
    * @param {string} title popup title
