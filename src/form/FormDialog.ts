@@ -18,7 +18,7 @@ export class FormDialog extends Dialog {
    * Contains the `IForm` instance from the FormBuilder build process.
    * The value is set in `showAsPromise()`. Otherwise this property is `null`.
    */
-  public formInstance: IForm = null;
+  public formInstance: IForm | null = null;
 
   /**
    * @param {string} title popup title
