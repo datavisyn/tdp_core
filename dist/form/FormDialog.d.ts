@@ -10,6 +10,7 @@ import { IFormElementDesc, IForm } from './interfaces';
  */
 export declare class FormDialog extends Dialog {
     readonly builder: FormBuilder;
+    formInstance: IForm;
     /**
      * @param {string} title popup title
      * @param {string} primaryButton name of the primary button

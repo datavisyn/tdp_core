@@ -51,9 +51,9 @@ export class FormDialog extends Dialog {
      * @returns {Promise<T>}
      */
     async showAsPromise(processData) {
-        const form = await this.builder.build();
+        this.formInstance = await this.builder.build();
         return new Promise((resolve) => {
-            this.onFormSubmit(form, (form) => {
+            this.onFormSubmit(this.formInstance, (form) => {
                 const data = processData(form);
                 if (data !== null) {
                     this.hide();

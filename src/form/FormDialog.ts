@@ -13,6 +13,7 @@ import {select} from 'd3';
  */
 export class FormDialog extends Dialog {
   readonly builder: FormBuilder;
+  public formInstance: IForm;
 
   /**
    * @param {string} title popup title
@@ -59,10 +60,10 @@ export class FormDialog extends Dialog {
    * @returns {Promise<T>}
    */
   async showAsPromise<T>(processData: (form: IForm) => T) {
-    const form: IForm = await this.builder.build();
+    this.formInstance = await this.builder.build();
 
     return new Promise<T>((resolve) => {
-      this.onFormSubmit(form, (form: IForm) => {
+      this.onFormSubmit(this.formInstance, (form: IForm) => {
         const data = processData(form);
         if (data !== null) {
           this.hide();
