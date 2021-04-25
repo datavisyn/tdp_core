@@ -18,7 +18,7 @@ export class ProvenanceGraphMenuUtils {
     static editProvenanceGraphMetaData(d, args = {}) {
         args = BaseUtils.mixin({
             button: I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save'),
-            title: `<i class="fas fa-edit" aria-hidden="true"></i>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
+            title: `<i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
             permission: true,
             name: d.name
         }, args);
