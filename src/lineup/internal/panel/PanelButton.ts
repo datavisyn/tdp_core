@@ -50,8 +50,9 @@ export class PanelNavButton implements IPanelButton {
    */
   constructor(parent: HTMLElement, onClick: () => void, options: IPanelTabDesc) {
     this.node = parent.ownerDocument.createElement('li');
+    this.node.classList.add('nav-item');
     this.order = options.order;
-    this.node.innerHTML = `<a role="tab" title="${options.title}" data-toggle="tab"><i class="fas ${options.cssClass}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
+    this.node.innerHTML = `<a class="nav-link" role="tab" title="${options.title}" data-toggle="tab"><i class="fas ${options.cssClass}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
     this.node.querySelector('a').addEventListener('click', (evt) => {
       evt.preventDefault();
       onClick();
@@ -63,7 +64,7 @@ export class PanelNavButton implements IPanelButton {
    * @param isActive Toggle the class
    */
   setActive(isActive: boolean) {
-    this.node.classList.toggle('active', isActive);
+    this.node.querySelector('a').classList.toggle('active', isActive);
   }
 
   /**
