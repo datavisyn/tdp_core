@@ -69,10 +69,10 @@ export class TourManager {
       <div class="tdp-tour-step-dots">
       </div>
       <div class="btn-group" role="group">
-        <button type="button" data-switch="--" class="btn-sm btn btn-default"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
-        <button type="button" data-switch="-" class="btn-sm btn btn-default"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
-        <button type="button" data-switch="0" class="btn-sm btn btn-default"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
-        <button type="button" data-switch="+" class="btn-sm btn btn-default"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
+        <button type="button" data-switch="--" class="btn-sm btn btn-light"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
+        <button type="button" data-switch="-" class="btn-sm btn btn-light"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
+        <button type="button" data-switch="0" class="btn-sm btn btn-light"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
+        <button type="button" data-switch="+" class="btn-sm btn btn-primary"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
       </div>
     </div>
     `;
@@ -115,10 +115,10 @@ export class TourManager {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
+                <h4 class="modal-title">${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.helpTours')}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.helpTours')}</h4>
             </div>
             <div class="modal-body">
               <ul class="fa-ul">

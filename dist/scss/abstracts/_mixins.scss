@@ -1,7 +1,7 @@
 
 @mixin idtype_color($idType, $color) {
   form.search {
-    label.checkbox-inline[data-idtype="#{$idType}"] {
+    label.form-check-inline.checkbox[data-idtype="#{$idType}"] {
       color: $color;
     }
   }

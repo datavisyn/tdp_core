@@ -25,7 +25,7 @@ export interface ISubInputDesc extends ISubDesc {
 export interface ISubSelectDesc extends ISubDesc {
   type: FormElementType.SELECT;
   /**
-   * teh data, a promise of the data or a function computing the data or promise
+   * the data, a promise of the data or a function computing the data or promise
    */
   optionsData: ISelectOptions | (() => ISelectOptions);
 }
@@ -76,11 +76,20 @@ export interface IFormRow {
   value: any;
 }
 
+/**
+ * Helper function to travserse the DOM tree up and
+ * looks for the following nested DOM constallation:
+ * `.parameters > .form-inline`
+ * If this constallation is found returns `true`.
+ * Otherwise returns `false`.
+ *
+ * @param node current node element
+ */
 function hasInlineParent(node: HTMLElement) {
   while (node.parentElement) {
     node = node.parentElement;
-    if (node.classList.contains('parameters')) {
-      return node.classList.contains('form-inline');
+    if (node.classList.contains('form-inline')) {
+      return node.parentElement.classList.contains('parameters');
     }
   }
   return false;
@@ -151,25 +160,28 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         //default badge provider for inline
         this.elementDesc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
       }
+
       this.$node.classed('dropdown', true);
+
       this.$node.html(`
-          <button class="btn btn-default dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn btn-white border-gray-3 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
-            <span class="badge"></span>
+            <span class="badge badge-pill badge-secondary"></span>
             <span class="caret"></span>
           </button>
-          <div class="dropdown-menu" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
-            <div class="form-horizontal"></div>
-            <div>
-                <button class="btn btn-default btn-sm right">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
+          <div class="dropdown-menu p-2" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
+            <div class="form-map-container"></div>
+            <div class="form-map-apply">
+                <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
-      this.$node.select('button.right').on('click', () => {
 
+      this.$node.select('form-map-apply button').on('click', () => {
         (<MouseEvent>d3event).preventDefault();
       });
-      this.$group = this.$node.select('div.form-horizontal');
+
+      this.$group = this.$node.select('div.form-map-container');
       this.$group.on('click', () => {
         // stop click propagation to avoid closing the dropdown
         (<MouseEvent>d3event).stopPropagation();
@@ -179,16 +191,18 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       if (!this.elementDesc.hideLabel) {
         const $label = this.$node.append('label').attr('for', this.elementDesc.attributes.id);
         if (this.elementDesc.options.badgeProvider) {
-          $label.html(`${this.elementDesc.label} <span class="badge"></span>`);
+          $label.html(`${this.elementDesc.label} <span class="badge badge-pill badge-secondary"></span>`);
         } else {
           $label.text(this.elementDesc.label);
         }
       }
+
       this.$group = this.$node.append('div');
     }
+
     this.setAttributes(this.$group, this.elementDesc.attributes);
     // adapt default settings
-    this.$group.classed('form-horizontal', true).classed('form-control', false).classed('form-group-sm', true);
+    this.$group.classed('form-map-container', true).classed('form-control', false); // remove form-control class to be complient with Bootstrap 4
   }
 
   /**
@@ -253,7 +267,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
     switch (desc.type) {
       case FormElementType.SELECT:
-        parent.insertAdjacentHTML('afterbegin', `<select class="form-control" style="width: 100%"></select>`);
+        parent.insertAdjacentHTML('afterbegin', `<select class="form-control from-control-sm" style="width: 100%"></select>`);
         // register on change listener
         parent.firstElementChild.addEventListener('change', function (this: HTMLSelectElement) {
           row.value = this.value;
@@ -271,7 +285,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         });
         break;
       case FormElementType.SELECT2:
-        parent.insertAdjacentHTML('afterbegin', `<select class="form-control" style="width: 100%"></select>`);
+        parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" style="width: 100%"></select>`);
 
         FormSelect.resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
@@ -333,7 +347,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         });
         break;
       default:
-        parent.insertAdjacentHTML('afterbegin', `<input class="form-control" value="${initialValue || ''}">`);
+        parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" value="${initialValue || ''}">`);
         parent.firstElementChild.addEventListener('change', function (this: HTMLInputElement) {
           row.value = this.value;
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
@@ -379,17 +393,17 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     const renderRow = (d: IFormRow) => {
       this.rows.push(d);
       const row = group.ownerDocument.createElement('div');
-      row.classList.add('form-group');
+      row.classList.add('form-row', 'pb-2');
       group.appendChild(row);
       row.innerHTML = `
         <div class="col-sm-5">
-          <select class="form-control map-selector">
+          <select class="form-control form-control-sm map-selector">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
         <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-default btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-1"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
 
       const valueElem = <HTMLElement>row.querySelector('.col-sm-6');
       if (d.key) { // has value
@@ -516,4 +530,3 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 }
 
 export declare type IFormMultiMap = {[key: string]: any | any[]};
-
