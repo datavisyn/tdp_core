@@ -36,13 +36,15 @@ export class TDPApplicationUtils {
         const div = o.doc.createElement('div');
         div.classList.add('form-group');
         div.innerHTML = `
-      <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="permission_public" id="${inlineRadioID1}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="form-check-label" for="${inlineRadioID1}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
-      </div>
-      <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="permission_public" id="${inlineRadioID2}" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="form-check-label" for="${inlineRadioID2}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
+      <div class="form-group">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="permission_public" id="${inlineRadioID1}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
+            <label class="form-check-label" for="${inlineRadioID1}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="permission_public" id="${inlineRadioID2}" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
+            <label class="form-check-label" for="${inlineRadioID2}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
+        </div>
       </div>
 
       <button type="button" name="permission_advanced" class="btn btn-light btn-sm pull-right">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
