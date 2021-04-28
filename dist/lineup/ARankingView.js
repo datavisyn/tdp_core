@@ -13,6 +13,7 @@ import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LazyColumn } from './internal/column';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -101,7 +102,7 @@ export class ARankingView extends AView {
         this.node.classList.add('lineup', 'lu-taggle', 'lu');
         this.node.insertAdjacentHTML('beforeend', `<div></div>`);
         this.stats = this.node.ownerDocument.createElement('p');
-        this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
+        this.provider = new TDPLocalDataProvider([], [], this.options.customProviderOptions);
         // hack in for providing the data provider within the graph
         // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
         // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
