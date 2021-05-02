@@ -1,2 +1,173 @@
+// TODO override the following SCSS variables once SCSS import is working again
+$lu_dialog_font_size: 1rem !default;
+$lu_toolbar_font_size: 1rem !default;
+
 // use css because importing sass file from src requires font awesome v4 dependency
 @import '~lineupjs/build/LineUpJS.css';
+
+// override the font-size manually (since the SCSS variables above does not work)
+.lu-tooltip,
+.lu-dialog {
+  font-size: $lu_dialog_font_size;
+
+  // adapt LineUp dialogs to Bootstrap v4 dialog style
+  padding: 1rem 1rem 0.5rem;
+  gap: 10px;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.3rem;
+
+  strong {
+    margin: unset;
+  }
+}
+
+.lu-dialog {
+  input {
+    font-size: inherit;
+  }
+
+  .lu-checkbox:not(.lu-dialog-filter-table-entry) > span {
+    font-size: inherit;
+    margin: unset;
+  }
+
+  strong:not(:first-of-type) {
+    margin-top: 1rem;
+  }
+}
+
+.lu-dialog-buttons {
+  margin-top: 0.5rem;
+}
+
+.lu-dialog-button {
+  margin: unset;
+}
+
+.lu-hierarchy-entry,
+.lu-hierarchy-adder,
+.lu-toolbar,
+.lu-more-options,
+.lu-side-panel-rankings > i,
+.lu-side-panel-ranking-label > i {
+  font-size: $lu_toolbar_font_size;
+}
+
+.lu-summary {
+  font-size: inherit;
+
+  .lu-checkbox > span {
+    font-size: inherit;
+    margin: unset;
+  }
+}
+
+.lu-stats {
+  font-size: inherit;
+
+  & > span {
+    font-size: inherit;
+  }
+}
+
+.lu-side-panel-summary {
+  font-size: inherit;
+
+  &.lu-renderer-string {
+    gap: 10px;
+  }
+}
+
+.lu-side-panel-ranking::before,
+.lu-group-hierarchy::before,
+.lu-sort-hierarchy::before,
+.lu-sort-groups-hierarchy::before {
+  font-size: inherit;
+}
+
+.lu-side-panel-entry-header {
+  font-size: inherit;
+}
+
+.lu-dialog {
+  .lu-checkbox {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+}
+
+.lu-dialog.lu-more-options {
+  padding: 0;
+  gap: 0;
+
+  & > i.lu-action {
+    padding: 10px;
+    gap: 5px;
+  }
+}
+
+.lu-search::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lu-hierarchy .lu-hierarchy-adder .lu-search::before {
+  height: unset;
+}
+
+.lu-search-input {
+  height: unset;
+}
+
+.lu-search-list {
+  top: 1.85rem;
+
+  li.lu-search-item > span,
+  li.lu-search-group > span {
+    padding: 0.5rem;
+  }
+}
+
+.lu-search-open > input {
+  border-radius: 0 4px 0 0;
+}
+
+.lu-hierarchy-entry,
+.lu-hierarchy-adder {
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.lu-hierarchy-adder > .lu-search > input {
+  height: 1.8rem;
+  font-size: inherit;
+}
+
+span.lu-mapping-hint {
+  font-size: small;
+}
+
+.lu-histogram-min-hint,
+.lu-histogram-max-hint {
+  font-size: inherit;
+}
+
+.lu-histogram-max,
+.lu-histogram-min {
+  &::before {
+    bottom: -1.2rem;
+    font-size: small;
+  }
+}
+
+.lu-histogram .lu-checkbox {
+  bottom: -3rem;
+}
+
+.lu-dialog-rename {
+  width: 20rem;
+}
