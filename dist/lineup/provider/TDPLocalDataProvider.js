@@ -15,7 +15,7 @@ export default class TDPLocalDataProvider extends LocalDataProvider {
         if (columnWidth >= 0 || isSupportType(col)) {
             return col;
         }
-        if (desc.type === "string") {
+        if (desc.type === 'string') {
             col.setWidthImpl(140); // use `setWidthImpl` instead of `setWidth` to avoid triggering an event
         }
         else {
