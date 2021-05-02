@@ -79,11 +79,15 @@ $lu_toolbar_font_size: 1rem !default;
   }
 }
 
-.lu-side-panel-ranking::before,
-.lu-group-hierarchy::before,
-.lu-sort-hierarchy::before,
-.lu-sort-groups-hierarchy::before {
-  font-size: inherit;
+.lu-side-panel-ranking,
+.lu-group-hierarchy,
+.lu-sort-hierarchy,
+.lu-sort-groups-hierarchy {
+  margin-bottom: 1rem;
+
+  &::before {
+    font-size: inherit;
+  }
 }
 
 .lu-side-panel-entry-header {
@@ -95,6 +99,7 @@ $lu_toolbar_font_size: 1rem !default;
     display: flex;
     align-items: baseline;
     gap: 5px;
+    margin: unset;
   }
 }
 
@@ -112,6 +117,7 @@ $lu_toolbar_font_size: 1rem !default;
   display: flex;
   justify-content: center;
   align-items: center;
+  border-color: #ced4da;
 }
 
 .lu-hierarchy .lu-hierarchy-adder .lu-search::before {
@@ -120,6 +126,7 @@ $lu_toolbar_font_size: 1rem !default;
 
 .lu-search-input {
   height: unset;
+  border-color: #ced4da;
 }
 
 .lu-search-list {
@@ -137,9 +144,10 @@ $lu_toolbar_font_size: 1rem !default;
 
 .lu-hierarchy-entry,
 .lu-hierarchy-adder {
-  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.3rem 0.5rem;
   align-items: baseline;
   gap: 5px;
+  border-top: none;
 }
 
 .lu-hierarchy-adder > .lu-search > input {
