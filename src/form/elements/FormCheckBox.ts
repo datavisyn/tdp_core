@@ -31,7 +31,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, Object.assign({options: { checked: true, unchecked: false}}, elementDesc), pluginDesc);
+    super(form, Object.assign({options: {checked: true, unchecked: false}}, elementDesc), pluginDesc);
   }
 
   /**
@@ -41,16 +41,19 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('checkbox', true);
+    this.$node = $formNode.append('div').classed('form-check checkbox', true);
     this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
 
     const $label = this.$node.select('label');
-    if ($label.empty()) {
-      this.$input = this.$node.append('input').attr('type', 'checkbox');
+    if ($label.length === 0) {
+      this.$input = this.$node.append('input').classed('form-check-input position-static', true).attr('type', 'checkbox');
     } else {
-      this.$input = $label.html(`<input type="checkbox">${$label.text()}`).select('input');
+      this.$input = this.$node.append('input').classed('form-check-input', true).attr('type', 'checkbox').order();
+      $label.classed('form-check-label', true);
+      // ensure correct order of input and label tags
+      this.appendLabel();
     }
+
     this.setAttributes(this.$input, this.elementDesc.attributes);
     this.$input.classed('form-control', false); //remove falsy class again
   }
@@ -62,7 +65,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     super.init();
 
     const options = this.elementDesc.options;
-    const isChecked: boolean = options.isChecked != null? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
+    const isChecked: boolean = options.isChecked != null ? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
     this.previousValue = isChecked;
     this.$input.property('checked', isChecked);
     if (this.hasStoredValue()) { // trigger if we have a stored value
