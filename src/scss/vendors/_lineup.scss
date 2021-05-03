@@ -92,20 +92,11 @@ $lu_toolbar_font_size: 1rem !default;
 }
 
 .lu-side-panel-entry {
-  border-top: 1px solid #999999;
   padding: 0 0 1rem;
-
-  &:hover,
-  &:focus-within {
-    .lu-side-panel-entry-header {
-      background-color: #f3f3f3;
-    }
-  }
 }
 
 .lu-side-panel-entry-header {
   font-size: inherit;
-  background: unset;
   border-top: unset;
   padding: 0.5rem;
   transition: background-color 0.3s ease;
