@@ -11,8 +11,8 @@ export default class TDPLocalDataProvider extends LocalDataProvider {
         const columnWidth = desc.width;
         // create a column instance needed for the `isSupportType(col)`
         const col = new type(id, desc, typeFactory);
-        // do nothing if column width is already defined or it is a support type column (e.g., rank, aggregation, selection)
-        if (columnWidth >= 0 || isSupportType(col)) {
+        // do nothing if column width is already defined, there is a default width set by the column instance, or it is a support type column (e.g., rank, aggregation, selection)
+        if (columnWidth >= 0 || (!columnWidth && col.getWidth() >= 0) || isSupportType(col)) {
             return col;
         }
         if (desc.type === 'string') {
