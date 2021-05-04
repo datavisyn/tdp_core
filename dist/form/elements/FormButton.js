@@ -20,7 +20,7 @@ export class FormButton extends EventHandler {
      * @param visible
      */
     setVisible(visible) {
-        this.$node.classed('hidden', !visible);
+        this.$node.attr('hidden', !visible);
     }
     get value() {
         return this.clicked;

@@ -117,9 +117,9 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
 
     if (visible) {
-      this.node.classList.remove('hidden');
+      this.node.removeAttribute('hidden');
     } else {
-      this.node.classList.add('hidden');
+      this.node.toggleAttribute('hidden');
     }
 
     if (visible && this.instance == null && selection && this.match(selection)) {
@@ -131,7 +131,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   get visible() {
-    return !this.node.classList.contains('hidden');
+    return !this.node.hasAttribute('hidden');
   }
 
   /**

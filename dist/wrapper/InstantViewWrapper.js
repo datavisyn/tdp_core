@@ -44,7 +44,7 @@ export class InstantViewWrapper {
         });
     }
     hide() {
-        this.node.classList.add('hidden');
+        this.node.toggleAttribute('hidden');
         this.clear();
     }
     clear() {
@@ -58,7 +58,7 @@ export class InstantViewWrapper {
             this.hide();
             return;
         }
-        this.node.classList.remove('hidden');
+        this.node.removeAttribute('hidden');
         this.selection = selection;
         const start = this.selection.idtype;
         FindViewUtils.findInstantViews(this.selection.idtype).then((views) => {

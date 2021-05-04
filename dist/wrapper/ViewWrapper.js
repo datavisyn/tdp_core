@@ -92,10 +92,10 @@ export class ViewWrapper extends EventHandler {
     set visible(visible) {
         const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
         if (visible) {
-            this.node.classList.remove('hidden');
+            this.node.removeAttribute('hidden');
         }
         else {
-            this.node.classList.add('hidden');
+            this.node.toggleAttribute('hidden');
         }
         if (visible && this.instance == null && selection && this.match(selection)) {
             //lazy init
@@ -106,7 +106,7 @@ export class ViewWrapper extends EventHandler {
         }
     }
     get visible() {
-        return !this.node.classList.contains('hidden');
+        return !this.node.hasAttribute('hidden');
     }
     /**
      * as needed for the lineup contract

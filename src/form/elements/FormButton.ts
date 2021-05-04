@@ -31,7 +31,7 @@ export class FormButton extends EventHandler implements IFormElement {
    * @param visible
    */
   setVisible(visible: boolean) {
-    this.$node.classed('hidden', !visible);
+    this.$node.attr('hidden', !visible);
   }
 
   get value(): boolean {

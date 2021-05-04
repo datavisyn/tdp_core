@@ -57,7 +57,7 @@ export class InstantViewWrapper {
   }
 
   hide() {
-    this.node.classList.add('hidden');
+    this.node.toggleAttribute('hidden');
     this.clear();
   }
 
@@ -74,7 +74,7 @@ export class InstantViewWrapper {
       return;
     }
 
-    this.node.classList.remove('hidden');
+    this.node.removeAttribute('hidden');
 
     this.selection = selection;
 

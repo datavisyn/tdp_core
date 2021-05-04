@@ -73,7 +73,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   isVisible() {
-    return !this.$node.classed('hidden');
+    return !this.$node.attr('hidden');
   }
 
   /**
@@ -81,7 +81,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * @param visible
    */
   setVisible(visible: boolean = true) {
-    this.$node.classed('hidden', !visible);
+    this.$node.attr('hidden', !visible);
   }
 
   protected addChangeListener() {
@@ -171,7 +171,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
           onDependentChange(values);
         }
         if (showIf) {
-          this.$node.classed('hidden', !showIf(values));
+          this.$node.attr('hidden', !showIf(values));
         }
       });
     });
@@ -179,7 +179,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     // initial values
     const values = dependElements.map((d) => d.value);
     if (showIf) {
-      this.$node.classed('hidden', !this.elementDesc.showIf(values));
+      this.$node.attr('hidden', !this.elementDesc.showIf(values));
     }
     return values;
   }
