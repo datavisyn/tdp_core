@@ -23,18 +23,16 @@
   }
 }
 
-.dropdown-menu .form-map-container {
-  // Bootstrap 4 sets `width: auto` for `.form-inline .form-control`
-  // which causes the select elements to overflow in the filter map
-  // This class limits the width to the column width.
-  .form-control {
-    width: 100%;
-  }
+// Bootstrap 4 sets `width: auto` for `.form-inline .form-control`
+// which causes the select elements to overflow in the filter map
+// This class limits the width to the column width.
+.dropdown-menu .form-map-container .form-control {
+  width: 100%;
+}
 
-  // Hide the remove button (`x`) when no option is selected in the first dropdown (= filter key)
-  .form-row .col-sm-6:empty ~ .col-sm-1 {
-    display: none;
-  }
+// Hide the remove button (`x`) when no option is selected in the first dropdown (= filter key)
+.form-map-container .form-row .col-sm-6:empty ~ .col-sm-1 {
+  display: none;
 }
 
 .select.map-selector option:disabled {
