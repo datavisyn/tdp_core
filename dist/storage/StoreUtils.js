@@ -5,7 +5,7 @@ export class StoreUtils {
     static editDialog(namedSet, entitiesTitle, result) {
         const isCreate = namedSet === null;
         const title = isCreate ? I18nextManager.getInstance().i18n.t('tdp:core.editDialog.save') : I18nextManager.getInstance().i18n.t('tdp:core.editDialog.edit');
-        const dialog = new FormDialog(title + entitiesTitle, title, 'namedset_form');
+        const dialog = new FormDialog(title + entitiesTitle, I18nextManager.getInstance().i18n.t('tdp:core.editDialog.save'), 'namedset_form');
         const permissions = TDPApplicationUtils.permissionForm(namedSet);
         dialog.form.innerHTML = `
       <p> ${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.dialog1')}</p>
