@@ -56,6 +56,7 @@ export class AFormElement extends EventHandler {
         return Boolean(this.value);
     }
     isVisible() {
+        console.log(this.$node.attr('hidden'), !this.$node.attr('hidden'));
         return !this.$node.attr('hidden');
     }
     /**
@@ -63,7 +64,7 @@ export class AFormElement extends EventHandler {
      * @param visible
      */
     setVisible(visible = true) {
-        this.$node.attr('hidden', !visible);
+        this.$node.attr('hidden', visible ? null : '');
     }
     addChangeListener() {
         if (this.elementDesc.useSession || this.elementDesc.onChange) {
@@ -136,14 +137,14 @@ export class AFormElement extends EventHandler {
                     onDependentChange(values);
                 }
                 if (showIf) {
-                    this.$node.attr('hidden', !showIf(values));
+                    this.$node.attr('hidden', showIf(values) ? null : '');
                 }
             });
         });
         // initial values
         const values = dependElements.map((d) => d.value);
         if (showIf) {
-            this.$node.attr('hidden', !this.elementDesc.showIf(values));
+            this.$node.attr('hidden', this.elementDesc.showIf(values) ? null : '');
         }
         return values;
     }
