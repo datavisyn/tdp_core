@@ -37,11 +37,10 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
 
     const options = this.elementDesc.options;
 
-    const $buttons = this.$node.selectAll('label.radio-inline').data(options.buttons);
-    $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
-      <label class="form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>
-    </div>`);
+    const $buttons = this.$node.selectAll('div.radio-inline').data(options.buttons);
+    $buttons.enter().append('div').classed('radio-inline form-check form-check-inline', true).html((d, i) => `<input class="form-check-input" type="radio"
+        name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
+      <label class="form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>`);
     const $buttonElements = $buttons.select('input');
 
     $buttonElements.on('change', (d) => {
