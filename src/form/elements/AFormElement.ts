@@ -73,7 +73,6 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   isVisible() {
-    console.log(this.$node.attr('hidden'), !this.$node.attr('hidden'));
     return !this.$node.attr('hidden');
   }
 

@@ -56,7 +56,6 @@ export class AFormElement extends EventHandler {
         return Boolean(this.value);
     }
     isVisible() {
-        console.log(this.$node.attr('hidden'), !this.$node.attr('hidden'));
         return !this.$node.attr('hidden');
     }
     /**
