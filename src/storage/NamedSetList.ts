@@ -144,10 +144,10 @@ export class NamedSetList {
         const extendedData = d.type === ENamedSetType.NAMEDSET ? {context: 'extended', creator: (<IStoredNamedSet>d).creator, public: UserSession.getInstance().hasPermission(<IStoredNamedSet>d, EEntity.OTHERS)} : {};
         return I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.title', {name: d.name, description: d.description, ...extendedData}) as string; // i18next context feature
       });
-    $options.select('a.delete').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d));
-    $options.select('a.edit').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d));
+    $options.select('a.delete').attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d)) ? '' : null);
+    $options.select('a.edit').attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d) ? '' : null));
     $options.select('a.public')
-      .classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d))
+      .attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d)) ? '' : null)
       .html((d) => {
         const isPublic = d.type === ENamedSetType.NAMEDSET && UserSession.getInstance().hasPermission(<IStoredNamedSet>d, EEntity.OTHERS);
         const publicOrPrivate = I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.status', {context: isPublic ? '' : 'private'});
