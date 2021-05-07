@@ -19,7 +19,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, Object.assign({options: { buttons: [] }}, elementDesc), pluginDesc);
+    super(form, Object.assign({options: {buttons: []}}, elementDesc), pluginDesc);
   }
 
   /**
@@ -38,8 +38,10 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
     const options = this.elementDesc.options;
 
     const $buttons = this.$node.selectAll('label.radio-inline').data(options.buttons);
-    $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<input type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}"> ${d.name}`);
-
+    $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
+      <label class="form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>
+    </div>`);
     const $buttonElements = $buttons.select('input');
 
     $buttonElements.on('change', (d) => {

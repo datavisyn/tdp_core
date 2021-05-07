@@ -22,7 +22,10 @@ export class FormRadio extends AFormElement {
         const $label = this.$node.select('label');
         const options = this.elementDesc.options;
         const $buttons = this.$node.selectAll('label.radio-inline').data(options.buttons);
-        $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<input type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}"> ${d.name}`);
+        $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
+      <label class="form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>
+    </div>`);
         const $buttonElements = $buttons.select('input');
         $buttonElements.on('change', (d) => {
             this.fire(FormRadio.EVENT_CHANGE, d, $buttons);
