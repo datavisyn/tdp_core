@@ -94,7 +94,7 @@ export class FormMap extends AFormElement {
             </div>
           </div>
       `);
-            this.$node.select('form-map-apply button').on('click', () => {
+            this.$node.select('.form-map-apply button').on('click', () => {
                 d3event.preventDefault();
             });
             this.$group = this.$node.select('div.form-map-container');

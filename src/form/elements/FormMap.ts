@@ -177,7 +177,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           </div>
       `);
 
-      this.$node.select('form-map-apply button').on('click', () => {
+      this.$node.select('.form-map-apply button').on('click', () => {
         (<MouseEvent>d3event).preventDefault();
       });
 
