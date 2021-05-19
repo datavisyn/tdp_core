@@ -40,12 +40,13 @@ export class ATDPApplication extends ACLUEWrapper {
                 header: () => this.header,
                 app: () => this.app
             });
+            // use help button for tours when not explicitly disabled by the `options` of the app customization
+            const reuseHelpLinkForToursModal = (options.showHelpLink !== false && this.tourManager.hasTours());
             BaseUtils.mixin(this.options, {
-                // use help button for tours when not explicitly disabled by the `options` of the app customization
-                showHelpLink: options.showHelpLink !== false && this.tourManager.hasTours() ? '#' : false
+                showHelpLink: reuseHelpLinkForToursModal ? '#' : false
             });
             this.build(document.body, { replaceBody: false });
-            if (options.showHelpLink !== false && this.tourManager.hasTours()) {
+            if (reuseHelpLinkForToursModal) {
                 const button = document.querySelector('[data-header="helpLink"] a');
                 button.dataset.toggle = 'modal';
                 button.tabIndex = -1;
