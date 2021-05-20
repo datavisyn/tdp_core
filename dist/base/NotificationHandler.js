@@ -8,7 +8,7 @@ export class NotificationHandler {
         }
         parent.classList.add('push');
         parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
     ${msg}</div>`);
         const alert = parent.firstElementChild;
         // fix link color

@@ -116,8 +116,7 @@ export class TourManager {
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.helpTours')}</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
-                    <span aria-hidden="true">×</span>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
                 </button>
             </div>
             <div class="modal-body">
