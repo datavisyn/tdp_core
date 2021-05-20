@@ -60,9 +60,9 @@ export class EditProvenanceGraphMenu {
     li.classList.add('nav-item', 'dropdown');
 
     li.innerHTML = `
-          <a href="#" class="nav-link dropdown-toggle" id="sessionDropdown" data-toggle="dropdown" role="button" aria-haspopup="true"
+          <a href="#" class="nav-link dropdown-toggle" id="sessionDropdown" data-bs-toggle="dropdown" role="button" aria-haspopup="true"
              aria-expanded="false"><i class="fas fa-folder-open" aria-hidden="true"></i> <i class="fas fa-save sync-indicator" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
-          <div class="dropdown-menu" aria-labelledby="sessionDropdown">
+          <div class="dropdown-menu" aria-labelledby="sessionDropdown" data-bs-popper="none">
             <div class="dropdown-label"><i class="fas fa-clock" aria-hidden="true"></i> <span class="session-name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionName')}</span></div>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a>

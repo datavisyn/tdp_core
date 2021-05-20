@@ -27,7 +27,7 @@ export class InstantViewWrapper {
         const content = this.node.querySelector('.tab-content');
         content.insertAdjacentHTML('beforeend', `<div role="tabpanel" class="tab-pane tdp-busy" id="instantView_${view.id}" role="tabpanel" aria-labelledby="instantView_${view.id}"></div>`);
         const body = content.lastElementChild;
-        ul.insertAdjacentHTML('beforeend', `<li class="nav-item"><a class="nav-link" href="#instantView_${view.id}" aria-controls="instantView_${view.id}" role="tab" data-toggle="tab">${view.name}</a></li>`);
+        ul.insertAdjacentHTML('beforeend', `<li class="nav-item"><a class="nav-link" href="#instantView_${view.id}" aria-controls="instantView_${view.id}" role="tab" data-bs-toggle="tab">${view.name}</a></li>`);
         ul.lastElementChild.firstElementChild.addEventListener('click', (evt) => {
             evt.preventDefault();
             // avoid Property 'tab' does not exist on type 'JQuery<EventTarget>'

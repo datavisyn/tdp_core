@@ -164,12 +164,12 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       this.$node.classed('dropdown', true);
 
       this.$node.html(`
-          <button class="btn btn-white border-gray-3 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn btn-white border-gray-3 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
           </button>
-          <div class="dropdown-menu p-2" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
+          <div class="dropdown-menu p-2" data-bs-popper="static" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-map-container"></div>
             <div class="form-map-apply">
                 <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
@@ -191,7 +191,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       if (!this.elementDesc.hideLabel) {
         const $label = this.$node.append('label').attr('for', this.elementDesc.attributes.id);
         if (this.elementDesc.options.badgeProvider) {
-          $label.html(`${this.elementDesc.label} <span class="badge badge-pill badge-secondary"></span>`);
+          $label.html(`${this.elementDesc.label} <span class="badge rounded-pill bg-secondary"></span>`);
         } else {
           $label.text(this.elementDesc.label);
         }
@@ -403,7 +403,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           </select>
         </div>
         <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-1"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
 
       const valueElem = <HTMLElement>row.querySelector('.col-sm-6');
       if (d.key) { // has value
