@@ -91,7 +91,7 @@
     "react-dom": "^16.13.0",
     "react-plotly.js": "^2.4.0",
     "react-split": "^2.0.9",
-    "bootstrap": "^4.5.3",
+    "bootstrap": "^5.0.1",
     "plotly.js-dist": "^1.57.1"
   },
   "devDependencies": {
@@ -99,7 +99,7 @@
     "@types/jquery": "~3.5.5",
     "@types/select2": "4.0.44",
     "@types/jest": "~26.0.20",
-    "@types/bootstrap": "~4.5.0",
+    "@types/bootstrap": "~5.0.15",
     "@types/react-plotly.js": "^2.2.4",
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
