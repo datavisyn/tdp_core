@@ -5,6 +5,7 @@ import { EventHandler, IDType } from 'phovea_core';
 import { IFormElementDesc } from '../form/interfaces';
 import { ISelection, IView, IViewContext } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
+import { IAuthorizationType } from '../auth';
 /**
  * base class for all views
  */
@@ -46,6 +47,14 @@ export declare abstract class AView extends EventHandler implements IView {
     protected setHint(visible: boolean, hintMessage?: string, hintCSSClass?: string): void;
     protected setNoMappingFoundHint(visible: boolean, hintMessage?: string): void;
     init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any>;
+    /**
+     * Uses the token manager to run the authorizations defined by `getAuthorizationConfiguration()`.
+     * Only authorizations which are not yet stored in the token manager are run, others are skipped.
+     * It will show an overlay over the detail view allowing the user to authorize the application.
+     */
+    protected runAuthorizations(): Promise<void>;
+    protected getAuthorizationConfiguration(): Promise<IAuthorizationType | IAuthorizationType[] | null>;
+    protected getAuthorization<T>(id: string): T | null;
     /**
      * hook for custom initialization
      */

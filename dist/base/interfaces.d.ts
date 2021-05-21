@@ -6,6 +6,7 @@ import { RangeLike } from 'phovea_core';
 import { IDType } from 'phovea_core';
 import { IColumnDesc, Column } from 'lineupjs';
 import { AppHeader } from 'phovea_ui';
+import { IAuthorizationType } from '../auth';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column
@@ -275,6 +276,11 @@ export interface IViewPluginDesc extends IPluginDesc {
      * optional security check to show only certain views
      */
     security?: string | ((user: IUser) => boolean);
+    /**
+     * optional authorization configuration ensuring authorization exists before loading the view.
+     * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
+     */
+    authorization?: IAuthorizationType | IAuthorizationType[] | null;
     /**
      * a lot of topics/tags describing this view
      */
