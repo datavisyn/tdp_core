@@ -88,7 +88,7 @@ export interface IFormRow {
 function hasInlineParent(node: HTMLElement) {
   while (node.parentElement) {
     node = node.parentElement;
-    if (node.classList.contains('form-inline')) {
+    if (node.classList.contains('row')) {
       return node.parentElement.classList.contains('parameters');
     }
   }
@@ -145,7 +145,8 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
+    const $colNode = $formNode.append('div').classed('col-sm-auto', true);
+    this.$node = $colNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
 
     this.inline = hasInlineParent(<HTMLElement>this.$node.node());
@@ -189,7 +190,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
     } else {
       if (!this.elementDesc.hideLabel) {
-        const $label = this.$node.append('label').attr('for', this.elementDesc.attributes.id);
+        const $label = this.$node.append('label').classed('form-label', true).attr('for', this.elementDesc.attributes.id);
         if (this.elementDesc.options.badgeProvider) {
           $label.html(`${this.elementDesc.label} <span class="badge rounded-pill bg-secondary"></span>`);
         } else {
@@ -393,25 +394,25 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     const renderRow = (d: IFormRow) => {
       this.rows.push(d);
       const row = group.ownerDocument.createElement('div');
-      row.classList.add('form-row', 'pb-2');
+      row.classList.add('row');
       group.appendChild(row);
       row.innerHTML = `
-        <div class="col-sm-5">
+        <div class="col root">
           <select class="form-control form-control-sm map-selector">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
-        <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
+        <div class="col-sm-auto"></div>
+        <div class="col-sm-auto"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
 
-      const valueElem = <HTMLElement>row.querySelector('.col-sm-6');
+      const valueElem = <HTMLElement>row.querySelector('.root');
       if (d.key) { // has value
         this.addValueEditor(d, valueElem, entries);
       } else {
         // add remove all button
       }
-      row.querySelector('div.col-sm-1 button').addEventListener('click', (evt: MouseEvent) => {
+      row.querySelector('div.col-sm-auto button').addEventListener('click', (evt: MouseEvent) => {
         evt.preventDefault();
         evt.stopPropagation();
         if (d.key) {

@@ -53,13 +53,16 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
+    const $colNode = $formNode.append('div').classed('col-sm-auto', true);
+    this.$node = $colNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 
     const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple});
     this.select3 = new Select3(options);
-    this.$node.node().appendChild(this.select3.node);
+    const divNode = document.createElement('div');
+    divNode.classList.add('col')  ;  
+    this.$node.node().appendChild(divNode).appendChild(this.select3.node);
 
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
     this.setAttributes(this.$node.select('.select3'), this.elementDesc.attributes);
