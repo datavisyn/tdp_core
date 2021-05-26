@@ -61,7 +61,7 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
     const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple});
     this.select3 = new Select3(options);
     const divNode = document.createElement('div');
-    divNode.classList.add('col')  ;  
+    divNode.classList.add('col');
     this.$node.node().appendChild(divNode).appendChild(this.select3.node);
 
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary

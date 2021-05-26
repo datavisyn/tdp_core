@@ -30,7 +30,8 @@ export class FormBuilder {
      * @param elementDesc
      */
     appendElement(elementDesc) {
-        elementDesc.options['inlineForm'] = this.formInline;
+        const inlineForm = 'inlineForm';
+        elementDesc.options[inlineForm] = this.formInline;
         const desc = Form.updateElementDesc(elementDesc, this.formId);
         const elementPromise = AFormElement.createFormElement(this.form, desc);
         this.elementPromises.push(elementPromise);

@@ -95,7 +95,8 @@ export class AFormElement extends EventHandler {
         if (this.elementDesc.hideLabel) {
             return;
         }
-        const colWidth = this.elementDesc.options['inlineForm'] ? 'col-sm-auto' : 'col-sm-12';
+        const inlineForm = 'inlineForm';
+        const colWidth = this.elementDesc.options[inlineForm] ? 'col-sm-auto' : 'col-sm-12';
         this.$node.append('label').classed(`col-form-label ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
     }
     /**
