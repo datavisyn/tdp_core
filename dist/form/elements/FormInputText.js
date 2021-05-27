@@ -19,7 +19,7 @@ export class FormInputText extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed('form-group', true);
+        this.$node = $formNode.append('div').classed('mb-3', true);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel();
         this.$input = this.$node.append('input').attr('type', (this.elementDesc.options || {}).type || 'text');

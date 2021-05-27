@@ -39,18 +39,18 @@ export class ProvenanceGraphMenuUtils {
           </div>`
           });
           dialog.form.innerHTML = `
-              <div class="form-group">
-                <label for="${prefix}_name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
+              <div class="mb-3">
+                <label class="form-label" for="${prefix}_name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
                 <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
               </div>
-              <div class="form-group">
-                <label for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
+              <div class="mb-3">
+                <label class="form-label" for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
                 <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
               </div>
-              <div class="form-group">
+              <div class="mb-3">
                 <div class="checkbox form-check">
                   <input type="checkbox"" id="customCheckbox1" name="${prefix}_agree" required="required" class="form-check-input">
-                  <label class="radio-inline form-check-label" for="customCheckbox1">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
+                  <label class="form-label radio-inline form-check-label" for="customCheckbox1">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
                 </div>
               </div>
           `;

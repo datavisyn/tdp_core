@@ -116,14 +116,14 @@ export class TourManager {
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.helpTours')}</h4>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
                 </button>
             </div>
             <div class="modal-body">
               <ul class="fa-ul">
                 ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}">
                   <i class="fa-li ${finished.has(d.id) ? 'fas fa-check-square' : 'far fa-square'}"></i>
-                  <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-dismiss="modal" data-name="${d.name}">${d.name}</a>
+                  <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-bs-dismiss="modal" data-name="${d.name}">${d.name}</a>
                   ${d.description ? `<p>${d.description}</p>` : ''}
                 </li>`).join('')}
               </ul>

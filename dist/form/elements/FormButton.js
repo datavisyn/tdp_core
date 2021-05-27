@@ -36,7 +36,7 @@ export class FormButton extends EventHandler {
      * @param $formNode The parent node this element will be attached to
      */
     build($formNode) {
-        this.$node = $formNode.append('div').classed('form-group', true);
+        this.$node = $formNode.append('div').classed('mb-3', true);
         this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
         this.$button.html(() => this.elementDesc.iconClass ? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
     }

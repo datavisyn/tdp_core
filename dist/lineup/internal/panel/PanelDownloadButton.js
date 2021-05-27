@@ -74,7 +74,7 @@ export class PanelDownloadButton {
             const flat = ranking.flatColumns.filter((c) => c.label.trim().length > 0);
             const lookup = new Map(flat.map((d) => [d.id, d]));
             dialog.form.innerHTML = `
-        <div class="form-group">
+        <div class="mb-3">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
           <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
           <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
@@ -83,32 +83,32 @@ export class PanelDownloadButton {
               <i class="fas fa-grip-vertical"></i>
               <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
-                <label class="form-check-label" for="customCheck_${col.id}">${col.label}</label>
+                <label class="form-label form-check-label" for="customCheck_${col.id}">${col.label}</label>
               </div>
             </div>
           `).join('')}
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
           <div class="radio form-check" data-num-rows="${orderedRowIndices.all.length}">
             <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="form-check-input">
-            <label class="form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
+            <label class="form-label form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
           </div>
           <div class="radio form-check" data-num-rows="${orderedRowIndices.filtered.length}">
             <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="form-check-input">
-            <label class="form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
+            <label class="form-label form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
           </div>
           <div class="radio form-check" data-num-rows="${orderedRowIndices.selected.length}">
             <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="form-check-input">
-            <label class="form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
+            <label class="form-label form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
           </div>
         </div>
-        <div class="form-group">
-          <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
+        <div class="mb-3">
+          <label class="form-label" for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
           <input class="form-control" id="name_${id}" name="name" value="Export" required>
         </div>
-        <div class="form-group">
-          <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
+        <div class="mb-3">
+          <label class="form-label" for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
           <select class="form-control" id="type_${id}" name="type" required>
           <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
           <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
