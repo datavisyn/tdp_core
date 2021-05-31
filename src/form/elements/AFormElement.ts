@@ -125,7 +125,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     }
     const inlineForm = 'inlineForm';
     const colWidth = this.elementDesc.options[inlineForm] ? 'col-sm-auto' : 'col-sm-12';
-    const labelClass = this.elementDesc.type === "FormCheckBox" ? 'form-check-label' : 'col-form-label';
+    const labelClass = this.elementDesc.type === 'FormCheckBox' ? 'form-check-label' : 'col-form-label';
     this.$node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
   }
 

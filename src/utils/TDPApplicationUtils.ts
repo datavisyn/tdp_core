@@ -108,7 +108,7 @@ export class TDPApplicationUtils {
             <label for="btnradio_permissions_2" class="form-label btn btn-outline-secondary btn-sm ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'active' : ''}">
                <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
-            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_3" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}> 
+            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_3" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}>
             <label for="btnradio_permissions_3" class="form-label btn btn-outline-secondary btn-sm ${permission.others.has(EPermission.WRITE) ? 'active' : ''}">
               <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
