@@ -301,15 +301,15 @@ export class FormMap extends AFormElement {
             row.classList.add('row');
             group.appendChild(row);
             row.innerHTML = `
-        <div class="col root">
+        <div class="col-sm root">
           <select class="form-control form-control-sm map-selector">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
         <div class="col-sm-auto"></div>
-        <div class="col-sm-auto"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
-            const valueElem = row.querySelector('.root');
+        <div class="col-sm-auto"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">&times;</span></button></div>`;
+            const valueElem = row.querySelector('.col-sm-auto');
             if (d.key) { // has value
                 this.addValueEditor(d, valueElem, entries);
             }
