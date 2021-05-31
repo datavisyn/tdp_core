@@ -12,7 +12,7 @@ import { ViewUtils } from './ViewUtils';
 import { ResolveUtils } from './ResolveUtils';
 import { EViewMode } from '../base/interfaces';
 import { IForm } from '../form/interfaces';
-import { ERenderAuthorizationStatus, IAuthorizationType, TokenManager, tokenManager } from '../auth';
+import { ERenderAuthorizationStatus, IAuthorizationConfiguration, TokenManager, TDPTokenManager } from '../auth';
 
 /**
  * base class for all views
@@ -108,7 +108,7 @@ export abstract class AView extends EventHandler implements IView {
     // tokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
     //   await this.rebuild();
     // });
-    tokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
+    TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
       // If a authorization is removed, rerun the registered authorizations
       await this.runAuthorizations();
     });
@@ -125,7 +125,7 @@ export abstract class AView extends EventHandler implements IView {
    * It will show an overlay over the detail view allowing the user to authorize the application.
    */
   protected async runAuthorizations(): Promise<void> {
-    await tokenManager.runAuthorizations(await this.getAuthorizationConfiguration(), {
+    await TDPTokenManager.runAuthorizations(await this.getAuthorizationConfiguration(), {
       render: ({ authConfiguration, status, error, trigger }) => {
         // Fetch or create the authorization overlay
         let overlay = this.node.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
@@ -145,7 +145,7 @@ export abstract class AView extends EventHandler implements IView {
               : ''
           }
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                <p class="lead">This view requires special authentication to ${authConfiguration.name}.</p>
+                <p class="lead">${authConfiguration.name} authorization is required for this view.</p>
                 <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? 'Loading' : 'Authorize'}</button>
             </div>`;
 
@@ -157,30 +157,14 @@ export abstract class AView extends EventHandler implements IView {
     });
   }
 
-  protected async getAuthorizationConfiguration(): Promise<IAuthorizationType | IAuthorizationType[] | null> {
+  /**
+   * Hook to override returning which authorizations are required for this view.
+   * @returns ID(s) or authorization configurations(s) which are required. Defaults to the `authorization` desc entry.
+   */
+  protected async getAuthorizationConfiguration(): Promise<string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null> {
     // hook
-    // return [{
-    //   type: 'simplePopup',
-    //   id: 'Compound360',
-    //   name: 'Compound360',
-    //   url: "http://localhost:5000/Target360/login",
-    //   tokenParameter: "access_token",
-    // }];
     return this.context.desc.authorization;
   }
-
-  protected getAuthorization<T>(id: string): T | null {
-    return UserSession.getInstance().retrieve(`token_${id}`);
-  }
-
-  // protected async rebuild() {
-  //   // Ensure that no busy indicator is shown
-  //   this.setBusy(false);
-  //   // Rerun authorizations
-  //   // await tokenManager.runAuthorizations(await this.getAuthorizationConfiguration(), {node: this.node});
-  //   // Reinitialize
-  //   return this.initImpl();
-  // }
 
   /**
    * hook for custom initialization

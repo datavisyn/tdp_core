@@ -1,38 +1,23 @@
 import { EventHandler, IEvent } from 'phovea_core';
-import { IAuthorizationType } from './interfaces';
+import { IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
 declare type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
 export declare function authorizationStored(event: IEvent, id: string, token: string): void;
 export declare function authorizationRemoved(event: IEvent, ids: string[]): void;
-export declare enum ERenderAuthorizationStatus {
-    NOT_TRIGGERED = "not_triggered",
-    PENDING = "pending",
-    SUCCESS = "success",
-    ERROR = "error"
-}
-interface IRenderAuthorizationOptions {
-    /**
-     * Currently active authorization configuration.
-     */
-    authConfiguration: IAuthorizationType;
-    /**
-     * Current status of the authorization process.
-     */
-    status: ERenderAuthorizationStatus;
-    /**
-     * If `status` is `not_triggered`, the trigger function is passed here.
-     * Some authorization configurations require the active triggering of the process, i.e. when opening a popup.
-     * Render a button and trigger this function to continue the authorization process.
-     */
-    trigger?: () => void;
-    /**
-     * If `status` is `error`, the error is passed here.
-     */
-    error?: Error;
-}
 export declare class TokenManager extends EventHandler {
     static EVENT_AUTHORIZATION_STORED: string;
     static EVENT_AUTHORIZATION_REMOVED: string;
+    /**
+     * Map of saved tokens.
+     */
     protected tokens: Map<string, string>;
+    /**
+     * Map of authorization configurations.
+     */
+    protected authorizationConfigurations: Map<string, import("./interfaces").ISimplePopupAuthorizationConfiguration>;
+    /**
+     * Map of possible authorization flows.
+     */
+    protected authorizationFlows: Map<string, IAuthorizationFlow<import("./interfaces").ISimplePopupAuthorizationConfiguration>>;
     constructor();
     on(events: typeof TokenManager.EVENT_AUTHORIZATION_STORED, handler?: typeof authorizationStored): this;
     on(events: typeof TokenManager.EVENT_AUTHORIZATION_REMOVED, handler?: typeof authorizationRemoved): this;
@@ -41,12 +26,30 @@ export declare class TokenManager extends EventHandler {
     fire(events: typeof TokenManager.EVENT_AUTHORIZATION_STORED, ...params: ExtractParametersExceptEvent<typeof authorizationStored>): this;
     fire(events: typeof TokenManager.EVENT_AUTHORIZATION_REMOVED, ...params: ExtractParametersExceptEvent<typeof authorizationRemoved>): this;
     /**
+     * Adds authorization configurations to the token manager.
+     * @param authorizationConfiguration Authorization configurations to be added.
+     */
+    addAuthorizationConfiguration(authorizationConfiguration?: IAuthorizationConfiguration | IAuthorizationConfiguration[]): Promise<void>;
+    /**
+     * Adds authorization flows to the token manager.
+     * @param authorizationFlows Authorization flows to be added.
+     */
+    addAuthorizationFlow(authorizationFlows: {
+        [id: string]: IAuthorizationFlow;
+    }): Promise<void>;
+    /**
      * Retrieves the token of a specific authorization.
+     * @param id ID of the token.
+     * @returns The retrieved token, or null if no token is available.
+     */
+    getToken(id: string): string | null;
+    /**
+     * Retrieves the token of a specific authorization asynchronously.
      * @param id ID of the token.
      * @param options Options for the token get.
      * @returns The retrieved token, or null if no token is available.
      */
-    getAuthorization(id: string, options?: {
+    getTokenAsync(id: string, options?: {
         /**
          * If true, the promise is resolved as soon as the token is stored, i.e. it waits for the token.
          * Note that it will wait forever until a `EVENT_AUTHORIZATION_STORED` is triggered.
@@ -56,29 +59,26 @@ export declare class TokenManager extends EventHandler {
     /**
      * Removes a token for a specific authorization.
      * @param id ID of the authorization.
-     * @returns True if the token was found and removed, false otherwise.
      */
-    invalidateAuthorization(id: string): Promise<boolean>;
+    invalidateToken(ids: string | string[]): Promise<void>;
     /**
      * Sets an authorization token.
      * @param id ID of the authorization.
      * @param token Token to be set.
      * @returns True if the token was set, false otherwise.
      */
-    setAuthorization(id: string, token: string): boolean;
+    setToken(id: string, token: string): boolean;
     /**
      * Returns all stored authorization tokens.
+     * @param authConfigurations Optional ID(s) or Authorization configuration(s) filter.
      * @returns Object of id -> token.
      */
-    getAuthorizations(): {
-        [id: string]: string;
-    };
     /**
      * Runs a single or multiple authorization configurations. See `runAuthorization` for details.
-     * @param authConfigurations Authorization configurations to be run.
+     * @param authConfigurations ID(s) or Authorization configuration(s) to be run.
      * @param options Options for the authorization runs.
      */
-    runAuthorizations(authConfigurations: IAuthorizationType | IAuthorizationType[] | null, options: {
+    runAuthorizations(authConfigurations: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null, options: {
         /**
          * Render function called every time the authorization status is updated.
          */
@@ -90,11 +90,21 @@ export declare class TokenManager extends EventHandler {
     }): Promise<void>;
     /**
      * Runs a specific authorization configuration and sets the result token in the manager.
-     * @param authConfiguration Authorization configuration to be run.
+     * @param authConfiguration ID or Authorization configuration to be run.
      * @param options Options for the authorization run.
      * @returns The retrieved token, or null if no token is available.
      */
-    runAuthorization(authConfiguration: IAuthorizationType, options: Parameters<TokenManager['runAuthorizations']>[1]): Promise<string | null>;
+    protected runAuthorization(authConfiguration: string | IAuthorizationConfiguration, options: Parameters<TokenManager['runAuthorizations']>[1]): Promise<string | null>;
 }
-export declare const tokenManager: TokenManager;
+/**
+ * Error thrown when a token is invalid (i.e. expired).
+ */
+export declare class InvalidTokenError extends Error {
+    readonly ids: string[];
+    constructor(ids: string | string[]);
+}
+/**
+ * Global token manager for TDP applications.
+ */
+export declare const TDPTokenManager: TokenManager;
 export {};

@@ -1,6 +1,7 @@
 import { EventHandler, GlobalEventHandler, IEvent, IEventListener, UserSession } from 'phovea_core';
-import { IAuthorizationType } from './interfaces';
-import { openTokenWindow } from './TokenWindowFlow';
+import { ERenderAuthorizationStatus, IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
+import { simplePopupFlow } from './simplePopup';
+import { castArray } from 'lodash';
 
 // Extract all parameters except the first one
 type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
@@ -8,42 +9,31 @@ type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent
 export declare function authorizationStored(event: IEvent, id: string, token: string): void;
 export declare function authorizationRemoved(event: IEvent, ids: string[]): void;
 
-export enum ERenderAuthorizationStatus {
-  NOT_TRIGGERED = 'not_triggered',
-  PENDING = 'pending',
-  SUCCESS = 'success',
-  ERROR = 'error',
-}
-
-interface IRenderAuthorizationOptions {
-  /**
-   * Currently active authorization configuration.
-   */
-  authConfiguration: IAuthorizationType;
-  /**
-   * Current status of the authorization process.
-   */
-  status: ERenderAuthorizationStatus;
-  /**
-   * If `status` is `not_triggered`, the trigger function is passed here.
-   * Some authorization configurations require the active triggering of the process, i.e. when opening a popup.
-   * Render a button and trigger this function to continue the authorization process.
-   */
-  trigger?: () => void;
-  /**
-   * If `status` is `error`, the error is passed here.
-   */
-  error?: Error;
-}
-
 export class TokenManager extends EventHandler {
   static EVENT_AUTHORIZATION_STORED = 'event_authorization_stored';
   static EVENT_AUTHORIZATION_REMOVED = 'event_authorization_removed';
 
-  protected tokens: Map<string, string> = new Map<string, string>();
+  /**
+   * Map of saved tokens.
+   */
+  protected tokens = new Map<string, string>();
+  /**
+   * Map of authorization configurations.
+   */
+  protected authorizationConfigurations = new Map<string, IAuthorizationConfiguration>();
+  /**
+   * Map of possible authorization flows.
+   */
+  protected authorizationFlows = new Map<string, IAuthorizationFlow>();
 
   constructor() {
     super();
+
+    // TODO: Currently, only one authorization flow is possible. Maybe add an extension point in the future.
+    this.addAuthorizationFlow({
+      simplePopup: simplePopupFlow
+    });
+
     // Clear all tokens as soon as a user logs out.
     GlobalEventHandler.getInstance().on(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT, () => {
       if (this.tokens.size > 0) {
@@ -73,12 +63,39 @@ export class TokenManager extends EventHandler {
   }
 
   /**
+   * Adds authorization configurations to the token manager.
+   * @param authorizationConfiguration Authorization configurations to be added.
+   */
+  public async addAuthorizationConfiguration(authorizationConfiguration: IAuthorizationConfiguration | IAuthorizationConfiguration[] = []): Promise<void> {
+    // Fill the authorization configurations with the predefined configurations.
+    castArray(authorizationConfiguration).forEach((config) => this.authorizationConfigurations.set(config.id, config));
+  }
+
+  /**
+   * Adds authorization flows to the token manager.
+   * @param authorizationFlows Authorization flows to be added.
+   */
+  public async addAuthorizationFlow(authorizationFlows: {[id: string]: IAuthorizationFlow}): Promise<void> {
+    // Fill the authorization flows with the predefined configurations.
+    Object.entries(authorizationFlows).forEach(([id, flow]) => this.authorizationFlows.set(id, flow));
+  }
+
+  /**
    * Retrieves the token of a specific authorization.
+   * @param id ID of the token.
+   * @returns The retrieved token, or null if no token is available.
+   */
+  public getToken(id: string): string | null {
+    return this.tokens.get(id);
+  }
+
+  /**
+   * Retrieves the token of a specific authorization asynchronously.
    * @param id ID of the token.
    * @param options Options for the token get.
    * @returns The retrieved token, or null if no token is available.
    */
-  public async getAuthorization(
+  public async getTokenAsync(
     id: string,
     options?: {
       /**
@@ -104,12 +121,11 @@ export class TokenManager extends EventHandler {
   /**
    * Removes a token for a specific authorization.
    * @param id ID of the authorization.
-   * @returns True if the token was found and removed, false otherwise.
    */
-  public async invalidateAuthorization(id: string): Promise<boolean> {
-    const removed = this.tokens.delete(id);
-    this.fire(TokenManager.EVENT_AUTHORIZATION_REMOVED, [id]);
-    return removed;
+  public async invalidateToken(ids: string | string[]): Promise<void> {
+    ids = castArray(ids);
+    ids.forEach((id) => this.tokens.delete(id));
+    this.fire(TokenManager.EVENT_AUTHORIZATION_REMOVED, ids);
   }
 
   /**
@@ -118,7 +134,7 @@ export class TokenManager extends EventHandler {
    * @param token Token to be set.
    * @returns True if the token was set, false otherwise.
    */
-  public setAuthorization(id: string, token: string): boolean {
+  public setToken(id: string, token: string): boolean {
     if (token) {
       this.tokens.set(id, token);
       this.fire(TokenManager.EVENT_AUTHORIZATION_STORED, id, token);
@@ -129,19 +145,21 @@ export class TokenManager extends EventHandler {
 
   /**
    * Returns all stored authorization tokens.
+   * @param authConfigurations Optional ID(s) or Authorization configuration(s) filter.
    * @returns Object of id -> token.
    */
-  public getAuthorizations(): { [id: string]: string } {
-    return Array.from(this.tokens.entries()).reduce((acc, [id, token]) => ({ ...acc, [id]: token }), {});
-  }
+  // public getTokens(authConfigurations: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null): { [id: string]: string | null } {
+  //   const keys = authConfigurations ? castArray(authConfigurations).map((auth) => typeof(auth) === 'string' ? auth : auth.id) : Array.from(this.tokens.keys());
+  //   return keys.reduce((acc, id) => ({ ...acc, [id]: this.tokens.get(id) }), {});
+  // }
 
   /**
    * Runs a single or multiple authorization configurations. See `runAuthorization` for details.
-   * @param authConfigurations Authorization configurations to be run.
+   * @param authConfigurations ID(s) or Authorization configuration(s) to be run.
    * @param options Options for the authorization runs.
    */
   public async runAuthorizations(
-    authConfigurations: IAuthorizationType | IAuthorizationType[] | null,
+    authConfigurations: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null,
     options: {
       /**
        * Render function called every time the authorization status is updated.
@@ -155,7 +173,7 @@ export class TokenManager extends EventHandler {
   ): Promise<void> {
     if (authConfigurations) {
       // Iterate over all authorization configurations
-      for (const authConfiguration of Array.isArray(authConfigurations) ? authConfigurations : [authConfigurations]) {
+      for (const authConfiguration of castArray(authConfigurations)) {
         await this.runAuthorization(authConfiguration, options);
       }
     }
@@ -163,12 +181,22 @@ export class TokenManager extends EventHandler {
 
   /**
    * Runs a specific authorization configuration and sets the result token in the manager.
-   * @param authConfiguration Authorization configuration to be run.
+   * @param authConfiguration ID or Authorization configuration to be run.
    * @param options Options for the authorization run.
    * @returns The retrieved token, or null if no token is available.
    */
-  public async runAuthorization(authConfiguration: IAuthorizationType, options: Parameters<TokenManager['runAuthorizations']>[1]): Promise<string | null> {
-    const existingToken = this.tokens.get(authConfiguration.id);
+  protected async runAuthorization(authConfiguration: string | IAuthorizationConfiguration, options: Parameters<TokenManager['runAuthorizations']>[1]): Promise<string | null> {
+    let config: IAuthorizationConfiguration = null;
+    if(typeof(authConfiguration) === 'string') {
+      config = this.authorizationConfigurations.get(authConfiguration);
+      if(!config) {
+        throw Error(`No authorization configuration with id ${authConfiguration} exists.`);
+      }
+    } else {
+      config = authConfiguration;
+    }
+
+    const existingToken = this.tokens.get(config.id);
     if (!options.force && existingToken) {
       return;
     }
@@ -176,14 +204,18 @@ export class TokenManager extends EventHandler {
     const render = (override: Pick<IRenderAuthorizationOptions, 'status' | 'error'>) => {
       options.render({
         ...override,
-        authConfiguration,
+        authConfiguration: config,
         trigger: async () => {
           try {
             render({
               status: ERenderAuthorizationStatus.PENDING,
             });
-            const token = await openTokenWindow(authConfiguration);
-            this.setAuthorization(authConfiguration.id, token);
+            const authorizationFlow = this.authorizationFlows.get(config.type);
+            if (!authorizationFlow) {
+              throw Error(`No authorization flow of type ${config.type} found.`);
+            }
+            const token = await authorizationFlow(config);
+            this.setToken(config.id, token);
           } catch (error) {
             render({
               status: ERenderAuthorizationStatus.ERROR,
@@ -194,10 +226,11 @@ export class TokenManager extends EventHandler {
       });
     };
 
+    // TODO: Should we support automatically triggering auth flows?
     render({
-      status: authConfiguration.type === 'simplePopup' ? ERenderAuthorizationStatus.NOT_TRIGGERED : ERenderAuthorizationStatus.PENDING,
+      status: ERenderAuthorizationStatus.NOT_TRIGGERED,
     });
-    const token = await this.getAuthorization(authConfiguration.id, { wait: true });
+    const token = await this.getTokenAsync(config.id, { wait: true });
     render({
       status: ERenderAuthorizationStatus.SUCCESS,
     });
@@ -205,4 +238,20 @@ export class TokenManager extends EventHandler {
   }
 }
 
-export const tokenManager = new TokenManager();
+/**
+ * Error thrown when a token is invalid (i.e. expired).
+ */
+export class InvalidTokenError extends Error {
+  public readonly ids: string[] = null;
+  constructor(ids: string | string[]) {
+    super(`Token is invalid for ${castArray(ids).join(', ')}`);
+
+    this.ids = castArray(ids);
+  }
+}
+
+/**
+ * Global token manager for TDP applications.
+ */
+/* tslint:disable-next-line:variable-name */
+export const TDPTokenManager = new TokenManager();

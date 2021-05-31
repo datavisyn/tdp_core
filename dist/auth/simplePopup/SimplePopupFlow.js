@@ -1,4 +1,4 @@
-export async function openTokenWindow({ id, url, tokenParameter, }) {
+export async function simplePopupFlow({ id, url, tokenParameter, }) {
     console.log(`Openining popup window for ${id}`);
     const popup = window.open(url, 'Authorization', 'toolbar=no,location=no,directories=no,status=no, menubar=no,scrollbars=no,resizable=no,width=600,height=300');
     return new Promise(async (resolve, reject) => {
@@ -25,4 +25,4 @@ export async function openTokenWindow({ id, url, tokenParameter, }) {
         }
     });
 }
-//# sourceMappingURL=TokenWindowFlow.js.map
+//# sourceMappingURL=SimplePopupFlow.js.map

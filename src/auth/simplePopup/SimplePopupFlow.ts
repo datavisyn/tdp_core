@@ -1,10 +1,10 @@
-import { IOpenTokenWindowProps } from './interfaces';
+import { ISimplePopupAuthorizationConfiguration } from '../interfaces';
 
-export async function openTokenWindow({
+export async function simplePopupFlow({
   id,
   url,
   tokenParameter,
-}: IOpenTokenWindowProps): Promise<string> {
+}: ISimplePopupAuthorizationConfiguration): Promise<string> {
   console.log(`Openining popup window for ${id}`);
 
   const popup = window.open(

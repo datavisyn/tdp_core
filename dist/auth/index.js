@@ -1,4 +1,4 @@
 export * from './interfaces';
 export * from './TokenManager';
-export * from './TokenWindowFlow';
+export * from './simplePopup/SimplePopupFlow';
 //# sourceMappingURL=index.js.map

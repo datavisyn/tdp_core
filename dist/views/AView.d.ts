@@ -5,7 +5,7 @@ import { EventHandler, IDType } from 'phovea_core';
 import { IFormElementDesc } from '../form/interfaces';
 import { ISelection, IView, IViewContext } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
-import { IAuthorizationType } from '../auth';
+import { IAuthorizationConfiguration } from '../auth';
 /**
  * base class for all views
  */
@@ -53,8 +53,11 @@ export declare abstract class AView extends EventHandler implements IView {
      * It will show an overlay over the detail view allowing the user to authorize the application.
      */
     protected runAuthorizations(): Promise<void>;
-    protected getAuthorizationConfiguration(): Promise<IAuthorizationType | IAuthorizationType[] | null>;
-    protected getAuthorization<T>(id: string): T | null;
+    /**
+     * Hook to override returning which authorizations are required for this view.
+     * @returns ID(s) or authorization configurations(s) which are required. Defaults to the `authorization` desc entry.
+     */
+    protected getAuthorizationConfiguration(): Promise<string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null>;
     /**
      * hook for custom initialization
      */

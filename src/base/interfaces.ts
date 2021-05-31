@@ -6,7 +6,7 @@ import {RangeLike} from 'phovea_core';
 import {IDType} from 'phovea_core';
 import {IColumnDesc, Column} from 'lineupjs';
 import {AppHeader} from 'phovea_ui';
-import {IAuthorizationType} from '../auth';
+import {IAuthorizationConfiguration} from '../auth';
 
 
 
@@ -79,7 +79,6 @@ export interface IScore<T> {
    */
   createDesc(extras?: object): IColumnDesc & {[key: string]: any};
 
-
   /**
    * start the computation of the score for the given ids
    * @param {RangeLike} ids the currently visible ids
@@ -88,6 +87,12 @@ export interface IScore<T> {
    * @returns {Promise<IScoreRow<T>[]>} the scores
    */
   compute(ids: RangeLike, idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
+
+  /**
+   * Hook to override returning which authorizations are required for this score.
+   * @returns ID(s) or authorization configurations(s) which are required.
+   */
+  getAuthorizationConfiguration?(): Promise<string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null>;
 }
 
 /**
@@ -324,7 +329,7 @@ export interface IViewPluginDesc extends IPluginDesc {
    * optional authorization configuration ensuring authorization exists before loading the view.
    * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
    */
-  authorization?: IAuthorizationType | IAuthorizationType[] | null;
+  authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
 
   /**
    * a lot of topics/tags describing this view
