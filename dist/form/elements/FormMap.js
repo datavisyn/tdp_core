@@ -83,14 +83,14 @@ export class FormMap extends AFormElement {
             }
             this.$node.classed('dropdown', true);
             this.$node.html(`
-          <button class="btn btn-white border-gray-3 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn btn-white border border-gray-3 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
           </button>
           <div class="dropdown-menu p-2" data-bs-popper="static" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-map-container"></div>
-            <div class="form-map-apply">
+            <div class="form-map-apply mt-3">
                 <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
@@ -301,22 +301,23 @@ export class FormMap extends AFormElement {
             row.classList.add('row');
             group.appendChild(row);
             row.innerHTML = `
-        <div class="col-sm root">
-          <select class="form-control form-control-sm map-selector">
+        <div class="col-sm-4 form-map-row-key pe-0">
+          <select class="form-select form-select-sm map-selector">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
-        <div class="col-sm-auto"></div>
-        <div class="col-sm-auto"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">&times;</span></button></div>`;
-            const valueElem = row.querySelector('.col-sm-auto');
+        <div class="col-sm-7 form-map-row-value px-0"></div>
+        <div class="col-sm-1 ps-0"><button class="close" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span
+        aria-hidden="true">&times;</span></button></div>`;
+            const valueElem = row.querySelector('.form-map-row-value');
             if (d.key) { // has value
                 this.addValueEditor(d, valueElem, entries);
             }
             else {
                 // add remove all button
             }
-            row.querySelector('div.col-sm-auto button').addEventListener('click', (evt) => {
+            row.querySelector('.close').addEventListener('click', (evt) => {
                 evt.preventDefault();
                 evt.stopPropagation();
                 if (d.key) {
