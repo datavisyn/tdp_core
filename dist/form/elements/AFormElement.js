@@ -56,7 +56,7 @@ export class AFormElement extends EventHandler {
         return Boolean(this.value);
     }
     isVisible() {
-        return !this.$node.attr('hidden');
+        return this.$node.attr('hidden') === null;
     }
     /**
      * Set the visibility of an form element (default = true)
