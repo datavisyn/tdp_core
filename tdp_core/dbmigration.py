@@ -8,6 +8,8 @@ from typing import List, Dict, Optional
 import alembic.command
 import alembic.config
 from os import path
+import os
+from sys import platform
 from argparse import REMAINDER
 
 
@@ -120,11 +122,42 @@ class DBMigration(object):
     if self.version_table_schema:
       alembic_cfg.set_main_option('version_table_schema', self.version_table_schema)
 
+
+    print(">>>", options, arguments)
+    if arguments[0] == 'init':
+      fix_pre_init(arguments[1])
+
     # Run the command
     cmd_parser.run_cmd(alembic_cfg, options)
 
+    if arguments[0] == 'init':
+      fix_post_init(arguments[1])
+
+    if arguments[0] == 'revision' and "linux" in platform:
+      for fn in os.listdir(self.script_location):
+        os.chmod(os.path.join(self.script_location, fn), 0o0777)
+
     return True
 
+def fix_post_init():
+      with open(os.path.join(self.script_location, "env.py"), "w") as f:
+        f.write("import tdp_core.dbmigration_env  # NOQA\n\ntdp_core.dbmigration_env.run_migrations_online()")
+      os.remove(os.path.join(self.script_location, "env.py"))
+      os.remove(os.path.join(self.script_location, "/../alembic.ini"))
+
+def fix_pre_init(migration_name):
+      initpy = os.path.join(self.script_location, "/../__init__.py")
+      fc = open(initpy, "r").read()
+      dbname, projname = re.findall("tdp-sql-database-definition', '(.+?)', '(.+?)\.", fc)[0]
+      print(f"Registering migration to proj: {projname} db: {dbname} / ")
+      open(initpy, "w").write(fc.replace("    # generator-phovea:end", f"""    # generator-phovea:end
+
+    from os import path
+    registry.append('tdp-sql-database-migration', '{migration_name}', '', {
+        'scriptLocation': path.join(path.abspath(path.dirname(__file__)), 'migration'),
+        'configKey': '{projname}.migration',
+        'dbKey': '{dbname}'
+    })"""))
 
 class DBMigrationManager(object):
   """
