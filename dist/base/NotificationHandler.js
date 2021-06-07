@@ -1,9 +1,9 @@
 import { I18nextManager } from 'phovea_core';
 export class NotificationHandler {
     static pushNotification(level, msg, autoHideInMs = -1) {
-        let parent = document.body.querySelector('div.toast-container');
+        let parent = document.body.querySelector('div.toast-container-custom');
         if (!parent) {
-            document.body.insertAdjacentHTML('beforeend', `<div class="toast-container"></div>`);
+            document.body.insertAdjacentHTML('beforeend', `<div class="toast-container-custom"></div>`);
             parent = document.body.lastElementChild;
         }
         parent.classList.add('push');

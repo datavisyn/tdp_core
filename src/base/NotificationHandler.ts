@@ -7,9 +7,9 @@ export class NotificationHandler {
   public static DEFAULT_ERROR_AUTO_HIDE = -1; // not
 
   static pushNotification(level: 'success' | 'info' | 'warning' | 'danger' | 'error', msg: string, autoHideInMs = -1) {
-    let parent = <HTMLElement>document.body.querySelector('div.toast-container');
+    let parent = <HTMLElement>document.body.querySelector('div.toast-container-custom');
     if (!parent) {
-      document.body.insertAdjacentHTML('beforeend', `<div class="toast-container"></div>`);
+      document.body.insertAdjacentHTML('beforeend', `<div class="toast-container-custom"></div>`);
       parent = <HTMLElement>document.body.lastElementChild!;
     }
 
