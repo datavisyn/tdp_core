@@ -20,6 +20,7 @@ export class FormRadio extends AFormElement {
         this.setVisible(this.elementDesc.visible);
         this.appendLabel();
         const $label = this.$node.select('label');
+        $label.classed('me-2', true);
         const options = this.elementDesc.options;
         const $buttons = this.$node.selectAll('div.radio-inline').data(options.buttons);
         $buttons.enter().append('div').classed('radio-inline form-check form-check-inline', true).html((d, i) => `<input class="form-check-input" type="radio"

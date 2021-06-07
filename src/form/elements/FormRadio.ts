@@ -34,6 +34,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
     this.appendLabel();
 
     const $label = this.$node.select('label');
+    $label.classed('me-2', true);
 
     const options = this.elementDesc.options;
 
