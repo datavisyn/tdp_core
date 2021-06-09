@@ -225,7 +225,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
     }
 
-    const modeSelector = body.querySelector('header');
+    const phoveaNavbar = document.body.querySelector('.phovea-navbar');
+    const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
     modeSelector.classList.add('collapsed');
     modeSelector.classList.add('clue-modeselector');
 
