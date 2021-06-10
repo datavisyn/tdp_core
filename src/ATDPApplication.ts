@@ -55,6 +55,11 @@ export interface ITDPOptions {
   showHelpLink: boolean | string;
 
   /**
+   * Show tour link if set to true and registered tours are available.
+   */
+  showTourLink: boolean;
+
+  /**
    * Show/hide the `Analysis Session Managment` menu in the header
    * @default: true
    */
@@ -91,6 +96,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showResearchDisclaimer: true,
     showAboutLink: true,
     showHelpLink: false,
+    showTourLink: true,
     showOptionsLink: false,
     showReportBugLink: true,
     showProvenanceMenu: true,
@@ -112,30 +118,28 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     const i18nPromise = I18nextManager.getInstance().initI18n();
 
-    Promise.all([configPromise, i18nPromise]).then(() => {
-      this.tourManager = new TourManager({
-        doc: document,
-        header: () => this.header,
-        app: () => this.app
+    Promise.all([configPromise, i18nPromise])
+      .then(() => {
+        this.build(document.body, {replaceBody: false});
+      })
+      .then(() => {
+        this.tourManager = new TourManager({
+          doc: document,
+          header: () => this.header,
+          app: () => this.app
+        });
+
+        if (this.options.showTourLink && this.tourManager.hasTours()) {
+          const button = this.header.addRightMenu('<i class="fas fa-question-circle fa-fw"></i>', (evt) => {
+            evt.preventDefault();
+            return false;
+          }, '#');
+
+          button.dataset.toggle = 'modal';
+          button.tabIndex = -1;
+          button.dataset.target = `#${this.tourManager.chooser.id}`;
+        }
       });
-
-      BaseUtils.mixin(this.options, {
-        showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
-      });
-
-      this.build(document.body, {replaceBody: false});
-
-      if (this.tourManager.hasTours()) {
-        const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
-
-        button.dataset.toggle = 'modal';
-        button.tabIndex = -1;
-        button.dataset.target = `#${this.tourManager.chooser.id}`;
-        button.onclick = (evt) => {
-          evt.preventDefault();
-        };
-      }
-    });
   }
 
   /**

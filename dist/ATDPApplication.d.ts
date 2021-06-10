@@ -41,6 +41,10 @@ export interface ITDPOptions {
      */
     showHelpLink: boolean | string;
     /**
+     * Show tour link if set to true and registered tours are available.
+     */
+    showTourLink: boolean;
+    /**
      * Show/hide the `Analysis Session Managment` menu in the header
      * @default: true
      */

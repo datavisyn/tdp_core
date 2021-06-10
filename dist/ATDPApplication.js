@@ -24,6 +24,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showResearchDisclaimer: true,
             showAboutLink: true,
             showHelpLink: false,
+            showTourLink: true,
             showOptionsLink: false,
             showReportBugLink: true,
             showProvenanceMenu: true,
@@ -34,24 +35,24 @@ export class ATDPApplication extends ACLUEWrapper {
         BaseUtils.mixin(this.options, options);
         const configPromise = ATDPApplication.initializeClientConfig(this.options);
         const i18nPromise = I18nextManager.getInstance().initI18n();
-        Promise.all([configPromise, i18nPromise]).then(() => {
+        Promise.all([configPromise, i18nPromise])
+            .then(() => {
+            this.build(document.body, { replaceBody: false });
+        })
+            .then(() => {
             this.tourManager = new TourManager({
                 doc: document,
                 header: () => this.header,
                 app: () => this.app
             });
-            BaseUtils.mixin(this.options, {
-                showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
-            });
-            this.build(document.body, { replaceBody: false });
-            if (this.tourManager.hasTours()) {
-                const button = document.querySelector('[data-header="helpLink"] a');
+            if (this.options.showTourLink && this.tourManager.hasTours()) {
+                const button = this.header.addRightMenu('<i class="fas fa-question-circle"></i>', (evt) => {
+                    evt.preventDefault();
+                    return false;
+                }, '#');
                 button.dataset.toggle = 'modal';
                 button.tabIndex = -1;
                 button.dataset.target = `#${this.tourManager.chooser.id}`;
-                button.onclick = (evt) => {
-                    evt.preventDefault();
-                };
             }
         });
     }
