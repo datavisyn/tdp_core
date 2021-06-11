@@ -76,6 +76,11 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected tourManager: TourManager;
     constructor(options?: Partial<ITDPOptions>);
     /**
+     * Initialize async parts
+     * TODO make public and remove call in constructor in the future
+     */
+    protected initialize(): Promise<void>;
+    /**
      * Loads the client config from '/clientConfig.json' and parses it.
      */
     static loadClientConfig<T = any>(): Promise<T | null>;
