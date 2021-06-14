@@ -131,8 +131,19 @@ export class TourManager {
         return this.tours;
     }
     setHighlight(mask) {
-        const fullAppHeight = this.backdrop.ownerDocument.body.scrollHeight; // full page height including scroll bars
-        const fullAppWidth = this.backdrop.ownerDocument.body.scrollWidth; // full page width including scroll bars
+        /**
+          * Adjust the size due to rounding errors with floating-point device pixel ratio (e.g., 1.25 for 125%).
+          * Usually the browser rounds the size for floating-point device pixel ratio and return a size + 1px.
+          * In case of an overlay this additional pixel causes the display of scroll bars of the viewport.
+          * This fix truncates the values instead of rounding it and return 1px less, depending on the device pixel ratio.
+          *
+          * @param size Size in pixel
+          */
+        const adjustSize = (size) => {
+            return Math.trunc(Math.trunc(size * window.devicePixelRatio) / window.devicePixelRatio);
+        };
+        const fullAppWidth = adjustSize(this.backdrop.ownerDocument.body.scrollWidth); // scrollWidth = full page width including scroll bars
+        const fullAppHeight = adjustSize(this.backdrop.ownerDocument.body.scrollHeight); // scrollHeight = full page height including scroll bars
         // set the new height of the backdrop
         this.backdrop.style.height = `${fullAppHeight}px`;
         this.backdrop.style.width = `${fullAppWidth}px`;
