@@ -3,7 +3,7 @@ import {Tour} from './Tour';
 import {IStep} from './extensions';
 import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
 import {AppHeader} from 'phovea_ui';
-import {GlobalEventHandler, I18nextManager} from 'phovea_core';
+import {GlobalEventHandler, I18nextManager, BaseUtils} from 'phovea_core';
 import {TourUtils} from './TourUtils';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
@@ -29,6 +29,10 @@ export class TourManager {
       this.hideTour();
     }
   }
+
+  private readonly resizeListener = BaseUtils.debounce(() => {
+    this.activeTour.refreshCurrent(this.activeTourContext);
+  }, 250);
 
   private readonly backdrop: HTMLElement;
   private readonly backdropBlocker: HTMLElement;
@@ -409,6 +413,9 @@ export class TourManager {
 
 
   private setUp(tour: Tour, context: any = {}) {
+    window.addEventListener('resize', this.resizeListener, {
+      passive: true
+    });
     this.backdrop.ownerDocument.addEventListener('keyup', this.keyListener, {
       passive: true
     });
@@ -421,6 +428,7 @@ export class TourManager {
 
   private takeDown() {
     this.clearHighlight();
+    window.removeEventListener('resize', this.resizeListener);
     this.backdrop.ownerDocument.removeEventListener('keyup', this.keyListener);
     this.backdrop.style.display = null;
     this.backdropBlocker.style.display = null;
