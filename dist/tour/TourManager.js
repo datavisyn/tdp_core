@@ -1,6 +1,6 @@
 import { Tour } from './Tour';
 import Popper from 'popper.js';
-import { GlobalEventHandler, I18nextManager } from 'phovea_core';
+import { GlobalEventHandler, I18nextManager, BaseUtils } from 'phovea_core';
 import { TourUtils } from './TourUtils';
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';
@@ -11,6 +11,9 @@ export class TourManager {
                 this.hideTour();
             }
         };
+        this.resizeListener = BaseUtils.debounce(() => {
+            this.activeTour.refreshCurrent(this.activeTourContext);
+        }, 250);
         this.activeTour = null;
         this.activeTourContext = null;
         this.tourContext = {
@@ -131,26 +134,26 @@ export class TourManager {
         return this.tours;
     }
     setHighlight(mask) {
-        const fullAppHeight = this.backdrop.ownerDocument.body.scrollHeight; // full page height including scroll bars
-        const fullAppWidth = this.backdrop.ownerDocument.body.scrollWidth; // full page width including scroll bars
+        const fullAppWidth = '100vw';
+        const fullAppHeight = '100vh';
         // set the new height of the backdrop
-        this.backdrop.style.height = `${fullAppHeight}px`;
-        this.backdrop.style.width = `${fullAppWidth}px`;
+        this.backdrop.style.height = fullAppHeight;
+        this.backdrop.style.width = fullAppWidth;
         // also consider the current scroll offset inside the window
         const scrollOffsetX = self.scrollX;
         const scrollOffsetY = self.scrollY;
         // @see http://bennettfeely.com/clippy/ -> select `Frame` example
         this.backdrop.style.clipPath = `polygon(
       0% 0%,
-      0% ${fullAppHeight}px,
-      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
+      0% ${fullAppHeight},
+      ${mask.left + scrollOffsetX}px ${fullAppHeight},
       ${mask.left + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
       ${mask.left + mask.width + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
       ${mask.left + mask.width + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
       ${mask.left + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
-      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
-      ${fullAppWidth}px ${fullAppHeight}px,
-      ${fullAppWidth}px 0%
+      ${mask.left + scrollOffsetX}px ${fullAppHeight},
+      ${fullAppWidth} ${fullAppHeight},
+      ${fullAppWidth} 0%
     )`;
     }
     clearHighlight() {
@@ -342,6 +345,9 @@ export class TourManager {
         }
     }
     setUp(tour, context = {}) {
+        this.backdrop.ownerDocument.defaultView.addEventListener('resize', this.resizeListener, {
+            passive: true
+        });
         this.backdrop.ownerDocument.addEventListener('keyup', this.keyListener, {
             passive: true
         });
@@ -352,6 +358,7 @@ export class TourManager {
     }
     takeDown() {
         this.clearHighlight();
+        this.backdrop.ownerDocument.defaultView.removeEventListener('resize', this.resizeListener);
         this.backdrop.ownerDocument.removeEventListener('keyup', this.keyListener);
         this.backdrop.style.display = null;
         this.backdropBlocker.style.display = null;

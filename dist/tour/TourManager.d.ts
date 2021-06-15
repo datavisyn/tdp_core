@@ -7,6 +7,7 @@ export interface ITourManagerContext {
 }
 export declare class TourManager {
     private readonly keyListener;
+    private readonly resizeListener;
     private readonly backdrop;
     private readonly backdropBlocker;
     private readonly step;
