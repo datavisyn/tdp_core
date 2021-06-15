@@ -401,7 +401,7 @@ export class TourManager {
 
 
   private setUp(tour: Tour, context: any = {}) {
-    window.addEventListener('resize', this.resizeListener, {
+    this.backdrop.ownerDocument.defaultView.addEventListener('resize', this.resizeListener, {
       passive: true
     });
     this.backdrop.ownerDocument.addEventListener('keyup', this.keyListener, {
@@ -416,7 +416,7 @@ export class TourManager {
 
   private takeDown() {
     this.clearHighlight();
-    window.removeEventListener('resize', this.resizeListener);
+    this.backdrop.ownerDocument.defaultView.removeEventListener('resize', this.resizeListener);
     this.backdrop.ownerDocument.removeEventListener('keyup', this.keyListener);
     this.backdrop.style.display = null;
     this.backdropBlocker.style.display = null;
