@@ -401,6 +401,9 @@ export class TourManager {
 
 
   private setUp(tour: Tour, context: any = {}) {
+    // prevent viewport scrollbars if backdrop is too large when resizing the window
+    this.backdrop.ownerDocument.body.style.overflow = 'hidden';
+
     this.backdrop.ownerDocument.defaultView.addEventListener('resize', this.resizeListener, {
       passive: true
     });
@@ -415,6 +418,8 @@ export class TourManager {
   }
 
   private takeDown() {
+    this.backdrop.ownerDocument.body.style.overflow = null;
+
     this.clearHighlight();
     this.backdrop.ownerDocument.defaultView.removeEventListener('resize', this.resizeListener);
     this.backdrop.ownerDocument.removeEventListener('keyup', this.keyListener);
