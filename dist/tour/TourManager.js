@@ -134,37 +134,26 @@ export class TourManager {
         return this.tours;
     }
     setHighlight(mask) {
-        /**
-          * Adjust the size due to rounding errors with floating-point device pixel ratio (e.g., 1.25 for 125%).
-          * Usually the browser rounds the size for floating-point device pixel ratio and return a size + 1px.
-          * In case of an overlay this additional pixel causes the display of scroll bars of the viewport.
-          * This fix truncates the values instead of rounding it and return 1px less, depending on the device pixel ratio.
-          *
-          * @param size Size in pixel
-          */
-        const adjustSize = (size) => {
-            return Math.trunc(Math.trunc(size * window.devicePixelRatio) / window.devicePixelRatio);
-        };
-        const fullAppWidth = adjustSize(this.backdrop.ownerDocument.body.scrollWidth); // scrollWidth = full page width including scroll bars
-        const fullAppHeight = adjustSize(this.backdrop.ownerDocument.body.scrollHeight); // scrollHeight = full page height including scroll bars
+        const fullAppWidth = '100vw';
+        const fullAppHeight = '100vh';
         // set the new height of the backdrop
-        this.backdrop.style.height = `${fullAppHeight}px`;
-        this.backdrop.style.width = `${fullAppWidth}px`;
+        this.backdrop.style.height = fullAppHeight;
+        this.backdrop.style.width = fullAppWidth;
         // also consider the current scroll offset inside the window
         const scrollOffsetX = self.scrollX;
         const scrollOffsetY = self.scrollY;
         // @see http://bennettfeely.com/clippy/ -> select `Frame` example
         this.backdrop.style.clipPath = `polygon(
       0% 0%,
-      0% ${fullAppHeight}px,
-      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
+      0% ${fullAppHeight},
+      ${mask.left + scrollOffsetX}px ${fullAppHeight},
       ${mask.left + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
       ${mask.left + mask.width + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
       ${mask.left + mask.width + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
       ${mask.left + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
-      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
-      ${fullAppWidth}px ${fullAppHeight}px,
-      ${fullAppWidth}px 0%
+      ${mask.left + scrollOffsetX}px ${fullAppHeight},
+      ${fullAppWidth} ${fullAppHeight},
+      ${fullAppWidth} 0%
     )`;
     }
     clearHighlight() {
