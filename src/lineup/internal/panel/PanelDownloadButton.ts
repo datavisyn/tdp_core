@@ -99,9 +99,9 @@ export class PanelDownloadButton implements IPanelButton {
           <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
           <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
           ${flat.map((col) => `
-            <div class="tdp-ranking-export-form-handle">
-              <i class="fas fa-grip-vertical"></i>
-              <div class="form-check">
+            <div class="tdp-ranking-export-form-handle row">
+              <i class="fas fa-grip-vertical col-sm-auto pb-2 pe-1"></i>
+              <div class="form-check col-sm-auto">
                 <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
                 <label class="form-label form-check-label" for="customCheck_${col.id}">${col.label}</label>
               </div>
