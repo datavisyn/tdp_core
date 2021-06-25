@@ -109,7 +109,7 @@ export class PanelDownloadButton {
         </div>
         <div class="mb-3">
           <label class="form-label" for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
-          <select class="form-control" id="type_${id}" name="type" required>
+          <select class="form-select" id="type_${id}" name="type" required>
           <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
           <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
           <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
