@@ -1,8 +1,7 @@
 
-import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, Ranking, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer, UIntTypedArray} from 'lineupjs';
+import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
 import {IDType} from 'phovea_core';
 import {IPlugin, IPluginDesc, EventHandler, I18nextManager, PluginRegistry, IDTypeManager} from 'phovea_core';
-import {StoreUtils} from '../../storage';
 import {
   EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   EP_TDP_CORE_LINEUP_PANEL_TAB
@@ -112,7 +111,7 @@ export class LineUpPanelActions extends EventHandler {
       this.tabContainer = new NullTabContainer(); // tab container without functionality
 
     } else {
-      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox(), ctx, doc);
+      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox({ formatItem: this.options.formatSearchBoxItem }), ctx, doc);
       this.panel = sidePanel.panel;
       this.tabContainer = new PanelTabContainer(this.node);
       this.tabContainer.addTab(sidePanel);
@@ -187,7 +186,7 @@ export class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableAddingColumns) {
-      const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
+      const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox({ formatItem: this.options.formatSearchBoxItem }));
       this.header.addButton(addColumnButton);
     }
 
@@ -291,7 +290,13 @@ export class LineUpPanelActions extends EventHandler {
     return descs
       .filter((d) => Boolean((<any>d)._score) === addScores)
       .map((d) => {
-        return {text: d.label, id: (<any>d).column.toString(), action: () => this.addColumn(d), chooserGroup: isAdditionalColumnDesc(d) ? d.chooserGroup : null};
+        return {
+          desc: d,
+          text: d.label,
+          id: (<any>d).column.toString(),
+          action: () => this.addColumn(d),
+          chooserGroup: isAdditionalColumnDesc(d) ? d.chooserGroup : null
+        };
       })
       .sort((a, b) => a.text.localeCompare(b.text));
   }
