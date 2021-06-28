@@ -89,6 +89,27 @@ export class ARankingView extends AView {
                 maxGroupColumns: Infinity,
                 filterGlobally: true,
                 propagateAggregationState: false
+            },
+            formatSearchBoxItem: (item, node) => {
+                // TypeScript type guard function
+                function hasColumnDesc(item) {
+                    return item.desc != null;
+                }
+                if (node.parentElement && hasColumnDesc(item)) {
+                    node.dataset.type = item.desc.type;
+                    const summary = item.desc.summary || item.desc.description;
+                    node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
+                    if (summary) {
+                        const label = node.ownerDocument.createElement('span');
+                        label.textContent = item.desc.label;
+                        node.appendChild(label);
+                        const desc = node.ownerDocument.createElement('span');
+                        desc.textContent = summary;
+                        node.appendChild(desc);
+                        return undefined;
+                    }
+                }
+                return item.text;
             }
         };
         // variants for deriving the item name
