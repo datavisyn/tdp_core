@@ -7,6 +7,11 @@ export async function simplePopupFlow({
 }: ISimplePopupAuthorizationConfiguration): Promise<string> {
   console.log(`Openining popup window for ${id}`);
 
+  // Allow a redirect_uri placeholder to automatically inject the location origin
+  if(url.includes('{{redirect_uri}}')) {
+    url = url.replace('{{redirect_uri}}', location.origin);
+  }
+
   const popup = window.open(
     url,
     'Authorization',
