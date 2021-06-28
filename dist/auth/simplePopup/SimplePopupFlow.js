@@ -7,7 +7,7 @@ export async function simplePopupFlow({ id, url, tokenParameter, }) {
     const popup = window.open(url, 'Authorization', 'toolbar=no,location=no,directories=no,status=no, menubar=no,scrollbars=no,resizable=no,width=600,height=300');
     return new Promise(async (resolve, reject) => {
         let i = 0;
-        while (i < 200) {
+        while (i < 300) {
             try {
                 if (popup.closed) {
                     reject('Window was closed before authorization was completed.');
@@ -24,7 +24,7 @@ export async function simplePopupFlow({ id, url, tokenParameter, }) {
             catch (e) {
                 console.error(e);
             }
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
             i++;
         }
     });

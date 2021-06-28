@@ -20,7 +20,7 @@ export async function simplePopupFlow({
 
   return new Promise(async (resolve, reject) => {
     let i = 0;
-    while (i < 200) {
+    while (i < 300) {
       try {
         if (popup.closed) {
           reject('Window was closed before authorization was completed.');
@@ -38,7 +38,7 @@ export async function simplePopupFlow({
       } catch (e) {
         console.error(e);
       }
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       i++;
     }
   });
