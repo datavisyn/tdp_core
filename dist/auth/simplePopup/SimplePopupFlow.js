@@ -27,6 +27,7 @@ export async function simplePopupFlow({ id, url, tokenParameter, }) {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             i++;
         }
+        reject('Authorization did not complete within timeframe.');
     });
 }
 //# sourceMappingURL=SimplePopupFlow.js.map
