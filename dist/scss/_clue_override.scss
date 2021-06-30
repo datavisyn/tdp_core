@@ -20,6 +20,10 @@ aside {
 
   &.provenance-layout-vis {
     border-color: $core_colour_selected;
+
+    &.collapsed {
+      border-left: 0; // hide border when panel is collapsed
+    }
   }
 
   &.provenance-story-vis {

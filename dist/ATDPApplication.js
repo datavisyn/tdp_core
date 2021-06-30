@@ -24,6 +24,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showResearchDisclaimer: true,
             showAboutLink: true,
             showHelpLink: false,
+            showTourLink: true,
             showOptionsLink: false,
             showReportBugLink: true,
             showProvenanceMenu: true,
@@ -32,28 +33,31 @@ export class ATDPApplication extends ACLUEWrapper {
         };
         this.app = null;
         BaseUtils.mixin(this.options, options);
+        this.initialize();
+    }
+    /**
+     * Initialize async parts
+     * TODO make public and remove call in constructor in the future
+     */
+    async initialize() {
         const configPromise = ATDPApplication.initializeClientConfig(this.options);
         const i18nPromise = I18nextManager.getInstance().initI18n();
-        Promise.all([configPromise, i18nPromise]).then(() => {
-            this.tourManager = new TourManager({
-                doc: document,
-                header: () => this.header,
-                app: () => this.app
-            });
-            BaseUtils.mixin(this.options, {
-                showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
-            });
-            this.build(document.body, { replaceBody: false });
-            if (this.tourManager.hasTours()) {
-                const button = document.querySelector('[data-header="helpLink"] a');
-                button.dataset.toggle = 'modal';
-                button.tabIndex = -1;
-                button.dataset.target = `#${this.tourManager.chooser.id}`;
-                button.onclick = (evt) => {
-                    evt.preventDefault();
-                };
-            }
+        await Promise.all([configPromise, i18nPromise]);
+        await this.build(document.body, { replaceBody: false });
+        this.tourManager = new TourManager({
+            doc: document,
+            header: () => this.header,
+            app: () => this.app
         });
+        if (this.options.showTourLink && this.tourManager.hasTours()) {
+            const button = this.header.addRightMenu('<i class="fas fa-question-circle fa-fw"></i>', (evt) => {
+                evt.preventDefault();
+                return false;
+            }, '#');
+            button.dataset.toggle = 'modal';
+            button.tabIndex = -1;
+            button.dataset.target = `#${this.tourManager.chooser.id}`;
+        }
     }
     /**
      * Loads the client config from '/clientConfig.json' and parses it.
@@ -131,7 +135,8 @@ export class ATDPApplication extends ACLUEWrapper {
         if (this.options.showProvenanceMenu) {
             provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
         }
-        const modeSelector = body.querySelector('header');
+        const phoveaNavbar = document.body.querySelector('.phovea-navbar');
+        const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
         modeSelector.classList.add('collapsed');
         modeSelector.classList.add('clue-modeselector');
         const main = document.body.querySelector('main');
