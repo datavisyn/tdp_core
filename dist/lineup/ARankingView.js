@@ -111,7 +111,7 @@ export class ARankingView extends AView {
         const taggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, {
             summaryHeader: this.options.enableHeaderSummary,
             labelRotation: this.options.enableHeaderRotation ? 45 : 0,
-            rowHeight: 20
+            rowHeight: 21
         }, options.customOptions);
         if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
             taggleOptions.rowHeight = this.options.itemRowHeight;
