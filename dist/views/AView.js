@@ -71,7 +71,7 @@ export class AView extends EventHandler {
     async init(params, onParameterChange) {
         // TODO: Is a "rebuild" required when a authorization is stored?
         TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
-            await this.selectionChanged();
+            await this.initImpl();
         });
         TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
             // If a authorization is removed, rerun the registered authorizations

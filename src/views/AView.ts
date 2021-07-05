@@ -106,7 +106,7 @@ export abstract class AView extends EventHandler implements IView {
   async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
     // TODO: Is a "rebuild" required when a authorization is stored?
     TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
-      await this.selectionChanged();
+      await this.initImpl();
     });
     TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
       // If a authorization is removed, rerun the registered authorizations
