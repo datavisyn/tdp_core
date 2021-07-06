@@ -1,4 +1,4 @@
-
+export * from './auth';
 export * from './public';
 export * from './base';
 export * from './tour';

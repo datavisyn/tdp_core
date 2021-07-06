@@ -2,17 +2,32 @@
  * Created by sam on 03.03.2017.
  */
 
-import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, IMixedStorageProvenanceGraphManagerOptions, Ajax} from 'phovea_core';
-import {AppHeaderLink, AppHeader} from 'phovea_ui';
+import {
+  ProvenanceGraph,
+  MixedStorageProvenanceGraphManager,
+  UserSession,
+  BaseUtils,
+  I18nextManager,
+  PluginRegistry,
+  IMixedStorageProvenanceGraphManagerOptions,
+  Ajax,
+} from 'phovea_core';
+import { AppHeaderLink, AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
-import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
-import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
-import {DialogUtils} from './base/dialogs';
-import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
-import {IAppExtensionExtension} from './base/interfaces';
-import {TourManager} from './tour/TourManager';
-import {TemporarySessionList} from './utils/SessionList';
-
+import {
+  CLUEGraphManager,
+  LoginMenu,
+  ButtonModeSelector,
+  ACLUEWrapper,
+  VisLoader,
+} from 'phovea_clue';
+import { EditProvenanceGraphMenu } from './utils/EditProvenanceGraphMenu';
+import { DialogUtils } from './base/dialogs';
+import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
+import { IAppExtensionExtension } from './base/interfaces';
+import { TourManager } from './tour/TourManager';
+import { TemporarySessionList } from './utils/SessionList';
+import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
 
 export interface ITDPOptions {
   /**
@@ -40,13 +55,17 @@ export interface ITDPOptions {
    * Show/hide the options link
    * @default: false
    */
-  showOptionsLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
+  showOptionsLink:
+    | boolean
+    | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
    * Show/hide the bug report link
    * @default: true
    */
-  showReportBugLink: boolean | ((title: HTMLElement, content: HTMLElement) => void);
+  showReportBugLink:
+    | boolean
+    | ((title: HTMLElement, content: HTMLElement) => void);
 
   /**
    * Show help link (`true`) or the url to link
@@ -74,7 +93,24 @@ export interface ITDPOptions {
    * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
    * Passing falsy values disables the client configuration load.
    */
-  clientConfig?: Record<any, any> | null | undefined;
+  clientConfig?:
+    | {
+        /**
+         * Configuration for the TDPTokenManager.
+         */
+        tokenManager?: {
+          /**
+           * Initial authorization configurations.
+           * Note that this is an object, because then the deep-merge with the local and remote config is easier.
+           */
+          authorizationConfigurations?: {
+            [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
+          };
+        };
+        [key: string]: any;
+      }
+    | null
+    | undefined;
 }
 
 /**
@@ -95,7 +131,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showReportBugLink: true,
     showProvenanceMenu: true,
     enableProvenanceUrlTracking: true,
-    clientConfig: null
+    clientConfig: null,
   };
 
   protected app: Promise<T> = null;
@@ -112,21 +148,32 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     const i18nPromise = I18nextManager.getInstance().initI18n();
 
-    Promise.all([configPromise, i18nPromise]).then(() => {
+    Promise.all([configPromise, i18nPromise]).then(async () => {
+      // Prefill the token manager with authorization configurations
+      if (
+        this.options.clientConfig?.tokenManager?.authorizationConfigurations
+      ) {
+        await TDPTokenManager.addAuthorizationConfiguration(
+          Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({id, ...config}))
+        );
+      }
+
       this.tourManager = new TourManager({
         doc: document,
         header: () => this.header,
-        app: () => this.app
+        app: () => this.app,
       });
 
       BaseUtils.mixin(this.options, {
-        showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
+        showHelpLink: this.tourManager.hasTours() ? '#' : false, // use help button for tours
       });
 
-      this.build(document.body, {replaceBody: false});
+      this.build(document.body, { replaceBody: false });
 
       if (this.tourManager.hasTours()) {
-        const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
+        const button = document.querySelector<HTMLElement>(
+          '[data-header="helpLink"] a'
+        );
 
         button.dataset.toggle = 'modal';
         button.tabIndex = -1;
@@ -152,14 +199,19 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
    * @param options Options where the client config should be merged into.
    */
-  public static async initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions | null> {
+  public static async initializeClientConfig(
+    options: ITDPOptions
+  ): Promise<ITDPOptions | null> {
     // If the clientConfig is falsy, assume no client configuration should be loaded.
-    if(!options?.clientConfig) {
+    if (!options?.clientConfig) {
       return null;
     }
     // Otherwise, load and merge the configuration into the existing one.
     const parsedConfig = await ATDPApplication.loadClientConfig();
-    options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
+    options.clientConfig = BaseUtils.mixin(
+      options?.clientConfig || {},
+      parsedConfig || {}
+    );
     return options;
   }
 
@@ -175,7 +227,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
         event.preventDefault();
         this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
         return false;
-      })
+      }),
     });
 
     if (this.options.showResearchDisclaimer) {
@@ -183,7 +235,12 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       if (typeof this.options.showResearchDisclaimer === 'function') {
         this.options.showResearchDisclaimer(aboutDialogBody);
       } else {
-        aboutDialogBody.insertAdjacentHTML('afterbegin', `<div class="alert alert-warning" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.disclaimerMessage')}</span></div>`);
+        aboutDialogBody.insertAdjacentHTML(
+          'afterbegin',
+          `<div class="alert alert-warning" role="alert">${I18nextManager.getInstance().i18n.t(
+            'tdp:core.disclaimerMessage'
+          )}</span></div>`
+        );
       }
     }
 
@@ -199,12 +256,15 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       prefix: this.options.prefix,
       storage: localStorage,
       application: this.options.prefix,
-      ...(this.options.provenanceManagerOptions || {})
+      ...(this.options.provenanceManagerOptions || {}),
     });
 
     this.cleanUpOld(manager);
 
-    const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
+    const clueManager = new CLUEGraphManager(
+      manager,
+      !this.options.enableProvenanceUrlTracking
+    );
 
     this.header.wait();
 
@@ -213,7 +273,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
       loginForm: this.options.loginForm,
-      watch: true
+      watch: true,
     });
     this.loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
       // reopen after logged out
@@ -222,28 +282,32 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     let provenanceMenu: EditProvenanceGraphMenu | null;
 
     if (this.options.showProvenanceMenu) {
-      provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
+      provenanceMenu = new EditProvenanceGraphMenu(
+        clueManager,
+        this.header.rightMenu
+      );
     }
 
     const modeSelector = body.querySelector('header');
     modeSelector.classList.add('collapsed');
     modeSelector.classList.add('clue-modeselector');
 
-
     const main = <HTMLElement>document.body.querySelector('main');
     const content = <HTMLElement>body.querySelector('div.content');
 
     //wrapper around to better control when the graph will be resolved
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
-    const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
+    const graph = new Promise<ProvenanceGraph>(
+      (resolve, reject) => (graphResolver = resolve)
+    );
 
-    graph.catch((error: {graph: string}) => {
+    graph.catch((error: { graph: string }) => {
       DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
     graph.then((graph) => {
       ButtonModeSelector.createButton(modeSelector, {
-        size: 'sm'
+        size: 'sm',
       });
       provenanceMenu?.setGraph(graph);
     });
@@ -251,10 +315,10 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
       thumbnails: false,
       provVisCollapsed: true,
-      hideCLUEButtonsOnCollapse: true
+      hideCLUEButtonsOnCollapse: true,
     });
     const storyVis = VisLoader.loadStoryVis(graph, content, main, {
-      thumbnails: false
+      thumbnails: false,
     });
 
     this.app = graph.then((graph) => this.createApp(graph, clueManager, main));
@@ -275,41 +339,55 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     });
     if (!UserSession.getInstance().isLoggedIn()) {
       //wait 1sec before the showing the login dialog to give the auto login mechanism a chance
-      forceShowLoginDialogTimeout = setTimeout(() => this.loginMenu.forceShowDialog(), 1000);
+      forceShowLoginDialogTimeout = setTimeout(
+        () => this.loginMenu.forceShowDialog(),
+        1000
+      );
     } else {
       initSession();
     }
 
-    return {graph, manager: clueManager, storyVis, provVis};
+    return { graph, manager: clueManager, storyVis, provVis };
   }
 
   /**
    * customize the using extension point
    */
   private customizeApp(content: HTMLElement, main: HTMLElement) {
-    const plugins = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_APP_EXTENSION);
+    const plugins = PluginRegistry.getInstance().listPlugins(
+      EXTENSION_POINT_TDP_APP_EXTENSION
+    );
     if (plugins.length === 0) {
       return;
     }
     this.app.then((app) => {
-      Promise.all(plugins.map((d) => d.load())).then((plugins: IAppExtensionExtension[]) => {
-        for (const plugin of plugins) {
-          plugin.factory({
-            header: this.header,
-            content,
-            main,
-            app
-          });
+      Promise.all(plugins.map((d) => d.load())).then(
+        (plugins: IAppExtensionExtension[]) => {
+          for (const plugin of plugins) {
+            plugin.factory({
+              header: this.header,
+              content,
+              main,
+              app,
+            });
+          }
         }
-      });
+      );
     });
   }
 
   private cleanUpOld(manager: MixedStorageProvenanceGraphManager) {
-    const workspaces = manager.listLocalSync().sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
+    const workspaces = manager
+      .listLocalSync()
+      .sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
     // cleanup up temporary ones
-    if (workspaces.length > TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
-      const toDelete = workspaces.slice(TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
+    if (
+      workspaces.length >
+      TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES
+    ) {
+      const toDelete = workspaces.slice(
+        TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES
+      );
       Promise.all(toDelete.map((d) => manager.delete(d))).catch((error) => {
         console.warn('cannot delete old graphs:', error);
       });
@@ -323,7 +401,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    * @param {HTMLElement} main root dom element
    * @returns {PromiseLike<T> | T}
    */
-  protected abstract createApp(graph: ProvenanceGraph, manager: CLUEGraphManager, main: HTMLElement): PromiseLike<T> | T;
+  protected abstract createApp(
+    graph: ProvenanceGraph,
+    manager: CLUEGraphManager,
+    main: HTMLElement
+  ): PromiseLike<T> | T;
 
   /**
    * triggered after the user is logged in and the session can be started or continued

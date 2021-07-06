@@ -1,15 +1,16 @@
 /**
  * Created by sam on 03.03.2017.
  */
-import { MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, Ajax } from 'phovea_core';
+import { MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, Ajax, } from 'phovea_core';
 import { AppHeaderLink, AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
-import { CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader } from 'phovea_clue';
+import { CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader, } from 'phovea_clue';
 import { EditProvenanceGraphMenu } from './utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './base/dialogs';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
+import { TDPTokenManager } from './auth';
 /**
  * base class for TDP based applications
  */
@@ -28,20 +29,25 @@ export class ATDPApplication extends ACLUEWrapper {
             showReportBugLink: true,
             showProvenanceMenu: true,
             enableProvenanceUrlTracking: true,
-            clientConfig: null
+            clientConfig: null,
         };
         this.app = null;
         BaseUtils.mixin(this.options, options);
         const configPromise = ATDPApplication.initializeClientConfig(this.options);
         const i18nPromise = I18nextManager.getInstance().initI18n();
-        Promise.all([configPromise, i18nPromise]).then(() => {
+        Promise.all([configPromise, i18nPromise]).then(async () => {
+            var _a, _b;
+            // Prefill the token manager with authorization configurations
+            if ((_b = (_a = this.options.clientConfig) === null || _a === void 0 ? void 0 : _a.tokenManager) === null || _b === void 0 ? void 0 : _b.authorizationConfigurations) {
+                await TDPTokenManager.addAuthorizationConfiguration(Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({ id, ...config })));
+            }
             this.tourManager = new TourManager({
                 doc: document,
                 header: () => this.header,
-                app: () => this.app
+                app: () => this.app,
             });
             BaseUtils.mixin(this.options, {
-                showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
+                showHelpLink: this.tourManager.hasTours() ? '#' : false,
             });
             this.build(document.body, { replaceBody: false });
             if (this.tourManager.hasTours()) {
@@ -90,7 +96,7 @@ export class ATDPApplication extends ACLUEWrapper {
                 event.preventDefault();
                 this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
                 return false;
-            })
+            }),
         });
         if (this.options.showResearchDisclaimer) {
             const aboutDialogBody = header.aboutDialog;
@@ -111,7 +117,7 @@ export class ATDPApplication extends ACLUEWrapper {
             prefix: this.options.prefix,
             storage: localStorage,
             application: this.options.prefix,
-            ...(this.options.provenanceManagerOptions || {})
+            ...(this.options.provenanceManagerOptions || {}),
         });
         this.cleanUpOld(manager);
         const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
@@ -121,7 +127,7 @@ export class ATDPApplication extends ACLUEWrapper {
         this.loginMenu = new LoginMenu(this.header, {
             insertIntoHeader: true,
             loginForm: this.options.loginForm,
-            watch: true
+            watch: true,
         });
         this.loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
             // reopen after logged out
@@ -138,23 +144,23 @@ export class ATDPApplication extends ACLUEWrapper {
         const content = body.querySelector('div.content');
         //wrapper around to better control when the graph will be resolved
         let graphResolver;
-        const graph = new Promise((resolve, reject) => graphResolver = resolve);
+        const graph = new Promise((resolve, reject) => (graphResolver = resolve));
         graph.catch((error) => {
             DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
         });
         graph.then((graph) => {
             ButtonModeSelector.createButton(modeSelector, {
-                size: 'sm'
+                size: 'sm',
             });
             provenanceMenu === null || provenanceMenu === void 0 ? void 0 : provenanceMenu.setGraph(graph);
         });
         const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
             thumbnails: false,
             provVisCollapsed: true,
-            hideCLUEButtonsOnCollapse: true
+            hideCLUEButtonsOnCollapse: true,
         });
         const storyVis = VisLoader.loadStoryVis(graph, content, main, {
-            thumbnails: false
+            thumbnails: false,
         });
         this.app = graph.then((graph) => this.createApp(graph, clueManager, main));
         const initSession = () => {
@@ -193,16 +199,19 @@ export class ATDPApplication extends ACLUEWrapper {
                         header: this.header,
                         content,
                         main,
-                        app
+                        app,
                     });
                 }
             });
         });
     }
     cleanUpOld(manager) {
-        const workspaces = manager.listLocalSync().sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
+        const workspaces = manager
+            .listLocalSync()
+            .sort((a, b) => -((a.ts || 0) - (b.ts || 0)));
         // cleanup up temporary ones
-        if (workspaces.length > TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
+        if (workspaces.length >
+            TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES) {
             const toDelete = workspaces.slice(TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES);
             Promise.all(toDelete.map((d) => manager.delete(d))).catch((error) => {
                 console.warn('cannot delete old graphs:', error);

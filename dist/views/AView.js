@@ -7,6 +7,7 @@ import { FormBuilder } from '../form/FormBuilder';
 import { AFormElement } from '../form/elements/AFormElement';
 import { ViewUtils } from './ViewUtils';
 import { ResolveUtils } from './ResolveUtils';
+import { ERenderAuthorizationStatus, TokenManager, TDPTokenManager } from '../auth';
 /**
  * base class for all views
  */
@@ -20,7 +21,10 @@ export class AView extends EventHandler {
         this.itemSelections = new Map();
         this.selections = new Map();
         this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
-        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, range: Range.none() });
+        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {
+            idtype: null,
+            range: Range.none(),
+        });
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('tdp-view');
         parent.appendChild(this.node);
@@ -57,13 +61,68 @@ export class AView extends EventHandler {
         }
     }
     setNoMappingFoundHint(visible, hintMessage) {
-        const conditionalData = { ...this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }, id: this.idType ? this.idType.name : '' };
+        const conditionalData = {
+            ...(this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }),
+            id: this.idType ? this.idType.name : '',
+        };
         return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', { ...conditionalData }), 'hint-mapping');
     }
     /*final*/
     async init(params, onParameterChange) {
+        // TODO: Is a "rebuild" required when a authorization is stored?
+        TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
+            await this.initImpl();
+        });
+        TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
+            // If a authorization is removed, rerun the registered authorizations
+            await this.runAuthorizations();
+        });
+        // First, run all required authorizations
+        await this.runAuthorizations();
         this.params = await this.buildParameterForm(params, onParameterChange);
         return this.initImpl();
+    }
+    /**
+     * Uses the token manager to run the authorizations defined by `getAuthorizationConfiguration()`.
+     * Only authorizations which are not yet stored in the token manager are run, others are skipped.
+     * It will show an overlay over the detail view allowing the user to authorize the application.
+     */
+    async runAuthorizations() {
+        await TDPTokenManager.runAuthorizations(await this.getAuthorizationConfiguration(), {
+            render: ({ authConfiguration, status, error, trigger }) => {
+                // Fetch or create the authorization overlay
+                let overlay = this.node.querySelector('.tdp-authorization-overlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.className = 'tdp-authorization-overlay';
+                    this.node.insertAdjacentElement('afterbegin', overlay);
+                }
+                if (status === ERenderAuthorizationStatus.SUCCESS) {
+                    overlay.remove();
+                }
+                else {
+                    overlay.innerHTML = `
+          ${error
+                        ? `<div class="alert alert-info" role="alert"><strong>Authorization failed: </strong>An error occurred when authorizing this page. ${error.toString()}</div>`
+                        : ''}
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                <p class="lead">${authConfiguration.name} authorization is required for this view.</p>
+                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? 'Loading' : 'Authorize'}</button>
+            </div>`;
+                    overlay.querySelector('button').onclick = async () => {
+                        trigger();
+                    };
+                }
+            },
+        });
+    }
+    /**
+     * Hook to override returning which authorizations are required for this view.
+     * @returns ID(s) or authorization configurations(s) which are required. Defaults to the `authorization` desc entry.
+     */
+    async getAuthorizationConfiguration() {
+        // hook
+        return this.context.desc.authorization;
     }
     /**
      * hook for custom initialization
