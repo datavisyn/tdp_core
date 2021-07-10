@@ -88,11 +88,14 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
+    const $colNode = $formNode.append('div').classed('col-sm-auto', true);
+    this.$node = $colNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 
-    this.$select = this.$node.append('select');
+    const $colDiv = this.$node.append('div').classed('col', true);
+    this.$select = $colDiv.append('select');
+    this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', 'form-select'); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
     this.setAttributes(this.$select, this.elementDesc.attributes);
   }
 

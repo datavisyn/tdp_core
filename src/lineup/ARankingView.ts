@@ -229,7 +229,7 @@ export abstract class ARankingView extends AView {
     return super.init(params, onParameterChange).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
-      base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+      base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
       const container = <HTMLElement>base.lastElementChild!;
       container.appendChild(this.stats);
 

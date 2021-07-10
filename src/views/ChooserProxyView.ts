@@ -67,7 +67,7 @@ export class ChooserProxyView extends AView {
 
     // inject stats
     const base = <HTMLElement>params.querySelector('form') || params;
-    base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+    base.insertAdjacentHTML('beforeend', `<div class="mb-3"></div>`);
     base.lastElementChild!.appendChild(this.openExternally);
 
     return initResult;

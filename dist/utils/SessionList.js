@@ -24,15 +24,15 @@ class ASessionList {
     static createButton(type) {
         switch (type) {
             case 'delete':
-                return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.delete')}</span></a>`;
+                return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.delete')}</span></a>`;
             case 'select':
-                return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continueSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continue')}</span></a>`;
+                return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continueSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continue')}</span></a>`;
             case 'clone':
-                return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
+                return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
             case 'persist':
-                return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
+                return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
             case 'edit':
-                return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fas fa-edit" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
+                return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
         }
     }
     registerActionListener(manager, $enter) {
@@ -98,7 +98,7 @@ class ASessionList {
         return select(this.parent).classed('menuTable', true).html(`
       <div class="loading">
         <i class="fas fa-spinner fa-pulse fa-fw"></i>
-        <span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.loadingText')}</span>
+        <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.loadingText')}</span>
       </div>`);
     }
 }

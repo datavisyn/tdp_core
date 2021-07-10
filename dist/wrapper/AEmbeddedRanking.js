@@ -97,7 +97,7 @@ export class AEmbeddedRanking {
             this.selectedRowsChanged(rows);
         });
         const form = this.node.ownerDocument.createElement('div');
-        form.classList.add('parameters', 'form-inline');
+        form.classList.add('parameters', 'row');
         this.node.insertAdjacentElement('afterbegin', form);
         return Promise.resolve(this.ranking.init(form, () => null)).then(() => {
             this.initialized();

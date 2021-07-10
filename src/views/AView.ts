@@ -109,7 +109,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
-    const builder = new FormBuilder(select(params), undefined, 'form-inline');
+    const builder = new FormBuilder(select(params), undefined, 'row', true);
 
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));

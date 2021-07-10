@@ -30,10 +30,12 @@ export class FormSelect2 extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed('form-group', true);
+        const $colNode = $formNode.append('div').classed('col-sm-auto', true);
+        this.$node = $colNode.append('div').classed('row', true);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel();
-        this.$select = this.$node.append('select');
+        const $colSelectNode = this.$node.append('div').classed('col', true);
+        this.$select = $colSelectNode.append('select');
         this.setAttributes(this.$select, this.elementDesc.attributes);
     }
     /**

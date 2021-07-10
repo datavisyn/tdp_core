@@ -185,7 +185,7 @@ export class ARankingView extends AView {
         return super.init(params, onParameterChange).then(() => {
             // inject stats
             const base = params.querySelector('form') || params;
-            base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+            base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
             const container = base.lastElementChild;
             container.appendChild(this.stats);
             if (this.options.enableSidePanel === 'top') {

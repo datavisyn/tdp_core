@@ -12,14 +12,6 @@ b,
   font-weight: 500 !important;
 }
 
-.form-inline .form-group {
-  margin-right: 15px;
-
-  label {
-    margin-right: 5px;
-  }
-}
-
 /**
  * Hide options menu
  */
@@ -47,7 +39,7 @@ li[data-header=optionsLink] {
   white-space: nowrap;
 }
 
-.toast-container {
+.toast-container-custom {
   $move_animation: 0.5s !default;
 
   position: fixed;
