@@ -395,6 +395,8 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       this.rows.push(d);
       const row = group.ownerDocument.createElement('div');
       row.classList.add('row');
+      row.classList.add('d-flex');
+      row.classList.add('align-items-center');
       group.appendChild(row);
       row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">
@@ -403,9 +405,8 @@ export class FormMap extends AFormElement<IFormMapDesc> {
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
-        <div class="col-sm-7 form-map-row-value px-0"></div>
-        <div class="col-sm-1 ps-0"><button class="close" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span
-        aria-hidden="true">&times;</span></button></div>`;
+        <div class="col-sm-7 form-map-row-value pl-1 pe-1"></div>
+        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
 
       const valueElem = <HTMLElement>row.querySelector('.form-map-row-value');
       if (d.key) { // has value
@@ -413,7 +414,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       } else {
         // add remove all button
       }
-      row.querySelector('.close').addEventListener('click', (evt: MouseEvent) => {
+      row.querySelector('.btn-close').addEventListener('click', (evt: MouseEvent) => {
         evt.preventDefault();
         evt.stopPropagation();
         if (d.key) {

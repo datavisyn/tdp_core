@@ -1,6 +1,13 @@
 // Hide the remove button (`x`) when no option is selected in the first dropdown (= filter key)
-.form-map-container .row .col-sm:empty ~ .col-sm-auto .col-sm-12 {
-  display: none;
+.form-map-container .row {
+  .form-map-row-value:empty ~ .col-sm-1.ps-0 .btn-close {
+    display: none;
+  }
+
+  .btn-close {
+    padding-top: 0.3px;
+    padding-left: 0px;
+  }
 }
 
 .select.map-selector option:disabled {
