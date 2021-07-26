@@ -108,10 +108,10 @@ export class Form {
         elementDesc.attributes = elementDesc.attributes || {};
         elementDesc.attributes.id = uid; // add id as attribute
         elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
-        if (elementDesc.type == 'FormSelect') {
+        if (elementDesc.type === 'FormSelect') {
             elementDesc.attributes.clazz += ' form-select';
         }
-        else if (elementDesc.type == 'FormButton') {
+        else if (elementDesc.type === 'FormButton') {
             elementDesc.attributes.clazz += 'btn btn-light btn-sm';
         }
         return elementDesc;
