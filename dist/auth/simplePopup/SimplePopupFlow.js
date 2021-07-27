@@ -1,3 +1,4 @@
+import { I18nextManager } from 'phovea_core';
 export async function simplePopupFlow({ id, url, tokenParameter, }) {
     console.log(`Openining popup window for ${id}`);
     // Allow a redirect_uri placeholder to automatically inject the location origin
@@ -10,13 +11,13 @@ export async function simplePopupFlow({ id, url, tokenParameter, }) {
         while (i < 300) {
             try {
                 if (popup.closed) {
-                    reject('Window was closed before authorization was completed.');
+                    reject(I18nextManager.getInstance().i18n.t('tdp:core.tokenManager.flows.simplePopup.windowClosedError'));
                 }
                 if (popup.location.origin === window.location.origin) {
                     popup.close();
                     const token = new URLSearchParams(popup.location.search).get(tokenParameter);
                     if (!token) {
-                        reject(`Token not found, return url was ${popup.location.search}.`);
+                        reject(I18nextManager.getInstance().i18n.t('tdp:core.tokenManager.flows.simplePopup.tokenNotFoundError', { location: popup.location.search }));
                     }
                     resolve(token);
                 }
@@ -27,7 +28,7 @@ export async function simplePopupFlow({ id, url, tokenParameter, }) {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             i++;
         }
-        reject('Authorization did not complete within timeframe.');
+        reject(I18nextManager.getInstance().i18n.t('tdp:core.tokenManager.flows.simplePopup.timeoutError'));
     });
 }
 //# sourceMappingURL=SimplePopupFlow.js.map

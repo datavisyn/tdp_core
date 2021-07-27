@@ -21,10 +21,7 @@ export class AView extends EventHandler {
         this.itemSelections = new Map();
         this.selections = new Map();
         this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
-        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {
-            idtype: null,
-            range: Range.none(),
-        });
+        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, range: Range.none() });
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('tdp-view');
         parent.appendChild(this.node);
@@ -61,10 +58,7 @@ export class AView extends EventHandler {
         }
     }
     setNoMappingFoundHint(visible, hintMessage) {
-        const conditionalData = {
-            ...(this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }),
-            id: this.idType ? this.idType.name : '',
-        };
+        const conditionalData = { ...this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }, id: this.idType ? this.idType.name : '' };
         return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', { ...conditionalData }), 'hint-mapping');
     }
     /*final*/
@@ -103,11 +97,11 @@ export class AView extends EventHandler {
                 else {
                     overlay.innerHTML = `
           ${error
-                        ? `<div class="alert alert-info" role="alert"><strong>Authorization failed: </strong>An error occurred when authorizing this page. ${error.toString()}</div>`
+                        ? `<div class="alert alert-info" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationFailed')} ${error.toString()}</div>`
                         : ''}
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                <p class="lead">${authConfiguration.name} authorization is required for this view.</p>
-                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? 'Loading' : 'Authorize'}</button>
+                <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', { name: authConfiguration.name })}</p>
+                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading') : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')}</button>
             </div>`;
                     overlay.querySelector('button').onclick = async () => {
                         trigger();

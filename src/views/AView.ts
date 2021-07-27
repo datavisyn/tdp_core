@@ -2,17 +2,17 @@
  * Created by Samuel Gratzl on 29.01.2016.
  */
 
-import { select } from 'd3';
-import { EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils, WebpackEnv, UserSession } from 'phovea_core';
-import { IFormElementDesc } from '../form/interfaces';
-import { FormBuilder } from '../form/FormBuilder';
-import { AFormElement } from '../form/elements/AFormElement';
-import { ISelection, IView, IViewContext } from '../base/interfaces';
-import { ViewUtils } from './ViewUtils';
-import { ResolveUtils } from './ResolveUtils';
-import { EViewMode } from '../base/interfaces';
-import { IForm } from '../form/interfaces';
-import { ERenderAuthorizationStatus, IAuthorizationConfiguration, TokenManager, TDPTokenManager } from '../auth';
+import {select} from 'd3';
+import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils, WebpackEnv} from 'phovea_core';
+import {IFormElementDesc} from '../form/interfaces';
+import {FormBuilder} from '../form/FormBuilder';
+import {AFormElement} from '../form/elements/AFormElement';
+import {ISelection, IView, IViewContext} from '../base/interfaces';
+import {ViewUtils} from './ViewUtils';
+import {ResolveUtils} from './ResolveUtils';
+import {EViewMode} from '../base/interfaces';
+import {IForm} from '../form/interfaces';
+import {ERenderAuthorizationStatus, IAuthorizationConfiguration, TokenManager, TDPTokenManager} from '../auth';
 
 /**
  * base class for all views
@@ -43,17 +43,14 @@ export abstract class AView extends EventHandler implements IView {
   private params: IForm;
   private readonly paramsFallback = new Map<string, any>();
   private readonly shared = new Map<string, any>();
-  private paramsChangeListener: (name: string, value: any, previousValue: any) => Promise<any>;
+  private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
   private readonly itemSelections = new Map<string, ISelection>();
   private readonly selections = new Map<string, ISelection>();
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
     this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
-    this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {
-      idtype: null,
-      range: Range.none(),
-    });
+    this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
 
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
@@ -80,8 +77,8 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
-    const conditionalData = this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' };
-    const defaultHintMessage = I18nextManager.getInstance().i18n.t('tdp:core.views.defaultHint', { ...conditionalData });
+    const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'};
+    const defaultHintMessage = I18nextManager.getInstance().i18n.t('tdp:core.views.defaultHint', {...conditionalData});
     this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;
@@ -91,15 +88,8 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
-    const conditionalData = {
-      ...(this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }),
-      id: this.idType ? this.idType.name : '',
-    };
-    return this.setHint(
-      visible,
-      hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', { ...conditionalData }),
-      'hint-mapping'
-    );
+    const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''};
+    return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
   }
 
   /*final*/
@@ -141,12 +131,12 @@ export abstract class AView extends EventHandler implements IView {
           overlay.innerHTML = `
           ${
             error
-              ? `<div class="alert alert-info" role="alert"><strong>Authorization failed: </strong>An error occurred when authorizing this page. ${error.toString()}</div>`
+              ? `<div class="alert alert-info" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationFailed')} ${error.toString()}</div>`
               : ''
           }
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                <p class="lead">${authConfiguration.name} authorization is required for this view.</p>
-                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? 'Loading' : 'Authorize'}</button>
+                <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', {name: authConfiguration.name})}</p>
+                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading') : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')}</button>
             </div>`;
 
           overlay.querySelector('button').onclick = async () => {
@@ -393,7 +383,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   getItemSelection(name: string = AView.DEFAULT_SELECTION_NAME) {
-    return this.itemSelections.get(name) || { idtype: null, range: Range.none() };
+    return this.itemSelections.get(name) || {idtype: null, range: Range.none()};
   }
 
   modeChanged(mode: EViewMode) {

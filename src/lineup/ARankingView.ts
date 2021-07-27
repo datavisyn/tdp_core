@@ -422,8 +422,8 @@ export abstract class ARankingView extends AView {
             if(status === ERenderAuthorizationStatus.SUCCESS) {
               overlay.remove();
             } else {
-              overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-overflow-ellipsis" style="max-width: 100%">${e ? e.toString() : `Authorization required`}</span>`;
-              overlay.title = e ? e.toString() : `${authConfiguration.name} authorization is required for this score. Click here to authorize.`;
+              overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-overflow-ellipsis" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
+              overlay.title = e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequiredTitle', {name: authConfiguration.name});
               overlay.style.cursor = 'pointer';
               overlay.onclick = () => trigger();
             }

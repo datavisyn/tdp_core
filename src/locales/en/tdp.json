@@ -272,7 +272,9 @@
         "notFoundHint": "No data found for selection and parameter.",
         "showing": "Showing",
         "of": "of",
-        "selected": "selected"
+        "selected": "selected",
+        "scoreAuthorizationRequired": "Authorization required",
+        "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize."
       }
     },
 
@@ -295,7 +297,22 @@
 
       "noViews": "No views defined",
 
-      "formSelectName": "No mapping found"
+      "formSelectName": "No mapping found",
+
+      "authorizationRequired": "{{name}} authorization is required for this view.",
+      "authorizationFailed": "<strong>Authorization failed: </strong>An error occurred when authorizing this page.",
+      "authorizationButtonLoading": "Loading",
+      "authorizationButton": "Authorize"
+    },
+
+    "tokenManager": {
+      "flows": {
+        "simplePopup": {
+          "windowClosedError": "Window was closed before authorization was completed.",
+          "tokenNotFoundError": "Token not found, return url was {{location}}.",
+          "timeoutError": "Authorization did not complete within timeframe."
+        }
+      }
     }
   }
 }
