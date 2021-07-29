@@ -405,7 +405,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
-        <div class="col-sm-7 form-map-row-value pl-1 pe-1"></div>
+        <div class="col-sm-7 form-map-row-value ps-1 pe-1"></div>
         <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
 
       const valueElem = <HTMLElement>row.querySelector('.form-map-row-value');
