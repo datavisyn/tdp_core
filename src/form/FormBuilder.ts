@@ -40,6 +40,10 @@ export class FormBuilder {
    */
   appendElement(elementDesc: IFormElementDesc) {
     const inlineForm = 'inlineForm';
+    if(!elementDesc.options) {
+      elementDesc.options = {};
+    }
+
     elementDesc.options[inlineForm] = this.formInline;
     const desc = Form.updateElementDesc(elementDesc, this.formId);
 
