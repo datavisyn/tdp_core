@@ -98,6 +98,7 @@ export class CompositeView extends EventHandler {
     build() {
         this.setBusy(true);
         const updateShared = (evt, name, oldValue, newValue) => {
+            // If a child updates any shared parameters, notify each child except the trigger.
             this.children.forEach(({ instance }) => {
                 if (evt.currentTarget !== instance) {
                     instance.off(AView.EVENT_UPDATE_SHARED, updateShared);
@@ -105,6 +106,11 @@ export class CompositeView extends EventHandler {
                     instance.on(AView.EVENT_UPDATE_SHARED, updateShared);
                 }
             });
+            // Propagate the event upwards.
+            // This is required if a CompositeView is nested in a CompositeView, because otherwise
+            // the CompositeView child would "swallow" the event here. But we want to pass it "up" the chain,
+            // such that we have to fire it again.
+            this.fire(AView.EVENT_UPDATE_SHARED, name, oldValue, newValue);
         };
         const toParentElement = (evt) => {
             const source = evt.currentTarget;

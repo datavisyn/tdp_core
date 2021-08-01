@@ -12,7 +12,7 @@ import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
 import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
 import {TemporarySessionList} from './utils/SessionList';
-
+import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
 
 export interface ITDPOptions {
   /**
@@ -86,7 +86,24 @@ export interface ITDPOptions {
    * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
    * Passing falsy values disables the client configuration load.
    */
-  clientConfig?: Record<any, any> | null | undefined;
+  clientConfig?:
+    | {
+        /**
+         * Configuration for the TDPTokenManager.
+         */
+        tokenManager?: {
+          /**
+           * Initial authorization configurations.
+           * Note that this is an object, because then the deep-merge with the local and remote config is easier.
+           */
+          authorizationConfigurations?: {
+            [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
+          };
+        };
+        [key: string]: any;
+      }
+    | null
+    | undefined;
 }
 
 /**
@@ -134,6 +151,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     const i18nPromise = I18nextManager.getInstance().initI18n();
 
     await Promise.all([configPromise, i18nPromise]);
+
+    // Prefill the token manager with authorization configurations
+    if (this.options.clientConfig?.tokenManager?.authorizationConfigurations) {
+      await TDPTokenManager.addAuthorizationConfiguration(Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({id, ...config})));
+    }
 
     await this.build(document.body, {replaceBody: false});
 
@@ -241,7 +263,6 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     if (this.options.showProvenanceMenu) {
       provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
     }
-
 
 
     const main = <HTMLElement>document.body.querySelector('main');

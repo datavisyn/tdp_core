@@ -10,6 +10,7 @@ import { DialogUtils } from './base/dialogs';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
+import { TDPTokenManager } from './auth';
 /**
  * base class for TDP based applications
  */
@@ -41,9 +42,14 @@ export class ATDPApplication extends ACLUEWrapper {
      * TODO make public and remove call in constructor in the future
      */
     async initialize() {
+        var _a, _b;
         const configPromise = ATDPApplication.initializeClientConfig(this.options);
         const i18nPromise = I18nextManager.getInstance().initI18n();
         await Promise.all([configPromise, i18nPromise]);
+        // Prefill the token manager with authorization configurations
+        if ((_b = (_a = this.options.clientConfig) === null || _a === void 0 ? void 0 : _a.tokenManager) === null || _b === void 0 ? void 0 : _b.authorizationConfigurations) {
+            await TDPTokenManager.addAuthorizationConfiguration(Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({ id, ...config })));
+        }
         await this.build(document.body, { replaceBody: false });
         this.tourManager = new TourManager({
             doc: document,
