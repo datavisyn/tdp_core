@@ -6,6 +6,7 @@ import { AppHeader } from 'phovea_ui';
 import 'phovea_ui/dist/webpack/_bootstrap';
 import { CLUEGraphManager, LoginMenu, ACLUEWrapper } from 'phovea_clue';
 import { TourManager } from './tour/TourManager';
+import { IAuthorizationConfiguration } from './auth';
 export interface ITDPOptions {
     /**
      * alternative login formular
@@ -58,7 +59,21 @@ export interface ITDPOptions {
      * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
      * Passing falsy values disables the client configuration load.
      */
-    clientConfig?: Record<any, any> | null | undefined;
+    clientConfig?: {
+        /**
+         * Configuration for the TDPTokenManager.
+         */
+        tokenManager?: {
+            /**
+             * Initial authorization configurations.
+             * Note that this is an object, because then the deep-merge with the local and remote config is easier.
+             */
+            authorizationConfigurations?: {
+                [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
+            };
+        };
+        [key: string]: any;
+    } | null | undefined;
 }
 /**
  * base class for TDP based applications

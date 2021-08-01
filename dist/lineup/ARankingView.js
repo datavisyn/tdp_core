@@ -13,6 +13,7 @@ import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LazyColumn } from './internal/column';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
+import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -343,8 +344,75 @@ export class ARankingView extends AView {
         const rawOrder = this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
         const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
         const ids = this.selectionHelper.rowIdsAsSet(order);
-        const data = score.compute(ids, this.itemIDType, args);
+        let columnResolve = null;
+        const columnPromise = new Promise((resolve) => columnResolve = resolve);
+        const data = new Promise(async (resolve) => {
+            var _a;
+            // Wait for the column to be initialized
+            const col = await columnPromise;
+            /**
+             * An error can occur either when the authorization fails, or the request using the token fails.
+             */
+            let outsideError = null;
+            // TODO: Add a button which allows the user to stop this process?
+            let done = false;
+            while (!done) {
+                await TDPTokenManager.runAuthorizations(await ((_a = score.getAuthorizationConfiguration) === null || _a === void 0 ? void 0 : _a.call(score)), {
+                    render: ({ authConfiguration, status, error, trigger }) => {
+                        const e = error || outsideError;
+                        // Select the header of the score column
+                        const headerNode = this.node.querySelector(`.lu-header[data-id=${col.id}]`);
+                        if (!col.findMyRanker() || !headerNode) {
+                            // The column was removed.
+                            done = true;
+                            return;
+                        }
+                        // Fetch or create the authorization overlay
+                        let overlay = headerNode.querySelector('.tdp-authorization-overlay');
+                        if (!overlay) {
+                            overlay = document.createElement('div');
+                            overlay.className = 'tdp-authorization-overlay';
+                            headerNode.insertAdjacentElement('afterbegin', overlay);
+                        }
+                        if (status === ERenderAuthorizationStatus.SUCCESS) {
+                            overlay.remove();
+                        }
+                        else {
+                            overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-overflow-ellipsis" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
+                            overlay.title = e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequiredTitle', { name: authConfiguration.name });
+                            overlay.style.cursor = 'pointer';
+                            overlay.onclick = () => trigger();
+                        }
+                    }
+                });
+                try {
+                    outsideError = null;
+                    return resolve(await score.compute(ids, this.itemIDType, args));
+                }
+                catch (e) {
+                    if (e instanceof InvalidTokenError) {
+                        console.error(`Score computation failed because of invalid token:`, e.message);
+                        outsideError = e;
+                        if (col.findMyRanker()) {
+                            // Only invalidate authorizations if the column was not removed yet.
+                            // TODO: When we invalidate it here, it also "disables" already open detail views for example
+                            TDPTokenManager.invalidateToken(e.ids);
+                        }
+                        else {
+                            // We are done if the column was removed
+                            done = true;
+                            continue;
+                        }
+                        continue;
+                    }
+                    else {
+                        throw e;
+                    }
+                }
+            }
+        });
         const r = this.addColumn(colDesc, data, -1, position);
+        columnResolve(r.col);
         // use _score function to reload the score
         colDesc._score = () => {
             const rawOrder = this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
