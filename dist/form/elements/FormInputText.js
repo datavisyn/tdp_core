@@ -22,7 +22,7 @@ export class FormInputText extends AFormElement {
         this.$node = $formNode.append('div').classed('mb-3', true);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel();
-        this.$input = this.$node.append('input').attr('type', (this.elementDesc.options || {}).type || 'text');
+        this.$input = this.$node.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text');
         this.setAttributes(this.$input, this.elementDesc.attributes);
     }
     /**
