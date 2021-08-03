@@ -51,6 +51,11 @@ export interface ITDPOptions {
      */
     showProvenanceMenu?: boolean;
     /**
+     * Show/hide the `Exploration`, `Authoring`, `Presentation` buttons in the header
+     * @default: true
+     */
+    showClueModeButtons: boolean;
+    /**
      * default: true
      */
     enableProvenanceUrlTracking?: boolean;

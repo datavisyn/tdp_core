@@ -23,6 +23,10 @@
     margin: 0 0.5em;
   }
 
+  > div.btn-group {
+    padding-top: 8px;
+  }
+
   > div.btn-group label input[name*=permission_] {
     display: none;
   }

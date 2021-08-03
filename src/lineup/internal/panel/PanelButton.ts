@@ -52,7 +52,7 @@ export class PanelNavButton implements IPanelButton {
     this.node = parent.ownerDocument.createElement('li');
     this.node.classList.add('nav-item');
     this.order = options.order;
-    this.node.innerHTML = `<a class="nav-link" role="tab" title="${options.title}" data-toggle="tab"><i class="fas ${options.cssClass}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
+    this.node.innerHTML = `<a class="nav-link" role="tab" title="${options.title}" data-bs-toggle="tab"><i class="fas ${options.cssClass}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
     this.node.querySelector('a').addEventListener('click', (evt) => {
       evt.preventDefault();
       onClick();

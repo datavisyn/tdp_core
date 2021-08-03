@@ -29,18 +29,19 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
+    this.$node = $formNode.append('div').classed('col-sm-auto', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 
     const $label = this.$node.select('label');
+    $label.classed('me-2', true);
 
     const options = this.elementDesc.options;
 
     const $buttons = this.$node.selectAll('div.radio-inline').data(options.buttons);
     $buttons.enter().append('div').classed('radio-inline form-check form-check-inline', true).html((d, i) => `<input class="form-check-input" type="radio"
         name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
-      <label class="form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>`);
+      <label class="form-label form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>`);
     const $buttonElements = $buttons.select('input');
 
     $buttonElements.on('change', (d) => {

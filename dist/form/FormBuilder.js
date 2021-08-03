@@ -14,14 +14,15 @@ export class FormBuilder {
      * @param formId unique form id
      * @param formClass class attribute for form, e.g. for inline forms
      */
-    constructor($parent, formId = BaseUtils.randomId(), formClass = null) {
+    constructor($parent, formId = BaseUtils.randomId(), formClass = null, formInline = false) {
         this.formId = formId;
         this.formClass = formClass;
+        this.formInline = formInline;
         /**
          * Map of all future elements
          */
         this.elementPromises = [];
-        this.form = new Form($parent, formId, formClass);
+        this.form = new Form($parent, formId, formClass, formInline);
     }
     /**
      * Creates a form element instance from a form element description and
@@ -29,6 +30,11 @@ export class FormBuilder {
      * @param elementDesc
      */
     appendElement(elementDesc) {
+        const inlineForm = 'inlineForm';
+        if (!elementDesc.options) {
+            elementDesc.options = {};
+        }
+        elementDesc.options[inlineForm] = this.formInline;
         const desc = Form.updateElementDesc(elementDesc, this.formId);
         const elementPromise = AFormElement.createFormElement(this.form, desc);
         this.elementPromises.push(elementPromise);

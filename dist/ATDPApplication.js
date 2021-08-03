@@ -29,6 +29,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showOptionsLink: false,
             showReportBugLink: true,
             showProvenanceMenu: true,
+            showClueModeButtons: true,
             enableProvenanceUrlTracking: true,
             clientConfig: null
         };
@@ -141,10 +142,6 @@ export class ATDPApplication extends ACLUEWrapper {
         if (this.options.showProvenanceMenu) {
             provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
         }
-        const phoveaNavbar = document.body.querySelector('.phovea-navbar');
-        const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
-        modeSelector.classList.add('collapsed');
-        modeSelector.classList.add('clue-modeselector');
         const main = document.body.querySelector('main');
         const content = body.querySelector('div.content');
         //wrapper around to better control when the graph will be resolved
@@ -154,9 +151,15 @@ export class ATDPApplication extends ACLUEWrapper {
             DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
         });
         graph.then((graph) => {
-            ButtonModeSelector.createButton(modeSelector, {
-                size: 'sm'
-            });
+            if (this.options.showClueModeButtons) {
+                const phoveaNavbar = document.body.querySelector('.phovea-navbar');
+                const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
+                modeSelector.classList.add('collapsed');
+                modeSelector.classList.add('clue-modeselector');
+                ButtonModeSelector.createButton(modeSelector, {
+                    size: 'sm'
+                });
+            }
             provenanceMenu === null || provenanceMenu === void 0 ? void 0 : provenanceMenu.setGraph(graph);
         });
         const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {

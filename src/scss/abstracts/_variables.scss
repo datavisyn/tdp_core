@@ -29,7 +29,7 @@ $annotation_color: #009ACD !default;
 $annotation_color_hover: #006b90 !default;
 
 $anchor_color: #EE2329 !default;
-$anchor_color_hover: darken($anchor_color, 20%) !default;
+$anchor_color_hover: shade-color($anchor_color, 20%) !default;
 
 $select-data-color: orange !default;
 $hover-data-color: #ffc46b !default;

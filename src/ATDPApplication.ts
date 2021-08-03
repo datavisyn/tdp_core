@@ -65,6 +65,13 @@ export interface ITDPOptions {
    */
   showProvenanceMenu?: boolean;
 
+
+  /**
+   * Show/hide the `Exploration`, `Authoring`, `Presentation` buttons in the header
+   * @default: true
+   */
+  showClueModeButtons: boolean;
+
   /**
    * default: true
    */
@@ -117,6 +124,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showOptionsLink: false,
     showReportBugLink: true,
     showProvenanceMenu: true,
+    showClueModeButtons: true,
     enableProvenanceUrlTracking: true,
     clientConfig: null
   };
@@ -256,10 +264,6 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
     }
 
-    const phoveaNavbar = document.body.querySelector('.phovea-navbar');
-    const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
-    modeSelector.classList.add('collapsed');
-    modeSelector.classList.add('clue-modeselector');
 
     const main = <HTMLElement>document.body.querySelector('main');
     const content = <HTMLElement>body.querySelector('div.content');
@@ -273,9 +277,15 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     });
 
     graph.then((graph) => {
-      ButtonModeSelector.createButton(modeSelector, {
-        size: 'sm'
-      });
+      if (this.options.showClueModeButtons) {
+        const phoveaNavbar = document.body.querySelector('.phovea-navbar');
+        const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
+        modeSelector.classList.add('collapsed');
+        modeSelector.classList.add('clue-modeselector');
+        ButtonModeSelector.createButton(modeSelector, {
+          size: 'sm'
+        });
+      }
       provenanceMenu?.setGraph(graph);
     });
 

@@ -1,38 +1,13 @@
-.parameters.form-inline .form-horizontal {
-  .form-control {
-    display: block;
-    margin-right: 0;
-    width: 100%;
-  }
-
-  .form-group {
-    display: block;
-    margin-right: 0;
-    margin-left: 0;
-
-    > div {
-      padding-left: 1px;
-      padding-right: 1px;
-    }
-  }
-}
-
-.parameters.form-inline {
-  div > div.radio-inline {
-    padding-left: 30px;
-  }
-}
-
-// Bootstrap 4 sets `width: auto` for `.form-inline .form-control`
-// which causes the select elements to overflow in the filter map
-// This class limits the width to the column width.
-.dropdown-menu .form-map-container .form-control {
-  width: 100%;
-}
-
 // Hide the remove button (`x`) when no option is selected in the first dropdown (= filter key)
-.form-map-container .form-row .col-sm-6:empty ~ .col-sm-1 {
-  display: none;
+.form-map-container .row {
+  .form-map-row-value:empty ~ .col-sm-1.ps-0 .btn-close {
+    display: none;
+  }
+
+  .btn-close {
+    padding-top: 0.3px;
+    padding-left: 0px;
+  }
 }
 
 .select.map-selector option:disabled {

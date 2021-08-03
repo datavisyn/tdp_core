@@ -246,7 +246,7 @@ $lu_assets: '~lineupjs/src/assets';
         content: attr(data-violation);
         color: black;
         text-align: left;
-        background: lighten(#ffd700, 45%);
+        background: tint-color(#ffd700, 45%);
         hyphens: manual;
         padding: 5px;
         width: 12em;

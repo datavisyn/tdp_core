@@ -88,7 +88,7 @@ export interface IFormRow {
 function hasInlineParent(node: HTMLElement) {
   while (node.parentElement) {
     node = node.parentElement;
-    if (node.classList.contains('form-inline')) {
+    if (node.classList.contains('row')) {
       return node.parentElement.classList.contains('parameters');
     }
   }
@@ -145,7 +145,8 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
+    const $colNode = $formNode.append('div').classed('col-sm-auto', true);
+    this.$node = $colNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
 
     this.inline = hasInlineParent(<HTMLElement>this.$node.node());
@@ -164,14 +165,14 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       this.$node.classed('dropdown', true);
 
       this.$node.html(`
-          <button class="btn btn-white border-gray-3 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn btn-white border border-gray-3 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
-            <span class="badge badge-pill badge-secondary"></span>
+            <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
           </button>
-          <div class="dropdown-menu p-2" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
+          <div class="dropdown-menu p-2" data-bs-popper="static" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-map-container"></div>
-            <div class="form-map-apply">
+            <div class="form-map-apply mt-3">
                 <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
@@ -189,9 +190,9 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
     } else {
       if (!this.elementDesc.hideLabel) {
-        const $label = this.$node.append('label').attr('for', this.elementDesc.attributes.id);
+        const $label = this.$node.append('label').classed('form-label', true).attr('for', this.elementDesc.attributes.id);
         if (this.elementDesc.options.badgeProvider) {
-          $label.html(`${this.elementDesc.label} <span class="badge badge-pill badge-secondary"></span>`);
+          $label.html(`${this.elementDesc.label} <span class="badge rounded-pill bg-secondary"></span>`);
         } else {
           $label.text(this.elementDesc.label);
         }
@@ -393,25 +394,27 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     const renderRow = (d: IFormRow) => {
       this.rows.push(d);
       const row = group.ownerDocument.createElement('div');
-      row.classList.add('form-row', 'pb-2');
+      row.classList.add('row');
+      row.classList.add('d-flex');
+      row.classList.add('align-items-center');
       group.appendChild(row);
       row.innerHTML = `
-        <div class="col-sm-5">
-          <select class="form-control form-control-sm map-selector">
+        <div class="col-sm-4 form-map-row-key pe-0">
+          <select class="form-select form-select-sm map-selector">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
-        <div class="col-sm-6"></div>
-        <div class="col-sm-1"><button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"><span aria-hidden="true">×</span></button></div>`;
+        <div class="col-sm-7 form-map-row-value ps-1 pe-1"></div>
+        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
 
-      const valueElem = <HTMLElement>row.querySelector('.col-sm-6');
+      const valueElem = <HTMLElement>row.querySelector('.form-map-row-value');
       if (d.key) { // has value
         this.addValueEditor(d, valueElem, entries);
       } else {
         // add remove all button
       }
-      row.querySelector('div.col-sm-1 button').addEventListener('click', (evt: MouseEvent) => {
+      row.querySelector('.btn-close').addEventListener('click', (evt: MouseEvent) => {
         evt.preventDefault();
         evt.stopPropagation();
         if (d.key) {

@@ -10,9 +10,9 @@ export class PanelSaveNamedSetButton extends EventHandler {
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('btn-group', 'save-named-set-dropdown');
         this.node.innerHTML = `
-      <button type="button" class="dropdown-toggle fas fa-save" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}">
+      <button type="button" class="dropdown-toggle fas fa-save" style="width: 100%;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}">
       </button>
-      <div class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
+      <div class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}" data-bs-popper="static">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}</div>
         <a class="dropdown-item" href="#" data-rows="all" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntireList')}</a>
         <a class="dropdown-item" href="#" data-rows="filtered" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveFilteredRows')}</a>

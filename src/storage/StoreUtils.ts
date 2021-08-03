@@ -15,12 +15,12 @@ export class StoreUtils {
     dialog.form.innerHTML = `
       <p> ${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.dialog1')}</p>
       <p style="margin-bottom: 15px">${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.dialog2')}</p>
-      <div class="form-group">
-        <label for="namedset_name">${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.name')}</label>
+      <div class="mb-3">
+        <label class="form-label" for="namedset_name">${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.name')}</label>
         <input type="text" class="form-control" name="name" id="namedset_name" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.name')}" required="required" ${namedSet ? `value="${namedSet.name}"` : ''}>
       </div>
-      <div class="form-group">
-        <label for="namedset_description">${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.description')}</label>
+      <div class="mb-3">
+        <label class="form-label" for="namedset_description">${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.description')}</label>
         <textarea class="form-control" name="description" id="namedset_description" rows="5" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.editDialog.description')}">${namedSet ? namedSet.description : ''}</textarea>
       </div>
     `;
