@@ -41,7 +41,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-check checkbox col-sm-auto', true);
+    this.$node = $formNode.append('div').classed('form-check checkbox col-sm-auto mt-3', true);
     this.setVisible(this.elementDesc.visible);
 
     const $label = this.$node.select('label');
