@@ -54,7 +54,7 @@ article.#{$tdp-css-prefix}-view-wrapper {
     justify-content: flex-start;
 
     > div {
-      background: white;
+      background: $tdp-view-wrapper-preview-background;
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
@@ -71,7 +71,7 @@ article.#{$tdp-css-prefix}-view-wrapper {
     }
   }
 
-  > a.view-help {
+  > a.view-help, div.view-help {
     position: absolute;
     right: 0.3em;
     top: 0.3em;
