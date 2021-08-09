@@ -112,7 +112,7 @@ export class Form {
             elementDesc.attributes.clazz += ' form-select';
         }
         else if (elementDesc.type === 'FormButton') {
-            elementDesc.attributes.clazz += 'btn btn-light btn-sm';
+            elementDesc.attributes.clazz += ' btn btn-light btn-sm';
         }
         return elementDesc;
     }
