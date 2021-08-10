@@ -102,7 +102,8 @@ export class ARankingView extends AView {
         BaseUtils.mixin(this.options, idTypeNames, names, options);
         this.node.classList.add('lineup', 'lu-taggle', 'lu');
         this.node.insertAdjacentHTML('beforeend', `<div></div>`);
-        this.stats = this.node.ownerDocument.createElement('p');
+        this.stats = this.node.ownerDocument.createElement('div');
+        this.stats.classList.add('mt-2', 'mb-2');
         this.provider = new TDPLocalDataProvider([], [], this.options.customProviderOptions);
         // hack in for providing the data provider within the graph
         // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
@@ -190,6 +191,7 @@ export class ARankingView extends AView {
             const container = base.lastElementChild;
             container.appendChild(this.stats);
             if (this.options.enableSidePanel === 'top') {
+                container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
                 container.insertAdjacentElement('afterbegin', this.panel.node);
             }
         });
