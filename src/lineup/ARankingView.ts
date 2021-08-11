@@ -250,6 +250,25 @@ export abstract class ARankingView extends AView {
     return this.taggle;
   }
 
+  setSortTrrack(rid: number, columns: {asc: boolean, col: string}[], isSorting: boolean) {
+    LineupTrackingManager.getInstance().setSortCriteriaTrrack(this.provider, rid, columns, isSorting)
+  }
+
+  setGroupTrrack(rid: number, columns: string[]) {
+    console.log("setting group")
+    LineupTrackingManager.getInstance().setGroupCriteriaTrrack(this.provider, rid, columns)
+  }
+
+  setFilterTrrack(column: string, rid: number, value: string | string[] | null, isRegExp: boolean, filterMissing: boolean) {
+    console.log("setting filter")
+    LineupTrackingManager.getInstance().setFilterTrrack(this.provider, column, rid, value, isRegExp, filterMissing)
+  }
+
+  setMetadataTrrack(column: string, rid: number, label: string, summary: string, description: string) {
+    console.log("setting metadata")
+    LineupTrackingManager.getInstance().setMetadataTrrack(this.provider, column, rid, label, summary, description)
+  }
+
   /**
    * create the selection adapter used to map input selections to LineUp columns
    * @default no columns are created
@@ -466,7 +485,7 @@ export abstract class ARankingView extends AView {
     return ColumnDescUtils.deriveColumns(columns);
   }
 
-  private getColumns(): Promise<IAdditionalColumnDesc[]> {
+  public getColumns(): Promise<IAdditionalColumnDesc[]> {
     return this.loadColumnDesc().then(({columns}) => {
       const cols = this.getColumnDescs(columns);
       // compatibility since visible is now a supported feature, so rename ones
@@ -502,7 +521,7 @@ export abstract class ARankingView extends AView {
       this.builtLineUp(this.provider);
 
       //record after the initial one
-      LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+      LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph, this);
       this.setBusy(false);
       this.update();
     }).catch(ErrorAlertHandler.getInstance().errorAlert)

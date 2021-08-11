@@ -241,6 +241,14 @@ export interface IView extends IEventHandler {
    */
   setItemSelection(selection: ISelection, name?: string): void;
 
+  setSortTrrack(rid: number, columns: {asc: boolean, col: string}[], isSorting: boolean): void;
+  setGroupTrrack(rid: number, columns: string[]): void;
+  setFilterTrrack(column: string, rid: number, value: string | string[] | null, isRegExp: boolean, filterMissing: boolean): void;
+  setMetadataTrrack(column: string, rid: number, label: string, summary: string, description: string): void;
+
+
+  getColumns(): Promise<IAdditionalColumnDesc[] | void>;
+
   /**
    * returns the current item selection
    * @returns {ISelection}

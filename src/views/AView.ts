@@ -7,7 +7,7 @@ import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUti
 import {IFormElementDesc} from '../form/interfaces';
 import {FormBuilder} from '../form/FormBuilder';
 import {AFormElement} from '../form/elements/AFormElement';
-import {ISelection, IView, IViewContext} from '../base/interfaces';
+import {ISelection, IView, IViewContext, IAdditionalColumnDesc} from '../base/interfaces';
 import {ViewUtils} from './ViewUtils';
 import {ResolveUtils} from './ResolveUtils';
 import {EViewMode} from '../base/interfaces';
@@ -18,26 +18,35 @@ import {IForm} from '../form/interfaces';
  * base class for all views
  */
 export abstract class AView extends EventHandler implements IView {
-
-  public static readonly DEFAULT_SELECTION_NAME = 'default';
+  public static readonly DEFAULT_SELECTION_NAME = "default";
 
   /**
    * params(oldValue: ISelection, newSelection: ISelection)
    */
   static readonly EVENT_ITEM_SELECT = ViewUtils.VIEW_EVENT_ITEM_SELECT;
+
+  /**
+   * params(oldValue: ISelection, newSelection: ISelection)
+   */
+  public static readonly EVENT_SORT_TRRACK = ViewUtils.TRRACK_EVENT_SORT;
+  public static readonly EVENT_GROUP_TRRACK = ViewUtils.TRRACK_EVENT_GROUP;
+  public static readonly EVENT_FILTER_TRRACK = ViewUtils.TRRACK_EVENT_FILTER;
+  public static readonly EVENT_RENAME_TRRACK = ViewUtils.TRRACK_EVENT_RENAME;
+
   /**
    * params(namedSet: INamedSet)
    */
-  static readonly EVENT_UPDATE_ENTRY_POINT = ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT;
+  static readonly EVENT_UPDATE_ENTRY_POINT =
+    ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT;
   /**
    * params()
    */
-  static readonly EVENT_LOADING_FINISHED = ViewUtils.VIEW_EVENT_LOADING_FINISHED;
+  static readonly EVENT_LOADING_FINISHED =
+    ViewUtils.VIEW_EVENT_LOADING_FINISHED;
   /**
    * params(name: string, oldValue: any, newValue: any)
    */
   static readonly EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
-
 
   readonly idType: IDType;
   readonly node: HTMLElement;
@@ -45,22 +54,35 @@ export abstract class AView extends EventHandler implements IView {
   private params: IForm;
   private readonly paramsFallback = new Map<string, any>();
   private readonly shared = new Map<string, any>();
-  private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
+  private paramsChangeListener: (
+    name: string,
+    value: any,
+    previousValue: any
+  ) => Promise<any>;
   private readonly itemSelections = new Map<string, ISelection>();
   private readonly selections = new Map<string, ISelection>();
 
-  constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
+  constructor(
+    protected readonly context: IViewContext,
+    protected selection: ISelection,
+    parent: HTMLElement
+  ) {
     super();
     this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
-    this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
+    this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {
+      idtype: null,
+      range: Range.none(),
+    });
 
-    this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('tdp-view');
+    this.node = parent.ownerDocument.createElement("div");
+    this.node.classList.add("tdp-view");
     parent.appendChild(this.node);
     if (this.isRegex(context.desc.idtype)) {
       this.idType = selection.idtype;
     } else {
-      this.idType = IDTypeManager.getInstance().resolveIdType(context.desc.idtype);
+      this.idType = IDTypeManager.getInstance().resolveIdType(
+        context.desc.idtype
+      );
     }
   }
 
@@ -70,17 +92,29 @@ export abstract class AView extends EventHandler implements IView {
    * @param {boolean|string} busyMessage optional loading message hint
    */
   protected setBusy(value: boolean, busyMessage?: string | boolean) {
-    this.node.classList.toggle('tdp-busy', value);
+    this.node.classList.toggle("tdp-busy", value);
     if (!value || !busyMessage) {
       delete this.node.dataset.busy;
     } else if (busyMessage) {
-      this.node.dataset.busy = typeof busyMessage === 'string' ? busyMessage : I18nextManager.getInstance().i18n.t('tdp:core.views.busyMessage');
+      this.node.dataset.busy =
+        typeof busyMessage === "string"
+          ? busyMessage
+          : I18nextManager.getInstance().i18n.t("tdp:core.views.busyMessage");
     }
   }
 
-  protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
-    const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'};
-    const defaultHintMessage = I18nextManager.getInstance().i18n.t('tdp:core.views.defaultHint', {...conditionalData});
+  protected setHint(
+    visible: boolean,
+    hintMessage?: string,
+    hintCSSClass = "hint"
+  ) {
+    const conditionalData = this.selection.idtype
+      ? { name: this.selection.idtype.name }
+      : { context: "unknown" };
+    const defaultHintMessage = I18nextManager.getInstance().i18n.t(
+      "tdp:core.views.defaultHint",
+      { ...conditionalData }
+    );
     this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;
@@ -90,12 +124,32 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
-    const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''};
-    return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
+    const conditionalData = {
+      ...(this.selection.idtype
+        ? { name: this.selection.idtype.name }
+        : { context: "unknown" }),
+      id: this.idType ? this.idType.name : "",
+    };
+    return this.setHint(
+      visible,
+      hintMessage ||
+        I18nextManager.getInstance().i18n.t(
+          "tdp:core.views.noMappingFoundHint",
+          { ...conditionalData }
+        ),
+      "hint-mapping"
+    );
   }
 
   /*final*/
-  async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
+  async init(
+    params: HTMLElement,
+    onParameterChange: (
+      name: string,
+      value: any,
+      previousValue: any
+    ) => Promise<any>
+  ): Promise<any> {
     this.params = await this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
   }
@@ -108,21 +162,34 @@ export abstract class AView extends EventHandler implements IView {
     return null;
   }
 
-  private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
-    const builder = new FormBuilder(select(params), undefined, 'form-inline');
+  private buildParameterForm(
+    params: HTMLElement,
+    onParameterChange: (
+      name: string,
+      value: any,
+      previousValue: any
+    ) => Promise<any>
+  ): Promise<IForm> {
+    const builder = new FormBuilder(select(params), undefined, "form-inline");
 
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
 
-
-    const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean) => void = <any>onParameterChange;
+    const onInit: (
+      name: string,
+      value: any,
+      previousValue: any,
+      isInitialzation: boolean
+    ) => void = <any>onParameterChange;
 
     // map FormElement change function to provenance graph onChange function
     descs.forEach((p) => {
-      p.onChange = (formElement, value, _data, previousValue) => onParameterChange(formElement.id, value, previousValue);
+      p.onChange = (formElement, value, _data, previousValue) =>
+        onParameterChange(formElement.id, value, previousValue);
 
       if (onInit) {
-        p.onInit = (formElement, value, _data, previousValue) => onInit(formElement.id, value, previousValue, true);
+        p.onInit = (formElement, value, _data, previousValue) =>
+          onInit(formElement.id, value, previousValue, true);
       }
     });
     this.paramsChangeListener = onParameterChange;
@@ -163,13 +230,19 @@ export abstract class AView extends EventHandler implements IView {
     const elem = this.getParameterElement(name);
     if (!elem) {
       if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
-        console.warn('invalid parameter detected use fallback', name, this.context.desc);
+        console.warn(
+          "invalid parameter detected use fallback",
+          name,
+          this.context.desc
+        );
       }
-      return this.paramsFallback.has(name) ? this.paramsFallback.get(name) : null;
+      return this.paramsFallback.has(name)
+        ? this.paramsFallback.get(name)
+        : null;
     }
     const v = elem.value;
 
-    return v === null ? '' : v;
+    return v === null ? "" : v;
   }
 
   protected getParameterData(name: string): any {
@@ -191,13 +264,54 @@ export abstract class AView extends EventHandler implements IView {
     const elem = this.getParameterElement(name);
     if (!elem) {
       if (WebpackEnv.__DEBUG__ && this.params.length > 0) {
-        console.warn('invalid parameter detected use fallback', name, this.context.desc);
+        console.warn(
+          "invalid parameter detected use fallback",
+          name,
+          this.context.desc
+        );
       }
       this.paramsFallback.set(name, value);
     } else {
       elem.value = value;
     }
     return this.parameterChanged(name);
+  }
+
+  setSortTrrack(
+    rid: number,
+    columns: { asc: boolean; col: string }[],
+    isSorting: boolean
+  ) {
+    console.log("this shouldnt happen");
+  }
+
+  setGroupTrrack(rid: number, columns: string[]) {
+    console.log("this shouldnt happen");
+  }
+
+  setFilterTrrack(
+    column: string,
+    rid: number,
+    value: string | string[] | null,
+    isRegExp: boolean,
+    filterMissing: boolean
+  ) {
+    console.log("this shouldnt happen");
+  }
+
+  setMetadataTrrack(
+    column: string,
+    rid: number,
+    label: string,
+    summary: string,
+    description: string
+  ) {
+    console.log("this shouldnt happen");
+  }
+
+  getColumns(): Promise<IAdditionalColumnDesc[] | void> {
+    console.log("shouldnt occur")
+    return Promise.resolve();
   }
 
   updateShared(name: string, value: any) {
@@ -226,7 +340,10 @@ export abstract class AView extends EventHandler implements IView {
     // hook
   }
 
-  setInputSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
+  setInputSelection(
+    selection: ISelection,
+    name: string = AView.DEFAULT_SELECTION_NAME
+  ) {
     const current = this.selections.get(name);
     if (current && ViewUtils.isSameSelection(current, selection)) {
       return;
@@ -262,7 +379,11 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveSelection(idType = this.idType): Promise<string[]> {
-    return ResolveUtils.resolveIds(this.selection.idtype, this.selection.range, idType);
+    return ResolveUtils.resolveIds(
+      this.selection.idtype,
+      this.selection.range,
+      idType
+    );
   }
 
   /**
@@ -270,33 +391,51 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveSelectionByName(idType = this.idType): Promise<string[]> {
-    return ResolveUtils.resolveNames(this.selection.idtype, this.selection.range, idType);
+    return ResolveUtils.resolveNames(
+      this.selection.idtype,
+      this.selection.range,
+      idType
+    );
   }
 
   /**
    * resolve the ids of the current input selection to all 1:n related names, not just the first one like `resolveSelection` does
    * @returns {Promise<string[]>}
    */
-  protected resolveMultipleSelections(idType = this.idType): Promise<string[][]> {
-    return ResolveUtils.resolveAllIds(this.selection.idtype, this.selection.range, idType);
+  protected resolveMultipleSelections(
+    idType = this.idType
+  ): Promise<string[][]> {
+    return ResolveUtils.resolveAllIds(
+      this.selection.idtype,
+      this.selection.range,
+      idType
+    );
   }
 
   /**
    * resolve the names of the current input selection to all 1:n related names, not just the first one like `resolveSelectionByName` does
    * @returns {Promise<string[]>}
    */
-  protected resolveMultipleSelectionsByName(idType = this.idType): Promise<string[][]> {
-    return ResolveUtils.resolveAllNames(this.selection.idtype, this.selection.range, idType);
+  protected resolveMultipleSelectionsByName(
+    idType = this.idType
+  ): Promise<string[][]> {
+    return ResolveUtils.resolveAllNames(
+      this.selection.idtype,
+      this.selection.range,
+      idType
+    );
   }
 
-
-
-  setItemSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
+  setItemSelection(
+    selection: ISelection,
+    name: string = AView.DEFAULT_SELECTION_NAME
+  ) {
     const current = this.itemSelections.get(name);
     if (current && ViewUtils.isSameSelection(current, selection)) {
       return;
     }
-    const wasEmpty = current == null || current.idtype == null || current.range.isNone;
+    const wasEmpty =
+      current == null || current.idtype == null || current.range.isNone;
     this.itemSelections.set(name, selection);
     // propagate
     if (selection.idtype) {
@@ -314,7 +453,8 @@ export abstract class AView extends EventHandler implements IView {
         }
       }
     }
-    const isEmpty = selection == null || selection.idtype == null || selection.range.isNone;
+    const isEmpty =
+      selection == null || selection.idtype == null || selection.range.isNone;
     if (!(wasEmpty && isEmpty)) {
       // the selection has changed when we really have some new values not just another empty one
       this.itemSelectionChanged(name);
@@ -330,7 +470,9 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   getItemSelection(name: string = AView.DEFAULT_SELECTION_NAME) {
-    return this.itemSelections.get(name) || {idtype: null, range: Range.none()};
+    return (
+      this.itemSelections.get(name) || { idtype: null, range: Range.none() }
+    );
   }
 
   modeChanged(mode: EViewMode) {
@@ -343,7 +485,7 @@ export abstract class AView extends EventHandler implements IView {
 
   isRegex(v: string) {
     // cheap test for regex
-    return v.includes('*') || v.includes('.') || v.includes('|');
+    return v.includes("*") || v.includes(".") || v.includes("|");
   }
 }
 
