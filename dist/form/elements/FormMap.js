@@ -68,7 +68,7 @@ export class FormMap extends AFormElement {
     build($formNode) {
         this.addChangeListener();
         const $colNode = $formNode.append('div').classed('col-sm-auto', true);
-        this.$node = $colNode.append('div').classed('row', true);
+        this.$node = $colNode.append('div');
         this.setVisible(this.elementDesc.visible);
         this.inline = hasInlineParent(this.$node.node());
         if (this.inline && this.elementDesc.onChange) {
@@ -76,6 +76,8 @@ export class FormMap extends AFormElement {
             this.inlineOnChange = this.elementDesc.onChange;
             this.elementDesc.onChange = null;
         }
+        // do not add the class in inline mode
+        this.$node.classed('row', !this.inline);
         if (this.inline) {
             if (!this.elementDesc.options.badgeProvider) {
                 //default badge provider for inline
