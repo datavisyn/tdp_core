@@ -25,9 +25,10 @@ export class Form implements IForm {
    * Constructor
    * @param $parent Node that the form should be attached to
    * @param formId unique form id
+   * @param formClass class attribute for form, e.g. for inline forms
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
-    this.$node = $parent.append('form').attr('id', this.formId);
+  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formClass = null, private readonly formInline: boolean = false) {
+    this.$node = $parent.append('form').attr('class', `${this.formClass} align-items-center`).attr('id', this.formId).attr('formInline', this.formInline);
   }
 
   /**
@@ -126,7 +127,11 @@ export class Form implements IForm {
     elementDesc.attributes = elementDesc.attributes || {};
     elementDesc.attributes.id = uid; // add id as attribute
     elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
-    elementDesc.attributes.clazz += ' form-control';
+    if (elementDesc.type === 'FormSelect') {
+      elementDesc.attributes.clazz += ' form-select';
+    } else if (elementDesc.type === 'FormButton') {
+      elementDesc.attributes.clazz += ' btn btn-light btn-sm';
+    }
 
     return elementDesc;
   }

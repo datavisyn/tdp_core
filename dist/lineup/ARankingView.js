@@ -13,6 +13,7 @@ import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LazyColumn } from './internal/column';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 /**
  * base class for views based on LineUp
@@ -101,8 +102,9 @@ export class ARankingView extends AView {
         BaseUtils.mixin(this.options, idTypeNames, names, options);
         this.node.classList.add('lineup', 'lu-taggle', 'lu');
         this.node.insertAdjacentHTML('beforeend', `<div></div>`);
-        this.stats = this.node.ownerDocument.createElement('p');
-        this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
+        this.stats = this.node.ownerDocument.createElement('div');
+        this.stats.classList.add('mt-2', 'mb-2');
+        this.provider = new TDPLocalDataProvider([], [], this.options.customProviderOptions);
         // hack in for providing the data provider within the graph
         // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
         // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
@@ -110,7 +112,8 @@ export class ARankingView extends AView {
         this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
         const taggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, {
             summaryHeader: this.options.enableHeaderSummary,
-            labelRotation: this.options.enableHeaderRotation ? 45 : 0
+            labelRotation: this.options.enableHeaderRotation ? 45 : 0,
+            rowHeight: 21
         }, options.customOptions);
         if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
             taggleOptions.rowHeight = this.options.itemRowHeight;
@@ -184,10 +187,11 @@ export class ARankingView extends AView {
         return super.init(params, onParameterChange).then(() => {
             // inject stats
             const base = params.querySelector('form') || params;
-            base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+            base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
             const container = base.lastElementChild;
             container.appendChild(this.stats);
             if (this.options.enableSidePanel === 'top') {
+                container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
                 container.insertAdjacentElement('afterbegin', this.panel.node);
             }
         });

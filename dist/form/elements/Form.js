@@ -10,14 +10,17 @@ export class Form {
      * Constructor
      * @param $parent Node that the form should be attached to
      * @param formId unique form id
+     * @param formClass class attribute for form, e.g. for inline forms
      */
-    constructor($parent, formId = BaseUtils.randomId()) {
+    constructor($parent, formId = BaseUtils.randomId(), formClass = null, formInline = false) {
         this.formId = formId;
+        this.formClass = formClass;
+        this.formInline = formInline;
         /**
          * Map of all appended form elements with the element id as key
          */
         this.elements = new Map();
-        this.$node = $parent.append('form').attr('id', this.formId);
+        this.$node = $parent.append('form').attr('class', `${this.formClass} align-items-center`).attr('id', this.formId).attr('formInline', this.formInline);
     }
     /**
      * Append a form element and builds it
@@ -105,7 +108,12 @@ export class Form {
         elementDesc.attributes = elementDesc.attributes || {};
         elementDesc.attributes.id = uid; // add id as attribute
         elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
-        elementDesc.attributes.clazz += ' form-control';
+        if (elementDesc.type === 'FormSelect') {
+            elementDesc.attributes.clazz += ' form-select';
+        }
+        else if (elementDesc.type === 'FormButton') {
+            elementDesc.attributes.clazz += ' btn btn-light btn-sm';
+        }
         return elementDesc;
     }
 }

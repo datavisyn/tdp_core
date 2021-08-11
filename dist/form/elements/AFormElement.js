@@ -56,14 +56,14 @@ export class AFormElement extends EventHandler {
         return Boolean(this.value);
     }
     isVisible() {
-        return !this.$node.classed('hidden');
+        return this.$node.attr('hidden') === null;
     }
     /**
      * Set the visibility of an form element (default = true)
      * @param visible
      */
     setVisible(visible = true) {
-        this.$node.classed('hidden', !visible);
+        this.$node.attr('hidden', visible ? null : '');
     }
     addChangeListener() {
         if (this.elementDesc.useSession || this.elementDesc.onChange) {
@@ -95,7 +95,10 @@ export class AFormElement extends EventHandler {
         if (this.elementDesc.hideLabel) {
             return;
         }
-        this.$node.append('label').attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
+        const inlineForm = 'inlineForm';
+        const colWidth = this.elementDesc.options[inlineForm] ? 'col-sm-auto' : 'col-sm-12';
+        const labelClass = this.elementDesc.type === 'FormCheckBox' ? 'form-check-label' : 'col-form-label';
+        this.$node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
     }
     /**
      * Set a list of object properties and values to a given node
@@ -136,14 +139,14 @@ export class AFormElement extends EventHandler {
                     onDependentChange(values);
                 }
                 if (showIf) {
-                    this.$node.classed('hidden', !showIf(values));
+                    this.$node.attr('hidden', showIf(values) ? null : '');
                 }
             });
         });
         // initial values
         const values = dependElements.map((d) => d.value);
         if (showIf) {
-            this.$node.classed('hidden', !this.elementDesc.showIf(values));
+            this.$node.attr('hidden', this.elementDesc.showIf(values) ? null : '');
         }
         return values;
     }

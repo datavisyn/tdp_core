@@ -20,6 +20,10 @@ aside {
 
   &.provenance-layout-vis {
     border-color: $core_colour_selected;
+
+    &.collapsed {
+      border-left: 0; // hide border when panel is collapsed
+    }
   }
 
   &.provenance-story-vis {
@@ -38,7 +42,7 @@ aside {
 label {
 
   &.clue-E, &.clue-A, &.clue-P {
-    padding: 5px 10px;
+    padding: 7px 10px;
     border-radius: 0 !important;
     border: none;
     border-left: 1px solid $header-menu-bg-color;

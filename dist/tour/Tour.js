@@ -73,6 +73,13 @@ export class Tour {
     previous(context) {
         return this.jumpTo(this.current - 1, context);
     }
+    /**
+     * Refresh current step, e.g., when resizing the browser window
+     * @param context tour context
+     */
+    refreshCurrent(context) {
+        return context.show(this.current, this.steps[this.current]);
+    }
     static resolveTours() {
         const tours = PluginRegistry.getInstance().listPlugins(TourUtils.EXTENSION_POINT_TDP_TOUR);
         return tours.map((d) => new Tour(d));

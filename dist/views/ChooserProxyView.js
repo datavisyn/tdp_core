@@ -23,7 +23,7 @@ export class ChooserProxyView extends AView {
         const initResult = await super.init(params, onParameterChange);
         // inject stats
         const base = params.querySelector('form') || params;
-        base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+        base.insertAdjacentHTML('beforeend', `<div class="mb-3"></div>`);
         base.lastElementChild.appendChild(this.openExternally);
         return initResult;
     }
@@ -76,7 +76,7 @@ export class ChooserProxyView extends AView {
         }
         if (this.options.openExternally) {
             this.setBusy(false);
-            this.node.innerHTML = `<div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+            this.node.innerHTML = `<div class="alert alert-info mx-auto" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
       <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
       </div>`;
             return;
@@ -106,7 +106,7 @@ export class ChooserProxyView extends AView {
     showNoHttpsMessage(url) {
         this.setBusy(false);
         this.node.innerHTML = `
-    <div class="alert alert-info center-block" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+    <div class="alert alert-info mx-auto" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
     <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
     </div>`;
         this.openExternally.innerHTML = ``;

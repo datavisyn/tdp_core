@@ -1,14 +1,14 @@
 import { I18nextManager } from 'phovea_core';
 export class NotificationHandler {
     static pushNotification(level, msg, autoHideInMs = -1) {
-        let parent = document.body.querySelector('div.toast-container');
+        let parent = document.body.querySelector('div.toast-container-custom');
         if (!parent) {
-            document.body.insertAdjacentHTML('beforeend', `<div class="toast-container"></div>`);
+            document.body.insertAdjacentHTML('beforeend', `<div class="toast-container-custom"></div>`);
             parent = document.body.lastElementChild;
         }
         parent.classList.add('push');
         parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     ${msg}</div>`);
         const alert = parent.firstElementChild;
         // fix link color

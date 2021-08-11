@@ -42,5 +42,10 @@ export declare class Tour {
     next(context: ITourContext): Promise<void>;
     jumpTo(step: number, context: ITourContext): Promise<void>;
     previous(context: ITourContext): Promise<void>;
+    /**
+     * Refresh current step, e.g., when resizing the browser window
+     * @param context tour context
+     */
+    refreshCurrent(context: ITourContext): void;
     static resolveTours(): Tour[];
 }

@@ -246,7 +246,7 @@ $lu_assets: '~lineupjs/src/assets';
         content: attr(data-violation);
         color: black;
         text-align: left;
-        background: lighten(#ffd700, 45%);
+        background: tint-color(#ffd700, 45%);
         hyphens: manual;
         padding: 5px;
         width: 12em;
@@ -274,8 +274,8 @@ $lu_assets: '~lineupjs/src/assets';
         display: inline;
       }
 
-      // hide the list item, if the number of rows is '0'
-      li[#{$attr_name}='0'] {
+      // hide the link, if the number of rows is '0'
+      a[#{$attr_name}='0'] {
         display: none;
       }
     }
@@ -284,12 +284,22 @@ $lu_assets: '~lineupjs/src/assets';
       @include num_rows_indicator('data-num-all-rows');
       @include num_rows_indicator('data-num-selected-rows');
       @include num_rows_indicator('data-num-filtered-rows');
+
+      // hide caret icon of drop down
+      .dropdown-toggle::after {
+        content: none;
+      }
     }
 
     .download-data-dropdown {
       @include num_rows_indicator('data-num-all-rows');
       @include num_rows_indicator('data-num-selected-rows');
       @include num_rows_indicator('data-num-filtered-rows');
+
+      // hide caret icon of drop down
+      .dropdown-toggle::after {
+        content: none;
+      }
     }
 
     > main {
@@ -418,7 +428,7 @@ $lu_assets: '~lineupjs/src/assets';
 
         &.once .lu-search {
           position: absolute;
-          top: 1.8em;
+          top: 2em;
           width: 17.5em;
           left: -15em;
           z-index: 2;
