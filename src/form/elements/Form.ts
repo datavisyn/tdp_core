@@ -28,7 +28,7 @@ export class Form implements IForm {
    * @param formClass class attribute for form, e.g. for inline forms
    */
   constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formClass = null, private readonly formInline: boolean = false) {
-    this.$node = $parent.append('form').attr('class', `${this.formClass} align-items-center`).attr('id', this.formId).attr('formInline', this.formInline);
+    this.$node = $parent.append('form').attr('class', `${this.formClass} align-items-center`).attr('id', this.formId).classed('form-inline', this.formInline);
   }
 
   /**
