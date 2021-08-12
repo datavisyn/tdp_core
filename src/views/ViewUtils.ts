@@ -3,22 +3,23 @@ import {IViewPluginDesc, IViewContext, ISelection} from '../base/interfaces';
 
 
 export class ViewUtils {
-
   /**
    * event when one or more elements are selected for the next level
    * @type {string}
    * @argument selection {ISelection}
    */
-  public static readonly VIEW_EVENT_ITEM_SELECT = 'select';
-  public static readonly VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
-  public static readonly VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
-  public static readonly VIEW_EVENT_UPDATE_SHARED = 'updateShared';
+  public static readonly VIEW_EVENT_ITEM_SELECT = "select";
+  public static readonly VIEW_EVENT_UPDATE_ENTRY_POINT = "update_entry_point";
+  public static readonly VIEW_EVENT_LOADING_FINISHED = "loadingFinished";
+  public static readonly VIEW_EVENT_UPDATE_SHARED = "updateShared";
+  public static readonly VIEW_EVENT_DUMP_CHANGE_TRRACK = "dumpChange";
 
   static toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
     const r: any = p;
-    r.selection = r.selection || 'none';
-    r.group = Object.assign({name: 'Other', order: 99}, r.group);
-    r.securityNotAllowedText = r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
+    r.selection = r.selection || "none";
+    r.group = Object.assign({ name: "Other", order: 99 }, r.group);
+    r.securityNotAllowedText =
+      r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
 
     // common typo
     if (r.idType !== undefined) {
@@ -29,21 +30,21 @@ export class ViewUtils {
 
   static matchLength(s: any, length: number) {
     switch (String(s)) {
-      case '':
-      case 'none':
-      case '0':
+      case "":
+      case "none":
+      case "0":
         return length === 0;
-      case 'any':
+      case "any":
         return true;
-      case 'single':
-      case '1':
-      case 'small_multiple':
+      case "single":
+      case "1":
+      case "small_multiple":
         return length === 1;
-      case 'multiple':
-      case 'chooser':
-      case 'some':
+      case "multiple":
+      case "chooser":
+      case "some":
         return length >= 1;
-      case '2':
+      case "2":
         return length === 2;
       default:
         return false;
@@ -56,7 +57,7 @@ export class ViewUtils {
    * @returns {boolean}
    */
   static showAsSmallMultiple(desc: any) {
-    return desc.selection === 'small_multiple';
+    return desc.selection === "small_multiple";
   }
 
   /**
@@ -65,7 +66,7 @@ export class ViewUtils {
    * @returns {boolean}
    */
   static willShowChooser(desc: any) {
-    return desc.selection === 'chooser';
+    return desc.selection === "chooser";
   }
 
   /**
@@ -75,8 +76,8 @@ export class ViewUtils {
    * @returns {boolean}
    */
   static isSameSelection(a: ISelection, b: ISelection): boolean {
-    const aNull = (a == null || a.idtype == null);
-    const bNull = (b == null || b.idtype == null);
+    const aNull = a == null || a.idtype == null;
+    const bNull = b == null || b.idtype == null;
     if (aNull || bNull) {
       return aNull === bNull;
     }
@@ -102,11 +103,15 @@ export class ViewUtils {
     });
   }
 
-  static createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IObjectRef<any>): IViewContext {
+  static createContext(
+    graph: ProvenanceGraph,
+    desc: IPluginDesc,
+    ref: IObjectRef<any>
+  ): IViewContext {
     return {
       graph,
       desc: ViewUtils.toViewPluginDesc(desc),
-      ref
+      ref,
     };
   }
 }

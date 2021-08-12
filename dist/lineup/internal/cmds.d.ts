@@ -3,6 +3,7 @@
  */
 import { IObjectRef, ProvenanceGraph, ICmdResult, IAction } from 'phovea_core';
 import { EngineRenderer, TaggleRenderer, LocalDataProvider } from 'lineupjs';
+import { ARankingView } from '..';
 export interface IViewProviderLocal {
     data: LocalDataProvider;
     getInstance(): {
@@ -56,11 +57,7 @@ export declare class LineupTrackingManager {
     private toSortObject;
     static setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
     setRankingSortCriteria(provider: IObjectRef<any>, rid: number, value: any): IAction;
-    static setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-    setSortCriteria(provider: IObjectRef<any>, rid: number, columns: {
-        asc: boolean;
-        col: string;
-    }[], isSorting?: boolean): IAction;
+    setSortCriteria(view: ARankingView, provider: LocalDataProvider): void;
     static setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
     setGroupCriteria(provider: IObjectRef<any>, rid: number, columns: string[]): IAction;
     setAggregation(provider: IObjectRef<any>, rid: number, group: string | string[], value: number | number[]): IAction;
@@ -133,7 +130,7 @@ export declare class LineupTrackingManager {
      * @param graph The provenance graph where the events should be tracked into
      * @returns Returns a promise that is waiting for the object reference (LineUp instance)
      */
-    clueify(lineup: EngineRenderer | TaggleRenderer, objectRef: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph): Promise<void>;
+    clueify(lineup: EngineRenderer | TaggleRenderer, objectRef: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph, view: ARankingView, provider: LocalDataProvider): Promise<void>;
     /**
      * Removes the event listener for adding and removing a ranking from the provided LineUp instance.
      * @param objectRef The object reference that contains the LineUp data provider

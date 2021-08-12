@@ -10,6 +10,7 @@ export declare class ViewUtils {
     static readonly VIEW_EVENT_UPDATE_ENTRY_POINT = "update_entry_point";
     static readonly VIEW_EVENT_LOADING_FINISHED = "loadingFinished";
     static readonly VIEW_EVENT_UPDATE_SHARED = "updateShared";
+    static readonly VIEW_EVENT_DUMP_CHANGE_TRRACK = "dumpChange";
     static toViewPluginDesc(p: IPluginDesc): IViewPluginDesc;
     static matchLength(s: any, length: number): boolean;
     /**

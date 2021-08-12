@@ -1,5 +1,5 @@
 
-import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, spaceFillingRule, updateLodRules, UIntTypedArray} from 'lineupjs';
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, spaceFillingRule, updateLodRules, UIntTypedArray, IDataProviderDump} from 'lineupjs';
 import {AView} from '../views/AView';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
@@ -430,7 +430,7 @@ export abstract class ARankingView extends AView {
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
-    return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
+    return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params, this, this.provider);
   }
 
   /**
@@ -443,6 +443,23 @@ export abstract class ARankingView extends AView {
       const column = this.provider.find(columnId);
       return column.removeMe();
     });
+  }
+
+  restoreDump(dump: IDataProviderDump): void {
+    this.withoutTracking(() => {
+      console.log("dumpin")
+      this.provider.restore(dump);
+
+    }).then(() => {
+      LineupTrackingManager.getInstance().clueify(
+        this.taggle,
+        this.context.ref,
+        this.context.graph,
+        this,
+        this.provider
+      );
+
+    })
   }
 
   /**
@@ -502,7 +519,7 @@ export abstract class ARankingView extends AView {
       this.builtLineUp(this.provider);
 
       //record after the initial one
-      LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+      LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph, this, this.provider);
       this.setBusy(false);
       this.update();
     }).catch(ErrorAlertHandler.getInstance().errorAlert)

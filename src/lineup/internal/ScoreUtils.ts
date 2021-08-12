@@ -8,6 +8,8 @@ import {IScore} from '../../base/interfaces';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../base/extensions';
 import {AttachemntUtils} from '../../storage/internal/attachment';
 import {IViewProvider} from '../IViewProvider';
+import {LocalDataProvider} from 'lineupjs';
+import {AView} from '../..';
 
 
 export class ScoreUtils {
@@ -59,12 +61,12 @@ export class ScoreUtils {
     });
   }
 
-  static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
+  static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, view:ARankingView, dataProvider: LocalDataProvider) {
     const storedParams = await AttachemntUtils.externalize(params);
     const currentParams = {id: scoreId, params, storedParams};
     const result = await ScoreUtils.addScoreAsync([provider], currentParams);
     const toStoreParams = {id: scoreId, params: storedParams};
-    return graph.pushWithResult(ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), ObjectRefUtils.category.data, ObjectRefUtils.operation.create), ScoreUtils.CMD_ADD_SCORE, ScoreUtils.addScoreImpl, [provider], toStoreParams), result);
+    view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, dataProvider.dump());
   }
 
   static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]) {

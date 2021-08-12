@@ -4,7 +4,7 @@ import { IObjectRef, ProvenanceGraph, Range } from 'phovea_core';
 import { IEventHandler } from 'phovea_core';
 import { RangeLike } from 'phovea_core';
 import { IDType } from 'phovea_core';
-import { IColumnDesc, Column } from 'lineupjs';
+import { IColumnDesc, Column, IDataProviderDump } from 'lineupjs';
 import { AppHeader } from 'phovea_ui';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
@@ -189,7 +189,7 @@ export interface IView extends IEventHandler {
     /**
      * optional natural size used when stacking the view on top of each other
      */
-    readonly naturalSize?: [number, number] | 'auto';
+    readonly naturalSize?: [number, number] | "auto";
     /**
      * initialized this view
      * @param {HTMLElement} params place to put parameter forms
@@ -208,6 +208,7 @@ export interface IView extends IEventHandler {
      * @param {string} name named item selection in case of multiple ones, default = DEFAULT_SELECTION_NAME
      */
     setItemSelection(selection: ISelection, name?: string): void;
+    restoreDump(dump: IDataProviderDump): void;
     /**
      * returns the current item selection
      * @returns {ISelection}

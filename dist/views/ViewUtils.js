@@ -1,9 +1,10 @@
 export class ViewUtils {
     static toViewPluginDesc(p) {
         const r = p;
-        r.selection = r.selection || 'none';
-        r.group = Object.assign({ name: 'Other', order: 99 }, r.group);
-        r.securityNotAllowedText = r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
+        r.selection = r.selection || "none";
+        r.group = Object.assign({ name: "Other", order: 99 }, r.group);
+        r.securityNotAllowedText =
+            r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
         // common typo
         if (r.idType !== undefined) {
             r.idtype = r.idType;
@@ -12,21 +13,21 @@ export class ViewUtils {
     }
     static matchLength(s, length) {
         switch (String(s)) {
-            case '':
-            case 'none':
-            case '0':
+            case "":
+            case "none":
+            case "0":
                 return length === 0;
-            case 'any':
+            case "any":
                 return true;
-            case 'single':
-            case '1':
-            case 'small_multiple':
+            case "single":
+            case "1":
+            case "small_multiple":
                 return length === 1;
-            case 'multiple':
-            case 'chooser':
-            case 'some':
+            case "multiple":
+            case "chooser":
+            case "some":
                 return length >= 1;
-            case '2':
+            case "2":
                 return length === 2;
             default:
                 return false;
@@ -38,7 +39,7 @@ export class ViewUtils {
      * @returns {boolean}
      */
     static showAsSmallMultiple(desc) {
-        return desc.selection === 'small_multiple';
+        return desc.selection === "small_multiple";
     }
     /**
      * whether the view is going to use a chooser for multiple selections
@@ -46,7 +47,7 @@ export class ViewUtils {
      * @returns {boolean}
      */
     static willShowChooser(desc) {
-        return desc.selection === 'chooser';
+        return desc.selection === "chooser";
     }
     /**
      * compares two selections and return true if they are the same
@@ -55,8 +56,8 @@ export class ViewUtils {
      * @returns {boolean}
      */
     static isSameSelection(a, b) {
-        const aNull = (a == null || a.idtype == null);
-        const bNull = (b == null || b.idtype == null);
+        const aNull = a == null || a.idtype == null;
+        const bNull = b == null || b.idtype == null;
         if (aNull || bNull) {
             return aNull === bNull;
         }
@@ -85,7 +86,7 @@ export class ViewUtils {
         return {
             graph,
             desc: ViewUtils.toViewPluginDesc(desc),
-            ref
+            ref,
         };
     }
 }
@@ -94,8 +95,9 @@ export class ViewUtils {
  * @type {string}
  * @argument selection {ISelection}
  */
-ViewUtils.VIEW_EVENT_ITEM_SELECT = 'select';
-ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
-ViewUtils.VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
-ViewUtils.VIEW_EVENT_UPDATE_SHARED = 'updateShared';
+ViewUtils.VIEW_EVENT_ITEM_SELECT = "select";
+ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT = "update_entry_point";
+ViewUtils.VIEW_EVENT_LOADING_FINISHED = "loadingFinished";
+ViewUtils.VIEW_EVENT_UPDATE_SHARED = "updateShared";
+ViewUtils.VIEW_EVENT_DUMP_CHANGE_TRRACK = "dumpChange";
 //# sourceMappingURL=ViewUtils.js.map

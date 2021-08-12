@@ -1,4 +1,4 @@
-import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
+import { EngineRenderer, LocalDataProvider, TaggleRenderer, IDataProviderDump } from 'lineupjs';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
@@ -116,6 +116,7 @@ export declare abstract class ARankingView extends AView {
      * @returns {Promise<boolean>}
      */
     removeTrackedScoreColumn(columnId: string): Promise<boolean>;
+    restoreDump(dump: IDataProviderDump): void;
     /**
      * load the table description from the server
      * @returns {Promise<IServerColumnDesc>} the column descriptions

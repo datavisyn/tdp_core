@@ -263,6 +263,9 @@ export class AView extends EventHandler {
     itemSelectionChanged(_name = AView.DEFAULT_SELECTION_NAME) {
         // hook
     }
+    restoreDump(dump) {
+        console.log("this should do anything!");
+    }
     getItemSelection(name = AView.DEFAULT_SELECTION_NAME) {
         return this.itemSelections.get(name) || { idtype: null, range: Range.none() };
     }
@@ -294,4 +297,5 @@ AView.EVENT_LOADING_FINISHED = ViewUtils.VIEW_EVENT_LOADING_FINISHED;
  * params(name: string, oldValue: any, newValue: any)
  */
 AView.EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
+AView.EVENT_DUMP_CHANGE_TRRACK = ViewUtils.VIEW_EVENT_DUMP_CHANGE_TRRACK;
 //# sourceMappingURL=AView.js.map

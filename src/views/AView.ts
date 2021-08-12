@@ -12,6 +12,7 @@ import {ViewUtils} from './ViewUtils';
 import {ResolveUtils} from './ResolveUtils';
 import {EViewMode} from '../base/interfaces';
 import {IForm} from '../form/interfaces';
+import {IDataProviderDump} from 'lineupjs';
 
 
 /**
@@ -38,6 +39,7 @@ export abstract class AView extends EventHandler implements IView {
    */
   static readonly EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
 
+  static readonly EVENT_DUMP_CHANGE_TRRACK = ViewUtils.VIEW_EVENT_DUMP_CHANGE_TRRACK;
 
   readonly idType: IDType;
   readonly node: HTMLElement;
@@ -328,6 +330,11 @@ export abstract class AView extends EventHandler implements IView {
   protected itemSelectionChanged(_name: string = AView.DEFAULT_SELECTION_NAME) {
     // hook
   }
+
+  restoreDump(dump: IDataProviderDump): void {
+    console.log("this should do anything!")
+  }
+
 
   getItemSelection(name: string = AView.DEFAULT_SELECTION_NAME) {
     return this.itemSelections.get(name) || {idtype: null, range: Range.none()};

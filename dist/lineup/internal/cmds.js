@@ -5,6 +5,7 @@ import { ResolveNow, I18nextManager, ObjectRefUtils, ActionMetaData, ActionUtils
 import { EngineRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn } from 'lineupjs';
 import { LineUpFilterUtils } from './lineUpFilter';
 import { isEqual } from 'lodash';
+import { AView } from '../..';
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 var LineUpTrackAndUntrackActions;
 (function (LineUpTrackAndUntrackActions) {
@@ -145,32 +146,8 @@ export class LineupTrackingManager {
             value
         });
     }
-    static async setSortCriteriaImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
-        const ranking = p.getRankings()[parameter.rid];
-        const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
-        let current;
-        const columns = parameter.columns.map((c) => ({ col: ranking.findByPath(c.col), asc: c.asc }));
-        if (parameter.isSorting) {
-            current = ranking.getSortCriteria();
-            LineupTrackingManager.getInstance().ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
-            ranking.setSortCriteria(columns);
-        }
-        else {
-            current = ranking.getGroupSortCriteria();
-            LineupTrackingManager.getInstance().ignoreNext = Ranking.EVENT_GROUP_SORT_CRITERIA_CHANGED;
-            ranking.setGroupSortCriteria(columns);
-        }
-        return waitForSorted({
-            inverse: LineupTrackingManager.getInstance().setSortCriteria(inputs[0], parameter.rid, current.map(LineupTrackingManager.getInstance().toSortObject), parameter.isSorting)
-        });
-    }
-    setSortCriteria(provider, rid, columns, isSorting = true) {
-        return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.cmds.changeSortCriteria'), ObjectRefUtils.category.layout, ObjectRefUtils.operation.update), LineUpCmds.CMD_SET_SORTING_CRITERIAS, LineupTrackingManager.setSortCriteriaImpl, [provider], {
-            rid,
-            columns,
-            isSorting
-        });
+    setSortCriteria(view, provider) {
+        view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
     }
     static async setGroupCriteriaImpl(inputs, parameter) {
         const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
@@ -400,7 +377,7 @@ export class LineupTrackingManager {
      * @param delayed Number of milliseconds to delay the tracking call (default is -1 = immediately)
      * @param bufferOrExecute Function that immediately executes the action or buffers LineUp live preview events and executes them when a dialog is confirmed
      */
-    recordPropertyChange(source, provider, objectRef, graph, property, delayed = -1, bufferOrExecute) {
+    recordPropertyChange(source, provider, objectRef, graph, view, property, delayed = -1, bufferOrExecute) {
         const eventListenerFunction = (oldValue, newValue) => {
             // wrap the execution in a separate function to buffer it if the `bufferOrExecute` is set
             const execute = (initialState = oldValue) => {
@@ -423,15 +400,11 @@ export class LineupTrackingManager {
                     objectRef.value.getInstance().updateLineUpStats();
                     const rid = LineupTrackingManager.getInstance().rankingId(provider, source.findMyRanker());
                     const path = source.fqpath;
-                    graph.pushWithResult(LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, property, newValue), {
-                        inverse: LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, property, initialState)
-                    });
+                    view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
                 }
                 else if (source instanceof Ranking) {
                     const rid = LineupTrackingManager.getInstance().rankingId(provider, source);
-                    graph.pushWithResult(LineupTrackingManager.getInstance().setColumn(objectRef, rid, null, property, newValue), {
-                        inverse: LineupTrackingManager.getInstance().setColumn(objectRef, rid, null, property, initialState || oldValue)
-                    });
+                    view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
                 }
             };
             if (bufferOrExecute) {
@@ -443,6 +416,9 @@ export class LineupTrackingManager {
             }
             execute(); // execute immediately
         };
+        if (typeof source === "number") {
+            return;
+        }
         source.on(LineupTrackingManager.getInstance().suffix(LineUpTrackAndUntrackActions.ChangedSuffix, property), delayed > 0 ? LineupTrackingManager.getInstance().delayedCall(eventListenerFunction, delayed) : eventListenerFunction);
     }
     /**
@@ -453,17 +429,17 @@ export class LineupTrackingManager {
      * @param col The column instance that should be tracked
      * @param bufferOrExecute Function that immediately executes the action or buffers LineUp live preview events and executes them when a dialog is confirmed
      */
-    trackColumn(provider, objectRef, graph, col, bufferOrExecute) {
-        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.metaData);
-        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.filter, null, bufferOrExecute);
-        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.rendererType, null, bufferOrExecute);
-        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.groupRenderer, null, bufferOrExecute);
-        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferOrExecute);
-        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.sortMethod, null, bufferOrExecute);
+    trackColumn(provider, objectRef, graph, view, col, bufferOrExecute) {
+        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.metaData);
+        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.filter, null, bufferOrExecute);
+        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.rendererType, null, bufferOrExecute);
+        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.groupRenderer, null, bufferOrExecute);
+        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.summaryRenderer, null, bufferOrExecute);
+        LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.sortMethod, null, bufferOrExecute);
         //recordPropertyChange(col, provider, lineup, graph, LineUpTrackAndUntrackActions.width, 100);
         if (col instanceof CompositeColumn) {
             col.on(`${CompositeColumn.EVENT_ADD_COLUMN}.track`, (column, index) => {
-                LineupTrackingManager.getInstance().trackColumn(provider, objectRef, graph, column, bufferOrExecute);
+                LineupTrackingManager.getInstance().trackColumn(provider, objectRef, graph, view, column, bufferOrExecute);
                 if (LineupTrackingManager.getInstance().ignore(CompositeColumn.EVENT_ADD_COLUMN, objectRef)) {
                     return;
                 }
@@ -471,9 +447,7 @@ export class LineupTrackingManager {
                 const d = provider.dumpColumn(column);
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, col.findMyRanker());
                 const path = col.fqpath;
-                graph.pushWithResult(LineupTrackingManager.getInstance().addColumn(objectRef, rid, path, index, d), {
-                    inverse: LineupTrackingManager.getInstance().addColumn(objectRef, rid, path, index, null)
-                });
+                view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
             });
             col.on(`${CompositeColumn.EVENT_REMOVE_COLUMN}.track`, (column, index) => {
                 LineupTrackingManager.getInstance().untrackColumn(column);
@@ -484,9 +458,7 @@ export class LineupTrackingManager {
                 const d = provider.dumpColumn(column);
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, col.findMyRanker());
                 const path = col.fqpath;
-                graph.pushWithResult(LineupTrackingManager.getInstance().addColumn(objectRef, rid, path, index, null), {
-                    inverse: LineupTrackingManager.getInstance().addColumn(objectRef, rid, path, index, d)
-                });
+                view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
             });
             col.on(`${CompositeColumn.EVENT_MOVE_COLUMN}.track`, (column, index, oldIndex) => {
                 if (LineupTrackingManager.getInstance().ignore(CompositeColumn.EVENT_MOVE_COLUMN, objectRef)) {
@@ -495,36 +467,32 @@ export class LineupTrackingManager {
                 // console.log(col.fqpath, 'addColumn', column, index);
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, col.findMyRanker());
                 const path = col.fqpath;
-                graph.pushWithResult(LineupTrackingManager.getInstance().moveColumn(objectRef, rid, path, oldIndex, index), {
-                    inverse: LineupTrackingManager.getInstance().moveColumn(objectRef, rid, path, index, oldIndex > index ? oldIndex + 1 : oldIndex)
-                });
+                view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
             });
             col.children.forEach(LineupTrackingManager.getInstance().trackColumn.bind(this, provider, objectRef, graph));
             if (col instanceof StackColumn) {
-                LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, 'weights', 100);
+                LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, 'weights', 100);
             }
         }
         else if (col instanceof NumberColumn) {
-            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
+            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
             col.on(`${NumberColumn.EVENT_MAPPING_CHANGED}.track`, (old, newValue) => {
                 if (LineupTrackingManager.getInstance().ignore(NumberColumn.EVENT_MAPPING_CHANGED, objectRef)) {
                     return;
                 }
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, col.findMyRanker());
                 const path = col.fqpath;
-                graph.pushWithResult(LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, newValue.toJSON()), {
-                    inverse: LineupTrackingManager.getInstance().setColumn(objectRef, rid, path, LineUpTrackAndUntrackActions.mapping, old.toJSON())
-                });
+                view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
             });
         }
         else if (col instanceof ScriptColumn) {
-            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.script, null, bufferOrExecute);
+            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.script, null, bufferOrExecute);
         }
         else if (col instanceof OrdinalColumn) {
-            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.mapping);
+            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.mapping);
         }
         else if (col instanceof StringColumn || col instanceof DateColumn) {
-            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
+            LineupTrackingManager.getInstance().recordPropertyChange(col, provider, objectRef, graph, view, LineUpTrackAndUntrackActions.grouping, null, bufferOrExecute);
         }
     }
     /**
@@ -555,7 +523,7 @@ export class LineupTrackingManager {
      * @param graph The provenance graph where the events should be tracked into
      * @param ranking The current ranking that should be tracked
      */
-    trackRanking(lineup, provider, objectRef, graph, ranking) {
+    trackRanking(lineup, provider, objectRef, graph, view, ranking) {
         // Map containing the initial state/value (before the dialog was opened) of the actions that are buffered.
         // Use this initial value to compare it to the last saved action. So if you open the filter dialog and the final result
         // is the same as it was before the dialog was opened, do not execute this action.
@@ -616,7 +584,9 @@ export class LineupTrackingManager {
         });
         ranking.on(`${Ranking.EVENT_SORT_CRITERIA_CHANGED}.track`, (old, newValue) => {
             // wrap the execution in a function to buffer it if a dialog is open
+            console.log("anywhere in here");
             const execute = (initialState = old) => {
+                console.log("or in here");
                 if (LineupTrackingManager.getInstance().ignore(Ranking.EVENT_SORT_CRITERIA_CHANGED, objectRef)) {
                     return;
                 }
@@ -625,9 +595,7 @@ export class LineupTrackingManager {
                     return;
                 }
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-                graph.pushWithResult(LineupTrackingManager.getInstance().setSortCriteria(objectRef, rid, newValue.map(LineupTrackingManager.getInstance().toSortObject)), {
-                    inverse: LineupTrackingManager.getInstance().setSortCriteria(objectRef, rid, initialState.map(LineupTrackingManager.getInstance().toSortObject))
-                });
+                LineupTrackingManager.getInstance().setSortCriteria(view, provider);
             };
             const action = {
                 name: 'sortCriteria',
@@ -646,9 +614,7 @@ export class LineupTrackingManager {
                     return;
                 }
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-                graph.pushWithResult(LineupTrackingManager.getInstance().setSortCriteria(objectRef, rid, newValue.map(LineupTrackingManager.getInstance().toSortObject), false), {
-                    inverse: LineupTrackingManager.getInstance().setSortCriteria(objectRef, rid, initialState.map(LineupTrackingManager.getInstance().toSortObject), false)
-                });
+                LineupTrackingManager.getInstance().setSortCriteria(view, provider);
             };
             const action = {
                 name: 'groupSortCriteria',
@@ -667,9 +633,7 @@ export class LineupTrackingManager {
                     return;
                 }
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-                graph.pushWithResult(LineupTrackingManager.getInstance().setGroupCriteria(objectRef, rid, newValue.map((c) => c.fqpath)), {
-                    inverse: LineupTrackingManager.getInstance().setGroupCriteria(objectRef, rid, initialState.map((c) => c.fqpath))
-                });
+                view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
             };
             const action = {
                 name: 'groupCriteria',
@@ -678,16 +642,14 @@ export class LineupTrackingManager {
             bufferOrExecute(action, old, isDialogOpen);
         });
         ranking.on(`${Ranking.EVENT_ADD_COLUMN}.track`, (column, index) => {
-            LineupTrackingManager.getInstance().trackColumn(provider, objectRef, graph, column, bufferOrExecute);
+            LineupTrackingManager.getInstance().trackColumn(provider, objectRef, graph, view, column, bufferOrExecute);
             if (LineupTrackingManager.getInstance().ignore(Ranking.EVENT_ADD_COLUMN, objectRef)) {
                 return;
             }
             // console.log(ranking, 'addColumn', column, index);
             const d = provider.dumpColumn(column);
             const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-            graph.pushWithResult(LineupTrackingManager.getInstance().addColumn(objectRef, rid, null, index, d), {
-                inverse: LineupTrackingManager.getInstance().addColumn(objectRef, rid, null, index, null)
-            });
+            view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
         });
         ranking.on(`${Ranking.EVENT_REMOVE_COLUMN}.track`, (column, index) => {
             LineupTrackingManager.getInstance().untrackColumn(column);
@@ -697,9 +659,7 @@ export class LineupTrackingManager {
             // console.log(ranking, 'removeColumn', column, index);
             const d = provider.dumpColumn(column);
             const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-            graph.pushWithResult(LineupTrackingManager.getInstance().addColumn(objectRef, rid, null, index, null), {
-                inverse: LineupTrackingManager.getInstance().addColumn(objectRef, rid, null, index, d)
-            });
+            view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
         });
         ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (_, index, oldIndex) => {
             if (LineupTrackingManager.getInstance().ignore(Ranking.EVENT_MOVE_COLUMN, objectRef)) {
@@ -707,9 +667,7 @@ export class LineupTrackingManager {
             }
             // console.log(col.fqpath, 'addColumn', column, index);
             const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-            graph.pushWithResult(LineupTrackingManager.getInstance().moveColumn(objectRef, rid, null, oldIndex, index), {
-                inverse: LineupTrackingManager.getInstance().moveColumn(objectRef, rid, null, index, oldIndex > index ? oldIndex + 1 : oldIndex)
-            });
+            view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
         });
         provider.on(`${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`, (ranking, groups, previousTopN, currentTopN) => {
             if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED, objectRef)) {
@@ -717,11 +675,9 @@ export class LineupTrackingManager {
             }
             const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
             const groupNames = Array.isArray(groups) ? groups.map((g) => g.name) : groups.name;
-            graph.pushWithResult(LineupTrackingManager.getInstance().setAggregation(objectRef, rid, groupNames, currentTopN), {
-                inverse: LineupTrackingManager.getInstance().setAggregation(objectRef, rid, groupNames, previousTopN)
-            });
+            view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
         });
-        ranking.children.forEach((col) => LineupTrackingManager.getInstance().trackColumn(provider, objectRef, graph, col, bufferOrExecute));
+        ranking.children.forEach((col) => LineupTrackingManager.getInstance().trackColumn(provider, objectRef, graph, view, col, bufferOrExecute));
     }
     /**
      * Removes the event listener for ranking events from the provided ranking
@@ -739,30 +695,28 @@ export class LineupTrackingManager {
      * @param graph The provenance graph where the events should be tracked into
      * @returns Returns a promise that is waiting for the object reference (LineUp instance)
      */
-    async clueify(lineup, objectRef, graph) {
+    async clueify(lineup, objectRef, graph, view, provider) {
         const p = await ResolveNow.resolveImmediately((await objectRef.v).data);
         p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking, index) => {
+            console.log(ranking);
             if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
                 return;
             }
             const rankingDump = ranking.dump(p.toDescRef.bind(p));
-            graph.pushWithResult(LineupTrackingManager.getInstance().addRanking(objectRef, index, rankingDump), {
-                inverse: LineupTrackingManager.getInstance().addRanking(objectRef, index, null)
-            });
-            LineupTrackingManager.getInstance().trackRanking(lineup, p, objectRef, graph, ranking);
+            view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
+            LineupTrackingManager.getInstance().trackRanking(lineup, p, objectRef, graph, view, ranking);
         });
         p.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}.track`, (ranking, index) => {
             if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_REMOVE_RANKING, objectRef)) {
                 return;
             }
+            console.log(ranking);
             const rankingDump = ranking.dump(p.toDescRef.bind(p));
-            graph.pushWithResult(LineupTrackingManager.getInstance().addRanking(objectRef, index, null), {
-                inverse: LineupTrackingManager.getInstance().addRanking(objectRef, index, rankingDump)
-            });
+            view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
             LineupTrackingManager.getInstance().untrackRanking(ranking);
         });
         // track further ranking event
-        p.getRankings().forEach(LineupTrackingManager.getInstance().trackRanking.bind(this, lineup, p, objectRef, graph));
+        p.getRankings().forEach(LineupTrackingManager.getInstance().trackRanking.bind(this, lineup, p, objectRef, graph, view));
     }
     /**
      * Removes the event listener for adding and removing a ranking from the provided LineUp instance.

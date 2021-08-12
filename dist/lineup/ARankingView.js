@@ -357,7 +357,7 @@ export class ARankingView extends AView {
         return this.withoutTracking(() => this.addScoreColumn(score, position));
     }
     pushTrackedScoreColumn(scoreName, scoreId, params) {
-        return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
+        return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params, this, this.provider);
     }
     /**
      * used by commands to remove a tracked score again
@@ -368,6 +368,14 @@ export class ARankingView extends AView {
         return this.withoutTracking(() => {
             const column = this.provider.find(columnId);
             return column.removeMe();
+        });
+    }
+    restoreDump(dump) {
+        this.withoutTracking(() => {
+            console.log("dumpin");
+            this.provider.restore(dump);
+        }).then(() => {
+            LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph, this, this.provider);
         });
     }
     /**
@@ -410,7 +418,7 @@ export class ARankingView extends AView {
         }).then(() => {
             this.builtLineUp(this.provider);
             //record after the initial one
-            LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+            LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph, this, this.provider);
             this.setBusy(false);
             this.update();
         }).catch(ErrorAlertHandler.getInstance().errorAlert)

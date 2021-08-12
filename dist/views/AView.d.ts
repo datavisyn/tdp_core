@@ -5,6 +5,7 @@ import { EventHandler, IDType } from 'phovea_core';
 import { IFormElementDesc } from '../form/interfaces';
 import { ISelection, IView, IViewContext } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
+import { IDataProviderDump } from 'lineupjs';
 /**
  * base class for all views
  */
@@ -28,6 +29,7 @@ export declare abstract class AView extends EventHandler implements IView {
      * params(name: string, oldValue: any, newValue: any)
      */
     static readonly EVENT_UPDATE_SHARED = "updateShared";
+    static readonly EVENT_DUMP_CHANGE_TRRACK = "dumpChange";
     readonly idType: IDType;
     readonly node: HTMLElement;
     private params;
@@ -111,6 +113,7 @@ export declare abstract class AView extends EventHandler implements IView {
      * hook when the item selection has changed
      */
     protected itemSelectionChanged(_name?: string): void;
+    restoreDump(dump: IDataProviderDump): void;
     getItemSelection(name?: string): ISelection;
     modeChanged(mode: EViewMode): void;
     destroy(): void;
