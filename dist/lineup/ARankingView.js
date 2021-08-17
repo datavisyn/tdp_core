@@ -314,6 +314,7 @@ export class ARankingView extends AView {
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
         return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
             this.taggle.update();
+            this.fire(AView.EVENT_DUMP_CHANGE_TRRACK, this.provider.dump());
         });
     }
     addScoreColumn(score, position) {

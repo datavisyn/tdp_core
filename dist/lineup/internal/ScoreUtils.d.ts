@@ -13,7 +13,6 @@ export declare class ScoreUtils {
     static addScoreAsync(inputs: IObjectRef<IViewProvider>[], parameter: any): Promise<any>;
     static removeScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any): any;
     static addScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): any;
-    2: any;
     static pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, view: ARankingView, dataProvider: LocalDataProvider): Promise<void>;
     static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]): any;
     private static shallowEqualObjects;

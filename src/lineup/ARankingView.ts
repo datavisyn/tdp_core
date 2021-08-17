@@ -376,7 +376,9 @@ export abstract class ARankingView extends AView {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
+
       this.taggle.update();
+      this.fire(AView.EVENT_DUMP_CHANGE_TRRACK, this.provider.dump());
     });
   }
 

@@ -4,7 +4,6 @@
 import { ObjectRefUtils, I18nextManager, ActionMetaData, PluginRegistry, ActionUtils } from 'phovea_core';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
-import { AView } from '../..';
 export class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {
         const scoreId = parameter.id;
@@ -46,7 +45,6 @@ export class ScoreUtils {
         const currentParams = { id: scoreId, params, storedParams };
         const result = await ScoreUtils.addScoreAsync([provider], currentParams);
         const toStoreParams = { id: scoreId, params: storedParams };
-        view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, dataProvider.dump());
     }
     static removeScore(provider, scoreName, scoreId, params, columnId) {
         return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.remove', { scoreName }), ObjectRefUtils.category.data, ObjectRefUtils.operation.remove), ScoreUtils.CMD_REMOVE_SCORE, ScoreUtils.removeScoreImpl, [provider], {
