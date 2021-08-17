@@ -561,7 +561,7 @@ export class LineupTrackingManager {
         const d = provider.dumpColumn(column);
         const rid = LineupTrackingManager.getInstance().rankingId(provider, col.findMyRanker());
         const path = col.fqpath;
-        view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
+        // view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
 
       });
 
@@ -803,7 +803,7 @@ export class LineupTrackingManager {
 
       const d = provider.dumpColumn(column);
       const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-      view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
+      // view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
 
     });
 

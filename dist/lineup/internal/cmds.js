@@ -458,7 +458,7 @@ export class LineupTrackingManager {
                 const d = provider.dumpColumn(column);
                 const rid = LineupTrackingManager.getInstance().rankingId(provider, col.findMyRanker());
                 const path = col.fqpath;
-                view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
+                // view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
             });
             col.on(`${CompositeColumn.EVENT_MOVE_COLUMN}.track`, (column, index, oldIndex) => {
                 if (LineupTrackingManager.getInstance().ignore(CompositeColumn.EVENT_MOVE_COLUMN, objectRef)) {
@@ -659,7 +659,7 @@ export class LineupTrackingManager {
             // console.log(ranking, 'removeColumn', column, index);
             const d = provider.dumpColumn(column);
             const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
-            view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
+            // view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, provider.dump());
         });
         ranking.on(`${Ranking.EVENT_MOVE_COLUMN}.track`, (_, index, oldIndex) => {
             if (LineupTrackingManager.getInstance().ignore(Ranking.EVENT_MOVE_COLUMN, objectRef)) {

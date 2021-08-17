@@ -449,7 +449,6 @@ export abstract class ARankingView extends AView {
     this.withoutTracking(() => {
       console.log("dumpin")
       this.provider.restore(dump);
-
     }).then(() => {
       LineupTrackingManager.getInstance().clueify(
         this.taggle,

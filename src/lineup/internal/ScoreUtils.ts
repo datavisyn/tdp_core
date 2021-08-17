@@ -9,7 +9,7 @@ import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../base/extensions';
 import {AttachemntUtils} from '../../storage/internal/attachment';
 import {IViewProvider} from '../IViewProvider';
 import {LocalDataProvider} from 'lineupjs';
-import {AView} from '../..';
+import {AView, ARankingView} from '../..';
 
 
 export class ScoreUtils {
@@ -60,7 +60,7 @@ export class ScoreUtils {
       params
     });
   }
-
+2
   static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, view:ARankingView, dataProvider: LocalDataProvider) {
     const storedParams = await AttachemntUtils.externalize(params);
     const currentParams = {id: scoreId, params, storedParams};

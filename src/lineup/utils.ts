@@ -34,7 +34,14 @@ export class AScoreAccessorProxy<T> {
   }
 
   setRows(rows: IScoreRow<T>[]) {
-    rows.forEach(({id, score}) => this.scores.set(String(id), score));
+    rows.forEach(({id, score}) => 
+    {
+      if(score === undefined || id === undefined)
+      {
+        console.log(score, id)
+      }
+      this.scores.set(String(id), score)
+    });
   }
 
   protected access(row: IRow) {

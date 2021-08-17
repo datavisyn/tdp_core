@@ -16,7 +16,12 @@ export class AScoreAccessorProxy {
         this.scores.clear();
     }
     setRows(rows) {
-        rows.forEach(({ id, score }) => this.scores.set(String(id), score));
+        rows.forEach(({ id, score }) => {
+            if (score === undefined || id === undefined) {
+                console.log(score, id);
+            }
+            this.scores.set(String(id), score);
+        });
     }
     access(row) {
         const rowId = String(row.id);
