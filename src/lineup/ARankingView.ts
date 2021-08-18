@@ -375,8 +375,8 @@ export abstract class ARankingView extends AView {
   private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
+    console.log(colDesc)
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
-
       this.taggle.update();
       this.fire(AView.EVENT_DUMP_CHANGE_TRRACK, this.provider.dump());
     });

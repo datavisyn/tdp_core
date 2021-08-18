@@ -66,6 +66,8 @@ export class ScoreUtils {
     const currentParams = {id: scoreId, params, storedParams};
     const result = await ScoreUtils.addScoreAsync([provider], currentParams);
     const toStoreParams = {id: scoreId, params: storedParams};
+
+    // view.fire(AView.EVENT_DUMP_CHANGE_TRRACK, dataProvider.dump());
   }
 
   static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]) {
