@@ -53,15 +53,15 @@ export class TDPApplicationUtils {
           <span></span>
           <div class="btn-group col-sm-auto" role="group">
             <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_1" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
-            <label for="btnradio_permissions_1" class="form-label btn btn-outline-secondary btn-sm" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
+            <label for="btnradio_permissions_1" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_2" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}>
-            <label for="btnradio_permissions_2" class="form-label btn btn-outline-secondary btn-sm" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}>
+            <label for="btnradio_permissions_2" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
             <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_3" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}>
-            <label for="btnradio_permissions_3" class="form-label btn btn-outline-secondary btn-sm" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}>
+            <label for="btnradio_permissions_3" class="form-label btn btn-outline-secondary btn-sm">
               <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
           </div>
@@ -76,15 +76,15 @@ export class TDPApplicationUtils {
           </select>
           <div class="btn-group col-sm-auto" role="group">
           <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_4" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}>
-            <label for="btnradio_permissions_4" class="form-label btn btn-outline-secondary btn-sm" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}>
+            <label for="btnradio_permissions_4" class="form-label btn btn-outline-secondary btn-sm">
               <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_5" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}>
-            <label for="btnradio_permissions_5" class="form-label btn btn-outline-secondary btn-sm" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}>
+            <label for="btnradio_permissions_5" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
             <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_6" value="write" autocomplete="off" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}>
-            <label for="btnradio_permissions_6" class="form-label btn btn-outline-secondary btn-sm" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}>
+            <label for="btnradio_permissions_6" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
           </div>
@@ -97,15 +97,15 @@ export class TDPApplicationUtils {
           <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control form-control-sm" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddiesPlaceholder')}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
           <div class="btn-group col-sm-auto" role="group">
             <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_7" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}>
-            <label for="btnradio_permissions_7" class="form-label btn btn-outline-secondary btn-sm" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}>
+            <label for="btnradio_permissions_7" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_8" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}>
-            <label for="btnradio_permissions_8" class="form-label btn btn-outline-secondary btn-sm" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}>
+            <label for="btnradio_permissions_8" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
             <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_9" value="write" autocomplete="off" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}>
-            <label for="btnradio_permissions_9" class="form-label btn btn-outline-secondary btn-sm" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}>
+            <label for="btnradio_permissions_9" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
           </div>
