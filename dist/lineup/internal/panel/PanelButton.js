@@ -8,14 +8,10 @@ export class PanelButton {
      * @param options Options to configure button
      */
     constructor(parent, options) {
-        this.options = Object.assign({
-            title: '',
-            cssClass: ''
-        }, options);
         this.node = parent.ownerDocument.createElement('button');
         this.node.setAttribute('type', 'button');
         this.node.title = options.title;
-        this.node.classList.add('btn', 'btn-sm', 'btn-outline-secondary', options.cssClass);
+        this.node.className = `btn btn-sm btn-outline-secondary ${options.cssClass || ''}`;
         this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
         this.node.addEventListener('click', (evt) => {
             evt.stopPropagation();
@@ -37,9 +33,9 @@ export class PanelNavButton {
      */
     constructor(parent, onClick, options) {
         this.node = parent.ownerDocument.createElement('li');
-        this.node.classList.add('nav-item');
+        this.node.className = `nav-item ${options.cssClass || ''}`;
         this.order = options.order;
-        this.node.innerHTML = `<a class="nav-link" role="tab" title="${options.title}" data-bs-toggle="tab"><i class="fas ${options.cssClass}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
+        this.node.innerHTML = `<a class="nav-link" role="tab" title="${options.title}" data-bs-toggle="tab"><i class="${options.faIcon}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
         this.node.querySelector('a').addEventListener('click', (evt) => {
             evt.preventDefault();
             onClick();
