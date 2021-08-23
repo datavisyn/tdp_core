@@ -64,7 +64,12 @@ export class PanelTab extends EventHandler {
       this.navButton.click();
     };
 
-    return new PanelButton(this.parent, this.options.title, 'fas ' + this.options.cssClass + ' shortcut-nav', onClick);
+    return new PanelButton(this.parent, {
+      title: this.options.title,
+      faIcon: 'fas ' + this.options.cssClass,
+      cssClass: 'shortcut-nav',
+      onClick
+    });
   }
 }
 

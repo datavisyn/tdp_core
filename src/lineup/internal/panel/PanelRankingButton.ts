@@ -1,4 +1,4 @@
-import {IPanelButton} from './PanelButton';
+import {IPanelButton, PanelButton} from './PanelButton';
 import {LocalDataProvider, Ranking} from 'lineupjs';
 
 /**
@@ -8,17 +8,17 @@ import {LocalDataProvider, Ranking} from 'lineupjs';
 export class PanelRankingButton implements IPanelButton {
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, linkClass: string, onClick: (ranking: Ranking) => void) {
-    this.node = parent.ownerDocument.createElement('button');
-    this.node.className = linkClass;
-    this.node.title = title;
-    this.node.addEventListener('click', (evt) => {
-      evt.stopPropagation();
-      evt.preventDefault();
-      const firstRanking = this.provider.getRankings()[0];
-      if (firstRanking) {
-        onClick(firstRanking);
+  constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, cssClass: string, faIcon: string, onClick: (ranking: Ranking) => void) {
+    this.node = new PanelButton(parent, {
+      title,
+      faIcon,
+      cssClass,
+      onClick: () => {
+        const firstRanking = this.provider.getRankings()[0];
+        if (firstRanking) {
+          onClick(firstRanking);
+        }
       }
-    });
+    }).node;
   }
 }

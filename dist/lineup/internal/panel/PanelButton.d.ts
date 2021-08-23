@@ -8,19 +8,24 @@ export interface IPanelButton {
      */
     readonly node: HTMLElement;
 }
+interface IPanelButtonOptions {
+    title?: string;
+    faIcon?: string;
+    cssClass?: string;
+    onClick: () => void;
+}
 /**
  * Plain HTML button with a custom title, CSS class and an onClick function
  */
 export declare class PanelButton implements IPanelButton {
     readonly node: HTMLElement;
+    private readonly options;
     /**
      * Constructor of the PanelButton
      * @param parent The parent HTML DOM element
-     * @param title String that is used for the title attribute
-     * @param linkClass CSS classes to apply
-     * @param onClick Function that should be executed on button click
+     * @param options Options to configure button
      */
-    constructor(parent: HTMLElement, title: string, linkClass: string, onClick: () => void);
+    constructor(parent: HTMLElement, options: IPanelButtonOptions);
 }
 /**
  * HTML button with a custom title, CSS class, an onClick function
@@ -46,3 +51,4 @@ export declare class PanelNavButton implements IPanelButton {
      */
     click(): void;
 }
+export {};

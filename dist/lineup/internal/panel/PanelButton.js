@@ -5,18 +5,23 @@ export class PanelButton {
     /**
      * Constructor of the PanelButton
      * @param parent The parent HTML DOM element
-     * @param title String that is used for the title attribute
-     * @param linkClass CSS classes to apply
-     * @param onClick Function that should be executed on button click
+     * @param options Options to configure button
      */
-    constructor(parent, title, linkClass, onClick) {
+    constructor(parent, options) {
+        this.options = Object.assign({
+            title: '',
+            faIcon: '',
+            extraCssClass: ''
+        }, options);
         this.node = parent.ownerDocument.createElement('button');
-        this.node.className = linkClass;
-        this.node.title = title;
+        this.node.setAttribute('type', 'button');
+        this.node.title = options.title;
+        this.node.classList.add('btn', 'btn-sm', 'btn-outline-secondary', options.cssClass);
+        this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
         this.node.addEventListener('click', (evt) => {
             evt.stopPropagation();
             evt.preventDefault();
-            onClick();
+            options.onClick();
         });
     }
 }

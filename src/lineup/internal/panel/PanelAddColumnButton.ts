@@ -1,6 +1,6 @@
 import {SearchBox} from 'lineupjs';
 import {ISearchOption} from './ISearchOption';
-import {IPanelButton} from './PanelButton';
+import {IPanelButton, PanelButton} from './PanelButton';
 import {I18nextManager} from 'phovea_core';
 
 /**
@@ -16,23 +16,23 @@ export class PanelAddColumnButton implements IPanelButton {
    */
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('lu-adder');
+    this.node.classList.add('lu-adder', 'btn-group', 'dropstart');
     this.node.addEventListener('mouseleave', () => {
       this.node.classList.remove('once');
     });
 
-    const button = this.node.ownerDocument.createElement('button');
-    button.classList.add('fas', 'fa-plus');
-    button.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton');
-
-    button.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      this.node.classList.add('once');
-      (<HTMLElement>this.search.node.querySelector('input'))!.focus();
-      this.search.focus();
+    const button = new PanelButton(this.node, {
+      title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
+      faIcon: 'fas fa-plus',
+      cssClass: 'dropdown-toggle',
+      onClick: () => {
+        this.node.classList.add('once');
+        (<HTMLElement>this.search.node.querySelector('input'))!.focus();
+        this.search.focus();
+      }
     });
 
-    this.node.appendChild(button);
+    this.node.appendChild(button.node);
     this.node.appendChild(this.search.node);
   }
 }

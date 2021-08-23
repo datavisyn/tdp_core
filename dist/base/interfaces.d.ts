@@ -4,9 +4,10 @@ import { IObjectRef, ProvenanceGraph, Range } from 'phovea_core';
 import { IEventHandler } from 'phovea_core';
 import { RangeLike } from 'phovea_core';
 import { IDType } from 'phovea_core';
-import { IColumnDesc, Column } from 'lineupjs';
+import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
 import { AppHeader } from 'phovea_ui';
 import { IAuthorizationConfiguration } from '../auth';
+import { PanelTab } from '../lineup/internal/panel';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column
@@ -146,8 +147,59 @@ export interface IRankingButtonExtension {
     factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
 }
 export interface IRankingButtonExtensionDesc extends IPluginDesc {
+    /**
+     * Additional class for RankingPanelButton
+     */
     cssClass: string;
+    /**
+     * Font Awesome icon
+     * Will be used as a button icon
+     * @see https://fontawesome.com/
+     * @example `fas fa-database`
+     */
+    faIcon: string;
     load(): Promise<IPlugin & IRankingButtonExtension>;
+}
+export interface IPanelTabExtension {
+    desc: IPanelTabExtensionDesc;
+    /**
+     * Create and attach a new LineUp side panel
+     * @param tab PanelTab instance to attach the HTMLElement and listen to events
+     * @param provider The data of the current ranking
+     * @param desc The phovea extension point description
+     */
+    factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
+}
+export interface IPanelTabExtensionDesc extends IPluginDesc {
+    /**
+     * CSS class for the PanelNavButton of the PanelTab
+     */
+    cssClass: string;
+    /**
+     * Font Awesome icon
+     * Will be used as a button icon
+     * @see https://fontawesome.com/
+     * @example `fas fa-database`
+     */
+    faIcon: string;
+    /**
+     * Title attribute PanelNavButton
+     */
+    title: string;
+    /**
+     * Customize the PanelNavButtons' position (recommended to use multiples of 10)
+     */
+    order: number;
+    /**
+     * Width of the PanelTab
+     */
+    width: string;
+    /**
+     * If true a shortcut button is appended to the SidePanel header in collapsed mode
+     * @default false
+     */
+    shortcut?: boolean;
+    load(): Promise<IPlugin & IPanelTabExtension>;
 }
 /**
  * additional meta data about

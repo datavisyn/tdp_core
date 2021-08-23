@@ -17,11 +17,13 @@ interface IExportData {
 export class PanelDownloadButton implements IPanelButton {
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, provider: LocalDataProvider, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode:boolean) {
+  constructor(parent: HTMLElement, provider: LocalDataProvider, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode: boolean) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('btn-group', 'download-data-dropdown');
+    this.node.classList.add('btn-group','dropstart', 'download-data-dropdown');
     this.node.innerHTML = `
-      <button type="button" class="dropdown-toggle fas fa-download" style="width: 100%;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
+      <button type="button" class="btn btn-outline-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown"
+       aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
+      <i class="fas fa-download fa-fw"></i>
       </button>
       <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-end dropdown-menu-lg-start' : 'dropdown-menu-lg-end'}" data-bs-popper="static">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAsExcel')}</div>
@@ -49,7 +51,7 @@ export class PanelDownloadButton implements IPanelButton {
       link.onclick = (_evt) => {
         let promise: Promise<IExportData>;
 
-        switch(link.dataset.format) {
+        switch (link.dataset.format) {
           case 'custom':
             promise = this.customizeDialog(provider, lineupOrderRowIndices);
             break;
@@ -151,7 +153,7 @@ export class PanelDownloadButton implements IPanelButton {
         dialog.onSubmit(() => {
           const data = new FormData(dialog.form);
 
-          if(data.getAll('columns').length === 0) {
+          if (data.getAll('columns').length === 0) {
             return false;
           }
 

@@ -1,3 +1,4 @@
+import { PanelButton } from './PanelButton';
 import { I18nextManager } from 'phovea_core';
 /**
  * Div HTMLElement that contains a button and a SearchBox.
@@ -12,20 +13,21 @@ export class PanelAddColumnButton {
     constructor(parent, search) {
         this.search = search;
         this.node = parent.ownerDocument.createElement('div');
-        this.node.classList.add('lu-adder');
+        this.node.classList.add('lu-adder', 'btn-group', 'dropstart');
         this.node.addEventListener('mouseleave', () => {
             this.node.classList.remove('once');
         });
-        const button = this.node.ownerDocument.createElement('button');
-        button.classList.add('fas', 'fa-plus');
-        button.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton');
-        button.addEventListener('click', (evt) => {
-            evt.preventDefault();
-            this.node.classList.add('once');
-            this.search.node.querySelector('input').focus();
-            this.search.focus();
+        const button = new PanelButton(this.node, {
+            title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
+            faIcon: 'fas fa-plus',
+            cssClass: 'dropdown-toggle',
+            onClick: () => {
+                this.node.classList.add('once');
+                this.search.node.querySelector('input').focus();
+                this.search.focus();
+            }
         });
-        this.node.appendChild(button);
+        this.node.appendChild(button.node);
         this.node.appendChild(this.search.node);
     }
 }
