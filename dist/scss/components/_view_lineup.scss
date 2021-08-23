@@ -173,6 +173,7 @@ $lu_assets: "~lineupjs/src/assets";
       }
     }
 
+    // add rounded corners to the action after `lu-adder` when it is hidden
     &:not(.collapsed) .btn-group-custom:nth-child(2) > .lu-adder + .btn {
       border-top-left-radius: 0.2rem !important;
       border-bottom-left-radius: 0.2rem !important;
@@ -362,6 +363,7 @@ $lu_assets: "~lineupjs/src/assets";
             @extend .btn-group-vertical;
             margin-bottom: 1em;
 
+            // bootstrap 5 bug, if first element in `btn-group` is a `btn-group` then the next element has does not get sharp corners (desired behavior)
             & > .btn-group + .btn {
               border-top-left-radius: 0;
               border-top-right-radius: 0;
