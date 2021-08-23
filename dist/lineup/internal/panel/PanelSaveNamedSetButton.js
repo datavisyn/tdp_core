@@ -14,7 +14,7 @@ export class PanelSaveNamedSetButton extends EventHandler {
       aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}">
      <i class="fas fa-save fa-fw"></i>
       </button>
-      <div class="dropdown-menu dropdown-menu-end">
+      <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-end dropdown-menu-start' : 'dropdown-menu-end'}">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}</div>
         <a class="dropdown-item" href="#" data-rows="all" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntireList')}</a>
         <a class="dropdown-item" href="#" data-rows="filtered" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveFilteredRows')}</a>
