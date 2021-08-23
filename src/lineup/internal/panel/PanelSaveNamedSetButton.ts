@@ -15,13 +15,13 @@ export class PanelSaveNamedSetButton extends EventHandler implements IPanelButto
     super();
 
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('btn-group','dropstart', 'save-named-set-dropdown');
+    this.node.classList.add('btn-group', 'save-named-set-dropdown');
     this.node.innerHTML = `
       <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown" aria-haspopup="true"
       aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}">
      <i class="fas fa-save fa-fw"></i>
       </button>
-      <div class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}" data-bs-popper="static">
+      <div class="dropdown-menu dropdown-menu-end">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}</div>
         <a class="dropdown-item" href="#" data-rows="all" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntireList')}</a>
         <a class="dropdown-item" href="#" data-rows="filtered" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveFilteredRows')}</a>

@@ -199,7 +199,7 @@ $lu_assets: "~lineupjs/src/assets";
       margin-bottom: 0.5em;
 
       // hide caret icon of drop down
-      .dropdown-toggle::before {
+      .dropdown-toggle::after {
         content: none;
       }
 

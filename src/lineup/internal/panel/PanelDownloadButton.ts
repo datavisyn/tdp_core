@@ -19,13 +19,13 @@ export class PanelDownloadButton implements IPanelButton {
 
   constructor(parent: HTMLElement, provider: LocalDataProvider, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode: boolean) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('btn-group','dropstart', 'download-data-dropdown');
+    this.node.classList.add('btn-group', 'download-data-dropdown');
     this.node.innerHTML = `
       <button type="button" class="btn btn-outline-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
       <i class="fas fa-download fa-fw"></i>
       </button>
-      <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-end dropdown-menu-lg-start' : 'dropdown-menu-lg-end'}" data-bs-popper="static">
+      <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-end dropdown-menu-start' : 'dropdown-menu-end'}">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAsExcel')}</div>
         <a class="dropdown-item" href="#" data-rows="all" data-format="xlsx" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadEntireList')}</a>
         <a class="dropdown-item" href="#" data-rows="filtered" data-format="xlsx" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadFilteredRows')}</a>

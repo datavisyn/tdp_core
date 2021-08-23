@@ -16,7 +16,7 @@ export class PanelAddColumnButton implements IPanelButton {
    */
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('lu-adder', 'btn-group', 'dropstart');
+    this.node.classList.add('lu-adder', 'btn-group');
     this.node.addEventListener('mouseleave', () => {
       this.node.classList.remove('once');
     });
