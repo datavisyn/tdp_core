@@ -11,7 +11,7 @@ export interface IPanelButton {
 
 interface IPanelButtonOptions {
   title?: string;
-  faIcon?: string;
+  faIcon: string;
   cssClass?: string;
   onClick: () => void;
 }
@@ -30,8 +30,7 @@ export class PanelButton implements IPanelButton {
   constructor(parent: HTMLElement, options: IPanelButtonOptions) {
     this.options = Object.assign({
       title: '',
-      faIcon: '',
-      extraCssClass: ''
+      cssClass: ''
     }, options);
     this.node = parent.ownerDocument.createElement('button');
     this.node.setAttribute('type', 'button');

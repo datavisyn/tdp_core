@@ -16,7 +16,7 @@ export class PanelTab extends EventHandler {
 
   readonly node: HTMLElement;
   readonly options: IPanelTabDesc = {
-    cssClass: 'fas fa-sliders-h',
+    faIcon: 'fas fa-sliders-h',
     title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
     width: '23em',
     order: 0
@@ -66,7 +66,7 @@ export class PanelTab extends EventHandler {
 
     return new PanelButton(this.parent, {
       title: this.options.title,
-      faIcon: 'fas ' + this.options.cssClass,
+      faIcon: this.options.faIcon,
       cssClass: 'shortcut-nav',
       onClick
     });

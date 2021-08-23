@@ -10,7 +10,7 @@ export interface IPanelButton {
 }
 interface IPanelButtonOptions {
     title?: string;
-    faIcon?: string;
+    faIcon: string;
     cssClass?: string;
     onClick: () => void;
 }

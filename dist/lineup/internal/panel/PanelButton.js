@@ -10,8 +10,7 @@ export class PanelButton {
     constructor(parent, options) {
         this.options = Object.assign({
             title: '',
-            faIcon: '',
-            extraCssClass: ''
+            cssClass: ''
         }, options);
         this.node = parent.ownerDocument.createElement('button');
         this.node.setAttribute('type', 'button');
