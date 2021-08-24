@@ -110,7 +110,7 @@ export class LineUpPanelActions extends EventHandler {
             const downloadButtonContainer = new PanelDownloadButton(buttons, this.provider, lineupOrderRowIndices, this.isTopMode);
             this.header.addButton(downloadButtonContainer, EPanelHeaderToolbar.TOP);
         }
-        if (!this.options.enableZoom) {
+        if (this.options.enableZoom) {
             const zoomInButton = new PanelButton(buttons, {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'),
                 cssClass: 'zoom-in-button',
