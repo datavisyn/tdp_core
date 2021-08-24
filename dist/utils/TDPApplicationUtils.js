@@ -264,7 +264,7 @@ TDPApplicationUtils.getAreas = () => {
         [25 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.day', { count: Math.ceil(d / TDPApplicationUtils.DAY) })],
         [45 * TDPApplicationUtils.DAY, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month')],
         [319 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month', { count: Math.ceil(d / TDPApplicationUtils.DAY / 30) })],
-        [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour')]
+        [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.year')]
     ];
 };
 //# sourceMappingURL=TDPApplicationUtils.js.map
