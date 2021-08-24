@@ -16,15 +16,17 @@ export class FormCheckBox extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed('checkbox', true);
+        this.$node = $formNode.append('div').classed('form-check checkbox col-sm-auto mt-3', true);
         this.setVisible(this.elementDesc.visible);
-        this.appendLabel();
         const $label = this.$node.select('label');
-        if ($label.empty()) {
-            this.$input = this.$node.append('input').attr('type', 'checkbox');
+        if ($label.length === 0) {
+            this.$input = this.$node.append('input').classed('form-check-input position-static', true).attr('type', 'checkbox');
         }
         else {
-            this.$input = $label.html(`<input type="checkbox">${$label.text()}`).select('input');
+            this.$input = this.$node.append('input').classed('form-check-input', true).attr('type', 'checkbox').order();
+            $label.classed('form-check-label', true);
+            // ensure correct order of input and label tags
+            this.appendLabel();
         }
         this.setAttributes(this.$input, this.elementDesc.attributes);
         this.$input.classed('form-control', false); //remove falsy class again

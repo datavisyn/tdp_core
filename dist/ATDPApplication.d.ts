@@ -42,10 +42,19 @@ export interface ITDPOptions {
      */
     showHelpLink: boolean | string;
     /**
+     * Show tour link if set to true and registered tours are available.
+     */
+    showTourLink: boolean;
+    /**
      * Show/hide the `Analysis Session Managment` menu in the header
      * @default: true
      */
     showProvenanceMenu?: boolean;
+    /**
+     * Show/hide the `Exploration`, `Authoring`, `Presentation` buttons in the header
+     * @default: true
+     */
+    showClueModeButtons: boolean;
     /**
      * default: true
      */
@@ -86,6 +95,11 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected loginMenu: LoginMenu;
     protected tourManager: TourManager;
     constructor(options?: Partial<ITDPOptions>);
+    /**
+     * Initialize async parts
+     * TODO make public and remove call in constructor in the future
+     */
+    protected initialize(): Promise<void>;
     /**
      * Loads the client config from '/clientConfig.json' and parses it.
      */

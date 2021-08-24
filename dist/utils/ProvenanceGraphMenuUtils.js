@@ -18,32 +18,32 @@ export class ProvenanceGraphMenuUtils {
     static editProvenanceGraphMetaData(d, args = {}) {
         args = BaseUtils.mixin({
             button: I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save'),
-            title: `<i class="fas fa-edit" aria-hidden="true"></i>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
+            title: `<i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
             permission: true,
             name: d.name
         }, args);
         return import('phovea_ui/dist/components/dialogs').then(({ FormDialog }) => {
-            const dialog = new FormDialog(args.title, args.button);
+            const dialog = new FormDialog(args.title, args.button, undefined, 'modal-lg');
             const prefix = 'd' + BaseUtils.randomId();
             const permissions = TDPApplicationUtils.permissionForm(d, {
-                extra: `<div class="help-block">
+                extra: `<div class="form-text">
             ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
           </div>`
             });
             dialog.form.innerHTML = `
-              <div class="form-group">
-                <label for="${prefix}_name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
+              <div class="mb-3">
+                <label class="form-label" for="${prefix}_name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
                 <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
               </div>
-              <div class="form-group">
-                <label for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
+              <div class="mb-3">
+                <label class="form-label" for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
                 <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
               </div>
-              <div class="checkbox">
-                <label class="radio-inline">
-                  <input type="checkbox" name="${prefix}_agree" required="required">
-                  ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.
-                </label>
+              <div class="mb-3">
+                <div class="checkbox form-check">
+                  <input type="checkbox" id="${prefix}_agree" name="${prefix}_agree" required="required" class="form-check-input">
+                  <label class="form-label radio-inline form-check-label" for="${prefix}_agree">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
+                </div>
               </div>
           `;
             dialog.form.lastElementChild.insertAdjacentElement('beforebegin', permissions.node);

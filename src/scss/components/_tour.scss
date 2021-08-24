@@ -9,7 +9,7 @@
 }
 
 $step-color: black !default;
-$step-border: black !default;
+$step-border: lightgray !default;
 
 
 .tdp-tour-backdrop-blocker {
@@ -38,16 +38,17 @@ $step-border: black !default;
   position: absolute;
   background: $step-color;
   border-radius: 50%;
-  width: 1.6em;
-  height: 1.6em;
-  left: -0.8em;
-  top: -0.8em;
+  width: 1.6rem;
+  height: 1.6rem;
+  left: -0.8rem;
+  top: -0.8rem;
   z-index: 2002;
   justify-content: center;
+  align-items: center;
   font-size: small;
   text-align: center;
   color: white;
-  box-shadow: 0px 0px 5px 1px $step-color;
+  box-shadow: rgba($step-color, 0.35) 0px 5px 15px;
   transition: transform ease 1s;
   animation: tdp-tour-fade-in 0.4s;
 }
@@ -57,7 +58,7 @@ $step-border: black !default;
   position: absolute;
   left: 0;
   top: 0;
-  box-shadow: 0px 0px 5px 1px $step-border;
+  box-shadow: rgba($step-color, 0.35) 0px 5px 15px;
   background-color: white;
   border-radius: 5px;
   z-index: 2001;
@@ -67,8 +68,8 @@ $step-border: black !default;
 }
 
 .tdp-tour-step-content {
-  margin: 10px;
-  max-width: 30em;
+  margin: 1rem;
+  max-width: 30rem;
   overflow: auto;
 }
 
@@ -78,7 +79,8 @@ $step-border: black !default;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 0 0.5em 0.5em 0.5em;
+  padding: 1rem;
+  gap: 1rem;
 }
 
 

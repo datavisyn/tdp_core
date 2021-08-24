@@ -21,6 +21,7 @@ import {NotificationHandler} from '../base/NotificationHandler';
 import {IARankingViewOptions} from './IARankingViewOptions';
 import {LineupUtils} from './utils';
 import {ISearchOption} from './internal/panel';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
 
 /**
@@ -156,10 +157,11 @@ export abstract class ARankingView extends AView {
 
     this.node.classList.add('lineup', 'lu-taggle', 'lu');
     this.node.insertAdjacentHTML('beforeend', `<div></div>`);
-    this.stats = this.node.ownerDocument.createElement('p');
+    this.stats = this.node.ownerDocument.createElement('div');
+    this.stats.classList.add('mt-2', 'mb-2');
 
 
-    this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
+    this.provider = new TDPLocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
     // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
     // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
@@ -169,7 +171,8 @@ export abstract class ARankingView extends AView {
 
     const taggleOptions: ITaggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
-      labelRotation: this.options.enableHeaderRotation ? 45 : 0
+      labelRotation: this.options.enableHeaderRotation ? 45 : 0,
+      rowHeight: 21
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
@@ -252,11 +255,12 @@ export abstract class ARankingView extends AView {
     return super.init(params, onParameterChange).then(() => {
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
-      base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+      base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
       const container = <HTMLElement>base.lastElementChild!;
       container.appendChild(this.stats);
 
       if (this.options.enableSidePanel === 'top') {
+        container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
         container.insertAdjacentElement('afterbegin', this.panel.node);
       }
     });

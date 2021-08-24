@@ -31,6 +31,11 @@ export declare class TDPApplicationUtils {
         node: HTMLDivElement;
         resolve: (data: FormData) => Partial<ISecureItem>;
     };
+    /**
+     * Get key-value pairs from `parameters` and persist them in the session storage
+     * @param _inputs
+     * @param parameters
+     */
     static initSessionImpl(_inputs: IObjectRef<any>[], parameters: object): {
         inverse: import("phovea_core").IAction;
     };

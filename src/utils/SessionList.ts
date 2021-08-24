@@ -31,15 +31,15 @@ abstract class ASessionList {
   protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
     switch (type) {
       case 'delete':
-        return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.delete')}</span></a>`;
+        return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.delete')}</span></a>`;
       case 'select':
-        return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continueSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continue')}</span></a>`;
+        return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continueSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continue')}</span></a>`;
       case 'clone':
-        return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
+        return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
       case 'persist':
-        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
+        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
       case 'edit':
-        return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fas fa-edit" aria-hidden="true"></i><span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
+        return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
     }
   }
 
@@ -107,7 +107,7 @@ abstract class ASessionList {
     return select(this.parent).classed('menuTable', true).html(`
       <div class="loading">
         <i class="fas fa-spinner fa-pulse fa-fw"></i>
-        <span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.loadingText')}</span>
+        <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.loadingText')}</span>
       </div>`);
   }
 
@@ -146,7 +146,7 @@ export class TemporarySessionList extends ASessionList {
     //select and sort by date desc
     const workspaces = await this.getData(manager);
 
-    const table = `<table class="table table-striped table-hover table-bordered table-condensed">
+    const table = `<table class="table table-striped table-hover table-bordered table-sm">
     <thead>
       <tr>
         <th>${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.name')}</th>
@@ -226,7 +226,7 @@ export class PersistentSessionList extends ASessionList {
     //select and sort by date desc
     const workspaces = await this.getData(manager);
 
-    const tableMine = `<table class="table table-striped table-hover table-bordered table-condensed">
+    const tableMine = `<table class="table table-striped table-hover table-bordered table-sm">
                 <thead>
                   <tr>
                     <th>${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.name')}</th>
@@ -239,7 +239,7 @@ export class PersistentSessionList extends ASessionList {
 
                 </tbody>
               </table>`;
-    const tablePublic = `<table class="table table-striped table-hover table-bordered table-condensed">
+    const tablePublic = `<table class="table table-striped table-hover table-bordered table-sm">
                 <thead>
                   <tr>
                     <th>${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.name')}</th>
@@ -257,14 +257,14 @@ export class PersistentSessionList extends ASessionList {
     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.paragraphText')}
     </p>
         <ul class="nav nav-tabs" role="tablist">
-          <li class="active" role="presentation"><a href="#${mySessionsTabId}" class="active"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
-          <li role="presentation"><a href="#${otherSessionsTabId}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
+          <li class="nav-item active"<a href="#${mySessionsTabId}" class="nav-link active" role="tab"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
+          <li class="nav-item"><a href="#${otherSessionsTabId}" class="nav-link" role="tab"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
         </ul>
         <div class="tab-content">
-            <div id="${mySessionsTabId}" class="tab-pane active">
+            <div id="${mySessionsTabId}" class="tab-pane show active" role="tabpanel">
                 ${this.mode === 'table' ? tableMine : ''}
             </div>
-            <div id="${otherSessionsTabId}" class="tab-pane">
+            <div id="${otherSessionsTabId}" class="tab-pane" role="tabpanel">
                 ${this.mode === 'table' ? tablePublic : ''}
             </div>
        </div>`);

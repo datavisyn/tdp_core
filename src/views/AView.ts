@@ -94,16 +94,17 @@ export abstract class AView extends EventHandler implements IView {
 
   /*final*/
   async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
-    // TODO: Is a "rebuild" required when a authorization is stored?
-    TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
-      await this.initImpl();
-    });
     TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
       // If a authorization is removed, rerun the registered authorizations
       await this.runAuthorizations();
     });
     // First, run all required authorizations
     await this.runAuthorizations();
+
+    // Register listener after the authorizations are run to avoid double-initializations
+    TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
+      await this.initImpl();
+    });
 
     this.params = await this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
@@ -165,7 +166,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
-    const builder = new FormBuilder(select(params));
+    const builder = new FormBuilder(select(params), undefined, 'row', true);
 
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));

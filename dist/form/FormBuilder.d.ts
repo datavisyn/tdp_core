@@ -8,6 +8,8 @@ import { IFormElementDesc, IForm } from './interfaces';
  */
 export declare class FormBuilder {
     private readonly formId;
+    private readonly formClass;
+    private readonly formInline;
     /**
      * The form that will be build
      */
@@ -20,8 +22,9 @@ export declare class FormBuilder {
      * Constructor
      * @param $parent Node that the form should be attached to
      * @param formId unique form id
+     * @param formClass class attribute for form, e.g. for inline forms
      */
-    constructor($parent: d3.Selection<any>, formId?: string);
+    constructor($parent: d3.Selection<any>, formId?: string, formClass?: any, formInline?: boolean);
     /**
      * Creates a form element instance from a form element description and
      * appends it to the form

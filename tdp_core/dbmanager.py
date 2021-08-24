@@ -101,11 +101,8 @@ class DBManager(object):
 
     session = self.create_session(engine)
 
-    _log.info('create web session')
-
     @after_this_request
     def close_db(response_or_exc):
-      _log.info('remove web session')
       session.close()
       return response_or_exc
 
