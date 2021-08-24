@@ -1,5 +1,5 @@
 
-import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, spaceFillingRule, updateLodRules, UIntTypedArray} from 'lineupjs';
+import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, Column, IColumnDesc, LocalDataProvider, deriveColors, TaggleRenderer, ITaggleOptions, spaceFillingRule, updateLodRules, UIntTypedArray, IGroupSearchItem} from 'lineupjs';
 import {AView} from '../views/AView';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
@@ -20,6 +20,7 @@ import {LazyColumn, ILazyLoadedColumn} from './internal/column';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {IARankingViewOptions} from './IARankingViewOptions';
 import {LineupUtils} from './utils';
+import {ISearchOption} from './internal/panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
 
@@ -104,6 +105,28 @@ export abstract class ARankingView extends AView {
       maxGroupColumns: Infinity,
       filterGlobally: true,
       propagateAggregationState: false
+    },
+    formatSearchBoxItem: (item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void => {
+      // TypeScript type guard function
+      function hasColumnDesc(item: ISearchOption | IGroupSearchItem<ISearchOption>): item is ISearchOption {
+        return (item as ISearchOption).desc != null;
+      }
+
+      if (node.parentElement && hasColumnDesc(item)) {
+        node.dataset.type = item.desc.type;
+        const summary = item.desc.summary || item.desc.description;
+        node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
+        if (summary) {
+          const label = node.ownerDocument.createElement('span');
+          label.textContent = item.desc.label;
+          node.appendChild(label);
+          const desc = node.ownerDocument.createElement('span');
+          desc.textContent = summary;
+          node.appendChild(desc);
+          return undefined;
+        }
+      }
+      return item.text;
     }
   };
 
