@@ -18,7 +18,7 @@ export interface IFormSelect3 extends IFormElementDesc {
     /**
      * Additional options
      */
-    options?: IFormSelect3Options;
+    options?: IFormSelect3Options & IFormElementDesc['options'];
 }
 /**
  * Select2 drop down field with integrated search field and communication to external data provider

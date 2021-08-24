@@ -33,7 +33,7 @@ export class FormBuilder {
         if (!elementDesc.options) {
             elementDesc.options = {};
         }
-        elementDesc.options['inlineForm'] = this.formInline;
+        elementDesc.options.inlineForm = this.formInline;
         const desc = Form.updateElementDesc(elementDesc, this.formId);
         const elementPromise = AFormElement.createFormElement(this.form, desc);
         this.elementPromises.push(elementPromise);

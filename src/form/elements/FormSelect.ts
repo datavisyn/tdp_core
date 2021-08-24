@@ -22,7 +22,7 @@ export interface IFormSelectOptionGroup {
 export declare type ISelectOptions = ((string|IFormSelectOption)[]|Promise<(string|IFormSelectOption)[]>);
 export declare type IHierarchicalSelectOptions = ((string|IFormSelectOption|IFormSelectOptionGroup)[]|Promise<(string|IFormSelectOption|IFormSelectOptionGroup)[]>);
 
-export interface IFormSelectOptions extends {
+export interface IFormSelectOptions {
   /**
    * Data for the options elements of the select
    */
@@ -40,7 +40,7 @@ export interface IFormSelectDesc extends IFormElementDesc {
   /**
    * Additional options
    */
-  options?: IFormSelectOptions;
+  options?: IFormSelectOptions & IFormElementDesc['options'];
 }
 
 export interface IFormSelectElement extends IFormElement {

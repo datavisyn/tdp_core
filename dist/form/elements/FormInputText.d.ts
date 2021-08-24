@@ -23,7 +23,7 @@ export interface IFormInputTextDesc extends IFormElementDesc {
          * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#step
          */
         step?: string;
-    };
+    } & IFormElementDesc['options'];
 }
 export declare class FormInputText extends AFormElement<IFormInputTextDesc> {
     readonly pluginDesc: IPluginDesc;

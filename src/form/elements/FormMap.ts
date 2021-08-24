@@ -68,7 +68,7 @@ export interface IFormMapDesc extends IFormElementDesc {
      * @default true
      */
     defaultSelection?: boolean;
-  };
+  } & IFormElementDesc['options'];
 }
 
 export interface IFormRow {

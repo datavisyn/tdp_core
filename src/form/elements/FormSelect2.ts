@@ -21,7 +21,7 @@ export interface IFormSelect2 extends IFormElementDesc {
   /**
    * Additional options
    */
-  options?: IFormSelect2Options;
+  options?: IFormSelect2Options & IFormElementDesc['options'];
 }
 
 export interface ISelect2Option {
