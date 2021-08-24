@@ -67,7 +67,7 @@ export class FormMap extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        const $colNode = $formNode.append('div').classed('col-sm-auto', true);
+        const $colNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12', true);
         this.$node = $colNode.append('div');
         this.setVisible(this.elementDesc.visible);
         this.inline = hasInlineParent(this.$node.node());

@@ -16,7 +16,7 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
          * default value
          */
         isChecked?: any;
-    };
+    } & IFormElementDesc['options'];
 }
 export declare class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     readonly pluginDesc: IPluginDesc;

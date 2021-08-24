@@ -7,7 +7,7 @@ import {IPluginDesc} from 'phovea_core';
 export interface IRadioElementDesc extends IFormElementDesc {
   options: {
     buttons: IFormSelectOption[];
-  };
+  } & IFormElementDesc['options'];
 }
 
 export class FormRadio extends AFormElement<IRadioElementDesc> {
@@ -28,8 +28,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    */
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
-
-    this.$node = $formNode.append('div').classed('col-sm-auto', true);
+    this.$node = $formNode.append('div').classed(this.elementDesc.options['inlineForm'] ? 'col-sm-auto' : 'col-sm-12', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 

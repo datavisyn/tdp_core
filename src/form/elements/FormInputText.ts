@@ -51,7 +51,7 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('mb-3', true);
+    this.$node = $formNode.append('div');
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 

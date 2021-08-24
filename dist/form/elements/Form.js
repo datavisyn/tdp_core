@@ -20,7 +20,7 @@ export class Form {
          * Map of all appended form elements with the element id as key
          */
         this.elements = new Map();
-        this.$node = $parent.append('form').attr('class', `${this.formClass} align-items-center`).attr('id', this.formId).classed('form-inline', this.formInline);
+        this.$node = $parent.append('form').attr('class', `${this.formClass} align-items-center gap-1 mb-2`).attr('id', this.formId);
     }
     /**
      * Append a form element and builds it

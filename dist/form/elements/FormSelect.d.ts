@@ -17,14 +17,6 @@ export interface IFormSelectOptionGroup {
 export declare type ISelectOptions = ((string | IFormSelectOption)[] | Promise<(string | IFormSelectOption)[]>);
 export declare type IHierarchicalSelectOptions = ((string | IFormSelectOption | IFormSelectOptionGroup)[] | Promise<(string | IFormSelectOption | IFormSelectOptionGroup)[]>);
 export interface IFormSelectOptions {
-    /**
-     * Data for the options elements of the select
-     */
-    optionsData?: IHierarchicalSelectOptions | ((dependents: any[]) => IHierarchicalSelectOptions);
-    /**
-     * Index of the selected option; this option overrides the selected index from the `useSession` property
-     */
-    selectedIndex?: number;
 }
 /**
  * Add specific options for select form elements

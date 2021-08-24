@@ -6,7 +6,7 @@ import { IPluginDesc } from 'phovea_core';
 export interface IRadioElementDesc extends IFormElementDesc {
     options: {
         buttons: IFormSelectOption[];
-    };
+    } & IFormElementDesc['options'];
 }
 export declare class FormRadio extends AFormElement<IRadioElementDesc> {
     readonly pluginDesc: IPluginDesc;

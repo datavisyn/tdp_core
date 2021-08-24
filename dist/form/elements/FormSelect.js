@@ -37,8 +37,7 @@ export class FormSelect extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        const $colNode = $formNode.append('div').classed('col-sm-auto', true);
-        this.$node = $colNode.append('div').classed('row', true);
+        this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12', true).classed('row', true);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel();
         const $colDiv = this.$node.append('div').classed('col', true);

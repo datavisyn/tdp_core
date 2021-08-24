@@ -112,7 +112,12 @@ export interface IFormElementDesc {
     /**
      * Form element specific options
      */
-    options?: {};
+    options?: {
+        /**
+         *
+         */
+        inlineForm?: boolean;
+    };
     /**
      * hide label
      */

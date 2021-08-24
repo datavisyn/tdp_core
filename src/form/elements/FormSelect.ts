@@ -22,7 +22,7 @@ export interface IFormSelectOptionGroup {
 export declare type ISelectOptions = ((string|IFormSelectOption)[]|Promise<(string|IFormSelectOption)[]>);
 export declare type IHierarchicalSelectOptions = ((string|IFormSelectOption|IFormSelectOptionGroup)[]|Promise<(string|IFormSelectOption|IFormSelectOptionGroup)[]>);
 
-export interface IFormSelectOptions {
+export interface IFormSelectOptions extends {
   /**
    * Data for the options elements of the select
    */
@@ -88,8 +88,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    const $colNode = $formNode.append('div').classed('col-sm-auto', true);
-    this.$node = $colNode.append('div').classed('row', true);
+    this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12', true).classed('row', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 
