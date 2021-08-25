@@ -88,7 +88,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12', true).classed('row', true);
+    this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true).classed('row', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel();
 

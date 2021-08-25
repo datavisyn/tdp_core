@@ -145,7 +145,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    const $colNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12', true);
+    const $colNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
     this.$node = $colNode.append('div');
     this.setVisible(this.elementDesc.visible);
 
