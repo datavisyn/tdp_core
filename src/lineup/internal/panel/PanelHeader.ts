@@ -3,9 +3,9 @@ import {IPanelButton} from './PanelButton';
 
 export enum EPanelHeaderToolbar {
   NAV,
-  TOP,
+  START,
   CENTER,
-  BOTTOM
+  END
 }
 
 /**
@@ -13,11 +13,11 @@ export enum EPanelHeaderToolbar {
  */
 export class PanelHeader {
 
-  readonly node: HTMLElement;
-  private readonly navToolbar: HTMLElement;
-  private readonly topToolbar: HTMLElement;
-  private readonly centerToolbar: HTMLElement;
-  private readonly bottomToolbar: HTMLElement;
+  node: HTMLElement;
+  private navToolbar: HTMLElement;
+  private startToolbar: HTMLElement;
+  private centerToolbar: HTMLElement;
+  private endToolbar: HTMLElement;
   private buttons: IPanelButton[] = [];
 
   /**
@@ -28,22 +28,13 @@ export class PanelHeader {
   constructor(parent: HTMLElement) {
     this.node = parent.ownerDocument.createElement('header');
     this.node.classList.add('panel-header');
-    this.navToolbar = this.createToolbar();
-    this.topToolbar = this.createToolbar();
-    this.centerToolbar = this.createToolbar();
-    this.bottomToolbar = this.createToolbar();
-
-    this.node.append(this.navToolbar);
-    this.node.append(this.topToolbar);
-    this.node.append(this.centerToolbar);
-    this.node.append(this.bottomToolbar);
-
     parent.appendChild(this.node);
   }
 
-  createToolbar() {
+
+  private createToolbar(cssClass: string = '') {
     const n = this.node.ownerDocument.createElement('div');
-    n.classList.add('btn-group-custom', 'panel-toolbar');
+    n.className = `panel-toolbar ${cssClass}`;
     return n;
   }
   /**
@@ -54,16 +45,33 @@ export class PanelHeader {
     this.buttons = [...this.buttons, button];
     switch (position) {
       case EPanelHeaderToolbar.NAV:
+        if (!this.navToolbar) {
+          this.navToolbar = this.createToolbar();
+          this.node.append(this.navToolbar);
+        }
+
         this.navToolbar.append(button.node);
         break;
-      case EPanelHeaderToolbar.TOP:
-        this.topToolbar.append(button.node);
+      case EPanelHeaderToolbar.START:
+        if (!this.startToolbar) {
+          this.startToolbar = this.createToolbar();
+          this.node.append(this.startToolbar);
+        }
+        this.startToolbar.append(button.node);
         break;
       case EPanelHeaderToolbar.CENTER:
+        if (!this.centerToolbar) {
+          this.centerToolbar = this.createToolbar();
+          this.node.append(this.centerToolbar);
+        }
         this.centerToolbar.append(button.node);
         break;
-      case EPanelHeaderToolbar.BOTTOM:
-        this.bottomToolbar.append(button.node);
+      case EPanelHeaderToolbar.END:
+        if (!this.endToolbar) {
+          this.endToolbar = this.createToolbar('shortcut-toolbar');
+          this.node.append(this.endToolbar);
+        }
+        this.endToolbar.append(button.node);
     }
   }
 }

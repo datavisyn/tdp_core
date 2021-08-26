@@ -15,9 +15,9 @@ export class PanelSaveNamedSetButton extends EventHandler implements IPanelButto
     super();
 
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('btn-group', 'save-named-set-dropdown');
+    this.node.classList.add('save-named-set-dropdown');
     this.node.innerHTML = `
-      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown" aria-haspopup="true"
+      <button type="button" class="btn btn-sm btn-icon" data-bs-toggle="dropdown" aria-haspopup="true"
       aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}">
      <i class="fas fa-save fa-fw"></i>
       </button>

@@ -1,9 +1,9 @@
 export var EPanelHeaderToolbar;
 (function (EPanelHeaderToolbar) {
     EPanelHeaderToolbar[EPanelHeaderToolbar["NAV"] = 0] = "NAV";
-    EPanelHeaderToolbar[EPanelHeaderToolbar["TOP"] = 1] = "TOP";
+    EPanelHeaderToolbar[EPanelHeaderToolbar["START"] = 1] = "START";
     EPanelHeaderToolbar[EPanelHeaderToolbar["CENTER"] = 2] = "CENTER";
-    EPanelHeaderToolbar[EPanelHeaderToolbar["BOTTOM"] = 3] = "BOTTOM";
+    EPanelHeaderToolbar[EPanelHeaderToolbar["END"] = 3] = "END";
 })(EPanelHeaderToolbar || (EPanelHeaderToolbar = {}));
 /**
  * The panel header contains a list of panel buttons.
@@ -18,19 +18,11 @@ export class PanelHeader {
         this.buttons = [];
         this.node = parent.ownerDocument.createElement('header');
         this.node.classList.add('panel-header');
-        this.navToolbar = this.createToolbar();
-        this.topToolbar = this.createToolbar();
-        this.centerToolbar = this.createToolbar();
-        this.bottomToolbar = this.createToolbar();
-        this.node.append(this.navToolbar);
-        this.node.append(this.topToolbar);
-        this.node.append(this.centerToolbar);
-        this.node.append(this.bottomToolbar);
         parent.appendChild(this.node);
     }
-    createToolbar() {
+    createToolbar(cssClass = '') {
         const n = this.node.ownerDocument.createElement('div');
-        n.classList.add('btn-group-custom', 'panel-toolbar');
+        n.className = `panel-toolbar ${cssClass}`;
         return n;
     }
     /**
@@ -41,16 +33,32 @@ export class PanelHeader {
         this.buttons = [...this.buttons, button];
         switch (position) {
             case EPanelHeaderToolbar.NAV:
+                if (!this.navToolbar) {
+                    this.navToolbar = this.createToolbar();
+                    this.node.append(this.navToolbar);
+                }
                 this.navToolbar.append(button.node);
                 break;
-            case EPanelHeaderToolbar.TOP:
-                this.topToolbar.append(button.node);
+            case EPanelHeaderToolbar.START:
+                if (!this.startToolbar) {
+                    this.startToolbar = this.createToolbar();
+                    this.node.append(this.startToolbar);
+                }
+                this.startToolbar.append(button.node);
                 break;
             case EPanelHeaderToolbar.CENTER:
+                if (!this.centerToolbar) {
+                    this.centerToolbar = this.createToolbar();
+                    this.node.append(this.centerToolbar);
+                }
                 this.centerToolbar.append(button.node);
                 break;
-            case EPanelHeaderToolbar.BOTTOM:
-                this.bottomToolbar.append(button.node);
+            case EPanelHeaderToolbar.END:
+                if (!this.endToolbar) {
+                    this.endToolbar = this.createToolbar('shortcut-toolbar');
+                    this.node.append(this.endToolbar);
+                }
+                this.endToolbar.append(button.node);
         }
     }
 }

@@ -158,25 +158,26 @@ $lu_assets: "~lineupjs/src/assets";
 
     &:not(.collapsed),
     &.lu-side-panel-top {
-      .btn-group-custom {
-        @extend .btn-group;
-        margin-right: 1em;
-      }
+      > header {
+        .panel-toolbar {
+          display: flex;
 
-      .lu-adder {
-        margin-top: 1em;
+          &:not(:first-child):not(.shortcut-toolbar) {
+            border-left: 1px solid #dee2e6;
+            margin-left: 0.4rem;
+            button {
+              margin-left: 0.4rem;
+            }
+          }
+        }
+        .lu-adder {
+          margin-top: 1em;
 
-        button {
-
-          display: none;
+          button {
+            display: none;
+          }
         }
       }
-    }
-
-    // add rounded corners to the action after `lu-adder` when it is hidden
-    &:not(.collapsed) .btn-group-custom:nth-child(2) > .lu-adder + .btn {
-      border-top-left-radius: 0.2rem !important;
-      border-bottom-left-radius: 0.2rem !important;
     }
 
     &:not(.collapsed) {
@@ -223,7 +224,7 @@ $lu_assets: "~lineupjs/src/assets";
 
     button[data-violation] {
       position: relative;
-      @extend .btn-outline-warning;
+      @extend .btn-icon-warning;
 
       &:hover {
         z-index: 2;
@@ -359,14 +360,16 @@ $lu_assets: "~lineupjs/src/assets";
 
       &:not(.lu-side-panel-top) {
         & > header {
-          .btn-group-custom {
-            @extend .btn-group-vertical;
-            margin-bottom: 1em;
+          .panel-toolbar {
+            display: flex;
+            flex-direction: column;
+            &:not(:first-child) {
+              margin-top: 0.4rem;
+              button {
+                margin-top: 0.4rem;
+              }
 
-            // bootstrap 5 bug, if first element in `btn-group` is a `btn-group` then the next element has does not get sharp corners (desired behavior)
-            & > .btn-group + .btn {
-              border-top-left-radius: 0;
-              border-top-right-radius: 0;
+              border-top: 1px solid #dee2e6;
             }
           }
         }

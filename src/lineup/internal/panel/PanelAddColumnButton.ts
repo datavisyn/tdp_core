@@ -16,7 +16,7 @@ export class PanelAddColumnButton implements IPanelButton {
    */
   constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('lu-adder', 'btn-group');
+    this.node.classList.add('lu-adder');
     this.node.addEventListener('mouseleave', () => {
       this.node.classList.remove('once');
     });
@@ -24,7 +24,7 @@ export class PanelAddColumnButton implements IPanelButton {
     const button = new PanelButton(this.node, {
       title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
       faIcon: 'fas fa-plus',
-      cssClass: 'dropdown-toggle',
+      cssClass: 'btn-icon-primary',
       onClick: () => {
         this.node.classList.add('once');
         (<HTMLElement>this.search.node.querySelector('input'))!.focus();

@@ -95,7 +95,7 @@ export class LineUpPanelActions extends EventHandler {
         }
         if (this.options.enableAddingColumns) {
             const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox());
-            this.header.addButton(addColumnButton, EPanelHeaderToolbar.TOP);
+            this.header.addButton(addColumnButton, EPanelHeaderToolbar.START);
         }
         this.appendExtraButtons(buttons);
         const lineupOrderRowIndices = new LineUpOrderedRowIndicies(this.provider); // save state of all, selected, and filtered rows
@@ -104,11 +104,11 @@ export class LineUpPanelActions extends EventHandler {
             saveRankingButtonContainer.on(PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET, (_event, order, name, description, sec) => {
                 this.fire(LineUpPanelActions.EVENT_SAVE_NAMED_SET, order, name, description, sec); // forward event
             });
-            this.header.addButton(saveRankingButtonContainer, EPanelHeaderToolbar.TOP);
+            this.header.addButton(saveRankingButtonContainer, EPanelHeaderToolbar.START);
         }
         if (this.options.enableDownload) {
             const downloadButtonContainer = new PanelDownloadButton(buttons, this.provider, lineupOrderRowIndices, this.isTopMode);
-            this.header.addButton(downloadButtonContainer, EPanelHeaderToolbar.TOP);
+            this.header.addButton(downloadButtonContainer, EPanelHeaderToolbar.START);
         }
         if (this.options.enableZoom) {
             const zoomInButton = new PanelButton(buttons, {
@@ -130,14 +130,16 @@ export class LineUpPanelActions extends EventHandler {
             const overviewButton = new PanelButton(buttons, {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'),
                 cssClass: 'toggle-overview-button',
-                faIcon: this.options.enableOverviewMode === 'active' ? 'fas fa-th-list' : 'fas fa-list',
+                faIcon: 'fas fa-list',
                 onClick: () => {
-                    const selected = this.overview.querySelector('i').classList.toggle('fa-th-list');
-                    this.overview.querySelector('i').classList.toggle('fa-list');
+                    const selected = this.overview.classList.toggle('active');
                     this.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, selected);
                 }
             });
             this.overview = overviewButton.node; // TODO might be removed
+            if (this.options.enableOverviewMode === 'active') {
+                overviewButton.node.classList.toggle('active');
+            }
             this.header.addButton(overviewButton, EPanelHeaderToolbar.CENTER);
         }
         if (!this.isTopMode) {
@@ -159,7 +161,7 @@ export class LineUpPanelActions extends EventHandler {
                 button.load().then((p) => this.scoreColumnDialog(p));
             };
             const luButton = new PanelRankingButton(parent, this.provider, button.title, button.cssClass, button.faIcon, listener);
-            this.header.addButton(luButton, EPanelHeaderToolbar.TOP);
+            this.header.addButton(luButton, EPanelHeaderToolbar.START);
         });
     }
     appendExtraTabs() {
@@ -184,7 +186,7 @@ export class LineUpPanelActions extends EventHandler {
                 }
             };
             if (plugin.shortcut) {
-                this.header.addButton(tab.getShortcutButton(), EPanelHeaderToolbar.BOTTOM);
+                this.header.addButton(tab.getShortcutButton(), EPanelHeaderToolbar.END);
             }
             this.tabContainer.addTab(tab, onClick);
         });

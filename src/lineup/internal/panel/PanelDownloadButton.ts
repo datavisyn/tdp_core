@@ -19,9 +19,9 @@ export class PanelDownloadButton implements IPanelButton {
 
   constructor(parent: HTMLElement, provider: LocalDataProvider, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode: boolean) {
     this.node = parent.ownerDocument.createElement('div');
-    this.node.classList.add('btn-group', 'download-data-dropdown');
+    this.node.classList.add('download-data-dropdown');
     this.node.innerHTML = `
-      <button type="button" class="btn btn-outline-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown"
+      <button type="button" class="btn btn-icon dropdown-toggle btn-sm" data-bs-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
       <i class="fas fa-download fa-fw"></i>
       </button>

@@ -13,14 +13,14 @@ export class PanelAddColumnButton {
     constructor(parent, search) {
         this.search = search;
         this.node = parent.ownerDocument.createElement('div');
-        this.node.classList.add('lu-adder', 'btn-group');
+        this.node.classList.add('lu-adder');
         this.node.addEventListener('mouseleave', () => {
             this.node.classList.remove('once');
         });
         const button = new PanelButton(this.node, {
             title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
             faIcon: 'fas fa-plus',
-            cssClass: 'dropdown-toggle',
+            cssClass: 'btn-icon-primary',
             onClick: () => {
                 this.node.classList.add('once');
                 this.search.node.querySelector('input').focus();
