@@ -31,7 +31,7 @@ export class PanelButton implements IPanelButton {
     this.node = parent.ownerDocument.createElement('button');
     this.node.setAttribute('type', 'button');
     this.node.title = options.title;
-    this.node.className = `btn btn-sm btn-outline-secondary ${options.cssClass || ''}`;
+    this.node.className = `btn btn-sm btn-icon ${options.cssClass || ''}`;
     this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
 
     this.node.addEventListener('click', (evt) => {

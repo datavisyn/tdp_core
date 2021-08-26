@@ -8,13 +8,13 @@ export class PanelSaveNamedSetButton extends EventHandler {
     constructor(parent, lineupOrderRowIndices, isTopMode) {
         super();
         this.node = parent.ownerDocument.createElement('div');
-        this.node.classList.add('save-named-set-dropdown');
+        this.node.classList.add('dropdown', 'save-named-set-dropdown');
         this.node.innerHTML = `
       <button type="button" class="btn btn-sm btn-icon" data-bs-toggle="dropdown" aria-haspopup="true"
       aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}">
      <i class="fas fa-save fa-fw"></i>
       </button>
-      <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-end dropdown-menu-start' : 'dropdown-menu-end'}">
+      <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-start' : 'dropdown-menu-end'}">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntities')}</div>
         <a class="dropdown-item" href="#" data-rows="all" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveEntireList')}</a>
         <a class="dropdown-item" href="#" data-rows="filtered" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.saveFilteredRows')}</a>
