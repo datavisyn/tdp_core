@@ -82,7 +82,7 @@ export function Multiples(props) {
     console.log(traces, subplots);
     return (React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "row" } },
         React.createElement("div", { style: { flex: "5" } },
-            React.createElement(Plot, { on: true, data: traces, layout: {
+            React.createElement(Plot, { data: traces, layout: {
                     width: 1200,
                     height: 1200,
                     grid: { rows: props.columns.filter(c => c.type === "Numerical").length, columns: props.columns.filter(c => c.type === "Numerical").length, pattern: 'independent' },

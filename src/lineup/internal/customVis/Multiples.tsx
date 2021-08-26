@@ -141,7 +141,6 @@ export function Multiples(props: MultiplesProps) {
         <div style={{height: "100%", display: "flex", flexDirection: "row"}}>
             <div style={{flex: "5"}}>
              <Plot
-                on
                 data={traces}
                 layout={ {
                     width: 1200, 
