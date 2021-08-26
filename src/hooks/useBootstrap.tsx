@@ -83,7 +83,7 @@ function BSClass<HookType extends BSHook, HookParameters extends (Parameters<Hoo
 ) {
   return ({
     children,
-    ref: onInstance,
+    instanceRef,
     // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
     ...options
   }: {
@@ -94,14 +94,14 @@ function BSClass<HookType extends BSHook, HookParameters extends (Parameters<Hoo
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: React.RefCallback<ReturnType<HookType>[1]>;
+    instanceRef?: React.RefCallback<ReturnType<HookType>[1]>;
   } & HookParameters & AdditionalHookOptions) => {
     // Instantiate the hook
     const [ref, instance] = hook(options);
 
     // Store the ref to the onInstance callback to avoid putting it into the deps
     React.useEffect(() => {
-      onInstance?.(instance);
+      instanceRef?.(instance);
     }, [instance]);
 
     // Call the optional additional hook with all options

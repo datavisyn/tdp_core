@@ -16,12 +16,12 @@ return <div ref={ref} className="modal">...</div>;
 ```
 
 ### `BS[Modal|...]` components
-The components are thin wrappers around the `useBS...` hooks, which allow for a more convenient way of writing components. Instead of attached the ref yourself, it automatically attaches the ref to the first child of the component. It also adds props for `show` if possible (i.e. for Modals, but not for Alerts) and syncs via `setShow`. You can also receive the instance via the `ref` property.
+The components are thin wrappers around the `useBS...` hooks, which allow for a more convenient way of writing components. Instead of attached the ref yourself, it automatically attaches the ref to the first child of the component. It also adds props for `show` if possible (i.e. for Modals, but not for Alerts) and syncs via `setShow`. You can also receive the instance via the `instanceRef` property.
 
 ```javascript
 const [show, setShow] = React.useState<boolean>(false);
 
-return <BSModal show={show} setShow={setShow} ref={(instance) => /* Do something with the instance */}>
+return <BSModal show={show} setShow={setShow} instanceRef={(instance) => /* Do something with the instance */}>
   <div className="modal">...</div>
 </BSModal>;
 ```

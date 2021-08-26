@@ -9,7 +9,7 @@ export declare const useBSTooltip: (options?: Partial<Tooltip.Options>) => [(ele
 export declare const useBSTab: () => [(element: HTMLElement | null) => void, Tab];
 export declare const useBSCollapse: (options?: Partial<Collapse.Options>) => [(element: HTMLElement | null) => void, Collapse];
 export declare const useBSDropdown: (options?: Partial<Dropdown.Options>) => [(element: HTMLElement | null) => void, Dropdown];
-export declare const BSModal: ({ children, ref: onInstance, ...options }: {
+export declare const BSModal: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -17,12 +17,12 @@ export declare const BSModal: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Modal) => void;
+    instanceRef?: (instance: Modal) => void;
 } & Partial<Modal.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
-export declare const BSToast: ({ children, ref: onInstance, ...options }: {
+export declare const BSToast: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -30,12 +30,12 @@ export declare const BSToast: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Toast) => void;
+    instanceRef?: (instance: Toast) => void;
 } & Partial<Toast.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
-export declare const BSPopover: ({ children, ref: onInstance, ...options }: {
+export declare const BSPopover: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -43,12 +43,12 @@ export declare const BSPopover: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Popover) => void;
+    instanceRef?: (instance: Popover) => void;
 } & Partial<Popover.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
-export declare const BSAlert: ({ children, ref: onInstance, ...options }: {
+export declare const BSAlert: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -56,9 +56,9 @@ export declare const BSAlert: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Alert) => void;
+    instanceRef?: (instance: Alert) => void;
 }) => JSX.Element;
-export declare const BSOffcanvas: ({ children, ref: onInstance, ...options }: {
+export declare const BSOffcanvas: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -66,13 +66,13 @@ export declare const BSOffcanvas: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Offcanvas) => void;
+    instanceRef?: (instance: Offcanvas) => void;
 } & {
     show?: boolean;
     relatedTarget?: HTMLElement;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
-export declare const BSTooltip: ({ children, ref: onInstance, ...options }: {
+export declare const BSTooltip: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -80,12 +80,12 @@ export declare const BSTooltip: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Tooltip) => void;
+    instanceRef?: (instance: Tooltip) => void;
 } & Partial<Tooltip.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
-export declare const BSTab: ({ children, ref: onInstance, ...options }: {
+export declare const BSTab: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -93,9 +93,9 @@ export declare const BSTab: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Tab) => void;
+    instanceRef?: (instance: Tab) => void;
 }) => JSX.Element;
-export declare const BSCollapse: ({ children, ref: onInstance, ...options }: {
+export declare const BSCollapse: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -103,12 +103,12 @@ export declare const BSCollapse: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Collapse) => void;
+    instanceRef?: (instance: Collapse) => void;
 } & Partial<Collapse.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
-export declare const BSDropdown: ({ children, ref: onInstance, ...options }: {
+export declare const BSDropdown: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
      */
@@ -116,7 +116,7 @@ export declare const BSDropdown: ({ children, ref: onInstance, ...options }: {
     /**
      * Optional ref to get access to the instance of the BS class.
      */
-    ref?: (instance: Dropdown) => void;
+    instanceRef?: (instance: Dropdown) => void;
 } & Partial<Dropdown.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
