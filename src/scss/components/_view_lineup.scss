@@ -177,7 +177,6 @@ $lu_assets: "~lineupjs/src/assets";
 
     & > header {
       .lu-adder {
-        margin-top: 1em;
 
         button {
           display: none;
@@ -367,13 +366,15 @@ $lu_assets: "~lineupjs/src/assets";
           .panel-toolbar {
             display: flex;
             flex-direction: column;
-            &:not(:first-child) {
+            
+            > .btn-icon,
+            > div > .btn-icon{
               margin-top: 0.4rem;
-              button {
-                margin-top: 0.4rem;
-              }
+            }
 
+            &:not(:first-child) {
               border-top: 1px solid #dee2e6;
+              margin-top: 0.4rem;
             }
           }
         }
