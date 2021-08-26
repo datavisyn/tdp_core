@@ -41,8 +41,8 @@ export class ProvenanceGraphMenuUtils {
               </div>
               <div class="mb-3">
                 <div class="checkbox form-check">
-                  <input type="checkbox"" id="customCheckbox1" name="${prefix}_agree" required="required" class="form-check-input">
-                  <label class="form-label radio-inline form-check-label" for="customCheckbox1">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
+                  <input type="checkbox" id="${prefix}_agree" name="${prefix}_agree" required="required" class="form-check-input">
+                  <label class="form-label radio-inline form-check-label" for="${prefix}_agree">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
                 </div>
               </div>
           `;
