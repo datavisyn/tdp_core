@@ -25,6 +25,7 @@ export declare class AScoreAccessorProxy<T> {
     private readonly scores;
     constructor(missingValue?: T);
     clear(): void;
+    z: any;
     setRows(rows: IScoreRow<T>[]): void;
     protected access(row: IRow): T;
 }

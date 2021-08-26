@@ -69,6 +69,7 @@ export class ARankingView extends AView {
             subType: { key: '', value: '' },
             enableOverviewMode: true,
             enableZoom: true,
+            enableCustomVis: true,
             enableDownload: true,
             enableSaveRanking: true,
             enableAddingColumns: true,
@@ -157,6 +158,9 @@ export class ARankingView extends AView {
         this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
             this.taggle.zoomIn();
         });
+        this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+            this.panel.addCustomVis(this.provider.getRow(6));
+        });
         if (this.options.enableOverviewMode) {
             const rule = spaceFillingRule(taggleOptions);
             this.panel.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event, isOverviewActive) => {
@@ -169,6 +173,7 @@ export class ARankingView extends AView {
         }
         if (this.options.enableSidePanel) {
             this.node.appendChild(this.panel.node);
+            this.node.appendChild(this.panel.customVisDiv);
             if (this.options.enableSidePanel !== 'top') {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }

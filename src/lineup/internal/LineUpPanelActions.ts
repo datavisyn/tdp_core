@@ -24,6 +24,9 @@ import {FormElementType, IForm} from '../../form/interfaces';
 import {FormDialog} from '../../form';
 import {PanelSaveNamedSetButton} from './panel/PanelSaveNamedSetButton';
 import {LineUpOrderedRowIndicies} from './panel/LineUpOrderedRowIndicies';
+import {CustomVis} from './customVis/CustomVis';
+import React, {createElement} from 'react';
+import ReactDOM from 'react-dom';
 
 
 export interface IPanelTabExtension {
@@ -72,6 +75,7 @@ export interface IPanelTabExtensionDesc extends IPluginDesc {
 export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
+  static readonly EVENT_OPEN_VIS = 'openVis';
   static readonly EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
   /**
@@ -90,6 +94,8 @@ export class LineUpPanelActions extends EventHandler {
 
   readonly panel: SidePanel | null;
   readonly node: HTMLElement; // wrapper node
+  readonly customVisDiv: HTMLElement; // wrapper node
+
 
   private readonly header: PanelHeader;
   private readonly tabContainer: ITabContainer;
@@ -99,6 +105,10 @@ export class LineUpPanelActions extends EventHandler {
 
   constructor(protected readonly provider: LocalDataProvider, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, private readonly options: Readonly<IARankingViewOptions>, doc = document) {
     super();
+
+    this.customVisDiv = doc.createElement('div')
+    this.customVisDiv.id = "customVisDiv"
+    this.customVisDiv.classList.add("custom-vis-panel")
 
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
@@ -216,6 +226,13 @@ export class LineUpPanelActions extends EventHandler {
       this.header.addButton(zoomOutButton);
     }
 
+    console.log("at the if")
+    if (this.options.enableCustomVis) {
+      console.log("making the button")
+      const customVis = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'), 'fas fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS));
+      this.header.addButton(customVis);
+    }
+
     if (this.options.enableOverviewMode) {
       const listener = () => {
         const selected = this.overview.classList.toggle('fa-th-list');
@@ -318,6 +335,29 @@ export class LineUpPanelActions extends EventHandler {
     const metaDataOptions = await Promise.all(metaDataPluginPromises);
     const loadedScorePlugins = ordinoScores.map((desc) => LineupUtils.wrap(desc));
     return {metaDataOptions, loadedScorePlugins};
+  }
+
+  addCustomVis(data: any) {
+    console.log(data)
+    this.customVisDiv.style.display = "flex"
+
+    let irisSepalLengthData = [5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 5.5, 4.9, 5.4, 4.8, 4.8, 4.3, 5.8, 5.7, 5.4, 5.1, 5.7, 5.1];
+    let irisSepalWidthData = [3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8];
+    let irisPetalLengthData = [1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.5, 1.4, 1.5, 1.5, 1.6, 1.4, 1.1, 1.2, 1.5, 1.3, 1.4, 1.7, 1.5];
+    let irisPetalWidthData = [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3];
+
+    let irisSpecies = ["Setosa", "Setosa", "Setosa", "Setosa", "Setosa", "Setosa", "Versicolor", "Versicolor","Versicolor", "Versicolor","Versicolor", "Versicolor",
+    "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica"]
+
+    ReactDOM.render(
+      React.createElement(CustomVis, {columns: [
+        {name: "Sepal Length", vals: irisSepalLengthData, type: "Numerical"}, 
+        {name: "Sepal Width", vals: irisSepalWidthData, type: "Numerical"}, 
+        {name: "Petal Length", vals: irisPetalLengthData, type: "Numerical"}, 
+        {name: "Petal Width", vals: irisPetalWidthData, type: "Numerical"}, 
+        {name: "Species", vals: irisSpecies, type: "Categorical"}], type: "Chooser"}),
+      this.customVisDiv
+    )
   }
 
   async updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]) {

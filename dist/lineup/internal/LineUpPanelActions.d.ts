@@ -43,6 +43,7 @@ export declare class LineUpPanelActions extends EventHandler {
     private readonly options;
     static readonly EVENT_ZOOM_OUT = "zoomOut";
     static readonly EVENT_ZOOM_IN = "zoomIn";
+    static readonly EVENT_OPEN_VIS = "openVis";
     static readonly EVENT_TOGGLE_OVERVIEW = "toggleOverview";
     static readonly EVENT_SAVE_NAMED_SET = "saveNamedSet";
     /**
@@ -58,6 +59,7 @@ export declare class LineUpPanelActions extends EventHandler {
     private readonly searchBoxProvider;
     readonly panel: SidePanel | null;
     readonly node: HTMLElement;
+    readonly customVisDiv: HTMLElement;
     private readonly header;
     private readonly tabContainer;
     private overview;
@@ -79,6 +81,7 @@ export declare class LineUpPanelActions extends EventHandler {
     private getColumnDescription;
     private addColumn;
     private resolveScores;
+    addCustomVis(data: any): void;
     updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]): Promise<void>;
     private groupColumnDescs;
     private groupedDialog;
