@@ -162,24 +162,28 @@ $lu_assets: "~lineupjs/src/assets";
         .panel-toolbar {
           display: flex;
 
+          > .btn-icon,
+          > div > .btn-icon {
+            margin-left: 0.4rem;
+          }
+
           &:not(:first-child):not(.shortcut-toolbar) {
             border-left: 1px solid #dee2e6;
             margin-left: 0.4rem;
-            button {
-              margin-left: 0.4rem;
-            }
-          }
-        }
-        .lu-adder {
-          margin-top: 1em;
-
-          button {
-            display: none;
           }
         }
       }
     }
 
+    & > header {
+      .lu-adder {
+        margin-top: 1em;
+
+        button {
+          display: none;
+        }
+      }
+    }
     &:not(.collapsed) {
       .shortcut-nav {
         display: none; // hide navTab that doesn't have class `shortcut-nav` in collapsed mode
