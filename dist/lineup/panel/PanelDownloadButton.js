@@ -1,5 +1,5 @@
 import { isSupportType } from 'lineupjs';
-import { ExportUtils } from '../ExportUtils';
+import { ExportUtils } from '../internal/ExportUtils';
 import { BaseUtils, I18nextManager } from 'phovea_core';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 /**

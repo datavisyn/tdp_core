@@ -7,22 +7,22 @@ import {
   EP_TDP_CORE_LINEUP_PANEL_TAB
 } from '../../base/extensions';
 import {IARankingViewOptions} from '../IARankingViewOptions';
-import {PanelButton} from './panel/PanelButton';
-import {ITabContainer, PanelTabContainer, NullTabContainer} from './panel/PanelTabContainer';
-import {PanelTab, SidePanelTab} from './panel/PanelTab';
-import {SearchBoxProvider} from './panel/SearchBoxProvider';
-import {EPanelHeaderToolbar, PanelHeader} from './panel/PanelHeader';
-import {PanelRankingButton} from './panel/PanelRankingButton';
-import {PanelAddColumnButton} from './panel/PanelAddColumnButton';
-import {PanelDownloadButton} from './panel/PanelDownloadButton';
+import {PanelButton} from '../panel/PanelButton';
+import {ITabContainer, PanelTabContainer, NullTabContainer} from '../panel/PanelTabContainer';
+import {PanelTab, SidePanelTab} from '../panel/PanelTab';
+import {SearchBoxProvider} from '../panel/SearchBoxProvider';
+import {EPanelHeaderToolbar, PanelHeader} from '../panel/PanelHeader';
+import {PanelRankingButton} from '../panel/PanelRankingButton';
+import {PanelAddColumnButton} from '../panel/PanelAddColumnButton';
+import {PanelDownloadButton} from '../panel/PanelDownloadButton';
 import {IScoreLoader, IRankingButtonExtensionDesc, IScoreLoaderExtensionDesc, IRankingButtonExtension, IPanelTabExtension, IPanelTabExtensionDesc} from '../../base/interfaces';
-import {ISearchOption} from './panel/ISearchOption';
+import {ISearchOption} from '../panel/ISearchOption';
 import {LineupUtils} from '../utils';
 import {IAdditionalColumnDesc, isAdditionalColumnDesc} from '../../base/interfaces';
 import {FormElementType, IForm} from '../../form/interfaces';
 import {FormDialog} from '../../form';
-import {PanelSaveNamedSetButton} from './panel/PanelSaveNamedSetButton';
-import {LineUpOrderedRowIndicies} from './panel/LineUpOrderedRowIndicies';
+import {PanelSaveNamedSetButton} from '../panel/PanelSaveNamedSetButton';
+import {LineUpOrderedRowIndicies} from '../panel/LineUpOrderedRowIndicies';
 
 export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';

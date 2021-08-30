@@ -7,7 +7,7 @@ import {IDType} from 'phovea_core';
 import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
 import {AppHeader} from 'phovea_ui';
 import {IAuthorizationConfiguration} from '../auth';
-import {PanelTab} from '../lineup/internal/panel';
+import {PanelTab} from '../lineup/panel';
 
 
 

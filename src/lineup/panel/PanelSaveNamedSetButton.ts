@@ -1,6 +1,6 @@
 import {IPanelButton} from './PanelButton';
 import {EventHandler, I18nextManager} from 'phovea_core';
-import {StoreUtils} from '../../../storage';
+import {StoreUtils} from '../../storage';
 import {LineUpOrderedRowIndicies} from './LineUpOrderedRowIndicies';
 
 /**

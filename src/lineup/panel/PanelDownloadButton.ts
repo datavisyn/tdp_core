@@ -1,5 +1,5 @@
 import {Column, LocalDataProvider, isSupportType} from 'lineupjs';
-import {ExportUtils, IExportFormat} from '../ExportUtils';
+import {ExportUtils, IExportFormat} from '../internal/ExportUtils';
 import {IPanelButton} from './PanelButton';
 import {BaseUtils, I18nextManager} from 'phovea_core';
 import {LineUpOrderedRowIndicies} from './LineUpOrderedRowIndicies';
