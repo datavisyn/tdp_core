@@ -120,7 +120,7 @@ export class ATableView extends AView {
     enableExport() {
         const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
         rightTableHeader.dataset.export = 'enabled';
-        rightTableHeader.insertAdjacentHTML('beforeend', `<a class="text-primary" href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fas fa-download"></i></a>`);
+        rightTableHeader.insertAdjacentHTML('beforeend', `<a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fas fa-download"></i></a>`);
         rightTableHeader.querySelector('a').onclick = (evt) => {
             evt.preventDefault();
             evt.stopPropagation();
