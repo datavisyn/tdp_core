@@ -1,5 +1,6 @@
 import d3 from 'd3';
 import {scale} from 'd3';
+import {Data} from 'plotly.js';
 import * as React from 'react';
 import {useEffect, useMemo} from 'react';
 import Plot from 'react-plotly.js';
@@ -7,6 +8,7 @@ import {NavLink} from 'react-router-dom';
 import {useAsync} from '../../..';
 import {CategoricalColumn, NumericalColumn, supportedPlotlyVis} from './CustomVis';
 import {GenericSidePanel} from './GenericSidePanel';
+import {MultipleDataTraces, MultiplesProps} from './Multiples';
 
 interface StripChartProps {
     xCol: NumericalColumn | CategoricalColumn,
@@ -23,6 +25,56 @@ function heuristic(columns) {
         xAxis: columns.filter(c => c.type === "Categorical")[0].name,
         yAxis: columns.filter(c => c.type === "Numerical")[0].name
     }
+}
+
+export function createMultiplesStripData(props: MultiplesProps, selectedNumCols: string[], selectedCatCols: string[], colorScale) : MultipleDataTraces {
+    let counter = 1
+    let numCols = props.columns.filter(c =>  selectedNumCols.includes(c.name))
+    let catCols = props.columns.filter(c => selectedCatCols.includes(c.name))
+    let traces: Data[] = []
+
+    for(let numCurr of numCols)
+    {
+        for(let catCurr of catCols)
+        {
+            traces.push( {
+                    x: catCurr.vals,
+                    y: numCurr.vals,
+                    xaxis: counter === 1 ? "x" : "x" + counter,
+                    yaxis: counter === 1 ? "y" : "y" + counter,
+                    type: 'box',
+                        boxpoints: "all",
+                        name: 'All points',
+                        mode: "none",
+                        pointpos: 0,
+                        box: {
+                            visible: true
+                          },
+                          line: {
+                            color: 'rgba(255,255,255,0)',
+                          },
+                          meanline: {
+                            visible: true
+                          },
+                    transforms: [{
+                        type: 'groupby',
+                        groups: catCurr.vals,
+                        styles: 
+                            [...new Set<string>(catCurr.vals as string[])].map(c => {
+                                return {target: c, value: {marker: {color: colorScale(c)}}}
+                            })
+                        }]
+                },
+            )
+            counter += 1
+        }
+    }
+
+    return {
+        data: traces,
+        rows: catCols.length, 
+        cols: numCols.length
+    };
 }
 
 export function StripChart(props: StripChartProps) {
@@ -51,12 +103,14 @@ export function StripChart(props: StripChartProps) {
     }, [])
 
     return (
-        <div style={{height: "100%", display: "flex", flexDirection: "row"}}>
-            <div style={{flex: "5"}}>
+        <div className="d-flex flex-row w-100 h-100">
+            <div className="flex-grow-1">
                 {props.xCol !== null &&
                 props.yCol !== null && 
                 props.xCol.type !== "Numerical" &&
                 props.yCol.type !== "Categorical" ? <Plot
+                divId={"plotlyDiv"}
+
                 data={[
                     {
                         x: props.xCol.vals,
@@ -87,8 +141,7 @@ export function StripChart(props: StripChartProps) {
                 ]}
                 layout={ 
                 {   
-                    width: 1200, 
-                    height: 1200,
+                    autosize: true,
                     xaxis: {
                         title: {
                         text: props.xCol.name,
@@ -109,6 +162,9 @@ export function StripChart(props: StripChartProps) {
                             }
                         }
                     }} }
+                    config={{responsive: true}}
+                    useResizeHandler={true}
+                    style={{width: "100%", height: "100%"}}
                 /> : null }
             </div>
             <GenericSidePanel 

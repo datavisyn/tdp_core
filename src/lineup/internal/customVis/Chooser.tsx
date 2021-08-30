@@ -1,7 +1,7 @@
 import * as React from 'react';
+import {chartTypes} from './CustomVis';
 
 interface ChooserProps {
-    dropdownNames: string[]
     updateChartType: (s: string) => void;
 }
   
@@ -13,7 +13,7 @@ export function Chooser(props: ChooserProps){
                     <label className="fw-light px-0 pb-1 form-label fs-6">Chart Type</label>
                     <select className="form-select text-muted" aria-label="Default select example" onChange={evt => props.updateChartType(evt.currentTarget.value)}>
                         <option value={"None"}>None</option>
-                        {props.dropdownNames.map(c => {
+                        {chartTypes.map(c => {
                                 return <option value={c} key={c}>{c}</option>
                             })}
                     </select>

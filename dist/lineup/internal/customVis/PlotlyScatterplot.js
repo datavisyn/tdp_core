@@ -1,7 +1,7 @@
 import d3 from 'd3';
 import { scale } from 'd3';
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import Plot from 'react-plotly.js';
 import { GenericSidePanel } from './GenericSidePanel';
 function heuristic(columns) {
@@ -10,7 +10,48 @@ function heuristic(columns) {
         yAxis: columns.filter(c => c.type === "Numerical")[1].name
     };
 }
+export function createMultiplesScatterplotData(props, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
+    let counter = 1;
+    let validCols = props.columns.filter(c => selectedNumCols.includes(c.name));
+    let traces = [];
+    for (let xCurr of validCols) {
+        for (let yCurr of validCols) {
+            if (xCurr === yCurr) {
+                traces.push({
+                    xaxis: counter === 1 ? "x" : "x" + counter,
+                    yaxis: counter === 1 ? "y" : "y" + counter,
+                });
+                counter += 1;
+                continue;
+            }
+            traces.push({
+                x: xCurr.vals,
+                y: yCurr.vals,
+                xaxis: counter === 1 ? "x" : "x" + counter,
+                yaxis: counter === 1 ? "y" : "y" + counter,
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    line: {
+                        width: 2
+                    },
+                    symbol: props.shape ? props.shape.vals.map(v => shapeScale(v)) : "circle-open",
+                    color: props.color ? props.color.vals.map(v => colorScale(v)) : "#232b2b",
+                    opacity: props.opacity ? props.opacity.vals.map(v => opacityScale(v)) : 1,
+                    size: props.bubbleSize ? props.bubbleSize.vals.map(v => bubbleScale(v)) : 7
+                },
+            });
+            counter += 1;
+        }
+    }
+    return {
+        data: traces,
+        rows: Math.sqrt(traces.length),
+        cols: Math.sqrt(traces.length)
+    };
+}
 export function Scatterplot(props) {
+    let plotRef = useRef(null);
     // heuristic for setting up used in this async call
     useEffect(() => {
         // useAsync(async () => {
@@ -42,11 +83,11 @@ export function Scatterplot(props) {
     let colorScale = useMemo(() => {
         return scale.category10();
     }, [props.color]);
-    return (React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "row" } },
-        React.createElement("div", { style: { flex: "5" } }, props.xCol !== null &&
+    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" },
+        React.createElement("div", { className: "flex-grow-1" }, props.xCol !== null &&
             props.yCol !== null &&
             props.xCol.type !== "Categorical" &&
-            props.yCol.type !== "Categorical" ? React.createElement(Plot, { data: [
+            props.yCol.type !== "Categorical" ? React.createElement(Plot, { divId: "plotlyDiv", data: [
                 {
                     x: props.xCol.vals,
                     y: props.yCol.vals,
@@ -64,8 +105,7 @@ export function Scatterplot(props) {
                     },
                 },
             ], layout: {
-                width: 1200,
-                height: 1200,
+                autosize: true,
                 xaxis: {
                     title: {
                         text: props.xCol.name,
@@ -86,7 +126,7 @@ export function Scatterplot(props) {
                         }
                     }
                 }
-            } }) : null),
+            }, useResizeHandler: true, config: { responsive: true }, style: { width: "100%", height: "100%" } }) : null),
         React.createElement(GenericSidePanel, { currentType: props.type, dropdowns: [
                 {
                     name: "X Axis",

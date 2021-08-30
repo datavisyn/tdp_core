@@ -1,5 +1,6 @@
 /// <reference types="react" />
 import { CategoricalColumn, NumericalColumn, supportedPlotlyVis } from './CustomVis';
+import { MultipleDataTraces, MultiplesProps } from './Multiples';
 interface ScatterplotProps {
     xCol: NumericalColumn | CategoricalColumn;
     yCol: NumericalColumn | CategoricalColumn;
@@ -17,5 +18,6 @@ interface ScatterplotProps {
     updateShape: (s: string) => void;
     updateChartType: (s: string) => void;
 }
+export declare function createMultiplesScatterplotData(props: MultiplesProps, selectedNumCols: string[], shapeScale: any, colorScale: any, opacityScale: any, bubbleScale: any): MultipleDataTraces;
 export declare function Scatterplot(props: ScatterplotProps): JSX.Element;
 export {};

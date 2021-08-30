@@ -1,9 +1,20 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
+import { useCallback } from "react";
+import { useResizeDetector } from 'react-resize-detector';
+import Plotly from "plotly.js";
 let chartTypes = ["Scatterplot", "PCP", "Violin", "Strip Plot", "Multiples"];
 export function GenericSidePanel(props) {
-    return (React.createElement("div", { className: "position-relative h-100 bg-light" },
+    const onResize = useCallback(() => {
+        // window.dispatchEvent(new Event('resize'));
+        if (document.getElementById("plotlyDiv")) {
+            console.log("in here");
+            Plotly.relayout("plotlyDiv", {});
+        }
+    }, []);
+    const { ref } = useResizeDetector({ onResize });
+    return (React.createElement("div", { ref: ref, className: "position-relative flex-shrink-1 bg-light" },
         React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#generalVisBurgerMenu", "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
             React.createElement(FontAwesomeIcon, { icon: faBars })),
         React.createElement("div", { className: "collapse show collapse-horizontal", id: "generalVisBurgerMenu" },

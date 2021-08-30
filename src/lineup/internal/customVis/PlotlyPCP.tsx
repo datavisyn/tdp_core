@@ -1,6 +1,6 @@
 import d3, {color} from 'd3';
 import {scale} from 'd3';
-import {PlotData, PlotDatum} from 'plotly.js';
+import {Data, PlotData, PlotDatum} from 'plotly.js';
 import * as React from 'react';
 import {useEffect, useMemo} from 'react';
 import Plot from 'react-plotly.js';
@@ -9,6 +9,7 @@ import {useAsync} from '../../..';
 import {ColumnDescUtils} from '../../desc';
 import {CategoricalColumn, NumericalColumn, supportedPlotlyVis} from './CustomVis';
 import {GenericSidePanel} from './GenericSidePanel';
+import {MultipleDataTraces, MultiplesProps} from './Multiples';
 
 interface PCPProps {
     xCol: NumericalColumn | CategoricalColumn,
@@ -35,6 +36,43 @@ function heuristic(columns) {
     }
 }
 
+export function createPCPData(props: MultiplesProps, selectedNumCols: string[], selectedCatCols: string[], colorScale) : MultipleDataTraces {
+    let numCols = props.columns.filter(c => selectedNumCols.includes(c.name))
+    let catCols = props.columns.filter(c => selectedCatCols.includes(c.name))
+    
+    let trace = {
+        //yo why does this error i dunno but it works
+        dimensions: [...numCols.map(c => {
+            return {
+                range: [d3.min(c.vals as number[]), d3.max(c.vals as number[])],
+                label: c.name, 
+                values: c.vals
+            }
+        }), ...catCols.map(c => {
+
+            let uniqueList = [...new Set<string>(c.vals as string[])]
+
+            return {
+                range: [0, uniqueList.length - 1],
+                label: c.name, 
+                values: c.vals.map(curr => uniqueList.indexOf(curr)),
+                tickvals: [...uniqueList.keys()],
+                ticktext: uniqueList
+            }
+        })],
+        type: 'parcoords',
+        line: {
+            color: props.color ? props.color.vals.map(c => colorScale(c)) : "red",
+          },
+    }
+
+    return {
+        data: [trace as Data],
+        rows: 1, 
+        cols: 1
+    };
+}
+
 
 export function PCP(props: PCPProps) {
 
@@ -57,24 +95,6 @@ export function PCP(props: PCPProps) {
         // })
     }, [props.columns])
 
-    let shapeScale = useMemo(() => {
-        return props.shape ? 
-                scale.ordinal<string>().domain(d3.set(props.shape.vals).values()).range(["circle-open", "square-open", "triangle-up-open", "star-open"])
-                : null
-    }, [props.shape])
-
-    let bubbleScale = useMemo(() => {
-        return props.bubbleSize ? 
-                scale.linear().domain([0, d3.max(props.bubbleSize.vals)]).range([0, 10])
-                : null
-    }, [props.bubbleSize])
-
-    let opacityScale = useMemo(() => {
-        return props.opacity ? 
-                scale.linear().domain([0, d3.max(props.opacity.vals)]).range([0, 1])
-                : null
-    }, [props.opacity])
-
     let colorScale = useMemo(() => {
         return scale.category10()
     }, [props.color])
@@ -95,17 +115,18 @@ export function PCP(props: PCPProps) {
     }
 
     return (
-        <div style={{height: "100%", display: "flex", flexDirection: "row"}}>
-            <div style={{flex: "5"}}>
+        <div className="d-flex flex-row w-100 h-100">
+            <div className="flex-grow-1">
                 {props.xCol !== null &&
                 props.yCol !== null && 
                 props.xCol.type !== "Categorical" &&
                 props.yCol.type !== "Categorical" ? <Plot
+                divId={"plotlyDiv"}
+
                 data={[dataVariable as Partial<PlotData>]}
                 layout={ 
                 {   
-                    width: 1200, 
-                    height: 1200,
+                    autosize: true,
                     xaxis: {
                         title: {
                         text: props.xCol.name,
@@ -126,6 +147,9 @@ export function PCP(props: PCPProps) {
                             }
                         }
                     }} }
+                    config={{responsive: true}}
+                    useResizeHandler={true}
+                    style={{width: "100%", height: "100%"}}
                 /> : null }
             </div>
             <GenericSidePanel 

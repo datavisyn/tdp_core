@@ -223,12 +223,13 @@ export class LineUpPanelActions extends EventHandler {
         let irisSpecies = ["Setosa", "Setosa", "Setosa", "Setosa", "Setosa", "Setosa", "Versicolor", "Versicolor", "Versicolor", "Versicolor", "Versicolor", "Versicolor",
             "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica"];
         ReactDOM.render(React.createElement(CustomVis, { columns: [
-                { name: "Sepal Length", vals: irisSepalLengthData, type: "Numerical" },
-                { name: "Sepal Width", vals: irisSepalWidthData, type: "Numerical" },
-                { name: "Petal Length", vals: irisPetalLengthData, type: "Numerical" },
-                { name: "Petal Width", vals: irisPetalWidthData, type: "Numerical" },
-                { name: "Species", vals: irisSpecies, type: "Categorical" }
-            ], type: "Chooser" }), this.customVisDiv);
+                { name: "Sepal Length", vals: irisSepalLengthData, type: "Numerical", selectedForMultiples: false },
+                { name: "Sepal Width", vals: irisSepalWidthData, type: "Numerical", selectedForMultiples: false },
+                { name: "Petal Length", vals: irisPetalLengthData, type: "Numerical", selectedForMultiples: true },
+                { name: "Petal Width", vals: irisPetalWidthData, type: "Numerical", selectedForMultiples: true },
+                { name: "Species", vals: irisSpecies, type: "Categorical", selectedForMultiples: false },
+                { name: "Species Again For Fun", vals: irisSpecies, type: "Categorical", selectedForMultiples: false }
+            ], type: "Multiples" }), this.customVisDiv);
     }
     async updateChooser(idType, descs) {
         this.idType = idType;

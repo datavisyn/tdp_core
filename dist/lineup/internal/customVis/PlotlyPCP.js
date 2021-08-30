@@ -10,6 +10,38 @@ function heuristic(columns) {
         yAxis: columns.filter(c => c.type === "Numerical")[1].name
     };
 }
+export function createPCPData(props, selectedNumCols, selectedCatCols, colorScale) {
+    let numCols = props.columns.filter(c => selectedNumCols.includes(c.name));
+    let catCols = props.columns.filter(c => selectedCatCols.includes(c.name));
+    let trace = {
+        //yo why does this error i dunno but it works
+        dimensions: [...numCols.map(c => {
+                return {
+                    range: [d3.min(c.vals), d3.max(c.vals)],
+                    label: c.name,
+                    values: c.vals
+                };
+            }), ...catCols.map(c => {
+                let uniqueList = [...new Set(c.vals)];
+                return {
+                    range: [0, uniqueList.length - 1],
+                    label: c.name,
+                    values: c.vals.map(curr => uniqueList.indexOf(curr)),
+                    tickvals: [...uniqueList.keys()],
+                    ticktext: uniqueList
+                };
+            })],
+        type: 'parcoords',
+        line: {
+            color: props.color ? props.color.vals.map(c => colorScale(c)) : "red",
+        },
+    };
+    return {
+        data: [trace],
+        rows: 1,
+        cols: 1
+    };
+}
 export function PCP(props) {
     // heuristic for setting up used in this async call
     useEffect(() => {
@@ -24,21 +56,6 @@ export function PCP(props) {
         }
         // })
     }, [props.columns]);
-    let shapeScale = useMemo(() => {
-        return props.shape ?
-            scale.ordinal().domain(d3.set(props.shape.vals).values()).range(["circle-open", "square-open", "triangle-up-open", "star-open"])
-            : null;
-    }, [props.shape]);
-    let bubbleScale = useMemo(() => {
-        return props.bubbleSize ?
-            scale.linear().domain([0, d3.max(props.bubbleSize.vals)]).range([0, 10])
-            : null;
-    }, [props.bubbleSize]);
-    let opacityScale = useMemo(() => {
-        return props.opacity ?
-            scale.linear().domain([0, d3.max(props.opacity.vals)]).range([0, 1])
-            : null;
-    }, [props.opacity]);
     let colorScale = useMemo(() => {
         return scale.category10();
     }, [props.color]);
@@ -56,13 +73,12 @@ export function PCP(props) {
             color: props.color ? props.color.vals.map(c => colorScale(c)) : "red",
         },
     };
-    return (React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "row" } },
-        React.createElement("div", { style: { flex: "5" } }, props.xCol !== null &&
+    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" },
+        React.createElement("div", { className: "flex-grow-1" }, props.xCol !== null &&
             props.yCol !== null &&
             props.xCol.type !== "Categorical" &&
-            props.yCol.type !== "Categorical" ? React.createElement(Plot, { data: [dataVariable], layout: {
-                width: 1200,
-                height: 1200,
+            props.yCol.type !== "Categorical" ? React.createElement(Plot, { divId: "plotlyDiv", data: [dataVariable], layout: {
+                autosize: true,
                 xaxis: {
                     title: {
                         text: props.xCol.name,
@@ -83,7 +99,7 @@ export function PCP(props) {
                         }
                     }
                 }
-            } }) : null),
+            }, config: { responsive: true }, useResizeHandler: true, style: { width: "100%", height: "100%" } }) : null),
         React.createElement(GenericSidePanel, { currentType: props.type, dropdowns: [
                 {
                     name: "X Axis",

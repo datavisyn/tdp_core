@@ -200,6 +200,11 @@ export abstract class ARankingView extends AView {
     });
     this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
       this.panel.addCustomVis(this.provider.getRow(6))
+
+      // let cols = this.provider
+      // const col = LineupUtils.createAccessor(cols[3]).getColumn();
+
+      // console.log(col)
     });
     if (this.options.enableOverviewMode) {
       const rule = spaceFillingRule(taggleOptions);

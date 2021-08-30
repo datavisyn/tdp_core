@@ -1,6 +1,7 @@
 /// <reference types="react" />
+import { Data } from 'plotly.js';
 import { CategoricalColumn, NumericalColumn, supportedPlotlyVis } from './CustomVis';
-interface MultiplesProps {
+export interface MultiplesProps {
     xCol: NumericalColumn | CategoricalColumn;
     yCol: NumericalColumn | CategoricalColumn;
     columns: (NumericalColumn | CategoricalColumn)[];
@@ -17,5 +18,9 @@ interface MultiplesProps {
     updateShape: (s: string) => void;
     updateChartType: (s: string) => void;
 }
+export declare type MultipleDataTraces = {
+    data: Data[];
+    rows: number;
+    cols: number;
+};
 export declare function Multiples(props: MultiplesProps): JSX.Element;
-export {};

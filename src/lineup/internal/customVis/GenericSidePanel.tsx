@@ -2,6 +2,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import * as React from 'react';
 import {supportedPlotlyVis} from './CustomVis';
+import {useCallback, useEffect, useRef} from "react";
+import { useResizeDetector } from 'react-resize-detector';
+import Plotly from "plotly.js";
+
 
 let chartTypes: supportedPlotlyVis[] = ["Scatterplot", "PCP", "Violin", "Strip Plot", "Multiples"]
 
@@ -19,12 +23,26 @@ type GenericSelect = {
 }
 
 export function GenericSidePanel(props: GenericSidePanelProps) {
+
+
+    const onResize = useCallback(() => {
+        // window.dispatchEvent(new Event('resize'));
+
+        if(document.getElementById("plotlyDiv"))
+        {
+            console.log("in here")
+            Plotly.relayout("plotlyDiv", {})
+        }
+    }, []);
+    
+    const { ref } = useResizeDetector({ onResize });
+
     return (
-        <div className="position-relative h-100 bg-light">
+        <div ref={ref} className="position-relative flex-shrink-1 bg-light">
             <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target="#generalVisBurgerMenu" aria-expanded="true" aria-controls="generalVisBurgerMenu">
                 <FontAwesomeIcon icon={faBars} />
             </button>
-            <div className="collapse show collapse-horizontal" id="generalVisBurgerMenu">
+            <div className="collapse show collapse-horizontal" id="generalVisBurgerMenu" >
                 <div className="container" style={{width: "15em"}}>
                     <form>
                         <div className="form-group row pt-2 pb-4 pe-3 ps-3">

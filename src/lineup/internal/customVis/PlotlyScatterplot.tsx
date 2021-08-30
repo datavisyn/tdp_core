@@ -1,10 +1,12 @@
 import d3 from 'd3';
 import {scale} from 'd3';
+import Plotly, {Data, PlotData} from 'plotly.js';
 import * as React from 'react';
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import Plot from 'react-plotly.js';
 import {CategoricalColumn, NumericalColumn, supportedPlotlyVis} from './CustomVis';
 import {GenericSidePanel} from './GenericSidePanel';
+import {MultipleDataTraces, MultiplesProps} from './Multiples';
 
 interface ScatterplotProps {
     xCol: NumericalColumn | CategoricalColumn,
@@ -31,8 +33,58 @@ function heuristic(columns) {
     }
 }
 
+export function createMultiplesScatterplotData(props: MultiplesProps, selectedNumCols: string[], shapeScale, colorScale, opacityScale, bubbleScale) : MultipleDataTraces {
+    let counter = 1
+    let validCols = props.columns.filter(c => selectedNumCols.includes(c.name))
+    let traces: Data[] = []
+
+    for(let xCurr of validCols)
+    {
+        for(let yCurr of validCols)
+        {
+            if(xCurr === yCurr)
+            {
+                traces.push(   
+                {            
+                    xaxis: counter === 1 ? "x" : "x" + counter,
+                    yaxis: counter === 1 ? "y" : "y" + counter,
+                })
+                counter += 1
+                continue;
+            }
+
+            traces.push( {
+                x: xCurr.vals,
+                y: yCurr.vals,
+                xaxis: counter === 1 ? "x" : "x" + counter,
+                yaxis: counter === 1 ? "y" : "y" + counter,
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+                    line: {
+                        width: 2
+                    },
+                    symbol: props.shape ? props.shape.vals.map(v => shapeScale(v)) : "circle-open",
+                    color: props.color ? props.color.vals.map(v => colorScale(v)) : "#232b2b",
+                    opacity: props.opacity ? props.opacity.vals.map(v => opacityScale(v)) : 1,
+                    size: props.bubbleSize ? props.bubbleSize.vals.map(v => bubbleScale(v)) : 7
+                },
+            })
+            counter += 1
+        }
+    }
+
+    return {
+        data: traces,
+        rows: Math.sqrt(traces.length),
+        cols: Math.sqrt(traces.length)
+    };
+}
+
 
 export function Scatterplot(props: ScatterplotProps) {
+
+    let plotRef = useRef<Plotly.PlotlyHTMLElement>(null)
 
     // heuristic for setting up used in this async call
     useEffect(() => {
@@ -75,13 +127,15 @@ export function Scatterplot(props: ScatterplotProps) {
         return scale.category10()
     }, [props.color])
 
+
     return (
-        <div style={{height: "100%", display: "flex", flexDirection: "row"}}>
-            <div style={{flex: "5"}}>
-                {props.xCol !== null &&
-                props.yCol !== null && 
-                props.xCol.type !== "Categorical" &&
-                props.yCol.type !== "Categorical" ? <Plot
+        <div className="d-flex flex-row w-100 h-100">
+            <div className="flex-grow-1">
+            {props.xCol !== null &&
+            props.yCol !== null && 
+            props.xCol.type !== "Categorical" &&
+            props.yCol.type !== "Categorical" ? <Plot
+                divId={"plotlyDiv"}
                 data={[
                     {
                         x: props.xCol.vals,
@@ -102,8 +156,7 @@ export function Scatterplot(props: ScatterplotProps) {
                 ]}
                 layout={ 
                 {   
-                    width: 1200, 
-                    height: 1200,
+                    autosize: true,
                     xaxis: {
                         title: {
                         text: props.xCol.name,
@@ -123,8 +176,12 @@ export function Scatterplot(props: ScatterplotProps) {
                                 color: 'black'
                             }
                         }
-                    }} }
-                /> : null }
+                    }
+                } }
+                    useResizeHandler={true}
+                    config={{responsive: true}}
+                    style={{width: "100%", height: "100%"}}
+            ></Plot> : null }
             </div>
             <GenericSidePanel 
                 currentType={props.type}

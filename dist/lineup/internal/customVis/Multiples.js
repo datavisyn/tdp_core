@@ -1,9 +1,13 @@
 import d3 from 'd3';
 import { scale } from 'd3';
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { GenericSidePanel } from './GenericSidePanel';
+import { MultiplesSidePanel } from './MultiplesSidePanel';
+import { createPCPData } from './PlotlyPCP';
+import { createMultiplesScatterplotData } from './PlotlyScatterplot';
+import { createMultiplesStripData } from './PlotlyStripPlot';
+import { createMultiplesViolinData } from './PlotlyViolinPlot';
 function heuristic(columns) {
     return {
         xAxis: columns.filter(c => c.type === "Numerical")[0].name,
@@ -11,21 +15,12 @@ function heuristic(columns) {
     };
 }
 export function Multiples(props) {
-    // heuristic for setting up used in this async call
-    // useEffect(() => {
-    //     // useAsync(async () => {
-    //         const { xAxis, yAxis} = heuristic(props.columns);
-    //         console.log(xAxis)
-    //         if(props.xCol === null || props.xCol.type === "Categorical")
-    //         {
-    //             props.updateXAxis(xAxis);
-    //         }
-    //         if(props.yCol === null || props.yCol.type === "Categorical")
-    //         {
-    //             props.updateYAxis(yAxis);
-    //         }
-    //     // })
-    // }, [props.columns])
+    const [currentVis, setCurrentVis] = useState("Scatterplot");
+    const [selectedCatCols, setSelectedCatCols] = useState(props.columns.filter(c => c.selectedForMultiples === true && c.type == "Categorical").map(c => c.name));
+    const [selectedNumCols, setSelectedNumCols] = useState(props.columns.filter(c => c.selectedForMultiples === true && c.type == "Numerical").map(c => c.name));
+    let updateCurrentVis = (s) => setCurrentVis(s);
+    let updateSelectedCatCols = (s, b) => b ? setSelectedCatCols([...selectedCatCols, s]) : setSelectedCatCols(selectedCatCols.filter(c => c !== s));
+    let updateSelectedNumCols = (s, b) => b ? setSelectedNumCols([...selectedNumCols, s]) : setSelectedNumCols(selectedNumCols.filter(c => c !== s));
     let shapeScale = useMemo(() => {
         return props.shape ?
             scale.ordinal().domain(d3.set(props.shape.vals).values()).range(["circle-open", "square-open", "triangle-up-open", "star-open"])
@@ -44,62 +39,36 @@ export function Multiples(props) {
     let colorScale = useMemo(() => {
         return scale.category10();
     }, [props.color]);
-    let traces = [];
-    let subplots = [];
-    let counter = 1;
-    for (let xCurr of props.columns.filter(c => c.type === "Numerical")) {
-        for (let yCurr of props.columns.filter(c => c.type === "Numerical")) {
-            if (xCurr === yCurr) {
-                traces.push({
-                    // x: null,
-                    // y: null,
-                    xaxis: counter === 1 ? "x" : "x" + counter,
-                    yaxis: counter === 1 ? "y" : "y" + counter,
-                });
-                counter += 1;
-                continue;
-            }
-            traces.push({
-                x: xCurr.vals,
-                y: yCurr.vals,
-                xaxis: counter === 1 ? "x" : "x" + counter,
-                yaxis: counter === 1 ? "y" : "y" + counter,
-                type: 'scatter',
-                mode: 'markers',
-                marker: {
-                    line: {
-                        width: 2
-                    },
-                    symbol: props.shape ? props.shape.vals.map(v => shapeScale(v)) : "circle-open",
-                    color: props.color ? props.color.vals.map(v => colorScale(v)) : "#232b2b",
-                    opacity: props.opacity ? props.opacity.vals.map(v => opacityScale(v)) : 1,
-                    size: props.bubbleSize ? props.bubbleSize.vals.map(v => bubbleScale(v)) : 7
-                },
-            });
-            counter += 1;
+    let traces = undefined;
+    switch (currentVis) {
+        case "Scatterplot": {
+            traces = createMultiplesScatterplotData(props, selectedNumCols, shapeScale, colorScale, opacityScale, colorScale);
+            break;
+        }
+        case "Violin": {
+            traces = createMultiplesViolinData(props, selectedNumCols, selectedCatCols, colorScale);
+            break;
+        }
+        case "Strip Plot": {
+            traces = createMultiplesStripData(props, selectedNumCols, selectedCatCols, colorScale);
+            break;
+        }
+        case "PCP": {
+            traces = createPCPData(props, selectedNumCols, selectedCatCols, colorScale);
+            break;
         }
     }
-    console.log(traces, subplots);
-    return (React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "row" } },
-        React.createElement("div", { style: { flex: "5" } },
-            React.createElement(Plot, { data: traces, layout: {
-                    width: 1200,
-                    height: 1200,
-                    grid: { rows: props.columns.filter(c => c.type === "Numerical").length, columns: props.columns.filter(c => c.type === "Numerical").length, pattern: 'independent' },
-                } })),
-        React.createElement(GenericSidePanel, { currentType: props.type, dropdowns: [
-                {
-                    name: "X Axis",
-                    callback: props.updateXAxis,
-                    currentSelected: props.xCol ? props.xCol.name : "None",
-                    options: props.columns.filter(c => c.type === "Numerical").map(c => c.name)
-                },
-                {
-                    name: "Y Axis",
-                    callback: props.updateYAxis,
-                    currentSelected: props.yCol ? props.yCol.name : "None",
-                    options: props.columns.filter(c => c.type === "Numerical").map(c => c.name)
-                },
+    console.log(traces);
+    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" },
+        React.createElement("div", { className: "flex-grow-1" },
+            React.createElement(Plot, { divId: "plotlyDiv", data: traces.data, layout: {
+                    showlegend: false,
+                    autosize: true,
+                    grid: { rows: traces.rows, columns: traces.cols, pattern: 'independent' },
+                    violingap: 0,
+                    violinmode: "overlay",
+                }, config: { responsive: true }, useResizeHandler: true, style: { width: "100%", height: "100%" } })),
+        React.createElement(MultiplesSidePanel, { currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, currentType: props.type, dropdowns: [
                 {
                     name: "Bubble Size",
                     callback: props.updateBubbleSize,

@@ -9,6 +9,49 @@ function heuristic(columns) {
         yAxis: columns.filter(c => c.type === "Numerical")[0].name
     };
 }
+export function createMultiplesStripData(props, selectedNumCols, selectedCatCols, colorScale) {
+    let counter = 1;
+    let numCols = props.columns.filter(c => selectedNumCols.includes(c.name));
+    let catCols = props.columns.filter(c => selectedCatCols.includes(c.name));
+    let traces = [];
+    for (let numCurr of numCols) {
+        for (let catCurr of catCols) {
+            traces.push({
+                x: catCurr.vals,
+                y: numCurr.vals,
+                xaxis: counter === 1 ? "x" : "x" + counter,
+                yaxis: counter === 1 ? "y" : "y" + counter,
+                type: 'box',
+                boxpoints: "all",
+                name: 'All points',
+                mode: "none",
+                pointpos: 0,
+                box: {
+                    visible: true
+                },
+                line: {
+                    color: 'rgba(255,255,255,0)',
+                },
+                meanline: {
+                    visible: true
+                },
+                transforms: [{
+                        type: 'groupby',
+                        groups: catCurr.vals,
+                        styles: [...new Set(catCurr.vals)].map(c => {
+                            return { target: c, value: { marker: { color: colorScale(c) } } };
+                        })
+                    }]
+            });
+            counter += 1;
+        }
+    }
+    return {
+        data: traces,
+        rows: catCols.length,
+        cols: numCols.length
+    };
+}
 export function StripChart(props) {
     // heuristic for setting up used in this async call
     useEffect(() => {
@@ -26,11 +69,11 @@ export function StripChart(props) {
     let colorScale = useMemo(() => {
         return scale.category10();
     }, []);
-    return (React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "row" } },
-        React.createElement("div", { style: { flex: "5" } }, props.xCol !== null &&
+    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" },
+        React.createElement("div", { className: "flex-grow-1" }, props.xCol !== null &&
             props.yCol !== null &&
             props.xCol.type !== "Numerical" &&
-            props.yCol.type !== "Categorical" ? React.createElement(Plot, { data: [
+            props.yCol.type !== "Categorical" ? React.createElement(Plot, { divId: "plotlyDiv", data: [
                 {
                     x: props.xCol.vals,
                     y: props.yCol.vals,
@@ -57,8 +100,7 @@ export function StripChart(props) {
                         }]
                 },
             ], layout: {
-                width: 1200,
-                height: 1200,
+                autosize: true,
                 xaxis: {
                     title: {
                         text: props.xCol.name,
@@ -79,7 +121,7 @@ export function StripChart(props) {
                         }
                     }
                 }
-            } }) : null),
+            }, config: { responsive: true }, useResizeHandler: true, style: { width: "100%", height: "100%" } }) : null),
         React.createElement(GenericSidePanel, { currentType: props.type, dropdowns: [
                 {
                     name: "X Axis",
