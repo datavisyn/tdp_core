@@ -4,7 +4,7 @@
 import * as d3 from 'd3';
 import { IPluginDesc } from 'phovea_core';
 import { AFormElement } from './AFormElement';
-import { IFormElementDesc, IForm, IFormElement } from '../interfaces';
+import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 export interface IFormSelectOption {
     name: string;
     value: string;
@@ -30,6 +30,7 @@ export interface IFormSelectOptions {
  * Add specific options for select form elements
  */
 export interface IFormSelectDesc extends IFormElementDesc {
+    type: FormElementType.SELECT;
     /**
      * Additional options
      */
@@ -60,7 +61,6 @@ export declare class FormSelect extends AFormElement<IFormSelectDesc> implements
      * @param $formNode The parent node this element will be attached to
      */
     build($formNode: d3.Selection<any>): void;
-    setVisible(visible: boolean): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

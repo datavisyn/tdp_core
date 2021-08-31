@@ -1,8 +1,9 @@
-import { IFormElementDesc, IForm } from '../interfaces';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IPluginDesc } from 'phovea_core';
 export interface ICheckBoxElementDesc extends IFormElementDesc {
+    type: FormElementType.CHECKBOX;
     options: {
         /**
          * checked value
@@ -20,7 +21,6 @@ export interface ICheckBoxElementDesc extends IFormElementDesc {
 }
 export declare class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     readonly pluginDesc: IPluginDesc;
-    private $input;
     /**
      * Constructor
      * @param form The form this element is a part of

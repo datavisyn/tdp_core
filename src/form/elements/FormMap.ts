@@ -49,6 +49,7 @@ declare type ISubDescs = ISubInputDesc | ISubSelectDesc | ISubSelect2Desc | ISub
  * Add specific options for input form elements
  */
 export interface IFormMapDesc extends IFormElementDesc {
+  type: FormElementType.MAP;
   /**
    * Additional options
    */
@@ -98,7 +99,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   private updateBadge() {
     const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
     ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-      this.$node.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', {text}) as string);
+      this.$inputNode.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', {text}) as string);
     });
   }
 
@@ -127,8 +128,8 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    const $colNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
-    this.$node = $colNode.append('div');
+    this.$rootNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    this.$inputNode = this.$rootNode.append('div');
     this.setVisible(this.elementDesc.visible);
 
     if (this.inline && this.elementDesc.onChange) {
@@ -138,7 +139,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     }
 
     // do not add the class in inline mode
-    this.$node.classed('row', !this.inline);
+    this.$inputNode.classed('row', !this.inline);
 
     if (this.inline) {
       if (!this.elementDesc.options.badgeProvider) {
@@ -146,9 +147,9 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         this.elementDesc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
       }
 
-      this.$node.classed('dropdown', true);
+      this.$inputNode.classed('dropdown', true);
 
-      this.$node.html(`
+      this.$inputNode.html(`
           <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
@@ -162,11 +163,11 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           </div>
       `);
 
-      this.$node.select('.form-map-apply button').on('click', () => {
+      this.$inputNode.select('.form-map-apply button').on('click', () => {
         (<MouseEvent>d3event).preventDefault();
       });
 
-      this.$group = this.$node.select('div.form-map-container');
+      this.$group = this.$inputNode.select('div.form-map-container');
       this.$group.on('click', () => {
         // stop click propagation to avoid closing the dropdown
         (<MouseEvent>d3event).stopPropagation();
@@ -174,7 +175,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
     } else {
       if (!this.elementDesc.hideLabel) {
-        const $label = this.$node.append('label').classed('form-label', true).attr('for', this.elementDesc.attributes.id);
+        const $label = this.$inputNode.append('label').classed('form-label', true).attr('for', this.elementDesc.attributes.id);
         if (this.elementDesc.options.badgeProvider) {
           $label.html(`${this.elementDesc.label} <span class="badge rounded-pill bg-secondary"></span>`);
         } else {
@@ -182,7 +183,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         }
       }
 
-      this.$group = this.$node.append('div');
+      this.$group = this.$inputNode.append('div');
     }
 
     this.setAttributes(this.$group, this.elementDesc.attributes);
@@ -218,7 +219,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
     if (this.inline && this.inlineOnChange) {
       // trigger change on onChange listener just when the dialog is closed
-      $(this.$node.node()).on('hidden.bs.dropdown', () => {
+      $(this.$inputNode.node()).on('hidden.bs.dropdown', () => {
         const v = this.value;
         const previous = this.previousValue;
         if (this.isEqual(v, previous)) {
@@ -475,7 +476,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
   focus() {
     // open dropdown
-    $(this.$node.select('.dropdown-menu').node()).show();
+    $(this.$inputNode.select('.dropdown-menu').node()).show();
   }
 
   isEqual(a: IFormRow[], b: IFormRow[]) {

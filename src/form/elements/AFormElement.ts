@@ -4,7 +4,7 @@
 
 import {Selection} from 'd3';
 import {EventHandler, UserSession, IPluginDesc, PluginRegistry} from 'phovea_core';
-import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
+import {IFormElementDesc, IForm, IFormElement, FormElementType} from '../interfaces';
 import {EP_TDP_CORE_FORM_ELEMENT} from '../../base/extensions';
 
 /**
@@ -16,7 +16,8 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
 
   readonly id: string;
 
-  protected $node: Selection<any>;
+  protected $rootNode: Selection<any>;
+  protected $inputNode: Selection<any> | null;
 
   protected previousValue: any = null;
 
@@ -64,7 +65,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
       return true;
     }
     const v = this.hasValue();
-    this.$node.classed('has-error', !v);
+    this.$inputNode?.classed('is-invalid', !v);
     return v;
   }
 
@@ -73,7 +74,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   isVisible() {
-    return this.$node.attr('hidden') === null;
+    return this.$rootNode.attr('hidden') === null;
   }
 
   /**
@@ -81,7 +82,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * @param visible
    */
   setVisible(visible: boolean = true) {
-    this.$node.attr('hidden', visible ? null : '');
+    this.$rootNode.attr('hidden', visible ? null : '');
   }
 
   protected addChangeListener() {
@@ -119,13 +120,14 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   /**
    * Append a label to the node element if `hideLabel = false` in the element description
    */
-  protected appendLabel() {
+  protected appendLabel($node: Selection<any>): Selection<any> {
     if (this.elementDesc.hideLabel) {
       return;
     }
     const colWidth = this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12';
-    const labelClass = this.elementDesc.type === 'FormCheckBox' ? 'form-check-label' : 'col-form-label';
-    this.$node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
+    // TODO: Better move this logic to the corresponding class, i.e. FormCheckbox.
+    const labelClass = this.elementDesc.type === FormElementType.CHECKBOX ? 'form-check-label' : 'col-form-label';
+    return $node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
   }
 
   /**
@@ -173,7 +175,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
           onDependentChange(values);
         }
         if (showIf) {
-          this.$node.attr('hidden', showIf(values) ? null : '');
+          this.setVisible(showIf(values));
         }
       });
     });
@@ -181,7 +183,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     // initial values
     const values = dependElements.map((d) => d.value);
     if (showIf) {
-      this.$node.attr('hidden', this.elementDesc.showIf(values) ? null : '');
+      this.setVisible(this.elementDesc.showIf(values));
     }
     return values;
   }

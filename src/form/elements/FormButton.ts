@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import {EventHandler, IPluginDesc} from 'phovea_core';
 
 export interface IButtonElementDesc extends IFormElementDesc {
+  type: FormElementType.BUTTON;
   onClick: () => void;
   iconClass?: string;
 }

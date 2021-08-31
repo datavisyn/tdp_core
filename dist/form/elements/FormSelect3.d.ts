@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 import { AFormElement } from './AFormElement';
-import { IForm, IFormElementDesc } from '../interfaces';
+import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
 import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
 import { ISelect2Option } from './FormSelect2';
 import { IPluginDesc } from 'phovea_core';
@@ -15,6 +15,7 @@ declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
  * Add specific options for select form elements
  */
 export interface IFormSelect3 extends IFormElementDesc {
+    type: FormElementType.SELECT3;
     /**
      * Additional options
      */

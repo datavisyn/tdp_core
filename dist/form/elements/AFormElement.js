@@ -2,6 +2,7 @@
  * Created by Samuel Gratzl on 08.03.2017.
  */
 import { EventHandler, UserSession, PluginRegistry } from 'phovea_core';
+import { FormElementType } from '../interfaces';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
 /**
  * Abstract form element class that is used as parent class for other form elements
@@ -45,25 +46,26 @@ export class AFormElement extends EventHandler {
         return this.elementDesc.required;
     }
     validate() {
+        var _a;
         if (!this.isVisible() || !this.isRequired()) {
             return true;
         }
         const v = this.hasValue();
-        this.$node.classed('has-error', !v);
+        (_a = this.$inputNode) === null || _a === void 0 ? void 0 : _a.classed('is-invalid', !v);
         return v;
     }
     hasValue() {
         return Boolean(this.value);
     }
     isVisible() {
-        return this.$node.attr('hidden') === null;
+        return this.$rootNode.attr('hidden') === null;
     }
     /**
      * Set the visibility of an form element (default = true)
      * @param visible
      */
     setVisible(visible = true) {
-        this.$node.attr('hidden', visible ? null : '');
+        this.$rootNode.attr('hidden', visible ? null : '');
     }
     addChangeListener() {
         if (this.elementDesc.useSession || this.elementDesc.onChange) {
@@ -91,13 +93,14 @@ export class AFormElement extends EventHandler {
     /**
      * Append a label to the node element if `hideLabel = false` in the element description
      */
-    appendLabel() {
+    appendLabel($node) {
         if (this.elementDesc.hideLabel) {
             return;
         }
         const colWidth = this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12';
-        const labelClass = this.elementDesc.type === 'FormCheckBox' ? 'form-check-label' : 'col-form-label';
-        this.$node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
+        // TODO: Better move this logic to the corresponding class, i.e. FormCheckbox.
+        const labelClass = this.elementDesc.type === FormElementType.CHECKBOX ? 'form-check-label' : 'col-form-label';
+        return $node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
     }
     /**
      * Set a list of object properties and values to a given node
@@ -138,14 +141,14 @@ export class AFormElement extends EventHandler {
                     onDependentChange(values);
                 }
                 if (showIf) {
-                    this.$node.attr('hidden', showIf(values) ? null : '');
+                    this.setVisible(showIf(values));
                 }
             });
         });
         // initial values
         const values = dependElements.map((d) => d.value);
         if (showIf) {
-            this.$node.attr('hidden', this.elementDesc.showIf(values) ? null : '');
+            this.setVisible(this.elementDesc.showIf(values));
         }
         return values;
     }

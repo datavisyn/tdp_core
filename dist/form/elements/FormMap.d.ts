@@ -40,6 +40,7 @@ declare type ISubDescs = ISubInputDesc | ISubSelectDesc | ISubSelect2Desc | ISub
  * Add specific options for input form elements
  */
 export interface IFormMapDesc extends IFormElementDesc {
+    type: FormElementType.MAP;
     /**
      * Additional options
      */

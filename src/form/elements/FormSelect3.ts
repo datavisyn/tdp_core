@@ -3,7 +3,7 @@
  */
 
 import {AFormElement} from './AFormElement';
-import {IForm, IFormElementDesc} from '../interfaces';
+import {IForm, IFormElementDesc, FormElementType} from '../interfaces';
 import {Select3, IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
 import {IPluginDesc} from 'phovea_core';
@@ -18,6 +18,7 @@ declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
  * Add specific options for select form elements
  */
 export interface IFormSelect3 extends IFormElementDesc {
+  type: FormElementType.SELECT3;
   /**
    * Additional options
    */
@@ -53,19 +54,19 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    const $colNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
-    this.$node = $colNode.append('div').classed('row', true);
+    this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    const rowNode = this.$rootNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
+    this.appendLabel(rowNode);
 
     const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple});
     this.select3 = new Select3(options);
     const divNode = document.createElement('div');
     divNode.classList.add('col');
-    this.$node.node().appendChild(divNode).appendChild(this.select3.node);
+    rowNode.node().appendChild(divNode).appendChild(this.select3.node);
 
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
-    this.setAttributes(this.$node.select('.select3'), this.elementDesc.attributes);
+    this.setAttributes(rowNode.select('.select3'), this.elementDesc.attributes);
   }
 
   /**

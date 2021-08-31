@@ -1,6 +1,7 @@
 import { FormElementType, IFormElement, IFormElementDesc, IForm } from '../interfaces';
 import { EventHandler, IPluginDesc } from 'phovea_core';
 export interface IButtonElementDesc extends IFormElementDesc {
+    type: FormElementType.BUTTON;
     onClick: () => void;
     iconClass?: string;
 }
