@@ -76,25 +76,6 @@ export interface IFormRow {
   value: any;
 }
 
-/**
- * Helper function to travserse the DOM tree up and
- * looks for the following nested DOM constallation:
- * `.parameters > .form-inline`
- * If this constallation is found returns `true`.
- * Otherwise returns `false`.
- *
- * @param node current node element
- */
-function hasInlineParent(node: HTMLElement) {
-  while (node.parentElement) {
-    node = node.parentElement;
-    if (node.classList.contains('row')) {
-      return node.parentElement.classList.contains('parameters');
-    }
-  }
-  return false;
-}
-
 export class FormMap extends AFormElement<IFormMapDesc> {
 
   private $group: d3.Selection<any>;
@@ -111,6 +92,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
    */
   constructor(form: IForm, elementDesc: IFormMapDesc, readonly pluginDesc: IPluginDesc) {
     super(form, elementDesc, pluginDesc);
+    this.inline = this.elementDesc.options.inlineForm;
   }
 
   private updateBadge() {
@@ -145,11 +127,10 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    const $colNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    const $colNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
     this.$node = $colNode.append('div');
     this.setVisible(this.elementDesc.visible);
 
-    this.inline = hasInlineParent(<HTMLElement>this.$node.node());
     if (this.inline && this.elementDesc.onChange) {
       //change the default onChange handler for the inline cas
       this.inlineOnChange = this.elementDesc.onChange;

@@ -10,24 +10,6 @@ import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
 import { BaseUtils, UserSession, ResolveNow, I18nextManager } from 'phovea_core';
 import { Select3 } from './Select3';
-/**
- * Helper function to travserse the DOM tree up and
- * looks for the following nested DOM constallation:
- * `.parameters > .form-inline`
- * If this constallation is found returns `true`.
- * Otherwise returns `false`.
- *
- * @param node current node element
- */
-function hasInlineParent(node) {
-    while (node.parentElement) {
-        node = node.parentElement;
-        if (node.classList.contains('row')) {
-            return node.parentElement.classList.contains('parameters');
-        }
-    }
-    return false;
-}
 export class FormMap extends AFormElement {
     /**
      * Constructor
@@ -39,6 +21,7 @@ export class FormMap extends AFormElement {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
         this.rows = [];
+        this.inline = this.elementDesc.options.inlineForm;
     }
     updateBadge() {
         const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
@@ -67,10 +50,9 @@ export class FormMap extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        const $colNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+        const $colNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
         this.$node = $colNode.append('div');
         this.setVisible(this.elementDesc.visible);
-        this.inline = hasInlineParent(this.$node.node());
         if (this.inline && this.elementDesc.onChange) {
             //change the default onChange handler for the inline cas
             this.inlineOnChange = this.elementDesc.onChange;

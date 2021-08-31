@@ -16,7 +16,8 @@ export class FormCheckBox extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed(`form-check checkbox ${this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-2 mb-1'}`, true);
+        this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-2 mb-1', true)
+            .append('div').classed(`form-check checkbox`, true);
         this.setVisible(this.elementDesc.visible);
         const $label = this.$node.select('label');
         if ($label.length === 0) {

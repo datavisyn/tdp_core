@@ -27,10 +27,10 @@ export class FormBuilder {
    * Constructor
    * @param $parent Node that the form should be attached to
    * @param formId unique form id
-   * @param formClass class attribute for form, e.g. for inline forms
+   * @param formInline whether the form is in inline mode or not
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formClass = null, private readonly formInline: boolean = false) {
-    this.form = new Form($parent, formId, formClass, formInline);
+  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formInline: boolean = false) {
+    this.form = new Form($parent, formId);
   }
 
   /**
