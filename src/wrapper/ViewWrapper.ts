@@ -57,9 +57,11 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     this.node.classList.add('tdp-view-wrapper');
     this.allowed = FindViewUtils.canAccess(plugin);
     this.node.innerHTML = `
-     <header>
+    <header class="container-fluid">
+      <div class="row">
         <div class="parameters row"></div>
-      </header>
+      </div>
+     </header>
      <main></main>
      <div class="preview-image">
         <div></div>
