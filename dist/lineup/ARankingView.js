@@ -133,8 +133,7 @@ export class ARankingView extends AView {
         this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
         const taggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, {
             summaryHeader: this.options.enableHeaderSummary,
-            labelRotation: this.options.enableHeaderRotation ? 45 : 0,
-            rowHeight: 21
+            labelRotation: this.options.enableHeaderRotation ? 45 : 0
         }, options.customOptions);
         if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
             taggleOptions.rowHeight = this.options.itemRowHeight;
