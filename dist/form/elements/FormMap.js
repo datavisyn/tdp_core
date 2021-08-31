@@ -85,7 +85,7 @@ export class FormMap extends AFormElement {
             }
             this.$node.classed('dropdown', true);
             this.$node.html(`
-          <button class="btn btn-white border border-gray-3 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>

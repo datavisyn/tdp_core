@@ -62,14 +62,14 @@ export class ViewWrapper extends EventHandler {
         }
         else if (plugin.helpUrl) {
             if (typeof plugin.helpUrl === 'string') {
-                this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help link-secondary" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
+                this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpLabel')}"><span aria-hidden="true">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
             }
             else { // object version of helpUrl
-                this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help link-secondary" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
+                this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span aria-hidden="true">${plugin.helpUrl.linkText}</span></a>`);
             }
         }
         else if (plugin.helpTourId) {
-            this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help link-secondary" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span aria-hidden="true">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpTour')}</span></a>`);
+            this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span aria-hidden="true">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpTour')}</span></a>`);
             this.node.lastElementChild.addEventListener('click', (evt) => {
                 evt.preventDefault();
                 evt.stopPropagation();

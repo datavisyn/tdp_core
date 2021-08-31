@@ -1,5 +1,6 @@
-import {ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData} from 'lineupjs';
+import {ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem} from 'lineupjs';
 import {IDTypeLike} from 'phovea_core';
+import {ISearchOption} from './internal/panel';
 
 
 export interface IARankingViewOptions {
@@ -130,7 +131,7 @@ export interface IARankingViewOptions {
   enableHeaderRotation: boolean;
 
   /**
-   * enable that the regular columns are added via a choser dialog
+   * enable that the regular columns are added via a chooser dialog
    * @default false
    */
   enableAddingColumnGrouping: boolean;
@@ -145,4 +146,10 @@ export interface IARankingViewOptions {
 
   customOptions: Partial<ITaggleOptions>;
   customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
+
+  /**
+   * Formatting function for the search box item
+   * Similar to `ISearchBoxOptions.formatItem()` in lineupjs
+   */
+  formatSearchBoxItem(item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void;
 }
