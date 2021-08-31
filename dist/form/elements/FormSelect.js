@@ -46,6 +46,14 @@ export class FormSelect extends AFormElement {
         this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', 'form-select'); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
         this.setAttributes(this.$select, this.elementDesc.attributes);
     }
+    setVisible(visible) {
+        super.setVisible(visible);
+        // Because this.$node is the first child of the appended div, we also need to set the parent to hidden.
+        // Otherwise, the markup will look like this: <div class="col-sm-auto"><div class="row" hidden></div></div>, i.e. without the parent being hidden.
+        // This causes the next element to be padded because the .col-sm-auto div is not hidden, only its child.
+        // TODO: This should be applied to all Form[...] elements where the this.$node != root element.
+        d3.select(this.$node.node().parentElement).attr('hidden', visible ? null : '');
+    }
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

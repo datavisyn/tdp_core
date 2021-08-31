@@ -60,6 +60,7 @@ export declare class FormSelect extends AFormElement<IFormSelectDesc> implements
      * @param $formNode The parent node this element will be attached to
      */
     build($formNode: d3.Selection<any>): void;
+    setVisible(visible: boolean): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */
