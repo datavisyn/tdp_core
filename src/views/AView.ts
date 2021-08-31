@@ -121,9 +121,10 @@ export abstract class AView extends EventHandler implements IView {
         // Fetch or create the authorization overlay
         let overlay = this.node.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
         if (!overlay) {
-          overlay = document.createElement('div');
+          overlay = overlay.ownerDocument.createElement('div');
           overlay.className = 'tdp-authorization-overlay';
-          this.node.insertAdjacentElement('afterbegin', overlay);
+          // Add element at the very bottom to avoid using z-index
+          this.node.appendChild(overlay);
         }
 
         if (status === ERenderAuthorizationStatus.SUCCESS) {
