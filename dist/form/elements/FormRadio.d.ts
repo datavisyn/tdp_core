@@ -1,12 +1,13 @@
-import { IFormElementDesc, IForm } from '../interfaces';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IFormSelectOption } from './FormSelect';
 import { IPluginDesc } from 'phovea_core';
 export interface IRadioElementDesc extends IFormElementDesc {
+    type: FormElementType.RADIO;
     options: {
         buttons: IFormSelectOption[];
-    };
+    } & IFormElementDesc['options'];
 }
 export declare class FormRadio extends AFormElement<IRadioElementDesc> {
     readonly pluginDesc: IPluginDesc;

@@ -12,17 +12,16 @@ export class FormBuilder {
      * Constructor
      * @param $parent Node that the form should be attached to
      * @param formId unique form id
-     * @param formClass class attribute for form, e.g. for inline forms
+     * @param formInline whether the form is in inline mode or not
      */
-    constructor($parent, formId = BaseUtils.randomId(), formClass = null, formInline = false) {
+    constructor($parent, formId = BaseUtils.randomId(), formInline = false) {
         this.formId = formId;
-        this.formClass = formClass;
         this.formInline = formInline;
         /**
          * Map of all future elements
          */
         this.elementPromises = [];
-        this.form = new Form($parent, formId, formClass, formInline);
+        this.form = new Form($parent, formId);
     }
     /**
      * Creates a form element instance from a form element description and
@@ -30,11 +29,10 @@ export class FormBuilder {
      * @param elementDesc
      */
     appendElement(elementDesc) {
-        const inlineForm = 'inlineForm';
         if (!elementDesc.options) {
             elementDesc.options = {};
         }
-        elementDesc.options[inlineForm] = this.formInline;
+        elementDesc.options.inlineForm = this.formInline;
         const desc = Form.updateElementDesc(elementDesc, this.formId);
         const elementPromise = AFormElement.createFormElement(this.form, desc);
         this.elementPromises.push(elementPromise);

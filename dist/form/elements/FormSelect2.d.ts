@@ -5,7 +5,7 @@ import 'select2';
 import * as d3 from 'd3';
 import { IPluginDesc } from 'phovea_core';
 import { AFormElement } from './AFormElement';
-import { IForm, IFormElementDesc } from '../interfaces';
+import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
 declare type IFormSelect2Options = Select2Options & {
     return?: 'text' | 'id';
     data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);
@@ -14,10 +14,11 @@ declare type IFormSelect2Options = Select2Options & {
  * Add specific options for select form elements
  */
 export interface IFormSelect2 extends IFormElementDesc {
+    type: FormElementType.SELECT2;
     /**
      * Additional options
      */
-    options?: IFormSelect2Options;
+    options?: IFormSelect2Options & IFormElementDesc['options'];
 }
 export interface ISelect2Option {
     id: string;

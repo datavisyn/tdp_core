@@ -27,10 +27,10 @@ export class FormBuilder {
    * Constructor
    * @param $parent Node that the form should be attached to
    * @param formId unique form id
-   * @param formClass class attribute for form, e.g. for inline forms
+   * @param formInline whether the form is in inline mode or not
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formClass = null, private readonly formInline: boolean = false) {
-    this.form = new Form($parent, formId, formClass, formInline);
+  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formInline: boolean = false) {
+    this.form = new Form($parent, formId);
   }
 
   /**
@@ -39,12 +39,11 @@ export class FormBuilder {
    * @param elementDesc
    */
   appendElement(elementDesc: IFormElementDesc) {
-    const inlineForm = 'inlineForm';
     if(!elementDesc.options) {
       elementDesc.options = {};
     }
 
-    elementDesc.options[inlineForm] = this.formInline;
+    elementDesc.options.inlineForm = this.formInline;
     const desc = Form.updateElementDesc(elementDesc, this.formId);
 
     const elementPromise = AFormElement.createFormElement(this.form, desc);

@@ -34,13 +34,13 @@ export class ViewWrapper extends EventHandler {
         this.node.classList.add('tdp-view-wrapper');
         this.allowed = FindViewUtils.canAccess(plugin);
         this.node.innerHTML = `
-     <header>
-        <div class="parameters row"></div>
-      </header>
-     <main></main>
-     <div class="preview-image">
-        <div></div>
-        <span>${!this.allowed ? TDPApplicationUtils.notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
+    <header>
+      <div class="parameters container-fluid"></div>
+    </header>
+    <main></main>
+    <div class="preview-image">
+      <div></div>
+      <span>${!this.allowed ? TDPApplicationUtils.notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
     </div>`;
         this.node.classList.add('view', 'disabled-view');
         this.content = this.node.querySelector('main');

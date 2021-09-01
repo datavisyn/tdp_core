@@ -126,7 +126,7 @@ export class AView extends EventHandler {
         return null;
     }
     buildParameterForm(params, onParameterChange) {
-        const builder = new FormBuilder(select(params), undefined, 'row', true);
+        const builder = new FormBuilder(select(params), undefined, true);
         //work on a local copy since we change it by adding an onChange handler
         const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
         const onInit = onParameterChange;

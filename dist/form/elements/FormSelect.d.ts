@@ -4,7 +4,7 @@
 import * as d3 from 'd3';
 import { IPluginDesc } from 'phovea_core';
 import { AFormElement } from './AFormElement';
-import { IFormElementDesc, IForm, IFormElement } from '../interfaces';
+import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 export interface IFormSelectOption {
     name: string;
     value: string;
@@ -30,10 +30,11 @@ export interface IFormSelectOptions {
  * Add specific options for select form elements
  */
 export interface IFormSelectDesc extends IFormElementDesc {
+    type: FormElementType.SELECT;
     /**
      * Additional options
      */
-    options?: IFormSelectOptions;
+    options?: IFormSelectOptions & IFormElementDesc['options'];
 }
 export interface IFormSelectElement extends IFormElement {
     getSelectedIndex(): number;
