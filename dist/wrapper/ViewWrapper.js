@@ -187,6 +187,7 @@ export class ViewWrapper extends EventHandler {
         return selection && selection.idtype ? selection.idtype : ViewWrapper.guessIDType(this.plugin); // TODO: better IDType strategy than guessIDType?
     }
     destroyInstance() {
+        this.fire(ViewWrapper.EVENT_VIEW_DESTROYED, this.instance);
         this.instance.destroy();
         this.content.innerHTML = '';
         this.node.querySelector('header div.parameters').innerHTML = '';
@@ -329,4 +330,5 @@ export class ViewWrapper extends EventHandler {
 }
 ViewWrapper.EVENT_VIEW_INITIALIZED = 'viewInitialized';
 ViewWrapper.EVENT_VIEW_CREATED = 'viewCreated';
+ViewWrapper.EVENT_VIEW_DESTROYED = 'viewDestroyed';
 //# sourceMappingURL=ViewWrapper.js.map

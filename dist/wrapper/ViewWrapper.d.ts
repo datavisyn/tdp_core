@@ -17,6 +17,7 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     private readonly viewOptionGenerator;
     static readonly EVENT_VIEW_INITIALIZED = "viewInitialized";
     static readonly EVENT_VIEW_CREATED = "viewCreated";
+    static readonly EVENT_VIEW_DESTROYED = "viewDestroyed";
     private instance;
     private instancePromise;
     private allowed;

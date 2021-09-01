@@ -22,6 +22,7 @@ import {TourUtils} from '../tour/TourUtils';
 export class ViewWrapper extends EventHandler implements IViewProvider {
   static readonly EVENT_VIEW_INITIALIZED = 'viewInitialized';
   static readonly EVENT_VIEW_CREATED = 'viewCreated';
+  static readonly EVENT_VIEW_DESTROYED = 'viewDestroyed';
 
   private instance: IView = null; //lazy
   private instancePromise: PromiseLike<IView> = null;
@@ -221,6 +222,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   private destroyInstance() {
+    this.fire(ViewWrapper.EVENT_VIEW_DESTROYED, this.instance);
     this.instance.destroy();
     this.content.innerHTML = '';
     (<HTMLElement>this.node.querySelector('header div.parameters')).innerHTML = '';
