@@ -39,7 +39,7 @@ class WrapperView {
         if (hideHeader) {
             header.innerHTML = '';
         }
-        header.insertAdjacentHTML('beforeend', `<div class="parameters row"></div>`);
+        header.insertAdjacentHTML('beforeend', `<div class="parameters container-fluid"></div>`);
         return header.lastElementChild;
     }
     get node() {
