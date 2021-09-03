@@ -27,7 +27,7 @@ export class Form implements IForm {
    * @param formId unique form id
    */
   constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
-    this.$node = $parent.append('form').attr('class', `row align-items-center mb-2`).attr('id', this.formId);
+    this.$node = $parent.append('form').attr('class', `row align-items-center`).attr('id', this.formId);
   }
 
   /**
