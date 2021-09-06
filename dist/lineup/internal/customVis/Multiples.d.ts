@@ -17,10 +17,18 @@ export interface MultiplesProps {
     updateColor: (s: string) => void;
     updateShape: (s: string) => void;
     updateChartType: (s: string) => void;
+    selectedCallback: (s: string[]) => void;
 }
 export declare type MultipleDataTraces = {
-    data: Data[];
+    plots: MultiplesPlot[];
+    legendPlots: MultiplesPlot[];
     rows: number;
     cols: number;
+    errorMessage: string;
+};
+export declare type MultiplesPlot = {
+    data: Data;
+    xLabel: string;
+    yLabel: string;
 };
 export declare function Multiples(props: MultiplesProps): JSX.Element;

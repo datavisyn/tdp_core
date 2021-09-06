@@ -1,39 +1,33 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {Chooser} from './Chooser';
 import {Multiples} from './Multiples';
-import {PCP} from './PlotlyPCP';
-// import {Chooser} from './Chooser';
-// import {BarChart} from './PlotlyBarChart';
-import {Scatterplot} from './PlotlyScatterplot';
-import {StripChart} from './PlotlyStripPlot';
-import {Violin} from './PlotlyViolinPlot';
 
-export type supportedPlotlyVis = "Chooser" | "Scatterplot" | "PCP" | "Violin" | "Strip Plot" | "Multiples"
+export type supportedPlotlyVis = "Chooser" | "Scatter" | "Parallel Coordinates" | "Violin" | "Strip" | "Multiples"
 
 export interface CustomVisProps {
     columns: (NumericalColumn | CategoricalColumn)[]
     type: supportedPlotlyVis
+    selectionCallback: (s: string[]) => void
 }
 
 export interface NumericalColumn {
     name: string
-    vals: number[]
-    type: "Numerical"
+    vals: {id: string, val: number, selected: boolean} []
+    type: "number"
     selectedForMultiples: boolean
 }
 
 export interface CategoricalColumn {
     name: string
-    vals: string[]
-    type: "Categorical"
+    vals: {id: string, val: string, selected: boolean} []
+    type: "categorical"
     selectedForMultiples: boolean
 }
 
-export const chartTypes: supportedPlotlyVis[] = ["Scatterplot", "PCP", "Violin", "Strip Plot", "Multiples"]
-export const correlationTypes: supportedPlotlyVis[] = ["Scatterplot"]
-export const distributionTypes: supportedPlotlyVis[] = ["Violin", "Strip Plot"]
-export const highDimensionalTypes: supportedPlotlyVis[] = ["PCP"]
+export const chartTypes: supportedPlotlyVis[] = ["Scatter", "Parallel Coordinates", "Violin", "Strip", "Multiples"]
+export const correlationTypes: supportedPlotlyVis[] = ["Scatter"]
+export const distributionTypes: supportedPlotlyVis[] = ["Violin", "Strip"]
+export const highDimensionalTypes: supportedPlotlyVis[] = ["Parallel Coordinates"]
 
 export function CustomVis(props: CustomVisProps){
     let [xAxis, setXAxis] = useState<NumericalColumn | CategoricalColumn | null>(null);
@@ -49,86 +43,18 @@ export function CustomVis(props: CustomVisProps){
     // let updateSelectedCols = (s: string, b: boolean) => b ? setSelectedCols([...selectedCols, s]) : setSelectedCols(selectedCols.filter(c => c !== s))
     let updateXAxis = (newCol: string) => setXAxis(props.columns.filter(c => c.name === newCol)[0])
     let updateYAxis = (newCol: string) => setYAxis(props.columns.filter(c => c.name === newCol)[0])
-    let updateBubbleSize = (newCol: string) => setBubbleSize(props.columns.filter(c => c.name === newCol && c.type == "Numerical")[0] as NumericalColumn)
-    let updateOpacity = (newCol: string) => setOpacity(props.columns.filter(c => c.name === newCol && c.type == "Numerical")[0] as NumericalColumn)
-    let updateColor = (newCol: string) => setColorMapping(props.columns.filter(c => c.name === newCol && c.type == "Categorical")[0] as CategoricalColumn)
-    let updateShape = (newCol: string) => setShape(props.columns.filter(c => c.name === newCol && c.type == "Categorical")[0] as CategoricalColumn)
+    let updateBubbleSize = (newCol: string) => setBubbleSize(props.columns.filter(c => c.name === newCol && c.type == "number")[0] as NumericalColumn)
+    let updateOpacity = (newCol: string) => setOpacity(props.columns.filter(c => c.name === newCol && c.type == "number")[0] as NumericalColumn)
+    let updateColor = (newCol: string) => setColorMapping(props.columns.filter(c => c.name === newCol && c.type == "categorical")[0] as CategoricalColumn)
+    let updateShape = (newCol: string) => setShape(props.columns.filter(c => c.name === newCol && c.type == "categorical")[0] as CategoricalColumn)
 
     let currentVisComponent = null;
 
     switch(visType)
     {
-        case "Violin" : {
-            currentVisComponent = <Violin 
-                xCol={xAxis} 
-                yCol={yAxis} 
-                columns={props.columns}
-                type={visType}
-                updateXAxis={updateXAxis}
-                updateYAxis={updateYAxis}
-                updateChartType={updateChartType}/>
-            break;
-        }
-        case "Strip Plot" : {
-            currentVisComponent = <StripChart 
-                xCol={xAxis} 
-                yCol={yAxis} 
-                type={visType}
-
-                columns={props.columns}
-                updateXAxis={updateXAxis}
-                updateYAxis={updateYAxis}
-                updateChartType={updateChartType}/>
-            break;
-        }
-        case "Chooser": {
-            currentVisComponent = <Chooser 
-                
-                updateChartType={updateChartType}/>
-            break;
-        }
-        case "Scatterplot": {
-            currentVisComponent = <Scatterplot 
-                xCol={xAxis} 
-                yCol={yAxis} 
-                type={visType}
-
-                columns={props.columns}
-                bubbleSize={bubbleSize}
-                opacity={opacity}
-                color={colorMapping}
-                shape={shape}
-                updateXAxis={updateXAxis}
-                updateYAxis={updateYAxis}
-                updateBubbleSize={updateBubbleSize}
-                updateOpacity={updateOpacity}
-                updateColor={updateColor}
-                updateShape={updateShape}
-                updateChartType={updateChartType}/>
-            break;
-        }
-        case "PCP": {
-            currentVisComponent = <PCP 
-                xCol={xAxis} 
-                yCol={yAxis} 
-                type={visType}
-
-                columns={props.columns}
-                bubbleSize={bubbleSize}
-                opacity={opacity}
-                color={colorMapping}
-                shape={shape}
-                updateXAxis={updateXAxis}
-                updateYAxis={updateYAxis}
-                updateBubbleSize={updateBubbleSize}
-                updateOpacity={updateOpacity}
-                updateColor={updateColor}
-                updateShape={updateShape}
-                updateChartType={updateChartType}/>    
-            break;
-        }
         case "Multiples": {
-            currentVisComponent = <Multiples 
+            currentVisComponent = <Multiples
+                selectedCallback={props.selectionCallback} 
                 xCol={xAxis} 
                 yCol={yAxis} 
                 type={visType}

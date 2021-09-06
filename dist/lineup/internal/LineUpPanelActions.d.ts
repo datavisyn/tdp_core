@@ -59,7 +59,6 @@ export declare class LineUpPanelActions extends EventHandler {
     private readonly searchBoxProvider;
     readonly panel: SidePanel | null;
     readonly node: HTMLElement;
-    readonly customVisDiv: HTMLElement;
     private readonly header;
     private readonly tabContainer;
     private overview;
@@ -81,7 +80,6 @@ export declare class LineUpPanelActions extends EventHandler {
     private getColumnDescription;
     private addColumn;
     private resolveScores;
-    addCustomVis(data: any): void;
     updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]): Promise<void>;
     private groupColumnDescs;
     private groupedDialog;

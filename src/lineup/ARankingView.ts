@@ -22,6 +22,7 @@ import {IARankingViewOptions} from './IARankingViewOptions';
 import {LineupUtils} from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
+import {GeneralVisWrapper} from './internal/GeneralVisWrapper';
 
 /**
  * base class for views based on LineUp
@@ -44,8 +45,10 @@ export abstract class ARankingView extends AView {
 
   private readonly provider: LocalDataProvider;
   private readonly taggle: EngineRenderer | TaggleRenderer;
-  private readonly selectionHelper: LineUpSelectionHelper;
+  public readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
+  private readonly generalVis: GeneralVisWrapper;
+
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -179,6 +182,8 @@ export abstract class ARankingView extends AView {
     this.node.appendChild(luBackdrop);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
+    this.generalVis = new GeneralVisWrapper(this.provider, this, this.node.ownerDocument);
+
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
     // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -199,12 +204,8 @@ export abstract class ARankingView extends AView {
       this.taggle.zoomIn();
     });
     this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-      this.panel.addCustomVis(this.provider.getRow(6))
-
-      // let cols = this.provider
-      // const col = LineupUtils.createAccessor(cols[3]).getColumn();
-
-      // console.log(col)
+      this.generalVis.toggleCustomVis()
+      this.generalVis.updateCustomVis()
     });
     if (this.options.enableOverviewMode) {
       const rule = spaceFillingRule(taggleOptions);
@@ -221,7 +222,7 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
-      this.node.appendChild(this.panel.customVisDiv)
+      this.node.appendChild(this.generalVis.node)
       if (this.options.enableSidePanel !== 'top') {
         this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
       }
@@ -230,6 +231,7 @@ export abstract class ARankingView extends AView {
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
       this.setItemSelection(selection);
+      this.generalVis.updateCustomVis();
     });
     this.selectionAdapter = this.createSelectionAdapter();
   }

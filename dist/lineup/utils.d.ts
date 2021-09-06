@@ -22,10 +22,9 @@ export declare class AScoreAccessorProxy<T> {
      * @param row
      */
     readonly accessor: IAccessorFunc<T>;
-    private readonly scores;
+    readonly scores: Map<string, T>;
     constructor(missingValue?: T);
     clear(): void;
-    z: any;
     setRows(rows: IScoreRow<T>[]): void;
     protected access(row: IRow): T;
 }

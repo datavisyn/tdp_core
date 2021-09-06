@@ -1,15 +1,6 @@
-/// <reference types="react" />
-import { CategoricalColumn, NumericalColumn, supportedPlotlyVis } from './CustomVis';
+import { GeneralPlot } from './GeneralPlot';
 import { MultipleDataTraces, MultiplesProps } from './Multiples';
-interface StripChartProps {
-    xCol: NumericalColumn | CategoricalColumn;
-    yCol: NumericalColumn | CategoricalColumn;
-    columns: (NumericalColumn | CategoricalColumn)[];
-    type: supportedPlotlyVis;
-    updateXAxis: (s: string) => void;
-    updateYAxis: (s: string) => void;
-    updateChartType: (s: string) => void;
+export declare class PlotlyStrip extends GeneralPlot {
+    startingHeuristic(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void): void;
+    createTrace(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], shapeScale: any, colorScale: any, opacityScale: any, bubbleScale: any): MultipleDataTraces;
 }
-export declare function createMultiplesStripData(props: MultiplesProps, selectedNumCols: string[], selectedCatCols: string[], colorScale: any): MultipleDataTraces;
-export declare function StripChart(props: StripChartProps): JSX.Element;
-export {};

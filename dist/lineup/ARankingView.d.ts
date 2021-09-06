@@ -2,6 +2,7 @@ import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
+import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
 import { IScore, IAdditionalColumnDesc } from '../base/interfaces';
 import { IInitialRankingOptions } from './desc';
 import { IRankingWrapper } from './IRankingWrapper';
@@ -26,8 +27,9 @@ export declare abstract class ARankingView extends AView {
     private readonly stats;
     private readonly provider;
     private readonly taggle;
-    private readonly selectionHelper;
+    readonly selectionHelper: LineUpSelectionHelper;
     private readonly panel;
+    private readonly generalVis;
     /**
      * clears and rebuilds this lineup instance from scratch
      * @returns {Promise<any[]>} promise when done

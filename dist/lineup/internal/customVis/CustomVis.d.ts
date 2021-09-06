@@ -1,19 +1,28 @@
 /// <reference types="react" />
-export declare type supportedPlotlyVis = "Chooser" | "Scatterplot" | "PCP" | "Violin" | "Strip Plot" | "Multiples";
+export declare type supportedPlotlyVis = "Chooser" | "Scatter" | "Parallel Coordinates" | "Violin" | "Strip" | "Multiples";
 export interface CustomVisProps {
     columns: (NumericalColumn | CategoricalColumn)[];
     type: supportedPlotlyVis;
+    selectionCallback: (s: string[]) => void;
 }
 export interface NumericalColumn {
     name: string;
-    vals: number[];
-    type: "Numerical";
+    vals: {
+        id: string;
+        val: number;
+        selected: boolean;
+    }[];
+    type: "number";
     selectedForMultiples: boolean;
 }
 export interface CategoricalColumn {
     name: string;
-    vals: string[];
-    type: "Categorical";
+    vals: {
+        id: string;
+        val: string;
+        selected: boolean;
+    }[];
+    type: "categorical";
     selectedForMultiples: boolean;
 }
 export declare const chartTypes: supportedPlotlyVis[];

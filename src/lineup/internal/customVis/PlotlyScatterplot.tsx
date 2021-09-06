@@ -1,230 +1,190 @@
-import d3 from 'd3';
-import {scale} from 'd3';
-import Plotly, {Data, PlotData} from 'plotly.js';
-import * as React from 'react';
-import {useEffect, useMemo, useRef} from 'react';
-import Plot from 'react-plotly.js';
-import {CategoricalColumn, NumericalColumn, supportedPlotlyVis} from './CustomVis';
-import {GenericSidePanel} from './GenericSidePanel';
-import {MultipleDataTraces, MultiplesProps} from './Multiples';
+import {GeneralPlot} from './GeneralPlot';
+import {MultipleDataTraces, MultiplesPlot, MultiplesProps} from './Multiples';
 
-interface ScatterplotProps {
-    xCol: NumericalColumn | CategoricalColumn,
-    yCol: NumericalColumn | CategoricalColumn,
-    columns: (NumericalColumn | CategoricalColumn) []
-    bubbleSize: NumericalColumn | null;
-    opacity: NumericalColumn | null;
-    color: CategoricalColumn | null;
-    shape: CategoricalColumn | null;
-    type: supportedPlotlyVis;
-    updateXAxis: (s: string) => void; 
-    updateYAxis: (s: string) => void; 
-    updateBubbleSize: (s: string) => void
-    updateOpacity: (s: string) => void;
-    updateColor: (s: string) => void;
-    updateShape: (s: string) => void;
-    updateChartType: (s: string) => void;
-}
+export class PlotlyScatter extends GeneralPlot
+{
 
-function heuristic(columns) {
-    return {
-        xAxis: columns.filter(c => c.type === "Numerical")[0].name,
-        yAxis: columns.filter(c => c.type === "Numerical")[1].name
-    }
-}
-
-export function createMultiplesScatterplotData(props: MultiplesProps, selectedNumCols: string[], shapeScale, colorScale, opacityScale, bubbleScale) : MultipleDataTraces {
-    let counter = 1
-    let validCols = props.columns.filter(c => selectedNumCols.includes(c.name))
-    let traces: Data[] = []
-
-    for(let xCurr of validCols)
+    startingHeuristic(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void)
     {
-        for(let yCurr of validCols)
+        let numCols = props.columns.filter(c => c.type === "number")
+        if(selectedNumCols.length < 2 && numCols.length >= 2)
         {
-            if(xCurr === yCurr)
+            if(selectedNumCols.length === 0)
             {
-                traces.push(   
-                {            
-                    xaxis: counter === 1 ? "x" : "x" + counter,
-                    yaxis: counter === 1 ? "y" : "y" + counter,
-                })
-                counter += 1
-                continue;
+                updateSelectedNumCols(numCols.slice(0, 2).map(c => c.name))
             }
-
-            traces.push( {
-                x: xCurr.vals,
-                y: yCurr.vals,
-                xaxis: counter === 1 ? "x" : "x" + counter,
-                yaxis: counter === 1 ? "y" : "y" + counter,
-                type: 'scatter',
-                mode: 'markers',
-                marker: {
-                    line: {
-                        width: 2
-                    },
-                    symbol: props.shape ? props.shape.vals.map(v => shapeScale(v)) : "circle-open",
-                    color: props.color ? props.color.vals.map(v => colorScale(v)) : "#232b2b",
-                    opacity: props.opacity ? props.opacity.vals.map(v => opacityScale(v)) : 1,
-                    size: props.bubbleSize ? props.bubbleSize.vals.map(v => bubbleScale(v)) : 7
-                },
-            })
-            counter += 1
+            else{
+                updateSelectedNumCols([...selectedNumCols, numCols.filter(c => !selectedNumCols.includes(c.name))[0].name])
+            }
         }
     }
 
-    return {
-        data: traces,
-        rows: Math.sqrt(traces.length),
-        cols: Math.sqrt(traces.length)
-    };
-}
+    createTrace(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], shapeScale, colorScale, opacityScale, bubbleScale) : MultipleDataTraces {
+        let counter = 1
+        let validCols = props.columns.filter(c => selectedNumCols.includes(c.name))
+        let plots: MultiplesPlot[] = []
 
-
-export function Scatterplot(props: ScatterplotProps) {
-
-    let plotRef = useRef<Plotly.PlotlyHTMLElement>(null)
-
-    // heuristic for setting up used in this async call
-    useEffect(() => {
-        // useAsync(async () => {
-            const { xAxis, yAxis} = heuristic(props.columns);
+        let legendPlots: MultiplesPlot[] = []
     
-            console.log(xAxis)
-        
-            if(props.xCol === null || props.xCol.type === "Categorical")
-            {
-                props.updateXAxis(xAxis);
+        if(validCols.length === 1)
+        {
+            return {
+                plots: [],
+                legendPlots: [],
+                rows: 0,
+                cols: 0,
+                errorMessage: "To create a Scatterplot, please select at least 2 numerical columns."
             }
-        
-            if(props.yCol === null || props.yCol.type === "Categorical")
+        }
+    
+        if(validCols.length === 2)
+        {
+            plots.push({
+                data: {
+                    x: validCols[0].vals.map(v => v.val),
+                    y: validCols[1].vals.map(v => v.val),
+                    ids: validCols[0].vals.map(v => v.id),
+                    xaxis: counter === 1 ? "x" : "x" + counter,
+                    yaxis: counter === 1 ? "y" : "y" + counter,
+                    type: 'scatter',
+                    mode: 'markers',
+                    showlegend: false,
+                    marker: {
+                        line: {
+                            width: validCols[0].vals.map(v => v.selected ? 20 : 0),
+                            color: "#E29609"
+                        },
+                        symbol: props.shape ? props.shape.vals.map(v => shapeScale(v.val)) : "circle",
+                        color: props.color ? props.color.vals.map(v => colorScale(v.val)) : "black",
+                        opacity: props.opacity ? props.opacity.vals.map(v => opacityScale(v.val)) : .5,
+                        size: props.bubbleSize ? props.bubbleSize.vals.map(v => bubbleScale(v.val)) : 10
+                    },
+                },
+                xLabel: validCols[0].name, 
+                yLabel: validCols[1].name
+            })
+        }
+        else
+        {
+            for(let yCurr of validCols)
             {
-                props.updateYAxis(yAxis);
-            }
-        // })
-    }, [props.columns])
-
-    let shapeScale = useMemo(() => {
-        return props.shape ? 
-                scale.ordinal<string>().domain(d3.set(props.shape.vals).values()).range(["circle-open", "square-open", "triangle-up-open", "star-open"])
-                : null
-    }, [props.shape])
-
-    let bubbleScale = useMemo(() => {
-        return props.bubbleSize ? 
-                scale.linear().domain([0, d3.max(props.bubbleSize.vals)]).range([0, 10])
-                : null
-    }, [props.bubbleSize])
-
-    let opacityScale = useMemo(() => {
-        return props.opacity ? 
-                scale.linear().domain([0, d3.max(props.opacity.vals)]).range([0, 1])
-                : null
-    }, [props.opacity])
-
-    let colorScale = useMemo(() => {
-        return scale.category10()
-    }, [props.color])
-
-
-    return (
-        <div className="d-flex flex-row w-100 h-100">
-            <div className="flex-grow-1">
-            {props.xCol !== null &&
-            props.yCol !== null && 
-            props.xCol.type !== "Categorical" &&
-            props.yCol.type !== "Categorical" ? <Plot
-                divId={"plotlyDiv"}
-                data={[
-                    {
-                        x: props.xCol.vals,
-                        y: props.yCol.vals,
-                        type: 'scatter',
-                        mode: 'markers',
-                        name: 'All points',
-                        marker: {
-                            line: {
-                                width: 2
+                for(let xCurr of validCols)
+                {
+                    plots.push( {
+                        data: {
+                            x: xCurr.vals.map(v => v.val),
+                            y: yCurr.vals.map(v => v.val),
+                            ids: xCurr.vals.map(v => v.id),
+                            xaxis: counter === 1 ? "x" : "x" + counter,
+                            yaxis: counter === 1 ? "y" : "y" + counter,
+                            type: 'scatter',
+                            mode: 'markers',
+                            showlegend: false,
+                            marker: {
+                                line: {
+                                    width: xCurr.vals.map(v => v.selected ? 20 : 0),
+                                    color: "#E29609"
+                                },
+                                symbol: props.shape ? props.shape.vals.map(v => shapeScale(v.val)) : "circle",
+                                color: props.color ? props.color.vals.map(v => colorScale(v.val)) : "#232b2b",
+                                opacity: props.opacity ? props.opacity.vals.map(v => opacityScale(v.val)) : .5,
+                                size: props.bubbleSize ? props.bubbleSize.vals.map(v => bubbleScale(v.val)) : 10
                             },
-                            symbol: props.shape ? props.shape.vals.map(v => shapeScale(v)) : "circle-open",
-                            color: props.color ? props.color.vals.map(v => colorScale(v)) : "#232b2b",
-                            opacity: props.opacity ? props.opacity.vals.map(v => opacityScale(v)) : 1,
-                            size: props.bubbleSize ? props.bubbleSize.vals.map(v => bubbleScale(v)) : 7
                         },
+                        xLabel: xCurr.name, 
+                        yLabel: yCurr.name
+                    })
+    
+                    counter += 1
+                }
+            }
+        }
+
+        if(props.color && validCols.length > 0)
+        {
+            legendPlots.push( {
+                data: {
+                    x: validCols[0].vals.map(v => v.val),
+                    y: validCols[0].vals.map(v => v.val),
+                    ids: validCols[0].vals.map(v => v.id),
+                    xaxis: "x",
+                    yaxis: "y",
+                    type: 'scatter',
+                    mode: 'markers',
+                    visible: "legendonly",
+                    legendgroup: "color",
+                    legendgrouptitle: {
+                        text: "Color"
                     },
-                ]}
-                layout={ 
-                {   
-                    autosize: true,
-                    xaxis: {
-                        title: {
-                        text: props.xCol.name,
-                        font: {
-                            family: 'Courier New, monospace',
-                            size: 12,
-                            color: 'black'
-                        }
+                    marker: {
+                        line: {
+                            width: 0
                         },
+                        symbol: "circle",
+                        size: 10,
+                        color: props.color ? props.color.vals.map(v => colorScale(v.val)) : "black",
+                        opacity: .5
                     },
-                    yaxis: {
-                        title: {
-                            text: props.yCol.name,
-                            font: {
-                                family: 'Courier New, monospace',
-                                size: 12,
-                                color: 'black'
-                            }
-                        }
-                    }
-                } }
-                    useResizeHandler={true}
-                    config={{responsive: true}}
-                    style={{width: "100%", height: "100%"}}
-            ></Plot> : null }
-            </div>
-            <GenericSidePanel 
-                currentType={props.type}
-                dropdowns={[
-                    {
-                        name: "X Axis",
-                        callback: props.updateXAxis,
-                        currentSelected: props.xCol ? props.xCol.name : "None",
-                        options: props.columns.filter(c => c.type === "Numerical").map(c => c.name)
+                    transforms: [{
+                        type: 'groupby',
+                        groups: props.color.vals.map(v => v.val),
+                        styles: 
+                            [...[...new Set<string>(props.color.vals.map(v => v.val) as string[])].map(c => {
+                                return {target: c, value: {name: c}}
+                            })]
+                        }]
+                },
+                xLabel: validCols[0].name, 
+                yLabel: validCols[0].name
+            })
+        }
+
+        if(props.shape)
+        {
+            legendPlots.push( {
+                data: {
+                    x: validCols[0].vals.map(v => v.val),
+                    y: validCols[0].vals.map(v => v.val),
+                    ids: validCols[0].vals.map(v => v.id),
+                    xaxis: "x",
+                    yaxis: "y",
+                    type: 'scatter',
+                    mode: 'markers',
+                    visible: "legendonly",
+                    showlegend: true,
+                    legendgroup: "shape",
+                    legendgrouptitle: {
+                        text: "Shape"
                     },
-                    {
-                        name: "Y Axis",
-                        callback: props.updateYAxis,
-                        currentSelected: props.yCol ? props.yCol.name : "None",
-                        options: props.columns.filter(c => c.type === "Numerical").map(c => c.name)
+                    marker: {
+                        line: {
+                            width: 0
+                        },
+                        opacity: .5,
+                        size: 10,
+                        symbol: props.shape ? props.shape.vals.map(v => shapeScale(v.val)) : "circle",
+                        color: "black"
                     },
-                    {
-                        name: "Bubble Size",
-                        callback: props.updateBubbleSize,
-                        currentSelected: props.bubbleSize ? props.bubbleSize.name : "None",
-                        options: ["None", ...props.columns.filter(c => c.type === "Numerical").map(c => c.name)]
-                    },
-                    {
-                        name: "Opacity",
-                        callback: props.updateOpacity,
-                        currentSelected: props.opacity ? props.opacity.name : "None",
-                        options: ["None", ...props.columns.filter(c => c.type === "Numerical").map(c => c.name)]
-                    },
-                    {
-                        name: "Color",
-                        callback: props.updateColor,
-                        currentSelected: props.color ? props.color.name : "None",
-                        options: ["None", ...props.columns.filter(c => c.type === "Categorical").map(c => c.name)]
-                    },
-                    {
-                        name: "Shape",
-                        callback: props.updateShape,
-                        currentSelected: props.shape ? props.shape.name : "None",
-                        options: ["None", ...props.columns.filter(c => c.type === "Categorical").map(c => c.name)]
-                    },
-                ]}
-                chartTypeChangeCallback={props.updateChartType}
-                ></GenericSidePanel>
-        </div>
-    );
+                    transforms: [{
+                        type: 'groupby',
+                        groups: props.shape.vals.map(v => v.val),
+                        styles: 
+                            [...[...new Set<string>(props.color.vals.map(v => v.val) as string[])].map(c => {
+                                return {target: c, value: {name: c}}
+                            })]
+                        }]
+                },
+                xLabel: validCols[0].name, 
+                yLabel: validCols[0].name
+            })
+        }
+    
+        return {
+            plots: plots,
+            legendPlots: legendPlots,
+            rows: Math.sqrt(plots.length),
+            cols: Math.sqrt(plots.length),
+            errorMessage: "To create a Scatterplot, please select at least 2 numerical columns."
+        };
+    }
 }

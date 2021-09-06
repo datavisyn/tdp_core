@@ -1,23 +1,6 @@
-/// <reference types="react" />
-import { CategoricalColumn, NumericalColumn, supportedPlotlyVis } from './CustomVis';
+import { GeneralPlot } from './GeneralPlot';
 import { MultipleDataTraces, MultiplesProps } from './Multiples';
-interface PCPProps {
-    xCol: NumericalColumn | CategoricalColumn;
-    yCol: NumericalColumn | CategoricalColumn;
-    columns: (NumericalColumn | CategoricalColumn)[];
-    bubbleSize: NumericalColumn | null;
-    opacity: NumericalColumn | null;
-    color: CategoricalColumn | null;
-    shape: CategoricalColumn | null;
-    type: supportedPlotlyVis;
-    updateXAxis: (s: string) => void;
-    updateYAxis: (s: string) => void;
-    updateBubbleSize: (s: string) => void;
-    updateOpacity: (s: string) => void;
-    updateColor: (s: string) => void;
-    updateShape: (s: string) => void;
-    updateChartType: (s: string) => void;
+export declare class PlotlyPCP extends GeneralPlot {
+    startingHeuristic(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void): void;
+    createTrace(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], shapeScale: any, colorScale: any, opacityScale: any, bubbleScale: any): MultipleDataTraces;
 }
-export declare function createPCPData(props: MultiplesProps, selectedNumCols: string[], selectedCatCols: string[], colorScale: any): MultipleDataTraces;
-export declare function PCP(props: PCPProps): JSX.Element;
-export {};

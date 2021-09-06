@@ -15,9 +15,6 @@ import { FormElementType } from '../../form/interfaces';
 import { FormDialog } from '../../form';
 import { PanelSaveNamedSetButton } from './panel/PanelSaveNamedSetButton';
 import { LineUpOrderedRowIndicies } from './panel/LineUpOrderedRowIndicies';
-import { CustomVis } from './customVis/CustomVis';
-import React from 'react';
-import ReactDOM from 'react-dom';
 export class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();
@@ -25,9 +22,6 @@ export class LineUpPanelActions extends EventHandler {
         this.options = options;
         this.idType = null;
         this.wasCollapsed = false;
-        this.customVisDiv = doc.createElement('div');
-        this.customVisDiv.id = "customVisDiv";
-        this.customVisDiv.classList.add("custom-vis-panel");
         this.node = doc.createElement('aside');
         this.node.classList.add('lu-side-panel-wrapper');
         this.header = new PanelHeader(this.node);
@@ -118,10 +112,8 @@ export class LineUpPanelActions extends EventHandler {
             const zoomOutButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fas fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
             this.header.addButton(zoomOutButton);
         }
-        console.log("at the if");
         if (this.options.enableCustomVis) {
-            console.log("making the button");
-            const customVis = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'), 'fas fa-search-plus gap', () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS));
+            const customVis = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'), 'fas fa-chart-bar gap', () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS));
             this.header.addButton(customVis);
         }
         if (this.options.enableOverviewMode) {
@@ -212,24 +204,6 @@ export class LineUpPanelActions extends EventHandler {
         const metaDataOptions = await Promise.all(metaDataPluginPromises);
         const loadedScorePlugins = ordinoScores.map((desc) => LineupUtils.wrap(desc));
         return { metaDataOptions, loadedScorePlugins };
-    }
-    addCustomVis(data) {
-        console.log(data);
-        this.customVisDiv.style.display = "flex";
-        let irisSepalLengthData = [5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 5.5, 4.9, 5.4, 4.8, 4.8, 4.3, 5.8, 5.7, 5.4, 5.1, 5.7, 5.1];
-        let irisSepalWidthData = [3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8];
-        let irisPetalLengthData = [1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.5, 1.4, 1.5, 1.5, 1.6, 1.4, 1.1, 1.2, 1.5, 1.3, 1.4, 1.7, 1.5];
-        let irisPetalWidthData = [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3];
-        let irisSpecies = ["Setosa", "Setosa", "Setosa", "Setosa", "Setosa", "Setosa", "Versicolor", "Versicolor", "Versicolor", "Versicolor", "Versicolor", "Versicolor",
-            "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica", "Virginica"];
-        ReactDOM.render(React.createElement(CustomVis, { columns: [
-                { name: "Sepal Length", vals: irisSepalLengthData, type: "Numerical", selectedForMultiples: false },
-                { name: "Sepal Width", vals: irisSepalWidthData, type: "Numerical", selectedForMultiples: false },
-                { name: "Petal Length", vals: irisPetalLengthData, type: "Numerical", selectedForMultiples: true },
-                { name: "Petal Width", vals: irisPetalWidthData, type: "Numerical", selectedForMultiples: true },
-                { name: "Species", vals: irisSpecies, type: "Categorical", selectedForMultiples: false },
-                { name: "Species Again For Fun", vals: irisSpecies, type: "Categorical", selectedForMultiples: false }
-            ], type: "Multiples" }), this.customVisDiv);
     }
     async updateChooser(idType, descs) {
         this.idType = idType;

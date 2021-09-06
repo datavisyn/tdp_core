@@ -1,140 +1,70 @@
-import { scale } from 'd3';
-import * as React from 'react';
-import { useEffect, useMemo } from 'react';
-import Plot from 'react-plotly.js';
-import { GenericSidePanel } from './GenericSidePanel';
+import { GeneralPlot } from './GeneralPlot';
 function heuristic(columns) {
     return {
         xAxis: columns.filter(c => c.type === "Categorical")[0].name,
         yAxis: columns.filter(c => c.type === "Numerical")[0].name
     };
 }
-export function createMultiplesStripData(props, selectedNumCols, selectedCatCols, colorScale) {
-    let counter = 1;
-    let numCols = props.columns.filter(c => selectedNumCols.includes(c.name));
-    let catCols = props.columns.filter(c => selectedCatCols.includes(c.name));
-    let traces = [];
-    for (let numCurr of numCols) {
-        for (let catCurr of catCols) {
-            traces.push({
-                x: catCurr.vals,
-                y: numCurr.vals,
-                xaxis: counter === 1 ? "x" : "x" + counter,
-                yaxis: counter === 1 ? "y" : "y" + counter,
-                type: 'box',
-                boxpoints: "all",
-                name: 'All points',
-                mode: "none",
-                pointpos: 0,
-                box: {
-                    visible: true
-                },
-                line: {
-                    color: 'rgba(255,255,255,0)',
-                },
-                meanline: {
-                    visible: true
-                },
-                transforms: [{
-                        type: 'groupby',
-                        groups: catCurr.vals,
-                        styles: [...new Set(catCurr.vals)].map(c => {
-                            return { target: c, value: { marker: { color: colorScale(c) } } };
-                        })
-                    }]
-            });
-            counter += 1;
+export class PlotlyStrip extends GeneralPlot {
+    startingHeuristic(props, selectedCatCols, selectedNumCols, updateSelectedCatCols, updateSelectedNumCols) {
+        let numCols = props.columns.filter(c => c.type === "number");
+        let catCols = props.columns.filter(c => c.type === "categorical");
+        if (selectedNumCols.length === 0 && numCols.length >= 1) {
+            updateSelectedNumCols([numCols[0].name]);
+        }
+        if (selectedCatCols.length === 0 && catCols.length >= 1) {
+            updateSelectedCatCols([catCols[0].name]);
         }
     }
-    return {
-        data: traces,
-        rows: catCols.length,
-        cols: numCols.length
-    };
-}
-export function StripChart(props) {
-    // heuristic for setting up used in this async call
-    useEffect(() => {
-        // useAsync(async () => {
-        const { xAxis, yAxis } = heuristic(props.columns);
-        console.log(xAxis);
-        if (props.xCol === null || props.xCol.type === "Numerical") {
-            props.updateXAxis(xAxis);
+    createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
+        let counter = 1;
+        let numCols = props.columns.filter(c => selectedNumCols.includes(c.name));
+        let catCols = props.columns.filter(c => selectedCatCols.includes(c.name));
+        let plots = [];
+        for (let numCurr of numCols) {
+            for (let catCurr of catCols) {
+                plots.push({
+                    data: {
+                        x: catCurr.vals.map(v => v.val),
+                        y: numCurr.vals.map(v => v.val),
+                        xaxis: counter === 1 ? "x" : "x" + counter,
+                        yaxis: counter === 1 ? "y" : "y" + counter,
+                        showlegend: false,
+                        type: 'box',
+                        boxpoints: "all",
+                        name: 'All points',
+                        mode: "none",
+                        pointpos: 0,
+                        box: {
+                            visible: true
+                        },
+                        line: {
+                            color: 'rgba(255,255,255,0)',
+                        },
+                        meanline: {
+                            visible: true
+                        },
+                        transforms: [{
+                                type: 'groupby',
+                                groups: catCurr.vals.map(v => v.val),
+                                styles: [...new Set(catCurr.vals.map(v => v.val))].map(c => {
+                                    return { target: c, value: { marker: { color: colorScale(c) } } };
+                                })
+                            }]
+                    },
+                    xLabel: catCurr.name,
+                    yLabel: numCurr.name
+                });
+                counter += 1;
+            }
         }
-        if (props.yCol === null || props.yCol.type === "Categorical") {
-            props.updateYAxis(yAxis);
-        }
-        // })
-    }, [props.columns]);
-    let colorScale = useMemo(() => {
-        return scale.category10();
-    }, []);
-    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" },
-        React.createElement("div", { className: "flex-grow-1" }, props.xCol !== null &&
-            props.yCol !== null &&
-            props.xCol.type !== "Numerical" &&
-            props.yCol.type !== "Categorical" ? React.createElement(Plot, { divId: "plotlyDiv", data: [
-                {
-                    x: props.xCol.vals,
-                    y: props.yCol.vals,
-                    type: 'box',
-                    boxpoints: "all",
-                    name: 'All points',
-                    mode: "none",
-                    pointpos: 0,
-                    box: {
-                        visible: true
-                    },
-                    line: {
-                        color: 'rgba(255,255,255,0)',
-                    },
-                    meanline: {
-                        visible: true
-                    },
-                    transforms: [{
-                            type: 'groupby',
-                            groups: props.xCol.vals,
-                            styles: [...new Set(props.xCol.vals)].map(c => {
-                                return { target: c, value: { marker: { color: colorScale(c) } } };
-                            })
-                        }]
-                },
-            ], layout: {
-                autosize: true,
-                xaxis: {
-                    title: {
-                        text: props.xCol.name,
-                        font: {
-                            family: 'Courier New, monospace',
-                            size: 12,
-                            color: 'black'
-                        }
-                    },
-                },
-                yaxis: {
-                    title: {
-                        text: props.yCol.name,
-                        font: {
-                            family: 'Courier New, monospace',
-                            size: 12,
-                            color: 'black'
-                        }
-                    }
-                }
-            }, config: { responsive: true }, useResizeHandler: true, style: { width: "100%", height: "100%" } }) : null),
-        React.createElement(GenericSidePanel, { currentType: props.type, dropdowns: [
-                {
-                    name: "X Axis",
-                    callback: props.updateXAxis,
-                    currentSelected: props.xCol ? props.xCol.name : "None",
-                    options: props.columns.filter(c => c.type === "Categorical").map(c => c.name)
-                },
-                {
-                    name: "Y Axis",
-                    callback: props.updateYAxis,
-                    currentSelected: props.yCol ? props.yCol.name : "None",
-                    options: props.columns.filter(c => c.type === "Numerical").map(c => c.name)
-                },
-            ], chartTypeChangeCallback: props.updateChartType })));
+        return {
+            plots: plots,
+            legendPlots: [],
+            rows: numCols.length,
+            cols: catCols.length,
+            errorMessage: "To create a Strip plot, please select at least 1 categorical column and at least 1 numerical column."
+        };
+    }
 }
 //# sourceMappingURL=PlotlyStripPlot.js.map

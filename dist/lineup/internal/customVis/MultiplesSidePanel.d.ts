@@ -2,8 +2,8 @@
 import { CategoricalColumn, NumericalColumn, supportedPlotlyVis } from './CustomVis';
 interface MultiplesSidePanelProps {
     chartTypeChangeCallback: (s: string) => void;
-    updateSelectedNumCols: (s: string, b: boolean) => void;
-    updateSelectedCatCols: (s: string, b: boolean) => void;
+    updateSelectedNumCols: (s: string[]) => void;
+    updateSelectedCatCols: (s: string[]) => void;
     selectedCatCols: string[];
     selectedNumCols: string[];
     setCurrentVis: (s: supportedPlotlyVis) => void;
