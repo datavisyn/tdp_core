@@ -1,11 +1,8 @@
 .#{$tdp-css-prefix}-view {
   &.multiple {
     overflow-y: auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-content: flex-start;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); // @see https://css-tricks.com/snippets/css/complete-guide-grid/#the-repeat-function-and-keywords
     gap: 4rem;
   }
 
