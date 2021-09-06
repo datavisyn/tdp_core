@@ -441,9 +441,10 @@ export abstract class ARankingView extends AView {
             // Fetch or create the authorization overlay
             let overlay = headerNode.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
             if (!overlay) {
-              overlay = document.createElement('div');
+              overlay = headerNode.ownerDocument.createElement('div');
               overlay.className = 'tdp-authorization-overlay';
-              headerNode.insertAdjacentElement('afterbegin', overlay);
+              // Add element at the very bottom to avoid using z-index
+              headerNode.appendChild(overlay);
             }
 
             if(status === ERenderAuthorizationStatus.SUCCESS) {

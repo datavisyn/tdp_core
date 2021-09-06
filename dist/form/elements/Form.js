@@ -17,7 +17,7 @@ export class Form {
          * Map of all appended form elements with the element id as key
          */
         this.elements = new Map();
-        this.$node = $parent.append('form').attr('class', `row align-items-center mb-2`).attr('id', this.formId);
+        this.$node = $parent.append('form').attr('class', `row align-items-center`).attr('id', this.formId);
     }
     /**
      * Append a form element and builds it
