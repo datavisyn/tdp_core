@@ -71,7 +71,8 @@ export class AView extends EventHandler {
         await this.runAuthorizations();
         // Register listener after the authorizations are run to avoid double-initializations
         TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
-            await this.initImpl();
+            // TODO: Enabling this leads to the taggle view being loaded twice
+            // await this.initImpl();
         });
         this.params = await this.buildParameterForm(params, onParameterChange);
         return this.initImpl();
