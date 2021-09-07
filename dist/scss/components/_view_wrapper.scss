@@ -32,9 +32,8 @@ article.#{$tdp-css-prefix}-view-wrapper {
     > * {
       position: absolute !important;
       top: 0;
-      // Align views with standard padding of bootstrap containers
-      left: var(--bs-gutter-x, .75rem);
-      width: calc(100% - var(--bs-gutter-x, .75rem));
+      left: 0;
+      width: 100%;
       height: 100%;
     }
 

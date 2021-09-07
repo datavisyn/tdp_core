@@ -35,7 +35,7 @@ export class ViewWrapper extends EventHandler {
         this.allowed = FindViewUtils.canAccess(plugin);
         this.node.innerHTML = `
     <header>
-      <div class="parameters container-fluid"></div>
+      <div class="parameters container-fluid ps-0 pe-0"></div>
     </header>
     <main></main>
     <div class="preview-image">
