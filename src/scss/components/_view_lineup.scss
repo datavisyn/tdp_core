@@ -162,8 +162,8 @@ $lu_assets: "~lineupjs/src/assets";
         .panel-toolbar {
           display: flex;
 
-          > .btn-icon,
-          > div > .btn-icon {
+          > .btn-text-bg-primary,
+          > div > .btn-text-bg-primary {
             margin-left: 0.4rem;
           }
 
@@ -227,7 +227,7 @@ $lu_assets: "~lineupjs/src/assets";
 
     button[data-violation] {
       position: relative;
-      @extend .btn-icon-warning;
+      @extend .btn-text-warning;
 
       &:hover {
         z-index: 2;
@@ -366,9 +366,8 @@ $lu_assets: "~lineupjs/src/assets";
           .panel-toolbar {
             display: flex;
             flex-direction: column;
-            
-            > .btn-icon,
-            > div > .btn-icon{
+            > .btn-text,
+            > div > .btn-text{
               margin-top: 0.4rem;
             }
 
