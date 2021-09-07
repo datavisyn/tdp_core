@@ -80,6 +80,7 @@
     "db-migration:list": "npm run db-migration:base list --"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
     "bootstrap": "^5.0.1",
@@ -88,6 +89,7 @@
     "lineupjs": "next",
     "lodash": "~4.17.20",
     "phovea_clue": "github:phovea/phovea_clue#develop",
+    "plotly.js": "^2.5.0",
     "plotly.js-dist": "^1.57.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",

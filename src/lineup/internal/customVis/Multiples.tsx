@@ -1,4 +1,3 @@
-import {faSignature} from '@fortawesome/free-solid-svg-icons';
 import d3 from 'd3';
 import {scale} from 'd3';
 import {Data, Layout} from 'plotly.js';
