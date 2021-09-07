@@ -1,14 +1,12 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
-import { IFormElementDesc, IForm } from '../interfaces';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { IPluginDesc } from 'phovea_core';
 /**
  * Add specific options for input form elements
  */
 export interface IFormInputTextDesc extends IFormElementDesc {
+    type: FormElementType.INPUT_TEXT;
     /**
      * Additional options
      */
@@ -23,11 +21,10 @@ export interface IFormInputTextDesc extends IFormElementDesc {
          * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#step
          */
         step?: string;
-    };
+    } & IFormElementDesc['options'];
 }
 export declare class FormInputText extends AFormElement<IFormInputTextDesc> {
     readonly pluginDesc: IPluginDesc;
-    private $input;
     /**
      * Constructor
      * @param form The form this element is a part of

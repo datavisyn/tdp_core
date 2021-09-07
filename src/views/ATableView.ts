@@ -169,7 +169,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
     (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
     rightTableHeader.insertAdjacentHTML('beforeend',
-      `<a class="link-secondary" href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fas fa-download"></i></a>`);
+      `<a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fas fa-download"></i></a>`);
     (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();

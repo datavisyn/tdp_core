@@ -14,7 +14,8 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
     static readonly EVENT_CHANGE = "change";
     static readonly EVENT_INITIAL_VALUE = "initial";
     readonly id: string;
-    protected $node: Selection<any>;
+    protected $rootNode: Selection<any>;
+    protected $inputNode: Selection<any> | null;
     protected previousValue: any;
     /**
      * Constructor
@@ -49,7 +50,7 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
     /**
      * Append a label to the node element if `hideLabel = false` in the element description
      */
-    protected appendLabel(): void;
+    protected appendLabel($node: Selection<any>): Selection<any>;
     /**
      * Set a list of object properties and values to a given node
      * Note: Use `clazz` instead of the attribute `class` (which is a reserved keyword in JavaScript)

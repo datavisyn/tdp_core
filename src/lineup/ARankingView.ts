@@ -171,8 +171,7 @@ export abstract class ARankingView extends AView {
 
     const taggleOptions: ITaggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, <Partial<ITaggleOptions>>{
       summaryHeader: this.options.enableHeaderSummary,
-      labelRotation: this.options.enableHeaderRotation ? 45 : 0,
-      rowHeight: 21
+      labelRotation: this.options.enableHeaderRotation ? 45 : 0
     }, options.customOptions);
 
     if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
@@ -442,9 +441,10 @@ export abstract class ARankingView extends AView {
             // Fetch or create the authorization overlay
             let overlay = headerNode.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
             if (!overlay) {
-              overlay = document.createElement('div');
+              overlay = headerNode.ownerDocument.createElement('div');
               overlay.className = 'tdp-authorization-overlay';
-              headerNode.insertAdjacentElement('afterbegin', overlay);
+              // Add element at the very bottom to avoid using z-index
+              headerNode.appendChild(overlay);
             }
 
             if(status === ERenderAuthorizationStatus.SUCCESS) {

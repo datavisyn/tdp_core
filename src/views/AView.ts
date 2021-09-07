@@ -103,7 +103,8 @@ export abstract class AView extends EventHandler implements IView {
 
     // Register listener after the authorizations are run to avoid double-initializations
     TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
-      await this.initImpl();
+      // TODO: Enabling this leads to the taggle view being loaded twice
+      // await this.initImpl();
     });
 
     this.params = await this.buildParameterForm(params, onParameterChange);
@@ -121,9 +122,10 @@ export abstract class AView extends EventHandler implements IView {
         // Fetch or create the authorization overlay
         let overlay = this.node.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
         if (!overlay) {
-          overlay = document.createElement('div');
+          overlay = this.node.ownerDocument.createElement('div');
           overlay.className = 'tdp-authorization-overlay';
-          this.node.insertAdjacentElement('afterbegin', overlay);
+          // Add element at the very bottom to avoid using z-index
+          this.node.appendChild(overlay);
         }
 
         if (status === ERenderAuthorizationStatus.SUCCESS) {
@@ -166,7 +168,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
-    const builder = new FormBuilder(select(params), undefined, 'row', true);
+    const builder = new FormBuilder(select(params), undefined, true);
 
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));

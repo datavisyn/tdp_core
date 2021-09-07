@@ -23,7 +23,7 @@ export class ChooserProxyView extends AView {
         const initResult = await super.init(params, onParameterChange);
         // inject stats
         const base = params.querySelector('form') || params;
-        base.insertAdjacentHTML('beforeend', `<div class="mb-3"></div>`);
+        base.insertAdjacentHTML('beforeend', `<div class="col-sm-auto"></div>`);
         base.lastElementChild.appendChild(this.openExternally);
         return initResult;
     }

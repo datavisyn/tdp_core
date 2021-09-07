@@ -133,8 +133,7 @@ export class ARankingView extends AView {
         this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
         const taggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, {
             summaryHeader: this.options.enableHeaderSummary,
-            labelRotation: this.options.enableHeaderRotation ? 45 : 0,
-            rowHeight: 21
+            labelRotation: this.options.enableHeaderRotation ? 45 : 0
         }, options.customOptions);
         if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
             taggleOptions.rowHeight = this.options.itemRowHeight;
@@ -374,9 +373,10 @@ export class ARankingView extends AView {
                         // Fetch or create the authorization overlay
                         let overlay = headerNode.querySelector('.tdp-authorization-overlay');
                         if (!overlay) {
-                            overlay = document.createElement('div');
+                            overlay = headerNode.ownerDocument.createElement('div');
                             overlay.className = 'tdp-authorization-overlay';
-                            headerNode.insertAdjacentElement('afterbegin', overlay);
+                            // Add element at the very bottom to avoid using z-index
+                            headerNode.appendChild(overlay);
                         }
                         if (status === ERenderAuthorizationStatus.SUCCESS) {
                             overlay.remove();

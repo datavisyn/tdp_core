@@ -125,7 +125,16 @@ export interface IFormElementDesc {
   /**
    * Form element specific options
    */
-  options?: {};
+  options?: {
+    /**
+     * Add property to check for inline forms explicitely.
+     */
+    inlineForm?: boolean;
+    /**
+     * Any other property.
+     */
+    [key: string]: any;
+  };
 
   /**
    * hide label

@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import { AFormElement } from './AFormElement';
 export class FormInputText extends AFormElement {
     /**
@@ -19,11 +16,11 @@ export class FormInputText extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed('mb-3', true);
+        this.$rootNode = $formNode.append('div');
         this.setVisible(this.elementDesc.visible);
-        this.appendLabel();
-        this.$input = this.$node.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text');
-        this.setAttributes(this.$input, this.elementDesc.attributes);
+        this.appendLabel(this.$rootNode);
+        this.$inputNode = this.$rootNode.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text');
+        this.setAttributes(this.$inputNode, this.elementDesc.attributes);
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event
@@ -31,19 +28,19 @@ export class FormInputText extends AFormElement {
     init() {
         super.init();
         if ((this.elementDesc.options || {}).type === 'number' && (this.elementDesc.options || {}).step) {
-            this.$input.attr('step', this.elementDesc.options.step);
+            this.$inputNode.attr('step', this.elementDesc.options.step);
         }
         const defaultValue = (this.elementDesc.options || {}).type === 'number' ? '0' : '';
         const defaultText = this.getStoredValue(defaultValue);
         this.previousValue = defaultText;
-        this.$input.property('value', defaultText);
+        this.$inputNode.property('value', defaultText);
         if (this.hasStoredValue()) {
             this.fire(FormInputText.EVENT_INITIAL_VALUE, defaultText, defaultValue);
         }
         this.handleDependent();
         // propagate change action with the data of the selected option
-        this.$input.on('change.propagate', () => {
-            this.fire(FormInputText.EVENT_CHANGE, this.value, this.$input);
+        this.$inputNode.on('change.propagate', () => {
+            this.fire(FormInputText.EVENT_CHANGE, this.value, this.$inputNode);
         });
     }
     /**
@@ -51,19 +48,19 @@ export class FormInputText extends AFormElement {
      * @returns {string}
      */
     get value() {
-        return this.$input.property('value');
+        return this.$inputNode.property('value');
     }
     /**
      * Sets the value
      * @param v
      */
     set value(v) {
-        this.$input.property('value', v);
+        this.$inputNode.property('value', v);
         this.previousValue = v; // force old value change
         this.updateStoredValue();
     }
     focus() {
-        this.$input.node().focus();
+        this.$inputNode.node().focus();
     }
 }
 //# sourceMappingURL=FormInputText.js.map
