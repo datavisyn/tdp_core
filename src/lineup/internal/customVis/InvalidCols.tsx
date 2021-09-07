@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface InvalidColsProps {
-    message: string
+    message: string;
 }
 
 export function InvalidCols(props: InvalidColsProps) {

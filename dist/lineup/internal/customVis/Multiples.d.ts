@@ -18,6 +18,7 @@ export interface MultiplesProps {
     updateShape: (s: string) => void;
     updateChartType: (s: string) => void;
     selectedCallback: (s: string[]) => void;
+    filterCallback: (s: string) => void;
 }
 export declare type MultipleDataTraces = {
     plots: MultiplesPlot[];

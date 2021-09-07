@@ -309,7 +309,7 @@ export class AView extends EventHandler {
             // the selection has changed when we really have some new values not just another empty one
             this.itemSelectionChanged(name);
         }
-        console.log("firing");
+        console.log('firing');
         this.fire(AView.EVENT_ITEM_SELECT, current, selection, name);
     }
     /**

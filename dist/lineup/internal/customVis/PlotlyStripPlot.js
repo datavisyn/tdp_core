@@ -1,14 +1,14 @@
 import { GeneralPlot } from './GeneralPlot';
 function heuristic(columns) {
     return {
-        xAxis: columns.filter(c => c.type === "Categorical")[0].name,
-        yAxis: columns.filter(c => c.type === "Numerical")[0].name
+        xAxis: columns.filter((c) => c.type === 'Categorical')[0].name,
+        yAxis: columns.filter((c) => c.type === 'Numerical')[0].name
     };
 }
 export class PlotlyStrip extends GeneralPlot {
     startingHeuristic(props, selectedCatCols, selectedNumCols, updateSelectedCatCols, updateSelectedNumCols) {
-        let numCols = props.columns.filter(c => c.type === "number");
-        let catCols = props.columns.filter(c => c.type === "categorical");
+        const numCols = props.columns.filter((c) => c.type === 'number');
+        const catCols = props.columns.filter((c) => c.type === 'categorical');
         if (selectedNumCols.length === 0 && numCols.length >= 1) {
             updateSelectedNumCols([numCols[0].name]);
         }
@@ -18,22 +18,22 @@ export class PlotlyStrip extends GeneralPlot {
     }
     createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
         let counter = 1;
-        let numCols = props.columns.filter(c => selectedNumCols.includes(c.name));
-        let catCols = props.columns.filter(c => selectedCatCols.includes(c.name));
-        let plots = [];
-        for (let numCurr of numCols) {
-            for (let catCurr of catCols) {
+        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name));
+        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name));
+        const plots = [];
+        for (const numCurr of numCols) {
+            for (const catCurr of catCols) {
                 plots.push({
                     data: {
-                        x: catCurr.vals.map(v => v.val),
-                        y: numCurr.vals.map(v => v.val),
-                        xaxis: counter === 1 ? "x" : "x" + counter,
-                        yaxis: counter === 1 ? "y" : "y" + counter,
+                        x: catCurr.vals.map((v) => v.val),
+                        y: numCurr.vals.map((v) => v.val),
+                        xaxis: counter === 1 ? 'x' : 'x' + counter,
+                        yaxis: counter === 1 ? 'y' : 'y' + counter,
                         showlegend: false,
                         type: 'box',
-                        boxpoints: "all",
+                        boxpoints: 'all',
                         name: 'All points',
-                        mode: "none",
+                        mode: 'none',
                         pointpos: 0,
                         box: {
                             visible: true
@@ -46,8 +46,8 @@ export class PlotlyStrip extends GeneralPlot {
                         },
                         transforms: [{
                                 type: 'groupby',
-                                groups: catCurr.vals.map(v => v.val),
-                                styles: [...new Set(catCurr.vals.map(v => v.val))].map(c => {
+                                groups: catCurr.vals.map((v) => v.val),
+                                styles: [...new Set(catCurr.vals.map((v) => v.val))].map((c) => {
                                     return { target: c, value: { marker: { color: colorScale(c) } } };
                                 })
                             }]
@@ -59,11 +59,11 @@ export class PlotlyStrip extends GeneralPlot {
             }
         }
         return {
-            plots: plots,
+            plots,
             legendPlots: [],
             rows: numCols.length,
             cols: catCols.length,
-            errorMessage: "To create a Strip plot, please select at least 1 categorical column and at least 1 numerical column."
+            errorMessage: 'To create a Strip plot, please select at least 1 categorical column and at least 1 numerical column.'
         };
     }
 }

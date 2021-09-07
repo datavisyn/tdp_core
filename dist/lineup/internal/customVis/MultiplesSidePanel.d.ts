@@ -11,6 +11,7 @@ interface MultiplesSidePanelProps {
     currentType: supportedPlotlyVis;
     columns: (NumericalColumn | CategoricalColumn)[];
     dropdowns: GenericSelect[];
+    filterCallback: (s: string) => void;
 }
 declare type GenericSelect = {
     name: string;

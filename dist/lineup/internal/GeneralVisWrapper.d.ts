@@ -1,6 +1,6 @@
-import { LocalDataProvider } from "lineupjs";
-import { EventHandler } from "phovea_core";
-import { ARankingView } from "..";
+import { LocalDataProvider } from 'lineupjs';
+import { EventHandler } from 'phovea_core';
+import { ARankingView } from '..';
 export declare class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement;
     private viewable;

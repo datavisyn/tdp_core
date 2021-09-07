@@ -134,7 +134,7 @@ export class LineUpSelectionHelper extends EventHandler {
       return;
     }
 
-    console.log(sel)
+    console.log(sel);
 
     const old = this.provider.getSelection().sort((a, b) => a - b);
 
@@ -151,7 +151,7 @@ export class LineUpSelectionHelper extends EventHandler {
       return; // no change
     }
 
-    console.log(indices)
+    console.log(indices);
 
     this.provider.setSelection(indices);
   }

@@ -204,8 +204,8 @@ export abstract class ARankingView extends AView {
       this.taggle.zoomIn();
     });
     this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-      this.generalVis.toggleCustomVis()
-      this.generalVis.updateCustomVis()
+      this.generalVis.toggleCustomVis();
+      this.generalVis.updateCustomVis();
     });
     if (this.options.enableOverviewMode) {
       const rule = spaceFillingRule(taggleOptions);
@@ -222,7 +222,7 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
-      this.node.appendChild(this.generalVis.node)
+      this.node.appendChild(this.generalVis.node);
       if (this.options.enableSidePanel !== 'top') {
         this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
       }
