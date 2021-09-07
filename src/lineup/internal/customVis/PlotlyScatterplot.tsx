@@ -1,3 +1,4 @@
+import {NumericalColumn} from './CustomVis';
 import {GeneralPlot} from './GeneralPlot';
 import {MultipleDataTraces, MultiplesPlot, MultiplesProps} from './Multiples';
 
@@ -16,7 +17,7 @@ export class PlotlyScatter extends GeneralPlot {
 
     createTrace(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], shapeScale, colorScale, opacityScale, bubbleScale): MultipleDataTraces {
         let counter = 1;
-        const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name));
+        const validCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number') as NumericalColumn[];
         const plots: MultiplesPlot[] = [];
 
         const legendPlots: MultiplesPlot[] = [];

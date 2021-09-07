@@ -1,4 +1,5 @@
 import d3 from 'd3';
+import {CategoricalColumn, NumericalColumn} from './CustomVis';
 import {GeneralPlot} from './GeneralPlot';
 import {MultipleDataTraces, MultiplesPlot, MultiplesProps} from './Multiples';
 
@@ -15,8 +16,8 @@ export class PlotlyPCP extends GeneralPlot {
     }
 
     createTrace(props: MultiplesProps, selectedCatCols: string[], selectedNumCols: string[], shapeScale, colorScale, opacityScale, bubbleScale): MultipleDataTraces {
-        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name));
-        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name));
+        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number') as NumericalColumn[];
+        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical') as CategoricalColumn[];
 
         if(numCols.length + catCols.length < 2) {
             return {

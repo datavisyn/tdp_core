@@ -18,8 +18,8 @@ export class PlotlyStrip extends GeneralPlot {
     }
     createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
         let counter = 1;
-        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name));
-        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name));
+        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number');
+        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical');
         const plots = [];
         for (const numCurr of numCols) {
             for (const catCurr of catCols) {

@@ -11,8 +11,8 @@ export class PlotlyPCP extends GeneralPlot {
         return null;
     }
     createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
-        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name));
-        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name));
+        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number');
+        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical');
         if (numCols.length + catCols.length < 2) {
             return {
                 plots: [],

@@ -13,7 +13,7 @@ export class PlotlyScatter extends GeneralPlot {
     }
     createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
         let counter = 1;
-        const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name));
+        const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number');
         const plots = [];
         const legendPlots = [];
         if (validCols.length === 1) {
