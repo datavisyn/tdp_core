@@ -92,6 +92,7 @@
     "react-plotly.js": "^2.4.0",
     "react-split": "^2.0.9",
     "bootstrap": "^5.0.1",
+    "popper.js": "^1.15.0",
     "plotly.js-dist": "^1.57.1"
   },
   "devDependencies": {
