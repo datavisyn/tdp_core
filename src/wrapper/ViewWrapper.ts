@@ -57,13 +57,13 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     this.node.classList.add('tdp-view-wrapper');
     this.allowed = FindViewUtils.canAccess(plugin);
     this.node.innerHTML = `
-     <header>
-        <div class="parameters form-inline"></div>
-      </header>
-     <main></main>
-     <div class="preview-image">
-        <div></div>
-        <span>${!this.allowed ? TDPApplicationUtils.notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
+    <header>
+      <div class="parameters container-fluid ps-0 pe-0"></div>
+    </header>
+    <main></main>
+    <div class="preview-image">
+      <div></div>
+      <span>${!this.allowed ? TDPApplicationUtils.notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
     </div>`;
     this.node.classList.add('view', 'disabled-view');
     this.content = <HTMLElement>this.node.querySelector('main');
@@ -117,9 +117,9 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
 
     if (visible) {
-      this.node.classList.remove('hidden');
+      this.node.removeAttribute('hidden');
     } else {
-      this.node.classList.add('hidden');
+      this.node.toggleAttribute('hidden');
     }
 
     if (visible && this.instance == null && selection && this.match(selection)) {
@@ -131,7 +131,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   get visible() {
-    return !this.node.classList.contains('hidden');
+    return !this.node.hasAttribute('hidden');
   }
 
   /**

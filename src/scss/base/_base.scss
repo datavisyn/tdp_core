@@ -12,18 +12,6 @@ b,
   font-weight: 500 !important;
 }
 
-.form-inline .form-group {
-  margin-right: 15px;
-
-  label {
-    margin-right: 5px;
-  }
-}
-
-.form-horizontal.form-group-sm .form-group {
-  margin-bottom: 5px;
-}
-
 /**
  * Hide options menu
  */
@@ -51,7 +39,7 @@ li[data-header=optionsLink] {
   white-space: nowrap;
 }
 
-.toast-container {
+.toast-container-custom {
   $move_animation: 0.5s !default;
 
   position: fixed;
@@ -92,7 +80,7 @@ li[data-header=optionsLink] {
     content: '';
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.26) $phovea-loading-icon-url center center no-repeat;
+    background: rgba(255, 255, 255, 0.26) $phovea-loading-icon-url center center / $phovea-loading-icon-size no-repeat;
     z-index: 9;
   }
 
@@ -113,4 +101,22 @@ li[data-header=optionsLink] {
 
 .#{$tdp-css-prefix}-busy-overlay > * {
   visibility: hidden !important;
+}
+
+/**
+ * Style for the authorization overlay in views and score headers.
+ */
+.#{$tdp-css-prefix}-authorization-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255,255,255,0.95);
 }

@@ -1,11 +1,3 @@
-
-
-// header navbar color (the inverse colors will be computed using sass `invert($color)`)
-$header-bg-color: #f0f0f0 !default;
-$header-border-color: #ddd !default;
-$header-link-color: #333 !default;
-$header-dropdown-link-color: $header-link-color !default;
-
 $select-color: orange !default;
 $select-color-bright: #ffdca3 !default;
 $hover-color: black !default;
@@ -37,9 +29,11 @@ $annotation_color: #009ACD !default;
 $annotation_color_hover: #006b90 !default;
 
 $anchor_color: #EE2329 !default;
-$anchor_color_hover: darken($anchor_color, 20%) !default;
+$anchor_color_hover: shade-color($anchor_color, 20%) !default;
 
 $select-data-color: orange !default;
 $hover-data-color: #ffc46b !default;
 
 $tdp-css-prefix: 'tdp' !default;
+
+$tdp-view-wrapper-preview-background: white !default;

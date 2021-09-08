@@ -97,7 +97,7 @@ export class NamedSetList {
     $enter.append('a')
       .classed('public', true)
       .attr('href', '#')
-      .html(`<i class="fas fa-fw" aria-hidden="true"></i> <span class="sr-only"></span>`)
+      .html(`<i class="fas fa-fw" aria-hidden="true"></i> <span class="visually-hidden"></span>`)
       .on('click', (namedSet: INamedSet) => {
         // prevent changing the hash (href)
         (<Event>d3event).preventDefault();
@@ -107,7 +107,7 @@ export class NamedSetList {
     $enter.append('a')
       .classed('edit', true)
       .attr('href', '#')
-      .html(`<i class="fas fa-edit" aria-hidden="true"></i> <span class="sr-only"> ${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.edit')}</span>`)
+      .html(`<i class="fas fa-edit" aria-hidden="true"></i> <span class="visually-hidden"> ${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.edit')}</span>`)
       .attr('title', I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.edit') as string)
       .on('click', (namedSet: IStoredNamedSet) => {
         // prevent changing the hash (href)
@@ -118,7 +118,7 @@ export class NamedSetList {
     $enter.append('a')
       .classed('delete', true)
       .attr('href', '#')
-      .html(`<i class="fas fa-trash" aria-hidden="true"></i> <span class="sr-only">${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.delete')}</span>`)
+      .html(`<i class="fas fa-trash" aria-hidden="true"></i> <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.delete')}</span>`)
       .attr('title', I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.delete') as string)
       .on('click', async (namedSet: IStoredNamedSet) => {
         // prevent changing the hash (href)
@@ -144,14 +144,14 @@ export class NamedSetList {
         const extendedData = d.type === ENamedSetType.NAMEDSET ? {context: 'extended', creator: (<IStoredNamedSet>d).creator, public: UserSession.getInstance().hasPermission(<IStoredNamedSet>d, EEntity.OTHERS)} : {};
         return I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.title', {name: d.name, description: d.description, ...extendedData}) as string; // i18next context feature
       });
-    $options.select('a.delete').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d));
-    $options.select('a.edit').classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d));
+    $options.select('a.delete').attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d)) ? '' : null);
+    $options.select('a.edit').attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d) ? '' : null));
     $options.select('a.public')
-      .classed('hidden', (d) => d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d))
+      .attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d)) ? '' : null)
       .html((d) => {
         const isPublic = d.type === ENamedSetType.NAMEDSET && UserSession.getInstance().hasPermission(<IStoredNamedSet>d, EEntity.OTHERS);
         const publicOrPrivate = I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.status', {context: isPublic ? '' : 'private'});
-        return `<i class="fas ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${publicOrPrivate}"></i> <span class="sr-only">${publicOrPrivate}</span>`;
+        return `<i class="fas ${isPublic ? 'fa-users' : 'fa-user'}" aria-hidden="true" title="${publicOrPrivate}"></i> <span class="visually-hidden">${publicOrPrivate}</span>`;
       });
 
     $options.exit().remove();

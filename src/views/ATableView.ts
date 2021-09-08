@@ -71,7 +71,7 @@ export abstract class ATableView<T extends IRow> extends AView {
   protected initImpl() {
     super.initImpl();
 
-    this.node.innerHTML = `<table class="table table-hover ${this.options.condensed ? ' table-condensed' : ''}${this.options.bordered ? ' table-bordered' : ''}${this.options.stripedRows ? ' table-striped' : ''}">
+    this.node.innerHTML = `<table class="table table-hover ${this.options.condensed ? ' table-sm' : ''}${this.options.bordered ? ' table-bordered' : ''}${this.options.stripedRows ? ' table-striped' : ''}">
         <thead><tr></tr></thead>
         <tbody></tbody>
     </table>`;

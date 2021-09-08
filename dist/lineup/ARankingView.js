@@ -13,6 +13,8 @@ import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LazyColumn } from './internal/column';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -89,6 +91,27 @@ export class ARankingView extends AView {
                 maxGroupColumns: Infinity,
                 filterGlobally: true,
                 propagateAggregationState: false
+            },
+            formatSearchBoxItem: (item, node) => {
+                // TypeScript type guard function
+                function hasColumnDesc(item) {
+                    return item.desc != null;
+                }
+                if (node.parentElement && hasColumnDesc(item)) {
+                    node.dataset.type = item.desc.type;
+                    const summary = item.desc.summary || item.desc.description;
+                    node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
+                    if (summary) {
+                        const label = node.ownerDocument.createElement('span');
+                        label.textContent = item.desc.label;
+                        node.appendChild(label);
+                        const desc = node.ownerDocument.createElement('span');
+                        desc.textContent = summary;
+                        node.appendChild(desc);
+                        return undefined;
+                    }
+                }
+                return item.text;
             }
         };
         // variants for deriving the item name
@@ -100,8 +123,9 @@ export class ARankingView extends AView {
         BaseUtils.mixin(this.options, idTypeNames, names, options);
         this.node.classList.add('lineup', 'lu-taggle', 'lu');
         this.node.insertAdjacentHTML('beforeend', `<div></div>`);
-        this.stats = this.node.ownerDocument.createElement('p');
-        this.provider = new LocalDataProvider([], [], this.options.customProviderOptions);
+        this.stats = this.node.ownerDocument.createElement('div');
+        this.stats.classList.add('mt-2', 'mb-2');
+        this.provider = new TDPLocalDataProvider([], [], this.options.customProviderOptions);
         // hack in for providing the data provider within the graph
         // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
         // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
@@ -183,10 +207,11 @@ export class ARankingView extends AView {
         return super.init(params, onParameterChange).then(() => {
             // inject stats
             const base = params.querySelector('form') || params;
-            base.insertAdjacentHTML('beforeend', `<div class="form-group"></div>`);
+            base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
             const container = base.lastElementChild;
             container.appendChild(this.stats);
             if (this.options.enableSidePanel === 'top') {
+                container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
                 container.insertAdjacentElement('afterbegin', this.panel.node);
             }
         });
@@ -322,8 +347,76 @@ export class ARankingView extends AView {
         const rawOrder = this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
         const order = (rawOrder instanceof Uint8Array || rawOrder instanceof Uint16Array || rawOrder instanceof Uint32Array) ? Array.from(rawOrder) : rawOrder; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
         const ids = this.selectionHelper.rowIdsAsSet(order);
-        const data = score.compute(ids, this.itemIDType, args);
+        let columnResolve = null;
+        const columnPromise = new Promise((resolve) => columnResolve = resolve);
+        const data = new Promise(async (resolve) => {
+            var _a;
+            // Wait for the column to be initialized
+            const col = await columnPromise;
+            /**
+             * An error can occur either when the authorization fails, or the request using the token fails.
+             */
+            let outsideError = null;
+            // TODO: Add a button which allows the user to stop this process?
+            let done = false;
+            while (!done) {
+                await TDPTokenManager.runAuthorizations(await ((_a = score.getAuthorizationConfiguration) === null || _a === void 0 ? void 0 : _a.call(score)), {
+                    render: ({ authConfiguration, status, error, trigger }) => {
+                        const e = error || outsideError;
+                        // Select the header of the score column
+                        const headerNode = this.node.querySelector(`.lu-header[data-id=${col.id}]`);
+                        if (!col.findMyRanker() || !headerNode) {
+                            // The column was removed.
+                            done = true;
+                            return;
+                        }
+                        // Fetch or create the authorization overlay
+                        let overlay = headerNode.querySelector('.tdp-authorization-overlay');
+                        if (!overlay) {
+                            overlay = headerNode.ownerDocument.createElement('div');
+                            overlay.className = 'tdp-authorization-overlay';
+                            // Add element at the very bottom to avoid using z-index
+                            headerNode.appendChild(overlay);
+                        }
+                        if (status === ERenderAuthorizationStatus.SUCCESS) {
+                            overlay.remove();
+                        }
+                        else {
+                            overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-overflow-ellipsis" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
+                            overlay.title = e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequiredTitle', { name: authConfiguration.name });
+                            overlay.style.cursor = 'pointer';
+                            overlay.onclick = () => trigger();
+                        }
+                    }
+                });
+                try {
+                    outsideError = null;
+                    return resolve(await score.compute(ids, this.itemIDType, args));
+                }
+                catch (e) {
+                    if (e instanceof InvalidTokenError) {
+                        console.error(`Score computation failed because of invalid token:`, e.message);
+                        outsideError = e;
+                        if (col.findMyRanker()) {
+                            // Only invalidate authorizations if the column was not removed yet.
+                            // TODO: When we invalidate it here, it also "disables" already open detail views for example
+                            TDPTokenManager.invalidateToken(e.ids);
+                        }
+                        else {
+                            // We are done if the column was removed
+                            done = true;
+                            continue;
+                        }
+                        continue;
+                    }
+                    else {
+                        throw e;
+                    }
+                }
+            }
+        });
         const r = this.addColumn(colDesc, data, -1, position);
+        columnResolve(r.col);
         // use _score function to reload the score
         colDesc._score = () => {
             const rawOrder = this.provider.getRankings()[0].getOrder(); // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array

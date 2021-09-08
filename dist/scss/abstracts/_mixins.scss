@@ -1,7 +1,7 @@
 
 @mixin idtype_color($idType, $color) {
   form.search {
-    label.checkbox-inline[data-idtype="#{$idType}"] {
+    .form-check-label[data-idtype="#{$idType}"] {
       color: $color;
     }
   }
@@ -17,7 +17,7 @@
     }
 
     .select2-results__option[data-idtype="#{$idType}"]:not([aria-selected=true]):not(.select2-results__option--highlighted) {
-      background: lighten($color, 22%);
+      background: tint-color($color, 22%);
       color: black;
     }
   }

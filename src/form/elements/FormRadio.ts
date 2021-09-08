@@ -1,13 +1,14 @@
-import {IFormElementDesc, IForm} from '../interfaces';
+import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 import {IFormSelectOption} from './FormSelect';
 import {IPluginDesc} from 'phovea_core';
 
 export interface IRadioElementDesc extends IFormElementDesc {
+  type: FormElementType.RADIO;
   options: {
     buttons: IFormSelectOption[];
-  };
+  } & IFormElementDesc['options'];
 }
 
 export class FormRadio extends AFormElement<IRadioElementDesc> {
@@ -19,7 +20,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, Object.assign({options: { buttons: [] }}, elementDesc), pluginDesc);
+    super(form, Object.assign({options: {buttons: []}}, elementDesc), pluginDesc);
   }
 
   /**
@@ -28,27 +29,26 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    */
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
-
-    this.$node = $formNode.append('div').classed('form-group', true);
+    this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
     this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
+    const $label = this.appendLabel(this.$rootNode);
 
-    const $label = this.$node.select('label');
-
+    $label.classed('me-2', true);
     const options = this.elementDesc.options;
 
-    const $buttons = this.$node.selectAll('label.radio-inline').data(options.buttons);
-    $buttons.enter().append('label').classed('radio-inline', true).html((d, i) => `<input type="radio" name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}"> ${d.name}`);
+    const $buttons = this.$rootNode.selectAll('div.radio-inline').data(options.buttons);
+    $buttons.enter().append('div').classed('radio-inline form-check form-check-inline', true).html((d, i) => `<input class="form-check-input" type="radio"
+        name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
+      <label class="form-label form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>`);
+    this.$inputNode = $buttons.select('input');
 
-    const $buttonElements = $buttons.select('input');
-
-    $buttonElements.on('change', (d) => {
+    this.$inputNode.on('change', (d) => {
       this.fire(FormRadio.EVENT_CHANGE, d, $buttons);
     });
 
     // TODO: fix that the form-control class is only appended for textual form elements, not for all
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because it is mainly used for text inputs and destroys the styling of the radio
-    this.setAttributes($buttonElements, this.elementDesc.attributes);
+    this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 
   /**
@@ -75,7 +75,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    * @returns {string}
    */
   get value() {
-    const checked = this.$node.select('input:checked');
+    const checked = this.$rootNode.select('input:checked');
     return checked.empty() ? null : checked.datum().data;
   }
 
@@ -84,12 +84,12 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    * @param v
    */
   set value(v: any) {
-    this.$node.selectAll('input').property('checked', (d) => d === v || d.data === v);
+    this.$rootNode.selectAll('input').property('checked', (d) => d === v || d.data === v);
     this.previousValue = v; // force old value change
     this.updateStoredValue();
   }
 
   focus() {
-    (<HTMLInputElement>this.$node.select('input').node()).focus();
+    (<HTMLInputElement>this.$rootNode.select('input').node()).focus();
   }
 }

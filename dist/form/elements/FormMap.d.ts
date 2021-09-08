@@ -19,7 +19,7 @@ export interface ISubInputDesc extends ISubDesc {
 export interface ISubSelectDesc extends ISubDesc {
     type: FormElementType.SELECT;
     /**
-     * teh data, a promise of the data or a function computing the data or promise
+     * the data, a promise of the data or a function computing the data or promise
      */
     optionsData: ISelectOptions | (() => ISelectOptions);
 }
@@ -40,6 +40,7 @@ declare type ISubDescs = ISubInputDesc | ISubSelectDesc | ISubSelect2Desc | ISub
  * Add specific options for input form elements
  */
 export interface IFormMapDesc extends IFormElementDesc {
+    type: FormElementType.MAP;
     /**
      * Additional options
      */
@@ -55,7 +56,7 @@ export interface IFormMapDesc extends IFormElementDesc {
          * @default true
          */
         defaultSelection?: boolean;
-    };
+    } & IFormElementDesc['options'];
 }
 export interface IFormRow {
     key: string;

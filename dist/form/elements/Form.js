@@ -17,7 +17,7 @@ export class Form {
          * Map of all appended form elements with the element id as key
          */
         this.elements = new Map();
-        this.$node = $parent.append('form').attr('id', this.formId);
+        this.$node = $parent.append('form').attr('class', `row align-items-center`).attr('id', this.formId);
     }
     /**
      * Append a form element and builds it
@@ -105,7 +105,12 @@ export class Form {
         elementDesc.attributes = elementDesc.attributes || {};
         elementDesc.attributes.id = uid; // add id as attribute
         elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
-        elementDesc.attributes.clazz += ' form-control';
+        if (elementDesc.type === 'FormSelect') {
+            elementDesc.attributes.clazz += ' form-select';
+        }
+        else if (elementDesc.type === 'FormButton') {
+            elementDesc.attributes.clazz += ' btn btn-light btn-sm';
+        }
         return elementDesc;
     }
 }

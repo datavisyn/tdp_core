@@ -3,7 +3,7 @@ import {Tour} from './Tour';
 import {IStep} from './extensions';
 import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
 import {AppHeader} from 'phovea_ui';
-import {GlobalEventHandler, I18nextManager} from 'phovea_core';
+import {GlobalEventHandler, I18nextManager, BaseUtils} from 'phovea_core';
 import {TourUtils} from './TourUtils';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
@@ -29,6 +29,10 @@ export class TourManager {
       this.hideTour();
     }
   }
+
+  private readonly resizeListener = BaseUtils.debounce(() => {
+    this.activeTour.refreshCurrent(this.activeTourContext);
+  }, 250);
 
   private readonly backdrop: HTMLElement;
   private readonly backdropBlocker: HTMLElement;
@@ -69,10 +73,10 @@ export class TourManager {
       <div class="tdp-tour-step-dots">
       </div>
       <div class="btn-group" role="group">
-        <button type="button" data-switch="--" class="btn-xs btn btn-default"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
-        <button type="button" data-switch="-" class="btn-xs btn btn-default"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
-        <button type="button" data-switch="0" class="btn-xs btn btn-default"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
-        <button type="button" data-switch="+" class="btn-xs btn btn-default"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
+        <button type="button" data-switch="--" class="btn-sm btn btn-light"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
+        <button type="button" data-switch="-" class="btn-sm btn btn-light"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
+        <button type="button" data-switch="0" class="btn-sm btn btn-light"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
+        <button type="button" data-switch="+" class="btn-sm btn btn-primary"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
       </div>
     </div>
     `;
@@ -115,16 +119,15 @@ export class TourManager {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
-                    <span aria-hidden="true">×</span>
-                </button>
                 <h4 class="modal-title">${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.helpTours')}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
+                </button>
             </div>
             <div class="modal-body">
               <ul class="fa-ul">
                 ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}">
                   <i class="fa-li ${finished.has(d.id) ? 'fas fa-check-square' : 'far fa-square'}"></i>
-                  <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-dismiss="modal" data-name="${d.name}">${d.name}</a>
+                  <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-bs-dismiss="modal" data-name="${d.name}">${d.name}</a>
                   ${d.description ? `<p>${d.description}</p>` : ''}
                 </li>`).join('')}
               </ul>
@@ -173,12 +176,12 @@ export class TourManager {
   }
 
   private setHighlight(mask: IBoundingBox) {
-    const fullAppHeight = this.backdrop.ownerDocument.body.scrollHeight; // full page height including scroll bars
-    const fullAppWidth = this.backdrop.ownerDocument.body.scrollWidth; // full page width including scroll bars
+    const fullAppWidth = '100vw';
+    const fullAppHeight = '100vh';
 
     // set the new height of the backdrop
-    this.backdrop.style.height = `${fullAppHeight}px`;
-    this.backdrop.style.width = `${fullAppWidth}px`;
+    this.backdrop.style.height = fullAppHeight;
+    this.backdrop.style.width = fullAppWidth;
 
     // also consider the current scroll offset inside the window
     const scrollOffsetX = self.scrollX;
@@ -187,15 +190,15 @@ export class TourManager {
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example
     this.backdrop.style.clipPath = `polygon(
       0% 0%,
-      0% ${fullAppHeight}px,
-      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
+      0% ${fullAppHeight},
+      ${mask.left + scrollOffsetX}px ${fullAppHeight},
       ${mask.left + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
       ${mask.left + mask.width + scrollOffsetX}px ${mask.top + scrollOffsetY}px,
       ${mask.left + mask.width + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
       ${mask.left + scrollOffsetX}px ${mask.top + mask.height + scrollOffsetY}px,
-      ${mask.left + scrollOffsetX}px ${fullAppHeight}px,
-      ${fullAppWidth}px ${fullAppHeight}px,
-      ${fullAppWidth}px 0%
+      ${mask.left + scrollOffsetX}px ${fullAppHeight},
+      ${fullAppWidth} ${fullAppHeight},
+      ${fullAppWidth} 0%
     )`;
   }
 
@@ -397,6 +400,9 @@ export class TourManager {
 
 
   private setUp(tour: Tour, context: any = {}) {
+    this.backdrop.ownerDocument.defaultView.addEventListener('resize', this.resizeListener, {
+      passive: true
+    });
     this.backdrop.ownerDocument.addEventListener('keyup', this.keyListener, {
       passive: true
     });
@@ -409,6 +415,7 @@ export class TourManager {
 
   private takeDown() {
     this.clearHighlight();
+    this.backdrop.ownerDocument.defaultView.removeEventListener('resize', this.resizeListener);
     this.backdrop.ownerDocument.removeEventListener('keyup', this.keyListener);
     this.backdrop.style.display = null;
     this.backdropBlocker.style.display = null;

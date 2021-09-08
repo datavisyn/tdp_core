@@ -12,7 +12,7 @@ import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
 import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
 import {TemporarySessionList} from './utils/SessionList';
-
+import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
 
 export interface ITDPOptions {
   /**
@@ -55,10 +55,22 @@ export interface ITDPOptions {
   showHelpLink: boolean | string;
 
   /**
+   * Show tour link if set to true and registered tours are available.
+   */
+  showTourLink: boolean;
+
+  /**
    * Show/hide the `Analysis Session Managment` menu in the header
    * @default: true
    */
   showProvenanceMenu?: boolean;
+
+
+  /**
+   * Show/hide the `Exploration`, `Authoring`, `Presentation` buttons in the header
+   * @default: true
+   */
+  showClueModeButtons: boolean;
 
   /**
    * default: true
@@ -74,7 +86,24 @@ export interface ITDPOptions {
    * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
    * Passing falsy values disables the client configuration load.
    */
-  clientConfig?: Record<any, any> | null | undefined;
+  clientConfig?:
+    | {
+        /**
+         * Configuration for the TDPTokenManager.
+         */
+        tokenManager?: {
+          /**
+           * Initial authorization configurations.
+           * Note that this is an object, because then the deep-merge with the local and remote config is easier.
+           */
+          authorizationConfigurations?: {
+            [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
+          };
+        };
+        [key: string]: any;
+      }
+    | null
+    | undefined;
 }
 
 /**
@@ -91,9 +120,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showResearchDisclaimer: true,
     showAboutLink: true,
     showHelpLink: false,
+    showTourLink: true,
     showOptionsLink: false,
     showReportBugLink: true,
     showProvenanceMenu: true,
+    showClueModeButtons: true,
     enableProvenanceUrlTracking: true,
     clientConfig: null
   };
@@ -108,34 +139,42 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     BaseUtils.mixin(this.options, options);
 
-    const configPromise = ATDPApplication.initializeClientConfig(this.options);
+    this.initialize();
+  }
 
+  /**
+   * Initialize async parts
+   * TODO make public and remove call in constructor in the future
+   */
+  protected async initialize() {
+    const configPromise = ATDPApplication.initializeClientConfig(this.options);
     const i18nPromise = I18nextManager.getInstance().initI18n();
 
-    Promise.all([configPromise, i18nPromise]).then(() => {
-      this.tourManager = new TourManager({
-        doc: document,
-        header: () => this.header,
-        app: () => this.app
-      });
+    await Promise.all([configPromise, i18nPromise]);
 
-      BaseUtils.mixin(this.options, {
-        showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
-      });
+    // Prefill the token manager with authorization configurations
+    if (this.options.clientConfig?.tokenManager?.authorizationConfigurations) {
+      await TDPTokenManager.addAuthorizationConfiguration(Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({id, ...config})));
+    }
 
-      this.build(document.body, {replaceBody: false});
+    await this.build(document.body, {replaceBody: false});
 
-      if (this.tourManager.hasTours()) {
-        const button = document.querySelector<HTMLElement>('[data-header="helpLink"] a');
-
-        button.dataset.toggle = 'modal';
-        button.tabIndex = -1;
-        button.dataset.target = `#${this.tourManager.chooser.id}`;
-        button.onclick = (evt) => {
-          evt.preventDefault();
-        };
-      }
+    this.tourManager = new TourManager({
+      doc: document,
+      header: () => this.header,
+      app: () => this.app
     });
+
+    if (this.options.showTourLink && this.tourManager.hasTours()) {
+      const button = this.header.addRightMenu('<i class="fas fa-question-circle fa-fw"></i>', (evt) => {
+        evt.preventDefault();
+        return false;
+      }, '#');
+
+      button.dataset.toggle = 'modal';
+      button.tabIndex = -1;
+      button.dataset.target = `#${this.tourManager.chooser.id}`;
+    }
   }
 
   /**
@@ -225,10 +264,6 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
     }
 
-    const modeSelector = body.querySelector('header');
-    modeSelector.classList.add('collapsed');
-    modeSelector.classList.add('clue-modeselector');
-
 
     const main = <HTMLElement>document.body.querySelector('main');
     const content = <HTMLElement>body.querySelector('div.content');
@@ -242,9 +277,15 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     });
 
     graph.then((graph) => {
-      ButtonModeSelector.createButton(modeSelector, {
-        size: 'sm'
-      });
+      if (this.options.showClueModeButtons) {
+        const phoveaNavbar = document.body.querySelector('.phovea-navbar');
+        const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
+        modeSelector.classList.add('collapsed');
+        modeSelector.classList.add('clue-modeselector');
+        ButtonModeSelector.createButton(modeSelector, {
+          size: 'sm'
+        });
+      }
       provenanceMenu?.setGraph(graph);
     });
 

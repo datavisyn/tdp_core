@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import {EventHandler, IPluginDesc} from 'phovea_core';
 
 export interface IButtonElementDesc extends IFormElementDesc {
+  type: FormElementType.BUTTON;
   onClick: () => void;
   iconClass?: string;
 }
@@ -31,7 +32,7 @@ export class FormButton extends EventHandler implements IFormElement {
    * @param visible
    */
   setVisible(visible: boolean) {
-    this.$node.classed('hidden', !visible);
+    this.$node.attr('hidden', !visible);
   }
 
   get value(): boolean {
@@ -51,7 +52,7 @@ export class FormButton extends EventHandler implements IFormElement {
    * @param $formNode The parent node this element will be attached to
    */
   build($formNode) {
-    this.$node = $formNode.append('div').classed('form-group', true);
+    this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
     this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
     this.$button.html(() => this.elementDesc.iconClass? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
   }

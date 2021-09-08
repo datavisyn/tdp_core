@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Remove all from dist folder
           command: |
-            rm -rf dist && mkdir dist          
+            rm -rf dist && mkdir dist
       - run:
           name: Build
           command: |
@@ -70,7 +70,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/.
-      - run: ls -a    
+      - run: ls -a
       - run:
           name: Install twine
           command: |
@@ -99,7 +99,7 @@ jobs:
             node -v
             npm -v
       - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "package.json" }}
+          key: deps2-{{ .Branch }}-{{ checksum "package.json" }}
       - run:
           name: Install npm dependencies
           command: npm install
@@ -108,7 +108,7 @@ jobs:
           command: |
             (grep -l '._resolved.: .\(git[^:]*\|bitbucket\):' ./node_modules/*/package.json || true) | xargs -r dirname | xargs -r rm -rf
       - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "package.json" }}
+          key: deps2-{{ .Branch }}-{{ checksum "package.json" }}
           paths: ./node_modules
       - run:
           name: Install npm dependencies from git repositories (always get latest commit)
@@ -130,7 +130,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/.
-      - run: ls -a    
+      - run: ls -a
       - run:
           name: Authentication
           command:  |

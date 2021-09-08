@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import $ from 'jquery';
 import {BaseUtils, AppContext, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
-import {IForm, IFormElementDesc} from '../interfaces';
+import {IForm, IFormElementDesc, FormElementType} from '../interfaces';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text'|'id';
@@ -18,10 +18,11 @@ declare type IFormSelect2Options = Select2Options & {
  * Add specific options for select form elements
  */
 export interface IFormSelect2 extends IFormElementDesc {
+  type: FormElementType.SELECT2;
   /**
    * Additional options
    */
-  options?: IFormSelect2Options;
+  options?: IFormSelect2Options & IFormElementDesc['options'];
 }
 
 export interface ISelect2Option {
@@ -101,12 +102,14 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
+    this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    const rowNode = this.$rootNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
+    this.appendLabel(rowNode);
 
-    this.$select = this.$node.append('select');
-    this.setAttributes(this.$select, this.elementDesc.attributes);
+    const $colSelectNode = rowNode.append('div').classed('col', true);
+    this.$inputNode = $colSelectNode.append('select');
+    this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 
   /**
@@ -120,7 +123,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     });
     const df = this.elementDesc.options.data;
     const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
-    this.buildSelect2(this.$select, this.elementDesc.options || {}, data);
+    this.buildSelect2(this.$inputNode, this.elementDesc.options || {}, data);
 
 
     // propagate change action with the data of the selected option

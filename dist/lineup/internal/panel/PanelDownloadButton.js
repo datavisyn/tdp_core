@@ -10,16 +10,16 @@ export class PanelDownloadButton {
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('btn-group', 'download-data-dropdown');
         this.node.innerHTML = `
-      <button type="button" class="dropdown-toggle fas fa-download" style="width: 100%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
+      <button type="button" class="dropdown-toggle fas fa-download" style="width: 100%;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
       </button>
-      <ul class="dropdown-menu dropdown-menu-${isTopMode ? 'left' : 'right'}">
-        <li class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAsExcel')}</li>
-        <li data-num-all-rows="0"><a href="#" data-rows="all" data-format="xlsx" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadEntireList')}</a></li>
-        <li data-num-filtered-rows="0"><a href="#" data-rows="filtered" data-format="xlsx" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadFilteredRows')}</a></li>
-        <li data-num-selected-rows="0"><a href="#" data-rows="selected" data-format="xlsx" data-num-selected-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</a></li>
-        <li role="separator" class="divider"></li>
-        <li><a href="#" data-rows="custom" data-format="custom">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a></li>
-      </ul>
+      <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-end dropdown-menu-lg-start' : 'dropdown-menu-lg-end'}" data-bs-popper="static">
+        <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAsExcel')}</div>
+        <a class="dropdown-item" href="#" data-rows="all" data-format="xlsx" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadEntireList')}</a>
+        <a class="dropdown-item" href="#" data-rows="filtered" data-format="xlsx" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadFilteredRows')}</a>
+        <a class="dropdown-item" href="#" data-rows="selected" data-format="xlsx" data-num-selected-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="#" data-rows="custom" data-format="custom">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a>
+      </div>
     `;
         lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_ALL, (_event, order) => {
             this.node.querySelectorAll('[data-num-all-rows]').forEach((element) => element.dataset.numAllRows = order.length.toString());
@@ -66,38 +66,50 @@ export class PanelDownloadButton {
         return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
             const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
             const id = `e${BaseUtils.randomId(3)}`;
+            const inlineRadioID1 = `inlineRadio_${BaseUtils.randomId()}`;
+            const inlineRadioID2 = `inlineRadio_${BaseUtils.randomId()}`;
+            const inlineRadioID3 = `inlineRadio_${BaseUtils.randomId()}`;
             const ranking = provider.getFirstRanking();
             dialog.form.classList.add('tdp-ranking-export-form');
             const flat = ranking.flatColumns.filter((c) => c.label.trim().length > 0);
             const lookup = new Map(flat.map((d) => [d.id, d]));
             dialog.form.innerHTML = `
-        <div class="form-group">
+        <div class="mb-3">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
           <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
           <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
           ${flat.map((col) => `
-            <div class="checkbox tdp-ranking-export-form-handle">
-              <i class="fas fa-grip-vertical"></i>
-              <label>
-                <input type="checkbox" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''}>
-                ${col.label}
-              </label>
+            <div class="tdp-ranking-export-form-handle hstack gap-1">
+              <i class="fas fa-grip-vertical pb-2"></i>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
+                <label class="form-label form-check-label" for="customCheck_${col.id}">${col.label}</label>
+              </div>
             </div>
           `).join('')}
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
-          <div class="radio" data-num-rows="${orderedRowIndices.all.length}"><label><input type="radio" name="rows" value="all" checked>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label></div>
-          <div class="radio" data-num-rows="${orderedRowIndices.filtered.length}"><label><input type="radio" name="rows" value="filtered">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label></div>
-          <div class="radio" data-num-rows="${orderedRowIndices.selected.length}"><label><input type="radio" name="rows" value="selected">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label></div>
+          <div class="radio form-check" data-num-rows="${orderedRowIndices.all.length}">
+            <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="form-check-input">
+            <label class="form-label form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
+          </div>
+          <div class="radio form-check" data-num-rows="${orderedRowIndices.filtered.length}">
+            <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="form-check-input">
+            <label class="form-label form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
+          </div>
+          <div class="radio form-check" data-num-rows="${orderedRowIndices.selected.length}">
+            <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="form-check-input">
+            <label class="form-label form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
+        <div class="mb-3">
+          <label class="form-label" for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
           <input class="form-control" id="name_${id}" name="name" value="Export" required>
         </div>
-        <div class="form-group">
-          <label for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
-          <select class="form-control" id="type_${id}" name="type" required>
+        <div class="mb-3">
+          <label class="form-label" for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
+          <select class="form-select" id="type_${id}" name="type" required>
           <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
           <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
           <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
@@ -111,7 +123,7 @@ export class PanelDownloadButton {
                     dialog.form.querySelector('.error-columns').parentElement.classList.toggle('has-error', (dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0));
                 });
             });
-            this.resortAble(dialog.form.firstElementChild, '.checkbox');
+            this.resortAble(dialog.form.firstElementChild, '.tdp-ranking-export-form-handle');
             return new Promise((resolve) => {
                 dialog.onSubmit(() => {
                     const data = new FormData(dialog.form);

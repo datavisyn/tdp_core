@@ -5,7 +5,7 @@
 import * as d3 from 'd3';
 import {UserSession, ResolveNow, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
-import {IFormElementDesc, IForm, IFormElement} from '../interfaces';
+import {IFormElementDesc, IForm, IFormElement, FormElementType} from '../interfaces';
 
 
 export interface IFormSelectOption {
@@ -37,10 +37,11 @@ export interface IFormSelectOptions {
  * Add specific options for select form elements
  */
 export interface IFormSelectDesc extends IFormElementDesc {
+  type: FormElementType.SELECT;
   /**
    * Additional options
    */
-  options?: IFormSelectOptions;
+  options?: IFormSelectOptions & IFormElementDesc['options'];
 }
 
 export interface IFormSelectElement extends IFormElement {
@@ -88,12 +89,15 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$node = $formNode.append('div').classed('form-group', true);
+    this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    const rowNode = this.$rootNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
-    this.appendLabel();
+    this.appendLabel(rowNode);
 
-    this.$select = this.$node.append('select');
-    this.setAttributes(this.$select, this.elementDesc.attributes);
+    const $colDiv = rowNode.append('div').classed('col', true);
+    this.$inputNode = $colDiv.append('select');
+    this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', 'form-select'); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
+    this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 
   /**
@@ -105,8 +109,8 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     const options = this.elementDesc.options;
 
     // propagate change action with the data of the selected option
-    this.$select.on('change.propagate', () => {
-      this.fire(FormSelect.EVENT_CHANGE, this.value, this.$select);
+    this.$inputNode.on('change.propagate', () => {
+      this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
     });
 
     const data = FormSelect.resolveData(options.optionsData);
@@ -114,8 +118,8 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     const values = this.handleDependent((values) => {
       data(values).then((items) => {
         this.updateOptionElements(items);
-        this.$select.property('selectedIndex', options.selectedIndex || 0);
-        this.fire(FormSelect.EVENT_CHANGE, this.value, this.$select);
+        this.$inputNode.property('selectedIndex', options.selectedIndex || 0);
+        this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
       });
     });
 
@@ -125,7 +129,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
       this.updateOptionElements(items);
       const index = options.selectedIndex !== undefined ? options.selectedIndex : Math.min(items.length -1, defaultSelectedIndex);
       this.previousValue = items[index];
-      this.$select.property('selectedIndex', index);
+      this.$inputNode.property('selectedIndex', index);
 
       if (options.selectedIndex === undefined && index > 0) {
         this.fire(FormSelect.EVENT_INITIAL_VALUE, this.value, items[0]);
@@ -139,7 +143,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    */
   getSelectedIndex(): number {
     const defaultSelectedIndex = this.getStoredValue(0);
-    const currentSelectedIndex = <number>this.$select.property('selectedIndex');
+    const currentSelectedIndex = <number>this.$inputNode.property('selectedIndex');
     return (currentSelectedIndex === -1) ? defaultSelectedIndex : currentSelectedIndex;
   }
 
@@ -155,17 +159,17 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     };
     const anyGroups = data.some(isGroup);
 
-    this.$select.selectAll('option, optgroup').remove();
+    this.$inputNode.selectAll('option, optgroup').remove();
 
     if (!anyGroups) {
-      const $options = this.$select.selectAll('option').data(<IFormSelectOption[]>options);
+      const $options = this.$inputNode.selectAll('option').data(<IFormSelectOption[]>options);
       $options.enter().append('option');
       $options.attr('value', (d) => d.value).html((d) => d.name);
       $options.exit().remove();
       return;
     }
-    const node = <HTMLSelectElement>this.$select.node();
-    const $options = this.$select.selectAll(() => <HTMLElement[]>Array.from(node.children)).data(options);
+    const node = <HTMLSelectElement>this.$inputNode.node();
+    const $options = this.$inputNode.selectAll(() => <HTMLElement[]>Array.from(node.children)).data(options);
     $options.enter()
       .append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
 
@@ -188,7 +192,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    * @returns {string|{name: string, value: string, data: any}|null}
    */
   get value() {
-    const option = d3.select((<HTMLSelectElement>this.$select.node()).selectedOptions[0]);
+    const option = d3.select((<HTMLSelectElement>this.$inputNode.node()).selectedOptions[0]);
     return (option.size() > 0) ? option.datum() : null;
   }
 
@@ -199,14 +203,14 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   set value(v: any) {
     // if value is undefined or null, set to first index
     if (!v) {
-      this.$select.property('selectedIndex', 0);
+      this.$inputNode.property('selectedIndex', 0);
       this.previousValue = null;
       return;
     }
 
-    this.$select.selectAll('option').data().forEach((d, i) => {
+    this.$inputNode.selectAll('option').data().forEach((d, i) => {
       if ((v.value && d.value === v.value) || d.value === v || d === v) {
-        this.$select.property('selectedIndex', i);
+        this.$inputNode.property('selectedIndex', i);
         this.updateStoredValue();
         this.previousValue = d; // force value update
       }
@@ -218,7 +222,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   }
 
   focus() {
-    (<HTMLSelectElement>this.$select.node()).focus();
+    (<HTMLSelectElement>this.$inputNode.node()).focus();
   }
 
   static toOption(d: string|IFormSelectOption|IFormSelectOptionGroup): IFormSelectOption|IFormSelectOptionGroup {

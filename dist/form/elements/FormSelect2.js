@@ -30,11 +30,13 @@ export class FormSelect2 extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed('form-group', true);
+        this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+        const rowNode = this.$rootNode.append('div').classed('row', true);
         this.setVisible(this.elementDesc.visible);
-        this.appendLabel();
-        this.$select = this.$node.append('select');
-        this.setAttributes(this.$select, this.elementDesc.attributes);
+        this.appendLabel(rowNode);
+        const $colSelectNode = rowNode.append('div').classed('col', true);
+        this.$inputNode = $colSelectNode.append('select');
+        this.setAttributes(this.$inputNode, this.elementDesc.attributes);
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event
@@ -46,7 +48,7 @@ export class FormSelect2 extends AFormElement {
         });
         const df = this.elementDesc.options.data;
         const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
-        this.buildSelect2(this.$select, this.elementDesc.options || {}, data);
+        this.buildSelect2(this.$inputNode, this.elementDesc.options || {}, data);
         // propagate change action with the data of the selected option
         this.$jqSelect.on('change.propagate', this.listener);
     }

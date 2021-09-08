@@ -12,13 +12,12 @@ import {ViewUtils} from './ViewUtils';
 import {ResolveUtils} from './ResolveUtils';
 import {EViewMode} from '../base/interfaces';
 import {IForm} from '../form/interfaces';
-
+import {ERenderAuthorizationStatus, IAuthorizationConfiguration, TokenManager, TDPTokenManager} from '../auth';
 
 /**
  * base class for all views
  */
 export abstract class AView extends EventHandler implements IView {
-
   public static readonly DEFAULT_SELECTION_NAME = 'default';
 
   /**
@@ -37,7 +36,6 @@ export abstract class AView extends EventHandler implements IView {
    * params(name: string, oldValue: any, newValue: any)
    */
   static readonly EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
-
 
   readonly idType: IDType;
   readonly node: HTMLElement;
@@ -96,8 +94,69 @@ export abstract class AView extends EventHandler implements IView {
 
   /*final*/
   async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
+    TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
+      // If a authorization is removed, rerun the registered authorizations
+      await this.runAuthorizations();
+    });
+    // First, run all required authorizations
+    await this.runAuthorizations();
+
+    // Register listener after the authorizations are run to avoid double-initializations
+    TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
+      // TODO: Enabling this leads to the taggle view being loaded twice
+      // await this.initImpl();
+    });
+
     this.params = await this.buildParameterForm(params, onParameterChange);
     return this.initImpl();
+  }
+
+  /**
+   * Uses the token manager to run the authorizations defined by `getAuthorizationConfiguration()`.
+   * Only authorizations which are not yet stored in the token manager are run, others are skipped.
+   * It will show an overlay over the detail view allowing the user to authorize the application.
+   */
+  protected async runAuthorizations(): Promise<void> {
+    await TDPTokenManager.runAuthorizations(await this.getAuthorizationConfiguration(), {
+      render: ({ authConfiguration, status, error, trigger }) => {
+        // Fetch or create the authorization overlay
+        let overlay = this.node.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
+        if (!overlay) {
+          overlay = this.node.ownerDocument.createElement('div');
+          overlay.className = 'tdp-authorization-overlay';
+          // Add element at the very bottom to avoid using z-index
+          this.node.appendChild(overlay);
+        }
+
+        if (status === ERenderAuthorizationStatus.SUCCESS) {
+          overlay.remove();
+        } else {
+          overlay.innerHTML = `
+          ${
+            error
+              ? `<div class="alert alert-info" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationFailed')} ${error.toString()}</div>`
+              : ''
+          }
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', {name: authConfiguration.name})}</p>
+                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading') : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')}</button>
+            </div>`;
+
+          overlay.querySelector('button').onclick = async () => {
+            trigger();
+          };
+        }
+      },
+    });
+  }
+
+  /**
+   * Hook to override returning which authorizations are required for this view.
+   * @returns ID(s) or authorization configurations(s) which are required. Defaults to the `authorization` desc entry.
+   */
+  protected async getAuthorizationConfiguration(): Promise<string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null> {
+    // hook
+    return this.context.desc.authorization;
   }
 
   /**
@@ -109,11 +168,10 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
-    const builder = new FormBuilder(select(params));
+    const builder = new FormBuilder(select(params), undefined, true);
 
     //work on a local copy since we change it by adding an onChange handler
     const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
-
 
     const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean) => void = <any>onParameterChange;
 
@@ -289,8 +347,6 @@ export abstract class AView extends EventHandler implements IView {
     return ResolveUtils.resolveAllNames(this.selection.idtype, this.selection.range, idType);
   }
 
-
-
   setItemSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
     const current = this.itemSelections.get(name);
     if (current && ViewUtils.isSameSelection(current, selection)) {
@@ -346,4 +402,3 @@ export abstract class AView extends EventHandler implements IView {
     return v.includes('*') || v.includes('.') || v.includes('|');
   }
 }
-

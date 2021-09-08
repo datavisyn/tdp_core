@@ -16,18 +16,13 @@ export class FormCheckBox extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$node = $formNode.append('div').classed('checkbox', true);
+        this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-2 mb-1', true);
+        const formCheckNode = this.$rootNode.append('div').classed(`form-check`, true);
         this.setVisible(this.elementDesc.visible);
-        this.appendLabel();
-        const $label = this.$node.select('label');
-        if ($label.empty()) {
-            this.$input = this.$node.append('input').attr('type', 'checkbox');
-        }
-        else {
-            this.$input = $label.html(`<input type="checkbox">${$label.text()}`).select('input');
-        }
-        this.setAttributes(this.$input, this.elementDesc.attributes);
-        this.$input.classed('form-control', false); //remove falsy class again
+        this.$inputNode = formCheckNode.append('input').classed('form-check-input', true).attr('type', 'checkbox').order();
+        // ensure correct order of input and label tags
+        this.appendLabel(formCheckNode);
+        this.setAttributes(this.$inputNode, this.elementDesc.attributes);
     }
     /**
      * Bind the change listener and propagate the selection by firing a change event
@@ -37,15 +32,15 @@ export class FormCheckBox extends AFormElement {
         const options = this.elementDesc.options;
         const isChecked = options.isChecked != null ? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
         this.previousValue = isChecked;
-        this.$input.property('checked', isChecked);
+        this.$inputNode.property('checked', isChecked);
         if (this.hasStoredValue()) { // trigger if we have a stored value
             // TODO: using the new value `isChecked` may be wrong, because it's of type boolean and options.checked and options.unchecked could be anything --> this.getStoredValue(...) should probably be used instead
             this.fire(FormCheckBox.EVENT_INITIAL_VALUE, isChecked, options.unchecked); // store initial values as actions with results in the provenance graph
         }
         this.handleDependent();
         // propagate change action with the data of the selected option
-        this.$input.on('change.propagate', () => {
-            this.fire(FormCheckBox.EVENT_CHANGE, this.value, this.$input);
+        this.$inputNode.on('change.propagate', () => {
+            this.fire(FormCheckBox.EVENT_CHANGE, this.value, this.$inputNode);
         });
     }
     /**
@@ -54,7 +49,7 @@ export class FormCheckBox extends AFormElement {
      */
     get value() {
         const options = this.elementDesc.options;
-        return this.$input.property('checked') ? options.checked : options.unchecked;
+        return this.$inputNode.property('checked') ? options.checked : options.unchecked;
     }
     /**
      * Sets the value
@@ -62,12 +57,12 @@ export class FormCheckBox extends AFormElement {
      */
     set value(v) {
         const options = this.elementDesc.options;
-        this.$input.property('value', v === options.checked);
+        this.$inputNode.property('value', v === options.checked);
         this.previousValue = v === options.checked; // force old value change
         this.updateStoredValue();
     }
     focus() {
-        this.$input.node().focus();
+        this.$inputNode.node().focus();
     }
 }
 //# sourceMappingURL=FormCheckBox.js.map

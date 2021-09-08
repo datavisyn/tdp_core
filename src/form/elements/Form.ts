@@ -27,7 +27,7 @@ export class Form implements IForm {
    * @param formId unique form id
    */
   constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
-    this.$node = $parent.append('form').attr('id', this.formId);
+    this.$node = $parent.append('form').attr('class', `row align-items-center`).attr('id', this.formId);
   }
 
   /**
@@ -126,7 +126,11 @@ export class Form implements IForm {
     elementDesc.attributes = elementDesc.attributes || {};
     elementDesc.attributes.id = uid; // add id as attribute
     elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';
-    elementDesc.attributes.clazz += ' form-control';
+    if (elementDesc.type === 'FormSelect') {
+      elementDesc.attributes.clazz += ' form-select';
+    } else if (elementDesc.type === 'FormButton') {
+      elementDesc.attributes.clazz += ' btn btn-light btn-sm';
+    }
 
     return elementDesc;
   }

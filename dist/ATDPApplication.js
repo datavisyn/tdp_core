@@ -10,6 +10,7 @@ import { DialogUtils } from './base/dialogs';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
+import { TDPTokenManager } from './auth';
 /**
  * base class for TDP based applications
  */
@@ -24,36 +25,46 @@ export class ATDPApplication extends ACLUEWrapper {
             showResearchDisclaimer: true,
             showAboutLink: true,
             showHelpLink: false,
+            showTourLink: true,
             showOptionsLink: false,
             showReportBugLink: true,
             showProvenanceMenu: true,
+            showClueModeButtons: true,
             enableProvenanceUrlTracking: true,
             clientConfig: null
         };
         this.app = null;
         BaseUtils.mixin(this.options, options);
+        this.initialize();
+    }
+    /**
+     * Initialize async parts
+     * TODO make public and remove call in constructor in the future
+     */
+    async initialize() {
+        var _a, _b;
         const configPromise = ATDPApplication.initializeClientConfig(this.options);
         const i18nPromise = I18nextManager.getInstance().initI18n();
-        Promise.all([configPromise, i18nPromise]).then(() => {
-            this.tourManager = new TourManager({
-                doc: document,
-                header: () => this.header,
-                app: () => this.app
-            });
-            BaseUtils.mixin(this.options, {
-                showHelpLink: this.tourManager.hasTours() ? '#' : false // use help button for tours
-            });
-            this.build(document.body, { replaceBody: false });
-            if (this.tourManager.hasTours()) {
-                const button = document.querySelector('[data-header="helpLink"] a');
-                button.dataset.toggle = 'modal';
-                button.tabIndex = -1;
-                button.dataset.target = `#${this.tourManager.chooser.id}`;
-                button.onclick = (evt) => {
-                    evt.preventDefault();
-                };
-            }
+        await Promise.all([configPromise, i18nPromise]);
+        // Prefill the token manager with authorization configurations
+        if ((_b = (_a = this.options.clientConfig) === null || _a === void 0 ? void 0 : _a.tokenManager) === null || _b === void 0 ? void 0 : _b.authorizationConfigurations) {
+            await TDPTokenManager.addAuthorizationConfiguration(Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({ id, ...config })));
+        }
+        await this.build(document.body, { replaceBody: false });
+        this.tourManager = new TourManager({
+            doc: document,
+            header: () => this.header,
+            app: () => this.app
         });
+        if (this.options.showTourLink && this.tourManager.hasTours()) {
+            const button = this.header.addRightMenu('<i class="fas fa-question-circle fa-fw"></i>', (evt) => {
+                evt.preventDefault();
+                return false;
+            }, '#');
+            button.dataset.toggle = 'modal';
+            button.tabIndex = -1;
+            button.dataset.target = `#${this.tourManager.chooser.id}`;
+        }
     }
     /**
      * Loads the client config from '/clientConfig.json' and parses it.
@@ -131,9 +142,6 @@ export class ATDPApplication extends ACLUEWrapper {
         if (this.options.showProvenanceMenu) {
             provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
         }
-        const modeSelector = body.querySelector('header');
-        modeSelector.classList.add('collapsed');
-        modeSelector.classList.add('clue-modeselector');
         const main = document.body.querySelector('main');
         const content = body.querySelector('div.content');
         //wrapper around to better control when the graph will be resolved
@@ -143,9 +151,15 @@ export class ATDPApplication extends ACLUEWrapper {
             DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
         });
         graph.then((graph) => {
-            ButtonModeSelector.createButton(modeSelector, {
-                size: 'sm'
-            });
+            if (this.options.showClueModeButtons) {
+                const phoveaNavbar = document.body.querySelector('.phovea-navbar');
+                const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
+                modeSelector.classList.add('collapsed');
+                modeSelector.classList.add('clue-modeselector');
+                ButtonModeSelector.createButton(modeSelector, {
+                    size: 'sm'
+                });
+            }
             provenanceMenu === null || provenanceMenu === void 0 ? void 0 : provenanceMenu.setGraph(graph);
         });
         const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
