@@ -20,7 +20,6 @@ export class PanelAddColumnButton {
         const button = new PanelButton(this.node, {
             title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
             faIcon: 'fas fa-plus',
-            cssClass: 'btn-text-bg-primary',
             onClick: () => {
                 this.node.classList.add('once');
                 this.search.node.querySelector('input').focus();
