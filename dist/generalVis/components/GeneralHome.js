@@ -5,35 +5,36 @@ import { useEffect, useMemo, useState } from 'react';
 import Plot from 'react-plotly.js';
 import { InvalidCols } from './InvalidCols';
 import { GeneralSidePanel } from './GeneralSidePanel';
-import { PlotlyBar } from '../visTypes/bar';
-import { PlotlyPCP } from '../visTypes/pcp';
-import { PlotlyScatter } from '../visTypes/scatter';
-import { PlotlyStrip } from '../visTypes/strip';
-import { PlotlyViolin } from '../visTypes/violin';
+import { EBarDirection, EBarDisplayType, EBarGroupingType, PlotlyBar } from '../plots/bar';
+import { PlotlyPCP } from '../plots/pcp';
+import { PlotlyScatter } from '../plots/scatter';
+import { PlotlyStrip } from '../plots/strip';
+import { PlotlyViolin } from '../plots/violin';
+import { EColumnTypes, ESupportedPlotlyVis, EGeneralFormType } from '../types/generalTypes';
 import { beautifyLayout } from '../utils/layoutUtils';
 export function GeneralHome(props) {
-    const [currentVis, setCurrentVis] = useState('Scatter');
-    const [selectedCatCols, setSelectedCatCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === 'categorical').map((c) => c.name));
-    const [selectedNumCols, setSelectedNumCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === 'number').map((c) => c.name));
+    const [currentVis, setCurrentVis] = useState(ESupportedPlotlyVis.SCATTER);
+    const [selectedCatCols, setSelectedCatCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.CATEGORICAL).map((c) => c.name));
+    const [selectedNumCols, setSelectedNumCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.NUMERICAL).map((c) => c.name));
     const [bubbleSize, setBubbleSize] = useState(null);
     const [colorMapping, setColorMapping] = useState(null);
     const [opacity, setOpacity] = useState(null);
     const [shape, setShape] = useState(null);
     const [barGroup, setBarGroup] = useState(null);
     const [barMultiples, setBarMultiples] = useState(null);
-    const [barNormalized, setBarNormalized] = useState('Default');
-    const [barGroupType, setBarGroupType] = useState('Stacked');
-    const [barDirection, setBarDirection] = useState('Vertical');
-    const updateBubbleSize = (newCol) => setBubbleSize(props.columns.filter((c) => c.name === newCol && c.type === 'number')[0]);
-    const updateOpacity = (newCol) => setOpacity(props.columns.filter((c) => c.name === newCol && c.type === 'number')[0]);
-    const updateColor = (newCol) => setColorMapping(props.columns.filter((c) => c.name === newCol && c.type === 'categorical')[0]);
-    const updateShape = (newCol) => setShape(props.columns.filter((c) => c.name === newCol && c.type === 'categorical')[0]);
-    const updateBarGroup = (newCol) => setBarGroup(props.columns.filter((c) => c.name === newCol && c.type === 'categorical')[0]);
-    const updateBarMultiples = (newCol) => setBarMultiples(props.columns.filter((c) => c.name === newCol && c.type === 'categorical')[0]);
+    const [barDisplayType, setBarDisplayType] = useState(EBarDisplayType.DEFAULT);
+    const [barGroupType, setBarGroupType] = useState(EBarGroupingType.STACK);
+    const [barDirection, setBarDirection] = useState(EBarDirection.VERTICAL);
+    const updateBubbleSize = (newCol) => setBubbleSize(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0]);
+    const updateOpacity = (newCol) => setOpacity(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0]);
+    const updateColor = (newCol) => setColorMapping(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0]);
+    const updateShape = (newCol) => setShape(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0]);
+    const updateBarGroup = (newCol) => setBarGroup(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0]);
+    const updateBarMultiples = (newCol) => setBarMultiples(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0]);
     const updateCurrentVis = (s) => setCurrentVis(s);
     const updateSelectedCatCols = (s) => setSelectedCatCols(s);
     const updateSelectedNumCols = (s) => setSelectedNumCols(s);
-    const updateBarNormalized = (s) => setBarNormalized(s);
+    const updateBarDisplayType = (s) => setBarDisplayType(s);
     const updateBarGroupType = (s) => setBarGroupType(s);
     const updateBarDirection = (s) => setBarDirection(s);
     const shapeScale = useMemo(() => {
@@ -61,9 +62,9 @@ export function GeneralHome(props) {
             scale: bubbleScale,
             currentColumn: bubbleSize ? bubbleSize : null,
             currentSelected: bubbleSize ? bubbleSize.name : null,
-            options: props.columns.filter((c) => c.type === 'number').map((c) => c.name),
-            type: 'dropdown',
-            active: true
+            options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
+            type: EGeneralFormType.DROPDOWN,
+            disabled: false
         },
         opacity: {
             name: 'Opacity',
@@ -71,9 +72,9 @@ export function GeneralHome(props) {
             scale: opacityScale,
             currentColumn: opacity ? opacity : null,
             currentSelected: opacity ? opacity.name : null,
-            options: props.columns.filter((c) => c.type === 'number').map((c) => c.name),
-            type: 'dropdown',
-            active: true
+            options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
+            type: EGeneralFormType.DROPDOWN,
+            disabled: false
         },
         color: {
             name: 'Color',
@@ -81,9 +82,9 @@ export function GeneralHome(props) {
             scale: colorScale,
             currentColumn: colorMapping ? colorMapping : null,
             currentSelected: colorMapping ? colorMapping.name : null,
-            options: props.columns.filter((c) => c.type === 'categorical').map((c) => c.name),
-            type: 'dropdown',
-            active: true
+            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+            type: EGeneralFormType.DROPDOWN,
+            disabled: false
         },
         shape: {
             name: 'Shape',
@@ -91,9 +92,9 @@ export function GeneralHome(props) {
             scale: shapeScale,
             currentColumn: shape ? shape : null,
             currentSelected: shape ? shape.name : null,
-            options: props.columns.filter((c) => c.type === 'categorical').map((c) => c.name),
-            type: 'dropdown',
-            active: true
+            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+            type: EGeneralFormType.DROPDOWN,
+            disabled: false
         },
         groupBy: {
             name: 'Group',
@@ -101,9 +102,9 @@ export function GeneralHome(props) {
             scale: null,
             currentColumn: barGroup ? barGroup : null,
             currentSelected: barGroup ? barGroup.name : null,
-            options: props.columns.filter((c) => c.type === 'categorical').map((c) => c.name),
-            type: 'dropdown',
-            active: true
+            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+            type: EGeneralFormType.DROPDOWN,
+            disabled: false
         },
         barMultiplesBy: {
             name: 'Small Multiples',
@@ -111,9 +112,9 @@ export function GeneralHome(props) {
             scale: null,
             currentColumn: barMultiples ? barMultiples : null,
             currentSelected: barMultiples ? barMultiples.name : null,
-            options: props.columns.filter((c) => c.type === 'categorical').map((c) => c.name),
-            type: 'dropdown',
-            active: true
+            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+            type: EGeneralFormType.DROPDOWN,
+            disabled: false
         },
         filter: {
             name: 'Filter',
@@ -122,8 +123,8 @@ export function GeneralHome(props) {
             currentColumn: null,
             currentSelected: '',
             options: ['Filter In', 'Filter Out', 'Clear'],
-            type: 'button',
-            active: true
+            type: EGeneralFormType.BUTTON,
+            disabled: false
         },
         barDirection: {
             name: 'Bar Direction',
@@ -131,9 +132,9 @@ export function GeneralHome(props) {
             scale: null,
             currentColumn: null,
             currentSelected: barDirection,
-            options: ['Vertical', 'Horizontal'],
-            type: 'button',
-            active: true
+            options: [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL],
+            type: EGeneralFormType.BUTTON,
+            disabled: false
         },
         barGroupType: {
             name: 'Bar Group By',
@@ -141,36 +142,36 @@ export function GeneralHome(props) {
             scale: null,
             currentColumn: null,
             currentSelected: barGroupType,
-            options: ['Stacked', 'Grouped'],
-            type: 'button',
-            active: barGroup !== null
+            options: [EBarGroupingType.STACK, EBarGroupingType.GROUP],
+            type: EGeneralFormType.BUTTON,
+            disabled: barGroup === null
         },
         barNormalized: {
             name: 'Bar Normalized',
-            callback: updateBarNormalized,
+            callback: updateBarDisplayType,
             scale: null,
             currentColumn: null,
-            currentSelected: barNormalized,
-            options: ['Default', 'Normalized'],
-            type: 'button',
-            active: barGroup !== null
+            currentSelected: barDisplayType,
+            options: [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED],
+            type: EGeneralFormType.BUTTON,
+            disabled: barGroup === null
         }
     };
     const currPlot = useMemo(() => {
         switch (currentVis) {
-            case 'Scatter': {
+            case ESupportedPlotlyVis.SCATTER: {
                 return new PlotlyScatter();
             }
-            case 'Violin': {
+            case ESupportedPlotlyVis.VIOLIN: {
                 return new PlotlyViolin();
             }
-            case 'Strip': {
+            case ESupportedPlotlyVis.STRIP: {
                 return new PlotlyStrip();
             }
-            case 'Parallel Coordinates': {
+            case ESupportedPlotlyVis.PCP: {
                 return new PlotlyPCP();
             }
-            case 'Bar': {
+            case ESupportedPlotlyVis.BAR: {
                 return new PlotlyBar();
             }
         }
@@ -193,7 +194,7 @@ export function GeneralHome(props) {
             shapes: [],
             violingap: 0,
             dragmode: 'select',
-            barmode: barGroupType === 'Stacked' ? 'stack' : 'group'
+            barmode: barGroupType === EBarGroupingType.STACK ? 'stack' : 'group'
         };
         return beautifyLayout(traces, layout);
     }, [traces, barGroupType]);

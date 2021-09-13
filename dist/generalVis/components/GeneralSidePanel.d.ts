@@ -1,12 +1,12 @@
 /// <reference types="react" />
-import { CategoricalColumn, GenericOption, NumericalColumn, supportedPlotlyVis } from '../types/generalTypes';
+import { CategoricalColumn, ESupportedPlotlyVis, GenericOption, NumericalColumn } from '../types/generalTypes';
 interface GeneralSidePanelProps {
     updateSelectedNumCols: (s: string[]) => void;
     updateSelectedCatCols: (s: string[]) => void;
     selectedCatCols: string[];
     selectedNumCols: string[];
-    setCurrentVis: (s: supportedPlotlyVis) => void;
-    currentVis: supportedPlotlyVis;
+    setCurrentVis: (s: ESupportedPlotlyVis) => void;
+    currentVis: ESupportedPlotlyVis;
     columns: (NumericalColumn | CategoricalColumn)[];
     dropdowns: GenericOption[];
     filterCallback: (s: string) => void;

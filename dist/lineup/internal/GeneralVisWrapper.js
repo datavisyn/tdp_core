@@ -3,6 +3,7 @@ import { EventHandler, IDTypeManager, Range } from 'phovea_core';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { GeneralHome } from '../../generalVis/components/GeneralHome';
+import { EColumnTypes } from '../../generalVis/types/generalTypes';
 export class GeneralVisWrapper extends EventHandler {
     constructor(provider, view, doc = document) {
         super();
@@ -60,7 +61,7 @@ export class GeneralVisWrapper extends EventHandler {
                 vals: data.map((d, i) => {
                     return { id: d.id, val: d[c.column] ? d[c.column] : '--', selected: selectedIndeces.includes(d._id) };
                 }),
-                type: c.type,
+                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
                 selectedForMultiples: false
             });
         }

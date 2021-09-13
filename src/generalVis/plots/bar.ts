@@ -1,10 +1,25 @@
-import {AllDropdownOptions, CategoricalColumn} from '../types/generalTypes';
+import {AllDropdownOptions, CategoricalColumn, EColumnTypes} from '../types/generalTypes';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 
+export enum EBarDisplayType {
+    DEFAULT = 'Default',
+    NORMALIZED = 'Normalized',
+}
+
+export enum EBarDirection {
+    VERTICAL = 'Vertical',
+    HORIZONTAL = 'Horizontal',
+}
+
+export enum EBarGroupingType {
+    STACK = 'Stacked',
+    GROUP = 'Grouped',
+}
+
 export class PlotlyBar implements GeneralPlot {
     startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
-        const catCols = props.columns.filter((c) => c.type === 'categorical');
+        const catCols = props.columns.filter((c) => EColumnTypes.CATEGORICAL);
 
         if (selectedCatCols.length === 0 && catCols.length >= 1) {
             updateSelectedCatCols([catCols[0].name]);
@@ -13,9 +28,9 @@ export class PlotlyBar implements GeneralPlot {
 
     createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
         let counter = 1;
-        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical') as CategoricalColumn[];
-        const vertFlag = dropdownOptions.barDirection.currentSelected === 'Vertical';
-        const normalizedFlag = dropdownOptions.barNormalized.currentSelected === 'Normalized';
+        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+        const vertFlag = dropdownOptions.barDirection.currentSelected === EBarDirection.VERTICAL;
+        const normalizedFlag = dropdownOptions.barNormalized.currentSelected === EBarDisplayType.NORMALIZED;
         const plots: PlotlyData[] = [];
 
         if(catCols.length > 0) {

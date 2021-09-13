@@ -1,5 +1,19 @@
 import { Data } from 'plotly.js';
-export declare type supportedPlotlyVis = 'Chooser' | 'Scatter' | 'Parallel Coordinates' | 'Violin' | 'Strip' | 'Multiples' | 'Bar';
+export declare enum ESupportedPlotlyVis {
+    SCATTER = "Scatter",
+    PCP = "Parallel Coordinates",
+    VIOLIN = "Violin",
+    STRIP = "Strip",
+    BAR = "Bar"
+}
+export declare enum EColumnTypes {
+    NUMERICAL = "Numerical",
+    CATEGORICAL = "Categorical"
+}
+export declare enum EGeneralFormType {
+    DROPDOWN = "Dropdown",
+    BUTTON = "Button"
+}
 export interface GeneralHomeProps {
     columns: (NumericalColumn | CategoricalColumn)[];
     selectionCallback: (s: string[]) => void;
@@ -12,7 +26,7 @@ export interface NumericalColumn {
         val: number;
         selected: boolean;
     }[];
-    type: 'number';
+    type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
 }
 export interface CategoricalColumn {
@@ -22,14 +36,13 @@ export interface CategoricalColumn {
         val: string;
         selected: boolean;
     }[];
-    type: 'categorical';
+    type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
-export declare const chartTypes: supportedPlotlyVis[];
-export declare const correlationTypes: supportedPlotlyVis[];
-export declare const comparisonTypes: supportedPlotlyVis[];
-export declare const distributionTypes: supportedPlotlyVis[];
-export declare const highDimensionalTypes: supportedPlotlyVis[];
+export declare const correlationTypes: ESupportedPlotlyVis[];
+export declare const comparisonTypes: ESupportedPlotlyVis[];
+export declare const distributionTypes: ESupportedPlotlyVis[];
+export declare const highDimensionalTypes: ESupportedPlotlyVis[];
 export declare type PlotlyInfo = {
     plots: PlotlyData[];
     legendPlots: PlotlyData[];
@@ -50,8 +63,8 @@ export declare type GenericOption = {
     scale: any;
     options: string[];
     callback: (s: string) => void;
-    type: 'button' | 'dropdown';
-    active: boolean;
+    type: EGeneralFormType;
+    disabled: boolean;
 };
 export declare type AllDropdownOptions = {
     color: GenericOption;

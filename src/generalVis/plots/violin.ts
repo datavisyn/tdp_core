@@ -1,11 +1,11 @@
-import {AllDropdownOptions, CategoricalColumn, NumericalColumn} from '../types/generalTypes';
+import {AllDropdownOptions, CategoricalColumn, EColumnTypes, NumericalColumn} from '../types/generalTypes';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 
 export class PlotlyViolin implements GeneralPlot {
     startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
-        const numCols = props.columns.filter((c) => c.type === 'number');
-        const catCols = props.columns.filter((c) => c.type === 'categorical');
+        const numCols = props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
+        const catCols = props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
 
         if(selectedNumCols.length === 0 && numCols.length >= 1) {
             updateSelectedNumCols([numCols[0].name]);
@@ -18,8 +18,8 @@ export class PlotlyViolin implements GeneralPlot {
 
     createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
         let counter = 1;
-        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number') as NumericalColumn[];
-        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical') as CategoricalColumn[];
+        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL) as NumericalColumn[];
+        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
         const plots: PlotlyData[] = [];
 
         for(const numCurr of numCols) {

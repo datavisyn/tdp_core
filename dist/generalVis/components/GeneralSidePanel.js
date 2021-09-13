@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
-import { comparisonTypes, correlationTypes, distributionTypes, highDimensionalTypes } from '../types/generalTypes';
+import { comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, highDimensionalTypes } from '../types/generalTypes';
 import Plotly from 'plotly.js';
 import { useCallback, useMemo, useState } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
@@ -22,7 +22,7 @@ export function GeneralSidePanel(props) {
     }, []);
     const { ref } = useResizeDetector({ onResize });
     const selectNumOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === 'number').map((c) => {
+        return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => {
             return {
                 value: c.name,
                 label: c.name
@@ -30,7 +30,7 @@ export function GeneralSidePanel(props) {
         });
     }, [props.columns.length]);
     const selectCatOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === 'categorical').map((c) => {
+        return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => {
             return {
                 value: c.name,
                 label: c.name
@@ -81,7 +81,7 @@ export function GeneralSidePanel(props) {
                         React.createElement("label", { className: "pb-1 pe-2" }, "Advanced"),
                         React.createElement(FontAwesomeIcon, { icon: advancedOpen ? faCaretUp : faCaretDown })),
                     React.createElement("div", { className: "collapse", id: "advancedOptions" },
-                        props.dropdowns.filter((d) => d.type === 'dropdown').map((d, i) => {
+                        props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                             return (React.createElement(React.Fragment, { key: `reactSelect${d.name}` },
                                 React.createElement("label", { className: "pt-2 pb-1" }, d.name),
                                 React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e ? e.value : ''), name: d.name, options: d.options.map((s) => {
@@ -91,11 +91,11 @@ export function GeneralSidePanel(props) {
                                         };
                                     }), value: d.currentColumn ? { label: d.currentColumn.name, value: d.currentColumn.name } : [] })));
                         }),
-                        props.dropdowns.filter((d) => d.type === 'button').map((d, i) => {
+                        props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                             return (React.createElement("div", { key: `dropdownDiv${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {
                                 return (React.createElement(React.Fragment, { key: `radioButtons${d.name + opt}` },
                                     React.createElement("input", { checked: d.currentSelected === opt, onChange: (e) => d.callback(e.currentTarget.value), value: opt, type: "checkbox", className: "btn-check", id: `btnCheck${opt}`, autoComplete: "off" }),
-                                    React.createElement("label", { style: { zIndex: 0 }, className: `btn btn-outline-primary w-100 ${!d.active ? 'disabled' : ''}`, htmlFor: `btnCheck${opt}` }, opt)));
+                                    React.createElement("label", { style: { zIndex: 0 }, className: `btn btn-outline-primary w-100 ${d.disabled ? 'disabled' : ''}`, htmlFor: `btnCheck${opt}` }, opt)));
                             }))));
                         })))))));
 }

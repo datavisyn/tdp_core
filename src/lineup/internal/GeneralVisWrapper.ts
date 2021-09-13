@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {ARankingView} from '..';
 import {GeneralHome} from '../../generalVis/components/GeneralHome';
+import {EColumnTypes} from '../../generalVis/types/generalTypes';
 
 export class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement; // wrapper node
@@ -85,7 +86,7 @@ export class GeneralVisWrapper extends EventHandler {
                 vals: data.map((d, i) => {
                     return {id: d.id, val: d[(<any> c).column] ? d[(<any> c).column] : '--', selected: selectedIndeces.includes(d._id)};
                 }),
-                type: c.type,
+                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
                 selectedForMultiples: false
             });
         }

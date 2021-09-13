@@ -1,27 +1,21 @@
-import {AllDropdownOptions, NumericalColumn} from '../types/generalTypes';
-import {GeneralPlot} from '../types/generalPlotInterface';
-import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
-
-export class PlotlyScatter implements GeneralPlot {
-
-    startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
-        const numCols = props.columns.filter((c) => c.type === 'number');
+import { EColumnTypes } from '../types/generalTypes';
+export class PlotlyScatter {
+    startingHeuristic(props, selectedCatCols, selectedNumCols, updateSelectedCatCols, updateSelectedNumCols) {
+        const numCols = props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
         if (selectedNumCols.length < 2 && numCols.length >= 2) {
             if (selectedNumCols.length === 0) {
                 updateSelectedNumCols(numCols.slice(0, 2).map((c) => c.name));
-            } else {
+            }
+            else {
                 updateSelectedNumCols([...selectedNumCols, numCols.filter((c) => !selectedNumCols.includes(c.name))[0].name]);
             }
         }
     }
-
-    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
+    createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
-        const validCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number') as NumericalColumn[];
-        const plots: PlotlyData[] = [];
-
-        const legendPlots: PlotlyData[] = [];
-
+        const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL);
+        const plots = [];
+        const legendPlots = [];
         if (validCols.length === 1) {
             return {
                 plots: [],
@@ -30,10 +24,8 @@ export class PlotlyScatter implements GeneralPlot {
                 cols: 0,
                 errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
                 dropdownList: ['Color', 'Opacity', 'Shape', 'Bubble Size']
-
             };
         }
-
         if (validCols.length === 2) {
             plots.push({
                 data: {
@@ -60,7 +52,8 @@ export class PlotlyScatter implements GeneralPlot {
                 xLabel: validCols[0].name,
                 yLabel: validCols[1].name
             });
-        } else {
+        }
+        else {
             for (const yCurr of validCols) {
                 for (const xCurr of validCols) {
                     plots.push({
@@ -88,12 +81,10 @@ export class PlotlyScatter implements GeneralPlot {
                         xLabel: xCurr.name,
                         yLabel: yCurr.name
                     });
-
                     counter += 1;
                 }
             }
         }
-
         if (dropdownOptions.color.currentColumn && validCols.length > 0) {
             legendPlots.push({
                 data: {
@@ -119,19 +110,17 @@ export class PlotlyScatter implements GeneralPlot {
                         opacity: .5
                     },
                     transforms: [{
-                        type: 'groupby',
-                        groups: dropdownOptions.color.currentColumn.vals.map((v) => v.val),
-                        styles:
-                            [...[...new Set<string>(dropdownOptions.color.currentColumn.vals.map((v) => v.val) as string[])].map((c) => {
-                                return {target: c, value: {name: c}};
-                            })]
-                    }]
+                            type: 'groupby',
+                            groups: dropdownOptions.color.currentColumn.vals.map((v) => v.val),
+                            styles: [...[...new Set(dropdownOptions.color.currentColumn.vals.map((v) => v.val))].map((c) => {
+                                    return { target: c, value: { name: c } };
+                                })]
+                        }]
                 },
                 xLabel: validCols[0].name,
                 yLabel: validCols[0].name
-            } as any);
+            });
         }
-
         if (dropdownOptions.shape.currentColumn) {
             legendPlots.push({
                 data: {
@@ -158,19 +147,17 @@ export class PlotlyScatter implements GeneralPlot {
                         color: '#2e2e2e'
                     },
                     transforms: [{
-                        type: 'groupby',
-                        groups: dropdownOptions.shape.currentColumn.vals.map((v) => v.val),
-                        styles:
-                            [...[...new Set<string>(dropdownOptions.shape.currentColumn.vals.map((v) => v.val) as string[])].map((c) => {
-                                return {target: c, value: {name: c}};
-                            })]
-                    }]
+                            type: 'groupby',
+                            groups: dropdownOptions.shape.currentColumn.vals.map((v) => v.val),
+                            styles: [...[...new Set(dropdownOptions.shape.currentColumn.vals.map((v) => v.val))].map((c) => {
+                                    return { target: c, value: { name: c } };
+                                })]
+                        }]
                 },
                 xLabel: validCols[0].name,
                 yLabel: validCols[0].name
-            } as any);
+            });
         }
-
         return {
             plots,
             legendPlots,
@@ -178,7 +165,7 @@ export class PlotlyScatter implements GeneralPlot {
             cols: Math.sqrt(plots.length),
             errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
             dropdownList: ['Color', 'Opacity', 'Shape', 'Bubble Size', 'Filter']
-
         };
     }
 }
+//# sourceMappingURL=scatter.js.map

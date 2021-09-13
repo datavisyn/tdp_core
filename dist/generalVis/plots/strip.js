@@ -1,27 +1,20 @@
-import {AllDropdownOptions, CategoricalColumn, NumericalColumn} from '../types/generalTypes';
-import {GeneralPlot} from '../types/generalPlotInterface';
-import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
-
-export class PlotlyStrip implements GeneralPlot {
-    startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
-        const numCols = props.columns.filter((c) => c.type === 'number');
-        const catCols = props.columns.filter((c) => c.type === 'categorical');
-
+import { EColumnTypes } from '../types/generalTypes';
+export class PlotlyStrip {
+    startingHeuristic(props, selectedCatCols, selectedNumCols, updateSelectedCatCols, updateSelectedNumCols) {
+        const numCols = props.columns.filter((c) => EColumnTypes.NUMERICAL);
+        const catCols = props.columns.filter((c) => EColumnTypes.CATEGORICAL);
         if (selectedNumCols.length === 0 && numCols.length >= 1) {
             updateSelectedNumCols([numCols[0].name]);
         }
-
         if (selectedCatCols.length === 0 && catCols.length >= 1) {
             updateSelectedCatCols([catCols[0].name]);
         }
     }
-
-    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
+    createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
-        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number') as NumericalColumn[];
-        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical') as CategoricalColumn[];
-        const plots: PlotlyData[] = [];
-
+        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === EColumnTypes.NUMERICAL);
+        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === EColumnTypes.CATEGORICAL);
+        const plots = [];
         for (const numCurr of numCols) {
             for (const catCurr of catCols) {
                 plots.push({
@@ -46,13 +39,12 @@ export class PlotlyStrip implements GeneralPlot {
                             visible: true
                         },
                         transforms: [{
-                            type: 'groupby',
-                            groups: catCurr.vals.map((v) => v.val),
-                            styles:
-                                [...new Set<string>(catCurr.vals.map((v) => v.val) as string[])].map((c) => {
-                                    return {target: c, value: {marker: {color: dropdownOptions.color.scale(c)}}};
+                                type: 'groupby',
+                                groups: catCurr.vals.map((v) => v.val),
+                                styles: [...new Set(catCurr.vals.map((v) => v.val))].map((c) => {
+                                    return { target: c, value: { marker: { color: dropdownOptions.color.scale(c) } } };
                                 })
-                        }]
+                            }]
                     },
                     xLabel: catCurr.name,
                     yLabel: numCurr.name
@@ -60,7 +52,6 @@ export class PlotlyStrip implements GeneralPlot {
                 counter += 1;
             }
         }
-
         return {
             plots,
             legendPlots: [],
@@ -71,3 +62,4 @@ export class PlotlyStrip implements GeneralPlot {
         };
     }
 }
+//# sourceMappingURL=strip.js.map

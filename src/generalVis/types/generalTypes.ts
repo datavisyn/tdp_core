@@ -1,6 +1,22 @@
 import {Data} from 'plotly.js';
 
-export type supportedPlotlyVis = 'Chooser' | 'Scatter' | 'Parallel Coordinates' | 'Violin' | 'Strip' | 'Multiples' | 'Bar';
+export enum ESupportedPlotlyVis {
+    SCATTER = 'Scatter',
+    PCP = 'Parallel Coordinates',
+    VIOLIN = 'Violin',
+    STRIP = 'Strip',
+    BAR = 'Bar',
+}
+
+export enum EColumnTypes {
+    NUMERICAL = 'Numerical',
+    CATEGORICAL = 'Categorical',
+}
+
+export enum EGeneralFormType {
+    DROPDOWN = 'Dropdown',
+    BUTTON = 'Button',
+}
 
 export interface GeneralHomeProps {
     columns: (NumericalColumn | CategoricalColumn)[];
@@ -11,22 +27,21 @@ export interface GeneralHomeProps {
 export interface NumericalColumn {
     name: string;
     vals: {id: string, val: number, selected: boolean}[];
-    type: 'number';
+    type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
 }
 
 export interface CategoricalColumn {
     name: string;
     vals: {id: string, val: string, selected: boolean}[];
-    type: 'categorical';
+    type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
 
-export const chartTypes: supportedPlotlyVis[] = ['Scatter', 'Parallel Coordinates', 'Violin', 'Strip', 'Multiples'];
-export const correlationTypes: supportedPlotlyVis[] = ['Scatter'];
-export const comparisonTypes: supportedPlotlyVis[] = ['Violin', 'Strip'];
-export const distributionTypes: supportedPlotlyVis[] = ['Bar'];
-export const highDimensionalTypes: supportedPlotlyVis[] = ['Parallel Coordinates'];
+export const correlationTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.SCATTER];
+export const comparisonTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
+export const distributionTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.BAR];
+export const highDimensionalTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.PCP];
 
 export type PlotlyInfo = {
     plots: PlotlyData[],
@@ -50,8 +65,8 @@ export type GenericOption = {
     scale: any,
     options: string[]
     callback: (s: string) => void
-    type: 'button' | 'dropdown'
-    active: boolean
+    type: EGeneralFormType
+    disabled: boolean
 };
 
 export type AllDropdownOptions = {

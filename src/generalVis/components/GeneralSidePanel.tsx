@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
-import {CategoricalColumn, comparisonTypes, correlationTypes, distributionTypes, GenericOption, highDimensionalTypes, NumericalColumn, supportedPlotlyVis} from '../types/generalTypes';
+import {CategoricalColumn, comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, ESupportedPlotlyVis, GenericOption, highDimensionalTypes, NumericalColumn} from '../types/generalTypes';
 import Plotly from 'plotly.js';
 import {useCallback, useMemo, useState} from 'react';
 import {useResizeDetector} from 'react-resize-detector';
@@ -12,8 +12,8 @@ interface GeneralSidePanelProps {
     updateSelectedCatCols: (s: string[]) => void;
     selectedCatCols: string[];
     selectedNumCols: string[];
-    setCurrentVis: (s: supportedPlotlyVis) => void;
-    currentVis: supportedPlotlyVis;
+    setCurrentVis: (s: ESupportedPlotlyVis) => void;
+    currentVis: ESupportedPlotlyVis;
     columns: (NumericalColumn | CategoricalColumn) [];
     dropdowns: GenericOption[];
     filterCallback: (s: string) => void;
@@ -38,7 +38,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
     const { ref } = useResizeDetector({ onResize });
 
     const selectNumOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === 'number').map((c) => {
+        return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => {
             return {
                 value: c.name,
                 label: c.name
@@ -47,7 +47,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
     }, [props.columns.length]);
 
     const selectCatOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === 'categorical').map((c) => {
+        return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => {
             return {
                 value: c.name,
                 label: c.name
@@ -69,7 +69,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                             {correlationTypes.map((d) => {
                                 return (
                                     <React.Fragment key={`correlationLabel${d}`}>
-                                        <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as supportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
+                                        <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
                                         <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
                                     </React.Fragment>
                                 );
@@ -83,7 +83,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                 {comparisonTypes.map((d) => {
                                     return (
                                         <React.Fragment key={`correlationLabel${d}`}>
-                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as supportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
+                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
                                             <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
                                         </React.Fragment>
                                     );
@@ -97,7 +97,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                 {distributionTypes.map((d) => {
                                     return (
                                         <React.Fragment key={`correlationLabel${d}`}>
-                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as supportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
+                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
                                             <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
                                         </React.Fragment>
                                     );
@@ -111,7 +111,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                 {highDimensionalTypes.map((d) => {
                                     return (
                                         <React.Fragment key={`correlationLabel${d}`}>
-                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as supportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
+                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
                                             <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
                                         </React.Fragment>
                                     );
@@ -146,7 +146,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                         </button>
                         <div className="collapse" id="advancedOptions">
 
-                        {props.dropdowns.filter((d) => d.type === 'dropdown').map((d, i) => {
+                        {props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                         return (
                             <React.Fragment key={`reactSelect${d.name}`}>
                                 <label className="pt-2 pb-1">{d.name}</label>
@@ -166,14 +166,14 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                         );
                         })}
 
-                        {props.dropdowns.filter((d) => d.type === 'button').map((d, i) => {
+                        {props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                             return (
                                 <div key={`dropdownDiv${d.name}`} className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
                                     {d.options.map(((opt) => {
                                         return (
                                             <React.Fragment key={`radioButtons${d.name + opt}`}>
                                                 <input checked={d.currentSelected === opt} onChange={(e) => d.callback(e.currentTarget.value)} value={opt} type="checkbox" className="btn-check" id={`btnCheck${opt}`} autoComplete="off"/>
-                                                <label style={{zIndex: 0}} className={`btn btn-outline-primary w-100 ${!d.active ? 'disabled' : ''}`} htmlFor={`btnCheck${opt}`}>{opt}</label>
+                                                <label style={{zIndex: 0}} className={`btn btn-outline-primary w-100 ${d.disabled ? 'disabled' : ''}`} htmlFor={`btnCheck${opt}`}>{opt}</label>
                                             </React.Fragment>
                                         );
                                     }))}
