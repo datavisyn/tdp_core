@@ -14,6 +14,11 @@ interface IPanelButtonOptions {
   faIcon: string;
   cssClass?: string;
   onClick: () => void;
+  /**
+   * @example: primary, warning, info,
+   * @default: dark
+   */
+  btnColor?: string;
 }
 
 /**
@@ -31,7 +36,7 @@ export class PanelButton implements IPanelButton {
     this.node = parent.ownerDocument.createElement('button');
     this.node.setAttribute('type', 'button');
     this.node.title = options.title;
-    this.node.className = `btn btn-sm btn-text-hover-bg-dark ${options.cssClass || ''}`;
+    this.node.className = `btn btn-sm btn-text-hover-bg-${options.btnColor || 'dark'} ${options.cssClass || ''}`;
     this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
 
     this.node.addEventListener('click', (evt) => {
