@@ -1,5 +1,5 @@
 /// <reference types="react" />
-export declare type supportedPlotlyVis = 'Chooser' | 'Scatter' | 'Parallel Coordinates' | 'Violin' | 'Strip' | 'Multiples';
+export declare type supportedPlotlyVis = 'Chooser' | 'Scatter' | 'Parallel Coordinates' | 'Violin' | 'Strip' | 'Multiples' | 'Bar';
 export interface CustomVisProps {
     columns: (NumericalColumn | CategoricalColumn)[];
     type: supportedPlotlyVis;

@@ -11,7 +11,7 @@ export class PlotlyScatter extends GeneralPlot {
             }
         }
     }
-    createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
+    createTrace(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
         const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number');
         const plots = [];
@@ -22,7 +22,8 @@ export class PlotlyScatter extends GeneralPlot {
                 legendPlots: [],
                 rows: 0,
                 cols: 0,
-                errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.'
+                errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
+                dropdownList: ['Color', 'Opacity', 'Shape', 'Bubble Size']
             };
         }
         if (validCols.length === 2) {
@@ -33,19 +34,19 @@ export class PlotlyScatter extends GeneralPlot {
                     ids: validCols[0].vals.map((v) => v.id),
                     xaxis: counter === 1 ? 'x' : 'x' + counter,
                     yaxis: counter === 1 ? 'y' : 'y' + counter,
-                    type: 'scatter',
+                    type: 'scattergl',
                     mode: 'markers',
                     showlegend: false,
                     text: validCols[0].vals.map((v) => v.id),
                     marker: {
                         line: {
-                            width: props.color ? validCols[0].vals.map((v) => v.selected ? 3 : 0) : 0,
+                            width: dropdownOptions.color.currentColumn ? validCols[0].vals.map((v) => v.selected ? 3 : 0) : 0,
                             color: '#E29609',
                         },
-                        symbol: props.shape ? props.shape.vals.map((v) => shapeScale(v.val)) : 'circle',
-                        color: props.color ? props.color.vals.map((v) => colorScale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                        opacity: props.opacity ? props.opacity.vals.map((v) => opacityScale(v.val)) : .5,
-                        size: props.bubbleSize ? props.bubbleSize.vals.map((v) => bubbleScale(v.val)) : 10
+                        symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
+                        color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+                        opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
+                        size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
                 },
                 xLabel: validCols[0].name,
@@ -62,19 +63,19 @@ export class PlotlyScatter extends GeneralPlot {
                             ids: xCurr.vals.map((v) => v.id),
                             xaxis: counter === 1 ? 'x' : 'x' + counter,
                             yaxis: counter === 1 ? 'y' : 'y' + counter,
-                            type: 'scatter',
+                            type: 'scattergl',
                             mode: 'markers',
                             showlegend: false,
                             text: validCols[0].vals.map((v) => v.id),
                             marker: {
                                 line: {
-                                    width: props.color ? xCurr.vals.map((v) => v.selected ? 3 : 0) : 0,
+                                    width: dropdownOptions.color.currentColumn ? validCols[0].vals.map((v) => v.selected ? 3 : 0) : 0,
                                     color: '#E29609'
                                 },
-                                symbol: props.shape ? props.shape.vals.map((v) => shapeScale(v.val)) : 'circle',
-                                color: props.color ? props.color.vals.map((v) => colorScale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                                opacity: props.opacity ? props.opacity.vals.map((v) => opacityScale(v.val)) : .5,
-                                size: props.bubbleSize ? props.bubbleSize.vals.map((v) => bubbleScale(v.val)) : 10
+                                symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
+                                color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+                                opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
+                                size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
                         },
                         xLabel: xCurr.name,
@@ -84,7 +85,7 @@ export class PlotlyScatter extends GeneralPlot {
                 }
             }
         }
-        if (props.color && validCols.length > 0) {
+        if (dropdownOptions.color.currentColumn && validCols.length > 0) {
             legendPlots.push({
                 data: {
                     x: validCols[0].vals.map((v) => v.val),
@@ -92,7 +93,7 @@ export class PlotlyScatter extends GeneralPlot {
                     ids: validCols[0].vals.map((v) => v.id),
                     xaxis: 'x',
                     yaxis: 'y',
-                    type: 'scatter',
+                    type: 'scattergl',
                     mode: 'markers',
                     visible: 'legendonly',
                     legendgroup: 'color',
@@ -105,13 +106,13 @@ export class PlotlyScatter extends GeneralPlot {
                         },
                         symbol: 'circle',
                         size: 10,
-                        color: props.color ? props.color.vals.map((v) => colorScale(v.val)) : '#2e2e2e',
+                        color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : '#2e2e2e',
                         opacity: .5
                     },
                     transforms: [{
                             type: 'groupby',
-                            groups: props.color.vals.map((v) => v.val),
-                            styles: [...[...new Set(props.color.vals.map((v) => v.val))].map((c) => {
+                            groups: dropdownOptions.color.currentColumn.vals.map((v) => v.val),
+                            styles: [...[...new Set(dropdownOptions.color.currentColumn.vals.map((v) => v.val))].map((c) => {
                                     return { target: c, value: { name: c } };
                                 })]
                         }]
@@ -120,7 +121,7 @@ export class PlotlyScatter extends GeneralPlot {
                 yLabel: validCols[0].name
             });
         }
-        if (props.shape) {
+        if (dropdownOptions.shape.currentColumn) {
             legendPlots.push({
                 data: {
                     x: validCols[0].vals.map((v) => v.val),
@@ -128,7 +129,7 @@ export class PlotlyScatter extends GeneralPlot {
                     ids: validCols[0].vals.map((v) => v.id),
                     xaxis: 'x',
                     yaxis: 'y',
-                    type: 'scatter',
+                    type: 'scattergl',
                     mode: 'markers',
                     visible: 'legendonly',
                     showlegend: true,
@@ -142,13 +143,13 @@ export class PlotlyScatter extends GeneralPlot {
                         },
                         opacity: .5,
                         size: 10,
-                        symbol: props.shape ? props.shape.vals.map((v) => shapeScale(v.val)) : 'circle',
+                        symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                         color: '#2e2e2e'
                     },
                     transforms: [{
                             type: 'groupby',
-                            groups: props.shape.vals.map((v) => v.val),
-                            styles: [...[...new Set(props.shape.vals.map((v) => v.val))].map((c) => {
+                            groups: dropdownOptions.shape.currentColumn.vals.map((v) => v.val),
+                            styles: [...[...new Set(dropdownOptions.shape.currentColumn.vals.map((v) => v.val))].map((c) => {
                                     return { target: c, value: { name: c } };
                                 })]
                         }]
@@ -162,7 +163,8 @@ export class PlotlyScatter extends GeneralPlot {
             legendPlots,
             rows: Math.sqrt(plots.length),
             cols: Math.sqrt(plots.length),
-            errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.'
+            errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
+            dropdownList: ['Color', 'Opacity', 'Shape', 'Bubble Size', 'Filter']
         };
     }
 }

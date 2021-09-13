@@ -10,7 +10,7 @@ export class PlotlyPCP extends GeneralPlot {
     startingHeuristic(props, selectedCatCols, selectedNumCols, updateSelectedCatCols, updateSelectedNumCols) {
         return null;
     }
-    createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
+    createTrace(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number');
         const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical');
         if (numCols.length + catCols.length < 2) {
@@ -19,7 +19,8 @@ export class PlotlyPCP extends GeneralPlot {
                 legendPlots: [],
                 rows: 0,
                 cols: 0,
-                errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.'
+                errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+                dropdownList: []
             };
         }
         const plot = {
@@ -52,7 +53,8 @@ export class PlotlyPCP extends GeneralPlot {
             legendPlots: [],
             rows: 1,
             cols: 1,
-            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.'
+            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+            dropdownList: []
         };
     }
 }

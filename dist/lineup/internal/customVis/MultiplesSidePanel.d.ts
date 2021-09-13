@@ -1,7 +1,6 @@
 /// <reference types="react" />
-import { CategoricalColumn, NumericalColumn, supportedPlotlyVis } from './CustomVis';
+import { CategoricalColumn, GenericSelect, NumericalColumn, supportedPlotlyVis } from './Multiples';
 interface MultiplesSidePanelProps {
-    chartTypeChangeCallback: (s: string) => void;
     updateSelectedNumCols: (s: string[]) => void;
     updateSelectedCatCols: (s: string[]) => void;
     selectedCatCols: string[];
@@ -13,11 +12,5 @@ interface MultiplesSidePanelProps {
     dropdowns: GenericSelect[];
     filterCallback: (s: string) => void;
 }
-declare type GenericSelect = {
-    name: string;
-    currentSelected: string;
-    options: string[];
-    callback: (s: string) => void;
-};
 export declare function MultiplesSidePanel(props: MultiplesSidePanelProps): JSX.Element;
 export {};

@@ -162,7 +162,6 @@ export class ARankingView extends AView {
         });
         this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
             this.generalVis.toggleCustomVis();
-            this.generalVis.updateCustomVis();
         });
         if (this.options.enableOverviewMode) {
             const rule = spaceFillingRule(taggleOptions);

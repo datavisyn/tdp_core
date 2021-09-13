@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
-import { correlationTypes, distributionTypes, highDimensionalTypes } from './CustomVis';
+import { correlationTypes, distributionTypes, highDimensionalTypes } from './Multiples';
 import Plotly from 'plotly.js';
 import { useCallback, useState } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
@@ -61,16 +61,16 @@ export function MultiplesSidePanel(props) {
                     }))),
                 React.createElement("hr", null),
                 React.createElement("label", { className: "pt-2 pb-1" }, "Numerical Columns"),
-                React.createElement(Select, { isMulti: true, onChange: (e) => props.updateSelectedNumCols(e.map((c) => c.value)), name: "numColumns", options: selectNumOptions, value: selectNumOptions.filter((c) => props.selectedNumCols.includes(c.value)) }),
+                React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, onChange: (e) => props.updateSelectedNumCols(e.map((c) => c.value)), name: "numColumns", options: selectNumOptions, value: selectNumOptions.filter((c) => props.selectedNumCols.includes(c.value)) }),
                 React.createElement("label", { className: "pt-2 pb-1" }, "Categorical Columns"),
-                React.createElement(Select, { isMulti: true, onChange: (e) => props.updateSelectedCatCols(e.map((c) => c.value)), name: "catColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => props.selectedCatCols.includes(c.value)) }),
+                React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, onChange: (e) => props.updateSelectedCatCols(e.map((c) => c.value)), name: "catColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => props.selectedCatCols.includes(c.value)) }),
                 React.createElement("hr", null),
                 React.createElement("div", null,
                     React.createElement("button", { className: "btn btn-primary-outline w-100", id: "advancedButton", onClick: (e) => setAdvancedOpen(!advancedOpen), type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#advancedOptions", "aria-expanded": "false", "aria-controls": "advancedOptions" },
                         React.createElement("label", { className: "pb-1 pe-2" }, "Advanced"),
                         React.createElement(FontAwesomeIcon, { icon: advancedOpen ? faCaretUp : faCaretDown })),
                     React.createElement("div", { className: "collapse", id: "advancedOptions" },
-                        props.dropdowns.map((d, i) => {
+                        props.dropdowns.filter((d) => d.type === 'dropdown').map((d, i) => {
                             return (React.createElement(React.Fragment, { key: `reactSelect${d.name}` },
                                 React.createElement("label", { className: "pt-2 pb-1" }, d.name),
                                 React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e ? e.value : ''), name: d.name, options: d.options.map((s) => {
@@ -78,12 +78,14 @@ export function MultiplesSidePanel(props) {
                                             value: s,
                                             label: s
                                         };
-                                    }), value: d.currentSelected ? { label: d.currentSelected, value: d.currentSelected } : [] })));
+                                    }), value: d.currentColumn ? { label: d.currentColumn.name, value: d.currentColumn.name } : [] })));
                         }),
-                        React.createElement("div", { className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" },
-                            React.createElement("button", { onClick: (e) => props.filterCallback('in'), type: "button", className: "btn btn-outline-primary" }, "Filter In"),
-                            React.createElement("button", { onClick: (e) => props.filterCallback('out'), type: "button", className: "btn btn-outline-primary" }, "Filter Out")),
-                        React.createElement("div", { className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" },
-                            React.createElement("button", { onClick: (e) => props.filterCallback('clear'), type: "button", className: "btn btn-outline-primary" }, "Clear Filters"))))))));
+                        props.dropdowns.filter((d) => d.type === 'button').map((d, i) => {
+                            return (React.createElement("div", { key: `dropdownDiv${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {
+                                return (React.createElement(React.Fragment, { key: `radioButtons${d.name + opt}` },
+                                    React.createElement("input", { checked: d.currentSelected === opt, onChange: (e) => d.callback(e.currentTarget.value), value: opt, type: "checkbox", className: "btn-check", id: `btnCheck${opt}`, autoComplete: "off" }),
+                                    React.createElement("label", { style: { zIndex: 0 }, className: `btn btn-outline-primary w-100 ${!d.active ? 'disabled' : ''}`, htmlFor: `btnCheck${opt}` }, opt)));
+                            }))));
+                        })))))));
 }
 //# sourceMappingURL=MultiplesSidePanel.js.map

@@ -16,7 +16,7 @@ export class PlotlyViolin extends GeneralPlot {
             updateSelectedCatCols([catCols[0].name]);
         }
     }
-    createTrace(props, selectedCatCols, selectedNumCols, shapeScale, colorScale, opacityScale, bubbleScale) {
+    createTrace(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
         const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === 'number');
         const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === 'categorical');
@@ -37,7 +37,7 @@ export class PlotlyViolin extends GeneralPlot {
                                 type: 'groupby',
                                 groups: catCurr.vals.map((v) => v.val),
                                 styles: [...new Set(catCurr.vals.map((v) => v.val))].map((c) => {
-                                    return { target: c, value: { line: { color: colorScale(c) } } };
+                                    return { target: c, value: { line: { color: dropdownOptions.color.scale(c) } } };
                                 })
                             }]
                     },
@@ -52,7 +52,8 @@ export class PlotlyViolin extends GeneralPlot {
             legendPlots: [],
             rows: numCols.length,
             cols: catCols.length,
-            errorMessage: 'To create a Violin plot, please select at least 1 categorical column and at least 1 numerical column.'
+            errorMessage: 'To create a Violin plot, please select at least 1 categorical column and at least 1 numerical column.',
+            dropdownList: []
         };
     }
 }

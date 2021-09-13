@@ -6,8 +6,11 @@ export declare class GeneralVisWrapper extends EventHandler {
     private viewable;
     private provider;
     private view;
+    private data;
     constructor(provider: LocalDataProvider, view: ARankingView, doc?: Document);
     getAllData(): any[];
+    selectCallback(selected: string[]): void;
+    filterCallback(s: string): void;
     updateCustomVis(): void;
     toggleCustomVis(): void;
 }
