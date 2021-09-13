@@ -1,6 +1,6 @@
 import {ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem} from 'lineupjs';
 import {IDTypeLike} from 'phovea_core';
-import {ISearchOption} from './panel';
+import {ISearchOption, IPanelAddColumnButtonOptions} from './panel';
 
 
 export interface IARankingViewOptions {
@@ -152,4 +152,10 @@ export interface IARankingViewOptions {
    * Similar to `ISearchBoxOptions.formatItem()` in lineupjs
    */
   formatSearchBoxItem(item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void;
+
+  /**
+   * Options for the add column button in the toolbar of the side panel
+   */
+  panelAddColumnBtnOptions: IPanelAddColumnButtonOptions;
+
 }

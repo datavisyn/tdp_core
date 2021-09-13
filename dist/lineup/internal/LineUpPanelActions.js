@@ -94,7 +94,7 @@ export class LineUpPanelActions extends EventHandler {
             this.header.addButton(collapseButton, EPanelHeaderToolbar.NAV);
         }
         if (this.options.enableAddingColumns) {
-            const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox({ formatItem: this.options.formatSearchBoxItem }));
+            const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox({ formatItem: this.options.formatSearchBoxItem }), this.options.panelAddColumnBtnOptions);
             this.header.addButton(addColumnButton, EPanelHeaderToolbar.START);
         }
         this.appendExtraButtons(buttons);

@@ -127,7 +127,8 @@ export abstract class ARankingView extends AView {
         }
       }
       return item.text;
-    }
+    },
+    panelAddColumnBtnOptions: {}
   };
 
   private readonly selectionAdapter: ISelectionAdapter | null;

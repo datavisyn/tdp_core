@@ -8,11 +8,16 @@ export interface IPanelButton {
      */
     readonly node: HTMLElement;
 }
-interface IPanelButtonOptions {
+export interface IPanelButtonOptions {
     title?: string;
     faIcon: string;
     cssClass?: string;
     onClick: () => void;
+    /**
+     * @example: btn-text-hover-bg-primary, btn-text-bg-danger, btn-text-warning, ...
+     * @default: btn-text-hover-bg-dark
+     */
+    btnColor?: string;
 }
 /**
  * Plain HTML button with a custom title, CSS class and an onClick function
@@ -51,4 +56,3 @@ export declare class PanelNavButton implements IPanelButton {
      */
     click(): void;
 }
-export {};

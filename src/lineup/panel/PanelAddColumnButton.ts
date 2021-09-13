@@ -1,7 +1,11 @@
 import {SearchBox} from 'lineupjs';
 import {ISearchOption} from './ISearchOption';
-import {IPanelButton, PanelButton} from './PanelButton';
+import {IPanelButton, PanelButton, IPanelButtonOptions} from './PanelButton';
 import {I18nextManager} from 'phovea_core';
+
+export interface IPanelAddColumnButtonOptions extends Pick<IPanelButtonOptions, 'btnColor'> {
+  // nothing to add
+}
 
 /**
  * Div HTMLElement that contains a button and a SearchBox.
@@ -14,14 +18,14 @@ export class PanelAddColumnButton implements IPanelButton {
    * @param parent The parent HTML DOM element
    * @param search LineUp SearchBox instance
    */
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>) {
+  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, options?: IPanelAddColumnButtonOptions) {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('lu-adder');
     this.node.addEventListener('mouseleave', () => {
       this.node.classList.remove('once');
     });
 
-    const button = new PanelButton(this.node, {
+    const button = new PanelButton(this.node, Object.assign(options, {
       title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
       faIcon: 'fas fa-plus',
       onClick: () => {
@@ -29,7 +33,7 @@ export class PanelAddColumnButton implements IPanelButton {
         (<HTMLElement>this.search.node.querySelector('input'))!.focus();
         this.search.focus();
       }
-    });
+    }));
 
     this.node.appendChild(button.node);
     this.node.appendChild(this.search.node);
