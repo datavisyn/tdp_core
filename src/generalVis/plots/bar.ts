@@ -12,6 +12,12 @@ export enum EBarDirection {
     HORIZONTAL = 'Horizontal',
 }
 
+export enum EViolinOverlay {
+    NONE = 'None',
+    STRIP = 'Strip',
+    BOX = 'Box'
+}
+
 export enum EBarGroupingType {
     STACK = 'Stacked',
     GROUP = 'Grouped',

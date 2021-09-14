@@ -80,4 +80,5 @@ export type AllDropdownOptions = {
     barDirection: GenericOption,
     barNormalized: GenericOption,
     barGroupType: GenericOption,
+    violinOverlay: GenericOption,
 };

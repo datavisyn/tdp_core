@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Plot from 'react-plotly.js';
 import { InvalidCols } from './InvalidCols';
 import { GeneralSidePanel } from './GeneralSidePanel';
-import { EBarDirection, EBarDisplayType, EBarGroupingType, PlotlyBar } from '../plots/bar';
+import { EBarDirection, EBarDisplayType, EBarGroupingType, EViolinOverlay, PlotlyBar } from '../plots/bar';
 import { PlotlyPCP } from '../plots/pcp';
 import { PlotlyScatter } from '../plots/scatter';
 import { PlotlyStrip } from '../plots/strip';
@@ -25,6 +25,7 @@ export function GeneralHome(props) {
     const [barDisplayType, setBarDisplayType] = useState(EBarDisplayType.DEFAULT);
     const [barGroupType, setBarGroupType] = useState(EBarGroupingType.STACK);
     const [barDirection, setBarDirection] = useState(EBarDirection.VERTICAL);
+    const [violinOverlay, setViolinOverlay] = useState(EViolinOverlay.NONE);
     const updateBubbleSize = (newCol) => setBubbleSize(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0]);
     const updateOpacity = (newCol) => setOpacity(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0]);
     const updateColor = (newCol) => setColorMapping(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0]);
@@ -37,6 +38,7 @@ export function GeneralHome(props) {
     const updateBarDisplayType = (s) => setBarDisplayType(s);
     const updateBarGroupType = (s) => setBarGroupType(s);
     const updateBarDirection = (s) => setBarDirection(s);
+    const updateViolinOverlay = (s) => setViolinOverlay(s);
     const shapeScale = useMemo(() => {
         return shape ?
             scale.ordinal().domain(d3.set(shape.vals.map((v) => v.val)).values()).range(['circle', 'square', 'triangle-up', 'star'])
@@ -155,6 +157,16 @@ export function GeneralHome(props) {
             options: [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED],
             type: EGeneralFormType.BUTTON,
             disabled: barGroup === null
+        },
+        violinOverlay: {
+            name: 'Show Strip Plot',
+            callback: updateViolinOverlay,
+            scale: null,
+            currentColumn: null,
+            currentSelected: violinOverlay,
+            options: [EViolinOverlay.NONE, EViolinOverlay.BOX, EViolinOverlay.STRIP],
+            type: EGeneralFormType.BUTTON,
+            disabled: false
         }
     };
     const currPlot = useMemo(() => {
@@ -201,6 +213,6 @@ export function GeneralHome(props) {
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" }, currPlot ? (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "d-flex justify-content-center align-items-center flex-grow-1" }, traces.plots.length > 0 ?
             (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => d ? props.selectionCallback(d.points.map((d) => d.id)) : props.selectionCallback([]), onInitialized: () => d3.selectAll('g .traces').style('opacity', 1), onUpdate: () => d3.selectAll('g .traces').style('opacity', 1) })) : (React.createElement(InvalidCols, { message: traces.errorMessage }))),
-        React.createElement(GeneralSidePanel, { filterCallback: props.filterCallback, currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, dropdowns: Object.keys(allExtraDropdowns).filter((d) => traces.formList.includes(d)).map((d) => allExtraDropdowns[d]) }))) : null));
+        React.createElement(GeneralSidePanel, { filterCallback: props.filterCallback, currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, dropdowns: traces.formList.map((t) => allExtraDropdowns[t]) }))) : null));
 }
 //# sourceMappingURL=GeneralHome.js.map

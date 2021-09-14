@@ -9,6 +9,11 @@ export declare enum EBarDirection {
     VERTICAL = "Vertical",
     HORIZONTAL = "Horizontal"
 }
+export declare enum EViolinOverlay {
+    NONE = "None",
+    STRIP = "Strip",
+    BOX = "Box"
+}
 export declare enum EBarGroupingType {
     STACK = "Stacked",
     GROUP = "Grouped"

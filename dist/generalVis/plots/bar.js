@@ -9,6 +9,12 @@ export var EBarDirection;
     EBarDirection["VERTICAL"] = "Vertical";
     EBarDirection["HORIZONTAL"] = "Horizontal";
 })(EBarDirection || (EBarDirection = {}));
+export var EViolinOverlay;
+(function (EViolinOverlay) {
+    EViolinOverlay["NONE"] = "None";
+    EViolinOverlay["STRIP"] = "Strip";
+    EViolinOverlay["BOX"] = "Box";
+})(EViolinOverlay || (EViolinOverlay = {}));
 export var EBarGroupingType;
 (function (EBarGroupingType) {
     EBarGroupingType["STACK"] = "Stacked";

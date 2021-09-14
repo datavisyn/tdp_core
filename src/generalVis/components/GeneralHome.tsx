@@ -7,7 +7,7 @@ import Plot, {Figure} from 'react-plotly.js';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {InvalidCols} from './InvalidCols';
 import {GeneralSidePanel} from './GeneralSidePanel';
-import {EBarDirection, EBarDisplayType, EBarGroupingType, PlotlyBar} from '../plots/bar';
+import {EBarDirection, EBarDisplayType, EBarGroupingType, EViolinOverlay, PlotlyBar} from '../plots/bar';
 import {PlotlyPCP} from '../plots/pcp';
 import {PlotlyScatter} from '../plots/scatter';
 import {PlotlyStrip} from '../plots/strip';
@@ -33,6 +33,8 @@ export function GeneralHome(props: GeneralHomeProps) {
     const [barDisplayType, setBarDisplayType] = useState<EBarDisplayType>(EBarDisplayType.DEFAULT);
     const [barGroupType, setBarGroupType] = useState<EBarGroupingType>(EBarGroupingType.STACK);
     const [barDirection, setBarDirection] = useState<EBarDirection>(EBarDirection.VERTICAL);
+    const [violinOverlay, setViolinOverlay] = useState<EViolinOverlay>(EViolinOverlay.NONE);
+
 
     const updateBubbleSize = (newCol: string) => setBubbleSize(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
     const updateOpacity = (newCol: string) => setOpacity(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
@@ -48,6 +50,8 @@ export function GeneralHome(props: GeneralHomeProps) {
     const updateBarDisplayType = (s: EBarDisplayType) => setBarDisplayType(s);
     const updateBarGroupType = (s: EBarGroupingType) => setBarGroupType(s);
     const updateBarDirection = (s: EBarDirection) => setBarDirection(s);
+    const updateViolinOverlay = (s: EViolinOverlay) => setViolinOverlay(s);
+
 
     const shapeScale = useMemo(() => {
         return shape ?
@@ -178,6 +182,16 @@ export function GeneralHome(props: GeneralHomeProps) {
             options: [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED],
             type: EGeneralFormType.BUTTON,
             disabled: barGroup === null
+        },
+        violinOverlay: {
+            name: 'Show Strip Plot',
+            callback: updateViolinOverlay,
+            scale: null,
+            currentColumn: null,
+            currentSelected: violinOverlay,
+            options: [EViolinOverlay.NONE, EViolinOverlay.BOX, EViolinOverlay.STRIP],
+            type: EGeneralFormType.BUTTON,
+            disabled: false
         }
     };
 

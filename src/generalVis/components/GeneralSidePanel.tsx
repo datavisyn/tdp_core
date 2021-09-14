@@ -172,8 +172,8 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                     {d.options.map(((opt) => {
                                         return (
                                             <React.Fragment key={`radioButtons${d.name + opt}`}>
-                                                <input checked={d.currentSelected === opt} onChange={(e) => d.callback(e.currentTarget.value)} value={opt} type="checkbox" className="btn-check" id={`btnCheck${opt}`} autoComplete="off"/>
-                                                <label style={{zIndex: 0}} className={`btn btn-outline-primary w-100 ${d.disabled ? 'disabled' : ''}`} htmlFor={`btnCheck${opt}`}>{opt}</label>
+                                                <input checked={d.currentSelected === opt} onChange={(e) => d.callback(e.currentTarget.value)} value={opt} type="checkbox" className="btn-check" id={`formButton${opt}`} autoComplete="off"/>
+                                                <label style={{zIndex: 0}} className={`btn btn-outline-primary w-100 ${d.disabled ? 'disabled' : ''}`} htmlFor={`formButton${opt}`}>{opt}</label>
                                             </React.Fragment>
                                         );
                                     }))}

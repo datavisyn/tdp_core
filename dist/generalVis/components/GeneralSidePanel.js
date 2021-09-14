@@ -94,8 +94,8 @@ export function GeneralSidePanel(props) {
                         props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                             return (React.createElement("div", { key: `dropdownDiv${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {
                                 return (React.createElement(React.Fragment, { key: `radioButtons${d.name + opt}` },
-                                    React.createElement("input", { checked: d.currentSelected === opt, onChange: (e) => d.callback(e.currentTarget.value), value: opt, type: "checkbox", className: "btn-check", id: `btnCheck${opt}`, autoComplete: "off" }),
-                                    React.createElement("label", { style: { zIndex: 0 }, className: `btn btn-outline-primary w-100 ${d.disabled ? 'disabled' : ''}`, htmlFor: `btnCheck${opt}` }, opt)));
+                                    React.createElement("input", { checked: d.currentSelected === opt, onChange: (e) => d.callback(e.currentTarget.value), value: opt, type: "checkbox", className: "btn-check", id: `formButton${opt}`, autoComplete: "off" }),
+                                    React.createElement("label", { style: { zIndex: 0 }, className: `btn btn-outline-primary w-100 ${d.disabled ? 'disabled' : ''}`, htmlFor: `formButton${opt}` }, opt)));
                             }))));
                         })))))));
 }
