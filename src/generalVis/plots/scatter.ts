@@ -1,4 +1,4 @@
-import {AllDropdownOptions, EColumnTypes, NumericalColumn} from '../types/generalTypes';
+import {AllDropdownOptions, EColumnTypes, NumericalColumn, CategoricalColumn} from '../types/generalTypes';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 
@@ -51,10 +51,10 @@ export class PlotlyScatter implements GeneralPlot {
                             width: dropdownOptions.color.currentColumn ? validCols[0].vals.map((v) => v.selected ? 3 : 0) : 0,
                             color: '#E29609',
                         },
-                        symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                        color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                        opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
-                        size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
+                        symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
+                        color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+                        opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
+                        size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
                 },
                 xLabel: validCols[0].name,
@@ -79,10 +79,10 @@ export class PlotlyScatter implements GeneralPlot {
                                     width: dropdownOptions.color.currentColumn ? validCols[0].vals.map((v) => v.selected ? 3 : 0) : 0,
                                     color: '#E29609'
                                 },
-                                symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                                color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                                opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
-                                size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
+                                symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
+                                color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+                                opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
+                                size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
                         },
                         xLabel: xCurr.name,
@@ -115,14 +115,14 @@ export class PlotlyScatter implements GeneralPlot {
                         },
                         symbol: 'circle',
                         size: 10,
-                        color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : '#2e2e2e',
+                        color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.color.scale(v.val)) : '#2e2e2e',
                         opacity: .5
                     },
                     transforms: [{
                         type: 'groupby',
-                        groups: dropdownOptions.color.currentColumn.vals.map((v) => v.val),
+                        groups: (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => v.val),
                         styles:
-                            [...[...new Set<string>(dropdownOptions.color.currentColumn.vals.map((v) => v.val) as string[])].map((c) => {
+                            [...[...new Set<string>((dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => v.val) as string[])].map((c) => {
                                 return {target: c, value: {name: c}};
                             })]
                     }]
@@ -154,14 +154,14 @@ export class PlotlyScatter implements GeneralPlot {
                         },
                         opacity: .5,
                         size: 10,
-                        symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
+                        symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                         color: '#2e2e2e'
                     },
                     transforms: [{
                         type: 'groupby',
-                        groups: dropdownOptions.shape.currentColumn.vals.map((v) => v.val),
+                        groups: (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => v.val),
                         styles:
-                            [...[...new Set<string>(dropdownOptions.shape.currentColumn.vals.map((v) => v.val) as string[])].map((c) => {
+                            [...[...new Set<string>((dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => v.val) as string[])].map((c) => {
                                 return {target: c, value: {name: c}};
                             })]
                     }]
