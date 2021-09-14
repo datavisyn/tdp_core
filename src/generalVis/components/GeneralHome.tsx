@@ -256,7 +256,7 @@ export function GeneralHome(props: GeneralHomeProps) {
                         selectedNumCols={selectedNumCols}
                         updateSelectedNumCols={updateSelectedNumCols}
                         columns={props.columns}
-                        dropdowns={Object.keys(allExtraDropdowns).filter((d) => traces.formList.includes(d)).map((d) => allExtraDropdowns[d])}
+                        dropdowns={traces.formList.map((t) => allExtraDropdowns[t])}
                     ></GeneralSidePanel>
                 </>
             ) : null}
