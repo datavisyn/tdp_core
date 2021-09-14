@@ -29,7 +29,7 @@ export class PlotlyScatter implements GeneralPlot {
                 rows: 0,
                 cols: 0,
                 errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-                dropdownList: ['Color', 'Opacity', 'Shape', 'Bubble Size']
+                formList: ['color', 'opacity', 'shape', 'bubble']
 
             };
         }
@@ -177,7 +177,7 @@ export class PlotlyScatter implements GeneralPlot {
             rows: Math.sqrt(plots.length),
             cols: Math.sqrt(plots.length),
             errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-            dropdownList: ['Color', 'Opacity', 'Shape', 'Bubble Size', 'Filter']
+            formList: ['color', 'opacity', 'shape', 'bubble', 'filter']
 
         };
     }

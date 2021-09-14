@@ -49,7 +49,7 @@ export declare type PlotlyInfo = {
     rows: number;
     cols: number;
     errorMessage: string;
-    dropdownList: string[];
+    formList: string[];
 };
 export declare type PlotlyData = {
     data: Data;

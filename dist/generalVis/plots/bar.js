@@ -148,7 +148,7 @@ export class PlotlyBar {
             rows: Math.ceil(Math.sqrt(plots.length)),
             cols: Math.ceil(Math.sqrt(plots.length)),
             errorMessage: 'To create a Strip plot, please select at least 1 categorical column and at least 1 numerical column.',
-            dropdownList: ['Group', 'Small Multiples', 'Bar Direction', 'Bar Group By', 'Bar Normalized']
+            formList: ['groupBy', 'barMultiplesBy', 'barDirection', 'barGroupType', 'barNormalized']
         };
     }
 }

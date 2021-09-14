@@ -19,7 +19,7 @@ export class PlotlyPCP implements GeneralPlot {
                 rows: 0,
                 cols: 0,
                 errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
-                dropdownList: []
+                formList: []
             };
         }
 
@@ -59,7 +59,7 @@ export class PlotlyPCP implements GeneralPlot {
             rows: 1,
             cols: 1,
             errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
-            dropdownList: []
+            formList: []
         };
     }
 }

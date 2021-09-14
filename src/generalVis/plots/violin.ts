@@ -57,7 +57,7 @@ export class PlotlyViolin implements GeneralPlot {
             rows: numCols.length,
             cols: catCols.length,
             errorMessage: 'To create a Violin plot, please select at least 1 categorical column and at least 1 numerical column.',
-            dropdownList: []
+            formList: []
 
         };
     }
