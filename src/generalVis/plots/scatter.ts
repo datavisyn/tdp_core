@@ -29,7 +29,7 @@ export class PlotlyScatter implements GeneralPlot {
                 rows: 0,
                 cols: 0,
                 errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-                formList: ['color', 'opacity', 'shape', 'bubble']
+                formList: ['color', 'shape', 'bubble', 'opacity']
 
             };
         }
@@ -72,6 +72,9 @@ export class PlotlyScatter implements GeneralPlot {
                             yaxis: counter === 1 ? 'y' : 'y' + counter,
                             type: 'scattergl',
                             mode: 'markers',
+                            hoverlabel: {
+                                namelength: 5
+                            },
                             showlegend: false,
                             text: validCols[0].vals.map((v) => v.id),
                             marker: {
@@ -177,7 +180,7 @@ export class PlotlyScatter implements GeneralPlot {
             rows: Math.sqrt(plots.length),
             cols: Math.sqrt(plots.length),
             errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-            formList: ['color', 'opacity', 'shape', 'bubble', 'filter']
+            formList: ['color', 'shape', 'bubble', 'opacity', 'filter']
 
         };
     }

@@ -23,7 +23,7 @@ export class PlotlyScatter {
                 rows: 0,
                 cols: 0,
                 errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-                formList: ['color', 'opacity', 'shape', 'bubble']
+                formList: ['color', 'shape', 'bubble', 'opacity']
             };
         }
         if (validCols.length === 2) {
@@ -65,6 +65,9 @@ export class PlotlyScatter {
                             yaxis: counter === 1 ? 'y' : 'y' + counter,
                             type: 'scattergl',
                             mode: 'markers',
+                            hoverlabel: {
+                                namelength: 5
+                            },
                             showlegend: false,
                             text: validCols[0].vals.map((v) => v.id),
                             marker: {
@@ -164,7 +167,7 @@ export class PlotlyScatter {
             rows: Math.sqrt(plots.length),
             cols: Math.sqrt(plots.length),
             errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-            formList: ['color', 'opacity', 'shape', 'bubble', 'filter']
+            formList: ['color', 'shape', 'bubble', 'opacity', 'filter']
         };
     }
 }

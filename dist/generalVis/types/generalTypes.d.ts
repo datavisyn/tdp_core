@@ -39,6 +39,7 @@ export interface CategoricalColumn {
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
+export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare const correlationTypes: ESupportedPlotlyVis[];
 export declare const comparisonTypes: ESupportedPlotlyVis[];
 export declare const distributionTypes: ESupportedPlotlyVis[];

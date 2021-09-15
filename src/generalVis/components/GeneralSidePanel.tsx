@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
-import {CategoricalColumn, comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, ESupportedPlotlyVis, GenericOption, highDimensionalTypes, NumericalColumn} from '../types/generalTypes';
+import {allVisTypes, CategoricalColumn, comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, ESupportedPlotlyVis, GenericOption, highDimensionalTypes, NumericalColumn} from '../types/generalTypes';
 import Plotly from 'plotly.js';
 import {useCallback, useMemo, useState} from 'react';
 import {useResizeDetector} from 'react-resize-detector';
@@ -62,62 +62,19 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
             </button>
             <div className="collapse show collapse-horizontal" id="generalVisBurgerMenu">
                 <div className="container" style={{width: '20rem'}}>
-                    <div className="row" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <label className="px-2 pt-2">Correlations</label>
-                        <div className="btn-group w-100 px-2 pt-1" role="group" aria-label="Basic checkbox toggle button group">
-
-                            {correlationTypes.map((d) => {
-                                return (
-                                    <React.Fragment key={`correlationLabel${d}`}>
-                                        <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
-                                        <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
-                    </div>
-                    <div className="row" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                        <label className="px-2 pt-2">Comparisons</label>
-
-                        <div className="btn-group w-100 px-2 pt-1" role="group" aria-label="Basic checkbox toggle button group">
-                                {comparisonTypes.map((d) => {
-                                    return (
-                                        <React.Fragment key={`correlationLabel${d}`}>
-                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
-                                            <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
-                                        </React.Fragment>
-                                    );
-                            })}
-                        </div>
-                    </div>
-                    <div className="row" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                        <label className="px-2 pt-2">Distributions</label>
-
-                        <div className="btn-group w-100 px-2 pt-1" role="group" aria-label="Basic checkbox toggle button group">
-                                {distributionTypes.map((d) => {
-                                    return (
-                                        <React.Fragment key={`correlationLabel${d}`}>
-                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
-                                            <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
-                                        </React.Fragment>
-                                    );
-                            })}
-                        </div>
-                    </div>
-                    <div className="row" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                        <label className="px-2 pt-2">High Dimensional</label>
-
-                        <div className="btn-group w-100 px-2 pt-1 pb-2" role="group" aria-label="Basic checkbox toggle button group">
-                                {highDimensionalTypes.map((d) => {
-                                    return (
-                                        <React.Fragment key={`correlationLabel${d}`}>
-                                            <input checked={props.currentVis === d} onChange={(e) => props.setCurrentVis(e.currentTarget.value as ESupportedPlotlyVis)} value={d} type="checkbox" className="btn-check" id={`btnCheck${d}`} autoComplete="off"/>
-                                            <label className="btn btn-outline-primary" htmlFor={`btnCheck${d}`}>{d}</label>
-                                        </React.Fragment>
-                                    );
-                            })}
-                        </div>
-                    </div>
+                    <label className="pt-2 pb-1">Visualization Type</label>
+                    <Select
+                        closeMenuOnSelect={true}
+                        onChange={(e) => props.setCurrentVis(e.value)}
+                        name="visTypes"
+                        options={allVisTypes.map((t) => {
+                            return {
+                                value: t,
+                                label: t
+                            };
+                        })}
+                        value={{value: props.currentVis, label: props.currentVis}}
+                    />
                     <hr></hr>
                     <label className="pt-2 pb-1">Numerical Columns</label>
                     <Select
@@ -140,12 +97,6 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                     <hr/>
 
                     <div>
-                        <button className="btn btn-primary-outline w-100" id="advancedButton" onClick={(e) => setAdvancedOpen(!advancedOpen)} type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
-                            <label className="pb-1 pe-2">Advanced</label>
-                            <FontAwesomeIcon icon={advancedOpen? faCaretUp : faCaretDown} />
-                        </button>
-                        <div className="collapse" id="advancedOptions">
-
                         {props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                         return (
                             <React.Fragment key={`reactSelect${d.name}`}>
@@ -181,7 +132,6 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                             );
                         })}
                         </div>
-                    </div>
                 </div>
             </div>
         </div>

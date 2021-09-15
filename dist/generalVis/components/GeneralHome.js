@@ -202,7 +202,7 @@ export function GeneralHome(props) {
                 itemdoubleclick: false
             },
             autosize: true,
-            grid: { rows: traces.rows, columns: traces.cols, pattern: 'independent' },
+            grid: { rows: traces.rows, columns: traces.cols, xgap: .3, pattern: 'independent' },
             shapes: [],
             violingap: 0,
             dragmode: 'select',
@@ -212,7 +212,22 @@ export function GeneralHome(props) {
     }, [traces, barGroupType]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" }, currPlot ? (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "d-flex justify-content-center align-items-center flex-grow-1" }, traces.plots.length > 0 ?
-            (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => d ? props.selectionCallback(d.points.map((d) => d.id)) : props.selectionCallback([]), onInitialized: () => d3.selectAll('g .traces').style('opacity', 1), onUpdate: () => d3.selectAll('g .traces').style('opacity', 1) })) : (React.createElement(InvalidCols, { message: traces.errorMessage }))),
+            (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => d ? props.selectionCallback(d.points.map((d) => d.id)) : props.selectionCallback([]), 
+                //plotly redraws everything on updates, so you need to reappend title and
+                // change opacity on update, instead of just in a use effect
+                onUpdate: () => {
+                    d3.selectAll('g .traces').style('opacity', 1);
+                    for (const p of traces.plots) {
+                        d3.select(`g .${p.data.xaxis}title`)
+                            .style('pointer-events', 'all')
+                            .append('title')
+                            .text(p.xLabel);
+                        d3.select(`g .${p.data.yaxis}title`)
+                            .style('pointer-events', 'all')
+                            .append('title')
+                            .text(p.yLabel);
+                    }
+                } })) : (React.createElement(InvalidCols, { message: traces.errorMessage }))),
         React.createElement(GeneralSidePanel, { filterCallback: props.filterCallback, currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, dropdowns: traces.formList.map((t) => allExtraDropdowns[t]) }))) : null));
 }
 //# sourceMappingURL=GeneralHome.js.map

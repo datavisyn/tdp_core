@@ -1,5 +1,14 @@
 import {PlotlyInfo} from '../types/generalTypes';
 
+/**
+ * Truncate long texts (e.g., to use as axes title)
+ * @param text Input text to be truncated
+ * @param maxLength Maximum text length (default: 50)
+ */
+function truncateText(text: string, maxLength = 50) {
+    return (text.length > maxLength) ? `${text.substr(0, maxLength)}...` : text;
+}
+
 export function beautifyLayout(traces: PlotlyInfo, layout: any) {
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
@@ -8,10 +17,10 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
             title:
             {
                 standoff: 5,
-                text: t.xLabel,
+                text: traces.plots.length > 1 ? truncateText(t.xLabel, 15) : truncateText(t.xLabel, 50),
                 font: {
                     family: 'Courier New, monospace',
-                    size: 14,
+                    size: traces.plots.length > 9 ? 10 : 14,
                     color: '#7f7f7f'
                 }
             },
@@ -22,10 +31,10 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
             ticks: 'outside',
             title:
             {
-                text: t.yLabel,
+                text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),
                 font: {
                     family: 'Courier New, monospace',
-                    size: 14,
+                    size: traces.plots.length > 9 ? 10 : 14,
                     color: '#7f7f7f'
                 }
             },

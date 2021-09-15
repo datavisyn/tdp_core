@@ -231,7 +231,7 @@ export function GeneralHome(props: GeneralHomeProps) {
                 itemdoubleclick: false
             },
             autosize: true,
-            grid: {rows: traces.rows, columns: traces.cols, pattern: 'independent'},
+            grid: {rows: traces.rows, columns: traces.cols, xgap: .3, pattern: 'independent'},
             shapes: [],
             violingap: 0,
             dragmode: 'select',
@@ -255,8 +255,23 @@ export function GeneralHome(props: GeneralHomeProps) {
                                 useResizeHandler={true}
                                 style={{width: '100%', height: '100%'}}
                                 onSelected={(d) => d ? props.selectionCallback(d.points.map((d) => (d as any).id)) : props.selectionCallback([])}
-                                onInitialized={() => d3.selectAll('g .traces').style('opacity', 1)}
-                                onUpdate={() => d3.selectAll('g .traces').style('opacity', 1)}
+                                //plotly redraws everything on updates, so you need to reappend title and
+                                // change opacity on update, instead of just in a use effect
+                                onUpdate={() => {
+                                    d3.selectAll('g .traces').style('opacity', 1);
+
+                                    for(const p of traces.plots) {
+                                        d3.select(`g .${(p.data as any).xaxis}title`)
+                                            .style('pointer-events', 'all')
+                                            .append('title')
+                                            .text(p.xLabel);
+
+                                        d3.select(`g .${(p.data as any).yaxis}title`)
+                                            .style('pointer-events', 'all')
+                                            .append('title')
+                                            .text(p.yLabel);
+                                    }
+                                }}
                             />) : (<InvalidCols
                                 message={traces.errorMessage} />)
                         }

@@ -38,6 +38,7 @@ export interface CategoricalColumn {
     selectedForMultiples: boolean;
 }
 
+export const allVisTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP, ESupportedPlotlyVis.PCP];
 export const correlationTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.SCATTER];
 export const comparisonTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
 export const distributionTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.BAR];
