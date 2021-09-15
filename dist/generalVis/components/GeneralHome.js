@@ -12,10 +12,14 @@ import { PlotlyStrip } from '../plots/strip';
 import { PlotlyViolin } from '../plots/violin';
 import { EColumnTypes, ESupportedPlotlyVis, EGeneralFormType } from '../types/generalTypes';
 import { beautifyLayout } from '../utils/layoutUtils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaintBrush } from '@fortawesome/free-solid-svg-icons';
+import { faSquare } from '@fortawesome/free-regular-svg-icons';
 export function GeneralHome(props) {
     const [currentVis, setCurrentVis] = useState(ESupportedPlotlyVis.SCATTER);
     const [selectedCatCols, setSelectedCatCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.CATEGORICAL).map((c) => c.name));
     const [selectedNumCols, setSelectedNumCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.NUMERICAL).map((c) => c.name));
+    const [isRectBrush, setIsRectBrush] = useState(true);
     const [bubbleSize, setBubbleSize] = useState(null);
     const [colorMapping, setColorMapping] = useState(null);
     const [opacity, setOpacity] = useState(null);
@@ -205,29 +209,37 @@ export function GeneralHome(props) {
             grid: { rows: traces.rows, columns: traces.cols, xgap: .3, pattern: 'independent' },
             shapes: [],
             violingap: 0,
-            dragmode: 'select',
+            dragmode: isRectBrush ? 'select' : 'lasso',
             barmode: barGroupType === EBarGroupingType.STACK ? 'stack' : 'group'
         };
         return beautifyLayout(traces, layout);
     }, [traces, barGroupType]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" }, currPlot ? (React.createElement(React.Fragment, null,
-        React.createElement("div", { className: "d-flex justify-content-center align-items-center flex-grow-1" }, traces.plots.length > 0 ?
-            (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => d ? props.selectionCallback(d.points.map((d) => d.id)) : props.selectionCallback([]), 
-                //plotly redraws everything on updates, so you need to reappend title and
-                // change opacity on update, instead of just in a use effect
-                onUpdate: () => {
-                    d3.selectAll('g .traces').style('opacity', 1);
-                    for (const p of traces.plots) {
-                        d3.select(`g .${p.data.xaxis}title`)
-                            .style('pointer-events', 'all')
-                            .append('title')
-                            .text(p.xLabel);
-                        d3.select(`g .${p.data.yaxis}title`)
-                            .style('pointer-events', 'all')
-                            .append('title')
-                            .text(p.yLabel);
-                    }
-                } })) : (React.createElement(InvalidCols, { message: traces.errorMessage }))),
+        React.createElement("div", { className: "position-relative d-flex justify-content-center align-items-center flex-grow-1" },
+            traces.plots.length > 0 ?
+                (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => d ? props.selectionCallback(d.points.map((d) => d.id)) : props.selectionCallback([]), 
+                    //plotly redraws everything on updates, so you need to reappend title and
+                    // change opacity on update, instead of just in a use effect
+                    onUpdate: () => {
+                        d3.selectAll('g .traces').style('opacity', 1);
+                        for (const p of traces.plots) {
+                            d3.select(`g .${p.data.xaxis}title`)
+                                .style('pointer-events', 'all')
+                                .append('title')
+                                .text(p.xLabel);
+                            d3.select(`g .${p.data.yaxis}title`)
+                                .style('pointer-events', 'all')
+                                .append('title')
+                                .text(p.yLabel);
+                        }
+                    } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
+            React.createElement("div", { className: "btn-group position-absolute top-0 start-50", role: "group" },
+                React.createElement("input", { checked: isRectBrush, onChange: (e) => setIsRectBrush(true), type: "checkbox", className: "btn-check", id: `rectBrushSelection`, autoComplete: "off" }),
+                React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection` },
+                    React.createElement(FontAwesomeIcon, { icon: faSquare })),
+                React.createElement("input", { checked: !isRectBrush, onChange: (e) => setIsRectBrush(false), type: "checkbox", className: "btn-check", id: `lassoBrushSelection`, autoComplete: "off" }),
+                React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection` },
+                    React.createElement(FontAwesomeIcon, { icon: faPaintBrush })))),
         React.createElement(GeneralSidePanel, { filterCallback: props.filterCallback, currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, dropdowns: traces.formList.map((t) => allExtraDropdowns[t]) }))) : null));
 }
 //# sourceMappingURL=GeneralHome.js.map

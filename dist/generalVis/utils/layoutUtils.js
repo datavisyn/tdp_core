@@ -10,6 +10,7 @@ export function beautifyLayout(traces, layout) {
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
             showline: true,
+            fixedrange: true,
             ticks: 'outside',
             title: {
                 standoff: 5,
@@ -24,6 +25,7 @@ export function beautifyLayout(traces, layout) {
         layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
             showline: true,
             ticks: 'outside',
+            fixedrange: true,
             title: {
                 text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),
                 font: {

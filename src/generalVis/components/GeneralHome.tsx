@@ -14,6 +14,10 @@ import {PlotlyStrip} from '../plots/strip';
 import {PlotlyViolin} from '../plots/violin';
 import {AllDropdownOptions, CategoricalColumn, PlotlyInfo, GeneralHomeProps, NumericalColumn, EColumnTypes, ESupportedPlotlyVis, EGeneralFormType} from '../types/generalTypes';
 import {beautifyLayout} from '../utils/layoutUtils';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPaintBrush} from '@fortawesome/free-solid-svg-icons';
+import {faSquare} from '@fortawesome/free-regular-svg-icons';
+
 
 export function GeneralHome(props: GeneralHomeProps) {
     const [currentVis, setCurrentVis] = useState<ESupportedPlotlyVis>(ESupportedPlotlyVis.SCATTER);
@@ -23,6 +27,8 @@ export function GeneralHome(props: GeneralHomeProps) {
     const [selectedNumCols, setSelectedNumCols] = useState<string[]>(
         props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.NUMERICAL).map((c) => c.name)
     );
+
+    const [isRectBrush, setIsRectBrush] = useState<boolean>(true);
 
     const [bubbleSize, setBubbleSize] = useState<NumericalColumn | null>(null);
     const [colorMapping, setColorMapping] = useState<CategoricalColumn | null>(null);
@@ -234,7 +240,7 @@ export function GeneralHome(props: GeneralHomeProps) {
             grid: {rows: traces.rows, columns: traces.cols, xgap: .3, pattern: 'independent'},
             shapes: [],
             violingap: 0,
-            dragmode: 'select',
+            dragmode: isRectBrush ? 'select' : 'lasso',
             barmode: barGroupType === EBarGroupingType.STACK ? 'stack' : 'group'
         };
 
@@ -245,13 +251,14 @@ export function GeneralHome(props: GeneralHomeProps) {
         <div className="d-flex flex-row w-100 h-100">
             {currPlot ? (
                 <>
-                    <div className="d-flex justify-content-center align-items-center flex-grow-1">
+                    <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+
                         {traces.plots.length > 0 ?
                             (<Plot
                                 divId={'plotlyDiv'}
                                 data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                                 layout={layout as any}
-                                config={{responsive: true}}
+                                config={{responsive: true, displayModeBar: false}}
                                 useResizeHandler={true}
                                 style={{width: '100%', height: '100%'}}
                                 onSelected={(d) => d ? props.selectionCallback(d.points.map((d) => (d as any).id)) : props.selectionCallback([])}
@@ -275,7 +282,15 @@ export function GeneralHome(props: GeneralHomeProps) {
                             />) : (<InvalidCols
                                 message={traces.errorMessage} />)
                         }
+                        <div className="btn-group position-absolute top-0 start-50" role="group">
+                            <input checked={isRectBrush} onChange={(e) => setIsRectBrush(true)} type="checkbox" className="btn-check" id={`rectBrushSelection`} autoComplete="off"/>
+                            <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`}><FontAwesomeIcon icon={faSquare} /></label>
+
+                            <input checked={!isRectBrush} onChange={(e) => setIsRectBrush(false)} type="checkbox" className="btn-check" id={`lassoBrushSelection`} autoComplete="off"/>
+                            <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`}><FontAwesomeIcon icon={faPaintBrush} /></label>
+                        </div>
                     </div>
+
                     <GeneralSidePanel
                         filterCallback={props.filterCallback}
                         currentVis={currentVis}
