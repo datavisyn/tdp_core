@@ -14,10 +14,11 @@ export interface IPanelButtonOptions {
     cssClass?: string;
     onClick: () => void;
     /**
-     * @example: btn-text-hover-bg-primary, btn-text-bg-danger, btn-text-warning, ...
+     * add a custom button class
+     * @example: btn-primary, btn-text-hover-bg-warning, btn-text-dark
      * @default: btn-text-hover-bg-dark
      */
-    btnColor?: string;
+    btnClass?: string;
 }
 /**
  * Plain HTML button with a custom title, CSS class and an onClick function

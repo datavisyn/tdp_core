@@ -162,7 +162,7 @@ $lu_assets: "~lineupjs/src/assets";
         .panel-toolbar {
           display: flex;
 
-          [class*="btn-text"] {
+          [class*="btn-"] {
             margin-left: 0.4rem;
           }
 
@@ -365,7 +365,7 @@ $lu_assets: "~lineupjs/src/assets";
           .panel-toolbar {
             display: flex;
             flex-direction: column;
-            [class*="btn-text"] {
+            [class*="btn-"] {
               margin-top: 0.4rem;
             }
 

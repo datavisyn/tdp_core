@@ -11,7 +11,7 @@ export class PanelButton {
         this.node = parent.ownerDocument.createElement('button');
         this.node.setAttribute('type', 'button');
         this.node.title = options.title;
-        this.node.className = `btn btn-sm ${options.btnColor || 'btn-text-hover-bg-dark'} ${options.cssClass || ''}`;
+        this.node.className = `btn btn-sm ${options.btnClass || 'btn-text-hover-bg-dark'} ${options.cssClass || ''}`;
         this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
         this.node.addEventListener('click', (evt) => {
             evt.stopPropagation();

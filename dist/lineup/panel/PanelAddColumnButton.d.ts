@@ -1,7 +1,7 @@
 import { SearchBox } from 'lineupjs';
 import { ISearchOption } from './ISearchOption';
 import { IPanelButton, IPanelButtonOptions } from './PanelButton';
-export interface IPanelAddColumnButtonOptions extends Pick<IPanelButtonOptions, 'btnColor'> {
+export interface IPanelAddColumnButtonOptions extends Pick<IPanelButtonOptions, 'btnClass'> {
 }
 /**
  * Div HTMLElement that contains a button and a SearchBox.

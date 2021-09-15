@@ -3,7 +3,7 @@ import {ISearchOption} from './ISearchOption';
 import {IPanelButton, PanelButton, IPanelButtonOptions} from './PanelButton';
 import {I18nextManager} from 'phovea_core';
 
-export interface IPanelAddColumnButtonOptions extends Pick<IPanelButtonOptions, 'btnColor'> {
+export interface IPanelAddColumnButtonOptions extends Pick<IPanelButtonOptions, 'btnClass'> {
   // nothing to add
 }
 
