@@ -2,6 +2,12 @@ import {AllDropdownOptions, EColumnTypes, NumericalColumn, CategoricalColumn} fr
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 
+export enum ENumericalColorScaleType {
+    SEQUENTIAL = 'Sequential',
+    DIVERGENT = 'Divergent',
+}
+
+
 export class PlotlyScatter implements GeneralPlot {
 
     startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
@@ -16,6 +22,8 @@ export class PlotlyScatter implements GeneralPlot {
     }
 
     createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
+
+        console.log(dropdownOptions);
         let counter = 1;
         const validCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL) as NumericalColumn[];
         const plots: PlotlyData[] = [];
@@ -52,8 +60,8 @@ export class PlotlyScatter implements GeneralPlot {
                             color: '#E29609',
                         },
                         symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                        color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                        opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
+                        color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+                        opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : 1,
                         size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
                 },
@@ -83,8 +91,9 @@ export class PlotlyScatter implements GeneralPlot {
                                     color: '#E29609'
                                 },
                                 symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                                color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                                opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : .5,
+                                color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+
+                                opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : 1,
                                 size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
                         },
@@ -97,43 +106,43 @@ export class PlotlyScatter implements GeneralPlot {
             }
         }
 
-        if (dropdownOptions.color.currentColumn && validCols.length > 0) {
-            legendPlots.push({
-                data: {
-                    x: validCols[0].vals.map((v) => v.val),
-                    y: validCols[0].vals.map((v) => v.val),
-                    ids: validCols[0].vals.map((v) => v.id),
-                    xaxis: 'x',
-                    yaxis: 'y',
-                    type: 'scattergl',
-                    mode: 'markers',
-                    visible: 'legendonly',
-                    legendgroup: 'color',
-                    legendgrouptitle: {
-                        text: 'Color'
-                    },
-                    marker: {
-                        line: {
-                            width: 0
-                        },
-                        symbol: 'circle',
-                        size: 10,
-                        color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.color.scale(v.val)) : '#2e2e2e',
-                        opacity: .5
-                    },
-                    transforms: [{
-                        type: 'groupby',
-                        groups: (dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => v.val),
-                        styles:
-                            [...[...new Set<string>((dropdownOptions.color.currentColumn as CategoricalColumn).vals.map((v) => v.val) as string[])].map((c) => {
-                                return {target: c, value: {name: c}};
-                            })]
-                    }]
-                },
-                xLabel: validCols[0].name,
-                yLabel: validCols[0].name
-            } as any);
-        }
+        // if (dropdownOptions.color.currentColumn && validCols.length > 0) {
+        //     legendPlots.push({
+        //         data: {
+        //             x: validCols[0].vals.map((v) => v.val),
+        //             y: validCols[0].vals.map((v) => v.val),
+        //             ids: validCols[0].vals.map((v) => v.id),
+        //             xaxis: 'x',
+        //             yaxis: 'y',
+        //             type: 'scattergl',
+        //             mode: 'markers',
+        //             visible: 'legendonly',
+        //             legendgroup: 'color',
+        //             legendgrouptitle: {
+        //                 text: 'Color'
+        //             },
+        //             marker: {
+        //                 line: {
+        //                     width: 0
+        //                 },
+        //                 symbol: 'circle',
+        //                 size: 10,
+        //                 color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => dropdownOptions.color.scale(v.val)) : '#2e2e2e',
+        //                 opacity: .5
+        //             },
+        //             transforms: [{
+        //                 type: 'groupby',
+        //                 groups: (dropdownOptions.color.currentColumn as any).vals.map((v) => v.val),
+        //                 styles:
+        //                     [...[...new Set<string>((dropdownOptions.color.currentColumn as any).vals.map((v) => v.val) as string[])].map((c) => {
+        //                         return {target: c, value: {name: c}};
+        //                     })]
+        //             }]
+        //         },
+        //         xLabel: validCols[0].name,
+        //         yLabel: validCols[0].name
+        //     } as any);
+        // }
 
         if (dropdownOptions.shape.currentColumn) {
             legendPlots.push({
@@ -155,7 +164,7 @@ export class PlotlyScatter implements GeneralPlot {
                         line: {
                             width: 0
                         },
-                        opacity: .5,
+                        opacity: 1,
                         size: 10,
                         symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                         color: '#2e2e2e'
@@ -180,7 +189,7 @@ export class PlotlyScatter implements GeneralPlot {
             rows: Math.sqrt(plots.length),
             cols: Math.sqrt(plots.length),
             errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-            formList: ['color', 'shape', 'bubble', 'opacity', 'filter']
+            formList: ['color', 'shape', 'bubble', 'opacity', 'filter', 'numericalColorScaleType']
 
         };
     }

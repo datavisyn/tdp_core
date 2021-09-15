@@ -1,4 +1,4 @@
-import d3 from 'd3';
+import d3, {color} from 'd3';
 import {scale} from 'd3';
 import {Data, Layout} from 'plotly.js';
 import * as React from 'react';
@@ -9,7 +9,7 @@ import {InvalidCols} from './InvalidCols';
 import {GeneralSidePanel} from './GeneralSidePanel';
 import {EBarDirection, EBarDisplayType, EBarGroupingType, EViolinOverlay, PlotlyBar} from '../plots/bar';
 import {PlotlyPCP} from '../plots/pcp';
-import {PlotlyScatter} from '../plots/scatter';
+import {ENumericalColorScaleType, PlotlyScatter} from '../plots/scatter';
 import {PlotlyStrip} from '../plots/strip';
 import {PlotlyViolin} from '../plots/violin';
 import {AllDropdownOptions, CategoricalColumn, PlotlyInfo, GeneralHomeProps, NumericalColumn, EColumnTypes, ESupportedPlotlyVis, EGeneralFormType} from '../types/generalTypes';
@@ -31,7 +31,7 @@ export function GeneralHome(props: GeneralHomeProps) {
     const [isRectBrush, setIsRectBrush] = useState<boolean>(true);
 
     const [bubbleSize, setBubbleSize] = useState<NumericalColumn | null>(null);
-    const [colorMapping, setColorMapping] = useState<CategoricalColumn | null>(null);
+    const [colorMapping, setColorMapping] = useState<CategoricalColumn | NumericalColumn | null>(null);
     const [opacity, setOpacity] = useState<NumericalColumn | null>(null);
     const [shape, setShape] = useState<CategoricalColumn | null>(null);
     const [barGroup, setBarGroup] = useState<CategoricalColumn | null>(null);
@@ -40,11 +40,11 @@ export function GeneralHome(props: GeneralHomeProps) {
     const [barGroupType, setBarGroupType] = useState<EBarGroupingType>(EBarGroupingType.STACK);
     const [barDirection, setBarDirection] = useState<EBarDirection>(EBarDirection.VERTICAL);
     const [violinOverlay, setViolinOverlay] = useState<EViolinOverlay>(EViolinOverlay.NONE);
-
+    const [numericalColorScaleType, setNumericalColorScaleType] = useState<ENumericalColorScaleType>(ENumericalColorScaleType.SEQUENTIAL);
 
     const updateBubbleSize = (newCol: string) => setBubbleSize(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
     const updateOpacity = (newCol: string) => setOpacity(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
-    const updateColor = (newCol: string) => setColorMapping(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
+    const updateColor = (newCol: string) => setColorMapping(props.columns.filter((c) => c.name === newCol)[0]);
     const updateShape = (newCol: string) => setShape(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
     const updateBarGroup = (newCol: string) => setBarGroup(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
     const updateBarMultiples = (newCol: string) => setBarMultiples(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
@@ -57,6 +57,7 @@ export function GeneralHome(props: GeneralHomeProps) {
     const updateBarGroupType = (s: EBarGroupingType) => setBarGroupType(s);
     const updateBarDirection = (s: EBarDirection) => setBarDirection(s);
     const updateViolinOverlay = (s: EViolinOverlay) => setViolinOverlay(s);
+    const updateNumericalColorScaleType = (s: ENumericalColorScaleType) => setNumericalColorScaleType(s);
 
 
     const shapeScale = useMemo(() => {
@@ -80,6 +81,21 @@ export function GeneralHome(props: GeneralHomeProps) {
     const colorScale = useMemo(() => {
         return scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
     }, [colorMapping]);
+
+    const sequentialColorScale = useMemo(() => {
+        if(colorMapping) {
+            console.log([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')), d3.max(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--'))]);
+        }
+        return colorMapping ?
+            scale.linear<string, number>()
+                .domain([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
+                        d3.median(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
+                        d3.max(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--'))])
+                .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#003367','#f5f5f5', '#6f0000'])
+            : null;
+    }, [colorMapping, numericalColorScaleType]);
+
+    console.log(colorMapping);
 
     const allExtraDropdowns: AllDropdownOptions = {
         bubble: {
@@ -106,13 +122,22 @@ export function GeneralHome(props: GeneralHomeProps) {
         color: {
             name: 'Color',
             callback: updateColor,
-            scale: colorScale,
+            scale: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? sequentialColorScale : colorScale,
             currentColumn: colorMapping ? colorMapping : null,
             currentSelected: colorMapping ? colorMapping.name : null,
-
-            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+            options: props.columns.map((c) => c.name),
             type: EGeneralFormType.DROPDOWN,
             disabled: false
+        },
+        numericalColorScaleType: {
+            name: 'Numerical Color Scale Type',
+            callback: updateNumericalColorScaleType,
+            scale: null,
+            currentColumn: null,
+            currentSelected: numericalColorScaleType,
+            options: [ENumericalColorScaleType.SEQUENTIAL, ENumericalColorScaleType.DIVERGENT],
+            type: EGeneralFormType.BUTTON,
+            disabled: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? false : true
         },
         shape: {
             name: 'Shape',
