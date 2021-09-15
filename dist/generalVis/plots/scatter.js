@@ -17,7 +17,6 @@ export class PlotlyScatter {
         }
     }
     createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
-        console.log("creating traces");
         let counter = 1;
         const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL);
         const plots = [];

@@ -22,7 +22,6 @@ export class PlotlyScatter implements GeneralPlot {
     }
 
     createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
-        console.log("creating traces");
         let counter = 1;
         const validCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL) as NumericalColumn[];
         const plots: PlotlyData[] = [];

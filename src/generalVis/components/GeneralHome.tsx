@@ -96,144 +96,148 @@ export function GeneralHome(props: GeneralHomeProps) {
             : null;
     }, [colorMapping, numericalColorScaleType]);
 
-    const allExtraDropdowns: AllDropdownOptions = {
-        bubble: {
-            name: 'Bubble Size',
-            callback: updateBubbleSize,
-            scale: bubbleScale,
-            currentColumn: bubbleSize ? bubbleSize : null,
-            currentSelected: bubbleSize ? bubbleSize.name : null,
-            options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
-            type: EGeneralFormType.DROPDOWN,
-            disabled: false
-        },
-        opacity: {
-            name: 'Opacity',
-            callback: updateOpacity,
-            scale: opacityScale,
-            currentColumn: opacity ? opacity : null,
-            currentSelected: opacity ? opacity.name : null,
 
-            options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
-            type: EGeneralFormType.DROPDOWN,
-            disabled: false
-        },
-        color: {
-            name: 'Color',
-            callback: updateColor,
-            scale: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? sequentialColorScale : colorScale,
-            currentColumn: colorMapping ? colorMapping : null,
-            currentSelected: colorMapping ? colorMapping.name : null,
-            options: props.columns.map((c) => c.name),
-            type: EGeneralFormType.DROPDOWN,
-            disabled: false
-        },
-        numericalColorScaleType: {
-            name: 'Numerical Color Scale Type',
-            callback: updateNumericalColorScaleType,
-            scale: null,
-            currentColumn: null,
-            currentSelected: numericalColorScaleType,
-            options: [ENumericalColorScaleType.SEQUENTIAL, ENumericalColorScaleType.DIVERGENT],
-            type: EGeneralFormType.BUTTON,
-            disabled: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? false : true
-        },
-        alphaSlider: {
-            name: 'Alpha',
-            callback: updateAlphaValue,
-            scale: null,
-            currentColumn: null,
-            currentSelected: alphaValue,
-            options: null,
-            type: EGeneralFormType.SLIDER,
-            disabled: false
-        },
-        shape: {
-            name: 'Shape',
-            callback: updateShape,
-            scale: shapeScale,
-            currentColumn: shape ? shape : null,
-            currentSelected: shape ? shape.name : null,
+    const allExtraDropdowns: AllDropdownOptions = useMemo(() => {
 
-            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
-            type: EGeneralFormType.DROPDOWN,
-            disabled: false
-        },
-        groupBy: {
-            name: 'Group',
-            callback: updateBarGroup,
-            scale: null,
-            currentColumn: barGroup ? barGroup : null,
-            currentSelected: barGroup ? barGroup.name : null,
+        return {
+            bubble: {
+                name: 'Bubble Size',
+                callback: updateBubbleSize,
+                scale: bubbleScale,
+                currentColumn: bubbleSize ? bubbleSize : null,
+                currentSelected: bubbleSize ? bubbleSize.name : null,
+                options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
+                type: EGeneralFormType.DROPDOWN,
+                disabled: false
+            },
+            opacity: {
+                name: 'Opacity',
+                callback: updateOpacity,
+                scale: opacityScale,
+                currentColumn: opacity ? opacity : null,
+                currentSelected: opacity ? opacity.name : null,
 
-            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
-            type: EGeneralFormType.DROPDOWN,
-            disabled: false
-        },
-        barMultiplesBy: {
-            name: 'Small Multiples',
-            callback: updateBarMultiples,
-            scale: null,
-            currentColumn: barMultiples ? barMultiples : null,
-            currentSelected: barMultiples ? barMultiples.name : null,
+                options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
+                type: EGeneralFormType.DROPDOWN,
+                disabled: false
+            },
+            color: {
+                name: 'Color',
+                callback: updateColor,
+                scale: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? sequentialColorScale : colorScale,
+                currentColumn: colorMapping ? colorMapping : null,
+                currentSelected: colorMapping ? colorMapping.name : null,
+                options: props.columns.map((c) => c.name),
+                type: EGeneralFormType.DROPDOWN,
+                disabled: false
+            },
+            numericalColorScaleType: {
+                name: 'Numerical Color Scale Type',
+                callback: updateNumericalColorScaleType,
+                scale: null,
+                currentColumn: null,
+                currentSelected: numericalColorScaleType,
+                options: [ENumericalColorScaleType.SEQUENTIAL, ENumericalColorScaleType.DIVERGENT],
+                type: EGeneralFormType.BUTTON,
+                disabled: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? false : true
+            },
+            alphaSlider: {
+                name: 'Alpha',
+                callback: updateAlphaValue,
+                scale: null,
+                currentColumn: null,
+                currentSelected: alphaValue,
+                options: null,
+                type: EGeneralFormType.SLIDER,
+                disabled: false
+            },
+            shape: {
+                name: 'Shape',
+                callback: updateShape,
+                scale: shapeScale,
+                currentColumn: shape ? shape : null,
+                currentSelected: shape ? shape.name : null,
 
-            options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
-            type: EGeneralFormType.DROPDOWN,
-            disabled: false
-        },
-        filter: {
-            name: 'Filter',
-            callback: props.filterCallback,
-            scale: null,
-            currentColumn: null,
-            currentSelected: '',
+                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+                type: EGeneralFormType.DROPDOWN,
+                disabled: false
+            },
+            groupBy: {
+                name: 'Group',
+                callback: updateBarGroup,
+                scale: null,
+                currentColumn: barGroup ? barGroup : null,
+                currentSelected: barGroup ? barGroup.name : null,
 
-            options: ['Filter In', 'Filter Out', 'Clear'],
-            type: EGeneralFormType.BUTTON,
-            disabled: false
-        },
-        barDirection: {
-            name: 'Bar Direction',
-            callback: updateBarDirection,
-            scale: null,
-            currentColumn: null,
-            currentSelected: barDirection,
-            options: [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL],
-            type: EGeneralFormType.BUTTON,
-            disabled: false
-        },
-        barGroupType: {
-            name: 'Bar Group By',
-            callback: updateBarGroupType,
-            scale: null,
-            currentColumn: null,
-            currentSelected: barGroupType,
+                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+                type: EGeneralFormType.DROPDOWN,
+                disabled: false
+            },
+            barMultiplesBy: {
+                name: 'Small Multiples',
+                callback: updateBarMultiples,
+                scale: null,
+                currentColumn: barMultiples ? barMultiples : null,
+                currentSelected: barMultiples ? barMultiples.name : null,
 
-            options: [EBarGroupingType.STACK, EBarGroupingType.GROUP],
-            type: EGeneralFormType.BUTTON,
-            disabled: barGroup === null
-        },
-        barNormalized: {
-            name: 'Bar Normalized',
-            callback: updateBarDisplayType,
-            scale: null,
-            currentColumn: null,
-            currentSelected: barDisplayType,
-            options: [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED],
-            type: EGeneralFormType.BUTTON,
-            disabled: barGroup === null
-        },
-        violinOverlay: {
-            name: 'Show Strip Plot',
-            callback: updateViolinOverlay,
-            scale: null,
-            currentColumn: null,
-            currentSelected: violinOverlay,
-            options: [EViolinOverlay.NONE, EViolinOverlay.BOX, EViolinOverlay.STRIP],
-            type: EGeneralFormType.BUTTON,
-            disabled: false
-        }
-    };
+                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+                type: EGeneralFormType.DROPDOWN,
+                disabled: false
+            },
+            filter: {
+                name: 'Filter',
+                callback: props.filterCallback,
+                scale: null,
+                currentColumn: null,
+                currentSelected: '',
+
+                options: ['Filter In', 'Filter Out', 'Clear'],
+                type: EGeneralFormType.BUTTON,
+                disabled: false
+            },
+            barDirection: {
+                name: 'Bar Direction',
+                callback: updateBarDirection,
+                scale: null,
+                currentColumn: null,
+                currentSelected: barDirection,
+                options: [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL],
+                type: EGeneralFormType.BUTTON,
+                disabled: false
+            },
+            barGroupType: {
+                name: 'Bar Group By',
+                callback: updateBarGroupType,
+                scale: null,
+                currentColumn: null,
+                currentSelected: barGroupType,
+
+                options: [EBarGroupingType.STACK, EBarGroupingType.GROUP],
+                type: EGeneralFormType.BUTTON,
+                disabled: barGroup === null
+            },
+            barNormalized: {
+                name: 'Bar Normalized',
+                callback: updateBarDisplayType,
+                scale: null,
+                currentColumn: null,
+                currentSelected: barDisplayType,
+                options: [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED],
+                type: EGeneralFormType.BUTTON,
+                disabled: barGroup === null
+            },
+            violinOverlay: {
+                name: 'Show Strip Plot',
+                callback: updateViolinOverlay,
+                scale: null,
+                currentColumn: null,
+                currentSelected: violinOverlay,
+                options: [EViolinOverlay.NONE, EViolinOverlay.BOX, EViolinOverlay.STRIP],
+                type: EGeneralFormType.BUTTON,
+                disabled: false
+            }
+        };
+    }, [props.columns, selectedCatCols, selectedNumCols, alphaValue, bubbleSize, colorMapping, opacity, shape, barGroup, barMultiples, barDisplayType, violinOverlay, numericalColorScaleType]);
 
     const currPlot: GeneralPlot = useMemo(() => {
         switch (currentVis) {
@@ -261,7 +265,7 @@ export function GeneralHome(props: GeneralHomeProps) {
 
     const traces: PlotlyInfo = useMemo(() => {
         return currPlot.createTraces(props, allExtraDropdowns, selectedCatCols, selectedNumCols);
-    }, [allExtraDropdowns, selectedCatCols, selectedNumCols]);
+    }, [allExtraDropdowns, selectedCatCols, selectedNumCols, currentVis]);
 
     const layout = useMemo(() => {
         const layout = {
@@ -279,7 +283,7 @@ export function GeneralHome(props: GeneralHomeProps) {
         };
 
         return beautifyLayout(traces, layout);
-    }, [traces, barGroupType]);
+    }, [traces, barGroupType, isRectBrush, currentVis]);
 
     return (
         <div className="d-flex flex-row w-100 h-100">
