@@ -119,7 +119,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
 
                         {props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                             return (
-                                <div key={`dropdownDiv${d.name}`} className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
+                                <div key={`buttonGroup${d.name}`} className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
                                     {d.options.map(((opt) => {
                                         return (
                                             <React.Fragment key={`radioButtons${d.name + opt}`}>
@@ -131,7 +131,16 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                 </div>
                             );
                         })}
-                        </div>
+
+                        {props.dropdowns.filter((d) => d.type === EGeneralFormType.SLIDER).map((d, i) => {
+                            return (
+                                <div key={`sliderDiv${d.name}`} className="w-100 px-2 pt-3">
+                                        <input type="range" onChange={(e) => d.callback(e.currentTarget.value)} className="form-range" min="=0" max="1" step=".1" id={`sliderInput${d.name}`}/>
+                                        <label htmlFor={`sliderInput${d.name}`}  className={`form-label ${d.disabled ? 'disabled' : ''}`}>{d.name}</label>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>

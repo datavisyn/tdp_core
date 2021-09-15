@@ -15,6 +15,7 @@ export var EGeneralFormType;
 (function (EGeneralFormType) {
     EGeneralFormType["DROPDOWN"] = "Dropdown";
     EGeneralFormType["BUTTON"] = "Button";
+    EGeneralFormType["SLIDER"] = "Slider";
 })(EGeneralFormType || (EGeneralFormType = {}));
 export const allVisTypes = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP, ESupportedPlotlyVis.PCP];
 export const correlationTypes = [ESupportedPlotlyVis.SCATTER];

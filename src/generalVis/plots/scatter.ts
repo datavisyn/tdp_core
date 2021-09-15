@@ -22,8 +22,7 @@ export class PlotlyScatter implements GeneralPlot {
     }
 
     createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
-
-        console.log(dropdownOptions);
+        console.log("creating traces");
         let counter = 1;
         const validCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL) as NumericalColumn[];
         const plots: PlotlyData[] = [];
@@ -61,7 +60,7 @@ export class PlotlyScatter implements GeneralPlot {
                         },
                         symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                         color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                        opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : 1,
+                        opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected as number,
                         size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
                 },
@@ -93,7 +92,7 @@ export class PlotlyScatter implements GeneralPlot {
                                 symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                                 color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
 
-                                opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : 1,
+                                opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected as number,
                                 size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
                         },
@@ -164,7 +163,7 @@ export class PlotlyScatter implements GeneralPlot {
                         line: {
                             width: 0
                         },
-                        opacity: 1,
+                        opacity: dropdownOptions.alphaSlider.currentSelected,
                         size: 10,
                         symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                         color: '#2e2e2e'

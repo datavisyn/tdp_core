@@ -67,11 +67,16 @@ export function GeneralSidePanel(props) {
                                 }), value: d.currentColumn ? { label: d.currentColumn.name, value: d.currentColumn.name } : [] })));
                     }),
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
-                        return (React.createElement("div", { key: `dropdownDiv${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {
+                        return (React.createElement("div", { key: `buttonGroup${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {
                             return (React.createElement(React.Fragment, { key: `radioButtons${d.name + opt}` },
                                 React.createElement("input", { checked: d.currentSelected === opt, onChange: (e) => d.callback(e.currentTarget.value), value: opt, type: "checkbox", className: "btn-check", id: `formButton${opt}`, autoComplete: "off" }),
                                 React.createElement("label", { style: { zIndex: 0 }, className: `btn btn-outline-primary w-100 ${d.disabled ? 'disabled' : ''}`, htmlFor: `formButton${opt}` }, opt)));
                         }))));
+                    }),
+                    props.dropdowns.filter((d) => d.type === EGeneralFormType.SLIDER).map((d, i) => {
+                        return (React.createElement("div", { key: `sliderDiv${d.name}`, className: "w-100 px-2 pt-3" },
+                            React.createElement("input", { type: "range", onChange: (e) => d.callback(e.currentTarget.value), className: "form-range", min: "=0", max: "1", step: ".1", id: `sliderInput${d.name}` }),
+                            React.createElement("label", { htmlFor: `sliderInput${d.name}`, className: `form-label ${d.disabled ? 'disabled' : ''}` }, d.name)));
                     }))))));
 }
 //# sourceMappingURL=GeneralSidePanel.js.map

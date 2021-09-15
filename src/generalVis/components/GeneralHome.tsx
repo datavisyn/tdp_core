@@ -29,6 +29,8 @@ export function GeneralHome(props: GeneralHomeProps) {
     );
 
     const [isRectBrush, setIsRectBrush] = useState<boolean>(true);
+    const [alphaValue, setAlphaValue] = useState<number>(1);
+
 
     const [bubbleSize, setBubbleSize] = useState<NumericalColumn | null>(null);
     const [colorMapping, setColorMapping] = useState<CategoricalColumn | NumericalColumn | null>(null);
@@ -57,6 +59,8 @@ export function GeneralHome(props: GeneralHomeProps) {
     const updateBarGroupType = (s: EBarGroupingType) => setBarGroupType(s);
     const updateBarDirection = (s: EBarDirection) => setBarDirection(s);
     const updateViolinOverlay = (s: EViolinOverlay) => setViolinOverlay(s);
+    const updateAlphaValue = (n: number) => setAlphaValue(n);
+
     const updateNumericalColorScaleType = (s: ENumericalColorScaleType) => setNumericalColorScaleType(s);
 
 
@@ -83,9 +87,6 @@ export function GeneralHome(props: GeneralHomeProps) {
     }, [colorMapping]);
 
     const sequentialColorScale = useMemo(() => {
-        if(colorMapping) {
-            console.log([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')), d3.max(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--'))]);
-        }
         return colorMapping ?
             scale.linear<string, number>()
                 .domain([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
@@ -94,8 +95,6 @@ export function GeneralHome(props: GeneralHomeProps) {
                 .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#003367','#f5f5f5', '#6f0000'])
             : null;
     }, [colorMapping, numericalColorScaleType]);
-
-    console.log(colorMapping);
 
     const allExtraDropdowns: AllDropdownOptions = {
         bubble: {
@@ -138,6 +137,16 @@ export function GeneralHome(props: GeneralHomeProps) {
             options: [ENumericalColorScaleType.SEQUENTIAL, ENumericalColorScaleType.DIVERGENT],
             type: EGeneralFormType.BUTTON,
             disabled: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? false : true
+        },
+        alphaSlider: {
+            name: 'Alpha',
+            callback: updateAlphaValue,
+            scale: null,
+            currentColumn: null,
+            currentSelected: alphaValue,
+            options: null,
+            type: EGeneralFormType.SLIDER,
+            disabled: false
         },
         shape: {
             name: 'Shape',
@@ -307,12 +316,20 @@ export function GeneralHome(props: GeneralHomeProps) {
                             />) : (<InvalidCols
                                 message={traces.errorMessage} />)
                         }
-                        <div className="btn-group position-absolute top-0 start-50" role="group">
-                            <input checked={isRectBrush} onChange={(e) => setIsRectBrush(true)} type="checkbox" className="btn-check" id={`rectBrushSelection`} autoComplete="off"/>
-                            <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`}><FontAwesomeIcon icon={faSquare} /></label>
+                        <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50">
+                            <div className="btn-group" role="group">
+                                <input checked={isRectBrush} onChange={(e) => setIsRectBrush(true)} type="checkbox" className="btn-check" id={`rectBrushSelection`} autoComplete="off"/>
+                                <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`}><FontAwesomeIcon icon={faSquare} /></label>
 
-                            <input checked={!isRectBrush} onChange={(e) => setIsRectBrush(false)} type="checkbox" className="btn-check" id={`lassoBrushSelection`} autoComplete="off"/>
-                            <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`}><FontAwesomeIcon icon={faPaintBrush} /></label>
+                                <input checked={!isRectBrush} onChange={(e) => setIsRectBrush(false)} type="checkbox" className="btn-check" id={`lassoBrushSelection`} autoComplete="off"/>
+                                <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`}><FontAwesomeIcon icon={faPaintBrush} /></label>
+
+
+                            </div>
+                            <div className="ps-2 pt-0 m-0">
+                                <label htmlFor={`alphaSlider`}  className={`form-label m-0 p-0`}>Opacity</label>
+                                <input type="range" onChange={(e) => updateAlphaValue(+e.currentTarget.value)} className="form-range" min="=0" max="1" step=".1" id={`alphaSlider`}/>
+                            </div>
                         </div>
                     </div>
 

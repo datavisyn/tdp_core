@@ -20,6 +20,7 @@ export function GeneralHome(props) {
     const [selectedCatCols, setSelectedCatCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.CATEGORICAL).map((c) => c.name));
     const [selectedNumCols, setSelectedNumCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.NUMERICAL).map((c) => c.name));
     const [isRectBrush, setIsRectBrush] = useState(true);
+    const [alphaValue, setAlphaValue] = useState(1);
     const [bubbleSize, setBubbleSize] = useState(null);
     const [colorMapping, setColorMapping] = useState(null);
     const [opacity, setOpacity] = useState(null);
@@ -44,6 +45,7 @@ export function GeneralHome(props) {
     const updateBarGroupType = (s) => setBarGroupType(s);
     const updateBarDirection = (s) => setBarDirection(s);
     const updateViolinOverlay = (s) => setViolinOverlay(s);
+    const updateAlphaValue = (n) => setAlphaValue(n);
     const updateNumericalColorScaleType = (s) => setNumericalColorScaleType(s);
     const shapeScale = useMemo(() => {
         return shape ?
@@ -64,9 +66,6 @@ export function GeneralHome(props) {
         return scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
     }, [colorMapping]);
     const sequentialColorScale = useMemo(() => {
-        if (colorMapping) {
-            console.log([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')), d3.max(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--'))]);
-        }
         return colorMapping ?
             scale.linear()
                 .domain([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
@@ -75,7 +74,6 @@ export function GeneralHome(props) {
                 .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#003367', '#f5f5f5', '#6f0000'])
             : null;
     }, [colorMapping, numericalColorScaleType]);
-    console.log(colorMapping);
     const allExtraDropdowns = {
         bubble: {
             name: 'Bubble Size',
@@ -116,6 +114,16 @@ export function GeneralHome(props) {
             options: [ENumericalColorScaleType.SEQUENTIAL, ENumericalColorScaleType.DIVERGENT],
             type: EGeneralFormType.BUTTON,
             disabled: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? false : true
+        },
+        alphaSlider: {
+            name: 'Alpha',
+            callback: updateAlphaValue,
+            scale: null,
+            currentColumn: null,
+            currentSelected: alphaValue,
+            options: null,
+            type: EGeneralFormType.SLIDER,
+            disabled: false
         },
         shape: {
             name: 'Shape',
@@ -258,13 +266,17 @@ export function GeneralHome(props) {
                                 .text(p.yLabel);
                         }
                     } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
-            React.createElement("div", { className: "btn-group position-absolute top-0 start-50", role: "group" },
-                React.createElement("input", { checked: isRectBrush, onChange: (e) => setIsRectBrush(true), type: "checkbox", className: "btn-check", id: `rectBrushSelection`, autoComplete: "off" }),
-                React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection` },
-                    React.createElement(FontAwesomeIcon, { icon: faSquare })),
-                React.createElement("input", { checked: !isRectBrush, onChange: (e) => setIsRectBrush(false), type: "checkbox", className: "btn-check", id: `lassoBrushSelection`, autoComplete: "off" }),
-                React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection` },
-                    React.createElement(FontAwesomeIcon, { icon: faPaintBrush })))),
+            React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50" },
+                React.createElement("div", { className: "btn-group", role: "group" },
+                    React.createElement("input", { checked: isRectBrush, onChange: (e) => setIsRectBrush(true), type: "checkbox", className: "btn-check", id: `rectBrushSelection`, autoComplete: "off" }),
+                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection` },
+                        React.createElement(FontAwesomeIcon, { icon: faSquare })),
+                    React.createElement("input", { checked: !isRectBrush, onChange: (e) => setIsRectBrush(false), type: "checkbox", className: "btn-check", id: `lassoBrushSelection`, autoComplete: "off" }),
+                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection` },
+                        React.createElement(FontAwesomeIcon, { icon: faPaintBrush }))),
+                React.createElement("div", { className: "ps-2 pt-0 m-0" },
+                    React.createElement("label", { htmlFor: `alphaSlider`, className: `form-label m-0 p-0` }, "Opacity"),
+                    React.createElement("input", { type: "range", onChange: (e) => updateAlphaValue(+e.currentTarget.value), className: "form-range", min: "=0", max: "1", step: ".1", id: `alphaSlider` })))),
         React.createElement(GeneralSidePanel, { filterCallback: props.filterCallback, currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, dropdowns: traces.formList.map((t) => allExtraDropdowns[t]) }))) : null));
 }
 //# sourceMappingURL=GeneralHome.js.map

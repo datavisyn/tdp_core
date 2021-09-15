@@ -16,6 +16,7 @@ export enum EColumnTypes {
 export enum EGeneralFormType {
     DROPDOWN = 'Dropdown',
     BUTTON = 'Button',
+    SLIDER = 'Slider',
 }
 
 export interface GeneralHomeProps {
@@ -62,10 +63,10 @@ export type PlotlyData = {
 export type GenericOption = {
     name: string;
     currentColumn: NumericalColumn | CategoricalColumn;
-    currentSelected: string
+    currentSelected: string | number
     scale: any,
     options: string[]
-    callback: (s: string) => void
+    callback: (s: string | number) => void
     type: EGeneralFormType
     disabled: boolean
 };
@@ -82,5 +83,6 @@ export type AllDropdownOptions = {
     barNormalized: GenericOption,
     barGroupType: GenericOption,
     violinOverlay: GenericOption,
-    numericalColorScaleType: GenericOption
+    numericalColorScaleType: GenericOption,
+    alphaSlider: GenericOption
 };

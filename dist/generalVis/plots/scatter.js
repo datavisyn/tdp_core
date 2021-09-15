@@ -17,7 +17,7 @@ export class PlotlyScatter {
         }
     }
     createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
-        console.log(dropdownOptions);
+        console.log("creating traces");
         let counter = 1;
         const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL);
         const plots = [];
@@ -51,7 +51,7 @@ export class PlotlyScatter {
                         },
                         symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                         color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                        opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : 1,
+                        opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected,
                         size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
                 },
@@ -83,7 +83,7 @@ export class PlotlyScatter {
                                 },
                                 symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                                 color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
-                                opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : 1,
+                                opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected,
                                 size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
                         },
@@ -151,7 +151,7 @@ export class PlotlyScatter {
                         line: {
                             width: 0
                         },
-                        opacity: 1,
+                        opacity: dropdownOptions.alphaSlider.currentSelected,
                         size: 10,
                         symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
                         color: '#2e2e2e'
