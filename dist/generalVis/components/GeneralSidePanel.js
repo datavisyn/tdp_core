@@ -27,6 +27,7 @@ export function GeneralSidePanel(props) {
         return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
     }, [props.columns.length]);
     const formatOptionLabel = (option, ctx) => {
+        console.log(option, ctx);
         return (React.createElement(React.Fragment, null,
             React.createElement(Highlighter, { searchWords: [ctx.inputValue], autoEscape: true, textToHighlight: option.name }),
             option.description &&
@@ -56,22 +57,18 @@ export function GeneralSidePanel(props) {
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                         return (React.createElement(React.Fragment, { key: `reactSelect${d.name}` },
                             React.createElement("label", { className: "pt-2 pb-1" }, d.name),
-                            React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e ? e.value : ''), name: d.name, options: d.options.map((s) => {
-                                    if (s.id) {
-                                        return {
-                                            value: s.id,
-                                            label: s.name,
-                                            description: s.description
-                                        };
+                            React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e ? e.value : ''), name: d.name, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, options: d.options.map((s) => {
+                                    if (s.name !== undefined) {
+                                        return s;
                                     }
                                     else {
                                         return {
-                                            value: s,
-                                            label: s,
+                                            id: s,
+                                            name: s,
                                             description: ''
                                         };
                                     }
-                                }), value: d.currentColumn ? { label: d.currentColumn.info.name, value: d.currentColumn.info.name, description: d.currentColumn.info.description } : [] })));
+                                }), value: d.currentColumn ? d.currentColumn.info : [] })));
                     }),
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                         return (React.createElement("div", { key: `buttonGroup${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {

@@ -45,6 +45,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
     }, [props.columns.length]);
 
     const formatOptionLabel = (option, ctx) => {
+        console.log(option, ctx);
         return (
             <>
                 <Highlighter
@@ -115,22 +116,21 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                     isClearable
                                     onChange={(e) => d.callback(e ? e.value : '')}
                                     name={d.name}
+                                    formatOptionLabel={formatOptionLabel}
+                                    getOptionLabel={(option) => option.name}
+                                    getOptionValue={(option) => option.id}
                                     options={d.options.map((s) => {
-                                        if(s.id) {
-                                            return {
-                                                value: s.id,
-                                                label: s.name,
-                                                description: s.description
-                                            };
+                                        if(s.name !== undefined) {
+                                            return s;
                                         } else {
                                             return {
-                                                value: s,
-                                                label: s,
+                                                id: s,
+                                                name: s,
                                                 description: ''
                                             };
                                         }
                                     })}
-                                    value={d.currentColumn ? {label: d.currentColumn.info.name, value: d.currentColumn.info.name, description: d.currentColumn.info.description} : []}
+                                    value={d.currentColumn ? d.currentColumn.info : []}
                                 />
                             </React.Fragment>
                         );
