@@ -232,7 +232,7 @@ export function GeneralHome(props) {
     }, [currentVis]);
     const traces = useMemo(() => {
         return currPlot.createTraces(props, allExtraDropdowns, selectedCatCols, selectedNumCols);
-    }, [allExtraDropdowns, selectedCatCols, selectedNumCols, currentVis]);
+    }, [allExtraDropdowns, selectedCatCols, selectedNumCols, currentVis, props.columns]);
     const layout = useMemo(() => {
         const layout = {
             showlegend: true,

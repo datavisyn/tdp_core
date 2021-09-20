@@ -265,7 +265,7 @@ export function GeneralHome(props: GeneralHomeProps) {
 
     const traces: PlotlyInfo = useMemo(() => {
         return currPlot.createTraces(props, allExtraDropdowns, selectedCatCols, selectedNumCols);
-    }, [allExtraDropdowns, selectedCatCols, selectedNumCols, currentVis]);
+    }, [allExtraDropdowns, selectedCatCols, selectedNumCols, currentVis, props.columns]);
 
     const layout = useMemo(() => {
         const layout = {
