@@ -1,6 +1,4 @@
 import d3 from 'd3';
-import {scale} from 'd3';
-import {Data, Layout} from 'plotly.js';
 import * as React from 'react';
 import {useEffect, useMemo, useState} from 'react';
 import Plot, {Figure} from 'react-plotly.js';
@@ -51,24 +49,24 @@ export function GeneralHome(props: GeneralHomeProps) {
 
     const shapeScale = useMemo(() => {
         return shape ?
-            scale.ordinal<string>().domain(d3.set(shape.vals.map((v) => v.val)).values()).range(['circle', 'square', 'triangle-up', 'star'])
+            d3.scale.ordinal<string>().domain([...new Set(shape.vals.map((v) => v.val))]).range(['circle', 'square', 'triangle-up', 'star'])
             : null;
     }, [shape]);
 
     const bubbleScale = useMemo(() => {
         return bubbleSize ?
-            scale.linear().domain([0, d3.max(bubbleSize.vals.map((v) => v.val))]).range([0, 10])
+            d3.scale.linear().domain([0, d3.max(bubbleSize.vals.map((v) => v.val))]).range([0, 10])
             : null;
     }, [bubbleSize]);
 
     const opacityScale = useMemo(() => {
         return opacity ?
-            scale.linear().domain([0, d3.max(opacity.vals.map((v) => v.val))]).range([0, 1])
+            d3.scale.linear().domain([0, d3.max(opacity.vals.map((v) => v.val))]).range([0, 1])
             : null;
     }, [opacity]);
 
     const colorScale = useMemo(() => {
-        return scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
+        return d3.scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
     }, [colorMapping]);
 
     const allExtraDropdowns: AllDropdownOptions = {

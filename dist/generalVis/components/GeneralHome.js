@@ -1,5 +1,4 @@
 import d3 from 'd3';
-import { scale } from 'd3';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import Plot from 'react-plotly.js';
@@ -39,21 +38,21 @@ export function GeneralHome(props) {
     const updateBarDirection = (s) => setBarDirection(s);
     const shapeScale = useMemo(() => {
         return shape ?
-            scale.ordinal().domain(d3.set(shape.vals.map((v) => v.val)).values()).range(['circle', 'square', 'triangle-up', 'star'])
+            d3.scale.ordinal().domain([...new Set(shape.vals.map((v) => v.val))]).range(['circle', 'square', 'triangle-up', 'star'])
             : null;
     }, [shape]);
     const bubbleScale = useMemo(() => {
         return bubbleSize ?
-            scale.linear().domain([0, d3.max(bubbleSize.vals.map((v) => v.val))]).range([0, 10])
+            d3.scale.linear().domain([0, d3.max(bubbleSize.vals.map((v) => v.val))]).range([0, 10])
             : null;
     }, [bubbleSize]);
     const opacityScale = useMemo(() => {
         return opacity ?
-            scale.linear().domain([0, d3.max(opacity.vals.map((v) => v.val))]).range([0, 1])
+            d3.scale.linear().domain([0, d3.max(opacity.vals.map((v) => v.val))]).range([0, 1])
             : null;
     }, [opacity]);
     const colorScale = useMemo(() => {
-        return scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
+        return d3.scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
     }, [colorMapping]);
     const allExtraDropdowns = {
         bubble: {
@@ -201,6 +200,6 @@ export function GeneralHome(props) {
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" }, currPlot ? (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "d-flex justify-content-center align-items-center flex-grow-1" }, traces.plots.length > 0 ?
             (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => d ? props.selectionCallback(d.points.map((d) => d.id)) : props.selectionCallback([]), onInitialized: () => d3.selectAll('g .traces').style('opacity', 1), onUpdate: () => d3.selectAll('g .traces').style('opacity', 1) })) : (React.createElement(InvalidCols, { message: traces.errorMessage }))),
-        React.createElement(GeneralSidePanel, { filterCallback: props.filterCallback, currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, dropdowns: Object.keys(allExtraDropdowns).filter((d) => traces.formList.includes(d)).map((d) => allExtraDropdowns[d]) }))) : null));
+        React.createElement(GeneralSidePanel, { filterCallback: props.filterCallback, currentVis: currentVis, setCurrentVis: updateCurrentVis, selectedCatCols: selectedCatCols, updateSelectedCatCols: updateSelectedCatCols, selectedNumCols: selectedNumCols, updateSelectedNumCols: updateSelectedNumCols, columns: props.columns, dropdowns: traces.formList.map((t) => allExtraDropdowns[t]) }))) : null));
 }
 //# sourceMappingURL=GeneralHome.js.map

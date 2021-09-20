@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
 import { comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, highDimensionalTypes } from '../types/generalTypes';
 import Plotly from 'plotly.js';
@@ -39,7 +37,7 @@ export function GeneralSidePanel(props) {
     }, [props.columns.length]);
     return (React.createElement("div", { ref: ref, className: "position-relative h-100 flex-shrink-1 bg-light" },
         React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#generalVisBurgerMenu", "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
-            React.createElement(FontAwesomeIcon, { icon: faBars })),
+            React.createElement("i", { className: "fas fa-bars" })),
         React.createElement("div", { className: "collapse show collapse-horizontal", id: "generalVisBurgerMenu" },
             React.createElement("div", { className: "container", style: { width: '20rem' } },
                 React.createElement("div", { className: "row", id: "home", role: "tabpanel", "aria-labelledby": "home-tab" },
@@ -79,7 +77,7 @@ export function GeneralSidePanel(props) {
                 React.createElement("div", null,
                     React.createElement("button", { className: "btn btn-primary-outline w-100", id: "advancedButton", onClick: (e) => setAdvancedOpen(!advancedOpen), type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#advancedOptions", "aria-expanded": "false", "aria-controls": "advancedOptions" },
                         React.createElement("label", { className: "pb-1 pe-2" }, "Advanced"),
-                        React.createElement(FontAwesomeIcon, { icon: advancedOpen ? faCaretUp : faCaretDown })),
+                        React.createElement("i", { className: `${advancedOpen ? 'fa fa-caret-up' : 'fa fa-caret-down'}` })),
                     React.createElement("div", { className: "collapse", id: "advancedOptions" },
                         props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                             return (React.createElement(React.Fragment, { key: `reactSelect${d.name}` },

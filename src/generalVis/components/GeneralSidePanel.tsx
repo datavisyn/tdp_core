@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
 import {CategoricalColumn, comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, ESupportedPlotlyVis, GenericOption, highDimensionalTypes, NumericalColumn} from '../types/generalTypes';
 import Plotly from 'plotly.js';
@@ -58,7 +56,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
     return (
         <div ref={ref} className="position-relative h-100 flex-shrink-1 bg-light">
             <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target="#generalVisBurgerMenu" aria-expanded="true" aria-controls="generalVisBurgerMenu">
-                <FontAwesomeIcon icon={faBars} />
+                <i className="fas fa-bars"/>
             </button>
             <div className="collapse show collapse-horizontal" id="generalVisBurgerMenu">
                 <div className="container" style={{width: '20rem'}}>
@@ -142,7 +140,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                     <div>
                         <button className="btn btn-primary-outline w-100" id="advancedButton" onClick={(e) => setAdvancedOpen(!advancedOpen)} type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
                             <label className="pb-1 pe-2">Advanced</label>
-                            <FontAwesomeIcon icon={advancedOpen? faCaretUp : faCaretDown} />
+                            <i className={`${advancedOpen ? 'fa fa-caret-up' : 'fa fa-caret-down'}`}/>
                         </button>
                         <div className="collapse" id="advancedOptions">
 
