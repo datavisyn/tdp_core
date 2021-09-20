@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { allVisTypes, EColumnTypes, EGeneralFormType } from '../types/generalTypes';
 import Plotly from 'plotly.js';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import Select from 'react-select';
 import Highlighter from 'react-highlight-words';
 export function GeneralSidePanel(props) {
-    const [advancedOpen, setAdvancedOpen] = useState(false);
     // GOTTA BE A BETTER WAY
     const onResize = useCallback(() => {
         if (document.getElementById('plotlyDiv')) {
@@ -56,18 +55,7 @@ export function GeneralSidePanel(props) {
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                         return (React.createElement(React.Fragment, { key: `reactSelect${d.name}` },
                             React.createElement("label", { className: "pt-2 pb-1" }, d.name),
-                            React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e), name: d.name, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, options: d.options.map((s) => {
-                                    if (s.name !== undefined) {
-                                        return s;
-                                    }
-                                    else {
-                                        return {
-                                            id: s,
-                                            name: s,
-                                            description: ''
-                                        };
-                                    }
-                                }), value: d.currentColumn ? d.currentColumn.info : [] })));
+                            React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e), name: d.name, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, options: d.options, value: d.currentColumn ? d.currentColumn.info : [] })));
                     }),
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                         return (React.createElement("div", { key: `buttonGroup${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {

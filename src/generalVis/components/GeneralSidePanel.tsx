@@ -19,8 +19,6 @@ interface GeneralSidePanelProps {
 }
 
 export function GeneralSidePanel(props: GeneralSidePanelProps) {
-    const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
-
     // GOTTA BE A BETTER WAY
     const onResize = useCallback(() => {
         if(document.getElementById('plotlyDiv')) {
@@ -118,17 +116,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                     formatOptionLabel={formatOptionLabel}
                                     getOptionLabel={(option) => option.name}
                                     getOptionValue={(option) => option.id}
-                                    options={d.options.map((s) => {
-                                        if(s.name !== undefined) {
-                                            return s;
-                                        } else {
-                                            return {
-                                                id: s,
-                                                name: s,
-                                                description: ''
-                                            };
-                                        }
-                                    })}
+                                    options={(d.options as ColumnInfo[])}
                                     value={d.currentColumn ? d.currentColumn.info : []}
                                 />
                             </React.Fragment>
@@ -138,7 +126,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                         {props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                             return (
                                 <div key={`buttonGroup${d.name}`} className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
-                                    {d.options.map(((opt) => {
+                                    {(d.options as string[]).map(((opt) => {
                                         return (
                                             <React.Fragment key={`radioButtons${d.name + opt}`}>
                                                 <input checked={d.currentSelected === opt} onChange={(e) => d.callback(e.currentTarget.value)} value={opt} type="checkbox" className="btn-check" id={`formButton${opt}`} autoComplete="off"/>

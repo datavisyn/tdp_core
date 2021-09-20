@@ -12,11 +12,6 @@ import {PlotlyStrip} from '../plots/strip';
 import {PlotlyViolin} from '../plots/violin';
 import {AllDropdownOptions, CategoricalColumn, PlotlyInfo, GeneralHomeProps, NumericalColumn, EColumnTypes, ESupportedPlotlyVis, EGeneralFormType, ColumnInfo} from '../types/generalTypes';
 import {beautifyLayout} from '../utils/layoutUtils';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faPaintBrush} from '@fortawesome/free-solid-svg-icons';
-import {faSquare} from '@fortawesome/free-regular-svg-icons';
-import {config} from '@fortawesome/fontawesome-svg-core';
-
 
 export function GeneralHome(props: GeneralHomeProps) {
     const [currentVis, setCurrentVis] = useState<ESupportedPlotlyVis>(ESupportedPlotlyVis.SCATTER);
@@ -88,9 +83,9 @@ export function GeneralHome(props: GeneralHomeProps) {
     const sequentialColorScale = useMemo(() => {
         return colorMapping ?
             d3.scale.linear<string, number>()
-                .domain([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
-                        d3.median(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
-                        d3.max(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--'))])
+                .domain([d3.min((colorMapping as NumericalColumn).vals.map((v) => v.val).filter((v) => v as any !== '--')),
+                        d3.median((colorMapping as NumericalColumn).vals.map((v) => v.val).filter((v) => v as any !== '--')),
+                        d3.max((colorMapping as NumericalColumn).vals.map((v) => v.val).filter((v) => v as any !== '--'))])
                 .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#003367','#f5f5f5', '#6f0000'])
             : null;
     }, [colorMapping, numericalColorScaleType]);
@@ -325,10 +320,10 @@ export function GeneralHome(props: GeneralHomeProps) {
                         <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50">
                             <div className="btn-group" role="group">
                                 <input checked={isRectBrush} onChange={(e) => setIsRectBrush(true)} type="checkbox" className="btn-check" id={`rectBrushSelection`} autoComplete="off"/>
-                                <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`}><FontAwesomeIcon icon={faSquare} /></label>
+                                <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`}><i className="fas fa-square"/></label>
 
                                 <input checked={!isRectBrush} onChange={(e) => setIsRectBrush(false)} type="checkbox" className="btn-check" id={`lassoBrushSelection`} autoComplete="off"/>
-                                <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`}><FontAwesomeIcon icon={faPaintBrush} /></label>
+                                <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`}><i className="fas fa-paint-brush"/></label>
 
 
                             </div>

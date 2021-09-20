@@ -11,9 +11,6 @@ import { PlotlyStrip } from '../plots/strip';
 import { PlotlyViolin } from '../plots/violin';
 import { EColumnTypes, ESupportedPlotlyVis, EGeneralFormType } from '../types/generalTypes';
 import { beautifyLayout } from '../utils/layoutUtils';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaintBrush } from '@fortawesome/free-solid-svg-icons';
-import { faSquare } from '@fortawesome/free-regular-svg-icons';
 export function GeneralHome(props) {
     const [currentVis, setCurrentVis] = useState(ESupportedPlotlyVis.SCATTER);
     const [selectedCatCols, setSelectedCatCols] = useState(props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.CATEGORICAL).map((c) => c.info));
@@ -275,10 +272,10 @@ export function GeneralHome(props) {
                 React.createElement("div", { className: "btn-group", role: "group" },
                     React.createElement("input", { checked: isRectBrush, onChange: (e) => setIsRectBrush(true), type: "checkbox", className: "btn-check", id: `rectBrushSelection`, autoComplete: "off" }),
                     React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection` },
-                        React.createElement(FontAwesomeIcon, { icon: faSquare })),
+                        React.createElement("i", { className: "fas fa-square" })),
                     React.createElement("input", { checked: !isRectBrush, onChange: (e) => setIsRectBrush(false), type: "checkbox", className: "btn-check", id: `lassoBrushSelection`, autoComplete: "off" }),
                     React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection` },
-                        React.createElement(FontAwesomeIcon, { icon: faPaintBrush }))),
+                        React.createElement("i", { className: "fas fa-paint-brush" }))),
                 React.createElement("div", { className: "ps-2 pt-0 m-0" },
                     React.createElement("label", { htmlFor: `alphaSlider`, className: `form-label m-0 p-0` }, "Opacity"),
                     React.createElement("input", { type: "range", onChange: (e) => updateAlphaValue(+e.currentTarget.value), className: "form-range", min: "=0", max: "1", step: ".1", id: `alphaSlider` })))),
