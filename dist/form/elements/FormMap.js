@@ -10,24 +10,6 @@ import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
 import { BaseUtils, UserSession, ResolveNow, I18nextManager } from 'phovea_core';
 import { Select3 } from './Select3';
-/**
- * Helper function to travserse the DOM tree up and
- * looks for the following nested DOM constallation:
- * `.parameters > .form-inline`
- * If this constallation is found returns `true`.
- * Otherwise returns `false`.
- *
- * @param node current node element
- */
-function hasInlineParent(node) {
-    while (node.parentElement) {
-        node = node.parentElement;
-        if (node.classList.contains('row')) {
-            return node.parentElement.classList.contains('parameters');
-        }
-    }
-    return false;
-}
 export class FormMap extends AFormElement {
     /**
      * Constructor
@@ -39,11 +21,12 @@ export class FormMap extends AFormElement {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
         this.rows = [];
+        this.inline = this.elementDesc.options.inlineForm;
     }
     updateBadge() {
         const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
         ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-            this.$node.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }));
+            this.$inputNode.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }));
         });
     }
     get sessionKey() {
@@ -67,25 +50,24 @@ export class FormMap extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        const $colNode = $formNode.append('div').classed('col-sm-auto', true);
-        this.$node = $colNode.append('div');
+        this.$rootNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+        this.$inputNode = this.$rootNode.append('div');
         this.setVisible(this.elementDesc.visible);
-        this.inline = hasInlineParent(this.$node.node());
         if (this.inline && this.elementDesc.onChange) {
             //change the default onChange handler for the inline cas
             this.inlineOnChange = this.elementDesc.onChange;
             this.elementDesc.onChange = null;
         }
         // do not add the class in inline mode
-        this.$node.classed('row', !this.inline);
+        this.$inputNode.classed('row', !this.inline);
         if (this.inline) {
             if (!this.elementDesc.options.badgeProvider) {
                 //default badge provider for inline
                 this.elementDesc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
             }
-            this.$node.classed('dropdown', true);
-            this.$node.html(`
-          <button class="btn btn-white border border-gray-3 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            this.$inputNode.classed('dropdown', true);
+            this.$inputNode.html(`
+          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
@@ -97,10 +79,10 @@ export class FormMap extends AFormElement {
             </div>
           </div>
       `);
-            this.$node.select('.form-map-apply button').on('click', () => {
+            this.$inputNode.select('.form-map-apply button').on('click', () => {
                 d3event.preventDefault();
             });
-            this.$group = this.$node.select('div.form-map-container');
+            this.$group = this.$inputNode.select('div.form-map-container');
             this.$group.on('click', () => {
                 // stop click propagation to avoid closing the dropdown
                 d3event.stopPropagation();
@@ -108,7 +90,7 @@ export class FormMap extends AFormElement {
         }
         else {
             if (!this.elementDesc.hideLabel) {
-                const $label = this.$node.append('label').classed('form-label', true).attr('for', this.elementDesc.attributes.id);
+                const $label = this.$inputNode.append('label').classed('form-label', true).attr('for', this.elementDesc.attributes.id);
                 if (this.elementDesc.options.badgeProvider) {
                     $label.html(`${this.elementDesc.label} <span class="badge rounded-pill bg-secondary"></span>`);
                 }
@@ -116,7 +98,7 @@ export class FormMap extends AFormElement {
                     $label.text(this.elementDesc.label);
                 }
             }
-            this.$group = this.$node.append('div');
+            this.$group = this.$inputNode.append('div');
         }
         this.setAttributes(this.$group, this.elementDesc.attributes);
         // adapt default settings
@@ -145,7 +127,7 @@ export class FormMap extends AFormElement {
         this.buildMap();
         if (this.inline && this.inlineOnChange) {
             // trigger change on onChange listener just when the dialog is closed
-            $(this.$node.node()).on('hidden.bs.dropdown', () => {
+            $(this.$inputNode.node()).on('hidden.bs.dropdown', () => {
                 const v = this.value;
                 const previous = this.previousValue;
                 if (this.isEqual(v, previous)) {
@@ -394,7 +376,7 @@ export class FormMap extends AFormElement {
     }
     focus() {
         // open dropdown
-        $(this.$node.select('.dropdown-menu').node()).show();
+        $(this.$inputNode.select('.dropdown-menu').node()).show();
     }
     isEqual(a, b) {
         if (a.length !== b.length) {
