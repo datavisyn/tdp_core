@@ -1,11 +1,10 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
 import { allVisTypes, EColumnTypes, EGeneralFormType } from '../types/generalTypes';
 import Plotly from 'plotly.js';
 import { useCallback, useMemo, useState } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import Select from 'react-select';
+import Highlighter from 'react-highlight-words';
 export function GeneralSidePanel(props) {
     const [advancedOpen, setAdvancedOpen] = useState(false);
     // GOTTA BE A BETTER WAY
@@ -22,28 +21,26 @@ export function GeneralSidePanel(props) {
     }, []);
     const { ref } = useResizeDetector({ onResize });
     const selectNumOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => {
-            return {
-                value: c.name,
-                label: c.name
-            };
-        });
+        return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info);
     }, [props.columns.length]);
     const selectCatOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => {
-            return {
-                value: c.name,
-                label: c.name
-            };
-        });
+        return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
     }, [props.columns.length]);
+    const formatOptionLabel = (option, ctx) => {
+        return (React.createElement(React.Fragment, null,
+            React.createElement(Highlighter, { searchWords: [ctx.inputValue], autoEscape: true, textToHighlight: option.name }),
+            option.description &&
+                React.createElement("span", { className: "small text-muted ms-1" }, option.description)));
+    };
     return (React.createElement("div", { ref: ref, className: "position-relative h-100 flex-shrink-1 bg-light" },
         React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#generalVisBurgerMenu", "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
-            React.createElement(FontAwesomeIcon, { icon: faBars })),
+            React.createElement("i", { className: "fas fa-bars" })),
         React.createElement("div", { className: "collapse show collapse-horizontal", id: "generalVisBurgerMenu" },
             React.createElement("div", { className: "container", style: { width: '20rem' } },
                 React.createElement("label", { className: "pt-2 pb-1" }, "Visualization Type"),
-                React.createElement(Select, { closeMenuOnSelect: true, onChange: (e) => props.setCurrentVis(e.value), name: "visTypes", options: allVisTypes.map((t) => {
+                React.createElement(Select, { closeMenuOnSelect: true, 
+                    // components={{Option: optionLayout}}
+                    onChange: (e) => props.setCurrentVis(e.value), name: "visTypes", options: allVisTypes.map((t) => {
                         return {
                             value: t,
                             label: t
@@ -51,20 +48,30 @@ export function GeneralSidePanel(props) {
                     }), value: { value: props.currentVis, label: props.currentVis } }),
                 React.createElement("hr", null),
                 React.createElement("label", { className: "pt-2 pb-1" }, "Numerical Columns"),
-                React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, onChange: (e) => props.updateSelectedNumCols(e.map((c) => c.value)), name: "numColumns", options: selectNumOptions, value: selectNumOptions.filter((c) => props.selectedNumCols.includes(c.value)) }),
+                React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => props.updateSelectedNumCols(e.map((c) => c)), name: "numColumns", options: selectNumOptions, value: selectNumOptions.filter((c) => props.selectedNumCols.filter((d) => d.id === c.id).length > 0) }),
                 React.createElement("label", { className: "pt-2 pb-1" }, "Categorical Columns"),
-                React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, onChange: (e) => props.updateSelectedCatCols(e.map((c) => c.value)), name: "catColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => props.selectedCatCols.includes(c.value)) }),
+                React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => props.updateSelectedCatCols(e.map((c) => c)), name: "catColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => props.selectedCatCols.filter((d) => d.id === c.id).length > 0) }),
                 React.createElement("hr", null),
                 React.createElement("div", null,
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                         return (React.createElement(React.Fragment, { key: `reactSelect${d.name}` },
                             React.createElement("label", { className: "pt-2 pb-1" }, d.name),
                             React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e ? e.value : ''), name: d.name, options: d.options.map((s) => {
-                                    return {
-                                        value: s,
-                                        label: s
-                                    };
-                                }), value: d.currentColumn ? { label: d.currentColumn.name, value: d.currentColumn.name } : [] })));
+                                    if (s.id) {
+                                        return {
+                                            value: s.id,
+                                            label: s.name,
+                                            description: s.description
+                                        };
+                                    }
+                                    else {
+                                        return {
+                                            value: s,
+                                            label: s,
+                                            description: ''
+                                        };
+                                    }
+                                }), value: d.currentColumn ? { label: d.currentColumn.info.name, value: d.currentColumn.info.name, description: d.currentColumn.info.description } : [] })));
                     }),
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                         return (React.createElement("div", { key: `buttonGroup${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {

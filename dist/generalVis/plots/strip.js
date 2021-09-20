@@ -4,16 +4,16 @@ export class PlotlyStrip {
         const numCols = props.columns.filter((c) => EColumnTypes.NUMERICAL);
         const catCols = props.columns.filter((c) => EColumnTypes.CATEGORICAL);
         if (selectedNumCols.length === 0 && numCols.length >= 1) {
-            updateSelectedNumCols([numCols[0].name]);
+            updateSelectedNumCols([numCols[0].info]);
         }
         if (selectedCatCols.length === 0 && catCols.length >= 1) {
-            updateSelectedCatCols([catCols[0].name]);
+            updateSelectedCatCols([catCols[0].info]);
         }
     }
     createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
-        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && c.type === EColumnTypes.NUMERICAL);
-        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && c.type === EColumnTypes.CATEGORICAL);
+        const numCols = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.NUMERICAL);
+        const catCols = props.columns.filter((c) => selectedCatCols.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
         const plots = [];
         for (const numCurr of numCols) {
             for (const catCurr of catCols) {
@@ -46,8 +46,8 @@ export class PlotlyStrip {
                                 })
                             }]
                     },
-                    xLabel: catCurr.name,
-                    yLabel: numCurr.name
+                    xLabel: catCurr.info.name,
+                    yLabel: numCurr.info.name
                 });
                 counter += 1;
             }

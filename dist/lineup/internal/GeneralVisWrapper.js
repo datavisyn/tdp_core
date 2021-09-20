@@ -57,7 +57,11 @@ export class GeneralVisWrapper extends EventHandler {
         const cols = [];
         for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
-                name: c.label,
+                info: {
+                    name: c.label,
+                    description: c.description,
+                    id: c.label + c.description
+                },
                 vals: data.map((d, i) => {
                     return { id: d.id, val: d[c.column] ? d[c.column] : '--', selected: selectedIndeces.includes(d._id) };
                 }),
@@ -75,6 +79,9 @@ export class GeneralVisWrapper extends EventHandler {
         this.viewable = !this.viewable;
         this.node.style.display = this.viewable ? 'flex' : 'none';
         this.provider.getFirstRanking().on(`${Ranking.EVENT_FILTER_CHANGED}.track`, () => {
+            this.updateCustomVis();
+        });
+        this.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, () => {
             this.updateCustomVis();
         });
         this.updateCustomVis();

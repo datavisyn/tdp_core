@@ -24,12 +24,12 @@ export class PlotlyBar {
     startingHeuristic(props, selectedCatCols, selectedNumCols, updateSelectedCatCols, updateSelectedNumCols) {
         const catCols = props.columns.filter((c) => EColumnTypes.CATEGORICAL);
         if (selectedCatCols.length === 0 && catCols.length >= 1) {
-            updateSelectedCatCols([catCols[0].name]);
+            updateSelectedCatCols([catCols[0].info]);
         }
     }
     createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
-        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && EColumnTypes.CATEGORICAL);
+        const catCols = props.columns.filter((c) => selectedCatCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL);
         const vertFlag = dropdownOptions.barDirection.currentSelected === EBarDirection.VERTICAL;
         const normalizedFlag = dropdownOptions.barNormalized.currentSelected === EBarDisplayType.NORMALIZED;
         const plots = [];
@@ -64,7 +64,7 @@ export class PlotlyBar {
                                     color: dropdownOptions.color.scale(uniqueGroup),
                                 }
                             },
-                            xLabel: catCurr.name,
+                            xLabel: catCurr.info.name,
                             yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
                         });
                     });
@@ -96,7 +96,7 @@ export class PlotlyBar {
                                 color: dropdownOptions.color.scale(uniqueVal),
                             }
                         },
-                        xLabel: catCurr.name,
+                        xLabel: catCurr.info.name,
                         yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
                     });
                 });
@@ -123,7 +123,7 @@ export class PlotlyBar {
                             type: 'bar',
                             name: uniqueVal,
                         },
-                        xLabel: catCurr.name,
+                        xLabel: catCurr.info.name,
                         yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
                     });
                     counter += 1;
@@ -140,9 +140,9 @@ export class PlotlyBar {
                         xaxis: counter === 1 ? 'x' : 'x' + counter,
                         yaxis: counter === 1 ? 'y' : 'y' + counter,
                         type: 'bar',
-                        name: catCurr.name
+                        name: catCurr.info.name
                     },
-                    xLabel: catCurr.name,
+                    xLabel: catCurr.info.name,
                     yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
                 });
             }

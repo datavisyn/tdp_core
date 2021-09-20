@@ -1,4 +1,4 @@
-import { AllDropdownOptions } from '../types/generalTypes';
+import { AllDropdownOptions, ColumnInfo } from '../types/generalTypes';
 import { GeneralPlot } from '../types/generalPlotInterface';
 import { PlotlyInfo, GeneralHomeProps } from '../types/generalTypes';
 export declare enum EBarDisplayType {
@@ -19,6 +19,6 @@ export declare enum EBarGroupingType {
     GROUP = "Grouped"
 }
 export declare class PlotlyBar implements GeneralPlot {
-    startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void): void;
-    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo;
+    startingHeuristic(props: GeneralHomeProps, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[], updateSelectedCatCols: (s: ColumnInfo[]) => void, updateSelectedNumCols: (s: ColumnInfo[]) => void): void;
+    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[]): PlotlyInfo;
 }

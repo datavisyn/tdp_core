@@ -21,7 +21,7 @@ export interface GeneralHomeProps {
     filterCallback: (s: string) => void;
 }
 export interface NumericalColumn {
-    name: string;
+    info: ColumnInfo;
     vals: {
         id: string;
         val: number;
@@ -31,7 +31,7 @@ export interface NumericalColumn {
     selectedForMultiples: boolean;
 }
 export interface CategoricalColumn {
-    name: string;
+    info: ColumnInfo;
     vals: {
         id: string;
         val: string;
@@ -58,13 +58,18 @@ export declare type PlotlyData = {
     xLabel: string;
     yLabel: string;
 };
+export declare type ColumnInfo = {
+    name: string;
+    id: string;
+    description: string;
+};
 export declare type GenericOption = {
     name: string;
     currentColumn: NumericalColumn | CategoricalColumn;
-    currentSelected: string | number;
+    currentSelected: string | number | ColumnInfo;
     scale: any;
-    options: string[];
-    callback: (s: string | number) => void;
+    options: ColumnInfo[] | string[];
+    callback: (s: ColumnInfo | number | string) => void;
     type: EGeneralFormType;
     disabled: boolean;
 };

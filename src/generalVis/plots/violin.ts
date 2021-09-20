@@ -1,22 +1,22 @@
-import {AllDropdownOptions, CategoricalColumn, EColumnTypes, NumericalColumn} from '../types/generalTypes';
+import {AllDropdownOptions, CategoricalColumn, ColumnInfo, EColumnTypes, NumericalColumn} from '../types/generalTypes';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 import {createSecureServer} from 'http2';
 import {EViolinOverlay} from './bar';
 
 export class PlotlyViolin implements GeneralPlot {
-    startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
+    startingHeuristic(props: GeneralHomeProps, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[], updateSelectedCatCols: (s: ColumnInfo[]) => void, updateSelectedNumCols: (s: ColumnInfo[]) => void) {
         const numCols = props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 
         if(selectedNumCols.length === 0 && numCols.length >= 1) {
-            updateSelectedNumCols([numCols[0].name]);
+            updateSelectedNumCols([numCols[0].info]);
         }
     }
 
-    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
+    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[]): PlotlyInfo {
         let counter = 1;
-        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL) as NumericalColumn[];
-        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL) as NumericalColumn[];
+        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
         const plots: PlotlyData[] = [];
 
         if(catCols.length === 0) {
@@ -37,13 +37,13 @@ export class PlotlyViolin implements GeneralPlot {
                             meanline: {
                                 visible: true
                             },
-                            name: `${numCurr.name}`,
+                            name: `${numCurr.info.name}`,
                             hoverinfo: 'y',
                             scalemode: 'width',
                             showlegend: false,
                         },
-                        xLabel: numCurr.name,
-                        yLabel: numCurr.name
+                        xLabel: numCurr.info.name,
+                        yLabel: numCurr.info.name
                     },
                 );
                 counter += 1;
@@ -64,7 +64,7 @@ export class PlotlyViolin implements GeneralPlot {
                             meanline: {
                                 visible: true
                             },
-                            name: `${catCurr.name} + ${numCurr.name}`,
+                            name: `${catCurr.info.name} + ${numCurr.info.name}`,
                             scalemode: 'width',
                             pointpos: 0,
                             jitter: .3,
@@ -82,8 +82,8 @@ export class PlotlyViolin implements GeneralPlot {
                                     })
                                 }]
                         },
-                        xLabel: catCurr.name,
-                        yLabel: numCurr.name
+                        xLabel: catCurr.info.name,
+                        yLabel: numCurr.info.name
                     },
                 );
                 counter += 1;

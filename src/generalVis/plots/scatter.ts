@@ -1,4 +1,4 @@
-import {AllDropdownOptions, EColumnTypes, NumericalColumn, CategoricalColumn} from '../types/generalTypes';
+import {AllDropdownOptions, EColumnTypes, NumericalColumn, CategoricalColumn, ColumnInfo} from '../types/generalTypes';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 
@@ -10,20 +10,20 @@ export enum ENumericalColorScaleType {
 
 export class PlotlyScatter implements GeneralPlot {
 
-    startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
+    startingHeuristic(props: GeneralHomeProps, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[], updateSelectedCatCols: (s: ColumnInfo[]) => void, updateSelectedNumCols: (s: ColumnInfo[]) => void) {
         const numCols = props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
         if (selectedNumCols.length < 2 && numCols.length >= 2) {
             if (selectedNumCols.length === 0) {
-                updateSelectedNumCols(numCols.slice(0, 2).map((c) => c.name));
+                updateSelectedNumCols(numCols.slice(0, 2).map((c) => c.info));
             } else {
-                updateSelectedNumCols([...selectedNumCols, numCols.filter((c) => !selectedNumCols.includes(c.name))[0].name]);
+                updateSelectedNumCols([...selectedNumCols, numCols.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length === 0)[0].info]);
             }
         }
     }
 
-    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
+    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[]): PlotlyInfo {
         let counter = 1;
-        const validCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL) as NumericalColumn[];
+        const validCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL) as NumericalColumn[];
         const plots: PlotlyData[] = [];
 
         const legendPlots: PlotlyData[] = [];
@@ -62,8 +62,8 @@ export class PlotlyScatter implements GeneralPlot {
                         size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
                 },
-                xLabel: validCols[0].name,
-                yLabel: validCols[1].name
+                xLabel: validCols[0].info.name,
+                yLabel: validCols[1].info.name
             });
         } else {
             for (const yCurr of validCols) {
@@ -93,8 +93,8 @@ export class PlotlyScatter implements GeneralPlot {
                                 size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
                         },
-                        xLabel: xCurr.name,
-                        yLabel: yCurr.name
+                        xLabel: xCurr.info.name,
+                        yLabel: yCurr.info.name
                     });
 
                     counter += 1;
@@ -174,8 +174,8 @@ export class PlotlyScatter implements GeneralPlot {
                             })]
                     }]
                 },
-                xLabel: validCols[0].name,
-                yLabel: validCols[0].name
+                xLabel: validCols[0].info.name,
+                yLabel: validCols[0].info.name
             } as any);
         }
 

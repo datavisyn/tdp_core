@@ -26,14 +26,14 @@ export interface GeneralHomeProps {
 }
 
 export interface NumericalColumn {
-    name: string;
+    info: ColumnInfo;
     vals: {id: string, val: number, selected: boolean}[];
     type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
 }
 
 export interface CategoricalColumn {
-    name: string;
+    info: ColumnInfo;
     vals: {id: string, val: string, selected: boolean}[];
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
@@ -60,13 +60,19 @@ export type PlotlyData = {
     yLabel: string
 };
 
+export type ColumnInfo = {
+    name: string,
+    id: string
+    description: string,
+};
+
 export type GenericOption = {
     name: string;
     currentColumn: NumericalColumn | CategoricalColumn;
-    currentSelected: string | number
+    currentSelected: string | number | ColumnInfo
     scale: any,
-    options: string[]
-    callback: (s: string | number) => void
+    options: ColumnInfo[] | string[]
+    callback: (s: ColumnInfo | number | string) => void
     type: EGeneralFormType
     disabled: boolean
 };

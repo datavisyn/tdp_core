@@ -9,16 +9,16 @@ export class PlotlyScatter {
         const numCols = props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
         if (selectedNumCols.length < 2 && numCols.length >= 2) {
             if (selectedNumCols.length === 0) {
-                updateSelectedNumCols(numCols.slice(0, 2).map((c) => c.name));
+                updateSelectedNumCols(numCols.slice(0, 2).map((c) => c.info));
             }
             else {
-                updateSelectedNumCols([...selectedNumCols, numCols.filter((c) => !selectedNumCols.includes(c.name))[0].name]);
+                updateSelectedNumCols([...selectedNumCols, numCols.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length === 0)[0].info]);
             }
         }
     }
     createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
-        const validCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL);
+        const validCols = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL);
         const plots = [];
         const legendPlots = [];
         if (validCols.length === 1) {
@@ -53,8 +53,8 @@ export class PlotlyScatter {
                         size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
                 },
-                xLabel: validCols[0].name,
-                yLabel: validCols[1].name
+                xLabel: validCols[0].info.name,
+                yLabel: validCols[1].info.name
             });
         }
         else {
@@ -84,8 +84,8 @@ export class PlotlyScatter {
                                 size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
                         },
-                        xLabel: xCurr.name,
-                        yLabel: yCurr.name
+                        xLabel: xCurr.info.name,
+                        yLabel: yCurr.info.name
                     });
                     counter += 1;
                 }
@@ -161,8 +161,8 @@ export class PlotlyScatter {
                                 })]
                         }]
                 },
-                xLabel: validCols[0].name,
-                yLabel: validCols[0].name
+                xLabel: validCols[0].info.name,
+                yLabel: validCols[0].info.name
             });
         }
         return {

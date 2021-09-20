@@ -1,6 +1,4 @@
-import d3, {color} from 'd3';
-import {scale} from 'd3';
-import {Data, Layout} from 'plotly.js';
+import d3 from 'd3';
 import * as React from 'react';
 import {useEffect, useMemo, useState} from 'react';
 import Plot, {Figure} from 'react-plotly.js';
@@ -12,20 +10,21 @@ import {PlotlyPCP} from '../plots/pcp';
 import {ENumericalColorScaleType, PlotlyScatter} from '../plots/scatter';
 import {PlotlyStrip} from '../plots/strip';
 import {PlotlyViolin} from '../plots/violin';
-import {AllDropdownOptions, CategoricalColumn, PlotlyInfo, GeneralHomeProps, NumericalColumn, EColumnTypes, ESupportedPlotlyVis, EGeneralFormType} from '../types/generalTypes';
+import {AllDropdownOptions, CategoricalColumn, PlotlyInfo, GeneralHomeProps, NumericalColumn, EColumnTypes, ESupportedPlotlyVis, EGeneralFormType, ColumnInfo} from '../types/generalTypes';
 import {beautifyLayout} from '../utils/layoutUtils';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPaintBrush} from '@fortawesome/free-solid-svg-icons';
 import {faSquare} from '@fortawesome/free-regular-svg-icons';
+import {config} from '@fortawesome/fontawesome-svg-core';
 
 
 export function GeneralHome(props: GeneralHomeProps) {
     const [currentVis, setCurrentVis] = useState<ESupportedPlotlyVis>(ESupportedPlotlyVis.SCATTER);
-    const [selectedCatCols, setSelectedCatCols] = useState<string[]>(
-        props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.CATEGORICAL).map((c) => c.name)
+    const [selectedCatCols, setSelectedCatCols] = useState<ColumnInfo[]>(
+        props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.CATEGORICAL).map((c) => c.info)
     );
-    const [selectedNumCols, setSelectedNumCols] = useState<string[]>(
-        props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.NUMERICAL).map((c) => c.name)
+    const [selectedNumCols, setSelectedNumCols] = useState<ColumnInfo[]>(
+        props.columns.filter((c) => c.selectedForMultiples === true && c.type === EColumnTypes.NUMERICAL).map((c) => c.info)
     );
 
     const [isRectBrush, setIsRectBrush] = useState<boolean>(true);
@@ -44,16 +43,16 @@ export function GeneralHome(props: GeneralHomeProps) {
     const [violinOverlay, setViolinOverlay] = useState<EViolinOverlay>(EViolinOverlay.NONE);
     const [numericalColorScaleType, setNumericalColorScaleType] = useState<ENumericalColorScaleType>(ENumericalColorScaleType.SEQUENTIAL);
 
-    const updateBubbleSize = (newCol: string) => setBubbleSize(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
-    const updateOpacity = (newCol: string) => setOpacity(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
-    const updateColor = (newCol: string) => setColorMapping(props.columns.filter((c) => c.name === newCol)[0]);
-    const updateShape = (newCol: string) => setShape(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
-    const updateBarGroup = (newCol: string) => setBarGroup(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
-    const updateBarMultiples = (newCol: string) => setBarMultiples(props.columns.filter((c) => c.name === newCol && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
+    const updateBubbleSize = (newCol: ColumnInfo) => setBubbleSize(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
+    const updateOpacity = (newCol: ColumnInfo) => setOpacity(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
+    const updateColor = (newCol: ColumnInfo) => setColorMapping(props.columns.filter((c) => c.info.id === newCol.id)[0]);
+    const updateShape = (newCol: ColumnInfo) => setShape(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
+    const updateBarGroup = (newCol: ColumnInfo) => setBarGroup(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
+    const updateBarMultiples = (newCol: ColumnInfo) => setBarMultiples(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
 
     const updateCurrentVis = (s: ESupportedPlotlyVis) => setCurrentVis(s);
-    const updateSelectedCatCols = (s: string[]) => setSelectedCatCols(s);
-    const updateSelectedNumCols = (s: string[]) => setSelectedNumCols(s);
+    const updateSelectedCatCols = (s: ColumnInfo[]) => setSelectedCatCols(s);
+    const updateSelectedNumCols = (s: ColumnInfo[]) => setSelectedNumCols(s);
 
     const updateBarDisplayType = (s: EBarDisplayType) => setBarDisplayType(s);
     const updateBarGroupType = (s: EBarGroupingType) => setBarGroupType(s);
@@ -66,36 +65,35 @@ export function GeneralHome(props: GeneralHomeProps) {
 
     const shapeScale = useMemo(() => {
         return shape ?
-            scale.ordinal<string>().domain(d3.set(shape.vals.map((v) => v.val)).values()).range(['circle', 'square', 'triangle-up', 'star'])
+            d3.scale.ordinal<string>().domain([...new Set(shape.vals.map((v) => v.val))]).range(['circle', 'square', 'triangle-up', 'star'])
             : null;
     }, [shape]);
 
     const bubbleScale = useMemo(() => {
         return bubbleSize ?
-            scale.linear().domain([0, d3.max(bubbleSize.vals.map((v) => v.val))]).range([0, 10])
+            d3.scale.linear().domain([0, d3.max(bubbleSize.vals.map((v) => v.val))]).range([0, 10])
             : null;
     }, [bubbleSize]);
 
     const opacityScale = useMemo(() => {
         return opacity ?
-            scale.linear().domain([0, d3.max(opacity.vals.map((v) => v.val))]).range([0, 1])
+            d3.scale.linear().domain([0, d3.max(opacity.vals.map((v) => v.val))]).range([0, 1])
             : null;
     }, [opacity]);
 
     const colorScale = useMemo(() => {
-        return scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
+        return d3.scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
     }, [colorMapping]);
 
     const sequentialColorScale = useMemo(() => {
         return colorMapping ?
-            scale.linear<string, number>()
+            d3.scale.linear<string, number>()
                 .domain([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
                         d3.median(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
                         d3.max(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--'))])
                 .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#003367','#f5f5f5', '#6f0000'])
             : null;
     }, [colorMapping, numericalColorScaleType]);
-
 
     const allExtraDropdowns: AllDropdownOptions = useMemo(() => {
 
@@ -105,8 +103,8 @@ export function GeneralHome(props: GeneralHomeProps) {
                 callback: updateBubbleSize,
                 scale: bubbleScale,
                 currentColumn: bubbleSize ? bubbleSize : null,
-                currentSelected: bubbleSize ? bubbleSize.name : null,
-                options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
+                currentSelected: bubbleSize ? bubbleSize.info : null,
+                options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info),
                 type: EGeneralFormType.DROPDOWN,
                 disabled: false
             },
@@ -115,9 +113,9 @@ export function GeneralHome(props: GeneralHomeProps) {
                 callback: updateOpacity,
                 scale: opacityScale,
                 currentColumn: opacity ? opacity : null,
-                currentSelected: opacity ? opacity.name : null,
+                currentSelected: opacity ? opacity.info : null,
 
-                options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.name),
+                options: props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info),
                 type: EGeneralFormType.DROPDOWN,
                 disabled: false
             },
@@ -126,8 +124,8 @@ export function GeneralHome(props: GeneralHomeProps) {
                 callback: updateColor,
                 scale: colorMapping && colorMapping.type === EColumnTypes.NUMERICAL ? sequentialColorScale : colorScale,
                 currentColumn: colorMapping ? colorMapping : null,
-                currentSelected: colorMapping ? colorMapping.name : null,
-                options: props.columns.map((c) => c.name),
+                currentSelected: colorMapping ? colorMapping.info : null,
+                options: props.columns.map((c) => c.info),
                 type: EGeneralFormType.DROPDOWN,
                 disabled: false
             },
@@ -156,9 +154,9 @@ export function GeneralHome(props: GeneralHomeProps) {
                 callback: updateShape,
                 scale: shapeScale,
                 currentColumn: shape ? shape : null,
-                currentSelected: shape ? shape.name : null,
+                currentSelected: shape ? shape.info : null,
 
-                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info),
                 type: EGeneralFormType.DROPDOWN,
                 disabled: false
             },
@@ -167,9 +165,9 @@ export function GeneralHome(props: GeneralHomeProps) {
                 callback: updateBarGroup,
                 scale: null,
                 currentColumn: barGroup ? barGroup : null,
-                currentSelected: barGroup ? barGroup.name : null,
+                currentSelected: barGroup ? barGroup.info : null,
 
-                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info),
                 type: EGeneralFormType.DROPDOWN,
                 disabled: false
             },
@@ -178,9 +176,9 @@ export function GeneralHome(props: GeneralHomeProps) {
                 callback: updateBarMultiples,
                 scale: null,
                 currentColumn: barMultiples ? barMultiples : null,
-                currentSelected: barMultiples ? barMultiples.name : null,
+                currentSelected: barMultiples ? barMultiples.info : null,
 
-                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.name),
+                options: props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info),
                 type: EGeneralFormType.DROPDOWN,
                 disabled: false
             },
@@ -190,7 +188,6 @@ export function GeneralHome(props: GeneralHomeProps) {
                 scale: null,
                 currentColumn: null,
                 currentSelected: '',
-
                 options: ['Filter In', 'Filter Out', 'Clear'],
                 type: EGeneralFormType.BUTTON,
                 disabled: false
@@ -290,7 +287,6 @@ export function GeneralHome(props: GeneralHomeProps) {
             {currPlot ? (
                 <>
                     <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
-
                         {traces.plots.length > 0 ?
                             (<Plot
                                 divId={'plotlyDiv'}

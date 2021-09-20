@@ -1,17 +1,16 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
-import {allVisTypes, CategoricalColumn, comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, ESupportedPlotlyVis, GenericOption, highDimensionalTypes, NumericalColumn} from '../types/generalTypes';
+import {allVisTypes, CategoricalColumn, ColumnInfo, comparisonTypes, correlationTypes, distributionTypes, EColumnTypes, EGeneralFormType, ESupportedPlotlyVis, GenericOption, highDimensionalTypes, NumericalColumn} from '../types/generalTypes';
 import Plotly from 'plotly.js';
 import {useCallback, useMemo, useState} from 'react';
 import {useResizeDetector} from 'react-resize-detector';
 import Select from 'react-select';
+import Highlighter from 'react-highlight-words';
 
 interface GeneralSidePanelProps {
-    updateSelectedNumCols: (s: string[]) => void;
-    updateSelectedCatCols: (s: string[]) => void;
-    selectedCatCols: string[];
-    selectedNumCols: string[];
+    updateSelectedNumCols: (s: ColumnInfo[]) => void;
+    updateSelectedCatCols: (s: ColumnInfo[]) => void;
+    selectedCatCols: ColumnInfo[];
+    selectedNumCols: ColumnInfo[];
     setCurrentVis: (s: ESupportedPlotlyVis) => void;
     currentVis: ESupportedPlotlyVis;
     columns: (NumericalColumn | CategoricalColumn) [];
@@ -38,33 +37,38 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
     const { ref } = useResizeDetector({ onResize });
 
     const selectNumOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => {
-            return {
-                value: c.name,
-                label: c.name
-            };
-        });
+        return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info);
     }, [props.columns.length]);
 
     const selectCatOptions = useMemo(() => {
-        return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => {
-            return {
-                value: c.name,
-                label: c.name
-            };
-        });
+        return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
     }, [props.columns.length]);
+
+    const formatOptionLabel = (option, ctx) => {
+        return (
+            <>
+                <Highlighter
+                    searchWords={[ctx.inputValue]}
+                    autoEscape={true}
+                    textToHighlight={option.name}
+                />
+                {option.description &&
+                    <span className="small text-muted ms-1">{option.description}</span>}
+            </>
+        );
+    };
 
     return (
         <div ref={ref} className="position-relative h-100 flex-shrink-1 bg-light">
             <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target="#generalVisBurgerMenu" aria-expanded="true" aria-controls="generalVisBurgerMenu">
-                <FontAwesomeIcon icon={faBars} />
+                <i className="fas fa-bars"/>
             </button>
             <div className="collapse show collapse-horizontal" id="generalVisBurgerMenu">
                 <div className="container" style={{width: '20rem'}}>
                     <label className="pt-2 pb-1">Visualization Type</label>
                     <Select
                         closeMenuOnSelect={true}
+                        // components={{Option: optionLayout}}
                         onChange={(e) => props.setCurrentVis(e.value)}
                         name="visTypes"
                         options={allVisTypes.map((t) => {
@@ -80,19 +84,25 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                     <Select
                         closeMenuOnSelect={false}
                         isMulti
-                        onChange={(e) => props.updateSelectedNumCols(e.map((c) => c.value))}
+                        formatOptionLabel={formatOptionLabel}
+                        getOptionLabel={(option) => option.name}
+                        getOptionValue={(option) => option.id}
+                        onChange={(e) => props.updateSelectedNumCols(e.map((c) => c))}
                         name="numColumns"
                         options={selectNumOptions}
-                        value={selectNumOptions.filter((c) => props.selectedNumCols.includes(c.value))}
+                        value={selectNumOptions.filter((c) => props.selectedNumCols.filter((d) => d.id === c.id).length > 0)}
                     />
                     <label className="pt-2 pb-1">Categorical Columns</label>
                     <Select
                         closeMenuOnSelect={false}
                         isMulti
-                        onChange={(e) => props.updateSelectedCatCols(e.map((c) => c.value))}
+                        formatOptionLabel={formatOptionLabel}
+                        getOptionLabel={(option) => option.name}
+                        getOptionValue={(option) => option.id}
+                        onChange={(e) => props.updateSelectedCatCols(e.map((c) => c))}
                         name="catColumns"
                         options={selectCatOptions}
-                        value={selectCatOptions.filter((c) => props.selectedCatCols.includes(c.value))}
+                        value={selectCatOptions.filter((c) => props.selectedCatCols.filter((d) => d.id === c.id).length > 0)}
                     />
                     <hr/>
 
@@ -106,12 +116,21 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                     onChange={(e) => d.callback(e ? e.value : '')}
                                     name={d.name}
                                     options={d.options.map((s) => {
-                                        return {
-                                            value: s,
-                                            label: s
-                                        };
+                                        if(s.id) {
+                                            return {
+                                                value: s.id,
+                                                label: s.name,
+                                                description: s.description
+                                            };
+                                        } else {
+                                            return {
+                                                value: s,
+                                                label: s,
+                                                description: ''
+                                            };
+                                        }
                                     })}
-                                    value={d.currentColumn ? {label: d.currentColumn.name, value: d.currentColumn.name} : []}
+                                    value={d.currentColumn ? {label: d.currentColumn.info.name, value: d.currentColumn.info.name, description: d.currentColumn.info.description} : []}
                                 />
                             </React.Fragment>
                         );
