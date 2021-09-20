@@ -27,7 +27,6 @@ export function GeneralSidePanel(props) {
         return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
     }, [props.columns.length]);
     const formatOptionLabel = (option, ctx) => {
-        console.log(option, ctx);
         return (React.createElement(React.Fragment, null,
             React.createElement(Highlighter, { searchWords: [ctx.inputValue], autoEscape: true, textToHighlight: option.name }),
             option.description &&
@@ -57,7 +56,7 @@ export function GeneralSidePanel(props) {
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.DROPDOWN).map((d, i) => {
                         return (React.createElement(React.Fragment, { key: `reactSelect${d.name}` },
                             React.createElement("label", { className: "pt-2 pb-1" }, d.name),
-                            React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e ? e.value : ''), name: d.name, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, options: d.options.map((s) => {
+                            React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e), name: d.name, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, options: d.options.map((s) => {
                                     if (s.name !== undefined) {
                                         return s;
                                     }

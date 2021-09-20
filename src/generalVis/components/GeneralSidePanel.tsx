@@ -45,7 +45,6 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
     }, [props.columns.length]);
 
     const formatOptionLabel = (option, ctx) => {
-        console.log(option, ctx);
         return (
             <>
                 <Highlighter
@@ -114,7 +113,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                 <label className="pt-2 pb-1">{d.name}</label>
                                 <Select
                                     isClearable
-                                    onChange={(e) => d.callback(e ? e.value : '')}
+                                    onChange={(e) => d.callback(e)}
                                     name={d.name}
                                     formatOptionLabel={formatOptionLabel}
                                     getOptionLabel={(option) => option.name}

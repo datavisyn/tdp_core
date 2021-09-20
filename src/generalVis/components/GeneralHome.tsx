@@ -43,12 +43,12 @@ export function GeneralHome(props: GeneralHomeProps) {
     const [violinOverlay, setViolinOverlay] = useState<EViolinOverlay>(EViolinOverlay.NONE);
     const [numericalColorScaleType, setNumericalColorScaleType] = useState<ENumericalColorScaleType>(ENumericalColorScaleType.SEQUENTIAL);
 
-    const updateBubbleSize = (newCol: ColumnInfo) => setBubbleSize(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
-    const updateOpacity = (newCol: ColumnInfo) => setOpacity(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
-    const updateColor = (newCol: ColumnInfo) => setColorMapping(props.columns.filter((c) => c.info.id === newCol.id)[0]);
-    const updateShape = (newCol: ColumnInfo) => setShape(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
-    const updateBarGroup = (newCol: ColumnInfo) => setBarGroup(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
-    const updateBarMultiples = (newCol: ColumnInfo) => setBarMultiples(props.columns.filter((c) => c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
+    const updateBubbleSize = (newCol: ColumnInfo) => setBubbleSize(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
+    const updateOpacity = (newCol: ColumnInfo) => setOpacity(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
+    const updateColor = (newCol: ColumnInfo) => setColorMapping(props.columns.filter((c) => newCol && c.info.id === newCol.id)[0]);
+    const updateShape = (newCol: ColumnInfo) => setShape(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
+    const updateBarGroup = (newCol: ColumnInfo) => setBarGroup(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
+    const updateBarMultiples = (newCol: ColumnInfo) => setBarMultiples(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.CATEGORICAL)[0] as CategoricalColumn);
 
     const updateCurrentVis = (s: ESupportedPlotlyVis) => setCurrentVis(s);
     const updateSelectedCatCols = (s: ColumnInfo[]) => setSelectedCatCols(s);
@@ -234,7 +234,7 @@ export function GeneralHome(props: GeneralHomeProps) {
                 disabled: false
             }
         };
-    }, [props.columns, selectedCatCols, selectedNumCols, alphaValue, bubbleSize, colorMapping, opacity, shape, barGroup, barMultiples, barDisplayType, violinOverlay, numericalColorScaleType]);
+    }, [props.columns, selectedCatCols, selectedNumCols, alphaValue, bubbleSize, colorMapping, opacity, shape, barDirection, barGroup, barGroupType, barMultiples, barDisplayType, violinOverlay, numericalColorScaleType]);
 
     const currPlot: GeneralPlot = useMemo(() => {
         switch (currentVis) {
@@ -298,8 +298,14 @@ export function GeneralHome(props: GeneralHomeProps) {
                                 onSelected={(d) => d ? props.selectionCallback(d.points.map((d) => (d as any).id)) : props.selectionCallback([])}
                                 //plotly redraws everything on updates, so you need to reappend title and
                                 // change opacity on update, instead of just in a use effect
+                                onInitialized={() => {
+                                    d3.selectAll('g .traces').style('opacity', alphaValue);
+                                    d3.selectAll('.scatterpts').style('opacity', alphaValue);
+
+                                }}
                                 onUpdate={() => {
-                                    d3.selectAll('g .traces').style('opacity', 1);
+                                    d3.selectAll('g .traces').style('opacity', alphaValue);
+                                    d3.selectAll('.scatterpts').style('opacity', alphaValue);
 
                                     for(const p of traces.plots) {
                                         d3.select(`g .${(p.data as any).xaxis}title`)

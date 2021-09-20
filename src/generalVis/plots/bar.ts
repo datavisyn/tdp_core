@@ -173,15 +173,19 @@ export class PlotlyBar implements GeneralPlot {
                     xLabel: catCurr.info.name,
                     yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
                 });
+                counter += 1;
             }
-            counter += 1;
         }
+
+        const rows = Math.ceil(Math.sqrt(counter - 1));
+        const cols = Math.ceil((counter - 1) / rows);
+        console.log(counter, rows, cols);
 
         return {
             plots,
             legendPlots: [],
-            rows: Math.ceil(Math.sqrt(plots.length)),
-            cols: Math.ceil(Math.sqrt(plots.length)),
+            rows,
+            cols,
             errorMessage: 'To create a Strip plot, please select at least 1 categorical column and at least 1 numerical column.',
             formList: ['groupBy', 'barMultiplesBy', 'barDirection', 'barGroupType', 'barNormalized']
         };

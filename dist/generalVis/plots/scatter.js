@@ -124,8 +124,8 @@ export class PlotlyScatter {
         //                     })]
         //             }]
         //         },
-        //         xLabel: validCols[0].name,
-        //         yLabel: validCols[0].name
+        //         xLabel: validCols[0].info.name,
+        //         yLabel: validCols[0].info.name
         //     } as any);
         // }
         if (dropdownOptions.shape.currentColumn) {
@@ -171,7 +171,7 @@ export class PlotlyScatter {
             rows: Math.sqrt(plots.length),
             cols: Math.sqrt(plots.length),
             errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-            formList: ['color', 'shape', 'bubble', 'opacity', 'filter', 'numericalColorScaleType']
+            formList: ['color', 'shape', 'filter', 'numericalColorScaleType']
         };
     }
 }
