@@ -8,8 +8,6 @@ import { IFormElement, IForm, IFormElementDesc } from '../interfaces';
  */
 export declare class Form implements IForm {
     private readonly formId;
-    private readonly formClass;
-    private readonly formInline;
     /**
      * DOM node for the form itself
      */
@@ -22,9 +20,8 @@ export declare class Form implements IForm {
      * Constructor
      * @param $parent Node that the form should be attached to
      * @param formId unique form id
-     * @param formClass class attribute for form, e.g. for inline forms
      */
-    constructor($parent: d3.Selection<any>, formId?: string, formClass?: any, formInline?: boolean);
+    constructor($parent: d3.Selection<any>, formId?: string);
     /**
      * Append a form element and builds it
      * Note: The initialization of the element must be done using `initAllElements()`

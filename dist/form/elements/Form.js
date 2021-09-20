@@ -10,17 +10,14 @@ export class Form {
      * Constructor
      * @param $parent Node that the form should be attached to
      * @param formId unique form id
-     * @param formClass class attribute for form, e.g. for inline forms
      */
-    constructor($parent, formId = BaseUtils.randomId(), formClass = null, formInline = false) {
+    constructor($parent, formId = BaseUtils.randomId()) {
         this.formId = formId;
-        this.formClass = formClass;
-        this.formInline = formInline;
         /**
          * Map of all appended form elements with the element id as key
          */
         this.elements = new Map();
-        this.$node = $parent.append('form').attr('class', `${this.formClass} align-items-center`).attr('id', this.formId).classed('form-inline', this.formInline);
+        this.$node = $parent.append('form').attr('class', `row align-items-center`).attr('id', this.formId);
     }
     /**
      * Append a form element and builds it

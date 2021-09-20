@@ -16,10 +16,10 @@ export default class TDPLocalDataProvider extends LocalDataProvider {
             return col;
         }
         if (desc.type === 'string') {
-            col.setWidthImpl(140); // use `setWidthImpl` instead of `setWidth` to avoid triggering an event
+            col.setWidthImpl(120); // use `setWidthImpl` instead of `setWidth` to avoid triggering an event
         }
         else {
-            col.setWidthImpl(110);
+            col.setWidthImpl(102);
         }
         return col;
     }

@@ -104,7 +104,7 @@ class WrapperView implements ILayoutView {
     if (hideHeader) {
       header.innerHTML = '';
     }
-    header.insertAdjacentHTML('beforeend', `<div class="parameters row"></div>`);
+    header.insertAdjacentHTML('beforeend', `<div class="parameters container-fluid ps-0 pe-0"></div>`);
     return <HTMLElement>header.lastElementChild;
   }
 
