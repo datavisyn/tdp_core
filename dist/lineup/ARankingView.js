@@ -93,6 +93,27 @@ export class ARankingView extends AView {
                 maxGroupColumns: Infinity,
                 filterGlobally: true,
                 propagateAggregationState: false
+            },
+            formatSearchBoxItem: (item, node) => {
+                // TypeScript type guard function
+                function hasColumnDesc(item) {
+                    return item.desc != null;
+                }
+                if (node.parentElement && hasColumnDesc(item)) {
+                    node.dataset.type = item.desc.type;
+                    const summary = item.desc.summary || item.desc.description;
+                    node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
+                    if (summary) {
+                        const label = node.ownerDocument.createElement('span');
+                        label.textContent = item.desc.label;
+                        node.appendChild(label);
+                        const desc = node.ownerDocument.createElement('span');
+                        desc.textContent = summary;
+                        node.appendChild(desc);
+                        return undefined;
+                    }
+                }
+                return item.text;
             }
         };
         // variants for deriving the item name
@@ -114,8 +135,7 @@ export class ARankingView extends AView {
         this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
         const taggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, {
             summaryHeader: this.options.enableHeaderSummary,
-            labelRotation: this.options.enableHeaderRotation ? 45 : 0,
-            rowHeight: 21
+            labelRotation: this.options.enableHeaderRotation ? 45 : 0
         }, options.customOptions);
         if (typeof this.options.itemRowHeight === 'number' && this.options.itemRowHeight > 0) {
             taggleOptions.rowHeight = this.options.itemRowHeight;
@@ -361,9 +381,10 @@ export class ARankingView extends AView {
                         // Fetch or create the authorization overlay
                         let overlay = headerNode.querySelector('.tdp-authorization-overlay');
                         if (!overlay) {
-                            overlay = document.createElement('div');
+                            overlay = headerNode.ownerDocument.createElement('div');
                             overlay.className = 'tdp-authorization-overlay';
-                            headerNode.insertAdjacentElement('afterbegin', overlay);
+                            // Add element at the very bottom to avoid using z-index
+                            headerNode.appendChild(overlay);
                         }
                         if (status === ERenderAuthorizationStatus.SUCCESS) {
                             overlay.remove();
