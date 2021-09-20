@@ -15,8 +15,8 @@ export interface IPanelButtonOptions {
     onClick: () => void;
     /**
      * add a custom button class
-     * @example: btn-primary, btn-text-hover-bg-warning, btn-text-dark
-     * @default: btn-text-hover-bg-dark
+     * @example: btn-primary, btn-text-warning
+     * @default: btn-text-dark
      */
     btnClass?: string;
 }

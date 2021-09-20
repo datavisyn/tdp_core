@@ -16,8 +16,8 @@ export interface IPanelButtonOptions {
   onClick: () => void;
   /**
    * add a custom button class
-   * @example: btn-primary, btn-text-hover-bg-warning, btn-text-dark
-   * @default: btn-text-hover-bg-dark
+   * @example: btn-primary, btn-text-warning
+   * @default: btn-text-dark
    */
   btnClass?: string;
 }
@@ -37,7 +37,7 @@ export class PanelButton implements IPanelButton {
     this.node = parent.ownerDocument.createElement('button');
     this.node.setAttribute('type', 'button');
     this.node.title = options.title;
-    this.node.className = `btn btn-sm ${options.btnClass || 'btn-text-hover-bg-dark'} ${options.cssClass || ''}`;
+    this.node.className = `btn btn-sm ${options.btnClass || 'btn-text-dark'} ${options.cssClass || ''}`;
     this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
 
     this.node.addEventListener('click', (evt) => {
