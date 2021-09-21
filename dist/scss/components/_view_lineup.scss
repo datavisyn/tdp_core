@@ -419,7 +419,7 @@ $lu_assets: "~lineupjs/src/assets";
           right: 0;
           bottom: -50vh;
           position: absolute;
-          z-index: -5;
+          z-index: 0;
         }
 
         &.once .lu-search {
