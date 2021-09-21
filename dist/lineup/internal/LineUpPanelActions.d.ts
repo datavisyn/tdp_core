@@ -43,6 +43,7 @@ export declare class LineUpPanelActions extends EventHandler {
     private readonly options;
     static readonly EVENT_ZOOM_OUT = "zoomOut";
     static readonly EVENT_ZOOM_IN = "zoomIn";
+    static readonly EVENT_OPEN_VIS = "openVis";
     static readonly EVENT_TOGGLE_OVERVIEW = "toggleOverview";
     static readonly EVENT_SAVE_NAMED_SET = "saveNamedSet";
     /**

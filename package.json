@@ -80,20 +80,23 @@
     "db-migration:list": "npm run db-migration:base list --"
   },
   "dependencies": {
+    "bootstrap": "^5.0.1",
     "d3": "~3.5.17",
     "jquery": "~3.5.1",
     "lineupjs": "next",
-    "phovea_clue": "^8.0.0",
-    "select2": "~4.0.13",
-    "select2-bootstrap-theme": "0.1.0-beta.9",
     "lodash": "~4.17.20",
+    "phovea_clue": "github:phovea/phovea_clue#develop",
+    "plotly.js": "^2.5.0",
+    "plotly.js-dist": "^1.57.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-plotly.js": "^2.4.0",
+    "react-resize-detector": "^6.7.6",
+    "react-select": "^4.3.1",
     "react-split": "^2.0.9",
-    "bootstrap": "^5.0.1",
-    "popper.js": "^1.15.0",
-    "plotly.js-dist": "^1.57.1"
+    "select2": "~4.0.13",
+    "select2-bootstrap-theme": "0.1.0-beta.9",
+    "popper.js": "^1.15.0"
   },
   "devDependencies": {
     "@types/d3": "~3.5.36",

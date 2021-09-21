@@ -15,6 +15,7 @@ import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
+import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -69,6 +70,7 @@ export class ARankingView extends AView {
             subType: { key: '', value: '' },
             enableOverviewMode: true,
             enableZoom: true,
+            enableCustomVis: true,
             enableDownload: true,
             enableSaveRanking: true,
             enableAddingColumns: true,
@@ -158,6 +160,7 @@ export class ARankingView extends AView {
         const luBackdrop = this.node.querySelector('.lu-backdrop');
         this.node.appendChild(luBackdrop);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
+        this.generalVis = new GeneralVisWrapper(this.provider, this, this.node.ownerDocument);
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -177,6 +180,9 @@ export class ARankingView extends AView {
         this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
             this.taggle.zoomIn();
         });
+        this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+            this.generalVis.toggleCustomVis();
+        });
         if (this.options.enableOverviewMode) {
             const rule = spaceFillingRule(taggleOptions);
             this.panel.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event, isOverviewActive) => {
@@ -189,6 +195,7 @@ export class ARankingView extends AView {
         }
         if (this.options.enableSidePanel) {
             this.node.appendChild(this.panel.node);
+            this.node.appendChild(this.generalVis.node);
             if (this.options.enableSidePanel !== 'top') {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }
@@ -196,6 +203,7 @@ export class ARankingView extends AView {
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection) => {
             this.setItemSelection(selection);
+            this.generalVis.updateCustomVis();
         });
         this.selectionAdapter = this.createSelectionAdapter();
     }

@@ -23,6 +23,7 @@ import {LineupUtils} from './utils';
 import {ISearchOption} from './internal/panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
+import {GeneralVisWrapper} from './internal/GeneralVisWrapper';
 
 /**
  * base class for views based on LineUp
@@ -45,8 +46,10 @@ export abstract class ARankingView extends AView {
 
   private readonly provider: LocalDataProvider;
   private readonly taggle: EngineRenderer | TaggleRenderer;
-  private readonly selectionHelper: LineUpSelectionHelper;
+  public readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
+  private readonly generalVis: GeneralVisWrapper;
+
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -83,6 +86,7 @@ export abstract class ARankingView extends AView {
     subType: {key: '', value: ''},
     enableOverviewMode: true,
     enableZoom: true,
+    enableCustomVis: true,
     enableDownload: true,
     enableSaveRanking: true,
     enableAddingColumns: true,
@@ -200,6 +204,8 @@ export abstract class ARankingView extends AView {
     this.node.appendChild(luBackdrop);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
+    this.generalVis = new GeneralVisWrapper(this.provider, this, this.node.ownerDocument);
+
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
     // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -219,6 +225,9 @@ export abstract class ARankingView extends AView {
     this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
       this.taggle.zoomIn();
     });
+    this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+      this.generalVis.toggleCustomVis();
+    });
     if (this.options.enableOverviewMode) {
       const rule = spaceFillingRule(taggleOptions);
 
@@ -234,6 +243,7 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
+      this.node.appendChild(this.generalVis.node);
       if (this.options.enableSidePanel !== 'top') {
         this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
       }
@@ -242,6 +252,7 @@ export abstract class ARankingView extends AView {
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
       this.setItemSelection(selection);
+      this.generalVis.updateCustomVis();
     });
     this.selectionAdapter = this.createSelectionAdapter();
   }

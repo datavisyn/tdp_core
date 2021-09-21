@@ -129,7 +129,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     });
 
     const form = this.node.ownerDocument.createElement('div');
-    form.classList.add('parameters', 'row');
+    form.classList.add('parameters', 'container-fluid', 'ps-0', 'pe-0');
     this.node.insertAdjacentElement('afterbegin', form);
     return Promise.resolve(this.ranking.init(form, () => null)).then(() => {
       this.initialized();

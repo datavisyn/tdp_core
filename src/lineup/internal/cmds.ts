@@ -332,6 +332,7 @@ export class LineupTrackingManager {
 
         case LineUpTrackAndUntrackActions.filter:
           bak = source[`get${prop}`]();
+          console.log(parameter.value);
           // restore serialized regular expression before passing to LineUp
           const value = LineUpFilterUtils.isSerializedFilter(parameter.value) ? LineUpFilterUtils.restoreLineUpFilter(parameter.value) : parameter.value;
           source[`set${prop}`].call(source, value);

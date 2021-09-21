@@ -112,6 +112,10 @@ export class LineUpPanelActions extends EventHandler {
             const zoomOutButton = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'), 'fas fa-search-minus', () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT));
             this.header.addButton(zoomOutButton);
         }
+        if (this.options.enableCustomVis) {
+            const customVis = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'), 'fas fa-chart-bar gap', () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS));
+            this.header.addButton(customVis);
+        }
         if (this.options.enableOverviewMode) {
             const listener = () => {
                 const selected = this.overview.classList.toggle('fa-th-list');
@@ -373,6 +377,7 @@ export class LineUpPanelActions extends EventHandler {
 }
 LineUpPanelActions.EVENT_ZOOM_OUT = 'zoomOut';
 LineUpPanelActions.EVENT_ZOOM_IN = 'zoomIn';
+LineUpPanelActions.EVENT_OPEN_VIS = 'openVis';
 LineUpPanelActions.EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
 LineUpPanelActions.EVENT_SAVE_NAMED_SET = 'saveNamedSet';
 /**

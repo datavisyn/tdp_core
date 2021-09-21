@@ -24,7 +24,6 @@ import {FormDialog} from '../../form';
 import {PanelSaveNamedSetButton} from './panel/PanelSaveNamedSetButton';
 import {LineUpOrderedRowIndicies} from './panel/LineUpOrderedRowIndicies';
 
-
 export interface IPanelTabExtension {
   desc: IPanelTabExtensionDesc;
 
@@ -71,6 +70,7 @@ export interface IPanelTabExtensionDesc extends IPluginDesc {
 export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
+  static readonly EVENT_OPEN_VIS = 'openVis';
   static readonly EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
   /**
@@ -89,6 +89,7 @@ export class LineUpPanelActions extends EventHandler {
 
   readonly panel: SidePanel | null;
   readonly node: HTMLElement; // wrapper node
+
 
   private readonly header: PanelHeader;
   private readonly tabContainer: ITabContainer;
@@ -215,6 +216,11 @@ export class LineUpPanelActions extends EventHandler {
       this.header.addButton(zoomOutButton);
     }
 
+    if (this.options.enableCustomVis) {
+      const customVis = new PanelButton(buttons, I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'), 'fas fa-chart-bar gap', () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS));
+      this.header.addButton(customVis);
+    }
+
     if (this.options.enableOverviewMode) {
       const listener = () => {
         const selected = this.overview.classList.toggle('fa-th-list');
@@ -324,6 +330,7 @@ export class LineUpPanelActions extends EventHandler {
     const loadedScorePlugins = ordinoScores.map((desc) => LineupUtils.wrap(desc));
     return {metaDataOptions, loadedScorePlugins};
   }
+
 
   async updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]) {
     this.idType = idType;
