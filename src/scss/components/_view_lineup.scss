@@ -176,7 +176,6 @@ $lu_assets: "~lineupjs/src/assets";
 
     & > header {
       .lu-adder {
-
         button {
           display: none;
         }
@@ -420,6 +419,7 @@ $lu_assets: "~lineupjs/src/assets";
           right: 0;
           bottom: -50vh;
           position: absolute;
+          z-index: -5;
         }
 
         &.once .lu-search {
