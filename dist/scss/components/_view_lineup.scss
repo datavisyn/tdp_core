@@ -410,6 +410,7 @@ $lu_assets: "~lineupjs/src/assets";
 
         button {
           display: block;
+          z-index: 1;
         }
 
         &.once::before {
@@ -419,7 +420,7 @@ $lu_assets: "~lineupjs/src/assets";
           right: 0;
           bottom: -50vh;
           position: absolute;
-          z-index: -3;
+          z-index: 0;
         }
 
         &.once .lu-search {
