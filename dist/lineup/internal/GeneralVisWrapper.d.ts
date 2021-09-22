@@ -9,7 +9,7 @@ export declare class GeneralVisWrapper extends EventHandler {
     private data;
     constructor(provider: LocalDataProvider, view: ARankingView, doc?: Document);
     getAllData(): any[];
-    selectCallback(selected: string[]): void;
+    selectCallback(selected: number[]): void;
     filterCallback(s: string): void;
     updateCustomVis(): void;
     toggleCustomVis(): void;

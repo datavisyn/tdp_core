@@ -109,7 +109,6 @@ export class LineUpSelectionHelper extends EventHandler {
         if (!this.provider) {
             return;
         }
-        console.log(sel);
         const old = this.provider.getSelection().sort((a, b) => a - b);
         const indices = [];
         sel.range.dim(0).forEach((uid) => {
@@ -122,7 +121,6 @@ export class LineUpSelectionHelper extends EventHandler {
         if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
             return; // no change
         }
-        console.log(indices);
         this.provider.setSelection(indices);
     }
 }

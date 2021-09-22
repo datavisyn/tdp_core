@@ -35,9 +35,10 @@ export class GeneralVisWrapper extends EventHandler {
     }
     selectCallback(selected) {
         const data = this.getAllData();
-        const selectedIds = selected.map((s) => data.filter((d) => d.id === s)[0]._id);
-        const r = Range.list(selectedIds);
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.idType.id);
+        console.log(selected);
+        const r = Range.list(selected);
+        //???
+        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
         this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
     }
     filterCallback(s) {
@@ -55,15 +56,22 @@ export class GeneralVisWrapper extends EventHandler {
         const colDescriptions = this.provider.getColumns();
         const selectedIndeces = this.provider.getSelection();
         const cols = [];
+        const selectedMap = {};
+        for (const i of data) {
+            selectedMap[i._id] = false;
+        }
+        for (const i of selectedIndeces) {
+            selectedMap[i] = true;
+        }
         for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
                 info: {
                     name: c.label,
-                    description: c.description,
-                    id: c.label + c.description
+                    description: c.summary,
+                    id: c.label + c.summary
                 },
                 vals: data.map((d, i) => {
-                    return { id: d.id, val: d[c.column] ? d[c.column] : '--', selected: selectedIndeces.includes(d._id) };
+                    return { id: d._id, val: d[c.column] ? d[c.column] : null };
                 }),
                 type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
                 selectedForMultiples: false
@@ -71,6 +79,7 @@ export class GeneralVisWrapper extends EventHandler {
         }
         ReactDOM.render(React.createElement(GeneralHome, {
             columns: cols,
+            selected: selectedMap,
             selectionCallback: (s) => this.selectCallback(s),
             filterCallback: (s) => this.filterCallback(s)
         }), this.node);

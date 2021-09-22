@@ -17,15 +17,17 @@ export declare enum EGeneralFormType {
 }
 export interface GeneralHomeProps {
     columns: (NumericalColumn | CategoricalColumn)[];
-    selectionCallback: (s: string[]) => void;
+    selected: {
+        [key: number]: boolean;
+    };
+    selectionCallback: (s: number[]) => void;
     filterCallback: (s: string) => void;
 }
 export interface NumericalColumn {
     info: ColumnInfo;
     vals: {
-        id: string;
+        id: number;
         val: number;
-        selected: boolean;
     }[];
     type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
@@ -33,9 +35,8 @@ export interface NumericalColumn {
 export interface CategoricalColumn {
     info: ColumnInfo;
     vals: {
-        id: string;
+        id: number;
         val: string;
-        selected: boolean;
     }[];
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;

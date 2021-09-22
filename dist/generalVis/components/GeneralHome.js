@@ -28,6 +28,7 @@ export function GeneralHome(props) {
     const [barDirection, setBarDirection] = useState(EBarDirection.VERTICAL);
     const [violinOverlay, setViolinOverlay] = useState(EViolinOverlay.NONE);
     const [numericalColorScaleType, setNumericalColorScaleType] = useState(ENumericalColorScaleType.SEQUENTIAL);
+    console.log(props.columns);
     const updateBubbleSize = (newCol) => setBubbleSize(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0]);
     const updateOpacity = (newCol) => setOpacity(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0]);
     const updateColor = (newCol) => setColorMapping(props.columns.filter((c) => newCol && c.info.id === newCol.id)[0]);
@@ -62,14 +63,22 @@ export function GeneralHome(props) {
         return d3.scale.ordinal().range(['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
     }, [colorMapping]);
     const sequentialColorScale = useMemo(() => {
+        console.log(colorMapping);
+        let min = 0;
+        let max = 0;
+        if (colorMapping) {
+            min = d3.min(colorMapping.vals.map((v) => +v.val).filter((v) => v !== null)),
+                max = d3.max(colorMapping.vals.map((v) => +v.val).filter((v) => v !== null));
+        }
         return colorMapping ?
             d3.scale.linear()
-                .domain([d3.min(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
-                d3.median(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--')),
-                d3.max(colorMapping.vals.map((v) => v.val).filter((v) => v !== '--'))])
-                .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#003367', '#f5f5f5', '#6f0000'])
+                .domain([min,
+                (max + min) / 2,
+                max])
+                .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#337ab7', '#d3d3d3', '#ec6836'])
             : null;
     }, [colorMapping, numericalColorScaleType]);
+    console.log(sequentialColorScale);
     const allExtraDropdowns = useMemo(() => {
         return {
             bubble: {
@@ -248,7 +257,10 @@ export function GeneralHome(props) {
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100" }, currPlot ? (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "position-relative d-flex justify-content-center align-items-center flex-grow-1" },
             traces.plots.length > 0 ?
-                (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => d ? props.selectionCallback(d.points.map((d) => d.id)) : props.selectionCallback([]), 
+                (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
+                        console.log(d);
+                        d ? props.selectionCallback(d.points.map((d) => +d.id)) : props.selectionCallback([]);
+                    }, 
                     //plotly redraws everything on updates, so you need to reappend title and
                     // change opacity on update, instead of just in a use effect
                     onInitialized: () => {
@@ -271,10 +283,10 @@ export function GeneralHome(props) {
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50" },
                 React.createElement("div", { className: "btn-group", role: "group" },
                     React.createElement("input", { checked: isRectBrush, onChange: (e) => setIsRectBrush(true), type: "checkbox", className: "btn-check", id: `rectBrushSelection`, autoComplete: "off" }),
-                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection` },
-                        React.createElement("i", { className: "fas fa-square" })),
+                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection`, title: "Rectangular Brush" },
+                        React.createElement("i", { className: "far fa-square" })),
                     React.createElement("input", { checked: !isRectBrush, onChange: (e) => setIsRectBrush(false), type: "checkbox", className: "btn-check", id: `lassoBrushSelection`, autoComplete: "off" }),
-                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection` },
+                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection`, title: "Lasso Brush" },
                         React.createElement("i", { className: "fas fa-paint-brush" }))),
                 React.createElement("div", { className: "ps-2 pt-0 m-0" },
                     React.createElement("label", { htmlFor: `alphaSlider`, className: `form-label m-0 p-0` }, "Opacity"),

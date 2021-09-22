@@ -5,6 +5,8 @@ import {useCallback, useMemo, useState} from 'react';
 import {useResizeDetector} from 'react-resize-detector';
 import Select from 'react-select';
 import Highlighter from 'react-highlight-words';
+import {NumericalColorChooser} from './NumericalColorChooser';
+import {ENumericalColorScaleType} from '../plots/scatter';
 
 interface GeneralSidePanelProps {
     updateSelectedNumCols: (s: ColumnInfo[]) => void;
@@ -124,8 +126,18 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                         })}
 
                         {props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
+                            if(d.name === 'Numerical Color Scale Type') {
+                                return <NumericalColorChooser
+                                    key={'numericalColorChooser'}
+                                    callback={d.callback}
+                                    currentSelected={d.currentSelected as ENumericalColorScaleType}
+                                    disabled={d.disabled}
+                                />;
+                            }
+
                             return (
                                 <div key={`buttonGroup${d.name}`} className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
+
                                     {(d.options as string[]).map(((opt) => {
                                         return (
                                             <React.Fragment key={`radioButtons${d.name + opt}`}>
@@ -134,6 +146,7 @@ export function GeneralSidePanel(props: GeneralSidePanelProps) {
                                             </React.Fragment>
                                         );
                                     }))}
+
                                 </div>
                             );
                         })}

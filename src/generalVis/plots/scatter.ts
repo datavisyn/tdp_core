@@ -45,19 +45,19 @@ export class PlotlyScatter implements GeneralPlot {
                 data: {
                     x: validCols[0].vals.map((v) => v.val),
                     y: validCols[1].vals.map((v) => v.val),
-                    ids: validCols[0].vals.map((v) => v.id),
+                    ids: validCols[0].vals.map((v) => v.id.toString()),
                     xaxis: counter === 1 ? 'x' : 'x' + counter,
                     yaxis: counter === 1 ? 'y' : 'y' + counter,
                     type: 'scattergl',
                     mode: 'markers',
                     showlegend: false,
-                    text: validCols[0].vals.map((v) => v.id),
+                    text: validCols[0].vals.map((v) => v.id.toString()),
                     marker: {
                         line: {
                             width: 0,
                         },
                         symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                        color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => v.selected ? '#E29609' : dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+                        color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => v.selected ? '#E29609' : dropdownOptions.color.scale(v.val)) : Object.values(props.selected).map((v) => v ? '#E29609' : '#2e2e2e'),
                         opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected as number,
                         size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
@@ -72,7 +72,7 @@ export class PlotlyScatter implements GeneralPlot {
                         data: {
                             x: xCurr.vals.map((v) => v.val),
                             y: yCurr.vals.map((v) => v.val),
-                            ids: xCurr.vals.map((v) => v.id),
+                            ids: xCurr.vals.map((v) => v.id.toString()),
                             xaxis: counter === 1 ? 'x' : 'x' + counter,
                             yaxis: counter === 1 ? 'y' : 'y' + counter,
                             type: 'scattergl',
@@ -81,13 +81,13 @@ export class PlotlyScatter implements GeneralPlot {
                                 namelength: 5
                             },
                             showlegend: false,
-                            text: validCols[0].vals.map((v) => v.id),
+                            text: validCols[0].vals.map((v) => v.id.toString()),
                             marker: {
                                 line: {
                                     width: 0,
                                 },
                                 symbol: dropdownOptions.shape.currentColumn ? (dropdownOptions.shape.currentColumn as CategoricalColumn).vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                                color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => v.selected ? '#E29609' : dropdownOptions.color.scale(v.val)) : validCols[0].vals.map((v) => v.selected ? '#E29609' : '#2e2e2e'),
+                                color: dropdownOptions.color.currentColumn ? (dropdownOptions.color.currentColumn as any).vals.map((v) => v.selected ? '#E29609' : dropdownOptions.color.scale(v.val)) : Object.values(props.selected).map((v) => v ? '#E29609' : '#2e2e2e'),
 
                                 opacity: dropdownOptions.opacity.currentColumn ? (dropdownOptions.opacity.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected as number,
                                 size: dropdownOptions.bubble.currentColumn ? (dropdownOptions.bubble.currentColumn as NumericalColumn).vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10

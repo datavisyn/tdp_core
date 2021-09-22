@@ -29,7 +29,7 @@ export class PlotlyBar {
     }
     createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
         let counter = 1;
-        const catCols = props.columns.filter((c) => selectedCatCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL);
+        const catCols = props.columns.filter((c) => selectedCatCols.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
         const vertFlag = dropdownOptions.barDirection.currentSelected === EBarDirection.VERTICAL;
         const normalizedFlag = dropdownOptions.barNormalized.currentSelected === EBarDisplayType.NORMALIZED;
         const plots = [];
@@ -64,8 +64,8 @@ export class PlotlyBar {
                                     color: dropdownOptions.color.scale(uniqueGroup),
                                 }
                             },
-                            xLabel: catCurr.info.name,
-                            yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                            xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                            yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                         });
                     });
                     counter += 1;
@@ -96,8 +96,8 @@ export class PlotlyBar {
                                 color: dropdownOptions.color.scale(uniqueVal),
                             }
                         },
-                        xLabel: catCurr.info.name,
-                        yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                        xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                        yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                     });
                 });
             }
@@ -123,8 +123,8 @@ export class PlotlyBar {
                             type: 'bar',
                             name: uniqueVal,
                         },
-                        xLabel: catCurr.info.name,
-                        yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                        xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                        yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                     });
                     counter += 1;
                 });
@@ -142,21 +142,20 @@ export class PlotlyBar {
                         type: 'bar',
                         name: catCurr.info.name
                     },
-                    xLabel: catCurr.info.name,
-                    yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                    xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                    yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                 });
                 counter += 1;
             }
         }
         const rows = Math.ceil(Math.sqrt(counter - 1));
         const cols = Math.ceil((counter - 1) / rows);
-        console.log(counter, rows, cols);
         return {
             plots,
             legendPlots: [],
             rows,
             cols,
-            errorMessage: 'To create a Strip plot, please select at least 1 categorical column and at least 1 numerical column.',
+            errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
             formList: ['groupBy', 'barMultiplesBy', 'barDirection', 'barGroupType', 'barNormalized']
         };
     }

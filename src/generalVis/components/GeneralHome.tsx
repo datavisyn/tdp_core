@@ -38,6 +38,8 @@ export function GeneralHome(props: GeneralHomeProps) {
     const [violinOverlay, setViolinOverlay] = useState<EViolinOverlay>(EViolinOverlay.NONE);
     const [numericalColorScaleType, setNumericalColorScaleType] = useState<ENumericalColorScaleType>(ENumericalColorScaleType.SEQUENTIAL);
 
+    console.log(props.columns);
+
     const updateBubbleSize = (newCol: ColumnInfo) => setBubbleSize(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
     const updateOpacity = (newCol: ColumnInfo) => setOpacity(props.columns.filter((c) => newCol && c.info.id === newCol.id && c.type === EColumnTypes.NUMERICAL)[0] as NumericalColumn);
     const updateColor = (newCol: ColumnInfo) => setColorMapping(props.columns.filter((c) => newCol && c.info.id === newCol.id)[0]);
@@ -81,14 +83,25 @@ export function GeneralHome(props: GeneralHomeProps) {
     }, [colorMapping]);
 
     const sequentialColorScale = useMemo(() => {
+        console.log(colorMapping);
+        let min = 0;
+        let max = 0;
+
+        if(colorMapping) {
+            min = d3.min((colorMapping as NumericalColumn).vals.map((v) => +v.val).filter((v) => v !== null)),
+            max = d3.max((colorMapping as NumericalColumn).vals.map((v) => +v.val).filter((v) => v !== null));
+        }
+
         return colorMapping ?
             d3.scale.linear<string, number>()
-                .domain([d3.min((colorMapping as NumericalColumn).vals.map((v) => v.val).filter((v) => v as any !== '--')),
-                        d3.median((colorMapping as NumericalColumn).vals.map((v) => v.val).filter((v) => v as any !== '--')),
-                        d3.max((colorMapping as NumericalColumn).vals.map((v) => v.val).filter((v) => v as any !== '--'))])
-                .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#003367','#f5f5f5', '#6f0000'])
+                .domain([min,
+                    (max + min) / 2,
+                    max])
+                .range(numericalColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#337ab7','#d3d3d3', '#ec6836'])
             : null;
     }, [colorMapping, numericalColorScaleType]);
+
+    console.log(sequentialColorScale);
 
     const allExtraDropdowns: AllDropdownOptions = useMemo(() => {
 
@@ -290,7 +303,10 @@ export function GeneralHome(props: GeneralHomeProps) {
                                 config={{responsive: true, displayModeBar: false}}
                                 useResizeHandler={true}
                                 style={{width: '100%', height: '100%'}}
-                                onSelected={(d) => d ? props.selectionCallback(d.points.map((d) => (d as any).id)) : props.selectionCallback([])}
+                                onSelected={(d) => {
+                                    console.log(d);
+                                    d ? props.selectionCallback(d.points.map((d) => +(d as any).id)) : props.selectionCallback([]);
+                                }}
                                 //plotly redraws everything on updates, so you need to reappend title and
                                 // change opacity on update, instead of just in a use effect
                                 onInitialized={() => {
@@ -319,11 +335,11 @@ export function GeneralHome(props: GeneralHomeProps) {
                         }
                         <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50">
                             <div className="btn-group" role="group">
-                                <input checked={isRectBrush} onChange={(e) => setIsRectBrush(true)} type="checkbox" className="btn-check" id={`rectBrushSelection`} autoComplete="off"/>
-                                <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`}><i className="fas fa-square"/></label>
+                                <input checked={isRectBrush} onChange={(e) => setIsRectBrush(true)} type="checkbox" className="btn-check" id={`rectBrushSelection`} autoComplete="off" />
+                                <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`} title="Rectangular Brush"><i className="far fa-square"/></label>
 
-                                <input checked={!isRectBrush} onChange={(e) => setIsRectBrush(false)} type="checkbox" className="btn-check" id={`lassoBrushSelection`} autoComplete="off"/>
-                                <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`}><i className="fas fa-paint-brush"/></label>
+                                <input checked={!isRectBrush} onChange={(e) => setIsRectBrush(false)} type="checkbox" className="btn-check" id={`lassoBrushSelection`} autoComplete="off" />
+                                <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`} title="Lasso Brush"><i className="fas fa-paint-brush"/></label>
 
 
                             </div>

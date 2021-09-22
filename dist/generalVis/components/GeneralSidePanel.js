@@ -5,6 +5,7 @@ import { useCallback, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import Select from 'react-select';
 import Highlighter from 'react-highlight-words';
+import { NumericalColorChooser } from './NumericalColorChooser';
 export function GeneralSidePanel(props) {
     // GOTTA BE A BETTER WAY
     const onResize = useCallback(() => {
@@ -58,6 +59,9 @@ export function GeneralSidePanel(props) {
                             React.createElement(Select, { isClearable: true, onChange: (e) => d.callback(e), name: d.name, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, options: d.options, value: d.currentColumn ? d.currentColumn.info : [] })));
                     }),
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
+                        if (d.name === 'Numerical Color Scale Type') {
+                            return React.createElement(NumericalColorChooser, { key: 'numericalColorChooser', callback: d.callback, currentSelected: d.currentSelected, disabled: d.disabled });
+                        }
                         return (React.createElement("div", { key: `buttonGroup${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {
                             return (React.createElement(React.Fragment, { key: `radioButtons${d.name + opt}` },
                                 React.createElement("input", { checked: d.currentSelected === opt, onChange: (e) => d.callback(e.currentTarget.value), value: opt, type: "checkbox", className: "btn-check", id: `formButton${opt}`, autoComplete: "off" }),

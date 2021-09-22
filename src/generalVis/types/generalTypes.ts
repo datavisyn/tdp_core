@@ -21,20 +21,21 @@ export enum EGeneralFormType {
 
 export interface GeneralHomeProps {
     columns: (NumericalColumn | CategoricalColumn)[];
-    selectionCallback: (s: string[]) => void;
+    selected: {[key: number]: boolean};
+    selectionCallback: (s: number[]) => void;
     filterCallback: (s: string) => void;
 }
 
 export interface NumericalColumn {
     info: ColumnInfo;
-    vals: {id: string, val: number, selected: boolean}[];
+    vals: {id: number, val: number}[];
     type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
 }
 
 export interface CategoricalColumn {
     info: ColumnInfo;
-    vals: {id: string, val: string, selected: boolean}[];
+    vals: {id: number, val: string}[];
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
