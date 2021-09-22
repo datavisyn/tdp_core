@@ -42,8 +42,8 @@ export class LineUpSelectionHelper extends EventHandler {
     }
     onMultiSelectionChanged(indices) {
         // compute the difference
-        const diffAdded = LineupUtils.array_diff(indices, this.orderedSelectedIndices);
-        const diffRemoved = LineupUtils.array_diff(this.orderedSelectedIndices, indices);
+        const diffAdded = [...LineupUtils.set_diff(new Set(indices), new Set(this.orderedSelectedIndices))];
+        const diffRemoved = [...LineupUtils.set_diff(new Set(this.orderedSelectedIndices), new Set(indices))];
         // remove elements within, but preserve order
         diffRemoved.forEach((d) => {
             this.orderedSelectedIndices.splice(this.orderedSelectedIndices.indexOf(d), 1);

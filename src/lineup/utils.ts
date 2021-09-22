@@ -165,7 +165,7 @@ export class LineupUtils {
   }
 
   /**
-   * Returns the all items that are not in the given two arrays
+   * Returns all items that are in array1 which are not in array2
    * TODO improve performance of diff algorithm
    * @param array1
    * @param array2
