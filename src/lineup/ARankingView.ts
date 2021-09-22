@@ -20,7 +20,7 @@ import {LazyColumn, ILazyLoadedColumn} from './internal/column';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {IARankingViewOptions} from './IARankingViewOptions';
 import {LineupUtils} from './utils';
-import {ISearchOption} from './internal/panel';
+import {ISearchOption} from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
 
@@ -127,7 +127,8 @@ export abstract class ARankingView extends AView {
         }
       }
       return item.text;
-    }
+    },
+    panelAddColumnBtnOptions: {}
   };
 
   private readonly selectionAdapter: ISelectionAdapter | null;

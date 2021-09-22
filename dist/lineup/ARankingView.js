@@ -112,7 +112,8 @@ export class ARankingView extends AView {
                     }
                 }
                 return item.text;
-            }
+            },
+            panelAddColumnBtnOptions: {}
         };
         // variants for deriving the item name
         const idTypeNames = options.itemIDType ? {
