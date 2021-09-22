@@ -22,7 +22,7 @@ export var EBarGroupingType;
 })(EBarGroupingType || (EBarGroupingType = {}));
 export class PlotlyBar {
     startingHeuristic(props, selectedCatCols, selectedNumCols, updateSelectedCatCols, updateSelectedNumCols) {
-        const catCols = props.columns.filter((c) => EColumnTypes.CATEGORICAL);
+        const catCols = props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
         if (selectedCatCols.length === 0 && catCols.length >= 1) {
             updateSelectedCatCols([catCols[0].info]);
         }

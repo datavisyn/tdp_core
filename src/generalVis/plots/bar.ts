@@ -25,7 +25,7 @@ export enum EBarGroupingType {
 
 export class PlotlyBar implements GeneralPlot {
     startingHeuristic(props: GeneralHomeProps, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[], updateSelectedCatCols: (s: ColumnInfo[]) => void, updateSelectedNumCols: (s: ColumnInfo[]) => void) {
-        const catCols = props.columns.filter((c) => EColumnTypes.CATEGORICAL);
+        const catCols = props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
 
         if (selectedCatCols.length === 0 && catCols.length >= 1) {
             updateSelectedCatCols([catCols[0].info]);
