@@ -48,7 +48,7 @@ export class PlotlyScatter {
                             width: 0,
                         },
                         symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                        color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => v.selected ? '#E29609' : dropdownOptions.color.scale(v.val)) : Object.values(props.selected).map((v) => v ? '#E29609' : '#2e2e2e'),
+                        color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => props.selected[v.id] ? '#E29609' : dropdownOptions.color.scale(v.val)) : Object.values(props.selected).map((v) => v ? '#E29609' : '#2e2e2e'),
                         opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected,
                         size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                     },
@@ -79,7 +79,7 @@ export class PlotlyScatter {
                                     width: 0,
                                 },
                                 symbol: dropdownOptions.shape.currentColumn ? dropdownOptions.shape.currentColumn.vals.map((v) => dropdownOptions.shape.scale(v.val)) : 'circle',
-                                color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => v.selected ? '#E29609' : dropdownOptions.color.scale(v.val)) : Object.values(props.selected).map((v) => v ? '#E29609' : '#2e2e2e'),
+                                color: dropdownOptions.color.currentColumn ? dropdownOptions.color.currentColumn.vals.map((v) => props.selected[v.id] ? '#E29609' : dropdownOptions.color.scale(v.val)) : Object.values(props.selected).map((v) => v ? '#E29609' : '#2e2e2e'),
                                 opacity: dropdownOptions.opacity.currentColumn ? dropdownOptions.opacity.currentColumn.vals.map((v) => dropdownOptions.opacity.scale(v.val)) : dropdownOptions.alphaSlider.currentSelected,
                                 size: dropdownOptions.bubble.currentColumn ? dropdownOptions.bubble.currentColumn.vals.map((v) => dropdownOptions.bubble.scale(v.val)) : 10
                             },
