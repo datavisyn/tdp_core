@@ -3,8 +3,8 @@ import {EventHandler, IDTypeManager, Range} from 'phovea_core';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {ARankingView} from '..';
-import {GeneralHome} from '../../generalVis/components/GeneralHome';
-import {EColumnTypes} from '../../generalVis/types/generalTypes';
+import {Vis} from '../../vis/components/vis';
+import {EColumnTypes} from '../../vis/types/generalTypes';
 
 export class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement; // wrapper node
@@ -94,7 +94,7 @@ export class GeneralVisWrapper extends EventHandler {
                 info: {
                     name: c.label,
                     description: c.summary,
-                    id: c.label + c.summary
+                    id: c.label + (<any> c)._id
                 },
                 vals: data.map((d, i) => {
                     return {id: d._id, val: d[(<any> c).column] ? d[(<any> c).column] : null};
@@ -106,7 +106,7 @@ export class GeneralVisWrapper extends EventHandler {
 
         ReactDOM.render(
             React.createElement(
-                GeneralHome,
+                Vis,
                 {
                     columns: cols,
                     selected: selectedMap,

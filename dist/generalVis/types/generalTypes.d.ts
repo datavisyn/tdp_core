@@ -1,4 +1,6 @@
 import { Data } from 'plotly.js';
+import { EBarDirection, EBarDisplayType, EBarGroupingType, EViolinOverlay } from '../traces/bar';
+import { ENumericalColorScaleType } from '../traces/scatter';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter",
     PCP = "Parallel Coordinates",
@@ -15,14 +17,48 @@ export declare enum EGeneralFormType {
     BUTTON = "Button",
     SLIDER = "Slider"
 }
-export interface GeneralHomeProps {
-    columns: (NumericalColumn | CategoricalColumn)[];
-    selected: {
-        [key: number]: boolean;
-    };
-    selectionCallback: (s: number[]) => void;
-    filterCallback: (s: string) => void;
+export declare enum EFilterOptions {
+    IN = "Filter In",
+    OUT = "Filter Out",
+    CLEAR = "Clear"
 }
+export declare function isScatter(s: IVisConfig): s is IScatterConfig;
+export interface IScatterConfig {
+    type: ESupportedPlotlyVis.SCATTER;
+    numColumnsSelected: ColumnInfo[];
+    color: ColumnInfo | null;
+    numColorScaleType: ENumericalColorScaleType;
+    shape: ColumnInfo | null;
+    isRectBrush: boolean;
+    alphaSliderVal: number;
+}
+export interface IViolinConfig {
+    type: ESupportedPlotlyVis.VIOLIN;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+    violinOverlay: EViolinOverlay;
+}
+export interface IBarConfig {
+    type: ESupportedPlotlyVis.BAR;
+    multiples: ColumnInfo | null;
+    group: ColumnInfo | null;
+    direction: EBarDirection;
+    display: EBarDisplayType;
+    groupType: EBarGroupingType;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+}
+export interface IStripConfig {
+    type: ESupportedPlotlyVis.STRIP;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+}
+export interface IPCPConfig {
+    type: ESupportedPlotlyVis.PCP;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+}
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 export interface NumericalColumn {
     info: ColumnInfo;
     vals: {
@@ -42,10 +78,6 @@ export interface CategoricalColumn {
     selectedForMultiples: boolean;
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
-export declare const correlationTypes: ESupportedPlotlyVis[];
-export declare const comparisonTypes: ESupportedPlotlyVis[];
-export declare const distributionTypes: ESupportedPlotlyVis[];
-export declare const highDimensionalTypes: ESupportedPlotlyVis[];
 export declare type PlotlyInfo = {
     plots: PlotlyData[];
     legendPlots: PlotlyData[];
@@ -63,6 +95,10 @@ export declare type ColumnInfo = {
     name: string;
     id: string;
     description: string;
+};
+export declare type Scales = {
+    color: any;
+    shape: any;
 };
 export declare type GenericOption = {
     name: string;

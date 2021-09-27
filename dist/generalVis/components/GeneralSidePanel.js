@@ -5,7 +5,7 @@ import { useCallback, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import Select from 'react-select';
 import Highlighter from 'react-highlight-words';
-import { NumericalColorChooser } from './NumericalColorChooser';
+import { NumericalColorButtons } from './sidebarComponents/NumericalColorButtons';
 export function GeneralSidePanel(props) {
     // GOTTA BE A BETTER WAY
     const onResize = useCallback(() => {
@@ -60,7 +60,7 @@ export function GeneralSidePanel(props) {
                     }),
                     props.dropdowns.filter((d) => d.type === EGeneralFormType.BUTTON).map((d, i) => {
                         if (d.name === 'Numerical Color Scale Type') {
-                            return React.createElement(NumericalColorChooser, { key: 'numericalColorChooser', callback: d.callback, currentSelected: d.currentSelected, disabled: d.disabled });
+                            return React.createElement(NumericalColorButtons, { key: 'numericalColorChooser', callback: d.callback, currentSelected: d.currentSelected });
                         }
                         return (React.createElement("div", { key: `buttonGroup${d.name}`, className: "btn-group w-100 px-2 pt-3", role: "group", "aria-label": "Basic outlined example" }, d.options.map(((opt) => {
                             return (React.createElement(React.Fragment, { key: `radioButtons${d.name + opt}` },
