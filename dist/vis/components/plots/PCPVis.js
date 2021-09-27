@@ -15,7 +15,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null
 };
-export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
+export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, }) {
     const mergedOptionsConfig = useMemo(() => {
         return merge(defaultConfig, optionsConfig);
     }, []);
@@ -27,7 +27,7 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, 
     }, []);
     const traces = useMemo(() => {
         return createPCPTraces(columns, config);
-    }, [columns, config, scales]);
+    }, [columns, config]);
     const layout = useMemo(() => {
         return {
             showlegend: true,

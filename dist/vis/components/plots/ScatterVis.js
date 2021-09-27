@@ -31,7 +31,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, filterCallback, selectionCallback, selected, setConfig, scales }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales }) {
     useEffect(() => {
         scatterInit(columns, config, setConfig);
     }, []);
@@ -42,8 +42,8 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, filterC
         return merge(defaultExtensions, extensions);
     }, []);
     const traces = useMemo(() => {
-        return createScatterTraces(columns, selected, config, scales);
-    }, [columns, selected, config, scales]);
+        return createScatterTraces(columns, selected, config, scales, shapes);
+    }, [columns, selected, config, scales, shapes]);
     const layout = useMemo(() => {
         const layout = {
             showlegend: true,

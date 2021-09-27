@@ -66,7 +66,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             grid: { rows: traces.rows, columns: traces.cols, xgap: .3, pattern: 'independent' },
             shapes: [],
             violingap: 0,
-            barMode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group'
+            barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group'
         };
         return beautifyLayout(traces, layout);
     }, [traces, config.groupType]);
@@ -107,11 +107,11 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                         || React.createElement(MultiplesSelect, { callback: (multiples) => setConfig({ ...config, multiples }), columns: columns, currentSelected: config.multiples }) : null,
                     React.createElement("hr", null),
                     mergedOptionsConfig.direction.enable ? mergedOptionsConfig.direction.customComponent
-                        || React.createElement(BarDirectionButtons, { callback: (direction) => setConfig({ ...config, direction }) }) : null,
+                        || React.createElement(BarDirectionButtons, { callback: (direction) => setConfig({ ...config, direction }), currentSelected: config.direction }) : null,
                     mergedOptionsConfig.groupType.enable ? mergedOptionsConfig.groupType.customComponent
-                        || React.createElement(BarGroupTypeButtons, { callback: (groupType) => setConfig({ ...config, groupType }) }) : null,
+                        || React.createElement(BarGroupTypeButtons, { callback: (groupType) => setConfig({ ...config, groupType }), currentSelected: config.groupType }) : null,
                     mergedOptionsConfig.display.enable ? mergedOptionsConfig.display.customComponent
-                        || React.createElement(BarDisplayButtons, { callback: (display) => setConfig({ ...config, display }) }) : null,
+                        || React.createElement(BarDisplayButtons, { callback: (display) => setConfig({ ...config, display }), currentSelected: config.display }) : null,
                     mergedExtensions.postSidebar)))));
 }
 //# sourceMappingURL=BarVis.js.map

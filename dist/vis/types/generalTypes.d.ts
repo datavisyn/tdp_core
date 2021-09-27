@@ -38,6 +38,7 @@ export interface NumericalColumn {
 }
 export interface CategoricalColumn {
     info: ColumnInfo;
+    colors: string[];
     vals: {
         id: number;
         val: string;
@@ -65,5 +66,4 @@ export declare type ColumnInfo = {
 };
 export declare type Scales = {
     color: any;
-    shape: any;
 };

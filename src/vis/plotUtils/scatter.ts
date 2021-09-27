@@ -2,6 +2,7 @@ import {EColumnTypes, NumericalColumn, CategoricalColumn, ColumnInfo, IVisConfig
 import {PlotlyInfo, PlotlyData} from '../types/generalTypes';
 import {getCol} from '../utils/sidebarUtils';
 import {merge} from 'lodash';
+import d3 from 'd3';
 
 export enum ENumericalColorScaleType {
     SEQUENTIAL = 'Sequential',
@@ -71,6 +72,7 @@ export function createScatterTraces(
     selected: {[key: number]: boolean},
     config: IScatterConfig,
     scales: Scales,
+    shapes: string[] | null
 ): PlotlyInfo {
     let counter = 1;
 
@@ -80,6 +82,28 @@ export function createScatterTraces(
 
     const validCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL) as NumericalColumn[];
     const plots: PlotlyData[] = [];
+
+    const shapeScale = config.shape ?
+        d3.scale.ordinal<string>().domain([...new Set(getCol(columns, config.shape).vals.map((v) => v.val))]).range(shapes || ['circle', 'square', 'triangle-up', 'star'])
+        : null;
+
+    let min = 0;
+    let max = 0;
+
+    if(config.color) {
+        min = d3.min((getCol(columns, config.color) as NumericalColumn).vals.map((v) => +v.val).filter((v) => v !== null)),
+        max = d3.max((getCol(columns, config.color) as NumericalColumn).vals.map((v) => +v.val).filter((v) => v !== null));
+    }
+
+
+
+    const numericalColorScale = config.color ?
+                d3.scale.linear<string, number>()
+                    .domain([min,
+                        (max + min) / 2,
+                        max])
+                    .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#337ab7','#d3d3d3', '#ec6836'])
+                : null;
 
     const legendPlots: PlotlyData[] = [];
 
@@ -103,8 +127,8 @@ export function createScatterTraces(
                     line: {
                         width: 0,
                     },
-                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => scales.shape(v.val)) : 'circle',
-                    color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : scales.color(v.val)) : Object.values(selected).map((v) => v ? '#E29609' : '#2e2e2e'),
+                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => shapeScale(v.val)) : 'circle',
+                    color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale : scales.color(v.val)) : Object.values(selected).map((v) => v ? '#E29609' : '#2e2e2e'),
                     opacity: config.alphaSliderVal,
                     size: 10
                 },
@@ -133,8 +157,8 @@ export function createScatterTraces(
                             line: {
                                 width: 0,
                             },
-                            symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => scales.shape(v.val)) : 'circle',
-                            color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : scales.color(v.val)) : Object.values(selected).map((v) => v ? '#E29609' : '#2e2e2e'),
+                            symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => shapeScale(v.val)) : 'circle',
+                            color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale : scales.color(v.val)) : Object.values(selected).map((v) => v ? '#E29609' : '#2e2e2e'),
                             opacity: config.alphaSliderVal,
                             size: 10
                         },
@@ -208,7 +232,7 @@ export function createScatterTraces(
                     },
                     opacity: config.alphaSliderVal,
                     size: 10,
-                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => scales.shape(v.val)) : 'circle',
+                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => shapeScale(v.val)) : 'circle',
                     color: '#2e2e2e'
                 },
                 transforms: [{

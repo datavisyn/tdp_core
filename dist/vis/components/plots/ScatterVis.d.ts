@@ -24,6 +24,7 @@ interface ScatterVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
+    shapes: string[] | null;
     columns: (NumericalColumn | CategoricalColumn)[];
     filterCallback: (s: EFilterOptions) => void;
     selectionCallback: (s: number[]) => void;
@@ -33,5 +34,5 @@ interface ScatterVisProps {
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
 }
-export declare function ScatterVis({ config, optionsConfig, extensions, columns, filterCallback, selectionCallback, selected, setConfig, scales }: ScatterVisProps): JSX.Element;
+export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales }: ScatterVisProps): JSX.Element;
 export {};

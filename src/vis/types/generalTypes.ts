@@ -43,11 +43,11 @@ export interface NumericalColumn {
 
 export interface CategoricalColumn {
     info: ColumnInfo;
+    colors: string[];
     vals: {id: number, val: string}[];
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
-
 
 export type PlotlyInfo = {
     plots: PlotlyData[],
@@ -72,5 +72,4 @@ export type ColumnInfo = {
 
 export type Scales = {
     color: any
-    shape: any
 };

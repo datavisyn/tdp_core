@@ -36,6 +36,7 @@ interface ScatterVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
+    shapes: string[] | null;
     columns: (NumericalColumn | CategoricalColumn) [];
     filterCallback: (s: EFilterOptions) => void;
     selectionCallback: (s: number[]) => void;
@@ -71,6 +72,7 @@ export function ScatterVis({
     optionsConfig,
     extensions,
     columns,
+    shapes,
     filterCallback,
     selectionCallback,
     selected,
@@ -91,8 +93,8 @@ export function ScatterVis({
     }, []);
 
     const traces: PlotlyInfo = useMemo(() => {
-        return createScatterTraces(columns, selected, config, scales);
-    }, [columns, selected, config, scales]);
+        return createScatterTraces(columns, selected, config, scales, shapes);
+    }, [columns, selected, config, scales, shapes]);
 
     const layout = useMemo(() => {
         const layout = {

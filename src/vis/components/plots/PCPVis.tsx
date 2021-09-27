@@ -25,7 +25,6 @@ interface PCPVisProps {
     };
     columns: (NumericalColumn | CategoricalColumn) [];
     setConfig: (config: IVisConfig) => void;
-    scales: Scales;
 }
 
 const defaultConfig = {};
@@ -43,7 +42,6 @@ export function PCPVis({
     extensions,
     columns,
     setConfig,
-    scales
 }: PCPVisProps) {
 
     const mergedOptionsConfig = useMemo(() => {
@@ -60,7 +58,7 @@ export function PCPVis({
 
     const traces: PlotlyInfo = useMemo(() => {
         return createPCPTraces(columns, config);
-    }, [columns, config, scales]);
+    }, [columns, config]);
 
     const layout = useMemo(() => {
         return {

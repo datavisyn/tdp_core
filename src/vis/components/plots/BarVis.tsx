@@ -122,7 +122,7 @@ export function BarVis({
             grid: {rows: traces.rows, columns: traces.cols, xgap: .3, pattern: 'independent'},
             shapes: [],
             violingap: 0,
-            barMode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group'
+            barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group'
         };
 
         return beautifyLayout(traces, layout);
@@ -201,16 +201,19 @@ export function BarVis({
                         {mergedOptionsConfig.direction.enable ? mergedOptionsConfig.direction.customComponent
                         || <BarDirectionButtons
                             callback={(direction: EBarDirection) => setConfig({...config, direction})}
+                            currentSelected={config.direction}
                         /> : null }
 
                         {mergedOptionsConfig.groupType.enable ? mergedOptionsConfig.groupType.customComponent
                         || <BarGroupTypeButtons
                             callback={(groupType: EBarGroupingType) => setConfig({...config, groupType})}
+                            currentSelected={config.groupType}
                         /> : null }
 
                         {mergedOptionsConfig.display.enable ? mergedOptionsConfig.display.customComponent
                         || <BarDisplayButtons
                             callback={(display: EBarDisplayType) => setConfig({...config, display})}
+                            currentSelected={config.display}
                         /> : null }
 
                         {mergedExtensions.postSidebar}

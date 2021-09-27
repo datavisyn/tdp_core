@@ -17,4 +17,4 @@ export interface IScatterConfig {
 export declare function scatterInit(columns: (NumericalColumn | CategoricalColumn)[], config: IScatterConfig, setConfig: (config: IVisConfig) => void): void;
 export declare function createScatterTraces(columns: (NumericalColumn | CategoricalColumn)[], selected: {
     [key: number]: boolean;
-}, config: IScatterConfig, scales: Scales): PlotlyInfo;
+}, config: IScatterConfig, scales: Scales, shapes: string[] | null): PlotlyInfo;

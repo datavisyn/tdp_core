@@ -4,6 +4,7 @@ import {EFilterOptions} from '../../types/generalTypes';
 
 interface ViolinOverlayProps {
     callback: (s: EViolinOverlay) => void;
+    currentSelected: EViolinOverlay;
 }
 
 export function ViolinOverlayButtons(props: ViolinOverlayProps) {
@@ -14,7 +15,7 @@ export function ViolinOverlayButtons(props: ViolinOverlayProps) {
                 {(options).map(((opt) => {
                     return (
                         <React.Fragment key={`radioButtonsFilter${opt}`}>
-                            <input onChange={(e) => props.callback(e.currentTarget.value as EViolinOverlay)} value={opt} type="checkbox" className="btn-check" id={`formButton${opt}`} autoComplete="off"/>
+                            <input checked={props.currentSelected === opt} onChange={(e) => props.callback(e.currentTarget.value as EViolinOverlay)} value={opt} type="checkbox" className="btn-check" id={`formButton${opt}`} autoComplete="off"/>
                             <label style={{zIndex: 0}} className={`btn btn-outline-primary w-100`} htmlFor={`formButton${opt}`}>{opt}</label>
                         </React.Fragment>
                     );

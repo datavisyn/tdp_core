@@ -11,13 +11,9 @@ interface CategoricalColumnSelectProps {
 }
 
 export function CategoricalColumnSelect(props: CategoricalColumnSelectProps) {
-    console.log(props.columns);
     const selectCatOptions = useMemo(() => {
         return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
     }, [props.columns.length]);
-
-    console.log(selectCatOptions);
-
 
     return (
         <>

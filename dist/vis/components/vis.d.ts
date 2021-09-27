@@ -5,6 +5,8 @@ export interface VisProps {
     selected: {
         [key: number]: boolean;
     };
+    colors?: string[];
+    shapes?: string[];
     selectionCallback: (s: number[]) => void;
     filterCallback: (s: string) => void;
 }

@@ -149,6 +149,7 @@ export function ViolinVis({
                         {mergedOptionsConfig.overlay.enable ? mergedOptionsConfig.overlay.customComponent
                         || <ViolinOverlayButtons
                             callback={(violinOverlay: EViolinOverlay) => setConfig({...config, violinOverlay})}
+                            currentSelected={config.violinOverlay}
                         /> : null }
 
                         {mergedExtensions.postSidebar}

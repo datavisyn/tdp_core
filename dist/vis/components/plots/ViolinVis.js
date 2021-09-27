@@ -81,7 +81,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
                     React.createElement("hr", null),
                     mergedExtensions.preSidebar,
                     mergedOptionsConfig.overlay.enable ? mergedOptionsConfig.overlay.customComponent
-                        || React.createElement(ViolinOverlayButtons, { callback: (violinOverlay) => setConfig({ ...config, violinOverlay }) }) : null,
+                        || React.createElement(ViolinOverlayButtons, { callback: (violinOverlay) => setConfig({ ...config, violinOverlay }), currentSelected: config.violinOverlay }) : null,
                     mergedExtensions.postSidebar)))));
 }
 //# sourceMappingURL=ViolinVis.js.map
