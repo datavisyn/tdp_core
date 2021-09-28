@@ -21,7 +21,7 @@ const defaultConfig: IViolinConfig = {
     violinOverlay: EViolinOverlay.NONE,
 };
 
-export function violinInit(
+export function violinMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IViolinConfig,
 ): IVisConfig {

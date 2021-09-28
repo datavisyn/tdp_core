@@ -14,7 +14,7 @@ export interface IScatterConfig {
     isRectBrush: boolean;
     alphaSliderVal: number;
 }
-export declare function scatterInit(columns: (NumericalColumn | CategoricalColumn)[], config: IScatterConfig): IVisConfig;
+export declare function scatterMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IScatterConfig): IVisConfig;
 export declare function createScatterTraces(columns: (NumericalColumn | CategoricalColumn)[], selected: {
     [key: number]: boolean;
 }, config: IScatterConfig, scales: Scales, shapes: string[] | null): PlotlyInfo;

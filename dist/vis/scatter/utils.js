@@ -19,7 +19,7 @@ const defaultConfig = {
     isRectBrush: true,
     alphaSliderVal: 1
 };
-export function scatterInit(columns, config) {
+export function scatterMergeDefaultConfig(columns, config) {
     const merged = merge(defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 1) {

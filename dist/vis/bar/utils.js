@@ -35,7 +35,7 @@ const defaultConfig = {
     display: EBarDisplayType.DEFAULT,
     direction: EBarDirection.VERTICAL,
 };
-export function barInit(columns, config) {
+export function barMergeDefaultConfig(columns, config) {
     const merged = merge(defaultConfig, config);
     const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
     if (merged.catColumnsSelected.length === 0 && catCols.length > 0) {

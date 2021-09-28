@@ -50,7 +50,7 @@ const defaultConfig: IBarConfig = {
     direction: EBarDirection.VERTICAL,
 };
 
-export function barInit(
+export function barMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IBarConfig
 ): IVisConfig {

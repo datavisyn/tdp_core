@@ -18,7 +18,7 @@ const defaultConfig: IStripConfig = {
     catColumnsSelected: [],
 };
 
-export function stripInit(
+export function stripMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IStripConfig,
 ): IVisConfig {

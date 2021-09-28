@@ -31,7 +31,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, scales }) {
     const mergedOptionsConfig = useMemo(() => {
         return merge(defaultConfig, optionsConfig);
     }, []);

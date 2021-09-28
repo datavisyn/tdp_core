@@ -10,7 +10,7 @@ const defaultConfig = {
     catColumnsSelected: [],
     violinOverlay: EViolinOverlay.NONE,
 };
-export function violinInit(columns, config) {
+export function violinMergeDefaultConfig(columns, config) {
     const merged = merge(defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 0) {

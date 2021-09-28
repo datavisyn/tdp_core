@@ -1,15 +1,15 @@
 import d3 from 'd3';
 import * as React from 'react';
 import {useMemo, useState} from 'react';
-import {barInit, isBar} from './bar/utils';
-import {ENumericalColorScaleType, isScatter, scatterInit} from './scatter/utils';
+import {barMergeDefaultConfig, isBar} from './bar/utils';
+import {ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig} from './scatter/utils';
 import {CategoricalColumn, NumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales} from './interfaces';
 import {ScatterVis} from './scatter/ScatterVis';
 import {ViolinVis} from './violin/ViolinVis';
-import {isViolin, violinInit} from './violin/utils';
-import {isStrip, stripInit} from './strip/utils';
+import {isViolin, violinMergeDefaultConfig} from './violin/utils';
+import {isStrip, stripMergeDefaultConfig} from './strip/utils';
 import {StripVis} from './strip/StripVis';
-import {isPCP, pcpInit} from './pcp/utils';
+import {isPCP, pcpMergeDefaultConfig} from './pcp/utils';
 import {PCPVis} from './pcp/PCPVis';
 import {BarVis} from './bar/BarVis';
 
@@ -41,11 +41,11 @@ export function Vis({
     });
 
     const visConfig = useMemo(() => {
-        if(isScatter(_visConfig)) { return scatterInit(columns, _visConfig); }
-        if(isViolin(_visConfig)) { return violinInit(columns, _visConfig); }
-        if(isStrip(_visConfig)) { return stripInit(columns, _visConfig); }
-        if(isPCP(_visConfig)) { return pcpInit(columns, _visConfig); }
-        if(isBar(_visConfig)) { return barInit(columns, _visConfig); }
+        if(isScatter(_visConfig)) { return scatterMergeDefaultConfig(columns, _visConfig); }
+        if(isViolin(_visConfig)) { return violinMergeDefaultConfig(columns, _visConfig); }
+        if(isStrip(_visConfig)) { return stripMergeDefaultConfig(columns, _visConfig); }
+        if(isPCP(_visConfig)) { return pcpMergeDefaultConfig(columns, _visConfig); }
+        if(isBar(_visConfig)) { return barMergeDefaultConfig(columns, _visConfig); }
 
     }, [_visConfig.type]);
 

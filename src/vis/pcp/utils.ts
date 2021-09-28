@@ -19,7 +19,7 @@ const defaultConfig: IPCPConfig = {
     catColumnsSelected: [],
 };
 
-export function pcpInit(
+export function pcpMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IPCPConfig,
 ): IVisConfig {

@@ -7,28 +7,34 @@ import {NumericalColorButtons} from './NumericalColorButtons';
 
 interface ColorSelectProps {
     callback: (c: ColumnInfo) => void;
-    numTypeCallback: (c: ENumericalColorScaleType) => void;
-    currentNumType: ENumericalColorScaleType;
+    numTypeCallback?: (c: ENumericalColorScaleType) => void;
+    currentNumType?: ENumericalColorScaleType;
     columns: (NumericalColumn | CategoricalColumn)[];
     currentSelected: ColumnInfo | null;
 }
 
-export function ColorSelect(props: ColorSelectProps) {
+export function ColorSelect({
+    callback,
+    numTypeCallback = () => null,
+    currentNumType = null,
+    columns,
+    currentSelected,
+}: ColorSelectProps) {
     return (
         <>
             <label className="pt-2 pb-1">Color</label>
             <Select
                 isClearable
-                onChange={(e) => props.callback(e)}
+                onChange={(e) => callback(e)}
                 name={'colorSelect'}
                 formatOptionLabel={formatOptionLabel}
                 getOptionLabel={(option) => option.name}
                 getOptionValue={(option) => option.id}
-                options={(props.columns.map((c) => c.info))}
-                value={props.currentSelected ? props.currentSelected : []}
+                options={(columns.map((c) => c.info))}
+                value={currentSelected ? currentSelected : []}
             />
-            {props.currentSelected && getCol(props.columns, props.currentSelected).type === EColumnTypes.NUMERICAL
-                ? <NumericalColorButtons callback={props.numTypeCallback} currentSelected={props.currentNumType}/>
+            {currentNumType && currentSelected && getCol(columns, currentSelected).type === EColumnTypes.NUMERICAL
+                ? <NumericalColorButtons callback={numTypeCallback} currentSelected={currentNumType}/>
                 : null
             }
         </>

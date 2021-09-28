@@ -8,5 +8,5 @@ export interface IViolinConfig {
     catColumnsSelected: ColumnInfo[];
     violinOverlay: EViolinOverlay;
 }
-export declare function violinInit(columns: (NumericalColumn | CategoricalColumn)[], config: IViolinConfig): IVisConfig;
+export declare function violinMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IViolinConfig): IVisConfig;
 export declare function createViolinTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IViolinConfig, scales: Scales): PlotlyInfo;

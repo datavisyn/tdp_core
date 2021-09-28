@@ -36,11 +36,11 @@ interface ScatterVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    shapes: string[] | null;
+    shapes?: string[];
     columns: (NumericalColumn | CategoricalColumn) [];
-    filterCallback: (s: EFilterOptions) => void;
-    selectionCallback: (s: number[]) => void;
-    selected: {[key: number]: boolean};
+    filterCallback?: (s: EFilterOptions) => void;
+    selectionCallback?: (s: number[]) => void;
+    selected?: {[key: number]: boolean};
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
 }
@@ -72,10 +72,10 @@ export function ScatterVis({
     optionsConfig,
     extensions,
     columns,
-    shapes,
-    filterCallback,
-    selectionCallback,
-    selected,
+    shapes = ['circle', 'square', 'triangle-up', 'star'],
+    filterCallback = () => null,
+    selectionCallback = () => null,
+    selected = {},
     setConfig,
     scales
 }: ScatterVisProps) {

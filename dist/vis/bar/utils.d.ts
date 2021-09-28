@@ -28,5 +28,5 @@ export interface IBarConfig {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
 }
-export declare function barInit(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig): IVisConfig;
+export declare function barMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig): IVisConfig;
 export declare function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig, scales: Scales): PlotlyInfo;

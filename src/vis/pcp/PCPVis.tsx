@@ -9,7 +9,7 @@ import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {merge} from 'lodash';
-import {createPCPTraces, IPCPConfig, pcpInit} from './utils';
+import {createPCPTraces, IPCPConfig} from './utils';
 
 interface PCPVisProps {
     config: IPCPConfig;

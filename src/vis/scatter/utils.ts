@@ -33,7 +33,7 @@ const defaultConfig: IScatterConfig = {
     alphaSliderVal: 1
 };
 
-export function scatterInit(
+export function scatterMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IScatterConfig,
 ): IVisConfig {

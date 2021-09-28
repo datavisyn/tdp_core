@@ -24,11 +24,11 @@ interface ScatterVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    shapes: string[] | null;
+    shapes?: string[];
     columns: (NumericalColumn | CategoricalColumn)[];
-    filterCallback: (s: EFilterOptions) => void;
-    selectionCallback: (s: number[]) => void;
-    selected: {
+    filterCallback?: (s: EFilterOptions) => void;
+    selectionCallback?: (s: number[]) => void;
+    selected?: {
         [key: number]: boolean;
     };
     setConfig: (config: IVisConfig) => void;
