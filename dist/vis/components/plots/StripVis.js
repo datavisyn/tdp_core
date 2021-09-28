@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import Plot from 'react-plotly.js';
@@ -8,7 +8,7 @@ import d3 from 'd3';
 import { beautifyLayout } from '../../utils/layoutUtils';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { merge } from 'lodash';
-import { createStripTraces, stripInit } from '../../plotUtils/strip';
+import { createStripTraces } from '../../strip/strip';
 const defaultConfig = {};
 const defaultExtensions = {
     prePlot: null,
@@ -22,9 +22,6 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
     }, []);
     const mergedExtensions = useMemo(() => {
         return merge(defaultExtensions, extensions);
-    }, []);
-    useEffect(() => {
-        stripInit(columns, config, setConfig);
     }, []);
     const traces = useMemo(() => {
         return createStripTraces(columns, config, scales);

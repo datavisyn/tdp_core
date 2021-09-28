@@ -8,13 +8,13 @@ const defaultConfig = {
     numColumnsSelected: [],
     catColumnsSelected: [],
 };
-export function stripInit(columns, config, setConfig) {
+export function stripInit(columns, config) {
     const merged = merge(defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 0) {
         merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
     }
-    setConfig(merged);
+    return merged;
 }
 export function createStripTraces(columns, config, scales) {
     let counter = 1;

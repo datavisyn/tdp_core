@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import Plot from 'react-plotly.js';
 import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
 import { beautifyLayout } from '../../utils/layoutUtils';
-import { createViolinTraces, violinInit } from '../../plotUtils/violin';
+import { createViolinTraces } from '../../violin/violin';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
 import { merge } from 'lodash';
@@ -28,9 +28,6 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     }, []);
     const mergedExtensions = useMemo(() => {
         return merge(defaultExtensions, extensions);
-    }, []);
-    useEffect(() => {
-        violinInit(columns, config, setConfig);
     }, []);
     const traces = useMemo(() => {
         return createViolinTraces(columns, config, scales);

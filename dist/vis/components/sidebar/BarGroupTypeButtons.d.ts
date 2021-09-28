@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { EBarGroupingType } from '../../plotUtils/bar';
+import { EBarGroupingType } from '../../bar/bar';
 interface BarGroupTypeProps {
     callback: (s: EBarGroupingType) => void;
     currentSelected: EBarGroupingType;

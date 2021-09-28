@@ -6,5 +6,5 @@ export interface IStripConfig {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
 }
-export declare function stripInit(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig, setConfig: (config: IVisConfig) => void): void;
+export declare function stripInit(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig): IVisConfig;
 export declare function createStripTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig, scales: Scales): PlotlyInfo;

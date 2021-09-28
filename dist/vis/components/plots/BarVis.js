@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import Plot from 'react-plotly.js';
@@ -7,7 +7,7 @@ import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
 import { beautifyLayout } from '../../utils/layoutUtils';
 import { merge } from 'lodash';
-import { barInit, createBarTraces, EBarGroupingType } from '../../plotUtils/bar';
+import { createBarTraces, EBarGroupingType } from '../../bar/bar';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
@@ -43,9 +43,6 @@ const defaultExtensions = {
     postSidebar: null
 };
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
-    useEffect(() => {
-        barInit(columns, config, setConfig);
-    }, []);
     const mergedOptionsConfig = useMemo(() => {
         return merge(defaultConfig, optionsConfig);
     }, []);

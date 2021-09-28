@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { EBarDirection } from '../../plotUtils/bar';
+import { EBarDirection } from '../../bar/bar';
 interface BarDirectionProps {
     callback: (s: EBarDirection) => void;
     currentSelected: EBarDirection;

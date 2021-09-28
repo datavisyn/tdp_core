@@ -35,13 +35,13 @@ const defaultConfig = {
     display: EBarDisplayType.DEFAULT,
     direction: EBarDirection.VERTICAL,
 };
-export function barInit(columns, config, setConfig) {
+export function barInit(columns, config) {
     const merged = merge(defaultConfig, config);
     const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
     if (merged.catColumnsSelected.length === 0 && catCols.length > 0) {
         merged.catColumnsSelected.push(catCols[catCols.length - 1].info);
     }
-    setConfig(merged);
+    return merged;
 }
 export function createBarTraces(columns, config, scales) {
     let counter = 1;

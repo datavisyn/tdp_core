@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EBarDisplayType } from '../../plotUtils/bar';
+import { EBarDisplayType } from '../../bar/bar';
 export function BarDisplayButtons(props) {
     const options = [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED];
     return (React.createElement(React.Fragment, null,

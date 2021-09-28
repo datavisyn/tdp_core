@@ -2,8 +2,8 @@ import { Ranking } from 'lineupjs';
 import { EventHandler, IDTypeManager, Range } from 'phovea_core';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Vis } from '../../vis/components/vis';
-import { EColumnTypes } from '../../vis/types/generalTypes';
+import { Vis } from '../../vis/Vis';
+import { EColumnTypes } from '../../vis/interfaces';
 export class GeneralVisWrapper extends EventHandler {
     constructor(provider, view, doc = document) {
         super();

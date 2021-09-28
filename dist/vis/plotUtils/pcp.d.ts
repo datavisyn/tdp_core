@@ -6,5 +6,5 @@ export interface IPCPConfig {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
 }
-export declare function pcpInit(columns: (NumericalColumn | CategoricalColumn)[], config: IPCPConfig, setConfig: (config: IVisConfig) => void): void;
+export declare function pcpInit(columns: (NumericalColumn | CategoricalColumn)[], config: IPCPConfig): IVisConfig;
 export declare function createPCPTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IPCPConfig): PlotlyInfo;

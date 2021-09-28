@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EViolinOverlay } from '../../plotUtils/bar';
+import { EViolinOverlay } from '../../bar/bar';
 export function ViolinOverlayButtons(props) {
     const options = [EViolinOverlay.NONE, EViolinOverlay.BOX, EViolinOverlay.STRIP];
     return (React.createElement(React.Fragment, null,

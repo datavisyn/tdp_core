@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EBarDirection } from '../../plotUtils/bar';
+import { EBarDirection } from '../../bar/bar';
 export function BarDirectionButtons(props) {
     const options = [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL];
     return (React.createElement(React.Fragment, null,

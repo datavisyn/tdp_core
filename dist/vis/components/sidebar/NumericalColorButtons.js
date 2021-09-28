@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ENumericalColorScaleType } from '../../plotUtils/scatter';
+import { ENumericalColorScaleType } from '../../scatter/scatter';
 export function NumericalColorButtons(props) {
     const sequentialColors = ['#002245', '#214066', '#3e618a', '#5c84af', '#83a8c9', '#a9cfe4', '#cff6ff'];
     const divergentColors = ['#337ab7', '#7496c1', '#a5b4ca', '#d3d3d3', '#e5b19d', '#ec8e6a', '#ec6836'];

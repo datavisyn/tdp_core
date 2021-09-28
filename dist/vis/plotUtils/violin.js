@@ -10,14 +10,13 @@ const defaultConfig = {
     catColumnsSelected: [],
     violinOverlay: EViolinOverlay.NONE,
 };
-export function violinInit(columns, config, setConfig) {
+export function violinInit(columns, config) {
     const merged = merge(defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 0) {
         merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
     }
-    console.log(merged);
-    setConfig(merged);
+    return merged;
 }
 export function createViolinTraces(columns, config, scales) {
     let counter = 1;

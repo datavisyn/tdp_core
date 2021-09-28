@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { EBarDisplayType } from '../../plotUtils/bar';
+import { EBarDisplayType } from '../../bar/bar';
 interface BarDisplayProps {
     callback: (s: EBarDisplayType) => void;
     currentSelected: EBarDisplayType;

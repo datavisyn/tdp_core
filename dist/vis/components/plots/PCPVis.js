@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import Plot from 'react-plotly.js';
@@ -7,7 +7,7 @@ import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { merge } from 'lodash';
-import { createPCPTraces, pcpInit } from '../../plotUtils/pcp';
+import { createPCPTraces } from '../../pcp/pcp';
 const defaultConfig = {};
 const defaultExtensions = {
     prePlot: null,
@@ -21,9 +21,6 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, 
     }, []);
     const mergedExtensions = useMemo(() => {
         return merge(defaultExtensions, extensions);
-    }, []);
-    useEffect(() => {
-        pcpInit(columns, config, setConfig);
     }, []);
     const traces = useMemo(() => {
         return createPCPTraces(columns, config);

@@ -1,19 +1,19 @@
 import d3 from 'd3';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import { isBar } from '../plotUtils/bar';
-import { ENumericalColorScaleType, isScatter } from '../plotUtils/scatter';
+import { barInit, isBar } from '../bar/bar';
+import { ENumericalColorScaleType, isScatter, scatterInit } from '../scatter/scatter';
 import { ESupportedPlotlyVis } from '../types/generalTypes';
-import { ScatterVis } from './plots/ScatterVis';
-import { ViolinVis } from './plots/ViolinVis';
-import { isViolin } from '../plotUtils/violin';
-import { isStrip } from '../plotUtils/strip';
-import { StripVis } from './plots/StripVis';
-import { isPCP } from '../plotUtils/pcp';
-import { PCPVis } from './plots/PCPVis';
-import { BarVis } from './plots/BarVis';
+import { ScatterVis } from '../scatter/ScatterVis';
+import { ViolinVis } from '../violin/ViolinVis';
+import { isViolin, violinInit } from '../violin/violin';
+import { isStrip, stripInit } from '../strip/strip';
+import { StripVis } from '../strip/StripVis';
+import { isPCP, pcpInit } from '../pcp/pcp';
+import { PCPVis } from '../pcp/PCPVis';
+import { BarVis } from '../bar/BarVis';
 export function Vis(props) {
-    const [visConfig, setVisConfig] = useState({
+    const [_visConfig, setVisConfig] = useState({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
@@ -22,6 +22,23 @@ export function Vis(props) {
         isRectBrush: true,
         alphaSliderVal: 1
     });
+    const visConfig = useMemo(() => {
+        if (isScatter(_visConfig)) {
+            return scatterInit(props.columns, _visConfig);
+        }
+        if (isViolin(_visConfig)) {
+            return violinInit(props.columns, _visConfig);
+        }
+        if (isStrip(_visConfig)) {
+            return stripInit(props.columns, _visConfig);
+        }
+        if (isPCP(_visConfig)) {
+            return pcpInit(props.columns, _visConfig);
+        }
+        if (isBar(_visConfig)) {
+            return barInit(props.columns, _visConfig);
+        }
+    }, [_visConfig.type]);
     const colorScale = useMemo(() => {
         return d3.scale.ordinal().range(props.colors || ['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b']);
     }, [visConfig]);

@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { EViolinOverlay } from '../../plotUtils/bar';
+import { EViolinOverlay } from '../../bar/bar';
 interface ViolinOverlayProps {
     callback: (s: EViolinOverlay) => void;
     currentSelected: EViolinOverlay;

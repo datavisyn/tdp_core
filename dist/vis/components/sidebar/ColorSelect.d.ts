@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { ENumericalColorScaleType } from '../../plotUtils/scatter';
+import { ENumericalColorScaleType } from '../../scatter/scatter';
 import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../../types/generalTypes';
 interface ColorSelectProps {
     callback: (c: ColumnInfo) => void;

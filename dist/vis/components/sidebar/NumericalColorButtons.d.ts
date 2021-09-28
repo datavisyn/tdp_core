@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { ENumericalColorScaleType } from '../../plotUtils/scatter';
+import { ENumericalColorScaleType } from '../../scatter/scatter';
 interface NumericalColorButtonsProps {
     callback: (s: ENumericalColorScaleType) => void;
     currentSelected: ENumericalColorScaleType;

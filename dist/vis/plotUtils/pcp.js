@@ -9,7 +9,7 @@ const defaultConfig = {
     numColumnsSelected: [],
     catColumnsSelected: [],
 };
-export function pcpInit(columns, config, setConfig) {
+export function pcpInit(columns, config) {
     const merged = merge(defaultConfig, config);
     if (merged.numColumnsSelected.length === 0 && columns.length > 1) {
         merged.numColumnsSelected.push(columns[columns.length - 1].info);
@@ -23,7 +23,7 @@ export function pcpInit(columns, config, setConfig) {
             merged.numColumnsSelected.push(columns[columns.length - 2].info);
         }
     }
-    setConfig(merged);
+    return merged;
 }
 export function createPCPTraces(columns, config) {
     if (!config.numColumnsSelected || !config.catColumnsSelected) {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { CategoricalColumn, NumericalColumn, Scales } from '../../types/generalTypes';
 import { IVisConfig } from '../../types/generalTypes';
-import { IViolinConfig } from '../../plotUtils/violin';
+import { IViolinConfig } from '../../violin/violin';
 interface ViolinVisProps {
     config: IViolinConfig;
     optionsConfig?: {

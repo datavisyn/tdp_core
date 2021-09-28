@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EBarGroupingType } from '../../plotUtils/bar';
+import { EBarGroupingType } from '../../bar/bar';
 export function BarGroupTypeButtons(props) {
     const options = [EBarGroupingType.GROUP, EBarGroupingType.STACK];
     return (React.createElement(React.Fragment, null,

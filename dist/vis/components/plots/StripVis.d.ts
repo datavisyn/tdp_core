@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { CategoricalColumn, NumericalColumn, Scales } from '../../types/generalTypes';
 import { IVisConfig } from '../../types/generalTypes';
-import { IStripConfig } from '../../plotUtils/strip';
+import { IStripConfig } from '../../strip/strip';
 interface StripVisProps {
     config: IStripConfig;
     optionsConfig?: {};
