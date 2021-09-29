@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
 import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
@@ -13,6 +13,7 @@ import d3 from 'd3';
 import {createScatterTraces, ENumericalColorScaleType, IScatterConfig} from './utils';
 import {beautifyLayout} from '../layoutUtils';
 import {merge} from 'lodash';
+import Plotly from 'plotly.js';
 
 interface ScatterVisProps {
     config: IScatterConfig;
@@ -79,6 +80,18 @@ export function ScatterVis({
     setConfig,
     scales
 }: ScatterVisProps) {
+
+    useEffect(() => {
+        const menu = document.getElementById('generalVisBurgerMenu');
+
+        menu.addEventListener('hidden.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById('plotlyDiv'));
+          });
+
+        menu.addEventListener('shown.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById('plotlyDiv'));
+          });
+    }, []);
 
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
