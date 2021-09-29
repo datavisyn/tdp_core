@@ -1,6 +1,6 @@
 export * from './ExportUtils';
 export * from './lineUpFilter';
-export * from './panel';
+export * from '../panel';
 export * from './cmds';
 export * from './column';
 export * from './LineUpPanelActions';
