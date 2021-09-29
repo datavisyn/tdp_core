@@ -9,7 +9,11 @@ function truncateText(text, maxLength = 50) {
 export function beautifyLayout(traces, layout) {
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
-            showline: true,
+            showline: false,
+            showspikes: true,
+            spikecolor: 'black',
+            spikethickness: 2,
+            spikedash: 'dash',
             fixedrange: true,
             ticks: 'outside',
             title: {
@@ -23,7 +27,11 @@ export function beautifyLayout(traces, layout) {
             },
         };
         layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
-            showline: true,
+            showline: false,
+            showspikes: true,
+            spikecolor: 'black',
+            spikethickness: 2,
+            spikedash: 'dash',
             ticks: 'outside',
             fixedrange: true,
             title: {
@@ -42,6 +50,38 @@ export function beautifyLayout(traces, layout) {
             x0: 0,
             y0: 1,
             x1: 1,
+            y1: 1,
+            line: {
+                color: 'rgb(238, 238, 238)',
+                width: 2
+            },
+            opacity: 1,
+            row: 2,
+            col: 2
+        });
+        layout.shapes.push({
+            type: 'line',
+            xref: `x${i > 0 ? i + 1 : ''} domain`,
+            yref: `y${i > 0 ? i + 1 : ''} domain`,
+            x0: 0,
+            y0: 0,
+            x1: 1,
+            y1: 0,
+            line: {
+                color: 'rgb(238, 238, 238)',
+                width: 2
+            },
+            opacity: 1,
+            row: 2,
+            col: 2
+        });
+        layout.shapes.push({
+            type: 'line',
+            xref: `x${i > 0 ? i + 1 : ''} domain`,
+            yref: `y${i > 0 ? i + 1 : ''} domain`,
+            x0: 0,
+            y0: 0,
+            x1: 0,
             y1: 1,
             line: {
                 color: 'rgb(238, 238, 238)',

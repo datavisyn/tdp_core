@@ -25,7 +25,7 @@ export function violinMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IViolinConfig,
 ): IVisConfig {
-    const merged = merge(defaultConfig, config);
+    const merged = merge({}, defaultConfig, config);
 
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 

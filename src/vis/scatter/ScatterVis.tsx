@@ -81,12 +81,13 @@ export function ScatterVis({
 }: ScatterVisProps) {
 
     const mergedOptionsConfig = useMemo(() => {
-        return merge(defaultConfig, optionsConfig);
+        return merge({}, defaultConfig, optionsConfig);
     }, []);
 
     const mergedExtensions = useMemo(() => {
-        return merge(defaultExtensions, extensions);
+        return merge({}, defaultExtensions, extensions);
     }, []);
+
 
     const traces: PlotlyInfo = useMemo(() => {
         return createScatterTraces(columns, selected, config, scales, shapes);
@@ -122,7 +123,6 @@ export function ScatterVis({
                         useResizeHandler={true}
                         style={{width: '100%', height: '100%'}}
                         onSelected={(d) => {
-                            console.log(d);
                             d ? selectionCallback(d.points.map((d) => +(d as any).id)) : selectionCallback([]);
                         }}
                         //plotly redraws everything on updates, so you need to reappend title and
@@ -151,6 +151,19 @@ export function ScatterVis({
                     />) : (<InvalidCols
                         message={traces.errorMessage} />)
                 }
+                <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x">
+                    <div className="btn-group" role="group">
+                        <input checked={config.isRectBrush} onChange={(e) => setConfig({...config, isRectBrush: true})} type="checkbox" className="btn-check" id={`rectBrushSelection`} autoComplete="off" />
+                        <label className={`btn btn-outline-primary`} htmlFor={`rectBrushSelection`} title="Rectangular Brush"><i className="far fa-square"/></label>
+
+                        <input checked={!config.isRectBrush} onChange={(e) => setConfig({...config, isRectBrush: false})} type="checkbox" className="btn-check" id={`lassoBrushSelection`} autoComplete="off" />
+                        <label className={`btn btn-outline-primary`} htmlFor={`lassoBrushSelection`} title="Lasso Brush"><i className="fas fa-paint-brush"/></label>
+                    </div>
+                    <div className="ps-2 pt-0 m-0">
+                        <label htmlFor={`alphaSlider`}  className={`form-label m-0 p-0`}>Opacity</label>
+                        <input type="range" onChange={(e) => setConfig({...config, alphaSliderVal: +e.currentTarget.value})} className="form-range" value={config.alphaSliderVal} min="=0" max="1" step=".1" id={`alphaSlider`}/>
+                    </div>
+                </div>
                 {mergedExtensions.postPlot}
 
             </div>

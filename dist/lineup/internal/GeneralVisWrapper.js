@@ -34,7 +34,6 @@ export class GeneralVisWrapper extends EventHandler {
     }
     selectCallback(selected) {
         const data = this.getAllData();
-        console.log(selected);
         const r = Range.list(selected);
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
@@ -63,6 +62,7 @@ export class GeneralVisWrapper extends EventHandler {
             selectedMap[i] = true;
         }
         for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
+            console.log(c);
             cols.push({
                 info: {
                     name: c.label,
@@ -70,7 +70,7 @@ export class GeneralVisWrapper extends EventHandler {
                     id: c.label + c._id
                 },
                 vals: data.map((d, i) => {
-                    return { id: d._id, val: d[c.column] ? d[c.column] : null };
+                    return { id: d._id, val: d[c.column] ? d[c.column] : c.type === 'number' ? null : '--' };
                 }),
                 type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
                 selectedForMultiples: false
@@ -93,6 +93,11 @@ export class GeneralVisWrapper extends EventHandler {
             this.updateCustomVis();
         });
         this.updateCustomVis();
+    }
+    hide() {
+        ReactDOM.unmountComponentAtNode(this.node);
+        this.viewable = false;
+        this.node.style.display = 'none';
     }
 }
 //# sourceMappingURL=GeneralVisWrapper.js.map

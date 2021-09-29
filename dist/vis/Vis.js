@@ -13,7 +13,7 @@ import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
 import { PCPVis } from './pcp/PCPVis';
 import { BarVis } from './bar/BarVis';
 export function Vis({ columns, selected = {}, colors = ['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b'], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null }) {
-    const [_visConfig, setVisConfig] = useState({
+    const [visConfig, setVisConfig] = useState({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
@@ -22,23 +22,23 @@ export function Vis({ columns, selected = {}, colors = ['#337ab7', '#ec6836', '#
         isRectBrush: true,
         alphaSliderVal: 1
     });
-    const visConfig = useMemo(() => {
-        if (isScatter(_visConfig)) {
-            return scatterMergeDefaultConfig(columns, _visConfig);
+    useMemo(() => {
+        if (isScatter(visConfig)) {
+            setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
         }
-        if (isViolin(_visConfig)) {
-            return violinMergeDefaultConfig(columns, _visConfig);
+        if (isViolin(visConfig)) {
+            setVisConfig(violinMergeDefaultConfig(columns, visConfig));
         }
-        if (isStrip(_visConfig)) {
-            return stripMergeDefaultConfig(columns, _visConfig);
+        if (isStrip(visConfig)) {
+            setVisConfig(stripMergeDefaultConfig(columns, visConfig));
         }
-        if (isPCP(_visConfig)) {
-            return pcpMergeDefaultConfig(columns, _visConfig);
+        if (isPCP(visConfig)) {
+            setVisConfig(pcpMergeDefaultConfig(columns, visConfig));
         }
-        if (isBar(_visConfig)) {
-            return barMergeDefaultConfig(columns, _visConfig);
+        if (isBar(visConfig)) {
+            setVisConfig(barMergeDefaultConfig(columns, visConfig));
         }
-    }, [_visConfig.type]);
+    }, [visConfig.type]);
     const colorScale = useMemo(() => {
         return d3.scale.ordinal().range(colors);
     }, [visConfig]);

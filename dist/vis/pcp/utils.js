@@ -10,7 +10,7 @@ const defaultConfig = {
     catColumnsSelected: [],
 };
 export function pcpMergeDefaultConfig(columns, config) {
-    const merged = merge(defaultConfig, config);
+    const merged = merge({}, defaultConfig, config);
     if (merged.numColumnsSelected.length === 0 && columns.length > 1) {
         merged.numColumnsSelected.push(columns[columns.length - 1].info);
         merged.numColumnsSelected.push(columns[columns.length - 2].info);
@@ -36,8 +36,8 @@ export function createPCPTraces(columns, config) {
             formList: []
         };
     }
-    const numCols = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL);
-    const catCols = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL);
+    const numCols = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.NUMERICAL);
+    const catCols = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
     if (numCols.length + catCols.length < 2) {
         return {
             plots: [],

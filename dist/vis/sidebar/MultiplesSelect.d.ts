@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
 interface MultiplesSelectProps {
     callback: (c: ColumnInfo) => void;

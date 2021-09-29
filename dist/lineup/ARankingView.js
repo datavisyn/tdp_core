@@ -313,6 +313,7 @@ export class ARankingView extends AView {
             return;
         }
         this.panel.hide();
+        this.generalVis.hide();
         if (this.dump !== null) {
             return;
         }

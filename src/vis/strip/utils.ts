@@ -22,7 +22,7 @@ export function stripMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IStripConfig,
 ): IVisConfig {
-    const merged = merge(defaultConfig, config);
+    const merged = merge({}, defaultConfig, config);
 
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 
@@ -55,7 +55,6 @@ export function createStripTraces(
     const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
     const plots: PlotlyData[] = [];
 
-    console.log(catCols);
 
     if(catCols.length === 0) {
         for(const numCurr of numCols) {
@@ -127,8 +126,6 @@ export function createStripTraces(
             counter += 1;
         }
     }
-
-    console.log(plots, numCols);
 
     return {
         plots,

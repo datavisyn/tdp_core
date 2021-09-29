@@ -11,7 +11,8 @@ export function ViolinOverlayButtons(props: ViolinOverlayProps) {
     const options = [EViolinOverlay.NONE, EViolinOverlay.BOX, EViolinOverlay.STRIP];
     return (
         <>
-            <div key={`buttonGroupFilter`} className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
+            <label className="px-2 pt-3 pb-1">Overlay</label>
+            <div key={`buttonGroupFilter`} className="btn-group w-100 px-2 pt-0" role="group" aria-label="Basic outlined example">
                 {(options).map(((opt) => {
                     return (
                         <React.Fragment key={`radioButtonsFilter${opt}`}>

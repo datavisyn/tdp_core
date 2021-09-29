@@ -54,7 +54,7 @@ export function barMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IBarConfig
 ): IVisConfig {
-    const merged = merge(defaultConfig, config);
+    const merged = merge({}, defaultConfig, config);
 
     const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
 

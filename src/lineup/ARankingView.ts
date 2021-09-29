@@ -377,6 +377,8 @@ export abstract class ARankingView extends AView {
     }
 
     this.panel.hide();
+    this.generalVis.hide();
+
 
     if (this.dump !== null) {
       return;

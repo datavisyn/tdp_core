@@ -33,10 +33,10 @@ const defaultExtensions = {
 };
 export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, scales }) {
     const mergedOptionsConfig = useMemo(() => {
-        return merge(defaultConfig, optionsConfig);
+        return merge({}, defaultConfig, optionsConfig);
     }, []);
     const mergedExtensions = useMemo(() => {
-        return merge(defaultExtensions, extensions);
+        return merge({}, defaultExtensions, extensions);
     }, []);
     const traces = useMemo(() => {
         return createScatterTraces(columns, selected, config, scales, shapes);
@@ -61,7 +61,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             mergedExtensions.prePlot,
             traces.plots.length > 0 ?
                 (React.createElement(Plot, { divId: 'plotlyDiv', data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
-                        console.log(d);
                         d ? selectionCallback(d.points.map((d) => +d.id)) : selectionCallback([]);
                     }, 
                     //plotly redraws everything on updates, so you need to reappend title and
@@ -83,6 +82,17 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                                 .text(p.yLabel);
                         }
                     } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
+            React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },
+                React.createElement("div", { className: "btn-group", role: "group" },
+                    React.createElement("input", { checked: config.isRectBrush, onChange: (e) => setConfig({ ...config, isRectBrush: true }), type: "checkbox", className: "btn-check", id: `rectBrushSelection`, autoComplete: "off" }),
+                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection`, title: "Rectangular Brush" },
+                        React.createElement("i", { className: "far fa-square" })),
+                    React.createElement("input", { checked: !config.isRectBrush, onChange: (e) => setConfig({ ...config, isRectBrush: false }), type: "checkbox", className: "btn-check", id: `lassoBrushSelection`, autoComplete: "off" }),
+                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection`, title: "Lasso Brush" },
+                        React.createElement("i", { className: "fas fa-paint-brush" }))),
+                React.createElement("div", { className: "ps-2 pt-0 m-0" },
+                    React.createElement("label", { htmlFor: `alphaSlider`, className: `form-label m-0 p-0` }, "Opacity"),
+                    React.createElement("input", { type: "range", onChange: (e) => setConfig({ ...config, alphaSliderVal: +e.currentTarget.value }), className: "form-range", value: config.alphaSliderVal, min: "=0", max: "1", step: ".1", id: `alphaSlider` }))),
             mergedExtensions.postPlot),
         React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#generalVisBurgerMenu", "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },

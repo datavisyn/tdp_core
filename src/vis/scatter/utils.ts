@@ -37,7 +37,8 @@ export function scatterMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IScatterConfig,
 ): IVisConfig {
-    const merged = merge(defaultConfig, config);
+
+    const merged = merge({}, defaultConfig, config);
 
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 
@@ -77,7 +78,7 @@ export function createScatterTraces(
         return emptyVal;
     }
 
-    const validCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL) as NumericalColumn[];
+    const validCols: NumericalColumn[] = config.numColumnsSelected.map((c) => columns.filter((col) => col.type === EColumnTypes.NUMERICAL && col.info.id === c.id)[0] as NumericalColumn);
     const plots: PlotlyData[] = [];
 
     const shapeScale = config.shape ?
@@ -94,9 +95,9 @@ export function createScatterTraces(
 
     const numericalColorScale = config.color ?
                 d3.scale.linear<string, number>()
-                    .domain([min,
+                    .domain([max,
                         (max + min) / 2,
-                        max])
+                        min])
                     .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#337ab7','#d3d3d3', '#ec6836'])
                 : null;
 

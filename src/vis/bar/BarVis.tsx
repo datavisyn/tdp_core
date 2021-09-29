@@ -92,11 +92,11 @@ export function BarVis({
     scales
 }: BarVisProps) {
     const mergedOptionsConfig = useMemo(() => {
-        return merge(defaultConfig, optionsConfig);
+        return merge({}, defaultConfig, optionsConfig);
     }, []);
 
     const mergedExtensions = useMemo(() => {
-        return merge(defaultExtensions, extensions);
+        return merge({}, defaultExtensions, extensions);
     }, []);
 
     const traces: PlotlyInfo = useMemo(() => {
@@ -164,11 +164,6 @@ export function BarVis({
                             currentSelected={config.type}
                         />
                         <hr/>
-                        <NumericalColumnSelect
-                            callback={(numColumnsSelected: ColumnInfo[]) => setConfig({...config, numColumnsSelected})}
-                            columns={columns}
-                            currentSelected={config.numColumnsSelected || []}
-                        />
                         <CategoricalColumnSelect
                             callback={(catColumnsSelected: ColumnInfo[]) => setConfig({...config, catColumnsSelected})}
                             columns={columns}

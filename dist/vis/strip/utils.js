@@ -9,7 +9,7 @@ const defaultConfig = {
     catColumnsSelected: [],
 };
 export function stripMergeDefaultConfig(columns, config) {
-    const merged = merge(defaultConfig, config);
+    const merged = merge({}, defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 0) {
         merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
@@ -31,7 +31,6 @@ export function createStripTraces(columns, config, scales) {
     const numCols = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.NUMERICAL);
     const catCols = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
     const plots = [];
-    console.log(catCols);
     if (catCols.length === 0) {
         for (const numCurr of numCols) {
             plots.push({
@@ -98,7 +97,6 @@ export function createStripTraces(columns, config, scales) {
             counter += 1;
         }
     }
-    console.log(plots, numCols);
     return {
         plots,
         legendPlots: [],

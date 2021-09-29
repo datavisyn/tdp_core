@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import Plot from 'react-plotly.js';
 import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
@@ -44,10 +43,10 @@ const defaultExtensions = {
 };
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
     const mergedOptionsConfig = useMemo(() => {
-        return merge(defaultConfig, optionsConfig);
+        return merge({}, defaultConfig, optionsConfig);
     }, []);
     const mergedExtensions = useMemo(() => {
-        return merge(defaultExtensions, extensions);
+        return merge({}, defaultExtensions, extensions);
     }, []);
     const traces = useMemo(() => {
         return createBarTraces(columns, config, scales);
@@ -94,7 +93,6 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                 React.createElement("div", { className: "container", style: { width: '20rem' } },
                     React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
                     React.createElement("hr", null),
-                    React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
                     React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
                     React.createElement("hr", null),
                     mergedExtensions.preSidebar,

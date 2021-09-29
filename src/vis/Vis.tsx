@@ -30,7 +30,7 @@ export function Vis({
     selectionCallback = () => null,
     filterCallback = () => null
 }: VisProps) {
-    const [_visConfig, setVisConfig] = useState<IVisConfig>({
+    const [visConfig, setVisConfig] = useState<IVisConfig>({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
@@ -40,14 +40,13 @@ export function Vis({
         alphaSliderVal: 1
     });
 
-    const visConfig = useMemo(() => {
-        if(isScatter(_visConfig)) { return scatterMergeDefaultConfig(columns, _visConfig); }
-        if(isViolin(_visConfig)) { return violinMergeDefaultConfig(columns, _visConfig); }
-        if(isStrip(_visConfig)) { return stripMergeDefaultConfig(columns, _visConfig); }
-        if(isPCP(_visConfig)) { return pcpMergeDefaultConfig(columns, _visConfig); }
-        if(isBar(_visConfig)) { return barMergeDefaultConfig(columns, _visConfig); }
-
-    }, [_visConfig.type]);
+    useMemo(() => {
+        if(isScatter(visConfig)) { setVisConfig(scatterMergeDefaultConfig(columns, visConfig)); }
+        if(isViolin(visConfig)) { setVisConfig(violinMergeDefaultConfig(columns, visConfig)); }
+        if(isStrip(visConfig)) { setVisConfig(stripMergeDefaultConfig(columns, visConfig)); }
+        if(isPCP(visConfig)) { setVisConfig(pcpMergeDefaultConfig(columns, visConfig)); }
+        if(isBar(visConfig)) { setVisConfig(barMergeDefaultConfig(columns, visConfig)); }
+    }, [visConfig.type]);
 
     const colorScale = useMemo(() => {
         return d3.scale.ordinal().range(colors);

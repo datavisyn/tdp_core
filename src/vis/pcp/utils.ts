@@ -23,7 +23,7 @@ export function pcpMergeDefaultConfig(
     columns: (NumericalColumn | CategoricalColumn)[],
     config: IPCPConfig,
 ): IVisConfig {
-    const merged = merge(defaultConfig, config);
+    const merged = merge({}, defaultConfig, config);
 
     if(merged.numColumnsSelected.length === 0 && columns.length > 1) {
         merged.numColumnsSelected.push(columns[columns.length - 1].info);
@@ -55,8 +55,8 @@ export function createPCPTraces(
         };
     }
 
-    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL) as NumericalColumn[];
-    const catCols: CategoricalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
+    const catCols: CategoricalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
 
     if(numCols.length + catCols.length < 2) {
         return {

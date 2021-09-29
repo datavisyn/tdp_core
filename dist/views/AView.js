@@ -280,7 +280,6 @@ export class AView extends EventHandler {
         return ResolveUtils.resolveAllNames(this.selection.idtype, this.selection.range, idType);
     }
     setItemSelection(selection, name = AView.DEFAULT_SELECTION_NAME) {
-        console.log(selection, name);
         const current = this.itemSelections.get(name);
         if (current && ViewUtils.isSameSelection(current, selection)) {
             return;
@@ -311,7 +310,6 @@ export class AView extends EventHandler {
             // the selection has changed when we really have some new values not just another empty one
             this.itemSelectionChanged(name);
         }
-        console.log('firing');
         this.fire(AView.EVENT_ITEM_SELECT, current, selection, name);
     }
     /**

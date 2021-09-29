@@ -45,11 +45,11 @@ export function StripVis({
 }: StripVisProps) {
 
     const mergedOptionsConfig = useMemo(() => {
-        return merge(defaultConfig, optionsConfig);
+        return merge({}, defaultConfig, optionsConfig);
     }, []);
 
     const mergedExtensions = useMemo(() => {
-        return merge(defaultExtensions, extensions);
+        return merge({}, defaultExtensions, extensions);
     }, []);
 
     const traces: PlotlyInfo = useMemo(() => {

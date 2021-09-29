@@ -13,4 +13,5 @@ export declare class GeneralVisWrapper extends EventHandler {
     filterCallback(s: string): void;
     updateCustomVis(): void;
     toggleCustomVis(): void;
+    hide(): void;
 }

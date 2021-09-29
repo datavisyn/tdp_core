@@ -20,7 +20,7 @@ const defaultConfig = {
     alphaSliderVal: 1
 };
 export function scatterMergeDefaultConfig(columns, config) {
-    const merged = merge(defaultConfig, config);
+    const merged = merge({}, defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 1) {
         merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
@@ -49,7 +49,7 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
     if (!config.numColumnsSelected) {
         return emptyVal;
     }
-    const validCols = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL);
+    const validCols = config.numColumnsSelected.map((c) => columns.filter((col) => col.type === EColumnTypes.NUMERICAL && col.info.id === c.id)[0]);
     const plots = [];
     const shapeScale = config.shape ?
         d3.scale.ordinal().domain([...new Set(getCol(columns, config.shape).vals.map((v) => v.val))]).range(shapes)
@@ -62,9 +62,9 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
     }
     const numericalColorScale = config.color ?
         d3.scale.linear()
-            .domain([min,
+            .domain([max,
             (max + min) / 2,
-            max])
+            min])
             .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? ['#002245', '#5c84af', '#cff6ff'] : ['#337ab7', '#d3d3d3', '#ec6836'])
         : null;
     const legendPlots = [];

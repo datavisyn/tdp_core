@@ -24,10 +24,10 @@ const defaultExtensions = {
 };
 export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
     const mergedOptionsConfig = useMemo(() => {
-        return merge(defaultConfig, optionsConfig);
+        return merge({}, defaultConfig, optionsConfig);
     }, []);
     const mergedExtensions = useMemo(() => {
-        return merge(defaultExtensions, extensions);
+        return merge({}, defaultExtensions, extensions);
     }, []);
     const traces = useMemo(() => {
         return createViolinTraces(columns, config, scales);

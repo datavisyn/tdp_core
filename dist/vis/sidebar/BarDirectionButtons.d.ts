@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { EBarDirection } from '../bar/utils';
 interface BarDirectionProps {
     callback: (s: EBarDirection) => void;

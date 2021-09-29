@@ -50,7 +50,6 @@ export class GeneralVisWrapper extends EventHandler {
     selectCallback(selected: number[]) {
         const data = this.getAllData();
 
-        console.log(selected);
 
         const r = Range.list(selected);
         //???
@@ -90,6 +89,8 @@ export class GeneralVisWrapper extends EventHandler {
         }
 
         for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
+
+            console.log(c);
             cols.push({
                 info: {
                     name: c.label,
@@ -97,7 +98,7 @@ export class GeneralVisWrapper extends EventHandler {
                     id: c.label + (<any> c)._id
                 },
                 vals: data.map((d, i) => {
-                    return {id: d._id, val: d[(<any> c).column] ? d[(<any> c).column] : null};
+                    return {id: d._id, val: d[(<any> c).column] ? d[(<any> c).column] : c.type === 'number' ? null : '--'};
                 }),
                 type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
                 selectedForMultiples: false
@@ -131,5 +132,11 @@ export class GeneralVisWrapper extends EventHandler {
         });
 
         this.updateCustomVis();
+    }
+
+    hide() {
+        ReactDOM.unmountComponentAtNode(this.node);
+        this.viewable = false;
+        this.node.style.display = 'none';
     }
 }
