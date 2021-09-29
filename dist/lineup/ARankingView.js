@@ -114,7 +114,8 @@ export class ARankingView extends AView {
                     }
                 }
                 return item.text;
-            }
+            },
+            panelAddColumnBtnOptions: {}
         };
         // variants for deriving the item name
         const idTypeNames = options.itemIDType ? {
@@ -391,7 +392,7 @@ export class ARankingView extends AView {
                             overlay.remove();
                         }
                         else {
-                            overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-overflow-ellipsis" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
+                            overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-truncate" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
                             overlay.title = e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequiredTitle', { name: authConfiguration.name });
                             overlay.style.cursor = 'pointer';
                             overlay.onclick = () => trigger();
