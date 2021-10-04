@@ -12,6 +12,8 @@ import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
 import { merge } from 'lodash';
 import Plotly from 'plotly.js';
+import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
+import { OpacitySlider } from '../sidebar/OpacitySlider';
 const defaultConfig = {
     color: {
         enable: true,
@@ -93,16 +95,8 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                         }
                     } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },
-                React.createElement("div", { className: "btn-group", role: "group" },
-                    React.createElement("input", { checked: config.isRectBrush, onChange: (e) => setConfig({ ...config, isRectBrush: true }), type: "checkbox", className: "btn-check", id: `rectBrushSelection`, autoComplete: "off" }),
-                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `rectBrushSelection`, title: "Rectangular Brush" },
-                        React.createElement("i", { className: "far fa-square" })),
-                    React.createElement("input", { checked: !config.isRectBrush, onChange: (e) => setConfig({ ...config, isRectBrush: false }), type: "checkbox", className: "btn-check", id: `lassoBrushSelection`, autoComplete: "off" }),
-                    React.createElement("label", { className: `btn btn-outline-primary`, htmlFor: `lassoBrushSelection`, title: "Lasso Brush" },
-                        React.createElement("i", { className: "fas fa-paint-brush" }))),
-                React.createElement("div", { className: "ps-2 pt-0 m-0" },
-                    React.createElement("label", { htmlFor: `alphaSlider`, className: `form-label m-0 p-0` }, "Opacity"),
-                    React.createElement("input", { type: "range", onChange: (e) => setConfig({ ...config, alphaSliderVal: +e.currentTarget.value }), className: "form-range", value: config.alphaSliderVal, min: "=0", max: "1", step: ".1", id: `alphaSlider` }))),
+                React.createElement(BrushOptionButtons, { callback: (e) => setConfig({ ...config, isRectBrush: true }), isRectBrush: config.isRectBrush }),
+                React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             mergedExtensions.postPlot),
         React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#generalVisBurgerMenu", "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },

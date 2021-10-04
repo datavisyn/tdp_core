@@ -7,6 +7,7 @@ function truncateText(text, maxLength = 50) {
     return (text.length > maxLength) ? `${text.substr(0, maxLength)}...` : text;
 }
 export function beautifyLayout(traces, layout) {
+    layout.annotations = [];
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
             showline: false,

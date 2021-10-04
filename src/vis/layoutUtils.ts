@@ -1,3 +1,4 @@
+import {LayoutedProvVis} from '../../../phovea_clue/dist';
 import {PlotlyInfo} from './interfaces';
 
 /**
@@ -10,6 +11,7 @@ function truncateText(text: string, maxLength = 50) {
 }
 
 export function beautifyLayout(traces: PlotlyInfo, layout: any) {
+    layout.annotations = [];
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
             showline: false,

@@ -124,7 +124,7 @@ export function createScatterTraces(
                         width: 0,
                     },
                     symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => shapeScale(v.val)) : 'circle',
-                    color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : Object.values(selected).map((v) => v ? '#E29609' : '#2e2e2e'),
+                    color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : validCols[0].vals.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                     opacity: config.alphaSliderVal,
                     size: 10
                 },
@@ -154,7 +154,7 @@ export function createScatterTraces(
                                 width: 0,
                             },
                             symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => shapeScale(v.val)) : 'circle',
-                            color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : Object.values(selected).map((v) => v ? '#E29609' : '#2e2e2e'),
+                            color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : xCurr.vals.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                             opacity: config.alphaSliderVal,
                             size: 10
                         },
