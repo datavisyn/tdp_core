@@ -1,4 +1,3 @@
-import {LayoutedProvVis} from '../../../phovea_clue/dist';
 import {PlotlyInfo} from './interfaces';
 
 /**
