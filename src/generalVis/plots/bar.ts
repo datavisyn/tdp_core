@@ -1,4 +1,4 @@
-import {AllDropdownOptions, CategoricalColumn, EColumnTypes} from '../types/generalTypes';
+import {AllDropdownOptions, CategoricalColumn, ColumnInfo, EColumnTypes} from '../types/generalTypes';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 
@@ -12,23 +12,29 @@ export enum EBarDirection {
     HORIZONTAL = 'Horizontal',
 }
 
+export enum EViolinOverlay {
+    NONE = 'None',
+    STRIP = 'Strip',
+    BOX = 'Box'
+}
+
 export enum EBarGroupingType {
     STACK = 'Stacked',
     GROUP = 'Grouped',
 }
 
 export class PlotlyBar implements GeneralPlot {
-    startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
-        const catCols = props.columns.filter((c) => EColumnTypes.CATEGORICAL);
+    startingHeuristic(props: GeneralHomeProps, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[], updateSelectedCatCols: (s: ColumnInfo[]) => void, updateSelectedNumCols: (s: ColumnInfo[]) => void) {
+        const catCols = props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
 
         if (selectedCatCols.length === 0 && catCols.length >= 1) {
-            updateSelectedCatCols([catCols[0].name]);
+            updateSelectedCatCols([catCols[0].info]);
         }
     }
 
-    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
+    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[]): PlotlyInfo {
         let counter = 1;
-        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
         const vertFlag = dropdownOptions.barDirection.currentSelected === EBarDirection.VERTICAL;
         const normalizedFlag = dropdownOptions.barNormalized.currentSelected === EBarDisplayType.NORMALIZED;
         const plots: PlotlyData[] = [];
@@ -73,8 +79,8 @@ export class PlotlyBar implements GeneralPlot {
                                     color: dropdownOptions.color.scale(uniqueGroup),
                                 }
                             },
-                            xLabel: catCurr.name,
-                            yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                            xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                            yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                         });
                     });
                     counter += 1;
@@ -112,8 +118,8 @@ export class PlotlyBar implements GeneralPlot {
                                 color: dropdownOptions.color.scale(uniqueVal),
                             }
                         },
-                        xLabel: catCurr.name,
-                        yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                        xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                        yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                     });
                 });
 
@@ -145,8 +151,8 @@ export class PlotlyBar implements GeneralPlot {
                             type: 'bar',
                             name: uniqueVal,
                         },
-                        xLabel: catCurr.name,
-                        yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                        xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                        yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                     });
                     counter += 1;
                 });
@@ -162,21 +168,24 @@ export class PlotlyBar implements GeneralPlot {
                         xaxis: counter === 1 ? 'x' : 'x' + counter,
                         yaxis: counter === 1 ? 'y' : 'y' + counter,
                         type: 'bar',
-                        name: catCurr.name
+                        name: catCurr.info.name
                     },
-                    xLabel: catCurr.name,
-                    yLabel: normalizedFlag ? 'Percent of Total' : 'Count'
+                    xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                    yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
                 });
+                counter += 1;
             }
-            counter += 1;
         }
+
+        const rows = Math.ceil(Math.sqrt(counter - 1));
+        const cols = Math.ceil((counter - 1) / rows);
 
         return {
             plots,
             legendPlots: [],
-            rows: Math.ceil(Math.sqrt(plots.length)),
-            cols: Math.ceil(Math.sqrt(plots.length)),
-            errorMessage: 'To create a Strip plot, please select at least 1 categorical column and at least 1 numerical column.',
+            rows,
+            cols,
+            errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
             formList: ['groupBy', 'barMultiplesBy', 'barDirection', 'barGroupType', 'barNormalized']
         };
     }

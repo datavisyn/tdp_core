@@ -90,6 +90,7 @@
     "plotly.js-dist": "^1.57.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "react-highlight-words": "^0.17.0",
     "react-plotly.js": "^2.4.0",
     "react-resize-detector": "^6.7.6",
     "react-select": "^4.3.1",

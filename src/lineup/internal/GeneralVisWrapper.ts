@@ -36,9 +36,7 @@ export class GeneralVisWrapper extends EventHandler {
             newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
         }
 
-        console.log(newData);
-
-        const scoreColumns = this.provider.getColumns().filter((d) => typeof (<any>d)._score === 'function');
+        const scoreColumns = this.provider.getColumns().filter((d) => typeof (<any>d).accessor === 'function' && (<any>d).selectedId !== -1);
 
         for(const j of newData) {
           for(const s of scoreColumns) {
@@ -49,13 +47,14 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
 
-    selectCallback(selected: string[]) {
+    selectCallback(selected: number[]) {
         const data = this.getAllData();
 
-        const selectedIds = selected.map((s) => data.filter((d) => d.id === s)[0]._id);
+        console.log(selected);
 
-        const r = Range.list(selectedIds);
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.idType.id);
+        const r = Range.list(selected);
+        //???
+        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
 
         this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
     }
@@ -80,11 +79,25 @@ export class GeneralVisWrapper extends EventHandler {
         const selectedIndeces = this.provider.getSelection();
         const cols: any[] = [];
 
+        const selectedMap: { [key: number]: boolean } = {};
+
+        for(const i of data) {
+            selectedMap[i._id] = false;
+        }
+
+        for(const i of selectedIndeces) {
+            selectedMap[i] = true;
+        }
+
         for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
-                name: c.label,
+                info: {
+                    name: c.label,
+                    description: c.summary,
+                    id: c.label + c.summary
+                },
                 vals: data.map((d, i) => {
-                    return {id: d.id, val: d[(<any> c).column] ? d[(<any> c).column] : '--', selected: selectedIndeces.includes(d._id)};
+                    return {id: d._id, val: d[(<any> c).column] ? d[(<any> c).column] : null};
                 }),
                 type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
                 selectedForMultiples: false
@@ -96,7 +109,8 @@ export class GeneralVisWrapper extends EventHandler {
                 GeneralHome,
                 {
                     columns: cols,
-                    selectionCallback: (s: string[]) => this.selectCallback(s),
+                    selected: selectedMap,
+                    selectionCallback: (s: number[]) => this.selectCallback(s),
                     filterCallback: (s: string) => this.filterCallback(s)
                 }
             ),
@@ -109,6 +123,10 @@ export class GeneralVisWrapper extends EventHandler {
         this.node.style.display = this.viewable ? 'flex' : 'none';
 
         this.provider.getFirstRanking().on(`${Ranking.EVENT_FILTER_CHANGED}.track`, () => {
+            this.updateCustomVis();
+        });
+
+        this.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, () => {
             this.updateCustomVis();
         });
 

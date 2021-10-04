@@ -5,8 +5,8 @@ export class PlotlyPCP {
         return null;
     }
     createTraces(props, dropdownOptions, selectedCatCols, selectedNumCols) {
-        const numCols = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL);
-        const catCols = props.columns.filter((c) => selectedCatCols.includes(c.name) && EColumnTypes.CATEGORICAL);
+        const numCols = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL);
+        const catCols = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL);
         if (numCols.length + catCols.length < 2) {
             return {
                 plots: [],
@@ -24,14 +24,14 @@ export class PlotlyPCP {
             data: { dimensions: [...numCols.map((c) => {
                         return {
                             range: [d3.min(c.vals.map((v) => v.val)), d3.max(c.vals.map((v) => v.val))],
-                            label: c.name,
+                            label: c.info.name,
                             values: c.vals.map((v) => v.val)
                         };
                     }), ...catCols.map((c) => {
                         const uniqueList = [...new Set(c.vals.map((v) => v.val))];
                         return {
                             range: [0, uniqueList.length - 1],
-                            label: c.name,
+                            label: c.info.name,
                             values: c.vals.map((curr) => uniqueList.indexOf(curr.val)),
                             tickvals: [...uniqueList.keys()],
                             ticktext: uniqueList

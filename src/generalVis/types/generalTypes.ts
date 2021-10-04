@@ -16,28 +16,31 @@ export enum EColumnTypes {
 export enum EGeneralFormType {
     DROPDOWN = 'Dropdown',
     BUTTON = 'Button',
+    SLIDER = 'Slider',
 }
 
 export interface GeneralHomeProps {
     columns: (NumericalColumn | CategoricalColumn)[];
-    selectionCallback: (s: string[]) => void;
+    selected: {[key: number]: boolean};
+    selectionCallback: (s: number[]) => void;
     filterCallback: (s: string) => void;
 }
 
 export interface NumericalColumn {
-    name: string;
-    vals: {id: string, val: number, selected: boolean}[];
+    info: ColumnInfo;
+    vals: {id: number, val: number}[];
     type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
 }
 
 export interface CategoricalColumn {
-    name: string;
-    vals: {id: string, val: string, selected: boolean}[];
+    info: ColumnInfo;
+    vals: {id: number, val: string}[];
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
 
+export const allVisTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP, ESupportedPlotlyVis.PCP];
 export const correlationTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.SCATTER];
 export const comparisonTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
 export const distributionTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.BAR];
@@ -58,13 +61,19 @@ export type PlotlyData = {
     yLabel: string
 };
 
+export type ColumnInfo = {
+    name: string,
+    id: string
+    description: string,
+};
+
 export type GenericOption = {
     name: string;
     currentColumn: NumericalColumn | CategoricalColumn;
-    currentSelected: string
+    currentSelected: string | number | ColumnInfo
     scale: any,
-    options: string[]
-    callback: (s: string) => void
+    options: ColumnInfo[] | string[]
+    callback: (s: ColumnInfo | number | string) => void
     type: EGeneralFormType
     disabled: boolean
 };
@@ -80,4 +89,7 @@ export type AllDropdownOptions = {
     barDirection: GenericOption,
     barNormalized: GenericOption,
     barGroupType: GenericOption,
+    violinOverlay: GenericOption,
+    numericalColorScaleType: GenericOption,
+    alphaSlider: GenericOption
 };

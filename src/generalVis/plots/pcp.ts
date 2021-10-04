@@ -1,16 +1,16 @@
 import d3 from 'd3';
-import {AllDropdownOptions, CategoricalColumn, EColumnTypes, NumericalColumn} from '../types/generalTypes';
+import {AllDropdownOptions, CategoricalColumn, ColumnInfo, EColumnTypes, NumericalColumn} from '../types/generalTypes';
 import {GeneralPlot} from '../types/generalPlotInterface';
 import {PlotlyInfo, PlotlyData, GeneralHomeProps} from '../types/generalTypes';
 
 export class PlotlyPCP implements GeneralPlot {
-    startingHeuristic(props: GeneralHomeProps, selectedCatCols: string[], selectedNumCols: string[], updateSelectedCatCols: (s: string[]) => void, updateSelectedNumCols: (s: string[]) => void) {
+    startingHeuristic(props: GeneralHomeProps, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[], updateSelectedCatCols: (s: ColumnInfo[]) => void, updateSelectedNumCols: (s: ColumnInfo[]) => void) {
         return null;
     }
 
-    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: string[], selectedNumCols: string[]): PlotlyInfo {
-        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.includes(c.name) && EColumnTypes.NUMERICAL) as NumericalColumn[];
-        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedCatCols.includes(c.name) && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    createTraces(props: GeneralHomeProps, dropdownOptions: AllDropdownOptions, selectedCatCols: ColumnInfo[], selectedNumCols: ColumnInfo[]): PlotlyInfo {
+        const numCols: NumericalColumn[] = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL) as NumericalColumn[];
+        const catCols: CategoricalColumn[] = props.columns.filter((c) => selectedNumCols.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
 
         if(numCols.length + catCols.length < 2) {
             return {
@@ -30,7 +30,7 @@ export class PlotlyPCP implements GeneralPlot {
             data: {dimensions: [...numCols.map((c) => {
                 return {
                     range: [d3.min(c.vals.map((v) => v.val) as number[]), d3.max(c.vals.map((v) => v.val) as number[])],
-                    label: c.name,
+                    label: c.info.name,
                     values: c.vals.map((v) => v.val)
                 };
             }), ...catCols.map((c) => {
@@ -39,7 +39,7 @@ export class PlotlyPCP implements GeneralPlot {
 
                 return {
                     range: [0, uniqueList.length - 1],
-                    label: c.name,
+                    label: c.info.name,
                     values: c.vals.map((curr) => uniqueList.indexOf(curr.val)),
                     tickvals: [...uniqueList.keys()],
                     ticktext: uniqueList

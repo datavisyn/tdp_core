@@ -12,33 +12,36 @@ export declare enum EColumnTypes {
 }
 export declare enum EGeneralFormType {
     DROPDOWN = "Dropdown",
-    BUTTON = "Button"
+    BUTTON = "Button",
+    SLIDER = "Slider"
 }
 export interface GeneralHomeProps {
     columns: (NumericalColumn | CategoricalColumn)[];
-    selectionCallback: (s: string[]) => void;
+    selected: {
+        [key: number]: boolean;
+    };
+    selectionCallback: (s: number[]) => void;
     filterCallback: (s: string) => void;
 }
 export interface NumericalColumn {
-    name: string;
+    info: ColumnInfo;
     vals: {
-        id: string;
+        id: number;
         val: number;
-        selected: boolean;
     }[];
     type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
 }
 export interface CategoricalColumn {
-    name: string;
+    info: ColumnInfo;
     vals: {
-        id: string;
+        id: number;
         val: string;
-        selected: boolean;
     }[];
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
+export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare const correlationTypes: ESupportedPlotlyVis[];
 export declare const comparisonTypes: ESupportedPlotlyVis[];
 export declare const distributionTypes: ESupportedPlotlyVis[];
@@ -56,13 +59,18 @@ export declare type PlotlyData = {
     xLabel: string;
     yLabel: string;
 };
+export declare type ColumnInfo = {
+    name: string;
+    id: string;
+    description: string;
+};
 export declare type GenericOption = {
     name: string;
     currentColumn: NumericalColumn | CategoricalColumn;
-    currentSelected: string;
+    currentSelected: string | number | ColumnInfo;
     scale: any;
-    options: string[];
-    callback: (s: string) => void;
+    options: ColumnInfo[] | string[];
+    callback: (s: ColumnInfo | number | string) => void;
     type: EGeneralFormType;
     disabled: boolean;
 };
@@ -77,4 +85,7 @@ export declare type AllDropdownOptions = {
     barDirection: GenericOption;
     barNormalized: GenericOption;
     barGroupType: GenericOption;
+    violinOverlay: GenericOption;
+    numericalColorScaleType: GenericOption;
+    alphaSlider: GenericOption;
 };
