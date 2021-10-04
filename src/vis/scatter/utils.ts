@@ -82,7 +82,7 @@ export function createScatterTraces(
     const plots: PlotlyData[] = [];
 
     const shapeScale = config.shape ?
-        d3.scale.ordinal<string>().domain([...new Set(getCol(columns, config.shape).vals.map((v) => v.val))]).range(shapes)
+        d3.scale.ordinal<string>().domain([...new Set((getCol(columns, config.shape) as CategoricalColumn).vals.map((v) => v.val))]).range(shapes)
         : null;
 
     let min = 0;
