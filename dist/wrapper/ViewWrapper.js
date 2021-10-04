@@ -22,6 +22,7 @@ export class ViewWrapper extends EventHandler {
         this.viewOptionGenerator = viewOptionGenerator;
         this.instance = null; //lazy
         this.instancePromise = null;
+        this._mode = null;
         this.listenerItemSelect = (_event, oldSelection, newSelection, name = AView.DEFAULT_SELECTION_NAME) => {
             this.fire(AView.EVENT_ITEM_SELECT, oldSelection, newSelection, name);
         };
@@ -35,6 +36,9 @@ export class ViewWrapper extends EventHandler {
         this.allowed = FindViewUtils.canAccess(plugin);
         this.node.innerHTML = `
     <header>
+      <div class="view-actions">
+      <button type="button" class="btn-close" arial-label="Close"></button>
+      </div>
       <div class="parameters container-fluid ps-0 pe-0"></div>
     </header>
     <main></main>
@@ -42,6 +46,7 @@ export class ViewWrapper extends EventHandler {
       <div></div>
       <span>${!this.allowed ? TDPApplicationUtils.notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
     </div>`;
+        this.node.querySelector('.view-actions > .btn-close').addEventListener('click', (_evt) => this.remove());
         this.node.classList.add('view', 'disabled-view');
         this.content = this.node.querySelector('main');
         this.node.classList.toggle('not-allowed', !this.allowed);
@@ -107,6 +112,20 @@ export class ViewWrapper extends EventHandler {
     }
     get visible() {
         return !this.node.hasAttribute('hidden');
+    }
+    set mode(mode) {
+        if (this._mode === mode) {
+            return;
+        }
+        const b = this._mode;
+        this.modeChanged(mode);
+        this.fire(ViewWrapper.EVENT_MODE_CHANGED, this._mode = mode, b);
+    }
+    get mode() {
+        return this._mode;
+    }
+    modeChanged(mode) {
+        // hook
     }
     /**
      * as needed for the lineup contract
@@ -326,7 +345,12 @@ export class ViewWrapper extends EventHandler {
     static guessIDType(v) {
         return v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype);
     }
+    remove() {
+        this.fire(ViewWrapper.EVENT_REMOVE, this);
+    }
 }
 ViewWrapper.EVENT_VIEW_INITIALIZED = 'viewInitialized';
 ViewWrapper.EVENT_VIEW_CREATED = 'viewCreated';
+ViewWrapper.EVENT_MODE_CHANGED = 'modeChanged';
+ViewWrapper.EVENT_REMOVE = 'remove';
 //# sourceMappingURL=ViewWrapper.js.map

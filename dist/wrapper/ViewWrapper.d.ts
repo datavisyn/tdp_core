@@ -10,18 +10,21 @@
  *********************************************************/
 import { EventHandler, ObjectNode, ProvenanceGraph, IDType } from 'phovea_core';
 import { IViewProvider } from '../lineup/IViewProvider';
-import { ISelection, IView, IViewPluginDesc } from '../base/interfaces';
+import { EViewMode, ISelection, IView, IViewPluginDesc } from '../base/interfaces';
 export declare class ViewWrapper extends EventHandler implements IViewProvider {
     readonly plugin: IViewPluginDesc;
     private readonly graph;
     private readonly viewOptionGenerator;
     static readonly EVENT_VIEW_INITIALIZED = "viewInitialized";
     static readonly EVENT_VIEW_CREATED = "viewCreated";
+    static readonly EVENT_MODE_CHANGED = "modeChanged";
+    static readonly EVENT_REMOVE = "remove";
     private instance;
     private instancePromise;
     private allowed;
     readonly node: HTMLElement;
     readonly content: HTMLElement;
+    private _mode;
     /**
      * Provenance graph reference of this object
      */
@@ -37,6 +40,9 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     constructor(plugin: IViewPluginDesc, graph: ProvenanceGraph, document: Document, viewOptionGenerator?: () => any);
     set visible(visible: boolean);
     get visible(): boolean;
+    set mode(mode: EViewMode);
+    get mode(): EViewMode;
+    protected modeChanged(mode: EViewMode): void;
     /**
      * as needed for the lineup contract
      * @returns {any}
@@ -68,4 +74,5 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     dumpReference(): number;
     selectionText(selection: any, idType: string): string;
     static guessIDType(v: IViewPluginDesc): IDType | null;
+    remove(): void;
 }

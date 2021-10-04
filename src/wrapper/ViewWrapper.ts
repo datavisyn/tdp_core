@@ -11,7 +11,7 @@
 
 import {EventHandler, ObjectRefUtils, ObjectNode, ProvenanceGraph, ResolveNow, Range, IDType, IDTypeManager, I18nextManager, NodeUtils} from 'phovea_core';
 import {IViewProvider} from '../lineup/IViewProvider';
-import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
+import {EViewMode, ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
 import {FindViewUtils} from '../views/FindViewUtils';
 import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';
 import {ViewUtils} from '../views/ViewUtils';
@@ -22,12 +22,16 @@ import {TourUtils} from '../tour/TourUtils';
 export class ViewWrapper extends EventHandler implements IViewProvider {
   static readonly EVENT_VIEW_INITIALIZED = 'viewInitialized';
   static readonly EVENT_VIEW_CREATED = 'viewCreated';
+  static readonly EVENT_MODE_CHANGED = 'modeChanged';
+  static readonly EVENT_REMOVE = 'remove';
 
   private instance: IView = null; //lazy
   private instancePromise: PromiseLike<IView> = null;
   private allowed: boolean;
   readonly node: HTMLElement;
   readonly content: HTMLElement;
+
+  private _mode: EViewMode = null;
 
   /**
    * Provenance graph reference of this object
@@ -58,6 +62,9 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     this.allowed = FindViewUtils.canAccess(plugin);
     this.node.innerHTML = `
     <header>
+      <div class="view-actions">
+      <button type="button" class="btn-close" arial-label="Close"></button>
+      </div>
       <div class="parameters container-fluid ps-0 pe-0"></div>
     </header>
     <main></main>
@@ -65,6 +72,8 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       <div></div>
       <span>${!this.allowed ? TDPApplicationUtils.notAllowedText(plugin.securityNotAllowedText) : this.selectionText(plugin.selection, plugin.idtype)}</span>
     </div>`;
+
+    (<HTMLButtonElement>this.node.querySelector('.view-actions > .btn-close')).addEventListener('click', (_evt) => this.remove());
     this.node.classList.add('view', 'disabled-view');
     this.content = <HTMLElement>this.node.querySelector('main');
     this.node.classList.toggle('not-allowed', !this.allowed);
@@ -132,6 +141,24 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   get visible() {
     return !this.node.hasAttribute('hidden');
+  }
+
+  set mode(mode: EViewMode) {
+    if (this._mode === mode) {
+      return;
+    }
+    const b = this._mode;
+    this.modeChanged(mode);
+    this.fire(ViewWrapper.EVENT_MODE_CHANGED, this._mode = mode, b);
+  }
+
+
+  get mode() {
+    return this._mode;
+  }
+
+  protected modeChanged(mode: EViewMode) {
+    // hook
   }
 
   /**
@@ -372,6 +399,10 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   static guessIDType(v: IViewPluginDesc): IDType | null {
     return v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype);
+  }
+
+  remove() {
+    this.fire(ViewWrapper.EVENT_REMOVE, this);
   }
 
 }
