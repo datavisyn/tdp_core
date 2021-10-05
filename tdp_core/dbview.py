@@ -551,7 +551,8 @@ class DBConnector(object):
   def create_engine(self, config):
     import sqlalchemy
 
-    engine_options = config.get('engine', default={})
+    default_engine_options = {"pool_pre_ping": True, "max_overflow": 5,  "pool_size": 5}
+    engine_options = {**default_engine_options, **config.get('engine', default={})}
     engine = sqlalchemy.create_engine(self.dburl, **engine_options)
     # Assuming that gevent monkey patched the builtin
     # threading library, we're likely good to use
