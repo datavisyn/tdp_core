@@ -2,6 +2,8 @@ import { useAsyncStatus } from './useAsync';
 /**
  * Wraps an (async) function and provides value, status and error states.
  *
+ * Compares the `immediate` array using [use-deep-compare-effect](https://github.com/kentcdodds/use-deep-compare-effect) such that it does not have to be memoized.
+ *
  * **Usage:**
  * ```typescript
  * // Somewhere outside
@@ -13,7 +15,7 @@ import { useAsyncStatus } from './useAsync';
  * ...
  * const {status, error, execute: wrappedFetchData} = useAsyncFunction(fetchData);
  * // Or with single, but immediate execution
- * const {status, error, execute: wrappedFetchData} = useAsyncFunction(fetchData, React.useMemo(() => [123], []));
+ * const {status, error, execute: wrappedFetchData} = useAsyncFunction(fetchData, [123]);
  * ...
  * wrappedFetchData(123)
  * ```

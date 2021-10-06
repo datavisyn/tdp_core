@@ -1,8 +1,11 @@
 import * as React from 'react';
 import {useAsyncStatus} from './useAsync';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 /**
  * Wraps an (async) function and provides value, status and error states.
+ *
+ * Compares the `immediate` array using [use-deep-compare-effect](https://github.com/kentcdodds/use-deep-compare-effect) such that it does not have to be memoized.
  *
  * **Usage:**
  * ```typescript
@@ -15,7 +18,7 @@ import {useAsyncStatus} from './useAsync';
  * ...
  * const {status, error, execute: wrappedFetchData} = useAsyncFunction(fetchData);
  * // Or with single, but immediate execution
- * const {status, error, execute: wrappedFetchData} = useAsyncFunction(fetchData, React.useMemo(() => [123], []));
+ * const {status, error, execute: wrappedFetchData} = useAsyncFunction(fetchData, [123]);
  * ...
  * wrappedFetchData(123)
  * ```
@@ -50,10 +53,11 @@ export const useAsyncFunction = <F extends (...args: any[]) => T | Promise<T>, E
   // Call execute if we want to fire it right away.
   // Otherwise execute can be called later, such as
   // in an onClick handler.
-  React.useEffect(() => {
+  useDeepCompareEffect(() => {
     if (immediate) {
       execute(...immediate);
     }
   }, [execute, immediate]);
+
   return { execute, status, value, error };
 };

@@ -1,6 +1,5 @@
-import * as React from 'react';
 import { useAsyncFunction } from './useAsyncFunction';
 export const useAsync = (asyncFunction, immediate = true) => {
-    return useAsyncFunction(asyncFunction, React.useMemo(() => immediate ? [] : null, [immediate]));
+    return useAsyncFunction(asyncFunction, immediate ? [] : null);
 };
 //# sourceMappingURL=useAsync.js.map
