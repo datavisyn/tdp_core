@@ -1,43 +1,8 @@
 import { SidePanel, LocalDataProvider, IColumnDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
 import { IDType } from 'phovea_core';
-import { IPlugin, IPluginDesc, EventHandler } from 'phovea_core';
+import { IPluginDesc, EventHandler } from 'phovea_core';
 import { IARankingViewOptions } from '../IARankingViewOptions';
-import { PanelTab } from './panel/PanelTab';
 import { IAdditionalColumnDesc } from '../../base/interfaces';
-export interface IPanelTabExtension {
-    desc: IPanelTabExtensionDesc;
-    /**
-     * Create and attach a new LineUp side panel
-     * @param tab PanelTab instance to attach the HTMLElement and listen to events
-     * @param provider The data of the current ranking
-     * @param desc The phovea extension point description
-     */
-    factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
-}
-export interface IPanelTabExtensionDesc extends IPluginDesc {
-    /**
-     * CSS class for the PanelNavButton of the PanelTab
-     */
-    cssClass: string;
-    /**
-     * Title attribute PanelNavButton
-     */
-    title: string;
-    /**
-     * Customize the PanelNavButtons' position (recommended to use multiples of 10)
-     */
-    order: number;
-    /**
-     * Width of the PanelTab
-     */
-    width: string;
-    /**
-     * If true a shortcut button is appended to the SidePanel header in collapsed mode
-     * @default false
-     */
-    shortcut?: boolean;
-    load(): Promise<IPlugin & IPanelTabExtension>;
-}
 export declare class LineUpPanelActions extends EventHandler {
     protected readonly provider: LocalDataProvider;
     private readonly options;

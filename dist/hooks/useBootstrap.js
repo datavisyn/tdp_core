@@ -106,11 +106,16 @@ function useBSListeners(instance, listeners) {
  */
 function useBSShowHide(instance, show) {
     React.useEffect(() => {
-        if (show) {
-            instance === null || instance === void 0 ? void 0 : instance.show();
+        try {
+            if (show) {
+                instance === null || instance === void 0 ? void 0 : instance.show();
+            }
+            else {
+                instance === null || instance === void 0 ? void 0 : instance.hide();
+            }
         }
-        else {
-            instance === null || instance === void 0 ? void 0 : instance.hide();
+        catch (e) {
+            console.error(e);
         }
     }, [show, instance]);
 }

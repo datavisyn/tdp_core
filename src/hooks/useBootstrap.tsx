@@ -154,10 +154,14 @@ function useBSListeners<T extends BSHook>(instance: ReturnType<T>[1], listeners:
  */
 function useBSShowHide(instance: Modal | Toast | Popover | Tooltip | Dropdown, show: boolean) {
   React.useEffect(() => {
-    if (show) {
-      instance?.show();
-    } else {
-      instance?.hide();
+    try {
+      if (show) {
+        instance?.show();
+      } else {
+        instance?.hide();
+      }
+    } catch(e) {
+      console.error(e);
     }
   }, [show, instance]);
 }
