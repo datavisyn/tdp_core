@@ -57,7 +57,8 @@ export class TDPApplicationUtils {
       const formatter = area[1];
       return typeof formatter === 'string' ? formatter : formatter(deltaInSeconds);
     }
-    return I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.farAway');
+
+    return new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric'}).format(new Date(date)); // e.g. Oct 10, 2021
   }
 
   static notAllowedText(notAllowed: boolean | string) {

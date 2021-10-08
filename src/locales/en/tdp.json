@@ -88,7 +88,6 @@
       "month": "a month ago",
       "month_plural": "{{count}} months ago",
       "year": "a year ago",
-      "farAway": "far far away",
 
       "notAllowed": "Not Allowed, please contact your system administrator",
       "private": "Private",
