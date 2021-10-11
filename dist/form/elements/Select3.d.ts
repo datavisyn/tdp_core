@@ -71,9 +71,9 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
      */
     id: string | null;
     /**
-   * unique id used for cypress testing
-   * @default null
-   */
+     * unique id used for cypress testing
+     * @default null
+     */
     testid?: string | null;
     /**
      * performs the search
