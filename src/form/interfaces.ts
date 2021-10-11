@@ -75,6 +75,11 @@ export interface IFormElementDesc {
   id: string;
 
   /**
+   * Unique ID for Cypress testing to select elements
+   */
+  testid?: string;
+
+  /**
    * Label for the form element
    */
   label?: string;
