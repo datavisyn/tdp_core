@@ -39,6 +39,8 @@ export class FormButton extends EventHandler {
         this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
         this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
         this.$button.html(() => this.elementDesc.iconClass ? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
+        const indexInParent = Array.from(this.$node.node().parentNode.children).indexOf(this.$node.node());
+        this.$button.attr('data-testid', `${this.elementDesc.testid}_button_${indexInParent}`);
     }
     init() {
         this.$button.on('click', () => {

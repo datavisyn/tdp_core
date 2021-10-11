@@ -36,6 +36,9 @@ export class FormSelect2 extends AFormElement {
         this.appendLabel(rowNode);
         const $colSelectNode = rowNode.append('div').classed('col', true);
         this.$inputNode = $colSelectNode.append('select');
+        // generate index of element in parentelement
+        const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(this.$rootNode.node());
+        this.$inputNode.attr('data-testid', `${this.elementDesc.testid}_select2_${indexInParent}`);
         this.setAttributes(this.$inputNode, this.elementDesc.attributes);
     }
     /**
@@ -64,13 +67,13 @@ export class FormSelect2 extends AFormElement {
                 const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];
                 initialValue = defaultValues.map((d) => typeof d === 'string' ? d : d.id);
                 if (!data) { //derive default data if none is set explictly
-                    data = defaultValues.map((d) => (typeof d === 'string' ? ({ id: d, text: d }) : d));
+                    data = defaultValues.map((d) => (typeof d === 'string' ? ({ id: d, text: d, testid: d }) : d));
                 }
             }
             else {
                 initialValue = [typeof defaultVal === 'string' ? defaultVal : defaultVal.id];
                 if (!data) {
-                    data = [typeof defaultVal === 'string' ? ({ id: defaultVal, text: defaultVal }) : defaultVal];
+                    data = [typeof defaultVal === 'string' ? ({ id: defaultVal, text: defaultVal, testid: defaultVal }) : defaultVal];
                 }
             }
         }

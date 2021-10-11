@@ -21,6 +21,7 @@ export class AFormElement extends EventHandler {
         this.pluginDesc = pluginDesc;
         this.previousValue = null;
         this.id = elementDesc.id;
+        this.testId = elementDesc.testid;
         if (elementDesc.onInit) {
             this.on(AFormElement.EVENT_INITIAL_VALUE, (_evt, value, previousValue) => {
                 elementDesc.onInit(this, value, AFormElement.toData(value), previousValue);

@@ -50,6 +50,7 @@ declare type ISubDescs = ISubInputDesc | ISubSelectDesc | ISubSelect2Desc | ISub
  */
 export interface IFormMapDesc extends IFormElementDesc {
   type: FormElementType.MAP;
+  testid?: string;
   /**
    * Additional options
    */
@@ -150,7 +151,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       this.$inputNode.classed('dropdown', true);
 
       this.$inputNode.html(`
-          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-testid="${this.testId}-build-filter-btn">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
@@ -158,7 +159,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           <div class="dropdown-menu p-2" data-bs-popper="static" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-map-container"></div>
             <div class="form-map-apply mt-3">
-                <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
+                <button class="btn btn-secondary btn-sm" data-testid="${this.testId}-build-filter-apply">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
@@ -166,6 +167,9 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       this.$inputNode.select('.form-map-apply button').on('click', () => {
         (<MouseEvent>d3event).preventDefault();
       });
+      // generate index of element in parentelement
+      const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(<HTMLElement>this.$rootNode.node());
+      this.$inputNode.attr('data-testid', `${this.elementDesc.testid}_checkbox-input_${indexInParent}`);
 
       this.$group = this.$inputNode.select('div.form-map-container');
       this.$group.on('click', () => {
@@ -238,22 +242,28 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     }
   }
 
-  private addValueEditor(row: IFormRow, parent: Element, entries: ISubDescs[]) {
+  private addValueEditor(row: IFormRow, parent: Element, entries: ISubDescs[], indexInParent: number) {
     const that = this;
     const desc = entries.find((d) => d.value === row.key);
     const defaultSelection = this.elementDesc.options.defaultSelection !== false;
 
     function mapOptions(d: any | string) {
+      console.log(d);
       const value = typeof d === 'string' || !d ? d : (d.value || d.id);
       const name = typeof d === 'string' || !d ? d : (d.name || d.text);
       return `<option value="${value}">${name}</option>`;
     }
 
     const initialValue = row.value;
+    console.log('par', parent);
+
+    const testIdSelect = `${this.testId}-addValueEditor-select-form-control-${indexInParent}`;
+    const testIdSelect2 = `${this.testId}-addValueEditor-select2-form-control-${indexInParent}`;
+    const testIdSelectDefault = `${this.testId}-addValueEditor-default-form-control-${indexInParent}`;
 
     switch (desc.type) {
       case FormElementType.SELECT:
-        parent.insertAdjacentHTML('afterbegin', `<select class="form-control from-control-sm" style="width: 100%"></select>`);
+        parent.insertAdjacentHTML('afterbegin', `<select class="form-control from-control-sm" data-testid="${testIdSelect}" style="width: 100%"></select>`);
         // register on change listener
         parent.firstElementChild.addEventListener('change', function (this: HTMLSelectElement) {
           row.value = this.value;
@@ -271,7 +281,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         });
         break;
       case FormElementType.SELECT2:
-        parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" style="width: 100%"></select>`);
+        parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" data-testid="${testIdSelect2}" style="width: 100%"></select>`);
 
         FormSelect.resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
@@ -333,7 +343,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         });
         break;
       default:
-        parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" value="${initialValue || ''}">`);
+        parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" data-testid="${testIdSelectDefault}" value="${initialValue || ''}">`);
         parent.firstElementChild.addEventListener('change', function (this: HTMLInputElement) {
           row.value = this.value;
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
@@ -383,19 +393,20 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       row.classList.add('d-flex');
       row.classList.add('align-items-center');
       group.appendChild(row);
+      const indexInParent = Array.from(row.parentNode.children).indexOf(row);
       row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">
-          <select class="form-select form-select-sm map-selector">
+          <select class="form-select form-select-sm map-selector" data-testid="${this.testId}-buildMapImpl-form-select-${indexInParent}">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
-            ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
+            ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''} data-testid="${this.testId}-buildMapImpl-form-select-option-${o.value}">${o.name}</option>`).join('')}
           </select>
         </div>
         <div class="col-sm-7 form-map-row-value ps-1 pe-1"></div>
-        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
+        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}" data-testid="${this.testId}-buildMapImpl-form-select-option-btn-remove-${indexInParent}"></button></div>`;
 
       const valueElem = <HTMLElement>row.querySelector('.form-map-row-value');
       if (d.key) { // has value
-        this.addValueEditor(d, valueElem, entries);
+        this.addValueEditor(d, valueElem, entries, indexInParent);
       } else {
         // add remove all button
       }
@@ -434,7 +445,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
             renderRow({key: '', value: null});
           }
           d.key = this.value;
-          that.addValueEditor(d, valueElem, entries);
+          that.addValueEditor(d, valueElem, entries, indexInParent);
           updateOptions();
         }
       });

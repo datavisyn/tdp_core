@@ -22,6 +22,7 @@ export class SelectionChooser {
             type: FormElementType.SELECT,
             label: this.options.label,
             id: this.formID,
+            testid: `parameter-form_${this.formID}`,
             options: {
                 optionsData: [],
             },

@@ -93,13 +93,19 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
   id: string | null;
 
   /**
+   * unique id used for cypress testing
+   * @default null
+   */
+  testid?: string | null;
+
+  /**
    * performs the search
    * @param {string} query the query to search can be ''
    * @param {number} page the page starting with 0 = first page
    * @param {number} pageSize the size of a page
    * @returns {Promise<{ more: boolean, items: IdTextPair[] }>} list of results along with a hint whether more are available
    */
-  search(query: string, page: number, pageSize: number): Promise<{ more: boolean, items: Readonly<T>[] }>;
+  search(query: string, page: number, pageSize: number): Promise<{more: boolean, items: Readonly<T>[]}>;
 
   group(items: ISelect3Item<T>[], query: string, page: number): (ISelect3Item<T> | ISelect3Group<T>)[];
 
@@ -304,7 +310,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
 
     this.node = this.options.document.createElement('div');
     this.node.classList.add('select3');
-    this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''}></select>`;
+    this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''} data-testid="${this.options.testid}"></select>`;
 
     this.$select = $('select', this.node);
 
@@ -432,7 +438,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     }));
   }
 
-  private searchImpl(x: { data: { q: string, page: number } }, success: (data: ISearchResult<T>) => void, failure: () => void) {
+  private searchImpl(x: {data: {q: string, page: number}}, success: (data: ISearchResult<T>) => void, failure: () => void) {
     const q = x.data.q;
     this.lastSearchQuery = new RegExp(`(${Select3Utils.escapeRegex(q)})`, 'im');
     if (x.data.page === undefined) {
@@ -508,7 +514,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       });
   }
 
-  private tokenize(query: { term: string }, _options: any, addSelection: (item: ISelect3Item<T>) => void) {
+  private tokenize(query: {term: string}, _options: any, addSelection: (item: ISelect3Item<T>) => void) {
     const term = query.term;
     if (term.length === 0) {
       return query;

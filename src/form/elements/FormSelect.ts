@@ -96,6 +96,9 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
 
     const $colDiv = rowNode.append('div').classed('col', true);
     this.$inputNode = $colDiv.append('select');
+    // generate index of element in parentelement
+    const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(<HTMLElement>this.$rootNode.node());
+    this.$inputNode.attr('data-testid', `${this.elementDesc.testid}_select_${indexInParent}`);
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', 'form-select'); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
     this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
@@ -153,7 +156,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    */
   updateOptionElements(data: (string|IFormSelectOption|IFormSelectOptionGroup)[]) {
     const options = data.map(FormSelect.toOption);
-
+    const uniqueFormID = this.elementDesc.attributes.id;
     const isGroup = (d: IFormSelectOption|IFormSelectOptionGroup): d is IFormSelectOptionGroup => {
       return Array.isArray((<any>d).children);
     };
@@ -165,6 +168,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
       const $options = this.$inputNode.selectAll('option').data(<IFormSelectOption[]>options);
       $options.enter().append('option');
       $options.attr('value', (d) => d.value).html((d) => d.name);
+      $options.attr('data-testid', (d) => `${uniqueFormID}-option-${d.name}`);
       $options.exit().remove();
       return;
     }

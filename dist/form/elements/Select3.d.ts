@@ -71,6 +71,11 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
      */
     id: string | null;
     /**
+   * unique id used for cypress testing
+   * @default null
+   */
+    testid?: string | null;
+    /**
      * performs the search
      * @param {string} query the query to search can be ''
      * @param {number} page the page starting with 0 = first page

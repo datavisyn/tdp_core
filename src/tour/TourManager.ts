@@ -58,6 +58,8 @@ export class TourManager {
     this.backdrop = context.doc.createElement('div');
     this.backdrop.classList.add('tdp-tour-backdrop');
 
+    const parentTestId = 'tourManager';
+
     this.backdropBlocker = context.doc.createElement('div');
     this.backdropBlocker.classList.add('tdp-tour-backdrop-blocker');
     // this.backdrop.onclick = () => {
@@ -73,10 +75,10 @@ export class TourManager {
       <div class="tdp-tour-step-dots">
       </div>
       <div class="btn-group" role="group">
-        <button type="button" data-switch="--" class="btn-sm btn btn-light"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
-        <button type="button" data-switch="-" class="btn-sm btn btn-light"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
-        <button type="button" data-switch="0" class="btn-sm btn btn-light"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
-        <button type="button" data-switch="+" class="btn-sm btn btn-primary"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
+        <button type="button" data-switch="--" class="btn-sm btn btn-light" data-testid="${parentTestId}-actions-btn-restart"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
+        <button type="button" data-switch="-" class="btn-sm btn btn-light" data-testid="${parentTestId}-actions-btn-backward"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
+        <button type="button" data-switch="0" class="btn-sm btn btn-light" data-testid="${parentTestId}-actions-btn-cancel"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
+        <button type="button" data-switch="+" class="btn-sm btn btn-primary" data-testid="${parentTestId}-actions-btn-next"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
       </div>
     </div>
     `;
@@ -120,7 +122,7 @@ export class TourManager {
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.helpTours')}</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}" data-testid="${parentTestId}-actions-btn-close">
                 </button>
             </div>
             <div class="modal-body">

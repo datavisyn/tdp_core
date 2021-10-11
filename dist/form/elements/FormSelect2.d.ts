@@ -24,6 +24,7 @@ export interface ISelect2Option {
     id: string;
     text: string;
     data?: any;
+    testId?: string;
 }
 /**
  * Select2 drop down field with integrated search field and communication to external data provider

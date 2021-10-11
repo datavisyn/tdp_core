@@ -41,6 +41,7 @@ declare type ISubDescs = ISubInputDesc | ISubSelectDesc | ISubSelect2Desc | ISub
  */
 export interface IFormMapDesc extends IFormElementDesc {
     type: FormElementType.MAP;
+    testid?: string;
     /**
      * Additional options
      */

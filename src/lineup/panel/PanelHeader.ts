@@ -42,6 +42,10 @@ export class PanelHeader {
    * @param button Panel button instance to add
    */
   addButton(button: IPanelButton, position: EPanelHeaderToolbar) {
+    const buttonTag = 'BUTTON';
+    const buttonElement = (button.node.tagName.toString() === buttonTag) ? button.node : button.node.firstElementChild;
+    const camelizedTitle = buttonElement.getAttribute('title').replace(/\s/g, '');
+    buttonElement.setAttribute(`data-testId`, `panel-header-${camelizedTitle}-button`);
     this.buttons = [...this.buttons, button];
     switch (position) {
       case EPanelHeaderToolbar.NAV:

@@ -59,7 +59,12 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
     this.setVisible(this.elementDesc.visible);
     this.appendLabel(rowNode);
 
-    const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple});
+    //  generate index of element in parentelement
+    const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(<HTMLElement>this.$rootNode.node());
+    const testid = `${this.elementDesc.id}-select3-${indexInParent}`;
+
+    const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple, testid});
+
     this.select3 = new Select3(options);
     const divNode = document.createElement('div');
     divNode.classList.add('col');

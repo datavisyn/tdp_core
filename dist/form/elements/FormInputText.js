@@ -9,6 +9,7 @@ export class FormInputText extends AFormElement {
     constructor(form, elementDesc, pluginDesc) {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
+        this.testId = `${elementDesc.testid}-formInputText`;
     }
     /**
      * Build the label and input element
@@ -19,7 +20,7 @@ export class FormInputText extends AFormElement {
         this.$rootNode = $formNode.append('div');
         this.setVisible(this.elementDesc.visible);
         this.appendLabel(this.$rootNode);
-        this.$inputNode = this.$rootNode.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text');
+        this.$inputNode = this.$rootNode.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text').attr('data-testid', `${this.testId}-build-form-control-input`);
         this.setAttributes(this.$inputNode, this.elementDesc.attributes);
     }
     /**

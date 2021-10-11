@@ -28,6 +28,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
+
   constructor(form: IForm, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
     super(form, Object.assign({options: {checked: true, unchecked: false}}, elementDesc), pluginDesc);
   }
@@ -44,6 +45,9 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     this.setVisible(this.elementDesc.visible);
 
     this.$inputNode = formCheckNode.append('input').classed('form-check-input', true).attr('type', 'checkbox').order();
+    //generate index of element in parentelement
+    const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(<HTMLElement>this.$rootNode.node());
+    this.$inputNode.attr('data-testid', `${this.elementDesc.testid}_checkbox-input_${indexInParent}`);
     // ensure correct order of input and label tags
     this.appendLabel(formCheckNode);
 

@@ -14,6 +14,7 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
     static readonly EVENT_CHANGE = "change";
     static readonly EVENT_INITIAL_VALUE = "initial";
     readonly id: string;
+    protected testId: string;
     protected $rootNode: Selection<any>;
     protected $inputNode: Selection<any> | null;
     protected previousValue: any;

@@ -131,7 +131,7 @@ export class Select3 extends EventHandler {
         });
         this.node = this.options.document.createElement('div');
         this.node.classList.add('select3');
-        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''}></select>`;
+        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''} data-testid="${this.options.testid}"></select>`;
         this.$select = $('select', this.node);
         if (this.options.name != null) {
             this.$select.attr('name', this.options.name);

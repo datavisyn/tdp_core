@@ -20,6 +20,9 @@ export class FormCheckBox extends AFormElement {
         const formCheckNode = this.$rootNode.append('div').classed(`form-check`, true);
         this.setVisible(this.elementDesc.visible);
         this.$inputNode = formCheckNode.append('input').classed('form-check-input', true).attr('type', 'checkbox').order();
+        //generate index of element in parentelement
+        const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(this.$rootNode.node());
+        this.$inputNode.attr('data-testid', `${this.elementDesc.testid}_checkbox-input_${indexInParent}`);
         // ensure correct order of input and label tags
         this.appendLabel(formCheckNode);
         this.setAttributes(this.$inputNode, this.elementDesc.attributes);

@@ -23,7 +23,7 @@ export class ProvenanceGraphMenuUtils {
             name: d.name
         }, args);
         return import('phovea_ui/dist/components/dialogs').then(({ FormDialog }) => {
-            const dialog = new FormDialog(args.title, args.button, undefined, 'modal-lg');
+            const dialog = new FormDialog(args.title, args.button, 'form-dialog_provenance-graph', 'modal-lg');
             const prefix = 'd' + BaseUtils.randomId();
             const permissions = TDPApplicationUtils.permissionForm(d, {
                 extra: `<div class="form-text">

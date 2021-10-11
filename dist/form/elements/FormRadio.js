@@ -29,6 +29,8 @@ export class FormRadio extends AFormElement {
         this.$inputNode.on('change', (d) => {
             this.fire(FormRadio.EVENT_CHANGE, d, $buttons);
         });
+        const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(this.$rootNode.node());
+        this.$inputNode.attr('data-testid', `${this.elementDesc.testid}_radio_${indexInParent}`);
         // TODO: fix that the form-control class is only appended for textual form elements, not for all
         this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', ''); // filter out the form-control class, because it is mainly used for text inputs and destroys the styling of the radio
         this.setAttributes(this.$inputNode, this.elementDesc.attributes);

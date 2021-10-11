@@ -15,6 +15,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   static readonly EVENT_INITIAL_VALUE = 'initial';
 
   readonly id: string;
+  protected testId: string;
 
   protected $rootNode: Selection<any>;
   protected $inputNode: Selection<any> | null;
@@ -30,6 +31,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   constructor(protected readonly form: IForm, protected readonly elementDesc: T, protected readonly pluginDesc: IPluginDesc) {
     super();
     this.id = elementDesc.id;
+    this.testId = elementDesc.testid;
 
     if (elementDesc.onInit) {
       this.on(AFormElement.EVENT_INITIAL_VALUE, (_evt, value: any, previousValue: any) => {

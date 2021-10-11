@@ -36,6 +36,7 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
    */
   constructor(form: IForm, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
     super(form, elementDesc, pluginDesc);
+    this.testId = `${elementDesc.testid}-formInputText`;
   }
 
   /**
@@ -49,7 +50,7 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
     this.setVisible(this.elementDesc.visible);
     this.appendLabel(this.$rootNode);
 
-    this.$inputNode = this.$rootNode.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text');
+    this.$inputNode = this.$rootNode.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text').attr('data-testid', `${this.testId}-build-form-control-input`);
     this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 
