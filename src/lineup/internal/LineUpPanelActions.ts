@@ -425,7 +425,7 @@ export class LineUpPanelActions extends EventHandler {
         const dialogTitle = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addText', {text});
         const dialogButton = I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addButton');
 
-        const dialog = new FormDialog(dialogTitle, dialogButton, `form-dialog-${text}`);
+        const dialog = new FormDialog(dialogTitle, dialogButton, `form-dialog_chooser-columns`);
 
         const CHOOSER_COLUMNS = 'chooser_columns';
 
