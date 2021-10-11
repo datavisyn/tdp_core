@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './cdc';
 export * from './public';
 export * from './base';
 export * from './tour';

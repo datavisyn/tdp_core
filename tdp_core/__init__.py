@@ -50,6 +50,12 @@ def phovea(registry):
                       'factory': 'create_migration_api',
                       'namespace': '/api/tdp/db-migration'
                   })
+
+  registry.append('namespace', 'tdp_cdc', 'tdp_core.cdc.api',
+                  {
+                      'namespace': '/api/tdp/cdc'
+                  })
+
   # generator-phovea:end
   pass
 
