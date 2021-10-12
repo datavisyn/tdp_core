@@ -112,7 +112,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     this.$inputNode = $colSelectNode.append('select');
     // generate index of element in parentelement
     const indexInParent = Array.from(this.$rootNode.node().parentNode.children).indexOf(<HTMLElement>this.$rootNode.node());
-    this.$inputNode.attr('data-testid', `${this.elementDesc.testid}_select2_${indexInParent}`);
+    this.$inputNode.attr('data-testid', `${this.elementDesc.id}_select2_${indexInParent}`);
     this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 
