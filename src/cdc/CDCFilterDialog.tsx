@@ -7,10 +7,10 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import produce from "immer";
 import { v4 as uuidv4 } from "uuid";
-import {createCDCGroupingFilter} from './GroupingFilter';
-import {createCDCTextFilter} from './TextFilter';
-import {createCDCCheckboxFilter} from './CheckboxFilter';
-import {createCDCRangeFilter} from './RangeFilter';
+import {createCDCGroupingFilter} from './CDCGroupingFilter';
+import {createCDCTextFilter} from './CDCTextFilter';
+import {createCDCCheckboxFilter} from './CDCCheckboxFilter';
+import {createCDCRangeFilter} from './CDCRangeFilter';
 
 export function CDCFilterDialog() {
   const [filters, setFilters] = React.useState<IFilter>(
@@ -22,13 +22,11 @@ export function CDCFilterDialog() {
     }
   );
 
-  //TODO filters + setFilters als prop
-  
   const filterSelection: IFilter<any>[] = [
-    createCDCGroupingFilter(uuidv4(), "grouping-filter"),
-    createCDCTextFilter(uuidv4(), "text-filter", {filter: [{field: "field1", value: []}], fields:[{field: "field1", options: ["hallo", "hier", "steht", "text"]}, {field: "field2", options: ["tschüss", "hier", "nicht"]}, {field: "field3", options: ["test", "noch ein test", "hi"]}]}),
-    createCDCCheckboxFilter(uuidv4(), "checkbox-filter", {fields: ["Eins", "zwei", "dRei"], filter: []}),
-    createCDCRangeFilter(uuidv4(), "range-filter", {min: 1950, max: 2021}),
+    createCDCGroupingFilter(uuidv4(), "Grouping Filter"),
+    createCDCTextFilter(uuidv4(), "Text Filter", {filter: [{field: "field1", value: []}], fields:[{field: "field1", options: ["hallo", "hier", "steht", "text"]}, {field: "field2", options: ["tschüss", "hier", "nicht"]}, {field: "field3", options: ["test", "noch ein test", "hi"]}]}),
+    createCDCCheckboxFilter(uuidv4(), "Checkbox Filter", {fields: ["Eins", "zwei", "dRei"], filter: []}),
+    createCDCRangeFilter(uuidv4(), "Range Filter", {min: 1950, max: 2021}),
   ];
   
   React.useEffect(() => {
@@ -121,8 +119,8 @@ export function CDCFilterDialog() {
 
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   
-  return <div>
-      <a href="#" style={{marginTop: 5, color: "white", cursor: "pointer"}} onClick={() => setShowDialog(true)}><i className="fas fa-filter" style={{marginRight: 4}}></i> Alert Filter</a>
+  return <>
+      <a style={{color: "white", cursor: "pointer"}} onClick={() => setShowDialog(true)}><i className="fas fa-filter" style={{marginRight: 4}}></i> Alert Filter</a>
       <BSModal show={showDialog}>
         <div className="modal fade" tabIndex={-1}>
           <div className="modal-dialog" style={{maxWidth: "90%"}}>
@@ -154,22 +152,21 @@ export function CDCFilterDialog() {
               </DndProvider>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-primary">Save changes</button>
+              <button type="button" onClick={() => setShowDialog(false)} className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" onClick={() => setShowDialog(false)} className="btn btn-primary">Save changes</button>
             </div>
             </div>
           </div>
         </div>
       </BSModal>
-  </div>
+  </>
 }
 
 export class CDCFilterDialogClass {
   private node: HTMLElement;
 
   constructor(parent: HTMLElement) {
-    this.node = document.createElement("ul");
-    this.node.classList.add("navbar-nav");
+    this.node = document.createElement("div");
     parent.appendChild(this.node);
     this.init();
   }

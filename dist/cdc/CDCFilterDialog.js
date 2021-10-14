@@ -7,22 +7,21 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import produce from "immer";
 import { v4 as uuidv4 } from "uuid";
-import { createCDCGroupingFilter } from './GroupingFilter';
-import { createCDCTextFilter } from './TextFilter';
-import { createCDCCheckboxFilter } from './CheckboxFilter';
-import { createCDCRangeFilter } from './RangeFilter';
+import { createCDCGroupingFilter } from './CDCGroupingFilter';
+import { createCDCTextFilter } from './CDCTextFilter';
+import { createCDCCheckboxFilter } from './CDCCheckboxFilter';
+import { createCDCRangeFilter } from './CDCRangeFilter';
 export function CDCFilterDialog() {
     const [filters, setFilters] = React.useState({
         ...createCDCGroupingFilter(uuidv4(), "Drop filters here"),
         disableDragging: true,
         disableRemoving: true
     });
-    //TODO filters + setFilters als prop
     const filterSelection = [
-        createCDCGroupingFilter(uuidv4(), "grouping-filter"),
-        createCDCTextFilter(uuidv4(), "text-filter", { filter: [{ field: "field1", value: [] }], fields: [{ field: "field1", options: ["hallo", "hier", "steht", "text"] }, { field: "field2", options: ["tschüss", "hier", "nicht"] }, { field: "field3", options: ["test", "noch ein test", "hi"] }] }),
-        createCDCCheckboxFilter(uuidv4(), "checkbox-filter", { fields: ["Eins", "zwei", "dRei"], filter: [] }),
-        createCDCRangeFilter(uuidv4(), "range-filter", { min: 1950, max: 2021 }),
+        createCDCGroupingFilter(uuidv4(), "Grouping Filter"),
+        createCDCTextFilter(uuidv4(), "Text Filter", { filter: [{ field: "field1", value: [] }], fields: [{ field: "field1", options: ["hallo", "hier", "steht", "text"] }, { field: "field2", options: ["tschüss", "hier", "nicht"] }, { field: "field3", options: ["test", "noch ein test", "hi"] }] }),
+        createCDCCheckboxFilter(uuidv4(), "Checkbox Filter", { fields: ["Eins", "zwei", "dRei"], filter: [] }),
+        createCDCRangeFilter(uuidv4(), "Range Filter", { min: 1950, max: 2021 }),
     ];
     React.useEffect(() => {
         const test = getTreeQuery(filters);
@@ -97,10 +96,10 @@ export function CDCFilterDialog() {
         });
     };
     const [showDialog, setShowDialog] = React.useState(false);
-    return React.createElement("div", null,
-        React.createElement("p", { style: { marginTop: 5, color: "white", cursor: "pointer" }, onClick: () => setShowDialog(true) },
+    return React.createElement(React.Fragment, null,
+        React.createElement("a", { style: { color: "white", cursor: "pointer" }, onClick: () => setShowDialog(true) },
             React.createElement("i", { className: "fas fa-filter", style: { marginRight: 4 } }),
-            " Filter Dialog"),
+            " Alert Filter"),
         React.createElement(BSModal, { show: showDialog },
             React.createElement("div", { className: "modal fade", tabIndex: -1 },
                 React.createElement("div", { className: "modal-dialog", style: { maxWidth: "90%" } },
@@ -118,12 +117,12 @@ export function CDCFilterDialog() {
                                         React.createElement("h5", null, "Add new filters"),
                                         filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f }))))))),
                         React.createElement("div", { className: "modal-footer" },
-                            React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
-                            React.createElement("button", { type: "button", className: "btn btn-primary" }, "Save changes")))))));
+                            React.createElement("button", { type: "button", onClick: () => setShowDialog(false), className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
+                            React.createElement("button", { type: "button", onClick: () => setShowDialog(false), className: "btn btn-primary" }, "Save changes")))))));
 }
 export class CDCFilterDialogClass {
     constructor(parent) {
-        this.node = document.createElement("ul");
+        this.node = document.createElement("div");
         parent.appendChild(this.node);
         this.init();
     }

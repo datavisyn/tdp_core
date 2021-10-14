@@ -27,7 +27,7 @@ function CDCRangeFilterToString(value: ICDCRangeFilterValue): string {
 }
 
 function CDCRangeFilter({ value, onValueChanged }) {
-  return <div style={{ margin: "10px", paddingTop: "10px" }}>
+  return <div style={{ margin: "10px", paddingTop: "10px"}}>
     <InputRange
         disabled={!onValueChanged}
         maxValue={2021}
