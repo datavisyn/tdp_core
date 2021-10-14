@@ -297,13 +297,13 @@ export class FormMap extends AFormElement {
             const indexInParent = Array.from(row.parentNode.children).indexOf(row);
             row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">
-          <select class="form-select form-select-sm map-selector" data-testid="${this.testId}-buildMapImpl-form-select-${indexInParent}">
+          <select class="form-select form-select-sm map-selector" data-testid="${this.testId}_buildMapImpl_inner-form-select-${indexInParent}">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
-            ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''} data-testid="${this.testId}-buildMapImpl-form-select-option-${o.value}">${o.name}</option>`).join('')}
+            ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''} data-testid="${this.testId}_buildMapImpl_form-select_option-${o.value}">${o.name}</option>`).join('')}
           </select>
         </div>
         <div class="col-sm-7 form-map-row-value ps-1 pe-1"></div>
-        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}" data-testid="${this.testId}-buildMapImpl-form-select-option-btn-remove-${indexInParent}"></button></div>`;
+        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}" data-testid="${this.testId}_buildMapImpl_form-select_option-btn-remove-${indexInParent}"></button></div>`;
             const valueElem = row.querySelector('.form-map-row-value');
             if (d.key) { // has value
                 this.addValueEditor(d, valueElem, entries, indexInParent);
