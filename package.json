@@ -93,7 +93,11 @@
     "react-split": "^2.0.9",
     "bootstrap": "^5.0.1",
     "popper.js": "^1.15.0",
-    "plotly.js-dist": "^1.57.1"
+    "plotly.js-dist": "^1.57.1",
+    "immer": "^9.0.6",
+    "react-dnd": "^14.0.4",
+    "react-dnd-html5-backend": "^14.0.2",
+    "react-select": "^5.1.0"
   },
   "devDependencies": {
     "@types/d3": "~3.5.36",
