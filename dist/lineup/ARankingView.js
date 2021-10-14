@@ -97,6 +97,7 @@ export class ARankingView extends AView {
                 function hasColumnDesc(item) {
                     return item.desc != null;
                 }
+                node.dataset.testid = `${this.context.desc.id}_lu-searchbox_${item.text.replace(/\s/g, '')}`;
                 if (node.parentElement && hasColumnDesc(item)) {
                     node.dataset.type = item.desc.type;
                     const summary = item.desc.summary || item.desc.description;
