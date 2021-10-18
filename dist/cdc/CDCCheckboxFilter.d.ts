@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IFilter } from "./interface";
+import { IFilter } from './interface';
 interface ICDCCheckboxFilterValue {
     fields: string[];
     filter: string[];

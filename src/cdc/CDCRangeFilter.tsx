@@ -1,11 +1,11 @@
-import {IFilter} from "./interface";
+import {IFilter} from './interface';
 import * as React from 'react';
-import InputRange from "react-input-range";
+import InputRange from 'react-input-range';
 
 
 export interface ICDCRangeFilterValue {
-  min: number,
-  max: number
+  min: number;
+  max: number;
 }
 
 export function createCDCRangeFilter(id: string, name: string, value: ICDCRangeFilterValue): IFilter<ICDCRangeFilterValue> {
@@ -18,7 +18,7 @@ export function createCDCRangeFilter(id: string, name: string, value: ICDCRangeF
       toFilter: CDCRangeFilterToString,
       value,
     }
-  }
+  };
 }
 
 function CDCRangeFilterToString(value: ICDCRangeFilterValue): string {
@@ -27,7 +27,7 @@ function CDCRangeFilterToString(value: ICDCRangeFilterValue): string {
 }
 
 function CDCRangeFilter({ value, onValueChanged }) {
-  return <div style={{ margin: "10px", paddingTop: "10px"}}>
+  return <div className="t360-input-range-wrapper" style={{ margin: '10px', paddingTop: '10px', minHeight: '50px' }}>
     <InputRange
         disabled={!onValueChanged}
         maxValue={2021}
@@ -35,6 +35,6 @@ function CDCRangeFilter({ value, onValueChanged }) {
         value={{min: value.min, max: value.max}}
         onChange={(v) => onValueChanged?.(v)}
     />
-    </div>
+    </div>;
 }
 

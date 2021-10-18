@@ -1,3 +1,4 @@
+from typing import Dict
 from .BaseCDC import BaseCDC
 from phovea_server.util import jsonify
 import requests 
@@ -8,24 +9,13 @@ _log = logging.getLogger(__name__)
 
 
 class DemoCDC(BaseCDC):
-    # Dummy data, should be in a db/key-value store
-    data = None
-
     @property
     def id(self):
         return 'demo'
 
-    def load_data(self):
+    def load_data(self, options: Dict = {}):
         _log.info('Loading up-to-date data')
         return requests.get('https://jsonplaceholder.typicode.com/users').json()
-
-    def load_existing(self):
-        _log.info('Loading existing data')
-        return self.data
-
-    def save_existing(self, data):
-        _log.info('Setting existing data')
-        self.data = data
 
     def get_id(self, item):
         _log.info(item)
@@ -54,7 +44,7 @@ class DemoCDC(BaseCDC):
 
         # {}
         # {1: {name: ..}, 2: {name: ...}}
-        return jsonify({'old': old_lookup, 'new': new_lookup, 'diff': DeepDiff(old_lookup, new_lookup).to_json()})
+        return DeepDiff(old_lookup, new_lookup).to_json()
 
         deep_diff = DeepDiff(old, new, group_by='id')
 

@@ -4,7 +4,7 @@ export function createCDCGroupingFilter(id, name) {
         id,
         name,
         disableDropping: true,
-        operator: "AND",
+        operator: 'AND',
         children: [],
         component: {
             clazz: CDCGroupingFilter,

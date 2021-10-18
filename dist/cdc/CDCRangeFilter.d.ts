@@ -1,4 +1,4 @@
-import { IFilter } from "./interface";
+import { IFilter } from './interface';
 export interface ICDCRangeFilterValue {
     min: number;
     max: number;

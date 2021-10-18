@@ -13,11 +13,11 @@ export interface IFilter<V = any> {
     disableRemoving?: boolean;
     disableDragging?: boolean;
     disableDropping?: boolean;
-    operator?: "AND" | "OR" | "NOT";
+    operator?: 'AND' | 'OR' | 'NOT';
     component?: IFilterComponent<V>;
     children?: IFilter[];
 }
-export declare const ItemTypes: {
+export declare const itemTypes: {
     FILTERCARD: string;
 };
 export declare const getFilterFromTree: (filter: IFilter, id: string) => {
@@ -25,3 +25,7 @@ export declare const getFilterFromTree: (filter: IFilter, id: string) => {
     current: IFilter | null;
 };
 export declare const getTreeQuery: (filter: IFilter) => string;
+export interface IAlert {
+    id: number;
+    name: string;
+}

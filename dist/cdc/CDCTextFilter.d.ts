@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IFilter } from "./interface";
+import { IFilter } from './interface';
 export interface ICDCTextFilterValue {
     fields: {
         field: string;

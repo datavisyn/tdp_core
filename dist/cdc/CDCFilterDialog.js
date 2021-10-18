@@ -1,27 +1,30 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import { BSModal } from '../hooks';
+import { BSModal, useAsync } from '../hooks';
 import { getFilterFromTree, getTreeQuery } from "./interface";
-import { FilterCard } from "./FilterCard";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import produce from "immer";
-import { v4 as uuidv4 } from "uuid";
+import { FilterCard } from './FilterCard';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import produce from 'immer';
+import { v4 as uuidv4 } from 'uuid';
 import { createCDCGroupingFilter } from './CDCGroupingFilter';
 import { createCDCTextFilter } from './CDCTextFilter';
 import { createCDCCheckboxFilter } from './CDCCheckboxFilter';
 import { createCDCRangeFilter } from './CDCRangeFilter';
+import { getAlerts } from './api';
 export function CDCFilterDialog() {
+    const [showDialog, setShowDialog] = React.useState(false);
     const [filters, setFilters] = React.useState({
-        ...createCDCGroupingFilter(uuidv4(), "Drop filters here"),
+        ...createCDCGroupingFilter(uuidv4(), 'Drop filters here'),
         disableDragging: true,
         disableRemoving: true
     });
+    const { status: alertStatus, error: alertError, execute: alertExecute, value: alerts } = useAsync(getAlerts, true);
     const filterSelection = [
-        createCDCGroupingFilter(uuidv4(), "Grouping Filter"),
-        createCDCTextFilter(uuidv4(), "Text Filter", { filter: [{ field: "field1", value: [] }], fields: [{ field: "field1", options: ["hallo", "hier", "steht", "text"] }, { field: "field2", options: ["tschüss", "hier", "nicht"] }, { field: "field3", options: ["test", "noch ein test", "hi"] }] }),
-        createCDCCheckboxFilter(uuidv4(), "Checkbox Filter", { fields: ["Eins", "zwei", "dRei"], filter: [] }),
-        createCDCRangeFilter(uuidv4(), "Range Filter", { min: 1950, max: 2021 }),
+        createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
+        createCDCTextFilter(uuidv4(), 'Text Filter', { filter: [{ field: 'field1', value: [] }], fields: [{ field: 'field1', options: ['hallo', 'hier', 'steht', 'text'] }, { field: 'field2', options: ['tschüss', 'hier', 'nicht'] }, { field: 'field3', options: ['test', 'noch ein test', 'hi'] }] }),
+        createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', { fields: ['Eins', 'zwei', 'dRei'], filter: [] }),
+        createCDCRangeFilter(uuidv4(), 'Range Filter', { min: 1950, max: 2021 }),
     ];
     React.useEffect(() => {
         const test = getTreeQuery(filters);
@@ -46,7 +49,7 @@ export function CDCFilterDialog() {
         // Add item to target children array
         setFilters((filters) => produce(filters, (nextFilters) => {
             // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilters,
-            // AND NOTHING FROM "OUTSIDE" LIKE item, or target. THESE REFERENCES
+            // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
             // ARE NOT UP-TO-DATE!
             var _a, _b, _c;
             // Find target in nextFilters
@@ -76,7 +79,7 @@ export function CDCFilterDialog() {
                 dropTarget.current.children.splice(index, 0, dropItem.current);
             }
             else {
-                console.error("Something is wrong");
+                console.error('Something is wrong');
             }
         }));
     };
@@ -95,21 +98,28 @@ export function CDCFilterDialog() {
             }
         });
     };
-    const [showDialog, setShowDialog] = React.useState(false);
+    console.log(alerts);
     return React.createElement(React.Fragment, null,
-        React.createElement("a", { style: { color: "white", cursor: "pointer" }, onClick: () => setShowDialog(true) },
+        React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
             React.createElement("i", { className: "fas fa-filter", style: { marginRight: 4 } }),
             " Alert Filter"),
-        React.createElement(BSModal, { show: showDialog },
+        React.createElement(BSModal, { show: showDialog, setShow: setShowDialog },
             React.createElement("div", { className: "modal fade", tabIndex: -1 },
-                React.createElement("div", { className: "modal-dialog", style: { maxWidth: "90%" } },
+                React.createElement("div", { className: "modal-dialog", style: { maxWidth: '90%' } },
                     React.createElement("div", { className: "modal-content" },
                         React.createElement("div", { className: "modal-header" },
                             React.createElement("h5", { className: "modal-title" }, "Modal title"),
                             React.createElement("button", { type: "button", className: "btn-close", "data-bs-dismiss": "modal", "aria-label": "Close" })),
                         React.createElement("div", { className: "modal-body" },
-                            React.createElement(DndProvider, { backend: HTML5Backend },
-                                React.createElement("div", { className: "row" },
+                            React.createElement("div", { className: "row" },
+                                React.createElement("div", { className: "col-md" },
+                                    alertStatus,
+                                    alertStatus === 'pending' ? React.createElement(React.Fragment, null, "Loading...") : null,
+                                    alertStatus === 'error' ? React.createElement(React.Fragment, null,
+                                        "Error ",
+                                        alertError.toString()) : null,
+                                    alertStatus === 'success' ? React.createElement(React.Fragment, null, alerts.map((alert) => React.createElement("li", null, alert.name))) : null),
+                                React.createElement(DndProvider, { backend: HTML5Backend },
                                     React.createElement("div", { className: "col-md" },
                                         React.createElement("h5", null, "Your filters"),
                                         React.createElement(FilterCard, { filter: filters, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged })),
@@ -117,12 +127,12 @@ export function CDCFilterDialog() {
                                         React.createElement("h5", null, "Add new filters"),
                                         filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f }))))))),
                         React.createElement("div", { className: "modal-footer" },
-                            React.createElement("button", { type: "button", onClick: () => setShowDialog(false), className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
-                            React.createElement("button", { type: "button", onClick: () => setShowDialog(false), className: "btn btn-primary" }, "Save changes")))))));
+                            React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
+                            React.createElement("button", { type: "button", className: "btn btn-primary" }, "Save changes")))))));
 }
 export class CDCFilterDialogClass {
     constructor(parent) {
-        this.node = document.createElement("div");
+        this.node = document.createElement('div');
         parent.appendChild(this.node);
         this.init();
     }

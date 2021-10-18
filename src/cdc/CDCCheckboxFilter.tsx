@@ -1,11 +1,11 @@
-import {IFilter} from "./interface";
+import {IFilter} from './interface';
 import * as React from 'react';
 
 interface ICDCCheckboxFilterValue {
-  fields: string[],
-  filter: string[]
+  fields: string[];
+  filter: string[];
 }
-  
+
 export function createCDCCheckboxFilter(id: string, name: string, value: ICDCCheckboxFilterValue): IFilter<ICDCCheckboxFilterValue> {
   return {
     id,
@@ -16,14 +16,14 @@ export function createCDCCheckboxFilter(id: string, name: string, value: ICDCChe
       toFilter: CDCCheckboxFilterToString,
       value,
     }
-  }
+  };
 }
-  
+
 function CDCCheckboxFilterToString(value: ICDCCheckboxFilterValue): string {
   // Generate filter from value
-  return `(${value?.fields.map((v) => {return `${v} == ${value.filter.filter((f) => f === v).length > 0}`;}).join(" and ")})`;
+  return `(${value?.fields.map((v) => {return `${v} == ${value.filter.filter((f) => f === v).length > 0}`;}).join(' and ')})`;
 }
-  
+
 export function CDCCheckboxFilter({ value, onValueChanged }) {
   return <>
     {value.fields.map((v) => {
@@ -57,5 +57,5 @@ export function CDCCheckboxFilter({ value, onValueChanged }) {
         </div>
       );
     })}
-  </>
+  </>;
 }

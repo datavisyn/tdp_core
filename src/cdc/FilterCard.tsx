@@ -1,7 +1,7 @@
-import * as React from "react";
-import { IFilter, ItemTypes } from "./interface";
-import { useDrag } from "react-dnd";
-import { DropZone } from "./DropZone";
+import * as React from 'react';
+import { IFilter, itemTypes } from './interface';
+import { useDrag } from 'react-dnd';
+import { DropZone } from './DropZone';
 
 export function FilterCard({
   filter,
@@ -17,7 +17,7 @@ export function FilterCard({
   onValueChanged?: (filter: IFilter, value: any) => void;
 }) {
   const [{ isDragging, draggedItem }, drag, preview] = useDrag(() => ({
-    type: ItemTypes.FILTERCARD,
+    type: itemTypes.FILTERCARD,
     item: filter,
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
@@ -29,15 +29,15 @@ export function FilterCard({
 
   return (
     <div
-      className={`card mb-2 ${isDragging ? "bg-light" : ""}`}
+      className={`card mb-2 ${isDragging ? 'bg-light' : ''}`}
       ref={preview}
-      style={filter.disableRemoving && filter.disableDragging ? {height: "93%"} : {}}
+      style={filter.disableRemoving && filter.disableDragging ? {height: '93%'} : {}}
     >
       <div className="card-body">
         <h6
           ref={filter.disableDragging ? undefined : drag}
           className="card-title d-flex"
-          style={filter.disableDragging ? {} : { cursor: "move" }}
+          style={filter.disableDragging ? {} : { cursor: 'move' }}
         >
           {filter.disableDragging ? null : (
             <i
@@ -51,8 +51,8 @@ export function FilterCard({
               {onChange && hasChildren && filter?.children?.length > 1 ? (
                 <select
                   className="form-select form-select-sm"
-                  style={{ width: "6em" }}
-                  value={filter.operator || "AND"}
+                  style={{ width: '6em' }}
+                  value={filter.operator || 'AND'}
                   onChange={(e) => {
                     onChange(filter, (f) => {
                       f.operator = e.currentTarget.value as any;

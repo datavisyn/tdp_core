@@ -1,6 +1,6 @@
-import {IFilter} from "./interface";
+import {IFilter} from './interface';
 import * as React from 'react';
-import Select from "react-select";
+import Select from 'react-select';
 
 
 export interface ICDCTextFilterValue {
@@ -24,14 +24,14 @@ export function createCDCTextFilter(id: string, name: string, value: ICDCTextFil
       toFilter: CDCTextFilterToString,
       value,
     }
-  }
+  };
 }
 
 function CDCTextFilterToString(value: ICDCTextFilterValue): string {
   // Generate filter from value
   return `(${value.filter
     .map((v) =>`${v.field} in (${v.value.join(',')})`)
-    .join(" and ")})`;
+    .join(' and ')})`;
 }
 
 export function CDCTextFilter({ value, onValueChanged }) {
@@ -64,7 +64,7 @@ export function CDCTextFilter({ value, onValueChanged }) {
             </option>
           ))}
         </select>
-        <div style={{ width: "70%" }}>
+        <div style={{ width: '70%' }}>
         <Select
           closeMenuOnSelect={false}
           isDisabled={!onValueChanged}
@@ -113,7 +113,7 @@ export function CDCTextFilter({ value, onValueChanged }) {
             filter: [
               ...value.filter,
               {
-                field: "",
+                field: '',
                 value: []
               }
             ]
@@ -123,5 +123,5 @@ export function CDCTextFilter({ value, onValueChanged }) {
         +
       </button>
     ) : null}
-  </>
+  </>;
 }

@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IFilter } from "./interface";
+import { IFilter } from './interface';
 export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged }: {
     filter: IFilter;
     onDrop?: any;

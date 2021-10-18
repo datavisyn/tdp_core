@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Select from "react-select";
+import Select from 'react-select';
 export function createCDCTextFilter(id, name, value) {
     return {
         id,
@@ -16,7 +16,7 @@ function CDCTextFilterToString(value) {
     // Generate filter from value
     return `(${value.filter
         .map((v) => `${v.field} in (${v.value.join(',')})`)
-        .join(" and ")})`;
+        .join(' and ')})`;
 }
 export function CDCTextFilter({ value, onValueChanged }) {
     return React.createElement(React.Fragment, null,
@@ -35,7 +35,7 @@ export function CDCTextFilter({ value, onValueChanged }) {
                     }) },
                     React.createElement("option", { value: "" }, "Select..."),
                     value.fields.map((f) => (React.createElement("option", { value: f.field, key: f.field }, f.field)))),
-                React.createElement("div", { style: { width: "70%" } },
+                React.createElement("div", { style: { width: '70%' } },
                     React.createElement(Select, { closeMenuOnSelect: false, isDisabled: !onValueChanged, isMulti: true, value: v.value.map((value) => ({ label: value, value })), options: (_a = value.fields
                             .find((f) => f.field === v.field)) === null || _a === void 0 ? void 0 : _a.options.map((o) => {
                             return { value: o, label: o };
@@ -59,7 +59,7 @@ export function CDCTextFilter({ value, onValueChanged }) {
                     filter: [
                         ...value.filter,
                         {
-                            field: "",
+                            field: '',
                             value: []
                         }
                     ]

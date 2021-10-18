@@ -1,6 +1,6 @@
-import * as React from "react";
-import { getFilterFromTree, IFilter, ItemTypes } from "./interface";
-import { useDrop } from "react-dnd";
+import * as React from 'react';
+import { getFilterFromTree, IFilter, itemTypes } from './interface';
+import { useDrop } from 'react-dnd';
 
 export function DropZone({
   canDrop,
@@ -16,7 +16,7 @@ export function DropZone({
   // TODO: Add proper types such that draggedItem can be infered
   const [{ isOver, draggedItem }, drop] = useDrop(
     () => ({
-      accept: ItemTypes.FILTERCARD,
+      accept: itemTypes.FILTERCARD,
       drop: (item: IFilter, monitor) => {
         onDrop(item, { target: filter, index });
       },
@@ -43,7 +43,7 @@ export function DropZone({
       ref={drop}
       style={{ opacity: 0.1 }}
       className={`border mt-1 mb-1 ${
-        isVisible && isOver ? "bg-primary" : isVisible ? "bg-dark" : ""
+        isVisible && isOver ? 'bg-primary' : isVisible ? 'bg-dark' : ''
       }`}
     >
       <>&nbsp;</>

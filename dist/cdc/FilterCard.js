@@ -1,11 +1,11 @@
-import * as React from "react";
-import { ItemTypes } from "./interface";
-import { useDrag } from "react-dnd";
-import { DropZone } from "./DropZone";
+import * as React from 'react';
+import { itemTypes } from './interface';
+import { useDrag } from 'react-dnd';
+import { DropZone } from './DropZone';
 export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged }) {
     var _a, _b, _c;
     const [{ isDragging, draggedItem }, drag, preview] = useDrag(() => ({
-        type: ItemTypes.FILTERCARD,
+        type: itemTypes.FILTERCARD,
         item: filter,
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
@@ -13,14 +13,14 @@ export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged 
         })
     }));
     const hasChildren = filter.children && filter.children.length >= 0;
-    return (React.createElement("div", { className: `card mb-2 ${isDragging ? "bg-light" : ""}`, ref: preview, style: filter.disableRemoving && filter.disableDragging ? { height: "93%" } : {} },
+    return (React.createElement("div", { className: `card mb-2 ${isDragging ? 'bg-light' : ''}`, ref: preview, style: filter.disableRemoving && filter.disableDragging ? { height: '93%' } : {} },
         React.createElement("div", { className: "card-body" },
-            React.createElement("h6", { ref: filter.disableDragging ? undefined : drag, className: "card-title d-flex", style: filter.disableDragging ? {} : { cursor: "move" } },
+            React.createElement("h6", { ref: filter.disableDragging ? undefined : drag, className: "card-title d-flex", style: filter.disableDragging ? {} : { cursor: 'move' } },
                 filter.disableDragging ? null : (React.createElement("i", { style: { marginRight: 5 }, className: "fas fa-arrows-alt" })),
                 React.createElement("span", { className: "flex-fill" }, filter.name),
                 React.createElement("div", null,
                     React.createElement("div", { className: "input-group" },
-                        onChange && hasChildren && ((_a = filter === null || filter === void 0 ? void 0 : filter.children) === null || _a === void 0 ? void 0 : _a.length) > 1 ? (React.createElement("select", { className: "form-select form-select-sm", style: { width: "6em" }, value: filter.operator || "AND", onChange: (e) => {
+                        onChange && hasChildren && ((_a = filter === null || filter === void 0 ? void 0 : filter.children) === null || _a === void 0 ? void 0 : _a.length) > 1 ? (React.createElement("select", { className: "form-select form-select-sm", style: { width: '6em' }, value: filter.operator || 'AND', onChange: (e) => {
                                 onChange(filter, (f) => {
                                     f.operator = e.currentTarget.value;
                                 });

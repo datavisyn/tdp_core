@@ -1,5 +1,5 @@
-export const ItemTypes = {
-    FILTERCARD: "filtercard"
+export const itemTypes = {
+    FILTERCARD: 'filtercard'
 };
 export const getFilterFromTree = (filter, id) => {
     if ((filter === null || filter === void 0 ? void 0 : filter.id) === id) {
@@ -23,7 +23,7 @@ export const getFilterFromTree = (filter, id) => {
 };
 export const getTreeQuery = (filter) => {
     if (!filter) {
-        return "";
+        return '';
     }
     if (!filter.children) {
         //leaf filter
@@ -33,21 +33,21 @@ export const getTreeQuery = (filter) => {
             return filter.component.toFilter(filter.component.value);
         }
         else {
-            return "";
+            return '';
         }
     }
     else {
         //go through every child
-        let returnValue = "(";
+        let returnValue = '(';
         filter.children.forEach((child, i) => {
             var _a;
             returnValue += `${getTreeQuery(child)}${filter.children && i < filter.children.length - 1
-                ? ` ${(filter === null || filter === void 0 ? void 0 : filter.operator) === "NOT"
-                    ? "and not"
+                ? ` ${(filter === null || filter === void 0 ? void 0 : filter.operator) === 'NOT'
+                    ? 'and not'
                     : (_a = filter === null || filter === void 0 ? void 0 : filter.operator) === null || _a === void 0 ? void 0 : _a.toLowerCase()} `
-                : ""}`;
+                : ''}`;
         });
-        returnValue += ")";
+        returnValue += ')';
         return returnValue;
     }
 };

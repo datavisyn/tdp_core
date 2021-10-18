@@ -13,7 +13,7 @@ export function createCDCCheckboxFilter(id, name, value) {
 }
 function CDCCheckboxFilterToString(value) {
     // Generate filter from value
-    return `(${value === null || value === void 0 ? void 0 : value.fields.map((v) => { return `${v} == ${value.filter.filter((f) => f === v).length > 0}`; }).join(" and ")})`;
+    return `(${value === null || value === void 0 ? void 0 : value.fields.map((v) => { return `${v} == ${value.filter.filter((f) => f === v).length > 0}`; }).join(' and ')})`;
 }
 export function CDCCheckboxFilter({ value, onValueChanged }) {
     return React.createElement(React.Fragment, null, value.fields.map((v) => {
