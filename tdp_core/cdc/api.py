@@ -58,7 +58,6 @@ def get_alerts():
     alerts = session.query(CDCAlert).all()
     return [p for p in alerts if can_read(p)]
 
-
 @no_cache
 @login_required
 @blp.route('/alert', methods=["POST"])

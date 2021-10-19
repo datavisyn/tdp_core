@@ -11,5 +11,6 @@
 import { IAlert } from './interface';
 export declare function getAlerts(): Promise<IAlert[]>;
 export declare function getCommunity(id: string): Promise<IAlert | null>;
-export declare function editCommunity(id: string, community: Partial<IAlert>): Promise<IAlert | null>;
+export declare function editCommunity(id: string, alert: Partial<IAlert>): Promise<IAlert | null>;
 export declare function deleteCommunity(id: string): Promise<void>;
+export declare function saveCommunity(alert: IAlert): Promise<IAlert | null>;

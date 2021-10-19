@@ -1,104 +1,16 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { BSModal, useAsync } from '../hooks';
-import { getFilterFromTree, getTreeQuery } from "./interface";
-import { FilterCard } from './FilterCard';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import produce from 'immer';
-import { v4 as uuidv4 } from 'uuid';
-import { createCDCGroupingFilter } from './CDCGroupingFilter';
-import { createCDCTextFilter } from './CDCTextFilter';
-import { createCDCCheckboxFilter } from './CDCCheckboxFilter';
-import { createCDCRangeFilter } from './CDCRangeFilter';
 import { getAlerts } from './api';
+import { CDCEditAlert } from './CDCEditAlert';
+import { CDCCreateAlert } from './CDCCreateAlert';
 export function CDCFilterDialog() {
+    const [selectedAlert, setSelectedAlert] = React.useState();
     const [showDialog, setShowDialog] = React.useState(false);
-    const [filters, setFilters] = React.useState({
-        ...createCDCGroupingFilter(uuidv4(), 'Drop filters here'),
-        disableDragging: true,
-        disableRemoving: true
-    });
+    const [creationMode, setCreationMode] = React.useState(false);
     const { status: alertStatus, error: alertError, execute: alertExecute, value: alerts } = useAsync(getAlerts, true);
-    const filterSelection = [
-        createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
-        createCDCTextFilter(uuidv4(), 'Text Filter', { filter: [{ field: 'field1', value: [] }], fields: [{ field: 'field1', options: ['hallo', 'hier', 'steht', 'text'] }, { field: 'field2', options: ['tschüss', 'hier', 'nicht'] }, { field: 'field3', options: ['test', 'noch ein test', 'hi'] }] }),
-        createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', { fields: ['Eins', 'zwei', 'dRei'], filter: [] }),
-        createCDCRangeFilter(uuidv4(), 'Range Filter', { min: 1950, max: 2021 }),
-    ];
-    React.useEffect(() => {
-        const test = getTreeQuery(filters);
-        if (test) {
-            console.log(test);
-        }
-    }, [filters]);
-    const onDelete = (filter) => {
-        setFilters(produce(filters, (nextFilters) => {
-            const { current, parent } = getFilterFromTree(nextFilters, filter.id);
-            if (current && parent && parent.children) {
-                // Find the index of the current element in the parents children
-                const deleteIndex = parent.children.indexOf(current);
-                // Remove it from the current parent
-                if (deleteIndex !== -1) {
-                    parent.children.splice(deleteIndex, 1);
-                }
-            }
-        }));
-    };
-    const onDrop = (item, { target, index }) => {
-        // Add item to target children array
-        setFilters((filters) => produce(filters, (nextFilters) => {
-            // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilters,
-            // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
-            // ARE NOT UP-TO-DATE!
-            var _a, _b, _c;
-            // Find target in nextFilters
-            const dropTarget = getFilterFromTree(nextFilters, target.id);
-            const dropItem = getFilterFromTree(nextFilters, item.id);
-            // Check if the dropped item is part of the tree already
-            if (dropItem.current) {
-                // If we have a parent to remove us from...
-                if ((_a = dropItem.parent) === null || _a === void 0 ? void 0 : _a.children) {
-                    // Find the index of the current element in the parents children
-                    const deleteIndex = dropItem.parent.children.indexOf(dropItem.current);
-                    // Remove it from the current parent
-                    if (deleteIndex !== -1) {
-                        (_c = (_b = dropItem.parent) === null || _b === void 0 ? void 0 : _b.children) === null || _c === void 0 ? void 0 : _c.splice(deleteIndex, 1);
-                    }
-                }
-            }
-            else {
-                // Otherwise, it is a new item to be added in the next step
-                dropItem.current = { ...item, id: uuidv4() };
-            }
-            if (dropTarget.current) {
-                // Next, add it as target child
-                if (!dropTarget.current.children) {
-                    dropTarget.current.children = [];
-                }
-                dropTarget.current.children.splice(index, 0, dropItem.current);
-            }
-            else {
-                console.error('Something is wrong');
-            }
-        }));
-    };
-    const onChange = (filter, changeFunc) => {
-        setFilters(produce(filters, (nextFilters) => {
-            const { current, parent } = getFilterFromTree(nextFilters, filter.id);
-            if (current) {
-                changeFunc(current);
-            }
-        }));
-    };
-    const onValueChanged = (filter, value) => {
-        onChange(filter, (f) => {
-            if (f.component) {
-                f.component.value = value;
-            }
-        });
-    };
     console.log(alerts);
+    //filter settings reusable // alert overview / edit alert
     return React.createElement(React.Fragment, null,
         React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
             React.createElement("i", { className: "fas fa-filter", style: { marginRight: 4 } }),
@@ -108,24 +20,36 @@ export function CDCFilterDialog() {
                 React.createElement("div", { className: "modal-dialog", style: { maxWidth: '90%' } },
                     React.createElement("div", { className: "modal-content" },
                         React.createElement("div", { className: "modal-header" },
-                            React.createElement("h5", { className: "modal-title" }, "Modal title"),
+                            React.createElement("h5", { className: "modal-title" }, "Alerts"),
                             React.createElement("button", { type: "button", className: "btn-close", "data-bs-dismiss": "modal", "aria-label": "Close" })),
                         React.createElement("div", { className: "modal-body" },
                             React.createElement("div", { className: "row" },
-                                React.createElement("div", { className: "col-md" },
-                                    alertStatus,
+                                React.createElement("div", { className: "col-4 overflow-auto" },
+                                    React.createElement("div", { className: "d-flex w-100 justify-content-between" },
+                                        React.createElement("h5", null, "Your alerts"),
+                                        React.createElement("small", null,
+                                            React.createElement("button", { className: "btn btn-secondary", onClick: () => { setCreationMode(true); setSelectedAlert(null); } }, "+"))),
                                     alertStatus === 'pending' ? React.createElement(React.Fragment, null, "Loading...") : null,
                                     alertStatus === 'error' ? React.createElement(React.Fragment, null,
                                         "Error ",
                                         alertError.toString()) : null,
-                                    alertStatus === 'success' ? React.createElement(React.Fragment, null, alerts.map((alert) => React.createElement("li", null, alert.name))) : null),
-                                React.createElement(DndProvider, { backend: HTML5Backend },
-                                    React.createElement("div", { className: "col-md" },
-                                        React.createElement("h5", null, "Your filters"),
-                                        React.createElement(FilterCard, { filter: filters, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged })),
-                                    React.createElement("div", { className: "col-md" },
-                                        React.createElement("h5", null, "Add new filters"),
-                                        filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f }))))))),
+                                    alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alerts.map((alert, i) => React.createElement(React.Fragment, null,
+                                        React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`, key: i, onClick: () => { setSelectedAlert(alert); setCreationMode(false); }, "aria-current": "true" },
+                                            React.createElement("div", { className: "d-flex w-100 justify-content-between" },
+                                                React.createElement("h6", { className: "mb-1" },
+                                                    alert.name,
+                                                    " ",
+                                                    React.createElement("small", { className: "text-muted" },
+                                                        "for ",
+                                                        alert.cdc_id),
+                                                    " "),
+                                                React.createElement("small", null,
+                                                    React.createElement("span", { className: "badge bg-primary rounded-pill" }, "1"))),
+                                            React.createElement("p", { className: "mb-1" }, "Some placeholder content in a paragraph."),
+                                            React.createElement("small", null,
+                                                "last confirmed: ",
+                                                alert.confirmation_date))))) : null),
+                                React.createElement("div", { className: "col-8 overflow-auto" }, creationMode ? (React.createElement(CDCCreateAlert, null)) : (selectedAlert ? React.createElement(CDCEditAlert, { selectedAlert: selectedAlert }) : null)))),
                         React.createElement("div", { className: "modal-footer" },
                             React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
                             React.createElement("button", { type: "button", className: "btn btn-primary" }, "Save changes")))))));

@@ -11,18 +11,19 @@
 import { Ajax, AppContext } from 'phovea_core';
 export async function getAlerts() {
     //    return Ajax.send(AppContext.getInstance().api2absURL('/tdp/cdc/alert'), null, 'GET', 'JSON', 'application/json');
+    console.log(AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`));
     return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`);
 }
 export async function getCommunity(id) {
-    return AppContext.getInstance().getAPIJSON(`/marketplace360/community/${id}`);
+    return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}`);
 }
-export async function editCommunity(id, community) {
-    return Ajax.send(AppContext.getInstance().api2absURL(`/marketplace360/community/${id}`), community, 'PUT', 'JSON', 'application/json');
+export async function editCommunity(id, alert) {
+    return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/${id}`), alert, 'PUT', 'JSON', 'application/json');
 }
 export async function deleteCommunity(id) {
-    return Ajax.send(AppContext.getInstance().api2absURL(`/marketplace360/community/${id}`), null, 'DELETE');
+    return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/${id}`), null, 'DELETE');
 }
-//  export async function saveCommunity(community: IUploadCommunity): Promise<IAlert | null> {
-//    return Ajax.send(AppContext.getInstance().api2absURL(`/marketplace360/community`), community, 'POST', 'JSON', 'application/json');
-//  }
+export async function saveCommunity(alert) {
+    return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/`), alert, 'POST', 'JSON', 'application/json');
+}
 //# sourceMappingURL=api.js.map

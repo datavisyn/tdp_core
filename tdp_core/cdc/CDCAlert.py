@@ -64,7 +64,8 @@ class CDCAlertArgsSchema(CDCAlertSchema):
             'creator',
             'creation_date',
             'modifier',
-            'modification_date'
+            'modification_date',
+            'permissions'
         )
 
 # TODO: Remove and use postgres

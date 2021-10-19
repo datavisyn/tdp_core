@@ -28,4 +28,6 @@ export declare const getTreeQuery: (filter: IFilter) => string;
 export interface IAlert {
     id: number;
     name: string;
+    cdc_id: string;
+    confirmation_date: string;
 }
