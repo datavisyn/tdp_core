@@ -29,7 +29,7 @@ export class TDPApplicationUtils {
         }, options);
         const user = UserSession.getInstance().currentUser();
         const roles = user ? user.roles : UserUtils.ANONYMOUS_USER.roles;
-        const permission = Permission.decode(item ? item.permissions : Permission.ALL_ALL_READ_NONE);
+        const permission = Permission.decode(item ? item.permissions : Permission.ALL_NONE_NONE);
         const id = BaseUtils.randomId();
         const div = o.doc.createElement('div');
         div.classList.add('mb-3');
