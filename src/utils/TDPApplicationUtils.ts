@@ -185,41 +185,25 @@ export class TDPApplicationUtils {
         if (!d.checked) {
           return;
         }
+
         // sync with others
-        const target = d.value === 'public' ? 'read' : 'none';
-        others.forEach((o) => o.checked = o.value === target);
-        const groupSelected = group.find((d) => d.checked);
-        if (groupSelected && groupSelected.value === 'none') {
-          group.forEach((i) => i.checked = i.value === target);
-        }
-        const buddiesSelected = buddies.find((d) => d.checked);
-        if (buddiesSelected && buddiesSelected.value === 'none') {
-          buddies.forEach((d) => d.checked = d.value === target);
-        }
+        const target = (d.value === 'public') ? 'read' : 'none';
+        others.forEach((o) => o.checked = (o.value === target));
+
         syncActive();
       };
     });
-    others.forEach((clicked) => {
-      clicked.onchange = () => {
-        if (!clicked.checked) {
+
+    others.forEach((d) => {
+      d.onchange = () => {
+        if (!d.checked) {
           return;
         }
+
         // sync with public
-        {
-          const target = clicked.value === 'none' ? 'private' : 'public';
-          publicSimple.forEach((o) => o.checked = o.value === target);
-        }
-        // others at least with the same right
-        if (clicked.value === 'read' || clicked.value === 'write') {
-          const groupSelected = group.find((d) => d.checked);
-          if (groupSelected && (groupSelected.value === 'none' || (groupSelected.value === 'read' && clicked.value === 'write'))) {
-            group.forEach((i) => i.checked = i.value === clicked.value);
-          }
-          const buddiesSelected = buddies.find((d) => d.checked);
-          if (buddiesSelected && (buddiesSelected.value === 'none' || (buddiesSelected.value === 'read' && clicked.value === 'write'))) {
-            buddies.forEach((d) => d.checked = d.value === clicked.value);
-          }
-        }
+        const target = d.value === 'none' ? 'private' : 'public';
+        publicSimple.forEach((o) => o.checked = o.value === target);
+
         syncActive();
       };
     });
