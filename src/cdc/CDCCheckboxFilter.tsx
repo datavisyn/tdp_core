@@ -26,9 +26,9 @@ function CDCCheckboxFilterToString(value: ICDCCheckboxFilterValue): string {
 
 export function CDCCheckboxFilter({ value, onValueChanged }) {
   return <>
-    {value.fields.map((v) => {
+    {value.fields.map((v, i) => {
       return (
-        <div className="input-group m-1">
+        <div key={i} className="input-group m-1">
           <div className="form-check">
             <input
               className="form-check-input"

@@ -2,34 +2,19 @@ import produce from "immer";
 import React from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { createCDCCheckboxFilter } from "./CDCCheckboxFilter";
-import { createCDCGroupingFilter } from "./CDCGroupingFilter";
-import { createCDCRangeFilter } from "./CDCRangeFilter";
-import { createCDCTextFilter } from "./CDCTextFilter";
 import { FilterCard } from "./FilterCard";
 import { getFilterFromTree, getTreeQuery } from "./interface";
 import { v4 as uuidv4 } from 'uuid';
-export function CDCFilterComponent() {
-    const [filters, setFilters] = React.useState({
-        ...createCDCGroupingFilter(uuidv4(), 'Drop filters here'),
-        disableDragging: true,
-        disableRemoving: true
-    });
+export function CDCFilterComponent({ filterSelection, filter, setFilter }) {
     React.useEffect(() => {
-        const test = getTreeQuery(filters);
+        const test = getTreeQuery(filter);
         if (test) {
             console.log(test);
         }
-    }, [filters]);
-    const filterSelection = [
-        createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
-        createCDCTextFilter(uuidv4(), 'Text Filter', { filter: [{ field: 'field1', value: [] }], fields: [{ field: 'field1', options: ['hallo', 'hier', 'steht', 'text'] }, { field: 'field2', options: ['tschüss', 'hier', 'nicht'] }, { field: 'field3', options: ['test', 'noch ein test', 'hi'] }] }),
-        createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', { fields: ['Eins', 'zwei', 'dRei'], filter: [] }),
-        createCDCRangeFilter(uuidv4(), 'Range Filter', { min: 1950, max: 2021 }),
-    ];
-    const onDelete = (filter) => {
-        setFilters(produce(filters, (nextFilters) => {
-            const { current, parent } = getFilterFromTree(nextFilters, filter.id);
+    }, [filter]);
+    const onDelete = (newFilter) => {
+        setFilter(produce(filter, (nextFilter) => {
+            const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current && parent && parent.children) {
                 // Find the index of the current element in the parents children
                 const deleteIndex = parent.children.indexOf(current);
@@ -42,14 +27,15 @@ export function CDCFilterComponent() {
     };
     const onDrop = (item, { target, index }) => {
         // Add item to target children array
-        setFilters((filters) => produce(filters, (nextFilters) => {
-            // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilters,
+        //TODO: remove any - but TS won't stop complaining
+        const newFilter = (filter) => produce(filter, (nextFilter) => {
+            // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
             // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
             // ARE NOT UP-TO-DATE!
             var _a, _b, _c;
-            // Find target in nextFilters
-            const dropTarget = getFilterFromTree(nextFilters, target.id);
-            const dropItem = getFilterFromTree(nextFilters, item.id);
+            // Find target in nextFilter
+            const dropTarget = getFilterFromTree(nextFilter, target.id);
+            const dropItem = getFilterFromTree(nextFilter, item.id);
             // Check if the dropped item is part of the tree already
             if (dropItem.current) {
                 // If we have a parent to remove us from...
@@ -76,11 +62,12 @@ export function CDCFilterComponent() {
             else {
                 console.error('Something is wrong');
             }
-        }));
+        });
+        setFilter(newFilter);
     };
-    const onChange = (filter, changeFunc) => {
-        setFilters(produce(filters, (nextFilters) => {
-            const { current, parent } = getFilterFromTree(nextFilters, filter.id);
+    const onChange = (newFilter, changeFunc) => {
+        setFilter(produce(filter, (nextFilter) => {
+            const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current) {
                 changeFunc(current);
             }
@@ -97,7 +84,7 @@ export function CDCFilterComponent() {
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filters, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged })),
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged })),
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "New filters"),
                 filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f })))))));

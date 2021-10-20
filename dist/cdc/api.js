@@ -14,16 +14,16 @@ export async function getAlerts() {
     console.log(AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`));
     return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`);
 }
-export async function getCommunity(id) {
+export async function getAlertsById(id) {
     return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}`);
 }
-export async function editCommunity(id, alert) {
+export async function editAlert(id, alert) {
     return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/${id}`), alert, 'PUT', 'JSON', 'application/json');
 }
-export async function deleteCommunity(id) {
+export async function deleteAlert(id) {
     return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/${id}`), null, 'DELETE');
 }
-export async function saveCommunity(alert) {
-    return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/`), alert, 'POST', 'JSON', 'application/json');
+export async function saveAlert(alert) {
+    return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert`), alert, 'POST', 'JSON', 'application/json');
 }
 //# sourceMappingURL=api.js.map

@@ -26,8 +26,11 @@ export declare const getFilterFromTree: (filter: IFilter, id: string) => {
 };
 export declare const getTreeQuery: (filter: IFilter) => string;
 export interface IAlert {
-    id: number;
+    id?: number;
     name: string;
     cdc_id: string;
-    confirmation_date: string;
+    confirmation_date?: string;
+    filter: string;
+    enable_mail_notification: boolean;
+    group: string;
 }

@@ -88,8 +88,11 @@ export const getTreeQuery = (filter: IFilter) => {
 
 
 export interface IAlert {
-  id: number;
+  id?: number;
   name: string;
   cdc_id: string;
-  confirmation_date: string;
+  confirmation_date?: string;
+  filter: string;
+  enable_mail_notification: boolean;
+  group: string;
 }

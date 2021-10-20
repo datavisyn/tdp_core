@@ -18,18 +18,18 @@
    return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`);
  }
  
- export async function getCommunity(id: string): Promise<IAlert | null> {
+ export async function getAlertsById(id: string): Promise<IAlert | null> {
    return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}`);
  }
  
- export async function editCommunity(id: string, alert: Partial<IAlert>): Promise<IAlert | null> {
+ export async function editAlert(id: string, alert: Partial<IAlert>): Promise<IAlert | null> {
    return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/${id}`), alert, 'PUT', 'JSON', 'application/json');
  }
  
- export async function deleteCommunity(id: string): Promise<void> {
+ export async function deleteAlert(id: string): Promise<void> {
    return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/${id}`), null, 'DELETE');
  }
  
- export async function saveCommunity(alert: IAlert): Promise<IAlert | null> {
-   return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/`), alert, 'POST', 'JSON', 'application/json');
+ export async function saveAlert(alert: IAlert): Promise<IAlert | null> {
+   return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert`), alert, 'POST', 'JSON', 'application/json');
  }

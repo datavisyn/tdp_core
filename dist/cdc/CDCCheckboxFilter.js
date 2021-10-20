@@ -16,8 +16,8 @@ function CDCCheckboxFilterToString(value) {
     return `(${value === null || value === void 0 ? void 0 : value.fields.map((v) => { return `${v} == ${value.filter.filter((f) => f === v).length > 0}`; }).join(' and ')})`;
 }
 export function CDCCheckboxFilter({ value, onValueChanged }) {
-    return React.createElement(React.Fragment, null, value.fields.map((v) => {
-        return (React.createElement("div", { className: "input-group m-1" },
+    return React.createElement(React.Fragment, null, value.fields.map((v, i) => {
+        return (React.createElement("div", { key: i, className: "input-group m-1" },
             React.createElement("div", { className: "form-check" },
                 React.createElement("input", { className: "form-check-input", type: "checkbox", id: "flexCheckDefault", checked: value.filter.filter((f) => f === v).length > 0, disabled: !onValueChanged, onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
                         ...value,
