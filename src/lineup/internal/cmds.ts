@@ -1,12 +1,9 @@
-/**
- * Created by Samuel Gratzl on 18.05.2016.
- */
-
-import {IObjectRef, ProvenanceGraph, ICmdResult, ResolveNow, I18nextManager, ObjectRefUtils, ActionMetaData, ActionUtils, ActionNode, IAction} from 'phovea_core';
 import {EngineRenderer, TaggleRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, ISortCriteria, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn, IGroup} from 'lineupjs';
-
 import {LineUpFilterUtils} from './lineUpFilter';
 import {isEqual} from 'lodash';
+import {ResolveNow} from '../../base';
+import {I18nextManager} from '../../i18n';
+import {IObjectRef, ICmdResult, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode, IAction} from '../../provenance';
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 enum LineUpTrackAndUntrackActions {

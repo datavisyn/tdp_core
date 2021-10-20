@@ -1,9 +1,6 @@
-/**
- * Created by Samuel Gratzl on 20.09.2017.
- */
-import {ITable, ITableColumn, DataCache} from 'phovea_core';
-import {ICategoricalValueTypeDesc, INumberValueTypeDesc, IValueTypeDesc} from 'phovea_core';
 import {IRow, IServerColumnDesc} from '../base/rest';
+import {DataCache, IValueTypeDesc, INumberValueTypeDesc, ICategoricalValueTypeDesc} from '../data';
+import {ITable, ITableColumn} from '../table';
 
 export class PhoveaDataAdapter {
   private readonly data: Promise<ITable>;

@@ -1,7 +1,10 @@
 import { LocalDataProvider } from 'lineupjs';
-import { ParseRangeUtils, PluginRegistry, IDTypeManager, ObjectRefUtils, Range } from 'phovea_core';
+import { ObjectRefUtils } from '../provenance';
+import { ParseRangeUtils, Range } from '../range';
 import { ARankingView } from '../lineup/ARankingView';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
+import { PluginRegistry } from '../app';
+import { IDTypeManager } from '../idtype';
 export class AEmbeddedRanking {
     constructor(node) {
         this.node = node;

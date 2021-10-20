@@ -1,6 +1,6 @@
-import {PluginRegistry} from 'phovea_core';
+import {PluginRegistry} from '../app';
 import {ITDPTourExtensionDesc, IStep} from './extensions';
-import {AppHeader} from 'phovea_ui';
+import {AppHeader} from '../components';
 import {TourUtils} from './TourUtils';
 
 export interface ITourContext {

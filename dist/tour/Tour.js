@@ -1,4 +1,4 @@
-import { PluginRegistry } from 'phovea_core';
+import { PluginRegistry } from '../app';
 import { TourUtils } from './TourUtils';
 export class Tour {
     constructor(desc) {

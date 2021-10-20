@@ -1,6 +1,8 @@
 import { AView } from '../AView';
-import { IDTypeManager, ParseRangeUtils, Range, I18nextManager } from 'phovea_core';
 import { ResolveUtils } from '../ResolveUtils';
+import { IDTypeManager } from '../../idtype';
+import { ParseRangeUtils, Range } from '../../range';
+import { I18nextManager } from '../../i18n';
 export class MessagingProxyView extends AView {
     constructor(context, selection, parent, options = {}) {
         super(context, selection, parent);

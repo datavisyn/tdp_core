@@ -1,13 +1,3 @@
-/**
- * Find views for a given idtype and number of selected items.
- * The seleted items itself are not considered in this function.
- * @param idtype
- * @param selection
- * @returns {any}
- */
-
-
-import {IDType} from 'phovea_core';
 import {ViewUtils} from './ViewUtils';
 import {
   EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW,
@@ -17,7 +7,11 @@ import {IGroupData, IInstanceViewExtensionDesc,
   IViewGroupExtensionDesc,
   IViewPluginDesc
 } from '../base/interfaces';
-import {IPluginDesc, PluginRegistry, Range, UserSession, IDTypeManager} from 'phovea_core';
+import {IDType, IDTypeManager} from '../idtype';
+import {Range} from '../range';
+import {PluginRegistry, UserSession} from '../app';
+import {IPluginDesc} from '../base';
+
 
 
 export interface IDiscoveredView {

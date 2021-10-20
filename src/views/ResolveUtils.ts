@@ -1,4 +1,6 @@
-import {IDType, IDTypeManager, Range} from 'phovea_core';
+import {IDType, IDTypeManager} from '../idtype';
+import {Range} from '../range';
+
 
 export class ResolveUtils {
   static resolveIdToNames(fromIDType: IDType, id: number, toIDType: IDType | string = null): Promise<string[][]> {

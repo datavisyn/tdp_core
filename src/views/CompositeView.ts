@@ -1,17 +1,13 @@
-import {BaseUtils, ResolveNow, EventHandler, IEvent, IDType, IDTypeManager, Range, PluginRegistry, I18nextManager, WebpackEnv} from 'phovea_core';
-import {
-  IRootLayoutContainer,
-  ISplitLayoutContainer,
-  ITabbingLayoutContainer,
-  IView as ILayoutView,
-  IViewLayoutContainer,
-  LayoutContainerEvents
-} from 'phovea_ui';
-import {BuilderUtils, ViewBuilder, LAYOUT_CONTAINER_WRAPPER} from 'phovea_ui';
+import {IDType, IDTypeManager} from '../idtype';
+import {BaseUtils, EventHandler, IEvent, ResolveNow, WebpackEnv} from '../base';
+import {Range} from '../range';
+import {I18nextManager} from '../i18n';
+import {PluginRegistry} from '../app';
 import {AView} from './AView';
 import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
 import {ViewUtils} from './ViewUtils';
+import {BuilderUtils, IRootLayoutContainer, ISplitLayoutContainer, ITabbingLayoutContainer, IViewLayoutContainer, LayoutContainerEvents, LAYOUT_CONTAINER_WRAPPER, ViewBuilder, PHOVEA_UI_IView} from '../layout';
 
 
 interface IElementDesc {
@@ -84,7 +80,7 @@ function unprefix(name: string) {
 }
 
 
-class WrapperView implements ILayoutView {
+class WrapperView implements PHOVEA_UI_IView {
   private _visible = true;
 
   constructor(public readonly instance: IView, public readonly key: string) {

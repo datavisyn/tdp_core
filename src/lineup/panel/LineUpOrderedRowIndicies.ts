@@ -1,5 +1,5 @@
 import {EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking} from 'lineupjs';
-import {EventHandler} from 'phovea_core';
+import {EventHandler} from '../../base';
 
 /**
  *  Store the ordered row indices for all, selected or filtered rows of the first ranking.

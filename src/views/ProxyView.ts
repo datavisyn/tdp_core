@@ -1,8 +1,6 @@
-/**
- * Created by Holger Stitz on 07.09.2016.
- */
-
-import {BaseUtils, IDTypeManager, I18nextManager} from 'phovea_core';
+import {IDTypeManager} from '../idtype';
+import {BaseUtils} from '../base';
+import {I18nextManager} from '../i18n';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {FormElementType} from '../form/interfaces';
 import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';

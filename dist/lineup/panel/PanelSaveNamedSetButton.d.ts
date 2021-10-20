@@ -1,6 +1,6 @@
 import { IPanelButton } from './PanelButton';
-import { EventHandler } from 'phovea_core';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
+import { EventHandler } from '../../base';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */

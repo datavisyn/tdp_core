@@ -7,3 +7,7 @@ yamlreader==3.0.4
 alembic==1.4.3
 openpyxl~=3.0.5
 -e git+https://github.com/phovea/phovea_server.git@develop#egg=phovea_server
+# phovea_clue
+python-memcached==1.59
+# phovea_security_flask
+flask-login==0.5.0

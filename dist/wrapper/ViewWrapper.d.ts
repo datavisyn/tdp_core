@@ -8,9 +8,11 @@
  * Proprietary and confidential. No warranty.
  *
  *********************************************************/
-import { EventHandler, ObjectNode, ProvenanceGraph, IDType } from 'phovea_core';
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc } from '../base/interfaces';
+import { EventHandler } from '../base';
+import { ObjectNode, ProvenanceGraph } from '../provenance';
+import { IDType } from '../idtype';
 export declare class ViewWrapper extends EventHandler implements IViewProvider {
     readonly plugin: IViewPluginDesc;
     private readonly graph;

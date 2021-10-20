@@ -1,8 +1,5 @@
-/**
- * Created by Samuel Gratzl on 18.05.2016.
- */
-import { IObjectRef, ProvenanceGraph, ICmdResult, IAction } from 'phovea_core';
 import { EngineRenderer, TaggleRenderer, LocalDataProvider } from 'lineupjs';
+import { IObjectRef, ICmdResult, ProvenanceGraph, IAction } from '../../provenance';
 export interface IViewProviderLocal {
     data: LocalDataProvider;
     getInstance(): {

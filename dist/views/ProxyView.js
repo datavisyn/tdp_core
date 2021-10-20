@@ -1,7 +1,6 @@
-/**
- * Created by Holger Stitz on 07.09.2016.
- */
-import { BaseUtils, IDTypeManager, I18nextManager } from 'phovea_core';
+import { IDTypeManager } from '../idtype';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
 import { FormElementType } from '../form/interfaces';
 import { AD3View } from './AD3View';
 import { RestBaseUtils } from '../base/rest';

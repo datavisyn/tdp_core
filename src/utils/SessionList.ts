@@ -1,16 +1,15 @@
-/**
- * Created by Holger Stitz on 27.07.2016.
- */
-
-import {FormDialog} from 'phovea_ui';
+import {PHOVEA_UI_FormDialog} from '../components';
 import {select, Selection, event} from 'd3';
 import $ from 'jquery';
-import {UserSession, IProvenanceGraphDataDescription, GlobalEventHandler, I18nextManager, UniqueIdManager} from 'phovea_core';
-import {CLUEGraphManager} from 'phovea_clue';
+import {I18nextManager} from '../i18n';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {TDPApplicationUtils} from './TDPApplicationUtils';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {ProvenanceGraphMenuUtils} from './ProvenanceGraphMenuUtils';
+import {CLUEGraphManager} from '../base/CLUEGraphManager';
+import {GlobalEventHandler} from '../base';
+import {IProvenanceGraphDataDescription} from '../provenance';
+import {UniqueIdManager, UserSession} from '../app';
 
 
 abstract class ASessionList {
@@ -51,7 +50,7 @@ abstract class ASessionList {
 
     $enter.select('a[data-action="delete"]').on('click', async function (d) {
       stopEvent();
-      const deleteIt = await FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
+      const deleteIt = await PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
       if (deleteIt) {
         await manager.delete(d);
         NotificationHandler.successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.session'), d.name);
@@ -111,7 +110,7 @@ abstract class ASessionList {
       </div>`);
   }
 
-  protected abstract async build(manager: CLUEGraphManager): Promise<() => any>;
+  protected abstract build(manager: CLUEGraphManager): Promise<() => any>;
 }
 
 function byDateDesc(a: any, b: any) {

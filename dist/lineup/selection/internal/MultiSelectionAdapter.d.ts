@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
 import { IContext, ISelectionAdapter } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { IScoreRow } from '../../../base/interfaces';

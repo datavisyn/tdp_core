@@ -1,7 +1,4 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-import { BaseUtils } from 'phovea_core';
+import { BaseUtils } from '../base';
 import { AFormElement } from './elements/AFormElement';
 import { Form } from './elements/Form';
 /**

@@ -1,5 +1,9 @@
-import {BaseUtils, I18nextManager, Permission, UserSession, EPermission, ISecureItem, UserUtils, IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode} from 'phovea_core';
-import {Compression} from 'phovea_clue';
+import {IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode} from '../provenance';
+import {BaseUtils} from '../base';
+import {I18nextManager} from '../i18n';
+import {Compression} from '../base/Compression';
+import {EPermission, ISecureItem, Permission, UserUtils} from '../security';
+import {UserSession} from '../app';
 
 
 export interface IPermissionFormOptions {

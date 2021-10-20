@@ -50,6 +50,17 @@ def phovea(registry):
                       'factory': 'create_migration_api',
                       'namespace': '/api/tdp/db-migration'
                   })
+
+  # phovea_clue
+  registry.append('namespace', 'caleydo-clue-screenshot', 'tdp_core.remoteplayer',
+                  {
+                      'namespace': '/api/clue',
+                      'factory': 'create'
+                  })
+
+  # phovea_security_flask
+  # TODO: Add ENV variables to allow disabling
+  registry.append('manager', 'security_manager', 'tdp_core.flask_login_impl', dict(singleton=True))
   # generator-phovea:end
   pass
 

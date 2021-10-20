@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 13.03.2017.
- */
 export declare class ValueCache {
     private values;
     /**

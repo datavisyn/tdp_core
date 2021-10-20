@@ -1,7 +1,4 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-import { BaseUtils } from 'phovea_core';
+import { BaseUtils } from '../../base';
 /**
  * Builds a form from a given collection of form elements
  */

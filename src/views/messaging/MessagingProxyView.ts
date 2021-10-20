@@ -1,8 +1,10 @@
 import {AView} from '../AView';
 import {IViewContext, ISelection} from '../../base/interfaces';
-import {IDTypeManager, ParseRangeUtils, Range, I18nextManager} from 'phovea_core';
 import {ResolveUtils} from '../ResolveUtils';
 import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
+import {IDTypeManager} from '../../idtype';
+import {ParseRangeUtils, Range} from '../../range';
+import {I18nextManager} from '../../i18n';
 
 
 export interface IPartialProxyViewOptions {
