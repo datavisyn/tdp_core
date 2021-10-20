@@ -1,6 +1,6 @@
 import {FormElementType} from './form/interfaces';
-import {EP_TDP_CORE_FORM_ELEMENT} from './base/extensions';
-import {EP_PHOVEA_CORE_LOCALE, PluginRegistry, ILocaleEPDesc} from './app';
+import {EP_PHOVEA_CLUE_PROVENANCE_GRAPH, EP_TDP_CORE_FORM_ELEMENT} from './base/extensions';
+import {EP_PHOVEA_CORE_LOCALE, PluginRegistry, ILocaleEPDesc, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT} from './app';
 import {IRegistry} from './base';
 
 export default function (registry: IRegistry) {
@@ -214,6 +214,30 @@ export default function (registry: IRegistry) {
   registry.push('tabSyncer', 'selection', function () { return import('./sync/SelectionSyncer').then((m) => m.SelectionSyncerOptionUtils); }, {
     factory: 'create'
   });
+
+  /* tdp_react */
+  registry.push('tdpView', 'dummy_react', function () {
+    return import('./dummy/DummyReactView');
+  }, {
+    name: 'Dummy React View',
+    factory: 'new DummyReactView',
+    idtype: 'IDTypeA',
+    selection: 'some'
+  });
+
+  /* tdp_matomo */
+  registry.push(EP_PHOVEA_CORE_LOGIN, 'matomoLogin', () => import('./app/Matomo').then((m) => m.Matomo), {
+    factory: 'trackLogin'
+  });
+
+  registry.push(EP_PHOVEA_CORE_LOGOUT, 'matomoLogout', () => import('./app/Matomo').then((m) => m.Matomo), {
+    factory: 'trackLogout'
+  });
+
+  registry.push(EP_PHOVEA_CLUE_PROVENANCE_GRAPH, 'matomoAnalytics', () => import('./app/Matomo').then((m) => m.Matomo), {
+    factory: 'trackProvenance'
+  });
+
   /// #endif
 
 }

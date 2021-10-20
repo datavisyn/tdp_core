@@ -30,5 +30,46 @@
         "admin"
       ]
     }
-  ]
+  ],
+  "--tdp_matomo": "comment",
+  "matomo": {
+    "--url": "comment: matomo url with a trailing slash",
+    "url": "",
+    "site": "1",
+    "encryptUserName": false
+  },
+  "--phovea_data_redis": "comment",
+  "assigner": {
+    "hostname": "redis",
+    "port": 6379,
+    "db": 3,
+    "extras": {
+
+    },
+    "cache": 262144
+  },
+  "mapping": {
+    "hostname": "redis",
+    "port": 6379,
+    "db": 4,
+    "extras": {
+
+    },
+    "bulk": false
+  },
+  "cache": {
+    "hostname": "redis",
+    "port": 6379,
+    "db": 5,
+    "extras": {
+
+    },
+    "timeout": 600
+  },
+  "--phovea_data_mongo": "comment",
+  "mongo": {
+    "host": "mongo",
+    "port": 27017,
+    "db": "graph"
+  }
 }

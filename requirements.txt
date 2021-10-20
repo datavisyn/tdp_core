@@ -11,3 +11,8 @@ openpyxl~=3.0.5
 python-memcached==1.59
 # phovea_security_flask
 flask-login==0.5.0
+# phovea_data_redis
+redis~=3.5.3
+cachelib==0.1.1
+# phovea_data_mongo
+pymongo~=3.11.1

@@ -61,6 +61,19 @@ def phovea(registry):
   # phovea_security_flask
   # TODO: Add ENV variables to allow disabling
   registry.append('manager', 'security_manager', 'tdp_core.flask_login_impl', dict(singleton=True))
+
+  # tdp_matomo
+  registry.append('tdp-config-safe-keys', 'matomo', '', {
+   'configKey': 'tdp_core.matomo'
+  })
+
+  # phovea_data_redis
+  registry.append('manager', 'idmanager', 'tdp_core.assigner', dict(priority=-5, singleton=True))
+  registry.append('mapping_provider', 'phovea_data_redis', 'tdp_core.redis_mapping_table')
+  registry.append('manager', 'cachemanager', 'tdp_core.cache', dict(priority=-5, singleton=True))
+
+  # phovea_data_mongo
+  registry.append('dataset-provider', 'dataset-graph', 'tdp_core.graph', {})
   # generator-phovea:end
   pass
 

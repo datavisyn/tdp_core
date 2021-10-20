@@ -36,6 +36,12 @@
 @import "./layout/layout";
 // phovea_security_flask
 @import "./components/login_dialog";
+// tdp_react
+@import './components/view_tdp';
+@import './components/view_react';
+// tdp_ui
+@import './components/table';
+@import './components/tree';
 
 // import the header navbar with a more specific CSS selector again, to style it with the CLUE colors
 .box {

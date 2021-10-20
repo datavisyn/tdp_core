@@ -31,3 +31,5 @@ export * from './graph';
 export * from './provenance';
 export * from './multiform';
 export * from './sync';
+export * from './dummy';
+export * from './TreeRenderer';
