@@ -26,7 +26,7 @@ export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProve
 
   /**
    * Default permissions for new graphs.
-   * @default ALL_READ_NONE
+   * @default ALL_NONE_NONE
    */
   defaultPermission?: number;
 }
@@ -36,7 +36,7 @@ export class LocalStorageProvenanceGraphManager implements IProvenanceGraphManag
     storage: localStorage,
     prefix: 'clue',
     application: 'unknown',
-    defaultPermission: Permission.ALL_READ_NONE
+    defaultPermission: Permission.ALL_NONE_NONE
   };
 
   constructor(options: ILocalStorageProvenanceGraphManagerOptions = {}) {

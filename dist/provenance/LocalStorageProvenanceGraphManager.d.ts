@@ -17,7 +17,7 @@ export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProve
     prefix?: string;
     /**
      * Default permissions for new graphs.
-     * @default ALL_READ_NONE
+     * @default ALL_NONE_NONE
      */
     defaultPermission?: number;
 }

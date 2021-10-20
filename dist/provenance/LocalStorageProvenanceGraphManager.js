@@ -12,7 +12,7 @@ export class LocalStorageProvenanceGraphManager {
             storage: localStorage,
             prefix: 'clue',
             application: 'unknown',
-            defaultPermission: Permission.ALL_READ_NONE
+            defaultPermission: Permission.ALL_NONE_NONE
         };
         BaseUtils.mixin(this.options, options);
     }
