@@ -88,7 +88,6 @@
       "month": "a month ago",
       "month_plural": "{{count}} months ago",
       "year": "a year ago",
-      "farAway": "far far away",
 
       "notAllowed": "Not Allowed, please contact your system administrator",
       "private": "Private",
@@ -98,11 +97,11 @@
       "noPermission": "No Permission",
       "read": "Read",
       "write": "Write",
-      "definePermissions": "define which are the default permissions for other users to access this item",
+      "definePermissions": "Define which are the default permissions for other users to access this item",
       "group": "Group",
-      "specifyRole": "specify a group / role which you are part of that should have extra rights, such as a group of administrators",
+      "specifyRole": "Specify a group / role which you are part of that should have extra rights, such as a group of administrators",
       "buddies": "Buddies",
-      "buddiesPlaceholder": "list of usernames separated by semicolon",
+      "buddiesPlaceholder": "List of usernames separated by semicolon",
       "buddiesDescription": "Buddies are a list of user names that can have advanced rights, such as backup administrators"
     },
 
