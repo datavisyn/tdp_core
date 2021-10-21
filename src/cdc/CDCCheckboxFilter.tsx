@@ -1,4 +1,4 @@
-import {IFilter} from './interface';
+import {IFilter, IFilterComponent} from './interface';
 import * as React from 'react';
 
 interface ICDCCheckboxFilterValue {
@@ -6,16 +6,19 @@ interface ICDCCheckboxFilterValue {
   filter: string[];
 }
 
+export const CDCCheckboxFilterId = 'checkbox';
+export const CDCCheckboxFilter: IFilterComponent<null> = {
+  clazz: CDCCheckboxFilterComponent,
+  toFilter: CDCCheckboxFilterToString
+};
+
 export function createCDCCheckboxFilter(id: string, name: string, value: ICDCCheckboxFilterValue): IFilter<ICDCCheckboxFilterValue> {
   return {
     id,
     name,
     disableDropping: true,
-    component: {
-      clazz: CDCCheckboxFilter,
-      toFilter: CDCCheckboxFilterToString,
-      value,
-    }
+    componentId: CDCCheckboxFilterId,
+    componentValue: value
   };
 }
 
@@ -24,7 +27,7 @@ function CDCCheckboxFilterToString(value: ICDCCheckboxFilterValue): string {
   return `(${value?.fields.map((v) => {return `${v} == ${value.filter.filter((f) => f === v).length > 0}`;}).join(' and ')})`;
 }
 
-export function CDCCheckboxFilter({ value, onValueChanged }) {
+export function CDCCheckboxFilterComponent({value, onValueChanged}) {
   return <>
     {value.fields.map((v, i) => {
       return (

@@ -70,7 +70,7 @@ def create_alert(data):
     # Security
     alert.creator = current_username()
     alert.creation_date = datetime.utcnow()
-    alert.group = "test"
+    alert.group = ""
     # Allow no one to see, and only the creator/buddy to edit
     # Use permissions from endpoint
     # alert.permissions = 7700

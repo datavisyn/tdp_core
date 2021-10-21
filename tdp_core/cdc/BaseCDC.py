@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod, abstractproperty
-from typing import Dict, TypeVar, Generic, List, Union
+from abc import abstractmethod, abstractproperty
+from typing import TypeVar, Generic, List
+from deepdiff import DeepDiff
 
 T = TypeVar('T')
 
@@ -26,6 +27,9 @@ class BaseCDC(Generic[T]):
     def get_id(self, item: T) -> str:
         pass
 
-    @abstractmethod
     def compare(self, old: List[T], new: List[T]):
-        pass
+        old = old or []
+        new = new or []
+        old_lookup = {self.get_id(item): item for item in old}
+        new_lookup = {self.get_id(item): item for item in new}
+        return DeepDiff(old_lookup, new_lookup).to_json()

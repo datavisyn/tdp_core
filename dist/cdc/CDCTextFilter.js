@@ -1,15 +1,17 @@
 import * as React from 'react';
 import Select from 'react-select';
+export const CDCTextFilterId = 'text';
+export const CDCTextFilter = {
+    clazz: CDCTextFilterComponent,
+    toFilter: CDCTextFilterToString
+};
 export function createCDCTextFilter(id, name, value) {
     return {
         id,
         name,
         disableDropping: true,
-        component: {
-            clazz: CDCTextFilter,
-            toFilter: CDCTextFilterToString,
-            value,
-        }
+        componentId: CDCTextFilterId,
+        componentValue: value
     };
 }
 function CDCTextFilterToString(value) {
@@ -18,7 +20,7 @@ function CDCTextFilterToString(value) {
         .map((v) => `${v.field} in (${v.value.join(',')})`)
         .join(' and ')})`;
 }
-export function CDCTextFilter({ value, onValueChanged }) {
+export function CDCTextFilterComponent({ value, onValueChanged }) {
     return React.createElement(React.Fragment, null,
         value.filter.map((v, i) => {
             var _a;

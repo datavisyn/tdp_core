@@ -5,15 +5,15 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { FilterCard } from "./FilterCard";
 import { getFilterFromTree, getTreeQuery } from "./interface";
 import { v4 as uuidv4 } from 'uuid';
-export function CDCFilterComponent({ filterSelection, filter, setFilter }) {
+export function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents }) {
     React.useEffect(() => {
-        const test = getTreeQuery(filter);
+        const test = getTreeQuery(filter, filterComponents);
         if (test) {
             console.log(test);
         }
     }, [filter]);
     const onDelete = (newFilter) => {
-        setFilter(produce(filter, (nextFilter) => {
+        setFilter((filter) => produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current && parent && parent.children) {
                 // Find the index of the current element in the parents children
@@ -27,8 +27,7 @@ export function CDCFilterComponent({ filterSelection, filter, setFilter }) {
     };
     const onDrop = (item, { target, index }) => {
         // Add item to target children array
-        //TODO: remove any - but TS won't stop complaining
-        const newFilter = (filter) => produce(filter, (nextFilter) => {
+        setFilter((filter) => produce(filter, (nextFilter) => {
             // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
             // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
             // ARE NOT UP-TO-DATE!
@@ -62,11 +61,10 @@ export function CDCFilterComponent({ filterSelection, filter, setFilter }) {
             else {
                 console.error('Something is wrong');
             }
-        });
-        setFilter(newFilter);
+        }));
     };
     const onChange = (newFilter, changeFunc) => {
-        setFilter(produce(filter, (nextFilter) => {
+        setFilter((filter) => produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current) {
                 changeFunc(current);
@@ -75,18 +73,18 @@ export function CDCFilterComponent({ filterSelection, filter, setFilter }) {
     };
     const onValueChanged = (filter, value) => {
         onChange(filter, (f) => {
-            if (f.component) {
-                f.component.value = value;
-            }
+            f.componentValue = value;
         });
     };
     return (React.createElement(DndProvider, { backend: HTML5Backend },
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged })),
-            React.createElement("div", { className: "col-md" },
-                React.createElement("h6", null, "New filters"),
-                filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f })))))));
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, filterComponents: filterComponents })),
+            filterSelection ?
+                React.createElement("div", { className: "col-md" },
+                    React.createElement("h6", null, "New filters"),
+                    filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f, filterComponents: filterComponents }))))
+                : null)));
 }
 //# sourceMappingURL=CDCFilterComponent.js.map

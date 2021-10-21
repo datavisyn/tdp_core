@@ -1,22 +1,24 @@
 import * as React from 'react';
-import { IFilter, itemTypes } from './interface';
-import { useDrag } from 'react-dnd';
-import { DropZone } from './DropZone';
+import {IFilter, IFilterComponent, itemTypes} from './interface';
+import {useDrag} from 'react-dnd';
+import {DropZone} from './DropZone';
 
 export function FilterCard({
   filter,
   onDrop,
   onDelete,
   onChange,
-  onValueChanged
+  onValueChanged,
+  filterComponents
 }: {
   filter: IFilter;
   onDrop?: any;
   onDelete?: (filter: IFilter) => void;
   onChange?: (filter: IFilter, changeFunc: (filter: IFilter) => void) => void;
   onValueChanged?: (filter: IFilter, value: any) => void;
+  filterComponents: {[key: string]: IFilterComponent<any>};
 }) {
-  const [{ isDragging, draggedItem }, drag, preview] = useDrag(() => ({
+  const [{isDragging, draggedItem}, drag, preview] = useDrag(() => ({
     type: itemTypes.FILTERCARD,
     item: filter,
     collect: (monitor) => ({
@@ -26,6 +28,11 @@ export function FilterCard({
   }));
 
   const hasChildren = filter.children && filter.children.length >= 0;
+  const filterComponent = filterComponents[filter.componentId];
+
+  if (!filterComponent) {
+    return <>ERROR!!</>;
+  }
 
   return (
     <div
@@ -37,11 +44,11 @@ export function FilterCard({
         <h6
           ref={filter.disableDragging ? undefined : drag}
           className="card-title d-flex"
-          style={filter.disableDragging ? {} : { cursor: 'move' }}
+          style={filter.disableDragging ? {} : {cursor: 'move'}}
         >
           {filter.disableDragging ? null : (
             <i
-              style={{ marginRight: 5 }}
+              style={{marginRight: 5}}
               className="fas fa-arrows-alt"
             ></i>
           )}
@@ -51,7 +58,7 @@ export function FilterCard({
               {onChange && hasChildren && filter?.children?.length > 1 ? (
                 <select
                   className="form-select form-select-sm"
-                  style={{ width: '6em' }}
+                  style={{width: '6em'}}
                   value={filter.operator || 'AND'}
                   onChange={(e) => {
                     onChange(filter, (f) => {
@@ -66,7 +73,7 @@ export function FilterCard({
               ) : null}
               {!filter.disableRemoving && onDelete ? (
                 <button
-                  className="btn btn-danger btn-sm"
+                  className="btn btn-secondary btn-sm"
                   onClick={() => onDelete(filter)}
                 >
                   <i className="fas fa-times" />
@@ -81,10 +88,10 @@ export function FilterCard({
           bulk of the card's content.
           </p>*/}
 
-        {filter.component ? (
+        {filterComponent ? (
           <div>
-            <filter.component.clazz
-              value={filter.component.value}
+            <filterComponent.clazz
+              value={filter.componentId}
               onValueChanged={
                 onValueChanged
                   ? (value) => onValueChanged(filter, value)
@@ -110,6 +117,7 @@ export function FilterCard({
               onDelete={onDelete}
               onValueChanged={onValueChanged}
               onChange={onChange}
+              filterComponents={filterComponents}
             />
             {onDrop && hasChildren ? (
               <DropZone

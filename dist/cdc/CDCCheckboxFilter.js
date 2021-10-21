@@ -1,21 +1,23 @@
 import * as React from 'react';
+export const CDCCheckboxFilterId = 'checkbox';
+export const CDCCheckboxFilter = {
+    clazz: CDCCheckboxFilterComponent,
+    toFilter: CDCCheckboxFilterToString
+};
 export function createCDCCheckboxFilter(id, name, value) {
     return {
         id,
         name,
         disableDropping: true,
-        component: {
-            clazz: CDCCheckboxFilter,
-            toFilter: CDCCheckboxFilterToString,
-            value,
-        }
+        componentId: CDCCheckboxFilterId,
+        componentValue: value
     };
 }
 function CDCCheckboxFilterToString(value) {
     // Generate filter from value
     return `(${value === null || value === void 0 ? void 0 : value.fields.map((v) => { return `${v} == ${value.filter.filter((f) => f === v).length > 0}`; }).join(' and ')})`;
 }
-export function CDCCheckboxFilter({ value, onValueChanged }) {
+export function CDCCheckboxFilterComponent({ value, onValueChanged }) {
     return React.createElement(React.Fragment, null, value.fields.map((v, i) => {
         return (React.createElement("div", { key: i, className: "input-group m-1" },
             React.createElement("div", { className: "form-check" },

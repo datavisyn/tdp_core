@@ -1,7 +1,6 @@
-import {IFilter} from './interface';
+import {IFilter, IFilterComponent} from './interface';
 import * as React from 'react';
 import Select from 'react-select';
-
 
 export interface ICDCTextFilterValue {
   fields: {
@@ -14,27 +13,30 @@ export interface ICDCTextFilterValue {
   }[];
 }
 
+export const CDCTextFilterId = 'text';
+export const CDCTextFilter: IFilterComponent<null> = {
+  clazz: CDCTextFilterComponent,
+  toFilter: CDCTextFilterToString
+};
+
 export function createCDCTextFilter(id: string, name: string, value: ICDCTextFilterValue): IFilter<ICDCTextFilterValue> {
   return {
     id,
     name,
     disableDropping: true,
-    component: {
-      clazz: CDCTextFilter,
-      toFilter: CDCTextFilterToString,
-      value,
-    }
-  };
+    componentId: CDCTextFilterId,
+    componentValue: value
+  }
 }
 
 function CDCTextFilterToString(value: ICDCTextFilterValue): string {
   // Generate filter from value
   return `(${value.filter
-    .map((v) =>`${v.field} in (${v.value.join(',')})`)
+    .map((v) => `${v.field} in (${v.value.join(',')})`)
     .join(' and ')})`;
 }
 
-export function CDCTextFilter({ value, onValueChanged }) {
+export function CDCTextFilterComponent({value, onValueChanged}) {
   return <>
     {value.filter.map((v, i) => (
       <div key={i} className="input-group m-1">
@@ -48,10 +50,10 @@ export function CDCTextFilter({ value, onValueChanged }) {
               filter: value.filter.map((oldV) =>
                 oldV === v
                   ? {
-                      ...v,
-                      field: e.currentTarget.value,
-                      value: []
-                    }
+                    ...v,
+                    field: e.currentTarget.value,
+                    value: []
+                  }
                   : oldV
               )
             })
@@ -64,31 +66,31 @@ export function CDCTextFilter({ value, onValueChanged }) {
             </option>
           ))}
         </select>
-        <div style={{ width: '70%' }}>
-        <Select
-          closeMenuOnSelect={false}
-          isDisabled={!onValueChanged}
-          isMulti
-          value={v.value.map((value) => ({ label: value, value }))}
-          options={value.fields
-            .find((f) => f.field === v.field)
-            ?.options.map((o) => {
-              return { value: o, label: o };
-            })}
-          onChange={(e) =>
-            onValueChanged?.({
-              ...value,
-              filter: value.filter.map((oldV) =>
-                oldV === v
-                  ? {
+        <div style={{width: '70%'}}>
+          <Select
+            closeMenuOnSelect={false}
+            isDisabled={!onValueChanged}
+            isMulti
+            value={v.value.map((value) => ({label: value, value}))}
+            options={value.fields
+              .find((f) => f.field === v.field)
+              ?.options.map((o) => {
+                return {value: o, label: o};
+              })}
+            onChange={(e) =>
+              onValueChanged?.({
+                ...value,
+                filter: value.filter.map((oldV) =>
+                  oldV === v
+                    ? {
                       ...v,
                       value: e.map((value) => (value as any).value)
                     }
-                  : oldV
-              )
-            })
-          }
-        />
+                    : oldV
+                )
+              })
+            }
+          />
         </div>
         <button
           disabled={!onValueChanged}

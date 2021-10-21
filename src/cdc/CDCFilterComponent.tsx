@@ -3,47 +3,45 @@ import React from "react";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {FilterCard} from "./FilterCard";
-import {getFilterFromTree, getTreeQuery, IFilter} from "./interface";
-import { v4 as uuidv4 } from 'uuid';
+import {getFilterFromTree, getTreeQuery, IFilter, IFilterComponent} from "./interface";
+import {v4 as uuidv4} from 'uuid';
 
 interface ICDCFilterComponentProps {
-  filterSelection: IFilter<any>[];
+  filterSelection?: IFilter<any>[];
   filter: IFilter;
-  setFilter: (filter: IFilter) => void;
+  setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
+  filterComponents: {[key: string]: IFilterComponent<any>};
 }
 
-export function CDCFilterComponent({filterSelection, filter, setFilter} : ICDCFilterComponentProps) {
-
+export function CDCFilterComponent({filterSelection, filter, setFilter, filterComponents}: ICDCFilterComponentProps) {
   React.useEffect(() => {
-    const test = getTreeQuery(filter);
+    const test = getTreeQuery(filter, filterComponents);
     if (test) {
       console.log(test);
     }
   }, [filter]);
 
   const onDelete = (newFilter: IFilter) => {
-    setFilter(
-      produce(filter, (nextFilter) => {
-        const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
-        if (current && parent && parent.children) {
-          // Find the index of the current element in the parents children
-          const deleteIndex = parent.children.indexOf(current);
-          // Remove it from the current parent
-          if (deleteIndex !== -1) {
-            parent.children.splice(deleteIndex, 1);
-          }
+    setFilter((filter) => produce(filter, (nextFilter) => {
+      const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
+      if (current && parent && parent.children) {
+        // Find the index of the current element in the parents children
+        const deleteIndex = parent.children.indexOf(current);
+        // Remove it from the current parent
+        if (deleteIndex !== -1) {
+          parent.children.splice(deleteIndex, 1);
         }
-      })
+      }
+    })
     );
   };
 
   const onDrop = (
     item: IFilter,
-    { target, index }: { target: IFilter; index: number }
+    {target, index}: {target: IFilter; index: number}
   ) => {
     // Add item to target children array
-    //TODO: remove any - but TS won't stop complaining
-    const newFilter: any = (filter) => produce(filter, (nextFilter) => {
+    setFilter((filter) => produce(filter, (nextFilter) => {
       // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
       // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
       // ARE NOT UP-TO-DATE!
@@ -67,7 +65,7 @@ export function CDCFilterComponent({filterSelection, filter, setFilter} : ICDCFi
         }
       } else {
         // Otherwise, it is a new item to be added in the next step
-        dropItem.current = { ...item, id: uuidv4() };
+        dropItem.current = {...item, id: uuidv4()};
       }
 
       if (dropTarget.current) {
@@ -79,13 +77,12 @@ export function CDCFilterComponent({filterSelection, filter, setFilter} : ICDCFi
       } else {
         console.error('Something is wrong');
       }
-    });
-    setFilter(newFilter);
+    }));
   };
 
   const onChange = (newFilter: IFilter, changeFunc: (filter: IFilter) => void) => {
-    setFilter(produce(filter, (nextFilter) => {
-      const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
+    setFilter((filter) => produce(filter, (nextFilter) => {
+      const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
       if (current) {
         changeFunc(current);
       }
@@ -94,32 +91,33 @@ export function CDCFilterComponent({filterSelection, filter, setFilter} : ICDCFi
 
   const onValueChanged = (filter: IFilter, value: any) => {
     onChange(filter, (f) => {
-      if (f.component) {
-        f.component.value = value;
-      }
+      f.componentValue = value;
     });
   };
-  
+
   return (
-  <DndProvider backend={HTML5Backend}>
-    <div className="row">
+    <DndProvider backend={HTML5Backend}>
+      <div className="row">
         <div className="col-md">
-        <h6>Your filters</h6>
-        <FilterCard
+          <h6>Your filters</h6>
+          <FilterCard
             filter={filter}
             onDrop={onDrop}
             onDelete={onDelete}
             onChange={onChange}
             onValueChanged={onValueChanged}
-        />
+            filterComponents={filterComponents}
+          />
         </div>
-        <div className="col-md">
-        <h6>New filters</h6>
+        {filterSelection ?
+          <div className="col-md">
+            <h6>New filters</h6>
             {filterSelection.map((f) => (
-            <FilterCard key={f.id} filter={f} />
+              <FilterCard key={f.id} filter={f} filterComponents={filterComponents} />
             ))}
-        </div>
-    </div>
-  </DndProvider>
+          </div>
+          : null}
+      </div>
+    </DndProvider>
   )
 }

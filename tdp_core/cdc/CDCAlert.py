@@ -23,6 +23,7 @@ class CDCAlert(Base):
     name = Column(TEXT, nullable=False)
     cdc_id = Column(TEXT, nullable=False)
     # TODO: Change to JSONB in postgres
+    # filter_dump = Column(PickleType, nullable=False)
     filter = Column(TEXT, nullable=False)
     enable_mail_notification = Column(Boolean, nullable=False)
 
@@ -65,7 +66,8 @@ class CDCAlertArgsSchema(CDCAlertSchema):
             'creation_date',
             'modifier',
             'modification_date',
-            'permissions'
+            'permissions',
+            'group'
         )
 
 # TODO: Remove and use postgres

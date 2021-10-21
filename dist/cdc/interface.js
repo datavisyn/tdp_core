@@ -21,27 +21,40 @@ export const getFilterFromTree = (filter, id) => {
     }
     return { parent: null, current: null };
 };
-export const getTreeQuery = (filter) => {
+export const getTreeQuery = (filter, components) => {
+    var _a, _b;
     if (!filter) {
         return '';
     }
     if (!filter.children) {
         //leaf filter
-        if (filter.component &&
-            filter.component.toFilter &&
-            filter.component.value) {
-            return filter.component.toFilter(filter.component.value);
+        if (filter &&
+            components && ((_a = components[filter.componentId]) === null || _a === void 0 ? void 0 : _a.clazz) && ((_b = components[filter.componentId]) === null || _b === void 0 ? void 0 : _b.toFilter)) {
+            return components[filter.componentId].toFilter(filter.componentValue);
         }
         else {
             return '';
         }
+        /*
+      
+          if (
+            filter.component &&
+            filter.component.toFilter &&
+            filter.component.value
+          ) {
+            return filter.component.toFilter(filter.component.value);
+          } else {
+            return '';
+          }
+      
+        */
     }
     else {
         //go through every child
         let returnValue = '(';
         filter.children.forEach((child, i) => {
             var _a;
-            returnValue += `${getTreeQuery(child)}${filter.children && i < filter.children.length - 1
+            returnValue += `${getTreeQuery(child, components)}${filter.children && i < filter.children.length - 1
                 ? ` ${(filter === null || filter === void 0 ? void 0 : filter.operator) === 'NOT'
                     ? 'and not'
                     : (_a = filter === null || filter === void 0 ? void 0 : filter.operator) === null || _a === void 0 ? void 0 : _a.toLowerCase()} `
@@ -51,4 +64,11 @@ export const getTreeQuery = (filter) => {
         return returnValue;
     }
 };
+export function isAlert(obj) {
+    var _a;
+    return typeof ((_a = obj) === null || _a === void 0 ? void 0 : _a.id) === 'number';
+}
+// const test: IAlert | IUploadAlert = null;
+// if (!isAlert(test)) {
+// }
 //# sourceMappingURL=interface.js.map

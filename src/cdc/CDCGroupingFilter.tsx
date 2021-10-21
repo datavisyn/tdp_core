@@ -1,5 +1,10 @@
-import {IFilter} from './interface';
+import {IFilter, IFilterComponent} from './interface';
 import * as React from 'react';
+
+export const CDCGroupingFilterId = 'group';
+export const CDCGroupingFilter: IFilterComponent<null> = {
+  clazz: CDCGroupingFilterComponent,
+}
 
 export function createCDCGroupingFilter(id: string, name: string): IFilter<null> {
   return {
@@ -8,12 +13,11 @@ export function createCDCGroupingFilter(id: string, name: string): IFilter<null>
     disableDropping: true,
     operator: 'AND',
     children: [],
-    component: {
-      clazz: CDCGroupingFilter,
-    }
+    componentId: CDCGroupingFilterId,
+    componentValue: null
   };
 }
 
-function CDCGroupingFilter() {
+function CDCGroupingFilterComponent() {
   return <div><br /></div>;
 }
