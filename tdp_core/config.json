@@ -31,6 +31,7 @@
       ]
     }
   ],
+  "alwaysAppendDummyStore": false,
   "--tdp_matomo": "comment",
   "matomo": {
     "--url": "comment: matomo url with a trailing slash",

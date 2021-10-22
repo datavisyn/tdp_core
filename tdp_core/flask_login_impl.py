@@ -1,5 +1,6 @@
 
 import phovea_server.security as security
+import phovea_server.config
 import flask_login
 import logging
 
@@ -44,7 +45,7 @@ class NamespaceLoginManager(security.SecurityManager):
 
     import phovea_server.plugin as plugin
     self._user_stores = list(filter(None, [p.load().factory() for p in plugin.list('user_stores')]))
-    if len(self._user_stores) == 0:
+    if len(self._user_stores) == 0 or phovea_server.config.get('phovea_security_flask.alwaysAppendDummyStore'):
       _log.info('using dummy store')
       from . import dummy_store
       self._user_stores.append(dummy_store.create())
@@ -55,8 +56,6 @@ class NamespaceLoginManager(security.SecurityManager):
       if u:
         return u
     return None
-
-  #  return User.query.get(int(id))
 
   def init_app(self, app):
     self._manager.init_app(app)
