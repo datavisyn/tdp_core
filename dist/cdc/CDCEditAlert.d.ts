@@ -1,7 +1,18 @@
 /// <reference types="react" />
-import { IAlert } from "./interface";
-interface ICDCEditAlertProps {
+import { IAlert, IFilter, IFilterComponent, IUploadAlert } from "./interface";
+interface ICDCEditAlert {
+    alertData: IUploadAlert;
+    setAlertData: (formData: IUploadAlert) => void;
+    filterSelection: IFilter<any>[] | undefined;
+    filter: IFilter;
+    setFilter: (filter: IFilter) => void;
+    filterComponents: {
+        [key: string]: IFilterComponent<any>;
+    };
+    alertList: IAlert[];
+    setAlertList: (alerts: IAlert[]) => void;
     selectedAlert: IAlert;
+    setSelctedAlert: (alert: IAlert) => void;
 }
-export declare function CDCEditAlert({ selectedAlert }: ICDCEditAlertProps): JSX.Element;
+export declare function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, selectedAlert, setSelctedAlert }: ICDCEditAlert): JSX.Element;
 export {};

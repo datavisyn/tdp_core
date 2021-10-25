@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { IFilter, IFilterComponent } from './interface';
-export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, filterComponents }: {
+interface IFilterCardProps {
     filter: IFilter;
     onDrop?: any;
     onDelete?: (filter: IFilter) => void;
@@ -9,4 +9,7 @@ export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValue
     filterComponents: {
         [key: string]: IFilterComponent<any>;
     };
-}): JSX.Element;
+    disableFilter: boolean;
+}
+export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter }: IFilterCardProps): JSX.Element;
+export {};

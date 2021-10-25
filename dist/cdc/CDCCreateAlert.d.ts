@@ -1,9 +1,18 @@
 /// <reference types="react" />
-import { IFilter } from "./interface";
+import { IAlert, IFilter, IFilterComponent, IUploadAlert } from "./interface";
 interface ICDCCreateAlert {
-    filter: IFilter<any>;
-    setFilter: (filter: IFilter<any>) => void;
-    filterSelection: IFilter<any>[];
+    alertData: IUploadAlert;
+    setAlertData: (formData: IUploadAlert) => void;
+    filterSelection: IFilter<any>[] | undefined;
+    filter: IFilter;
+    setFilter: (filter: IFilter) => void;
+    filterComponents: {
+        [key: string]: IFilterComponent<any>;
+    };
+    alertList: IAlert[];
+    setAlertList: (alerts: IAlert[]) => void;
+    setSelectedAlert: (alert: IAlert) => void;
+    setCreationMode: (mode: boolean) => void;
 }
-export declare function CDCCreateAlert({ filter, setFilter, filterSelection }: ICDCCreateAlert): JSX.Element;
+export declare function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, setCreationMode, setSelectedAlert }: ICDCCreateAlert): JSX.Element;
 export {};

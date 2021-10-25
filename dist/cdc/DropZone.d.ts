@@ -1,8 +1,10 @@
 /// <reference types="react" />
 import { IFilter } from './interface';
-export declare function DropZone({ canDrop, onDrop, filter, index }: {
+interface IDropZoneProps {
     onDrop: any;
     canDrop: boolean;
     filter: IFilter;
     index: number;
-}): JSX.Element;
+}
+export declare function DropZone({ canDrop, onDrop, filter, index }: IDropZoneProps): JSX.Element;
+export {};

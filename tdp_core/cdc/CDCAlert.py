@@ -23,8 +23,8 @@ class CDCAlert(Base):
     name = Column(TEXT, nullable=False)
     cdc_id = Column(TEXT, nullable=False)
     # TODO: Change to JSONB in postgres
-    # filter_dump = Column(PickleType, nullable=False)
-    filter = Column(TEXT, nullable=False)
+    filter_dump = Column(PickleType, nullable=False)
+    filter_query = Column(TEXT, nullable=False)
     enable_mail_notification = Column(Boolean, nullable=False)
 
     latest_compare_date = Column(DateTime, nullable=True)
@@ -75,6 +75,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine('sqlite:////:memory:')
-# Base.metadata.drop_all(engine)
+#Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)
 create_session = sessionmaker(engine)

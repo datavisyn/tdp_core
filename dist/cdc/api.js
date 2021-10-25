@@ -10,8 +10,6 @@
  *********************************************************/
 import { Ajax, AppContext } from 'phovea_core';
 export async function getAlerts() {
-    //    return Ajax.send(AppContext.getInstance().api2absURL('/tdp/cdc/alert'), null, 'GET', 'JSON', 'application/json');
-    console.log(AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`));
     return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`);
 }
 export async function getAlertsById(id) {

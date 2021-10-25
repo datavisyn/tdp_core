@@ -3,15 +3,9 @@ import React from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { FilterCard } from "./FilterCard";
-import { getFilterFromTree, getTreeQuery } from "./interface";
+import { getFilterFromTree } from "./interface";
 import { v4 as uuidv4 } from 'uuid';
-export function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents }) {
-    React.useEffect(() => {
-        const test = getTreeQuery(filter, filterComponents);
-        if (test) {
-            console.log(test);
-        }
-    }, [filter]);
+export function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents, disableFilter }) {
     const onDelete = (newFilter) => {
         setFilter((filter) => produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
@@ -80,11 +74,11 @@ export function CDCFilterComponent({ filterSelection, filter, setFilter, filterC
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, filterComponents: filterComponents })),
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, filterComponents: filterComponents, disableFilter: disableFilter })),
             filterSelection ?
                 React.createElement("div", { className: "col-md" },
                     React.createElement("h6", null, "New filters"),
-                    filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f, filterComponents: filterComponents }))))
+                    filterSelection.map((f) => (React.createElement(FilterCard, { key: f.id, filter: f, filterComponents: filterComponents, disableFilter: disableFilter }))))
                 : null)));
 }
 //# sourceMappingURL=CDCFilterComponent.js.map

@@ -1,65 +1,57 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { BSModal, useAsync } from '../hooks';
-import { deleteAlert, getAlerts, saveAlert } from './api';
-import { CDCCreateEditAlert } from './CDCCreateEditAlert';
+import { deleteAlert, getAlerts } from './api';
 import { CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter } from './CDCGroupingFilter';
 import { v4 as uuidv4 } from 'uuid';
 import { CDCTextFilter, CDCTextFilterId, createCDCTextFilter } from './CDCTextFilter';
 import { CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter } from './CDCCheckboxFilter';
 import { CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter } from './CDCRangeFilter';
-const DEFAULTFORMDATA = { name: "", enable_mail_notification: false, cdc_id: "" };
-const DEFAULTFILTER = { ...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true };
+import { CDCCreateAlert } from './CDCCreateAlert';
+import { CDCEditAlert } from './CDCEditAlert';
+export const DEFAULTALERTDATA = { name: "", enable_mail_notification: false, cdc_id: "demo", filter_dump: "", filter_query: "" };
+export const DEFAULTFILTER = { ...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true };
+export const accordionItem = (index, title, parentId, child, show) => {
+    parentId = parentId.trim();
+    return (React.createElement("div", { key: index, className: "accordion-item" },
+        React.createElement("h2", { className: "accordion-header", id: `heading${index}` },
+            React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#collapse${index}`, "aria-expanded": "true", "aria-controls": `collapse${index}` }, title)),
+        React.createElement("div", { id: `collapse${index}`, className: `p-2 accordion-collapse collapse${show ? " show" : ""}`, "aria-labelledby": `heading${index}`, "data-bs-parent": `#${parentId}` }, child)));
+};
 export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
     const [selectedAlert, setSelectedAlert] = React.useState();
     const [showDialog, setShowDialog] = React.useState(false);
     const [creationMode, setCreationMode] = React.useState(false);
     const [filter, setFilter] = React.useState();
-    const [formData, setFormData] = React.useState();
-    const [editMode, setEditMode] = React.useState(false);
+    const [alertData, setAlertData] = React.useState();
     const [alertList, setAlertList] = React.useState();
+    const { status: alertStatus, error: alertError, execute: alertExecute, value: alerts } = useAsync(getAlerts, true);
     React.useEffect(() => {
-        setFormData(DEFAULTFORMDATA);
+        setAlertData(DEFAULTALERTDATA);
         setFilter(DEFAULTFILTER);
     }, []);
     React.useEffect(() => {
-        console.log(selectedAlert);
-        setEditMode(false);
-        if (selectedAlert) {
-            setFormData(selectedAlert);
-            if (selectedAlert.filter) {
-                try {
-                    setFilter(JSON.parse(selectedAlert.filter));
-                }
-                catch (e) {
-                    console.log(e);
-                }
-            }
-        }
-    }, [selectedAlert]);
-    const { status: alertStatus, error: alertError, execute: alertExecute, value: alerts } = useAsync(getAlerts, true);
-    React.useEffect(() => {
         setAlertList(alerts);
     }, [alerts]);
-    const onSave = () => {
-        //TODO: put group away again
-        saveAlert({ ...formData, filter: JSON.stringify(filter) });
-    };
-    const editButton = !creationMode ? (!editMode && selectedAlert ? (React.createElement("button", { className: "btn btn-secondary", onClick: () => setEditMode(true) },
-        React.createElement("i", { className: "fas fa-pencil-alt" }))) : (React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Save changes", className: "btn btn-secondary", onClick: () => setEditMode(false) },
-            React.createElement("i", { className: "fas fa-save" })),
-        React.createElement("button", { title: "Discard changes", className: "btn btn-secondary ms-1", onClick: () => setEditMode(false) },
-            React.createElement("i", { className: "fas fa-ban" }))))) : null;
     const onCreateButtonClick = () => {
         setCreationMode(true);
         setSelectedAlert(null);
-        setFormData(DEFAULTFORMDATA);
+        setAlertData(DEFAULTALERTDATA);
         setFilter(DEFAULTFILTER);
     };
-    const onDeleteButton = (id) => {
+    const onDeleteButton = async (id) => {
         setAlertList([...alertList.filter((alert) => alert.id !== id)]);
-        deleteAlert(id);
+        await deleteAlert(id);
+        if (selectedAlert.id === id) {
+            setSelectedAlert(null);
+        }
+    };
+    const onAlertClick = async (alert) => {
+        console.log(alert);
+        setAlertData(alert);
+        setFilter(JSON.parse(alert.filter_dump));
+        setCreationMode(false);
+        setSelectedAlert(alert);
     };
     return React.createElement(React.Fragment, null,
         React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
@@ -84,7 +76,7 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                         "Error ",
                                         alertError.toString()) : null,
                                     alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alertList.map((alert) => React.createElement("div", { key: alert.id },
-                                        React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`, onClick: () => { setSelectedAlert(alert); setCreationMode(false); }, "aria-current": "true" },
+                                        React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
                                             React.createElement("div", { className: "d-flex w-100 justify-content-between" },
                                                 React.createElement("h6", { className: "mb-1" },
                                                     alert.name,
@@ -101,14 +93,14 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                             React.createElement("small", null,
                                                 "last confirmed: ",
                                                 alert.confirmation_date))))) : null),
-                                React.createElement("div", { className: "col-8 overflow-auto" }, selectedAlert || creationMode ? React.createElement(React.Fragment, null,
-                                    React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },
-                                        React.createElement("h5", null, "Your options"),
-                                        React.createElement("small", null, editButton)),
-                                    React.createElement(CDCCreateEditAlert, { editMode: selectedAlert ? editMode : null, setEditMode: selectedAlert ? setEditMode : null, filter: filter, setFilter: setFilter, formData: formData, setFormData: setFormData, filterSelection: filtersByCDC[selectedAlert.cdc_id], filterComponents: filterComponents, selectedAlert: selectedAlert ? selectedAlert : null })) : null))),
+                                React.createElement("div", { className: "col-8 overflow-auto" }, selectedAlert ?
+                                    React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC[selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.cdc_id], filterComponents: filterComponents, alertList: alertList, setAlertList: setAlertList, selectedAlert: selectedAlert, setSelctedAlert: setSelectedAlert })
+                                    :
+                                        creationMode ?
+                                            React.createElement(CDCCreateAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterComponents: filterComponents, filterSelection: filtersByCDC["demo"], alertList: alertList, setAlertList: setAlertList, setSelectedAlert: setSelectedAlert, setCreationMode: setCreationMode })
+                                            : null))),
                         React.createElement("div", { className: "modal-footer" },
-                            React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
-                            React.createElement("button", { type: "button", className: "btn btn-primary", onClick: () => onSave() }, "Save changes")))))));
+                            React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close")))))));
 }
 export class CDCFilterDialogClass {
     constructor(parent) {
@@ -119,8 +111,8 @@ export class CDCFilterDialogClass {
     init() {
         ReactDOM.render(React.createElement(CDCFilterDialog, { filterComponents: {
                 [CDCGroupingFilterId]: CDCGroupingFilter,
-                [CDCCheckboxFilterId]: CDCCheckboxFilter,
                 [CDCTextFilterId]: CDCTextFilter,
+                [CDCCheckboxFilterId]: CDCCheckboxFilter,
                 [CDCRangeFilterId]: CDCRangeFilter
             }, filtersByCDC: {
                 'demo': [

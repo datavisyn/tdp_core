@@ -26,7 +26,7 @@ export function createCDCTextFilter(id: string, name: string, value: ICDCTextFil
     disableDropping: true,
     componentId: CDCTextFilterId,
     componentValue: value
-  }
+  };
 }
 
 function CDCTextFilterToString(value: ICDCTextFilterValue): string {
@@ -36,13 +36,13 @@ function CDCTextFilterToString(value: ICDCTextFilterValue): string {
     .join(' and ')})`;
 }
 
-export function CDCTextFilterComponent({value, onValueChanged}) {
+export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
   return <>
     {value.filter.map((v, i) => (
       <div key={i} className="input-group m-1">
         <select
           className="form-select"
-          disabled={!onValueChanged}
+          disabled={!onValueChanged || disabled}
           value={v.field}
           onChange={(e) =>
             onValueChanged?.({
@@ -69,7 +69,7 @@ export function CDCTextFilterComponent({value, onValueChanged}) {
         <div style={{width: '70%'}}>
           <Select
             closeMenuOnSelect={false}
-            isDisabled={!onValueChanged}
+            isDisabled={!onValueChanged || disabled}
             isMulti
             value={v.value.map((value) => ({label: value, value}))}
             options={value.fields
@@ -92,21 +92,23 @@ export function CDCTextFilterComponent({value, onValueChanged}) {
             }
           />
         </div>
-        <button
-          disabled={!onValueChanged}
-          onClick={(e) =>
-            onValueChanged?.({
-              ...value,
-              filter: value.filter.filter((oldV) => oldV !== v)
-            })
-          }
-          className="btn btn-secondary"
-        >
-          X
-        </button>
+        {disabled ? null :
+          <button
+            disabled={!onValueChanged}
+            onClick={(e) =>
+              onValueChanged?.({
+                ...value,
+                filter: value.filter.filter((oldV) => oldV !== v)
+              })
+            }
+            className="btn btn-secondary"
+          >
+            X
+          </button>
+        }
       </div>
     ))}
-    {onValueChanged ? (
+    {onValueChanged && !disabled ? (
       <button
         className="btn btn-secondary m-1"
         onClick={() => {

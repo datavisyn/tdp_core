@@ -31,7 +31,7 @@ class CDCManager():
 
         # Filter new entry
         # '(item["id"] in (4, 5, 6, 7, 8) and not (item["id"] == 5 and item["id"] == 4 or item["id"] == 8)) or ((item["address"]["city"] == "Gwenborough") and (item["id"] > 0 and item["id"] < 5))'
-        new = [item for item in new if eval(alert.filter)]
+        new = [item for item in new if eval(alert.filter_query)]
 
         
         # filter = {

@@ -2,6 +2,7 @@ export interface IFilterComponent<V> {
   clazz: (props: {
     value: V;
     onValueChanged?: (value: V) => void;
+    disabled: boolean;
   }) => JSX.Element;
   toFilter?: (value: V) => string;
 }
@@ -34,7 +35,6 @@ export const getFilterFromTree = (
     if (current) {
       return {parent: filter, current};
     }
-
     // Otherwise, continue with all children
     for (const f of filter.children) {
       const current = getFilterFromTree(f, id);
@@ -43,7 +43,6 @@ export const getFilterFromTree = (
       }
     }
   }
-
   return {parent: null, current: null};
 };
 
@@ -53,7 +52,6 @@ export const getTreeQuery = (filter: IFilter, components: {[key: string]: IFilte
   }
   if (!filter.children) {
     //leaf filter
-
     if (
       filter &&
       components &&
@@ -64,20 +62,6 @@ export const getTreeQuery = (filter: IFilter, components: {[key: string]: IFilte
     } else {
       return '';
     }
-
-    /*
-  
-      if (
-        filter.component &&
-        filter.component.toFilter &&
-        filter.component.value
-      ) {
-        return filter.component.toFilter(filter.component.value);
-      } else {
-        return '';
-      }
-  
-    */
   } else {
     //go through every child
     let returnValue = '(';
@@ -95,25 +79,18 @@ export const getTreeQuery = (filter: IFilter, components: {[key: string]: IFilte
   }
 };
 
-
 export interface IAlert {
   id: number;
   name: string;
   cdc_id: string;
   confirmation_date?: string;
-  filter: string;
+  filter_dump: string;
+  filter_query: string;
   enable_mail_notification: boolean;
 }
 
-
-export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'enable_mail_notification'> {}
+export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter_dump' | 'filter_query' | 'enable_mail_notification'> {}
 
 export function isAlert(obj: IAlert | IUploadAlert): obj is IAlert {
   return typeof (obj as any)?.id === 'number';
 }
-
-
-// const test: IAlert | IUploadAlert = null;
-
-// if (!isAlert(test)) {
-// }

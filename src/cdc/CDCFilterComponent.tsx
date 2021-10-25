@@ -11,16 +11,10 @@ interface ICDCFilterComponentProps {
   filter: IFilter;
   setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
   filterComponents: {[key: string]: IFilterComponent<any>};
+  disableFilter?: boolean;
 }
 
-export function CDCFilterComponent({filterSelection, filter, setFilter, filterComponents}: ICDCFilterComponentProps) {
-  React.useEffect(() => {
-    const test = getTreeQuery(filter, filterComponents);
-    if (test) {
-      console.log(test);
-    }
-  }, [filter]);
-
+export function CDCFilterComponent({filterSelection, filter, setFilter, filterComponents, disableFilter}: ICDCFilterComponentProps) {
   const onDelete = (newFilter: IFilter) => {
     setFilter((filter) => produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
@@ -107,13 +101,14 @@ export function CDCFilterComponent({filterSelection, filter, setFilter, filterCo
             onChange={onChange}
             onValueChanged={onValueChanged}
             filterComponents={filterComponents}
+            disableFilter={disableFilter}
           />
         </div>
         {filterSelection ?
           <div className="col-md">
             <h6>New filters</h6>
             {filterSelection.map((f) => (
-              <FilterCard key={f.id} filter={f} filterComponents={filterComponents} />
+              <FilterCard key={f.id} filter={f} filterComponents={filterComponents} disableFilter={disableFilter} />
             ))}
           </div>
           : null}

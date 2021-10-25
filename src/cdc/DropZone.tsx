@@ -2,17 +2,14 @@ import * as React from 'react';
 import { getFilterFromTree, IFilter, itemTypes } from './interface';
 import { useDrop } from 'react-dnd';
 
-export function DropZone({
-  canDrop,
-  onDrop,
-  filter,
-  index
-}: {
+interface IDropZoneProps {
   onDrop: any;
   canDrop: boolean;
   filter: IFilter;
   index: number;
-}) {
+}
+
+export function DropZone({canDrop, onDrop, filter, index} : IDropZoneProps) {
   // TODO: Add proper types such that draggedItem can be infered
   const [{ isOver, draggedItem }, drop] = useDrop(
     () => ({

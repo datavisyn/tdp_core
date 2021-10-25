@@ -27,7 +27,7 @@ function CDCCheckboxFilterToString(value: ICDCCheckboxFilterValue): string {
   return `(${value?.fields.map((v) => {return `${v} == ${value.filter.filter((f) => f === v).length > 0}`;}).join(' and ')})`;
 }
 
-export function CDCCheckboxFilterComponent({value, onValueChanged}) {
+export function CDCCheckboxFilterComponent({value, onValueChanged, disabled}) {
   return <>
     {value.fields.map((v, i) => {
       return (
@@ -38,7 +38,7 @@ export function CDCCheckboxFilterComponent({value, onValueChanged}) {
               type="checkbox"
               id="flexCheckDefault"
               checked={value.filter.filter((f) => f === v).length > 0}
-              disabled={!onValueChanged}
+              disabled={!onValueChanged || disabled}
               onChange={(e) =>
                 onValueChanged?.({
                   ...value,

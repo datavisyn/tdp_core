@@ -13,16 +13,14 @@ import {Ajax, AppContext} from 'phovea_core';
 import {IAlert, IUploadAlert} from './interface';
 
 export async function getAlerts(): Promise<IAlert[]> {
-  //    return Ajax.send(AppContext.getInstance().api2absURL('/tdp/cdc/alert'), null, 'GET', 'JSON', 'application/json');
-  console.log(AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`))
   return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`);
 }
 
-export async function getAlertsById(id: string): Promise<IAlert | null> {
+export async function getAlertsById(id: number): Promise<IAlert | null> {
   return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}`);
 }
 
-export async function editAlert(id: string, alert: Partial<IAlert>): Promise<IAlert | null> {
+export async function editAlert(id: number, alert: Partial<IAlert>): Promise<IAlert | null> {
   return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert/${id}`), alert, 'PUT', 'JSON', 'application/json');
 }
 

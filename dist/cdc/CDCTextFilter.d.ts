@@ -13,7 +13,8 @@ export interface ICDCTextFilterValue {
 export declare const CDCTextFilterId = "text";
 export declare const CDCTextFilter: IFilterComponent<null>;
 export declare function createCDCTextFilter(id: string, name: string, value: ICDCTextFilterValue): IFilter<ICDCTextFilterValue>;
-export declare function CDCTextFilterComponent({ value, onValueChanged }: {
+export declare function CDCTextFilterComponent({ value, onValueChanged, disabled }: {
     value: any;
     onValueChanged: any;
+    disabled: any;
 }): JSX.Element;

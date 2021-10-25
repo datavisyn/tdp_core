@@ -35,19 +35,6 @@ export const getTreeQuery = (filter, components) => {
         else {
             return '';
         }
-        /*
-      
-          if (
-            filter.component &&
-            filter.component.toFilter &&
-            filter.component.value
-          ) {
-            return filter.component.toFilter(filter.component.value);
-          } else {
-            return '';
-          }
-      
-        */
     }
     else {
         //go through every child
@@ -68,7 +55,4 @@ export function isAlert(obj) {
     var _a;
     return typeof ((_a = obj) === null || _a === void 0 ? void 0 : _a.id) === 'number';
 }
-// const test: IAlert | IUploadAlert = null;
-// if (!isAlert(test)) {
-// }
 //# sourceMappingURL=interface.js.map

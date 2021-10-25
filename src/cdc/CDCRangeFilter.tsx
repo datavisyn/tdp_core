@@ -28,10 +28,10 @@ function CDCRangeFilterToString(value: ICDCRangeFilterValue): string {
   return `(date >= ${value.min} and date <= ${value.max})`;
 }
 
-function CDCRangeFilterComponent({value, onValueChanged}) {
+function CDCRangeFilterComponent({value, onValueChanged, disabled}) {
   return <div className="t360-input-range-wrapper" style={{margin: '10px', paddingTop: '10px', minHeight: '50px'}}>
     <InputRange
-      disabled={!onValueChanged}
+      disabled={!onValueChanged || disabled}
       maxValue={2021}
       minValue={1950}
       value={{min: value.min, max: value.max}}

@@ -1,20 +1,30 @@
 /// <reference types="react" />
-import { IFilter, IFilterComponent } from "./interface";
-export interface ICDCFormData {
-    name: string;
-    cdc_id: string;
-    enable_mail_notification: boolean;
-}
-export declare function CDCFilterDialog({ filterComponents, filtersByCDC }: {
+import { IFilter, IFilterComponent, IUploadAlert } from "./interface";
+interface ICDCFilterDialogProps {
     filterComponents: {
         [key: string]: IFilterComponent<any>;
     };
     filtersByCDC: {
         [cdcId: string]: IFilter<any>[];
     };
-}): JSX.Element;
+}
+export declare const DEFAULTALERTDATA: IUploadAlert;
+export declare const DEFAULTFILTER: {
+    disableDragging: boolean;
+    disableRemoving: boolean;
+    id: string;
+    name: string;
+    disableDropping?: boolean;
+    operator?: "AND" | "OR" | "NOT";
+    componentId: string;
+    componentValue: null;
+    children?: IFilter<any>[];
+};
+export declare const accordionItem: (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => JSX.Element;
+export declare function CDCFilterDialog({ filterComponents, filtersByCDC }: ICDCFilterDialogProps): JSX.Element;
 export declare class CDCFilterDialogClass {
     private node;
     constructor(parent: HTMLElement);
     private init;
 }
+export {};

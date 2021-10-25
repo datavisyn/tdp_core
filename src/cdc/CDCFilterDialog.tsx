@@ -1,85 +1,79 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
-import {IAlert, IFilter, IFilterComponent} from "./interface";
-import {deleteAlert, getAlerts, saveAlert} from './api';
-import {CDCCreateEditAlert} from './CDCCreateEditAlert';
+import {IAlert, IFilter, IFilterComponent, IUploadAlert} from "./interface";
+import {deleteAlert, getAlerts} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter} from './CDCGroupingFilter';
 import {v4 as uuidv4} from 'uuid';
 import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './CDCTextFilter';
 import {CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter} from './CDCCheckboxFilter';
 import {CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter} from './CDCRangeFilter';
+import {CDCCreateAlert} from './CDCCreateAlert';
+import {CDCEditAlert} from './CDCEditAlert';
 
-export interface ICDCFormData {
-  name: string;
-  cdc_id: string;
-  enable_mail_notification: boolean;
+interface ICDCFilterDialogProps {
+  filterComponents: {[key: string]: IFilterComponent<any>};
+  filtersByCDC: {[cdcId: string]: IFilter<any>[]};
 }
 
-const DEFAULTFORMDATA = {name: "", enable_mail_notification: false, cdc_id: ""};
-const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true};
+export const DEFAULTALERTDATA: IUploadAlert = {name: "", enable_mail_notification: false, cdc_id: "demo", filter_dump: "", filter_query: ""};
+export const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true};
 
-export function CDCFilterDialog({filterComponents, filtersByCDC}: {
-  filterComponents: {[key: string]: IFilterComponent<any>};
-  filtersByCDC: {[cdcId: string]: IFilter<any>[]}
-}) {
+export const accordionItem = (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => {
+  parentId = parentId.trim();
+  return (
+    <div key={index} className="accordion-item">
+      <h2 className="accordion-header" id={`heading${index}`}>
+        <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${index}`} aria-expanded="true" aria-controls={`collapse${index}`}>
+          {title}
+        </button>
+      </h2>
+      <div id={`collapse${index}`} className={`p-2 accordion-collapse collapse${show ? " show" : ""}`} aria-labelledby={`heading${index}`} data-bs-parent={`#${parentId}`}>
+        {child}
+      </div>
+    </div>
+  );
+};
+
+export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDialogProps) {
   const [selectedAlert, setSelectedAlert] = React.useState<IAlert>();
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [creationMode, setCreationMode] = React.useState<boolean>(false);
   const [filter, setFilter] = React.useState<IFilter>();
-  const [formData, setFormData] = React.useState<ICDCFormData>();
-  const [editMode, setEditMode] = React.useState<boolean>(false);
+  const [alertData, setAlertData] = React.useState<IUploadAlert>();
   const [alertList, setAlertList] = React.useState<IAlert[]>();
+  const {status: alertStatus, error: alertError, execute: alertExecute, value: alerts} = useAsync(getAlerts, true);
 
   React.useEffect(() => {
-    setFormData(DEFAULTFORMDATA);
+    setAlertData(DEFAULTALERTDATA);
     setFilter(DEFAULTFILTER);
   }, []);
 
   React.useEffect(() => {
-    console.log(selectedAlert)
-    setEditMode(false);
-    if (selectedAlert) {
-      setFormData(selectedAlert);
-      if (selectedAlert.filter) {
-        try {
-          setFilter(JSON.parse(selectedAlert.filter));
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    }
-  }, [selectedAlert]);
-
-  const {status: alertStatus, error: alertError, execute: alertExecute, value: alerts} = useAsync(getAlerts, true);
-  React.useEffect(() => {
     setAlertList(alerts);
   }, [alerts]);
-
-  const onSave = () => {
-    //TODO: put group away again
-    saveAlert({...formData, filter: JSON.stringify(filter)});
-  };
-
-  const editButton = !creationMode ? (
-    !editMode && selectedAlert ? (
-      <button className="btn btn-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
-    ) : (<>
-      <button title="Save changes" className="btn btn-secondary" onClick={() => setEditMode(false)}><i className="fas fa-save"></i></button>
-      <button title="Discard changes" className="btn btn-secondary ms-1" onClick={() => setEditMode(false)}><i className="fas fa-ban"></i></button>
-    </>)
-  ) : null;
 
   const onCreateButtonClick = () => {
     setCreationMode(true);
     setSelectedAlert(null);
-    setFormData(DEFAULTFORMDATA);
+    setAlertData(DEFAULTALERTDATA);
     setFilter(DEFAULTFILTER);
   };
 
-  const onDeleteButton = (id: number) => {
+  const onDeleteButton = async (id: number) => {
     setAlertList([...alertList.filter((alert) => alert.id !== id)]);
-    deleteAlert(id);
+    await deleteAlert(id);
+    if (selectedAlert.id === id) {
+      setSelectedAlert(null);
+    }
+  };
+
+  const onAlertClick = async (alert: IAlert) => {
+    console.log(alert);
+    setAlertData(alert);
+    setFilter(JSON.parse(alert.filter_dump));
+    setCreationMode(false);
+    setSelectedAlert(alert);
   };
 
   return <>
@@ -102,7 +96,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: {
                   {alertStatus === 'pending' ? <>Loading...</> : null}
                   {alertStatus === 'error' ? <>Error {alertError.toString()}</> : null}
                   {alertStatus === 'success' ? <div className="list-group">{alertList.map((alert) =>
-                    <div key={alert.id} ><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`} onClick={() => {setSelectedAlert(alert); setCreationMode(false)}} aria-current="true">
+                    <div key={alert.id} ><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`} onClick={() => onAlertClick(alert)} aria-current="true">
                       <div className="d-flex w-100 justify-content-between">
                         <h6 className="mb-1">{alert.name} <small className="text-muted">for {alert.cdc_id}</small> </h6>
                         <small><span className="badge bg-primary rounded-pill">1</span><span className="badge bg-secondary rounded-pill" onClick={() => onDeleteButton(alert.id)}><i className="fas fa-trash"></i></span></small>
@@ -113,26 +107,40 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: {
                   )}</div> : null}
                 </div>
                 <div className="col-8 overflow-auto">
-                  {selectedAlert || creationMode ? <>
-                    <div className="d-flex w-100 justify-content-between mb-1">
-                      <h5>Your options</h5>
-                      <small>{editButton}</small>
-                    </div>
-                    <CDCCreateEditAlert
-                      editMode={selectedAlert ? editMode : null}
-                      setEditMode={selectedAlert ? setEditMode : null}
+                  {selectedAlert ?
+                    <CDCEditAlert
+                      alertData={alertData}
+                      setAlertData={setAlertData}
                       filter={filter} setFilter={setFilter}
-                      formData={formData} setFormData={setFormData}
-                      filterSelection={filtersByCDC[selectedAlert.cdc_id]}
+                      filterSelection={filtersByCDC[selectedAlert?.cdc_id]}
                       filterComponents={filterComponents}
-                      selectedAlert={selectedAlert ? selectedAlert : null} />
-                  </> : null}
+                      alertList={alertList}
+                      setAlertList={setAlertList}
+                      selectedAlert={selectedAlert}
+                      setSelctedAlert={setSelectedAlert}
+                    />
+                    :
+                    creationMode ?
+                      <CDCCreateAlert
+                        alertData={alertData}
+                        setAlertData={setAlertData}
+                        filter={filter}
+                        setFilter={setFilter}
+                        filterComponents={filterComponents}
+                        filterSelection={filtersByCDC["demo"]}
+                        alertList={alertList}
+                        setAlertList={setAlertList}
+                        setSelectedAlert={setSelectedAlert}
+                        setCreationMode={setCreationMode}
+                      />
+                      : null
+                  }
                 </div>
               </div>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-primary" onClick={() => onSave()}>Save changes</button>
+              {/* <button type="button" className="btn btn-primary" onClick={() => onSave()}>Save changes</button> */}
             </div>
           </div>
         </div>
@@ -155,8 +163,8 @@ export class CDCFilterDialogClass {
       <CDCFilterDialog
         filterComponents={{
           [CDCGroupingFilterId]: CDCGroupingFilter,
-          [CDCCheckboxFilterId]: CDCCheckboxFilter,
           [CDCTextFilterId]: CDCTextFilter,
+          [CDCCheckboxFilterId]: CDCCheckboxFilter,
           [CDCRangeFilterId]: CDCRangeFilter
         }}
         filtersByCDC={{
