@@ -24,7 +24,7 @@ export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged,
                 React.createElement("span", { className: "flex-fill" }, filter.name),
                 React.createElement("div", null,
                     React.createElement("div", { className: "input-group" },
-                        onChange && hasChildren && ((_a = filter === null || filter === void 0 ? void 0 : filter.children) === null || _a === void 0 ? void 0 : _a.length) > 1 && !disableFilter ? (React.createElement("select", { className: "form-select form-select-sm", style: { width: '6em' }, value: filter.operator || 'AND', onChange: (e) => {
+                        onChange && hasChildren && ((_a = filter === null || filter === void 0 ? void 0 : filter.children) === null || _a === void 0 ? void 0 : _a.length) > 1 ? (React.createElement("select", { className: "form-select form-select-sm", style: { width: '6em' }, value: filter.operator || 'AND', disabled: disableFilter, onChange: (e) => {
                                 onChange(filter, (f) => {
                                     f.operator = e.currentTarget.value;
                                 });
@@ -32,7 +32,7 @@ export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged,
                             React.createElement("option", { value: "AND" }, "AND"),
                             React.createElement("option", { value: "OR" }, "OR"),
                             React.createElement("option", { value: "NOT" }, "NOT (AND)"))) : null,
-                        !filter.disableRemoving && onDelete && !disableFilter ? (React.createElement("button", { className: "btn btn-secondary btn-sm", onClick: () => onDelete(filter) },
+                        !filter.disableRemoving && onDelete && !disableFilter ? (React.createElement("button", { className: "btn btn-text-secondary btn-sm", onClick: () => onDelete(filter) },
                             React.createElement("i", { className: "fas fa-times" }))) : null))),
             filterComponent ? (React.createElement("div", null,
                 React.createElement(filterComponent.clazz, { disabled: disableFilter, value: filter.componentValue, onValueChanged: onValueChanged

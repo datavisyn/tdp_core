@@ -13,6 +13,7 @@ interface ICDCCreateAlert {
     setAlertList: (alerts: IAlert[]) => void;
     setSelectedAlert: (alert: IAlert) => void;
     setCreationMode: (mode: boolean) => void;
+    cdcs: string[];
 }
-export declare function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, setCreationMode, setSelectedAlert }: ICDCCreateAlert): JSX.Element;
+export declare function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, setCreationMode, setSelectedAlert, cdcs }: ICDCCreateAlert): JSX.Element;
 export {};

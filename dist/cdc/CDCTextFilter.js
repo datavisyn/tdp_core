@@ -54,9 +54,10 @@ export function CDCTextFilterComponent({ value, onValueChanged, disabled }) {
                     React.createElement("button", { disabled: !onValueChanged, onClick: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
                             ...value,
                             filter: value.filter.filter((oldV) => oldV !== v)
-                        }), className: "btn btn-secondary" }, "X")));
+                        }), className: "btn btn-text-secondary" },
+                        React.createElement("i", { className: "fas fa-trash" }))));
         }),
-        onValueChanged && !disabled ? (React.createElement("button", { className: "btn btn-secondary m-1", onClick: () => {
+        onValueChanged && !disabled ? (React.createElement("button", { className: "btn btn-text-secondary m-1", onClick: () => {
                 onValueChanged({
                     ...value,
                     filter: [
@@ -67,6 +68,7 @@ export function CDCTextFilterComponent({ value, onValueChanged, disabled }) {
                         }
                     ]
                 });
-            } }, "+")) : null);
+            } },
+            React.createElement("i", { className: "fas fa-plus" }))) : null);
 }
 //# sourceMappingURL=CDCTextFilter.js.map

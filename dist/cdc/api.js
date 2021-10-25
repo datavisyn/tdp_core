@@ -24,4 +24,10 @@ export async function deleteAlert(id) {
 export async function saveAlert(alert) {
     return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert`), alert, 'POST', 'JSON', 'application/json');
 }
+export async function runAlertById(id) {
+    return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/run`);
+}
+// export async function getCDCs(): Promise<string[] | null> {
+//   return AppContext.getInstance().getAPIJSON(`/tdp/cdc`);
+// }
 //# sourceMappingURL=api.js.map

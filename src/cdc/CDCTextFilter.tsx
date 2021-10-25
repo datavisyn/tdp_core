@@ -101,16 +101,16 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
                 filter: value.filter.filter((oldV) => oldV !== v)
               })
             }
-            className="btn btn-secondary"
+            className="btn btn-text-secondary"
           >
-            X
+            <i className="fas fa-trash"></i>
           </button>
         }
       </div>
     ))}
     {onValueChanged && !disabled ? (
       <button
-        className="btn btn-secondary m-1"
+        className="btn btn-text-secondary m-1"
         onClick={() => {
           onValueChanged({
             ...value,
@@ -124,7 +124,7 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
           });
         }}
       >
-        +
+        <i className="fas fa-plus"></i>
       </button>
     ) : null}
   </>;

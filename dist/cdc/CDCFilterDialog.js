@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { BSModal, useAsync } from '../hooks';
-import { deleteAlert, getAlerts } from './api';
+import { deleteAlert, getAlerts, runAlertById } from './api';
 import { CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter } from './CDCGroupingFilter';
 import { v4 as uuidv4 } from 'uuid';
 import { CDCTextFilter, CDCTextFilterId, createCDCTextFilter } from './CDCTextFilter';
@@ -25,13 +25,17 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
     const [filter, setFilter] = React.useState();
     const [alertData, setAlertData] = React.useState();
     const [alertList, setAlertList] = React.useState();
+    const [cdcs, setCdcs] = React.useState();
     const { status: alertStatus, error: alertError, execute: alertExecute, value: alerts } = useAsync(getAlerts, true);
     React.useEffect(() => {
         setAlertData(DEFAULTALERTDATA);
         setFilter(DEFAULTFILTER);
+        setCdcs(["demo"]);
     }, []);
     React.useEffect(() => {
-        setAlertList(alerts);
+        const runAlerts = [];
+        alerts === null || alerts === void 0 ? void 0 : alerts.sort((a, b) => a.modification_date > b.modification_date ? -1 : a.modification_date < b.modification_date ? 1 : 0).forEach((alert) => runAlertById(alert.id).then((a) => runAlerts.push(a)));
+        setAlertList(runAlerts);
     }, [alerts]);
     const onCreateButtonClick = () => {
         setCreationMode(true);
@@ -42,16 +46,18 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
     const onDeleteButton = async (id) => {
         setAlertList([...alertList.filter((alert) => alert.id !== id)]);
         await deleteAlert(id);
-        if (selectedAlert.id === id) {
-            setSelectedAlert(null);
-        }
+        setSelectedAlert(null);
     };
     const onAlertClick = async (alert) => {
-        console.log(alert);
         setAlertData(alert);
         setFilter(JSON.parse(alert.filter_dump));
         setCreationMode(false);
         setSelectedAlert(alert);
+    };
+    const newLiteratureCount = (alert) => {
+        var _a;
+        const data = (_a = JSON.parse(alert === null || alert === void 0 ? void 0 : alert.latest_diff)) === null || _a === void 0 ? void 0 : _a.dictionary_item_added;
+        return (data === null || data === void 0 ? void 0 : data.length) > 0 ? React.createElement("span", { className: "badge bg-primary rounded-pill ms-1" }, data.length) : null;
     };
     return React.createElement(React.Fragment, null,
         React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
@@ -70,7 +76,8 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                     React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },
                                         React.createElement("h5", null, "Your alerts"),
                                         React.createElement("small", null,
-                                            React.createElement("button", { className: "btn btn-secondary", onClick: () => onCreateButtonClick() }, "+"))),
+                                            React.createElement("button", { className: "btn btn-text-secondary", onClick: () => onCreateButtonClick() },
+                                                React.createElement("i", { className: "fas fa-plus" })))),
                                     alertStatus === 'pending' ? React.createElement(React.Fragment, null, "Loading...") : null,
                                     alertStatus === 'error' ? React.createElement(React.Fragment, null,
                                         "Error ",
@@ -84,20 +91,16 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                                     React.createElement("small", { className: "text-muted" },
                                                         "for ",
                                                         alert.cdc_id),
-                                                    " "),
-                                                React.createElement("small", null,
-                                                    React.createElement("span", { className: "badge bg-primary rounded-pill" }, "1"),
-                                                    React.createElement("span", { className: "badge bg-secondary rounded-pill", onClick: () => onDeleteButton(alert.id) },
-                                                        React.createElement("i", { className: "fas fa-trash" })))),
-                                            React.createElement("p", { className: "mb-1" }, "Some placeholder content in a paragraph."),
-                                            React.createElement("small", null,
-                                                "last confirmed: ",
-                                                alert.confirmation_date))))) : null),
+                                                    " ",
+                                                    newLiteratureCount(alert)),
+                                                selectedAlert === alert ? React.createElement("span", { className: "text-muted", onClick: () => onDeleteButton(alert.id) },
+                                                    React.createElement("i", { className: "fas fa-trash" })) : null),
+                                            React.createElement("small", null, alert.confirmation_date ? `last confirmed: ${alert.confirmation_date}` : 'No data revision yet'))))) : null),
                                 React.createElement("div", { className: "col-8 overflow-auto" }, selectedAlert ?
-                                    React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC[selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.cdc_id], filterComponents: filterComponents, alertList: alertList, setAlertList: setAlertList, selectedAlert: selectedAlert, setSelctedAlert: setSelectedAlert })
+                                    React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC[selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.cdc_id], filterComponents: filterComponents, alertList: alertList, setAlertList: setAlertList, selectedAlert: selectedAlert, setSelctedAlert: setSelectedAlert, cdcs: cdcs })
                                     :
                                         creationMode ?
-                                            React.createElement(CDCCreateAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterComponents: filterComponents, filterSelection: filtersByCDC["demo"], alertList: alertList, setAlertList: setAlertList, setSelectedAlert: setSelectedAlert, setCreationMode: setCreationMode })
+                                            React.createElement(CDCCreateAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterComponents: filterComponents, filterSelection: filtersByCDC["demo"], alertList: alertList, setAlertList: setAlertList, setSelectedAlert: setSelectedAlert, setCreationMode: setCreationMode, cdcs: cdcs })
                                             : null))),
                         React.createElement("div", { className: "modal-footer" },
                             React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close")))))));
@@ -117,9 +120,9 @@ export class CDCFilterDialogClass {
             }, filtersByCDC: {
                 'demo': [
                     createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
-                    createCDCTextFilter(uuidv4(), 'Text Filter', { filter: [{ field: 'field1', value: [] }], fields: [{ field: 'field1', options: ['hallo', 'hier', 'steht', 'text'] }, { field: 'field2', options: ['tschüss', 'hier', 'nicht'] }, { field: 'field3', options: ['test', 'noch ein test', 'hi'] }] }),
+                    createCDCTextFilter(uuidv4(), 'Text Filter', { filter: [{ field: `item["address"]["city"]`, value: [] }], fields: [{ field: `item["address"]["city"]`, options: [`"Gwenborough"`, `"Wisokyburgh"`, `"McKenziehaven"`, `"South Elvis"`, `"Roscoeview"`, `"South Christy"`, `"Howemouth"`, `"Aliyaview"`, `"Bartholomebury"`] }, { field: `item["address"]["zipcode"]`, options: [`"33263"`, `"23505-1337"`, `"58804-1099"`] }, { field: `item["name"]`, options: [`"Leanne Graham"`, `"Ervin Howell"`, `"Glenna Reichert"`, `"Clementina DuBuque"`] }] }),
                     createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', { fields: ['Eins', 'zwei', 'dRei'], filter: [] }),
-                    createCDCRangeFilter(uuidv4(), 'Range Filter', { min: 1950, max: 2021 }),
+                    createCDCRangeFilter(uuidv4(), 'Range Filter', { min: 1, max: 10 }),
                 ]
             } }), this.node);
     }

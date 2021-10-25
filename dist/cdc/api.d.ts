@@ -14,3 +14,4 @@ export declare function getAlertsById(id: number): Promise<IAlert | null>;
 export declare function editAlert(id: number, alert: Partial<IAlert>): Promise<IAlert | null>;
 export declare function deleteAlert(id: number): Promise<void>;
 export declare function saveAlert(alert: IUploadAlert): Promise<IAlert | null>;
+export declare function runAlertById(id: number): Promise<IAlert | null>;

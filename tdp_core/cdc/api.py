@@ -104,7 +104,7 @@ def edit_alert_by_id(data, id: str):
 @login_required
 @blp.route('/alert/<id>', methods=["DELETE"])
 @blp.response(code=200)
-def delete_alert_by_id(id: str):
+def delete_alert_by_id(id: int):
     session = create_session()
     item = session.query(CDCAlert).get(id)
     if not item:
@@ -121,7 +121,7 @@ def delete_alert_by_id(id: str):
 @login_required
 @blp.route('/alert/<id>/run', methods=["GET"])
 @blp.response(CDCAlertSchema(), code=200)
-def run_alert_by_id(id: str):
+def run_alert_by_id(id: int):
     session = create_session()
     alert = session.query(CDCAlert).get(id)
     if not alert:

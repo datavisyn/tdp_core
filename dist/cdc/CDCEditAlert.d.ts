@@ -13,6 +13,7 @@ interface ICDCEditAlert {
     setAlertList: (alerts: IAlert[]) => void;
     selectedAlert: IAlert;
     setSelctedAlert: (alert: IAlert) => void;
+    cdcs: string[];
 }
-export declare function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, selectedAlert, setSelctedAlert }: ICDCEditAlert): JSX.Element;
+export declare function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, selectedAlert, setSelctedAlert, cdcs }: ICDCEditAlert): JSX.Element;
 export {};

@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
 import {IAlert, IFilter, IFilterComponent, IUploadAlert} from "./interface";
-import {deleteAlert, getAlerts} from './api';
+import {deleteAlert, getAlerts, runAlertById} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter} from './CDCGroupingFilter';
 import {v4 as uuidv4} from 'uuid';
 import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './CDCTextFilter';
@@ -42,15 +42,19 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
   const [filter, setFilter] = React.useState<IFilter>();
   const [alertData, setAlertData] = React.useState<IUploadAlert>();
   const [alertList, setAlertList] = React.useState<IAlert[]>();
+  const [cdcs, setCdcs] = React.useState<string[]>();
   const {status: alertStatus, error: alertError, execute: alertExecute, value: alerts} = useAsync(getAlerts, true);
 
   React.useEffect(() => {
     setAlertData(DEFAULTALERTDATA);
     setFilter(DEFAULTFILTER);
+    setCdcs(["demo"]);
   }, []);
 
   React.useEffect(() => {
-    setAlertList(alerts);
+    const runAlerts = [];
+    alerts?.sort((a, b) => a.modification_date > b.modification_date ? -1 : a.modification_date < b.modification_date ? 1 : 0).forEach((alert) => runAlertById(alert.id).then((a) => runAlerts.push(a)));
+    setAlertList(runAlerts);
   }, [alerts]);
 
   const onCreateButtonClick = () => {
@@ -63,17 +67,19 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
   const onDeleteButton = async (id: number) => {
     setAlertList([...alertList.filter((alert) => alert.id !== id)]);
     await deleteAlert(id);
-    if (selectedAlert.id === id) {
-      setSelectedAlert(null);
-    }
+    setSelectedAlert(null);
   };
 
   const onAlertClick = async (alert: IAlert) => {
-    console.log(alert);
     setAlertData(alert);
     setFilter(JSON.parse(alert.filter_dump));
     setCreationMode(false);
     setSelectedAlert(alert);
+  };
+
+  const newLiteratureCount = (alert: IAlert) => {
+    const data = JSON.parse(alert?.latest_diff)?.dictionary_item_added;
+    return data?.length > 0 ? <span className="badge bg-primary rounded-pill ms-1">{data.length}</span> : null;
   };
 
   return <>
@@ -91,18 +97,17 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                 <div className="col-4 overflow-auto">
                   <div className="d-flex w-100 justify-content-between mb-1">
                     <h5>Your alerts</h5>
-                    <small><button className="btn btn-secondary" onClick={() => onCreateButtonClick()}>+</button></small>
+                    <small><button className="btn btn-text-secondary" onClick={() => onCreateButtonClick()}><i className="fas fa-plus"></i></button></small>
                   </div>
                   {alertStatus === 'pending' ? <>Loading...</> : null}
                   {alertStatus === 'error' ? <>Error {alertError.toString()}</> : null}
                   {alertStatus === 'success' ? <div className="list-group">{alertList.map((alert) =>
-                    <div key={alert.id} ><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`} onClick={() => onAlertClick(alert)} aria-current="true">
+                    <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`} onClick={() => onAlertClick(alert)} aria-current="true">
                       <div className="d-flex w-100 justify-content-between">
-                        <h6 className="mb-1">{alert.name} <small className="text-muted">for {alert.cdc_id}</small> </h6>
-                        <small><span className="badge bg-primary rounded-pill">1</span><span className="badge bg-secondary rounded-pill" onClick={() => onDeleteButton(alert.id)}><i className="fas fa-trash"></i></span></small>
+                        <h6 className="mb-1">{alert.name} <small className="text-muted">for {alert.cdc_id}</small> {newLiteratureCount(alert)}</h6>
+                        {selectedAlert === alert ? <span className="text-muted" onClick={() => onDeleteButton(alert.id)}><i className="fas fa-trash"></i></span> : null}
                       </div>
-                      <p className="mb-1">Some placeholder content in a paragraph.</p>
-                      <small>last confirmed: {alert.confirmation_date}</small>
+                      <small>{alert.confirmation_date ? `last confirmed: ${alert.confirmation_date}` : 'No data revision yet'}</small>
                     </a></div>
                   )}</div> : null}
                 </div>
@@ -118,6 +123,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                       setAlertList={setAlertList}
                       selectedAlert={selectedAlert}
                       setSelctedAlert={setSelectedAlert}
+                      cdcs={cdcs}
                     />
                     :
                     creationMode ?
@@ -132,6 +138,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                         setAlertList={setAlertList}
                         setSelectedAlert={setSelectedAlert}
                         setCreationMode={setCreationMode}
+                        cdcs={cdcs}
                       />
                       : null
                   }
@@ -140,7 +147,6 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              {/* <button type="button" className="btn btn-primary" onClick={() => onSave()}>Save changes</button> */}
             </div>
           </div>
         </div>
@@ -170,9 +176,9 @@ export class CDCFilterDialogClass {
         filtersByCDC={{
           'demo': [
             createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
-            createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: 'field1', value: []}], fields: [{field: 'field1', options: ['hallo', 'hier', 'steht', 'text']}, {field: 'field2', options: ['tschüss', 'hier', 'nicht']}, {field: 'field3', options: ['test', 'noch ein test', 'hi']}]}),
+            createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: `item["address"]["city"]`, value: []}], fields: [{field: `item["address"]["city"]`, options: [`"Gwenborough"`, `"Wisokyburgh"`, `"McKenziehaven"`, `"South Elvis"`, `"Roscoeview"`, `"South Christy"`, `"Howemouth"`, `"Aliyaview"`, `"Bartholomebury"`]}, {field: `item["address"]["zipcode"]`, options: [`"33263"`, `"23505-1337"`, `"58804-1099"`]}, {field: `item["name"]`, options: [`"Leanne Graham"`, `"Ervin Howell"`, `"Glenna Reichert"`, `"Clementina DuBuque"`]}]}),
             createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', {fields: ['Eins', 'zwei', 'dRei'], filter: []}),
-            createCDCRangeFilter(uuidv4(), 'Range Filter', {min: 1950, max: 2021}),
+            createCDCRangeFilter(uuidv4(), 'Range Filter', {min: 1, max: 10}),
           ]
         }} />,
       this.node

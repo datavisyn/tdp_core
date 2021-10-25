@@ -51,11 +51,12 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
           <span className="flex-fill">{filter.name}</span>
           <div>
             <div className="input-group">
-              {onChange && hasChildren && filter?.children?.length > 1 && !disableFilter ? (
+              {onChange && hasChildren && filter?.children?.length > 1 ? (
                 <select
                   className="form-select form-select-sm"
                   style={{width: '6em'}}
                   value={filter.operator || 'AND'}
+                  disabled={disableFilter}
                   onChange={(e) => {
                     onChange(filter, (f) => {
                       f.operator = e.currentTarget.value as any;
@@ -69,7 +70,7 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
               ) : null}
               {!filter.disableRemoving && onDelete && !disableFilter ? (
                 <button
-                  className="btn btn-secondary btn-sm"
+                  className="btn btn-text-secondary btn-sm"
                   onClick={() => onDelete(filter)}
                 >
                   <i className="fas fa-times" />

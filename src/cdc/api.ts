@@ -31,3 +31,11 @@ export async function deleteAlert(id: number): Promise<void> {
 export async function saveAlert(alert: IUploadAlert): Promise<IAlert | null> {
   return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert`), alert, 'POST', 'JSON', 'application/json');
 }
+
+export async function runAlertById(id: number): Promise<IAlert | null> {
+  return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/run`);
+}
+
+// export async function getCDCs(): Promise<string[] | null> {
+//   return AppContext.getInstance().getAPIJSON(`/tdp/cdc`);
+// }
