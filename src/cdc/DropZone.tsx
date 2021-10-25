@@ -9,7 +9,7 @@ interface IDropZoneProps {
   index: number;
 }
 
-export function DropZone({canDrop, onDrop, filter, index} : IDropZoneProps) {
+export function DropZone({canDrop, onDrop, filter, index}: IDropZoneProps) {
   // TODO: Add proper types such that draggedItem can be infered
   const [{ isOver, draggedItem }, drop] = useDrop(
     () => ({

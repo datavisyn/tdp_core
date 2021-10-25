@@ -4,7 +4,7 @@ import * as React from 'react';
 export const CDCGroupingFilterId = 'group';
 export const CDCGroupingFilter: IFilterComponent<null> = {
   clazz: CDCGroupingFilterComponent,
-}
+};
 
 export function createCDCGroupingFilter(id: string, name: string): IFilter<null> {
   return {

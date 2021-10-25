@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IAlert, IFilter, IFilterComponent, IUploadAlert } from "./interface";
+import { IAlert, IFilter, IFilterComponent, IUploadAlert } from './interface';
 interface ICDCEditAlert {
     alertData: IUploadAlert;
     setAlertData: (formData: IUploadAlert) => void;

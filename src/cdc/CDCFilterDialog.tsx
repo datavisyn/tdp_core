@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
-import {IAlert, IFilter, IFilterComponent, IUploadAlert} from "./interface";
+import {IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
 import {deleteAlert, getAlerts, runAlertById} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter} from './CDCGroupingFilter';
 import {v4 as uuidv4} from 'uuid';
@@ -16,7 +16,7 @@ interface ICDCFilterDialogProps {
   filtersByCDC: {[cdcId: string]: IFilter<any>[]};
 }
 
-export const DEFAULTALERTDATA: IUploadAlert = {name: "", enable_mail_notification: false, cdc_id: "demo", filter_dump: "", filter_query: ""};
+export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter_dump: '', filter_query: ''};
 export const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true};
 
 export const accordionItem = (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => {
@@ -28,7 +28,7 @@ export const accordionItem = (index: number, title: string, parentId: string, ch
           {title}
         </button>
       </h2>
-      <div id={`collapse${index}`} className={`p-2 accordion-collapse collapse${show ? " show" : ""}`} aria-labelledby={`heading${index}`} data-bs-parent={`#${parentId}`}>
+      <div id={`collapse${index}`} className={`p-2 accordion-collapse collapse${show ? ' show' : ''}`} aria-labelledby={`heading${index}`} data-bs-parent={`#${parentId}`}>
         {child}
       </div>
     </div>
@@ -48,7 +48,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
   React.useEffect(() => {
     setAlertData(DEFAULTALERTDATA);
     setFilter(DEFAULTFILTER);
-    setCdcs(["demo"]);
+    setCdcs(['demo']);
   }, []);
 
   React.useEffect(() => {
@@ -102,7 +102,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                   {alertStatus === 'pending' ? <>Loading...</> : null}
                   {alertStatus === 'error' ? <>Error {alertError.toString()}</> : null}
                   {alertStatus === 'success' ? <div className="list-group">{alertList.map((alert) =>
-                    <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? " border-primary" : ""}`} onClick={() => onAlertClick(alert)} aria-current="true">
+                    <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? ' border-primary' : ''}`} onClick={() => onAlertClick(alert)} aria-current="true">
                       <div className="d-flex w-100 justify-content-between">
                         <h6 className="mb-1">{alert.name} <small className="text-muted">for {alert.cdc_id}</small> {newLiteratureCount(alert)}</h6>
                         {selectedAlert === alert ? <span className="text-muted" onClick={() => onDeleteButton(alert.id)}><i className="fas fa-trash"></i></span> : null}
@@ -133,7 +133,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                         filter={filter}
                         setFilter={setFilter}
                         filterComponents={filterComponents}
-                        filterSelection={filtersByCDC["demo"]}
+                        filterSelection={filtersByCDC['demo']}
                         alertList={alertList}
                         setAlertList={setAlertList}
                         setSelectedAlert={setSelectedAlert}

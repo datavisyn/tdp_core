@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IFilter, IFilterComponent, IUploadAlert } from "./interface";
+import { IFilter, IFilterComponent, IUploadAlert } from './interface';
 interface ICDCFilterDialogProps {
     filterComponents: {
         [key: string]: IFilterComponent<any>;

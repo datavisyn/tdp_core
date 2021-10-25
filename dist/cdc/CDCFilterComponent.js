@@ -1,9 +1,9 @@
-import produce from "immer";
-import React from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { FilterCard } from "./FilterCard";
-import { getFilterFromTree } from "./interface";
+import produce from 'immer';
+import React from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { FilterCard } from './FilterCard';
+import { getFilterFromTree } from './interface';
 import { v4 as uuidv4 } from 'uuid';
 export function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents, disableFilter }) {
     const onDelete = (newFilter) => {

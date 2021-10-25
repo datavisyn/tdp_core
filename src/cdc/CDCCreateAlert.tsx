@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 import Select from 'react-select';
-import {accordionItem} from ".";
-import {saveAlert} from "./api";
-import {CDCFilterComponent} from "./CDCFilterComponent";
-import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from "./interface";
+import {accordionItem} from '.';
+import {saveAlert} from './api';
+import {CDCFilterComponent} from './CDCFilterComponent';
+import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
 
 interface ICDCCreateAlert {
   alertData: IUploadAlert;
@@ -30,9 +30,9 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
       <div className="mb-3">
         <label className="form-label">CDC</label>
         <Select
-          options={cdcs.map(c => {return {label: c, value: c}})}
+          options={cdcs.map((c) => {return {label: c, value: c};})}
           value={{label: alertData.cdc_id, value: alertData.cdc_id}}
-          onChange={e => setAlertData({...alertData, cdc_id: e.value})}
+          onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
         />
       </div>
       <input className="form-check-input" type="checkbox" checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />

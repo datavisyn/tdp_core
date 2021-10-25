@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 import Select from 'react-select';
-import { accordionItem } from ".";
-import { saveAlert } from "./api";
-import { CDCFilterComponent } from "./CDCFilterComponent";
-import { getTreeQuery } from "./interface";
+import { accordionItem } from '.';
+import { saveAlert } from './api';
+import { CDCFilterComponent } from './CDCFilterComponent';
+import { getTreeQuery } from './interface';
 export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, setCreationMode, setSelectedAlert, cdcs }) {
     const generalInformation = (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "mb-3" },
@@ -11,7 +11,7 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
             React.createElement("input", { type: "text", className: "form-control", value: alertData.name, onChange: (e) => setAlertData({ ...alertData, name: e.target.value }) })),
         React.createElement("div", { className: "mb-3" },
             React.createElement("label", { className: "form-label" }, "CDC"),
-            React.createElement(Select, { options: cdcs.map(c => { return { label: c, value: c }; }), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: e => setAlertData({ ...alertData, cdc_id: e.value }) })),
+            React.createElement(Select, { options: cdcs.map((c) => { return { label: c, value: c }; }), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: (e) => setAlertData({ ...alertData, cdc_id: e.value }) })),
         React.createElement("input", { className: "form-check-input", type: "checkbox", checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
         React.createElement("label", { className: "form-check-label ms-2" }, "Email notification"),
         React.createElement("div", { className: "mb-3 form-check" })));

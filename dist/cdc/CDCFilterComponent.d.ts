@@ -1,5 +1,5 @@
-import React from "react";
-import { IFilter, IFilterComponent } from "./interface";
+import React from 'react';
+import { IFilter, IFilterComponent } from './interface';
 interface ICDCFilterComponentProps {
     filterSelection?: IFilter<any>[];
     filter: IFilter;

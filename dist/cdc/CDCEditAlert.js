@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 import Select from 'react-select';
-import { accordionItem } from ".";
-import { editAlert } from "./api";
-import { CDCFilterComponent } from "./CDCFilterComponent";
-import { getTreeQuery } from "./interface";
+import { accordionItem } from '.';
+import { editAlert } from './api';
+import { CDCFilterComponent } from './CDCFilterComponent';
+import { getTreeQuery } from './interface';
 export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, selectedAlert, setSelctedAlert, cdcs }) {
     const [editMode, setEditMode] = React.useState(false);
     React.useEffect(() => {
@@ -18,7 +18,7 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                     React.createElement("input", { type: "text", className: "form-control", value: alertData.name, onChange: (e) => setAlertData({ ...alertData, name: e.target.value }) })),
         React.createElement("div", { className: "mb-3" },
             React.createElement("label", { className: "form-label" }, "CDC"),
-            React.createElement(Select, { isDisabled: !editMode, options: cdcs.map(c => { return { label: c, value: c }; }), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: e => setAlertData({ ...alertData, cdc_id: e.value }) })),
+            React.createElement(Select, { isDisabled: !editMode, options: cdcs.map((c) => { return { label: c, value: c }; }), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: (e) => setAlertData({ ...alertData, cdc_id: e.value }) })),
         React.createElement("input", { className: "form-check-input", type: "checkbox", disabled: !editMode, checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
         React.createElement("label", { className: "form-check-label ms-2" }, "Email notification"),
         React.createElement("div", { className: "mb-3 form-check" })));

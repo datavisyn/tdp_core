@@ -1,9 +1,9 @@
-import produce from "immer";
-import React from "react";
-import {DndProvider} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
-import {FilterCard} from "./FilterCard";
-import {getFilterFromTree, getTreeQuery, IFilter, IFilterComponent} from "./interface";
+import produce from 'immer';
+import React from 'react';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
+import {FilterCard} from './FilterCard';
+import {getFilterFromTree, IFilter, IFilterComponent} from './interface';
 import {v4 as uuidv4} from 'uuid';
 
 interface ICDCFilterComponentProps {
@@ -114,5 +114,5 @@ export function CDCFilterComponent({filterSelection, filter, setFilter, filterCo
           : null}
       </div>
     </DndProvider>
-  )
+  );
 }
