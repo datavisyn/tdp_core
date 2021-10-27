@@ -2,12 +2,24 @@
 import { IFilter, IFilterComponent } from './interface';
 export interface ICDCTextFilterValue {
     fields: {
-        field: string;
-        options: string[];
+        field: {
+            label: string;
+            value: string;
+        };
+        options: {
+            label: string;
+            value: string;
+        }[];
     }[];
     filter: {
-        field: string;
-        value: string[];
+        field: {
+            label: string;
+            value: string;
+        };
+        value: {
+            label: string;
+            value: string;
+        }[];
     }[];
 }
 export declare const CDCTextFilterId = "text";

@@ -1,5 +1,6 @@
 from abc import abstractmethod, abstractproperty
-from typing import TypeVar, Generic, List
+from types import LambdaType
+from typing import Dict, TypeVar, Generic, List
 from deepdiff import DeepDiff
 
 T = TypeVar('T')
@@ -33,3 +34,15 @@ class BaseCDC(Generic[T]):
         old_lookup = {self.get_id(item): item for item in old}
         new_lookup = {self.get_id(item): item for item in new}
         return DeepDiff(old_lookup, new_lookup).to_json()
+
+    # @abstractproperty # ?
+    # @property
+    # def available_filters() -> Dict[str, LambdaType]:
+    #     return {
+    #         'text': lambda item, filter: item[filter.field] == filter.value,
+    #         'range': lambda item, filter: item[filter.field] >= filter.min and item[filter.field] <= filter.max,
+    #         'text': textFilter
+    #     }
+
+# def textFilter(item, filter) -> bool:
+#     return True

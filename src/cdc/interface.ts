@@ -83,7 +83,6 @@ export interface IAlert {
   id: number;
   name: string;
   cdc_id: string;
-  confirmation_date?: string;
   filter_dump: string;
   filter_query: string;
   enable_mail_notification: boolean;
@@ -91,6 +90,8 @@ export interface IAlert {
   latest_fetched_data: string;
   latest_compare_date: string;
   modification_date: string;
+  confirmed_data: string;
+  confirmation_date: string;
 }
 
 export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter_dump' | 'filter_query' | 'enable_mail_notification'> {}

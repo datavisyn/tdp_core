@@ -27,7 +27,7 @@ export async function saveAlert(alert) {
 export async function runAlertById(id) {
     return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/run`);
 }
-// export async function getCDCs(): Promise<string[] | null> {
-//   return AppContext.getInstance().getAPIJSON(`/tdp/cdc`);
-// }
+export async function confirmAlertById(id) {
+    return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/confirm`);
+}
 //# sourceMappingURL=api.js.map

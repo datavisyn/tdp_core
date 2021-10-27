@@ -4,12 +4,16 @@ import Select from 'react-select';
 
 export interface ICDCTextFilterValue {
   fields: {
-    field: string,
-    options: string[]
+    // field: string;
+    // options: string[];
+    field: {label: string, value: string};
+    options: {label: string, value: string}[];
   }[];
   filter: {
-    field: string,
-    value: string[]
+    // field: string;
+    // value: string[];
+    field: {label: string, value: string}
+    value: {label: string, value: string}[]
   }[];
 }
 
@@ -32,7 +36,7 @@ export function createCDCTextFilter(id: string, name: string, value: ICDCTextFil
 function CDCTextFilterToString(value: ICDCTextFilterValue): string {
   // Generate filter from value
   return `(${value.filter
-    .map((v) => `${v.field} in (${v.value.join(',')})`)
+    .map((v) => `${v.field.value} in (${v.value.map((vV => vV.value)).join(',')})`)
     .join(' and ')})`;
 }
 
@@ -40,43 +44,11 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
   return <>
     {value.filter.map((v, i) => (
       <div key={i} className="input-group m-1">
-        <select
-          className="form-select"
-          disabled={!onValueChanged || disabled}
-          value={v.field}
-          onChange={(e) =>
-            onValueChanged?.({
-              ...value,
-              filter: value.filter.map((oldV) =>
-                oldV === v
-                  ? {
-                    ...v,
-                    field: e.currentTarget.value,
-                    value: []
-                  }
-                  : oldV
-              )
-            })
-          }
-        >
-          <option value="">Select...</option>
-          {value.fields.map((f) => (
-            <option value={f.field} key={f.field}>
-              {f.field}
-            </option>
-          ))}
-        </select>
-        <div style={{width: '70%'}}>
+        <div style={{width: '30%'}}>
           <Select
-            closeMenuOnSelect={false}
             isDisabled={!onValueChanged || disabled}
-            isMulti
-            value={v.value.map((value) => ({label: value, value}))}
-            options={value.fields
-              .find((f) => f.field === v.field)
-              ?.options.map((o) => {
-                return {value: o, label: o};
-              })}
+            value={v.field}
+            options={[...value.fields.map((field) => field.field)]}
             onChange={(e) =>
               onValueChanged?.({
                 ...value,
@@ -84,7 +56,30 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
                   oldV === v
                     ? {
                       ...v,
-                      value: e.map((value) => (value as any).value)
+                      field: e,
+                      value: []
+                    }
+                    : oldV
+                )
+              })
+            }
+          />
+        </div>
+        <div style={{width: '70%'}}>
+          <Select
+            closeMenuOnSelect={false}
+            isDisabled={!onValueChanged || disabled || !v.field}
+            isMulti
+            value={v.value}
+            options={value.fields.find((f) => f.field === v.field)?.options}
+            onChange={(e) =>
+              onValueChanged?.({
+                ...value,
+                filter: value.filter.map((oldV) =>
+                  oldV === v
+                    ? {
+                      ...v,
+                      value: e
                     }
                     : oldV
                 )

@@ -1,3 +1,4 @@
+from types import LambdaType
 from typing import Dict
 from .BaseCDC import BaseCDC
 import requests 

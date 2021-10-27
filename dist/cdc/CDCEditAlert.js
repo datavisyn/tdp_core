@@ -1,10 +1,11 @@
 import React from 'react';
 import Select from 'react-select';
 import { accordionItem } from '.';
-import { editAlert } from './api';
+import { confirmAlertById, deleteAlert, editAlert } from './api';
 import { CDCFilterComponent } from './CDCFilterComponent';
 import { getTreeQuery } from './interface';
-export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, selectedAlert, setSelctedAlert, cdcs }) {
+export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, selectedAlert, setSelectedAlert, cdcs }) {
+    var _a;
     const [editMode, setEditMode] = React.useState(false);
     React.useEffect(() => {
         setEditMode(false);
@@ -26,15 +27,19 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
         var _a;
         const data = (_a = JSON.parse(selectedAlert.latest_diff)) === null || _a === void 0 ? void 0 : _a.dictionary_item_added;
         return (React.createElement(React.Fragment, null, (data === null || data === void 0 ? void 0 : data.length) > 0 ? (React.createElement(React.Fragment, null,
-            React.createElement("h6", null, "New literature from:"),
-            React.createElement("p", null, selectedAlert.latest_compare_date),
             React.createElement("h6", null, "Literature:"),
-            data.map((d, i) => React.createElement("p", { key: i }, d)))) : (React.createElement("p", null, "No new literature available"))));
+            data.map((d, i) => React.createElement("p", { key: i }, d)),
+            React.createElement("button", { className: "btn btn-secondary", onClick: () => confirmChanges(selectedAlert.id) }, "Confirm changes"))) : (React.createElement("p", null, "No new data available"))));
+    };
+    const confirmChanges = async (id) => {
+        const alert = await confirmAlertById(id);
+        await fetchAlerts();
+        setSelectedAlert(alert);
     };
     const onSave = async () => {
         const newAlert = await editAlert(selectedAlert.id, { ...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents) });
-        setAlertList([newAlert, ...alertList.filter((alert) => alert.id !== selectedAlert.id)]);
-        setSelctedAlert(newAlert);
+        await fetchAlerts();
+        setSelectedAlert(newAlert);
         setEditMode(false);
     };
     const onDiscard = () => {
@@ -42,8 +47,16 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
         setFilter(JSON.parse(selectedAlert.filter_dump));
         setEditMode(false);
     };
-    const editButton = !editMode ? (React.createElement("button", { className: "btn btn-text-secondary", onClick: () => setEditMode(true) },
-        React.createElement("i", { className: "fas fa-pencil-alt" }))) : (React.createElement(React.Fragment, null,
+    const onDelete = async (id) => {
+        await fetchAlerts();
+        await deleteAlert(id);
+        setSelectedAlert(null);
+    };
+    const editButton = !editMode ? (React.createElement(React.Fragment, null,
+        React.createElement("button", { className: "btn btn-text-secondary", onClick: () => setEditMode(true) },
+            React.createElement("i", { className: "fas fa-pencil-alt" })),
+        React.createElement("button", { className: "btn btn-text-secondary", onClick: () => onDelete(selectedAlert.id) },
+            React.createElement("i", { className: "fas fa-trash" })))) : (React.createElement(React.Fragment, null,
         React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: () => onSave() },
             React.createElement("i", { className: "fas fa-save" })),
         React.createElement("button", { title: "Discard changes", className: "btn btn-text-secondary ms-1", onClick: () => onDiscard() },
@@ -52,9 +65,9 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
         React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },
             React.createElement("h5", null, "Your options"),
             React.createElement("small", null, editButton)),
-        React.createElement("div", { className: "accordion", id: "createAlert" },
-            accordionItem(1, 'New literature', 'createAlert', literature(), true),
-            accordionItem(2, 'Alert overview', 'createAlert', generalInformation),
-            accordionItem(3, 'Filter settings', 'createAlert', filterSelection ? (!filter ? null : React.createElement(CDCFilterComponent, { filterSelection: !editMode ? null : filterSelection, filterComponents: filterComponents, filter: filter, setFilter: setFilter, disableFilter: !editMode })) : React.createElement("p", null, "No filters available for this cdc")))));
+        React.createElement("div", { className: "accordion", id: "editAlert" },
+            accordionItem(1, `${((_a = JSON.parse(selectedAlert.latest_diff)) === null || _a === void 0 ? void 0 : _a.dictionary_item_added) ? "Latest revision from: " + selectedAlert.latest_compare_date : "No new data"}`, 'editAlert', literature(), true),
+            accordionItem(2, 'Alert overview', 'editAlert', generalInformation),
+            accordionItem(3, 'Filter settings', 'editAlert', filterSelection ? (!filter ? null : React.createElement(CDCFilterComponent, { filterSelection: !editMode ? null : filterSelection, filterComponents: filterComponents, filter: filter, setFilter: setFilter, disableFilter: !editMode })) : React.createElement("p", null, "No filters available for this cdc")))));
 }
 //# sourceMappingURL=CDCEditAlert.js.map

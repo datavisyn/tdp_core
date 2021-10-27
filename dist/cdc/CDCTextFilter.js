@@ -17,7 +17,7 @@ export function createCDCTextFilter(id, name, value) {
 function CDCTextFilterToString(value) {
     // Generate filter from value
     return `(${value.filter
-        .map((v) => `${v.field} in (${v.value.join(',')})`)
+        .map((v) => `${v.field.value} in (${v.value.map((vV => vV.value)).join(',')})`)
         .join(' and ')})`;
 }
 export function CDCTextFilterComponent({ value, onValueChanged, disabled }) {
@@ -25,28 +25,24 @@ export function CDCTextFilterComponent({ value, onValueChanged, disabled }) {
         value.filter.map((v, i) => {
             var _a;
             return (React.createElement("div", { key: i, className: "input-group m-1" },
-                React.createElement("select", { className: "form-select", disabled: !onValueChanged || disabled, value: v.field, onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
-                        ...value,
-                        filter: value.filter.map((oldV) => oldV === v
-                            ? {
-                                ...v,
-                                field: e.currentTarget.value,
-                                value: []
-                            }
-                            : oldV)
-                    }) },
-                    React.createElement("option", { value: "" }, "Select..."),
-                    value.fields.map((f) => (React.createElement("option", { value: f.field, key: f.field }, f.field)))),
-                React.createElement("div", { style: { width: '70%' } },
-                    React.createElement(Select, { closeMenuOnSelect: false, isDisabled: !onValueChanged || disabled, isMulti: true, value: v.value.map((value) => ({ label: value, value })), options: (_a = value.fields
-                            .find((f) => f.field === v.field)) === null || _a === void 0 ? void 0 : _a.options.map((o) => {
-                            return { value: o, label: o };
-                        }), onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
+                React.createElement("div", { style: { width: '30%' } },
+                    React.createElement(Select, { isDisabled: !onValueChanged || disabled, value: v.field, options: [...value.fields.map((field) => field.field)], onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
                             ...value,
                             filter: value.filter.map((oldV) => oldV === v
                                 ? {
                                     ...v,
-                                    value: e.map((value) => value.value)
+                                    field: e,
+                                    value: []
+                                }
+                                : oldV)
+                        }) })),
+                React.createElement("div", { style: { width: '70%' } },
+                    React.createElement(Select, { closeMenuOnSelect: false, isDisabled: !onValueChanged || disabled || !v.field, isMulti: true, value: v.value, options: (_a = value.fields.find((f) => f.field === v.field)) === null || _a === void 0 ? void 0 : _a.options, onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
+                            ...value,
+                            filter: value.filter.map((oldV) => oldV === v
+                                ? {
+                                    ...v,
+                                    value: e
                                 }
                                 : oldV)
                         }) })),

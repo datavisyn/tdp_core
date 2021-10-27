@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 import {accordionItem} from '.';
-import {editAlert} from './api';
+import {confirmAlertById, deleteAlert, editAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
 import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
 
@@ -12,14 +12,13 @@ interface ICDCEditAlert {
   filter: IFilter;
   setFilter: (filter: IFilter) => void;
   filterComponents: {[key: string]: IFilterComponent<any>};
-  alertList: IAlert[];
-  setAlertList: (alerts: IAlert[]) => void;
+  fetchAlerts: () => void;
   selectedAlert: IAlert;
-  setSelctedAlert: (alert: IAlert) => void;
+  setSelectedAlert: (alert: IAlert) => void;
   cdcs: string[];
 }
 
-export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, selectedAlert, setSelctedAlert, cdcs}: ICDCEditAlert) {
+export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, selectedAlert, setSelectedAlert, cdcs}: ICDCEditAlert) {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   React.useEffect(() => {
     setEditMode(false);
@@ -52,20 +51,25 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
   const literature = () => {
     const data = JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added;
     return (<>{data?.length > 0 ? (<>
-      <h6>New literature from:</h6>
-      <p>{selectedAlert.latest_compare_date}</p>
       <h6>Literature:</h6>
       {data.map((d, i) => <p key={i}>{d}</p>)}
+      <button className="btn btn-secondary" onClick={() => confirmChanges(selectedAlert.id)}>Confirm changes</button>
     </>) : (
-      <p>No new literature available</p>
+      <p>No new data available</p>
     )}
     </>);
   };
 
+  const confirmChanges = async (id: number) => {
+    const alert = await confirmAlertById(id);
+    await fetchAlerts()
+    setSelectedAlert(alert);
+  }
+
   const onSave = async () => {
     const newAlert = await editAlert(selectedAlert.id, {...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
-    setAlertList([newAlert, ...alertList.filter((alert) => alert.id !== selectedAlert.id)]);
-    setSelctedAlert(newAlert);
+    await fetchAlerts();
+    setSelectedAlert(newAlert);
     setEditMode(false);
   };
 
@@ -75,9 +79,16 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     setEditMode(false);
   };
 
-  const editButton = !editMode ? (
+  const onDelete = async (id: number) => {
+    await fetchAlerts();
+    await deleteAlert(id);
+    setSelectedAlert(null);
+  };
+
+  const editButton = !editMode ? (<>
     <button className="btn btn-text-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
-  ) : (<>
+    <button className="btn btn-text-secondary" onClick={() => onDelete(selectedAlert.id)}><i className="fas fa-trash"></i></button>
+  </>) : (<>
     <button title="Save changes" className="btn btn-text-secondary" onClick={() => onSave()}><i className="fas fa-save"></i></button>
     <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={() => onDiscard()}><i className="fas fa-ban"></i></button>
   </>);
@@ -87,10 +98,10 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
       <h5>Your options</h5>
       <small>{editButton}</small>
     </div>
-    <div className="accordion" id="createAlert">
-      {accordionItem(1, 'New literature', 'createAlert', literature(), true)}
-      {accordionItem(2, 'Alert overview', 'createAlert', generalInformation)}
-      {accordionItem(3, 'Filter settings', 'createAlert', filterSelection ? (!filter ? null : <CDCFilterComponent filterSelection={!editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} disableFilter={!editMode} />) : <p>No filters available for this cdc</p>)}
+    <div className="accordion" id="editAlert">
+      {accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? "Latest revision from: " + selectedAlert.latest_compare_date : "No new data"}`, 'editAlert', literature(), true)}
+      {accordionItem(2, 'Alert overview', 'editAlert', generalInformation)}
+      {accordionItem(3, 'Filter settings', 'editAlert', filterSelection ? (!filter ? null : <CDCFilterComponent filterSelection={!editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} disableFilter={!editMode} />) : <p>No filters available for this cdc</p>)}
     </div>
   </>);
 }

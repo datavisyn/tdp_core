@@ -1,10 +1,10 @@
 import React from 'react';
 import Select from 'react-select';
 import { accordionItem } from '.';
-import { saveAlert } from './api';
+import { runAlertById, saveAlert } from './api';
 import { CDCFilterComponent } from './CDCFilterComponent';
 import { getTreeQuery } from './interface';
-export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, setCreationMode, setSelectedAlert, cdcs }) {
+export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, setCreationMode, setSelectedAlert, cdcs }) {
     const generalInformation = (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "mb-3" },
             React.createElement("label", { className: "form-label" }, "Name"),
@@ -17,9 +17,11 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
         React.createElement("div", { className: "mb-3 form-check" })));
     const onSave = async () => {
         const newAlert = await saveAlert({ ...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents) });
-        setAlertList([newAlert, ...alertList]);
-        setSelectedAlert(newAlert);
+        await runAlertById(newAlert.id);
+        await fetchAlerts();
         setCreationMode(false);
+        // setSelectedAlert(newAlert);
+        setSelectedAlert(null);
     };
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },

@@ -9,11 +9,10 @@ interface ICDCCreateAlert {
     filterComponents: {
         [key: string]: IFilterComponent<any>;
     };
-    alertList: IAlert[];
-    setAlertList: (alerts: IAlert[]) => void;
+    fetchAlerts: () => void;
     setSelectedAlert: (alert: IAlert) => void;
     setCreationMode: (mode: boolean) => void;
     cdcs: string[];
 }
-export declare function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, setCreationMode, setSelectedAlert, cdcs }: ICDCCreateAlert): JSX.Element;
+export declare function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, setCreationMode, setSelectedAlert, cdcs }: ICDCCreateAlert): JSX.Element;
 export {};

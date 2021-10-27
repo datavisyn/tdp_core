@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 import {accordionItem} from '.';
-import {saveAlert} from './api';
+import {runAlertById, saveAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
 import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
 
@@ -12,14 +12,13 @@ interface ICDCCreateAlert {
   filter: IFilter;
   setFilter: (filter: IFilter) => void;
   filterComponents: {[key: string]: IFilterComponent<any>};
-  alertList: IAlert[];
-  setAlertList: (alerts: IAlert[]) => void;
+  fetchAlerts: () => void;
   setSelectedAlert: (alert: IAlert) => void;
   setCreationMode: (mode: boolean) => void;
   cdcs: string[];
 }
 
-export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, alertList, setAlertList, setCreationMode, setSelectedAlert, cdcs}: ICDCCreateAlert) {
+export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, setCreationMode, setSelectedAlert, cdcs}: ICDCCreateAlert) {
 
   const generalInformation =
     (<>
@@ -42,9 +41,11 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
 
   const onSave = async () => {
     const newAlert = await saveAlert({...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
-    setAlertList([newAlert, ...alertList]);
-    setSelectedAlert(newAlert);
+    await runAlertById(newAlert.id);
+    await fetchAlerts();
     setCreationMode(false);
+    // setSelectedAlert(newAlert);
+    setSelectedAlert(null);
   };
 
   return (<>

@@ -56,7 +56,7 @@ def execute_cdc(id: str):
 def get_alerts():
     session = create_session()
     alerts = session.query(CDCAlert).all()
-    return [p for p in alerts if can_read(p)]
+    return sorted([p for p in alerts if can_read(p)], key=lambda item: item.id)
 
 @no_cache
 @login_required
@@ -136,6 +136,7 @@ def run_alert_by_id(id: int):
         alert.latest_compare_date = datetime.utcnow()
         alert.latest_fetched_data = new_data
         alert.latest_diff = diff
+    # TODO else: also set latest diff to empty
 
     session.commit()
     return alert, 200

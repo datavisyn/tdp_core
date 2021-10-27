@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
 import {IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
-import {deleteAlert, getAlerts, runAlertById} from './api';
+import {getAlerts, runAlertById} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter} from './CDCGroupingFilter';
 import {v4 as uuidv4} from 'uuid';
 import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './CDCTextFilter';
@@ -41,9 +41,8 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
   const [creationMode, setCreationMode] = React.useState<boolean>(false);
   const [filter, setFilter] = React.useState<IFilter>();
   const [alertData, setAlertData] = React.useState<IUploadAlert>();
-  const [alertList, setAlertList] = React.useState<IAlert[]>();
   const [cdcs, setCdcs] = React.useState<string[]>();
-  const {status: alertStatus, error: alertError, execute: alertExecute, value: alerts} = useAsync(getAlerts, true);
+  const {status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts} = useAsync(getAlerts, true);
 
   React.useEffect(() => {
     setAlertData(DEFAULTALERTDATA);
@@ -51,23 +50,11 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
     setCdcs(['demo']);
   }, []);
 
-  React.useEffect(() => {
-    const runAlerts = [];
-    alerts?.sort((a, b) => a.modification_date > b.modification_date ? -1 : a.modification_date < b.modification_date ? 1 : 0).forEach((alert) => runAlertById(alert.id).then((a) => runAlerts.push(a)));
-    setAlertList(runAlerts);
-  }, [alerts]);
-
   const onCreateButtonClick = () => {
     setCreationMode(true);
     setSelectedAlert(null);
     setAlertData(DEFAULTALERTDATA);
     setFilter(DEFAULTFILTER);
-  };
-
-  const onDeleteButton = async (id: number) => {
-    setAlertList([...alertList.filter((alert) => alert.id !== id)]);
-    await deleteAlert(id);
-    setSelectedAlert(null);
   };
 
   const onAlertClick = async (alert: IAlert) => {
@@ -77,9 +64,8 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
     setSelectedAlert(alert);
   };
 
-  const newLiteratureCount = (alert: IAlert) => {
-    const data = JSON.parse(alert?.latest_diff)?.dictionary_item_added;
-    return data?.length > 0 ? <span className="badge bg-primary rounded-pill ms-1">{data.length}</span> : null;
+  const onAlertChanged = async () => {
+    await fetchAlerts();
   };
 
   return <>
@@ -94,35 +80,35 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
             </div>
             <div className="modal-body">
               <div className="row">
-                <div className="col-4 overflow-auto">
+                <div className="col-3 overflow-auto">
                   <div className="d-flex w-100 justify-content-between mb-1">
                     <h5>Your alerts</h5>
                     <small><button className="btn btn-text-secondary" onClick={() => onCreateButtonClick()}><i className="fas fa-plus"></i></button></small>
                   </div>
                   {alertStatus === 'pending' ? <>Loading...</> : null}
                   {alertStatus === 'error' ? <>Error {alertError.toString()}</> : null}
-                  {alertStatus === 'success' ? <div className="list-group">{alertList.map((alert) =>
+                  {alertStatus === 'success' ? <div className="list-group">{alerts.map((alert) =>
                     <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? ' border-primary' : ''}`} onClick={() => onAlertClick(alert)} aria-current="true">
                       <div className="d-flex w-100 justify-content-between">
-                        <h6 className="mb-1">{alert.name} <small className="text-muted">for {alert.cdc_id}</small> {newLiteratureCount(alert)}</h6>
-                        {selectedAlert === alert ? <span className="text-muted" onClick={() => onDeleteButton(alert.id)}><i className="fas fa-trash"></i></span> : null}
+                        <h6 className="mb-1">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
+                        {JSON.parse(alert?.latest_diff)?.dictionary_item_added?.length > 0 ? <small><i className="fas fa-circle text-danger"></i></small> : null}
                       </div>
-                      <small>{alert.confirmation_date ? `last confirmed: ${alert.confirmation_date}` : 'No data revision yet'}</small>
+                      <small>{!alert.latest_diff && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${alert.confirmation_date}`}</small>
                     </a></div>
                   )}</div> : null}
                 </div>
-                <div className="col-8 overflow-auto">
+                <div className="col-9 overflow-auto">
                   {selectedAlert ?
                     <CDCEditAlert
                       alertData={alertData}
                       setAlertData={setAlertData}
-                      filter={filter} setFilter={setFilter}
-                      filterSelection={filtersByCDC[selectedAlert?.cdc_id]}
+                      filter={filter} 
+                      setFilter={setFilter}
+                      filterSelection={filtersByCDC['demo']}
                       filterComponents={filterComponents}
-                      alertList={alertList}
-                      setAlertList={setAlertList}
+                      fetchAlerts={() => onAlertChanged()}
                       selectedAlert={selectedAlert}
-                      setSelctedAlert={setSelectedAlert}
+                      setSelectedAlert={setSelectedAlert}
                       cdcs={cdcs}
                     />
                     :
@@ -134,8 +120,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                         setFilter={setFilter}
                         filterComponents={filterComponents}
                         filterSelection={filtersByCDC['demo']}
-                        alertList={alertList}
-                        setAlertList={setAlertList}
+                        fetchAlerts={() => onAlertChanged()}
                         setSelectedAlert={setSelectedAlert}
                         setCreationMode={setCreationMode}
                         cdcs={cdcs}
@@ -147,6 +132,9 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" onClick={() => {
+                Promise.all(alerts?.map((alert) => runAlertById(alert.id))).then(() => fetchAlerts());
+              }} className="btn btn-secondary">Sync</button>
             </div>
           </div>
         </div>
@@ -176,7 +164,7 @@ export class CDCFilterDialogClass {
         filtersByCDC={{
           'demo': [
             createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
-            createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: `item["address"]["city"]`, value: []}], fields: [{field: `item["address"]["city"]`, options: [`"Gwenborough"`, `"Wisokyburgh"`, `"McKenziehaven"`, `"South Elvis"`, `"Roscoeview"`, `"South Christy"`, `"Howemouth"`, `"Aliyaview"`, `"Bartholomebury"`]}, {field: `item["address"]["zipcode"]`, options: [`"33263"`, `"23505-1337"`, `"58804-1099"`]}, {field: `item["name"]`, options: [`"Leanne Graham"`, `"Ervin Howell"`, `"Glenna Reichert"`, `"Clementina DuBuque"`]}]}),
+            createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: null, value: []}], fields: [{field: {label: 'City', value: `item["address"]["city"]`}, options: [{label: 'Gwenborough', value: `"Gwenborough"`}, {label: 'Wisokyburgh', value: `"Wisokyburgh"`}, {label: 'McKenziehaven', value: `"McKenziehaven"`}, {label: 'Roscoeview', value: `"Roscoeview"`},  {label: 'Aliyaview', value: `"Aliyaview"`}, {label: 'Howemouth', value: `"Howemouth"`}]}, {field: {label: "Zip Code", value: `item["address"]["zipcode"]`}, options: [{label: '33263', value: `"33263"`}, {label: '23505-1337', value: `"23505-1337"`}, {label: '58804-1099', value: `"58804-1099"`}]}, {field: {label: 'Name', value: `item["name"]`}, options: [{label: 'Leanne Graham', value: `"Leanne Graham"`}, {label: 'Ervin Howell', value: `"Ervin Howell"`}, {label: 'Glenna Reichert', value: `"Glenna Reichert"`}, {label: 'Clementina DuBuque', value: `"Clementina DuBuque"`}]}]}),
             createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', {fields: ['Eins', 'zwei', 'dRei'], filter: []}),
             createCDCRangeFilter(uuidv4(), 'Range Filter', {min: 1, max: 10}),
           ]

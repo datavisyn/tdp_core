@@ -17,6 +17,7 @@ function CDCCheckboxFilterToString(value) {
     // Generate filter from value
     return `(${value === null || value === void 0 ? void 0 : value.fields.map((v) => { return `${v} == ${value.filter.filter((f) => f === v).length > 0}`; }).join(' and ')})`;
 }
+//checkbox1 == true and checkbox2 == false and item["address"] == true
 export function CDCCheckboxFilterComponent({ value, onValueChanged, disabled }) {
     return React.createElement(React.Fragment, null, value.fields.map((v, i) => {
         return (React.createElement("div", { key: i, className: "input-group m-1" },

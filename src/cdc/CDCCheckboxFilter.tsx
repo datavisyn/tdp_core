@@ -27,6 +27,8 @@ function CDCCheckboxFilterToString(value: ICDCCheckboxFilterValue): string {
   return `(${value?.fields.map((v) => {return `${v} == ${value.filter.filter((f) => f === v).length > 0}`;}).join(' and ')})`;
 }
 
+//checkbox1 == true and checkbox2 == false and item["address"] == true
+
 export function CDCCheckboxFilterComponent({value, onValueChanged, disabled}) {
   return <>
     {value.fields.map((v, i) => {

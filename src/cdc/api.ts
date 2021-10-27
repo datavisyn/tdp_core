@@ -36,6 +36,6 @@ export async function runAlertById(id: number): Promise<IAlert | null> {
   return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/run`);
 }
 
-// export async function getCDCs(): Promise<string[] | null> {
-//   return AppContext.getInstance().getAPIJSON(`/tdp/cdc`);
-// }
+export async function confirmAlertById(id: number): Promise<IAlert | null> {
+  return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/confirm`);
+}

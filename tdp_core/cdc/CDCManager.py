@@ -69,23 +69,29 @@ class CDCManager():
         # Fetch new entry
         new = cdc.load_data()
 
+        # validate filter tree
+
+        # {
+        #   id: 'group',
+        #   value: {operator: 'AND'}
+        #   filters: [{
+        #       id: 'range',
+        #       value: {from: 1, to: 2, field: 'address.zipCode'}
+        #   }, {
+        #       id: 'group',
+        #       value: {operator: 'AND'},
+        #       filters: [...]
+        #   }]
+        # }
+
+        class GroupFilter():
+            pass
+            # schema = ..
+
+            # def filter(item: Dict[...], ..)
+
         # Filter new entry
         new = [item for item in new if eval('(item["id"] in (4, 5, 6, 7, 8) and not (item["id"] == 5 and item["id"] == 4 or item["id"] == 8)) or ((item["address"]["city"] == "Gwenborough") and (item["id"] > 0 and item["id"] < 5))')]
-
-        
-        # filter = {
-        #     'operator': 'AND',
-        #     'filters': [{
-        #         'query': 'num1 == false && num2 == true'
-        #     }, {
-        #         'operator': 'OR',
-        #         'filters': [{
-        #         }, {
-        #             'query': ''
-        #         }]
-        #     }]
-        # }
-        # filter = '(num1 == false AND num2 == true) AND ((age1 >= ...) OR (age1 <= ...))'
 
         # TODO: How to find a proper "filter" library?
         # 1) [item for item in new if exec('item.age >= 20')]

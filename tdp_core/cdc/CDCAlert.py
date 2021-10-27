@@ -42,6 +42,10 @@ class CDCAlert(Base):
     modifier = Column(TEXT)  # NOQA: N815
     modification_date = Column(DateTime)  # NOQA: N815
 
+    # TODO: Avoid loading latest_diff, latest_fetch_data, latest_confirmed_data, use flags instead and load individually
+    # def has_latest_diff(self):
+    #     return self.latest_diff is not None
+
 
 class CDCAlertSchema(SQLAlchemyAutoSchema):
     class Meta:
