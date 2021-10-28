@@ -2,6 +2,7 @@ from typing import Optional
 from phovea_server import security
 from phovea_server.config import view as viewconfig
 import logging
+import jwt
 
 
 _log = logging.getLogger(__name__)
@@ -33,9 +34,18 @@ class ALBSecurityStore(object):
         return None
 
     def load_from_request(self, req):
-        if 'X-Amzn-Oidc-Identity' in req.headers and 'X-Amzn-Oidc-Accesstoken' in req.headers:
-            # TODO: Add graph lookup to extract more information regarding user.
-            return ALBSecurityUser(req.headers['X-Amzn-Oidc-Identity'])
+        if 'X-Amzn-Oidc-Identity' in req.headers and 'X-Amzn-Oidc-Accesstoken' in req.headers and 'X-Amzn-Oidc-Data' in req.headers:
+            try:
+                # Get token data from header
+                encoded = req.headers['X-Amzn-Oidc-Data']
+                # Try to decode the oidc data jwt
+                user = jwt.decode(encoded, options={"verify_signature": False})
+                # Create new user from given attributes
+                email = user['email']
+                return ALBSecurityUser(email)
+            except Exception:
+                _log.exception('Error in load_from_request')
+                return None
         return None
 
     def load_from_key(self, token):
