@@ -77,9 +77,9 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
       if (!id) {
         setSelectedAlert(null);
       } else {
-        setSelectedAlert(alerts.find((alert) => alert.id === id))
+        setSelectedAlert(alerts.find((alert) => alert.id === id));
       }
-    }).catch((e) => console.error(e))
+    }).catch((e) => console.error(e));
   };
 
   return <>
@@ -116,7 +116,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                     <CDCEditAlert
                       alertData={alertData}
                       setAlertData={setAlertData}
-                      filter={filter} 
+                      filter={filter}
                       setFilter={setFilter}
                       filterSelection={filtersByCDC['demo']}
                       filterComponents={filterComponents}
@@ -176,9 +176,9 @@ export class CDCFilterDialogClass {
         filtersByCDC={{
           'demo': [
             createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
-            createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: null, value: []}], fields: [{field: {label: 'City', value: `item["address"]["city"]`}, options: [{label: 'Gwenborough', value: `"Gwenborough"`}, {label: 'Wisokyburgh', value: `"Wisokyburgh"`}, {label: 'McKenziehaven', value: `"McKenziehaven"`}, {label: 'Roscoeview', value: `"Roscoeview"`},  {label: 'Aliyaview', value: `"Aliyaview"`}, {label: 'Howemouth', value: `"Howemouth"`}]}, {field: {label: "Zip Code", value: `item["address"]["zipcode"]`}, options: [{label: '33263', value: `"33263"`}, {label: '23505-1337', value: `"23505-1337"`}, {label: '58804-1099', value: `"58804-1099"`}]}, {field: {label: 'Name', value: `item["name"]`}, options: [{label: 'Leanne Graham', value: `"Leanne Graham"`}, {label: 'Ervin Howell', value: `"Ervin Howell"`}, {label: 'Glenna Reichert', value: `"Glenna Reichert"`}, {label: 'Clementina DuBuque', value: `"Clementina DuBuque"`}]}]}),
+            createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: null, value: []}], fields: [{field: {label: 'City', value: `item["address"]["city"]`}, options: [{label: 'Gwenborough', value: `"Gwenborough"`}, {label: 'Wisokyburgh', value: `"Wisokyburgh"`}, {label: 'McKenziehaven', value: `"McKenziehaven"`}, {label: 'Roscoeview', value: `"Roscoeview"`},  {label: 'Aliyaview', value: `"Aliyaview"`}, {label: 'Howemouth', value: `"Howemouth"`}]}, {field: {label: 'Zip Code', value: `item["address"]["zipcode"]`}, options: [{label: '33263', value: `"33263"`}, {label: '23505-1337', value: `"23505-1337"`}, {label: '58804-1099', value: `"58804-1099"`}]}, {field: {label: 'Name', value: `item["name"]`}, options: [{label: 'Leanne Graham', value: `"Leanne Graham"`}, {label: 'Ervin Howell', value: `"Ervin Howell"`}, {label: 'Glenna Reichert', value: `"Glenna Reichert"`}, {label: 'Clementina DuBuque', value: `"Clementina DuBuque"`}]}]}),
             createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', {fields: ['Eins', 'zwei', 'dRei'], filter: []}),
-            createCDCRangeFilter(uuidv4(), 'Range Filter', {config: {minValue: 1, maxValue: 10, label: "ID", field: `item["id"]`}, value: {min: 1, max: 10}}),
+            createCDCRangeFilter(uuidv4(), 'Range Filter', {config: {minValue: 1, maxValue: 10, label: 'ID', field: `item["id"]`}, value: {min: 1, max: 10}}),
           ]
         }} />,
       this.node

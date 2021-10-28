@@ -8,11 +8,11 @@ export interface ICDCRangeFilterValue {
     maxValue: number;
     label: string;
     field: string;
-  }
+  };
   value: {
     min: number;
     max: number;
-  }
+  };
 }
 
 export const CDCRangeFilterId = 'range';

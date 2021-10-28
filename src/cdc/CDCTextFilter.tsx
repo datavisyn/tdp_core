@@ -32,7 +32,7 @@ export function createCDCTextFilter(id: string, name: string, value: ICDCTextFil
 function CDCTextFilterToString(value: ICDCTextFilterValue): string {
   // Generate filter from value
   return `(${value.filter
-    .map((v) => `${v.field.value} in (${v.value.map((vV => vV.value)).join(',')})`)
+    .map((v) => `${v.field.value} in (${v.value.map(((vV) => vV.value)).join(',')})`)
     .join(' and ')})`;
 }
 

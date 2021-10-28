@@ -25,6 +25,30 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     setDeleteMode(false);
   }, [selectedAlert]);
 
+  const confirmChanges = async (id: number) => {
+    const alert = await confirmAlertById(id);
+    onAlertChanged(alert.id);
+  };
+  
+  const onSave = async () => {
+    setEditMode(false);
+    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
+    runAlert(newAlert.id);
+    onAlertChanged(newAlert.id);
+  };
+  
+  const onDiscard = () => {
+    setEditMode(false);
+    setAlertData(selectedAlert);
+    setFilter(JSON.parse(selectedAlert.filter_dump));
+  };
+  
+  const onDelete = async (id: number) => {
+    setEditMode(false);
+    await deleteAlert(id);
+    onAlertChanged();
+  };
+
   const generalInformation =
     (<>
       <div className="mb-3">
@@ -61,30 +85,6 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     </>);
   };
 
-  const confirmChanges = async (id: number) => {
-    const alert = await confirmAlertById(id);
-    onAlertChanged(alert.id);
-  }
-
-  const onSave = async () => {
-    setEditMode(false);
-    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
-    runAlert(newAlert.id);
-    onAlertChanged(newAlert.id);
-  };
-
-  const onDiscard = () => {
-    setEditMode(false);
-    setAlertData(selectedAlert);
-    setFilter(JSON.parse(selectedAlert.filter_dump));
-  };
-
-  const onDelete = async (id: number) => {
-    setEditMode(false);
-    await deleteAlert(id);
-    onAlertChanged();
-  };
-
   const editButton = !editMode && !deleteMode ? (<>
     <button title="Edit Alert" className="btn btn-text-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
     <button title="Delete Alert" className="btn btn-text-secondary" onClick={() => setDeleteMode(true)}><i className="fas fa-trash"></i></button>
@@ -102,7 +102,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
       <small>{editButton}</small>
     </div>
     <div className="accordion" id="editAlert">
-      {!editMode ? accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? "Latest revision from: " + selectedAlert.latest_compare_date : "No new data"}`, 'editAlert', literature(), true) : null}
+      {!editMode ? accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? 'Latest revision from: ' + selectedAlert.latest_compare_date : 'No new data'}`, 'editAlert', literature(), true) : null}
       {accordionItem(2, 'Alert overview', 'editAlert', generalInformation, editMode)}
       {accordionItem(3, 'Filter settings', 'editAlert', filterSelection ? (!filter ? null : <CDCFilterComponent filterSelection={!editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} disableFilter={!editMode} />) : <p>No filters available for this cdc</p>)}
     </div>
