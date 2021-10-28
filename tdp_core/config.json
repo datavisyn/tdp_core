@@ -32,6 +32,15 @@
     }
   ],
   "alwaysAppendDummyStore": false,
+  "security": {
+    "store": {
+      "alb_security_store": {
+        "enable": false,
+        "cookie_name": null,
+        "signout_url": null
+      }
+    }
+  },
   "--tdp_matomo": "comment",
   "matomo": {
     "--url": "comment: matomo url with a trailing slash",

@@ -1,5 +1,6 @@
 import { Session } from '../base/Session';
 import { IUser, ISecureItem, EPermission, EEntity } from '../security';
+import { ILogoutOptions } from './interfaces';
 export declare class UserSession extends Session {
     static GLOBAL_EVENT_USER_LOGGED_IN: string;
     static GLOBAL_EVENT_USER_LOGGED_OUT: string;
@@ -20,7 +21,7 @@ export declare class UserSession extends Session {
     /**
      * logs the current user out
      */
-    logout(): void;
+    logout(options: ILogoutOptions): void;
     /**
      * returns the current user or null
      * @returns {any}

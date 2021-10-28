@@ -1,4 +1,5 @@
 
+from typing import Dict, Optional
 import phovea_server.security as security
 import phovea_server.config
 import flask_login
@@ -31,7 +32,7 @@ class UserStore(object):
   def login(self, username, extra_fields={}):
     return None
 
-  def logout(self, user):
+  def logout(self, user) -> Optional[Dict]:
     pass
 
 
@@ -93,8 +94,16 @@ class NamespaceLoginManager(security.SecurityManager):
     @app.route('/logout', methods=['POST'])
     @ns.no_cache
     def logout():
-      self.logout()
-      return ns.jsonify(msg='Bye Bye')
+      payload, cookies = self.logout()
+      # Create response and add security store payload
+      response = ns.jsonify(msg='Bye Bye', **payload)
+      # Handle cookie changes from the security stores
+      for cookie in cookies:
+        try:
+          response.set_cookie(**cookie)
+        except Exception:
+          _log.exception(f'Error setting cookie {cookie} to logout response')
+      return response
 
     @app.route('/loggedinas', methods=['POST'])
     def loggedinas():
@@ -114,9 +123,17 @@ class NamespaceLoginManager(security.SecurityManager):
   def logout(self):
     u = self.current_user
     _log.debug('user logout: ' + (u.name if hasattr(u, 'name') else str(u)))
+    response_payload = {}
+    response_cookies = []
     for store in self._user_stores:
-      store.logout(u)
+      customizations = store.logout(u) or {}
+      # data is an arbitrary Dict which is added to the response payload.
+      response_payload.update(customizations.get('data') or {})
+      # cookies is a list of Dicts which are passed 1:1 to response.set_cookie.
+      response_cookies.extend(customizations.get('cookies') or [])
+
     flask_login.logout_user()
+    return response_payload, response_cookies
 
   def login(self, username, extra_fields=None):
     if extra_fields is None:
@@ -173,4 +190,5 @@ class NamespaceLoginManager(security.SecurityManager):
 
 
 def create():
+  # TODO: Add setting key to enable similar to the ALBSecurityStore
   return NamespaceLoginManager()

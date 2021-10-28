@@ -3,6 +3,7 @@ import {IUser,UserUtils,ISecureItem, Permission, EPermission, EEntity} from '../
 import {GlobalEventHandler} from '../base/event';
 import {PluginRegistry} from './PluginRegistry';
 import {ILoginExtensionPointDesc, ILogoutEP, ILogoutEPDesc, ILoginExtensionPoint, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT} from './extensions';
+import {ILogoutOptions} from './interfaces';
 
 
 
@@ -46,7 +47,7 @@ export class UserSession extends Session {
   /**
    * logs the current user out
    */
-  public logout() {
+  public logout(options: ILogoutOptions) {
     const wasLoggedIn = UserSession.getInstance().isLoggedIn();
     UserSession.getInstance().reset();
     if (wasLoggedIn) {
@@ -54,7 +55,14 @@ export class UserSession extends Session {
         desc.load().then((plugin: ILogoutEP) => plugin.factory());
       });
 
-      GlobalEventHandler.getInstance().fire(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT);
+      // Notify all listeners
+      GlobalEventHandler.getInstance().fire(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT, options);
+
+      // Handle different logout options
+      // TODO: Maybe extract them to extension points later?
+      if(options.alb_security_store?.redirect) {
+        location.href = options.alb_security_store?.redirect;
+      }
     }
   }
 
