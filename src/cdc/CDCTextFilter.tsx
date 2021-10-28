@@ -4,14 +4,10 @@ import Select from 'react-select';
 
 export interface ICDCTextFilterValue {
   fields: {
-    // field: string;
-    // options: string[];
     field: {label: string, value: string};
     options: {label: string, value: string}[];
   }[];
   filter: {
-    // field: string;
-    // value: string[];
     field: {label: string, value: string}
     value: {label: string, value: string}[]
   }[];
@@ -43,8 +39,8 @@ function CDCTextFilterToString(value: ICDCTextFilterValue): string {
 export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
   return <>
     {value.filter.map((v, i) => (
-      <div key={i} className="input-group m-1">
-        <div style={{width: '28%'}}>
+      <div key={i} className="input-group m-1 row">
+        <div className="col-3 p-0">
           <Select
             isDisabled={!onValueChanged || disabled}
             value={v.field}
@@ -65,7 +61,7 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
             }
           />
         </div>
-        <div className="ms-1" style={{width: '58%'}}>
+        <div className="col-7 p-0">
           <Select
             closeMenuOnSelect={false}
             isDisabled={!onValueChanged || disabled || !v.field}
@@ -88,18 +84,20 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
           />
         </div>
         {disabled ? null :
-          <button
-            disabled={!onValueChanged}
-            onClick={(e) =>
-              onValueChanged?.({
-                ...value,
-                filter: value.filter.filter((oldV) => oldV !== v)
-              })
-            }
-            className="btn btn-text-secondary"
-          >
-            <i className="fas fa-trash"></i>
-          </button>
+          <div className="col-1 p-0">
+            <button
+              disabled={!onValueChanged}
+              onClick={(e) =>
+                onValueChanged?.({
+                  ...value,
+                  filter: value.filter.filter((oldV) => oldV !== v)
+                })
+              }
+              className="btn btn-text-secondary"
+            >
+              <i className="fas fa-trash"></i>
+            </button>
+          </div>
         }
       </div>
     ))}
