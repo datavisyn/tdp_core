@@ -9,10 +9,9 @@ interface ICDCEditAlert {
     filterComponents: {
         [key: string]: IFilterComponent<any>;
     };
-    fetchAlerts: () => void;
+    onAlertChanged: (id?: number) => void;
     selectedAlert: IAlert;
-    setSelectedAlert: (alert: IAlert) => void;
     cdcs: string[];
 }
-export declare function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, selectedAlert, setSelectedAlert, cdcs }: ICDCEditAlert): JSX.Element;
+export declare function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs }: ICDCEditAlert): JSX.Element;
 export {};

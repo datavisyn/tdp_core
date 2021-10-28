@@ -1,10 +1,11 @@
 import React from 'react';
 import Select from 'react-select';
 import { accordionItem } from '.';
-import { runAlertById, saveAlert } from './api';
+import { runAlert } from '..';
+import { saveAlert } from './api';
 import { CDCFilterComponent } from './CDCFilterComponent';
 import { getTreeQuery } from './interface';
-export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, setCreationMode, setSelectedAlert, cdcs }) {
+export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs }) {
     const generalInformation = (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "mb-3" },
             React.createElement("label", { className: "form-label" }, "Name"),
@@ -17,11 +18,9 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
         React.createElement("div", { className: "mb-3 form-check" })));
     const onSave = async () => {
         const newAlert = await saveAlert({ ...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents) });
-        await runAlertById(newAlert.id);
-        await fetchAlerts();
+        runAlert(newAlert.id);
+        onAlertChanged(newAlert.id);
         setCreationMode(false);
-        // setSelectedAlert(newAlert);
-        setSelectedAlert(null);
     };
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },
@@ -30,7 +29,7 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
                 React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: () => onSave() },
                     React.createElement("i", { className: "fas fa-save" })),
                 React.createElement("button", { title: "Discard changes", className: "btn btn-text-secondary ms-1", onClick: () => setCreationMode(false) },
-                    React.createElement("i", { className: "fas fa-ban" })))),
+                    React.createElement("i", { className: "fas fa-times" })))),
         React.createElement("div", { className: "accordion", id: "createAlert" },
             accordionItem(1, 'Alert overview', 'createAlert', generalInformation, true),
             accordionItem(2, 'Filter settings', 'createAlert', filterSelection ? (!filter ? null : React.createElement(CDCFilterComponent, { filterSelection: filterSelection, filterComponents: filterComponents, filter: filter, setFilter: setFilter })) : React.createElement("p", null, "No filters available for this cdc")))));

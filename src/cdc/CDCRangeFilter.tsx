@@ -3,8 +3,16 @@ import * as React from 'react';
 import InputRange from 'react-input-range';
 
 export interface ICDCRangeFilterValue {
-  min: number;
-  max: number;
+  config: {
+    minValue: number;
+    maxValue: number;
+    label: string;
+    field: string;
+  }
+  value: {
+    min: number;
+    max: number;
+  }
 }
 
 export const CDCRangeFilterId = 'range';
@@ -25,17 +33,18 @@ export function createCDCRangeFilter(id: string, name: string, value: ICDCRangeF
 
 function CDCRangeFilterToString(value: ICDCRangeFilterValue): string {
   // Generate filter from value
-  return `(item["id"] >= ${value.min} and item["id"] <= ${value.max})`;
+  return `(${value.config.field} >= ${value.value.min} and ${value.config.field} <= ${value.value.max})`;
 }
 
 function CDCRangeFilterComponent({value, onValueChanged, disabled}) {
   return <div className="t360-input-range-wrapper" style={{margin: '10px', paddingTop: '10px', minHeight: '50px'}}>
+    <h6>{value?.config?.label}</h6>
     <InputRange
       disabled={!onValueChanged || disabled}
-      minValue={1}
-      maxValue={10}
-      value={{min: value.min, max: value.max}}
-      onChange={(v) => onValueChanged?.(v)}
+      minValue={value.config.minValue}
+      maxValue={value.config.maxValue}
+      value={value.value}
+      onChange={(v) => onValueChanged?.({...value, value: v})}
     />
   </div>;
 }

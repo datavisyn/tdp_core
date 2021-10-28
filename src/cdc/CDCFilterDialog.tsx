@@ -35,6 +35,12 @@ export const accordionItem = (index: number, title: string, parentId: string, ch
   );
 };
 
+export const runAlert = (id: number) => {
+  runAlertById(id).catch((e) => {
+    alert(`${e}: Invalid filter parameter in alert: ${id}`);
+  });
+};
+
 export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDialogProps) {
   const [selectedAlert, setSelectedAlert] = React.useState<IAlert>();
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
@@ -64,8 +70,16 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
     setSelectedAlert(alert);
   };
 
-  const onAlertChanged = async () => {
-    await fetchAlerts();
+  const onAlertChanged = async (id?: number) => {
+    //refetches alerts and makes new selection
+    fetchAlerts().then((alerts) => {
+      //if no id there is no need to iterate through alerts
+      if (!id) {
+        setSelectedAlert(null);
+      } else {
+        setSelectedAlert(alerts.find((alert) => alert.id === id))
+      }
+    }).catch((e) => console.error(e))
   };
 
   return <>
@@ -88,10 +102,10 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                   {alertStatus === 'pending' ? <>Loading...</> : null}
                   {alertStatus === 'error' ? <>Error {alertError.toString()}</> : null}
                   {alertStatus === 'success' ? <div className="list-group">{alerts.map((alert) =>
-                    <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert === alert ? ' border-primary' : ''}`} onClick={() => onAlertClick(alert)} aria-current="true">
+                    <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert?.id === alert?.id ? ' border-primary' : ''}`} onClick={() => onAlertClick(alert)} aria-current="true">
                       <div className="d-flex w-100 justify-content-between">
-                        <h6 className="mb-1">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
-                        {JSON.parse(alert?.latest_diff)?.dictionary_item_added?.length > 0 ? <small><i className="fas fa-circle text-danger"></i></small> : null}
+                        <h6 title={`${alert.name} for ${alert.cdc_id}`} className="mb-1 overflow-hidden">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
+                        {JSON.parse(alert?.latest_diff)?.dictionary_item_added?.length > 0 ? <small><i className="fas fa-circle text-primary"></i></small> : null}
                       </div>
                       <small>{!alert.latest_diff && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${alert.confirmation_date}`}</small>
                     </a></div>
@@ -106,9 +120,8 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                       setFilter={setFilter}
                       filterSelection={filtersByCDC['demo']}
                       filterComponents={filterComponents}
-                      fetchAlerts={() => onAlertChanged()}
+                      onAlertChanged={onAlertChanged}
                       selectedAlert={selectedAlert}
-                      setSelectedAlert={setSelectedAlert}
                       cdcs={cdcs}
                     />
                     :
@@ -120,8 +133,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                         setFilter={setFilter}
                         filterComponents={filterComponents}
                         filterSelection={filtersByCDC['demo']}
-                        fetchAlerts={() => onAlertChanged()}
-                        setSelectedAlert={setSelectedAlert}
+                        onAlertChanged={onAlertChanged}
                         setCreationMode={setCreationMode}
                         cdcs={cdcs}
                       />
@@ -133,7 +145,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" onClick={() => {
-                Promise.all(alerts?.map((alert) => runAlertById(alert.id))).then(() => fetchAlerts());
+                Promise.all(alerts?.map((alert) => runAlert(alert.id))).then(() => fetchAlerts());
               }} className="btn btn-secondary">Sync</button>
             </div>
           </div>
@@ -166,7 +178,7 @@ export class CDCFilterDialogClass {
             createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
             createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: null, value: []}], fields: [{field: {label: 'City', value: `item["address"]["city"]`}, options: [{label: 'Gwenborough', value: `"Gwenborough"`}, {label: 'Wisokyburgh', value: `"Wisokyburgh"`}, {label: 'McKenziehaven', value: `"McKenziehaven"`}, {label: 'Roscoeview', value: `"Roscoeview"`},  {label: 'Aliyaview', value: `"Aliyaview"`}, {label: 'Howemouth', value: `"Howemouth"`}]}, {field: {label: "Zip Code", value: `item["address"]["zipcode"]`}, options: [{label: '33263', value: `"33263"`}, {label: '23505-1337', value: `"23505-1337"`}, {label: '58804-1099', value: `"58804-1099"`}]}, {field: {label: 'Name', value: `item["name"]`}, options: [{label: 'Leanne Graham', value: `"Leanne Graham"`}, {label: 'Ervin Howell', value: `"Ervin Howell"`}, {label: 'Glenna Reichert', value: `"Glenna Reichert"`}, {label: 'Clementina DuBuque', value: `"Clementina DuBuque"`}]}]}),
             createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', {fields: ['Eins', 'zwei', 'dRei'], filter: []}),
-            createCDCRangeFilter(uuidv4(), 'Range Filter', {min: 1, max: 10}),
+            createCDCRangeFilter(uuidv4(), 'Range Filter', {config: {minValue: 1, maxValue: 10, label: "ID", field: `item["id"]`}, value: {min: 1, max: 10}}),
           ]
         }} />,
       this.node

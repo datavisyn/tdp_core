@@ -25,7 +25,7 @@ export function CDCTextFilterComponent({ value, onValueChanged, disabled }) {
         value.filter.map((v, i) => {
             var _a;
             return (React.createElement("div", { key: i, className: "input-group m-1" },
-                React.createElement("div", { style: { width: '30%' } },
+                React.createElement("div", { style: { width: '28%' } },
                     React.createElement(Select, { isDisabled: !onValueChanged || disabled, value: v.field, options: [...value.fields.map((field) => field.field)], onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
                             ...value,
                             filter: value.filter.map((oldV) => oldV === v
@@ -36,7 +36,7 @@ export function CDCTextFilterComponent({ value, onValueChanged, disabled }) {
                                 }
                                 : oldV)
                         }) })),
-                React.createElement("div", { style: { width: '70%' } },
+                React.createElement("div", { className: "ms-1", style: { width: '58%' } },
                     React.createElement(Select, { closeMenuOnSelect: false, isDisabled: !onValueChanged || disabled || !v.field, isMulti: true, value: v.value, options: (_a = value.fields.find((f) => f.field === v.field)) === null || _a === void 0 ? void 0 : _a.options, onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
                             ...value,
                             filter: value.filter.map((oldV) => oldV === v

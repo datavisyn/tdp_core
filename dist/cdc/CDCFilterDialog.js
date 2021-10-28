@@ -18,6 +18,11 @@ export const accordionItem = (index, title, parentId, child, show) => {
             React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#collapse${index}`, "aria-expanded": "true", "aria-controls": `collapse${index}` }, title)),
         React.createElement("div", { id: `collapse${index}`, className: `p-2 accordion-collapse collapse${show ? ' show' : ''}`, "aria-labelledby": `heading${index}`, "data-bs-parent": `#${parentId}` }, child)));
 };
+export const runAlert = (id) => {
+    runAlertById(id).catch((e) => {
+        alert(`${e}: Invalid filter parameter in alert: ${id}`);
+    });
+};
 export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
     const [selectedAlert, setSelectedAlert] = React.useState();
     const [showDialog, setShowDialog] = React.useState(false);
@@ -43,8 +48,17 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
         setCreationMode(false);
         setSelectedAlert(alert);
     };
-    const onAlertChanged = async () => {
-        await fetchAlerts();
+    const onAlertChanged = async (id) => {
+        //refetches alerts and makes new selection
+        fetchAlerts().then((alerts) => {
+            //if no id there is no need to iterate through alerts
+            if (!id) {
+                setSelectedAlert(null);
+            }
+            else {
+                setSelectedAlert(alerts.find((alert) => alert.id === id));
+            }
+        }).catch((e) => console.error(e));
     };
     return React.createElement(React.Fragment, null,
         React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
@@ -72,28 +86,28 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                     alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alerts.map((alert) => {
                                         var _a, _b;
                                         return React.createElement("div", { key: alert.id },
-                                            React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${selectedAlert === alert ? ' border-primary' : ''}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
+                                            React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id) === (alert === null || alert === void 0 ? void 0 : alert.id) ? ' border-primary' : ''}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
                                                 React.createElement("div", { className: "d-flex w-100 justify-content-between" },
-                                                    React.createElement("h6", { className: "mb-1" },
+                                                    React.createElement("h6", { title: `${alert.name} for ${alert.cdc_id}`, className: "mb-1 overflow-hidden" },
                                                         alert.name,
                                                         " ",
                                                         React.createElement("small", { className: "text-muted" },
                                                             "for ",
                                                             alert.cdc_id)),
                                                     ((_b = (_a = JSON.parse(alert === null || alert === void 0 ? void 0 : alert.latest_diff)) === null || _a === void 0 ? void 0 : _a.dictionary_item_added) === null || _b === void 0 ? void 0 : _b.length) > 0 ? React.createElement("small", null,
-                                                        React.createElement("i", { className: "fas fa-circle text-danger" })) : null),
+                                                        React.createElement("i", { className: "fas fa-circle text-primary" })) : null),
                                                 React.createElement("small", null, !alert.latest_diff && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${alert.confirmation_date}`)));
                                     })) : null),
                                 React.createElement("div", { className: "col-9 overflow-auto" }, selectedAlert ?
-                                    React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC['demo'], filterComponents: filterComponents, fetchAlerts: () => onAlertChanged(), selectedAlert: selectedAlert, setSelectedAlert: setSelectedAlert, cdcs: cdcs })
+                                    React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC['demo'], filterComponents: filterComponents, onAlertChanged: onAlertChanged, selectedAlert: selectedAlert, cdcs: cdcs })
                                     :
                                         creationMode ?
-                                            React.createElement(CDCCreateAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterComponents: filterComponents, filterSelection: filtersByCDC['demo'], fetchAlerts: () => onAlertChanged(), setSelectedAlert: setSelectedAlert, setCreationMode: setCreationMode, cdcs: cdcs })
+                                            React.createElement(CDCCreateAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterComponents: filterComponents, filterSelection: filtersByCDC['demo'], onAlertChanged: onAlertChanged, setCreationMode: setCreationMode, cdcs: cdcs })
                                             : null))),
                         React.createElement("div", { className: "modal-footer" },
                             React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
                             React.createElement("button", { type: "button", onClick: () => {
-                                    Promise.all(alerts === null || alerts === void 0 ? void 0 : alerts.map((alert) => runAlertById(alert.id))).then(() => fetchAlerts());
+                                    Promise.all(alerts === null || alerts === void 0 ? void 0 : alerts.map((alert) => runAlert(alert.id))).then(() => fetchAlerts());
                                 }, className: "btn btn-secondary" }, "Sync")))))));
 }
 export class CDCFilterDialogClass {
@@ -113,7 +127,7 @@ export class CDCFilterDialogClass {
                     createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
                     createCDCTextFilter(uuidv4(), 'Text Filter', { filter: [{ field: null, value: [] }], fields: [{ field: { label: 'City', value: `item["address"]["city"]` }, options: [{ label: 'Gwenborough', value: `"Gwenborough"` }, { label: 'Wisokyburgh', value: `"Wisokyburgh"` }, { label: 'McKenziehaven', value: `"McKenziehaven"` }, { label: 'Roscoeview', value: `"Roscoeview"` }, { label: 'Aliyaview', value: `"Aliyaview"` }, { label: 'Howemouth', value: `"Howemouth"` }] }, { field: { label: "Zip Code", value: `item["address"]["zipcode"]` }, options: [{ label: '33263', value: `"33263"` }, { label: '23505-1337', value: `"23505-1337"` }, { label: '58804-1099', value: `"58804-1099"` }] }, { field: { label: 'Name', value: `item["name"]` }, options: [{ label: 'Leanne Graham', value: `"Leanne Graham"` }, { label: 'Ervin Howell', value: `"Ervin Howell"` }, { label: 'Glenna Reichert', value: `"Glenna Reichert"` }, { label: 'Clementina DuBuque', value: `"Clementina DuBuque"` }] }] }),
                     createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', { fields: ['Eins', 'zwei', 'dRei'], filter: [] }),
-                    createCDCRangeFilter(uuidv4(), 'Range Filter', { min: 1, max: 10 }),
+                    createCDCRangeFilter(uuidv4(), 'Range Filter', { config: { minValue: 1, maxValue: 10, label: "ID", field: `item["id"]` }, value: { min: 1, max: 10 } }),
                 ]
             } }), this.node);
     }

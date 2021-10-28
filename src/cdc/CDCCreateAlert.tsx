@@ -1,7 +1,8 @@
 import React from 'react';
 import Select from 'react-select';
 import {accordionItem} from '.';
-import {runAlertById, saveAlert} from './api';
+import {runAlert} from '..';
+import {saveAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
 import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
 
@@ -12,13 +13,12 @@ interface ICDCCreateAlert {
   filter: IFilter;
   setFilter: (filter: IFilter) => void;
   filterComponents: {[key: string]: IFilterComponent<any>};
-  fetchAlerts: () => void;
-  setSelectedAlert: (alert: IAlert) => void;
+  onAlertChanged: (id?: number) => void;
   setCreationMode: (mode: boolean) => void;
   cdcs: string[];
 }
 
-export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, setCreationMode, setSelectedAlert, cdcs}: ICDCCreateAlert) {
+export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs}: ICDCCreateAlert) {
 
   const generalInformation =
     (<>
@@ -41,11 +41,9 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
 
   const onSave = async () => {
     const newAlert = await saveAlert({...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
-    await runAlertById(newAlert.id);
-    await fetchAlerts();
+    runAlert(newAlert.id);
+    onAlertChanged(newAlert.id);
     setCreationMode(false);
-    // setSelectedAlert(newAlert);
-    setSelectedAlert(null);
   };
 
   return (<>
@@ -53,7 +51,7 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
       <h5>Create alert</h5>
       <small>
         <button title="Save changes" className="btn btn-text-secondary" onClick={() => onSave()}><i className="fas fa-save"></i></button>
-        <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={() => setCreationMode(false)}><i className="fas fa-ban"></i></button>
+        <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={() => setCreationMode(false)}><i className="fas fa-times"></i></button>
       </small>
     </div>
     <div className="accordion" id="createAlert">

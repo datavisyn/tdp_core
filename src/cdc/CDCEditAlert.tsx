@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
-import {accordionItem} from '.';
+import {accordionItem, runAlert} from '.';
 import {confirmAlertById, deleteAlert, editAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
 import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
@@ -12,16 +12,17 @@ interface ICDCEditAlert {
   filter: IFilter;
   setFilter: (filter: IFilter) => void;
   filterComponents: {[key: string]: IFilterComponent<any>};
-  fetchAlerts: () => void;
+  onAlertChanged: (id?: number) => void;
   selectedAlert: IAlert;
-  setSelectedAlert: (alert: IAlert) => void;
   cdcs: string[];
 }
 
-export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, fetchAlerts, selectedAlert, setSelectedAlert, cdcs}: ICDCEditAlert) {
+export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs}: ICDCEditAlert) {
   const [editMode, setEditMode] = React.useState<boolean>(false);
+  const [deleteMode, setDeleteMode] = React.useState<boolean>(false);
   React.useEffect(() => {
     setEditMode(false);
+    setDeleteMode(false);
   }, [selectedAlert]);
 
   const generalInformation =
@@ -53,7 +54,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     return (<>{data?.length > 0 ? (<>
       <h6>Literature:</h6>
       {data.map((d, i) => <p key={i}>{d}</p>)}
-      <button className="btn btn-secondary" onClick={() => confirmChanges(selectedAlert.id)}>Confirm changes</button>
+      <button title="Confirm changes" className="btn btn-text-secondary" onClick={() => confirmChanges(selectedAlert.id)}>Confirm Changes</button>
     </>) : (
       <p>No new data available</p>
     )}
@@ -62,35 +63,37 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
 
   const confirmChanges = async (id: number) => {
     const alert = await confirmAlertById(id);
-    await fetchAlerts()
-    setSelectedAlert(alert);
+    onAlertChanged(alert.id);
   }
 
   const onSave = async () => {
-    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
-    await fetchAlerts();
-    setSelectedAlert(newAlert);
     setEditMode(false);
+    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
+    runAlert(newAlert.id);
+    onAlertChanged(newAlert.id);
   };
 
   const onDiscard = () => {
+    setEditMode(false);
     setAlertData(selectedAlert);
     setFilter(JSON.parse(selectedAlert.filter_dump));
-    setEditMode(false);
   };
 
   const onDelete = async (id: number) => {
-    await fetchAlerts();
+    setEditMode(false);
     await deleteAlert(id);
-    setSelectedAlert(null);
+    onAlertChanged();
   };
 
-  const editButton = !editMode ? (<>
-    <button className="btn btn-text-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
-    <button className="btn btn-text-secondary" onClick={() => onDelete(selectedAlert.id)}><i className="fas fa-trash"></i></button>
-  </>) : (<>
+  const editButton = !editMode && !deleteMode ? (<>
+    <button title="Edit Alert" className="btn btn-text-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
+    <button title="Delete Alert" className="btn btn-text-secondary" onClick={() => setDeleteMode(true)}><i className="fas fa-trash"></i></button>
+  </>) : (editMode ? <>
     <button title="Save changes" className="btn btn-text-secondary" onClick={() => onSave()}><i className="fas fa-save"></i></button>
-    <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={() => onDiscard()}><i className="fas fa-ban"></i></button>
+    <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={() => onDiscard()}><i className="fas fa-times"></i></button>
+  </> : <>
+    <button title="Delete" className="btn btn-text-secondary" onClick={() => onDelete(selectedAlert.id)}><i className="fas fa-check"></i></button>
+    <button title="No Delete" className="btn btn-text-secondary ms-1" onClick={() => setDeleteMode(false)}><i className="fas fa-times"></i></button>
   </>);
 
   return (<>
@@ -99,8 +102,8 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
       <small>{editButton}</small>
     </div>
     <div className="accordion" id="editAlert">
-      {accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? "Latest revision from: " + selectedAlert.latest_compare_date : "No new data"}`, 'editAlert', literature(), true)}
-      {accordionItem(2, 'Alert overview', 'editAlert', generalInformation)}
+      {!editMode ? accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? "Latest revision from: " + selectedAlert.latest_compare_date : "No new data"}`, 'editAlert', literature(), true) : null}
+      {accordionItem(2, 'Alert overview', 'editAlert', generalInformation, editMode)}
       {accordionItem(3, 'Filter settings', 'editAlert', filterSelection ? (!filter ? null : <CDCFilterComponent filterSelection={!editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} disableFilter={!editMode} />) : <p>No filters available for this cdc</p>)}
     </div>
   </>);

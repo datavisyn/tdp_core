@@ -44,7 +44,7 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
   return <>
     {value.filter.map((v, i) => (
       <div key={i} className="input-group m-1">
-        <div style={{width: '30%'}}>
+        <div style={{width: '28%'}}>
           <Select
             isDisabled={!onValueChanged || disabled}
             value={v.field}
@@ -65,7 +65,7 @@ export function CDCTextFilterComponent({value, onValueChanged, disabled}) {
             }
           />
         </div>
-        <div style={{width: '70%'}}>
+        <div className="ms-1" style={{width: '58%'}}>
           <Select
             closeMenuOnSelect={false}
             isDisabled={!onValueChanged || disabled || !v.field}

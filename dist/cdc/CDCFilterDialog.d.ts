@@ -21,6 +21,7 @@ export declare const DEFAULTFILTER: {
     children?: IFilter<any>[];
 };
 export declare const accordionItem: (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => JSX.Element;
+export declare const runAlert: (id: number) => void;
 export declare function CDCFilterDialog({ filterComponents, filtersByCDC }: ICDCFilterDialogProps): JSX.Element;
 export declare class CDCFilterDialogClass {
     private node;
