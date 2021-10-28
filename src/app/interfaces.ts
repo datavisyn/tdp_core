@@ -14,5 +14,5 @@ export interface ILogoutOptions {
          * Redirect URL for the client to actually logout.
          */
         redirect?: string;
-    }
+    };
 }
