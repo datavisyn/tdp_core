@@ -1,6 +1,8 @@
+# TODO: This file was previously in the tdp_core/security.py file, causing a name conflict with this package.
+
 from phovea_server.security import login_required
-from .formatter import formatter
-from .db import resolve_view
+from ..formatter import formatter
+from ..db import resolve_view
 from functools import wraps
 
 

@@ -35,14 +35,21 @@ export class UserSession extends Session {
     /**
      * logs the current user out
      */
-    logout() {
+    logout(options) {
+        var _a, _b;
         const wasLoggedIn = UserSession.getInstance().isLoggedIn();
         UserSession.getInstance().reset();
         if (wasLoggedIn) {
             PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CORE_LOGOUT).map((desc) => {
                 desc.load().then((plugin) => plugin.factory());
             });
-            GlobalEventHandler.getInstance().fire(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT);
+            // Notify all listeners
+            GlobalEventHandler.getInstance().fire(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT, options);
+            // Handle different logout options
+            // TODO: Maybe extract them to extension points later?
+            if ((_a = options.alb_security_store) === null || _a === void 0 ? void 0 : _a.redirect) {
+                location.href = (_b = options.alb_security_store) === null || _b === void 0 ? void 0 : _b.redirect;
+            }
         }
     }
     /**

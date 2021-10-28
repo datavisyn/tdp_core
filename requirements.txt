@@ -16,3 +16,5 @@ redis~=3.5.3
 cachelib==0.1.1
 # phovea_data_mongo
 pymongo~=3.11.1
+# Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
+docutils==0.17.1

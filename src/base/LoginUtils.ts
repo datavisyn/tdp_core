@@ -41,7 +41,9 @@ export class LoginUtils {
     });
     //separate for multiple catch clauses
     r.catch(() => {
-      UserSession.getInstance().logout();
+      UserSession.getInstance().logout({
+        msg: 'Error logging in.'
+      });
     });
     return r;
   }
@@ -52,13 +54,17 @@ export class LoginUtils {
    */
   static logout(): Promise<any> {
     if (!AppContext.getInstance().offline) {
-      return Ajax.send('/logout', {}, 'post').then(() => {
-        UserSession.getInstance().logout();
+      return Ajax.send('/logout', {}, 'post').then((r) => {
+        UserSession.getInstance().logout(r);
       }).catch(() => {
-        UserSession.getInstance().logout();
+        UserSession.getInstance().logout({
+          msg: 'Error logging out via server. Logging out manually.'
+        });
       });
     }
-    UserSession.getInstance().logout();
+    UserSession.getInstance().logout({
+      msg: 'Logging out in offline mode'
+    });
     return Promise.resolve(true);
   }
 
