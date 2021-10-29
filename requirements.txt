@@ -7,3 +7,5 @@ yamlreader==3.0.4
 alembic==1.4.3
 openpyxl~=3.0.5
 phovea_server>=7.2.0,<8.0.0
+# Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
+docutils==0.17.1
