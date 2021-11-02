@@ -29,7 +29,7 @@ export class TDPApplicationUtils {
         }, options);
         const user = UserSession.getInstance().currentUser();
         const roles = user ? user.roles : UserUtils.ANONYMOUS_USER.roles;
-        const permission = Permission.decode(item ? item.permissions : Permission.ALL_ALL_READ_NONE);
+        const permission = Permission.decode(item ? item.permissions : Permission.ALL_NONE_NONE);
         const parentTestId = 'permissionForm';
         const id = BaseUtils.randomId();
         const div = o.doc.createElement('div');
@@ -53,7 +53,7 @@ export class TDPApplicationUtils {
           <div class="btn-group col-sm-auto" role="group">
             <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_none" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''} data-testid="${parentTestId}-permissions-others-radio-none">
             <label for="btnradio_permissions_public_${id}_none" class="form-label btn btn-outline-secondary btn-sm">
-               <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
+               <i class="fas fa-ban"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_read" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''} data-testid="${parentTestId}-permissions-others-radio-read">
             <label for="btnradio_permissions_public_${id}_read" class="form-label btn btn-outline-secondary btn-sm">
@@ -76,7 +76,7 @@ export class TDPApplicationUtils {
           <div class="btn-group col-sm-auto" role="group">
           <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_none" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''} data-testid="${parentTestId}-permissions-group-radio-none">
             <label for="btnradio_permissions_group_${id}_none" class="form-label btn btn-outline-secondary btn-sm">
-              <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
+              <i class="fas fa-ban"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_read" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''} data-testid="${parentTestId}-permissions-group-radio-read">
             <label for="btnradio_permissions_group_${id}_read" class="form-label btn btn-outline-secondary btn-sm">
@@ -97,7 +97,7 @@ export class TDPApplicationUtils {
           <div class="btn-group col-sm-auto" role="group">
             <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_none" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''} data-testid="${parentTestId}-permissions-buddies-permissions-none">
             <label for="btnradio_permissions_buddies_${id}_none" class="form-label btn btn-outline-secondary btn-sm">
-               <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
+               <i class="fas fa-ban"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
             <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_read" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''} data-testid="${parentTestId}-permissions-buddies-permissions-read">
             <label for="btnradio_permissions_buddies_${id}_read" class="form-label btn btn-outline-secondary btn-sm">
@@ -134,40 +134,19 @@ export class TDPApplicationUtils {
                     return;
                 }
                 // sync with others
-                const target = d.value === 'public' ? 'read' : 'none';
-                others.forEach((o) => o.checked = o.value === target);
-                const groupSelected = group.find((d) => d.checked);
-                if (groupSelected && groupSelected.value === 'none') {
-                    group.forEach((i) => i.checked = i.value === target);
-                }
-                const buddiesSelected = buddies.find((d) => d.checked);
-                if (buddiesSelected && buddiesSelected.value === 'none') {
-                    buddies.forEach((d) => d.checked = d.value === target);
-                }
+                const target = (d.value === 'public') ? 'read' : 'none';
+                others.forEach((o) => o.checked = (o.value === target));
                 syncActive();
             };
         });
-        others.forEach((clicked) => {
-            clicked.onchange = () => {
-                if (!clicked.checked) {
+        others.forEach((d) => {
+            d.onchange = () => {
+                if (!d.checked) {
                     return;
                 }
                 // sync with public
-                {
-                    const target = clicked.value === 'none' ? 'private' : 'public';
-                    publicSimple.forEach((o) => o.checked = o.value === target);
-                }
-                // others at least with the same right
-                if (clicked.value === 'read' || clicked.value === 'write') {
-                    const groupSelected = group.find((d) => d.checked);
-                    if (groupSelected && (groupSelected.value === 'none' || (groupSelected.value === 'read' && clicked.value === 'write'))) {
-                        group.forEach((i) => i.checked = i.value === clicked.value);
-                    }
-                    const buddiesSelected = buddies.find((d) => d.checked);
-                    if (buddiesSelected && (buddiesSelected.value === 'none' || (buddiesSelected.value === 'read' && clicked.value === 'write'))) {
-                        buddies.forEach((d) => d.checked = d.value === clicked.value);
-                    }
-                }
+                const target = d.value === 'none' ? 'private' : 'public';
+                publicSimple.forEach((o) => o.checked = o.value === target);
                 syncActive();
             };
         });
