@@ -24,7 +24,6 @@ export interface ISelect2Option {
     id: string;
     text: string;
     data?: any;
-    testId?: string;
 }
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
@@ -37,7 +36,7 @@ export declare class FormSelect2 extends AFormElement<IFormSelect2> {
         theme: string;
         minimumInputLength: number;
         escapeMarkup: (markup: any) => any;
-        templateResult: (item: any) => any;
+        templateResult: (item: any) => string;
         templateSelection: (item: any) => any;
     };
     static readonly DEFAULT_AJAX_OPTIONS: {
@@ -62,7 +61,7 @@ export declare class FormSelect2 extends AFormElement<IFormSelect2> {
         theme: string;
         minimumInputLength: number;
         escapeMarkup: (markup: any) => any;
-        templateResult: (item: any) => any;
+        templateResult: (item: any) => string;
         templateSelection: (item: any) => any;
     };
     private $select;

@@ -67,13 +67,13 @@ export class FormSelect2 extends AFormElement {
                 const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];
                 initialValue = defaultValues.map((d) => typeof d === 'string' ? d : d.id);
                 if (!data) { //derive default data if none is set explictly
-                    data = defaultValues.map((d) => (typeof d === 'string' ? ({ id: d, text: d, testid: d }) : d));
+                    data = defaultValues.map((d) => (typeof d === 'string' ? ({ id: d, text: d }) : d));
                 }
             }
             else {
                 initialValue = [typeof defaultVal === 'string' ? defaultVal : defaultVal.id];
                 if (!data) {
-                    data = [typeof defaultVal === 'string' ? ({ id: defaultVal, text: defaultVal, testid: defaultVal }) : defaultVal];
+                    data = [typeof defaultVal === 'string' ? ({ id: defaultVal, text: defaultVal }) : defaultVal];
                 }
             }
         }
@@ -88,6 +88,8 @@ export class FormSelect2 extends AFormElement {
         if (defaultVal) {
             this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
         }
+        const select2TestId = `${this.$inputNode.attr('data-testid')}-select2`;
+        this.$jqSelect[0].nextElementSibling.setAttribute('data-testid', select2TestId);
         return this.$jqSelect;
     }
     resolveValue(items) {
@@ -183,7 +185,10 @@ FormSelect2.DEFAULT_OPTIONS = {
     //selectOnClose: true,
     //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
     escapeMarkup: (markup) => markup,
-    templateResult: (item) => item.text,
+    templateResult: function (item) {
+        const textCamelCase = item.text.replace(/\s/g, '');
+        return `<span data-testid="select2-option-${item.id}-${textCamelCase}">${item.text}</span>`;
+    },
     templateSelection: (item) => item.text
 };
 FormSelect2.DEFAULT_AJAX_OPTIONS = Object.assign({

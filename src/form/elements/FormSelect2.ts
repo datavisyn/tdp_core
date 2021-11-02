@@ -10,8 +10,8 @@ import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc, FormElementType} from '../interfaces';
 
 declare type IFormSelect2Options = Select2Options & {
-  return?: 'text'|'id';
-  data?: ISelect2Option[] | ((dependents: any)=>ISelect2Option[]);
+  return?: 'text' | 'id';
+  data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);
 };
 
 /**
@@ -29,7 +29,6 @@ export interface ISelect2Option {
   id: string;
   text: string;
   data?: any;
-  testId?: string;
 }
 
 /**
@@ -45,7 +44,10 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     //selectOnClose: true,
     //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
     escapeMarkup: (markup) => markup,
-    templateResult: (item: any) => item.text,
+    templateResult: function(item: any) {
+      const textCamelCase = item.text.replace(/\s/g, '');
+      return `<span data-testid="select2-option-${item.id}-${textCamelCase}">${item.text}</span>`;
+    },
     templateSelection: (item: any) => item.text
   };
 
@@ -57,12 +59,12 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       cache: true,
       data: (params: any) => {
         return {
-          query: params.term === undefined ? '': params.term, // search term from select2
-          page: params.page === undefined ? 0: params.page
+          query: params.term === undefined ? '' : params.term, // search term from select2
+          page: params.page === undefined ? 0 : params.page
         };
       },
       processResults: (data, params) => {
-        params.page = params.page === undefined ? 0: params.page;
+        params.page = params.page === undefined ? 0 : params.page;
         return {
           results: data.items,
           pagination: { // indicate infinite scrolling
@@ -91,7 +93,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, elementDesc: IFormSelect2, readonly pluginDesc: IPluginDesc) {
-    super(form,elementDesc, pluginDesc);
+    super(form, elementDesc, pluginDesc);
 
     this.isMultiple = (pluginDesc.selection === 'multiple');
   }
@@ -134,6 +136,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     this.$jqSelect.on('change.propagate', this.listener);
   }
 
+
   /**
    * Builds the jQuery select2
    */
@@ -148,12 +151,12 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
         const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];
         initialValue = defaultValues.map((d) => typeof d === 'string' ? d : d.id);
         if (!data) { //derive default data if none is set explictly
-          data = defaultValues.map((d) => (typeof d === 'string' ? ({id: d, text: d, testid: d}) : d));
+          data = defaultValues.map((d) => (typeof d === 'string' ? ({id: d, text: d}) : d));
         }
       } else {
         initialValue = [typeof defaultVal === 'string' ? defaultVal : <string>defaultVal.id];
         if (!data) {
-          data = [typeof defaultVal === 'string' ? ({id: defaultVal, text: defaultVal, testid: defaultVal}) : defaultVal];
+          data = [typeof defaultVal === 'string' ? ({id: defaultVal, text: defaultVal}) : defaultVal];
         }
       }
     }
@@ -162,7 +165,8 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       select2Options.multiple = true;
       select2Options.allowClear = true;
     }
-    BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
+
+    BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, {data});
 
     this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial
@@ -171,6 +175,8 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     if (defaultVal) {
       this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
     }
+    const select2TestId = `${this.$inputNode.attr('data-testid')}-select2`;
+    this.$jqSelect[0].nextElementSibling.setAttribute('data-testid', select2TestId);
     return this.$jqSelect;
   }
 
@@ -178,9 +184,9 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     const returnValue = this.elementDesc.options.return;
     const returnF = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
     if (!items || items.length === 0) {
-      return this.isMultiple ?  [] : returnF({id: '', text: ''});
+      return this.isMultiple ? [] : returnF({id: '', text: ''});
     }
-    const data = items.map((d) => ({id: d.id, text: d.text, data: d.data? d.data : undefined})).map(returnF);
+    const data = items.map((d) => ({id: d.id, text: d.text, data: d.data ? d.data : undefined})).map(returnF);
     return this.isMultiple ? data : data[0];
   }
 
@@ -188,7 +194,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
    * Returns the selected value or if nothing found `null`
    * @returns {string|{name: string, value: string, data: any}|null}
    */
-  get value(): (ISelect2Option|string)|(ISelect2Option|string)[] {
+  get value(): (ISelect2Option | string) | (ISelect2Option | string)[] {
     return this.resolveValue(this.$jqSelect.select2('data'));
   }
 
@@ -205,7 +211,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
    * Select the option by value. If no value found, then the first option is selected.
    * @param v If string then compares to the option value property. Otherwise compares the object reference.
    */
-  set value(v: (ISelect2Option|string)|(ISelect2Option|string)[]) {
+  set value(v: (ISelect2Option | string) | (ISelect2Option | string)[]) {
     try {
       this.$jqSelect.off('change.propagate', this.listener);
 
@@ -215,7 +221,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
         this.previousValue = this.isMultiple ? [] : null;
         return;
       }
-      let r: string|string[] = null;
+      let r: string | string[] = null;
 
       if (this.isMultiple) {
         const values = Array.isArray(v) ? v : [v];

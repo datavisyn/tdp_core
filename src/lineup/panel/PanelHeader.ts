@@ -45,7 +45,7 @@ export class PanelHeader {
     const buttonTag = 'BUTTON';
     const buttonElement = (button.node.tagName.toString() === buttonTag) ? button.node : button.node.firstElementChild;
     const camelizedTitle = buttonElement.getAttribute('title').replace(/\s/g, '');
-    buttonElement.setAttribute(`data-testId`, `panel-header-${camelizedTitle}-button`);
+    buttonElement.setAttribute(`data-testid`, `panel-header-${camelizedTitle}-button`);
     this.buttons = [...this.buttons, button];
     switch (position) {
       case EPanelHeaderToolbar.NAV:
