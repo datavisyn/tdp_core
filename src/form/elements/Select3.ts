@@ -421,6 +421,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
 
   private formatItem(mode: 'result' | 'selection', item: ISelect3Item<T> | ISelect3Group<T>, container: HTMLElement | JQuery) {
     const elem = container instanceof $ ? container[0] : container;
+    elem.setAttribute('data-testid', `select3-option-${item.text}`);
     if (!isSelect3Item(item)) {
       return this.options.formatGroup(item, elem, this.lastSearchQuery);
     }

@@ -227,6 +227,7 @@ export class Select3 extends EventHandler {
     }
     formatItem(mode, item, container) {
         const elem = container instanceof $ ? container[0] : container;
+        elem.setAttribute('data-testid', `select3-option-${item.text}`);
         if (!isSelect3Item(item)) {
             return this.options.formatGroup(item, elem, this.lastSearchQuery);
         }
