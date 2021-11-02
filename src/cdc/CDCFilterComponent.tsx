@@ -12,9 +12,10 @@ interface ICDCFilterComponentProps {
   setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
   filterComponents: {[key: string]: IFilterComponent<any>};
   disableFilter?: boolean;
+  isInvalid?: boolean;
 }
 
-export function CDCFilterComponent({filterSelection, filter, setFilter, filterComponents, disableFilter}: ICDCFilterComponentProps) {
+export function CDCFilterComponent({filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid}: ICDCFilterComponentProps) {
   const onDelete = (newFilter: IFilter) => {
     setFilter((filter) => produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
@@ -102,6 +103,7 @@ export function CDCFilterComponent({filterSelection, filter, setFilter, filterCo
             onValueChanged={onValueChanged}
             filterComponents={filterComponents}
             disableFilter={disableFilter}
+            isInvalid={isInvalid}
           />
         </div>
         {filterSelection ?

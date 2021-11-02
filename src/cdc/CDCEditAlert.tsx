@@ -20,29 +20,51 @@ interface ICDCEditAlert {
 export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs}: ICDCEditAlert) {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const [deleteMode, setDeleteMode] = React.useState<boolean>(false);
+  const [validName, setValidName] = React.useState(true);
+  const [validFilter, setValidFilter] = React.useState(true);
+
   React.useEffect(() => {
     setEditMode(false);
     setDeleteMode(false);
   }, [selectedAlert]);
 
+  React.useEffect(() => {
+    setValidFilter(filter?.children.length > 0);
+  }, [filter]);
+
+  React.useEffect(() => {
+    setValidName(alertData?.name?.trim().length > 0);
+  }, [alertData.name]);
+
   const confirmChanges = async (id: number) => {
     const alert = await confirmAlertById(id);
     onAlertChanged(alert.id);
   };
-  
+
   const onSave = async () => {
-    setEditMode(false);
-    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
-    runAlert(newAlert.id);
-    onAlertChanged(newAlert.id);
+    if (validFilter && validName) {
+      const newAlert = await editAlert(
+        selectedAlert.id,
+        {
+          ...alertData,
+          filter_dump: JSON.stringify(filter),
+          filter_query: getTreeQuery(filter, filterComponents)
+        }).then((alert) => {
+          return runAlert(alert.id).then((a) => {
+            return a ? a : alert;
+          });
+        });
+      onAlertChanged(newAlert.id);
+      setEditMode(false);
+    }
   };
-  
+
   const onDiscard = () => {
     setEditMode(false);
     setAlertData(selectedAlert);
     setFilter(JSON.parse(selectedAlert.filter_dump));
   };
-  
+
   const onDelete = async (id: number) => {
     setEditMode(false);
     await deleteAlert(id);
@@ -51,26 +73,42 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
 
   const generalInformation =
     (<>
-      <div className="mb-3">
-        <label className="form-label">Name</label>
-        {!editMode ?
-          <p>{alertData.name}</p>
+      <div className="row mb-3">
+        <div className="mb-3 col">
+          <label className="form-label">Name</label>
+          {!editMode ?
+            <p>{alertData.name}</p>
+            :
+            <><input type="text" className={`form-control${validName ? '' : ' is-invalid'}`} value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} />
+              {validName ? null :
+                <div className="invalid-feedback">
+                  Name must not be empty!
+                </div>}</>
+          }
+        </div>
+        <div className="mb-3 col">
+          <label className="form-label">CDC</label>
+          <Select
+            isDisabled={!editMode}
+            options={cdcs.map((c) => {return {label: c, value: c};})}
+            value={{label: alertData.cdc_id, value: alertData.cdc_id}}
+            onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
+          />
+        </div>
+        <div className="mb-3 col">
+          <label className="form-label">Email notification</label>
+          <div className="form-check">
+            <input className="form-check-input" type="checkbox" disabled={!editMode} checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
+            <label className="form-check-label ms-2">Send me an email</label>
+          </div>
+        </div>
+      </div>
+      <div>
+        {filterSelection || !filter ?
+          <CDCFilterComponent filterSelection={!editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} disableFilter={!editMode} isInvalid={!validFilter} />
           :
-          <input type="text" className="form-control" value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} />
-        }
+          <p>No filters available for this cdc</p>}
       </div>
-      <div className="mb-3">
-        <label className="form-label">CDC</label>
-        <Select
-          isDisabled={!editMode}
-          options={cdcs.map((c) => {return {label: c, value: c};})}
-          value={{label: alertData.cdc_id, value: alertData.cdc_id}}
-          onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
-        />
-      </div>
-      <input className="form-check-input" type="checkbox" disabled={!editMode} checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
-      <label className="form-check-label ms-2">Email notification</label>
-      <div className="mb-3 form-check"></div>
     </>);
 
   const literature = () => {
@@ -78,7 +116,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     return (<>{data?.length > 0 ? (<>
       <h6>Literature:</h6>
       {data.map((d, i) => <p key={i}>{d}</p>)}
-      <button title="Confirm changes" className="btn btn-text-secondary" onClick={() => confirmChanges(selectedAlert.id)}>Confirm Changes</button>
+      <button title="Confirm changes" className="btn btn-secondary" onClick={() => confirmChanges(selectedAlert.id)}><i className="far fa-eye"></i> Confirm</button>
     </>) : (
       <p>No new data available</p>
     )}
@@ -102,9 +140,8 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
       <small>{editButton}</small>
     </div>
     <div className="accordion" id="editAlert">
-      {!editMode ? accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? 'Latest revision from: ' + selectedAlert.latest_compare_date : 'No new data'}`, 'editAlert', literature(), true) : null}
+      {!editMode ? accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? 'Latest revision from: ' + new Date(selectedAlert.latest_compare_date)?.toLocaleDateString() : 'No new data'}`, 'editAlert', literature(), true) : null}
       {accordionItem(2, 'Alert overview', 'editAlert', generalInformation, editMode)}
-      {accordionItem(3, 'Filter settings', 'editAlert', filterSelection ? (!filter ? null : <CDCFilterComponent filterSelection={!editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} disableFilter={!editMode} />) : <p>No filters available for this cdc</p>)}
     </div>
   </>);
 }

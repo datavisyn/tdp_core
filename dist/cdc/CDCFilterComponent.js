@@ -5,7 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FilterCard } from './FilterCard';
 import { getFilterFromTree } from './interface';
 import { v4 as uuidv4 } from 'uuid';
-export function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents, disableFilter }) {
+export function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid }) {
     const onDelete = (newFilter) => {
         setFilter((filter) => produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
@@ -74,7 +74,7 @@ export function CDCFilterComponent({ filterSelection, filter, setFilter, filterC
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, filterComponents: filterComponents, disableFilter: disableFilter })),
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid })),
             filterSelection ?
                 React.createElement("div", { className: "col-md" },
                     React.createElement("h6", null, "New filters"),

@@ -19,31 +19,31 @@ interface ICDCCreateAlert {
 }
 
 export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs}: ICDCCreateAlert) {
+  const [validFilter, setValidFilter] = React.useState(true);
+  const [validName, setValidName] = React.useState(true);
 
-  const generalInformation =
-    (<>
-      <div className="mb-3">
-        <label className="form-label">Name</label>
-        <input type="text" className="form-control" value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">CDC</label>
-        <Select
-          options={cdcs.map((c) => {return {label: c, value: c};})}
-          value={{label: alertData.cdc_id, value: alertData.cdc_id}}
-          onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
-        />
-      </div>
-      <input className="form-check-input" type="checkbox" checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
-      <label className="form-check-label ms-2">Email notification</label>
-      <div className="mb-3 form-check"></div>
-    </>);
+  React.useEffect(() => {
+    setValidFilter(filter?.children.length > 0);
+  }, [filter]);
+
+  React.useEffect(() => {
+    setValidName(alertData?.name?.trim().length > 0);
+  }, [alertData.name]);
 
   const onSave = async () => {
-    const newAlert = await saveAlert({...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
-    runAlert(newAlert.id);
-    onAlertChanged(newAlert.id);
-    setCreationMode(false);
+    if (validFilter && validName) {
+      const newAlert = await saveAlert({
+        ...alertData,
+        filter_dump: JSON.stringify(filter),
+        filter_query: getTreeQuery(filter, filterComponents)
+      }).then((alert) => {
+        return runAlert(alert.id).then((a) => {
+          return a ? a : alert;
+        });
+      });
+      onAlertChanged(newAlert.id);
+      setCreationMode(false);
+    }
   };
 
   return (<>
@@ -54,9 +54,39 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
         <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={() => setCreationMode(false)}><i className="fas fa-times"></i></button>
       </small>
     </div>
-    <div className="accordion" id="createAlert">
-      {accordionItem(1, 'Alert overview', 'createAlert', generalInformation, true)}
-      {accordionItem(2, 'Filter settings', 'createAlert', filterSelection ? (!filter ? null : <CDCFilterComponent filterSelection={filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} />) : <p>No filters available for this cdc</p>)}
+    <div className="card p-3">
+      <div className="row mb-3">
+        <div className="mb-3 col">
+          <label className="form-label">Name</label>
+          <input type="text" className={`form-control${validName ? '' : ' is-invalid'}`} value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} required />
+          {validName ? null :
+            <div className="invalid-feedback">
+              Name must not be empty!
+            </div>}
+        </div>
+        <div className="mb-3 col">
+          <label className="form-label">CDC</label>
+          <Select
+            options={cdcs.map((c) => {return {label: c, value: c};})}
+            value={{label: alertData.cdc_id, value: alertData.cdc_id}}
+            onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
+          />
+        </div>
+        <div className="mb-3 col">
+          <label className="form-label">Email notification</label>
+          <div className="form-check">
+            <input className="form-check-input" type="checkbox" checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
+            <label className="form-check-label ms-2">Send me an email</label>
+          </div>
+        </div>
+      </div>
+      <div>
+        {filterSelection || !filter ?
+          <CDCFilterComponent filterSelection={filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} isInvalid={!validFilter} />
+          :
+          <p>No filters available for this cdc</p>
+        }
+      </div>
     </div>
   </>);
 }

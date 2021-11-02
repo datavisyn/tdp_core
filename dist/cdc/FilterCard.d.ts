@@ -10,6 +10,7 @@ interface IFilterCardProps {
         [key: string]: IFilterComponent<any>;
     };
     disableFilter: boolean;
+    isInvalid?: boolean;
 }
-export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter }: IFilterCardProps): JSX.Element;
+export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter, isInvalid }: IFilterCardProps): JSX.Element;
 export {};

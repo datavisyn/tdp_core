@@ -11,9 +11,10 @@ interface IFilterCardProps {
   onValueChanged?: (filter: IFilter, value: any) => void;
   filterComponents: {[key: string]: IFilterComponent<any>};
   disableFilter: boolean;
+  isInvalid?: boolean;
 }
 
-export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter}: IFilterCardProps) {
+export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter, isInvalid}: IFilterCardProps) {
   const [{isDragging, draggedItem}, drag, preview] = useDrag(() => ({
     type: itemTypes.FILTERCARD,
     item: filter,
@@ -30,9 +31,9 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
     return <>ERROR!!</>;
   }
 
-  return (
+  return (<>
     <div
-      className={`card mb-2 ${isDragging ? 'bg-light' : ''}`}
+      className={`card mb-2 ${isDragging ? 'bg-light' : ''}${isInvalid ? ' form-control is-invalid' : ''}`}
       ref={preview}
       style={filter.disableRemoving && filter.disableDragging ? {height: '93%'} : {}}
     >
@@ -132,5 +133,10 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
         ))}
       </div>
     </div>
-  );
+    {isInvalid ?
+      <div className="invalid-feedback mb-2">
+        Filter must not be empty!
+      </div> :
+      null}
+  </>);
 }

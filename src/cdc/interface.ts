@@ -88,10 +88,10 @@ export interface IAlert {
   enable_mail_notification: boolean;
   latest_diff: any;
   latest_fetched_data: string;
-  latest_compare_date: string;
+  latest_compare_date: Date;
   modification_date: string;
   confirmed_data: string;
-  confirmation_date: string;
+  confirmation_date: Date;
 }
 
 export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter_dump' | 'filter_query' | 'enable_mail_notification'> {}

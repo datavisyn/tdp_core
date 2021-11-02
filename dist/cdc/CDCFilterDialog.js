@@ -18,10 +18,12 @@ export const accordionItem = (index, title, parentId, child, show) => {
             React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#collapse${index}`, "aria-expanded": "true", "aria-controls": `collapse${index}` }, title)),
         React.createElement("div", { id: `collapse${index}`, className: `p-2 accordion-collapse collapse${show ? ' show' : ''}`, "aria-labelledby": `heading${index}`, "data-bs-parent": `#${parentId}` }, child)));
 };
-export const runAlert = (id) => {
-    runAlertById(id).catch((e) => {
+export const runAlert = async (id) => {
+    const runAlert = runAlertById(id).then((alert) => { return alert; }).catch((e) => {
         alert(`${e}: Invalid filter parameter in alert: ${id}`);
+        return null;
     });
+    return runAlert;
 };
 export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
     const [selectedAlert, setSelectedAlert] = React.useState();
@@ -84,7 +86,7 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                         "Error ",
                                         alertError.toString()) : null,
                                     alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alerts.map((alert) => {
-                                        var _a, _b;
+                                        var _a, _b, _c, _d, _e;
                                         return React.createElement("div", { key: alert.id },
                                             React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id) === (alert === null || alert === void 0 ? void 0 : alert.id) ? ' border-primary' : ''}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
                                                 React.createElement("div", { className: "d-flex w-100 justify-content-between" },
@@ -96,7 +98,7 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                                             alert.cdc_id)),
                                                     ((_b = (_a = JSON.parse(alert === null || alert === void 0 ? void 0 : alert.latest_diff)) === null || _a === void 0 ? void 0 : _a.dictionary_item_added) === null || _b === void 0 ? void 0 : _b.length) > 0 ? React.createElement("small", null,
                                                         React.createElement("i", { className: "fas fa-circle text-primary" })) : null),
-                                                React.createElement("small", null, !alert.latest_diff && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${alert.confirmation_date}`)));
+                                                React.createElement("small", null, !((_c = JSON.parse(alert === null || alert === void 0 ? void 0 : alert.latest_diff)) === null || _c === void 0 ? void 0 : _c.dictionary_item_added) && !alert.confirmed_data ? 'No data revision yet' : ((_d = JSON.parse(alert.latest_diff)) === null || _d === void 0 ? void 0 : _d.dictionary_item_added) ? 'Pending data revision' : `Last confirmed: ${(_e = new Date(alert.confirmation_date)) === null || _e === void 0 ? void 0 : _e.toLocaleDateString()}`)));
                                     })) : null),
                                 React.createElement("div", { className: "col-9 overflow-auto" }, selectedAlert ?
                                     React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC['demo'], filterComponents: filterComponents, onAlertChanged: onAlertChanged, selectedAlert: selectedAlert, cdcs: cdcs })

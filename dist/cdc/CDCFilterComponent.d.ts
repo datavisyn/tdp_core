@@ -8,6 +8,7 @@ interface ICDCFilterComponentProps {
         [key: string]: IFilterComponent<any>;
     };
     disableFilter?: boolean;
+    isInvalid?: boolean;
 }
-export declare function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents, disableFilter }: ICDCFilterComponentProps): JSX.Element;
+export declare function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid }: ICDCFilterComponentProps): JSX.Element;
 export {};

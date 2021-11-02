@@ -35,10 +35,12 @@ export const accordionItem = (index: number, title: string, parentId: string, ch
   );
 };
 
-export const runAlert = (id: number) => {
-  runAlertById(id).catch((e) => {
+export const runAlert = async (id: number): Promise<IAlert> => {
+  const runAlert = runAlertById(id).then((alert) => {return alert}).catch((e) => {
     alert(`${e}: Invalid filter parameter in alert: ${id}`);
+    return null;
   });
+  return runAlert;
 };
 
 export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDialogProps) {
@@ -107,7 +109,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                         <h6 title={`${alert.name} for ${alert.cdc_id}`} className="mb-1 overflow-hidden">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
                         {JSON.parse(alert?.latest_diff)?.dictionary_item_added?.length > 0 ? <small><i className="fas fa-circle text-primary"></i></small> : null}
                       </div>
-                      <small>{!alert.latest_diff && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${alert.confirmation_date}`}</small>
+                      <small>{!JSON.parse(alert?.latest_diff)?.dictionary_item_added && !alert.confirmed_data ? 'No data revision yet' : JSON.parse(alert.latest_diff)?.dictionary_item_added ? 'Pending data revision' : `Last confirmed: ${new Date(alert.confirmation_date)?.toLocaleDateString()}`}</small>
                     </a></div>
                   )}</div> : null}
                 </div>

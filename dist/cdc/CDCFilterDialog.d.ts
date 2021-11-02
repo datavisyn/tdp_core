@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IFilter, IFilterComponent, IUploadAlert } from './interface';
+import { IAlert, IFilter, IFilterComponent, IUploadAlert } from './interface';
 interface ICDCFilterDialogProps {
     filterComponents: {
         [key: string]: IFilterComponent<any>;
@@ -21,7 +21,7 @@ export declare const DEFAULTFILTER: {
     children?: IFilter<any>[];
 };
 export declare const accordionItem: (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => JSX.Element;
-export declare const runAlert: (id: number) => void;
+export declare const runAlert: (id: number) => Promise<IAlert>;
 export declare function CDCFilterDialog({ filterComponents, filtersByCDC }: ICDCFilterDialogProps): JSX.Element;
 export declare class CDCFilterDialogClass {
     private node;
