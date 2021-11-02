@@ -83,7 +83,7 @@ export interface IAlert {
   id: number;
   name: string;
   cdc_id: string;
-  filter: object;
+  filter: IFilter;
   filter_query: string;
   enable_mail_notification: boolean;
   latest_diff: any;

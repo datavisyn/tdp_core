@@ -16,7 +16,7 @@ interface ICDCFilterDialogProps {
   filtersByCDC: {[cdcId: string]: IFilter<any>[]};
 }
 
-export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter: {}, filter_query: ''};
+export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, filter_query: ''};
 export const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true};
 
 export const accordionItem = (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => {

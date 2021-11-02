@@ -9,7 +9,7 @@ import { CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter } from 
 import { CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter } from './CDCRangeFilter';
 import { CDCCreateAlert } from './CDCCreateAlert';
 import { CDCEditAlert } from './CDCEditAlert';
-export const DEFAULTALERTDATA = { name: '', enable_mail_notification: false, cdc_id: 'demo', filter_dump: '', filter_query: '' };
+export const DEFAULTALERTDATA = { name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, filter_query: '' };
 export const DEFAULTFILTER = { ...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true };
 export const accordionItem = (index, title, parentId, child, show) => {
     parentId = parentId.trim();
@@ -44,7 +44,7 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
     };
     const onAlertClick = async (alert) => {
         setAlertData(alert);
-        setFilter(JSON.parse(alert.filter_dump));
+        setFilter(alert.filter);
         setCreationMode(false);
         setSelectedAlert(alert);
     };

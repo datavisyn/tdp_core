@@ -17,7 +17,7 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
         React.createElement("label", { className: "form-check-label ms-2" }, "Email notification"),
         React.createElement("div", { className: "mb-3 form-check" })));
     const onSave = async () => {
-        const newAlert = await saveAlert({ ...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents) });
+        const newAlert = await saveAlert({ ...alertData, filter, filter_query: getTreeQuery(filter, filterComponents) });
         runAlert(newAlert.id);
         onAlertChanged(newAlert.id);
         setCreationMode(false);
