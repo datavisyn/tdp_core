@@ -329,7 +329,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     }
 
     this.node.querySelector('span.select2').setAttribute('data-testid', `${this.options.testid}-select2`);
-    
+
     this.node.addEventListener('paste', (evt) => {
       // see https://jsfiddle.net/GertG/99t5d5vf/
       // the browser normalizes copy-paste data by its own but to avoid that we do it ourselves

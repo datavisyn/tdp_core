@@ -185,7 +185,7 @@ FormSelect2.DEFAULT_OPTIONS = {
     //selectOnClose: true,
     //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
     escapeMarkup: (markup) => markup,
-    templateResult: function (item) {
+    templateResult(item) {
         const textCamelCase = item.text.replace(/\s/g, '');
         return `<span data-testid="select2-option-${item.id}-${textCamelCase}">${item.text}</span>`;
     },
