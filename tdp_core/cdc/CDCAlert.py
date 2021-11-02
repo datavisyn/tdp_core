@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, BLOB, PickleType
+from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, BLOB, PickleType, JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql.schema import ForeignKey
@@ -23,7 +23,7 @@ class CDCAlert(Base):
     name = Column(TEXT, nullable=False)
     cdc_id = Column(TEXT, nullable=False)
     # TODO: Change to JSONB in postgres
-    filter_dump = Column(PickleType, nullable=False)
+    filter = Column(JSON, nullable=False)
     filter_query = Column(TEXT, nullable=False)
     enable_mail_notification = Column(Boolean, nullable=False)
 

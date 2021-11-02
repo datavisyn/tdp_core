@@ -83,7 +83,7 @@ export interface IAlert {
   id: number;
   name: string;
   cdc_id: string;
-  filter_dump: string;
+  filter: object;
   filter_query: string;
   enable_mail_notification: boolean;
   latest_diff: any;
@@ -94,7 +94,7 @@ export interface IAlert {
   confirmation_date: string;
 }
 
-export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter_dump' | 'filter_query' | 'enable_mail_notification'> {}
+export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'filter_query' | 'enable_mail_notification'> {}
 
 export function isAlert(obj: IAlert | IUploadAlert): obj is IAlert {
   return typeof (obj as any)?.id === 'number';

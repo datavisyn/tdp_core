@@ -29,20 +29,20 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     const alert = await confirmAlertById(id);
     onAlertChanged(alert.id);
   };
-  
+
   const onSave = async () => {
     setEditMode(false);
-    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
+    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter, filter_query: getTreeQuery(filter, filterComponents)});
     runAlert(newAlert.id);
     onAlertChanged(newAlert.id);
   };
-  
+
   const onDiscard = () => {
     setEditMode(false);
     setAlertData(selectedAlert);
-    setFilter(JSON.parse(selectedAlert.filter_dump));
+    setFilter(selectedAlert.filter);
   };
-  
+
   const onDelete = async (id: number) => {
     setEditMode(false);
     await deleteAlert(id);

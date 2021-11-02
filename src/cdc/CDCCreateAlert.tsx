@@ -40,7 +40,7 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
     </>);
 
   const onSave = async () => {
-    const newAlert = await saveAlert({...alertData, filter_dump: JSON.stringify(filter), filter_query: getTreeQuery(filter, filterComponents)});
+    const newAlert = await saveAlert({...alertData, filter, filter_query: getTreeQuery(filter, filterComponents)});
     runAlert(newAlert.id);
     onAlertChanged(newAlert.id);
     setCreationMode(false);
