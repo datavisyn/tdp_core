@@ -131,7 +131,8 @@ export class Select3 extends EventHandler {
         });
         this.node = this.options.document.createElement('div');
         this.node.classList.add('select3');
-        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''} data-testid="${this.options.testid}"></select>`;
+        this.node.setAttribute('data-testid', this.options.testid);
+        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''} data-testid="${this.options.testid}-select"></select>`;
         this.$select = $('select', this.node);
         if (this.options.name != null) {
             this.$select.attr('name', this.options.name);
@@ -144,6 +145,7 @@ export class Select3 extends EventHandler {
         if (this.options.validate && this.options.dropable) {
             this.dropFile(this.node.querySelector('.select2-container'));
         }
+        this.node.querySelector('span.select2').setAttribute('data-testid', `${this.options.testid}-select2`);
         this.node.addEventListener('paste', (evt) => {
             // see https://jsfiddle.net/GertG/99t5d5vf/
             // the browser normalizes copy-paste data by its own but to avoid that we do it ourselves
