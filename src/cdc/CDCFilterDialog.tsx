@@ -16,7 +16,7 @@ interface ICDCFilterDialogProps {
   filtersByCDC: {[cdcId: string]: IFilter<any>[]};
 }
 
-export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter_dump: '', filter_query: ''};
+export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter_dump: null, filter_query: ''};
 export const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true};
 
 export const accordionItem = (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => {
@@ -67,7 +67,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
 
   const onAlertClick = async (alert: IAlert) => {
     setAlertData(alert);
-    setFilter(JSON.parse(alert.filter_dump));
+    setFilter(alert.filter_dump);
     setCreationMode(false);
     setSelectedAlert(alert);
   };
@@ -107,9 +107,9 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                     <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert?.id === alert?.id ? ' border-primary' : ''}`} onClick={() => onAlertClick(alert)} aria-current="true">
                       <div className="d-flex w-100 justify-content-between">
                         <h6 title={`${alert.name} for ${alert.cdc_id}`} className="mb-1 overflow-hidden">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
-                        {JSON.parse(alert?.latest_diff)?.dictionary_item_added?.length > 0 ? <small><i className="fas fa-circle text-primary"></i></small> : null}
+                        {alert?.latest_diff ? <small><i className="fas fa-circle text-primary"></i></small> : null}
                       </div>
-                      <small>{!JSON.parse(alert?.latest_diff)?.dictionary_item_added && !alert.confirmed_data ? 'No data revision yet' : JSON.parse(alert.latest_diff)?.dictionary_item_added ? 'Pending data revision' : `Last confirmed: ${new Date(alert.confirmation_date)?.toLocaleDateString()}`}</small>
+                      <small>{!alert?.latest_diff && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${new Date(alert.confirmation_date)?.toLocaleDateString()}`}</small>
                     </a></div>
                   )}</div> : null}
                 </div>

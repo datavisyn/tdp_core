@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, BLOB, PickleType
+from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, BLOB, PickleType, JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql.schema import ForeignKey
@@ -23,16 +23,16 @@ class CDCAlert(Base):
     name = Column(TEXT, nullable=False)
     cdc_id = Column(TEXT, nullable=False)
     # TODO: Change to JSONB in postgres
-    filter_dump = Column(PickleType, nullable=False)
+    filter_dump = Column(JSON, nullable=False)
     filter_query = Column(TEXT, nullable=False)
     enable_mail_notification = Column(Boolean, nullable=False)
 
     latest_compare_date = Column(DateTime, nullable=True)
-    latest_diff = Column(PickleType, nullable=True)
-    latest_fetched_data = Column(PickleType, nullable=True)
+    latest_diff = Column(JSON, nullable=True)
+    latest_fetched_data = Column(JSON, nullable=True)
 
     confirmation_date = Column(DateTime, nullable=True)  # date of confirmation
-    confirmed_data = Column(PickleType, nullable=True)  # your confirmed data
+    confirmed_data = Column(JSON, nullable=True)  # your confirmed data
     #security
     creator = Column(TEXT, nullable=False)  # NOQA: N815
     creation_date = Column(DateTime, nullable=False)  # NOQA: N815
@@ -79,6 +79,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine('sqlite:////:memory:')
-#Base.metadata.drop_all(engine)
+# Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)
 create_session = sessionmaker(engine)

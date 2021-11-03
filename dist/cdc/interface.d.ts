@@ -32,14 +32,25 @@ export interface IAlert {
     id: number;
     name: string;
     cdc_id: string;
-    filter_dump: string;
+    filter_dump: IFilter;
     filter_query: string;
     enable_mail_notification: boolean;
-    latest_diff: any;
-    latest_fetched_data: string;
+    latest_diff: {
+        dictionary_item_added?: number[];
+        dictionary_item_removed?: number[];
+        values_changed?: {
+            key: {
+                field: string;
+                id: number;
+                new_value: string;
+                old_value: string;
+            };
+        };
+    };
+    latest_fetched_data: any;
     latest_compare_date: Date;
     modification_date: string;
-    confirmed_data: string;
+    confirmed_data: any;
     confirmation_date: Date;
 }
 export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter_dump' | 'filter_query' | 'enable_mail_notification'> {

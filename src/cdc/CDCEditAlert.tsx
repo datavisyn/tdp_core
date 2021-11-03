@@ -1,3 +1,4 @@
+import {css} from 'jquery';
 import React from 'react';
 import Select from 'react-select';
 import {accordionItem, runAlert} from '.';
@@ -47,7 +48,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
         selectedAlert.id,
         {
           ...alertData,
-          filter_dump: JSON.stringify(filter),
+          filter_dump: filter,
           filter_query: getTreeQuery(filter, filterComponents)
         }).then((alert) => {
           return runAlert(alert.id).then((a) => {
@@ -62,7 +63,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
   const onDiscard = () => {
     setEditMode(false);
     setAlertData(selectedAlert);
-    setFilter(JSON.parse(selectedAlert.filter_dump));
+    setFilter(selectedAlert.filter_dump);
   };
 
   const onDelete = async (id: number) => {
@@ -112,11 +113,74 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     </>);
 
   const literature = () => {
-    const data = JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added;
-    return (<>{data?.length > 0 ? (<>
-      <h6>Literature:</h6>
-      {data.map((d, i) => <p key={i}>{d}</p>)}
-      <button title="Confirm changes" className="btn btn-secondary" onClick={() => confirmChanges(selectedAlert.id)}><i className="far fa-eye"></i> Confirm</button>
+    const diff = selectedAlert.latest_diff;
+    // const changedValues: Map<number, {field: string, newValue: string, oldValue: string}[]> = new Map();
+    // if (diff.values_changed) {
+    //   const dvc = diff.values_changed;
+    //   Object.keys(dvc).map((key) => {
+    //     const id = dvc[key].id
+    //     if (changedValues.has(id)) {
+    //       changedValues.set(id, [...changedValues.get(id), {field: dvc[key].field, oldValue: dvc[key].old_value, newValue: dvc[key].new_value}]);
+    //     } else {
+    //       changedValues.set(id, [{field: dvc[key].field, oldValue: dvc[key].old_value, newValue: dvc[key].new_value}]);
+    //     }
+    //   });
+    // }
+    console.log(diff)
+    return (<>{diff ? (<>
+      <h6>Changed data:</h6>
+      <table className="table table-light mt-4">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Street</th>
+            <th scope="col">City</th>
+          </tr>
+        </thead>
+        <tbody>
+          {diff.dictionary_item_added ?
+            diff.dictionary_item_added.map((d) => {
+              const data = selectedAlert.latest_fetched_data.find(a => a.id === d);
+              return (<tr key={d} className="table-success">
+                <td>{data?.id}</td>
+                <td>{data?.name}</td>
+                <td>{data?.address.street}</td>
+                <td>{`${data?.address?.zipcode} ${data?.address?.city}`}</td>
+              </tr>)
+            }) : null}
+          {diff.dictionary_item_removed ?
+            diff.dictionary_item_removed.map((d) => {
+              const data = selectedAlert.confirmed_data.find(a => a.id === d);
+              return (<tr key={d} className="table-danger">
+                <td>{data?.id}</td>
+                <td>{data?.name}</td>
+                <td>{data?.address.street}</td>
+                <td>{`${data?.address?.zipcode} ${data?.address?.city}`}</td>
+              </tr>)
+            }) : null}
+          {diff.values_changed ?
+            Object.keys(diff.values_changed).map((d) => {
+              const cv = diff.values_changed[d];
+              const data = selectedAlert.confirmed_data.find(a => a.id === cv.id);
+              return (<tr key={d} className="table-primary">
+                {cv.field === 'id' ? <td><s>{cv.old_value}</s> {cv.new_value}</td> : <td>{data?.id}</td>}
+                {cv.field === 'name' ? <td><s>{cv.old_value}</s> {cv.new_value}</td> : <td>{data?.name}</td>}
+                {cv.field === 'address.street' ? <td><s>{cv.old_value}</s> {cv.new_value}</td> : <td>{data?.address.street}</td>}
+                {cv.field === 'address.zipcode' ?
+                  <td><s>{cv.old_value} {data.address.city}</s> {cv.new_value} {selectedAlert.latest_fetched_data.find(a => a.id === cv.id)?.address.city}</td>
+                  : cv.field === 'address.city' ?
+                    <td><s>{data.address.zipcode} {cv.old_value}</s> {selectedAlert.latest_fetched_data.find(a => a.id === cv.id)?.address.zipcode} {cv.new_value}</td>
+                    :
+                    <td>{`${data?.address?.zipcode} ${data?.address?.city}`}</td>}
+                {/* TODO: zipcode and street not working yet + combine multiple changes from same id*/}
+              </tr>)
+            }) : null}
+        </tbody>
+      </table>
+      <div className="d-md-flex justify-content-md-end">
+        <button title="Confirm changes" className="btn btn-primary" onClick={() => confirmChanges(selectedAlert.id)}>Confirm</button>
+      </div>
     </>) : (
       <p>No new data available</p>
     )}
@@ -140,7 +204,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
       <small>{editButton}</small>
     </div>
     <div className="accordion" id="editAlert">
-      {!editMode ? accordionItem(1, `${JSON.parse(selectedAlert.latest_diff)?.dictionary_item_added ? 'Latest revision from: ' + new Date(selectedAlert.latest_compare_date)?.toLocaleDateString() : 'No new data'}`, 'editAlert', literature(), true) : null}
+      {!editMode ? accordionItem(1, `${selectedAlert.latest_diff ? 'Latest revision from: ' + new Date(selectedAlert.latest_compare_date)?.toLocaleDateString() : 'No new data'}`, 'editAlert', literature(), true) : null}
       {accordionItem(2, 'Alert overview', 'editAlert', generalInformation, editMode)}
     </div>
   </>);

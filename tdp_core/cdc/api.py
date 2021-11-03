@@ -160,6 +160,10 @@ def confirm_alert_by_id(id: str):
     # TODO: How to confirm this override?
     alert.confirmation_date = datetime.utcnow()
     alert.confirmed_data = alert.latest_fetched_data
+    alert.confirmed_data[1]['name'] = 'Herbert'
+    alert.confirmed_data[2]['name'] = 'Herbert'
+    alert.confirmed_data[1]['address']['street'] = 'Dornach'
+    alert.confirmed_data[2]['address']['city'] = 'Lünz'
     
     alert.latest_compare_date = None
     alert.latest_fetched_data = None
