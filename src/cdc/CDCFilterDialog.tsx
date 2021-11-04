@@ -28,7 +28,7 @@ export const accordionItem = (index: number, title: string, parentId: string, ch
           {title}
         </button>
       </h2>
-      <div id={`collapse${index}`} className={`p-2 accordion-collapse collapse${show ? ' show' : ''}`} aria-labelledby={`heading${index}`} data-bs-parent={`#${parentId}`}>
+      <div id={`collapse${index}`} className={`p-4 accordion-collapse collapse${show ? ' show' : ''}`} aria-labelledby={`heading${index}`} data-bs-parent={`#${parentId}`}>
         {child}
       </div>
     </div>

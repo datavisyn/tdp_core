@@ -33,7 +33,7 @@ class BaseCDC(Generic[T]):
         new = new or []
         old_lookup = {self.get_id(item): item for item in old}
         new_lookup = {self.get_id(item): item for item in new}
-        return DeepDiff(old_lookup, new_lookup).to_json()
+        return DeepDiff(old_lookup, new_lookup, view='tree')
 
     # @abstractproperty # ?
     # @property

@@ -114,22 +114,21 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
 
   const literature = () => {
     const diff = selectedAlert.latest_diff;
-    // const changedValues: Map<number, {field: string, newValue: string, oldValue: string}[]> = new Map();
-    // if (diff.values_changed) {
-    //   const dvc = diff.values_changed;
-    //   Object.keys(dvc).map((key) => {
-    //     const id = dvc[key].id
-    //     if (changedValues.has(id)) {
-    //       changedValues.set(id, [...changedValues.get(id), {field: dvc[key].field, oldValue: dvc[key].old_value, newValue: dvc[key].new_value}]);
-    //     } else {
-    //       changedValues.set(id, [{field: dvc[key].field, oldValue: dvc[key].old_value, newValue: dvc[key].new_value}]);
-    //     }
-    //   });
-    // }
-    console.log(diff)
+    const change: Map<String, Map<String, {old: string, new: string}>> = new Map();
+    if (diff?.values_changed) {
+      const dvc = diff.values_changed;
+      dvc.map((d) => {
+        const nestedField = d.field.map((f) => f).join(".");
+        if (change.has(d.id)) {
+          change.set(d.id, change.get(d.id).set(nestedField, {old: d.old_value, new: d.new_value}));
+        } else {
+          change.set(d.id, new Map<String, {old: string, new: string}>().set(nestedField, {old: d.old_value, new: d.new_value}));
+        }
+      })
+    }
     return (<>{diff ? (<>
       <h6>Changed data:</h6>
-      <table className="table table-light mt-4">
+      <table className="table table-light mt-2">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -160,20 +159,19 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
               </tr>)
             }) : null}
           {diff.values_changed ?
-            Object.keys(diff.values_changed).map((d) => {
-              const cv = diff.values_changed[d];
-              const data = selectedAlert.confirmed_data.find(a => a.id === cv.id);
-              return (<tr key={d} className="table-primary">
-                {cv.field === 'id' ? <td><s>{cv.old_value}</s> {cv.new_value}</td> : <td>{data?.id}</td>}
-                {cv.field === 'name' ? <td><s>{cv.old_value}</s> {cv.new_value}</td> : <td>{data?.name}</td>}
-                {cv.field === 'address.street' ? <td><s>{cv.old_value}</s> {cv.new_value}</td> : <td>{data?.address.street}</td>}
-                {cv.field === 'address.zipcode' ?
-                  <td><s>{cv.old_value} {data.address.city}</s> {cv.new_value} {selectedAlert.latest_fetched_data.find(a => a.id === cv.id)?.address.city}</td>
-                  : cv.field === 'address.city' ?
-                    <td><s>{data.address.zipcode} {cv.old_value}</s> {selectedAlert.latest_fetched_data.find(a => a.id === cv.id)?.address.zipcode} {cv.new_value}</td>
+            [...change.keys()].map((id, i) => {
+              const oldData = selectedAlert.confirmed_data?.find(a => a.id === id);
+              const newData = selectedAlert.latest_fetched_data?.find(a => a.id === id);
+              return (<tr key={i} className="table-primary">
+                {change.get(id).has('id') ? <td><s>{change.get(id).get('id').old}</s> {change.get(id).get('id').new}</td> : <td>{oldData.id}</td>}
+                {change.get(id).has('name') ? <td><s>{change.get(id).get('name').old}</s> {change.get(id).get('name').new}</td> : <td>{oldData.name}</td>}
+                {change.get(id).has('address.street') ? <td><s>{change.get(id).get('address.street').old}</s> {change.get(id).get('address.street').new}</td> : <td>{oldData.address.street}</td>}
+                {change.get(id).has('address.zipcode') ?
+                  <td><s>{change.get(id).get('address.zipcode').old} {oldData.address.city}</s> {change.get(id).get('address.zipcode').new} {newData.address.city}</td>
+                  : change.get(id).has('address.city') ?
+                    <td><s>{oldData.address.zipcode} {change.get(id).get('address.city').old}</s> {newData.address.zipcode} {change.get(id).get('address.city').new}</td>
                     :
-                    <td>{`${data?.address?.zipcode} ${data?.address?.city}`}</td>}
-                {/* TODO: zipcode and street not working yet + combine multiple changes from same id*/}
+                    <td>{`${oldData.address?.zipcode} ${oldData.address?.city}`}</td>}
               </tr>)
             }) : null}
         </tbody>

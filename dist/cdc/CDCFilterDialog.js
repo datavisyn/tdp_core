@@ -16,7 +16,7 @@ export const accordionItem = (index, title, parentId, child, show) => {
     return (React.createElement("div", { key: index, className: "accordion-item" },
         React.createElement("h2", { className: "accordion-header", id: `heading${index}` },
             React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#collapse${index}`, "aria-expanded": "true", "aria-controls": `collapse${index}` }, title)),
-        React.createElement("div", { id: `collapse${index}`, className: `p-2 accordion-collapse collapse${show ? ' show' : ''}`, "aria-labelledby": `heading${index}`, "data-bs-parent": `#${parentId}` }, child)));
+        React.createElement("div", { id: `collapse${index}`, className: `p-4 accordion-collapse collapse${show ? ' show' : ''}`, "aria-labelledby": `heading${index}`, "data-bs-parent": `#${parentId}` }, child)));
 };
 export const runAlert = async (id) => {
     const runAlert = runAlertById(id).then((alert) => { return alert; }).catch((e) => {

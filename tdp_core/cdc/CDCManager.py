@@ -54,33 +54,26 @@ class CDCManager():
         #    new_df = new_df.query('name == ["test123", "asdfasdf"] or age > 40 and ...')
 
         # Compare confirmed with new entry
-        diff = json.loads(cdc.compare(alert.confirmed_data, new))
+        diff = cdc.compare(alert.confirmed_data, new)
 
         if "dictionary_item_removed" in diff:
-            diff["dictionary_item_removed"] = [int(rm[(rm.find('[') + 1):rm.find(']')]) for rm in diff["dictionary_item_removed"]]   
+            diff["dictionary_item_removed"] = [rm.path(output_format='list')[0] for rm in diff["dictionary_item_removed"]]   
 
         if "dictionary_item_added" in diff:
-            diff["dictionary_item_added"] = [int(add[(add.find('[') + 1):add.find(']')]) for add in diff["dictionary_item_added"]]
+            diff["dictionary_item_added"] = [add.path(output_format='list')[0] for add in diff["dictionary_item_added"]]
 
         if "values_changed" in diff:
-            keys = diff["values_changed"].keys()
-            newDict = {}
-            i = 1
-            for key in keys:
-                newKey = "key" + str(i)
-                newDict[newKey] = {}
-                field = key[(key.find('\'') + 1):key.find('\']')]
-                rest = key[key.find('\']')+1:]
-                while len(rest) > 2:
-                    field = field + '.' + rest[(rest.find('\'') + 1):rest.find('\']')]
-                    rest = rest[rest.find('\']')+1:]
-                newDict[newKey]["field"] = field
-                newDict[newKey]["id"] = int(key[(key.find('[') + 1):key.find(']')])
-                newDict[newKey]["new_value"] = diff["values_changed"][key]['new_value']
-                newDict[newKey]["old_value"] = diff["values_changed"][key]['old_value']
-                i = i + 1
-            diff["values_changed"] = newDict
-        
+            new_values_changed = []
+            for changed in diff["values_changed"]:
+                new_obj = {}
+                change_path = changed.path(output_format='list')
+                new_obj["id"] = change_path[0]
+                new_obj["field"] = change_path[1:len(change_path)]
+                new_obj["old_value"] = changed.t1
+                new_obj["new_value"] = changed.t2
+                new_values_changed.append(new_obj)
+            diff["values_changed"] = new_values_changed
+
         return new, diff
 
     def registerCDC(self, cdc: BaseCDC):

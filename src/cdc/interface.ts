@@ -86,7 +86,7 @@ export interface IAlert {
   filter_dump: IFilter;
   filter_query: string;
   enable_mail_notification: boolean;
-  latest_diff: {dictionary_item_added?: number[], dictionary_item_removed?: number[], values_changed?: {key: {field: string, id: number, new_value: string, old_value: string}}};
+  latest_diff: {dictionary_item_added?: string[], dictionary_item_removed?: string[], values_changed?: {id: string, field: [], old_value: string, new_value: string}[]};
   latest_fetched_data: any;
   latest_compare_date: Date;
   modification_date: string;

@@ -75,22 +75,22 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                 React.createElement("p", null, "No filters available for this cdc"))));
     const literature = () => {
         const diff = selectedAlert.latest_diff;
-        // const changedValues: Map<number, {field: string, newValue: string, oldValue: string}[]> = new Map();
-        // if (diff.values_changed) {
-        //   const dvc = diff.values_changed;
-        //   Object.keys(dvc).map((key) => {
-        //     const id = dvc[key].id
-        //     if (changedValues.has(id)) {
-        //       changedValues.set(id, [...changedValues.get(id), {field: dvc[key].field, oldValue: dvc[key].old_value, newValue: dvc[key].new_value}]);
-        //     } else {
-        //       changedValues.set(id, [{field: dvc[key].field, oldValue: dvc[key].old_value, newValue: dvc[key].new_value}]);
-        //     }
-        //   });
-        // }
-        console.log(diff);
+        const change = new Map();
+        if (diff === null || diff === void 0 ? void 0 : diff.values_changed) {
+            const dvc = diff.values_changed;
+            dvc.map((d) => {
+                const nestedField = d.field.map((f) => f).join(".");
+                if (change.has(d.id)) {
+                    change.set(d.id, change.get(d.id).set(nestedField, { old: d.old_value, new: d.new_value }));
+                }
+                else {
+                    change.set(d.id, new Map().set(nestedField, { old: d.old_value, new: d.new_value }));
+                }
+            });
+        }
         return (React.createElement(React.Fragment, null, diff ? (React.createElement(React.Fragment, null,
             React.createElement("h6", null, "Changed data:"),
-            React.createElement("table", { className: "table table-light mt-4" },
+            React.createElement("table", { className: "table table-light mt-2" },
                 React.createElement("thead", null,
                     React.createElement("tr", null,
                         React.createElement("th", { scope: "col" }, "#"),
@@ -119,45 +119,45 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                                 React.createElement("td", null, `${(_a = data === null || data === void 0 ? void 0 : data.address) === null || _a === void 0 ? void 0 : _a.zipcode} ${(_b = data === null || data === void 0 ? void 0 : data.address) === null || _b === void 0 ? void 0 : _b.city}`)));
                         }) : null,
                     diff.values_changed ?
-                        Object.keys(diff.values_changed).map((d) => {
+                        [...change.keys()].map((id, i) => {
                             var _a, _b, _c, _d;
-                            const cv = diff.values_changed[d];
-                            const data = selectedAlert.confirmed_data.find(a => a.id === cv.id);
-                            return (React.createElement("tr", { key: d, className: "table-primary" },
-                                cv.field === 'id' ? React.createElement("td", null,
-                                    React.createElement("s", null, cv.old_value),
+                            const oldData = (_a = selectedAlert.confirmed_data) === null || _a === void 0 ? void 0 : _a.find(a => a.id === id);
+                            const newData = (_b = selectedAlert.latest_fetched_data) === null || _b === void 0 ? void 0 : _b.find(a => a.id === id);
+                            return (React.createElement("tr", { key: i, className: "table-primary" },
+                                change.get(id).has('id') ? React.createElement("td", null,
+                                    React.createElement("s", null, change.get(id).get('id').old),
                                     " ",
-                                    cv.new_value) : React.createElement("td", null, data === null || data === void 0 ? void 0 : data.id),
-                                cv.field === 'name' ? React.createElement("td", null,
-                                    React.createElement("s", null, cv.old_value),
+                                    change.get(id).get('id').new) : React.createElement("td", null, oldData.id),
+                                change.get(id).has('name') ? React.createElement("td", null,
+                                    React.createElement("s", null, change.get(id).get('name').old),
                                     " ",
-                                    cv.new_value) : React.createElement("td", null, data === null || data === void 0 ? void 0 : data.name),
-                                cv.field === 'address.street' ? React.createElement("td", null,
-                                    React.createElement("s", null, cv.old_value),
+                                    change.get(id).get('name').new) : React.createElement("td", null, oldData.name),
+                                change.get(id).has('address.street') ? React.createElement("td", null,
+                                    React.createElement("s", null, change.get(id).get('address.street').old),
                                     " ",
-                                    cv.new_value) : React.createElement("td", null, data === null || data === void 0 ? void 0 : data.address.street),
-                                cv.field === 'address.zipcode' ?
+                                    change.get(id).get('address.street').new) : React.createElement("td", null, oldData.address.street),
+                                change.get(id).has('address.zipcode') ?
                                     React.createElement("td", null,
                                         React.createElement("s", null,
-                                            cv.old_value,
+                                            change.get(id).get('address.zipcode').old,
                                             " ",
-                                            data.address.city),
+                                            oldData.address.city),
                                         " ",
-                                        cv.new_value,
-                                        " ", (_a = selectedAlert.latest_fetched_data.find(a => a.id === cv.id)) === null || _a === void 0 ? void 0 :
-                                        _a.address.city)
-                                    : cv.field === 'address.city' ?
+                                        change.get(id).get('address.zipcode').new,
+                                        " ",
+                                        newData.address.city)
+                                    : change.get(id).has('address.city') ?
                                         React.createElement("td", null,
                                             React.createElement("s", null,
-                                                data.address.zipcode,
+                                                oldData.address.zipcode,
                                                 " ",
-                                                cv.old_value),
-                                            " ", (_b = selectedAlert.latest_fetched_data.find(a => a.id === cv.id)) === null || _b === void 0 ? void 0 :
-                                            _b.address.zipcode,
+                                                change.get(id).get('address.city').old),
                                             " ",
-                                            cv.new_value)
+                                            newData.address.zipcode,
+                                            " ",
+                                            change.get(id).get('address.city').new)
                                         :
-                                            React.createElement("td", null, `${(_c = data === null || data === void 0 ? void 0 : data.address) === null || _c === void 0 ? void 0 : _c.zipcode} ${(_d = data === null || data === void 0 ? void 0 : data.address) === null || _d === void 0 ? void 0 : _d.city}`)));
+                                            React.createElement("td", null, `${(_c = oldData.address) === null || _c === void 0 ? void 0 : _c.zipcode} ${(_d = oldData.address) === null || _d === void 0 ? void 0 : _d.city}`)));
                         }) : null)),
             React.createElement("div", { className: "d-md-flex justify-content-md-end" },
                 React.createElement("button", { title: "Confirm changes", className: "btn btn-primary", onClick: () => confirmChanges(selectedAlert.id) }, "Confirm")))) : (React.createElement("p", null, "No new data available"))));

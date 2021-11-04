@@ -1,6 +1,5 @@
 import React from 'react';
 import Select from 'react-select';
-import {accordionItem} from '.';
 import {runAlert} from '..';
 import {saveAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
