@@ -12,6 +12,10 @@ interface ICDCCreateAlert {
     onAlertChanged: (id?: number) => void;
     setCreationMode: (mode: boolean) => void;
     cdcs: string[];
+    compareColumnOptions: {
+        label: string;
+        value: string;
+    }[];
 }
-export declare function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs }: ICDCCreateAlert): JSX.Element;
+export declare function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs, compareColumnOptions }: ICDCCreateAlert): JSX.Element;
 export {};

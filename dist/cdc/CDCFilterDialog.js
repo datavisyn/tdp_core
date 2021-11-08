@@ -9,15 +9,8 @@ import { CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter } from 
 import { CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter } from './CDCRangeFilter';
 import { CDCCreateAlert } from './CDCCreateAlert';
 import { CDCEditAlert } from './CDCEditAlert';
-export const DEFAULTALERTDATA = { name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, filter_query: '' };
+export const DEFAULTALERTDATA = { name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, filter_query: '', compare_columns: null };
 export const DEFAULTFILTER = { ...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true };
-export const accordionItem = (index, title, parentId, child, show) => {
-    parentId = parentId.trim();
-    return (React.createElement("div", { key: index, className: "accordion-item" },
-        React.createElement("h2", { className: "accordion-header", id: `heading${index}` },
-            React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#collapse${index}`, "aria-expanded": "true", "aria-controls": `collapse${index}` }, title)),
-        React.createElement("div", { id: `collapse${index}`, className: `p-4 accordion-collapse collapse${show ? ' show' : ''}`, "aria-labelledby": `heading${index}`, "data-bs-parent": `#${parentId}` }, child)));
-};
 export const runAlert = async (id) => {
     const runAlert = runAlertById(id).then((alert) => { return alert; }).catch((e) => {
         alert(`${e}: Invalid filter parameter in alert: ${id}`);
@@ -25,7 +18,7 @@ export const runAlert = async (id) => {
     });
     return runAlert;
 };
-export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
+export function CDCFilterDialog({ filterComponents, filtersByCDC, compareColumnOptions }) {
     const [selectedAlert, setSelectedAlert] = React.useState();
     const [showDialog, setShowDialog] = React.useState(false);
     const [creationMode, setCreationMode] = React.useState(false);
@@ -101,15 +94,15 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                                                 React.createElement("small", null, !(alert === null || alert === void 0 ? void 0 : alert.latest_diff) && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${(_a = new Date(alert.confirmation_date)) === null || _a === void 0 ? void 0 : _a.toLocaleDateString()}`)));
                                     })) : null),
                                 React.createElement("div", { className: "col-9 overflow-auto" }, selectedAlert ?
-                                    React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC['demo'], filterComponents: filterComponents, onAlertChanged: onAlertChanged, selectedAlert: selectedAlert, cdcs: cdcs })
+                                    React.createElement(CDCEditAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterSelection: filtersByCDC['demo'], filterComponents: filterComponents, onAlertChanged: onAlertChanged, selectedAlert: selectedAlert, cdcs: cdcs, compareColumnOptions: compareColumnOptions })
                                     :
                                         creationMode ?
-                                            React.createElement(CDCCreateAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterComponents: filterComponents, filterSelection: filtersByCDC['demo'], onAlertChanged: onAlertChanged, setCreationMode: setCreationMode, cdcs: cdcs })
+                                            React.createElement(CDCCreateAlert, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, filterComponents: filterComponents, filterSelection: filtersByCDC['demo'], onAlertChanged: onAlertChanged, setCreationMode: setCreationMode, cdcs: cdcs, compareColumnOptions: compareColumnOptions })
                                             : null))),
                         React.createElement("div", { className: "modal-footer" },
                             React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
                             React.createElement("button", { type: "button", onClick: () => {
-                                    Promise.all(alerts === null || alerts === void 0 ? void 0 : alerts.map((alert) => runAlert(alert.id))).then(() => onAlertChanged(selectedAlert.id));
+                                    Promise.all(alerts === null || alerts === void 0 ? void 0 : alerts.map((alert) => runAlert(alert === null || alert === void 0 ? void 0 : alert.id))).then(() => onAlertChanged(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id));
                                 }, className: "btn btn-secondary" }, "Sync")))))));
 }
 export class CDCFilterDialogClass {
@@ -131,7 +124,7 @@ export class CDCFilterDialogClass {
                     createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', { fields: ['Eins', 'zwei', 'dRei'], filter: [] }),
                     createCDCRangeFilter(uuidv4(), 'Range Filter', { config: { minValue: 1, maxValue: 10, label: 'ID', field: `item["id"]` }, value: { min: 1, max: 10 } }),
                 ]
-            } }), this.node);
+            }, compareColumnOptions: [{ label: "name", value: "name" }, { label: "street", value: "address.street" }, { label: "zipcode", value: "address.zipcode" }, { label: "city", value: "address.city" }, { label: "id", value: "id" }] }), this.node);
     }
 }
 //# sourceMappingURL=CDCFilterDialog.js.map

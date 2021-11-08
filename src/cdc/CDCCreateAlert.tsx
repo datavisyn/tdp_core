@@ -3,7 +3,7 @@ import Select from 'react-select';
 import {runAlert} from '..';
 import {saveAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
-import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
+import {getTreeQuery, IFilter, IFilterComponent, IUploadAlert} from './interface';
 
 interface ICDCCreateAlert {
   alertData: IUploadAlert;
@@ -15,9 +15,10 @@ interface ICDCCreateAlert {
   onAlertChanged: (id?: number) => void;
   setCreationMode: (mode: boolean) => void;
   cdcs: string[];
+  compareColumnOptions: {label: string, value: string}[];
 }
 
-export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs}: ICDCCreateAlert) {
+export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs, compareColumnOptions}: ICDCCreateAlert) {
   const [validFilter, setValidFilter] = React.useState(true);
   const [validName, setValidName] = React.useState(true);
 
@@ -69,6 +70,16 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
             options={cdcs.map((c) => {return {label: c, value: c};})}
             value={{label: alertData.cdc_id, value: alertData.cdc_id}}
             onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
+          />
+        </div>
+        <div className="mb-3 col">
+          <label className="form-label">Change Fields</label>
+          <Select
+            isMulti
+            closeMenuOnSelect={false}
+            options={compareColumnOptions}
+            value={alertData.compare_columns}
+            onChange={(e) => setAlertData({...alertData, compare_columns:e as {value: string, label: string}[]})}
           />
         </div>
         <div className="mb-3 col">

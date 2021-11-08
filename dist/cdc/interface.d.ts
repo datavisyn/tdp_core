@@ -50,7 +50,11 @@ export interface IAlert {
     modification_date: string;
     confirmed_data: any;
     confirmation_date: Date;
+    compare_columns: {
+        label: string;
+        value: string;
+    }[];
 }
-export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'filter_query' | 'enable_mail_notification'> {
+export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'filter_query' | 'enable_mail_notification' | 'compare_columns'> {
 }
 export declare function isAlert(obj: IAlert | IUploadAlert): obj is IAlert;

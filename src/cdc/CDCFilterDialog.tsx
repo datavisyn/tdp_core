@@ -14,26 +14,11 @@ import {CDCEditAlert} from './CDCEditAlert';
 interface ICDCFilterDialogProps {
   filterComponents: {[key: string]: IFilterComponent<any>};
   filtersByCDC: {[cdcId: string]: IFilter<any>[]};
+  compareColumnOptions: {label: string, value: string}[];
 }
 
-export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, filter_query: ''};
+export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, filter_query: '', compare_columns: null};
 export const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true};
-
-export const accordionItem = (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => {
-  parentId = parentId.trim();
-  return (
-    <div key={index} className="accordion-item">
-      <h2 className="accordion-header" id={`heading${index}`}>
-        <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${index}`} aria-expanded="true" aria-controls={`collapse${index}`}>
-          {title}
-        </button>
-      </h2>
-      <div id={`collapse${index}`} className={`p-4 accordion-collapse collapse${show ? ' show' : ''}`} aria-labelledby={`heading${index}`} data-bs-parent={`#${parentId}`}>
-        {child}
-      </div>
-    </div>
-  );
-};
 
 export const runAlert = async (id: number): Promise<IAlert> => {
   const runAlert = runAlertById(id).then((alert) => {return alert}).catch((e) => {
@@ -43,7 +28,7 @@ export const runAlert = async (id: number): Promise<IAlert> => {
   return runAlert;
 };
 
-export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDialogProps) {
+export function CDCFilterDialog({filterComponents, filtersByCDC, compareColumnOptions}: ICDCFilterDialogProps) {
   const [selectedAlert, setSelectedAlert] = React.useState<IAlert>();
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [creationMode, setCreationMode] = React.useState<boolean>(false);
@@ -125,6 +110,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                       onAlertChanged={onAlertChanged}
                       selectedAlert={selectedAlert}
                       cdcs={cdcs}
+                      compareColumnOptions={compareColumnOptions}
                     />
                     :
                     creationMode ?
@@ -138,6 +124,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
                         onAlertChanged={onAlertChanged}
                         setCreationMode={setCreationMode}
                         cdcs={cdcs}
+                        compareColumnOptions={compareColumnOptions}
                       />
                       : null
                   }
@@ -147,7 +134,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" onClick={() => {
-                Promise.all(alerts?.map((alert) => runAlert(alert.id))).then(() => onAlertChanged(selectedAlert.id));
+                Promise.all(alerts?.map((alert) => runAlert(alert?.id))).then(() => onAlertChanged(selectedAlert?.id));
               }} className="btn btn-secondary">Sync</button>
             </div>
           </div>
@@ -182,7 +169,9 @@ export class CDCFilterDialogClass {
             createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', {fields: ['Eins', 'zwei', 'dRei'], filter: []}),
             createCDCRangeFilter(uuidv4(), 'Range Filter', {config: {minValue: 1, maxValue: 10, label: 'ID', field: `item["id"]`}, value: {min: 1, max: 10}}),
           ]
-        }} />,
+        }} 
+        compareColumnOptions={[{label: "name", value: "name"}, {label: "street", value: "address.street"}, {label: "zipcode", value: "address.zipcode"}, {label: "city", value: "address.city"}, {label: "id", value: "id"}]}
+      />,
       this.node
     );
   }

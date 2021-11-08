@@ -30,6 +30,7 @@ class CDCAlert(Base):
     latest_compare_date = Column(DateTime, nullable=True)
     latest_diff = Column(JSON, nullable=True)
     latest_fetched_data = Column(JSON, nullable=True)
+    compare_columns = Column(JSON, nullable=True)
 
     confirmation_date = Column(DateTime, nullable=True)  # date of confirmation
     confirmed_data = Column(JSON, nullable=True)  # your confirmed data
