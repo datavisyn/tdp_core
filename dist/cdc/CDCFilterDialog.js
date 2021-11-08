@@ -109,7 +109,7 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC }) {
                         React.createElement("div", { className: "modal-footer" },
                             React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
                             React.createElement("button", { type: "button", onClick: () => {
-                                    Promise.all(alerts === null || alerts === void 0 ? void 0 : alerts.map((alert) => runAlert(alert.id))).then(() => fetchAlerts());
+                                    Promise.all(alerts === null || alerts === void 0 ? void 0 : alerts.map((alert) => runAlert(alert.id))).then(() => onAlertChanged(selectedAlert.id));
                                 }, className: "btn btn-secondary" }, "Sync")))))));
 }
 export class CDCFilterDialogClass {

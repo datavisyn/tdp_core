@@ -113,53 +113,47 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     </>);
 
   const literature = () => {
-    const diff = selectedAlert.latest_diff;
-    const change: Map<String, Map<String, {old: string, new: string}>> = new Map();
-    if (diff?.values_changed) {
-      const dvc = diff.values_changed;
-      dvc.map((d) => {
+    if (selectedAlert.latest_diff) {
+      const change: Map<String, Map<String, {old: string, new: string}>> = new Map();
+      selectedAlert.latest_diff?.values_changed?.map((d) => {
         const nestedField = d.field.map((f) => f).join(".");
         if (change.has(d.id)) {
           change.set(d.id, change.get(d.id).set(nestedField, {old: d.old_value, new: d.new_value}));
         } else {
           change.set(d.id, new Map<String, {old: string, new: string}>().set(nestedField, {old: d.old_value, new: d.new_value}));
         }
-      })
-    }
-    return (<>{diff ? (<>
-      <h6>Changed data:</h6>
-      <table className="table table-light mt-2">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Street</th>
-            <th scope="col">City</th>
-          </tr>
-        </thead>
-        <tbody>
-          {diff.dictionary_item_added ?
-            diff.dictionary_item_added.map((d) => {
+      });
+      return (<>
+        <h6>Changed data:</h6>
+        <table className="table table-light mt-2">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Street</th>
+              <th scope="col">City</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedAlert.latest_diff.dictionary_item_added?.map((d) => {
               const data = selectedAlert.latest_fetched_data.find(a => a.id === d);
               return (<tr key={d} className="table-success">
                 <td>{data?.id}</td>
                 <td>{data?.name}</td>
                 <td>{data?.address.street}</td>
                 <td>{`${data?.address?.zipcode} ${data?.address?.city}`}</td>
-              </tr>)
-            }) : null}
-          {diff.dictionary_item_removed ?
-            diff.dictionary_item_removed.map((d) => {
+              </tr>);
+            })}
+            {selectedAlert.latest_diff.dictionary_item_removed?.map((d) => {
               const data = selectedAlert.confirmed_data.find(a => a.id === d);
               return (<tr key={d} className="table-danger">
                 <td>{data?.id}</td>
                 <td>{data?.name}</td>
                 <td>{data?.address.street}</td>
                 <td>{`${data?.address?.zipcode} ${data?.address?.city}`}</td>
-              </tr>)
-            }) : null}
-          {diff.values_changed ?
-            [...change.keys()].map((id, i) => {
+              </tr>);
+            })}
+            {[...change.keys()]?.map((id, i) => {
               const oldData = selectedAlert.confirmed_data?.find(a => a.id === id);
               const newData = selectedAlert.latest_fetched_data?.find(a => a.id === id);
               return (<tr key={i} className="table-primary">
@@ -172,17 +166,16 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
                     <td><s>{oldData.address.zipcode} {change.get(id).get('address.city').old}</s> {newData.address.zipcode} {change.get(id).get('address.city').new}</td>
                     :
                     <td>{`${oldData.address?.zipcode} ${oldData.address?.city}`}</td>}
-              </tr>)
-            }) : null}
-        </tbody>
-      </table>
-      <div className="d-md-flex justify-content-md-end">
-        <button title="Confirm changes" className="btn btn-primary" onClick={() => confirmChanges(selectedAlert.id)}>Confirm</button>
-      </div>
-    </>) : (
-      <p>No new data available</p>
-    )}
-    </>);
+              </tr>);
+            })}
+          </tbody>
+        </table>
+        <div className="d-md-flex justify-content-md-end">
+          <button title="Confirm changes" className="btn btn-primary" onClick={() => confirmChanges(selectedAlert.id)}>Confirm</button>
+        </div>
+      </>);
+    }
+    return <p>No new data available</p>;
   };
 
   const editButton = !editMode && !deleteMode ? (<>

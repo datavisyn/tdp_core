@@ -147,7 +147,7 @@ export function CDCFilterDialog({filterComponents, filtersByCDC}: ICDCFilterDial
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" onClick={() => {
-                Promise.all(alerts?.map((alert) => runAlert(alert.id))).then(() => fetchAlerts());
+                Promise.all(alerts?.map((alert) => runAlert(alert.id))).then(() => onAlertChanged(selectedAlert.id));
               }} className="btn btn-secondary">Sync</button>
             </div>
           </div>

@@ -74,11 +74,10 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
             :
                 React.createElement("p", null, "No filters available for this cdc"))));
     const literature = () => {
-        const diff = selectedAlert.latest_diff;
-        const change = new Map();
-        if (diff === null || diff === void 0 ? void 0 : diff.values_changed) {
-            const dvc = diff.values_changed;
-            dvc.map((d) => {
+        var _a, _b, _c, _d, _e;
+        if (selectedAlert.latest_diff) {
+            const change = new Map();
+            (_b = (_a = selectedAlert.latest_diff) === null || _a === void 0 ? void 0 : _a.values_changed) === null || _b === void 0 ? void 0 : _b.map((d) => {
                 const nestedField = d.field.map((f) => f).join(".");
                 if (change.has(d.id)) {
                     change.set(d.id, change.get(d.id).set(nestedField, { old: d.old_value, new: d.new_value }));
@@ -87,19 +86,17 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                     change.set(d.id, new Map().set(nestedField, { old: d.old_value, new: d.new_value }));
                 }
             });
-        }
-        return (React.createElement(React.Fragment, null, diff ? (React.createElement(React.Fragment, null,
-            React.createElement("h6", null, "Changed data:"),
-            React.createElement("table", { className: "table table-light mt-2" },
-                React.createElement("thead", null,
-                    React.createElement("tr", null,
-                        React.createElement("th", { scope: "col" }, "#"),
-                        React.createElement("th", { scope: "col" }, "Name"),
-                        React.createElement("th", { scope: "col" }, "Street"),
-                        React.createElement("th", { scope: "col" }, "City"))),
-                React.createElement("tbody", null,
-                    diff.dictionary_item_added ?
-                        diff.dictionary_item_added.map((d) => {
+            return (React.createElement(React.Fragment, null,
+                React.createElement("h6", null, "Changed data:"),
+                React.createElement("table", { className: "table table-light mt-2" },
+                    React.createElement("thead", null,
+                        React.createElement("tr", null,
+                            React.createElement("th", { scope: "col" }, "#"),
+                            React.createElement("th", { scope: "col" }, "Name"),
+                            React.createElement("th", { scope: "col" }, "Street"),
+                            React.createElement("th", { scope: "col" }, "City"))),
+                    React.createElement("tbody", null, (_c = selectedAlert.latest_diff.dictionary_item_added) === null || _c === void 0 ? void 0 :
+                        _c.map((d) => {
                             var _a, _b;
                             const data = selectedAlert.latest_fetched_data.find(a => a.id === d);
                             return (React.createElement("tr", { key: d, className: "table-success" },
@@ -107,9 +104,8 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                                 React.createElement("td", null, data === null || data === void 0 ? void 0 : data.name),
                                 React.createElement("td", null, data === null || data === void 0 ? void 0 : data.address.street),
                                 React.createElement("td", null, `${(_a = data === null || data === void 0 ? void 0 : data.address) === null || _a === void 0 ? void 0 : _a.zipcode} ${(_b = data === null || data === void 0 ? void 0 : data.address) === null || _b === void 0 ? void 0 : _b.city}`)));
-                        }) : null,
-                    diff.dictionary_item_removed ?
-                        diff.dictionary_item_removed.map((d) => {
+                        }), (_d = selectedAlert.latest_diff.dictionary_item_removed) === null || _d === void 0 ? void 0 :
+                        _d.map((d) => {
                             var _a, _b;
                             const data = selectedAlert.confirmed_data.find(a => a.id === d);
                             return (React.createElement("tr", { key: d, className: "table-danger" },
@@ -117,9 +113,8 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                                 React.createElement("td", null, data === null || data === void 0 ? void 0 : data.name),
                                 React.createElement("td", null, data === null || data === void 0 ? void 0 : data.address.street),
                                 React.createElement("td", null, `${(_a = data === null || data === void 0 ? void 0 : data.address) === null || _a === void 0 ? void 0 : _a.zipcode} ${(_b = data === null || data === void 0 ? void 0 : data.address) === null || _b === void 0 ? void 0 : _b.city}`)));
-                        }) : null,
-                    diff.values_changed ?
-                        [...change.keys()].map((id, i) => {
+                        }), (_e = [...change.keys()]) === null || _e === void 0 ? void 0 :
+                        _e.map((id, i) => {
                             var _a, _b, _c, _d;
                             const oldData = (_a = selectedAlert.confirmed_data) === null || _a === void 0 ? void 0 : _a.find(a => a.id === id);
                             const newData = (_b = selectedAlert.latest_fetched_data) === null || _b === void 0 ? void 0 : _b.find(a => a.id === id);
@@ -158,9 +153,11 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                                             change.get(id).get('address.city').new)
                                         :
                                             React.createElement("td", null, `${(_c = oldData.address) === null || _c === void 0 ? void 0 : _c.zipcode} ${(_d = oldData.address) === null || _d === void 0 ? void 0 : _d.city}`)));
-                        }) : null)),
-            React.createElement("div", { className: "d-md-flex justify-content-md-end" },
-                React.createElement("button", { title: "Confirm changes", className: "btn btn-primary", onClick: () => confirmChanges(selectedAlert.id) }, "Confirm")))) : (React.createElement("p", null, "No new data available"))));
+                        }))),
+                React.createElement("div", { className: "d-md-flex justify-content-md-end" },
+                    React.createElement("button", { title: "Confirm changes", className: "btn btn-primary", onClick: () => confirmChanges(selectedAlert.id) }, "Confirm"))));
+        }
+        return React.createElement("p", null, "No new data available");
     };
     const editButton = !editMode && !deleteMode ? (React.createElement(React.Fragment, null,
         React.createElement("button", { title: "Edit Alert", className: "btn btn-text-secondary", onClick: () => setEditMode(true) },
