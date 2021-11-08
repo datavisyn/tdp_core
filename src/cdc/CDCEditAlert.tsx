@@ -48,7 +48,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
         selectedAlert.id,
         {
           ...alertData,
-          filter_dump: filter,
+          filter,
           filter_query: getTreeQuery(filter, filterComponents)
         }).then((alert) => {
           return runAlert(alert.id).then((a) => {
@@ -63,7 +63,7 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
   const onDiscard = () => {
     setEditMode(false);
     setAlertData(selectedAlert);
-    setFilter(selectedAlert.filter_dump);
+    setFilter(selectedAlert.filter);
   };
 
   const onDelete = async (id: number) => {

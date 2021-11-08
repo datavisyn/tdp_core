@@ -83,7 +83,7 @@ export interface IAlert {
   id: number;
   name: string;
   cdc_id: string;
-  filter_dump: IFilter;
+  filter: IFilter;
   filter_query: string;
   enable_mail_notification: boolean;
   latest_diff: {dictionary_item_added?: string[], dictionary_item_removed?: string[], values_changed?: {id: string, field: [], old_value: string, new_value: string}[]};
@@ -94,7 +94,7 @@ export interface IAlert {
   confirmation_date: Date;
 } //TODO: remove any
 
-export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter_dump' | 'filter_query' | 'enable_mail_notification'> {}
+export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'filter_query' | 'enable_mail_notification'> {}
 
 export function isAlert(obj: IAlert | IUploadAlert): obj is IAlert {
   return typeof (obj as any)?.id === 'number';

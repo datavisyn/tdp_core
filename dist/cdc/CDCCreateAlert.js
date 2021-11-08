@@ -18,7 +18,7 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
         if (validFilter && validName) {
             const newAlert = await saveAlert({
                 ...alertData,
-                filter_dump: filter,
+                filter,
                 filter_query: getTreeQuery(filter, filterComponents)
             }).then((alert) => {
                 return runAlert(alert.id).then((a) => {

@@ -23,7 +23,7 @@ class CDCAlert(Base):
     name = Column(TEXT, nullable=False)
     cdc_id = Column(TEXT, nullable=False)
     # TODO: Change to JSONB in postgres
-    filter_dump = Column(JSON, nullable=False)
+    filter = Column(JSON, nullable=False)
     filter_query = Column(TEXT, nullable=False)
     enable_mail_notification = Column(Boolean, nullable=False)
 
