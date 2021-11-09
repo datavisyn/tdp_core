@@ -1,13 +1,14 @@
+import logging
+from datetime import datetime
+
+import requests
+from flask_smorest import Api, Blueprint
+
 from phovea_server.ns import Namespace, abort, no_cache
 from phovea_server.security import login_required, can_write, can_read, current_username
 from phovea_server.util import jsonify
-from .CDCManager import CDCManager, cdc_manager
 from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema
-from flask_smorest import Api, Blueprint
-import logging
-import uuid
-from datetime import datetime
-
+from .CDCManager import cdc_manager
 
 app = Namespace(__name__)
 app.config['OPENAPI_VERSION'] = '3.0.2'
@@ -58,14 +59,25 @@ def get_alerts():
     alerts = session.query(CDCAlert).all()
     return sorted([p for p in alerts if can_read(p)], key=lambda item: item.id)
 
+
+@no_cache
+@login_required
+@blp.route('/test', methods=["POST"])
+@blp.arguments(CDCAlertArgsSchema)
+# @blp.response(CDCAlertSchema, code=200)
+def test(data):
+    users = requests.get('https://jsonplaceholder.typicode.com/users').json()
+    fusers = data["filter"]["apply"](users)
+    return jsonify(fusers)
+
+
 @no_cache
 @login_required
 @blp.route('/alert', methods=["POST"])
-@blp.arguments(CDCAlertArgsSchema(), location='json', description='Create an alert')
-@blp.response(CDCAlertSchema(), code=200)
+@blp.arguments(CDCAlertArgsSchema)
+@blp.response(CDCAlertSchema, code=200)
 def create_alert(data):
     session = create_session()
-    alert = CDCAlertSchema().load(data, partial=True, session=session)
 
     # Security
     alert.creator = current_username()
@@ -164,7 +176,7 @@ def confirm_alert_by_id(id: str):
     alert.confirmed_data[2]['name'] = 'Herbert'
     alert.confirmed_data[1]['address']['street'] = 'Dornach'
     alert.confirmed_data[2]['address']['city'] = 'Lünz'
-    
+
     alert.latest_compare_date = None
     alert.latest_fetched_data = None
     alert.latest_diff = None

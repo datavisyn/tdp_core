@@ -1,12 +1,10 @@
-
-from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, BLOB, PickleType, JSON
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlalchemy.sql.schema import ForeignKey
+from tdp_core.cdc.filter import Filter
+from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, JSON
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import EXCLUDE, fields
+from marshmallow import EXCLUDE, post_load, Schema
 from sqlalchemy.ext.declarative import declarative_base
 
+from marshmallow import fields
 
 Base = declarative_base()
 
@@ -54,25 +52,14 @@ class CDCAlertSchema(SQLAlchemyAutoSchema):
         unknown = EXCLUDE
 
 
-class CDCAlertArgsSchema(CDCAlertSchema):
-    class Meta(CDCAlertSchema.Meta):
-        load_instance = False
-        # TODO: Update to include all read-only fields
-        exclude = (
-            'id',
-            'latest_compare_date',
-            'latest_diff',
-            'latest_fetched_data',
-            'confirmation_date',
-            'confirmed_data',
-            # Security fields
-            'creator',
-            'creation_date',
-            'modifier',
-            'modification_date',
-            'permissions',
-            'group'
-        )
+class CDCAlertArgsSchema(Schema):
+    id = fields.String()
+    name = fields.String()
+    enable_mail_notification = fields.Boolean()
+    cdc_id = fields.String()
+    filter = fields.Nested(Filter, required=True)
+    compare_columns = fields.List(fields.String())
+
 
 # TODO: Remove and use postgres
 from sqlalchemy import create_engine
