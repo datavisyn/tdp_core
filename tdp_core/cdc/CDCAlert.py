@@ -24,7 +24,6 @@ class CDCAlert(Base):
     cdc_id = Column(TEXT, nullable=False)
     # TODO: Change to JSONB in postgres
     filter = Column(JSON, nullable=False)
-    filter_query = Column(TEXT, nullable=False)
     enable_mail_notification = Column(Boolean, nullable=False)
 
     latest_compare_date = Column(DateTime, nullable=True)
