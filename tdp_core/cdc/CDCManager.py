@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Union
 
-from .schema.FieldFilterMixin import FieldFilterMixin
 from .DemoCDC import DemoCDC
 from .BaseCDC import BaseCDC
 from .CDCAlert import CDCAlert
@@ -26,7 +25,7 @@ class CDCManager():
 
         if not cdc:
             raise Exception(f'Missing cdc {alert.cdc_id}')
-        
+
         # Fetch new entry
         new = cdc.load_data({
             # TODO: Define options like username?
@@ -44,13 +43,12 @@ class CDCManager():
             }
             for field in fields:
                # new_item[field] = FieldFilterMixin.access(item, field)
-               FieldFilterMixin.set(new_item, field, FieldFilterMixin.access(item, field))
             new[i] = new_item
 
         # Filter new entry
         # '(item["id"] in (4, 5, 6, 7, 8) and not (item["id"] == 5 and item["id"] == 4 or item["id"] == 8)) or ((item["address"]["city"] == "Gwenborough") and (item["id"] > 0 and item["id"] < 5))'
 
-        
+
         # filter = {
         #     'operator': 'AND',
         #     'filters': [{
@@ -73,7 +71,7 @@ class CDCManager():
         diff = cdc.compare(alert.confirmed_data, new)
 
         if "dictionary_item_removed" in diff:
-            diff["dictionary_item_removed"] = [rm.path(output_format='list')[0] for rm in diff["dictionary_item_removed"]]   
+            diff["dictionary_item_removed"] = [rm.path(output_format='list')[0] for rm in diff["dictionary_item_removed"]]
 
         if "dictionary_item_added" in diff:
             diff["dictionary_item_added"] = [add.path(output_format='list')[0] for add in diff["dictionary_item_added"]]

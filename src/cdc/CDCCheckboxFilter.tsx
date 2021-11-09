@@ -30,11 +30,10 @@ export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, con
               type="checkbox"
               id="flexCheckDefault"
               checked={flag? true : false}
-              disabled={!onValueChanged || disabled}
               onChange={(e) =>
                 onValueChanged?.({
                   ...value,
-                  [field]: e
+                  [field]: e.target.checked
                 })}
             />
             <label

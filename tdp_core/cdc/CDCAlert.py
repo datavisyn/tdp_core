@@ -58,7 +58,7 @@ class CDCAlertArgsSchema(Schema):
     enable_mail_notification = fields.Boolean()
     cdc_id = fields.String()
     filter = fields.Nested(Filter, required=True)
-    compare_columns = fields.List(fields.String())
+    compare = fields.List(fields.String())
 
 
 # TODO: Remove and use postgres

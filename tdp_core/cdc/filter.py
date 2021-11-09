@@ -14,21 +14,21 @@ class Filter(Schema):
     unknown = INCLUDE
 
   id = fields.String(required=True)
-  name = fields.String(required=True)
-  componentId = fields.String(required=False)  # "type" of the filter: group, checkbox, text...
+  type = fields.String(required=False)  # "type" of the filter: group, checkbox, text...
 
   @post_load()
   def _postload(self, data: Dict, **_) -> Dict:
     """ Call a postload function in every sub-class """
     return self.postload(data, **data)
 
-  def postload(self, data: Dict, componentId: str, **_) -> Dict:
-    """ Delegate to a subclass based on componentId field """
+  def postload(self, data: Dict, type: str, **_) -> Dict:
+    """ Delegate to a subclass based on type field """
     filters = {f.__name__.lower(): f for f in Filter.__subclasses__()}
-    assert componentId in filters, f"Error: Filter type {componentId} doesn't exist in {filters.values()}"
-    sub_cls = filters[componentId]
-    data["filt"] = sub_cls().load(data)
-    data["apply"] = lambda items: list(filter(data["filt"], items))
+    assert type in filters, f"Error: Filter type {type} doesn't exist in {filters.values()}"
+    sub_cls = filters[type]
+    # _prvate so it doesn't get serialized
+    data["_filt"] = filt = sub_cls().load(data)
+    data["_apply"] = lambda items: list(filter(filt, items))
     return data
 
 
@@ -65,38 +65,38 @@ class Group(Filter):
   def postload(self, data: Dict, children: List, operator: str, **_):
     if not children:
       return lambda _: True
-    children = [Filter().load(child)["filt"] for child in children]
+    children = [Filter().load(child)["_filt"] for child in children]
     op = ALLOWED_OPERATORS[operator]
     return lambda d: reduce(op, [child(d) for child in children])
 
 
 class Range(Filter, FieldFilterMixin):
-  min = fields.Number()
-  max = fields.Number()
+  value = fields.Dict(fields.String(), fields.Number)
 
-  # noinspection PyMethodOverriding, PyShadowingBuiltins
-  def postload(self, data, field: str, min: float, max: float, **_):
-    return lambda item: min <= FieldFilterMixin.access(item, field) <= max
+  # noinspection PyMethodOverriding
+  def postload(self, data, field: str, value: Dict, **_):
+    assert "min" in value and "max" in value
+    return lambda item: value["min"] <= FieldFilterMixin.access(item, field) <= value["max"]
 
 
 class Text(Filter, FieldFilterMixin):
   """ Filter for textfields to match """
-  values = fields.List(fields.String(), required=True)
+  value = fields.List(fields.String(), required=True)
   match_case = fields.Boolean(required=False, missing=False)
   match_exact = fields.Boolean(required=False, missing=False)
 
   # noinspection PyMethodOverriding
-  def postload(self, data: Dict, field: str, values: List[str], match_case: bool, match_exact: bool, **_):
+  def postload(self, data: Dict, field: str, value: List[str], match_case: bool, match_exact: bool, **_):
     compare = eq if match_exact else str.__contains__
     if match_case:
       compare = lambda a, b: compare(b.lower(), a.lower())  # nopep8    # ignore lambda assign
-    return lambda item: any(compare(FieldFilterMixin.access(item, field), value) for value in values)
+    return lambda item: any(compare(FieldFilterMixin.access(item, field), v) for v in value)
 
 
 class Checkbox(Filter):
-  values = fields.Dict(fields.String(), fields.Boolean(), required=True)
+  value = fields.Dict(fields.String(), fields.Boolean(), required=True)
 
   # noinspection PyMethodOverriding
-  def postload(self, data, values: Dict[str, bool], **_):
-    return lambda item: all([FieldFilterMixin.access(item, key) == value
-                             for key, value in values.items()])
+  def postload(self, data, value: Dict[str, bool], **_):
+    return lambda item: all([FieldFilterMixin.access(item, key) == v
+                             for key, v in value.items()])

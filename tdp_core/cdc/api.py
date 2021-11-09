@@ -8,7 +8,6 @@ from phovea_server.ns import Namespace, abort, no_cache
 from phovea_server.security import login_required, can_write, can_read, current_username
 from phovea_server.util import jsonify
 from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema
-from .CDCManager import cdc_manager
 
 app = Namespace(__name__)
 app.config['OPENAPI_VERSION'] = '3.0.2'
@@ -62,23 +61,19 @@ def get_alerts():
 
 @no_cache
 @login_required
-@blp.route('/test', methods=["POST"])
-@blp.arguments(CDCAlertArgsSchema)
-# @blp.response(CDCAlertSchema, code=200)
-def test(data):
-    users = requests.get('https://jsonplaceholder.typicode.com/users').json()
-    fusers = data["filter"]["apply"](users)
-    return jsonify(fusers)
-
-
-@no_cache
-@login_required
 @blp.route('/alert', methods=["POST"])
 @blp.arguments(CDCAlertArgsSchema)
-@blp.response(CDCAlertSchema, code=200)
+# @blp.response(CDCAlertSchema, code=200)
 def create_alert(data):
-    session = create_session()
+    users = requests.get('https://jsonplaceholder.typicode.com/users').json()
+    for user in users:
+      user["Eins"] = user["Zwei"] = user["Drei"] = False
+    users[1]["Eins"] = users[2]["Zwei"] = users[3]["Drei"] = True
+    fusers = data["filter"]["_apply"](users)
+    return jsonify(fusers)
 
+    """
+    session = create_session()
     # Security
     alert.creator = current_username()
     alert.creation_date = datetime.utcnow()
@@ -91,6 +86,7 @@ def create_alert(data):
     session.add(alert)
     session.commit()
     return alert
+    """
 
 @no_cache
 @login_required
