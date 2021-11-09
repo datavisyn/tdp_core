@@ -3,69 +3,23 @@ import Select from 'react-select';
 export const CDCTextFilterId = 'text';
 export const CDCTextFilter = {
     clazz: CDCTextFilterComponent,
-    toFilter: CDCTextFilterToString
+    disableDropping: true
 };
-export function createCDCTextFilter(id, name, value) {
+export function createCDCTextFilter(id, field, value) {
     return {
         id,
-        name,
-        disableDropping: true,
-        componentId: CDCTextFilterId,
-        componentValue: value
+        type: CDCTextFilterId,
+        field: field,
+        value: value,
     };
 }
-function CDCTextFilterToString(value) {
-    // Generate filter from value
-    return `(${value.filter
-        .map((v) => `${v.field.value} in (${v.value.map(((vV) => vV.value)).join(',')})`)
-        .join(' and ')})`;
-}
-export function CDCTextFilterComponent({ value, onValueChanged, disabled }) {
+export function CDCTextFilterComponent({ value, onValueChanged, onFieldChanged, disabled, field, config }) {
+    var _a;
     return React.createElement(React.Fragment, null,
-        value.filter.map((v, i) => {
-            var _a;
-            return (React.createElement("div", { key: i, className: "input-group m-1 row" },
-                React.createElement("div", { className: "col-3 p-0" },
-                    React.createElement(Select, { isDisabled: !onValueChanged || disabled, value: v.field, options: [...value.fields.map((field) => field.field)], onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
-                            ...value,
-                            filter: value.filter.map((oldV) => oldV === v
-                                ? {
-                                    ...v,
-                                    field: e,
-                                    value: []
-                                }
-                                : oldV)
-                        }) })),
-                React.createElement("div", { className: "col-7 p-0" },
-                    React.createElement(Select, { closeMenuOnSelect: false, isDisabled: !onValueChanged || disabled || !v.field, isMulti: true, value: v.value, options: (_a = value.fields.find((f) => f.field === v.field)) === null || _a === void 0 ? void 0 : _a.options, onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
-                            ...value,
-                            filter: value.filter.map((oldV) => oldV === v
-                                ? {
-                                    ...v,
-                                    value: e
-                                }
-                                : oldV)
-                        }) })),
-                disabled ? null :
-                    React.createElement("div", { className: "col-1 p-0" },
-                        React.createElement("button", { disabled: !onValueChanged, onClick: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged({
-                                ...value,
-                                filter: value.filter.filter((oldV) => oldV !== v)
-                            }), className: "btn btn-text-secondary" },
-                            React.createElement("i", { className: "fas fa-trash" })))));
-        }),
-        onValueChanged && !disabled ? (React.createElement("button", { className: "btn btn-text-secondary m-1", onClick: () => {
-                onValueChanged({
-                    ...value,
-                    filter: [
-                        ...value.filter,
-                        {
-                            field: '',
-                            value: []
-                        }
-                    ]
-                });
-            } },
-            React.createElement("i", { className: "fas fa-plus" }))) : null);
+        React.createElement("div", { className: "input-group m-1 row" },
+            React.createElement("div", { className: "col-4 p-0" },
+                React.createElement(Select, { isDisabled: !onValueChanged || disabled, value: { label: field, value: field }, options: [...config === null || config === void 0 ? void 0 : config.map((conf) => { return { label: conf.field, value: conf.field }; })], onChange: (e) => onFieldChanged === null || onFieldChanged === void 0 ? void 0 : onFieldChanged(e.value) })),
+            React.createElement("div", { className: "col-8 p-0" },
+                React.createElement(Select, { closeMenuOnSelect: false, isDisabled: !onValueChanged || disabled || !field, isMulti: true, value: value === null || value === void 0 ? void 0 : value.map((v) => { return { label: v, value: v }; }), options: (_a = config === null || config === void 0 ? void 0 : config.find((f) => (f === null || f === void 0 ? void 0 : f.field) === field)) === null || _a === void 0 ? void 0 : _a.options.map((o) => { return { label: o, value: o }; }), onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged([...e.map((v) => v.value)]) }))));
 }
 //# sourceMappingURL=CDCTextFilter.js.map

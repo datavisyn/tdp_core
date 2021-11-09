@@ -3,7 +3,6 @@ import Select from 'react-select';
 import { runAlert } from '..';
 import { saveAlert } from './api';
 import { CDCFilterComponent } from './CDCFilterComponent';
-import { getTreeQuery } from './interface';
 export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs, compareColumnOptions }) {
     const [validFilter, setValidFilter] = React.useState(true);
     const [validName, setValidName] = React.useState(true);
@@ -16,11 +15,8 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
     }, [alertData.name]);
     const onSave = async () => {
         if (validFilter && validName) {
-            const newAlert = await saveAlert({
-                ...alertData,
-                filter,
-                filter_query: getTreeQuery(filter, filterComponents)
-            }).then((alert) => {
+            const newAlert = await saveAlert({ ...alertData, filter })
+                .then((alert) => {
                 return runAlert(alert.id).then((a) => {
                     return a ? a : alert;
                 });

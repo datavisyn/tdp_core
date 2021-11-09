@@ -10,7 +10,8 @@ class FieldFilterMixin:
     field = String(required=True)
 
     @staticmethod
-    def access(item, field) -> Any:
+    def access(item, field: str) -> Any:
+        # TODO: Return None if field does not exist?
         for field_name in field.split("."):
             assert not field_name.startswith("_"), "Private access detected."
 
@@ -23,4 +24,8 @@ class FieldFilterMixin:
                 item = len(item)
             else:
                 item = item.get(field_name)
+        return item
+
+    def set(item, field: str, value: Any) -> Any:
+        # TODO: static dict-setter with complex field
         return item

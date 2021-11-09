@@ -3,7 +3,7 @@ import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FilterCard } from './FilterCard';
-import { getFilterFromTree } from './interface';
+import { getFilterFromTree } from './interfaces';
 import { v4 as uuidv4 } from 'uuid';
 export function CDCFilterComponent({ filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid }) {
     const onDelete = (newFilter) => {
@@ -67,14 +67,23 @@ export function CDCFilterComponent({ filterSelection, filter, setFilter, filterC
     };
     const onValueChanged = (filter, value) => {
         onChange(filter, (f) => {
-            f.componentValue = value;
+            f.value = value;
         });
     };
+    const onFieldChanged = (filter, field) => {
+        console.log(field, filter);
+        onChange(filter, (f) => {
+            f.field = field;
+        });
+    };
+    if (filter.type !== 'group') {
+        throw Error('First filter always has to be a group filter');
+    }
     return (React.createElement(DndProvider, { backend: HTML5Backend },
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid })),
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, onFieldChanged: onFieldChanged, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid })),
             filterSelection ?
                 React.createElement("div", { className: "col-md" },
                     React.createElement("h6", null, "New filters"),

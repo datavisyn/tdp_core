@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
-import {IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
+import {IAlert, IFilter, IFilterComponent, IUploadAlert} from './interfaces';
 import {getAlerts, runAlertById} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter} from './CDCGroupingFilter';
 import {v4 as uuidv4} from 'uuid';
@@ -12,13 +12,13 @@ import {CDCCreateAlert} from './CDCCreateAlert';
 import {CDCEditAlert} from './CDCEditAlert';
 
 interface ICDCFilterDialogProps {
-  filterComponents: {[key: string]: IFilterComponent<any>};
+  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   filtersByCDC: {[cdcId: string]: IFilter<any>[]};
   compareColumnOptions: {label: string, value: string}[];
 }
 
-export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, filter_query: '', compare_columns: null};
-export const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4(), 'Drop filters here'), disableDragging: true, disableRemoving: true};
+export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, compare_columns: null};
+export const DEFAULTFILTER = {...createCDCGroupingFilter(uuidv4())};
 
 export const runAlert = async (id: number): Promise<IAlert> => {
   const runAlert = runAlertById(id).then((alert) => {return alert}).catch((e) => {
@@ -68,6 +68,8 @@ export function CDCFilterDialog({filterComponents, filtersByCDC, compareColumnOp
       }
     }).catch((e) => console.error(e));
   };
+
+  console.log(filter)
 
   return <>
     <a style={{color: 'white', cursor: 'pointer'}} onClick={() => setShowDialog(true)}><i className="fas fa-filter" style={{marginRight: 4}}></i> Alert Filter</a>
@@ -157,17 +159,17 @@ export class CDCFilterDialogClass {
     ReactDOM.render(
       <CDCFilterDialog
         filterComponents={{
-          [CDCGroupingFilterId]: CDCGroupingFilter,
-          [CDCTextFilterId]: CDCTextFilter,
-          [CDCCheckboxFilterId]: CDCCheckboxFilter,
-          [CDCRangeFilterId]: CDCRangeFilter
+          [CDCGroupingFilterId]: {component: CDCGroupingFilter},
+          [CDCTextFilterId]: {component: CDCTextFilter, config: [{field: 'address.city', options: ['Gwenborough', 'Wisokyburgh', 'McKenziehaven', 'Roscoeview', 'Aliyaview', 'Howemouth']}, {field: 'address.zipcode', options: ['33263', '23505-1337', '58804-1099']}, {field: 'name', options: ['Leanne Graham', 'Ervin Howell', 'Glenna Reichert', 'Clementina DuBuque']}]},
+          [CDCCheckboxFilterId]: {component: CDCCheckboxFilter, config: {fields: ['Eins', 'Zwei', 'Drei']}},
+          [CDCRangeFilterId]: {component: CDCRangeFilter, config: {minValue: 1, maxValue: 10}}
         }}
         filtersByCDC={{
           'demo': [
-            createCDCGroupingFilter(uuidv4(), 'Grouping Filter'),
-            createCDCTextFilter(uuidv4(), 'Text Filter', {filter: [{field: null, value: []}], fields: [{field: {label: 'City', value: `item["address"]["city"]`}, options: [{label: 'Gwenborough', value: `"Gwenborough"`}, {label: 'Wisokyburgh', value: `"Wisokyburgh"`}, {label: 'McKenziehaven', value: `"McKenziehaven"`}, {label: 'Roscoeview', value: `"Roscoeview"`},  {label: 'Aliyaview', value: `"Aliyaview"`}, {label: 'Howemouth', value: `"Howemouth"`}]}, {field: {label: 'Zip Code', value: `item["address"]["zipcode"]`}, options: [{label: '33263', value: `"33263"`}, {label: '23505-1337', value: `"23505-1337"`}, {label: '58804-1099', value: `"58804-1099"`}]}, {field: {label: 'Name', value: `item["name"]`}, options: [{label: 'Leanne Graham', value: `"Leanne Graham"`}, {label: 'Ervin Howell', value: `"Ervin Howell"`}, {label: 'Glenna Reichert', value: `"Glenna Reichert"`}, {label: 'Clementina DuBuque', value: `"Clementina DuBuque"`}]}]}),
-            createCDCCheckboxFilter(uuidv4(), 'Checkbox Filter', {fields: ['Eins', 'zwei', 'dRei'], filter: []}),
-            createCDCRangeFilter(uuidv4(), 'Range Filter', {config: {minValue: 1, maxValue: 10, label: 'ID', field: `item["id"]`}, value: {min: 1, max: 10}}),
+            createCDCGroupingFilter(uuidv4()),
+            createCDCTextFilter(uuidv4(), 'Select...', null),
+            createCDCCheckboxFilter(uuidv4(), {['Eins']: undefined, ['Zwei']: undefined, ['Drei']: undefined}),
+            createCDCRangeFilter(uuidv4(), 'id', {min: 1, max: 10}),
           ]
         }} 
         compareColumnOptions={[{label: "name", value: "name"}, {label: "street", value: "address.street"}, {label: "zipcode", value: "address.zipcode"}, {label: "city", value: "address.city"}, {label: "id", value: "id"}]}

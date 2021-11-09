@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IFilter } from './interface';
+import { IFilter } from './interfaces';
 interface IDropZoneProps {
     onDrop: any;
     canDrop: boolean;

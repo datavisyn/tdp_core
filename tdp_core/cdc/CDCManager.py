@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import Union
+
+from .schema.FieldFilterMixin import FieldFilterMixin
 from .DemoCDC import DemoCDC
 from .BaseCDC import BaseCDC
 from .CDCAlert import CDCAlert
@@ -29,37 +31,21 @@ class CDCManager():
         new = cdc.load_data({
             # TODO: Define options like username?
         })
+
         new = [item for item in new if eval(alert.filter_query)]
 
-        import functools
-        def rsetattr(obj, attr, val):
-            pre, _, post = attr.rpartition('.')
-            return setattr(rgetattr(obj, pre) if pre else obj, post, val)
 
-        def rgetattr(obj, attr, *args):
-            def _getattr(obj, attr):
-                # return getattr(obj, attr, *args)
-                return obj.get(attr, None)
-            return functools.reduce(_getattr, [obj] + attr.split('.'))
-
-        # fields = [col["value"] for col in alert.compare_columns]
-
-        # for i, item in enumerate(new):
-        #     print("----------------------")
-        #     print("----------------------")
-        #     print(item)
-        #     testii = 'name'
-        #     print(item[testii])
-        #     print(item.get(testii, None))
-        #     print("----------------------")
-        #     print("----------------------")
-        #     new_item = {}
-        #     for field in fields:
-        #         rsetattr(new_item, field, rgetattr(item, field))
-            
-        #     new[i] = new_item
-
-        # {address: {plz: 'asdf'}}
+        fields = [col["value"] for col in alert.compare_columns]
+        for i, item in enumerate(new):
+            new_item = {
+                '_cdc_compare_id': cdc.get_id(item),
+                # TODO: Recursive lookup and field selection
+                **item
+            }
+            for field in fields:
+               # new_item[field] = FieldFilterMixin.access(item, field)
+               FieldFilterMixin.set(new_item, field, FieldFilterMixin.access(item, field))
+            new[i] = new_item
 
         # Filter new entry
         # '(item["id"] in (4, 5, 6, 7, 8) and not (item["id"] == 5 and item["id"] == 4 or item["id"] == 8)) or ((item["address"]["city"] == "Gwenborough") and (item["id"] > 0 and item["id"] < 5))'

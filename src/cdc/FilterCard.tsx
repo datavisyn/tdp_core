@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {IFilter, IFilterComponent, itemTypes} from './interface';
+import {IFilter, IFilterComponent, itemTypes} from './interfaces';
 import {useDrag} from 'react-dnd';
 import {DropZone} from './DropZone';
 
@@ -9,12 +9,15 @@ interface IFilterCardProps {
   onDelete?: (filter: IFilter) => void;
   onChange?: (filter: IFilter, changeFunc: (filter: IFilter) => void) => void;
   onValueChanged?: (filter: IFilter, value: any) => void;
-  filterComponents: {[key: string]: IFilterComponent<any>};
+  onFieldChanged?: (filter: IFilter, field: any) => void;
+  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   disableFilter: boolean;
   isInvalid?: boolean;
+  disableRemoving?: boolean;
+  disableDragging?: boolean;
 }
 
-export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter, isInvalid}: IFilterCardProps) {
+export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, onFieldChanged, filterComponents, disableFilter, isInvalid, disableDragging, disableRemoving}: IFilterCardProps) {
   const [{isDragging, draggedItem}, drag, preview] = useDrag(() => ({
     type: itemTypes.FILTERCARD,
     item: filter,
@@ -25,7 +28,7 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
   }));
 
   const hasChildren = filter.children && filter.children.length >= 0;
-  const filterComponent = filterComponents[filter.componentId];
+  const filterComponent = filterComponents[filter.type];
 
   if (!filterComponent) {
     return <>ERROR!!</>;
@@ -35,21 +38,20 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
     <div
       className={`card mb-2 ${isDragging ? 'bg-light' : ''}${isInvalid ? ' form-control is-invalid' : ''}`}
       ref={preview}
-      style={filter.disableRemoving && filter.disableDragging ? {height: '93%'} : {}}
+      style={disableRemoving && disableDragging ? {height: '93%'} : {}}
     >
       <div className="card-body">
         <h6
-          ref={filter.disableDragging || disableFilter ? undefined : drag}
+          ref={disableDragging || disableFilter ? undefined : drag}
           className="card-title d-flex"
-          style={filter.disableDragging || disableFilter ? {} : {cursor: 'move'}}
+          style={disableDragging || disableFilter ? {} : {cursor: 'move'}}
         >
-          {filter.disableDragging || disableFilter ? null : (
+          {disableDragging || disableFilter ? null : (
             <i
               style={{marginRight: 5}}
               className="fas fa-arrows-alt"
             ></i>
           )}
-          <span className="flex-fill">{filter.name}</span>
           <div>
             <div className="input-group">
               {onChange && hasChildren && filter?.children?.length > 1 ? (
@@ -66,10 +68,9 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
                 >
                   <option value="AND">AND</option>
                   <option value="OR">OR</option>
-                  <option value="NOT">NOT (AND)</option>
                 </select>
               ) : null}
-              {!filter.disableRemoving && onDelete && !disableFilter ? (
+              {!disableRemoving && onDelete && !disableFilter ? (
                 <button
                   className="btn btn-text-secondary btn-sm"
                   onClick={() => onDelete(filter)}
@@ -86,11 +87,18 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
           bulk of the card's content.
           </p>*/}
 
-        {filterComponent ? (
+        {filterComponent?.component ? (
           <div>
-            <filterComponent.clazz
+            <filterComponent.component.clazz
               disabled={disableFilter}
-              value={filter.componentValue}
+              value={filter.value}
+              config={filterComponent.config}
+              field={filter.field}
+              onFieldChanged={
+                onFieldChanged
+                  ? (field) => onFieldChanged(filter, field)
+                  : undefined
+              }
               onValueChanged={
                 onValueChanged
                   ? (value) => onValueChanged(filter, value)
@@ -99,7 +107,7 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
             />
           </div>
         ) : null}
-        {onDrop && (hasChildren || !filter.disableDropping) && !disableFilter ? (
+        {onDrop && (hasChildren || !filterComponent.component.disableDropping) && !disableFilter ? (
           <DropZone
             onDrop={onDrop}
             filter={filter}
@@ -115,6 +123,7 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
               onDrop={onDrop}
               onDelete={onDelete}
               onValueChanged={onValueChanged}
+              onFieldChanged={onFieldChanged}
               onChange={onChange}
               filterComponents={filterComponents}
               disableFilter={disableFilter}

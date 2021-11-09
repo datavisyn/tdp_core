@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IFilter, IFilterComponent, IUploadAlert } from './interface';
+import { IFilter, IFilterComponent, IUploadAlert } from './interfaces';
 interface ICDCCreateAlert {
     alertData: IUploadAlert;
     setAlertData: (formData: IUploadAlert) => void;
@@ -7,7 +7,10 @@ interface ICDCCreateAlert {
     filter: IFilter;
     setFilter: (filter: IFilter) => void;
     filterComponents: {
-        [key: string]: IFilterComponent<any>;
+        [key: string]: {
+            component: IFilterComponent<any>;
+            config?: any;
+        };
     };
     onAlertChanged: (id?: number) => void;
     setCreationMode: (mode: boolean) => void;

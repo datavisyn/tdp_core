@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IAlert, IFilter, IFilterComponent, IUploadAlert } from './interface';
+import { IAlert, IFilter, IFilterComponent, IUploadAlert } from './interfaces';
 interface ICDCEditAlert {
     alertData: IUploadAlert;
     setAlertData: (formData: IUploadAlert) => void;
@@ -7,7 +7,10 @@ interface ICDCEditAlert {
     filter: IFilter;
     setFilter: (filter: IFilter) => void;
     filterComponents: {
-        [key: string]: IFilterComponent<any>;
+        [key: string]: {
+            component: IFilterComponent<any>;
+            config?: any;
+        };
     };
     onAlertChanged: (id?: number) => void;
     selectedAlert: IAlert;

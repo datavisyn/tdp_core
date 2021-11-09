@@ -1,32 +1,15 @@
 /// <reference types="react" />
-import { IFilter, IFilterComponent } from './interface';
+import { IFilter, IFilterComponent } from './interfaces';
 export interface ICDCTextFilterValue {
-    fields: {
-        field: {
-            label: string;
-            value: string;
-        };
-        options: {
-            label: string;
-            value: string;
-        }[];
-    }[];
-    filter: {
-        field: {
-            label: string;
-            value: string;
-        };
-        value: {
-            label: string;
-            value: string;
-        }[];
-    }[];
 }
 export declare const CDCTextFilterId = "text";
 export declare const CDCTextFilter: IFilterComponent<null>;
-export declare function createCDCTextFilter(id: string, name: string, value: ICDCTextFilterValue): IFilter<ICDCTextFilterValue>;
-export declare function CDCTextFilterComponent({ value, onValueChanged, disabled }: {
+export declare function createCDCTextFilter(id: string, field: string, value: string[]): IFilter<ICDCTextFilterValue>;
+export declare function CDCTextFilterComponent({ value, onValueChanged, onFieldChanged, disabled, field, config }: {
     value: any;
     onValueChanged: any;
+    onFieldChanged: any;
     disabled: any;
+    field: any;
+    config: any;
 }): JSX.Element;

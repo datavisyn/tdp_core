@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getFilterFromTree, itemTypes } from './interface';
+import { getFilterFromTree, itemTypes } from './interfaces';
 import { useDrop } from 'react-dnd';
 export function DropZone({ canDrop, onDrop, filter, index }) {
     // TODO: Add proper types such that draggedItem can be infered

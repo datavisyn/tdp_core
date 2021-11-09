@@ -1,4 +1,4 @@
-import { IFilter, IFilterComponent } from './interface';
+import { IFilter, IFilterComponent } from './interfaces';
 export interface ICDCRangeFilterValue {
     config: {
         minValue: number;
@@ -13,4 +13,7 @@ export interface ICDCRangeFilterValue {
 }
 export declare const CDCRangeFilterId = "range";
 export declare const CDCRangeFilter: IFilterComponent<null>;
-export declare function createCDCRangeFilter(id: string, name: string, value: ICDCRangeFilterValue): IFilter<ICDCRangeFilterValue>;
+export declare function createCDCRangeFilter(id: string, field: string, value: {
+    min: number;
+    max: number;
+}): IFilter<ICDCRangeFilterValue>;

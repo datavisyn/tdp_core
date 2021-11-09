@@ -2,20 +2,21 @@ export interface IFilterComponent<V> {
   clazz: (props: {
     value: V;
     onValueChanged?: (value: V) => void;
+    onFieldChanged?: (field: string) => void;
     disabled: boolean;
+    config: any;
+    field: any;
   }) => JSX.Element;
-  toFilter?: (value: V) => string;
+  disableDropping?: boolean;
 }
+
 
 export interface IFilter<V = any> {
   id: string;
-  name: string;
-  disableRemoving?: boolean;
-  disableDragging?: boolean;
-  disableDropping?: boolean;
-  operator?: 'AND' | 'OR' | 'NOT';
-  componentId: string;
-  componentValue: V;
+  operator?: 'AND' | 'OR';
+  type: string;
+  value?: any;
+  field?: string;
   children?: IFilter[];
 }
 
@@ -46,45 +47,41 @@ export const getFilterFromTree = (
   return {parent: null, current: null};
 };
 
-export const getTreeQuery = (filter: IFilter, components: {[key: string]: IFilterComponent<any>}) => {
-  if (!filter) {
-    return '';
-  }
-  if (!filter.children) {
-    //leaf filter
-    if (
-      filter &&
-      components &&
-      components[filter.componentId]?.clazz &&
-      components[filter.componentId]?.toFilter
-    ) {
-      return components[filter.componentId].toFilter(filter.componentValue);
-    } else {
-      return '';
-    }
-  } else {
-    //go through every child
-    let returnValue = '(';
-    filter.children.forEach((child, i) => {
-      returnValue += `${getTreeQuery(child, components)}${filter.children && i < filter.children.length - 1
-        ? ` ${filter?.operator === 'NOT'
-          ? 'and not'
-          : filter?.operator?.toLowerCase()
-        } `
-        : ''
-        }`;
-    });
-    returnValue += ')';
-    return returnValue;
-  }
-};
+// export const getTreeQuery = (filter: IFilter, components: {[key: string]: IFilterComponent<any>}) => {
+//   if (!filter) {
+//     return '';
+//   }
+//   if (!filter.children) {
+//     //leaf filter
+//     if (
+//       filter &&
+//       components &&
+//       components[filter.type]?.clazz &&
+//       components[filter.type]?.toFilter
+//     ) {
+//       return components[filter.type].toFilter(filter.componentValue);
+//     } else {
+//       return '';
+//     }
+//   } else {
+//     //go through every child
+//     let returnValue = '(';
+//     filter.children.forEach((child, i) => {
+//       returnValue += `${getTreeQuery(child, components)}${filter.children && i < filter.children.length - 1
+//         ? ` ${filter?.operator?.toLowerCase()} `
+//         : ''
+//         }`;
+//     });
+//     returnValue += ')';
+//     return returnValue;
+//   }
+// };
 
 export interface IAlert {
   id: number;
   name: string;
   cdc_id: string;
   filter: IFilter;
-  filter_query: string;
   enable_mail_notification: boolean;
   latest_diff: {dictionary_item_added?: string[], dictionary_item_removed?: string[], values_changed?: {id: string, field: [], old_value: string, new_value: string}[]};
   latest_fetched_data: any;
@@ -95,7 +92,7 @@ export interface IAlert {
   compare_columns: {label: string, value: string}[];
 } //TODO: remove any
 
-export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'filter_query' | 'enable_mail_notification' | 'compare_columns'> {}
+export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'enable_mail_notification' | 'compare_columns'> {}
 
 export function isAlert(obj: IAlert | IUploadAlert): obj is IAlert {
   return typeof (obj as any)?.id === 'number';

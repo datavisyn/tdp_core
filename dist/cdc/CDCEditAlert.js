@@ -1,9 +1,9 @@
+import get from 'lodash.get';
 import React from 'react';
 import Select from 'react-select';
 import { runAlert } from '.';
 import { confirmAlertById, deleteAlert, editAlert } from './api';
 import { CDCFilterComponent } from './CDCFilterComponent';
-import { getTreeQuery } from './interface';
 export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs, compareColumnOptions }) {
     var _a;
     const [editMode, setEditMode] = React.useState(false);
@@ -27,11 +27,8 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
     };
     const onSave = async () => {
         if (validFilter && validName) {
-            const newAlert = await editAlert(selectedAlert.id, {
-                ...alertData,
-                filter,
-                filter_query: getTreeQuery(filter, filterComponents)
-            }).then((alert) => {
+            const newAlert = await editAlert(selectedAlert.id, { ...alertData, filter })
+                .then((alert) => {
                 return runAlert(alert.id).then((a) => {
                     return a ? a : alert;
                 });
@@ -50,14 +47,6 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
         await deleteAlert(id);
         onAlertChanged();
     };
-    const getNestedValue = (obj, key) => {
-        const keys = key.split(".");
-        let value = obj;
-        keys.forEach((k) => {
-            value = value[k];
-        });
-        return value;
-    };
     const accordionItem = (index, title, parentId, child, show) => {
         parentId = parentId.trim();
         return (React.createElement("div", { key: index, className: "accordion-item" },
@@ -65,6 +54,7 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                 React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#collapse${index}`, "aria-expanded": "true", "aria-controls": `collapse${index}` }, title)),
             React.createElement("div", { id: `collapse${index}`, className: `p-4 accordion-collapse collapse${show ? ' show' : ''}`, "aria-labelledby": `heading${index}`, "data-bs-parent": `#${parentId}` }, child)));
     };
+    console.log(selectedAlert.latest_diff);
     const generalInformation = React.createElement(React.Fragment, null,
         React.createElement("div", { className: "row mb-3" },
             React.createElement("div", { className: "mb-3 col" },
@@ -113,12 +103,12 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                         _d.map((d) => {
                             var _a;
                             const data = selectedAlert.latest_fetched_data.find(a => a.id === d);
-                            return (React.createElement("tr", { key: d, className: "table-success" }, (_a = selectedAlert.compare_columns) === null || _a === void 0 ? void 0 : _a.map((field, i) => React.createElement("td", { key: `added-${i}` }, getNestedValue(data, field.value)))));
+                            return (React.createElement("tr", { key: d, className: "table-success" }, (_a = selectedAlert.compare_columns) === null || _a === void 0 ? void 0 : _a.map((field, i) => React.createElement("td", { key: `added-${i}` }, get(data, field.value)))));
                         }), (_e = selectedAlert.latest_diff.dictionary_item_removed) === null || _e === void 0 ? void 0 :
                         _e.map((d) => {
                             var _a;
                             const data = selectedAlert.confirmed_data.find(a => a.id === d);
-                            return (React.createElement("tr", { key: d, className: "table-danger" }, (_a = selectedAlert.compare_columns) === null || _a === void 0 ? void 0 : _a.map((field, i) => React.createElement("td", { key: `removed-${i}` }, getNestedValue(data, field.value)))));
+                            return (React.createElement("tr", { key: d, className: "table-danger" }, (_a = selectedAlert.compare_columns) === null || _a === void 0 ? void 0 : _a.map((field, i) => React.createElement("td", { key: `removed-${i}` }, get(data, field.value)))));
                         }), (_f = [...change.keys()]) === null || _f === void 0 ? void 0 :
                         _f.map((id, i) => {
                             var _a, _b;
@@ -126,7 +116,7 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                             return (React.createElement("tr", { key: `tr-changed-${i}`, className: "table-primary" }, (_b = selectedAlert.compare_columns) === null || _b === void 0 ? void 0 : _b.map((field, index) => change.get(id).has(field.value) ? React.createElement("td", { key: `changed-${i}-${index}` },
                                 React.createElement("s", null, change.get(id).get(field.value).old),
                                 " ",
-                                change.get(id).get(field.value).new) : React.createElement("td", { key: `changed-${i}-${index}` }, getNestedValue(oldData, field.value)))));
+                                change.get(id).get(field.value).new) : React.createElement("td", { key: `changed-${i}-${index}` }, get(oldData, field.value)))));
                         }))),
                 React.createElement("div", { className: "d-md-flex justify-content-md-end" },
                     React.createElement("button", { title: "Confirm changes", className: "btn btn-primary", onClick: () => confirmChanges(selectedAlert.id) }, "Confirm"))));

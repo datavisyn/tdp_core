@@ -31,8 +31,8 @@ class BaseCDC(Generic[T]):
     def compare(self, old: List[T], new: List[T]):
         old = old or []
         new = new or []
-        old_lookup = {self.get_id(item): item for item in old}
-        new_lookup = {self.get_id(item): item for item in new}
+        old_lookup = {item['_cdc_compare_id']: item for item in old}
+        new_lookup = {item['_cdc_compare_id']: item for item in new}
         return DeepDiff(old_lookup, new_lookup, view='tree')
 
     # @abstractproperty # ?

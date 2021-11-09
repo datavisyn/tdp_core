@@ -10,7 +10,7 @@
  *********************************************************/
 
 import {Ajax, AppContext} from 'phovea_core';
-import {IAlert, IUploadAlert} from './interface';
+import {IAlert, IUploadAlert} from './interfaces';
 
 export async function getAlerts(): Promise<IAlert[]> {
   return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert`);

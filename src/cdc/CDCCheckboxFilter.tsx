@@ -1,37 +1,27 @@
-import {IFilter, IFilterComponent} from './interface';
+import {IFilter, IFilterComponent} from './interfaces';
 import * as React from 'react';
 
 interface ICDCCheckboxFilterValue {
-  fields: string[];
-  filter: string[];
+  [field: string]: boolean;
 }
 
 export const CDCCheckboxFilterId = 'checkbox';
 export const CDCCheckboxFilter: IFilterComponent<null> = {
   clazz: CDCCheckboxFilterComponent,
-  toFilter: CDCCheckboxFilterToString
+  disableDropping: true
 };
 
-export function createCDCCheckboxFilter(id: string, name: string, value: ICDCCheckboxFilterValue): IFilter<ICDCCheckboxFilterValue> {
+export function createCDCCheckboxFilter(id: string, value: ICDCCheckboxFilterValue): IFilter<ICDCCheckboxFilterValue> {
   return {
     id,
-    name,
-    disableDropping: true,
-    componentId: CDCCheckboxFilterId,
-    componentValue: value
+    type: CDCCheckboxFilterId,
+    value: value
   };
 }
 
-function CDCCheckboxFilterToString(value: ICDCCheckboxFilterValue): string {
-  // Generate filter from value
-  return `(${value?.fields.map((v) => {return `${v} == ${value.filter.filter((f) => f === v).length > 0}`;}).join(' and ')})`;
-}
-
-//checkbox1 == true and checkbox2 == false and item["address"] == true
-
-export function CDCCheckboxFilterComponent({value, onValueChanged, disabled}) {
+export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, config, field}) {
   return <>
-    {value.fields.map((v, i) => {
+    {Object.entries(value).map(([field, flag], i) => {
       return (
         <div key={i} className="input-group m-1">
           <div className="form-check">
@@ -39,24 +29,19 @@ export function CDCCheckboxFilterComponent({value, onValueChanged, disabled}) {
               className="form-check-input"
               type="checkbox"
               id="flexCheckDefault"
-              checked={value.filter.filter((f) => f === v).length > 0}
+              checked={flag? true : false}
               disabled={!onValueChanged || disabled}
               onChange={(e) =>
                 onValueChanged?.({
                   ...value,
-                  fields: value.fields,
-                  filter:
-                    value.filter.filter((f) => f === v).length > 0
-                      ? value.filter.filter((f) => f !== v)
-                      : [...value.filter, v]
-                })
-              }
+                  [field]: e
+                })}
             />
             <label
               className="form-check-label"
               htmlFor="flexCheckDefault"
             >
-              {v}
+              {field}
             </label>
           </div>
         </div>

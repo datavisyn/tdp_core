@@ -1,8 +1,11 @@
 /// <reference types="react" />
-import { IAlert, IFilter, IFilterComponent, IUploadAlert } from './interface';
+import { IAlert, IFilter, IFilterComponent, IUploadAlert } from './interfaces';
 interface ICDCFilterDialogProps {
     filterComponents: {
-        [key: string]: IFilterComponent<any>;
+        [key: string]: {
+            component: IFilterComponent<any>;
+            config?: any;
+        };
     };
     filtersByCDC: {
         [cdcId: string]: IFilter<any>[];
@@ -14,14 +17,11 @@ interface ICDCFilterDialogProps {
 }
 export declare const DEFAULTALERTDATA: IUploadAlert;
 export declare const DEFAULTFILTER: {
-    disableDragging: boolean;
-    disableRemoving: boolean;
     id: string;
-    name: string;
-    disableDropping?: boolean;
-    operator?: "AND" | "OR" | "NOT";
-    componentId: string;
-    componentValue: null;
+    operator?: "AND" | "OR";
+    type: string;
+    value?: any;
+    field?: string;
     children?: IFilter<any>[];
 };
 export declare const runAlert: (id: number) => Promise<IAlert>;

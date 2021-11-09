@@ -8,7 +8,7 @@
  * Proprietary and confidential. No warranty.
  *
  *********************************************************/
-import { IAlert, IUploadAlert } from './interface';
+import { IAlert, IUploadAlert } from './interfaces';
 export declare function getAlerts(): Promise<IAlert[]>;
 export declare function getAlertsById(id: number): Promise<IAlert | null>;
 export declare function editAlert(id: number, alert: Partial<IAlert>): Promise<IAlert | null>;

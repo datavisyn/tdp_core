@@ -2,16 +2,14 @@ import * as React from 'react';
 export const CDCGroupingFilterId = 'group';
 export const CDCGroupingFilter = {
     clazz: CDCGroupingFilterComponent,
+    disableDropping: true
 };
-export function createCDCGroupingFilter(id, name) {
+export function createCDCGroupingFilter(id) {
     return {
         id,
-        name,
-        disableDropping: true,
         operator: 'AND',
         children: [],
-        componentId: CDCGroupingFilterId,
-        componentValue: null
+        type: CDCGroupingFilterId,
     };
 }
 function CDCGroupingFilterComponent() {

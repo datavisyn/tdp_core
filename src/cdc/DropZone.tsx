@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getFilterFromTree, IFilter, itemTypes } from './interface';
+import { getFilterFromTree, IFilter, itemTypes } from './interfaces';
 import { useDrop } from 'react-dnd';
 
 interface IDropZoneProps {

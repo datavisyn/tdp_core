@@ -1,4 +1,4 @@
-import {IFilter, IFilterComponent} from './interface';
+import {IFilter, IFilterComponent} from './interfaces';
 import * as React from 'react';
 import InputRange from 'react-input-range';
 
@@ -18,33 +18,27 @@ export interface ICDCRangeFilterValue {
 export const CDCRangeFilterId = 'range';
 export const CDCRangeFilter: IFilterComponent<null> = {
   clazz: CDCRangeFilterComponent,
-  toFilter: CDCRangeFilterToString
+  disableDropping: true
 };
 
-export function createCDCRangeFilter(id: string, name: string, value: ICDCRangeFilterValue): IFilter<ICDCRangeFilterValue> {
+export function createCDCRangeFilter(id: string, field: string, value: {min: number, max: number}): IFilter<ICDCRangeFilterValue> {
   return {
     id,
-    name,
-    disableDropping: true,
-    componentId: CDCRangeFilterId,
-    componentValue: value
+    type: CDCRangeFilterId,
+    field: field,
+    value: value,
   };
 }
 
-function CDCRangeFilterToString(value: ICDCRangeFilterValue): string {
-  // Generate filter from value
-  return `(${value.config.field} >= ${value.value.min} and ${value.config.field} <= ${value.value.max})`;
-}
-
-function CDCRangeFilterComponent({value, onValueChanged, disabled}) {
+function CDCRangeFilterComponent({value, onValueChanged, disabled, config, field}) {
   return <div className="t360-input-range-wrapper" style={{margin: '10px', paddingTop: '10px', minHeight: '50px'}}>
-    <h6>{value?.config?.label}</h6>
+    <h6>{field}</h6>
     <InputRange
       disabled={!onValueChanged || disabled}
-      minValue={value.config.minValue}
-      maxValue={value.config.maxValue}
-      value={value.value}
-      onChange={(v) => onValueChanged?.({...value, value: v})}
+      minValue={config.minValue}
+      maxValue={config.maxValue}
+      value={value}
+      onChange={(e) => onValueChanged?.(e)}
     />
   </div>;
 }

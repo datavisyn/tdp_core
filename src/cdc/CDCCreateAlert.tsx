@@ -3,7 +3,7 @@ import Select from 'react-select';
 import {runAlert} from '..';
 import {saveAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
-import {getTreeQuery, IFilter, IFilterComponent, IUploadAlert} from './interface';
+import {IFilter, IFilterComponent, IUploadAlert} from './interfaces';
 
 interface ICDCCreateAlert {
   alertData: IUploadAlert;
@@ -11,7 +11,7 @@ interface ICDCCreateAlert {
   filterSelection: IFilter<any>[] | undefined;
   filter: IFilter;
   setFilter: (filter: IFilter) => void;
-  filterComponents: {[key: string]: IFilterComponent<any>};
+  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   onAlertChanged: (id?: number) => void;
   setCreationMode: (mode: boolean) => void;
   cdcs: string[];
@@ -32,15 +32,12 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
 
   const onSave = async () => {
     if (validFilter && validName) {
-      const newAlert = await saveAlert({
-        ...alertData,
-        filter,
-        filter_query: getTreeQuery(filter, filterComponents)
-      }).then((alert) => {
-        return runAlert(alert.id).then((a) => {
-          return a ? a : alert;
+      const newAlert = await saveAlert({...alertData, filter})
+        .then((alert) => {
+          return runAlert(alert.id).then((a) => {
+            return a ? a : alert;
+          });
         });
-      });
       onAlertChanged(newAlert.id);
       setCreationMode(false);
     }
@@ -79,7 +76,7 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
             closeMenuOnSelect={false}
             options={compareColumnOptions}
             value={alertData.compare_columns}
-            onChange={(e) => setAlertData({...alertData, compare_columns:e as {value: string, label: string}[]})}
+            onChange={(e) => setAlertData({...alertData, compare_columns: e as {value: string, label: string}[]})}
           />
         </div>
         <div className="mb-3 col">

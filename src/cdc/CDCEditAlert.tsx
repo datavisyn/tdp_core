@@ -1,9 +1,10 @@
+import get from 'lodash.get';
 import React from 'react';
 import Select from 'react-select';
 import {runAlert} from '.';
 import {confirmAlertById, deleteAlert, editAlert} from './api';
 import {CDCFilterComponent} from './CDCFilterComponent';
-import {getTreeQuery, IAlert, IFilter, IFilterComponent, IUploadAlert} from './interface';
+import {IAlert, IFilter, IFilterComponent, IUploadAlert} from './interfaces';
 
 interface ICDCEditAlert {
   alertData: IUploadAlert;
@@ -11,7 +12,7 @@ interface ICDCEditAlert {
   filterSelection: IFilter<any>[] | undefined;
   filter: IFilter;
   setFilter: (filter: IFilter) => void;
-  filterComponents: {[key: string]: IFilterComponent<any>};
+  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   onAlertChanged: (id?: number) => void;
   selectedAlert: IAlert;
   cdcs: string[];
@@ -44,13 +45,8 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
 
   const onSave = async () => {
     if (validFilter && validName) {
-      const newAlert = await editAlert(
-        selectedAlert.id,
-        {
-          ...alertData,
-          filter,
-          filter_query: getTreeQuery(filter, filterComponents)
-        }).then((alert) => {
+      const newAlert = await editAlert(selectedAlert.id, {...alertData, filter})
+        .then((alert) => {
           return runAlert(alert.id).then((a) => {
             return a ? a : alert;
           });
@@ -72,15 +68,6 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
     onAlertChanged();
   };
 
-  const getNestedValue = (obj: Object, key: string) => {
-    const keys = key.split(".");
-    let value = obj;
-    keys.forEach((k) => {
-      value = value[k];
-    });
-    return value;
-  }
-
   const accordionItem = (index: number, title: string, parentId: string, child: JSX.Element, show?: boolean) => {
     parentId = parentId.trim();
     return (
@@ -96,6 +83,8 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
       </div>
     );
   };
+
+  console.log(selectedAlert.latest_diff)
 
   const generalInformation =
     <>
@@ -171,19 +160,19 @@ export function CDCEditAlert({alertData, setAlertData, filterSelection, filter, 
             {selectedAlert.latest_diff.dictionary_item_added?.map((d) => {
               const data = selectedAlert.latest_fetched_data.find(a => a.id === d);
               return (<tr key={d} className="table-success">
-                {selectedAlert.compare_columns?.map((field, i) => <td key={`added-${i}`} >{getNestedValue(data, field.value)}</td>)}
+                {selectedAlert.compare_columns?.map((field, i) => <td key={`added-${i}`} >{get(data, field.value)}</td>)}
               </tr>);
             })}
             {selectedAlert.latest_diff.dictionary_item_removed?.map((d) => {
               const data = selectedAlert.confirmed_data.find(a => a.id === d);
               return (<tr key={d} className="table-danger">
-                {selectedAlert.compare_columns?.map((field, i) => <td key={`removed-${i}`}>{getNestedValue(data, field.value)}</td>)}
+                {selectedAlert.compare_columns?.map((field, i) => <td key={`removed-${i}`}>{get(data, field.value)}</td>)}
               </tr>);
             })}
             {[...change.keys()]?.map((id, i) => {
               const oldData = selectedAlert.confirmed_data?.find(a => a.id === id);
               return (<tr key={`tr-changed-${i}`} className="table-primary">
-                {selectedAlert.compare_columns?.map((field, index) => change.get(id).has(field.value) ? <td key={`changed-${i}-${index}`}><s>{change.get(id).get(field.value).old}</s> {change.get(id).get(field.value).new}</td> : <td key={`changed-${i}-${index}`}>{getNestedValue(oldData, field.value)}</td>)}
+                {selectedAlert.compare_columns?.map((field, index) => change.get(id).has(field.value) ? <td key={`changed-${i}-${index}`}><s>{change.get(id).get(field.value).old}</s> {change.get(id).get(field.value).new}</td> : <td key={`changed-${i}-${index}`}>{get(oldData, field.value)}</td>)}
               </tr>);
             })}
           </tbody>

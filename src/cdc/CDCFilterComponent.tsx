@@ -3,14 +3,14 @@ import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {FilterCard} from './FilterCard';
-import {getFilterFromTree, IFilter, IFilterComponent} from './interface';
+import {getFilterFromTree, IFilter, IFilterComponent} from './interfaces';
 import {v4 as uuidv4} from 'uuid';
 
 interface ICDCFilterComponentProps {
   filterSelection?: IFilter<any>[];
   filter: IFilter;
   setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
-  filterComponents: {[key: string]: IFilterComponent<any>};
+  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   disableFilter?: boolean;
   isInvalid?: boolean;
 }
@@ -86,9 +86,20 @@ export function CDCFilterComponent({filterSelection, filter, setFilter, filterCo
 
   const onValueChanged = (filter: IFilter, value: any) => {
     onChange(filter, (f) => {
-      f.componentValue = value;
+      f.value = value;
     });
   };
+
+  const onFieldChanged = (filter: IFilter, field: any) => {
+    console.log(field, filter)
+    onChange(filter, (f) => {
+      f.field = field;
+    });
+  }
+
+  if(filter.type !== 'group') {
+    throw Error('First filter always has to be a group filter');
+  }
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -101,6 +112,7 @@ export function CDCFilterComponent({filterSelection, filter, setFilter, filterCo
             onDelete={onDelete}
             onChange={onChange}
             onValueChanged={onValueChanged}
+            onFieldChanged={onFieldChanged}
             filterComponents={filterComponents}
             disableFilter={disableFilter}
             isInvalid={isInvalid}

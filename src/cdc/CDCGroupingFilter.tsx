@@ -1,20 +1,18 @@
-import {IFilter, IFilterComponent} from './interface';
+import {IFilter, IFilterComponent} from './interfaces';
 import * as React from 'react';
 
 export const CDCGroupingFilterId = 'group';
 export const CDCGroupingFilter: IFilterComponent<null> = {
   clazz: CDCGroupingFilterComponent,
+  disableDropping: true
 };
 
-export function createCDCGroupingFilter(id: string, name: string): IFilter<null> {
+export function createCDCGroupingFilter(id: string): IFilter<null> {
   return {
     id,
-    name,
-    disableDropping: true,
     operator: 'AND',
     children: [],
-    componentId: CDCGroupingFilterId,
-    componentValue: null
+    type: CDCGroupingFilterId,
   };
 }
 
