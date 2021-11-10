@@ -42,7 +42,7 @@ class CDCManager():
                 **item
             }
             for field in fields:
-               # new_item[field] = FieldFilterMixin.access(item, field)
+            #    new_item[field] = FieldFilterMixin.access(item, field)
             new[i] = new_item
 
         # Filter new entry

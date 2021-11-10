@@ -41,72 +41,73 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
       style={disableRemoving && disableDragging ? {height: '93%'} : {}}
     >
       <div className="card-body">
-        <h6
-          ref={disableDragging || disableFilter ? undefined : drag}
-          className="card-title d-flex"
-          style={disableDragging || disableFilter ? {} : {cursor: 'move'}}
-        >
-          {disableDragging || disableFilter ? null : (
-            <i
-              style={{marginRight: 5}}
-              className="fas fa-arrows-alt"
-            ></i>
-          )}
-          <div>
-            <div className="input-group">
-              {onChange && hasChildren && filter?.children?.length > 1 ? (
-                <select
-                  className="form-select form-select-sm"
-                  style={{width: '6em'}}
-                  value={filter.operator || 'AND'}
+        <div className="row">
+          <div className="col-1 pe-0"
+            style={disableDragging || disableFilter ? {} : {cursor: 'move'}}
+            ref={disableDragging || disableFilter ? undefined : drag}
+          >
+            {disableDragging || disableFilter ? null : (
+              <i
+                style={{marginRight: 5}}
+                className="fas fa-arrows-alt"
+              ></i>
+            )}
+          </div>
+          <div className="col-10">
+            {filterComponent?.component ? (
+              <div>
+                <filterComponent.component.clazz
                   disabled={disableFilter}
-                  onChange={(e) => {
-                    onChange(filter, (f) => {
-                      f.operator = e.currentTarget.value as any;
-                    });
-                  }}
-                >
-                  <option value="AND">AND</option>
-                  <option value="OR">OR</option>
-                </select>
-              ) : null}
-              {!disableRemoving && onDelete && !disableFilter ? (
-                <button
-                  className="btn btn-text-secondary btn-sm"
-                  onClick={() => onDelete(filter)}
-                >
-                  <i className="fas fa-times" />
-                </button>
-              ) : null}
-            </div>
+                  value={filter.value}
+                  config={filterComponent.config}
+                  field={filter.field}
+                  onFieldChanged={
+                    onFieldChanged
+                      ? (field) => onFieldChanged(filter, field)
+                      : undefined
+                  }
+                  onValueChanged={
+                    onValueChanged
+                      ? (value) => onValueChanged(filter, value)
+                      : undefined
+                  }
+                />
+                {filter.type === 'group' ?
+                  <div className="input-group d-flex w-100 justify-content-between">
+                    <h6>Group Filter</h6>
+                    {onChange && hasChildren && filter?.children?.length > 1 ? (
+                      <small>
+                        <select
+                          className="form-select form-select-sm"
+                          style={{width: '6em'}}
+                          value={filter.operator || 'AND'}
+                          disabled={disableFilter}
+                          onChange={(e) => {
+                            onChange(filter, (f) => {
+                              f.operator = e.currentTarget.value as any;
+                            });
+                          }}
+                        >
+                          <option value="AND">AND</option>
+                          <option value="OR">OR</option>
+                        </select>
+                      </small>
+                    ) : null}
+                  </div> : null}
+              </div>
+            ) : null}
           </div>
-        </h6>
-        {/*<h6 className="card-subtitle mb-2 text-muted">Card subtitle</h6>*/}
-        {/*<p className="card-text">
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-          </p>*/}
-
-        {filterComponent?.component ? (
-          <div>
-            <filterComponent.component.clazz
-              disabled={disableFilter}
-              value={filter.value}
-              config={filterComponent.config}
-              field={filter.field}
-              onFieldChanged={
-                onFieldChanged
-                  ? (field) => onFieldChanged(filter, field)
-                  : undefined
-              }
-              onValueChanged={
-                onValueChanged
-                  ? (value) => onValueChanged(filter, value)
-                  : undefined
-              }
-            />
+          <div className="col-1 ps-0">
+            {!disableRemoving && onDelete && !disableFilter ? (
+              <button
+                className="btn btn-text-secondary btn-sm"
+                onClick={() => onDelete(filter)}
+              >
+                <i className="fas fa-times" />
+              </button>
+            ) : null}
           </div>
-        ) : null}
+        </div>
         {onDrop && (hasChildren || !filterComponent.component.disableDropping) && !disableFilter ? (
           <DropZone
             onDrop={onDrop}

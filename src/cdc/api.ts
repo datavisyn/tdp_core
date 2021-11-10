@@ -29,8 +29,6 @@ export async function deleteAlert(id: number): Promise<void> {
 }
 
 export async function saveAlert(alert: IUploadAlert): Promise<IAlert | null> {
-  alert.compare = alert.compare_columns?.map((cc) => cc.value);
-  delete alert.compare_columns;
   return Ajax.send(AppContext.getInstance().api2absURL(`/tdp/cdc/alert`), alert, 'POST', 'JSON', 'application/json');
 }
 

@@ -1,5 +1,6 @@
 import {IFilter, IFilterComponent} from './interfaces';
 import * as React from 'react';
+import Checkbox from 'react-three-state-checkbox';
 
 interface ICDCCheckboxFilterValue {
   [field: string]: boolean;
@@ -19,22 +20,34 @@ export function createCDCCheckboxFilter(id: string, value: ICDCCheckboxFilterVal
   };
 }
 
-export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, config, field}) {
+
+export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, config}) {
+  const onChange = (value, field, e) => {
+    if (value[field] === false) {
+      const newVal = {};
+      Object.keys(value).forEach((key) => {
+        if (key !== field) {
+          newVal[key] = value[key];
+        }
+      });
+      return newVal;
+    } else {
+      return {...value, [field]: e.target.checked}
+    }
+  }
+
   return <>
-    {Object.entries(value).map(([field, flag], i) => {
+    {config.fields.map((field, i) => {
       return (
         <div key={i} className="input-group m-1">
           <div className="form-check">
-            <input
+            <Checkbox
+              disabled={disabled}
+              checked={value[field]}
               className="form-check-input"
-              type="checkbox"
-              id="flexCheckDefault"
-              checked={flag? true : false}
+              indeterminate={value[field] == null ? true : false}
               onChange={(e) =>
-                onValueChanged?.({
-                  ...value,
-                  [field]: e.target.checked
-                })}
+                onValueChanged?.(onChange(value, field, e))}
             />
             <label
               className="form-check-label"

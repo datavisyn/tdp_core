@@ -83,7 +83,7 @@ export function CDCFilterComponent({ filterSelection, filter, setFilter, filterC
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, onFieldChanged: onFieldChanged, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid })),
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, onFieldChanged: onFieldChanged, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid, disableDragging: true, disableRemoving: true })),
             filterSelection ?
                 React.createElement("div", { className: "col-md" },
                     React.createElement("h6", null, "New filters"),

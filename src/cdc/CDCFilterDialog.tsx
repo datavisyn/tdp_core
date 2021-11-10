@@ -9,12 +9,12 @@ import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './CDCTextFilt
 import {CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter} from './CDCCheckboxFilter';
 import {CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter} from './CDCRangeFilter';
 import {CDCCreateAlert} from './CDCCreateAlert';
-import {CDCEditAlert} from './CDCEditAlert';
+import {CDCAlertView} from './CDCAlertView';
 
 interface ICDCFilterDialogProps {
   filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   filtersByCDC: {[cdcId: string]: IFilter<any>[]};
-  compareColumnOptions: {label: string, value: string}[];
+  compareColumnOptions: string[];
 }
 
 export const DEFAULTALERTDATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'demo', filter: null, compare_columns: null};
@@ -101,34 +101,22 @@ export function CDCFilterDialog({filterComponents, filtersByCDC, compareColumnOp
                   )}</div> : null}
                 </div>
                 <div className="col-9 overflow-auto">
-                  {selectedAlert ?
-                    <CDCEditAlert
+                  {selectedAlert || creationMode ?
+                    <CDCAlertView
                       alertData={alertData}
                       setAlertData={setAlertData}
                       filter={filter}
                       setFilter={setFilter}
-                      filterSelection={filtersByCDC['demo']}
                       filterComponents={filterComponents}
+                      filterSelection={filtersByCDC['demo']}
                       onAlertChanged={onAlertChanged}
+                      setCreationMode={setCreationMode}
                       selectedAlert={selectedAlert}
                       cdcs={cdcs}
                       compareColumnOptions={compareColumnOptions}
+                      creationMode={creationMode}
                     />
-                    :
-                    creationMode ?
-                      <CDCCreateAlert
-                        alertData={alertData}
-                        setAlertData={setAlertData}
-                        filter={filter}
-                        setFilter={setFilter}
-                        filterComponents={filterComponents}
-                        filterSelection={filtersByCDC['demo']}
-                        onAlertChanged={onAlertChanged}
-                        setCreationMode={setCreationMode}
-                        cdcs={cdcs}
-                        compareColumnOptions={compareColumnOptions}
-                      />
-                      : null
+                    : null
                   }
                 </div>
               </div>
@@ -168,11 +156,11 @@ export class CDCFilterDialogClass {
           'demo': [
             createCDCGroupingFilter(uuidv4()),
             createCDCTextFilter(uuidv4(), 'Select...', null),
-            createCDCCheckboxFilter(uuidv4(), {['Eins']: undefined, ['Zwei']: undefined, ['Drei']: undefined}),
+            createCDCCheckboxFilter(uuidv4(), {}),
             createCDCRangeFilter(uuidv4(), 'id', {min: 1, max: 10}),
           ]
-        }} 
-        compareColumnOptions={[{label: "name", value: "name"}, {label: "street", value: "address.street"}, {label: "zipcode", value: "address.zipcode"}, {label: "city", value: "address.city"}, {label: "id", value: "id"}]}
+        }}
+        compareColumnOptions={['id', 'name', 'address.street', 'adress.city', 'address.zipcode']}
       />,
       this.node
     );

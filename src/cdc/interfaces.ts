@@ -5,7 +5,7 @@ export interface IFilterComponent<V> {
     onFieldChanged?: (field: string) => void;
     disabled: boolean;
     config: any;
-    field: any;
+    field?: any;
   }) => JSX.Element;
   disableDropping?: boolean;
 }
@@ -89,7 +89,7 @@ export interface IAlert {
   modification_date: string;
   confirmed_data: any;
   confirmation_date: Date;
-  compare_columns: {label: string, value: string}[];
+  compare_columns: string[];
 } //TODO: remove any
 
 export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'enable_mail_notification' | 'compare_columns'> {

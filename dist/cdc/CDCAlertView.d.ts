@@ -19,5 +19,5 @@ interface ICDCEditAlert {
     creationMode: boolean;
     setCreationMode: (mode: boolean) => void;
 }
-export declare function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs, compareColumnOptions, setCreationMode, creationMode }: ICDCEditAlert): JSX.Element;
+export declare function CDCAlertView({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs, compareColumnOptions, setCreationMode, creationMode }: ICDCEditAlert): JSX.Element;
 export {};

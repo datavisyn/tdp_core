@@ -10,10 +10,7 @@ interface ICDCFilterDialogProps {
     filtersByCDC: {
         [cdcId: string]: IFilter<any>[];
     };
-    compareColumnOptions: {
-        label: string;
-        value: string;
-    }[];
+    compareColumnOptions: string[];
 }
 export declare const DEFAULTALERTDATA: IUploadAlert;
 export declare const DEFAULTFILTER: {

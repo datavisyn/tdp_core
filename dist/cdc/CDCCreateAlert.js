@@ -45,7 +45,7 @@ export function CDCCreateAlert({ alertData, setAlertData, filterSelection, filte
                     React.createElement(Select, { options: cdcs.map((c) => { return { label: c, value: c }; }), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: (e) => setAlertData({ ...alertData, cdc_id: e.value }) })),
                 React.createElement("div", { className: "mb-3 col" },
                     React.createElement("label", { className: "form-label" }, "Change Fields"),
-                    React.createElement(Select, { isMulti: true, closeMenuOnSelect: false, options: compareColumnOptions, value: alertData.compare_columns, onChange: (e) => setAlertData({ ...alertData, compare_columns: e }) })),
+                    React.createElement(Select, { isMulti: true, closeMenuOnSelect: false, options: compareColumnOptions, value: alertData.compare_columns, onChange: (e) => setAlertData({ ...alertData, compare_columns: [...e] }) })),
                 React.createElement("div", { className: "mb-3 col" },
                     React.createElement("label", { className: "form-label" }, "Email notification"),
                     React.createElement("div", { className: "form-check" },

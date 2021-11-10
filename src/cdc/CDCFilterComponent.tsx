@@ -116,6 +116,8 @@ export function CDCFilterComponent({filterSelection, filter, setFilter, filterCo
             filterComponents={filterComponents}
             disableFilter={disableFilter}
             isInvalid={isInvalid}
+            disableDragging={true}
+            disableRemoving={true}
           />
         </div>
         {filterSelection ?

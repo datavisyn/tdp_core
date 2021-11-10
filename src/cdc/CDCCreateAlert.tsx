@@ -15,7 +15,7 @@ interface ICDCCreateAlert {
   onAlertChanged: (id?: number) => void;
   setCreationMode: (mode: boolean) => void;
   cdcs: string[];
-  compareColumnOptions: {label: string, value: string}[];
+  compareColumnOptions: string[];
 }
 
 export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, setCreationMode, cdcs, compareColumnOptions}: ICDCCreateAlert) {
@@ -76,7 +76,7 @@ export function CDCCreateAlert({alertData, setAlertData, filterSelection, filter
             closeMenuOnSelect={false}
             options={compareColumnOptions}
             value={alertData.compare_columns}
-            onChange={(e) => setAlertData({...alertData, compare_columns: e as {value: string, label: string}[]})}
+            onChange={(e) => setAlertData({...alertData, compare_columns: [...e]})}
           />
         </div>
         <div className="mb-3 col">

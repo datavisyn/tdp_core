@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { runAlert } from '.';
 import { confirmAlertById, deleteAlert, editAlert, saveAlert } from './api';
 import { CDCFilterComponent } from './CDCFilterComponent';
-export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs, compareColumnOptions, setCreationMode, creationMode }) {
+export function CDCAlertView({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs, compareColumnOptions, setCreationMode, creationMode }) {
     var _a, _b;
     const [editMode, setEditMode] = React.useState(false);
     const [deleteMode, setDeleteMode] = React.useState(false);
@@ -123,12 +123,12 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                 React.createElement("div", { key: "one", className: "accordion-item" },
                     React.createElement("h2", { className: "accordion-header", id: "heading-one" },
                         React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#collapse-one", "aria-expanded": "true", "aria-controls": "collapse-one" }, `${selectedAlert.latest_diff ? 'Latest revision from: ' + ((_a = new Date(selectedAlert.latest_compare_date)) === null || _a === void 0 ? void 0 : _a.toLocaleDateString()) : 'No new data'}`)),
-                    React.createElement("div", { id: "collapse-one", className: "p-4 accordion-collapse collapse", "aria-labelledby": "heading-one", "data-bs-parent": "#editAlert" }, literature()))
+                    React.createElement("div", { id: "collapse-one", className: "p-4 accordion-collapse collapse show", "aria-labelledby": "heading-one", "data-bs-parent": "#editAlert" }, literature()))
                 : null,
             React.createElement("div", { key: "two", className: "accordion-item" },
                 React.createElement("h2", { className: "accordion-header", id: "heading-two" },
                     React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#collapse-two", "aria-expanded": "true", "aria-controls": "collapse-two" }, "Alert overview")),
-                React.createElement("div", { id: "collapse-two", className: `p-4 accordion-collapse${editMode || creationMode ? ' collapse' : ''}`, "aria-labelledby": "heading-two", "data-bs-parent": "#editAlert" },
+                React.createElement("div", { id: "collapse-two", className: `p-4 accordion-collapse collapse${editMode || creationMode ? ' show' : ''}`, "aria-labelledby": "heading-two", "data-bs-parent": "#editAlert" },
                     React.createElement("div", { className: "row mb-3" },
                         React.createElement("div", { className: "mb-3 col" },
                             React.createElement("label", { className: "form-label" }, "Name"),
@@ -151,7 +151,7 @@ export function CDCEditAlert({ alertData, setAlertData, filterSelection, filter,
                                 React.createElement("input", { className: "form-check-input", type: "checkbox", disabled: true, checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
                                 React.createElement("label", { className: "form-check-label ms-2" }, "Send me an email")))),
                     React.createElement("div", null, filterSelection || !filter ?
-                        React.createElement(CDCFilterComponent, { filterSelection: !creationMode || !editMode ? null : filterSelection, filterComponents: filterComponents, filter: filter, setFilter: setFilter, isInvalid: !validFilter })
+                        React.createElement(CDCFilterComponent, { filterSelection: !creationMode && !editMode ? null : filterSelection, filterComponents: filterComponents, filter: filter, setFilter: setFilter, isInvalid: !validFilter })
                         :
                             React.createElement("p", null, "No filters available for this cdc")))))));
 }
@@ -321,4 +321,4 @@ const alterAlert =
 </>;
 
 */
-//# sourceMappingURL=CDCEditAlert.js.map
+//# sourceMappingURL=CDCAlertView.js.map
