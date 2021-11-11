@@ -41,10 +41,16 @@ export interface IAlert {
             new_value: string;
         }[];
     };
-    latest_fetched_data: any;
+    latest_fetched_data: {
+        _cdc_compare_id: string;
+        [key: string]: any;
+    }[];
     latest_compare_date: Date;
     modification_date: string;
-    confirmed_data: any;
+    confirmed_data?: {
+        _cdc_compare_id: string;
+        [key: string]: any;
+    }[];
     confirmation_date: Date;
     compare_columns: string[];
 }
@@ -52,3 +58,7 @@ export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' 
     compare?: string[];
 }
 export declare function isAlert(obj: IAlert | IUploadAlert): obj is IAlert;
+export interface IReactSelectOption {
+    value: string;
+    label: string;
+}

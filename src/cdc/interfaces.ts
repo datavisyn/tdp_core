@@ -10,7 +10,6 @@ export interface IFilterComponent<V> {
   disableDropping?: boolean;
 }
 
-
 export interface IFilter<V = any> {
   id: string;
   operator?: 'AND' | 'OR';
@@ -47,36 +46,6 @@ export const getFilterFromTree = (
   return {parent: null, current: null};
 };
 
-// export const getTreeQuery = (filter: IFilter, components: {[key: string]: IFilterComponent<any>}) => {
-//   if (!filter) {
-//     return '';
-//   }
-//   if (!filter.children) {
-//     //leaf filter
-//     if (
-//       filter &&
-//       components &&
-//       components[filter.type]?.clazz &&
-//       components[filter.type]?.toFilter
-//     ) {
-//       return components[filter.type].toFilter(filter.componentValue);
-//     } else {
-//       return '';
-//     }
-//   } else {
-//     //go through every child
-//     let returnValue = '(';
-//     filter.children.forEach((child, i) => {
-//       returnValue += `${getTreeQuery(child, components)}${filter.children && i < filter.children.length - 1
-//         ? ` ${filter?.operator?.toLowerCase()} `
-//         : ''
-//         }`;
-//     });
-//     returnValue += ')';
-//     return returnValue;
-//   }
-// };
-
 export interface IAlert {
   id: number;
   name: string;
@@ -84,10 +53,16 @@ export interface IAlert {
   filter: IFilter;
   enable_mail_notification: boolean;
   latest_diff: {dictionary_item_added?: string[], dictionary_item_removed?: string[], values_changed?: {id: string, field: [], old_value: string, new_value: string}[]};
-  latest_fetched_data: any;
+  latest_fetched_data: {
+    _cdc_compare_id: string;
+    [key: string]: any;
+  }[];
   latest_compare_date: Date;
   modification_date: string;
-  confirmed_data: any;
+  confirmed_data?: {
+    _cdc_compare_id: string;
+    [key: string]: any;
+  }[];
   confirmation_date: Date;
   compare_columns: string[];
 } //TODO: remove any
@@ -98,4 +73,10 @@ export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' 
 
 export function isAlert(obj: IAlert | IUploadAlert): obj is IAlert {
   return typeof (obj as any)?.id === 'number';
+}
+
+
+export interface IReactSelectOption {
+  value: string;
+  label: string;
 }

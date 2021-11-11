@@ -12,8 +12,8 @@ interface ICDCFilterDialogProps {
     };
     compareColumnOptions: string[];
 }
-export declare const DEFAULTALERTDATA: IUploadAlert;
-export declare const DEFAULTFILTER: {
+export declare const CDC_DEFAULT_ALERT_DATA: IUploadAlert;
+export declare const CDC_DEFAULT_FILTER: {
     id: string;
     operator?: "AND" | "OR";
     type: string;

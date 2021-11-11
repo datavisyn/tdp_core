@@ -2,8 +2,12 @@ from functools import reduce
 from operator import and_, or_, eq
 from re import match
 from typing import Dict, List, Any
-
 from marshmallow import Schema, post_load, INCLUDE, fields
+
+
+# Create a subclass of dict to allow adding arbitrary attributes
+class MyDict(dict):
+    pass
 
 
 # This method contains all filter classes to avoid cyclic dependencies
@@ -26,10 +30,13 @@ class Filter(Schema):
     filters = {f.__name__.lower(): f for f in Filter.__subclasses__()}
     assert type in filters, f"Error: Filter type {type} doesn't exist in {filters.values()}"
     sub_cls = filters[type]
-    # _prvate so it doesn't get serialized
-    data["_filt"] = filt = sub_cls().load(data)
-    data["_apply"] = lambda items: list(filter(filt, items))
-    return data
+    filt = sub_cls().load(data)
+    # Create a MyDict to allow adding attributes
+    new_data = MyDict(**data)
+    # _private attributes so it doesn't get serialized
+    setattr(new_data, '_filt', filt)
+    setattr(new_data, '_apply', lambda items: list(filter(filt, items)))
+    return new_data
 
 
 class FieldFilterMixin:
@@ -65,7 +72,7 @@ class Group(Filter):
   def postload(self, data: Dict, children: List, operator: str, **_):
     if not children:
       return lambda _: True
-    children = [Filter().load(child)["_filt"] for child in children]
+    children = [Filter().load(child)._filt for child in children]
     op = ALLOWED_OPERATORS[operator]
     return lambda d: reduce(op, [child(d) for child in children])
 
@@ -89,7 +96,7 @@ class Text(Filter, FieldFilterMixin):
   def postload(self, data: Dict, field: str, value: List[str], match_case: bool, match_exact: bool, **_):
     compare = eq if match_exact else str.__contains__
     if match_case:
-      compare = lambda a, b: compare(b.lower(), a.lower())  # nopep8    # ignore lambda assign
+      compare = lambda a, b: compare(b.lower(), a.lower())  # NOQA E731
     return lambda item: any(compare(FieldFilterMixin.access(item, field), v) for v in value)
 
 

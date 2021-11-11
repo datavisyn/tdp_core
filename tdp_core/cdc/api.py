@@ -1,13 +1,11 @@
 import logging
 from datetime import datetime
-
-import requests
 from flask_smorest import Api, Blueprint
-
 from phovea_server.ns import Namespace, abort, no_cache
 from phovea_server.security import login_required, can_write, can_read, current_username
 from phovea_server.util import jsonify
 from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema
+from .CDCManager import cdc_manager
 
 app = Namespace(__name__)
 app.config['OPENAPI_VERSION'] = '3.0.2'
@@ -26,9 +24,10 @@ blp = Blueprint(
   'cdc', __name__, url_prefix='/'
 )
 
-#@app.errorhandler(400)
-##@app.errorhandler(404)
-#@app.errorhandler(500)
+
+@app.errorhandler(400)
+@app.errorhandler(404)
+@app.errorhandler(500)
 def handle_error(e):
     return jsonify(error=str(e.description), code=e.code), e.code
 
@@ -43,10 +42,10 @@ def list_cdc():
 
 @app.route('/cdc/<id>', methods=['GET'])
 def execute_cdc(id: str):
-  cdc = cdc_manager.getCDC(id)
+  cdc = cdc_manager.get_cdc(id)
   if not cdc:
     abort(404, f'No cdc with id {id} available')
-  return cdc_manager.refreshCDC(cdc)
+  return cdc_manager.refresh_cdc(cdc)
 
 
 @no_cache
@@ -62,18 +61,12 @@ def get_alerts():
 @no_cache
 @login_required
 @blp.route('/alert', methods=["POST"])
-@blp.arguments(CDCAlertArgsSchema)
-# @blp.response(CDCAlertSchema, code=200)
+@blp.arguments(CDCAlertArgsSchema, location='json', description='Create an alert')
+@blp.response(CDCAlertSchema, code=200)
 def create_alert(data):
-    users = requests.get('https://jsonplaceholder.typicode.com/users').json()
-    for user in users:
-      user["Eins"] = user["Zwei"] = user["Drei"] = False
-    users[1]["Eins"] = users[2]["Zwei"] = users[3]["Drei"] = True
-    fusers = data["filter"]["_apply"](users)
-    return jsonify(fusers)
-
-    """
     session = create_session()
+    # session.query(CDCAlert).delete()
+    alert = CDCAlertSchema().load(data, partial=True, session=session)
     # Security
     alert.creator = current_username()
     alert.creation_date = datetime.utcnow()
@@ -86,7 +79,7 @@ def create_alert(data):
     session.add(alert)
     session.commit()
     return alert
-    """
+
 
 @no_cache
 @login_required
@@ -163,16 +156,10 @@ def confirm_alert_by_id(id: str):
         abort(401)
 
     if not alert.latest_fetched_data:
-        abort(500, f'No data to confirm for id {id}')
+        abort(400, f'No data to confirm for id {id}')
 
-    # TODO: How to confirm this override?
     alert.confirmation_date = datetime.utcnow()
     alert.confirmed_data = alert.latest_fetched_data
-    alert.confirmed_data[1]['name'] = 'Herbert'
-    alert.confirmed_data[2]['name'] = 'Herbert'
-    alert.confirmed_data[1]['address']['street'] = 'Dornach'
-    alert.confirmed_data[2]['address']['city'] = 'Lünz'
-
     alert.latest_compare_date = None
     alert.latest_fetched_data = None
     alert.latest_diff = None
