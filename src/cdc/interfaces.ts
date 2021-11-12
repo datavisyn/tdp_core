@@ -1,3 +1,5 @@
+import {ISecureItem} from "phovea_core";
+
 export interface IFilterComponent<V> {
   clazz: (props: {
     value: V;
@@ -46,7 +48,7 @@ export const getFilterFromTree = (
   return {parent: null, current: null};
 };
 
-export interface IAlert {
+export interface IAlert extends ISecureItem{
   id: number;
   name: string;
   cdc_id: string;
@@ -57,15 +59,17 @@ export interface IAlert {
     _cdc_compare_id: string;
     [key: string]: any;
   }[];
-  latest_compare_date: Date;
-  modification_date: string;
+  latest_compare_date?: Date;
+  modification_date?: string;
   confirmed_data?: {
     _cdc_compare_id: string;
     [key: string]: any;
   }[];
   confirmation_date: Date;
   compare_columns: string[];
-} //TODO: remove any
+  latest_error?: string;
+  latest_error_date?: Date;
+}
 
 export interface IUploadAlert extends Pick<IAlert, 'name' | 'cdc_id' | 'filter' | 'enable_mail_notification' | 'compare_columns'> {
   compare?: string[];

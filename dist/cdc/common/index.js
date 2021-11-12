@@ -1,2 +1,2 @@
-export * from './CDCAlertView';
+export * from './ErrorMessage';
 //# sourceMappingURL=index.js.map

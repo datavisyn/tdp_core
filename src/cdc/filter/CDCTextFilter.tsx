@@ -2,11 +2,6 @@ import {IFilter, IFilterComponent} from '../interfaces';
 import * as React from 'react';
 import Select from 'react-select';
 
-/* tslint:disable-next-line:no-empty-interface */
-export interface ICDCTextFilterValue {
-  // TODO: empty?
-}
-
 /* tslint:disable-next-line:variable-name */
 export const CDCTextFilterId = 'text';
 /* tslint:disable-next-line:variable-name */
@@ -15,7 +10,7 @@ export const CDCTextFilter: IFilterComponent<null> = {
   disableDropping: true
 };
 
-export function createCDCTextFilter(id: string, field: string, value: string[]): IFilter<ICDCTextFilterValue> {
+export function createCDCTextFilter(id: string, field: string, value: string[]): IFilter<string[]> {
   return {
     id,
     type: CDCTextFilterId,
@@ -32,7 +27,10 @@ export function CDCTextFilterComponent({value, onValueChanged, onFieldChanged, d
           isDisabled={!onValueChanged || disabled}
           value={{label: field, value: field}}
           options={[...config?.map((conf) => {return {label: conf.field, value: conf.field};})]}
-          onChange={(e) => onFieldChanged?.(e.value)}
+          onChange={(e) => {
+            onFieldChanged?.(e.value);
+            onValueChanged?.([]);
+          }}
         />
       </div>
       <div className="col-8 p-0">

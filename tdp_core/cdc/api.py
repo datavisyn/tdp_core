@@ -130,17 +130,27 @@ def run_alert_by_id(id: int):
     if not can_read(alert):
         abort(401)
 
-    new_data, diff = cdc_manager.run_alert(alert)
+    try: 
+        new_data, diff = cdc_manager.run_alert(alert)
 
-    if diff:
-        # We have a new diff! Send email? Store in db? ...
-        alert.latest_compare_date = datetime.utcnow()
-        alert.latest_fetched_data = new_data
-        alert.latest_diff = diff
-    # TODO else: also set latest diff to empty
+        if diff:
+            # We have a new diff! Send email? Store in db? ...
+            alert.latest_compare_date = datetime.utcnow()
+            alert.latest_fetched_data = new_data
+            alert.latest_diff = diff
+        # TODO else: also set latest diff to empty
+        
+        alert.latest_error = None
+        alert.latest_error_date = None
 
-    session.commit()
-    return alert, 200
+        session.commit()
+        return alert, 200
+
+    except Exception as e:
+        alert.latest_error = str(e)
+        alert.latest_error_date = datetime.utcnow()
+        session.commit()
+        abort(400)
 
 
 @no_cache

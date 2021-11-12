@@ -3,16 +3,8 @@ import * as React from 'react';
 import InputRange from 'react-input-range';
 
 export interface ICDCRangeFilterValue {
-  config: {
-    minValue: number;
-    maxValue: number;
-    label: string;
-    field: string;
-  };
-  value: {
-    min: number;
-    max: number;
-  };
+  min: number;
+  max: number;
 }
 
 /* tslint:disable-next-line:variable-name */
@@ -23,7 +15,7 @@ export const CDCRangeFilter: IFilterComponent<null> = {
   disableDropping: true
 };
 
-export function createCDCRangeFilter(id: string, field: string, value: {min: number, max: number}): IFilter<ICDCRangeFilterValue> {
+export function createCDCRangeFilter(id: string, field: string, value: ICDCRangeFilterValue): IFilter<ICDCRangeFilterValue> {
   return {
     id,
     type: CDCRangeFilterId,

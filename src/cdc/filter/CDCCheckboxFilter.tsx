@@ -22,7 +22,6 @@ export function createCDCCheckboxFilter(id: string, value: ICDCCheckboxFilterVal
   };
 }
 
-
 export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, config}) {
   const onChange = (value, field, e) => {
     if (value[field] === false) {

@@ -51,7 +51,6 @@ export function CDCFilterDialog({ filterComponents, filtersByCDC, compareColumnO
             }
         }).catch((e) => console.error(e));
     };
-    console.log(filter);
     return React.createElement(React.Fragment, null,
         React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
             React.createElement("i", { className: "fas fa-filter", style: { marginRight: 4 } }),
@@ -105,6 +104,7 @@ export class CDCFilterDialogClass {
         parent.appendChild(this.node);
         this.init();
     }
+    //{id: .., filters: filter[], compareColumns: [], config: [id]: config} --> überschreibt die config einer bestimmten
     init() {
         ReactDOM.render(React.createElement(CDCFilterDialog, { filterComponents: {
                 [CDCGroupingFilterId]: { component: CDCGroupingFilter },
@@ -113,6 +113,7 @@ export class CDCFilterDialogClass {
                 [CDCRangeFilterId]: { component: CDCRangeFilter, config: { minValue: 1, maxValue: 10 } }
             }, filtersByCDC: {
                 'JSONPlaceholderUserCDC': [
+                    // [CDCTextFilterId]: {filter (defaultwert): createCDCGroupingFilter(uuidv4()), component: CDCTextFilter, config: [{field: 'address.city', options: ['Gwenborough', 'Wisokyburgh', 'McKenziehaven', 'Roscoeview', 'Aliyaview', 'Howemouth']}, {field: 'address.zipcode', options: ['33263', '23505-1337', '58804-1099']}, {field: 'name', options: ['Leanne Graham', 'Ervin Howell', 'Glenna Reichert', 'Clementina DuBuque']}]},
                     createCDCGroupingFilter(uuidv4()),
                     createCDCTextFilter(uuidv4(), 'Select...', null),
                     createCDCCheckboxFilter(uuidv4(), {}),

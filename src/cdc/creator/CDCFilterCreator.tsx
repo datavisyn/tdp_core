@@ -98,7 +98,7 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, filterComp
   };
 
   if(filter.type !== 'group') {
-    throw Error('First filter always has to be a group filter');
+    throw Error('First filter always has to be a group filter!');
   }
 
   return (

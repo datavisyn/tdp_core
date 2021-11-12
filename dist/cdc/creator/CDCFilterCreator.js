@@ -77,7 +77,7 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, filterCom
         });
     };
     if (filter.type !== 'group') {
-        throw Error('First filter always has to be a group filter');
+        throw Error('First filter always has to be a group filter!');
     }
     return (React.createElement(DndProvider, { backend: HTML5Backend },
         React.createElement("div", { className: "row" },

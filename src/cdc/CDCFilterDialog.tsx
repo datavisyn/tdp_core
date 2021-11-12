@@ -66,8 +66,6 @@ export function CDCFilterDialog({filterComponents, filtersByCDC, compareColumnOp
     }).catch((e) => console.error(e));
   };
 
-  console.log(filter);
-
   return <>
     <a style={{color: 'white', cursor: 'pointer'}} onClick={() => setShowDialog(true)}><i className="fas fa-filter" style={{marginRight: 4}}></i> Alert Filter</a>
     <BSModal show={showDialog} setShow={setShowDialog}>
@@ -138,8 +136,9 @@ export class CDCFilterDialogClass {
     this.node = document.createElement('div');
     parent.appendChild(this.node);
     this.init();
-  }
 
+  }
+//{id: .., filters: filter[], compareColumns: [], config: [id]: config} --> überschreibt die config einer bestimmten
   private init() {
     ReactDOM.render(
       <CDCFilterDialog
@@ -151,10 +150,12 @@ export class CDCFilterDialogClass {
         }}
         filtersByCDC={{
           'JSONPlaceholderUserCDC': [
+            // [CDCTextFilterId]: {filter (defaultwert): createCDCGroupingFilter(uuidv4()), component: CDCTextFilter, config: [{field: 'address.city', options: ['Gwenborough', 'Wisokyburgh', 'McKenziehaven', 'Roscoeview', 'Aliyaview', 'Howemouth']}, {field: 'address.zipcode', options: ['33263', '23505-1337', '58804-1099']}, {field: 'name', options: ['Leanne Graham', 'Ervin Howell', 'Glenna Reichert', 'Clementina DuBuque']}]},
             createCDCGroupingFilter(uuidv4()),
             createCDCTextFilter(uuidv4(), 'Select...', null),
             createCDCCheckboxFilter(uuidv4(), {}),
             createCDCRangeFilter(uuidv4(), 'id', {min: 1, max: 10}),
+            //compareComlumns
           ],
           'JSONPlaceholderPostsCDC': [
             createCDCGroupingFilter(uuidv4()),
