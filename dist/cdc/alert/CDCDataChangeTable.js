@@ -29,7 +29,6 @@ export function CDCDataChangeTable({ selectedAlert, onAlertChanged }) {
         const alert = await confirmAlertById(selectedAlert.id);
         onAlertChanged(alert.id);
     }, false);
-    //loading icon when loading
     return (React.createElement(React.Fragment, null, selectedAlert.latest_diff || selectedAlert.confirmed_data ? (React.createElement(React.Fragment, null,
         React.createElement("table", { className: "table mb-0" },
             React.createElement("thead", null,
@@ -73,7 +72,7 @@ export function CDCDataChangeTable({ selectedAlert, onAlertChanged }) {
                             React.createElement("td", null, hasChanged ? React.createElement(React.Fragment, null, "Changed") : null)));
                 })) : null)),
         selectedAlert.latest_diff ? React.createElement("div", { className: "p-1" },
-            React.createElement(ErrorMessage, { error: confirmError, onRetry: () => doConfirm() }),
+            React.createElement(ErrorMessage, { error: confirmError }),
             React.createElement("div", { className: "d-md-flex justify-content-md-end" },
                 React.createElement("button", { disabled: confirmStatus === 'pending', title: "Confirm changes", className: "btn btn-primary", onClick: () => doConfirm() }, "Confirm"))) : null)) : React.createElement("p", null, "No new data available")));
 }

@@ -1,11 +1,12 @@
 import React from 'react';
 import Select from 'react-select';
-import { CDC_DEFAULT_FILTER, runAlert } from '..';
+import { CDC_DEFAULT_FILTER, ErrorMessage, runAlert } from '..';
+import { useAsync } from '../../hooks';
 import { deleteAlert, editAlert, saveAlert } from '../api';
 import { CDCFilterCreator } from '../creator';
 import { CDCDataChangeTable } from './CDCDataChangeTable';
 export function CDCAlertView({ alertData, setAlertData, filter, setFilter, onAlertChanged, selectedAlert, setCreationMode, creationMode, cdcConfig }) {
-    var _a, _b;
+    var _a;
     const [editMode, setEditMode] = React.useState(false);
     const [deleteMode, setDeleteMode] = React.useState(false);
     const [filterSelection, setFilterSelection] = React.useState();
@@ -13,6 +14,40 @@ export function CDCAlertView({ alertData, setAlertData, filter, setFilter, onAle
     const [filterComponents, setFilterComponents] = React.useState();
     const [validFilter, setValidFilter] = React.useState();
     const [validName, setValidName] = React.useState();
+    const { status: deleteStatus, error: deleteError, execute: doDelete } = useAsync(async () => {
+        setEditMode(false);
+        await deleteAlert(selectedAlert.id);
+        onAlertChanged();
+    }, false);
+    const { status: saveStatus, error: saveError, execute: doSave } = useAsync(async () => {
+        var _a;
+        const valFilter = (filter === null || filter === void 0 ? void 0 : filter.children.length) > 0;
+        const valName = ((_a = alertData === null || alertData === void 0 ? void 0 : alertData.name) === null || _a === void 0 ? void 0 : _a.trim().length) > 0;
+        if (valFilter && valName) {
+            let newAlert;
+            if (selectedAlert) {
+                newAlert = await editAlert(selectedAlert.id, { ...alertData, filter })
+                    .then((alert) => {
+                    return runAlert(alert.id).then((a) => {
+                        return a ? a : alert;
+                    });
+                });
+                setEditMode(false);
+            }
+            else {
+                newAlert = await saveAlert({ ...alertData, filter })
+                    .then((alert) => {
+                    return runAlert(alert.id).then((a) => {
+                        return a ? a : alert;
+                    });
+                });
+                setCreationMode(false);
+            }
+            onAlertChanged(newAlert.id);
+        }
+        setValidFilter(valFilter);
+        setValidName(valName);
+    }, false);
     // TODO: CDCs are more complex than just filters, i.e. they also have fields.
     const cdcs = Object.keys(cdcConfig);
     React.useEffect(() => {
@@ -25,47 +60,13 @@ export function CDCAlertView({ alertData, setAlertData, filter, setFilter, onAle
         setEditMode(false);
         setDeleteMode(false);
     }, [selectedAlert]);
-    const onCreateSave = async () => {
-        var _a;
-        const valFilter = (filter === null || filter === void 0 ? void 0 : filter.children.length) > 0;
-        const valName = ((_a = alertData === null || alertData === void 0 ? void 0 : alertData.name) === null || _a === void 0 ? void 0 : _a.trim().length) > 0;
-        if (valFilter && valName) {
-            const newAlert = await saveAlert({ ...alertData, filter })
-                .then((alert) => {
-                return runAlert(alert.id).then((a) => {
-                    return a ? a : alert;
-                });
-            });
-            onAlertChanged(newAlert.id);
-            setCreationMode(false);
-        }
-        setValidFilter(valFilter);
-        setValidName(valName);
-    };
-    const onEditSave = async () => {
-        if (validFilter && validName) {
-            const newAlert = await editAlert(selectedAlert.id, { ...alertData, filter })
-                .then((alert) => {
-                return runAlert(alert.id).then((a) => {
-                    return a ? a : alert;
-                });
-            });
-            onAlertChanged(newAlert.id);
-            setEditMode(false);
-        }
-    };
     const onDiscard = () => {
         setEditMode(false);
         setAlertData(selectedAlert);
         setFilter(selectedAlert.filter);
     };
-    const onDelete = async (id) => {
-        setEditMode(false);
-        await deleteAlert(id);
-        onAlertChanged();
-    };
     const onCDCChanged = (e) => {
-        setAlertData({ ...alertData, cdc_id: e.value });
+        setAlertData({ ...alertData, cdc_id: e.value, compare_columns: null });
         setFilter(CDC_DEFAULT_FILTER);
     };
     const editButton = !editMode && !deleteMode && !creationMode ? (React.createElement(React.Fragment, null,
@@ -73,17 +74,17 @@ export function CDCAlertView({ alertData, setAlertData, filter, setFilter, onAle
             React.createElement("i", { className: "fas fa-pencil-alt" })),
         React.createElement("button", { title: "Delete Alert", className: "btn btn-text-secondary", onClick: () => setDeleteMode(true) },
             React.createElement("i", { className: "fas fa-trash" })))) : (editMode || creationMode ? React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: editMode ? () => onEditSave() : () => onCreateSave() },
+        React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: () => doSave() },
             React.createElement("i", { className: "fas fa-save" })),
         React.createElement("button", { title: "Discard changes", className: "btn btn-text-secondary ms-1", onClick: editMode ? () => onDiscard() : () => setCreationMode(false) },
             React.createElement("i", { className: "fas fa-times" }))) : React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Delete", className: "btn btn-text-secondary", onClick: () => onDelete(selectedAlert.id) },
+        React.createElement("button", { title: "Delete", className: "btn btn-text-secondary", onClick: () => doDelete() },
             React.createElement("i", { className: "fas fa-check" })),
         React.createElement("button", { title: "No Delete", className: "btn btn-text-secondary ms-1", onClick: () => setDeleteMode(false) },
             React.createElement("i", { className: "fas fa-times" }))));
     return (React.createElement(React.Fragment, null,
-        React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },
-            React.createElement("h5", null, "Your options"),
+        React.createElement("div", { className: "d-md-flex justify-content-md-end" },
+            React.createElement(ErrorMessage, { error: deleteError || saveError }),
             React.createElement("small", null, editButton)),
         React.createElement("div", { className: "accordion", id: "editAlert" },
             !editMode && !creationMode ?
@@ -112,7 +113,9 @@ export function CDCAlertView({ alertData, setAlertData, filter, setFilter, onAle
                             React.createElement(Select, { isDisabled: !creationMode && !editMode, options: cdcs.map((c) => ({ label: c, value: c })), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: (e) => onCDCChanged(e) })),
                         React.createElement("div", { className: "mb-3 col pe-2" },
                             React.createElement("label", { className: "form-label" }, "Change Fields"),
-                            React.createElement(Select, { isMulti: true, isDisabled: !creationMode && !editMode, closeMenuOnSelect: false, options: compareColumns === null || compareColumns === void 0 ? void 0 : compareColumns.map((c) => ({ label: c, value: c })), value: (_b = alertData.compare_columns) === null || _b === void 0 ? void 0 : _b.map((c) => ({ label: c, value: c })), onChange: (e) => setAlertData({ ...alertData, compare_columns: e.map((col) => col.value) }) })),
+                            React.createElement(Select, { isMulti: true, isDisabled: !creationMode && !editMode, closeMenuOnSelect: false, options: compareColumns === null || compareColumns === void 0 ? void 0 : compareColumns.map((c) => ({ label: c, value: c })), 
+                                //check for compare_columns because otherwise it would not reset the selection after the cdc_id was changed
+                                value: alertData.compare_columns ? alertData.compare_columns.map((c) => ({ label: c, value: c })) : null, onChange: (e) => setAlertData({ ...alertData, compare_columns: e.map((col) => col.value) }) })),
                         React.createElement("div", { className: "mb-3 col" },
                             React.createElement("label", { className: "form-label" }, "Email notification"),
                             React.createElement("div", { className: "form-check" },

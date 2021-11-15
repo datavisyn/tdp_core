@@ -35,8 +35,6 @@ export function CDCDataChangeTable({selectedAlert, onAlertChanged}: ICDCDataChan
     onAlertChanged(alert.id);
   }, false);
 
-  //loading icon when loading
-
   return (<>
     {selectedAlert.latest_diff || selectedAlert.confirmed_data ? (<>
       <table className="table mb-0">
@@ -96,7 +94,7 @@ export function CDCDataChangeTable({selectedAlert, onAlertChanged}: ICDCDataChan
         </tbody>
       </table>
       {selectedAlert.latest_diff ? <div className="p-1">
-        <ErrorMessage error={confirmError} onRetry={() => doConfirm()} />
+        <ErrorMessage error={confirmError} />
         <div className="d-md-flex justify-content-md-end">
           <button disabled={confirmStatus === 'pending'} title="Confirm changes" className="btn btn-primary" onClick={() => doConfirm()}>Confirm</button>
         </div>
@@ -104,3 +102,5 @@ export function CDCDataChangeTable({selectedAlert, onAlertChanged}: ICDCDataChan
     </>) : <p>No new data available</p>}
   </>);
 }
+
+

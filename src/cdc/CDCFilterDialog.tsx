@@ -1,12 +1,14 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
-import {IAlert, IFilter, IFilterComponent, IUploadAlert, ICDCConfiguration} from './interfaces';
+import {IAlert, IFilter, IUploadAlert, ICDCConfiguration} from './interfaces';
 import {getAlerts, runAlertById} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter, CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter, CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter} from './filter';
 import {v4 as uuidv4} from 'uuid';
 import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './filter/CDCTextFilter';
 import {CDCAlertView} from './alert/CDCAlertView';
+import {ErrorMessage} from './common';
+import {runAllAlerts} from '.';
 
 interface ICDCFilterDialogProps {
   cdcConfig: {[cdcId: string]: ICDCConfiguration};
@@ -29,6 +31,13 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
   const [filter, setFilter] = React.useState<IFilter>();
   const [alertData, setAlertData] = React.useState<IUploadAlert>();
   const {status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts} = useAsync(getAlerts, true);
+  const {status: syncStatus, error: syncError, execute: doSync} = useAsync(async () => {
+    const result = await runAllAlerts()
+    if (result.error?.length > 0) {
+      throw `Alert(s) [${result.error.join(',')}] could not be synchronized!`;
+    }
+    onAlertChanged(selectedAlert?.id);
+  }, false);
 
   React.useEffect(() => {
     setAlertData(CDC_DEFAULT_ALERT_DATA);
@@ -61,6 +70,19 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
     }).catch((e) => console.error(e));
   };
 
+  const reviewStatus = (alert: IAlert) => {
+    switch (true) {
+      case (alert.latest_error != null):
+        return `Error from Sync: ${new Date(alert.latest_error_date)?.toLocaleDateString()}`;
+      case (alert.latest_diff != null):
+        return 'Pending data revision';
+      case (alert.confirmation_date != null):
+        return `Last confirmed: ${new Date(alert.confirmation_date)?.toLocaleDateString()}`;
+      default:
+        return 'No data revision yet';
+    }
+  }
+
   return <>
     <a style={{color: 'white', cursor: 'pointer'}} onClick={() => setShowDialog(true)}><i className="fas fa-filter" style={{marginRight: 4}}></i> Alert Filter</a>
     <BSModal show={showDialog} setShow={setShowDialog}>
@@ -74,8 +96,7 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
             <div className="modal-body">
               <div className="row">
                 <div className="col-3 overflow-auto">
-                  <div className="d-flex w-100 justify-content-between mb-1">
-                    <h5>Your alerts</h5>
+                  <div className="d-md-flex justify-content-md-end">
                     <small><button className="btn btn-text-secondary" onClick={() => onCreateButtonClick()}><i className="fas fa-plus"></i></button></small>
                   </div>
                   {alertStatus === 'pending' ? <>Loading...</> : null}
@@ -85,8 +106,9 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
                       <div className="d-flex w-100 justify-content-between">
                         <h6 title={`${alert.name} for ${alert.cdc_id}`} className="mb-1 overflow-hidden">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
                         {alert?.latest_diff ? <small><i className="fas fa-circle text-primary"></i></small> : null}
+                        {alert?.latest_error ? <small><i className="fas fa-exclamation-triangle text-danger"></i></small> : null}
                       </div>
-                      <small>{!alert?.latest_diff && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${new Date(alert.confirmation_date)?.toLocaleDateString()}`}</small>
+                      <small>{reviewStatus(alert)}</small>
                     </a></div>
                   )}</div> : null}
                 </div>
@@ -109,10 +131,9 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
               </div>
             </div>
             <div className="modal-footer">
+              <ErrorMessage error={syncError} />
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" onClick={() => {
-                Promise.all(alerts?.map((alert) => runAlert(alert?.id))).then(() => onAlertChanged(selectedAlert?.id));
-              }} className="btn btn-secondary">Sync</button>
+              <button type="button" disabled={syncStatus === 'pending'} title="Sync alerts" className="btn btn-secondary" onClick={() => doSync()}>Sync</button>
             </div>
           </div>
         </div>
@@ -147,7 +168,7 @@ export class CDCFilterDialogClass {
               [CDCCheckboxFilterId]: {component: CDCCheckboxFilter, config: {fields: ['Eins', 'Zwei', 'Drei']}},
               [CDCRangeFilterId]: {component: CDCRangeFilter, config: {minValue: 1, maxValue: 10}}
             },
-            compareColumns: ['id', 'name', 'address.street', 'adress.city', 'address.zipcode']
+            compareColumns: ['id', 'name', 'address.street', 'address.city', 'address.zipcode']
           },
           'JSONPlaceholderPostsCDC': {
             filters: [
@@ -166,3 +187,4 @@ export class CDCFilterDialogClass {
     );
   }
 }
+

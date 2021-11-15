@@ -5,7 +5,6 @@ import {HTML5Backend} from 'react-dnd-html5-backend';
 import {FilterCard} from './CDCFilterCard';
 import {getFilterFromTree, IFilter, IFilterComponent} from '../interfaces';
 import {v4 as uuidv4} from 'uuid';
-import {CDCGroupingFilter} from '..';
 
 interface ICDCFilterCreatorProps {
   filterComponents?: {[key: string]: {component: IFilterComponent<any>, config?: any}};

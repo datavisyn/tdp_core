@@ -39,3 +39,7 @@ export async function runAlertById(id: number): Promise<IAlert | null> {
 export async function confirmAlertById(id: number): Promise<IAlert | null> {
   return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/confirm`);
 }
+
+export async function runAllAlerts(): Promise<{success: string[], error: string[]} | null> {
+  return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/run`);
+}

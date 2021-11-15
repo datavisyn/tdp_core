@@ -6,6 +6,8 @@ import { CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter, CDCChe
 import { v4 as uuidv4 } from 'uuid';
 import { CDCTextFilter, CDCTextFilterId, createCDCTextFilter } from './filter/CDCTextFilter';
 import { CDCAlertView } from './alert/CDCAlertView';
+import { ErrorMessage } from './common';
+import { runAllAlerts } from '.';
 export const CDC_DEFAULT_ALERT_DATA = { name: '', enable_mail_notification: false, cdc_id: 'JSONPlaceholderUserCDC', filter: null, compare_columns: null };
 export const CDC_DEFAULT_FILTER = { ...createCDCGroupingFilter(uuidv4()) };
 export const runAlert = async (id) => {
@@ -21,6 +23,14 @@ export function CDCFilterDialog({ cdcConfig }) {
     const [filter, setFilter] = React.useState();
     const [alertData, setAlertData] = React.useState();
     const { status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts } = useAsync(getAlerts, true);
+    const { status: syncStatus, error: syncError, execute: doSync } = useAsync(async () => {
+        var _a;
+        const result = await runAllAlerts();
+        if (((_a = result.error) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+            throw `Alert(s) [${result.error.join(',')}] could not be synchronized!`;
+        }
+        onAlertChanged(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id);
+    }, false);
     React.useEffect(() => {
         setAlertData(CDC_DEFAULT_ALERT_DATA);
         setFilter(CDC_DEFAULT_FILTER);
@@ -49,6 +59,19 @@ export function CDCFilterDialog({ cdcConfig }) {
             }
         }).catch((e) => console.error(e));
     };
+    const reviewStatus = (alert) => {
+        var _a, _b;
+        switch (true) {
+            case (alert.latest_error != null):
+                return `Error from Sync: ${(_a = new Date(alert.latest_error_date)) === null || _a === void 0 ? void 0 : _a.toLocaleDateString()}`;
+            case (alert.latest_diff != null):
+                return 'Pending data revision';
+            case (alert.confirmation_date != null):
+                return `Last confirmed: ${(_b = new Date(alert.confirmation_date)) === null || _b === void 0 ? void 0 : _b.toLocaleDateString()}`;
+            default:
+                return 'No data revision yet';
+        }
+    };
     return React.createElement(React.Fragment, null,
         React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
             React.createElement("i", { className: "fas fa-filter", style: { marginRight: 4 } }),
@@ -63,8 +86,7 @@ export function CDCFilterDialog({ cdcConfig }) {
                         React.createElement("div", { className: "modal-body" },
                             React.createElement("div", { className: "row" },
                                 React.createElement("div", { className: "col-3 overflow-auto" },
-                                    React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },
-                                        React.createElement("h5", null, "Your alerts"),
+                                    React.createElement("div", { className: "d-md-flex justify-content-md-end" },
                                         React.createElement("small", null,
                                             React.createElement("button", { className: "btn btn-text-secondary", onClick: () => onCreateButtonClick() },
                                                 React.createElement("i", { className: "fas fa-plus" })))),
@@ -72,29 +94,27 @@ export function CDCFilterDialog({ cdcConfig }) {
                                     alertStatus === 'error' ? React.createElement(React.Fragment, null,
                                         "Error ",
                                         alertError.toString()) : null,
-                                    alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alerts.map((alert) => {
-                                        var _a;
-                                        return React.createElement("div", { key: alert.id },
-                                            React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id) === (alert === null || alert === void 0 ? void 0 : alert.id) ? ' border-primary' : ''}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
-                                                React.createElement("div", { className: "d-flex w-100 justify-content-between" },
-                                                    React.createElement("h6", { title: `${alert.name} for ${alert.cdc_id}`, className: "mb-1 overflow-hidden" },
-                                                        alert.name,
-                                                        " ",
-                                                        React.createElement("small", { className: "text-muted" },
-                                                            "for ",
-                                                            alert.cdc_id)),
-                                                    (alert === null || alert === void 0 ? void 0 : alert.latest_diff) ? React.createElement("small", null,
-                                                        React.createElement("i", { className: "fas fa-circle text-primary" })) : null),
-                                                React.createElement("small", null, !(alert === null || alert === void 0 ? void 0 : alert.latest_diff) && !alert.confirmed_data ? 'No data revision yet' : alert.latest_diff ? 'Pending data revision' : `Last confirmed: ${(_a = new Date(alert.confirmation_date)) === null || _a === void 0 ? void 0 : _a.toLocaleDateString()}`)));
-                                    })) : null),
+                                    alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alerts.map((alert) => React.createElement("div", { key: alert.id },
+                                        React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id) === (alert === null || alert === void 0 ? void 0 : alert.id) ? ' border-primary' : ''}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
+                                            React.createElement("div", { className: "d-flex w-100 justify-content-between" },
+                                                React.createElement("h6", { title: `${alert.name} for ${alert.cdc_id}`, className: "mb-1 overflow-hidden" },
+                                                    alert.name,
+                                                    " ",
+                                                    React.createElement("small", { className: "text-muted" },
+                                                        "for ",
+                                                        alert.cdc_id)),
+                                                (alert === null || alert === void 0 ? void 0 : alert.latest_diff) ? React.createElement("small", null,
+                                                    React.createElement("i", { className: "fas fa-circle text-primary" })) : null,
+                                                (alert === null || alert === void 0 ? void 0 : alert.latest_error) ? React.createElement("small", null,
+                                                    React.createElement("i", { className: "fas fa-exclamation-triangle text-danger" })) : null),
+                                            React.createElement("small", null, reviewStatus(alert)))))) : null),
                                 React.createElement("div", { className: "col-9 overflow-auto" }, selectedAlert || creationMode ?
                                     React.createElement(CDCAlertView, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, onAlertChanged: onAlertChanged, setCreationMode: setCreationMode, selectedAlert: selectedAlert, creationMode: creationMode, cdcConfig: cdcConfig })
                                     : null))),
                         React.createElement("div", { className: "modal-footer" },
+                            React.createElement(ErrorMessage, { error: syncError }),
                             React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
-                            React.createElement("button", { type: "button", onClick: () => {
-                                    Promise.all(alerts === null || alerts === void 0 ? void 0 : alerts.map((alert) => runAlert(alert === null || alert === void 0 ? void 0 : alert.id))).then(() => onAlertChanged(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id));
-                                }, className: "btn btn-secondary" }, "Sync")))))));
+                            React.createElement("button", { type: "button", disabled: syncStatus === 'pending', title: "Sync alerts", className: "btn btn-secondary", onClick: () => doSync() }, "Sync")))))));
 }
 export class CDCFilterDialogClass {
     constructor(parent) {
@@ -117,7 +137,7 @@ export class CDCFilterDialogClass {
                         [CDCCheckboxFilterId]: { component: CDCCheckboxFilter, config: { fields: ['Eins', 'Zwei', 'Drei'] } },
                         [CDCRangeFilterId]: { component: CDCRangeFilter, config: { minValue: 1, maxValue: 10 } }
                     },
-                    compareColumns: ['id', 'name', 'address.street', 'adress.city', 'address.zipcode']
+                    compareColumns: ['id', 'name', 'address.street', 'address.city', 'address.zipcode']
                 },
                 'JSONPlaceholderPostsCDC': {
                     filters: [

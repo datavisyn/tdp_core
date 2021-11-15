@@ -48,9 +48,12 @@ class FieldFilterMixin:
   def access(item, field: str) -> Any:
     for field_name in field.split("."):
       assert not field_name.startswith("_"), "Private access detected."
+      if item is None:
+        return None
 
       # get array-calls
       m = match(r"(.*)\[(.*)\\]", field)
+
       if m:
         field_name, field_idx = m.groups()
         item = getattr(item, field_name).__getitem__(field_idx)

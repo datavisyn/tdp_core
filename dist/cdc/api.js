@@ -30,4 +30,7 @@ export async function runAlertById(id) {
 export async function confirmAlertById(id) {
     return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/${id}/confirm`);
 }
+export async function runAllAlerts() {
+    return AppContext.getInstance().getAPIJSON(`/tdp/cdc/alert/run`);
+}
 //# sourceMappingURL=api.js.map

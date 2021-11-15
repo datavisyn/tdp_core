@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from re import A
 from flask_smorest import Api, Blueprint
 from phovea_server.ns import Namespace, abort, no_cache
 from phovea_server.security import login_required, can_write, can_read, current_username
@@ -24,6 +25,18 @@ blp = Blueprint(
   'cdc', __name__, url_prefix='/'
 )
 
+def run_alert(alert: CDCAlert):
+    new_data, diff = cdc_manager.run_alert(alert)
+
+    if diff:
+        # We have a new diff! Send email? Store in db? ...
+        alert.latest_compare_date = datetime.utcnow()
+        alert.latest_fetched_data = new_data
+        alert.latest_diff = diff
+    # TODO else: also set latest diff to empty
+    
+    alert.latest_error = None
+    alert.latest_error_date = None
 
 @app.errorhandler(400)
 @app.errorhandler(404)
@@ -120,6 +133,25 @@ def delete_alert_by_id(id: int):
 
 @no_cache
 @login_required
+@blp.route('/alert/run', methods=["GET"])
+@blp.response(CDCAlertSchema(many=True,), code=200)
+def run_all_alerts():
+    session = create_session()
+    alerts = session.query(CDCAlert).all()
+    result = {'success': [], 'error': []}
+    for alert in alerts:
+        try:
+            run_alert(alert)
+            result['success'].append(alert.id)
+        except:
+            result['error'].append(alert.id)
+
+    session.commit()
+    return jsonify(result)
+
+
+@no_cache
+@login_required
 @blp.route('/alert/<id>/run', methods=["GET"])
 @blp.response(CDCAlertSchema(), code=200)
 def run_alert_by_id(id: int):
@@ -131,18 +163,7 @@ def run_alert_by_id(id: int):
         abort(401)
 
     try: 
-        new_data, diff = cdc_manager.run_alert(alert)
-
-        if diff:
-            # We have a new diff! Send email? Store in db? ...
-            alert.latest_compare_date = datetime.utcnow()
-            alert.latest_fetched_data = new_data
-            alert.latest_diff = diff
-        # TODO else: also set latest diff to empty
-        
-        alert.latest_error = None
-        alert.latest_error_date = None
-
+        run_alert(alert)
         session.commit()
         return alert, 200
 

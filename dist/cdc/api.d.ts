@@ -16,3 +16,7 @@ export declare function deleteAlert(id: number): Promise<void>;
 export declare function saveAlert(alert: IUploadAlert): Promise<IAlert | null>;
 export declare function runAlertById(id: number): Promise<IAlert | null>;
 export declare function confirmAlertById(id: number): Promise<IAlert | null>;
+export declare function runAllAlerts(): Promise<{
+    success: string[];
+    error: string[];
+} | null>;
