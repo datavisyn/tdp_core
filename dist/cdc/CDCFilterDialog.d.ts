@@ -1,16 +1,9 @@
 /// <reference types="react" />
-import { IAlert, IFilter, IFilterComponent, IUploadAlert } from './interfaces';
+import { IAlert, IFilter, IUploadAlert, ICDCConfiguration } from './interfaces';
 interface ICDCFilterDialogProps {
-    filterComponents: {
-        [key: string]: {
-            component: IFilterComponent<any>;
-            config?: any;
-        };
+    cdcConfig: {
+        [cdcId: string]: ICDCConfiguration;
     };
-    filtersByCDC: {
-        [cdcId: string]: IFilter<any>[];
-    };
-    compareColumnOptions: string[];
 }
 export declare const CDC_DEFAULT_ALERT_DATA: IUploadAlert;
 export declare const CDC_DEFAULT_FILTER: {
@@ -22,7 +15,7 @@ export declare const CDC_DEFAULT_FILTER: {
     children?: IFilter<any>[];
 };
 export declare const runAlert: (id: number) => Promise<IAlert>;
-export declare function CDCFilterDialog({ filterComponents, filtersByCDC, compareColumnOptions }: ICDCFilterDialogProps): JSX.Element;
+export declare function CDCFilterDialog({ cdcConfig }: ICDCFilterDialogProps): JSX.Element;
 export declare class CDCFilterDialogClass {
     private node;
     constructor(parent: HTMLElement);

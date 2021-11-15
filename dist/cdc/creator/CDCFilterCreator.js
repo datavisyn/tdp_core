@@ -5,7 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FilterCard } from './CDCFilterCard';
 import { getFilterFromTree } from '../interfaces';
 import { v4 as uuidv4 } from 'uuid';
-export function CDCFilterCreator({ filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid }) {
+export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents }) {
     const onDelete = (newFilter) => {
         setFilter((filter) => produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);

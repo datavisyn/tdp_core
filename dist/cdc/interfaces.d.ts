@@ -19,6 +19,16 @@ export interface IFilter<V = any> {
     field?: string;
     children?: IFilter[];
 }
+export interface ICDCConfiguration {
+    filters: IFilter[];
+    components: {
+        [key: string]: {
+            component: IFilterComponent<any>;
+            config?: any;
+        };
+    };
+    compareColumns: string[];
+}
 export declare const itemTypes: {
     FILTERCARD: string;
 };

@@ -1,23 +1,17 @@
 /// <reference types="react" />
-import { IAlert, IFilter, IFilterComponent, IUploadAlert } from '../interfaces';
+import { IAlert, IFilter, IUploadAlert, ICDCConfiguration } from '../interfaces';
 interface ICDCEditAlert {
     alertData: IUploadAlert;
     setAlertData: (formData: IUploadAlert) => void;
-    filterSelection?: IFilter<any>[];
     filter: IFilter;
     setFilter: (filter: IFilter) => void;
-    filterComponents: {
-        [key: string]: {
-            component: IFilterComponent<any>;
-            config?: any;
-        };
-    };
     onAlertChanged: (id?: number) => void;
     selectedAlert?: IAlert;
-    cdcs: string[];
-    compareColumnOptions: string[];
     creationMode: boolean;
     setCreationMode: (mode: boolean) => void;
+    cdcConfig: {
+        [cdcId: string]: ICDCConfiguration;
+    };
 }
-export declare function CDCAlertView({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs, compareColumnOptions, setCreationMode, creationMode }: ICDCEditAlert): JSX.Element;
+export declare function CDCAlertView({ alertData, setAlertData, filter, setFilter, onAlertChanged, selectedAlert, setCreationMode, creationMode, cdcConfig }: ICDCEditAlert): JSX.Element;
 export {};

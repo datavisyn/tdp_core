@@ -25,7 +25,9 @@ export function CDCTextFilterComponent({value, onValueChanged, onFieldChanged, d
       <div className="col-4 p-0">
         <Select
           isDisabled={!onValueChanged || disabled}
-          value={{label: field, value: field}}
+          value={{label: field, value: field}}          
+          maxMenuHeight={200}
+          menuPlacement="auto"
           options={[...config?.map((conf) => {return {label: conf.field, value: conf.field};})]}
           onChange={(e) => {
             onFieldChanged?.(e.value);
@@ -37,6 +39,8 @@ export function CDCTextFilterComponent({value, onValueChanged, onFieldChanged, d
         <Select
           closeMenuOnSelect={false}
           isDisabled={!onValueChanged || disabled || !field}
+          maxMenuHeight={200}
+          menuPlacement="auto"
           isMulti
           value={value?.map((v) => {return {label: v, value: v};})}
           options={config?.find((f) => f?.field === field)?.options.map((o) => {return {label: o, value: o};})}

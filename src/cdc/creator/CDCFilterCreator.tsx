@@ -5,17 +5,18 @@ import {HTML5Backend} from 'react-dnd-html5-backend';
 import {FilterCard} from './CDCFilterCard';
 import {getFilterFromTree, IFilter, IFilterComponent} from '../interfaces';
 import {v4 as uuidv4} from 'uuid';
+import {CDCGroupingFilter} from '..';
 
 interface ICDCFilterCreatorProps {
-  filterSelection?: IFilter<any>[];
+  filterComponents?: {[key: string]: {component: IFilterComponent<any>, config?: any}};
+  filterSelection?: IFilter[];
   filter: IFilter;
   setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
-  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   disableFilter?: boolean;
   isInvalid?: boolean;
 }
 
-export function CDCFilterCreator({filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid}: ICDCFilterCreatorProps) {
+export function CDCFilterCreator({filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents}: ICDCFilterCreatorProps) {
   const onDelete = (newFilter: IFilter) => {
     setFilter((filter) => produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);

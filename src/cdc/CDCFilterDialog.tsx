@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
-import {IAlert, IFilter, IFilterComponent, IUploadAlert} from './interfaces';
+import {IAlert, IFilter, IFilterComponent, IUploadAlert, ICDCConfiguration} from './interfaces';
 import {getAlerts, runAlertById} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter, CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter, CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter} from './filter';
 import {v4 as uuidv4} from 'uuid';
@@ -9,9 +9,7 @@ import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './filter/CDCT
 import {CDCAlertView} from './alert/CDCAlertView';
 
 interface ICDCFilterDialogProps {
-  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
-  filtersByCDC: {[cdcId: string]: IFilter<any>[]};
-  compareColumnOptions: string[];
+  cdcConfig: {[cdcId: string]: ICDCConfiguration};
 }
 
 export const CDC_DEFAULT_ALERT_DATA: IUploadAlert = {name: '', enable_mail_notification: false, cdc_id: 'JSONPlaceholderUserCDC', filter: null, compare_columns: null};
@@ -24,16 +22,13 @@ export const runAlert = async (id: number): Promise<IAlert> => {
   });
 };
 
-export function CDCFilterDialog({filterComponents, filtersByCDC, compareColumnOptions}: ICDCFilterDialogProps) {
+export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
   const [selectedAlert, setSelectedAlert] = React.useState<IAlert>();
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [creationMode, setCreationMode] = React.useState<boolean>(false);
   const [filter, setFilter] = React.useState<IFilter>();
   const [alertData, setAlertData] = React.useState<IUploadAlert>();
   const {status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts} = useAsync(getAlerts, true);
-
-  // TODO: CDCs are more complex than just filters, i.e. they also have fields.
-  const cdcs = Object.keys(filtersByCDC);
 
   React.useEffect(() => {
     setAlertData(CDC_DEFAULT_ALERT_DATA);
@@ -102,14 +97,11 @@ export function CDCFilterDialog({filterComponents, filtersByCDC, compareColumnOp
                       setAlertData={setAlertData}
                       filter={filter}
                       setFilter={setFilter}
-                      filterComponents={filterComponents}
-                      filterSelection={filtersByCDC[alertData.cdc_id]}
                       onAlertChanged={onAlertChanged}
                       setCreationMode={setCreationMode}
                       selectedAlert={selectedAlert}
-                      cdcs={cdcs}
-                      compareColumnOptions={compareColumnOptions}
                       creationMode={creationMode}
+                      cdcConfig={cdcConfig}
                     />
                     : null
                   }
@@ -138,32 +130,37 @@ export class CDCFilterDialogClass {
     this.init();
 
   }
-//{id: .., filters: filter[], compareColumns: [], config: [id]: config} --> überschreibt die config einer bestimmten
   private init() {
     ReactDOM.render(
       <CDCFilterDialog
-        filterComponents={{
-          [CDCGroupingFilterId]: {component: CDCGroupingFilter},
-          [CDCTextFilterId]: {component: CDCTextFilter, config: [{field: 'address.city', options: ['Gwenborough', 'Wisokyburgh', 'McKenziehaven', 'Roscoeview', 'Aliyaview', 'Howemouth']}, {field: 'address.zipcode', options: ['33263', '23505-1337', '58804-1099']}, {field: 'name', options: ['Leanne Graham', 'Ervin Howell', 'Glenna Reichert', 'Clementina DuBuque']}]},
-          [CDCCheckboxFilterId]: {component: CDCCheckboxFilter, config: {fields: ['Eins', 'Zwei', 'Drei']}},
-          [CDCRangeFilterId]: {component: CDCRangeFilter, config: {minValue: 1, maxValue: 10}}
+        cdcConfig={{
+          'JSONPlaceholderUserCDC': {
+            filters: [
+              createCDCGroupingFilter(uuidv4()),
+              createCDCTextFilter(uuidv4(), 'Select...', null),
+              createCDCCheckboxFilter(uuidv4(), {}),
+              createCDCRangeFilter(uuidv4(), 'id', {min: 1, max: 10})
+            ],
+            components: {
+              [CDCGroupingFilterId]: {component: CDCGroupingFilter},
+              [CDCTextFilterId]: {component: CDCTextFilter, config: [{field: 'address.city', options: ['Gwenborough', 'Wisokyburgh', 'McKenziehaven', 'Roscoeview', 'Aliyaview', 'Howemouth']}, {field: 'address.zipcode', options: ['33263', '23505-1337', '58804-1099']}, {field: 'name', options: ['Leanne Graham', 'Ervin Howell', 'Glenna Reichert', 'Clementina DuBuque']}]},
+              [CDCCheckboxFilterId]: {component: CDCCheckboxFilter, config: {fields: ['Eins', 'Zwei', 'Drei']}},
+              [CDCRangeFilterId]: {component: CDCRangeFilter, config: {minValue: 1, maxValue: 10}}
+            },
+            compareColumns: ['id', 'name', 'address.street', 'adress.city', 'address.zipcode']
+          },
+          'JSONPlaceholderPostsCDC': {
+            filters: [
+              createCDCGroupingFilter(uuidv4()),
+              createCDCRangeFilter(uuidv4(), 'id', {min: 1, max: 100})
+            ],
+            components: {
+              [CDCGroupingFilterId]: {component: CDCGroupingFilter},
+              [CDCRangeFilterId]: {component: CDCRangeFilter, config: {minValue: 1, maxValue: 100}}
+            },
+            compareColumns: ['title', 'body']
+          }
         }}
-        filtersByCDC={{
-          'JSONPlaceholderUserCDC': [
-            // [CDCTextFilterId]: {filter (defaultwert): createCDCGroupingFilter(uuidv4()), component: CDCTextFilter, config: [{field: 'address.city', options: ['Gwenborough', 'Wisokyburgh', 'McKenziehaven', 'Roscoeview', 'Aliyaview', 'Howemouth']}, {field: 'address.zipcode', options: ['33263', '23505-1337', '58804-1099']}, {field: 'name', options: ['Leanne Graham', 'Ervin Howell', 'Glenna Reichert', 'Clementina DuBuque']}]},
-            createCDCGroupingFilter(uuidv4()),
-            createCDCTextFilter(uuidv4(), 'Select...', null),
-            createCDCCheckboxFilter(uuidv4(), {}),
-            createCDCRangeFilter(uuidv4(), 'id', {min: 1, max: 10}),
-            //compareComlumns
-          ],
-          'JSONPlaceholderPostsCDC': [
-            createCDCGroupingFilter(uuidv4()),
-            createCDCRangeFilter(uuidv4(), 'id', {min: 1, max: 100}),
-          ]
-        }}
-        // TODO: This needs to be defined per CDC. Maybe we define this in the backend and fetch it via an API?
-        compareColumnOptions={['id', 'name', 'address.street', 'adress.city', 'address.zipcode', 'title', 'body']}
       />,
       this.node
     );
