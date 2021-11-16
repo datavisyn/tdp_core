@@ -67,7 +67,8 @@ export class LineUpPanelActions extends EventHandler {
       this.tabContainer = new NullTabContainer(); // tab container without functionality
 
     } else {
-      const sidePanel = new SidePanelTab(this.node, this.searchBoxProvider.createSearchBox({formatItem: this.options.formatSearchBoxItem}), ctx, doc);
+      const searchBox = this.searchBoxProvider.createSearchBox({formatItem: (item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement) => this.options.formatSearchBoxItem(item, node, 'open')});
+      const sidePanel = new SidePanelTab(this.node, searchBox, ctx, doc);
       this.panel = sidePanel.panel;
       this.tabContainer = new PanelTabContainer(this.node);
       this.tabContainer.addTab(sidePanel);
@@ -145,7 +146,7 @@ export class LineUpPanelActions extends EventHandler {
     }
 
     if (this.options.enableAddingColumns) {
-      const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox({formatItem: this.options.formatSearchBoxItem}), this.options.panelAddColumnBtnOptions);
+      const addColumnButton = new PanelAddColumnButton(buttons, this.searchBoxProvider.createSearchBox({formatItem: (item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement) => this.options.formatSearchBoxItem(item, node, 'collapsed')}), this.options.panelAddColumnBtnOptions);
       this.header.addButton(addColumnButton, EPanelHeaderToolbar.START);
     }
 

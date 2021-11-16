@@ -92,12 +92,12 @@ export class ARankingView extends AView {
                 filterGlobally: true,
                 propagateAggregationState: false
             },
-            formatSearchBoxItem: (item, node) => {
+            formatSearchBoxItem: (item, node, panelMode) => {
                 // TypeScript type guard function
                 function hasColumnDesc(item) {
                     return item.desc != null;
                 }
-                node.dataset.testid = `${this.context.desc.id}_lu-searchbox_${item.text.replace(/\s/g, '')}`;
+                node.dataset.testid = `${panelMode}_${this.context.desc.id}_lu-searchbox_${item.text.replace(/\s/g, '')}`;
                 if (node.parentElement && hasColumnDesc(item)) {
                     node.dataset.type = item.desc.type;
                     const summary = item.desc.summary || item.desc.description;

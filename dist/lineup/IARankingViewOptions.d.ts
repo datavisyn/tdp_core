@@ -134,7 +134,7 @@ export interface IARankingViewOptions {
      * Formatting function for the search box item
      * Similar to `ISearchBoxOptions.formatItem()` in lineupjs
      */
-    formatSearchBoxItem(item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void;
+    formatSearchBoxItem(item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement, panelMode?: string): string | void;
     /**
      * Options for the add column button in the toolbar of the side panel
      */
