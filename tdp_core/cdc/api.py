@@ -1,13 +1,16 @@
-import logging
-from flask import jsonify
+from flask_apscheduler import APScheduler
 from datetime import datetime
+from typing import List
 from flask_smorest import Api, Blueprint
 from phovea_server.ns import Namespace, abort, no_cache
-from phovea_server.security import login_required, can_write, can_read, current_username
+from phovea_server.security import can_write, login_required, can_read, current_username
+from phovea_server.util import jsonify
+from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema, RunAllAlertsSchema
+from .JSONPlaceholderUserCDC import JSONPlaceholderUserCDC
+from .JSONPlaceholderPostsCDC import JSONPlaceholderPostsCDC
+from .filter import FieldFilterMixin
 from phovea_server.config import view
-from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema
-from .CDCManager import cdc_manager
-from flask_apscheduler import APScheduler
+
 
 
 app = Namespace(__name__)
@@ -27,9 +30,60 @@ blp = Blueprint(
   'cdc', __name__, url_prefix='/'
 )
 
+cdcs = {cls.__name__: cls() for cls in [JSONPlaceholderUserCDC, JSONPlaceholderPostsCDC]}
 
-def run_alert(alert: CDCAlert):
-    new_data, diff = cdc_manager.run_alert(alert)
+
+def run_alert2(alert: CDCAlert):
+  app.logger.info(f'Refreshing alert {alert.cdc_id}')
+  cdc = cdcs[alert.cdc_id]
+  data = cdc.load_data()
+  data = alert.apply_filt(data)
+
+  # i have no idea what this is doing tbh
+  for i, item in enumerate(data):
+    new_item = {
+      '_cdc_compare_id': str(cdc.get_id(item)),
+      # TODO: Recursive lookup and field selection
+      # **item
+    }
+    for field in alert.compare_columns:
+      new_item[field] = FieldFilterMixin.access(item, field)
+    data[i] = new_item
+
+  # Compare confirmed with new entry
+  diff = cdc.compare(alert.confirmed_data, data)
+
+  if "dictionary_item_removed" in diff:
+    diff["dictionary_item_removed"] = [rm.path(output_format='list')[0] for rm in diff["dictionary_item_removed"]]
+
+  if "dictionary_item_added" in diff:
+    diff["dictionary_item_added"] = [add.path(output_format='list')[0] for add in diff["dictionary_item_added"]]
+
+  if "values_changed" in diff:
+    vc = diff["values_changed"]
+    changed_path = [changed.path(output_format='list') for changed in vc]
+    diff["values_changed"] = [{
+        "id": p[0],
+        "field": p[1:len(p)],
+        "old_value": c.t1,
+        "new_value": c.t2
+      } for c, p in zip(vc, changed_path)]
+
+  return data, diff
+
+
+def run_alert(alert: CDCAlert) -> bool:
+    try:
+        if alert.id == 13:
+            raise Exception('Something is wrong, i can feel it')
+        # todo: only used here, so we could inline it?
+        new_data, diff = run_alert2(alert)
+    except Exception as e:
+        app.logger.exception(f'Error when running alert {alert.id}')
+        # TODO: Clear latest_diff and latest_fetched_data and latest_compare_data?
+        alert.latest_error = str(e)
+        alert.latest_error_date = datetime.utcnow()
+        return False
 
     if diff:
         # We have a new diff! Send email? Store in db? ...
@@ -40,11 +94,13 @@ def run_alert(alert: CDCAlert):
 
     alert.latest_error = None
     alert.latest_error_date = None
+    return True
 
 
-@app.errorhandler(TypeError)
-def handle_type_error(e):
-  return jsonify(*e), 400
+@app.errorhandler(ValueError)  # happens in filter validation
+@app.errorhandler(KeyError)  # happens in cdc lookups
+def handle_error(e):
+  return jsonify(error=str(e), code=400), 400
 
 
 @app.errorhandler(400)
@@ -54,20 +110,17 @@ def handle_error(e):
     return jsonify(error=str(e.description), code=e.code), e.code
 
 
-_log = logging.getLogger(__name__)
-
-
 @app.route('/cdc', methods=['GET'])
 def list_cdc():
-  return jsonify([c.id for c in cdc_manager.cdcs])
+  return jsonify(list(cdcs.keys()))
 
 
 @app.route('/cdc/<id>', methods=['GET'])
 def execute_cdc(id: str):
-  cdc = cdc_manager.get_cdc(id)
-  if not cdc:
+  try:
+    return cdcs.get(id, None)
+  except KeyError:
     abort(404, f'No cdc with id {id} available')
-  return cdc_manager.refresh_cdc(cdc)
 
 
 @no_cache
@@ -141,24 +194,19 @@ def delete_alert_by_id(id: int):
 
 
 def _run_all_alerts():
+    """ Schedule-able version that does not need a login / session-scope """
     session = create_session()
     alerts = session.query(CDCAlert).all()
-    result = {'success': [], 'error': []}
-    for alert in alerts:
-        try:
-            run_alert(alert)
-            result['success'].append(alert.id)
-        except:
-            result['error'].append(alert.id)
-
+    statuus = [run_alert(alert) for alert in alerts]
     session.commit()
-    return jsonify(result)
+    return {'success': [a.id for a, s in zip(alerts, statuus) if s],
+            'error':   [a.id for a, s in zip(alerts, statuus) if not s]}
 
 
 @no_cache
 @login_required
 @blp.route('/alert/run', methods=["GET"])
-@blp.response(CDCAlertSchema(many=True,), code=200)
+@blp.response(RunAllAlertsSchema, code=200, description="Response includes ids of successful and failing alerts")
 def run_all_alerts():
   return _run_all_alerts()
 
@@ -175,16 +223,12 @@ def run_alert_by_id(id: int):
     if not can_read(alert):
         abort(401)
 
-    try:
-        run_alert(alert)
-        session.commit()
-        return alert, 200
-
-    except Exception as e:
-        alert.latest_error = str(e)
-        alert.latest_error_date = datetime.utcnow()
-        session.commit()
+    successful = run_alert(alert)
+    session.commit()
+    if not successful:
         abort(400)
+
+    return alert, 200
 
 
 @no_cache
@@ -213,13 +257,12 @@ def confirm_alert_by_id(id: str):
 
 api.register_blueprint(blp)
 
-# schedule update by param
 scheduler = APScheduler()
 scheduler.init_app(app)
-cron_update_params = view("tdp_core").get("cdc_update", default={})  # default: every minute at second 0
-app.logger.info(f"cron_update_params={cron_update_params}")
-if cron_update_params:
-    scheduler.add_job(id="update", func=_run_all_alerts, trigger="cron", **cron_update_params)
+_conf = view("tdp_core")
+cdc_update = _conf.get("cdc_update", default={})
+if cdc_update:
+    scheduler.add_job(id="update", func=_run_all_alerts, trigger="cron", **cdc_update)
 scheduler.start()
 
 
