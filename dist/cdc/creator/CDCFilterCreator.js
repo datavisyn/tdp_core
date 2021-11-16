@@ -20,10 +20,6 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFi
         }));
     };
     const onDrop = (item, { target, index }) => {
-        console.log("filter", filter);
-        console.log("item", item);
-        console.log("target", target);
-        console.log("index", index);
         // Add item to target children array
         setFilter(produce(filter, (nextFilter) => {
             // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
@@ -69,17 +65,6 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFi
             }
         }));
     };
-    const onValueChanged = (filter, value) => {
-        onChange(filter, (f) => {
-            f.value = value;
-        });
-    };
-    const onFieldChanged = (filter, field) => {
-        console.log(field, filter);
-        onChange(filter, (f) => {
-            f.field = field;
-        });
-    };
     if (filter.type !== 'group') {
         throw Error('First filter always has to be a group filter!');
     }
@@ -87,7 +72,16 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFi
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, onFieldChanged: onFieldChanged, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid, disableDragging: true, disableRemoving: true })),
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: (filter, value, field) => {
+                        onChange(filter, (f) => {
+                            if (value !== undefined) {
+                                f.value = value;
+                            }
+                            if (field !== undefined) {
+                                f.field = field;
+                            }
+                        });
+                    }, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid, disableDragging: true, disableRemoving: true })),
             filterSelection ?
                 React.createElement("div", { className: "col-md" },
                     React.createElement("h6", null, "New filters"),

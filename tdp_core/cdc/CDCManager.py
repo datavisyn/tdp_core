@@ -13,7 +13,7 @@ cdcs = []
 
 
 def get_cdc(id: str) -> Union[BaseCDC, None]:
-    return next((c for c in cdcs.cdcs if c.id == id), None)
+    return next((c for c in cdcs if c.id == id), None)
 
 
 def run_alert2(alert: CDCAlert):

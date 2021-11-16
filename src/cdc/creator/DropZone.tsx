@@ -1,30 +1,31 @@
 import * as React from 'react';
-import { getFilterFromTree, IFilter, itemTypes } from '../interfaces';
+import { getFilterFromTree, IFilter, ITEM_TYPES } from '../interfaces';
 import { useDrop } from 'react-dnd';
 
 interface IDropZoneProps {
-  // TODO: Typings
-  onDrop: any;
+  onDrop: (item: IFilter, {target, index}: {target: IFilter; index: number}) => void;
   canDrop: boolean;
   filter: IFilter;
   index: number;
 }
 
 export function DropZone({canDrop, onDrop, filter, index}: IDropZoneProps) {
-  // TODO: Add proper types such that draggedItem can be infered
-  const [{ isOver, draggedItem }, drop] = useDrop(
+  const [{ isOver, draggedItem }, drop] = useDrop<IFilter, void, {
+    isOver: boolean;
+    draggedItem: IFilter | undefined
+  }>(
     () => ({
-      accept: itemTypes.FILTERCARD,
-      drop: (item: IFilter, monitor) => {
+      accept: ITEM_TYPES.FILTERCARD,
+      drop: (item) => {
         onDrop(item, { target: filter, index });
       },
-      canDrop: (item: IFilter) => canDrop,
+      canDrop: () => canDrop,
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
-        draggedItem: (monitor.getItem() as unknown) as IFilter | undefined
+        draggedItem: monitor.getItem()
       })
     }),
-    []
+    [canDrop, onDrop, filter, index]
   );
 
   // Check if the dragged item is actually our parent, because then we are no target

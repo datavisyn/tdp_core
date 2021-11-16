@@ -91,6 +91,7 @@ def create_alert(data):
     # alert.permissions = 7700
     alert.modifier = None
     alert.modification_date = None
+    run_alert(alert)
     session.add(alert)
     session.commit()
     return alert
@@ -109,11 +110,12 @@ def edit_alert_by_id(data, id: str):
     if not can_write(item):
         abort(401)
 
-    new_item = CDCAlertSchema().load(data, partial=True, instance=item, session=session)
-    new_item.modification_date = datetime.utcnow()
-    new_item.modifier = current_username()
+    alert = CDCAlertSchema().load(data, partial=True, instance=item, session=session)
+    alert.modification_date = datetime.utcnow()
+    alert.modifier = current_username()
+    run_alert(alert)
     session.commit()
-    return new_item
+    return alert
 
 
 @no_cache

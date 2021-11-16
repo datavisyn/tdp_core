@@ -1,4 +1,4 @@
-export const itemTypes = {
+export const ITEM_TYPES = {
     FILTERCARD: 'filtercard'
 };
 export const getFilterFromTree = (filter, id) => {

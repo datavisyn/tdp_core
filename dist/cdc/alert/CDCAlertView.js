@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
-import { ErrorMessage, runAlert } from '..';
+import { ErrorMessage } from '../common';
 import { useAsync, useSyncedRef } from '../../hooks';
 import { deleteAlert, editAlert, saveAlert } from '../api';
 import { CDCFilterCreator } from '../creator';
@@ -26,21 +26,11 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
         if (valFilter && valName && valCompareColumns) {
             let newAlert;
             if (selectedAlert) {
-                newAlert = await editAlert(selectedAlert.id, { ...alertData })
-                    .then((alert) => {
-                    return runAlert(alert.id).then((a) => {
-                        return a ? a : alert;
-                    });
-                });
+                newAlert = await editAlert(selectedAlert.id, { ...alertData });
                 setEditMode(false);
             }
             else {
-                newAlert = await saveAlert({ ...alertData })
-                    .then((alert) => {
-                    return runAlert(alert.id).then((a) => {
-                        return a ? a : alert;
-                    });
-                });
+                newAlert = await saveAlert({ ...alertData });
                 setCreationMode(false);
             }
             onAlertChanged(newAlert.id);
@@ -64,22 +54,21 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
         setEditMode(false);
         setAlertData(selectedAlert);
     };
-    const editButton = saveStatus === 'pending' || deleteStatus === 'pending' ? (React.createElement("i", { className: "fas fa-spinner fa-spin" })) : !editMode && !deleteMode && !creationMode ? (React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Edit Alert", className: "btn btn-text-secondary", onClick: () => setEditMode(true) },
-            React.createElement("i", { className: "fas fa-pencil-alt" })),
-        React.createElement("button", { title: "Delete Alert", className: "btn btn-text-secondary", onClick: () => setDeleteMode(true) },
-            React.createElement("i", { className: "fas fa-trash" })))) : (editMode || creationMode ? React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: () => doSave() },
-            React.createElement("i", { className: "fas fa-save" })),
-        React.createElement("button", { title: "Discard changes", className: "btn btn-text-secondary ms-1", onClick: editMode ? () => onDiscard() : () => setCreationMode(false) },
-            React.createElement("i", { className: "fas fa-times" }))) : React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Delete", className: "btn btn-text-secondary", onClick: () => doDelete() },
-            React.createElement("i", { className: "fas fa-check" })),
-        React.createElement("button", { title: "No Delete", className: "btn btn-text-secondary ms-1", onClick: () => setDeleteMode(false) },
-            React.createElement("i", { className: "fas fa-times" }))));
     return (React.createElement(React.Fragment, null,
-        React.createElement("div", { className: "d-md-flex justify-content-md-end" },
-            React.createElement("small", null, editButton)),
+        React.createElement("div", { className: "d-md-flex justify-content-md-end mb-1 mt-1" },
+            React.createElement("small", null, saveStatus === 'pending' || deleteStatus === 'pending' ? (React.createElement("i", { className: "fas fa-spinner fa-spin" })) : !editMode && !deleteMode && !creationMode ? (React.createElement(React.Fragment, null,
+                React.createElement("button", { title: "Edit Alert", className: "btn btn-text-secondary", onClick: () => setEditMode(true) },
+                    React.createElement("i", { className: "fas fa-pencil-alt" })),
+                React.createElement("button", { title: "Delete Alert", className: "btn btn-text-secondary", onClick: () => setDeleteMode(true) },
+                    React.createElement("i", { className: "fas fa-trash" })))) : (editMode || creationMode ? React.createElement(React.Fragment, null,
+                React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: () => doSave() },
+                    React.createElement("i", { className: "fas fa-save" })),
+                React.createElement("button", { title: "Discard changes", className: "btn btn-text-secondary ms-1", onClick: editMode ? () => onDiscard() : () => setCreationMode(false) },
+                    React.createElement("i", { className: "fas fa-times" }))) : React.createElement(React.Fragment, null,
+                React.createElement("button", { title: "Delete", className: "btn btn-text-secondary", onClick: () => doDelete() },
+                    React.createElement("i", { className: "fas fa-check" })),
+                React.createElement("button", { title: "No Delete", className: "btn btn-text-secondary ms-1", onClick: () => setDeleteMode(false) },
+                    React.createElement("i", { className: "fas fa-times" })))))),
         (selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.latest_error) ?
             React.createElement(ErrorMessage, { error: new Error(`In the sync from ${new Date(selectedAlert.latest_error_date)} an error occured: ${selectedAlert.latest_error}`) })
             : deleteError ?
@@ -125,11 +114,7 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
                                 React.createElement("input", { className: "form-check-input", type: "checkbox", disabled: !creationMode && !editMode, checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
                                 React.createElement("label", { className: "form-check-label ms-2" }, "Send me an email")))),
                     React.createElement("div", null, filterSelection && (alertData === null || alertData === void 0 ? void 0 : alertData.filter) ?
-                        React.createElement(CDCFilterCreator, { filterSelection: !creationMode && !editMode ? null : filterSelection, filterComponents: filterComponents, filter: alertData.filter, setFilter: (v) => {
-                                console.log("TEST123", alertData);
-                                const current = alertDataRef.current;
-                                setAlertData({ ...current, filter: v(current.filter) });
-                            }, isInvalid: !validFilter })
+                        React.createElement(CDCFilterCreator, { filterSelection: !creationMode && !editMode ? null : filterSelection, filterComponents: filterComponents, filter: alertData.filter, setFilter: (filter) => setAlertData({ ...alertData, filter }), isInvalid: !validFilter })
                         :
                             React.createElement("p", null, "No filters available for this cdc")))))));
 }

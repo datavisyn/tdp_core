@@ -30,8 +30,7 @@ export function CDCTextFilterComponent({value, onValueChanged, onFieldChanged, d
           menuPlacement="auto"
           options={[...config?.map((conf) => {return {label: conf.field, value: conf.field};})]}
           onChange={(e) => {
-            onFieldChanged?.(e.value);
-            onValueChanged?.([]);
+            onValueChanged?.([], e.value);
           }}
         />
       </div>

@@ -2,11 +2,13 @@
 import { IFilter, IFilterComponent } from '../interfaces';
 interface IFilterCardProps {
     filter: IFilter;
-    onDrop?: any;
+    onDrop?: (item: IFilter, { target, index }: {
+        target: IFilter;
+        index: number;
+    }) => void;
     onDelete?: (filter: IFilter) => void;
     onChange?: (filter: IFilter, changeFunc: (filter: IFilter) => void) => void;
-    onValueChanged?: (filter: IFilter, value: any) => void;
-    onFieldChanged?: (filter: IFilter, field: any) => void;
+    onValueChanged?: (filter: IFilter, value: any, field: string) => void;
     filterComponents: {
         [key: string]: {
             component: IFilterComponent<any>;
@@ -18,5 +20,5 @@ interface IFilterCardProps {
     disableRemoving?: boolean;
     disableDragging?: boolean;
 }
-export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, onFieldChanged, filterComponents, disableFilter, isInvalid, disableDragging, disableRemoving }: IFilterCardProps): JSX.Element;
+export declare function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter, isInvalid, disableDragging, disableRemoving }: IFilterCardProps): JSX.Element;
 export {};

@@ -1,27 +1,19 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {BSModal, useAsync} from '../hooks';
-import {IAlert, IFilter, IUploadAlert, ICDCConfiguration} from './interfaces';
-import {getAlerts, runAlertById} from './api';
+import {IAlert, IUploadAlert, ICDCConfiguration} from './interfaces';
+import {getAlerts, runAllAlerts} from './api';
 import {CDCGroupingFilterId, CDCGroupingFilter, createCDCGroupingFilter, CDCCheckboxFilter, CDCCheckboxFilterId, createCDCCheckboxFilter, CDCRangeFilter, CDCRangeFilterId, createCDCRangeFilter} from './filter';
 import {v4 as uuidv4} from 'uuid';
 import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './filter/CDCTextFilter';
 import {CDCAlertView} from './alert/CDCAlertView';
 import {ErrorMessage} from './common';
-import {runAllAlerts} from '.';
 
 interface ICDCFilterDialogProps {
   cdcConfig: {[cdcId: string]: ICDCConfiguration};
 }
 
 export const CDC_DEFAULT_ALERT_DATA: () => IUploadAlert = () => ({name: '', enable_mail_notification: false, cdc_id: 'JSONPlaceholderUserCDC', filter: createCDCGroupingFilter(uuidv4()), compare_columns: null});
-
-export const runAlert = async (id: number): Promise<IAlert> => {
-  return runAlertById(id).then((alert) => {return alert;}).catch((e) => {
-    alert(`${e}: Invalid filter parameter in alert: ${id}`);
-    return null;
-  });
-};
 
 export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
   const [selectedAlert, setSelectedAlert] = React.useState<IAlert | null>(null);
@@ -45,8 +37,8 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
 
   const {status: syncStatus, error: syncError, execute: doSync} = useAsync(async () => {
     const result = await runAllAlerts();
-    if (result.error?.length > 0) {
-      throw new Error(`Alert(s) [${result.error.join(',')}] could not be synchronized!`);
+    if (result.error.length > 0) {
+      throw new Error(`Alert(s) could not be synchronized!`);
     }
     onAlertChanged(selectedAlert?.id);
   }, false);
@@ -81,52 +73,48 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
     <BSModal show={showDialog} setShow={setShowDialog}>
       <div className="modal fade" tabIndex={-1}>
         <div className="modal-dialog" style={{maxWidth: '90%'}}>
-          <div className="modal-content">
+          <div className="modal-content" style={{height: '90vh'}}>
             <div className="modal-header">
               <h5 className="modal-title">Alerts</h5>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              {syncStatus === 'pending' || alertStatus === 'pending' ?
-                <i className="fas fa-spinner fa-spin"></i>
-                :
-                <div className="row">
-                  <div className="col-3 overflow-auto">
-                    <div className="d-md-flex justify-content-md-end">
-                      <small><button className="btn btn-text-secondary" onClick={() => onCreateButtonClick()}><i className="fas fa-plus"></i></button></small>
-                    </div>
-                    {alertError ? <ErrorMessage error={new Error(`While loading occured ${alertError}`)} onRetry={() => fetchAlerts()} /> : null}
-                    {alertStatus === 'success' ? <div className="list-group">{alerts.map((alert) =>
-                      <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action${selectedAlert?.id === alert?.id ? ' border-primary' : ''}`} onClick={() => onAlertClick(alert)} aria-current="true">
-                        <div className="d-flex w-100 justify-content-between">
-                          <h6 title={`${alert.name} for ${alert.cdc_id}`} className="mb-1 overflow-hidden">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
-                          <small><i className={alert?.latest_error ? "fas fa-exclamation-triangle text-danger" : alert?.latest_diff ? "fas fa-circle text-primary" : null} /></small>
-                        </div>
-                        <small>{reviewStatus(alert)}</small>
-                      </a></div>
-                    )}</div> : null}
+              <div className="row h-100">
+                <div className={`col-3 overflow-auto position-relative h-100 ${alertStatus === 'pending' ? 'tdp-busy-overlay' : ''}`}>
+                  {syncError ? <ErrorMessage error={syncError} /> : null}
+                  <div className="d-md-flex justify-content-md-end mb-1 mt-1">
+                    <button type="button" disabled={syncStatus === 'pending'} title="Synchronize all alerts" className="btn btn-text-secondary" onClick={() => doSync()}><i className={`fas fa-sync ${syncStatus === 'pending' ? 'fa-spin' : ''}`}></i></button>
+                    <button className="btn btn-text-secondary" onClick={() => onCreateButtonClick()}><i className="fas fa-plus"></i></button>
                   </div>
-                  <div className="col-9 overflow-auto">
-                    {selectedAlert || creationMode ?
-                      <CDCAlertView
-                        alertData={alertData}
-                        setAlertData={setAlertData}
-                        onAlertChanged={onAlertChanged}
-                        setCreationMode={setCreationMode}
-                        selectedAlert={selectedAlert}
-                        creationMode={creationMode}
-                        cdcConfig={cdcConfig}
-                      />
-                      : null
-                    }
-                  </div>
+                  {alertError ? <ErrorMessage error={alertError} onRetry={() => fetchAlerts()} /> : null}
+                  {alertStatus === 'success' ? <div className="list-group">{alerts.sort((a, b) => (b.latest_diff ? 1 : 0) - (a.latest_diff ? 1 : 0)).map((alert) =>
+                    <div key={alert.id}><a href="#" className={`list-group-item list-group-item-action ${selectedAlert?.id === alert?.id ? 'border-primary' : ''}`} onClick={() => onAlertClick(alert)} aria-current="true">
+                      <div className="d-flex w-100 justify-content-between">
+                        <h6 title={`${alert.name} for ${alert.cdc_id}`} className="mb-1 overflow-hidden">{alert.name} <small className="text-muted">for {alert.cdc_id}</small></h6>
+                        <small>
+                          {alert?.latest_error ? <i className="fas fa-exclamation-triangle text-danger" title={alert.latest_error} /> : null}
+                          {alert?.latest_diff && !alert?.latest_error ? <i className="fas fa-circle text-primary" /> : null}
+                        </small>
+                      </div>
+                      <small>{reviewStatus(alert)}</small>
+                    </a></div>
+                  )}</div> : null}
                 </div>
-              }
-            </div>
-            <div className="modal-footer">
-              {syncError ? <ErrorMessage error={new Error(`While synchronizing an error occured: ${syncError}`)} /> : null}
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" disabled={syncStatus === 'pending'} title="Sync alerts" className="btn btn-secondary" onClick={() => doSync()}>Sync</button>
+                <div className="col-9 overflow-auto">
+                  {selectedAlert || creationMode ?
+                    <CDCAlertView
+                      alertData={alertData}
+                      setAlertData={setAlertData}
+                      onAlertChanged={onAlertChanged}
+                      setCreationMode={setCreationMode}
+                      selectedAlert={selectedAlert}
+                      creationMode={creationMode}
+                      cdcConfig={cdcConfig}
+                    />
+                    : null
+                  }
+                </div>
+              </div>
             </div>
           </div>
         </div>

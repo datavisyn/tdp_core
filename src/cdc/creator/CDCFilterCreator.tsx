@@ -6,17 +6,14 @@ import {FilterCard} from './CDCFilterCard';
 import {getFilterFromTree, IFilter, IFilterComponent} from '../interfaces';
 import {v4 as uuidv4} from 'uuid';
 
-interface ICDCFilterCreatorProps {
+export function CDCFilterCreator({filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents}: {
   filterComponents?: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   filterSelection?: IFilter[];
   filter: IFilter;
-  // setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
   setFilter: (value: IFilter) => void;
   disableFilter?: boolean;
   isInvalid?: boolean;
-}
-
-export function CDCFilterCreator({filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents}: ICDCFilterCreatorProps) {
+}) {
   const onDelete = (newFilter: IFilter) => {
     setFilter(produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
@@ -36,10 +33,6 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, disableFil
     item: IFilter,
     {target, index}: {target: IFilter; index: number}
   ) => {
-    console.log("filter", filter)
-    console.log("item", item)
-    console.log("target", target)
-    console.log("index", index)
     // Add item to target children array
     setFilter(produce(filter, (nextFilter) => {
       // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
@@ -89,19 +82,6 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, disableFil
     }));
   };
 
-  const onValueChanged = (filter: IFilter, value: any) => {
-    onChange(filter, (f) => {
-      f.value = value;
-    });
-  };
-
-  const onFieldChanged = (filter: IFilter, field: any) => {
-    console.log(field, filter);
-    onChange(filter, (f) => {
-      f.field = field;
-    });
-  };
-
   if(filter.type !== 'group') {
     throw Error('First filter always has to be a group filter!');
   }
@@ -116,8 +96,16 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, disableFil
             onDrop={onDrop}
             onDelete={onDelete}
             onChange={onChange}
-            onValueChanged={onValueChanged}
-            onFieldChanged={onFieldChanged}
+            onValueChanged={(filter: IFilter, value: any, field: string) => {
+              onChange(filter, (f) => {
+                if(value !== undefined) {
+                  f.value = value;
+                }
+                if(field !== undefined) {
+                  f.field = field;
+                }
+              });
+            }}
             filterComponents={filterComponents}
             disableFilter={disableFilter}
             isInvalid={isInvalid}

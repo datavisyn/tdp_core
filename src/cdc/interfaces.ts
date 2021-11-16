@@ -3,8 +3,7 @@ import {ISecureItem} from 'phovea_core';
 export interface IFilterComponent<V> {
   clazz: (props: {
     value: V;
-    onValueChanged?: (value: V) => void;
-    onFieldChanged?: (field: string) => void;
+    onValueChanged?: (value: V, field: string) => void;
     disabled: boolean;
     config: any;
     field?: any;
@@ -27,7 +26,7 @@ export interface ICDCConfiguration {
   compareColumns: string[];
 }
 
-export const itemTypes = {
+export const ITEM_TYPES = {
   FILTERCARD: 'filtercard'
 };
 
@@ -60,8 +59,8 @@ export interface IAlert extends ISecureItem {
   cdc_id: string;
   filter: IFilter;
   enable_mail_notification: boolean;
-  latest_diff: {dictionary_item_added?: string[], dictionary_item_removed?: string[], values_changed?: {id: string, field: [], old_value: string, new_value: string}[]};
-  latest_fetched_data: {
+  latest_diff?: {dictionary_item_added?: string[], dictionary_item_removed?: string[], values_changed?: {id: string, field: [], old_value: string, new_value: string}[]};
+  latest_fetched_data?: {
     _cdc_compare_id: string;
     [key: string]: any;
   }[];
