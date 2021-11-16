@@ -1,7 +1,7 @@
 from tdp_core.cdc.filter import Filter
 from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, JSON
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import EXCLUDE, Schema
+from marshmallow import EXCLUDE, Schema, post_load
 from sqlalchemy.ext.declarative import declarative_base
 from marshmallow import fields
 # TODO: Remove and use postgres
@@ -64,13 +64,12 @@ class CDCAlertArgsSchema(Schema):
     name = fields.String()
     enable_mail_notification = fields.Boolean()
     cdc_id = fields.String()
-    filter = fields.Nested(Filter, required=True)
+    filter = fields.Dict(required=True)  # dict to persist
     compare_columns = fields.List(fields.String())
 
-
-class RunAllAlertsSchema(Schema):
-    success = fields.List(fields.Integer(), required=True)
-    error = fields.List(fields.Integer(), required=True)
+    @post_load
+    def parse_filter(self, data, **kwargs):
+      return {"apply": Filter().load(data["filter"]), **data}
 
 
 engine = create_engine('sqlite:////:memory:')
