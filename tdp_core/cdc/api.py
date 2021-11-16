@@ -6,7 +6,7 @@ from phovea_server.ns import Namespace, abort, no_cache
 from phovea_server.security import can_write, login_required, can_read, current_username
 from phovea_server.util import jsonify
 from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema, RunAllAlertsSchema
-from .CDCManager import cdc_manager
+from .CDCManager import run_alert2, cdcs
 
 app = Namespace(__name__)
 app.config['OPENAPI_VERSION'] = '3.0.2'
@@ -28,10 +28,7 @@ blp = Blueprint(
 
 def run_alert(alert: CDCAlert) -> bool:
     try:
-        if alert.id == 13:
-            raise Exception('Something is wrong, i can feel it')
-
-        new_data, diff = cdc_manager.run_alert(alert)
+        new_data, diff = run_alert2(alert)
     except Exception as e:
         _log.exception(f'Error when running alert {alert.id}')
         # TODO: Clear latest_diff and latest_fetched_data and latest_compare_data?
@@ -63,15 +60,7 @@ _log = logging.getLogger(__name__)
 
 @app.route('/cdc', methods=['GET'])
 def list_cdc():
-  return jsonify([c.id for c in cdc_manager.cdcs])
-
-
-@app.route('/cdc/<id>', methods=['GET'])
-def execute_cdc(id: str):
-  cdc = cdc_manager.get_cdc(id)
-  if not cdc:
-    abort(404, f'No cdc with id {id} available')
-  return cdc_manager.refresh_cdc(cdc)
+  return jsonify([c.id for c in cdcs])
 
 
 @no_cache
@@ -150,7 +139,7 @@ def delete_alert_by_id(id: int):
 @blp.response(RunAllAlertsSchema, code=200, description="Response includes ids of successful and failing alerts")
 def run_all_alerts():
     session = create_session()
-    alerts = session.query(CDCAlert).all()
+    alerts = [p for p in session.query(CDCAlert).all() if can_read(p)]
     success: List[str] = []
     error: List[str] = []
     for alert in alerts:
