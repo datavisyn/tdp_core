@@ -25,7 +25,7 @@ export function CDCTextFilterComponent({value, onValueChanged, onFieldChanged, d
       <div className="col-4 p-0">
         <Select
           isDisabled={!onValueChanged || disabled}
-          value={{label: field, value: field}}          
+          value={{label: field, value: field}}
           maxMenuHeight={200}
           menuPlacement="auto"
           options={[...config?.map((conf) => {return {label: conf.field, value: conf.field};})]}

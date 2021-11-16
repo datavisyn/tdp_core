@@ -1,4 +1,4 @@
-import React from 'react';
+/// <reference types="react" />
 import { IFilter, IFilterComponent } from '../interfaces';
 interface ICDCFilterCreatorProps {
     filterComponents?: {
@@ -9,7 +9,7 @@ interface ICDCFilterCreatorProps {
     };
     filterSelection?: IFilter[];
     filter: IFilter;
-    setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
+    setFilter: (value: IFilter) => void;
     disableFilter?: boolean;
     isInvalid?: boolean;
 }

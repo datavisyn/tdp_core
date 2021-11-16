@@ -10,14 +10,15 @@ interface ICDCFilterCreatorProps {
   filterComponents?: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   filterSelection?: IFilter[];
   filter: IFilter;
-  setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
+  // setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
+  setFilter: (value: IFilter) => void;
   disableFilter?: boolean;
   isInvalid?: boolean;
 }
 
 export function CDCFilterCreator({filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents}: ICDCFilterCreatorProps) {
   const onDelete = (newFilter: IFilter) => {
-    setFilter((filter) => produce(filter, (nextFilter) => {
+    setFilter(produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
       if (current && parent && parent.children) {
         // Find the index of the current element in the parents children
@@ -35,8 +36,12 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, disableFil
     item: IFilter,
     {target, index}: {target: IFilter; index: number}
   ) => {
+    console.log("filter", filter)
+    console.log("item", item)
+    console.log("target", target)
+    console.log("index", index)
     // Add item to target children array
-    setFilter((filter) => produce(filter, (nextFilter) => {
+    setFilter(produce(filter, (nextFilter) => {
       // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
       // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
       // ARE NOT UP-TO-DATE!
@@ -76,7 +81,7 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, disableFil
   };
 
   const onChange = (newFilter: IFilter, changeFunc: (filter: IFilter) => void) => {
-    setFilter((filter) => produce(filter, (nextFilter) => {
+    setFilter(produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
       if (current) {
         changeFunc(current);

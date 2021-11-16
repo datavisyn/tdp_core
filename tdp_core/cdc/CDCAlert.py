@@ -68,6 +68,11 @@ class CDCAlertArgsSchema(Schema):
     compare_columns = fields.List(fields.String())
 
 
+class RunAllAlertsSchema(Schema):
+    success = fields.List(fields.Integer(), required=True)
+    error = fields.List(fields.Integer(), required=True)
+
+
 engine = create_engine('sqlite:////:memory:')
 # Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)

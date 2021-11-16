@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { IAlert } from "../interfaces";
+import { IAlert } from '../interfaces';
 interface ICDCDataChangeTable {
     selectedAlert: IAlert;
     onAlertChanged: (id?: number) => void;

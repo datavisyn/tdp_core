@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { ISecureItem } from "phovea_core";
+import { ISecureItem } from 'phovea_core';
 export interface IFilterComponent<V> {
     clazz: (props: {
         value: V;

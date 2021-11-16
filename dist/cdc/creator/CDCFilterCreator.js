@@ -7,7 +7,7 @@ import { getFilterFromTree } from '../interfaces';
 import { v4 as uuidv4 } from 'uuid';
 export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents }) {
     const onDelete = (newFilter) => {
-        setFilter((filter) => produce(filter, (nextFilter) => {
+        setFilter(produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current && parent && parent.children) {
                 // Find the index of the current element in the parents children
@@ -20,8 +20,12 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFi
         }));
     };
     const onDrop = (item, { target, index }) => {
+        console.log("filter", filter);
+        console.log("item", item);
+        console.log("target", target);
+        console.log("index", index);
         // Add item to target children array
-        setFilter((filter) => produce(filter, (nextFilter) => {
+        setFilter(produce(filter, (nextFilter) => {
             // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
             // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
             // ARE NOT UP-TO-DATE!
@@ -58,7 +62,7 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFi
         }));
     };
     const onChange = (newFilter, changeFunc) => {
-        setFilter((filter) => produce(filter, (nextFilter) => {
+        setFilter(produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current) {
                 changeFunc(current);

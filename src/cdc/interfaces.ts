@@ -1,4 +1,4 @@
-import {ISecureItem} from "phovea_core";
+import {ISecureItem} from 'phovea_core';
 
 export interface IFilterComponent<V> {
   clazz: (props: {
@@ -54,7 +54,7 @@ export const getFilterFromTree = (
   return {parent: null, current: null};
 };
 
-export interface IAlert extends ISecureItem{
+export interface IAlert extends ISecureItem {
   id: number;
   name: string;
   cdc_id: string;

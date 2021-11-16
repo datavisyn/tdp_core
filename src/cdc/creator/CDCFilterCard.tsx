@@ -25,7 +25,7 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
       isDragging: !!monitor.isDragging(),
       draggedItem: (monitor.getItem() as unknown) as IFilter | undefined
     })
-  }));
+  }), [filter, onDrop, onDelete, onChange, onValueChanged, onFieldChanged, filterComponents]);
 
   const hasChildren = filter.children && filter.children.length >= 0;
   const filterComponent = filterComponents[filter.type];

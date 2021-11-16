@@ -8,8 +8,7 @@ import { CDCTextFilter, CDCTextFilterId, createCDCTextFilter } from './filter/CD
 import { CDCAlertView } from './alert/CDCAlertView';
 import { ErrorMessage } from './common';
 import { runAllAlerts } from '.';
-export const CDC_DEFAULT_ALERT_DATA = { name: '', enable_mail_notification: false, cdc_id: 'JSONPlaceholderUserCDC', filter: null, compare_columns: null };
-export const CDC_DEFAULT_FILTER = { ...createCDCGroupingFilter(uuidv4()) };
+export const CDC_DEFAULT_ALERT_DATA = () => ({ name: '', enable_mail_notification: false, cdc_id: 'JSONPlaceholderUserCDC', filter: createCDCGroupingFilter(uuidv4()), compare_columns: null });
 export const runAlert = async (id) => {
     return runAlertById(id).then((alert) => { return alert; }).catch((e) => {
         alert(`${e}: Invalid filter parameter in alert: ${id}`);
@@ -17,36 +16,10 @@ export const runAlert = async (id) => {
     });
 };
 export function CDCFilterDialog({ cdcConfig }) {
-    const [selectedAlert, setSelectedAlert] = React.useState();
+    const [selectedAlert, setSelectedAlert] = React.useState(null);
     const [showDialog, setShowDialog] = React.useState(false);
     const [creationMode, setCreationMode] = React.useState(false);
-    const [filter, setFilter] = React.useState();
-    const [alertData, setAlertData] = React.useState();
-    const { status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts } = useAsync(getAlerts, true);
-    const { status: syncStatus, error: syncError, execute: doSync } = useAsync(async () => {
-        var _a;
-        const result = await runAllAlerts();
-        if (((_a = result.error) === null || _a === void 0 ? void 0 : _a.length) > 0) {
-            throw `Alert(s) [${result.error.join(',')}] could not be synchronized!`;
-        }
-        onAlertChanged(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id);
-    }, false);
-    React.useEffect(() => {
-        setAlertData(CDC_DEFAULT_ALERT_DATA);
-        setFilter(CDC_DEFAULT_FILTER);
-    }, []);
-    const onCreateButtonClick = () => {
-        setCreationMode(true);
-        setSelectedAlert(null);
-        setAlertData(CDC_DEFAULT_ALERT_DATA);
-        setFilter(CDC_DEFAULT_FILTER);
-    };
-    const onAlertClick = async (alert) => {
-        setAlertData(alert);
-        setFilter(alert.filter);
-        setCreationMode(false);
-        setSelectedAlert(alert);
-    };
+    const [alertData, setAlertData] = React.useState(null);
     const onAlertChanged = async (id) => {
         //refetches alerts and makes new selection
         fetchAlerts().then((alerts) => {
@@ -57,7 +30,26 @@ export function CDCFilterDialog({ cdcConfig }) {
             else {
                 setSelectedAlert(alerts.find((alert) => alert.id === id));
             }
-        }).catch((e) => console.error(e));
+        });
+    };
+    const { status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts } = useAsync(getAlerts, true);
+    const { status: syncStatus, error: syncError, execute: doSync } = useAsync(async () => {
+        var _a;
+        const result = await runAllAlerts();
+        if (((_a = result.error) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+            throw new Error(`Alert(s) [${result.error.join(',')}] could not be synchronized!`);
+        }
+        onAlertChanged(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id);
+    }, false);
+    const onCreateButtonClick = () => {
+        setCreationMode(true);
+        setSelectedAlert(null);
+        setAlertData(CDC_DEFAULT_ALERT_DATA());
+    };
+    const onAlertClick = async (alert) => {
+        setAlertData(alert);
+        setCreationMode(false);
+        setSelectedAlert(alert);
     };
     const reviewStatus = (alert) => {
         var _a, _b;
@@ -83,36 +75,33 @@ export function CDCFilterDialog({ cdcConfig }) {
                         React.createElement("div", { className: "modal-header" },
                             React.createElement("h5", { className: "modal-title" }, "Alerts"),
                             React.createElement("button", { type: "button", className: "btn-close", "data-bs-dismiss": "modal", "aria-label": "Close" })),
-                        React.createElement("div", { className: "modal-body" },
-                            React.createElement("div", { className: "row" },
-                                React.createElement("div", { className: "col-3 overflow-auto" },
-                                    React.createElement("div", { className: "d-md-flex justify-content-md-end" },
-                                        React.createElement("small", null,
-                                            React.createElement("button", { className: "btn btn-text-secondary", onClick: () => onCreateButtonClick() },
-                                                React.createElement("i", { className: "fas fa-plus" })))),
-                                    alertStatus === 'pending' ? React.createElement(React.Fragment, null, "Loading...") : null,
-                                    alertStatus === 'error' ? React.createElement(React.Fragment, null,
-                                        "Error ",
-                                        alertError.toString()) : null,
-                                    alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alerts.map((alert) => React.createElement("div", { key: alert.id },
-                                        React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id) === (alert === null || alert === void 0 ? void 0 : alert.id) ? ' border-primary' : ''}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
-                                            React.createElement("div", { className: "d-flex w-100 justify-content-between" },
-                                                React.createElement("h6", { title: `${alert.name} for ${alert.cdc_id}`, className: "mb-1 overflow-hidden" },
-                                                    alert.name,
-                                                    " ",
-                                                    React.createElement("small", { className: "text-muted" },
-                                                        "for ",
-                                                        alert.cdc_id)),
-                                                (alert === null || alert === void 0 ? void 0 : alert.latest_diff) ? React.createElement("small", null,
-                                                    React.createElement("i", { className: "fas fa-circle text-primary" })) : null,
-                                                (alert === null || alert === void 0 ? void 0 : alert.latest_error) ? React.createElement("small", null,
-                                                    React.createElement("i", { className: "fas fa-exclamation-triangle text-danger" })) : null),
-                                            React.createElement("small", null, reviewStatus(alert)))))) : null),
-                                React.createElement("div", { className: "col-9 overflow-auto" }, selectedAlert || creationMode ?
-                                    React.createElement(CDCAlertView, { alertData: alertData, setAlertData: setAlertData, filter: filter, setFilter: setFilter, onAlertChanged: onAlertChanged, setCreationMode: setCreationMode, selectedAlert: selectedAlert, creationMode: creationMode, cdcConfig: cdcConfig })
-                                    : null))),
+                        React.createElement("div", { className: "modal-body" }, syncStatus === 'pending' || alertStatus === 'pending' ?
+                            React.createElement("i", { className: "fas fa-spinner fa-spin" })
+                            :
+                                React.createElement("div", { className: "row" },
+                                    React.createElement("div", { className: "col-3 overflow-auto" },
+                                        React.createElement("div", { className: "d-md-flex justify-content-md-end" },
+                                            React.createElement("small", null,
+                                                React.createElement("button", { className: "btn btn-text-secondary", onClick: () => onCreateButtonClick() },
+                                                    React.createElement("i", { className: "fas fa-plus" })))),
+                                        alertError ? React.createElement(ErrorMessage, { error: new Error(`While loading occured ${alertError}`), onRetry: () => fetchAlerts() }) : null,
+                                        alertStatus === 'success' ? React.createElement("div", { className: "list-group" }, alerts.map((alert) => React.createElement("div", { key: alert.id },
+                                            React.createElement("a", { href: "#", className: `list-group-item list-group-item-action${(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id) === (alert === null || alert === void 0 ? void 0 : alert.id) ? ' border-primary' : ''}`, onClick: () => onAlertClick(alert), "aria-current": "true" },
+                                                React.createElement("div", { className: "d-flex w-100 justify-content-between" },
+                                                    React.createElement("h6", { title: `${alert.name} for ${alert.cdc_id}`, className: "mb-1 overflow-hidden" },
+                                                        alert.name,
+                                                        " ",
+                                                        React.createElement("small", { className: "text-muted" },
+                                                            "for ",
+                                                            alert.cdc_id)),
+                                                    React.createElement("small", null,
+                                                        React.createElement("i", { className: (alert === null || alert === void 0 ? void 0 : alert.latest_error) ? "fas fa-exclamation-triangle text-danger" : (alert === null || alert === void 0 ? void 0 : alert.latest_diff) ? "fas fa-circle text-primary" : null }))),
+                                                React.createElement("small", null, reviewStatus(alert)))))) : null),
+                                    React.createElement("div", { className: "col-9 overflow-auto" }, selectedAlert || creationMode ?
+                                        React.createElement(CDCAlertView, { alertData: alertData, setAlertData: setAlertData, onAlertChanged: onAlertChanged, setCreationMode: setCreationMode, selectedAlert: selectedAlert, creationMode: creationMode, cdcConfig: cdcConfig })
+                                        : null))),
                         React.createElement("div", { className: "modal-footer" },
-                            React.createElement(ErrorMessage, { error: syncError }),
+                            syncError ? React.createElement(ErrorMessage, { error: new Error(`While synchronizing an error occured: ${syncError}`) }) : null,
                             React.createElement("button", { type: "button", className: "btn btn-secondary", "data-bs-dismiss": "modal" }, "Close"),
                             React.createElement("button", { type: "button", disabled: syncStatus === 'pending', title: "Sync alerts", className: "btn btn-secondary", onClick: () => doSync() }, "Sync")))))));
 }

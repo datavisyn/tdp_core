@@ -1,17 +1,15 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Select from 'react-select';
-import {CDC_DEFAULT_FILTER, ErrorMessage, IFilterComponent, runAlert} from '..';
-import {useAsync} from '../../hooks';
+import {ErrorMessage, runAlert} from '..';
+import {useAsync, useSyncedRef} from '../../hooks';
 import {deleteAlert, editAlert, saveAlert} from '../api';
 import {CDCFilterCreator} from '../creator';
-import {IAlert, IFilter, IUploadAlert, IReactSelectOption, ICDCConfiguration} from '../interfaces';
+import {IAlert, IUploadAlert, IReactSelectOption, ICDCConfiguration} from '../interfaces';
 import {CDCDataChangeTable} from './CDCDataChangeTable';
 
 interface ICDCEditAlert {
   alertData: IUploadAlert;
   setAlertData: (formData: IUploadAlert) => void;
-  filter: IFilter;
-  setFilter: (filter: IFilter) => void;
   onAlertChanged: (id?: number) => void;
   selectedAlert?: IAlert;
   creationMode: boolean;
@@ -19,14 +17,14 @@ interface ICDCEditAlert {
   cdcConfig: {[cdcId: string]: ICDCConfiguration};
 }
 
-export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAlertChanged, selectedAlert, setCreationMode, creationMode, cdcConfig}: ICDCEditAlert) {
+export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedAlert, setCreationMode, creationMode, cdcConfig}: ICDCEditAlert) {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const [deleteMode, setDeleteMode] = React.useState<boolean>(false);
-  const [filterSelection, setFilterSelection] = React.useState<IFilter[]>();
-  const [compareColumns, setCompareColumns] = React.useState<string[]>();
-  const [filterComponents, setFilterComponents] = React.useState<{[key: string]: {component: IFilterComponent<any>, config?: any}}>();
-  const [validFilter, setValidFilter] = React.useState<boolean>();
-  const [validName, setValidName] = React.useState<boolean>();
+  const [validFilter, setValidFilter] = React.useState<boolean>(true);
+  const [validName, setValidName] = React.useState<boolean>(true);
+  const [validCompareColumns, setValidCompareColumns] = React.useState<boolean>(true);
+
+  const alertDataRef = useSyncedRef(alertData);
 
   const {status: deleteStatus, error: deleteError, execute: doDelete} = useAsync(async () => {
     setEditMode(false);
@@ -35,12 +33,13 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
   }, false);
 
   const {status: saveStatus, error: saveError, execute: doSave} = useAsync(async () => {
-    const valFilter = filter?.children.length > 0;
+    const valFilter = alertData?.filter?.children.length > 0;
     const valName = alertData?.name?.trim().length > 0;
-    if (valFilter && valName) {
+    const valCompareColumns = alertData?.compare_columns?.length > 0;
+    if (valFilter && valName && valCompareColumns) {
       let newAlert;
       if (selectedAlert) {
-        newAlert = await editAlert(selectedAlert.id, {...alertData, filter})
+        newAlert = await editAlert(selectedAlert.id, {...alertData})
           .then((alert) => {
             return runAlert(alert.id).then((a) => {
               return a ? a : alert;
@@ -48,7 +47,7 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
           });
         setEditMode(false);
       } else {
-        newAlert = await saveAlert({...alertData, filter})
+        newAlert = await saveAlert({...alertData})
           .then((alert) => {
             return runAlert(alert.id).then((a) => {
               return a ? a : alert;
@@ -60,35 +59,32 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
     }
     setValidFilter(valFilter);
     setValidName(valName);
+    setValidCompareColumns(valCompareColumns);
   }, false);
 
   // TODO: CDCs are more complex than just filters, i.e. they also have fields.
   const cdcs = Object.keys(cdcConfig);
 
-  React.useEffect(() => {
-    setFilterSelection(cdcConfig[alertData?.cdc_id]?.filters);
-    setCompareColumns(cdcConfig[alertData?.cdc_id]?.compareColumns);
-    setFilterComponents(cdcConfig[alertData?.cdc_id]?.components)
-  }, [alertData?.cdc_id]);
+  const filterSelection = cdcConfig[alertData?.cdc_id]?.filters;
+  const compareColumns = cdcConfig[alertData?.cdc_id]?.compareColumns;
+  const filterComponents = cdcConfig[alertData?.cdc_id]?.components;
 
   React.useEffect(() => {
-    setEditMode(false);
-    setDeleteMode(false);
+    if (selectedAlert) {
+      setEditMode(false);
+      setDeleteMode(false);
+    }
   }, [selectedAlert]);
 
 
   const onDiscard = () => {
     setEditMode(false);
     setAlertData(selectedAlert);
-    setFilter(selectedAlert.filter);
   };
 
-  const onCDCChanged = (e) => {
-    setAlertData({...alertData, cdc_id: e.value, compare_columns: null});
-    setFilter(CDC_DEFAULT_FILTER);
-  }
-
-  const editButton = !editMode && !deleteMode && !creationMode ? (<>
+  const editButton = saveStatus === 'pending' || deleteStatus === 'pending' ? (
+    <i className="fas fa-spinner fa-spin" />
+  ) : !editMode && !deleteMode && !creationMode ? (<>
     <button title="Edit Alert" className="btn btn-text-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
     <button title="Delete Alert" className="btn btn-text-secondary" onClick={() => setDeleteMode(true)}><i className="fas fa-trash"></i></button>
   </>) : (editMode || creationMode ? <>
@@ -101,9 +97,16 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
 
   return (<>
     <div className="d-md-flex justify-content-md-end">
-      <ErrorMessage error={deleteError || saveError} />
       <small>{editButton}</small>
     </div>
+    {selectedAlert?.latest_error ?
+      <ErrorMessage error={new Error(`In the sync from ${new Date(selectedAlert.latest_error_date)} an error occured: ${selectedAlert.latest_error}`)} />
+      : deleteError ?
+        <ErrorMessage error={new Error(`While deleting an error occured: ${deleteError}`)} />
+        : saveError ?
+          <ErrorMessage error={new Error(`While saving an error occured: ${saveError}`)} />
+          : null
+    }
     <div className="accordion" id="editAlert">
       {!editMode && !creationMode ?
         <div key="one" className="accordion-item">
@@ -130,8 +133,8 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
               {!creationMode && !editMode ?
                 <h6>{alertData.name}</h6>
                 :
-                <><input type="text" className={`form-control${validName !== false ? '' : ' is-invalid'}`} value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} required />
-                  {validName !== false ? null :
+                <><input type="text" className={`form-control${validName ? '' : ' is-invalid'}`} value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} required />
+                  {validName ? null :
                     <div className="invalid-feedback">
                       Name must not be empty!
                     </div>}</>
@@ -143,13 +146,14 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
                 isDisabled={!creationMode && !editMode}
                 options={cdcs.map((c) => ({label: c, value: c}))}
                 value={{label: alertData.cdc_id, value: alertData.cdc_id}}
-                onChange={(e) => onCDCChanged(e)}
+                onChange={(e) => setAlertData({...alertData, cdc_id: e.value, compare_columns: null})}
               />
             </div>
             <div className="mb-3 col pe-2">
               <label className="form-label">Change Fields</label>
               <Select<IReactSelectOption, true>
                 isMulti
+                className={`${validCompareColumns ? '' : 'form-control is-invalid'}`}
                 isDisabled={!creationMode && !editMode}
                 closeMenuOnSelect={false}
                 options={compareColumns?.map((c) => ({label: c, value: c}))}
@@ -157,6 +161,11 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
                 value={alertData.compare_columns ? alertData.compare_columns.map((c) => ({label: c, value: c})) : null}
                 onChange={(e) => setAlertData({...alertData, compare_columns: e.map((col) => col.value)})}
               />
+              {validCompareColumns ? null :
+                <div className="invalid-feedback">
+                  Change fields must not be empty!
+                </div>
+              }
             </div>
             <div className="mb-3 col">
               <label className="form-label">Email notification</label>
@@ -167,8 +176,12 @@ export function CDCAlertView({alertData, setAlertData, filter, setFilter, onAler
             </div>
           </div>
           <div>
-            {filterSelection || !filter ?
-              <CDCFilterCreator filterSelection={!creationMode && !editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} isInvalid={validFilter === false} />
+            {filterSelection && alertData?.filter ?
+              <CDCFilterCreator filterSelection={!creationMode && !editMode ? null : filterSelection} filterComponents={filterComponents} filter={alertData.filter} setFilter={(v) => {
+                console.log("TEST123", alertData);
+                const current = alertDataRef.current;
+                setAlertData({...current, filter: v(current.filter)});
+              }} isInvalid={!validFilter} />
               :
               <p>No filters available for this cdc</p>}
           </div>

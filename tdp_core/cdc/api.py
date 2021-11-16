@@ -1,11 +1,11 @@
 import logging
 from datetime import datetime
-from re import A
+from typing import List
 from flask_smorest import Api, Blueprint
 from phovea_server.ns import Namespace, abort, no_cache
-from phovea_server.security import login_required, can_write, can_read, current_username
+from phovea_server.security import can_write, login_required, can_read, current_username
 from phovea_server.util import jsonify
-from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema
+from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema, RunAllAlertsSchema
 from .CDCManager import cdc_manager
 
 app = Namespace(__name__)
@@ -25,8 +25,19 @@ blp = Blueprint(
   'cdc', __name__, url_prefix='/'
 )
 
-def run_alert(alert: CDCAlert):
-    new_data, diff = cdc_manager.run_alert(alert)
+
+def run_alert(alert: CDCAlert) -> bool:
+    try:
+        if alert.id == 13:
+            raise Exception('Something is wrong, i can feel it')
+
+        new_data, diff = cdc_manager.run_alert(alert)
+    except Exception as e:
+        _log.exception(f'Error when running alert {alert.id}')
+        # TODO: Clear latest_diff and latest_fetched_data and latest_compare_data?
+        alert.latest_error = str(e)
+        alert.latest_error_date = datetime.utcnow()
+        return False
 
     if diff:
         # We have a new diff! Send email? Store in db? ...
@@ -34,9 +45,11 @@ def run_alert(alert: CDCAlert):
         alert.latest_fetched_data = new_data
         alert.latest_diff = diff
     # TODO else: also set latest diff to empty
-    
+
     alert.latest_error = None
     alert.latest_error_date = None
+    return True
+
 
 @app.errorhandler(400)
 @app.errorhandler(404)
@@ -134,20 +147,21 @@ def delete_alert_by_id(id: int):
 @no_cache
 @login_required
 @blp.route('/alert/run', methods=["GET"])
-@blp.response(CDCAlertSchema(many=True,), code=200)
+@blp.response(RunAllAlertsSchema, code=200, description="Response includes ids of successful and failing alerts")
 def run_all_alerts():
     session = create_session()
     alerts = session.query(CDCAlert).all()
-    result = {'success': [], 'error': []}
+    success: List[str] = []
+    error: List[str] = []
     for alert in alerts:
-        try:
-            run_alert(alert)
-            result['success'].append(alert.id)
-        except:
-            result['error'].append(alert.id)
+        successful = run_alert(alert)
+        if successful:
+            success.append(alert.id)
+        else:
+            error.append(alert.id)
 
     session.commit()
-    return jsonify(result)
+    return {'success': success, 'error': error}
 
 
 @no_cache
@@ -162,17 +176,13 @@ def run_alert_by_id(id: int):
     if not can_read(alert):
         abort(401)
 
-    try: 
-        run_alert(alert)
-        session.commit()
-        return alert, 200
-
-    except Exception as e:
-        alert.latest_error = str(e)
-        alert.latest_error_date = datetime.utcnow()
-        session.commit()
+    successful = run_alert(alert)
+    session.commit()
+    if not successful:
         abort(400)
 
+    return alert, 200
+    
 
 @no_cache
 @login_required
