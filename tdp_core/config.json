@@ -4,5 +4,6 @@
   "database": "targid",
   "migrations": {
     "autoUpgrade": true
-  }
+  },
+  "cdc_update": {"second":  0}
 }
