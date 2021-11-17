@@ -1,4 +1,9 @@
 from phovea_server.ns import abort
+import logging
+
+
+_log = logging.getLogger(__name__)
+
 
 secure_replacements = ['where', 'and_where', 'agg_score', 'joins']  # has to be part of the computed replacements
 
@@ -39,3 +44,19 @@ def clean_query(query):
   q = query.strip()
   q_clean = re.sub(r'(\s)+', ' ', q)
   return q_clean
+
+
+def wait_for_redis_ready(db, timeout=None):
+  import time
+  import redis
+
+  _log.info('check if redis is ready')
+  start_time = time.time()
+  while timeout is None or time.time() - start_time < timeout:
+    try:
+      db.dbsize()
+    except redis.exceptions.BusyLoadingError:
+      _log.info('stall till redis is ready')
+      time.sleep(0.5)
+    else:
+        break

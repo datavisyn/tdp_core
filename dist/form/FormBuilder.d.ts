@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import * as d3 from 'd3';
 import { IFormElementDesc, IForm } from './interfaces';
 /**

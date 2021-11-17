@@ -1,13 +1,6 @@
-/**
- * Find views for a given idtype and number of selected items.
- * The seleted items itself are not considered in this function.
- * @param idtype
- * @param selection
- * @returns {any}
- */
-import { IDType } from 'phovea_core';
 import { IGroupData, IInstanceViewExtensionDesc, IViewPluginDesc } from '../base/interfaces';
-import { Range } from 'phovea_core';
+import { IDType } from '../idtype';
+import { Range } from '../range';
 export interface IDiscoveredView {
     enabled: boolean;
     v: IViewPluginDesc;

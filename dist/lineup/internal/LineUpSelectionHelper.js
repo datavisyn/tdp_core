@@ -1,9 +1,7 @@
-/**
- * Created by sam on 13.02.2017.
- */
-import { EventHandler, Range } from 'phovea_core';
+import { EventHandler } from '../../base';
 import { LocalDataProvider } from 'lineupjs';
 import { LineupUtils } from '../utils';
+import { Range } from '../../range';
 export class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType) {
         super();

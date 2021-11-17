@@ -12,3 +12,7 @@ export * from './ChooserProxyView';
 export * from './CompositeView';
 export * from './ProxyView';
 export * from './FindViewUtils';
+export * from './AReactView';
+export * from './AReactChooserView';
+export * from './ReactViewWrapper';
+export * from './TDPView';

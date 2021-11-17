@@ -1,9 +1,5 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-
 import * as d3 from 'd3';
-import {BaseUtils} from 'phovea_core';
+import {BaseUtils} from '../../base';
 import {IFormElement, IForm, IFormElementDesc} from '../interfaces';
 
 /**

@@ -1,13 +1,12 @@
-import { IPlugin, IPluginDesc } from 'phovea_core';
-import { IUser } from 'phovea_core';
-import { IObjectRef, ProvenanceGraph, Range } from 'phovea_core';
-import { IEventHandler } from 'phovea_core';
-import { RangeLike } from 'phovea_core';
-import { IDType } from 'phovea_core';
 import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
-import { AppHeader } from 'phovea_ui';
+import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
+import { IPluginDesc, IPlugin, IEventHandler } from '.';
+import { IDType } from '../idtype';
+import { ProvenanceGraph, IObjectRef } from '../provenance';
+import { RangeLike, Range } from '../range';
+import { IUser } from '../security';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column

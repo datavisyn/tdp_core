@@ -1,7 +1,7 @@
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
-import {IPluginDesc} from 'phovea_core';
+import {IPluginDesc} from '../../base';
 
 export interface ICheckBoxElementDesc extends IFormElementDesc {
   type: FormElementType.CHECKBOX;

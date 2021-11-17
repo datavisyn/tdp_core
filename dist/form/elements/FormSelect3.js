@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import { AFormElement } from './AFormElement';
 import { Select3 } from './Select3';
 /**

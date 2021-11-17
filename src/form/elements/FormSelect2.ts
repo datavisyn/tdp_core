@@ -1,13 +1,10 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-
 import 'select2';
 import * as d3 from 'd3';
 import $ from 'jquery';
-import {BaseUtils, AppContext, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc, FormElementType} from '../interfaces';
+import {AppContext} from '../../app';
+import {IPluginDesc, BaseUtils} from '../../base';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text'|'id';

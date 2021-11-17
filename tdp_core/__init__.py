@@ -51,11 +51,36 @@ def phovea(registry):
                       'namespace': '/api/tdp/db-migration'
                   })
 
+  # CDC
   registry.append('namespace', 'tdp_cdc', 'tdp_core.cdc.api',
                   {
                       'namespace': '/api/tdp/cdc'
                   })
 
+  # phovea_clue
+  registry.append('namespace', 'caleydo-clue-screenshot', 'tdp_core.remoteplayer',
+                  {
+                      'namespace': '/api/clue',
+                      'factory': 'create'
+                  })
+
+  # phovea_security_flask
+  # TODO: Add ENV variables to allow disabling
+  registry.append('manager', 'security_manager', 'tdp_core.flask_login_impl', dict(singleton=True))
+  registry.append('user_stores', 'alb_security_store', 'tdp_core.security.store.ALBSecurityStore', {})
+
+  # tdp_matomo
+  registry.append('tdp-config-safe-keys', 'matomo', '', {
+   'configKey': 'tdp_core.matomo'
+  })
+
+  # phovea_data_redis
+  registry.append('manager', 'idmanager', 'tdp_core.assigner', dict(priority=-5, singleton=True))
+  registry.append('mapping_provider', 'phovea_data_redis', 'tdp_core.redis_mapping_table')
+  registry.append('manager', 'cachemanager', 'tdp_core.cache', dict(priority=-5, singleton=True))
+
+  # phovea_data_mongo
+  registry.append('dataset-provider', 'dataset-graph', 'tdp_core.graph', {})
   # generator-phovea:end
   pass
 

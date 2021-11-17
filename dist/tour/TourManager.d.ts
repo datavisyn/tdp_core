@@ -1,5 +1,5 @@
 import { Tour } from './Tour';
-import { AppHeader } from 'phovea_ui';
+import { AppHeader } from '../components';
 export interface ITourManagerContext {
     doc: Document;
     app(): Promise<any>;

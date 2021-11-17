@@ -7,6 +7,16 @@ yamlreader==3.0.4
 alembic==1.4.3
 openpyxl~=3.0.5
 deepdiff==5.5.0
+pyjwt==2.1.0
 -e git+https://github.com/phovea/phovea_server.git@develop#egg=phovea_server
+# phovea_clue
+python-memcached==1.59
+# phovea_security_flask
+flask-login==0.5.0
+# phovea_data_redis
+redis~=3.5.3
+cachelib==0.1.1
+# phovea_data_mongo
+pymongo~=3.11.1
 # Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
 docutils==0.17.1

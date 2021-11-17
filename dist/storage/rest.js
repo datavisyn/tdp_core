@@ -1,5 +1,9 @@
-import { IDTypeManager, ParseRangeUtils, UserSession, Ajax, AppContext, Permission } from 'phovea_core';
+import { AppContext, UserSession } from '../app';
+import { Ajax } from '../base';
 import { RestBaseUtils } from '../base/rest';
+import { IDTypeManager } from '../idtype';
+import { ParseRangeUtils } from '../range';
+import { Permission } from '../security';
 import { ENamedSetType } from './interfaces';
 export class RestStorageUtils {
     static listNamedSets(idType = null) {

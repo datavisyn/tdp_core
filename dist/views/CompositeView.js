@@ -1,9 +1,12 @@
-import { BaseUtils, ResolveNow, EventHandler, IDTypeManager, Range, PluginRegistry, I18nextManager, WebpackEnv } from 'phovea_core';
-import { LayoutContainerEvents } from 'phovea_ui';
-import { BuilderUtils, LAYOUT_CONTAINER_WRAPPER } from 'phovea_ui';
+import { IDTypeManager } from '../idtype';
+import { BaseUtils, EventHandler, ResolveNow, WebpackEnv } from '../base';
+import { Range } from '../range';
+import { I18nextManager } from '../i18n';
+import { PluginRegistry } from '../app';
 import { AView } from './AView';
 import { EViewMode } from '../base/interfaces';
 import { ViewUtils } from './ViewUtils';
+import { BuilderUtils, LayoutContainerEvents, LAYOUT_CONTAINER_WRAPPER } from '../layout';
 export function isCompositeViewPluginDesc(desc) {
     return Array.isArray(desc.elements);
 }

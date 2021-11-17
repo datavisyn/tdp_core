@@ -9,7 +9,6 @@
  *
  *********************************************************/
 
-import {EventHandler, ObjectRefUtils, ObjectNode, ProvenanceGraph, ResolveNow, Range, IDType, IDTypeManager, I18nextManager, NodeUtils} from 'phovea_core';
 import {IViewProvider} from '../lineup/IViewProvider';
 import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
 import {FindViewUtils} from '../views/FindViewUtils';
@@ -17,6 +16,12 @@ import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';
 import {ViewUtils} from '../views/ViewUtils';
 import {AView} from '../views/AView';
 import {TourUtils} from '../tour/TourUtils';
+import {EventHandler, ResolveNow} from '../base';
+import {NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph} from '../provenance';
+import {Range} from '../range';
+import {I18nextManager} from '../i18n';
+import {IDType, IDTypeManager} from '../idtype';
+import {Dialog} from '../components';
 
 
 export class ViewWrapper extends EventHandler implements IViewProvider {
@@ -75,12 +80,10 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
-        import('phovea_ui/dist/components/dialogs').then(({Dialog}) => {
-          const d = Dialog.generateDialog(plugin.name, I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.close'));
-          d.body.innerHTML = plugin.helpText;
-          d.show();
-          d.hideOnSubmit();
-        });
+        const d = Dialog.generateDialog(plugin.name, I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.close'));
+        d.body.innerHTML = plugin.helpText;
+        d.show();
+        d.hideOnSubmit();
       });
     } else if (plugin.helpUrl) {
       if (typeof plugin.helpUrl === 'string') {

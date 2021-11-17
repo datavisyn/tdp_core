@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 12.09.2017.
- */
 import { IDataProvider, IColumnDesc, Column } from 'lineupjs';
 import { IScoreRow } from '../../base/interfaces';
 export interface ILazyLoadedColumn {

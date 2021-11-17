@@ -1,4 +1,4 @@
-import { IDTypeManager } from 'phovea_core';
+import { IDTypeManager } from '../idtype';
 export class ResolveUtils {
     static resolveIdToNames(fromIDType, id, toIDType = null) {
         const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
