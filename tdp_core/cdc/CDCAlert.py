@@ -47,10 +47,6 @@ class CDCAlert(Base):
     modifier = Column(TEXT)  # NOQA: N815
     modification_date = Column(DateTime)  # NOQA: N815
 
-    @property
-    def apply_filt(self) -> Callable:
-      return Filter().load(self.filter)
-
     # TODO: Avoid loading latest_diff, latest_fetch_data, latest_confirmed_data, use flags instead and load individually
     # def has_latest_diff(self):
     #     return self.latest_diff is not None
@@ -71,7 +67,7 @@ class CDCAlertArgsSchema(Schema):
     name = fields.String()
     enable_mail_notification = fields.Boolean()
     cdc_id = fields.String(validate=lambda name: name in api.cdcs.keys())
-    filter = fields.Dict(required=True, validate=Filter().load)
+    filter = fields.Nested(Filter, required=True)
     compare_columns = fields.List(fields.String())
 
 

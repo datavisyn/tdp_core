@@ -1,3 +1,4 @@
+from werkzeug.exceptions import BadRequest, HTTPException
 from flask_apscheduler import APScheduler
 from datetime import datetime
 from typing import List
@@ -8,10 +9,12 @@ from phovea_server.util import jsonify
 from .CDCAlert import CDCAlert, CDCAlertSchema, create_session, CDCAlertArgsSchema, RunAllAlertsSchema
 from .JSONPlaceholderUserCDC import JSONPlaceholderUserCDC
 from .JSONPlaceholderPostsCDC import JSONPlaceholderPostsCDC
-from .filter import FieldFilterMixin
+from .CortellisTrialsCDC import CortellisTrialsCDC
+from .filter import FieldFilterMixin, Filter
 from phovea_server.config import view
+import logging
 
-
+_log = logging.getLogger(__name__)
 
 app = Namespace(__name__)
 app.config['OPENAPI_VERSION'] = '3.0.2'
@@ -30,14 +33,21 @@ blp = Blueprint(
   'cdc', __name__, url_prefix='/'
 )
 
-cdcs = {cls.__name__: cls() for cls in [JSONPlaceholderUserCDC, JSONPlaceholderPostsCDC]}
+cdcs = {cls.__name__: cls() for cls in [JSONPlaceholderUserCDC, JSONPlaceholderPostsCDC, CortellisTrialsCDC]}
 
 
-def run_alert2(alert: CDCAlert):
-  app.logger.info(f'Refreshing alert {alert.cdc_id}')
+def compute_new_data_diff(alert: CDCAlert):
+  app.logger.info(f'Refreshing alert {alert.id}')
   cdc = cdcs[alert.cdc_id]
-  data = cdc.load_data()
-  data = alert.apply_filt(data)
+
+  if not cdc:
+    raise Exception(f'Missing cdc {alert.cdc_id}')
+
+  data = cdc.load_data({
+    # TODO: Define options like username?
+  })
+
+  data = Filter().load(alert.filter)._apply(data)
 
   # i have no idea what this is doing tbh
   for i, item in enumerate(data):
@@ -74,10 +84,7 @@ def run_alert2(alert: CDCAlert):
 
 def run_alert(alert: CDCAlert) -> bool:
     try:
-        if alert.id == 13:
-            raise Exception('Something is wrong, i can feel it')
-        # todo: only used here, so we could inline it?
-        new_data, diff = run_alert2(alert)
+        new_data, diff = compute_new_data_diff(alert)
     except Exception as e:
         app.logger.exception(f'Error when running alert {alert.id}')
         # TODO: Clear latest_diff and latest_fetched_data and latest_compare_data?
@@ -100,14 +107,11 @@ def run_alert(alert: CDCAlert) -> bool:
 @app.errorhandler(ValueError)  # happens in filter validation
 @app.errorhandler(KeyError)  # happens in cdc lookups
 def handle_error(e):
-  return jsonify(error=str(e), code=400), 400
-
-
-@app.errorhandler(400)
-@app.errorhandler(404)
-@app.errorhandler(500)
-def handle_error(e):
-    return jsonify(error=str(e.description), code=e.code), e.code
+    return {
+        "code": 400,
+        "status": "Bad Request",
+        "message": str(e)
+    }, 400
 
 
 @app.route('/cdc', methods=['GET'])
@@ -199,10 +203,10 @@ def _run_all_alerts():
     """ Schedule-able version that does not need a login / session-scope """
     session = create_session()
     alerts = session.query(CDCAlert).all()
-    statuus = [run_alert(alert) for alert in alerts]
+    status = [run_alert(alert) for alert in alerts]
     session.commit()
-    return {'success': [a.id for a, s in zip(alerts, statuus) if s],
-            'error':   [a.id for a, s in zip(alerts, statuus) if not s]}
+    return {'success': [a.id for a, s in zip(alerts, status) if s],
+            'error':   [a.id for a, s in zip(alerts, status) if not s]}
 
 
 @no_cache
@@ -210,7 +214,12 @@ def _run_all_alerts():
 @blp.route('/alert/run', methods=["GET"])
 @blp.response(RunAllAlertsSchema, code=200, description="Response includes ids of successful and failing alerts")
 def run_all_alerts():
-  return _run_all_alerts()
+    session = create_session()
+    alerts = [alert for alert in session.query(CDCAlert).all() if can_read(alert)]
+    status = [run_alert(alert) for alert in alerts]
+    session.commit()
+    return {'success': [a.id for a, s in zip(alerts, status) if s],
+            'error':   [a.id for a, s in zip(alerts, status) if not s]}
 
 
 @no_cache

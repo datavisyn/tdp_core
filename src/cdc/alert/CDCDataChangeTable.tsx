@@ -40,15 +40,15 @@ export function CDCDataChangeTable({selectedAlert, onAlertChanged}: ICDCDataChan
       <i className="fas fa-spinner fa-spin" />
       : <>
         {selectedAlert.latest_diff || selectedAlert.confirmed_data ? (<>
-          <table className="table mb-0">
-            <thead>
+          <table className="table mb-0 d-block overflow-auto">
+            <thead className="position-sticky table-light top-0">
               <tr>
                 <th scope="col">ID</th>
                 {selectedAlert.compare_columns.map((field, i) => <th key={field} scope="col">{field}</th>)}
                 <th scope="col">Status</th>
               </tr>
             </thead>
-            <tbody style={{maxHeight: 600, overflow: 'auto'}}>
+            <tbody className="overflow-auto">
               {selectedAlert.latest_diff ? <>
                 {selectedAlert.latest_diff?.dictionary_item_added?.map((d) => {
                   const data = selectedAlert.latest_fetched_data.find((a) => a._cdc_compare_id === d);

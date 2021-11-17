@@ -32,13 +32,13 @@ export function CDCDataChangeTable({ selectedAlert, onAlertChanged }) {
     return (React.createElement(React.Fragment, null, confirmStatus === 'pending' ?
         React.createElement("i", { className: "fas fa-spinner fa-spin" })
         : React.createElement(React.Fragment, null, selectedAlert.latest_diff || selectedAlert.confirmed_data ? (React.createElement(React.Fragment, null,
-            React.createElement("table", { className: "table mb-0" },
-                React.createElement("thead", null,
+            React.createElement("table", { className: "table mb-0 d-block overflow-auto" },
+                React.createElement("thead", { className: "position-sticky table-light top-0" },
                     React.createElement("tr", null,
                         React.createElement("th", { scope: "col" }, "ID"),
                         selectedAlert.compare_columns.map((field, i) => React.createElement("th", { key: field, scope: "col" }, field)),
                         React.createElement("th", { scope: "col" }, "Status"))),
-                React.createElement("tbody", { style: { maxHeight: 600, overflow: 'auto' } },
+                React.createElement("tbody", { className: "overflow-auto" },
                     selectedAlert.latest_diff ? React.createElement(React.Fragment, null, (_b = (_a = selectedAlert.latest_diff) === null || _a === void 0 ? void 0 : _a.dictionary_item_added) === null || _b === void 0 ? void 0 :
                         _b.map((d) => {
                             const data = selectedAlert.latest_fetched_data.find((a) => a._cdc_compare_id === d);

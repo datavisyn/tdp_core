@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 import {ErrorMessage} from '../common';
-import {useAsync, useSyncedRef} from '../../hooks';
+import {useAsync} from '../../hooks';
 import {deleteAlert, editAlert, saveAlert} from '../api';
 import {CDCFilterCreator} from '../creator';
 import {IAlert, IUploadAlert, IReactSelectOption, ICDCConfiguration} from '../interfaces';
@@ -23,8 +23,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
   const [validFilter, setValidFilter] = React.useState<boolean>(true);
   const [validName, setValidName] = React.useState<boolean>(true);
   const [validCompareColumns, setValidCompareColumns] = React.useState<boolean>(true);
-
-  const alertDataRef = useSyncedRef(alertData);
+  const [activePage, setActivePage] = React.useState<'data' | 'info'>('info');
 
   const {status: deleteStatus, error: deleteError, execute: doDelete} = useAsync(async () => {
     setEditMode(false);
@@ -33,7 +32,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
   }, false);
 
   const {status: saveStatus, error: saveError, execute: doSave} = useAsync(async () => {
-    const valFilter = alertData?.filter?.children.length > 0;
+    const valFilter = !!alertData?.filter;
     const valName = alertData?.name?.trim().length > 0;
     const valCompareColumns = alertData?.compare_columns?.length > 0;
     if (valFilter && valName && valCompareColumns) {
@@ -63,6 +62,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
     if (selectedAlert) {
       setEditMode(false);
       setDeleteMode(false);
+      setActivePage('info')
     }
   }, [selectedAlert]);
 
@@ -74,18 +74,6 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
 
   return (<>
     <div className="d-md-flex justify-content-md-end mb-1 mt-1">
-      <small>{saveStatus === 'pending' || deleteStatus === 'pending' ? (
-        <i className="fas fa-spinner fa-spin" />
-      ) : !editMode && !deleteMode && !creationMode ? (<>
-        <button title="Edit Alert" className="btn btn-text-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
-        <button title="Delete Alert" className="btn btn-text-secondary" onClick={() => setDeleteMode(true)}><i className="fas fa-trash"></i></button>
-      </>) : (editMode || creationMode ? <>
-        <button title="Save changes" className="btn btn-text-secondary" onClick={() => doSave()}><i className="fas fa-save"></i></button>
-        <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={editMode ? () => onDiscard() : () => setCreationMode(false)}><i className="fas fa-times"></i></button>
-      </> : <>
-        <button title="Delete" className="btn btn-text-secondary" onClick={() => doDelete()}><i className="fas fa-check"></i></button>
-        <button title="No Delete" className="btn btn-text-secondary ms-1" onClick={() => setDeleteMode(false)}><i className="fas fa-times"></i></button>
-      </>)}</small>
     </div>
     {selectedAlert?.latest_error ?
       <ErrorMessage error={new Error(`In the sync from ${new Date(selectedAlert.latest_error_date)} an error occured: ${selectedAlert.latest_error}`)} />
@@ -95,27 +83,38 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
           <ErrorMessage error={new Error(`While saving an error occured: ${saveError}`)} />
           : null
     }
-    <div className="accordion" id="editAlert">
-      {!editMode && !creationMode ?
-        <div key="one" className="accordion-item">
-          <h2 className="accordion-header" id="heading-one">
-            <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-one" aria-expanded="true" aria-controls="collapse-one">
-              {`${selectedAlert.latest_diff ? 'Latest revision from: ' + new Date(selectedAlert.latest_compare_date)?.toLocaleDateString() : 'No new data'}`}
-            </button>
-          </h2>
-          <div id="collapse-one" className="accordion-collapse collapse show" aria-labelledby="heading-one" data-bs-parent="#editAlert">
-            <CDCDataChangeTable selectedAlert={selectedAlert} onAlertChanged={onAlertChanged} />
-          </div>
-        </div>
-        : null}
-      <div key="two" className="accordion-item">
-        <h2 className="accordion-header" id="heading-two">
-          <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-two" aria-expanded="true" aria-controls="collapse-two">
-            Alert overview
-          </button>
-        </h2>
-        <div id="collapse-two" className={`p-4 accordion-collapse collapse${editMode || creationMode ? ' show' : ''}`} aria-labelledby="heading-two" data-bs-parent="#editAlert">
-          <div className="row mb-3">
+    <ul className="nav nav-tabs">
+      <li className="nav-item">
+        <a className={`nav-link ${activePage === 'info' ? 'active' : ''}`} href="#" onClick={(e) => {
+          e.preventDefault();
+          setActivePage('info');
+        }}>Information</a>
+      </li>
+      {!editMode && !creationMode ? <li className="nav-item">
+        <a className={`nav-link ${activePage === 'data' ? 'active' : ''}`} href="#" onClick={(e) => {
+          e.preventDefault();
+          setActivePage('data');
+        }}>{selectedAlert?.latest_diff ? 'Data revision from: ' + new Date(selectedAlert.latest_compare_date)?.toLocaleDateString() : 'Data'}</a>
+      </li> : null}
+      <small className="d-flex justify-content-end flex-grow-1">
+        {saveStatus === 'pending' || deleteStatus === 'pending' ? (
+          <i className="fas fa-spinner fa-spin" />
+        ) : !editMode && !deleteMode && !creationMode ? (<>
+          <button title="Edit Alert" className="btn btn-text-secondary" onClick={() => setEditMode(true)}><i className="fas fa-pencil-alt"></i></button>
+          <button title="Delete Alert" className="btn btn-text-secondary" onClick={() => setDeleteMode(true)}><i className="fas fa-trash"></i></button>
+        </>) : (editMode || creationMode ? <>
+          <button title="Save changes" className="btn btn-text-secondary" onClick={() => doSave()}><i className="fas fa-save"></i></button>
+          <button title="Discard changes" className="btn btn-text-secondary ms-1" onClick={editMode ? () => onDiscard() : () => setCreationMode(false)}><i className="fas fa-times"></i></button>
+        </> : <>
+          <button title="Delete" className="btn btn-text-secondary" onClick={() => doDelete()}><i className="fas fa-check"></i></button>
+          <button title="No Delete" className="btn btn-text-secondary ms-1" onClick={() => setDeleteMode(false)}><i className="fas fa-times"></i></button>
+        </>)}
+      </small>
+    </ul>
+    <div className="overflow-auto h-100 d-flex flex-column">
+      {activePage === 'data' && !editMode && !creationMode ? <CDCDataChangeTable selectedAlert={selectedAlert} onAlertChanged={onAlertChanged} /> : null}
+      {activePage === 'info' ? <>
+      <div className="row mb-3 mt-3">
             <div className="mb-3 col">
               <label className="form-label">Name</label>
               {!creationMode && !editMode ?
@@ -174,8 +173,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
               :
               <p>No filters available for this cdc</p>}
           </div>
-        </div>
-      </div>
+      </> : null}
     </div>
   </>);
 }

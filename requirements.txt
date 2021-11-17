@@ -7,6 +7,7 @@ yamlreader==3.0.4
 alembic==1.4.3
 openpyxl~=3.0.5
 deepdiff==5.5.0
+flask_apscheduler==1.12.2
 -e git+https://github.com/phovea/phovea_server.git@develop#egg=phovea_server
 # Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
 docutils==0.17.1

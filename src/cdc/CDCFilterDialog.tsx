@@ -8,6 +8,7 @@ import {v4 as uuidv4} from 'uuid';
 import {CDCTextFilter, CDCTextFilterId, createCDCTextFilter} from './filter/CDCTextFilter';
 import {CDCAlertView} from './alert/CDCAlertView';
 import {ErrorMessage} from './common';
+import {Dialog} from 'phovea_ui';
 
 interface ICDCFilterDialogProps {
   cdcConfig: {[cdcId: string]: ICDCConfiguration};
@@ -17,9 +18,9 @@ export const CDC_DEFAULT_ALERT_DATA: () => IUploadAlert = () => ({name: '', enab
 
 export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
   const [selectedAlert, setSelectedAlert] = React.useState<IAlert | null>(null);
-  const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [creationMode, setCreationMode] = React.useState<boolean>(false);
   const [alertData, setAlertData] = React.useState<IUploadAlert | null>(null);
+  const [dialogNode, setDialogNode] = React.useState<HTMLDivElement | null>(null);
 
   const onAlertChanged = async (id?: number) => {
     //refetches alerts and makes new selection
@@ -68,9 +69,22 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
     }
   };
 
+  const openDialog = () => {
+    const dialog = document.createElement('div');
+    document.body.appendChild(dialog);
+    setDialogNode(dialog);
+  }
+
   return <>
-    <a style={{color: 'white', cursor: 'pointer'}} onClick={() => setShowDialog(true)}><i className="fas fa-filter" style={{marginRight: 4}}></i> Alert Filter</a>
-    <BSModal show={showDialog} setShow={setShowDialog}>
+    <a style={{color: 'white', cursor: 'pointer'}} onClick={() => openDialog()}><i className="fas fa-filter"></i></a>
+    {dialogNode ? ReactDOM.createPortal(<BSModal show={!!dialogNode} setShow={(show) => {
+        if(!show) {
+          setDialogNode(null); 
+          dialogNode.remove();
+        } else if(!dialogNode) {
+          openDialog();
+        }
+      }}>
       <div className="modal fade" tabIndex={-1}>
         <div className="modal-dialog" style={{maxWidth: '90%'}}>
           <div className="modal-content" style={{height: '90vh'}}>
@@ -78,9 +92,9 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
               <h5 className="modal-title">Alerts</h5>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div className="modal-body">
-              <div className="row h-100">
-                <div className={`col-3 overflow-auto position-relative h-100 ${alertStatus === 'pending' ? 'tdp-busy-overlay' : ''}`}>
+            <div className="modal-body overflow-auto">
+              <div className="row h-100 overflow-auto">
+                <div className={`col-3 overflow-auto h-100 position-relative ${alertStatus === 'pending' ? 'tdp-busy-overlay' : ''}`}>
                   {syncError ? <ErrorMessage error={syncError} /> : null}
                   <div className="d-md-flex justify-content-md-end mb-1 mt-1">
                     <button type="button" disabled={syncStatus === 'pending'} title="Synchronize all alerts" className="btn btn-text-secondary" onClick={() => doSync()}><i className={`fas fa-sync ${syncStatus === 'pending' ? 'fa-spin' : ''}`}></i></button>
@@ -100,7 +114,7 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
                     </a></div>
                   )}</div> : null}
                 </div>
-                <div className="col-9 overflow-auto">
+                <div className="col-9 overflow-auto h-100 position-relative d-flex flex-column">
                   {selectedAlert || creationMode ?
                     <CDCAlertView
                       alertData={alertData}
@@ -119,7 +133,7 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
           </div>
         </div>
       </div>
-    </BSModal>
+    </BSModal>, dialogNode) : null}
   </>;
 }
 
@@ -161,6 +175,15 @@ export class CDCFilterDialogClass {
               [CDCRangeFilterId]: {component: CDCRangeFilter, config: {minValue: 1, maxValue: 100}}
             },
             compareColumns: ['title', 'body']
+          },
+          'CortellisTrialsCDC': {
+            filters: [
+              createCDCGroupingFilter(uuidv4())
+            ],
+            components: {
+              [CDCGroupingFilterId]: {component: CDCGroupingFilter},
+            },
+            compareColumns: ['phase', 'indications', 'enrollmentrount', 'numberofsites']
           }
         }}
       />,

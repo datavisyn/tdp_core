@@ -10,9 +10,9 @@ import { ErrorMessage } from './common';
 export const CDC_DEFAULT_ALERT_DATA = () => ({ name: '', enable_mail_notification: false, cdc_id: 'JSONPlaceholderUserCDC', filter: createCDCGroupingFilter(uuidv4()), compare_columns: null });
 export function CDCFilterDialog({ cdcConfig }) {
     const [selectedAlert, setSelectedAlert] = React.useState(null);
-    const [showDialog, setShowDialog] = React.useState(false);
     const [creationMode, setCreationMode] = React.useState(false);
     const [alertData, setAlertData] = React.useState(null);
+    const [dialogNode, setDialogNode] = React.useState(null);
     const onAlertChanged = async (id) => {
         //refetches alerts and makes new selection
         fetchAlerts().then((alerts) => {
@@ -56,20 +56,32 @@ export function CDCFilterDialog({ cdcConfig }) {
                 return 'No data revision yet';
         }
     };
+    const openDialog = () => {
+        const dialog = document.createElement('div');
+        document.body.appendChild(dialog);
+        setDialogNode(dialog);
+    };
     return React.createElement(React.Fragment, null,
-        React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => setShowDialog(true) },
-            React.createElement("i", { className: "fas fa-filter", style: { marginRight: 4 } }),
-            " Alert Filter"),
-        React.createElement(BSModal, { show: showDialog, setShow: setShowDialog },
+        React.createElement("a", { style: { color: 'white', cursor: 'pointer' }, onClick: () => openDialog() },
+            React.createElement("i", { className: "fas fa-filter" })),
+        dialogNode ? ReactDOM.createPortal(React.createElement(BSModal, { show: !!dialogNode, setShow: (show) => {
+                if (!show) {
+                    setDialogNode(null);
+                    dialogNode.remove();
+                }
+                else if (!dialogNode) {
+                    openDialog();
+                }
+            } },
             React.createElement("div", { className: "modal fade", tabIndex: -1 },
                 React.createElement("div", { className: "modal-dialog", style: { maxWidth: '90%' } },
                     React.createElement("div", { className: "modal-content", style: { height: '90vh' } },
                         React.createElement("div", { className: "modal-header" },
                             React.createElement("h5", { className: "modal-title" }, "Alerts"),
                             React.createElement("button", { type: "button", className: "btn-close", "data-bs-dismiss": "modal", "aria-label": "Close" })),
-                        React.createElement("div", { className: "modal-body" },
-                            React.createElement("div", { className: "row h-100" },
-                                React.createElement("div", { className: `col-3 overflow-auto position-relative h-100 ${alertStatus === 'pending' ? 'tdp-busy-overlay' : ''}` },
+                        React.createElement("div", { className: "modal-body overflow-auto" },
+                            React.createElement("div", { className: "row h-100 overflow-auto" },
+                                React.createElement("div", { className: `col-3 overflow-auto h-100 position-relative ${alertStatus === 'pending' ? 'tdp-busy-overlay' : ''}` },
                                     syncError ? React.createElement(ErrorMessage, { error: syncError }) : null,
                                     React.createElement("div", { className: "d-md-flex justify-content-md-end mb-1 mt-1" },
                                         React.createElement("button", { type: "button", disabled: syncStatus === 'pending', title: "Synchronize all alerts", className: "btn btn-text-secondary", onClick: () => doSync() },
@@ -90,9 +102,9 @@ export function CDCFilterDialog({ cdcConfig }) {
                                                     (alert === null || alert === void 0 ? void 0 : alert.latest_error) ? React.createElement("i", { className: "fas fa-exclamation-triangle text-danger", title: alert.latest_error }) : null,
                                                     (alert === null || alert === void 0 ? void 0 : alert.latest_diff) && !(alert === null || alert === void 0 ? void 0 : alert.latest_error) ? React.createElement("i", { className: "fas fa-circle text-primary" }) : null)),
                                             React.createElement("small", null, reviewStatus(alert)))))) : null),
-                                React.createElement("div", { className: "col-9 overflow-auto" }, selectedAlert || creationMode ?
+                                React.createElement("div", { className: "col-9 overflow-auto h-100 position-relative d-flex flex-column" }, selectedAlert || creationMode ?
                                     React.createElement(CDCAlertView, { alertData: alertData, setAlertData: setAlertData, onAlertChanged: onAlertChanged, setCreationMode: setCreationMode, selectedAlert: selectedAlert, creationMode: creationMode, cdcConfig: cdcConfig })
-                                    : null))))))));
+                                    : null))))))), dialogNode) : null);
 }
 export class CDCFilterDialogClass {
     constructor(parent) {
@@ -127,6 +139,15 @@ export class CDCFilterDialogClass {
                         [CDCRangeFilterId]: { component: CDCRangeFilter, config: { minValue: 1, maxValue: 100 } }
                     },
                     compareColumns: ['title', 'body']
+                },
+                'CortellisTrialsCDC': {
+                    filters: [
+                        createCDCGroupingFilter(uuidv4())
+                    ],
+                    components: {
+                        [CDCGroupingFilterId]: { component: CDCGroupingFilter },
+                    },
+                    compareColumns: ['phase', 'indications', 'enrollmentrount', 'numberofsites']
                 }
             } }), this.node);
     }

@@ -1,9 +1,13 @@
 from functools import reduce
 from operator import and_, or_, eq
 from re import match
-from typing import Dict, List, Any, Callable
-from marshmallow import Schema, post_load, INCLUDE, fields
-# This method contains all filter classes to avoid cyclic dependencies
+from typing import Dict, List, Any
+from marshmallow import Schema, post_load, INCLUDE, fields, ValidationError
+
+
+# Create a subclass of dict to allow adding arbitrary attributes
+class MyDict(dict):
+    pass
 
 
 class Filter(Schema):
@@ -15,18 +19,23 @@ class Filter(Schema):
   type = fields.String(required=False)  # "type" of the filter: group, checkbox, text...
 
   @post_load()
-  def _postload(self, data: Dict, **_) -> Callable:
+  def _postload(self, data: Dict, **_) -> MyDict:
     """ Call a postload function in every sub-class """
     return self.postload(data, **data)
 
-  def postload(self, data: Dict, type: str, **_) -> Callable:
+  def postload(self, data: Dict, type: str, **_) -> MyDict:
     """ Delegate to a subclass based on type field """
     filters = {f.__name__.lower(): f for f in Filter.__subclasses__()}
     if type not in filters:
-      raise TypeError(f"Error: Filter type {type} doesn't exist in {filters.keys()}")
+      raise ValidationError(f"Filter type {type} doesn't exist in {list(filters.keys())}", field_name="type")
     sub_cls = filters[type]
     filt = sub_cls().load(data)
-    return lambda items: list(filter(filt, items))
+    # Create a MyDict to allow adding attributes
+    new_data = MyDict(**data)
+    # _private attributes so it doesn't get serialized
+    setattr(new_data, '_filt', filt)
+    setattr(new_data, '_apply', lambda items: list(filter(filt, items)))
+    return new_data
 
 
 class FieldFilterMixin:
@@ -38,7 +47,7 @@ class FieldFilterMixin:
   def access(item, field: str) -> Any:
     for field_name in field.split("."):
       if field_name.startswith("_"):
-        raise TypeError("Private access detected.")
+        raise ValidationError("Private access detected.", field_name='field')
       if item is None:
         return None
 
@@ -77,7 +86,7 @@ class Range(Filter, FieldFilterMixin):
   # noinspection PyMethodOverriding
   def postload(self, data, field: str, value: Dict, **_):
     if "min" not in value or "max" not in value:
-      raise TypeError("Range did not contain min or max.")
+      raise ValidationError("Range did not contain min or max.", field_name="value")
     return lambda item: value["min"] <= FieldFilterMixin.access(item, field) <= value["max"]
 
 
