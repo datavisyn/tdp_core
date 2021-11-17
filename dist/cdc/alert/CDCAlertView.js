@@ -1,337 +1,124 @@
-import get from 'lodash.get';
 import React from 'react';
 import Select from 'react-select';
-import { runAlert } from '..';
-import { confirmAlertById, deleteAlert, editAlert, saveAlert } from '../api';
+import { ErrorMessage } from '../common';
+import { useAsync } from '../../hooks';
+import { deleteAlert, editAlert, saveAlert } from '../api';
 import { CDCFilterCreator } from '../creator';
-export function CDCAlertView({ alertData, setAlertData, filterSelection, filter, setFilter, filterComponents, onAlertChanged, selectedAlert, cdcs, compareColumnOptions, setCreationMode, creationMode }) {
-    var _a, _b, _c;
+import { CDCDataChangeTable } from './CDCDataChangeTable';
+export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selectedAlert, setCreationMode, creationMode, cdcConfig }) {
+    var _a, _b, _c, _d;
     const [editMode, setEditMode] = React.useState(false);
     const [deleteMode, setDeleteMode] = React.useState(false);
-    const validFilter = (filter === null || filter === void 0 ? void 0 : filter.children.length) > 0;
-    const validName = ((_a = alertData === null || alertData === void 0 ? void 0 : alertData.name) === null || _a === void 0 ? void 0 : _a.trim().length) > 0;
-    React.useEffect(() => {
+    const [validFilter, setValidFilter] = React.useState(true);
+    const [validName, setValidName] = React.useState(true);
+    const [validCompareColumns, setValidCompareColumns] = React.useState(true);
+    const [activePage, setActivePage] = React.useState('info');
+    const { status: deleteStatus, error: deleteError, execute: doDelete } = useAsync(async () => {
         setEditMode(false);
-        setDeleteMode(false);
-    }, [selectedAlert]);
-    const confirmChanges = async (id) => {
-        const alert = await confirmAlertById(id);
-        onAlertChanged(alert.id);
-    };
-    const onCreateSave = async () => {
-        if (validFilter && validName) {
-            const newAlert = await saveAlert({ ...alertData, filter })
-                .then((alert) => {
-                return runAlert(alert.id).then((a) => {
-                    return a ? a : alert;
-                });
-            });
+        await deleteAlert(selectedAlert.id);
+        onAlertChanged();
+    }, false);
+    const { status: saveStatus, error: saveError, execute: doSave } = useAsync(async () => {
+        var _a, _b;
+        const valFilter = !!(alertData === null || alertData === void 0 ? void 0 : alertData.filter);
+        const valName = ((_a = alertData === null || alertData === void 0 ? void 0 : alertData.name) === null || _a === void 0 ? void 0 : _a.trim().length) > 0;
+        const valCompareColumns = ((_b = alertData === null || alertData === void 0 ? void 0 : alertData.compare_columns) === null || _b === void 0 ? void 0 : _b.length) > 0;
+        if (valFilter && valName && valCompareColumns) {
+            let newAlert;
+            if (selectedAlert) {
+                newAlert = await editAlert(selectedAlert.id, { ...alertData });
+                setEditMode(false);
+            }
+            else {
+                newAlert = await saveAlert({ ...alertData });
+                setCreationMode(false);
+            }
             onAlertChanged(newAlert.id);
-            setCreationMode(false);
         }
-    };
-    const onEditSave = async () => {
-        if (validFilter && validName) {
-            const newAlert = await editAlert(selectedAlert.id, { ...alertData, filter })
-                .then((alert) => {
-                return runAlert(alert.id).then((a) => {
-                    return a ? a : alert;
-                });
-            });
-            onAlertChanged(newAlert.id);
+        setValidFilter(valFilter);
+        setValidName(valName);
+        setValidCompareColumns(valCompareColumns);
+    }, false);
+    // TODO: CDCs are more complex than just filters, i.e. they also have fields.
+    const cdcs = Object.keys(cdcConfig);
+    const filterSelection = (_a = cdcConfig[alertData === null || alertData === void 0 ? void 0 : alertData.cdc_id]) === null || _a === void 0 ? void 0 : _a.filters;
+    const compareColumns = (_b = cdcConfig[alertData === null || alertData === void 0 ? void 0 : alertData.cdc_id]) === null || _b === void 0 ? void 0 : _b.compareColumns;
+    const filterComponents = (_c = cdcConfig[alertData === null || alertData === void 0 ? void 0 : alertData.cdc_id]) === null || _c === void 0 ? void 0 : _c.components;
+    React.useEffect(() => {
+        if (selectedAlert) {
             setEditMode(false);
+            setDeleteMode(false);
+            setActivePage('info');
         }
-    };
+    }, [selectedAlert]);
     const onDiscard = () => {
         setEditMode(false);
         setAlertData(selectedAlert);
-        setFilter(selectedAlert.filter);
     };
-    const onDelete = async (id) => {
-        setEditMode(false);
-        await deleteAlert(id);
-        onAlertChanged();
-    };
-    // TODO: Extract to component instead of inline function
-    const literature = () => {
-        var _a, _b, _c, _d, _e, _f;
-        if (selectedAlert.latest_diff || selectedAlert.confirmed_data) {
-            const change = new Map();
-            (_b = (_a = selectedAlert.latest_diff) === null || _a === void 0 ? void 0 : _a.values_changed) === null || _b === void 0 ? void 0 : _b.map((d) => {
-                const nestedField = d.field.map((f) => f).join('.');
-                if (change.has(d.id)) {
-                    change.set(d.id, change.get(d.id).set(nestedField, { old: d.old_value, new: d.new_value }));
-                }
-                else {
-                    change.set(d.id, new Map().set(nestedField, { old: d.old_value, new: d.new_value }));
-                }
-            });
-            return (React.createElement(React.Fragment, null,
-                React.createElement("table", { className: "table mb-0" },
-                    React.createElement("thead", null,
-                        React.createElement("tr", null,
-                            React.createElement("th", { scope: "col" }, "ID"),
-                            selectedAlert.compare_columns.map((field, i) => React.createElement("th", { key: field, scope: "col" }, field)),
-                            React.createElement("th", { scope: "col" }, "Status"))),
-                    React.createElement("tbody", { style: { maxHeight: 600, overflow: 'auto' } },
-                        selectedAlert.latest_diff ? React.createElement(React.Fragment, null, (_d = (_c = selectedAlert.latest_diff) === null || _c === void 0 ? void 0 : _c.dictionary_item_added) === null || _d === void 0 ? void 0 :
-                            _d.map((d) => {
-                                const data = selectedAlert.latest_fetched_data.find((a) => a._cdc_compare_id === d);
-                                return (React.createElement("tr", { key: d, className: "table-success" },
-                                    React.createElement("td", { scope: "row" }, data._cdc_compare_id),
-                                    selectedAlert.compare_columns.map((field, i) => React.createElement("td", { key: field }, get(data, field))),
-                                    React.createElement("td", null, "Added")));
-                            }), (_f = (_e = selectedAlert.latest_diff) === null || _e === void 0 ? void 0 : _e.dictionary_item_removed) === null || _f === void 0 ? void 0 :
-                            _f.map((d) => {
-                                const data = selectedAlert.confirmed_data.find((a) => a._cdc_compare_id === d);
-                                return (React.createElement("tr", { key: d, className: "table-danger" },
-                                    React.createElement("td", { scope: "row" }, data._cdc_compare_id),
-                                    selectedAlert.compare_columns.map((field, i) => React.createElement("td", { key: field }, get(data, field))),
-                                    React.createElement("td", null, "Removed")));
-                            })) : null,
-                        selectedAlert.confirmed_data ? React.createElement(React.Fragment, null, selectedAlert.confirmed_data
-                            // Only show entries which are not already shown above
-                            .filter((item) => { var _a, _b, _c, _d; return !((_b = (_a = selectedAlert.latest_diff) === null || _a === void 0 ? void 0 : _a.dictionary_item_added) === null || _b === void 0 ? void 0 : _b.includes(item._cdc_compare_id)) && !((_d = (_c = selectedAlert.latest_diff) === null || _c === void 0 ? void 0 : _c.dictionary_item_removed) === null || _d === void 0 ? void 0 : _d.includes(item._cdc_compare_id)); })
-                            // Sort such that rows with changes are on top
-                            .sort((a, b) => (change.has(b._cdc_compare_id) ? 1 : 0) - (change.has(a._cdc_compare_id) ? 1 : 0)).map((d) => {
-                            var _a, _b, _c, _d;
-                            const id = d._cdc_compare_id;
-                            const hasChanged = change.has(id);
-                            // TODO: All these .find() and .includes() should be refactored as they are O(n).
-                            const isAlreadyHandled = ((_b = (_a = selectedAlert.latest_diff) === null || _a === void 0 ? void 0 : _a.dictionary_item_added) === null || _b === void 0 ? void 0 : _b.includes(id)) || ((_d = (_c = selectedAlert.latest_diff) === null || _c === void 0 ? void 0 : _c.dictionary_item_removed) === null || _d === void 0 ? void 0 : _d.includes(id));
-                            return (isAlreadyHandled ? null :
-                                React.createElement("tr", { key: id, className: `${hasChanged ? 'table-primary' : ''}` },
-                                    React.createElement("td", { scope: "row" }, d._cdc_compare_id),
-                                    selectedAlert.compare_columns.map((field) => (React.createElement(React.Fragment, { key: field }, hasChanged ? (change.get(id).has(field) ? (React.createElement("td", null,
-                                        React.createElement("s", null, change.get(id).get(field).old),
-                                        " ",
-                                        change.get(id).get(field).new)) : (React.createElement("td", null, get(d, field)))) : (React.createElement("td", { key: field }, get(d, field)))))),
-                                    React.createElement("td", null, hasChanged ? React.createElement(React.Fragment, null, "Changed") : null)));
-                        })) : null)),
-                selectedAlert.latest_diff ? React.createElement("div", { className: "p-1" },
-                    React.createElement("div", { className: "d-md-flex justify-content-md-end" },
-                        React.createElement("button", { title: "Confirm changes", className: "btn btn-primary", onClick: () => confirmChanges(selectedAlert.id) }, "Confirm"))) : null));
-        }
-        return React.createElement("p", null, "No new data available");
-    };
-    const editButton = !editMode && !deleteMode && !creationMode ? (React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Edit Alert", className: "btn btn-text-secondary", onClick: () => setEditMode(true) },
-            React.createElement("i", { className: "fas fa-pencil-alt" })),
-        React.createElement("button", { title: "Delete Alert", className: "btn btn-text-secondary", onClick: () => setDeleteMode(true) },
-            React.createElement("i", { className: "fas fa-trash" })))) : (editMode || creationMode ? React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: editMode ? () => onEditSave() : () => onCreateSave() },
-            React.createElement("i", { className: "fas fa-save" })),
-        React.createElement("button", { title: "Discard changes", className: "btn btn-text-secondary ms-1", onClick: editMode ? () => onDiscard() : () => setCreationMode(false) },
-            React.createElement("i", { className: "fas fa-times" }))) : React.createElement(React.Fragment, null,
-        React.createElement("button", { title: "Delete", className: "btn btn-text-secondary", onClick: () => onDelete(selectedAlert.id) },
-            React.createElement("i", { className: "fas fa-check" })),
-        React.createElement("button", { title: "No Delete", className: "btn btn-text-secondary ms-1", onClick: () => setDeleteMode(false) },
-            React.createElement("i", { className: "fas fa-times" }))));
     return (React.createElement(React.Fragment, null,
-        React.createElement("div", { className: "d-flex w-100 justify-content-between mb-1" },
-            React.createElement("h5", null, "Your options"),
-            React.createElement("small", null, editButton)),
-        React.createElement("div", { className: "accordion", id: "editAlert" },
-            !editMode && !creationMode ?
-                React.createElement("div", { key: "one", className: "accordion-item" },
-                    React.createElement("h2", { className: "accordion-header", id: "heading-one" },
-                        React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#collapse-one", "aria-expanded": "true", "aria-controls": "collapse-one" }, `${selectedAlert.latest_diff ? 'Latest revision from: ' + ((_b = new Date(selectedAlert.latest_compare_date)) === null || _b === void 0 ? void 0 : _b.toLocaleDateString()) : 'No new data'}`)),
-                    React.createElement("div", { id: "collapse-one", className: "accordion-collapse collapse show", "aria-labelledby": "heading-one", "data-bs-parent": "#editAlert" }, literature()))
-                : null,
-            React.createElement("div", { key: "two", className: "accordion-item" },
-                React.createElement("h2", { className: "accordion-header", id: "heading-two" },
-                    React.createElement("button", { className: "accordion-button", type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#collapse-two", "aria-expanded": "true", "aria-controls": "collapse-two" }, "Alert overview")),
-                React.createElement("div", { id: "collapse-two", className: `p-4 accordion-collapse collapse${editMode || creationMode ? ' show' : ''}`, "aria-labelledby": "heading-two", "data-bs-parent": "#editAlert" },
-                    React.createElement("div", { className: "row mb-3" },
-                        React.createElement("div", { className: "mb-3 col" },
-                            React.createElement("label", { className: "form-label" }, "Name"),
-                            !creationMode && !editMode ?
-                                React.createElement("h6", null, alertData.name)
-                                :
-                                    React.createElement(React.Fragment, null,
-                                        React.createElement("input", { type: "text", className: `form-control${validName ? '' : ' is-invalid'}`, value: alertData.name, onChange: (e) => setAlertData({ ...alertData, name: e.target.value }), required: true }),
-                                        validName ? null :
-                                            React.createElement("div", { className: "invalid-feedback" }, "Name must not be empty!"))),
-                        React.createElement("div", { className: "mb-3 col pe-2" },
-                            React.createElement("label", { className: "form-label" }, "CDC"),
-                            React.createElement(Select, { isDisabled: !creationMode && !editMode, options: cdcs.map((c) => ({ label: c, value: c })), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: (e) => setAlertData({ ...alertData, cdc_id: e.value }) })),
-                        React.createElement("div", { className: "mb-3 col pe-2" },
-                            React.createElement("label", { className: "form-label" }, "Change Fields"),
-                            React.createElement(Select, { isMulti: true, isDisabled: !creationMode && !editMode, closeMenuOnSelect: false, options: compareColumnOptions.map((c) => ({ label: c, value: c })), value: (_c = alertData.compare_columns) === null || _c === void 0 ? void 0 : _c.map((c) => ({ label: c, value: c })), onChange: (e) => setAlertData({ ...alertData, compare_columns: e.map((col) => col.value) }) })),
-                        React.createElement("div", { className: "mb-3 col" },
-                            React.createElement("label", { className: "form-label" }, "Email notification"),
-                            React.createElement("div", { className: "form-check" },
-                                React.createElement("input", { className: "form-check-input", type: "checkbox", disabled: true, checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
-                                React.createElement("label", { className: "form-check-label ms-2" }, "Send me an email")))),
-                    React.createElement("div", null, filterSelection || !filter ?
-                        React.createElement(CDCFilterCreator, { filterSelection: !creationMode && !editMode ? null : filterSelection, filterComponents: filterComponents, filter: filter, setFilter: setFilter, isInvalid: !validFilter })
-                        :
-                            React.createElement("p", null, "No filters available for this cdc")))))));
+        React.createElement("div", { className: "d-md-flex justify-content-md-end mb-1 mt-1" }),
+        (selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.latest_error) ?
+            React.createElement(ErrorMessage, { error: new Error(`In the sync from ${new Date(selectedAlert.latest_error_date)} an error occured: ${selectedAlert.latest_error}`) })
+            : deleteError ?
+                React.createElement(ErrorMessage, { error: new Error(`While deleting an error occured: ${deleteError}`) })
+                : saveError ?
+                    React.createElement(ErrorMessage, { error: new Error(`While saving an error occured: ${saveError}`) })
+                    : null,
+        React.createElement("ul", { className: "nav nav-tabs" },
+            React.createElement("li", { className: "nav-item" },
+                React.createElement("a", { className: `nav-link ${activePage === 'info' ? 'active' : ''}`, href: "#", onClick: (e) => {
+                        e.preventDefault();
+                        setActivePage('info');
+                    } }, "Information")),
+            !editMode && !creationMode ? React.createElement("li", { className: "nav-item" },
+                React.createElement("a", { className: `nav-link ${activePage === 'data' ? 'active' : ''}`, href: "#", onClick: (e) => {
+                        e.preventDefault();
+                        setActivePage('data');
+                    } }, (selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.latest_diff) ? 'Data revision from: ' + ((_d = new Date(selectedAlert.latest_compare_date)) === null || _d === void 0 ? void 0 : _d.toLocaleDateString()) : 'Data')) : null,
+            React.createElement("small", { className: "d-flex justify-content-end flex-grow-1" }, saveStatus === 'pending' || deleteStatus === 'pending' ? (React.createElement("i", { className: "fas fa-spinner fa-spin" })) : !editMode && !deleteMode && !creationMode ? (React.createElement(React.Fragment, null,
+                React.createElement("button", { title: "Edit Alert", className: "btn btn-text-secondary", onClick: () => setEditMode(true) },
+                    React.createElement("i", { className: "fas fa-pencil-alt" })),
+                React.createElement("button", { title: "Delete Alert", className: "btn btn-text-secondary", onClick: () => setDeleteMode(true) },
+                    React.createElement("i", { className: "fas fa-trash" })))) : (editMode || creationMode ? React.createElement(React.Fragment, null,
+                React.createElement("button", { title: "Save changes", className: "btn btn-text-secondary", onClick: () => doSave() },
+                    React.createElement("i", { className: "fas fa-save" })),
+                React.createElement("button", { title: "Discard changes", className: "btn btn-text-secondary ms-1", onClick: editMode ? () => onDiscard() : () => setCreationMode(false) },
+                    React.createElement("i", { className: "fas fa-times" }))) : React.createElement(React.Fragment, null,
+                React.createElement("button", { title: "Delete", className: "btn btn-text-secondary", onClick: () => doDelete() },
+                    React.createElement("i", { className: "fas fa-check" })),
+                React.createElement("button", { title: "No Delete", className: "btn btn-text-secondary ms-1", onClick: () => setDeleteMode(false) },
+                    React.createElement("i", { className: "fas fa-times" })))))),
+        React.createElement("div", { className: "overflow-auto h-100 d-flex flex-column" },
+            activePage === 'data' && !editMode && !creationMode ? React.createElement(CDCDataChangeTable, { selectedAlert: selectedAlert, onAlertChanged: onAlertChanged }) : null,
+            activePage === 'info' ? React.createElement(React.Fragment, null,
+                React.createElement("div", { className: "row mb-3 mt-3" },
+                    React.createElement("div", { className: "mb-3 col" },
+                        React.createElement("label", { className: "form-label" }, "Name"),
+                        !creationMode && !editMode ?
+                            React.createElement("h6", null, alertData.name)
+                            :
+                                React.createElement(React.Fragment, null,
+                                    React.createElement("input", { type: "text", className: `form-control${validName ? '' : ' is-invalid'}`, value: alertData.name, onChange: (e) => setAlertData({ ...alertData, name: e.target.value }), required: true }),
+                                    validName ? null :
+                                        React.createElement("div", { className: "invalid-feedback" }, "Name must not be empty!"))),
+                    React.createElement("div", { className: "mb-3 col pe-2" },
+                        React.createElement("label", { className: "form-label" }, "CDC"),
+                        React.createElement(Select, { isDisabled: !creationMode && !editMode, options: cdcs.map((c) => ({ label: c, value: c })), value: { label: alertData.cdc_id, value: alertData.cdc_id }, onChange: (e) => setAlertData({ ...alertData, cdc_id: e.value, compare_columns: null }) })),
+                    React.createElement("div", { className: "mb-3 col pe-2" },
+                        React.createElement("label", { className: "form-label" }, "Change Fields"),
+                        React.createElement(Select, { isMulti: true, className: `${validCompareColumns ? '' : 'form-control is-invalid'}`, isDisabled: !creationMode && !editMode, closeMenuOnSelect: false, options: compareColumns === null || compareColumns === void 0 ? void 0 : compareColumns.map((c) => ({ label: c, value: c })), 
+                            //check for compare_columns because otherwise it would not reset the selection after the cdc_id was changed
+                            value: alertData.compare_columns ? alertData.compare_columns.map((c) => ({ label: c, value: c })) : null, onChange: (e) => setAlertData({ ...alertData, compare_columns: e.map((col) => col.value) }) }),
+                        validCompareColumns ? null :
+                            React.createElement("div", { className: "invalid-feedback" }, "Change fields must not be empty!")),
+                    React.createElement("div", { className: "mb-3 col" },
+                        React.createElement("label", { className: "form-label" }, "Email notification"),
+                        React.createElement("div", { className: "form-check" },
+                            React.createElement("input", { className: "form-check-input", type: "checkbox", disabled: !creationMode && !editMode, checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
+                            React.createElement("label", { className: "form-check-label ms-2" }, "Send me an email")))),
+                React.createElement("div", null, filterSelection && (alertData === null || alertData === void 0 ? void 0 : alertData.filter) ?
+                    React.createElement(CDCFilterCreator, { filterSelection: !creationMode && !editMode ? null : filterSelection, filterComponents: filterComponents, filter: alertData.filter, setFilter: (filter) => setAlertData({ ...alertData, filter }), isInvalid: !validFilter })
+                    :
+                        React.createElement("p", null, "No filters available for this cdc"))) : null)));
 }
-/*
-const generalInformation =
-  <>
-    <div className="row mb-3">
-      <div className="mb-3 col">
-        <label className="form-label">Name</label>
-        {!editMode ?
-          <h6>{alertData.name}</h6>
-          :
-          <><input type="text" className={`form-control${validName ? '' : ' is-invalid'}`} value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} />
-            {validName ? null :
-              <div className="invalid-feedback">
-                Name must not be empty!
-              </div>}</>
-        }
-      </div>
-      <div className="mb-3 col pe-2">
-        <label className="form-label">CDC</label>
-        <Select
-          isDisabled={!editMode}
-          options={cdcs.map((c) => {return {label: c, value: c};})}
-          value={{label: alertData.cdc_id, value: alertData.cdc_id}}
-          onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
-        />
-      </div>
-      <div className="mb-3 col pe-2">
-        <label className="form-label">Change Fields</label>
-        <Select
-          isDisabled={!editMode}
-          isMulti
-          closeMenuOnSelect={false}
-          options={compareColumnOptions}
-          value={alertData.compare_columns}
-          onChange={(e) => setAlertData({...alertData, compare_columns: [...e]})}
-        />
-      </div>
-      <div className="mb-3 col">
-        <label className="form-label">Email notification</label>
-        <div className="form-check">
-          <input className="form-check-input" type="checkbox" disabled={!editMode} checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
-          <label className="form-check-label ms-2">Send me an email</label>
-        </div>
-      </div>
-    </div>
-    <div>
-      {filterSelection || !filter ?
-        <CDCFilterCreator filterSelection={!editMode ? null : filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} disableFilter={!editMode} isInvalid={!validFilter} />
-        :
-        <p>No filters available for this cdc</p>}
-    </div>
-  </>;
-
-
-const alertInformation =
-<>
-<div className="row mb-3">
-  <div className="mb-3 col">
-    <label className="form-label">Name</label>
-      <h6>{alertData.name}</h6>
-  </div>
-  <div className="mb-3 col pe-2">
-    <label className="form-label">CDC</label>
-    <Select
-      isDisabled={true}
-      value={{label: alertData.cdc_id, value: alertData.cdc_id}}
-    />
-  </div>
-  <div className="mb-3 col pe-2">
-    <label className="form-label">Change Fields</label>
-    <Select
-      isDisabled={true}
-      isMulti
-      value={alertData.compare_columns}
-    />
-  </div>
-  <div className="mb-3 col">
-    <label className="form-label">Email notification</label>
-    <div className="form-check">
-      <input className="form-check-input" type="checkbox" disabled={true} checked={alertData.enable_mail_notification} />
-      <label className="form-check-label ms-2">Send me an email</label>
-    </div>
-  </div>
-</div>
-<div>
-  {filterSelection || !filter ?
-    <CDCFilterCreator  filterComponents={filterComponents} filter={filter} setFilter={setFilter} />
-    :
-    <p>No filters available for this cdc</p>}
-</div>
-</>;
-
-const onCreateSave = async () => {
-  if (validFilter && validName) {
-    const newAlert = await saveAlert({...alertData, filter})
-      .then((alert) => {
-        return runAlert(alert.id).then((a) => {
-          return a ? a : alert;
-        });
-      });
-    onAlertChanged(newAlert.id);
-    setCreationMode(false);
-  }
-};
-
-  const onEditSave = async () => {
-  if (validFilter && validName) {
-    const newAlert = await editAlert(selectedAlert.id, {...alertData, filter})
-      .then((alert) => {
-        return runAlert(alert.id).then((a) => {
-          return a ? a : alert;
-        });
-      });
-    onAlertChanged(newAlert.id);
-    setEditMode(false);
-  }
-};
-
-const alterAlert =
-<>
-  <div className="card p-3">
-    <div className="row mb-3">
-      <div className="mb-3 col">
-        <label className="form-label">Name</label>
-        <input type="text" className={`form-control${validName ? '' : ' is-invalid'}`} value={alertData.name} onChange={(e) => setAlertData({...alertData, name: e.target.value})} required />
-        {validName ? null :
-          <div className="invalid-feedback">
-            Name must not be empty!
-          </div>}
-      </div>
-      <div className="mb-3 col">
-        <label className="form-label">CDC</label>
-        <Select
-          options={cdcs.map((c) => {return {label: c, value: c};})}
-          value={{label: alertData.cdc_id, value: alertData.cdc_id}}
-          onChange={(e) => setAlertData({...alertData, cdc_id: e.value})}
-        />
-      </div>
-      <div className="mb-3 col">
-        <label className="form-label">Change Fields</label>
-        <Select
-          isMulti
-          closeMenuOnSelect={false}
-          options={compareColumnOptions}
-          value={alertData.compare_columns}
-          onChange={(e) => setAlertData({...alertData, compare_columns: [...e]})}
-        />
-      </div>
-      <div className="mb-3 col">
-        <label className="form-label">Email notification</label>
-        <div className="form-check">
-          <input className="form-check-input" type="checkbox" checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
-          <label className="form-check-label ms-2">Send me an email</label>
-        </div>
-      </div>
-    </div>
-    <div>
-      {filterSelection || !filter ?
-        <CDCFilterCreator filterSelection={filterSelection} filterComponents={filterComponents} filter={filter} setFilter={setFilter} isInvalid={!validFilter} />
-        :
-        <p>No filters available for this cdc</p>
-      }
-    </div>
-  </div>
-</>;
-
-*/
 //# sourceMappingURL=CDCAlertView.js.map

@@ -1,17 +1,17 @@
 import * as React from 'react';
-import { itemTypes } from '../interfaces';
+import { ITEM_TYPES } from '../interfaces';
 import { useDrag } from 'react-dnd';
 import { DropZone } from './DropZone';
-export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, onFieldChanged, filterComponents, disableFilter, isInvalid, disableDragging, disableRemoving }) {
+export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter, isInvalid, disableDragging, disableRemoving }) {
     var _a, _b, _c;
     const [{ isDragging, draggedItem }, drag, preview] = useDrag(() => ({
-        type: itemTypes.FILTERCARD,
+        type: ITEM_TYPES.FILTERCARD,
         item: filter,
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
             draggedItem: monitor.getItem()
         })
-    }));
+    }), [filter]);
     const hasChildren = filter.children && filter.children.length >= 0;
     const filterComponent = filterComponents[filter.type];
     if (!filterComponent) {
@@ -23,10 +23,8 @@ export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged,
                 React.createElement("div", { className: "row" },
                     React.createElement("div", { className: "col-1 pe-0", style: disableDragging || disableFilter ? {} : { cursor: 'move' }, ref: disableDragging || disableFilter ? undefined : drag }, disableDragging || disableFilter ? null : (React.createElement("i", { style: { marginRight: 5 }, className: "fas fa-arrows-alt" }))),
                     React.createElement("div", { className: "col-10" }, (filterComponent === null || filterComponent === void 0 ? void 0 : filterComponent.component) ? (React.createElement("div", null,
-                        React.createElement(filterComponent.component.clazz, { disabled: disableFilter, value: filter.value, config: filterComponent.config, field: filter.field, onFieldChanged: onFieldChanged
-                                ? (field) => onFieldChanged(filter, field)
-                                : undefined, onValueChanged: onValueChanged
-                                ? (value) => onValueChanged(filter, value)
+                        React.createElement(filterComponent.component.clazz, { disabled: disableFilter, value: filter.value, config: filterComponent.config, field: filter.field, onValueChanged: onValueChanged
+                                ? (value, field) => onValueChanged(filter, value, field)
                                 : undefined }),
                         filter.type === 'group' ?
                             React.createElement("div", { className: "input-group d-flex w-100 justify-content-between" },
@@ -43,7 +41,7 @@ export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged,
                         React.createElement("i", { className: "fas fa-times" }))) : null)),
                 onDrop && (hasChildren || !filterComponent.component.disableDropping) && !disableFilter ? (React.createElement(DropZone, { onDrop: onDrop, filter: filter, index: 0, canDrop: draggedItem !== ((_b = filter.children) === null || _b === void 0 ? void 0 : _b[0]) })) : null, (_c = filter.children) === null || _c === void 0 ? void 0 :
                 _c.map((child, i, allChildren) => (React.createElement(React.Fragment, { key: child.id },
-                    React.createElement(FilterCard, { key: child.id, filter: child, onDrop: onDrop, onDelete: onDelete, onValueChanged: onValueChanged, onFieldChanged: onFieldChanged, onChange: onChange, filterComponents: filterComponents, disableFilter: disableFilter }),
+                    React.createElement(FilterCard, { key: child.id, filter: child, onDrop: onDrop, onDelete: onDelete, onValueChanged: onValueChanged, onChange: onChange, filterComponents: filterComponents, disableFilter: disableFilter }),
                     onDrop && hasChildren && !disableFilter ? (React.createElement(DropZone, { onDrop: onDrop, filter: filter, index: i + 1, canDrop: draggedItem !== allChildren[i + 1] && draggedItem !== child && !disableFilter })) : null))))),
         isInvalid ?
             React.createElement("div", { className: "invalid-feedback mb-2" }, "Filter must not be empty!") :

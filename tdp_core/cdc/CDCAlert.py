@@ -1,7 +1,10 @@
+from . import api
+from typing import Callable
+
 from tdp_core.cdc.filter import Filter
 from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, JSON
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import EXCLUDE, Schema
+from marshmallow import EXCLUDE, Schema, post_load
 from sqlalchemy.ext.declarative import declarative_base
 from marshmallow import fields
 # TODO: Remove and use postgres
@@ -29,6 +32,9 @@ class CDCAlert(Base):
     latest_diff = Column(JSON, nullable=True)
     latest_fetched_data = Column(JSON, nullable=True)
     compare_columns = Column(JSON, nullable=True)
+
+    latest_error_date = Column(DateTime, nullable=True)
+    latest_error = Column(JSON, nullable=True)
 
     confirmation_date = Column(DateTime, nullable=True)  # date of confirmation
     confirmed_data = Column(JSON, nullable=True)  # your confirmed data
@@ -60,9 +66,14 @@ class CDCAlertArgsSchema(Schema):
     id = fields.Integer()
     name = fields.String()
     enable_mail_notification = fields.Boolean()
-    cdc_id = fields.String()
+    cdc_id = fields.String(validate=lambda name: name in api.cdcs.keys())
     filter = fields.Nested(Filter, required=True)
     compare_columns = fields.List(fields.String())
+
+
+class RunAllAlertsSchema(Schema):
+  success = fields.List(fields.Integer(), required=True)
+  error = fields.List(fields.Integer(), required=True)
 
 
 engine = create_engine('sqlite:////:memory:')

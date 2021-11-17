@@ -5,9 +5,9 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FilterCard } from './CDCFilterCard';
 import { getFilterFromTree } from '../interfaces';
 import { v4 as uuidv4 } from 'uuid';
-export function CDCFilterCreator({ filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid }) {
+export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents }) {
     const onDelete = (newFilter) => {
-        setFilter((filter) => produce(filter, (nextFilter) => {
+        setFilter(produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current && parent && parent.children) {
                 // Find the index of the current element in the parents children
@@ -21,7 +21,7 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, filterCom
     };
     const onDrop = (item, { target, index }) => {
         // Add item to target children array
-        setFilter((filter) => produce(filter, (nextFilter) => {
+        setFilter(produce(filter, (nextFilter) => {
             // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
             // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
             // ARE NOT UP-TO-DATE!
@@ -58,32 +58,30 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, filterCom
         }));
     };
     const onChange = (newFilter, changeFunc) => {
-        setFilter((filter) => produce(filter, (nextFilter) => {
+        setFilter(produce(filter, (nextFilter) => {
             const { current, parent } = getFilterFromTree(nextFilter, newFilter.id);
             if (current) {
                 changeFunc(current);
             }
         }));
     };
-    const onValueChanged = (filter, value) => {
-        onChange(filter, (f) => {
-            f.value = value;
-        });
-    };
-    const onFieldChanged = (filter, field) => {
-        console.log(field, filter);
-        onChange(filter, (f) => {
-            f.field = field;
-        });
-    };
     if (filter.type !== 'group') {
-        throw Error('First filter always has to be a group filter');
+        throw Error('First filter always has to be a group filter!');
     }
     return (React.createElement(DndProvider, { backend: HTML5Backend },
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
                 React.createElement("h6", null, "Your filters"),
-                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: onValueChanged, onFieldChanged: onFieldChanged, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid, disableDragging: true, disableRemoving: true })),
+                React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: (filter, value, field) => {
+                        onChange(filter, (f) => {
+                            if (value !== undefined) {
+                                f.value = value;
+                            }
+                            if (field !== undefined) {
+                                f.field = field;
+                            }
+                        });
+                    }, filterComponents: filterComponents, disableFilter: disableFilter, isInvalid: isInvalid, disableDragging: true, disableRemoving: true })),
             filterSelection ?
                 React.createElement("div", { className: "col-md" },
                     React.createElement("h6", null, "New filters"),

@@ -6,18 +6,16 @@ import {FilterCard} from './CDCFilterCard';
 import {getFilterFromTree, IFilter, IFilterComponent} from '../interfaces';
 import {v4 as uuidv4} from 'uuid';
 
-interface ICDCFilterCreatorProps {
-  filterSelection?: IFilter<any>[];
+export function CDCFilterCreator({filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents}: {
+  filterComponents?: {[key: string]: {component: IFilterComponent<any>, config?: any}};
+  filterSelection?: IFilter[];
   filter: IFilter;
-  setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
-  filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
+  setFilter: (value: IFilter) => void;
   disableFilter?: boolean;
   isInvalid?: boolean;
-}
-
-export function CDCFilterCreator({filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid}: ICDCFilterCreatorProps) {
+}) {
   const onDelete = (newFilter: IFilter) => {
-    setFilter((filter) => produce(filter, (nextFilter) => {
+    setFilter(produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
       if (current && parent && parent.children) {
         // Find the index of the current element in the parents children
@@ -36,7 +34,7 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, filterComp
     {target, index}: {target: IFilter; index: number}
   ) => {
     // Add item to target children array
-    setFilter((filter) => produce(filter, (nextFilter) => {
+    setFilter(produce(filter, (nextFilter) => {
       // DANGER: BE SURE TO ONLY REFERENCE SOMETHING FROM nextFilter,
       // AND NOTHING FROM 'OUTSIDE' LIKE item, or target. THESE REFERENCES
       // ARE NOT UP-TO-DATE!
@@ -76,7 +74,7 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, filterComp
   };
 
   const onChange = (newFilter: IFilter, changeFunc: (filter: IFilter) => void) => {
-    setFilter((filter) => produce(filter, (nextFilter) => {
+    setFilter(produce(filter, (nextFilter) => {
       const {current, parent} = getFilterFromTree(nextFilter, newFilter.id);
       if (current) {
         changeFunc(current);
@@ -84,21 +82,8 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, filterComp
     }));
   };
 
-  const onValueChanged = (filter: IFilter, value: any) => {
-    onChange(filter, (f) => {
-      f.value = value;
-    });
-  };
-
-  const onFieldChanged = (filter: IFilter, field: any) => {
-    console.log(field, filter);
-    onChange(filter, (f) => {
-      f.field = field;
-    });
-  };
-
   if(filter.type !== 'group') {
-    throw Error('First filter always has to be a group filter');
+    throw Error('First filter always has to be a group filter!');
   }
 
   return (
@@ -111,8 +96,16 @@ export function CDCFilterCreator({filterSelection, filter, setFilter, filterComp
             onDrop={onDrop}
             onDelete={onDelete}
             onChange={onChange}
-            onValueChanged={onValueChanged}
-            onFieldChanged={onFieldChanged}
+            onValueChanged={(filter: IFilter, value: any, field: string) => {
+              onChange(filter, (f) => {
+                if(value !== undefined) {
+                  f.value = value;
+                }
+                if(field !== undefined) {
+                  f.field = field;
+                }
+              });
+            }}
             filterComponents={filterComponents}
             disableFilter={disableFilter}
             isInvalid={isInvalid}

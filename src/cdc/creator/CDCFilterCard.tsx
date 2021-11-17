@@ -1,15 +1,14 @@
 import * as React from 'react';
-import {IFilter, IFilterComponent, itemTypes} from '../interfaces';
+import {IFilter, IFilterComponent, ITEM_TYPES} from '../interfaces';
 import {useDrag} from 'react-dnd';
 import {DropZone} from './DropZone';
 
 interface IFilterCardProps {
   filter: IFilter;
-  onDrop?: any;
+  onDrop?: (item: IFilter, {target, index}: {target: IFilter; index: number}) => void;
   onDelete?: (filter: IFilter) => void;
   onChange?: (filter: IFilter, changeFunc: (filter: IFilter) => void) => void;
-  onValueChanged?: (filter: IFilter, value: any) => void;
-  onFieldChanged?: (filter: IFilter, field: any) => void;
+  onValueChanged?: (filter: IFilter, value: any, field: string) => void;
   filterComponents: {[key: string]: {component: IFilterComponent<any>, config?: any}};
   disableFilter: boolean;
   isInvalid?: boolean;
@@ -17,15 +16,18 @@ interface IFilterCardProps {
   disableDragging?: boolean;
 }
 
-export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, onFieldChanged, filterComponents, disableFilter, isInvalid, disableDragging, disableRemoving}: IFilterCardProps) {
-  const [{isDragging, draggedItem}, drag, preview] = useDrag(() => ({
-    type: itemTypes.FILTERCARD,
+export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, filterComponents, disableFilter, isInvalid, disableDragging, disableRemoving}: IFilterCardProps) {
+  const [{isDragging, draggedItem}, drag, preview] = useDrag<IFilter, void, {
+    isDragging: boolean;
+    draggedItem: IFilter | undefined
+  }>(() => ({
+    type: ITEM_TYPES.FILTERCARD,
     item: filter,
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
-      draggedItem: (monitor.getItem() as unknown) as IFilter | undefined
+      draggedItem: monitor.getItem()
     })
-  }));
+  }), [filter]);
 
   const hasChildren = filter.children && filter.children.length >= 0;
   const filterComponent = filterComponents[filter.type];
@@ -61,14 +63,9 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
                   value={filter.value}
                   config={filterComponent.config}
                   field={filter.field}
-                  onFieldChanged={
-                    onFieldChanged
-                      ? (field) => onFieldChanged(filter, field)
-                      : undefined
-                  }
                   onValueChanged={
                     onValueChanged
-                      ? (value) => onValueChanged(filter, value)
+                      ? (value, field) => onValueChanged(filter, value, field)
                       : undefined
                   }
                 />
@@ -124,7 +121,6 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
               onDrop={onDrop}
               onDelete={onDelete}
               onValueChanged={onValueChanged}
-              onFieldChanged={onFieldChanged}
               onChange={onChange}
               filterComponents={filterComponents}
               disableFilter={disableFilter}

@@ -81,5 +81,6 @@
     "host": "mongo",
     "port": 27017,
     "db": "graph"
-  }
+  },
+  "cdc_update": {"second":  0}
 }

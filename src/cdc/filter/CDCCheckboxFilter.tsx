@@ -22,22 +22,7 @@ export function createCDCCheckboxFilter(id: string, value: ICDCCheckboxFilterVal
   };
 }
 
-
 export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, config}) {
-  const onChange = (value, field, e) => {
-    if (value[field] === false) {
-      const newVal = {};
-      Object.keys(value).forEach((key) => {
-        if (key !== field) {
-          newVal[key] = value[key];
-        }
-      });
-      return newVal;
-    } else {
-      return {...value, [field]: e.target.checked};
-    }
-  };
-
   return <>
     {config.fields.map((field, i) => {
       return (
@@ -48,9 +33,20 @@ export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, con
               checked={value[field]}
               className="form-check-input"
               indeterminate={value[field] == null ? true : false}
-              onChange={(e) =>
-                onValueChanged?.(onChange(value, field, e))}
-            />
+              onChange={(e) => {
+                if (value[field] === false) {
+                  const newVal = {};
+                  Object.keys(value).forEach((key) => {
+                    if (key !== field) {
+                      newVal[key] = value[key];
+                    }
+                  });
+                  onValueChanged?.(newVal);
+                } else {
+                  onValueChanged?.({...value, [field]: e.target.checked});
+                }
+              }}
+              />
             <label
               className="form-check-label"
               htmlFor="flexCheckDefault"

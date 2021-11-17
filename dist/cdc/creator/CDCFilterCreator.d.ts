@@ -1,17 +1,15 @@
-import React from 'react';
+/// <reference types="react" />
 import { IFilter, IFilterComponent } from '../interfaces';
-interface ICDCFilterCreatorProps {
-    filterSelection?: IFilter<any>[];
-    filter: IFilter;
-    setFilter: React.Dispatch<React.SetStateAction<IFilter>>;
-    filterComponents: {
+export declare function CDCFilterCreator({ filterSelection, filter, setFilter, disableFilter, isInvalid, filterComponents }: {
+    filterComponents?: {
         [key: string]: {
             component: IFilterComponent<any>;
             config?: any;
         };
     };
+    filterSelection?: IFilter[];
+    filter: IFilter;
+    setFilter: (value: IFilter) => void;
     disableFilter?: boolean;
     isInvalid?: boolean;
-}
-export declare function CDCFilterCreator({ filterSelection, filter, setFilter, filterComponents, disableFilter, isInvalid }: ICDCFilterCreatorProps): JSX.Element;
-export {};
+}): JSX.Element;
