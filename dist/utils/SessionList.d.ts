@@ -1,9 +1,6 @@
-/**
- * Created by Holger Stitz on 27.07.2016.
- */
 import { Selection } from 'd3';
-import { IProvenanceGraphDataDescription } from 'phovea_core';
-import { CLUEGraphManager } from 'phovea_clue';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { IProvenanceGraphDataDescription } from '../provenance';
 declare abstract class ASessionList {
     private readonly parent;
     protected readonly mode: 'table' | 'list';

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { EventHandler } from 'phovea_core';
+import { EventHandler } from '../../base';
 export class FormButton extends EventHandler {
     /**
      * Constructor

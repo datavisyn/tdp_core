@@ -1,10 +1,7 @@
-/**
- * Created by sam on 13.02.2017.
- */
 import { LocalDataProvider, IColumnDesc, ICategory, ICategoryNode } from 'lineupjs';
-import { IAnyVector } from 'phovea_core';
 import { IServerColumn } from '../base/rest';
 import { IAdditionalColumnDesc } from '../base/interfaces';
+import { IAnyVector } from '../vector';
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {
     /**
      * visible by default

@@ -1,14 +1,13 @@
-/**
- * Created by Holger Stitz on 27.07.2016.
- */
-import { FormDialog } from 'phovea_ui';
+import { PHOVEA_UI_FormDialog } from '../components';
 import { select, event } from 'd3';
 import $ from 'jquery';
-import { UserSession, GlobalEventHandler, I18nextManager, UniqueIdManager } from 'phovea_core';
+import { I18nextManager } from '../i18n';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { TDPApplicationUtils } from './TDPApplicationUtils';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
+import { GlobalEventHandler } from '../base';
+import { UniqueIdManager, UserSession } from '../app';
 class ASessionList {
     constructor(parent, graphManager, mode = 'table') {
         this.parent = parent;
@@ -42,7 +41,7 @@ class ASessionList {
         };
         $enter.select('a[data-action="delete"]').on('click', async function (d) {
             stopEvent();
-            const deleteIt = await FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', { name: d.name }));
+            const deleteIt = await PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', { name: d.name }));
             if (deleteIt) {
                 await manager.delete(d);
                 NotificationHandler.successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.session'), d.name);

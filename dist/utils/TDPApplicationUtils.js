@@ -1,5 +1,9 @@
-import { BaseUtils, I18nextManager, Permission, UserSession, EPermission, UserUtils, ActionUtils, ActionMetaData, ObjectRefUtils } from 'phovea_core';
-import { Compression } from 'phovea_clue';
+import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../provenance';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
+import { Compression } from '../base/Compression';
+import { EPermission, Permission, UserUtils } from '../security';
+import { UserSession } from '../app';
 export class TDPApplicationUtils {
     /**
      * see http://momentjs.com/docs/#/displaying/fromnow/

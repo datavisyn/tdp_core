@@ -1,7 +1,4 @@
 /**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-/**
  * List of all available for elements that the form builder can handle
  * @see FormBuilder.appendElement()
  */

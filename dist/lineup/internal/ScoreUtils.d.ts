@@ -1,8 +1,5 @@
-/**
- * Created by Samuel Gratzl on 18.05.2016.
- */
-import { IObjectRef, ProvenanceGraph, ActionNode } from 'phovea_core';
 import { IViewProvider } from '../IViewProvider';
+import { IObjectRef, ProvenanceGraph, ActionNode } from '../../provenance';
 export declare class ScoreUtils {
     static readonly CMD_ADD_SCORE = "tdpAddScore";
     static readonly CMD_REMOVE_SCORE = "tdpRemoveScore";

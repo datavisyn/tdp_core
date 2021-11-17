@@ -1,9 +1,7 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import * as d3 from 'd3';
-import { UserSession, ResolveNow } from 'phovea_core';
 import { AFormElement } from './AFormElement';
+import { UserSession } from '../../app';
+import { ResolveNow } from '../../base';
 /**
  * Select form element instance
  * Propagates the changes from the DOM select element using the internal `change` event

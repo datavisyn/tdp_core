@@ -1,4 +1,5 @@
-import { Ajax, AppContext } from 'phovea_core';
+import { Ajax } from '.';
+import { AppContext } from '../app';
 /**
  * Define empty filter object for use as function default parameter
  */

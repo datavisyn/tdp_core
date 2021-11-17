@@ -1,6 +1,7 @@
-import {Ajax, AppContext} from 'phovea_core';
+import {Ajax} from '.';
+import {AppContext} from '../app';
+import {IDTypeLike} from '../idtype';
 import {IScoreRow} from './interfaces';
-import {IDTypeLike} from 'phovea_core';
 
 /**
  * common interface for a row as used in LineUp

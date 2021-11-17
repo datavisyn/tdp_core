@@ -1,11 +1,8 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import 'select2';
 import * as d3 from 'd3';
-import { IPluginDesc } from 'phovea_core';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
+import { IPluginDesc } from '../../base';
 declare type IFormSelect2Options = Select2Options & {
     return?: 'text' | 'id';
     data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);

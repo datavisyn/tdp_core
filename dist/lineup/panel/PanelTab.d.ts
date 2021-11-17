@@ -1,8 +1,8 @@
 import { SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
 import { ISearchOption } from './ISearchOption';
-import { EventHandler } from 'phovea_core';
 import { PanelButton, PanelNavButton } from './PanelButton';
 import { IPanelTabDesc } from './IPanelTabDesc';
+import { EventHandler } from '../../base';
 /**
  * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
  */

@@ -1,6 +1,7 @@
 import { SidePanel } from 'lineupjs';
-import { EventHandler, I18nextManager } from 'phovea_core';
 import { PanelButton, PanelNavButton } from './PanelButton';
+import { EventHandler } from '../../base';
+import { I18nextManager } from '../../i18n';
 /**
  * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
  */

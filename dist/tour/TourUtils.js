@@ -1,4 +1,4 @@
-import { BaseUtils, GlobalEventHandler } from 'phovea_core';
+import { GlobalEventHandler, BaseUtils } from '../base';
 export class TourUtils {
     /**
      * start a view help tour

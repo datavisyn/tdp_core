@@ -1,4 +1,4 @@
-import { I18nextManager } from 'phovea_core';
+import { I18nextManager } from '../i18n';
 export class NotificationHandler {
     static pushNotification(level, msg, autoHideInMs = -1) {
         let parent = document.body.querySelector('div.toast-container-custom');
