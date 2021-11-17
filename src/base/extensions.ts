@@ -1,3 +1,6 @@
+import {IPluginDesc, IPlugin} from './plugin';
+import {ProvenanceGraph} from '../provenance';
+
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
@@ -28,3 +31,35 @@ export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
 export const EP_TDP_CORE_FORM_ELEMENT = 'epTdpCoreFormElement';
 
 export const EP_TDP_CORE_SCORE_COLUMN_PATCHER = 'epTdpCoreScoreColumnPatcher';
+
+/**
+ * Provides the loaded provenance graph
+ *
+ * @factoryParam {ProvenanceGraph} provenanceGraph The loaded provenance graph
+ */
+export const EP_PHOVEA_CLUE_PROVENANCE_GRAPH = 'epPhoveaClueProvenanceGraph';
+
+export interface IProvenanceGraphEP {
+  factory(graph: ProvenanceGraph): void;
+}
+
+export interface IProvenanceGraphEPDesc extends IPluginDesc {
+  load(): Promise<IPlugin & IProvenanceGraphEP>;
+}
+
+/* phovea_security_flask */
+export const EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM = 'securityCustomizedLoginForm';
+
+export interface ICustomizedLoginFormPluginDesc extends IPluginDesc {
+  template?: string;
+}
+
+
+export interface ICustomizedLoginFormPlugin extends IPlugin {
+  /**
+   * underlying plugin description
+   */
+  readonly desc: ICustomizedLoginFormPluginDesc;
+
+  factory(loginMenu: HTMLElement, loginDialog: HTMLElement): void;
+}

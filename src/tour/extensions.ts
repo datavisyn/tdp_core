@@ -1,6 +1,6 @@
-import {IPlugin, EventHandler} from 'phovea_core';
+import {IPlugin} from '../base';
 import {Placement, PopperOptions} from 'popper.js';
-import {AppHeader} from 'phovea_ui';
+import {AppHeader} from '../components';
 import {IViewPluginDesc, IView, ISelection} from '../base/interfaces';
 
 

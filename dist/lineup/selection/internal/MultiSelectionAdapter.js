@@ -1,6 +1,6 @@
 import { LineupUtils } from '../../utils';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
-import { ResolveNow } from 'phovea_core';
+import { ResolveNow } from '../../../base';
 export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     constructor(adapter) {
         super();

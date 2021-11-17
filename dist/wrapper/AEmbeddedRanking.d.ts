@@ -1,5 +1,5 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { ProvenanceGraph } from 'phovea_core';
+import { ProvenanceGraph } from '../provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
 import { IViewProviderLocal } from '../lineup/internal/cmds';

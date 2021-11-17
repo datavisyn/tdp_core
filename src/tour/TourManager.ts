@@ -2,9 +2,10 @@ import {ITourContext} from './Tour';
 import {Tour} from './Tour';
 import {IStep} from './extensions';
 import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
-import {AppHeader} from 'phovea_ui';
-import {GlobalEventHandler, I18nextManager, BaseUtils} from 'phovea_core';
+import {AppHeader} from '../components';
 import {TourUtils} from './TourUtils';
+import {BaseUtils, GlobalEventHandler} from '../base';
+import {I18nextManager} from '../i18n';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';

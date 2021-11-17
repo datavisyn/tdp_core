@@ -1,16 +1,19 @@
-/**
- * Created by sam on 03.03.2017.
- */
-import { MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, Ajax } from 'phovea_core';
-import { AppHeaderLink, AppHeader } from 'phovea_ui';
-import 'phovea_ui/dist/webpack/_bootstrap';
-import { CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader } from 'phovea_clue';
+import { AppHeaderLink, AppHeader } from './components';
+// TODO: Do we need a relative import?
+import './webpack/_bootstrap';
 import { EditProvenanceGraphMenu } from './utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './base/dialogs';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
 import { TDPTokenManager } from './auth';
+import { ACLUEWrapper } from './wrapper';
+import { LoginMenu } from './menu';
+import { Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
+import { UserSession, PluginRegistry } from './app';
+import { I18nextManager } from './i18n';
+import { MixedStorageProvenanceGraphManager } from './provenance';
+import { VisLoader } from './vis';
 /**
  * base class for TDP based applications
  */

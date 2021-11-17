@@ -1,12 +1,11 @@
-/**
- * Created by sam on 03.03.2017.
- */
-import { ProvenanceGraph, IMixedStorageProvenanceGraphManagerOptions } from 'phovea_core';
-import { AppHeader } from 'phovea_ui';
-import 'phovea_ui/dist/webpack/_bootstrap';
-import { CLUEGraphManager, LoginMenu, ACLUEWrapper } from 'phovea_clue';
+import { AppHeader } from './components';
+import './webpack/_bootstrap';
 import { TourManager } from './tour/TourManager';
 import { IAuthorizationConfiguration } from './auth';
+import { ACLUEWrapper } from './wrapper';
+import { LoginMenu } from './menu';
+import { CLUEGraphManager } from './base';
+import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './provenance';
 export interface ITDPOptions {
     /**
      * alternative login formular
@@ -113,8 +112,8 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;
         manager: CLUEGraphManager;
-        storyVis: () => Promise<import("phovea_clue").VerticalStoryVis>;
-        provVis: () => Promise<import("phovea_clue").LayoutedProvVis>;
+        storyVis: () => Promise<import("./vis").VerticalStoryVis>;
+        provVis: () => Promise<import("./vis").LayoutedProvVis>;
     };
     /**
      * customize the using extension point

@@ -1,13 +1,12 @@
-/**
- * Created by Samuel Gratzl on 28.02.2017.
- */
-
-import {ProvenanceGraph, PropertyHandler, IEvent, GlobalEventHandler, I18nextManager} from 'phovea_core';
-import {CLUEGraphManager} from 'phovea_clue';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {TemporarySessionList, PersistentSessionList} from './SessionList';
 import {ProvenanceGraphMenuUtils} from './ProvenanceGraphMenuUtils';
+import {CLUEGraphManager} from '../base/CLUEGraphManager';
+import {IEvent, GlobalEventHandler, PropertyHandler} from '../base';
+import {I18nextManager} from '../i18n';
+import {ProvenanceGraph} from '../provenance';
+import {Dialog, PHOVEA_UI_FormDialog} from '../components';
 
 
 export class EditProvenanceGraphMenu {
@@ -110,29 +109,27 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
 
-      import('phovea_ui/dist/components/dialogs').then(({Dialog}) => {
-          const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'));
-          dialog.body.classList.add('tdp-session-dialog');
-          dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
-            <div role="tab" class="collapsed">
-            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.temporarySessions')}</h4>
-            <div role="tabpanel" data-session="t">
-            </div>
-          </div>
+        const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession'));
+        dialog.body.classList.add('tdp-session-dialog');
+        dialog.body.innerHTML = `<div role="tab" data-menu="dashboards">
           <div role="tab" class="collapsed">
-            <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.savedSessions')}</h4>
-            <div role="tabpanel" data-session="p">
-            </div>
-          </div>`;
-          const t = new TemporarySessionList(<HTMLElement>dialog.body.querySelector('div[data-session=t]'), manager);
-          const p = new PersistentSessionList(<HTMLElement>dialog.body.querySelector('div[data-session=p]'), manager);
-          dialog.hideOnSubmit();
-          dialog.onHide(() => {
-            t.destroy();
-            p.destroy();
-          });
-          dialog.show();
+          <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.temporarySessions')}</h4>
+          <div role="tabpanel" data-session="t">
+          </div>
+        </div>
+        <div role="tab" class="collapsed">
+          <h4>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.savedSessions')}</h4>
+          <div role="tabpanel" data-session="p">
+          </div>
+        </div>`;
+        const t = new TemporarySessionList(<HTMLElement>dialog.body.querySelector('div[data-session=t]'), manager);
+        const p = new PersistentSessionList(<HTMLElement>dialog.body.querySelector('div[data-session=p]'), manager);
+        dialog.hideOnSubmit();
+        dialog.onHide(() => {
+          t.destroy();
+          p.destroy();
         });
+        dialog.show();
       return false;
     });
 
@@ -170,9 +167,7 @@ export class EditProvenanceGraphMenu {
       if (!this.graph) {
         return false;
       }
-      import('phovea_ui/dist/components/dialogs')
-        .then(({FormDialog}) =>
-        FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name})))
+      PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', {name: this.graph.desc.name}))
         .then((deleteIt) => {
           if (deleteIt) {
             Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
@@ -217,22 +212,20 @@ export class EditProvenanceGraphMenu {
       event.preventDefault();
       event.stopPropagation();
       //import dialog
-      import('phovea_ui/dist/components/dialogs').then(({Dialog}) => {
-        const d = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
-        d.body.innerHTML = `<input type="file" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
-        (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
-          const file = (<HTMLInputElement>evt.target).files[0];
-          const reader = new FileReader();
-          reader.onload = function (e: any) {
-            const dataS = e.target.result;
-            const dump = JSON.parse(dataS);
-            manager.importGraph(dump);
-          };
-          // Read in the image file as a data URL.
-          reader.readAsText(file);
-        });
-        d.show();
+      const d = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
+      d.body.innerHTML = `<input type="file" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
+      (<HTMLInputElement>d.body.querySelector('input')).addEventListener('change', function (evt) {
+        const file = (<HTMLInputElement>evt.target).files[0];
+        const reader = new FileReader();
+        reader.onload = function (e: any) {
+          const dataS = e.target.result;
+          const dump = JSON.parse(dataS);
+          manager.importGraph(dump);
+        };
+        // Read in the image file as a data URL.
+        reader.readAsText(file);
       });
+      d.show();
     });
 
     return li;

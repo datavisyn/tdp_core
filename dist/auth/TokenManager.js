@@ -1,7 +1,8 @@
-import { EventHandler, GlobalEventHandler, UserSession } from 'phovea_core';
 import { ERenderAuthorizationStatus } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
 import { castArray } from 'lodash';
+import { UserSession } from '../app';
+import { EventHandler, GlobalEventHandler } from '../base';
 export class TokenManager extends EventHandler {
     constructor() {
         super();

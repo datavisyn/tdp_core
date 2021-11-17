@@ -1,13 +1,10 @@
-/**
- * Created by Samuel Gratzl on 18.05.2016.
- */
-
-
-import {IObjectRef, ObjectRefUtils, I18nextManager, ActionMetaData, PluginRegistry, ProvenanceGraph, ActionNode, ActionUtils} from 'phovea_core';
 import {IScore} from '../../base/interfaces';
 import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../base/extensions';
 import {AttachemntUtils} from '../../storage/internal/attachment';
 import {IViewProvider} from '../IViewProvider';
+import {PluginRegistry} from '../../app';
+import {I18nextManager} from '../../i18n';
+import {IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode} from '../../provenance';
 
 
 export class ScoreUtils {

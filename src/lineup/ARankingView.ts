@@ -3,7 +3,6 @@ import {EngineRenderer, defaultOptions, IRule, IGroupData, IGroupItem, isGroup, 
 import {AView} from '../views/AView';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {EViewMode} from '../base/interfaces';
-import {IDTypeManager, BaseUtils, ISecureItem, I18nextManager} from 'phovea_core';
 import {LineupTrackingManager} from './internal/cmds';
 import {RestStorageUtils} from '../storage';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
@@ -23,6 +22,10 @@ import {LineupUtils} from './utils';
 import {ISearchOption} from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
+import {BaseUtils} from '../base';
+import {I18nextManager} from '../i18n';
+import {IDTypeManager} from '../idtype';
+import {ISecureItem} from '../security';
 
 /**
  * base class for views based on LineUp

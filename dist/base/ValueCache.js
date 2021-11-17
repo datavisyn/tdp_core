@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 13.03.2017.
- */
 export class ValueCache {
     constructor() {
         this.values = new Map();

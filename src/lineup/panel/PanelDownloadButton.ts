@@ -1,8 +1,10 @@
 import {Column, LocalDataProvider, isSupportType} from 'lineupjs';
 import {ExportUtils, IExportFormat} from '../internal/ExportUtils';
 import {IPanelButton} from './PanelButton';
-import {BaseUtils, I18nextManager} from 'phovea_core';
 import {LineUpOrderedRowIndicies} from './LineUpOrderedRowIndicies';
+import {BaseUtils} from '../../base';
+import {I18nextManager} from '../../i18n';
+import {PHOVEA_UI_FormDialog} from '../../components';
 
 interface IExportData {
   type: IExportFormat;
@@ -85,99 +87,97 @@ export class PanelDownloadButton implements IPanelButton {
   }
 
   private customizeDialog(provider: LocalDataProvider, orderedRowIndices: LineUpOrderedRowIndicies): Promise<IExportData> {
-    return import('phovea_ui/dist/components/dialogs').then((dialogs) => {
-      const dialog = new dialogs.FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
-      const id = `e${BaseUtils.randomId(3)}`;
-      const inlineRadioID1 = `inlineRadio_${BaseUtils.randomId()}`;
-      const inlineRadioID2 = `inlineRadio_${BaseUtils.randomId()}`;
-      const inlineRadioID3 = `inlineRadio_${BaseUtils.randomId()}`;
-      const ranking = provider.getFirstRanking();
-      dialog.form.classList.add('tdp-ranking-export-form');
-      const flat = ranking.flatColumns.filter((c) => c.label.trim().length > 0);
-      const lookup = new Map(flat.map((d) => <[string, Column]>[d.id, d]));
-      dialog.form.innerHTML = `
-        <div class="mb-3">
-          <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
-          <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
-          <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
-          ${flat.map((col) => `
-            <div class="tdp-ranking-export-form-handle hstack gap-1">
-              <i class="fas fa-grip-vertical pb-2"></i>
-              <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
-                <label class="form-label form-check-label" for="customCheck_${col.id}">${col.label}</label>
-              </div>
+    const dialog = new PHOVEA_UI_FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+    const id = `e${BaseUtils.randomId(3)}`;
+    const inlineRadioID1 = `inlineRadio_${BaseUtils.randomId()}`;
+    const inlineRadioID2 = `inlineRadio_${BaseUtils.randomId()}`;
+    const inlineRadioID3 = `inlineRadio_${BaseUtils.randomId()}`;
+    const ranking = provider.getFirstRanking();
+    dialog.form.classList.add('tdp-ranking-export-form');
+    const flat = ranking.flatColumns.filter((c) => c.label.trim().length > 0);
+    const lookup = new Map(flat.map((d) => <[string, Column]>[d.id, d]));
+    dialog.form.innerHTML = `
+      <div class="mb-3">
+        <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
+        <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
+        <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
+        ${flat.map((col) => `
+          <div class="tdp-ranking-export-form-handle hstack gap-1">
+            <i class="fas fa-grip-vertical pb-2"></i>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
+              <label class="form-label form-check-label" for="customCheck_${col.id}">${col.label}</label>
             </div>
-          `).join('')}
-        </div>
-        <div class="mb-3">
-          <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
-          <div class="radio form-check" data-num-rows="${orderedRowIndices.all.length}">
-            <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="form-check-input">
-            <label class="form-label form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
           </div>
-          <div class="radio form-check" data-num-rows="${orderedRowIndices.filtered.length}">
-            <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="form-check-input">
-            <label class="form-label form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
-          </div>
-          <div class="radio form-check" data-num-rows="${orderedRowIndices.selected.length}">
-            <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="form-check-input">
-            <label class="form-label form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
-          </div>
+        `).join('')}
+      </div>
+      <div class="mb-3">
+        <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
+        <div class="radio form-check" data-num-rows="${orderedRowIndices.all.length}">
+          <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="form-check-input">
+          <label class="form-label form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
         </div>
-        <div class="mb-3">
-          <label class="form-label" for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
-          <input class="form-control" id="name_${id}" name="name" value="Export" required>
+        <div class="radio form-check" data-num-rows="${orderedRowIndices.filtered.length}">
+          <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="form-check-input">
+          <label class="form-label form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
         </div>
-        <div class="mb-3">
-          <label class="form-label" for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
-          <select class="form-select" id="type_${id}" name="type" required>
-          <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
-          <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
-          <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
-          <option value="JSON">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
-          <option value="XLSX" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
-          </select>
+        <div class="radio form-check" data-num-rows="${orderedRowIndices.selected.length}">
+          <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="form-check-input">
+          <label class="form-label form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
         </div>
-      `;
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFileName')}</label>
+        <input class="form-control" id="name_${id}" name="name" value="Export" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="type_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportFormat')}</label>
+        <select class="form-select" id="type_${id}" name="type" required>
+        <option value="CSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvComma')}</option>
+        <option value="TSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.tsv')}</option>
+        <option value="SSV">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.csvColon')}</option>
+        <option value="JSON">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.json')}</option>
+        <option value="XLSX" selected>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.excel')}</option>
+        </select>
+      </div>
+    `;
 
-      dialog.form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-        checkbox.addEventListener('change', () => {
-          dialog.form.querySelector('.error-columns').parentElement.classList.toggle('has-error', (dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0));
-        });
+    dialog.form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+      checkbox.addEventListener('change', () => {
+        dialog.form.querySelector('.error-columns').parentElement.classList.toggle('has-error', (dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0));
       });
+    });
 
-      this.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.tdp-ranking-export-form-handle');
+    this.resortAble(<HTMLElement>dialog.form.firstElementChild!, '.tdp-ranking-export-form-handle');
 
-      return new Promise<IExportData>((resolve) => {
-        dialog.onSubmit(() => {
-          const data = new FormData(dialog.form);
+    return new Promise<IExportData>((resolve) => {
+      dialog.onSubmit(() => {
+        const data = new FormData(dialog.form);
 
-          if (data.getAll('columns').length === 0) {
-            return false;
-          }
-
-          dialog.hide();
-
-          resolve({
-            type: ExportUtils.getExportFormat(<string>data.get('type')),
-            columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
-            order: orderedRowIndices[data.get('rows').toString()],
-            name: <string>data.get('name')
-          });
-
+        if (data.getAll('columns').length === 0) {
           return false;
+        }
+
+        dialog.hide();
+
+        resolve({
+          type: ExportUtils.getExportFormat(<string>data.get('type')),
+          columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
+          order: orderedRowIndices[data.get('rows').toString()],
+          name: <string>data.get('name')
         });
 
-        dialog.show();
-
-        setTimeout(() => {
-          const first = <HTMLElement>dialog.form.querySelector('input, select, textarea');
-          if (first) {
-            first.focus();
-          }
-        }, 250); // till dialog is visible
+        return false;
       });
+
+      dialog.show();
+
+      setTimeout(() => {
+        const first = <HTMLElement>dialog.form.querySelector('input, select, textarea');
+        if (first) {
+          first.focus();
+        }
+      }, 250); // till dialog is visible
     });
   }
 

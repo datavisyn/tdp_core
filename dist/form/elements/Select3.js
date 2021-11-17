@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import { EventHandler, BaseUtils } from 'phovea_core';
 import 'select2';
+import { EventHandler, BaseUtils } from '../../base';
 function isSelect3Item(item) {
     return typeof item.verified === 'string';
 }

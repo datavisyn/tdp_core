@@ -1,6 +1,3 @@
-/**
- * a string column with optional alignment
- */
 import { IDataRow, BooleanColumn, IBooleanColumnDesc } from 'lineupjs';
 /**
  * extra column for highlighting and filtering

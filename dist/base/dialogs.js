@@ -1,7 +1,5 @@
-/**
- * Created by Holger Stitz on 18.08.2016.
- */
-import { I18nextManager } from 'phovea_core';
+import { Dialog } from '../components';
+import { I18nextManager } from '../i18n';
 export class DialogUtils {
     /**
      * utility dialog when a session was not found
@@ -9,35 +7,33 @@ export class DialogUtils {
      * @param {string} id session id
      */
     static showProveanceGraphNotFoundDialog(manager, id, additionalCSSClasses = '') {
-        import('phovea_ui/dist/components/dialogs').then(({ Dialog }) => {
-            const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'), I18nextManager.getInstance().i18n.t('tdp:core.newSession'), additionalCSSClasses);
-            // append bg-danger to the dialog parent element
-            dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
-            dialog.body.innerHTML = `
-          <p>
-            ${I18nextManager.getInstance().i18n.t('tdp:core.notAccessibleMessage', { id })}
-          </p>
-          <p>
-          ${I18nextManager.getInstance().i18n.t('tdp:core.possibleReasons')}
-          <ul>
-              <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason1')}</li>
-              <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason2')}</li>
-              <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason3')}</li>
-          </ul>
-          </p>
-          <p>
-            ${I18nextManager.getInstance().i18n.t('tdp:core.contactOwnerMessage')}
-          </p>`;
-            dialog.onSubmit(() => {
-                dialog.hide();
-                return false;
-            });
-            dialog.onHide(() => {
-                dialog.destroy();
-                manager.newGraph();
-            });
-            dialog.show();
+        const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'), I18nextManager.getInstance().i18n.t('tdp:core.newSession'), additionalCSSClasses);
+        // append bg-danger to the dialog parent element
+        dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
+        dialog.body.innerHTML = `
+        <p>
+          ${I18nextManager.getInstance().i18n.t('tdp:core.notAccessibleMessage', { id })}
+        </p>
+        <p>
+        ${I18nextManager.getInstance().i18n.t('tdp:core.possibleReasons')}
+        <ul>
+            <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason1')}</li>
+            <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason2')}</li>
+            <li>${I18nextManager.getInstance().i18n.t('tdp:core.possibleReason3')}</li>
+        </ul>
+        </p>
+        <p>
+          ${I18nextManager.getInstance().i18n.t('tdp:core.contactOwnerMessage')}
+        </p>`;
+        dialog.onSubmit(() => {
+            dialog.hide();
+            return false;
         });
+        dialog.onHide(() => {
+            dialog.destroy();
+            manager.newGraph();
+        });
+        dialog.show();
     }
 }
 //# sourceMappingURL=dialogs.js.map

@@ -1,4 +1,6 @@
-import { IDType, RangeLike, ISecureItem } from 'phovea_core';
+import { IDType } from '../idtype';
+import { RangeLike } from '../range';
+import { ISecureItem } from '../security';
 import { IStoredNamedSet } from './interfaces';
 export declare class RestStorageUtils {
     static readonly REST_NAMESPACE: string;
