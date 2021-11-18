@@ -263,7 +263,7 @@ class GraphProvider(ADataSetProvider):
     c = phovea_server.config.view('tdp_core.mongo')
 
     self.client = MongoClient(c.host, c.port)
-    self.db = self.client[c.db]
+    self.db = self.client[c.db_graph]
 
   def __iter__(self):
     return iter((f for f in MongoGraph.list(self.db) if f.can_read()))
