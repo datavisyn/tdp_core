@@ -16,7 +16,7 @@ import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';
 import {ViewUtils} from '../views/ViewUtils';
 import {AView} from '../views/AView';
 import {TourUtils} from '../tour/TourUtils';
-import {EventHandler, ResolveNow} from '../base';
+import {EventHandler, IEvent, IEventListener, ResolveNow} from '../base';
 import {NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph} from '../provenance';
 import {Range} from '../range';
 import {I18nextManager} from '../i18n';
@@ -34,6 +34,31 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   private allowed: boolean;
   readonly node: HTMLElement;
   readonly content: HTMLElement;
+
+  off(events: typeof ViewWrapper.EVENT_VIEW_CREATED, handler?: (event: IEvent, view: IView) => void): this;
+  off(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, handler?: (event: IEvent, view: IView) => void): this;
+  off(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, handler?: (event: IEvent, view: IView, viewWrapper: ViewWrapper) => void): this;
+  off(events: typeof AView.EVENT_ITEM_SELECT, handler?: (event: IEvent, oldSelection: ISelection, newSelection: ISelection, name: string) => void): this;
+  off(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+    return super.on(events, handler);
+  }
+
+  on(events: typeof ViewWrapper.EVENT_VIEW_CREATED, handler?: (event: IEvent, view: IView) => void): this;
+  on(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, handler?: (event: IEvent, view: IView) => void): this;
+  on(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, handler?: (event: IEvent, view: IView, viewWrapper: ViewWrapper) => void): this;
+  on(events: typeof AView.EVENT_ITEM_SELECT, handler?: (event: IEvent, oldSelection: ISelection, newSelection: ISelection, name: string) => void): this;
+  on(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+    return super.on(events, handler);
+  }
+
+  fire(events: typeof ViewWrapper.EVENT_VIEW_CREATED, view: IView, viewWrapper: ViewWrapper): this;
+  fire(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, view: IView, viewWrapper: ViewWrapper): this;
+  fire(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, view: IView, viewWrapper: ViewWrapper): this;
+  fire(events: typeof AView.EVENT_ITEM_SELECT, oldSelection: ISelection, newSelection: ISelection, name: string): this;
+  fire(events: string, ...args: any[]) {
+    return super.fire(events, ...args);
+  }
+
 
   /**
    * Provenance graph reference of this object
@@ -161,7 +186,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       // create provenance reference
       this.context = ViewUtils.createContext(this.graph, this.plugin, this.ref);
       this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
-      this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
+      this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance, this);
       return this.instancePromise = ResolveNow.resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
         this.inputSelections.forEach((v, k) => {
           if (k !== AView.DEFAULT_SELECTION_NAME) { // already handled
@@ -195,7 +220,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
         });
         this.preInstanceParameter.clear();
 
-        this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance);
+        this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance, this);
         return this.instance;
       });
     });
@@ -225,7 +250,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   private destroyInstance() {
-    this.fire(ViewWrapper.EVENT_VIEW_DESTROYED, this.instance);
+    this.fire(ViewWrapper.EVENT_VIEW_DESTROYED, this.instance, this);
     this.instance.destroy();
     this.content.innerHTML = '';
     (<HTMLElement>this.node.querySelector('header div.parameters')).innerHTML = '';
