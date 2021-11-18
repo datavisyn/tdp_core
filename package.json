@@ -99,7 +99,8 @@
     "@fortawesome/fontawesome-free": "^5.15.1",
     "i18next": "^19.8.4",
     "crypto-js": "^4.0.0",
-    "md5": "^2.3.0"
+    "md5": "^2.3.0",
+    "use-deep-compare-effect": "^1.8.0"
   },
   "devDependencies": {
     "@types/d3": "~3.5.36",
