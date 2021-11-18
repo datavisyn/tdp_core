@@ -1,13 +1,8 @@
 from functools import reduce
 from operator import and_, or_, eq
 from re import match
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Callable
 from marshmallow import Schema, post_load, INCLUDE, fields, ValidationError
-
-
-# Create a subclass of dict to allow adding arbitrary attributes
-class MyDict(dict):
-    pass
 
 
 class Filter(Schema):
@@ -19,23 +14,17 @@ class Filter(Schema):
   type = fields.String(required=False)  # "type" of the filter: group, checkbox, text...
 
   @post_load()
-  def _postload(self, data: Dict, **_) -> MyDict:
+  def _postload(self, data: Dict, **_) -> Callable:
     """ Call a postload function in every sub-class """
     return self.postload(data, **data)
 
-  def postload(self, data: Dict, type: str, **_) -> MyDict:
+  def postload(self, data: Dict, type: str, **_) -> Callable:
     """ Delegate to a subclass based on type field """
     filters = {f.__name__.lower(): f for f in Filter.__subclasses__()}
     if type not in filters:
       raise ValidationError(f"Filter type {type} doesn't exist in {list(filters.keys())}", field_name="type")
     sub_cls = filters[type]
-    filt = sub_cls().load(data)
-    # Create a MyDict to allow adding attributes
-    new_data = MyDict(**data)
-    # _private attributes so it doesn't get serialized
-    setattr(new_data, '_filt', filt)
-    setattr(new_data, '_apply', lambda items: list(filter(filt, items)))
-    return new_data
+    return sub_cls().load(data)
 
 
 class FieldFilterMixin:
@@ -69,15 +58,13 @@ ALLOWED_OPERATORS = {"AND": and_, "OR": or_}
 
 class Group(Filter):
   operator = fields.String(required=True, validate=lambda o: o in ALLOWED_OPERATORS)
-  children = fields.Nested(Filter, many=True)
+  children = fields.List(fields.Dict)
 
   # noinspection PyMethodOverriding
   def postload(self, data: Dict, children: List, operator: str, **_):
-    if not children:
-      return lambda _: True
-    children = [Filter().load(child)._filt for child in children]
+    children = [Filter().load(child) for child in children]
     op = ALLOWED_OPERATORS[operator]
-    return lambda d: reduce(op, [child(d) for child in children])
+    return lambda d: reduce(op, [child(d) for child in children]) if children else True
 
 
 class Range(Filter, FieldFilterMixin):

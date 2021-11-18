@@ -1,11 +1,10 @@
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 from typing import TypeVar, Generic, List
 from deepdiff import DeepDiff
 
 T = TypeVar('T')
 
 
-# @ABC
 class BaseCDC(Generic[T]):
     @abstractmethod
     def load_data(self) -> List[T]:

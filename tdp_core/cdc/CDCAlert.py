@@ -1,15 +1,15 @@
-from . import api
-from typing import Callable
-
-from tdp_core.cdc.filter import Filter
-from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, JSON
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import EXCLUDE, Schema, post_load
-from sqlalchemy.ext.declarative import declarative_base
+from marshmallow import EXCLUDE, Schema
 from marshmallow import fields
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from sqlalchemy import Column, Integer, DateTime, TEXT, Boolean, JSON
 # TODO: Remove and use postgres
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from typing import List, Dict
+
+from tdp_core.cdc.filter import Filter
+from . import api
 
 Base = declarative_base()
 
@@ -26,7 +26,9 @@ class CDCAlert(Base):
     name = Column(TEXT, nullable=False)
     cdc_id = Column(TEXT, nullable=False)
     filter = Column(JSON, nullable=False)
+
     enable_mail_notification = Column(Boolean, nullable=False)
+    latest_email_notification = Column(DateTime, nullable=True)
 
     latest_compare_date = Column(DateTime, nullable=True)
     latest_diff = Column(JSON, nullable=True)
@@ -47,9 +49,10 @@ class CDCAlert(Base):
     modifier = Column(TEXT)  # NOQA: N815
     modification_date = Column(DateTime)  # NOQA: N815
 
-    # TODO: Avoid loading latest_diff, latest_fetch_data, latest_confirmed_data, use flags instead and load individually
-    # def has_latest_diff(self):
-    #     return self.latest_diff is not None
+    def apply_filter(self, data: List[Dict]):
+      """ Re-computes the filter on every call, by recursive marshmallow loading """
+      filt = Filter().load(self.filter)
+      return list(filter(filt, data))
 
 
 class CDCAlertSchema(SQLAlchemyAutoSchema):
@@ -67,7 +70,7 @@ class CDCAlertArgsSchema(Schema):
     name = fields.String()
     enable_mail_notification = fields.Boolean()
     cdc_id = fields.String(validate=lambda name: name in api.cdcs.keys())
-    filter = fields.Nested(Filter, required=True)
+    filter = fields.Dict(required=True, validate=Filter().load)
     compare_columns = fields.List(fields.String())
 
 
