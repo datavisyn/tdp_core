@@ -1,6 +1,8 @@
 // TODO override the following SCSS variables once SCSS import is working again
 $lu_dialog_font_size: 1rem !default;
 $lu_toolbar_font_size: 1rem !default;
+
+$lu_assets: '~lineupjs/src/assets' !default;
 $lu_use_font_awesome: true !default;
 
 @import '~lineupjs/src/style.scss';
