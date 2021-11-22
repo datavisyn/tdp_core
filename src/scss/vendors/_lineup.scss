@@ -1,9 +1,9 @@
 // TODO override the following SCSS variables once SCSS import is working again
 $lu_dialog_font_size: 1rem !default;
 $lu_toolbar_font_size: 1rem !default;
+$lu_use_font_awesome: true !default;
 
-// use css because importing sass file from src requires font awesome v4 dependency
-@import '~lineupjs/build/LineUpJS.css';
+@import '~lineupjs/src/style.scss';
 
 // override the font-size manually (since the SCSS variables above does not work)
 .lu-tooltip,
