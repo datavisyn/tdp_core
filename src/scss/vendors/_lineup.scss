@@ -1,4 +1,3 @@
-// TODO override the following SCSS variables once SCSS import is working again
 $lu_dialog_font_size: 1rem !default;
 $lu_toolbar_font_size: 1rem !default;
 
@@ -10,8 +9,6 @@ $lu_use_font_awesome: true !default;
 // override the font-size manually (since the SCSS variables above does not work)
 .lu-tooltip,
 .lu-dialog {
-  font-size: $lu_dialog_font_size;
-
   // adapt LineUp dialogs to Bootstrap v4 dialog style
   padding: 1rem 1rem 0.5rem;
   gap: 10px;
@@ -45,15 +42,6 @@ $lu_use_font_awesome: true !default;
 
 .lu-dialog-button {
   margin: unset;
-}
-
-.lu-hierarchy-entry,
-.lu-hierarchy-adder,
-.lu-toolbar,
-.lu-more-options,
-.lu-side-panel-rankings > i,
-.lu-side-panel-ranking-label > i {
-  font-size: $lu_toolbar_font_size;
 }
 
 .lu-summary {
