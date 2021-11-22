@@ -37,8 +37,8 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      margin-left: -$nothing/2;
-      margin-top: -$nothing/2;
+      margin-left: -$nothing*0.5;
+      margin-top: -$nothing*0.5;
       font-size: $nothing;
       z-index: 9;
     }
