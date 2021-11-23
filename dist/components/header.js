@@ -7,11 +7,12 @@ import { AppMetaDataUtils } from './metaData';
 /**
  * header html template declared inline so we can use i18next
  */
+const testId = 'tabsheader';
 const getTemplate = () => {
     return (`<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#" data-header="appLink"></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavBar" aria-controls="headerNavBar" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand" href="#" data-header="appLink" data-testid="${testId}-logo-link"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavBar" aria-controls="headerNavBar" aria-expanded="false" aria-label="Toggle navigation" data-testid="${testId}-navtoggle-button">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -21,25 +22,25 @@ const getTemplate = () => {
         </ul>
         <ul class="navbar-nav" data-header="rightMenu">
             <li class="nav-item" hidden data-header="optionsLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerOptionsDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.options')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerOptionsDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.options')}" data-testid="${testId}-options-link">
                     <i class="fas fa-cog fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.openOptionsDialog')}</span>
                 </a>
             </li>
             <li class="nav-item" hidden data-header="aboutLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.about')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.about')}" data-testid="${testId}-about-link">
                     <i class="fas fa-info fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.openAboutDialog')}</span>
                 </a>
             </li>
             <li class="nav-item" hidden data-header="bugLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}" data-testid="${testId}-bug-link">
                     <i class="fas fa-bug fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}</span>
                 </a>
             </li>
             <li class="nav-item" hidden data-header="helpLink">
-                <a href="//caleydo.org" target="_blank" class="nav-link" title="${I18nextManager.getInstance().i18n.t('phovea:ui.openHelpPage')}">
+                <a href="//caleydo.org" target="_blank" class="nav-link" title="${I18nextManager.getInstance().i18n.t('phovea:ui.openHelpPage')}" data-testid="${testId}-help-link">
                     <span class="fa-stack" style="font-size: 0.5em; height: 2.3em;">
                       <i class="fas fa-book-open fa-stack-2x"></i>
                       <i class="fas fa-info fa-stack-1x" style="left: 20%; filter:invert(100%);"></i>
@@ -133,7 +134,7 @@ export class AppHeaderLink {
 function createLi(name, action, href = '#') {
     const li = document.createElement('li');
     li.classList.add('nav-item');
-    li.innerHTML = `<a href="${href}" class="nav-link">${name}</a>`;
+    li.innerHTML = `<a href="${href}" class="nav-link" data-testid="${testId}-${name}">${name}</a>`;
     if (action) {
         li.querySelector('a').onclick = action;
     }

@@ -29,6 +29,8 @@ export class Dialog {
   private bakKeyDownListener: (ev: KeyboardEvent) => any = null; // temporal for restoring an old keydown listener
   static openDialogs: number = 0;
 
+  protected testId: string;
+
   /**
    * @param title Dialog title
    * @param primaryBtnText Label for primary button
@@ -43,6 +45,7 @@ export class Dialog {
    * @default backdrop true
    */
   constructor(title: string, primaryBtnText = 'OK', additionalCSSClasses: string = '', backdrop: boolean | 'static' = true) {
+    this.testId = title.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
     const dialog = document.createElement('div');
     dialog.setAttribute('role', 'dialog');
     dialog.classList.add('modal', 'fade');
@@ -52,13 +55,13 @@ export class Dialog {
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title">${title}</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('phovea:ui.close')}"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('phovea:ui.close')}" data-testid="${this.testId}-modal-close"></button>
           </div>
           <div class="modal-body">
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary btn-primary submit-dialog">${primaryBtnText}</button>
+            <button type="button" class="btn btn-primary btn-primary submit-dialog" data-testid="${this.testId}-footer-btn-close">${primaryBtnText}</button>
           </div>
         </div>
       </div>`;
@@ -221,7 +224,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
       const dialog = Dialog.generateDialog(o.title, o.primaryBtnText, o.additionalCSSClasses);
       const option = items.map((d) => `<option value="${d}">${d}</option>`).join('\n');
       if (o.editable) {
-        dialog.body.innerHTML = `<form><input type="text" list="chooseList" class="form-control" autofocus="autofocus" placeholder="${o.placeholder}">
+        dialog.body.innerHTML = `<form><input type="text" list="chooseList" class="form-control" data-testid="bla" autofocus="autofocus" placeholder="${o.placeholder}">
           <datalist id="chooseList">${option}</datalist>
         </form>`;
       } else {
