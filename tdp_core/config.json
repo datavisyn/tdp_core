@@ -1,7 +1,4 @@
 {
-  "host": "mongo",
-  "port": 27017,
-  "database": "targid",
   "migrations": {
     "autoUpgrade": true
   },
@@ -80,16 +77,20 @@
   "mongo": {
     "host": "mongo",
     "port": 27017,
-    "db": "graph"
+    "db_graph": "graph",
+    "db_namedsets": "targid"
   },
-  /*"cdc_update": {"second":  0},
-  "cdc_mail": {"second":  15}, */
-    "mail": {
-      "sender": "noreply@datavisyn.io",
-      "host": "smtp.gmail.com",
-      "port": 587,
-      "username": "", // i.e. your.name@datavisyn.io
-      // to send mail from your datavisyn gmail, go to https://myaccount.google.com/lesssecureapps and disable 2fa
-      "password": "",
+  "cdc_update": {
+    "second":  0
+  },
+  "cdc_mail": {
+    "second":  15
+  },
+  "mail": {
+    "sender": "noreply@datavisyn.io",
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "username": "",
+    "password": ""
   }
 }

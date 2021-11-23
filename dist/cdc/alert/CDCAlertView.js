@@ -55,8 +55,7 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
         setEditMode(false);
         setAlertData(selectedAlert);
     };
-    return (React.createElement(React.Fragment, null,
-        React.createElement("div", { className: "d-md-flex justify-content-md-end mb-1 mt-1" }),
+    return (React.createElement("div", { className: `${saveStatus === 'pending' ? 'tdp-busy-overlay' : ''}` },
         (selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.latest_error) ?
             React.createElement(ErrorMessage, { error: new Error(`In the sync from ${new Date(selectedAlert.latest_error_date)} an error occured: ${selectedAlert.latest_error}`) })
             : deleteError ?
@@ -88,7 +87,7 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
                     React.createElement("i", { className: "fas fa-check" })),
                 React.createElement("button", { title: "No Delete", className: "btn btn-text-secondary ms-1", onClick: () => setDeleteMode(false) },
                     React.createElement("i", { className: "fas fa-times" })))))),
-        React.createElement("div", { className: "overflow-auto h-100 d-flex flex-column" },
+        React.createElement("div", { className: "overflow-auto h-100 d-flex flex-column container" },
             activePage === 'data' && !editMode && !creationMode ? React.createElement(CDCDataChangeTable, { selectedAlert: selectedAlert, onAlertChanged: onAlertChanged }) : null,
             activePage === 'info' ? React.createElement(React.Fragment, null,
                 React.createElement("div", { className: "row mb-3 mt-3" },

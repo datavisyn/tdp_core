@@ -79,7 +79,7 @@ export function CDCFilterDialog({ cdcConfig }) {
                         React.createElement("div", { className: "modal-header" },
                             React.createElement("h5", { className: "modal-title" }, "Alerts"),
                             React.createElement("button", { type: "button", className: "btn-close", "data-bs-dismiss": "modal", "aria-label": "Close" })),
-                        React.createElement("div", { className: "modal-body overflow-auto" },
+                        React.createElement("div", { className: "modal-body overflow-auto container" },
                             React.createElement("div", { className: "row h-100 overflow-auto" },
                                 React.createElement("div", { className: `col-3 overflow-auto h-100 position-relative ${alertStatus === 'pending' ? 'tdp-busy-overlay' : ''}` },
                                     syncError ? React.createElement(ErrorMessage, { error: syncError }) : null,
