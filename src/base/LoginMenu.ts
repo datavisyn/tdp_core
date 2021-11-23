@@ -71,20 +71,21 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
   }
 
   private init() {
+    const testId = 'loginmenu';
     const doc = this.options.document;
     const ul = doc.createElement('ul');
     ul.classList.add('navbar-nav', 'navbar-right');
     ul.innerHTML = `
       <li class="nav-item" id="login_menu">
-        <a class="nav-link" data-bs-toggle="modal" data-bs-target="#loginDialog" href="#">
+        <a class="nav-link" data-bs-toggle="modal" data-bs-target="#loginDialog" href="#" data-testid="${testId}-login-menu-link">
           <i class="fas fa-user fa-fw" aria-hidden="true"></i>
         </a>
       </li>
       <li style="display: none" class="nav-item dropdown" id="user_menu">
           <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" id="userMenuDropdown"
-              aria-expanded="false"><i class="fas fa-user" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('phovea:security_flask.unknown')}</span></a>
+              aria-expanded="false" data-testid="${testId}-login-dropdown-link"><i class="fas fa-user" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('phovea:security_flask.unknown')}</span></a>
           <div class="dropdown-menu dropdown-menu-end" data-bs-popper="none" aria-labelledby="userMenuDropdown">
-              <a class="dropdown-item" href="#" id="logout_link">${I18nextManager.getInstance().i18n.t('phovea:security_flask.logoutButton')}</a>
+              <a class="dropdown-item" href="#" id="logout_link" data-testid="${testId}-logout-link">${I18nextManager.getInstance().i18n.t('phovea:security_flask.logoutButton')}</a>
           </div>
       </li>`;
 
