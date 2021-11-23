@@ -185,6 +185,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
 
   private build($parent: d3.Selection<any>) {
     let $node = $parent.select('aside.provenance-story-vis');
+    const testId = 'storyvis';
     if ($node.empty()) {
       $node = $parent.append('aside').classed('provenance-story-vis', true).classed('provenance-sidepanel', true);
     }
@@ -194,11 +195,11 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
     $node.html(`
       <div>
         <h2><i class="fas fa-video"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.story')} <span id="player_controls">
-            <i data-player="backward" class="btn btn-sm btn-light fas fa-step-backward" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.stepBackward')}"></i>
-            <i data-player="play" class="btn btn-sm btn-light fas fa-play" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.play')}"></i>
-            <i data-player="forward" class="btn btn-sm btn-light fas fa-step-forward" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.stepForward')}"></i>
+            <i data-player="backward" class="btn btn-sm btn-light fas fa-step-backward" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.stepBackward')}" data-testid="${testId}-player-controls-backward"></i>
+            <i data-player="play" class="btn btn-sm btn-light fas fa-play" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.play')}" data-testid="${testId}-player-controls-play"></i>
+            <i data-player="forward" class="btn btn-sm btn-light fas fa-step-forward" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.stepForward')}" data-testid="${testId}-player-controls-forward"></i>
           </span>
-          <i class="fas fa-plus-circle"></i></h2>
+          <i class="fas fa-plus-circle" data-testid="${testId}-player-controls-plus"></i></h2>
         <form class="row toolbar" style="display: none" onsubmit="return false;">
           <div class="btn-group col-sm-auto" role="group">
             <button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true"
@@ -210,16 +211,16 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
             </div>
           </div>
           <div class="btn-group col-sm-auto" role="group">
-            <button class="btn btn-light btn-sm" data-create="plus" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.newStoryLabel')}"><i class="fas fa-plus"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.newStory')}</button>
-            <button class="btn btn-light btn-sm" data-create="clone" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.extractLabel')}"><i class="fas fa-copy"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.extract')}</button>
-            <button class="btn btn-light btn-sm" data-create="bookmark" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.bookmarkedLabel')}"><i class="fas fa-bookmark"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.bookmarked')}</button>
+            <button class="btn btn-light btn-sm" data-create="plus" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.newStoryLabel')}" data-testid="${testId}-label-controls-create"><i class="fas fa-plus"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.newStory')}</button>
+            <button class="btn btn-light btn-sm" data-create="clone" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.extractLabel')}" data-testid="${testId}-label-controls-extract"><i class="fas fa-copy"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.extract')}</button>
+            <button class="btn btn-light btn-sm" data-create="bookmark" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.bookmarkedLabel')}" data-testid="${testId}-label-controls-bookmark"><i class="fas fa-bookmark"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.bookmarked')}</button>
           </div>
         </form>
       </div>
       <div class="current">
-        <input type="text" class="form-control" placeholder="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.slideName')}" disabled="disabled">
+        <input type="text" class="form-control" placeholder="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.slideName')}" data-testid="${testId}-input-slide-name" disabled="disabled">
         <div class="name"></div>
-        <textarea class="form-control" placeholder="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.slideDescription')}" disabled="disabled"></textarea>
+        <textarea class="form-control" placeholder="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.slideDescription')}" data-testid="${testId}-textarea-slide-description" disabled="disabled"></textarea>
         <div class="description"></div>
       </div>
       <div class="stories ${this.options.class}">
@@ -455,8 +456,9 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
 
   private createToolbar($elem: d3.Selection<SlideNode>) {
 
+    const testId = 'storyvis';
     const $toolbarEnter = $elem.append('div').classed('toolbar', true);
-    $toolbarEnter.append('i').attr('class', 'fas fa-edit').on('click', (d) => {
+    $toolbarEnter.append('i').attr('class', 'fas fa-edit').attr('data-testid', `${testId}-createToolBar-edit-name`).on('click', (d) => {
       const e = <Event>d3.event;
       //remove me
       e.stopPropagation();
@@ -476,7 +478,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       return false;
     });
 
-    $toolbarEnter.append('i').attr('class', 'fas fa-copy').attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.cloneSlide') as string).on('click', (d) => {
+    $toolbarEnter.append('i').attr('class', 'fas fa-copy').attr('data-testid', `${testId}-createToolBar-clone-slide`).attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.cloneSlide') as string).on('click', (d) => {
       const e = <Event>d3.event;
       //remove me
       e.stopPropagation();
@@ -495,7 +497,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
      return false;
      });
      */
-    $toolbarEnter.append('i').attr('class', 'fas fa-times').attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.removeSlide') as string).on('click', (d) => {
+    $toolbarEnter.append('i').attr('class', 'fas fa-times').attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.removeSlide') as string).attr('data-testid', `${testId}-createToolBar-remove-slide`).on('click', (d) => {
       const e = <Event>d3.event;
       //remove me
       e.stopPropagation();
@@ -513,11 +515,12 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
   }
 
   private createLastPlaceholder($p: d3.Selection<ISlideNodeRepr>) {
+    const testId = 'storyvis';
     const that = this;
     $p.html(`<div>
-       <button class="btn btn-light btn-sm" data-add="text" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.addTextSlide')}"><i class="far fa-file-alt"></i></button>
-       <button class="btn btn-light btn-sm" data-add="extract" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.addCurrentState')}"><i class="far fa-file"></i></button>
-       <button class="btn btn-light btn-sm" data-add="extract_all" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.addPathToCurrentState')}"><i class="far fa-copy"></i></button>
+       <button class="btn btn-light btn-sm" data-add="text" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.addTextSlide')}" data-testid="${testId}-slide-controls-addTextSlide"><i class="far fa-file-alt"></i></button>
+       <button class="btn btn-light btn-sm" data-add="extract" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.addCurrentState')}" data-testid="${testId}-slide-controls-addCurrentState"><i class="far fa-file"></i></button>
+       <button class="btn btn-light btn-sm" data-add="extract_all" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.addPathToCurrentState')}" data-testid="${testId}-slide-controls-addPathToCurrentState"><i class="far fa-copy"></i></button>
        </div>
        <div class="duration"><span>00:00</span><i class="fas fa-circle"></i></div>
       `);
