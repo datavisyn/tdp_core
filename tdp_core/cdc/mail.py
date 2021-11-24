@@ -6,7 +6,7 @@ from smtplib import SMTP
 from sqlalchemy import and_, or_
 
 from phovea_server.config import view
-from tdp_core.cdc.CDCAlert import create_session, CDCAlert
+from .CDCAlert import create_session, CDCAlert
 
 conf = view("tdp_core").get("mail")
 

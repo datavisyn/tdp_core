@@ -28,7 +28,7 @@ export function CDCDataChangeTable({ selectedAlert, onAlertChanged }) {
     const { status: confirmStatus, error: confirmError, execute: doConfirm } = useAsync(async () => {
         const alert = await confirmAlertById(selectedAlert.id);
         onAlertChanged(alert.id);
-    }, false);
+    });
     return (React.createElement(React.Fragment, null, confirmStatus === 'pending' ?
         React.createElement("i", { className: "fas fa-spinner fa-spin" })
         : React.createElement(React.Fragment, null, selectedAlert.latest_diff || selectedAlert.confirmed_data ? (React.createElement(React.Fragment, null,

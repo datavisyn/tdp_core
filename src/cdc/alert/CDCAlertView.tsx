@@ -29,7 +29,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
     setEditMode(false);
     await deleteAlert(selectedAlert.id);
     onAlertChanged();
-  }, false);
+  });
 
   const {status: saveStatus, error: saveError, execute: doSave} = useAsync(async () => {
     const valFilter = !!alertData?.filter;
@@ -49,7 +49,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
     setValidFilter(valFilter);
     setValidName(valName);
     setValidCompareColumns(valCompareColumns);
-  }, false);
+  });
 
   // TODO: CDCs are more complex than just filters, i.e. they also have fields.
   const cdcs = Object.keys(cdcConfig);
@@ -72,9 +72,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
     setAlertData(selectedAlert);
   };
 
-  return (<>
-    <div className="d-md-flex justify-content-md-end mb-1 mt-1">
-    </div>
+  return (<div className={`${saveStatus === 'pending' ? 'tdp-busy-overlay' : ''}`}>
     {selectedAlert?.latest_error ?
       <ErrorMessage error={new Error(`In the sync from ${new Date(selectedAlert.latest_error_date)} an error occured: ${selectedAlert.latest_error}`)} />
       : deleteError ?
@@ -111,7 +109,7 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
         </>)}
       </small>
     </ul>
-    <div className="overflow-auto h-100 d-flex flex-column">
+    <div className="overflow-auto h-100 d-flex flex-column container">
       {activePage === 'data' && !editMode && !creationMode ? <CDCDataChangeTable selectedAlert={selectedAlert} onAlertChanged={onAlertChanged} /> : null}
       {activePage === 'info' ? <>
       <div className="row mb-3 mt-3">
@@ -175,5 +173,5 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
           </div>
       </> : null}
     </div>
-  </>);
+  </div>);
 }

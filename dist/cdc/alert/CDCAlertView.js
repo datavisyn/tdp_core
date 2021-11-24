@@ -17,7 +17,7 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
         setEditMode(false);
         await deleteAlert(selectedAlert.id);
         onAlertChanged();
-    }, false);
+    });
     const { status: saveStatus, error: saveError, execute: doSave } = useAsync(async () => {
         var _a, _b;
         const valFilter = !!(alertData === null || alertData === void 0 ? void 0 : alertData.filter);
@@ -38,7 +38,7 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
         setValidFilter(valFilter);
         setValidName(valName);
         setValidCompareColumns(valCompareColumns);
-    }, false);
+    });
     // TODO: CDCs are more complex than just filters, i.e. they also have fields.
     const cdcs = Object.keys(cdcConfig);
     const filterSelection = (_a = cdcConfig[alertData === null || alertData === void 0 ? void 0 : alertData.cdc_id]) === null || _a === void 0 ? void 0 : _a.filters;

@@ -71,7 +71,7 @@ export function CDCFilterCreator({ filterSelection, filter, setFilter, disableFi
     return (React.createElement(DndProvider, { backend: HTML5Backend },
         React.createElement("div", { className: "row" },
             React.createElement("div", { className: "col-md" },
-                React.createElement("h6", null, "Your test"),
+                React.createElement("h6", null, "Your filters"),
                 React.createElement(FilterCard, { filter: filter, onDrop: onDrop, onDelete: onDelete, onChange: onChange, onValueChanged: (filter, value, field) => {
                         onChange(filter, (f) => {
                             if (value !== undefined) {

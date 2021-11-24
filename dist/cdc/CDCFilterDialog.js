@@ -13,7 +13,7 @@ export function CDCFilterDialog({ cdcConfig }) {
     const [creationMode, setCreationMode] = React.useState(false);
     const [alertData, setAlertData] = React.useState(null);
     const [dialogNode, setDialogNode] = React.useState(null);
-    const { status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts } = useAsync(getAlerts, true);
+    const { status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts } = useAsync(getAlerts, []);
     const onAlertChanged = async (id) => {
         //refetches alerts and makes new selection
         fetchAlerts().then((alerts) => {
@@ -32,7 +32,7 @@ export function CDCFilterDialog({ cdcConfig }) {
             throw new Error(`Alert(s) could not be synchronized!`);
         }
         onAlertChanged(selectedAlert === null || selectedAlert === void 0 ? void 0 : selectedAlert.id);
-    }, false);
+    });
     const onCreateButtonClick = () => {
         setCreationMode(true);
         setSelectedAlert(null);

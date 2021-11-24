@@ -33,7 +33,7 @@ export function CDCDataChangeTable({selectedAlert, onAlertChanged}: ICDCDataChan
   const {status: confirmStatus, error: confirmError, execute: doConfirm} = useAsync(async () => {
     const alert = await confirmAlertById(selectedAlert.id);
     onAlertChanged(alert.id);
-  }, false);
+  });
 
   return (<>
     {confirmStatus === 'pending' ?

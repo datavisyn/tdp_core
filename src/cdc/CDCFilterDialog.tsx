@@ -21,7 +21,7 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
   const [alertData, setAlertData] = React.useState<IUploadAlert | null>(null);
   const [dialogNode, setDialogNode] = React.useState<HTMLDivElement | null>(null);
 
-  const {status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts} = useAsync(getAlerts, true);
+  const {status: alertStatus, error: alertError, execute: fetchAlerts, value: alerts} = useAsync(getAlerts, []);
 
   const onAlertChanged = async (id?: number) => {
     //refetches alerts and makes new selection
@@ -41,7 +41,7 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
       throw new Error(`Alert(s) could not be synchronized!`);
     }
     onAlertChanged(selectedAlert?.id);
-  }, false);
+  });
 
   const onCreateButtonClick = () => {
     setCreationMode(true);
@@ -91,7 +91,7 @@ export function CDCFilterDialog({cdcConfig}: ICDCFilterDialogProps) {
               <h5 className="modal-title">Alerts</h5>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div className="modal-body overflow-auto">
+            <div className="modal-body overflow-auto container">
               <div className="row h-100 overflow-auto">
                 <div className={`col-3 overflow-auto h-100 position-relative ${alertStatus === 'pending' ? 'tdp-busy-overlay' : ''}`}>
                   {syncError ? <ErrorMessage error={syncError} /> : null}
