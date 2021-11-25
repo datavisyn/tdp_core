@@ -70,6 +70,10 @@ export interface IFormElementDesc {
      */
     label?: string;
     /**
+     * Unique ID for Cypress testing to select elements
+     */
+    testid?: string;
+    /**
      * Show or hide form element
      */
     visible?: boolean;
