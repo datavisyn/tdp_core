@@ -21,6 +21,9 @@ function useBSClass(clazz, ...options) {
             return null;
         });
     }, []);
+    React.useEffect(() => {
+        return () => instance === null || instance === void 0 ? void 0 : instance.dispose();
+    }, [instance]);
     return [setRef, instance];
 }
 function __useBSClass(clazz) {
