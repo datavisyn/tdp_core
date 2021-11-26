@@ -1,5 +1,4 @@
 import logging
-import phovea_server.config
 from .sql_filter import filter_logic
 from phovea_server.ns import abort
 from .dbmanager import DBManager
@@ -8,7 +7,6 @@ from werkzeug.datastructures import MultiDict
 
 __author__ = 'Samuel Gratzl'
 _log = logging.getLogger(__name__)
-c = phovea_server.config.view('tdp_core')
 configs = DBManager()
 
 

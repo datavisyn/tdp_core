@@ -1,4 +1,5 @@
 import logging
+from .dbview import DBMapping
 from . import db
 import itertools
 
@@ -6,12 +7,14 @@ _log = logging.getLogger(__name__)
 
 
 class SQLMappingTable(object):
-  def __init__(self, mapping, engine):
+  def __init__(self, mapping: DBMapping, engine):
     self.from_idtype = mapping.from_idtype
     self.to_idtype = mapping.to_idtype
     self._engine = engine
     self._query = mapping.query
     self._integer_ids = mapping.integer_ids
+    # Enable batch mapping operations by ensuring the correct return order
+    self.preserves_order = True
 
   def __call__(self, ids):
     # ensure strings
@@ -25,6 +28,7 @@ class SQLMappingTable(object):
       # handle multi mappings
       data = sorted(mapped, key=lambda x: x['f'])
       grouped = {k: [r['t'] for r in g] for k, g in itertools.groupby(data, lambda x: x['f'])}
+      # Return according to the given ids to ensure that we are preserving the order correctly
       return [grouped.get(id, []) for id in ids]
 
 
