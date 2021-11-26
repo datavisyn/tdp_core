@@ -51,6 +51,12 @@ def phovea(registry):
                       'namespace': '/api/tdp/db-migration'
                   })
 
+  # CDC
+  registry.append('namespace', 'tdp_cdc', 'tdp_core.cdc.api',
+                  {
+                      'namespace': '/api/tdp/cdc'
+                  })
+
   # phovea_clue
   registry.append('namespace', 'caleydo-clue-screenshot', 'tdp_core.remoteplayer',
                   {

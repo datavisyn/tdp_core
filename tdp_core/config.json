@@ -79,5 +79,18 @@
     "port": 27017,
     "db_graph": "graph",
     "db_namedsets": "targid"
+  },
+  "cdc_update": {
+    "second":  0
+  },
+  "cdc_mail": {
+    "second":  15
+  },
+  "mail": {
+    "sender": "noreply@datavisyn.io",
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "username": "",
+    "password": ""
   }
 }
