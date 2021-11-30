@@ -30,19 +30,15 @@ export class Permission {
   }
 
   encode() {
-    return Permission.encode(this.user, this.group, this.others);
-    // TODO: When to enable buddies?
-    // return Permission.encode(this.user, this.group, this.others, this.buddies);
+    return Permission.encode(this.user, this.group, this.others, this.buddies);
   }
 
   toString() {
     const userEncoded = Permission.toString(this.user);
     const groupEncoded = Permission.toString(this.group);
     const othersEncoded = Permission.toString(this.others);
-    return userEncoded + groupEncoded + othersEncoded;
-    // TODO: When to enable buddies?
-    // const buddiesEncoded = Permission.toString(this.buddies);
-    // return buddiesEncoded + userEncoded + groupEncoded + othersEncoded;
+    const buddiesEncoded = Permission.toString(this.buddies);
+    return buddiesEncoded + userEncoded + groupEncoded + othersEncoded;
   }
 
   clone() {
@@ -59,8 +55,7 @@ export class Permission {
       case EEntity.USER: return this.user;
       case EEntity.GROUP: return this.group;
       case EEntity.OTHERS: return this.others;
-      // TODO: When to enable buddies?
-      // case EEntity.BUDDIES: return this.buddies;
+      case EEntity.BUDDIES: return this.buddies;
     }
   }
 
