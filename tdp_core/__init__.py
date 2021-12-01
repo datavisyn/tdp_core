@@ -77,7 +77,6 @@ def phovea(registry):
   # phovea_data_redis
   registry.append('manager', 'idmanager', 'tdp_core.assigner', dict(priority=-5, singleton=True))
   registry.append('mapping_provider', 'phovea_data_redis', 'tdp_core.redis_mapping_table')
-  registry.append('manager', 'cachemanager', 'tdp_core.cache', dict(priority=-5, singleton=True))
 
   # phovea_data_mongo
   registry.append('dataset-provider', 'dataset-graph', 'tdp_core.graph', {})

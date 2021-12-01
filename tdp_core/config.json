@@ -64,15 +64,6 @@
     },
     "bulk": false
   },
-  "cache": {
-    "hostname": "redis",
-    "port": 6379,
-    "db": 5,
-    "extras": {
-
-    },
-    "timeout": 600
-  },
   "--phovea_data_mongo": "comment",
   "mongo": {
     "host": "mongo",

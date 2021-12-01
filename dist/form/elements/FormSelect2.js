@@ -56,7 +56,7 @@ export class FormSelect2 extends AFormElement {
     buildSelect2($select, options, data) {
         const select2Options = {};
         let initialValue = [];
-        const defaultVal = this.getStoredValue(null);
+        const defaultVal = this.getStoredValue(options.selectedDefaultValue || null);
         if (defaultVal) {
             if (this.isMultiple) {
                 const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];

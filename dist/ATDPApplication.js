@@ -64,9 +64,9 @@ export class ATDPApplication extends ACLUEWrapper {
                 evt.preventDefault();
                 return false;
             }, '#');
-            button.dataset.toggle = 'modal';
+            button.dataset.bsToggle = 'modal';
             button.tabIndex = -1;
-            button.dataset.target = `#${this.tourManager.chooser.id}`;
+            button.dataset.bsTarget = `#${this.tourManager.chooser.id}`;
         }
     }
     /**
