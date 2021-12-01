@@ -165,7 +165,8 @@ export abstract class ARankingView extends AView {
     this.stats.classList.add('mt-2', 'mb-2');
 
 
-    this.provider = new TDPLocalDataProvider([], [], this.options.customProviderOptions);
+
+    this.provider = this.options.customProvider ? this.options.customProvider : new TDPLocalDataProvider([], [], this.options.customProviderOptions);
     // hack in for providing the data provider within the graph
     // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
     // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
@@ -437,7 +438,7 @@ export abstract class ARankingView extends AView {
             const e = error || outsideError;
             // Select the header of the score column
             const headerNode = this.node.querySelector(`.lu-header[data-id=${col.id}]`);
-            if(!col.findMyRanker() || !headerNode) {
+            if (!col.findMyRanker() || !headerNode) {
               // The column was removed.
               done = true;
               return;
@@ -451,7 +452,7 @@ export abstract class ARankingView extends AView {
               headerNode.appendChild(overlay);
             }
 
-            if(status === ERenderAuthorizationStatus.SUCCESS) {
+            if (status === ERenderAuthorizationStatus.SUCCESS) {
               overlay.remove();
             } else {
               overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-truncate" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
@@ -465,11 +466,11 @@ export abstract class ARankingView extends AView {
         try {
           outsideError = null;
           return resolve(await score.compute(ids, this.itemIDType, args));
-        } catch(e) {
+        } catch (e) {
           if (e instanceof InvalidTokenError) {
             console.error(`Score computation failed because of invalid token:`, e.message);
             outsideError = e;
-            if(col.findMyRanker()) {
+            if (col.findMyRanker()) {
               // Only invalidate authorizations if the column was not removed yet.
               // TODO: When we invalidate it here, it also "disables" already open detail views for example
               TDPTokenManager.invalidateToken(e.ids);
@@ -579,13 +580,7 @@ export abstract class ARankingView extends AView {
 
   private build() {
     this.setBusy(true);
-    return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
-      const columns: IColumnDesc[] = r[0];
-      columns.forEach((c) => this.provider.pushDesc(c));
-
-      const rows: IRow[] = r[1];
-
-      this.setLineUpData(rows);
+    return Promise.resolve().then(() => {
       this.createInitialRanking(this.provider);
       const ranking = this.provider.getLastRanking();
       this.customizeRanking(LineupUtils.wrapRanking(this.provider, ranking));

@@ -1,6 +1,7 @@
 import { ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem } from 'lineupjs';
 import { IDTypeLike } from '../idtype';
 import { ISearchOption, IPanelAddColumnButtonOptions } from './panel';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 export interface IARankingViewOptions {
     /**
      * name of a single item in LineUp
@@ -130,6 +131,7 @@ export interface IARankingViewOptions {
         maxGroupColumns: number;
         filterGlobally: true;
     }>;
+    customProvider?: TDPLocalDataProvider;
     /**
      * Formatting function for the search box item
      * Similar to `ISearchBoxOptions.formatItem()` in lineupjs

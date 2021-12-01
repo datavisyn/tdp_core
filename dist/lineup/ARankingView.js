@@ -128,7 +128,7 @@ export class ARankingView extends AView {
         this.node.insertAdjacentHTML('beforeend', `<div></div>`);
         this.stats = this.node.ownerDocument.createElement('div');
         this.stats.classList.add('mt-2', 'mb-2');
-        this.provider = new TDPLocalDataProvider([], [], this.options.customProviderOptions);
+        this.provider = this.options.customProvider ? this.options.customProvider : new TDPLocalDataProvider([], [], this.options.customProviderOptions);
         // hack in for providing the data provider within the graph
         // the reason for `this.context.ref.value.data` is that from the sub-class the `this` context (reference) is set to `this.context.ref.value` through the provenance graph
         // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
@@ -488,11 +488,7 @@ export class ARankingView extends AView {
     }
     build() {
         this.setBusy(true);
-        return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
-            const columns = r[0];
-            columns.forEach((c) => this.provider.pushDesc(c));
-            const rows = r[1];
-            this.setLineUpData(rows);
+        return Promise.resolve().then(() => {
             this.createInitialRanking(this.provider);
             const ranking = this.provider.getLastRanking();
             this.customizeRanking(LineupUtils.wrapRanking(this.provider, ranking));

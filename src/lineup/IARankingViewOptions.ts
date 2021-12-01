@@ -1,6 +1,7 @@
 import {ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem} from 'lineupjs';
 import {IDTypeLike} from '../idtype';
 import {ISearchOption, IPanelAddColumnButtonOptions} from './panel';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 
 
 export interface IARankingViewOptions {
@@ -145,7 +146,9 @@ export interface IARankingViewOptions {
   itemRowHeight: number | ((item: IGroupItem | IGroupData) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
-  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
+  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions & {maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true;}>;
+
+  customProvider?: TDPLocalDataProvider;
 
   /**
    * Formatting function for the search box item
