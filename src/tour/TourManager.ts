@@ -445,9 +445,9 @@ export class TourManager {
     this.takeDown();
     if (finished) {
       this.rememberFinished(this.activeTour);
-      const finished = this.chooser.querySelector<HTMLElement>(`li[data-id="${this.activeTour.id}"] > i`);
-      finished.classList.remove('fa-square-o');
-      finished.classList.add('fa-check-square');
+      const finishedTourNode = this.chooser.querySelector<HTMLElement>(`li[data-id="${this.activeTour.id}"] > i`);
+      finishedTourNode?.classList.remove('fa-square-o');
+      finishedTourNode?.classList.add('fa-check-square');
     }
     this.activeTour = null;
     this.activeTourContext = null;
