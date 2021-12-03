@@ -1,9 +1,8 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
-
 import {select} from 'd3';
-import {EventHandler, IDTypeManager, IDType, Range, I18nextManager, SelectionUtils, WebpackEnv} from 'phovea_core';
+import {IDType, IDTypeManager, SelectionUtils} from '../idtype';
+import {EventHandler, WebpackEnv} from '../base';
+import {Range} from '../range';
+import {I18nextManager} from '../i18n';
 import {IFormElementDesc} from '../form/interfaces';
 import {FormBuilder} from '../form/FormBuilder';
 import {AFormElement} from '../form/elements/AFormElement';

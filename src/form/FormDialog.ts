@@ -1,17 +1,14 @@
-/**
- * Created by Samuel Gratzl on 07.06.2017.
- */
-import {FormDialog as Dialog} from 'phovea_ui';
-import {BaseUtils} from 'phovea_core';
+import {PHOVEA_UI_FormDialog} from '../components';
 import {FormBuilder} from './FormBuilder';
 import {IFormElementDesc, IForm} from './interfaces';
 import {select} from 'd3';
+import {BaseUtils} from '../base';
 
 /**
  * a utililty dialog to show a dialog modal using a FormBuilder
  * @see FormBuilder
  */
-export class FormDialog extends Dialog {
+export class FormDialog extends PHOVEA_UI_FormDialog {
   readonly builder: FormBuilder;
 
   /**

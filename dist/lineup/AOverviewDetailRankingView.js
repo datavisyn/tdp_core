@@ -1,9 +1,9 @@
-import { LayoutContainerEvents } from 'phovea_ui';
 import { ARankingView } from './ARankingView';
-import { BuilderUtils } from 'phovea_ui';
-import { BaseUtils, I18nextManager } from 'phovea_core';
+import { BuilderUtils, LayoutContainerEvents } from '../layout';
 import { LocalDataProvider } from 'lineupjs';
 import { OverviewColumn } from './internal/OverviewColumn';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
 export class AOverviewDetailRankingView extends ARankingView {
     constructor(context, selection, parent, options = {}) {
         super(context, selection, parent, options);

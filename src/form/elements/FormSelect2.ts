@@ -1,17 +1,20 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-
 import 'select2';
 import * as d3 from 'd3';
 import $ from 'jquery';
-import {BaseUtils, AppContext, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc, FormElementType} from '../interfaces';
+import {AppContext} from '../../app';
+import {IPluginDesc, BaseUtils} from '../../base';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text'|'id';
   data?: ISelect2Option[] | ((dependents: any)=>ISelect2Option[]);
+  /**
+   * Define one or multiple values that are selected when initializing the Select2
+   * Values as array only works when Select2 is `multiple` mode.
+   * @default null
+   */
+  selectedDefaultValue?: string | string[] | null;
 };
 
 /**
@@ -137,7 +140,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     const select2Options: Select2Options = {};
 
     let initialValue: string[] = [];
-    const defaultVal: any = this.getStoredValue(null);
+    const defaultVal: any = this.getStoredValue(options.selectedDefaultValue || null);
 
     if (defaultVal) {
       if (this.isMultiple) {
@@ -262,4 +265,3 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     return a.every((d) => bids.has(d));
   }
 }
-

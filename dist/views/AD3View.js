@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
 import { AView } from './AView';
 import { select } from 'd3';
 /**

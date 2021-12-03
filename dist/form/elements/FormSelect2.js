@@ -1,10 +1,8 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import 'select2';
 import $ from 'jquery';
-import { BaseUtils, AppContext } from 'phovea_core';
 import { AFormElement } from './AFormElement';
+import { AppContext } from '../../app';
+import { BaseUtils } from '../../base';
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
@@ -58,7 +56,7 @@ export class FormSelect2 extends AFormElement {
     buildSelect2($select, options, data) {
         const select2Options = {};
         let initialValue = [];
-        const defaultVal = this.getStoredValue(null);
+        const defaultVal = this.getStoredValue(options.selectedDefaultValue || null);
         if (defaultVal) {
             if (this.isMultiple) {
                 const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];

@@ -1,12 +1,9 @@
-/**
- * Created by sam on 13.02.2017.
- */
-
-import {ISelection} from '../../base';
-import {EventHandler, IDType, IDTypeManager, ParseRangeUtils, Range} from 'phovea_core';
+import {EventHandler, ISelection} from '../../base';
 import {IRow} from '../../base/rest';
 import {LocalDataProvider} from 'lineupjs';
 import {LineupUtils} from '../utils';
+import {IDType} from '../../idtype';
+import {Range} from '../../range';
 
 
 export class LineUpSelectionHelper extends EventHandler {

@@ -1,4 +1,4 @@
-import { ISecureItem } from 'phovea_core';
+import { ISecureItem } from '../security';
 export declare enum ENamedSetType {
     NAMEDSET = 0,
     CUSTOM = 1,

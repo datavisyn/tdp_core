@@ -1,6 +1,6 @@
 import { ARankingView } from '../lineup/ARankingView';
 import { ENamedSetType } from '../storage/interfaces';
-import { UserSession } from 'phovea_core';
+import { UserSession } from '../app';
 /**
  * base class for ranking views start doen't require any input but can have as additional input a NamedSet they are representing
  */

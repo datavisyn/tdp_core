@@ -1,5 +1,5 @@
 import { ITDPTourExtensionDesc, IStep } from './extensions';
-import { AppHeader } from 'phovea_ui';
+import { AppHeader } from '../components';
 export interface ITourContext {
     /**
      * The TDP application

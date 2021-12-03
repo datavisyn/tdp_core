@@ -1,5 +1,7 @@
-import { BaseUtils, IDTypeManager, I18nextManager } from 'phovea_core';
 import { FormElementType } from '../form/interfaces';
+import { IDTypeManager } from '../idtype';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
 /**
  * helper class for chooser logic
  */

@@ -1,6 +1,7 @@
-import { EventHandler, I18nextManager } from 'phovea_core';
 import { StoreUtils } from '../../storage';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
+import { EventHandler } from '../../base';
+import { I18nextManager } from '../../i18n';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */

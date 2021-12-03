@@ -1,5 +1,5 @@
 import { FormElementType, IFormElement, IFormElementDesc, IForm } from '../interfaces';
-import { EventHandler, IPluginDesc } from 'phovea_core';
+import { EventHandler, IPluginDesc } from '../../base';
 export interface IButtonElementDesc extends IFormElementDesc {
     type: FormElementType.BUTTON;
     onClick: () => void;

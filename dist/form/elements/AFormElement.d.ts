@@ -1,9 +1,6 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import { Selection } from 'd3';
-import { EventHandler, IPluginDesc } from 'phovea_core';
 import { IFormElementDesc, IForm, IFormElement } from '../interfaces';
+import { EventHandler, IPluginDesc } from '../../base';
 /**
  * Abstract form element class that is used as parent class for other form elements
  */

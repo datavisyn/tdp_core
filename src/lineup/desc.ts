@@ -1,12 +1,9 @@
-/**
- * Created by sam on 13.02.2017.
- */
-
 import {LocalDataProvider, createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
 import {extent} from 'd3';
-import {IAnyVector, ValueTypeUtils} from 'phovea_core';
 import {IServerColumn} from '../base/rest';
 import {IAdditionalColumnDesc} from '../base/interfaces';
+import {ValueTypeUtils} from '../data';
+import {IAnyVector} from '../vector';
 
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {
   /**

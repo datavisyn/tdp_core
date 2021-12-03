@@ -1,0 +1,5 @@
+@import './font';
+
+@include font-face(Yantramanav, normal, 400, '#{$phovea_ui_assset_dir}/fonts/yantramanav-v6-latin-regular', regular);
+@include font-face(Yantramanav, normal, 500, '#{$phovea_ui_assset_dir}/fonts/yantramanav-v6-latin-500', medium);
+@include font-face(Yantramanav, normal, 700, '#{$phovea_ui_assset_dir}/fonts/yantramanav-v6-latin-700', bold);

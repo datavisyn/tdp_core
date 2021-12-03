@@ -1,0 +1,1 @@
+{"version":3,"file":"RangeUtils.js","sourceRoot":"","sources":["../../../src/range/internal/RangeUtils.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,UAAU;IAErB,MAAM,CAAC,QAAQ,CAAC,CAAS,EAAE,IAAY;QACrC,OAAO,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC,IAAI,GAAG,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC;IACpC,CAAC;CACF"}

@@ -25,4 +25,12 @@ export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
  */
 export const EP_TDP_CORE_FORM_ELEMENT = 'epTdpCoreFormElement';
 export const EP_TDP_CORE_SCORE_COLUMN_PATCHER = 'epTdpCoreScoreColumnPatcher';
+/**
+ * Provides the loaded provenance graph
+ *
+ * @factoryParam {ProvenanceGraph} provenanceGraph The loaded provenance graph
+ */
+export const EP_PHOVEA_CLUE_PROVENANCE_GRAPH = 'epPhoveaClueProvenanceGraph';
+/* phovea_security_flask */
+export const EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM = 'securityCustomizedLoginForm';
 //# sourceMappingURL=extensions.js.map

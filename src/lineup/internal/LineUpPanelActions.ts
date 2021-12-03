@@ -1,7 +1,5 @@
 
 import {SidePanel, IGroupSearchItem, LocalDataProvider, createStackDesc, IColumnDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
-import {IDType} from 'phovea_core';
-import {IPlugin, IPluginDesc, EventHandler, I18nextManager, PluginRegistry, IDTypeManager} from 'phovea_core';
 import {
   EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON,
   EP_TDP_CORE_LINEUP_PANEL_TAB
@@ -23,6 +21,10 @@ import {FormElementType, IForm} from '../../form/interfaces';
 import {FormDialog} from '../../form';
 import {PanelSaveNamedSetButton} from '../panel/PanelSaveNamedSetButton';
 import {LineUpOrderedRowIndicies} from '../panel/LineUpOrderedRowIndicies';
+import {PluginRegistry} from '../../app';
+import {EventHandler, IPluginDesc, IPlugin} from '../../base';
+import {I18nextManager} from '../../i18n';
+import {IDType, IDTypeManager} from '../../idtype';
 
 export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';

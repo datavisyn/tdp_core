@@ -2,7 +2,7 @@ import {AView }from './AView';
 import {IViewContext, ISelection} from '../base/interfaces';
 import {RestBaseUtils} from '../base/rest';
 import {SelectionChooser, ISelectionChooserOptions} from './SelectionChooser';
-import {I18nextManager} from 'phovea_core';
+import {I18nextManager} from '../i18n';
 
 export interface IProxyViewChooserOptions extends Partial<ISelectionChooserOptions> {
   /**

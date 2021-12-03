@@ -3,3 +3,6 @@ services:
   db_mongo:
     ports:
       - '27017:27017'
+  db_redis:
+    ports:
+      - '6379:6379'
