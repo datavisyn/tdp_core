@@ -50,7 +50,7 @@ export class Compression {
         }
         const canDelete = arr[len+1] && (arr[len].f_id === functionId) && (arr[len+1].f_id === functionId) && toKey(arr[len]) === toKey(arr[len]);
         return compress(arr, len+1, canDelete);
-      };
+      }
       return;
     };
 
