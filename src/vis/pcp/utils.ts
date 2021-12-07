@@ -51,12 +51,11 @@ export function createPCPTraces(
             rows: 0,
             cols: 0,
             errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
-            formList: []
         };
     }
 
-    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
-    const catCols: CategoricalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
+    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
 
     if(numCols.length + catCols.length < 2) {
         return {
@@ -65,7 +64,6 @@ export function createPCPTraces(
             rows: 0,
             cols: 0,
             errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
-            formList: []
         };
     }
 
@@ -75,18 +73,18 @@ export function createPCPTraces(
         //yo why does this error i dunno but it works
         data: {dimensions: [...numCols.map((c) => {
             return {
-                range: [d3.min(c.vals.map((v) => v.val) as number[]), d3.max(c.vals.map((v) => v.val) as number[])],
+                range: [d3.min(c.values.map((v) => v.val) as number[]), d3.max(c.values.map((v) => v.val) as number[])],
                 label: c.info.name,
-                values: c.vals.map((v) => v.val)
+                values: c.values.map((v) => v.val)
             };
         }), ...catCols.map((c) => {
 
-            const uniqueList = [...new Set<string>(c.vals.map((v) => v.val) as string[])];
+            const uniqueList = [...new Set<string>(c.values.map((v) => v.val) as string[])];
 
             return {
                 range: [0, uniqueList.length - 1],
                 label: c.info.name,
-                values: c.vals.map((curr) => uniqueList.indexOf(curr.val)),
+                values: c.values.map((curr) => uniqueList.indexOf(curr.val)),
                 tickvals: [...uniqueList.keys()],
                 ticktext: uniqueList
             };
@@ -105,6 +103,5 @@ export function createPCPTraces(
         rows: 1,
         cols: 1,
         errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
-        formList: []
     };
 }

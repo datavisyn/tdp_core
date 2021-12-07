@@ -103,6 +103,10 @@ export function BarVis({
         return createBarTraces(columns, config, scales);
     }, [columns, config, scales]);
 
+    const uniqueId = useMemo(() => {
+        return Math.random().toString(36).substr(2, 5);
+    }, []);
+
     const layout = useMemo(() => {
         const layout = {
             showlegend: true,
@@ -126,7 +130,7 @@ export function BarVis({
                 {mergedExtensions.prePlot}
                 {traces.plots.length > 0 ?
                     (<Plot
-                        divId={'plotlyDiv'}
+                        divId={`plotlyDiv${uniqueId}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout as any}
                         config={{responsive: true, displayModeBar: false}}
@@ -154,10 +158,10 @@ export function BarVis({
 
             </div>
             <div className="position-relative h-100 flex-shrink-1 bg-light">
-                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target="#generalVisBurgerMenu" aria-expanded="true" aria-controls="generalVisBurgerMenu">
+                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
-                <div className="collapse show collapse-horizontal" id="generalVisBurgerMenu">
+                <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
                     <div className="container" style={{width: '20rem'}}>
                         <VisTypeSelect
                             callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}

@@ -29,7 +29,7 @@ export declare enum EFilterOptions {
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 export interface NumericalColumn {
     info: ColumnInfo;
-    vals: {
+    values: {
         id: number;
         val: number;
     }[];
@@ -39,7 +39,7 @@ export interface NumericalColumn {
 export interface CategoricalColumn {
     info: ColumnInfo;
     colors: string[];
-    vals: {
+    values: {
         id: number;
         val: string;
     }[];
@@ -52,7 +52,6 @@ export declare type PlotlyInfo = {
     rows: number;
     cols: number;
     errorMessage: string;
-    formList: string[];
 };
 export declare type PlotlyData = {
     data: Data;

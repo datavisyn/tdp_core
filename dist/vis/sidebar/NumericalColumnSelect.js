@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
-import Select, { components } from 'react-select';
+import Select, { components, } from 'react-select';
 import { EColumnTypes } from '../interfaces';
 import { formatOptionLabel } from './utils';
 import { SortableContainer, SortableElement, SortableHandle, } from 'react-sortable-hoc';
@@ -13,8 +13,7 @@ function arrayMove(array, from, to) {
 const SortableMultiValue = SortableElement((props) => {
     // this prevents the menu from being opened/closed when the user clicks
     // on a value to begin dragging it. ideally, detecting a click (instead of
-    // a drag) would still focus the control and toggle the menu, but that
-    // requires some magic with refs that are out of scope for this example
+    // a drag) would still focus the control and toggle the menu
     const onMouseDown = (e) => {
         e.preventDefault();
         e.stopPropagation();

@@ -1,5 +1,5 @@
 import { Ranking } from 'lineupjs';
-import { EventHandler, IDTypeManager, Range } from 'phovea_core';
+import { EventHandler, IDTypeManager, Range } from '../..';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Vis } from '../../vis/Vis';

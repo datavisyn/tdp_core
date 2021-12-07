@@ -1,3 +1,4 @@
+/// <reference types="react" />
 interface OpacitySliderProps {
     callback: (n: number) => void;
     currentValue: number;

@@ -4,9 +4,9 @@ import Select, {
     components,
     MultiValueProps,
     Props,
-    OnChangeValue,
-    MultiValueGenericProps
   } from 'react-select';
+
+
 import {CategoricalColumn, ColumnInfo, EColumnTypes, NumericalColumn} from '../interfaces';
 import {formatOptionLabel} from './utils';
 import {
@@ -39,8 +39,7 @@ const SortableMultiValue = SortableElement(
     (props: MultiValueProps<ColumnInfo>) => {
         // this prevents the menu from being opened/closed when the user clicks
         // on a value to begin dragging it. ideally, detecting a click (instead of
-        // a drag) would still focus the control and toggle the menu, but that
-        // requires some magic with refs that are out of scope for this example
+        // a drag) would still focus the control and toggle the menu
         const onMouseDown: MouseEventHandler<HTMLDivElement> = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -52,7 +51,7 @@ const SortableMultiValue = SortableElement(
 
 // tslint:disable-next-line:variable-name
 const SortableMultiValueLabel = SortableHandle(
-    (props: MultiValueGenericProps<ColumnInfo>) => <components.MultiValueLabel {...props} />
+    (props: Props<ColumnInfo>) => <components.MultiValueLabel {...props} />
 );
 
 // tslint:disable-next-line:variable-name

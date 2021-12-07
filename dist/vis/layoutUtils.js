@@ -4,8 +4,14 @@
  * @param maxLength Maximum text length (default: 50)
  */
 function truncateText(text, maxLength = 50) {
-    return (text.length > maxLength) ? `${text.substr(0, maxLength)}...` : text;
+    return (text.length > maxLength) ? `${text.substr(0, maxLength)}&hellip` : text;
 }
+/**
+ * Cleans up the layout of a given trace, primarily by positioning potential small multiple plots in a reasonable way
+ * @param traces the traces associated with the layout
+ * @param layout the current layout to be changed. Typed to any because the plotly types complain.
+ * @returns the changed layout
+ */
 export function beautifyLayout(traces, layout) {
     layout.annotations = [];
     traces.plots.forEach((t, i) => {

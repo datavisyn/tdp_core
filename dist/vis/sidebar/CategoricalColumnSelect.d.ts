@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
 interface CategoricalColumnSelectProps {
     callback: (s: ColumnInfo[]) => void;

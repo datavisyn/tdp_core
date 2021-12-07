@@ -38,7 +38,7 @@ export function createStripTraces(
     config: IStripConfig,
     scales: Scales,
 ): PlotlyInfo {
-    let counter = 1;
+    let plotCounter = 1;
 
     if(!config.numColumnsSelected || !config.catColumnsSelected) {
         return {
@@ -47,22 +47,22 @@ export function createStripTraces(
             rows: 0,
             cols: 0,
             errorMessage: 'To create a Strip plot, please select at least 1 numerical column.',
-            formList: []
         };
     }
 
-    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
-    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
+    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
     const plots: PlotlyData[] = [];
 
 
+    // if we only have numerical columns, add them individually
     if(catCols.length === 0) {
         for(const numCurr of numCols) {
             plots.push( {
                     data: {
-                        y: numCurr.vals.map((v) => v.val),
-                        xaxis: counter === 1 ? 'x' : 'x' + counter,
-                        yaxis: counter === 1 ? 'y' : 'y' + counter,
+                        y: numCurr.values.map((v) => v.val),
+                        xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+                        yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                         showlegend: false,
                         type: 'box',
                         boxpoints: 'all',
@@ -84,7 +84,7 @@ export function createStripTraces(
 
                 },
             );
-            counter += 1;
+            plotCounter += 1;
         }
     }
 
@@ -92,10 +92,10 @@ export function createStripTraces(
         for (const catCurr of catCols) {
             plots.push({
                 data: {
-                    x: catCurr.vals.map((v) => v.val),
-                    y: numCurr.vals.map((v) => v.val),
-                    xaxis: counter === 1 ? 'x' : 'x' + counter,
-                    yaxis: counter === 1 ? 'y' : 'y' + counter,
+                    x: catCurr.values.map((v) => v.val),
+                    y: numCurr.values.map((v) => v.val),
+                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                     showlegend: false,
                     type: 'box',
                     boxpoints: 'all',
@@ -113,9 +113,9 @@ export function createStripTraces(
                     },
                     transforms: [{
                         type: 'groupby',
-                        groups: catCurr.vals.map((v) => v.val),
+                        groups: catCurr.values.map((v) => v.val),
                         styles:
-                            [...new Set<string>(catCurr.vals.map((v) => v.val) as string[])].map((c) => {
+                            [...new Set<string>(catCurr.values.map((v) => v.val) as string[])].map((c) => {
                                 return {target: c, value: {marker: {color: scales.color(c)}}};
                             })
                     }]
@@ -123,7 +123,7 @@ export function createStripTraces(
                 xLabel: catCurr.info.name,
                 yLabel: numCurr.info.name
             });
-            counter += 1;
+            plotCounter += 1;
         }
     }
 
@@ -133,6 +133,5 @@ export function createStripTraces(
         rows: numCols.length,
         cols: catCols.length > 0 ? catCols.length : 1,
         errorMessage: 'To create a Strip plot, please select at least 1 numerical column',
-        formList: []
     };
 }

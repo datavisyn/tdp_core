@@ -12,6 +12,7 @@ import {StripVis} from './strip/StripVis';
 import {isPCP, pcpMergeDefaultConfig} from './pcp/utils';
 import {PCPVis} from './pcp/PCPVis';
 import {BarVis} from './bar/BarVis';
+import {getCssValue} from '..';
 
 export interface VisProps {
     columns: (NumericalColumn | CategoricalColumn)[];
@@ -25,11 +26,21 @@ export interface VisProps {
 export function Vis({
     columns,
     selected = {},
-    colors = ['#337ab7', '#ec6836', '#75c4c2', '#e9d36c', '#24b466', '#e891ae', '#db933c', '#b08aa6', '#8a6044', '#7b7b7b'],
+    colors = [getCssValue('visyn-c1'),
+                getCssValue('visyn-c2'),
+                getCssValue('visyn-c3'),
+                getCssValue('visyn-c4'),
+                getCssValue('visyn-c5'),
+                getCssValue('visyn-c6'),
+                getCssValue('visyn-c7'),
+                getCssValue('visyn-c8'),
+                getCssValue('visyn-c9'),
+                getCssValue('visyn-c10')],
     shapes = ['circle', 'square', 'triangle-up', 'star'],
     selectionCallback = () => null,
     filterCallback = () => null
 }: VisProps) {
+
     const [visConfig, setVisConfig] = useState<IVisConfig>({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],

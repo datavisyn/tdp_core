@@ -36,7 +36,7 @@ export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripCon
 
 export interface NumericalColumn {
     info: ColumnInfo;
-    vals: {id: number, val: number}[];
+    values: {id: number, val: number}[];
     type: EColumnTypes.NUMERICAL;
     selectedForMultiples: boolean;
 }
@@ -44,7 +44,7 @@ export interface NumericalColumn {
 export interface CategoricalColumn {
     info: ColumnInfo;
     colors: string[];
-    vals: {id: number, val: string}[];
+    values: {id: number, val: string}[];
     type: EColumnTypes.CATEGORICAL;
     selectedForMultiples: boolean;
 }
@@ -55,7 +55,6 @@ export type PlotlyInfo = {
     rows: number,
     cols: number,
     errorMessage: string,
-    formList: string[]
 };
 
 export type PlotlyData = {

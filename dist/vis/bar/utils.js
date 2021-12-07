@@ -44,7 +44,7 @@ export function barMergeDefaultConfig(columns, config) {
     return merged;
 }
 export function createBarTraces(columns, config, scales) {
-    let counter = 1;
+    let plotCounter = 1;
     if (!config.catColumnsSelected) {
         return {
             plots: [],
@@ -52,137 +52,164 @@ export function createBarTraces(columns, config, scales) {
             rows: 0,
             cols: 0,
             errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
-            formList: ['groupBy', 'barMultiplesBy', 'barDirection', 'barGroupType', 'barNormalized']
         };
     }
-    const catCols = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
-    const vertFlag = config.direction === EBarDirection.VERTICAL;
-    const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const plots = [];
+    const catCols = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL);
     if (catCols.length > 0) {
-        const catCurr = catCols[0];
         if (config.group && config.multiples) {
-            const currGroupColumn = getCol(columns, config.group);
-            const currMultiplesColumn = getCol(columns, config.multiples);
-            const uniqueGroupVals = [...new Set(currGroupColumn.vals.map((v) => v.val))];
-            const uniqueMultiplesVals = [...new Set(currMultiplesColumn.vals.map((v) => v.val))];
-            const uniqueColVals = [...new Set(catCurr.vals.map((v) => v.val))];
-            uniqueMultiplesVals.forEach((uniqueMultiples) => {
-                uniqueGroupVals.forEach((uniqueGroup) => {
-                    const groupedLength = uniqueColVals.map((v) => {
-                        const allObjs = catCurr.vals.filter((c) => c.val === v).map((c) => c.id);
-                        const allGroupObjs = currGroupColumn.vals.filter((c) => c.val === uniqueGroup).map((c) => c.id);
-                        const allMultiplesObjs = currMultiplesColumn.vals.filter((c) => c.val === uniqueMultiples).map((c) => c.id);
-                        const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c) && allMultiplesObjs.includes(c));
-                        return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
-                    });
-                    plots.push({
-                        data: {
-                            x: vertFlag ? [...new Set(catCurr.vals.map((v) => v.val))] : groupedLength,
-                            y: !vertFlag ? [...new Set(catCurr.vals.map((v) => v.val))] : groupedLength,
-                            orientation: vertFlag ? 'v' : 'h',
-                            xaxis: counter === 1 ? 'x' : 'x' + counter,
-                            yaxis: counter === 1 ? 'y' : 'y' + counter,
-                            showlegend: counter === 1 ? true : false,
-                            type: 'bar',
-                            name: uniqueGroup,
-                            marker: {
-                                color: scales.color(uniqueGroup),
-                            }
-                        },
-                        xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-                        yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
-                    });
-                });
-                counter += 1;
-            });
+            plotCounter = setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCounter);
         }
         else if (config.group) {
-            const currColumn = getCol(columns, config.group);
-            const uniqueGroupVals = [...new Set(currColumn.vals.map((v) => v.val))];
-            const uniqueColVals = [...new Set(catCurr.vals.map((v) => v.val))];
-            uniqueGroupVals.forEach((uniqueVal) => {
-                const groupedLength = uniqueColVals.map((v) => {
-                    const allObjs = catCurr.vals.filter((c) => c.val === v).map((c) => c.id);
-                    const allGroupObjs = currColumn.vals.filter((c) => c.val === uniqueVal).map((c) => c.id);
-                    const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
-                    return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
-                });
-                plots.push({
-                    data: {
-                        x: vertFlag ? [...new Set(catCurr.vals.map((v) => v.val))] : groupedLength,
-                        y: !vertFlag ? [...new Set(catCurr.vals.map((v) => v.val))] : groupedLength,
-                        orientation: vertFlag ? 'v' : 'h',
-                        xaxis: counter === 1 ? 'x' : 'x' + counter,
-                        yaxis: counter === 1 ? 'y' : 'y' + counter,
-                        showlegend: counter === 1 ? true : false,
-                        type: 'bar',
-                        name: uniqueVal,
-                        marker: {
-                            color: scales.color(uniqueVal),
-                        }
-                    },
-                    xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-                    yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
-                });
-            });
+            plotCounter = setPlotsWithGroups(columns, config, plots, scales, plotCounter);
         }
         else if (config.multiples) {
-            const currColumn = getCol(columns, config.multiples);
-            const uniqueGroupVals = [...new Set(currColumn.vals.map((v) => v.val))];
-            const uniqueColVals = [...new Set(catCurr.vals.map((v) => v.val))];
-            uniqueGroupVals.forEach((uniqueVal) => {
-                const groupedLength = uniqueColVals.map((v) => {
-                    const allObjs = catCurr.vals.filter((c) => c.val === v).map((c) => c.id);
-                    const allGroupObjs = currColumn.vals.filter((c) => c.val === uniqueVal).map((c) => c.id);
-                    const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
-                    return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
-                });
-                plots.push({
-                    data: {
-                        x: vertFlag ? [...new Set(catCurr.vals.map((v) => v.val))] : groupedLength,
-                        y: !vertFlag ? [...new Set(catCurr.vals.map((v) => v.val))] : groupedLength,
-                        orientation: vertFlag ? 'v' : 'h',
-                        xaxis: counter === 1 ? 'x' : 'x' + counter,
-                        yaxis: counter === 1 ? 'y' : 'y' + counter,
-                        showlegend: counter === 1 ? true : false,
-                        type: 'bar',
-                        name: uniqueVal,
-                    },
-                    xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-                    yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
-                });
-                counter += 1;
-            });
+            plotCounter = setPlotsWithMultiples(columns, config, plots, scales, plotCounter);
         }
         else {
-            const count = [...new Set(catCurr.vals.map((v) => v.val))].map((curr) => catCurr.vals.filter((c) => c.val === curr).length);
-            const valArr = [...new Set(catCurr.vals.map((v) => v.val))];
-            plots.push({
-                data: {
-                    x: vertFlag ? valArr : count,
-                    y: !vertFlag ? valArr : count,
-                    orientation: vertFlag ? 'v' : 'h',
-                    xaxis: counter === 1 ? 'x' : 'x' + counter,
-                    yaxis: counter === 1 ? 'y' : 'y' + counter,
-                    type: 'bar',
-                    name: catCurr.info.name
-                },
-                xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-                yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
-            });
-            counter += 1;
+            plotCounter = setPlotsBasic(columns, config, plots, scales, plotCounter);
         }
     }
-    const rows = Math.ceil(Math.sqrt(counter - 1));
-    const cols = Math.ceil((counter - 1) / rows);
+    const rows = Math.ceil(Math.sqrt(plotCounter - 1));
+    const cols = Math.ceil((plotCounter - 1) / rows);
     return {
         plots,
         legendPlots: [],
         rows,
         cols,
         errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
-        formList: ['groupBy', 'barMultiplesBy', 'barDirection', 'barGroupType', 'barNormalized']
     };
+}
+function setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCounter) {
+    const catCols = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
+    const vertFlag = config.direction === EBarDirection.VERTICAL;
+    const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
+    const catCurr = catCols[0];
+    const currGroupColumn = getCol(columns, config.group);
+    const currMultiplesColumn = getCol(columns, config.multiples);
+    const uniqueGroupVals = [...new Set(currGroupColumn.values.map((v) => v.val))];
+    const uniqueMultiplesVals = [...new Set(currMultiplesColumn.values.map((v) => v.val))];
+    const uniqueColVals = [...new Set(catCurr.values.map((v) => v.val))];
+    uniqueMultiplesVals.forEach((uniqueMultiples) => {
+        uniqueGroupVals.forEach((uniqueGroup) => {
+            const groupedLength = uniqueColVals.map((v) => {
+                const allObjs = catCurr.values.filter((c) => c.val === v).map((c) => c.id);
+                const allGroupObjs = currGroupColumn.values.filter((c) => c.val === uniqueGroup).map((c) => c.id);
+                const allMultiplesObjs = currMultiplesColumn.values.filter((c) => c.val === uniqueMultiples).map((c) => c.id);
+                const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c) && allMultiplesObjs.includes(c));
+                return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
+            });
+            plots.push({
+                data: {
+                    x: vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+                    y: !vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+                    orientation: vertFlag ? 'v' : 'h',
+                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                    showlegend: plotCounter === 1 ? true : false,
+                    type: 'bar',
+                    name: uniqueGroup,
+                    marker: {
+                        color: scales.color(uniqueGroup),
+                    }
+                },
+                xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+                yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+            });
+        });
+        plotCounter += 1;
+    });
+    return plotCounter;
+}
+function setPlotsWithGroups(columns, config, plots, scales, plotCounter) {
+    const catCols = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
+    const vertFlag = config.direction === EBarDirection.VERTICAL;
+    const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
+    const catCurr = catCols[0];
+    const currColumn = getCol(columns, config.group);
+    const uniqueGroupVals = [...new Set(currColumn.values.map((v) => v.val))];
+    const uniqueColVals = [...new Set(catCurr.values.map((v) => v.val))];
+    uniqueGroupVals.forEach((uniqueVal) => {
+        const groupedLength = uniqueColVals.map((v) => {
+            const allObjs = catCurr.values.filter((c) => c.val === v).map((c) => c.id);
+            const allGroupObjs = currColumn.values.filter((c) => c.val === uniqueVal).map((c) => c.id);
+            const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
+            return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
+        });
+        plots.push({
+            data: {
+                x: vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+                y: !vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+                orientation: vertFlag ? 'v' : 'h',
+                xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+                yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                showlegend: plotCounter === 1 ? true : false,
+                type: 'bar',
+                name: uniqueVal,
+                marker: {
+                    color: scales.color(uniqueVal),
+                }
+            },
+            xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+            yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+        });
+    });
+    return plotCounter;
+}
+function setPlotsWithMultiples(columns, config, plots, scales, plotCounter) {
+    const catCols = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
+    const vertFlag = config.direction === EBarDirection.VERTICAL;
+    const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
+    const catCurr = catCols[0];
+    const currColumn = getCol(columns, config.group);
+    const uniqueGroupVals = [...new Set(currColumn.values.map((v) => v.val))];
+    const uniqueColVals = [...new Set(catCurr.values.map((v) => v.val))];
+    uniqueGroupVals.forEach((uniqueVal) => {
+        const groupedLength = uniqueColVals.map((v) => {
+            const allObjs = catCurr.values.filter((c) => c.val === v).map((c) => c.id);
+            const allGroupObjs = currColumn.values.filter((c) => c.val === uniqueVal).map((c) => c.id);
+            const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
+            return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
+        });
+        plots.push({
+            data: {
+                x: vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+                y: !vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+                orientation: vertFlag ? 'v' : 'h',
+                xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+                yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                showlegend: plotCounter === 1 ? true : false,
+                type: 'bar',
+                name: uniqueVal,
+            },
+            xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+            yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+        });
+        plotCounter += 1;
+    });
+    return plotCounter;
+}
+function setPlotsBasic(columns, config, plots, scales, plotCounter) {
+    const catCols = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL);
+    const vertFlag = config.direction === EBarDirection.VERTICAL;
+    const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
+    const catCurr = catCols[0];
+    const count = [...new Set(catCurr.values.map((v) => v.val))].map((curr) => catCurr.values.filter((c) => c.val === curr).length);
+    const valArr = [...new Set(catCurr.values.map((v) => v.val))];
+    plots.push({
+        data: {
+            x: vertFlag ? valArr : count,
+            y: !vertFlag ? valArr : count,
+            orientation: vertFlag ? 'v' : 'h',
+            xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+            yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+            type: 'bar',
+            name: catCurr.info.name
+        },
+        xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
+        yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+    });
+    plotCounter += 1;
+    return plotCounter;
 }
 //# sourceMappingURL=utils.js.map

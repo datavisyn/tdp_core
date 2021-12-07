@@ -41,7 +41,7 @@ export function createViolinTraces(
     config: IViolinConfig,
     scales: Scales,
 ): PlotlyInfo {
-    let counter = 1;
+    let plotCounter = 1;
 
     if(!config.numColumnsSelected || !config.catColumnsSelected) {
         return {
@@ -50,21 +50,21 @@ export function createViolinTraces(
             rows: 0,
             cols: 0,
             errorMessage: 'To create a Violin plot, please select at least 1 numerical column.',
-            formList: ['violinOverlay']
         };
     }
 
-    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.NUMERICAL) as NumericalColumn[];
-    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
+    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
     const plots: PlotlyData[] = [];
 
+    //if we onl have numerical columns, add them individually.
     if(catCols.length === 0) {
         for(const numCurr of numCols) {
             plots.push( {
                     data: {
-                        y: numCurr.vals.map((v) => v.val),
-                        xaxis: counter === 1 ? 'x' : 'x' + counter,
-                        yaxis: counter === 1 ? 'y' : 'y' + counter,
+                        y: numCurr.values.map((v) => v.val),
+                        xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+                        yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                         type: 'violin',
                         pointpos: 0,
                         jitter: .3,
@@ -85,7 +85,7 @@ export function createViolinTraces(
                     yLabel: numCurr.info.name
                 },
             );
-            counter += 1;
+            plotCounter += 1;
         }
     }
 
@@ -93,10 +93,10 @@ export function createViolinTraces(
         for(const catCurr of catCols) {
             plots.push( {
                     data: {
-                        x: catCurr.vals.map((v) => v.val),
-                        y: numCurr.vals.map((v) => v.val),
-                        xaxis: counter === 1 ? 'x' : 'x' + counter,
-                        yaxis: counter === 1 ? 'y' : 'y' + counter,
+                        x: catCurr.values.map((v) => v.val),
+                        y: numCurr.values.map((v) => v.val),
+                        xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
+                        yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                         type: 'violin',
                         hoveron: 'violins',
                         hoverinfo: 'y',
@@ -114,9 +114,9 @@ export function createViolinTraces(
                         showlegend: false,
                         transforms: [{
                             type: 'groupby',
-                            groups: catCurr.vals.map((v) => v.val),
+                            groups: catCurr.values.map((v) => v.val),
                             styles:
-                                [...new Set<string>(catCurr.vals.map((v) => v.val) as string[])].map((c) => {
+                                [...new Set<string>(catCurr.values.map((v) => v.val) as string[])].map((c) => {
                                     return {target: c, value: {line: {color: scales.color(c)}}};
                                 })
                             }]
@@ -125,7 +125,7 @@ export function createViolinTraces(
                     yLabel: numCurr.info.name
                 },
             );
-            counter += 1;
+            plotCounter += 1;
         }
     }
 
@@ -135,7 +135,6 @@ export function createViolinTraces(
         rows: numCols.length,
         cols: catCols.length > 0 ? catCols.length : 1,
         errorMessage: 'To create a Violin plot, please select at least 1 numerical column.',
-        formList: ['violinOverlay']
 
     };
 }
