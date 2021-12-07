@@ -10,7 +10,7 @@ import { AppMetaDataUtils } from './metaData';
 const getTemplate = () => {
     return (`<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#" data-header="appLink"></a>
+    <a class="navbar-brand" data-testid="ordino-logo-tab" href="#" data-header="appLink"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavBar" aria-controls="headerNavBar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
