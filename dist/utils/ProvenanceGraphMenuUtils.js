@@ -52,6 +52,7 @@ export class ProvenanceGraphMenuUtils {
         dialog.form.lastElementChild.insertAdjacentElement('beforebegin', permissions.node);
         return new Promise((resolve) => {
             dialog.onHide(() => {
+                dialog.destroy();
                 resolve(null);
             });
             dialog.onSubmit(() => {
