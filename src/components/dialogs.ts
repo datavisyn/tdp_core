@@ -259,7 +259,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
     return new Promise((resolve) => {
       const dialog = Dialog.generateDialog(o.title, o.cancelButton, o.additionalCSSClasses);
       dialog.body.innerHTML = msg;
-      $(`<button class="btn btn-danger">${o.button}</button>`).appendTo(dialog.footer);
+      $(`<button class="btn btn-danger" data-testid="delete-button">${o.button}</button>`).appendTo(dialog.footer);
       let clicked = false;
       $(dialog.footer).find('button.btn-primary').on('click', function () {
         dialog.hide();
