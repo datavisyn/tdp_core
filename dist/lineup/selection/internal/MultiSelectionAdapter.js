@@ -3,11 +3,14 @@ import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 import { ResolveNow } from '../../../base';
 export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     constructor(adapter) {
-        super();
+        super(adapter);
         this.adapter = adapter;
     }
     parameterChangedImpl(context) {
         const selectedIds = context.selection.range.dim(0).asList();
+        if (this.adapter.selectionLimit) {
+            selectedIds.length = this.adapter.selectionLimit;
+        }
         this.removePartialDynamicColumns(context, selectedIds);
         return context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
     }

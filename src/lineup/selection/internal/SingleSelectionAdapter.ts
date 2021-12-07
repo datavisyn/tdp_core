@@ -20,16 +20,25 @@ export interface ISingleSelectionAdapter {
    * @returns {Promise<IScoreRow<any>[]>} data
    */
   loadData(_id: number, id: string): Promise<IScoreRow<any>[]>;
+
+  /**
+   * Limit incoming selections considered when adding
+   * a column in the dependent ranking.
+   */
+  selectionLimit?: number;
 }
 
 export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
-  constructor(private readonly adapter: ISingleSelectionAdapter) {
-    super();
+  constructor(protected readonly adapter: ISingleSelectionAdapter) {
+    super(adapter);
   }
 
   protected parameterChangedImpl(context: IContext) {
     // remove all and start again
     const selectedIds = context.selection.range.dim(0).asList();
+    if (this.adapter.selectionLimit) {
+      selectedIds.length = this.adapter.selectionLimit;
+    }
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1 && (<IAdditionalColumnDesc>d.desc).selectedId !== undefined);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 

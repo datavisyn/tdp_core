@@ -17,9 +17,14 @@ export interface ISingleSelectionAdapter {
      * @returns {Promise<IScoreRow<any>[]>} data
      */
     loadData(_id: number, id: string): Promise<IScoreRow<any>[]>;
+    /**
+     * Limit incoming selections considered when adding
+     * a column in the dependent ranking.
+     */
+    selectionLimit?: number;
 }
 export declare class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
-    private readonly adapter;
+    protected readonly adapter: ISingleSelectionAdapter;
     constructor(adapter: ISingleSelectionAdapter);
     protected parameterChangedImpl(context: IContext): Promise<void>;
     protected createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<{
