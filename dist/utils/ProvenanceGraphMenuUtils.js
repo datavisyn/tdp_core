@@ -36,15 +36,15 @@ export class ProvenanceGraphMenuUtils {
         dialog.form.innerHTML = `
             <div class="mb-3">
               <label class="form-label" for="${prefix}_name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.name')}</label>
-              <input type="text" class="form-control" id="${prefix}_name" value="${args.name}" required="required">
+              <input type="text" class="form-control" data-testid="name-input" id="${prefix}_name" value="${args.name}" required="required">
             </div>
             <div class="mb-3">
               <label class="form-label" for="${prefix}_desc">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.description')}</label>
-              <textarea class="form-control" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
+              <textarea class="form-control" data-testid="description-textarea" id="${prefix}_desc" rows="3">${d.description || ''}</textarea>
             </div>
             <div class="mb-3">
               <div class="checkbox form-check">
-                <input type="checkbox" id="${prefix}_agree" name="${prefix}_agree" required="required" class="form-check-input">
+                <input type="checkbox" data-testid="agree-input" id="${prefix}_agree" name="${prefix}_agree" required="required" class="form-check-input">
                 <label class="form-label radio-inline form-check-label" for="${prefix}_agree">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.confirmMessage')} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.dialog')}.</label>
               </div>
             </div>

@@ -49,16 +49,16 @@ export class Dialog {
     // $(dialog).modal({backdrop});
     dialog.innerHTML = `
        <div class="modal-dialog ${additionalCSSClasses}" role="document">
-        <div class="modal-content">
+        <div class="modal-content" data-testid="${title.replace(/<\/?[^>]+(>|$)/g, "").trim().replace(/\s+/g, '-').toLowerCase()}">
           <div class="modal-header">
             <h4 class="modal-title">${title}</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('phovea:ui.close')}"></button>
+            <button type="button" class="btn-close" data-testid="close-button" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('phovea:ui.close')}"></button>
           </div>
           <div class="modal-body">
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary btn-primary submit-dialog">${primaryBtnText}</button>
+            <button type="button" data-testid="primary-dialog-button" class="btn btn-primary btn-primary submit-dialog">${primaryBtnText}</button>
           </div>
         </div>
       </div>`;
