@@ -89,22 +89,22 @@ export class LoginUtils {
         };
     }
 }
-LoginUtils.defaultLoginForm = () => (`<form class="form-signin" action="/login" method="post">
+LoginUtils.defaultLoginForm = () => (`<form class="form-signin" action="/login" method="post" data-testid="security_flask-form-signin">
     <div class="mb-3">
       <label class="form-label" for="login_username">${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}</label>
-      <input type="text" class="form-control" id="login_username" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}" required="required" autofocus="autofocus" autocomplete="username">
+      <input type="text" class="form-control" id="login_username" data-testid="input-login-username" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}" required="required" autofocus="autofocus" autocomplete="username">
     </div>
     <div class="mb-3">
       <label class="form-label" for="login_password"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}</label>
-      <input type="password" class="form-control" id="login_password" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}" required="required" autocomplete="current-password">
+      <input type="password" class="form-control" id="login_password" data-testid="input-login-password" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}" required="required" autocomplete="current-password">
     </div>
     <div class="mb-3">
       <div class="checkbox form-check">
-        <input type="checkbox" class="form-check-input" id="login_remember">
+        <input type="checkbox" class="form-check-input" id="login_remember" data-testid="input-login-remember">
         <label class="form-label form-check-label" for="login_remember">${I18nextManager.getInstance().i18n.t('phovea:security_flask.rememberMe')}</label>
       </div>
     </div>
-    <button type="submit" class="btn btn-primary"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.submit')}</button>
+    <button type="submit" class="btn btn-primary" data-testid="login-button"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.submit')}</button>
     </form>
     `);
 //# sourceMappingURL=LoginUtils.js.map
