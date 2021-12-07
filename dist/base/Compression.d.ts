@@ -21,6 +21,6 @@ export declare class Compression {
      * @param toKey Unique key to check the consecutive duplicates
      * @returns A copy of the path which can be mutated in the number of items
      */
-    static removeConsecutiveNodes(path: ActionNode[], functionId: string, toKey: (action: ActionNode) => string): ActionNode[];
+    static lastConsecutive(path: ActionNode[], functionId: string, toKey: (action: ActionNode) => string): ActionNode[];
     static createRemove(path: ActionNode[], createFunctionId: string, removeFunctionId: string): ActionNode[];
 }

@@ -26,9 +26,9 @@ describe('action compressor', () => {
     expect(newPath.toString()).toBe('action1,action4,action5,action6'); // missing action2 and action3
   });
 
-  it('removeConsecutiveNodes()', () => {
+  it('lastConsecutive()', () => {
     // remove only consecutive nodes of `selection2` but not `selection3`
-    const newPath = Compression.removeConsecutiveNodes(path, 'selection2', (p) => p.f_id);
+    const newPath = Compression.lastConsecutive(path, 'selection2', (p) => p.f_id);
     expect(newPath.length).toBe(5);
     expect(newPath.toString()).toBe('action1,action3,action4,action5,action6'); // missing action2 only
   });

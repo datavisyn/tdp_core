@@ -35,7 +35,7 @@ export class Compression {
      * @param toKey Unique key to check the consecutive duplicates
      * @returns A copy of the path which can be mutated in the number of items
      */
-    static removeConsecutiveNodes(path, functionId, toKey) {
+    static lastConsecutive(path, functionId, toKey) {
         // recursive function that mutates the input array
         const compress = (arr, len = 0, deletable = false) => {
             if (len < arr.length) {
