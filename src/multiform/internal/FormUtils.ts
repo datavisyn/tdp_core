@@ -1,5 +1,5 @@
 
-import {IVisPluginDesc} from '../../vis/IVisPluginDesc';
+import {IVisPluginDesc} from '../../provvis';
 
 export class FormUtils {
 

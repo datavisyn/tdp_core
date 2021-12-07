@@ -13,7 +13,7 @@ import {
   AVisInstance,
   VisUtils,
   ITransform
-} from '../vis';
+} from '../provvis';
 import {IMultiForm, IMultiFormOptions} from './IMultiForm';
 import {VisChooser} from './VisChooser';
 import {FormUtils, ProxyMetaData} from './internal/internal';

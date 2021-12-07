@@ -1,6 +1,6 @@
 import { BaseUtils } from '../../base/BaseUtils';
 import { DataUtils } from '../../data';
-import { VisUtils } from '../../vis';
+import { VisUtils } from '../../provvis';
 import { FormUtils } from './FormUtils';
 /**
  * @internal

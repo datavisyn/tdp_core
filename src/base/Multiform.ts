@@ -1,6 +1,6 @@
 import {IMultiForm} from '../multiform';
 import {IObjectRef, ICmdResult, ActionMetaData, ObjectRefUtils, ProvenanceGraph} from '../provenance';
-import {IVisInstance, ITransform} from '../vis';
+import {IVisInstance, ITransform} from '../provvis';
 
 const disabled = {};
 

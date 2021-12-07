@@ -1,6 +1,6 @@
 import { IPersistable } from '../../base/IPersistable';
 import { IDataType } from '../../data';
-import { IVisInstance, ITransform } from '../../vis';
+import { IVisInstance, ITransform } from '../../provvis';
 import { Range } from '../../range';
 import { IPlugin } from '../../base/plugin';
 /**

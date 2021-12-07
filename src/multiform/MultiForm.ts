@@ -1,6 +1,6 @@
 import {BaseUtils} from '../base/BaseUtils';
 import {IDataType, DataUtils} from '../data';
-import {IVisMetaData, IVisPluginDesc, AVisInstance, VisUtils, ITransform, IVisInstance} from '../vis';
+import {IVisMetaData, IVisPluginDesc, AVisInstance, VisUtils, ITransform, IVisInstance} from '../provvis';
 import {IMultiForm, IMultiFormOptions} from './IMultiForm';
 import {VisChooser} from './VisChooser';
 import {FormUtils, ProxyMetaData} from './internal/internal';
