@@ -8,7 +8,7 @@ import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
 import { TDPTokenManager } from './auth';
 import { ACLUEWrapper } from './wrapper';
-import { LoginMenu } from './menu';
+import { LoginMenu } from './base';
 import { Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
@@ -64,9 +64,9 @@ export class ATDPApplication extends ACLUEWrapper {
                 evt.preventDefault();
                 return false;
             }, '#');
-            button.dataset.toggle = 'modal';
+            button.dataset.bsToggle = 'modal';
             button.tabIndex = -1;
-            button.dataset.target = `#${this.tourManager.chooser.id}`;
+            button.dataset.bsTarget = `#${this.tourManager.chooser.id}`;
         }
     }
     /**

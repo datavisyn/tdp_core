@@ -46,7 +46,7 @@ def clean_query(query):
   return q_clean
 
 
-def wait_for_redis_ready(db, timeout=None):
+def wait_for_redis_ready(db, timeout=5) -> bool:
   import time
   import redis
 
@@ -55,8 +55,11 @@ def wait_for_redis_ready(db, timeout=None):
   while timeout is None or time.time() - start_time < timeout:
     try:
       db.dbsize()
-    except redis.exceptions.BusyLoadingError:
+    except (redis.exceptions.BusyLoadingError, redis.exceptions.ConnectionError):
       _log.info('stall till redis is ready')
       time.sleep(0.5)
     else:
-        break
+      # Return true if we managed to get a valid response
+      return True
+  # If we time out, return false
+  return False

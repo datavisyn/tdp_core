@@ -22,7 +22,8 @@ class RedisIDAssigner(object):
 
     # print c.hostname, c.port, c.db
     self._db = redis.Redis(host=c.hostname, port=c.port, db=c.db, charset='utf-8', decode_responses=True, **c.extras)
-    wait_for_redis_ready(self._db)
+    if not wait_for_redis_ready(self._db):
+      raise Exception('Redis is not ready')
 
     from cachelib import SimpleCache
     self._cache = SimpleCache(threshold=c.cache)
@@ -158,5 +159,10 @@ class RedisIDAssigner(object):
 
 
 def create():
-  _log.info('create redis assigner')
-  return RedisIDAssigner()
+  _log.info('Create RedisIDAssigner')
+  try:
+    return RedisIDAssigner()
+  except Exception:
+    _log.exception('Error creating RedisIDAssigner, creating default phovea_server.assigner instead')
+    from phovea_server.assigner import create
+    return create()

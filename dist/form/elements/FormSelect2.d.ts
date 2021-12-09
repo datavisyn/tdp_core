@@ -6,6 +6,12 @@ import { IPluginDesc } from '../../base';
 declare type IFormSelect2Options = Select2Options & {
     return?: 'text' | 'id';
     data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);
+    /**
+     * Define one or multiple values that are selected when initializing the Select2
+     * Values as array only works when Select2 is `multiple` mode.
+     * @default null
+     */
+    selectedDefaultValue?: string | string[] | null;
 };
 /**
  * Add specific options for select form elements

@@ -379,7 +379,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       const row = group.ownerDocument.createElement('div');
       row.classList.add('row');
       row.classList.add('d-flex');
-      row.classList.add('align-items-center');
+      row.classList.add('align-items-top');
       group.appendChild(row);
       row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">

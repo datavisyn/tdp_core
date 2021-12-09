@@ -85,7 +85,7 @@ export class Selection {
   }
 
   static compressSelection(path: ActionNode[]) {
-    return Compression.lastOnly(path, 'select', (p) => p.parameter.idtype + '@' + p.parameter.type);
+    return Compression.lastConsecutive(path, 'select', (p) => p.parameter.idtype + '@' + p.parameter.type);
   }
 }
 

@@ -75,7 +75,7 @@ export class Selection {
         });
     }
     static compressSelection(path) {
-        return Compression.lastOnly(path, 'select', (p) => p.parameter.idtype + '@' + p.parameter.type);
+        return Compression.lastConsecutive(path, 'select', (p) => p.parameter.idtype + '@' + p.parameter.type);
     }
 }
 /**
