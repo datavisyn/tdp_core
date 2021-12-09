@@ -5,10 +5,11 @@ import ReactDOM from 'react-dom';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 export class GeneralVisWrapper extends EventHandler {
-    constructor(provider, view, doc = document) {
+    constructor(provider, view, selectionHelper, doc = document) {
         super();
         this.view = view;
         this.provider = provider;
+        this.selectionHelper = selectionHelper;
         this.node = doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
@@ -34,6 +35,7 @@ export class GeneralVisWrapper extends EventHandler {
     }
     selectCallback(selected) {
         const data = this.getAllData();
+        console.log(selected);
         const r = Range.list(selected);
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
@@ -62,17 +64,17 @@ export class GeneralVisWrapper extends EventHandler {
             selectedMap[i] = true;
         }
         for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
+            console.log(c, data);
             cols.push({
                 info: {
                     name: c.label,
                     description: c.summary,
                     id: c.label + c._id
                 },
-                vals: data.map((d, i) => {
+                values: data.map((d, i) => {
                     return { id: d._id, val: d[c.column] ? d[c.column] : c.type === 'number' ? null : '--' };
                 }),
-                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
-                selectedForMultiples: false
+                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL
             });
         }
         ReactDOM.render(React.createElement(Vis, {

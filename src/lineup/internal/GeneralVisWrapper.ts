@@ -5,19 +5,22 @@ import ReactDOM from 'react-dom';
 import {ARankingView} from '..';
 import {Vis} from '../../vis/Vis';
 import {EColumnTypes} from '../../vis/interfaces';
+import {LineUpSelectionHelper} from './LineUpSelectionHelper';
 
 export class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement; // wrapper node
     private viewable: boolean;
     private provider: LocalDataProvider;
+    private selectionHelper: LineUpSelectionHelper;
     private view: ARankingView;
     private data: any[];
 
-    constructor(provider: LocalDataProvider, view: ARankingView, doc = document) {
+    constructor(provider: LocalDataProvider, view: ARankingView, selectionHelper: LineUpSelectionHelper, doc = document) {
         super();
 
         this.view = view;
         this.provider = provider;
+        this.selectionHelper = selectionHelper;
         this.node = doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
@@ -50,6 +53,7 @@ export class GeneralVisWrapper extends EventHandler {
     selectCallback(selected: number[]) {
         const data = this.getAllData();
 
+        console.log(selected);
 
         const r = Range.list(selected);
         //???
@@ -89,17 +93,17 @@ export class GeneralVisWrapper extends EventHandler {
         }
 
         for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
+            console.log(c, data);
             cols.push({
                 info: {
                     name: c.label,
                     description: c.summary,
                     id: c.label + (<any> c)._id
                 },
-                vals: data.map((d, i) => {
+                values: data.map((d, i) => {
                     return {id: d._id, val: d[(<any> c).column] ? d[(<any> c).column] : c.type === 'number' ? null : '--'};
                 }),
-                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
-                selectedForMultiples: false
+                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL
             });
         }
 

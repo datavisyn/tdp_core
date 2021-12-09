@@ -34,7 +34,6 @@ export interface NumericalColumn {
         val: number;
     }[];
     type: EColumnTypes.NUMERICAL;
-    selectedForMultiples: boolean;
 }
 export interface CategoricalColumn {
     info: ColumnInfo;
@@ -44,7 +43,6 @@ export interface CategoricalColumn {
         val: string;
     }[];
     type: EColumnTypes.CATEGORICAL;
-    selectedForMultiples: boolean;
 }
 export declare type PlotlyInfo = {
     plots: PlotlyData[];

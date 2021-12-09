@@ -91,7 +91,7 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
                         width: 0,
                     },
                     symbol: getCol(columns, config.shape) ? getCol(columns, config.shape).values.map((v) => shapeScale(v.val)) : 'circle',
-                    color: getCol(columns, config.color) ? getCol(columns, config.color).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : validCols[0].values.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
+                    color: getCol(columns, config.color) ? getCol(columns, config.color).values.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : validCols[0].values.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                     opacity: config.alphaSliderVal,
                     size: 10
                 },
@@ -122,7 +122,7 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
                                 width: 0,
                             },
                             symbol: getCol(columns, config.shape) ? getCol(columns, config.shape).values.map((v) => shapeScale(v.val)) : 'circle',
-                            color: getCol(columns, config.color) ? getCol(columns, config.color).vals.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : xCurr.values.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
+                            color: getCol(columns, config.color) ? getCol(columns, config.color).values.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : xCurr.values.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                             opacity: config.alphaSliderVal,
                             size: 10
                         },
@@ -177,7 +177,7 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
             data: {
                 x: validCols[0].values.map((v) => v.val),
                 y: validCols[0].values.map((v) => v.val),
-                ids: validCols[0].values.map((v) => v.id),
+                ids: validCols[0].values.map((v) => v.id.toString()),
                 xaxis: 'x',
                 yaxis: 'y',
                 type: 'scattergl',

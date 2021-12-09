@@ -1,6 +1,6 @@
 import d3 from 'd3';
 import * as React from 'react';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {barMergeDefaultConfig, isBar} from './bar/utils';
 import {ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig} from './scatter/utils';
 import {CategoricalColumn, NumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales} from './interfaces';
@@ -15,11 +15,29 @@ import {BarVis} from './bar/BarVis';
 import {getCssValue} from '..';
 
 export interface VisProps {
+    /**
+     * Required data columns which are displayed.
+     */
     columns: (NumericalColumn | CategoricalColumn)[];
+    /**
+     * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
+     */
     selected?: {[key: number]: boolean};
+    /**
+     * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
+     */
     colors?: string[];
+    /**
+     * Optional Prop for changing the shapes that are used in shape mapping. Defaults to the circle, square, triangle, star.
+     */
     shapes?: string[];
+    /**
+     * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
+     */
     selectionCallback?: (s: number[]) => void;
+    /**
+     * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
+     */
     filterCallback?: (s: string) => void;
 }
 
@@ -41,6 +59,8 @@ export function Vis({
     filterCallback = () => null
 }: VisProps) {
 
+    console.log(selected);
+
     const [visConfig, setVisConfig] = useState<IVisConfig>({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
@@ -51,7 +71,7 @@ export function Vis({
         alphaSliderVal: 1
     });
 
-    useMemo(() => {
+    useEffect(() => {
         if(isScatter(visConfig)) { setVisConfig(scatterMergeDefaultConfig(columns, visConfig)); }
         if(isViolin(visConfig)) { setVisConfig(violinMergeDefaultConfig(columns, visConfig)); }
         if(isStrip(visConfig)) { setVisConfig(stripMergeDefaultConfig(columns, visConfig)); }

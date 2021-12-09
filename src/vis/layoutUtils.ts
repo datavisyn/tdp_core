@@ -7,7 +7,7 @@ import {PlotlyInfo} from './interfaces';
  * @param maxLength Maximum text length (default: 50)
  */
 function truncateText(text: string, maxLength = 50) {
-    return (text.length > maxLength) ? `${text.substr(0, maxLength)}&hellip` : text;
+    return (text.length > maxLength) ? `${text.substr(0, maxLength)}...` : text;
 }
 
 

@@ -206,9 +206,10 @@ export abstract class ARankingView extends AView {
     // Append `lu-backdrop` one level higher so fading effect can be applied also to the sidePanel when a dialog is opened.
     const luBackdrop = this.node.querySelector('.lu-backdrop');
     this.node.appendChild(luBackdrop);
+    this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-    this.generalVis = new GeneralVisWrapper(this.provider, this, this.node.ownerDocument);
+    this.generalVis = new GeneralVisWrapper(this.provider, this, this.selectionHelper, this.node.ownerDocument);
 
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
@@ -253,7 +254,6 @@ export abstract class ARankingView extends AView {
       }
     }
 
-    this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
       this.setItemSelection(selection);
       this.generalVis.updateCustomVis();

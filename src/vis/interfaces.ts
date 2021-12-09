@@ -38,7 +38,6 @@ export interface NumericalColumn {
     info: ColumnInfo;
     values: {id: number, val: number}[];
     type: EColumnTypes.NUMERICAL;
-    selectedForMultiples: boolean;
 }
 
 export interface CategoricalColumn {
@@ -46,7 +45,6 @@ export interface CategoricalColumn {
     colors: string[];
     values: {id: number, val: string}[];
     type: EColumnTypes.CATEGORICAL;
-    selectedForMultiples: boolean;
 }
 
 export type PlotlyInfo = {

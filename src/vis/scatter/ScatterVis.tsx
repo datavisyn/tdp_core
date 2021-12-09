@@ -141,6 +141,7 @@ export function ScatterVis({
                         useResizeHandler={true}
                         style={{width: '100%', height: '100%'}}
                         onSelected={(d) => {
+                            console.log(d);
                             d ? selectionCallback(d.points.map((d) => +(d as any).id)) : selectionCallback([]);
                         }}
                         //plotly redraws everything on updates, so you need to reappend title and
@@ -171,7 +172,7 @@ export function ScatterVis({
                 }
                 <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x">
                     <BrushOptionButtons
-                        callback={(e) => setConfig({...config, isRectBrush: true})}
+                        callback={(e: boolean) => setConfig({...config, isRectBrush: e})}
                         isRectBrush={config.isRectBrush}
                     />
                     <OpacitySlider

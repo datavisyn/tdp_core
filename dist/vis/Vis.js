@@ -1,6 +1,6 @@
 import d3 from 'd3';
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
 import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig } from './scatter/utils';
 import { ESupportedPlotlyVis } from './interfaces';
@@ -23,6 +23,7 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1'),
     getCssValue('visyn-c8'),
     getCssValue('visyn-c9'),
     getCssValue('visyn-c10')], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null }) {
+    console.log(selected);
     const [visConfig, setVisConfig] = useState({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
@@ -32,7 +33,7 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1'),
         isRectBrush: true,
         alphaSliderVal: 1
     });
-    useMemo(() => {
+    useEffect(() => {
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
         }
