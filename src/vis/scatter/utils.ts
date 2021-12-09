@@ -99,7 +99,7 @@ export function createScatterTraces(
                     .domain([max,
                         (max + min) / 2,
                         min])
-                    .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('s9-blue'), getCssValue('s5-blue'), getCssValue('s1-blue')] : [getCssValue('visyn-c1'),'#d3d3d3', getCssValue('visyn-c2')])
+                    .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue').slice(1), getCssValue('visyn-s5-blue').slice(1), getCssValue('visyn-s1-blue').slice(1)] : [getCssValue('visyn-c1').slice(1),'#d3d3d3', getCssValue('visyn-c2').slice(1)])
                 : null;
 
     const legendPlots: PlotlyData[] = [];
@@ -171,45 +171,46 @@ export function createScatterTraces(
         }
     }
 
-    // if (getCol(columns, config.color) && validCols.length > 0) {
-    //     legendPlots.push({
-    //         data: {
-    //             x: validCols[0].vals.map((v) => v.val),
-    //             y: validCols[0].vals.map((v) => v.val),
-    //             ids: validCols[0].vals.map((v) => v.id),
-    //             xaxis: 'x',
-    //             yaxis: 'y',
-    //             type: 'scattergl',
-    //             mode: 'markers',
-    //             visible: 'legendonly',
-    //             legendgroup: 'color',
-    //             legendgrouptitle: {
-    //                 text: 'Color'
-    //             },
-    //             marker: {
-    //                 line: {
-    //                     width: 0
-    //                 },
-    //                 symbol: 'circle',
-    //                 size: 10,
-    //                 color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).vals.map((v) => scales.color(v.val)) : '#2e2e2e',
-    //                 opacity: .5
-    //             },
-    //             transforms: [{
-    //                 type: 'groupby',
-    //                 groups: (getCol(columns, config.color) as any).vals.map((v) => v.val),
-    //                 styles:
-    //                     [...[...new Set<string>((getCol(columns, config.color) as any).vals.map((v) => v.val) as string[])].map((c) => {
-    //                         return {target: c, value: {name: c}};
-    //                     })]
-    //             }]
-    //         },
-    //         xLabel: validCols[0].info.name,
-    //         yLabel: validCols[0].info.name
-    //     } as any);
-    // }
+    //if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
+    if (getCol(columns, config.color) && getCol(columns, config.color).type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
+        legendPlots.push({
+            data: {
+                x: validCols[0].values.map((v) => v.val),
+                y: validCols[0].values.map((v) => v.val),
+                ids: validCols[0].values.map((v) => v.id),
+                xaxis: 'x',
+                yaxis: 'y',
+                type: 'scattergl',
+                mode: 'markers',
+                visible: 'legendonly',
+                legendgroup: 'color',
+                legendgrouptitle: {
+                    text: 'Color'
+                },
+                marker: {
+                    line: {
+                        width: 0
+                    },
+                    symbol: 'circle',
+                    size: 10,
+                    color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).values.map((v) => scales.color(v.val)) : '#2e2e2e',
+                    opacity: .5
+                },
+                transforms: [{
+                    type: 'groupby',
+                    groups: (getCol(columns, config.color) as any).values.map((v) => v.val),
+                    styles:
+                        [...[...new Set<string>((getCol(columns, config.color) as any).values.map((v) => v.val) as string[])].map((c) => {
+                            return {target: c, value: {name: c}};
+                        })]
+                }]
+            },
+            xLabel: validCols[0].info.name,
+            yLabel: validCols[0].info.name
+        } as any);
+    }
 
-    //if we have a column for the shape, add a legendPlot that handles it.
+    //if we have a column for the shape, add a legendPlot that creates a legend.
     if (getCol(columns, config.shape)) {
         legendPlots.push({
             data: {
