@@ -14,6 +14,7 @@ import { merge } from 'lodash';
 import Plotly from 'plotly.js';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
+import { WarningMessage } from '../sidebar/WarningMessage';
 const defaultConfig = {
     color: {
         enable: true,
@@ -107,6 +108,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 React.createElement("i", { className: "fas fa-bars" })),
             React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
                 React.createElement("div", { className: "container", style: { width: '20rem' } },
+                    React.createElement(WarningMessage, null),
                     React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
                     React.createElement("hr", null),
                     React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),

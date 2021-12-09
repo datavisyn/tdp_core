@@ -16,6 +16,7 @@ import {merge} from 'lodash';
 import Plotly from 'plotly.js';
 import {BrushOptionButtons} from '../sidebar/BrushOptionButtons';
 import {OpacitySlider} from '../sidebar/OpacitySlider';
+import {WarningMessage} from '../sidebar/WarningMessage';
 
 interface ScatterVisProps {
     config: IScatterConfig;
@@ -188,6 +189,7 @@ export function ScatterVis({
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
                     <div className="container" style={{width: '20rem'}}>
+                        <WarningMessage/>
                         <VisTypeSelect
                             callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
                             currentSelected={config.type}

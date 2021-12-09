@@ -11,6 +11,7 @@ import {beautifyLayout} from '../layoutUtils';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {merge} from 'lodash';
 import {createStripTraces, IStripConfig} from './utils';
+import {WarningMessage} from '../sidebar/WarningMessage';
 
 interface StripVisProps {
     config: IStripConfig;
@@ -116,6 +117,7 @@ export function StripVis({
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
                     <div className="container" style={{width: '20rem'}}>
+                        <WarningMessage/>
                         <VisTypeSelect
                             callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
                             currentSelected={config.type}

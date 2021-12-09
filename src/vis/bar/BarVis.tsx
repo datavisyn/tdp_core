@@ -17,6 +17,7 @@ import {BarDirectionButtons} from '../sidebar/BarDirectionButtons';
 import {BarGroupTypeButtons} from '../sidebar/BarGroupTypeButtons';
 import {BarDisplayButtons} from '../sidebar/BarDisplayTypeButtons';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
+import {WarningMessage} from '../sidebar/WarningMessage';
 
 interface BarVisProps {
     config: IBarConfig;
@@ -163,6 +164,7 @@ export function BarVis({
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
                     <div className="container" style={{width: '20rem'}}>
+                        <WarningMessage/>
                         <VisTypeSelect
                             callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
                             currentSelected={config.type}

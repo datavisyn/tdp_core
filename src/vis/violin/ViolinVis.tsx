@@ -13,6 +13,7 @@ import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {ViolinOverlayButtons} from '../sidebar/ViolinOverlayButtons';
 import {EViolinOverlay} from '../bar/utils';
 import {merge} from 'lodash';
+import {WarningMessage} from '../sidebar/WarningMessage';
 
 interface ViolinVisProps {
     config: IViolinConfig;
@@ -128,6 +129,7 @@ export function ViolinVis({
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
                     <div className="container" style={{width: '20rem'}}>
+                        <WarningMessage/>
                         <VisTypeSelect
                             callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
                             currentSelected={config.type}

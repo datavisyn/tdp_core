@@ -9,6 +9,7 @@ import { beautifyLayout } from '../layoutUtils';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { merge } from 'lodash';
 import { createStripTraces } from './utils';
+import { WarningMessage } from '../sidebar/WarningMessage';
 const defaultConfig = {};
 const defaultExtensions = {
     prePlot: null,
@@ -68,6 +69,7 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
                 React.createElement("i", { className: "fas fa-bars" })),
             React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
                 React.createElement("div", { className: "container", style: { width: '20rem' } },
+                    React.createElement(WarningMessage, null),
                     React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
                     React.createElement("hr", null),
                     React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),

@@ -10,6 +10,7 @@ import d3 from 'd3';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {merge} from 'lodash';
 import {createPCPTraces, IPCPConfig} from './utils';
+import {WarningMessage} from '../sidebar/WarningMessage';
 
 interface PCPVisProps {
     config: IPCPConfig;
@@ -111,6 +112,7 @@ export function PCPVis({
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
                     <div className="container" style={{width: '20rem'}}>
+                        <WarningMessage/>
                         <VisTypeSelect
                             callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
                             currentSelected={config.type}
