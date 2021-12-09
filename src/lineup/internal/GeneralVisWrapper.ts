@@ -53,8 +53,6 @@ export class GeneralVisWrapper extends EventHandler {
     selectCallback(selected: number[]) {
         const data = this.getAllData();
 
-        console.log(selected);
-
         const r = Range.list(selected);
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
@@ -94,7 +92,6 @@ export class GeneralVisWrapper extends EventHandler {
         }
 
         for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
-            console.log(c, data);
             cols.push({
                 info: {
                     name: c.label,

@@ -59,8 +59,6 @@ export function Vis({
     filterCallback = () => null
 }: VisProps) {
 
-    console.log(selected);
-
     const [visConfig, setVisConfig] = useState<IVisConfig>({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],

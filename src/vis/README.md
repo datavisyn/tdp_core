@@ -58,3 +58,16 @@ export interface VisProps {
 ```
 
 Currently, there is no way to limit or edit the options that are presented within the Vis package from outside of the package. This should be changed in the future to allow simplifying, for example to only show the scatterplot component.
+
+### 'Known Problems'
+
+A Few of the known problems/limitations. 
+
+1. Labels are not always properly truncated, and if too many small multiples are created at once, this can cause problems. 
+2. Scatterplots numerical color scale does not have a legend
+3. Scatterplots shape mapping has too few shapes, quickly runs into duplicates. 
+4. Only one filter can be applied at a time. Applying a second one simply erases the first. This is due to a limitation in how the LineupDataProvider creates global filters. will be solved in Ordino 2.0
+5. Adding extra categorical Columns to the Bar chart does nothing. Should instead be a single select dropdown. This is an easy fix but I just noticed it. 
+6. Parallel Coordinates are overall useless as they don't have any opacity applied to them, cant select. 
+7. Changing Opacity can get slow in the scatterplot if you have many points/plots. 
+8. Closing/opening the sidebar has a small delay before resizing the plotly canvas. 
