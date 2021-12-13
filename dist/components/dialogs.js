@@ -24,7 +24,7 @@ export class Dialog {
         // $(dialog).modal({backdrop});
         dialog.innerHTML = `
        <div class="modal-dialog ${additionalCSSClasses}" role="document">
-        <div class="modal-content" data-testid="${title.replace(/<\/?[^>]+(>|$)/g, "").trim().replace(/\s+/g, '-').toLowerCase()}">
+        <div class="modal-content" data-testid="${title.replace(/<\/?[^>]+(>|$)/g, '').trim().replace(/\s+/g, '-').toLowerCase()}">
           <div class="modal-header">
             <h4 class="modal-title">${title}</h4>
             <button type="button" class="btn-close" data-testid="close-button" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('phovea:ui.close')}"></button>

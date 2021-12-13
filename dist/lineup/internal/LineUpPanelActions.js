@@ -27,6 +27,7 @@ export class LineUpPanelActions extends EventHandler {
         this.wasCollapsed = false;
         this.node = doc.createElement('aside');
         this.node.classList.add('lu-side-panel-wrapper');
+        this.node.setAttribute('data-testid', 'side-panel-wrapper');
         this.header = new PanelHeader(this.node);
         this.searchBoxProvider = new SearchBoxProvider();
         if (this.options.enableSidePanel === 'top') {
