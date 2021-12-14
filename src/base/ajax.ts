@@ -1,4 +1,5 @@
 import {GlobalEventHandler} from './event';
+import {merge} from 'lodash';
 
 
 
@@ -54,7 +55,7 @@ export class Ajax {
    * @param requestBody body mime type, default auto derive
    * @returns {Promise<any>}
    */
-  static async send(url: string, data: any = {}, method = 'GET', expectedDataType = 'json', requestBody = 'formdata'): Promise<any> {
+  static async send<T = any>(url: string, data: any = {}, method = 'GET', expectedDataType = 'json', requestBody = 'formdata', options: Partial<RequestInit> = {}): Promise<T> {
     // for compatibility
     method = method.toUpperCase();
 
@@ -67,13 +68,13 @@ export class Ajax {
       }
     }
 
-    const options: RequestInit = {
+    const mergedOptions: RequestInit = merge({
       credentials: 'same-origin',
       method,
       headers: {
         'Accept': 'application/json'
       },
-    };
+    }, options);
 
     if (data) {
       let mimetype: string = '';
@@ -81,36 +82,36 @@ export class Ajax {
         case 'json':
         case 'application/json':
           mimetype = 'application/json';
-          options.body = typeof data === 'string' ? data : JSON.stringify(data);
+          mergedOptions.body = typeof data === 'string' ? data : JSON.stringify(data);
           break;
         case 'text':
         case 'text/plain':
           mimetype = 'text/plain';
-          options.body = String(data);
+          mergedOptions.body = String(data);
           break;
         case 'blob':
         case 'arraybuffer':
           mimetype = 'application/octet-stream';
-          options.body = data;
+          mergedOptions.body = data;
           break;
         default:
           if (data instanceof FormData) {
-            options.body = data;
+            mergedOptions.body = data;
           } else {
             mimetype = 'application/x-www-form-urlencoded';
-            options.body = Ajax.encodeParams(data);
+            mergedOptions.body = Ajax.encodeParams(data);
           }
       }
       if (mimetype) {
-        (<any>options.headers)['Content-Type'] = mimetype;
+        mergedOptions.headers['Content-Type'] = mimetype;
       }
     }
 
     // there are no typings for fetch so far
-    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_PRE_SEND, url, options);
-    const r = Ajax.checkStatus(await self.fetch(url, options));
+    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_PRE_SEND, url, mergedOptions);
+    const r = Ajax.checkStatus(await self.fetch(url, mergedOptions));
     const output = Ajax.parseType(expectedDataType, r);
-    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_POST_SEND, url, options, r, output);
+    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_POST_SEND, url, mergedOptions, r, output);
     return output;
   }
   /**
