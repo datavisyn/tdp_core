@@ -14,7 +14,9 @@ export declare class ScoreUtils {
         inverse: import("../../provenance").IAction;
     }>;
     static addScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): import("../../provenance").IAction;
-    static pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): Promise<any>;
+    static pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): Promise<{
+        inverse: import("../../provenance").IAction;
+    }>;
     static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]): import("../../provenance").IAction;
     private static shallowEqualObjects;
     /**

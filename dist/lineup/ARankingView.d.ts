@@ -108,7 +108,7 @@ export declare abstract class ARankingView extends AView {
      * @param {IScore<any>} score
      * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
      */
-    addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
+    addTrackedScoreColumn(score: IScore<any>, position?: number): ILazyLoadedColumn;
     private pushTrackedScoreColumn;
     /**
      * used by commands to remove a tracked score again

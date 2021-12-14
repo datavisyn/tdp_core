@@ -6,13 +6,15 @@ import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../provenance';
 export class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {
         const scoreId = parameter.id;
+        console.log(inputs);
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
         const plugin = await pluginDesc.load();
-        const view = await inputs[0].v.then((vi) => vi.getInstance());
+        const view = await inputs[0].v;
         const params = await AttachemntUtils.resolveExternalized(parameter.params);
         const score = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
         const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
+        console.log(results);
         const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
         return {
             inverse: ScoreUtils.removeScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id))
@@ -40,11 +42,10 @@ export class ScoreUtils {
         });
     }
     static async pushScoreAsync(graph, provider, scoreName, scoreId, params) {
+        console.log(provider);
         const storedParams = await AttachemntUtils.externalize(params);
-        const currentParams = { id: scoreId, params, storedParams };
-        const result = await ScoreUtils.addScoreAsync([provider], currentParams);
         const toStoreParams = { id: scoreId, params: storedParams };
-        return graph.pushWithResult(ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', { scoreName }), ObjectRefUtils.category.data, ObjectRefUtils.operation.create), ScoreUtils.CMD_ADD_SCORE, ScoreUtils.addScoreImpl, [provider], toStoreParams), result);
+        return ScoreUtils.addScoreImpl([provider], toStoreParams);
     }
     static removeScore(provider, scoreName, scoreId, params, columnId) {
         return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.remove', { scoreName }), ObjectRefUtils.category.data, ObjectRefUtils.operation.remove), ScoreUtils.CMD_REMOVE_SCORE, ScoreUtils.removeScoreImpl, [provider], {

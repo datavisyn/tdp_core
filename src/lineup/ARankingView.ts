@@ -521,11 +521,12 @@ export abstract class ARankingView extends AView {
    * @param {IScore<any>} score
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
-  addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn> {
-    return this.withoutTracking(() => this.addScoreColumn(score, position));
+  addTrackedScoreColumn(score: IScore<any>, position?: number): ILazyLoadedColumn {
+    return this.addScoreColumn(score, position);
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
+
     return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
   }
 

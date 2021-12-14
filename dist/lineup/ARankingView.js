@@ -448,7 +448,7 @@ export class ARankingView extends AView {
      * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
      */
     addTrackedScoreColumn(score, position) {
-        return this.withoutTracking(() => this.addScoreColumn(score, position));
+        return this.addScoreColumn(score, position);
     }
     pushTrackedScoreColumn(scoreName, scoreId, params) {
         return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
