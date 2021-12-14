@@ -15,7 +15,7 @@ export function createCDCTextFilter(id, field, value) {
         value,
     };
 }
-export function CDCTextFilterComponent({ value, onValueChanged, onFieldChanged, disabled, field, config }) {
+export function CDCTextFilterComponent({ value, onValueChanged, disabled, field, config }) {
     var _a;
     return React.createElement(React.Fragment, null,
         React.createElement("div", { className: "input-group m-1 row" },

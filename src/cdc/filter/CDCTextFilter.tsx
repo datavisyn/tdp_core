@@ -1,4 +1,4 @@
-import {IFilter, IFilterComponent} from '../interfaces';
+import {IFilter, IFilterComponent, IFilterComponentProps} from '../interfaces';
 import * as React from 'react';
 import Select from 'react-select';
 
@@ -19,7 +19,7 @@ export function createCDCTextFilter(id: string, field: string, value: string[]):
   };
 }
 
-export function CDCTextFilterComponent({value, onValueChanged, onFieldChanged, disabled, field, config}) {
+export function CDCTextFilterComponent({value, onValueChanged, disabled, field, config}: IFilterComponentProps<string[]>) {
   return <>
     <div className="input-group m-1 row">
       <div className="col-4 p-0">

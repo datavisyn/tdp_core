@@ -1,4 +1,4 @@
-import {IFilter, IFilterComponent} from '../interfaces';
+import {IFilter, IFilterComponent, IFilterComponentProps} from '../interfaces';
 import * as React from 'react';
 import InputRange from 'react-input-range';
 
@@ -24,7 +24,7 @@ export function createCDCRangeFilter(id: string, field: string, value: ICDCRange
   };
 }
 
-function CDCRangeFilterComponent({value, onValueChanged, disabled, config, field}) {
+function CDCRangeFilterComponent({value, onValueChanged, disabled, config, field}: IFilterComponentProps<ICDCRangeFilterValue>) {
   return <div className="t360-input-range-wrapper row" style={{margin: '10px', paddingTop: '10px', minHeight: '50px'}}>
     <div className="col-2 px-0">
       <h6>{field}</h6>
@@ -35,7 +35,7 @@ function CDCRangeFilterComponent({value, onValueChanged, disabled, config, field
         minValue={config.minValue}
         maxValue={config.maxValue}
         value={value}
-        onChange={(e) => onValueChanged?.(e)}
+        onChange={(e) => typeof e === 'number' ? undefined : onValueChanged?.(e)}
       />
     </div>
   </div>;

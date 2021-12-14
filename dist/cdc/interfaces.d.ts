@@ -1,13 +1,14 @@
 /// <reference types="react" />
 import { ISecureItem } from '../security';
+export interface IFilterComponentProps<V> {
+    value: V;
+    onValueChanged?: (value: V, field?: string) => void;
+    disabled: boolean;
+    config: any;
+    field?: any;
+}
 export interface IFilterComponent<V> {
-    clazz: (props: {
-        value: V;
-        onValueChanged?: (value: V, field: string) => void;
-        disabled: boolean;
-        config: any;
-        field?: any;
-    }) => JSX.Element;
+    clazz: (props: IFilterComponentProps<V>) => JSX.Element;
     disableDropping?: boolean;
 }
 export interface IFilter<V = any> {

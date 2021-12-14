@@ -65,7 +65,7 @@ export function FilterCard({filter, onDrop, onDelete, onChange, onValueChanged, 
                   field={filter.field}
                   onValueChanged={
                     onValueChanged
-                      ? (value, field) => onValueChanged(filter, value, field)
+                      ? (value, field) => onValueChanged(filter, value, field || filter.field)
                       : undefined
                   }
                 />

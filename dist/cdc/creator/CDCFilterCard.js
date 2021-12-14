@@ -24,7 +24,7 @@ export function FilterCard({ filter, onDrop, onDelete, onChange, onValueChanged,
                     React.createElement("div", { className: "col-1 pe-0", style: disableDragging || disableFilter ? {} : { cursor: 'move' }, ref: disableDragging || disableFilter ? undefined : drag }, disableDragging || disableFilter ? null : (React.createElement("i", { style: { marginRight: 5 }, className: "fas fa-arrows-alt" }))),
                     React.createElement("div", { className: "col-10" }, (filterComponent === null || filterComponent === void 0 ? void 0 : filterComponent.component) ? (React.createElement("div", null,
                         React.createElement(filterComponent.component.clazz, { disabled: disableFilter, value: filter.value, config: filterComponent.config, field: filter.field, onValueChanged: onValueChanged
-                                ? (value, field) => onValueChanged(filter, value, field)
+                                ? (value, field) => onValueChanged(filter, value, field || filter.field)
                                 : undefined }),
                         filter.type === 'group' ?
                             React.createElement("div", { className: "input-group d-flex w-100 justify-content-between" },

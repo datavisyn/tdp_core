@@ -20,6 +20,6 @@ function CDCRangeFilterComponent({ value, onValueChanged, disabled, config, fiel
         React.createElement("div", { className: "col-2 px-0" },
             React.createElement("h6", null, field)),
         React.createElement("div", { className: "col-10 px-0" },
-            React.createElement(InputRange, { disabled: !onValueChanged || disabled, minValue: config.minValue, maxValue: config.maxValue, value: value, onChange: (e) => onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged(e) })));
+            React.createElement(InputRange, { disabled: !onValueChanged || disabled, minValue: config.minValue, maxValue: config.maxValue, value: value, onChange: (e) => typeof e === 'number' ? undefined : onValueChanged === null || onValueChanged === void 0 ? void 0 : onValueChanged(e) })));
 }
 //# sourceMappingURL=CDCRangeFilter.js.map

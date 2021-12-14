@@ -1,6 +1,6 @@
-import {IFilter, IFilterComponent} from '../interfaces';
+import {IFilter, IFilterComponent, IFilterComponentProps} from '../interfaces';
 import * as React from 'react';
-import Checkbox from 'react-three-state-checkbox';
+import {uniqueId} from 'lodash';
 
 interface ICDCCheckboxFilterValue {
   [field: string]: boolean;
@@ -22,17 +22,17 @@ export function createCDCCheckboxFilter(id: string, value: ICDCCheckboxFilterVal
   };
 }
 
-export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, config}) {
+export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, config}: IFilterComponentProps<ICDCCheckboxFilterValue>) {
+  const id = React.useMemo(() => uniqueId('CDCCheckboxFilterComponent'), []);
+
   return <>
     {config.fields.map((field, i) => {
       return (
         <div key={i} className="input-group m-1">
           <div className="form-check">
-            <Checkbox
-              disabled={disabled}
+            <input className="form-check-input" type="checkbox" value="" id={`${id}-${field}`}
+              disabled={disabled} 
               checked={value[field]}
-              className="form-check-input"
-              indeterminate={value[field] == null ? true : false}
               onChange={(e) => {
                 if (value[field] === false) {
                   const newVal = {};
@@ -45,11 +45,10 @@ export function CDCCheckboxFilterComponent({value, onValueChanged, disabled, con
                 } else {
                   onValueChanged?.({...value, [field]: e.target.checked});
                 }
-              }}
-              />
+              }} />
             <label
               className="form-check-label"
-              htmlFor="flexCheckDefault"
+              htmlFor={`${id}-${field}`}
             >
               {field}
             </label>

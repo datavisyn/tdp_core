@@ -127,7 +127,6 @@
     "tslib": "~2.0.3",
     "tslint": "~5.20.1",
     "typedoc": "~0.19.2",
-    "typescript": "~3.9.7",
-    "react-three-state-checkbox":"^1.4.1"
+    "typescript": "~3.9.7"
   }
 }

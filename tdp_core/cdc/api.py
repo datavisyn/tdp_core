@@ -117,7 +117,7 @@ def execute_cdc(id: str):
 @no_cache
 @login_required
 @blp.route('/alert', methods=["GET"])
-@blp.response(CDCAlertSchema(many=True, ), code=200)
+@blp.response(200, CDCAlertSchema(many=True, ))
 def get_alerts():
   session = create_session()
   alerts = session.query(CDCAlert).all()
@@ -128,7 +128,7 @@ def get_alerts():
 @login_required
 @blp.route('/alert', methods=["POST"])
 @blp.arguments(CDCAlertArgsSchema, location='json', description='Create an alert')
-@blp.response(CDCAlertSchema, code=200)
+@blp.response(200, CDCAlertSchema)
 def create_alert(data):
   session = create_session()
   # session.query(CDCAlert).delete()
@@ -152,7 +152,7 @@ def create_alert(data):
 @login_required
 @blp.route('/alert/<id>', methods=["PUT"])
 @blp.arguments(CDCAlertArgsSchema(partial=True), location='json', description='Update an alert')
-@blp.response(CDCAlertSchema(), code=200)
+@blp.response(200, CDCAlertSchema)
 def edit_alert_by_id(data, id: str):
   session = create_session()
   item = session.query(CDCAlert).get(id)
@@ -172,7 +172,7 @@ def edit_alert_by_id(data, id: str):
 @no_cache
 @login_required
 @blp.route('/alert/<id>', methods=["DELETE"])
-@blp.response(code=200)
+@blp.response(200)
 def delete_alert_by_id(id: int):
   session = create_session()
   item = session.query(CDCAlert).get(id)
@@ -200,7 +200,7 @@ def cdc_update(without_perms=True):
 @no_cache
 @login_required
 @blp.route('/alert/run', methods=["GET"])
-@blp.response(RunAllAlertsSchema, code=200, description="Response includes ids of successful and failing alerts")
+@blp.response(200, RunAllAlertsSchema, description="Response includes ids of successful and failing alerts")
 def run_all_alerts():
   return cdc_update(without_perms=False)
 
@@ -208,7 +208,7 @@ def run_all_alerts():
 @no_cache
 @login_required
 @blp.route('/alert/<id>/run', methods=["GET"])
-@blp.response(CDCAlertSchema(), code=200)
+@blp.response(200, CDCAlertSchema)
 def run_alert_by_id(id: int):
   session = create_session()
   alert = session.query(CDCAlert).get(id)
@@ -228,7 +228,7 @@ def run_alert_by_id(id: int):
 @no_cache
 @login_required
 @blp.route('/alert/<id>/confirm', methods=["GET"])
-@blp.response(CDCAlertSchema(), code=200)
+@blp.response(200, CDCAlertSchema)
 def confirm_alert_by_id(id: str):
   session = create_session()
   alert = session.query(CDCAlert).get(id)

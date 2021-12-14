@@ -219,7 +219,7 @@ export class TDPApplicationUtils {
         });
     }
     static compressSetParameter(path) {
-        return Compression.lastOnly(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p) => `${p.requires[0].id}_${p.parameter.name}`);
+        return Compression.lastConsecutive(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p) => `${p.requires[0].id}_${p.parameter.name}`);
     }
     /**
      * @deprecated
