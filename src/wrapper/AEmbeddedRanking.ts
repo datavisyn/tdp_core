@@ -14,7 +14,7 @@ import {PluginRegistry} from '../app';
 import {IDTypeManager} from '../idtype';
 
 export interface IEmbeddedRanking extends ARankingView {
-  rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
+  rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): Promise<any>;
   runWithoutTracking<T>(f: () => T): Promise<T>;
 }
 
@@ -73,7 +73,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
         return Promise.resolve(that.loadRows());
       }
 
-      rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data') {
+      rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data'): Promise<any> {
         switch (mode) {
           case 'scores':
             return this.reloadScores();
@@ -165,9 +165,9 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     });
   }
 
-  protected rebuild(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data') {
+  protected async rebuild(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc' = 'data'): Promise<void> {
     if (this.ranking) {
-      this.ranking.rebuildLineUp(mode);
+      return this.ranking.rebuildLineUp(mode);
     }
   }
 
