@@ -29,7 +29,7 @@ export enum EGeneralFormType {
 export enum EFilterOptions {
     IN = 'Filter In',
     OUT = 'Filter Out',
-    CLEAR = 'Clear',
+    CLEAR = 'Clear Filter',
 }
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;

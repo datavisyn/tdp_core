@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ENumericalColorScaleType } from '../scatter/utils';
 interface NumericalColorButtonsProps {
     callback: (s: ENumericalColorScaleType) => void;

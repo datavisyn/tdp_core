@@ -46,7 +46,8 @@ export class GeneralVisWrapper extends EventHandler {
         else {
             newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
         }
-        const scoreColumns = this.provider.getColumns().filter((d) => typeof d.accessor === 'function');
+        console.log(this.provider.getColumns());
+        const scoreColumns = this.provider.getColumns().filter((d) => typeof d.accessor === 'function' && d.selectedId !== -1);
         for (const j of newData) {
             for (const s of scoreColumns) {
                 j[s.column] = s.accessor({ v: { id: j.id } }, s);

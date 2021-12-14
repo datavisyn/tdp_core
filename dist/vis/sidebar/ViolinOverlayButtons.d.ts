@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { EViolinOverlay } from '../bar/utils';
 interface ViolinOverlayProps {
     callback: (s: EViolinOverlay) => void;
