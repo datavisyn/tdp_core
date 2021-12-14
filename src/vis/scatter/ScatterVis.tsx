@@ -183,7 +183,7 @@ export function ScatterVis({
                 </div>
                 {mergedExtensions.postPlot}
             </div>
-            <div className="position-relative h-100 flex-shrink-1 bg-light">
+            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
                 <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>

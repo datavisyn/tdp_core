@@ -213,7 +213,7 @@ function setPlotsWithMultiples(columns, config, plots, scales, plotCounter): num
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const catCurr = catCols[0];
-    const currColumn = getCol(columns, config.group) as CategoricalColumn;
+    const currColumn = getCol(columns, config.multiples) as CategoricalColumn;
 
     const uniqueGroupVals = [...new Set(currColumn.values.map((v) => v.val))];
     const uniqueColVals = [...new Set(catCurr.values.map((v) => v.val))];

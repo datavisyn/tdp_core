@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Column } from 'react-table';
 export interface ITableProps<T extends object> {
     columns: Column<T>[];

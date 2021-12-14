@@ -40,7 +40,7 @@ export class GeneralVisWrapper extends EventHandler {
                     return () => this.provider._dataRows.map((row) => v.getValue(row));
                 } else {
                     let resolve = null;
-                    const promise = new Promise((resolve2) => { 
+                    const promise = new Promise((resolve2) => {
                         resolve = resolve2;
                     });
 
@@ -117,8 +117,8 @@ export class GeneralVisWrapper extends EventHandler {
         for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
                 info: {
-                    name: c.label,
-                    description: c.summary,
+                    name: c.label.replace(/(<([^>]+)>)/gi, ''),
+                    description: c.summary ? c.summary.replace(/(<([^>]+)>)/gi, '') : '',
                     id: c.label + (<any> c)._id
                 },
                 values: data.map((d, i) => {

@@ -71,3 +71,4 @@ A Few of the known problems/limitations.
 6. Parallel Coordinates are overall useless as they don't have any opacity applied to them, cant select. 
 7. Changing Opacity can get slow in the scatterplot if you have many points/plots. 
 8. Closing/opening the sidebar has a small delay before resizing the plotly canvas. 
+9. Should include an error boundary on the component, so that it doesnt unmount when an error is thrown. 

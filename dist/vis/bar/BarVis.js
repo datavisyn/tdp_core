@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import Plot from 'react-plotly.js';
 import { InvalidCols } from '../InvalidCols';
@@ -14,6 +14,7 @@ import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
+import Plotly from 'plotly.js';
 const defaultConfig = {
     group: {
         enable: true,
@@ -55,6 +56,15 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     const uniqueId = useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
     }, []);
+    useEffect(() => {
+        const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+        menu.addEventListener('hidden.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+        });
+        menu.addEventListener('shown.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+        });
+    }, []);
     const layout = useMemo(() => {
         const layout = {
             showlegend: true,
@@ -90,7 +100,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                         }
                     } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
             mergedExtensions.postPlot),
-        React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light" },
+        React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
                 React.createElement("i", { className: "fas fa-bars" })),
             React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
