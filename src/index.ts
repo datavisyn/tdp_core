@@ -17,6 +17,7 @@ export * from './components';
 export * from './2D';
 export * from './security';
 export * from './app';
+export * from './vis';
 export * from './i18n';
 export * from './geom';
 export * from './range';

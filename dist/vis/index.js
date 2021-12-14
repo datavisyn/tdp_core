@@ -1,12 +1,2 @@
-export * from './DetailUtils';
-export * from './provvis';
-export * from './storyvis';
-export * from './VisLoader';
-export * from './ILocateAble';
-export * from './ITransform';
-export * from './IVisMetaData';
-export * from './IVisPluginDesc';
-export * from './visInstance';
-export * from './zoom';
-export * from './VisUtils';
+export * from './Vis';
 //# sourceMappingURL=index.js.map

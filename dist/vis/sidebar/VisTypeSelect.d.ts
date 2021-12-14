@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ESupportedPlotlyVis } from '../interfaces';
 interface VisTypeSelectProps {
     callback: (s: ESupportedPlotlyVis) => void;

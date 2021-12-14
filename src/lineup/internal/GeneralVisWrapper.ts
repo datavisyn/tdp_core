@@ -93,6 +93,8 @@ export class GeneralVisWrapper extends EventHandler {
             selectedMap[i] = true;
         }
 
+        console.log(data);
+
         for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
                 info: {
