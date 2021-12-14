@@ -11,7 +11,7 @@ import {
 import {select} from 'd3';
 import {SelectionRecorder} from '../base/Selection';
 import {CLUEMode, ButtonModeSelector, ModeWrapper} from '../base/mode';
-import {VisLoader} from '../vis/VisLoader';
+import {VisLoader} from '../provvis';
 import {CLUEGraphManager} from '../base/CLUEGraphManager';
 import {ProvenanceGraphMenu} from '../menu/ProvenanceGraphMenu';
 import {LoginMenu} from '../menu/LoginMenu';

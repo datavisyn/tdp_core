@@ -29,6 +29,7 @@ import {IDType, IDTypeManager} from '../../idtype';
 export class LineUpPanelActions extends EventHandler {
   static readonly EVENT_ZOOM_OUT = 'zoomOut';
   static readonly EVENT_ZOOM_IN = 'zoomIn';
+  static readonly EVENT_OPEN_VIS = 'openVis';
   static readonly EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
   /**
@@ -47,6 +48,7 @@ export class LineUpPanelActions extends EventHandler {
 
   readonly panel: SidePanel | null;
   readonly node: HTMLElement; // wrapper node
+
 
   private readonly header: PanelHeader;
   private readonly tabContainer: ITabContainer;
@@ -186,6 +188,15 @@ export class LineUpPanelActions extends EventHandler {
       this.header.addButton(zoomOutButton, EPanelHeaderToolbar.CENTER);
     }
 
+    if (this.options.enableCustomVis) {
+      const customVis = new PanelButton(buttons, {
+        title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'),
+        faIcon: 'fas fa-chart-bar',
+        onClick: () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS)
+      });
+      this.header.addButton(customVis, EPanelHeaderToolbar.END);
+    }
+
     if (this.options.enableOverviewMode) {
       const overviewButton = new PanelButton(buttons, {
         title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'),
@@ -301,6 +312,7 @@ export class LineUpPanelActions extends EventHandler {
     const loadedScorePlugins = ordinoScores.map((desc) => LineupUtils.wrap(desc));
     return {metaDataOptions, loadedScorePlugins};
   }
+
 
   async updateChooser(idType: IDType, descs: IAdditionalColumnDesc[] | IColumnDesc[]) {
     this.idType = idType;

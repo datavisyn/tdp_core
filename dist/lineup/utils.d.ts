@@ -19,7 +19,7 @@ export declare class AScoreAccessorProxy<T> {
      * @param row
      */
     readonly accessor: IAccessorFunc<T>;
-    private readonly scores;
+    readonly scores: Map<string, T>;
     constructor(missingValue?: T);
     clear(): void;
     setRows(rows: IScoreRow<T>[]): void;

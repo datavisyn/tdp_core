@@ -125,4 +125,44 @@ export class LineUpSelectionHelper extends EventHandler {
     this.provider.setSelection(indices);
     this.addEventListener();
   }
+
+  setGeneralVisSelection(sel: ISelection) {
+    if (!this.provider) {
+      return;
+    }
+
+    const old = this.provider.getSelection().sort((a, b) => a - b);
+
+    const indices: number[] = [];
+    sel.range.dim(0).forEach((uid) => {
+      const index = this.uid2index.get(uid);
+      if (typeof index === 'number') {
+        indices.push(index);
+      }
+    });
+    indices.sort((a, b) => a - b);
+
+    if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
+      return; // no change
+    }
+
+    this.provider.setSelection(indices);
+  }
+
+  getSelection() {
+    if (!this.provider) {
+      return;
+    }
+
+    const sel = this.provider.getSelection();
+
+    const indices: number[] = [];
+    sel.forEach((uid) => {
+      const index = this.uid2index.get(uid);
+      if (typeof index === 'number') {
+        indices.push(index);
+      }
+    });
+    return indices;
+  }
 }
