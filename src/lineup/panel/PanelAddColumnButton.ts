@@ -36,7 +36,6 @@ export class PanelAddColumnButton implements IPanelButton {
       }
     }));
 
-    button.node.setAttribute('data-testid', 'add-column-button');
     this.node.appendChild(button.node);
     this.node.appendChild(this.search.node);
   }
