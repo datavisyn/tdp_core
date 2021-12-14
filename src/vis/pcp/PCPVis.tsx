@@ -86,7 +86,7 @@ export function PCPVis({
     }, [traces]);
 
     return (
-        <div className="d-flex flex-row w-100 h-100">
+        <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
             <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
                 {mergedExtensions.prePlot}
 
@@ -124,7 +124,7 @@ export function PCPVis({
                     <i className="fas fa-bars"/>
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
-                    <div className="container" style={{width: '20rem'}}>
+                    <div className="container pb-3" style={{width: '20rem'}}>
                         <WarningMessage/>
                         <VisTypeSelect
                             callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
