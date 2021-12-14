@@ -94,6 +94,8 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     const $colDiv = rowNode.append('div').classed('col', true);
     this.$inputNode = $colDiv.append('select');
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', 'form-select'); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
+    this.$inputNode.attr('data-testid', 'form-select')
+    $colDiv.attr('data-testid', this.elementDesc.id)
     this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 
