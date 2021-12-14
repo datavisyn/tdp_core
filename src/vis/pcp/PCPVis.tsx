@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
 import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
@@ -11,6 +11,7 @@ import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {merge} from 'lodash';
 import {createPCPTraces, IPCPConfig} from './utils';
 import {WarningMessage} from '../sidebar/WarningMessage';
+import Plotly from 'plotly.js';
 
 interface PCPVisProps {
     config: IPCPConfig;
@@ -56,6 +57,18 @@ export function PCPVis({
 
     const uniqueId = useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
+    }, []);
+
+    useEffect(() => {
+        const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+
+        menu.addEventListener('hidden.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+          });
+
+        menu.addEventListener('shown.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+          });
     }, []);
 
     const layout = useMemo(() => {
@@ -106,7 +119,7 @@ export function PCPVis({
             {mergedExtensions.postPlot}
 
             </div>
-            <div className="position-relative h-100 flex-shrink-1 bg-light">
+            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
                 <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>

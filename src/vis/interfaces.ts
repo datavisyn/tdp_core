@@ -29,7 +29,7 @@ export enum EGeneralFormType {
 export enum EFilterOptions {
     IN = 'Filter In',
     OUT = 'Filter Out',
-    CLEAR = 'Clear',
+    CLEAR = 'Clear Filter',
 }
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
@@ -37,6 +37,8 @@ export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripCon
 export interface NumericalColumn {
     info: ColumnInfo;
     values: {id: number, val: number}[];
+    // TODO: Think about making async accessor function:
+    // values: (rows: object[]) => Promise<{id: number, val: number}[]>;
     type: EColumnTypes.NUMERICAL;
 }
 

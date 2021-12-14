@@ -24,7 +24,7 @@ export declare enum EGeneralFormType {
 export declare enum EFilterOptions {
     IN = "Filter In",
     OUT = "Filter Out",
-    CLEAR = "Clear"
+    CLEAR = "Clear Filter"
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 export interface NumericalColumn {

@@ -22,6 +22,6 @@ export var EFilterOptions;
 (function (EFilterOptions) {
     EFilterOptions["IN"] = "Filter In";
     EFilterOptions["OUT"] = "Filter Out";
-    EFilterOptions["CLEAR"] = "Clear";
+    EFilterOptions["CLEAR"] = "Clear Filter";
 })(EFilterOptions || (EFilterOptions = {}));
 //# sourceMappingURL=interfaces.js.map
