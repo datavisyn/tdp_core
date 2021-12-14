@@ -31,6 +31,29 @@ export class GeneralVisWrapper extends EventHandler {
         //make a real copy at some point
         const globalFilter = this.provider.getFilter();
 
+        // TODO: Think about using this.provider.getFirstRanking().flatColumns instead of the descriptions.
+
+        /* TODO: This is an untested way of resolving the values of all possible ValueColumn variants (could be lazy for example).
+        this.provider.getFirstRanking().flatColumns.forEach((v) => {
+            if(v instanceof ValueColumn) {
+                if(v.isLoaded()) {
+                    return () => this.provider._dataRows.map((row) => v.getValue(row));
+                } else {
+                    let resolve = null;
+                    const promise = new Promise((resolve2) => {
+                        resolve = resolve2;
+                    });
+
+                    v.on(ValueColumn.EVENT_DATA_LOADED, () => {
+                        resolve(this.provider._dataRows.map((row) => v.getValue(row)))
+                    })
+
+                    return () => promise;
+                }
+            }
+        })
+        */
+
         let newData = [];
 
         if(globalFilter) {
@@ -39,13 +62,11 @@ export class GeneralVisWrapper extends EventHandler {
             newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
         }
 
-        console.log(this.provider.getColumns());
-
-        const scoreColumns = this.provider.getColumns().filter((d) => typeof (<any>d).accessor === 'function' && (<any>d).selectedId !== -1);
+        const scoreColumns = this.provider.getColumns().filter((d) => typeof (<any>d).accessor === 'function');
 
         for(const j of newData) {
           for(const s of scoreColumns) {
-            j[(<any> s).column] = (<any> s).accessor({v: {id: j.id}});
+            j[(<any> s).column] = (<any> s).accessor({v: {id: j.id}}, s);
           }
         }
 
@@ -53,8 +74,6 @@ export class GeneralVisWrapper extends EventHandler {
     }
 
     selectCallback(selected: number[]) {
-        const data = this.getAllData();
-
         const r = Range.list(selected);
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
