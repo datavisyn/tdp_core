@@ -164,7 +164,7 @@ export class ARankingView extends AView {
         this.node.appendChild(luBackdrop);
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        this.generalVis = new GeneralVisWrapper(this.provider, this, this.selectionHelper, this.node.ownerDocument);
+        this.generalVis = new GeneralVisWrapper(this.provider, this, this.selectionHelper, this.itemIDType, this.node.ownerDocument);
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338

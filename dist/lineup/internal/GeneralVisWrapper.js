@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 export class GeneralVisWrapper extends EventHandler {
-    constructor(provider, view, selectionHelper, doc = document) {
+    constructor(provider, view, selectionHelper, idType, doc = document) {
         super();
         this.view = view;
         this.provider = provider;
@@ -13,7 +13,20 @@ export class GeneralVisWrapper extends EventHandler {
         this.node = doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
+        this.idType = idType;
         this.viewable = false;
+    }
+    getSelectionMap() {
+        const sel = this.provider.getSelection();
+        const selectedMap = {};
+        const allData = this.provider.data;
+        for (const i of allData) {
+            selectedMap[i._id] = false;
+        }
+        for (const i of sel) {
+            selectedMap[allData[i]._id] = true;
+        }
+        return selectedMap;
     }
     getAllData() {
         //make a real copy at some point
@@ -46,6 +59,7 @@ export class GeneralVisWrapper extends EventHandler {
         else {
             newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
         }
+        console.log(this.provider.data);
         console.log(this.provider.getColumns());
         const scoreColumns = this.provider.getColumns().filter((d) => typeof d.accessor === 'function' && d.selectedId !== -1);
         for (const j of newData) {
@@ -63,27 +77,23 @@ export class GeneralVisWrapper extends EventHandler {
     }
     filterCallback(s) {
         const selectedIds = this.provider.getSelection();
-        if (selectedIds.length === 0) {
+        if (selectedIds.length === 0 && s !== 'Clear Filter') {
             return;
         }
         this.provider.setFilter((row) => {
             return s === 'Filter In' ? selectedIds.includes(row.i) : s === 'Filter Out' ? !selectedIds.includes(row.i) : true;
         });
+        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
+        //de select everything after filtering.
+        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: Range.list([]) });
         this.updateCustomVis();
     }
     updateCustomVis() {
         const data = this.getAllData();
         const colDescriptions = this.provider.getColumns();
         //need some way to convert these to _ids.
-        const selectedIndeces = this.selectionHelper.getSelection();
         const cols = [];
-        const selectedMap = {};
-        for (const i of data) {
-            selectedMap[i._id] = false;
-        }
-        for (const i of selectedIndeces) {
-            selectedMap[i] = true;
-        }
+        const selectedMap = this.getSelectionMap();
         for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
                 info: {

@@ -6,16 +6,19 @@ import {ARankingView} from '..';
 import {Vis} from '../../vis/Vis';
 import {EColumnTypes} from '../../vis/interfaces';
 import {LineUpSelectionHelper} from './LineUpSelectionHelper';
+import {IDType} from '../../idtype';
+import {touches} from 'd3';
 
 export class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement; // wrapper node
     private viewable: boolean;
     private provider: LocalDataProvider;
     private selectionHelper: LineUpSelectionHelper;
+    private idType: IDType;
     private view: ARankingView;
     private data: any[];
 
-    constructor(provider: LocalDataProvider, view: ARankingView, selectionHelper: LineUpSelectionHelper, doc = document) {
+    constructor(provider: LocalDataProvider, view: ARankingView, selectionHelper: LineUpSelectionHelper, idType: IDType, doc = document) {
         super();
 
         this.view = view;
@@ -24,7 +27,25 @@ export class GeneralVisWrapper extends EventHandler {
         this.node = doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
+        this.idType = idType;
         this.viewable = false;
+    }
+
+    getSelectionMap() {
+        const sel = this.provider.getSelection();
+        const selectedMap: { [key: number]: boolean } = {};
+
+        const allData = this.provider.data;
+
+        for(const i of allData) {
+            selectedMap[i._id] = false;
+        }
+
+        for(const i of sel) {
+            selectedMap[allData[i]._id] = true;
+        }
+
+        return selectedMap;
     }
 
     getAllData(): any[] {
@@ -62,6 +83,8 @@ export class GeneralVisWrapper extends EventHandler {
             newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
         }
 
+        console.log(this.provider.data);
+
         console.log(this.provider.getColumns());
 
         const scoreColumns = this.provider.getColumns().filter((d) => typeof (<any>d).accessor === 'function' && (<any>d).selectedId !== -1);
@@ -86,13 +109,18 @@ export class GeneralVisWrapper extends EventHandler {
     filterCallback(s: string) {
         const selectedIds = this.provider.getSelection();
 
-        if(selectedIds.length === 0) {
+        if(selectedIds.length === 0 && s !== 'Clear Filter') {
             return;
         }
 
         this.provider.setFilter((row) => {
             return s === 'Filter In' ? selectedIds.includes(row.i) : s === 'Filter Out' ? !selectedIds.includes(row.i) : true;
         });
+
+        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
+
+        //de select everything after filtering.
+        this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: Range.list([])});
 
         this.updateCustomVis();
     }
@@ -101,18 +129,9 @@ export class GeneralVisWrapper extends EventHandler {
         const data = this.getAllData();
         const colDescriptions = this.provider.getColumns();
         //need some way to convert these to _ids.
-        const selectedIndeces = this.selectionHelper.getSelection();
         const cols: any[] = [];
 
-        const selectedMap: { [key: number]: boolean } = {};
-
-        for(const i of data) {
-            selectedMap[i._id] = false;
-        }
-
-        for(const i of selectedIndeces) {
-            selectedMap[i] = true;
-        }
+        const selectedMap: { [key: number]: boolean } = this.getSelectionMap();
 
         for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
