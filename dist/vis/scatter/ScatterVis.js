@@ -77,7 +77,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             mergedExtensions.prePlot,
             traces.plots.length > 0 ?
                 (React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
-                        console.log(d);
                         d ? selectionCallback(d.points.map((d) => +d.id)) : selectionCallback([]);
                     }, 
                     //plotly redraws everything on updates, so you need to reappend title and

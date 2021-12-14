@@ -142,7 +142,6 @@ export function ScatterVis({
                         useResizeHandler={true}
                         style={{width: '100%', height: '100%'}}
                         onSelected={(d) => {
-                            console.log(d);
                             d ? selectionCallback(d.points.map((d) => +(d as any).id)) : selectionCallback([]);
                         }}
                         //plotly redraws everything on updates, so you need to reappend title and
