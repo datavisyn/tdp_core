@@ -9,6 +9,6 @@ $visyn-selection-colors: (
 // create css variables and inject them in :root
 :root {
   @each $key, $value in map-collect($visyn-selection-colors) {
-    --visyn-#{$key}: #{$value};
+    --visyn-#{$key}:#{$value};
   }
 }

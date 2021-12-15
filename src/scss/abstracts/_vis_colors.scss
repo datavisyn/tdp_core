@@ -147,6 +147,6 @@ $visyn-diverging-colors-blue-pink: (
     $visyn-diverging-colors-blue-yellow,
     $visyn-diverging-colors-blue-pink)
   {
-    --visyn-#{$key}: #{$value};
+    --visyn-#{$key}:#{$value};
   }
 }

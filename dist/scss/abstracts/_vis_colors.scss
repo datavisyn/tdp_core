@@ -3,7 +3,7 @@
 // categorical color map
 $visyn-categorical-colors: (
   'c1': '#337AB7',
-  'c2': '#ec6836',
+  'c2':'#ec6836',
   'c3': '#75c4c2',
   'c4': '#e9d36c',
   'c5': '#24b466',
@@ -147,6 +147,6 @@ $visyn-diverging-colors-blue-pink: (
     $visyn-diverging-colors-blue-yellow,
     $visyn-diverging-colors-blue-pink)
   {
-    --visyn-#{$key}: #{$value};
+    --visyn-#{$key}:#{$value};
   }
 }
