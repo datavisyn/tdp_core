@@ -25,7 +25,7 @@ export declare abstract class ARankingView extends AView {
      * DOM element for LineUp stats in parameter UI
      */
     private readonly stats;
-    private readonly provider;
+    protected readonly provider: LocalDataProvider;
     private readonly taggle;
     readonly selectionHelper: LineUpSelectionHelper;
     private readonly panel;
