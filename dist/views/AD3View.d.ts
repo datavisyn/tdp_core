@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
 import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';
 import { Selection } from 'd3';

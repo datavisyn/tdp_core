@@ -1,4 +1,4 @@
-import {BaseUtils, GlobalEventHandler} from 'phovea_core';
+import {GlobalEventHandler, BaseUtils} from '../base';
 import {IViewTourContext} from './extensions';
 
 export class TourUtils {

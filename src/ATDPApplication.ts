@@ -1,11 +1,6 @@
-/**
- * Created by sam on 03.03.2017.
- */
-
-import {ProvenanceGraph, MixedStorageProvenanceGraphManager, UserSession, BaseUtils, I18nextManager, PluginRegistry, IMixedStorageProvenanceGraphManagerOptions, Ajax} from 'phovea_core';
-import {AppHeaderLink, AppHeader} from 'phovea_ui';
-import 'phovea_ui/dist/webpack/_bootstrap';
-import {CLUEGraphManager, LoginMenu, ButtonModeSelector, ACLUEWrapper, VisLoader} from 'phovea_clue';
+import {AppHeaderLink, AppHeader} from './components';
+// TODO: Do we need a relative import?
+import './webpack/_bootstrap';
 import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
 import {DialogUtils} from './base/dialogs';
 import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
@@ -13,6 +8,13 @@ import {IAppExtensionExtension} from './base/interfaces';
 import {TourManager} from './tour/TourManager';
 import {TemporarySessionList} from './utils/SessionList';
 import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
+import {ACLUEWrapper} from './wrapper';
+import {LoginMenu} from './base';
+import {Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager} from './base';
+import {UserSession, PluginRegistry} from './app';
+import {I18nextManager} from './i18n';
+import {IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph} from './provenance';
+import {VisLoader} from './vis';
 
 export interface ITDPOptions {
   /**
@@ -171,9 +173,9 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
         return false;
       }, '#');
 
-      button.dataset.toggle = 'modal';
+      button.dataset.bsToggle = 'modal';
       button.tabIndex = -1;
-      button.dataset.target = `#${this.tourManager.chooser.id}`;
+      button.dataset.bsTarget = `#${this.tourManager.chooser.id}`;
     }
   }
 

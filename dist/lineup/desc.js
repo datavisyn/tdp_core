@@ -1,9 +1,6 @@
-/**
- * Created by sam on 13.02.2017.
- */
 import { createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, createRankDesc } from 'lineupjs';
 import { extent } from 'd3';
-import { ValueTypeUtils } from 'phovea_core';
+import { ValueTypeUtils } from '../data';
 export class ColumnDescUtils {
     static baseColumn(column, options = {}) {
         return Object.assign({

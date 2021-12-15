@@ -1,4 +1,5 @@
-import {Ajax, AppContext} from 'phovea_core';
+import {AppContext} from '../app';
+import {Ajax} from '../base';
 
 export interface IXLSXColumn {
   name: string;

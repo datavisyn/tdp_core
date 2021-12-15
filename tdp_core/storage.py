@@ -8,7 +8,7 @@ import phovea_server.range as ranges
 import logging
 
 __author__ = 'Samuel Gratzl'
-c = phovea_server.config.view('tdp_core')
+c = phovea_server.config.view('tdp_core.mongo')
 _log = logging.getLogger(__name__)
 
 app = Namespace(__name__)
@@ -17,7 +17,7 @@ app = Namespace(__name__)
 @app.route('/namedsets/', methods=['GET', 'POST'])
 @etag
 def list_namedset():
-  db = MongoClient(c.host, c.port)[c.database]
+  db = MongoClient(c.host, c.port)[c.db_namedsets]
 
   if request.method == 'GET':
     q = dict(idType=request.args['idType']) if 'idType' in request.args else {}
@@ -45,7 +45,7 @@ def list_namedset():
 @app.route('/namedset/<namedset_id>', methods=['GET', 'DELETE', 'PUT'])
 @etag
 def get_namedset(namedset_id):
-  db = MongoClient(c.host, c.port)[c.database]
+  db = MongoClient(c.host, c.port)[c.db_namedsets]
   result = list(db.namedsets.find(dict(id=namedset_id), {'_id': 0}))
   entry = result[0] if len(result) > 0 else None
 
@@ -84,7 +84,7 @@ def get_namedset(namedset_id):
 
 
 def get_namedset_by_id(namedset_id):
-  db = MongoClient(c.host, c.port)[c.database]
+  db = MongoClient(c.host, c.port)[c.db_namedsets]
   q = dict(id=namedset_id)
   result = list(db.namedsets.find(q, {'_id': 0}))
   if not result:
@@ -107,7 +107,7 @@ def post_attachment():
   simple attachment management
   :return:
   """
-  db = MongoClient(c.host, c.port)[c.database]
+  db = MongoClient(c.host, c.port)[c.db_namedsets]
 
   id = _generate_id()
   # keep the encoded string
@@ -122,7 +122,7 @@ def post_attachment():
 @app.route('/attachment/<attachment_id>', methods=['GET', 'DELETE', 'PUT'])
 @etag
 def get_attachment(attachment_id):
-  db = MongoClient(c.host, c.port)[c.database]
+  db = MongoClient(c.host, c.port)[c.db_namedsets]
   result = list(db.attachments.find(dict(id=attachment_id), {'_id': 0}))
   entry = result[0] if len(result) > 0 else None
 
@@ -153,7 +153,7 @@ def get_attachment(attachment_id):
 
 # @app.route('/delete_legacy_namedsets/', methods=['GET'])
 # def delete_legacy_namedsets():
-#  db = MongoClient(c.host, c.port)[c.database]
+#  db = MongoClient(c.host, c.port)[c.db_namedsets]
 #  result = db.namedsets.remove({'id': {'$exists': False}}) # find all entries without id
 #  return jsonify(result['n'])  # number of deleted documents
 

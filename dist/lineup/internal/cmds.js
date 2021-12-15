@@ -1,10 +1,9 @@
-/**
- * Created by Samuel Gratzl on 18.05.2016.
- */
-import { ResolveNow, I18nextManager, ObjectRefUtils, ActionMetaData, ActionUtils } from 'phovea_core';
 import { EngineRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn } from 'lineupjs';
 import { LineUpFilterUtils } from './lineUpFilter';
 import { isEqual } from 'lodash';
+import { ResolveNow } from '../../base';
+import { I18nextManager } from '../../i18n';
+import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../provenance';
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 var LineUpTrackAndUntrackActions;
 (function (LineUpTrackAndUntrackActions) {

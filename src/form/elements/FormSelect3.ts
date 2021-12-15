@@ -1,13 +1,9 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-
 import {AFormElement} from './AFormElement';
 import {IForm, IFormElementDesc, FormElementType} from '../interfaces';
 import {Select3, IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
 import {ISelect2Option} from './FormSelect2';
-import {IPluginDesc} from 'phovea_core';
 import * as d3 from 'd3';
+import {IPluginDesc} from '../../base';
 
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
   return?: 'text' | 'id';

@@ -86,7 +86,7 @@ export declare abstract class ARankingView extends AView {
      * return the idType of the shown items in LineUp
      * @returns {IDType}
      */
-    get itemIDType(): import("phovea_core").IDType;
+    get itemIDType(): import("../idtype").IDType;
     protected parameterChanged(name: string): PromiseLike<any> | void;
     protected itemSelectionChanged(): PromiseLike<any> | void;
     protected selectionChanged(): PromiseLike<any> | void;

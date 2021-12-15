@@ -1,5 +1,6 @@
-import { IPluginDesc, ProvenanceGraph, IObjectRef } from 'phovea_core';
+import { IPluginDesc } from '../base';
 import { IViewPluginDesc, IViewContext, ISelection } from '../base/interfaces';
+import { IObjectRef, ProvenanceGraph } from '../provenance';
 export declare class ViewUtils {
     /**
      * event when one or more elements are selected for the next level

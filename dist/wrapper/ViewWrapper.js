@@ -8,12 +8,17 @@
  * Proprietary and confidential. No warranty.
  *
  *********************************************************/
-import { EventHandler, ObjectRefUtils, ResolveNow, Range, IDTypeManager, I18nextManager, NodeUtils } from 'phovea_core';
 import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
+import { EventHandler, ResolveNow } from '../base';
+import { NodeUtils, ObjectRefUtils } from '../provenance';
+import { Range } from '../range';
+import { I18nextManager } from '../i18n';
+import { IDTypeManager } from '../idtype';
+import { Dialog } from '../components';
 export class ViewWrapper extends EventHandler {
     constructor(plugin, graph, document, viewOptionGenerator = () => ({})) {
         super();
@@ -50,12 +55,10 @@ export class ViewWrapper extends EventHandler {
             this.node.lastElementChild.addEventListener('click', (evt) => {
                 evt.preventDefault();
                 evt.stopPropagation();
-                import('phovea_ui/dist/components/dialogs').then(({ Dialog }) => {
-                    const d = Dialog.generateDialog(plugin.name, I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.close'));
-                    d.body.innerHTML = plugin.helpText;
-                    d.show();
-                    d.hideOnSubmit();
-                });
+                const d = Dialog.generateDialog(plugin.name, I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.close'));
+                d.body.innerHTML = plugin.helpText;
+                d.show();
+                d.hideOnSubmit();
             });
         }
         else if (plugin.helpUrl) {
@@ -88,6 +91,15 @@ export class ViewWrapper extends EventHandler {
             });
         }
         this.ref = graph.findOrAddObject(ObjectRefUtils.objectRef(this, plugin.name, ObjectRefUtils.category.visual));
+    }
+    off(events, handler) {
+        return super.on(events, handler);
+    }
+    on(events, handler) {
+        return super.on(events, handler);
+    }
+    fire(events, ...args) {
+        return super.fire(events, ...args);
     }
     set visible(visible) {
         const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);
@@ -130,7 +142,7 @@ export class ViewWrapper extends EventHandler {
             // create provenance reference
             this.context = ViewUtils.createContext(this.graph, this.plugin, this.ref);
             this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
-            this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance);
+            this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance, this);
             return this.instancePromise = ResolveNow.resolveImmediately(this.instance.init(this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
                 this.inputSelections.forEach((v, k) => {
                     if (k !== AView.DEFAULT_SELECTION_NAME) { // already handled
@@ -160,7 +172,7 @@ export class ViewWrapper extends EventHandler {
                     this.instance.setParameter(key, value);
                 });
                 this.preInstanceParameter.clear();
-                this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance);
+                this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance, this);
                 return this.instance;
             });
         });
@@ -187,7 +199,7 @@ export class ViewWrapper extends EventHandler {
         return selection && selection.idtype ? selection.idtype : ViewWrapper.guessIDType(this.plugin); // TODO: better IDType strategy than guessIDType?
     }
     destroyInstance() {
-        this.fire(ViewWrapper.EVENT_VIEW_DESTROYED, this.instance);
+        this.fire(ViewWrapper.EVENT_VIEW_DESTROYED, this.instance, this);
         this.instance.destroy();
         this.content.innerHTML = '';
         this.node.querySelector('header div.parameters').innerHTML = '';

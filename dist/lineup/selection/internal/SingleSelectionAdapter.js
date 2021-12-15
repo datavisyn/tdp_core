@@ -1,8 +1,5 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
-import { ResolveNow } from 'phovea_core';
+import { ResolveNow } from '../../../base';
 export class SingleSelectionAdapter extends ABaseSelectionAdapter {
     constructor(adapter) {
         super();

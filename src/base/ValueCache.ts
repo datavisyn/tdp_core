@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 13.03.2017.
- */
 export class ValueCache {
 
   private values = new Map<string, any>();

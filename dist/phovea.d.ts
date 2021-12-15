@@ -1,2 +1,2 @@
-import { IRegistry } from 'phovea_core';
+import { IRegistry } from './base';
 export default function (registry: IRegistry): void;

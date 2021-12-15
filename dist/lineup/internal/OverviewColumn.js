@@ -1,8 +1,5 @@
-/**
- * a string column with optional alignment
- */
 import { Column, BooleanColumn } from 'lineupjs';
-import { I18nextManager } from 'phovea_core';
+import { I18nextManager } from '../../i18n';
 /**
  * extra column for highlighting and filtering
  */

@@ -1,0 +1,11 @@
+.phovea-layout {
+  @import './header';
+  @import './root';
+  @import './tabbing';
+  @import './split';
+  @import './lineup';
+  @import './view';
+
+  @import './dropper';
+}
+

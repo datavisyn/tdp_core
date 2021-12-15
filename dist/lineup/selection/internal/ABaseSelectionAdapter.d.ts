@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { ISelectionColumn, IContext } from '../ISelectionAdapter';
 export declare abstract class ABaseSelectionAdapter {

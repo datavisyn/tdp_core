@@ -1,5 +1,5 @@
 import { ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem } from 'lineupjs';
-import { IDTypeLike } from 'phovea_core';
+import { IDTypeLike } from '../idtype';
 import { ISearchOption, IPanelAddColumnButtonOptions } from './panel';
 export interface IARankingViewOptions {
     /**

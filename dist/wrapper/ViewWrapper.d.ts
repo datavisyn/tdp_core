@@ -8,9 +8,12 @@
  * Proprietary and confidential. No warranty.
  *
  *********************************************************/
-import { EventHandler, ObjectNode, ProvenanceGraph, IDType } from 'phovea_core';
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc } from '../base/interfaces';
+import { AView } from '../views/AView';
+import { EventHandler, IEvent } from '../base';
+import { ObjectNode, ProvenanceGraph } from '../provenance';
+import { IDType } from '../idtype';
 export declare class ViewWrapper extends EventHandler implements IViewProvider {
     readonly plugin: IViewPluginDesc;
     private readonly graph;
@@ -23,6 +26,18 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     private allowed;
     readonly node: HTMLElement;
     readonly content: HTMLElement;
+    off(events: typeof ViewWrapper.EVENT_VIEW_CREATED, handler?: (event: IEvent, view: IView) => void): this;
+    off(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, handler?: (event: IEvent, view: IView) => void): this;
+    off(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, handler?: (event: IEvent, view: IView, viewWrapper: ViewWrapper) => void): this;
+    off(events: typeof AView.EVENT_ITEM_SELECT, handler?: (event: IEvent, oldSelection: ISelection, newSelection: ISelection, name: string) => void): this;
+    on(events: typeof ViewWrapper.EVENT_VIEW_CREATED, handler?: (event: IEvent, view: IView) => void): this;
+    on(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, handler?: (event: IEvent, view: IView) => void): this;
+    on(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, handler?: (event: IEvent, view: IView, viewWrapper: ViewWrapper) => void): this;
+    on(events: typeof AView.EVENT_ITEM_SELECT, handler?: (event: IEvent, oldSelection: ISelection, newSelection: ISelection, name: string) => void): this;
+    fire(events: typeof ViewWrapper.EVENT_VIEW_CREATED, view: IView, viewWrapper: ViewWrapper): this;
+    fire(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, view: IView, viewWrapper: ViewWrapper): this;
+    fire(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, view: IView, viewWrapper: ViewWrapper): this;
+    fire(events: typeof AView.EVENT_ITEM_SELECT, oldSelection: ISelection, newSelection: ISelection, name: string): this;
     /**
      * Provenance graph reference of this object
      */
