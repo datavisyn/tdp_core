@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
+import {ColumnInfo, ESupportedPlotlyVis, PlotlyInfo, Scales, VisColumn} from '../interfaces';
 import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
@@ -30,7 +30,7 @@ interface ViolinVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn) [];
+    columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
 }

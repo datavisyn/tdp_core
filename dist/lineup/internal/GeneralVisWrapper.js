@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Ranking } from 'lineupjs';
+import { CategoricalColumn, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
 import { EventHandler } from '../../base';
 import { IDTypeManager } from '../../idtype';
 import { Range } from '../../range';
@@ -30,48 +30,8 @@ export class GeneralVisWrapper extends EventHandler {
         }
         return selectedMap;
     }
-    getAllData() {
-        //make a real copy at some point
-        const globalFilter = this.provider.getFilter();
-        // TODO: Think about using this.provider.getFirstRanking().flatColumns instead of the descriptions.
-        /* TODO: This is an untested way of resolving the values of all possible ValueColumn variants (could be lazy for example).
-        this.provider.getFirstRanking().flatColumns.forEach((v) => {
-            if(v instanceof ValueColumn) {
-                if(v.isLoaded()) {
-                    return () => this.provider._dataRows.map((row) => v.getValue(row));
-                } else {
-                    let resolve = null;
-                    const promise = new Promise((resolve2) => {
-                        resolve = resolve2;
-                    });
-
-                    v.on(ValueColumn.EVENT_DATA_LOADED, () => {
-                        resolve(this.provider._dataRows.map((row) => v.getValue(row)))
-                    })
-
-                    return () => promise;
-                }
-            }
-        })
-        */
-        let newData = [];
-        if (globalFilter) {
-            newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)) && globalFilter(this.provider.getRow(i)));
-        }
-        else {
-            newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
-        }
-        const scoreColumns = this.provider.getColumns().filter((d) => typeof d.accessor === 'function' && d.selectedId !== -1);
-        for (const j of newData) {
-            for (const s of scoreColumns) {
-                j[s.column] = s.accessor({ v: { id: j.id } }, s);
-            }
-        }
-        return newData;
-    }
     selectCallback(selected) {
         const r = Range.list(selected);
-        //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
         this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
     }
@@ -89,23 +49,50 @@ export class GeneralVisWrapper extends EventHandler {
         this.updateCustomVis();
     }
     updateCustomVis() {
-        const data = this.getAllData();
-        const colDescriptions = this.provider.getColumns();
-        //need some way to convert these to _ids.
+        const ranking = this.provider.getFirstRanking();
+        const data = this.provider.viewRawRows(ranking.getOrder());
         const cols = [];
         const selectedMap = this.getSelectionMap();
-        for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
-            cols.push({
-                info: {
-                    name: c.label.replace(/(<([^>]+)>)/gi, ''),
-                    description: c.summary ? c.summary.replace(/(<([^>]+)>)/gi, '') : '',
-                    id: c.label + c._id
-                },
-                values: data.map((d, i) => {
-                    return { id: d._id, val: d[c.column] ? d[c.column] : c.type === 'number' ? null : '--' };
-                }),
-                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL
+        const getColumnInfo = (column) => {
+            return {
+                name: column.getMetaData().label.replace(/(<([^>]+)>)/gi, ''),
+                description: column.getMetaData().summary.replace(/(<([^>]+)>)/gi, ''),
+                // TODO: What kind of id to use?
+                id: column.fqid,
+            };
+        };
+        // wait for 2 seconds
+        const getColumnValue = async (column) => {
+            if (column.isLoaded()) {
+                return data.map((d, i) => ({ id: d.v._id, val: column.getValue(d) }));
+            }
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject('Timeout');
+                }, 60000);
+                column.on(ValueColumn.EVENT_DATA_LOADED, () => {
+                    clearTimeout(timeout);
+                    resolve(data.map((d, i) => ({ id: d.v._id, val: column.getValue(d) })));
+                });
             });
+        };
+        for (const c of ranking.flatColumns) {
+            if (c instanceof NumberColumn) {
+                cols.push({
+                    info: getColumnInfo(c),
+                    values: () => getColumnValue(c),
+                    type: EColumnTypes.NUMERICAL
+                });
+            }
+            if (c instanceof CategoricalColumn) {
+                cols.push({
+                    info: getColumnInfo(c),
+                    values: () => getColumnValue(c).then((res) => res.map((v) => v.val ? v : { ...v, val: '--' })),
+                    // TODO: This is required?
+                    colors: null,
+                    type: EColumnTypes.CATEGORICAL
+                });
+            }
         }
         ReactDOM.render(React.createElement(Vis, {
             columns: cols,

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, NumericalColumn } from '../interfaces';
+import { VisCategoricalColumn, VisNumericalColumn } from '../interfaces';
 import { IVisConfig } from '../interfaces';
 import { IPCPConfig } from './utils';
 interface PCPVisProps {
@@ -11,7 +11,7 @@ interface PCPVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: (VisNumericalColumn | VisCategoricalColumn)[];
     setConfig: (config: IVisConfig) => void;
 }
 export declare function PCPVis({ config, optionsConfig, extensions, columns, setConfig, }: PCPVisProps): JSX.Element;

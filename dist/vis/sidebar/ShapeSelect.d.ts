@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
+import { VisCategoricalColumn, ColumnInfo, VisNumericalColumn } from '../interfaces';
 interface ShapeSelectProps {
     callback: (shape: ColumnInfo) => void;
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: (VisNumericalColumn | VisCategoricalColumn)[];
     currentSelected: ColumnInfo | null;
 }
 export declare function ShapeSelect(props: ShapeSelectProps): JSX.Element;

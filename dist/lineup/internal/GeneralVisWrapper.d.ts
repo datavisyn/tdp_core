@@ -15,7 +15,6 @@ export declare class GeneralVisWrapper extends EventHandler {
     getSelectionMap(): {
         [key: number]: boolean;
     };
-    getAllData(): any[];
     selectCallback(selected: number[]): void;
     filterCallback(s: string): void;
     updateCustomVis(): void;

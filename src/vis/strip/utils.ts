@@ -1,5 +1,5 @@
 import {merge} from 'lodash';
-import {CategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
@@ -19,7 +19,7 @@ const defaultConfig: IStripConfig = {
 };
 
 export function stripMergeDefaultConfig(
-    columns: (NumericalColumn | CategoricalColumn)[],
+    columns: VisColumn[],
     config: IStripConfig,
 ): IVisConfig {
     const merged = merge({}, defaultConfig, config);
@@ -34,7 +34,7 @@ export function stripMergeDefaultConfig(
 }
 
 export function createStripTraces(
-    columns: (NumericalColumn | CategoricalColumn)[],
+    columns: VisColumn[],
     config: IStripConfig,
     scales: Scales,
 ): PlotlyInfo {
@@ -50,8 +50,8 @@ export function createStripTraces(
         };
     }
 
-    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
-    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    const numCols: VisNumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as VisNumericalColumn[];
+    const catCols: VisCategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as VisCategoricalColumn[];
     const plots: PlotlyData[] = [];
 
 

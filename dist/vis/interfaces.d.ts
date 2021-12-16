@@ -27,23 +27,25 @@ export declare enum EFilterOptions {
     CLEAR = "Clear Filter"
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
-export interface NumericalColumn {
+declare type ValueGetter<T> = () => Promise<T>;
+export interface VisNumericalColumn {
     info: ColumnInfo;
-    values: {
+    values: ValueGetter<{
         id: number;
         val: number;
-    }[];
+    }[]>;
     type: EColumnTypes.NUMERICAL;
 }
-export interface CategoricalColumn {
+export interface VisCategoricalColumn {
     info: ColumnInfo;
     colors: string[];
-    values: {
+    values: ValueGetter<{
         id: number;
         val: string;
-    }[];
+    }[]>;
     type: EColumnTypes.CATEGORICAL;
 }
+export declare type VisColumn = VisNumericalColumn | VisCategoricalColumn;
 export declare type PlotlyInfo = {
     plots: PlotlyData[];
     legendPlots: PlotlyData[];
@@ -64,3 +66,4 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
+export {};

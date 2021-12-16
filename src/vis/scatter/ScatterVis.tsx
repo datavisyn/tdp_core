@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales} from '../interfaces';
 import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
@@ -41,7 +41,7 @@ interface ScatterVisProps {
         postSidebar?: React.ReactNode;
     };
     shapes?: string[];
-    columns: (NumericalColumn | CategoricalColumn) [];
+    columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
     selectionCallback?: (s: number[]) => void;
     selected?: {[key: number]: boolean};

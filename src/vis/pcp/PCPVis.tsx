@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales} from '../interfaces';
 import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
@@ -8,10 +8,11 @@ import Plot from 'react-plotly.js';
 import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
-import {merge} from 'lodash';
+import {merge, uniqueId} from 'lodash';
 import {createPCPTraces, IPCPConfig} from './utils';
 import {WarningMessage} from '../sidebar/WarningMessage';
 import Plotly from 'plotly.js';
+import {useAsync} from '../..';
 
 interface PCPVisProps {
     config: IPCPConfig;
@@ -22,7 +23,7 @@ interface PCPVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn) [];
+    columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
 }
 
@@ -51,28 +52,24 @@ export function PCPVis({
         return merge({}, defaultExtensions, extensions);
     }, []);
 
-    const traces: PlotlyInfo = useMemo(() => {
-        return createPCPTraces(columns, config);
-    }, [columns, config]);
+    const {value: traces, status: traceStatus, error: traceError} = useAsync(createPCPTraces, [columns, config]);
 
-    const uniqueId = useMemo(() => {
-        return Math.random().toString(36).substr(2, 5);
-    }, []);
+    const id = useMemo(() => uniqueId('PCPVis'), []);
 
     useEffect(() => {
-        const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
           });
 
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
           });
     }, []);
 
-    const layout = useMemo(() => {
-        return {
+    const layout = useMemo<Partial<Plotly.Layout> | null>(() => {
+        return traces ? {
             showlegend: true,
             legend: {
                 itemclick: false,
@@ -82,19 +79,21 @@ export function PCPVis({
             grid: {rows: traces.rows, columns: traces.cols, xgap: .3, pattern: 'independent'},
             shapes: [],
             violingap: 0,
-        };
+        } : null;
     }, [traces]);
+
+
+    console.log(traces, traceStatus, traceError)
 
     return (
         <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
-            <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+            <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
-
-                {traces.plots.length > 0 ?
-                    (<Plot
-                        divId={`plotlyDiv${uniqueId}`}
+                {traceStatus === 'success' && traces?.plots.length > 0 ? 
+                    <Plot
+                        divId={`plotlyDiv${id}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-                        layout={layout as any}
+                        layout={layout}
                         config={{responsive: true, displayModeBar: false}}
                         useResizeHandler={true}
                         style={{width: '100%', height: '100%'}}
@@ -113,17 +112,16 @@ export function PCPVis({
                                     .text(p.yLabel);
                             }
                         }}
-                    />) : (<InvalidCols
-                        message={traces.errorMessage} />)
-                }
+                    /> : 
+                    traceStatus !== 'pending' ? <InvalidCols message={traceError?.message || traces?.errorMessage} /> : null}
             {mergedExtensions.postPlot}
 
             </div>
             <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
+                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${id}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
-                <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
+                <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
                     <div className="container pb-3" style={{width: '20rem'}}>
                         <WarningMessage/>
                         <VisTypeSelect

@@ -1,4 +1,4 @@
-import {EColumnTypes, NumericalColumn, CategoricalColumn, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis} from '../interfaces';
+import {EColumnTypes, VisNumericalColumn, VisCategoricalColumn, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 import {getCol} from '../sidebar/utils';
 import {merge} from 'lodash';
@@ -35,7 +35,7 @@ const defaultConfig: IScatterConfig = {
 };
 
 export function scatterMergeDefaultConfig(
-    columns: (NumericalColumn | CategoricalColumn)[],
+    columns: VisColumn[],
     config: IScatterConfig,
 ): IVisConfig {
 
@@ -67,7 +67,7 @@ const emptyVal = {
 };
 
 export function createScatterTraces(
-    columns: (NumericalColumn | CategoricalColumn)[],
+    columns: VisColumn[],
     selected: {[key: number]: boolean},
     config: IScatterConfig,
     scales: Scales,
@@ -79,19 +79,19 @@ export function createScatterTraces(
         return emptyVal;
     }
 
-    const validCols: NumericalColumn[] = config.numColumnsSelected.map((c) => columns.filter((col) => col.type === EColumnTypes.NUMERICAL && col.info.id === c.id)[0] as NumericalColumn);
+    const validCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.filter((col) => col.type === EColumnTypes.NUMERICAL && col.info.id === c.id)[0] as VisNumericalColumn);
     const plots: PlotlyData[] = [];
 
     const shapeScale = config.shape ?
-        d3.scale.ordinal<string>().domain([...new Set((getCol(columns, config.shape) as CategoricalColumn).values.map((v) => v.val))]).range(shapes)
+        d3.scale.ordinal<string>().domain([...new Set((getCol(columns, config.shape) as VisCategoricalColumn).values.map((v) => v.val))]).range(shapes)
         : null;
 
     let min = 0;
     let max = 0;
 
     if(config.color) {
-        min = d3.min((getCol(columns, config.color) as NumericalColumn).values.map((v) => +v.val).filter((v) => v !== null)),
-        max = d3.max((getCol(columns, config.color) as NumericalColumn).values.map((v) => +v.val).filter((v) => v !== null));
+        min = d3.min((getCol(columns, config.color) as VisNumericalColumn).values.map((v) => +v.val).filter((v) => v !== null)),
+        max = d3.max((getCol(columns, config.color) as VisNumericalColumn).values.map((v) => +v.val).filter((v) => v !== null));
     }
 
     const numericalColorScale = config.color ?
@@ -126,7 +126,7 @@ export function createScatterTraces(
                     line: {
                         width: 0,
                     },
-                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).values.map((v) => shapeScale(v.val)) : 'circle',
+                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as VisCategoricalColumn).values.map((v) => shapeScale(v.val)) : 'circle',
                     color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).values.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : validCols[0].values.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                     opacity: config.alphaSliderVal,
                     size: 10
@@ -156,7 +156,7 @@ export function createScatterTraces(
                             line: {
                                 width: 0,
                             },
-                            symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).values.map((v) => shapeScale(v.val)) : 'circle',
+                            symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as VisCategoricalColumn).values.map((v) => shapeScale(v.val)) : 'circle',
                             color: getCol(columns, config.color) ? (getCol(columns, config.color) as any).values.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : xCurr.values.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                             opacity: config.alphaSliderVal,
                             size: 10
@@ -233,14 +233,14 @@ export function createScatterTraces(
                     },
                     opacity: config.alphaSliderVal,
                     size: 10,
-                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as CategoricalColumn).values.map((v) => shapeScale(v.val)) : 'circle',
+                    symbol: getCol(columns, config.shape) ? (getCol(columns, config.shape) as VisCategoricalColumn).values.map((v) => shapeScale(v.val)) : 'circle',
                     color: '#2e2e2e'
                 },
                 transforms: [{
                     type: 'groupby',
-                    groups: (getCol(columns, config.shape) as CategoricalColumn).values.map((v) => v.val),
+                    groups: (getCol(columns, config.shape) as VisCategoricalColumn).values.map((v) => v.val),
                     styles:
-                        [...[...new Set<string>((getCol(columns, config.shape) as CategoricalColumn).values.map((v) => v.val) as string[])].map((c) => {
+                        [...[...new Set<string>((getCol(columns, config.shape) as VisCategoricalColumn).values.map((v) => v.val) as string[])].map((c) => {
                             return {target: c, value: {name: c}};
                         })]
                 }]

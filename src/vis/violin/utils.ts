@@ -1,5 +1,5 @@
 import {merge} from 'lodash';
-import {CategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 import {EViolinOverlay} from '../bar/utils';
 
@@ -22,7 +22,7 @@ const defaultConfig: IViolinConfig = {
 };
 
 export function violinMergeDefaultConfig(
-    columns: (NumericalColumn | CategoricalColumn)[],
+    columns: VisColumn[],
     config: IViolinConfig,
 ): IVisConfig {
     const merged = merge({}, defaultConfig, config);
@@ -37,7 +37,7 @@ export function violinMergeDefaultConfig(
 }
 
 export function createViolinTraces(
-    columns: (NumericalColumn | CategoricalColumn)[],
+    columns: VisColumn[],
     config: IViolinConfig,
     scales: Scales,
 ): PlotlyInfo {
@@ -53,8 +53,8 @@ export function createViolinTraces(
         };
     }
 
-    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
-    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    const numCols: VisNumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as VisNumericalColumn[];
+    const catCols: VisCategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as VisCategoricalColumn[];
     const plots: PlotlyData[] = [];
 
     //if we onl have numerical columns, add them individually.

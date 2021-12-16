@@ -1,6 +1,7 @@
 import d3 from 'd3';
 import { merge } from 'lodash';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
+import { resolveColumnValues } from '../layoutUtils';
 export function isPCP(s) {
     return s.type === ESupportedPlotlyVis.PCP;
 }
@@ -12,6 +13,7 @@ const defaultConfig = {
 export function pcpMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
     if (merged.numColumnsSelected.length === 0 && columns.length > 1) {
+        // TODO: Bug. It is always selecting the last two columns, no matter their type.
         merged.numColumnsSelected.push(columns[columns.length - 1].info);
         merged.numColumnsSelected.push(columns[columns.length - 2].info);
     }
@@ -25,7 +27,7 @@ export function pcpMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-export function createPCPTraces(columns, config) {
+export async function createPCPTraces(columns, config) {
     if (!config.numColumnsSelected || !config.catColumnsSelected) {
         return {
             plots: [],
@@ -46,30 +48,43 @@ export function createPCPTraces(columns, config) {
             errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
         };
     }
+    const numColValues = await resolveColumnValues(numCols);
+    const catColValues = await resolveColumnValues(catCols);
     const plot = {
         xLabel: null,
         yLabel: null,
-        //yo why does this error i dunno but it works
-        data: { dimensions: [...numCols.map((c) => {
+        data: {
+            dimensions: [
+                ...numColValues.map((c, i) => {
                     return {
-                        range: [d3.min(c.values.map((v) => v.val)), d3.max(c.values.map((v) => v.val))],
+                        range: [
+                            d3.min(c.resolvedValues.map((v) => v.val)),
+                            d3.max(c.resolvedValues.map((v) => v.val)),
+                        ],
                         label: c.info.name,
-                        values: c.values.map((v) => v.val)
+                        values: c.resolvedValues.map((v) => v.val),
                     };
-                }), ...catCols.map((c) => {
-                    const uniqueList = [...new Set(c.values.map((v) => v.val))];
+                }),
+                ...catColValues.map((c) => {
+                    const uniqueList = [
+                        ...new Set(c.resolvedValues.map((v) => v.val)),
+                    ];
                     return {
                         range: [0, uniqueList.length - 1],
                         label: c.info.name,
-                        values: c.values.map((curr) => uniqueList.indexOf(curr.val)),
+                        values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val)),
                         tickvals: [...uniqueList.keys()],
-                        ticktext: uniqueList
+                        ticktext: uniqueList,
                     };
-                })], type: 'parcoords',
+                }),
+            ],
+            type: "parcoords",
             line: {
-                shape: 'spline',
-                opacity: .2
-            }, }
+                shape: "spline",
+                // @ts-ignore
+                opacity: 0.2,
+            },
+        },
     };
     return {
         plots: [plot],

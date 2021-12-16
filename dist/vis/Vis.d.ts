@@ -1,10 +1,10 @@
 /// <reference types="react" />
-import { CategoricalColumn, NumericalColumn } from './interfaces';
+import { VisCategoricalColumn, VisNumericalColumn } from './interfaces';
 export interface VisProps {
     /**
      * Required data columns which are displayed.
      */
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: (VisNumericalColumn | VisCategoricalColumn)[];
     /**
      * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
      */

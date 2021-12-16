@@ -34,20 +34,22 @@ export enum EFilterOptions {
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 
-export interface NumericalColumn {
+type ValueGetter<T> = () => Promise<T>;
+
+export interface VisNumericalColumn {
     info: ColumnInfo;
-    values: {id: number, val: number}[];
-    // TODO: Think about making async accessor function:
-    // values: (rows: object[]) => Promise<{id: number, val: number}[]>;
+    values: ValueGetter<{id: number, val: number}[]>;
     type: EColumnTypes.NUMERICAL;
 }
 
-export interface CategoricalColumn {
+export interface VisCategoricalColumn {
     info: ColumnInfo;
     colors: string[];
-    values: {id: number, val: string}[];
+    values: ValueGetter<{id: number, val: string}[]>;
     type: EColumnTypes.CATEGORICAL;
 }
+
+export type VisColumn = VisNumericalColumn | VisCategoricalColumn;
 
 export type PlotlyInfo = {
     plots: PlotlyData[],

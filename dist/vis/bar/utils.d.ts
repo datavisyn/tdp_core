@@ -1,4 +1,4 @@
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales } from '../interfaces';
+import { VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales } from '../interfaces';
 import { PlotlyInfo } from '../interfaces';
 export declare enum EBarDisplayType {
     DEFAULT = "Default",
@@ -28,5 +28,5 @@ export interface IBarConfig {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
 }
-export declare function barMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig): IVisConfig;
-export declare function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig, scales: Scales): PlotlyInfo;
+export declare function barMergeDefaultConfig(columns: (VisNumericalColumn | VisCategoricalColumn)[], config: IBarConfig): IVisConfig;
+export declare function createBarTraces(columns: (VisNumericalColumn | VisCategoricalColumn)[], config: IBarConfig, scales: Scales): PlotlyInfo;

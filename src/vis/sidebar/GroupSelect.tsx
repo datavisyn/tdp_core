@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Select from 'react-select';
-import {CategoricalColumn, ColumnInfo, EColumnTypes, NumericalColumn} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, VisNumericalColumn} from '../interfaces';
 import {formatOptionLabel} from './utils';
 
 interface GroupSelectProps {
     callback: (c: ColumnInfo) => void;
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     currentSelected: ColumnInfo | null;
 }
 
