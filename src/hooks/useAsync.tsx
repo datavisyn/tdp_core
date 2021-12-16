@@ -36,6 +36,7 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
   const [status, setStatus] = React.useState<useAsyncStatus>('idle');
   const [value, setValue] = React.useState<T | null>(null);
   const [error, setError] = React.useState<E | null>(null);
+  const latestPromiseRef = React.useRef<Promise<T> | null>();
   // The execute function wraps asyncFunction and
   // handles setting state for pending, value, and error.
   // useCallback ensures the below useEffect is not called
@@ -44,24 +45,34 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
     setStatus('pending');
     setValue(null);
     setError(null);
-    return Promise.resolve(asyncFunction(...args))
+    const currentPromise = Promise.resolve(asyncFunction(...args))
       .then((response: T) => {
-        setValue(response);
-        setStatus('success');
+        if(currentPromise === latestPromiseRef.current) {
+          setStatus('success');
+          setValue(response);
+        }
         return response;
       })
       .catch((error: E) => {
-        setError(error);
-        setStatus('error');
+        if(currentPromise === latestPromiseRef.current) {
+          setStatus('error');
+          setError(error);
+        }
         throw error;
       });
+    latestPromiseRef.current = currentPromise;
+    return currentPromise;
   }, [asyncFunction]);
   // Call execute if we want to fire it right away.
   // Otherwise execute can be called later, such as
   // in an onClick handler.
   useDeepCompareEffect(() => {
     if (immediate) {
-      execute(...immediate);
+      try {
+        execute(...immediate);
+      } catch (e) {
+        // ignore any immediate error
+      }
     }
   }, [execute, immediate]);
 
