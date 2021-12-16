@@ -1,13 +1,7 @@
-/**
- * Find views for a given idtype and number of selected items.
- * The seleted items itself are not considered in this function.
- * @param idtype
- * @param selection
- * @returns {any}
- */
 import { ViewUtils } from './ViewUtils';
 import { EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW, EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS } from '../base/extensions';
-import { PluginRegistry, UserSession, IDTypeManager } from 'phovea_core';
+import { IDTypeManager } from '../idtype';
+import { PluginRegistry, UserSession } from '../app';
 export class FindViewUtils {
     /**
      * finds for the given IDType and selection matching views

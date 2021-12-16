@@ -1,11 +1,8 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-
 import * as d3 from 'd3';
-import {UserSession, ResolveNow, IPluginDesc} from 'phovea_core';
 import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, IFormElement, FormElementType} from '../interfaces';
+import {UserSession} from '../../app';
+import {IPluginDesc, ResolveNow} from '../../base';
 
 
 export interface IFormSelectOption {

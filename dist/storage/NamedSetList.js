@@ -1,16 +1,14 @@
-/**
- * Created by Holger Stitz on 27.07.2016.
- */
-import { FormDialog } from 'phovea_ui';
+import { PHOVEA_UI_FormDialog } from '../components';
 import { StoreUtils } from './StoreUtils';
 import { RestStorageUtils } from './rest';
 import { ENamedSetType } from './interfaces';
-import { PluginRegistry, I18nextManager } from 'phovea_core';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { EXTENSION_POINT_TDP_LIST_FILTERS } from '../base/extensions';
 import { select, event as d3event } from 'd3';
-import { UserSession, EEntity } from 'phovea_core';
 import { NotificationHandler } from '../base/NotificationHandler';
+import { UserSession, PluginRegistry } from '../app';
+import { I18nextManager } from '../i18n';
+import { EEntity } from '../security';
 export class NamedSetList {
     constructor(idType, sessionCreator, doc = document) {
         this.idType = idType;
@@ -105,7 +103,7 @@ export class NamedSetList {
             if (!UserSession.getInstance().canWrite(namedSet)) {
                 return;
             }
-            const deleteIt = await FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dialogText', { name: namedSet.name }), { title: I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.deleteSet') });
+            const deleteIt = await PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dialogText', { name: namedSet.name }), { title: I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.deleteSet') });
             if (deleteIt) {
                 await RestStorageUtils.deleteNamedSet(namedSet.id);
                 NotificationHandler.successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.dashboard'), namedSet.name);

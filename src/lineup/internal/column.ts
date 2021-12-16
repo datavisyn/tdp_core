@@ -1,13 +1,10 @@
-/**
- * Created by Samuel Gratzl on 12.09.2017.
- */
 import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, toCategories} from 'lineupjs';
 import {LineupUtils} from '../utils';
 import {IScoreRow,IScoreColumnPatcherExtensionDesc} from '../../base/interfaces';
 import {EP_TDP_CORE_SCORE_COLUMN_PATCHER} from '../../base/extensions';
 import {ErrorAlertHandler} from '../../base/ErrorAlertHandler';
 import {extent, min, max} from 'd3';
-import {PluginRegistry} from 'phovea_core';
+import {PluginRegistry} from '../../app';
 
 export interface ILazyLoadedColumn {
   col: Column;

@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import 'select2';
 import { event as d3event } from 'd3';
 import $ from 'jquery';
@@ -8,8 +5,10 @@ import { AFormElement } from './AFormElement';
 import { FormElementType } from '../interfaces';
 import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
-import { BaseUtils, UserSession, ResolveNow, I18nextManager } from 'phovea_core';
 import { Select3 } from './Select3';
+import { UserSession } from '../../app';
+import { ResolveNow, BaseUtils } from '../../base';
+import { I18nextManager } from '../../i18n';
 export class FormMap extends AFormElement {
     /**
      * Constructor
@@ -284,7 +283,7 @@ export class FormMap extends AFormElement {
             const row = group.ownerDocument.createElement('div');
             row.classList.add('row');
             row.classList.add('d-flex');
-            row.classList.add('align-items-center');
+            row.classList.add('align-items-top');
             group.appendChild(row);
             row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">

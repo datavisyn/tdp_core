@@ -1,6 +1,6 @@
 import {SearchBox, IGroupSearchItem, ISearchBoxOptions} from 'lineupjs';
+import {I18nextManager} from '../../i18n';
 import {ISearchOption} from './ISearchOption';
-import {I18nextManager} from 'phovea_core';
 
 /**
  * The SearchBoxProvider allows creating multiple LineUp SearchBoxes and stores them internally in a list.

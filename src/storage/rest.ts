@@ -1,5 +1,9 @@
-import {IDType, IDTypeManager, ParseRangeUtils, RangeLike, UserSession, ISecureItem, Ajax, AppContext, Permission} from 'phovea_core';
+import {AppContext, UserSession} from '../app';
+import {Ajax} from '../base';
 import {RestBaseUtils} from '../base/rest';
+import {IDType, IDTypeManager} from '../idtype';
+import {RangeLike, ParseRangeUtils} from '../range';
+import {ISecureItem, Permission} from '../security';
 import {ENamedSetType, IStoredNamedSet} from './interfaces';
 
 

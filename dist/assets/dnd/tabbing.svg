@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="235"
+   height="235"
+   viewBox="0 0 66.322222 66.322224"
+   version="1.1"
+   id="svg10133">
+  <g
+     id="layer1"
+     transform="translate(-71.769652,-72.312796)">
+    <g
+       id="g1426">
+      <rect
+         y="73.723907"
+         x="73.180763"
+         height="63.5"
+         width="63.5"
+         id="rect9481-4"
+         style="fill:none;fill-opacity:0;stroke:#4d4d4d;stroke-width:2.82222223;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         y="74.006126"
+         x="73.180763"
+         height="15.804445"
+         width="63.500004"
+         id="rect10722"
+         style="opacity:1;fill:none;fill-opacity:0.29019608;stroke:#4d4d4d;stroke-width:2.82222223;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         y="77.08149"
+         x="76.078514"
+         height="9.448185"
+         width="18.817339"
+         id="rect10727"
+         style="opacity:1;fill:#4d4d4d;fill-opacity:1;stroke:#4d4d4d;stroke-width:1.42565548;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97647059" />
+      <rect
+         style="opacity:1;fill:#4d4d4d;fill-opacity:1;stroke:#4d4d4d;stroke-width:1.42565548;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97647059"
+         id="rect10731"
+         width="18.817339"
+         height="9.448185"
+         x="98.603027"
+         y="77.08149" />
+    </g>
+  </g>
+</svg>

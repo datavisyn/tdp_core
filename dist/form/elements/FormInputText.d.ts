@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
-import { IPluginDesc } from 'phovea_core';
+import { IPluginDesc } from '../../base';
 /**
  * Add specific options for input form elements
  */

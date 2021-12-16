@@ -1,16 +1,15 @@
-/**
- * Created by Holger Stitz on 27.07.2016.
- */
-
-import {FormDialog} from 'phovea_ui';
+import {PHOVEA_UI_FormDialog} from '../components';
 import {select, Selection, event} from 'd3';
 import $ from 'jquery';
-import {UserSession, IProvenanceGraphDataDescription, GlobalEventHandler, I18nextManager, UniqueIdManager} from 'phovea_core';
-import {CLUEGraphManager} from 'phovea_clue';
+import {I18nextManager} from '../i18n';
 import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
 import {TDPApplicationUtils} from './TDPApplicationUtils';
 import {NotificationHandler} from '../base/NotificationHandler';
 import {ProvenanceGraphMenuUtils} from './ProvenanceGraphMenuUtils';
+import {CLUEGraphManager} from '../base/CLUEGraphManager';
+import {GlobalEventHandler} from '../base';
+import {IProvenanceGraphDataDescription} from '../provenance';
+import {UniqueIdManager, UserSession} from '../app';
 
 
 abstract class ASessionList {
@@ -19,7 +18,7 @@ abstract class ASessionList {
 
   constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
     this.build(graphManager).then((update) => {
-     this.handler = () => update();
+      this.handler = () => update();
       GlobalEventHandler.getInstance().on(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
     });
   }
@@ -51,7 +50,7 @@ abstract class ASessionList {
 
     $enter.select('a[data-action="delete"]').on('click', async function (d) {
       stopEvent();
-      const deleteIt = await FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
+      const deleteIt = await PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
       if (deleteIt) {
         await manager.delete(d);
         NotificationHandler.successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.session'), d.name);
@@ -111,7 +110,7 @@ abstract class ASessionList {
       </div>`);
   }
 
-  protected abstract async build(manager: CLUEGraphManager): Promise<() => any>;
+  protected abstract build(manager: CLUEGraphManager): Promise<() => any>;
 }
 
 function byDateDesc(a: any, b: any) {
@@ -257,10 +256,10 @@ export class PersistentSessionList extends ASessionList {
     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.paragraphText')}
     </p>
         <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item active"<a href="#${mySessionsTabId}" class="nav-link active" role="tab"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
+          <li class="nav-item active"><a href="#${mySessionsTabId}" class="nav-link active" role="tab"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
           <li class="nav-item"><a href="#${otherSessionsTabId}" class="nav-link" role="tab"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
         </ul>
-        <div class="tab-content">
+        <div class="tab-content pt-1">
             <div id="${mySessionsTabId}" class="tab-pane show active" role="tabpanel">
                 ${this.mode === 'table' ? tableMine : ''}
             </div>
@@ -311,7 +310,7 @@ export class PersistentSessionList extends ASessionList {
 
           const $trEnter = $tr.enter().append('tr').html((d) => {
             let actions = '';
-            if(UserSession.getInstance().canWrite(d)) {
+            if (UserSession.getInstance().canWrite(d)) {
               actions += ASessionList.createButton('select');
             }
             actions += ASessionList.createButton('clone');
@@ -356,7 +355,7 @@ export class PersistentSessionList extends ASessionList {
 
           const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html((d) => {
             let actions = '';
-            if(UserSession.getInstance().canWrite(d)) {
+            if (UserSession.getInstance().canWrite(d)) {
               actions += ASessionList.createButton('select');
             }
             actions += ASessionList.createButton('clone');

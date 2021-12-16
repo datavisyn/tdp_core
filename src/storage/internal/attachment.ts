@@ -1,4 +1,4 @@
-import {ResolveNow} from 'phovea_core';
+import {ResolveNow} from '../../base';
 import {RestStorageUtils} from '../rest';
 
 export class AttachemntUtils {

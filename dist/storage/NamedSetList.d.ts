@@ -1,8 +1,5 @@
-/**
- * Created by Holger Stitz on 27.07.2016.
- */
-import { IDType } from 'phovea_core';
 import { INamedSet } from './interfaces';
+import { IDType } from '../idtype';
 export declare class NamedSetList {
     private readonly idType;
     private readonly sessionCreator;

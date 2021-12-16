@@ -1,8 +1,5 @@
-/**
- * Created by Samuel Gratzl on 28.02.2017.
- */
-import { ProvenanceGraph } from 'phovea_core';
-import { CLUEGraphManager } from 'phovea_clue';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { ProvenanceGraph } from '../provenance';
 export declare class EditProvenanceGraphMenu {
     private readonly manager;
     readonly node: HTMLLIElement;

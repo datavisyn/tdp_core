@@ -1,5 +1,5 @@
+import {I18nextManager} from '../../i18n';
 import { ISimplePopupAuthorizationConfiguration } from '../interfaces';
-import {I18nextManager} from 'phovea_core';
 
 export async function simplePopupFlow({
   id,

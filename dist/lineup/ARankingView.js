@@ -1,7 +1,6 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules } from 'lineupjs';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
-import { IDTypeManager, BaseUtils, I18nextManager } from 'phovea_core';
 import { LineupTrackingManager } from './internal/cmds';
 import { RestStorageUtils } from '../storage';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
@@ -16,6 +15,9 @@ import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
+import { IDTypeManager } from '../idtype';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.

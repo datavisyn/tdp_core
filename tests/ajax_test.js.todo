@@ -1,0 +1,96 @@
+define(["require", "exports", 'ajax'], function (require, exports, ajax) {
+  exports.test = function(){
+
+    QUnit.module('ajax', function() {
+
+      QUnit.test('Object.keys', function(assert) {
+        assert.deepEqual(Object.keys(ajax).sort(), [
+          "api2absURL",
+          "encodeParams",
+          "getAPIData",
+          "getAPIJSON",
+          "getData",
+          "getJSON",
+          "send",
+          "sendAPI"
+        ]);
+      });
+
+      /*
+      TODO: encodeParams is internal? Usage across all projects limited to:
+      ./caleydo_d3/ajax_adapter_d3.ts:        data = ajax.encodeParams(data); //encode in url
+      ./caleydo_d3/ajax_adapter_d3.ts:      xhr.send(method, data instanceof FormData ? data: ajax.encodeParams(data), (error, _raw) => {
+      */
+
+      var xhr;
+      var requests =[];
+      QUnit.module('stub to exercise Sinon until Phovea AJAX works', {
+        before: function() {
+          xhr = sinon.useFakeXMLHttpRequest();
+          xhr.onCreate = function (xhr) {
+            requests.push(xhr);
+          }
+        },
+        after: function() {
+          xhr.restore();
+        }
+      }, function() {
+        QUnit.test('stub', function(assert) {
+          var done = assert.async();
+
+          var httpRequest = new XMLHttpRequest();
+          httpRequest.onreadystatechange = function() {
+            console.log('readyState', this.readyState);
+            if (this.readyState > 1) {
+              // I don't really understand this part.
+              return;
+            }
+
+            requests[ 0 ].respond([ 200 , {}, 'body' ]);
+            if (this.readyState === XMLHttpRequest.DONE) {
+
+              console.log('status', this.status);
+              assert.equal(this.status, 200);
+              done();
+            }
+          };
+          httpRequest.open('GET', 'http://www.example.org/some.file');
+        });
+      });
+
+      /*
+      TODO: getAPIData is internal? Usage across all projects limited to:
+      ./caleydo_core/matrix_impl.ts:      return ajax.getAPIData('/dataset/matrix/'+desc.id+'/raw', {
+      ./caleydo_core/table_impl.ts:      return ajax.getAPIData('/dataset/table/'+desc.id+'/raw', {
+      ./caleydo_core/table_impl.ts:      return ajax.getAPIData('/dataset/table/'+desc.id+'/col/'+column, {
+      */
+
+      /*
+      TODO: sendAPI is internal? Usage across all projects limited to:
+      ./caleydo_core/data.ts:  return ajax.sendAPI('/dataset/',data, 'post').then(transformEntry);
+      ./caleydo_core/data.ts:  return ajax.sendAPI('/dataset/'+entry.desc.id, data, 'put').then((desc) => {
+      ./caleydo_core/data.ts:  return ajax.sendAPI('/dataset/'+entry.desc.id, data, 'post').then((desc) => {
+      ./caleydo_core/data.ts:  return ajax.sendAPI('/dataset/'+desc.id, {}, 'delete').then((result) => {
+      ./caleydo_core/graph.ts:    return ajax.sendAPI('/dataset/graph/' + this.desc.id + '/data').then((r) => {
+      ./caleydo_core/graph.ts:    return ajax.sendAPI('/dataset/graph/' + this.desc.id + '/node', {
+      ./caleydo_core/graph.ts:    return ajax.sendAPI('/dataset/graph/' + this.desc.id + '/node/'+n.id,{
+      ./caleydo_core/graph.ts:    return ajax.sendAPI('/dataset/graph/' + this.desc.id + '/node/'+n.id, {}, 'delete').then((r) => {
+      ./caleydo_core/graph.ts:      return ajax.sendAPI('/dataset/graph/' + this.desc.id + '/edge', {
+      ./caleydo_core/graph.ts:    return ajax.sendAPI('/dataset/graph/' + this.desc.id + '/edge/'+e.id, {}, 'delete').then((r) => {
+      ./caleydo_core/graph.ts:    return ajax.sendAPI('/dataset/graph/' + this.desc.id + '/edge/'+e.id, {
+      ./caleydo_core/graph.ts:    return ajax.sendAPI('/dataset/graph/'+this.desc.id + '/node', {}, 'delete').then((r) => {
+      */
+
+      /* TODO: Add at least one test for ajax.sendAPI
+      QUnit.module('sendAPI', function() {
+        QUnit.test('???', function(assert) {
+          assert.equal(ajax.sendAPI(), '???');
+        });
+      })
+      */
+
+    });
+
+  }
+});
+

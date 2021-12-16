@@ -1,6 +1,3 @@
-/**
- * Created by Holger Stitz on 07.09.2016.
- */
 import { IViewContext, ISelection } from '../base/interfaces';
 import { IFormSelectOption } from '../form/elements/FormSelect';
 import { AD3View } from './AD3View';

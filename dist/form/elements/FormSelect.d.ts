@@ -1,10 +1,7 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 import * as d3 from 'd3';
-import { IPluginDesc } from 'phovea_core';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
+import { IPluginDesc } from '../../base';
 export interface IFormSelectOption {
     name: string;
     value: string;

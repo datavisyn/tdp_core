@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import {EventHandler, BaseUtils} from 'phovea_core';
 import 'select2';
+import {EventHandler, BaseUtils} from '../../base';
 
 export interface IdTextPair {
   id: string;

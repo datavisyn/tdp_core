@@ -1,7 +1,9 @@
-import { BaseUtils, ParseRangeUtils, I18nextManager } from 'phovea_core';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { AView } from './AView';
 import { XlsxUtils } from '../utils/XlsxUtils';
+import { ParseRangeUtils } from '../range';
 /**
  * base class for views based on LineUp
  */

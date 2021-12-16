@@ -1,5 +1,5 @@
+import { ResolveNow } from '../../../base';
 import { LineupUtils } from '../../utils';
-import { ResolveNow } from 'phovea_core';
 export class ABaseSelectionAdapter {
     constructor() {
         this.waitingForSelection = null;

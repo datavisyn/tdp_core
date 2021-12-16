@@ -1,6 +1,6 @@
 import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
 import * as d3 from 'd3';
-import {EventHandler, IPluginDesc} from 'phovea_core';
+import {EventHandler, IPluginDesc} from '../../base';
 
 export interface IButtonElementDesc extends IFormElementDesc {
   type: FormElementType.BUTTON;

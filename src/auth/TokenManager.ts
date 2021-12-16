@@ -1,7 +1,8 @@
-import { EventHandler, GlobalEventHandler, IEvent, IEventListener, UserSession } from 'phovea_core';
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
 import { castArray } from 'lodash';
+import {UserSession} from '../app';
+import {IEvent, EventHandler, GlobalEventHandler, IEventListener} from '../base';
 
 // Extract all parameters except the first one
 type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;

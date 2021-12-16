@@ -1,4 +1,5 @@
-import { ISecureItem, IObjectRef, ProvenanceGraph, ActionNode } from 'phovea_core';
+import { IObjectRef, ProvenanceGraph, ActionNode } from '../provenance';
+import { ISecureItem } from '../security';
 export interface IPermissionFormOptions {
     /**
      * extra html
@@ -37,11 +38,13 @@ export declare class TDPApplicationUtils {
      * @param parameters
      */
     static initSessionImpl(_inputs: IObjectRef<any>[], parameters: object): {
-        inverse: import("phovea_core").IAction;
+        inverse: import("../provenance").IAction;
     };
-    static initSession(map: object): import("phovea_core").IAction;
-    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): any;
-    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): any;
+    static initSession(map: object): import("../provenance").IAction;
+    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): Promise<{
+        inverse: import("../provenance").IAction;
+    }>;
+    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("../provenance").IAction;
     static compressSetParameter(path: ActionNode[]): ActionNode[];
     /**
      * @deprecated

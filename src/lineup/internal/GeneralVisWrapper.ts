@@ -1,10 +1,12 @@
 import {LocalDataProvider, Ranking} from 'lineupjs';
-import {EventHandler, IDTypeManager, Range} from 'phovea_core';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {ARankingView} from '..';
 import {GeneralHome} from '../../generalVis/components/GeneralHome';
 import {EColumnTypes} from '../../generalVis/types/generalTypes';
+import {EventHandler} from '../../base';
+import {IDTypeManager} from '../../idtype';
+import {Range} from '../../range';
 
 export class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement; // wrapper node

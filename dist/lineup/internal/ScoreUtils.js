@@ -1,9 +1,8 @@
-/**
- * Created by Samuel Gratzl on 18.05.2016.
- */
-import { ObjectRefUtils, I18nextManager, ActionMetaData, PluginRegistry, ActionUtils } from 'phovea_core';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
+import { PluginRegistry } from '../../app';
+import { I18nextManager } from '../../i18n';
+import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../provenance';
 export class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {
         const scoreId = parameter.id;
