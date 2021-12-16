@@ -425,7 +425,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
   }
 
   private setBusy(value: boolean) {
-    this.node.classList.toggle('select4s-searching', value);
+    this.node.classList.toggle('select3-searching', value);
   }
 
   private static wrap<T extends Readonly<IdTextPair>>(items: T[]): ISelect3Item<T>[] {

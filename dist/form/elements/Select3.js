@@ -233,7 +233,7 @@ export class Select3 extends EventHandler {
         return this.options.format(item, elem, mode, this.lastSearchQuery);
     }
     setBusy(value) {
-        this.node.classList.toggle('select4s-searching', value);
+        this.node.classList.toggle('select3-searching', value);
     }
     static wrap(items) {
         return items.map((data) => ({
