@@ -66,7 +66,7 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
             .domain([max,
             (max + min) / 2,
             min])
-            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue').slice(1), getCssValue('visyn-s5-blue').slice(1), getCssValue('visyn-s1-blue').slice(1)] : [getCssValue('visyn-c1').slice(1), '#d3d3d3', getCssValue('visyn-c2').slice(1)])
+            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')] : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')])
         : null;
     const legendPlots = [];
     //cant currently do 1d scatterplots
