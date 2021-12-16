@@ -54,6 +54,11 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
    */
   required: boolean;
   /**
+   * readonly flag
+   * @default false
+   */
+     readonly: boolean;
+  /**
    * page size to use for searching
    * @default 30
    */
@@ -221,6 +226,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     document,
     width: '100%',
     required: false,
+    readonly: false,
     pageSize: 30,
     minimumInputLength: 0,
     multiple: false,
@@ -303,9 +309,8 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     });
 
     this.node = this.options.document.createElement('div');
+    this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : '' } ${this.options.readonly ? 'readonly' : ''}></select>`;
     this.node.classList.add('select3');
-    this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''}></select>`;
-
     this.$select = $('select', this.node);
 
     if (this.options.name != null) {
@@ -420,7 +425,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
   }
 
   private setBusy(value: boolean) {
-    this.node.classList.toggle('select3-searching', value);
+    this.node.classList.toggle('select4s-searching', value);
   }
 
   private static wrap<T extends Readonly<IdTextPair>>(items: T[]): ISelect3Item<T>[] {

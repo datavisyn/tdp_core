@@ -36,6 +36,11 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
      */
     required: boolean;
     /**
+     * readonly flag
+     * @default false
+     */
+    readonly: boolean;
+    /**
      * page size to use for searching
      * @default 30
      */
