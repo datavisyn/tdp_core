@@ -925,6 +925,8 @@ export class LineupTrackingManager {
    * @returns Returns a promise that is waiting for the object reference (LineUp instance)
    */
   public withoutTracking<T>(objectRef: IObjectRef<IViewProviderLocal>, func: () => T): PromiseLike<T> {
+
+    console.log(objectRef);
     return objectRef.v.then((d) => ResolveNow.resolveImmediately(d.data)).then((p) => {
       LineupTrackingManager.getInstance().temporaryUntracked.add(objectRef.hash);
       const r = func();

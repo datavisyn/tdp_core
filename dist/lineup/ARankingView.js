@@ -281,12 +281,8 @@ export class ARankingView extends AView {
             columns,
             selection: this.selection,
             freeColor: (id) => this.colors.freeColumnColor(id),
-            add: (columns) => this.withoutTracking(() => {
-                columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
-            }),
-            remove: (columns) => this.withoutTracking(() => {
-                columns.forEach((c) => c.removeMe());
-            })
+            add: (columns) => columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
+            remove: (columns) => columns.forEach((c) => c.removeMe())
         };
     }
     /**
