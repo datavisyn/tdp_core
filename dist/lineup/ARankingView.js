@@ -72,7 +72,7 @@ export class ARankingView extends AView {
             subType: { key: '', value: '' },
             enableOverviewMode: true,
             enableZoom: true,
-            enableCustomVis: true,
+            enableVisPanel: true,
             enableDownload: true,
             enableSaveRanking: true,
             enableAddingColumns: true,

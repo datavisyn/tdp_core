@@ -129,7 +129,7 @@ export class LineUpPanelActions extends EventHandler {
             });
             this.header.addButton(zoomOutButton, EPanelHeaderToolbar.CENTER);
         }
-        if (this.options.enableCustomVis) {
+        if (this.options.enableVisPanel) {
             const customVis = new PanelButton(buttons, {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'),
                 faIcon: 'fas fa-chart-bar',
