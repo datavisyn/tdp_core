@@ -106,7 +106,14 @@ export class ProvenanceGraphUtils {
         }
         const lazyFunction = (id) => {
             let _resolved = null;
-            return function (inputs, parameters) {
+            return async function (inputs, parameters) {
+                // ObjectRef value might not be defined when replayed -> therefore
+                // waiting until it is defined
+                let counter = 0;
+                while (!inputs.every((o) => o.v) && counter < 10) {
+                    await new Promise((resolve) => setTimeout(resolve, 500));
+                    counter++;
+                }
                 const that = this, args = Array.from(arguments);
                 if (_resolved == null) {
                     _resolved = resolveFun(id);

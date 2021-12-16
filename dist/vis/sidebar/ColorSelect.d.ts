@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ENumericalColorScaleType } from '../scatter/utils';
 import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
 interface ColorSelectProps {

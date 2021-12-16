@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { CategoricalColumn, NumericalColumn } from './interfaces';
 export interface VisProps {
     /**

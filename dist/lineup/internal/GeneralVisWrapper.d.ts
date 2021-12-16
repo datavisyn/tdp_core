@@ -1,5 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
-import { EventHandler } from '../..';
+import { EventHandler } from '../../base';
 import { ARankingView } from '..';
 import { LineUpSelectionHelper } from './LineUpSelectionHelper';
 import { IDType } from '../../idtype';

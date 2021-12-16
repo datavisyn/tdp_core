@@ -1,7 +1,9 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { Ranking } from 'lineupjs';
-import { EventHandler, IDTypeManager, Range } from '../..';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { EventHandler } from '../../base';
+import { IDTypeManager } from '../../idtype';
+import { Range } from '../../range';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 export class GeneralVisWrapper extends EventHandler {

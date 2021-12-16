@@ -1,13 +1,14 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import {LocalDataProvider, Ranking} from 'lineupjs';
-import {EventHandler, IDTypeManager, Range} from '../..';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import {EventHandler} from '../../base';
+import {IDTypeManager} from '../../idtype';
+import {Range} from '../../range';
 import {ARankingView} from '..';
 import {Vis} from '../../vis/Vis';
 import {EColumnTypes} from '../../vis/interfaces';
 import {LineUpSelectionHelper} from './LineUpSelectionHelper';
 import {IDType} from '../../idtype';
-import {touches} from 'd3';
 
 export class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement; // wrapper node
