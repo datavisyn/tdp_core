@@ -155,8 +155,8 @@ export function CDCAlertView({alertData, setAlertData, onAlertChanged, selectedA
             <div className="mb-3 col">
               <label className="form-label">Email notification</label>
               <div className="form-check">
-                <input className="form-check-input" type="checkbox" disabled={!creationMode && !editMode} checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
-                <label className="form-check-label ms-2">Send me an email</label>
+                <input className="form-check-input" id="CDCAlertViewMailCheckbox" type="checkbox" disabled={!creationMode && !editMode} checked={alertData.enable_mail_notification} onChange={(e) => setAlertData({...alertData, enable_mail_notification: e.target.checked})} />
+                <label className="form-check-label ms-2" htmlFor="CDCAlertViewMailCheckbox">Send me an email</label>
               </div>
             </div>
           </div>

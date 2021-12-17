@@ -113,8 +113,8 @@ export function CDCAlertView({ alertData, setAlertData, onAlertChanged, selected
                     React.createElement("div", { className: "mb-3 col" },
                         React.createElement("label", { className: "form-label" }, "Email notification"),
                         React.createElement("div", { className: "form-check" },
-                            React.createElement("input", { className: "form-check-input", type: "checkbox", disabled: !creationMode && !editMode, checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
-                            React.createElement("label", { className: "form-check-label ms-2" }, "Send me an email")))),
+                            React.createElement("input", { className: "form-check-input", id: "CDCAlertViewMailCheckbox", type: "checkbox", disabled: !creationMode && !editMode, checked: alertData.enable_mail_notification, onChange: (e) => setAlertData({ ...alertData, enable_mail_notification: e.target.checked }) }),
+                            React.createElement("label", { className: "form-check-label ms-2", htmlFor: "CDCAlertViewMailCheckbox" }, "Send me an email")))),
                 React.createElement("div", null, filterSelection && (alertData === null || alertData === void 0 ? void 0 : alertData.filter) ?
                     React.createElement(CDCFilterCreator, { filterSelection: !creationMode && !editMode ? null : filterSelection, filterComponents: filterComponents, filter: alertData.filter, setFilter: (filter) => setAlertData({ ...alertData, filter }), isInvalid: !validFilter })
                     :
