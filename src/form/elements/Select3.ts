@@ -58,9 +58,8 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
    * @default false
    */
   readonly: boolean;
-
   /**
-   * disabled flag 
+   * disabled flag
    * select is readonly and the value is ignored when submitting the form
    * @default false
    */
@@ -234,7 +233,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     width: '100%',
     required: false,
     readonly: false,
-    disabled:false,
+    disabled: false,
     pageSize: 30,
     minimumInputLength: 0,
     multiple: false,
