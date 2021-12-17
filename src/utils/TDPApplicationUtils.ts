@@ -283,7 +283,7 @@ export class TDPApplicationUtils {
   }
 
   static compressSetParameter(path: ActionNode[]) {
-    return Compression.lastOnly(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
+    return Compression.lastConsecutive(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
   }
 
 

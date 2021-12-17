@@ -59,6 +59,8 @@ export class Select3 extends EventHandler {
             document,
             width: '100%',
             required: false,
+            readonly: false,
+            disabled: false,
             pageSize: 30,
             minimumInputLength: 0,
             multiple: false,
@@ -130,8 +132,8 @@ export class Select3 extends EventHandler {
             })
         });
         this.node = this.options.document.createElement('div');
+        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''} ${this.options.readonly ? 'readonly' : ''} ${this.options.disabled ? 'disabled' : ''}></select>`;
         this.node.classList.add('select3');
-        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''}></select>`;
         this.$select = $('select', this.node);
         if (this.options.name != null) {
             this.$select.attr('name', this.options.name);

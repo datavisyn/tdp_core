@@ -215,6 +215,50 @@ export default function (registry) {
     registry.push(EP_PHOVEA_CLUE_PROVENANCE_GRAPH, 'matomoAnalytics', () => import('./app/Matomo').then((m) => m.Matomo), {
         factory: 'trackProvenance'
     });
+    /* phovea_importer */
+    registry.push('importer_value_type', 'boolean', function () {
+        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+    }, {
+        'factory': 'boolean',
+        'name': 'Boolean',
+        'priority': 30 // test first for boolean then for categorical
+    });
+    registry.push('importer_value_type', 'categorical', function () {
+        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+    }, {
+        'factory': 'categorical',
+        'name': 'Categorical',
+        'priority': 40 // test first for boolean then for categorical
+    });
+    registry.push('importer_value_type', 'real', function () {
+        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+    }, {
+        'factory': 'numerical',
+        'name': 'Float',
+        'priority': 10
+    });
+    registry.push('importer_value_type', 'int', function () {
+        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+    }, {
+        'factory': 'numerical',
+        'name': 'Integer',
+        'priority': 20
+    });
+    registry.push('importer_value_type', 'string', function () {
+        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+    }, {
+        'factory': 'string_',
+        'name': 'String',
+        'priority': 100
+    });
+    registry.push('importer_value_type', 'idType', function () {
+        return import('./valuetype/idtypes').then((v) => v.IDTypeUtils);
+    }, {
+        'factory': 'idType',
+        'name': 'IDType',
+        'priority': 50,
+        'implicit': true
+    });
     /// #endif
 }
 //# sourceMappingURL=phovea.js.map
