@@ -9,6 +9,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     parameterChangedImpl(context) {
         const selectedIds = context.selection.range.dim(0).asList();
         if (this.adapter.selectionLimit) {
+            // override the original array length so that only the first items are considered further on
             selectedIds.length = this.adapter.selectionLimit;
         }
         this.removePartialDynamicColumns(context, selectedIds);

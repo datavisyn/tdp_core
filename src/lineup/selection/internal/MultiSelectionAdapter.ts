@@ -46,8 +46,10 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISel
     const selectedIds = context.selection.range.dim(0).asList();
 
     if (this.adapter.selectionLimit) {
+      // override the original array length so that only the first items are considered further on
       selectedIds.length = this.adapter.selectionLimit;
     }
+
     this.removePartialDynamicColumns(context, selectedIds);
     return context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
   }

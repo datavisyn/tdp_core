@@ -36,9 +36,12 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISe
   protected parameterChangedImpl(context: IContext) {
     // remove all and start again
     const selectedIds = context.selection.range.dim(0).asList();
+
     if (this.adapter.selectionLimit) {
+      // override the original array length so that only the first items are considered further on
       selectedIds.length = this.adapter.selectionLimit;
     }
+
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1 && (<IAdditionalColumnDesc>d.desc).selectedId !== undefined);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
