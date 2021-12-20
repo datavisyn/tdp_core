@@ -170,6 +170,30 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     if (defaultVal) {
       this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
     }
+
+    const formNode = (<any>this.form).$node[0][0];
+    const $searchContainer = $('.select2.select2-container', formNode);
+    const $search = $searchContainer.find('input');
+    $search.attr('data-testid', 'select2-search-field');
+
+    this.$jqSelect.on('select2:open', function (e) {
+      const $optionsContainer = $('.select2-results__options');
+      // wait for options to be loaded
+      setTimeout(() => {
+        [...$optionsContainer[0].children].forEach((child) => {
+          const childAsElement = (<HTMLElement>child);
+          if (childAsElement.lastElementChild.className === 'select2-results__options select2-results__options--nested') {
+            const nested = $('.select2-results__options--nested');
+            [...nested].forEach((nest) => {
+              [...nest.children].forEach((nestedChild) => {
+                nestedChild.setAttribute('data-testid', `select2-option-${(<HTMLElement>nestedChild).innerText}`);
+              });
+            });
+          }
+        });
+      }, 1000);
+    });
+
     return this.$jqSelect;
   }
 
