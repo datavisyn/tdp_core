@@ -1,7 +1,8 @@
 import { ResolveNow } from '../../../base';
 import { LineupUtils } from '../../utils';
 export class ABaseSelectionAdapter {
-    constructor() {
+    constructor(adapter) {
+        this.adapter = adapter;
         this.waitingForSelection = null;
         this.waitingForParameter = null;
     }
@@ -51,6 +52,10 @@ export class ABaseSelectionAdapter {
     }
     selectionChangedImpl(context) {
         const selectedIds = context.selection.range.dim(0).asList();
+        if (this.adapter.selectionLimit) {
+            // override the original array length so that only the first items are considered further on
+            selectedIds.length = this.adapter.selectionLimit;
+        }
         const usedCols = context.columns.filter((d) => d.desc.selectedId !== -1 && d.desc.selectedId !== undefined);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // compute the difference
@@ -65,7 +70,7 @@ export class ABaseSelectionAdapter {
         if (diffAdded.length <= 0) {
             return null;
         }
-        //console.log('add columns', diffAdded);
+        // console.log('add columns', diffAdded);
         return context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
     }
     static patchDesc(desc, selectedId) {

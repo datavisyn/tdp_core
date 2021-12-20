@@ -1,9 +1,14 @@
 import {ResolveNow} from '../../../base';
 import {IAdditionalColumnDesc} from '../../../base/interfaces';
 import {LineupUtils} from '../../utils';
-import {ISelectionColumn, IContext} from '../ISelectionAdapter';
+import {ISelectionColumn, IContext, ISelectionAdapter} from '../ISelectionAdapter';
+import {IMultiSelectionAdapter} from './MultiSelectionAdapter';
+import {ISingleSelectionAdapter} from './SingleSelectionAdapter';
 
 export abstract class ABaseSelectionAdapter {
+  constructor(protected readonly adapter: ISingleSelectionAdapter | IMultiSelectionAdapter) {
+  }
+
 
   protected addDynamicColumns(context: IContext, _ids: number[], ids: string[]) {
     return Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i]))).then((columns) => {
@@ -60,6 +65,12 @@ export abstract class ABaseSelectionAdapter {
 
   protected selectionChangedImpl(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
+
+    if (this.adapter.selectionLimit) {
+      // override the original array length so that only the first items are considered further on
+      selectedIds.length = this.adapter.selectionLimit;
+    }
+
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1 && (<IAdditionalColumnDesc>d.desc).selectedId !== undefined);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
@@ -76,7 +87,7 @@ export abstract class ABaseSelectionAdapter {
     if (diffAdded.length <= 0) {
       return null;
     }
-    //console.log('add columns', diffAdded);
+    // console.log('add columns', diffAdded);
     return context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
   }
 

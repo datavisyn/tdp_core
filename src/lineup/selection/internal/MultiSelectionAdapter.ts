@@ -29,15 +29,27 @@ export interface IMultiSelectionAdapter {
    * @returns {Promise<IScoreRow<any>[][]>} data
    */
   loadData(_id: number, id: string, descs: IAdditionalColumnDesc[]): Promise<IScoreRow<any>[]>[];
+
+  /**
+   * Limit the columns incoming selections considered when adding
+   * a column in the dependent ranking
+   */
+  selectionLimit?: number;
 }
 
 export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISelectionAdapter {
-  constructor(private readonly adapter: IMultiSelectionAdapter) {
-    super();
+  constructor(protected readonly adapter: IMultiSelectionAdapter) {
+    super(adapter);
   }
 
   protected parameterChangedImpl(context: IContext) {
     const selectedIds = context.selection.range.dim(0).asList();
+
+    if (this.adapter.selectionLimit) {
+      // override the original array length so that only the first items are considered further on
+      selectedIds.length = this.adapter.selectionLimit;
+    }
+
     this.removePartialDynamicColumns(context, selectedIds);
     return context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
   }
