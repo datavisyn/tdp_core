@@ -29,7 +29,7 @@ export declare class Stratification extends ADataType<IStratificationDataDescrip
     get ngroups(): number;
     get dim(): number[];
     persist(): string;
-    static guessColor(stratification: string, group: string): "gray" | "blue" | "red" | "#e41a1b" | "#377eb8";
+    static guessColor(stratification: string, group: string): "blue" | "gray" | "red" | "#e41a1b" | "#377eb8";
     /**
      * module entry point for creating a datatype
      * @param desc

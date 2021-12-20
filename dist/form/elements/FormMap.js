@@ -66,12 +66,12 @@ export class FormMap extends AFormElement {
             }
             this.$inputNode.classed('dropdown', true);
             this.$inputNode.html(`
-          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" data-testid="form-map-button" type="button" id="${this.elementDesc.attributes.id}l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
           </button>
-          <div class="dropdown-menu p-2" data-bs-popper="static" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
+          <div class="dropdown-menu p-2" data-bs-popper="static" data-testid="form-map-dropdown" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-map-container"></div>
             <div class="form-map-apply mt-3">
                 <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
@@ -287,7 +287,7 @@ export class FormMap extends AFormElement {
             group.appendChild(row);
             row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">
-          <select class="form-select form-select-sm map-selector">
+          <select class="form-select form-select-sm map-selector" data-testid="form-select">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
