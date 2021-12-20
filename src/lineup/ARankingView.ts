@@ -22,7 +22,7 @@ import {LineupUtils} from './utils';
 import {ISearchOption} from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
-import {BaseUtils} from '../base';
+import {BaseUtils, debounceAsync} from '../base';
 import {I18nextManager} from '../i18n';
 import {IDTypeManager} from '../idtype';
 import {ISecureItem} from '../security';
@@ -55,18 +55,18 @@ export abstract class ARankingView extends AView {
    * clears and rebuilds this lineup instance from scratch
    * @returns {Promise<any[]>} promise when done
    */
-  protected rebuild = BaseUtils.debounce(() => this.rebuildImpl(), 100);
+  protected rebuild = debounceAsync(() => this.rebuildImpl(), 100);
 
   /**
    * similar to rebuild but just loads new data and keep the columns
    * @returns {Promise<any[]>} promise when done
    */
-  protected reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
+  protected reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
 
   /**
    * updates the list of available columns in the side panel
    */
-  protected updatePanelChooser = BaseUtils.debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
+  protected updatePanelChooser = debounceAsync(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
 
   /**
    * promise resolved when everything is built
@@ -500,7 +500,7 @@ export abstract class ARankingView extends AView {
     return r;
   }
 
-  protected reloadScores(visibleOnly = false) {
+  protected reloadScores(visibleOnly = false): Promise<any[]> {
     let scores: {_score: () => any}[] = <any[]>this.provider.getColumns().filter((d) => typeof (<any>d)._score === 'function');
 
     if (visibleOnly) {
@@ -577,7 +577,7 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  private build() {
+  private build(): Promise<void> {
     this.setBusy(true);
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];
