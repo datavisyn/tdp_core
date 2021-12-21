@@ -74,7 +74,7 @@ export class FormMap extends AFormElement {
           <div class="dropdown-menu p-2" data-bs-popper="static" data-testid="form-map-dropdown" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
             <div class="form-map-container"></div>
             <div class="form-map-apply mt-3">
-                <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
+                <button class="btn btn-secondary btn-sm" data-testid="apply-button">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
@@ -284,6 +284,7 @@ export class FormMap extends AFormElement {
             row.classList.add('row');
             row.classList.add('d-flex');
             row.classList.add('align-items-top');
+            row.setAttribute('data-testid', `row-${this.rows.length}`);
             group.appendChild(row);
             row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">
@@ -293,7 +294,7 @@ export class FormMap extends AFormElement {
           </select>
         </div>
         <div class="col-sm-7 form-map-row-value ps-1 pe-1"></div>
-        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
+        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" data-testid="close-button" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
             const valueElem = row.querySelector('.form-map-row-value');
             if (d.key) { // has value
                 this.addValueEditor(d, valueElem, entries);
