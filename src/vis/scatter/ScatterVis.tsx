@@ -130,8 +130,8 @@ export function ScatterVis({
     }, [traces, config.isRectBrush]);
 
     return (
-        <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
-            <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+        <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px', borderTop: '1px solid #ddd'}}>
+            <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1 mt-2">
                 {mergedExtensions.prePlot}
                 {traces.plots.length > 0 ?
                     (<Plot
@@ -183,7 +183,7 @@ export function ScatterVis({
                 </div>
                 {mergedExtensions.postPlot}
             </div>
-            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
+            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
                 <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
