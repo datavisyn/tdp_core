@@ -246,4 +246,26 @@ export class BaseUtils {
         return [min, max];
     }
 }
+/**
+ * Debounces a function returning a promise and properly returns a promise resolving when the function is finally evaluated.
+ * See https://github.com/lodash/lodash/issues/4400 for details why lodash#debounce does not work in cases like this.
+ * @param callback Function to be debounced.
+ * @param wait Wait time in milliseconds.
+ */
+export function debounceAsync(callback, wait) {
+    let timeoutId = null;
+    return (...args) => {
+        if (timeoutId) {
+            window.clearTimeout(timeoutId);
+        }
+        return new Promise((resolve) => {
+            const timeoutPromise = new Promise((resolve) => {
+                timeoutId = window.setTimeout(resolve, wait);
+            });
+            timeoutPromise.then(async () => {
+                resolve(await callback(...args));
+            });
+        });
+    };
+}
 //# sourceMappingURL=BaseUtils.js.map
