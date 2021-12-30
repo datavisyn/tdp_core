@@ -161,33 +161,6 @@ export class LineupUtils {
     };
   }
 
-  /**
-   * Returns all items that are in array1 which are not in array2
-   * TODO improve performance of diff algorithm
-   * @param array1
-   * @param array2
-   * @returns {any}
-   */
-  static array_diff<T>(array1: T[], array2: T[]) {
-    return array1.filter((elm) => array2.indexOf(elm) === -1);
-  }
-
-  /**
-   * Returns all elements from set1 which are not in set2
-   * @param set1
-   * @param set2
-   * @returns Set<T>
-   */
-  static set_diff<T>(set1: Set<T>, set2: Set<T>): Set<T> {
-    const diff = new Set<T>();
-    set1.forEach((elem) => {
-      if (!set2.has(elem)) {
-        diff.add(elem);
-      }
-    });
-    return diff;
-  }
-
   static wrapRanking(data: LocalDataProvider, ranking: Ranking) {
     const findColumn = (column: string) => ranking.find((d) => (<any>d.desc).column === column || d.desc.label === column);
     return <IRankingWrapper> {

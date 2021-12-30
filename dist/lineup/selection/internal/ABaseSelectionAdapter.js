@@ -1,5 +1,5 @@
 import { ResolveNow } from '../../../base';
-import { LineupUtils } from '../../utils';
+import { difference } from 'lodash';
 export class ABaseSelectionAdapter {
     constructor() {
         this.waitingForSelection = null;
@@ -54,8 +54,8 @@ export class ABaseSelectionAdapter {
         const usedCols = context.columns.filter((d) => d.desc.selectedId !== -1 && d.desc.selectedId !== undefined);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // compute the difference
-        const diffAdded = LineupUtils.array_diff(selectedIds, lineupColIds);
-        const diffRemoved = LineupUtils.array_diff(lineupColIds, selectedIds);
+        const diffAdded = difference(selectedIds, lineupColIds);
+        const diffRemoved = difference(lineupColIds, selectedIds);
         // remove deselected columns
         if (diffRemoved.length > 0) {
             //console.log('remove columns', diffRemoved);
