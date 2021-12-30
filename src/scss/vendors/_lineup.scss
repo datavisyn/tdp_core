@@ -3,6 +3,8 @@ $lu_toolbar_font_size: 1rem !default;
 
 $lu_assets: '~lineupjs/src/assets' !default;
 $lu_use_font_awesome: true !default;
+// do not include Font Awesome files from LineUp, but use ours instead
+$lu_include_font_awesome: false !default;
 
 @import '~lineupjs/src/style.scss';
 
