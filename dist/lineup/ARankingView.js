@@ -1,7 +1,6 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules } from 'lineupjs';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
-import { IDTypeManager, BaseUtils, I18nextManager } from 'phovea_core';
 import { LineupTrackingManager } from './internal/cmds';
 import { RestStorageUtils } from '../storage';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
@@ -16,6 +15,9 @@ import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
+import { IDTypeManager } from '../idtype';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -114,7 +116,8 @@ export class ARankingView extends AView {
                     }
                 }
                 return item.text;
-            }
+            },
+            panelAddColumnBtnOptions: {}
         };
         // variants for deriving the item name
         const idTypeNames = options.itemIDType ? {
@@ -390,7 +393,7 @@ export class ARankingView extends AView {
                             overlay.remove();
                         }
                         else {
-                            overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-overflow-ellipsis" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
+                            overlay.innerHTML = `${e ? `<i class="fas fa-exclamation"></i>` : status === ERenderAuthorizationStatus.PENDING ? `<i class="fas fa-spinner fa-pulse"></i>` : `<i class="fas fa-lock"></i>`}<span class="text-truncate" style="max-width: 100%">${e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')}</span>`;
                             overlay.title = e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequiredTitle', { name: authConfiguration.name });
                             overlay.style.cursor = 'pointer';
                             overlay.onclick = () => trigger();

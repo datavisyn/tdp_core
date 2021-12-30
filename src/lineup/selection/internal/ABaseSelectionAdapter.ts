@@ -1,10 +1,7 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
+import {ResolveNow} from '../../../base';
 import {IAdditionalColumnDesc} from '../../../base/interfaces';
 import {LineupUtils} from '../../utils';
 import {ISelectionColumn, IContext} from '../ISelectionAdapter';
-import {ResolveNow} from 'phovea_core';
 
 export abstract class ABaseSelectionAdapter {
 

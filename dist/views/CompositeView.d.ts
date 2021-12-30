@@ -1,4 +1,5 @@
-import { EventHandler, IDType } from 'phovea_core';
+import { IDType } from '../idtype';
+import { EventHandler } from '../base';
 import { ISelection, IView, IViewContext, IViewPluginDesc } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
 interface IElementDesc {

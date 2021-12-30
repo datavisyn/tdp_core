@@ -2,7 +2,7 @@ import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import * as d3 from 'd3';
 import {AFormElement} from './AFormElement';
 import {IFormSelectOption} from './FormSelect';
-import {IPluginDesc} from 'phovea_core';
+import {IPluginDesc} from '../../base';
 
 export interface IRadioElementDesc extends IFormElementDesc {
   type: FormElementType.RADIO;

@@ -1,7 +1,8 @@
 import { Tour } from './Tour';
 import Popper from 'popper.js';
-import { GlobalEventHandler, I18nextManager, BaseUtils } from 'phovea_core';
 import { TourUtils } from './TourUtils';
+import { BaseUtils, GlobalEventHandler } from '../base';
+import { I18nextManager } from '../i18n';
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';
 export class TourManager {
@@ -382,9 +383,9 @@ export class TourManager {
         this.takeDown();
         if (finished) {
             this.rememberFinished(this.activeTour);
-            const finished = this.chooser.querySelector(`li[data-id="${this.activeTour.id}"] > i`);
-            finished.classList.remove('fa-square-o');
-            finished.classList.add('fa-check-square');
+            const finishedTourNode = this.chooser.querySelector(`li[data-id="${this.activeTour.id}"] > i`);
+            finishedTourNode === null || finishedTourNode === void 0 ? void 0 : finishedTourNode.classList.remove('fa-square-o');
+            finishedTourNode === null || finishedTourNode === void 0 ? void 0 : finishedTourNode.classList.add('fa-check-square');
         }
         this.activeTour = null;
         this.activeTourContext = null;

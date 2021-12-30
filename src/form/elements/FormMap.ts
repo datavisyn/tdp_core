@@ -1,7 +1,3 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-
 import 'select2';
 import {event as d3event} from 'd3';
 import $ from 'jquery';
@@ -9,10 +5,12 @@ import {AFormElement} from './AFormElement';
 import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import {ISelectOptions, IFormSelectOption, FormSelect} from './FormSelect';
 import {FormSelect2} from './FormSelect2';
-import {BaseUtils, UserSession, ResolveNow, IPluginDesc, I18nextManager} from 'phovea_core';
 import {IFormElement} from '..';
 import {ISelect3Options, Select3, IdTextPair} from './Select3';
 import * as d3 from 'd3';
+import {UserSession} from '../../app';
+import {IPluginDesc, ResolveNow, BaseUtils} from '../../base';
+import {I18nextManager} from '../../i18n';
 
 export interface ISubDesc {
   name: string;
@@ -381,7 +379,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       const row = group.ownerDocument.createElement('div');
       row.classList.add('row');
       row.classList.add('d-flex');
-      row.classList.add('align-items-center');
+      row.classList.add('align-items-top');
       group.appendChild(row);
       row.innerHTML = `
         <div class="col-sm-4 form-map-row-key pe-0">

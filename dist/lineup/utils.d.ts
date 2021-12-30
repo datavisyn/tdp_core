@@ -1,14 +1,11 @@
-/**
- * Created by sam on 13.02.2017.
- */
 import { IScoreRow } from '../base/interfaces';
 import { IParams, IRow } from '../base/rest';
 import { IDataRow } from 'lineupjs';
 import { IFormMultiMap, IFormRow } from '../form/elements/FormMap';
-import { IPluginDesc } from 'phovea_core';
 import { IScoreLoader } from '../base/interfaces';
 import { Ranking, LocalDataProvider } from 'lineupjs';
 import { IRankingWrapper } from './IRankingWrapper';
+import { IPluginDesc } from '../base';
 /**
  * Interface for AScoreAccessorProxy
  */

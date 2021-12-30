@@ -21,6 +21,10 @@ function useBSClass(clazz, ...options) {
             return null;
         });
     }, []);
+    React.useEffect(() => {
+        // Whenever we are unmounting (an instance), destroy it.
+        return () => instance === null || instance === void 0 ? void 0 : instance.dispose();
+    }, [instance]);
     return [setRef, instance];
 }
 function __useBSClass(clazz) {
@@ -106,11 +110,16 @@ function useBSListeners(instance, listeners) {
  */
 function useBSShowHide(instance, show) {
     React.useEffect(() => {
-        if (show) {
-            instance === null || instance === void 0 ? void 0 : instance.show();
+        try {
+            if (show) {
+                instance === null || instance === void 0 ? void 0 : instance.show();
+            }
+            else {
+                instance === null || instance === void 0 ? void 0 : instance.hide();
+            }
         }
-        else {
-            instance === null || instance === void 0 ? void 0 : instance.hide();
+        catch (e) {
+            console.error(e);
         }
     }, [show, instance]);
 }

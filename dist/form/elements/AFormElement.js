@@ -1,9 +1,7 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
-import { EventHandler, UserSession, PluginRegistry } from 'phovea_core';
 import { FormElementType } from '../interfaces';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
+import { UserSession, PluginRegistry } from '../../app';
+import { EventHandler } from '../../base';
 /**
  * Abstract form element class that is used as parent class for other form elements
  */

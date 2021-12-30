@@ -1,5 +1,6 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
-import {ProvenanceGraph, ParseRangeUtils, PluginRegistry, IDTypeManager, ObjectRefUtils, Range} from 'phovea_core';
+import {ProvenanceGraph, ObjectRefUtils} from '../provenance';
+import {ParseRangeUtils, Range} from '../range';
 import {ARankingView} from '../lineup/ARankingView';
 import {IARankingViewOptions} from '../lineup/IARankingViewOptions';
 import {IInitialRankingOptions} from '../lineup/desc';
@@ -9,6 +10,8 @@ import {IScore} from '../base/interfaces';
 import {IServerColumnDesc, IRow} from '../base/rest';
 import {IFormElementDesc} from '../form/interfaces';
 import {ILazyLoadedColumn} from '../lineup/internal/column';
+import {PluginRegistry} from '../app';
+import {IDTypeManager} from '../idtype';
 
 export interface IEmbeddedRanking extends ARankingView {
   rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;

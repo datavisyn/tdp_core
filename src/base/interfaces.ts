@@ -1,12 +1,12 @@
-import {IPlugin, IPluginDesc} from 'phovea_core';
-import {IUser} from 'phovea_core';
-import {IObjectRef, ProvenanceGraph, Range} from 'phovea_core';
-import {IEventHandler} from 'phovea_core';
-import {RangeLike} from 'phovea_core';
-import {IDType} from 'phovea_core';
-import {IColumnDesc, Column} from 'lineupjs';
-import {AppHeader} from 'phovea_ui';
+import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
+import {AppHeader} from '../components';
 import {IAuthorizationConfiguration} from '../auth';
+import {PanelTab} from '../lineup/panel';
+import {IPluginDesc, IPlugin, IEventHandler} from '.';
+import {IDType} from '../idtype';
+import {ProvenanceGraph, IObjectRef} from '../provenance';
+import {RangeLike, Range} from '../range';
+import {IUser} from '../security';
 
 
 
@@ -165,9 +165,70 @@ export interface IRankingButtonExtension {
 }
 
 export interface IRankingButtonExtensionDesc extends IPluginDesc {
+  /**
+   * Additional class for RankingPanelButton
+   */
   cssClass: string;
 
+  /**
+   * Font Awesome icon
+   * Will be used as a button icon
+   * @see https://fontawesome.com/
+   * @example `fas fa-database`
+   */
+  faIcon: string;
   load(): Promise<IPlugin & IRankingButtonExtension>;
+}
+
+
+export interface IPanelTabExtension {
+  desc: IPanelTabExtensionDesc;
+
+  /**
+   * Create and attach a new LineUp side panel
+   * @param tab PanelTab instance to attach the HTMLElement and listen to events
+   * @param provider The data of the current ranking
+   * @param desc The phovea extension point description
+   */
+  factory(desc: IPanelTabExtensionDesc, tab: PanelTab, provider: LocalDataProvider): void;
+}
+
+export interface IPanelTabExtensionDesc extends IPluginDesc {
+  /**
+   * CSS class for the PanelNavButton of the PanelTab
+   */
+  cssClass: string;
+
+  /**
+   * Font Awesome icon
+   * Will be used as a button icon
+   * @see https://fontawesome.com/
+   * @example `fas fa-database`
+   */
+  faIcon: string;
+
+  /**
+   * Title attribute PanelNavButton
+   */
+  title: string;
+
+  /**
+   * Customize the PanelNavButtons' position (recommended to use multiples of 10)
+   */
+  order: number;
+
+  /**
+   * Width of the PanelTab
+   */
+  width: string;
+
+  /**
+   * If true a shortcut button is appended to the SidePanel header in collapsed mode
+   * @default false
+   */
+  shortcut?: boolean;
+
+  load(): Promise<IPlugin & IPanelTabExtension>;
 }
 
 /**
@@ -224,14 +285,14 @@ export interface IView extends IEventHandler {
   /**
    * optional natural size used when stacking the view on top of each other
    */
-  readonly naturalSize?: [number, number]|'auto';
+  readonly naturalSize?: [number, number] | 'auto';
 
   /**
    * initialized this view
    * @param {HTMLElement} params place to put parameter forms
    * @param {(name: string, value: any, previousValue: any) => Promise<any>} onParameterChange instead of directly setting the parameter this method should be used to track the changes
    */
-  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => PromiseLike<any>): PromiseLike<any>|undefined;
+  init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => PromiseLike<any>): PromiseLike<any> | undefined;
 
   /**
    * changes the input selection as given to the constructor of this class
@@ -323,7 +384,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * optional security check to show only certain views
    */
-  security?: string|((user: IUser) => boolean);
+  security?: string | ((user: IUser) => boolean);
 
   /**
    * optional authorization configuration ensuring authorization exists before loading the view.

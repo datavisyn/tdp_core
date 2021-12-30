@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 08.03.2017.
- */
 export * from './AFormElement';
 export * from './builder';
 export * from './Form';

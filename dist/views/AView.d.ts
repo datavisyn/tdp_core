@@ -1,7 +1,5 @@
-/**
- * Created by Samuel Gratzl on 29.01.2016.
- */
-import { EventHandler, IDType } from 'phovea_core';
+import { IDType } from '../idtype';
+import { EventHandler } from '../base';
 import { IFormElementDesc } from '../form/interfaces';
 import { ISelection, IView, IViewContext } from '../base/interfaces';
 import { EViewMode } from '../base/interfaces';
