@@ -4,5 +4,5 @@
  * @returns the value which is stored in the css variable or undefined if the variable could not be found
  */
 export function getCssValue(name: string): string | undefined {
-  return getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
+  return getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
 }

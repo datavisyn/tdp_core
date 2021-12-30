@@ -125,9 +125,9 @@ export class AEmbeddedRanking {
             this.selectedRowsChanged(rows);
         });
     }
-    rebuild(mode = 'data') {
+    async rebuild(mode = 'data') {
         if (this.ranking) {
-            this.ranking.rebuildLineUp(mode);
+            return this.ranking.rebuildLineUp(mode);
         }
     }
     runWithoutTracking(f) {

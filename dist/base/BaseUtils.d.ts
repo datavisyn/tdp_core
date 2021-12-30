@@ -128,3 +128,10 @@ export declare class BaseUtils {
      */
     static extent(arr: IIterable<number>): [number, number];
 }
+/**
+ * Debounces a function returning a promise and properly returns a promise resolving when the function is finally evaluated.
+ * See https://github.com/lodash/lodash/issues/4400 for details why lodash#debounce does not work in cases like this.
+ * @param callback Function to be debounced.
+ * @param wait Wait time in milliseconds.
+ */
+export declare function debounceAsync<T, Callback extends (...args: any[]) => Promise<T>>(callback: Callback, wait: number): (...args: Parameters<Callback>) => Promise<T>;

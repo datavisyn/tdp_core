@@ -143,5 +143,30 @@
         "alertOffline": "The server seems to be offline! Login not possible. Try again later.",
         "alertWrongCredentials": "Username or password incorrect. Please check again."
     },
-    "core": {}
+    "core": {},
+    "importer": {
+        "name": "Name",
+        "description": "Description",
+        "column": "Column",
+        "type": "Type",
+        "columnName": "Column ID Type",
+        "rowName": "Row ID Type",
+        "value": "value",
+        "save": "Save",
+        "editStringConversion": "Edit String Conversion",
+        "editIdType": "Edit IDType",
+        "dialogLabel": "New IDType",
+        "optionLabel": "Identifier",
+        "textConversion": "Text Conversion",
+        "none": "None",
+        "upperCase": "UPPER CASE",
+        "lowerCase": "lower case",
+        "regexReplacement": "Regex Replacement",
+        "regexSearchExpression": "Regex Search Expression",
+        "regexReplacementExpression": "Regex Replacement Expression",
+        "editCategories": "Edit Categories (name TAB color)",
+        "editNumerical": "Edit Numerical Range",
+        "minimumValue": "Minimum Value",
+        "maximumValue": "Maximum Value"
+    }
 }
