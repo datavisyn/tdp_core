@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Select from 'react-select';
-import {VisCategoricalColumn, ColumnInfo, EColumnTypes, VisNumericalColumn} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, VisNumericalColumn, VisColumn} from '../interfaces';
 import {formatOptionLabel} from './utils';
 
 interface GroupSelectProps {

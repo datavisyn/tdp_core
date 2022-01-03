@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import { VisCategoricalColumn, ColumnInfo, VisNumericalColumn } from '../interfaces';
+import { ColumnInfo, VisColumn } from '../interfaces';
 interface MultiplesSelectProps {
     callback: (c: ColumnInfo) => void;
-    columns: (VisNumericalColumn | VisCategoricalColumn)[];
+    columns: VisColumn[];
     currentSelected: ColumnInfo | null;
 }
 export declare function MultiplesSelect(props: MultiplesSelectProps): JSX.Element;
