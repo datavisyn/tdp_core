@@ -110,8 +110,6 @@ export function ScatterVis({
 
     const {value: traces, status: traceStatus, error: traceError} = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
 
-    console.log(traces, traceStatus, traceError);
-
     const layout = useMemo(() => {
         if(!traces) {
             return null;

@@ -49,7 +49,6 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, 
             violingap: 0,
         } : null;
     }, [traces]);
-    console.log(traces, traceStatus, traceError);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,

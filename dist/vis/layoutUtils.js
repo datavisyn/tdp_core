@@ -118,7 +118,6 @@ export function beautifyLayout(traces, layout) {
     return layout;
 }
 export function resolveColumnValues(columns) {
-    console.log(columns);
     return Promise.all(columns.map(async (col) => ({ ...col, resolvedValues: await col.values() })));
 }
 export async function resolveSingleColumn(column) {

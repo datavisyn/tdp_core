@@ -56,7 +56,6 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     const validCols = await resolveColumnValues(numCols);
     const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
     const colorCol = await resolveSingleColumn(getCol(columns, config.color));
-    console.log(validCols);
     const shapeScale = config.shape ?
         d3.scale.ordinal().domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))]).range(shapes)
         : null;

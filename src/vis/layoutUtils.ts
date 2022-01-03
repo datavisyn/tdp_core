@@ -134,7 +134,6 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
 }
 
 export function resolveColumnValues(columns: VisColumn[]) {
-    console.log(columns);
     return Promise.all(columns.map(async (col) => ({...col, resolvedValues: await col.values()})));
 }
 
