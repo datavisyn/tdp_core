@@ -9,60 +9,48 @@ export declare function beautifyLayout(traces: PlotlyInfo, layout: any): any;
 export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
     resolvedValues: {
         id: number;
-        val: number;
-    }[] | {
-        id: number;
-        val: string;
+        val: string | number;
     }[];
+    type: import("./interfaces").EColumnTypes.NUMERICAL;
     info: import("./interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: number;
+        val: string | number;
     }[]>;
-    type: import("./interfaces").EColumnTypes.NUMERICAL;
 } | {
     resolvedValues: {
         id: number;
-        val: number;
-    }[] | {
-        id: number;
-        val: string;
+        val: string | number;
     }[];
-    info: import("./interfaces").ColumnInfo;
     colors: string[];
+    type: import("./interfaces").EColumnTypes.CATEGORICAL;
+    info: import("./interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: string;
+        val: string | number;
     }[]>;
-    type: import("./interfaces").EColumnTypes.CATEGORICAL;
 })[]>;
 export declare function resolveSingleColumn(column: VisColumn): Promise<{
     resolvedValues: {
         id: number;
-        val: number;
-    }[] | {
-        id: number;
-        val: string;
+        val: string | number;
     }[];
+    type: import("./interfaces").EColumnTypes.NUMERICAL;
     info: import("./interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: number;
+        val: string | number;
     }[]>;
-    type: import("./interfaces").EColumnTypes.NUMERICAL;
 } | {
     resolvedValues: {
         id: number;
-        val: number;
-    }[] | {
-        id: number;
-        val: string;
+        val: string | number;
     }[];
-    info: import("./interfaces").ColumnInfo;
     colors: string[];
+    type: import("./interfaces").EColumnTypes.CATEGORICAL;
+    info: import("./interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: string;
+        val: string | number;
     }[]>;
-    type: import("./interfaces").EColumnTypes.CATEGORICAL;
 }>;

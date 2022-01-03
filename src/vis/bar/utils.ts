@@ -148,7 +148,7 @@ async function setPlotsWithGroupsAndMultiples(columns: VisColumn[], catCols: Vis
                     yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                     showlegend: plotCounter === 1 ? true : false,
                     type: 'bar',
-                    name: uniqueGroup,
+                    name: uniqueGroup as string,
                     marker: {
                         color: scales.color(uniqueGroup),
                     }
@@ -193,7 +193,7 @@ async function setPlotsWithGroups(columns: VisColumn[], catCols: VisCategoricalC
                 yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                 showlegend: plotCounter === 1 ? true : false,
                 type: 'bar',
-                name: uniqueVal,
+                name: uniqueVal as string,
                 marker: {
                     color: scales.color(uniqueVal),
                 }
@@ -236,7 +236,7 @@ async function setPlotsWithMultiples(columns: VisColumn[], catCols: VisCategoric
                 yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                 showlegend: plotCounter === 1 ? true : false,
                 type: 'bar',
-                name: uniqueVal,
+                name: uniqueVal as string,
             },
             xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
             yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name

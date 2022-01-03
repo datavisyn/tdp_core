@@ -28,21 +28,18 @@ export declare enum EFilterOptions {
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 declare type ValueGetter<T> = () => Promise<T>;
-export interface VisNumericalColumn {
+export interface VisCommonColumn {
     info: ColumnInfo;
     values: ValueGetter<{
         id: number;
-        val: number;
+        val: string | number;
     }[]>;
+}
+export interface VisNumericalColumn extends VisCommonColumn {
     type: EColumnTypes.NUMERICAL;
 }
-export interface VisCategoricalColumn {
-    info: ColumnInfo;
+export interface VisCategoricalColumn extends VisCommonColumn {
     colors: string[];
-    values: ValueGetter<{
-        id: number;
-        val: string;
-    }[]>;
     type: EColumnTypes.CATEGORICAL;
 }
 export declare type VisColumn = VisNumericalColumn | VisCategoricalColumn;

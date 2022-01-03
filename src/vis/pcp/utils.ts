@@ -95,7 +95,7 @@ export async function createPCPTraces(
             return {
               range: [0, uniqueList.length - 1],
               label: c.info.name,
-              values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val)),
+              values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val as string)),
               tickvals: [...uniqueList.keys()],
               ticktext: uniqueList,
             };

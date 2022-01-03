@@ -36,16 +36,17 @@ export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripCon
 
 type ValueGetter<T> = () => Promise<T>;
 
-export interface VisNumericalColumn {
+export interface VisCommonColumn {
     info: ColumnInfo;
-    values: ValueGetter<{id: number, val: number}[]>;
+    values: ValueGetter<{id: number, val: string|number}[]>;
+}
+
+export interface VisNumericalColumn extends VisCommonColumn {
     type: EColumnTypes.NUMERICAL;
 }
 
-export interface VisCategoricalColumn {
-    info: ColumnInfo;
+export interface VisCategoricalColumn extends VisCommonColumn {
     colors: string[];
-    values: ValueGetter<{id: number, val: string}[]>;
     type: EColumnTypes.CATEGORICAL;
 }
 
