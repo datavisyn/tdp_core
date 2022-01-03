@@ -12,7 +12,7 @@ import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
 import {createScatterTraces, ENumericalColorScaleType, IScatterConfig} from './utils';
 import {beautifyLayout} from '../layoutUtils';
-import {merge} from 'lodash';
+import {merge, uniqueId} from 'lodash';
 import Plotly from 'plotly.js';
 import {BrushOptionButtons} from '../sidebar/BrushOptionButtons';
 import {OpacitySlider} from '../sidebar/OpacitySlider';
@@ -85,19 +85,18 @@ export function ScatterVis({
     scales
 }: ScatterVisProps) {
 
-    const uniqueId = useMemo(() => {
-        return Math.random().toString(36).substr(2, 5);
-    }, []);
+    const id = useMemo(() => uniqueId('ScatterVis'), []);
+
 
     useEffect(() => {
-        const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
           });
 
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
           });
     }, []);
 
@@ -140,7 +139,7 @@ export function ScatterVis({
                 {mergedExtensions.prePlot}
                 {traceStatus === 'success' && traces?.plots.length > 0 ?
                     <Plot
-                        divId={`plotlyDiv${uniqueId}`}
+                        divId={`plotlyDiv${id}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout as any}
                         config={{responsive: true, displayModeBar: false}}
@@ -187,10 +186,10 @@ export function ScatterVis({
                 {mergedExtensions.postPlot}
             </div>
             <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
+                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${id}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
-                <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
+                <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
                     <div className="container pb-3" style={{width: '20rem'}}>
                         <WarningMessage/>
                         <VisTypeSelect

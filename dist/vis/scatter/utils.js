@@ -71,7 +71,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
             .domain([max,
             (max + min) / 2,
             min])
-            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue').slice(1), getCssValue('visyn-s5-blue').slice(1), getCssValue('visyn-s1-blue').slice(1)] : [getCssValue('visyn-c1').slice(1), '#d3d3d3', getCssValue('visyn-c2').slice(1)])
+            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')] : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')])
         : null;
     const legendPlots = [];
     //cant currently do 1d scatterplots
@@ -96,7 +96,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                         width: 0,
                     },
                     symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                    color: colorCol ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : validCols[0].resolvedValues.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
+                    color: colorCol ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : validCols[0].resolvedValues.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                     opacity: config.alphaSliderVal,
                     size: 10
                 },
@@ -127,7 +127,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                                 width: 0,
                             },
                             symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                            color: colorCol ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : xCurr.resolvedValues.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
+                            color: colorCol ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : xCurr.resolvedValues.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
                             opacity: config.alphaSliderVal,
                             size: 10
                         },
@@ -140,7 +140,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         }
     }
     //if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
-    if (getCol(columns, config.color) && getCol(columns, config.color).type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
+    if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
         legendPlots.push({
             data: {
                 x: validCols[0].resolvedValues.map((v) => v.val),
@@ -161,13 +161,13 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     },
                     symbol: 'circle',
                     size: 10,
-                    color: getCol(columns, config.color) ? getCol(columns, config.color).resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
+                    color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
                     opacity: .5
                 },
                 transforms: [{
                         type: 'groupby',
-                        groups: getCol(columns, config.color).resolvedValues.map((v) => v.val),
-                        styles: [...[...new Set(getCol(columns, config.color).resolvedValues.map((v) => v.val))].map((c) => {
+                        groups: colorCol.resolvedValues.map((v) => v.val),
+                        styles: [...[...new Set(colorCol.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { name: c } };
                             })]
                     }]
