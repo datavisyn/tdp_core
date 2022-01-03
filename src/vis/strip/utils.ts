@@ -1,6 +1,7 @@
 import {merge} from 'lodash';
 import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
+import {resolveColumnValues} from '../layoutUtils';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
     return s.type === ESupportedPlotlyVis.STRIP;
@@ -33,11 +34,11 @@ export function stripMergeDefaultConfig(
     return merged;
 }
 
-export function createStripTraces(
+export async function createStripTraces(
     columns: VisColumn[],
     config: IStripConfig,
     scales: Scales,
-): PlotlyInfo {
+): Promise<PlotlyInfo> {
     let plotCounter = 1;
 
     if(!config.numColumnsSelected || !config.catColumnsSelected) {
@@ -50,17 +51,20 @@ export function createStripTraces(
         };
     }
 
-    const numCols: VisNumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as VisNumericalColumn[];
-    const catCols: VisCategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as VisCategoricalColumn[];
+    const _numCols: VisNumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as VisNumericalColumn[];
+    const _catCols: VisCategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as VisCategoricalColumn[];
     const plots: PlotlyData[] = [];
+
+    const numColValues = await resolveColumnValues(_numCols);
+    const catColValues = await resolveColumnValues(_catCols);
 
 
     // if we only have numerical columns, add them individually
-    if(catCols.length === 0) {
-        for(const numCurr of numCols) {
+    if(catColValues.length === 0) {
+        for(const numCurr of numColValues) {
             plots.push( {
                     data: {
-                        y: numCurr.values.map((v) => v.val),
+                        y: numCurr.resolvedValues.map((v) => v.val),
                         xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
                         yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                         showlegend: false,
@@ -88,12 +92,12 @@ export function createStripTraces(
         }
     }
 
-    for (const numCurr of numCols) {
-        for (const catCurr of catCols) {
+    for (const numCurr of numColValues) {
+        for (const catCurr of catColValues) {
             plots.push({
                 data: {
-                    x: catCurr.values.map((v) => v.val),
-                    y: numCurr.values.map((v) => v.val),
+                    x: catCurr.resolvedValues.map((v) => v.val),
+                    y: numCurr.resolvedValues.map((v) => v.val),
                     xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
                     yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                     showlegend: false,
@@ -113,9 +117,9 @@ export function createStripTraces(
                     },
                     transforms: [{
                         type: 'groupby',
-                        groups: catCurr.values.map((v) => v.val),
+                        groups: catCurr.resolvedValues.map((v) => v.val),
                         styles:
-                            [...new Set<string>(catCurr.values.map((v) => v.val) as string[])].map((c) => {
+                            [...new Set<string>(catCurr.resolvedValues.map((v) => v.val) as string[])].map((c) => {
                                 return {target: c, value: {marker: {color: scales.color(c)}}};
                             })
                     }]
@@ -130,8 +134,8 @@ export function createStripTraces(
     return {
         plots,
         legendPlots: [],
-        rows: numCols.length,
-        cols: catCols.length > 0 ? catCols.length : 1,
+        rows: numColValues.length,
+        cols: catColValues.length > 0 ? catColValues.length : 1,
         errorMessage: 'To create a Strip plot, please select at least 1 numerical column',
     };
 }

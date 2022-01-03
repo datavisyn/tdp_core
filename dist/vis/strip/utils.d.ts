@@ -7,4 +7,4 @@ export interface IStripConfig {
     catColumnsSelected: ColumnInfo[];
 }
 export declare function stripMergeDefaultConfig(columns: VisColumn[], config: IStripConfig): IVisConfig;
-export declare function createStripTraces(columns: VisColumn[], config: IStripConfig, scales: Scales): PlotlyInfo;
+export declare function createStripTraces(columns: VisColumn[], config: IStripConfig, scales: Scales): Promise<PlotlyInfo>;
