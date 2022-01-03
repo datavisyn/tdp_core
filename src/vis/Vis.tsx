@@ -3,7 +3,7 @@ import * as React from 'react';
 import {useEffect, useMemo, useState} from 'react';
 import {barMergeDefaultConfig, isBar} from './bar/utils';
 import {ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig} from './scatter/utils';
-import {VisCategoricalColumn, VisNumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales} from './interfaces';
+import {VisCategoricalColumn, VisNumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn} from './interfaces';
 import {ScatterVis} from './scatter/ScatterVis';
 import {ViolinVis} from './violin/ViolinVis';
 import {isViolin, violinMergeDefaultConfig} from './violin/utils';
@@ -60,7 +60,7 @@ export function Vis({
 }: VisProps) {
 
     const [visConfig, setVisConfig] = useState<IVisConfig>({
-        type: ESupportedPlotlyVis.PCP,
+        type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
         numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,

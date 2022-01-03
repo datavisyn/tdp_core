@@ -24,7 +24,7 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1').
     getCssValue('visyn-c9').slice(1),
     getCssValue('visyn-c10').slice(1)], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null }) {
     const [visConfig, setVisConfig] = useState({
-        type: ESupportedPlotlyVis.PCP,
+        type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
         numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,

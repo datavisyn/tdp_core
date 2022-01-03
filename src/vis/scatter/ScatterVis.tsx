@@ -136,7 +136,7 @@ export function ScatterVis({
 
     return (
         <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
-            <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+            <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
                 {traceStatus === 'success' && traces?.plots.length > 0 ?
                     <Plot
