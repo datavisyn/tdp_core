@@ -122,8 +122,7 @@ export function BarVis({
     }, []);
 
     const layout = useMemo(() => {
-        if(!traces)
-        {
+        if(!traces) {
             return null;
         }
 
@@ -170,7 +169,7 @@ export function BarVis({
                                     .text(p.yLabel);
                             }
                         }}
-                    /> : 
+                    /> :
                     traceStatus !== 'pending' ? <InvalidCols message={traceError?.message || traces?.errorMessage} /> : null}
                 {mergedExtensions.postPlot}
 

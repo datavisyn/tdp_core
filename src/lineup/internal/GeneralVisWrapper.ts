@@ -89,8 +89,8 @@ export class GeneralVisWrapper extends EventHandler {
                 description: column.getMetaData().summary.replace(/(<([^>]+)>)/gi, ''),
                 // TODO: What kind of id to use?
                 id: column.fqid,
-            }
-        }
+            };
+        };
 
 
         // wait for 2 seconds
@@ -108,10 +108,10 @@ export class GeneralVisWrapper extends EventHandler {
 
                 column.on(ValueColumn.EVENT_DATA_LOADED, () => {
                     clearTimeout(timeout);
-                    resolve(data.map((d, i) => ({id: (<IRow>d.v)._id, val: column.getValue(d)})))
+                    resolve(data.map((d, i) => ({id: (<IRow>d.v)._id, val: column.getValue(d)})));
                 });
             });
-        }
+        };
 
         for(const c of ranking.flatColumns) {
             if(c instanceof NumberColumn) {
@@ -119,7 +119,7 @@ export class GeneralVisWrapper extends EventHandler {
                     info: getColumnInfo(c),
                     values: () => getColumnValue(c),
                     type: EColumnTypes.NUMERICAL
-                })
+                });
             }
             if(c instanceof CategoricalColumn) {
                 cols.push({
@@ -128,7 +128,7 @@ export class GeneralVisWrapper extends EventHandler {
                     // TODO: This is required?
                     colors: null,
                     type: EColumnTypes.CATEGORICAL
-                })
+                });
             }
         }
 
