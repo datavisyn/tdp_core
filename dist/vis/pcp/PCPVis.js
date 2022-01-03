@@ -36,6 +36,7 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, 
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
     }, []);
+    //@ts-ignore
     const layout = useMemo(() => {
         return traces ? {
             showlegend: true,

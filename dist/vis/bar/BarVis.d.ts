@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { VisCategoricalColumn, VisNumericalColumn, Scales } from '../interfaces';
+import { Scales, VisColumn } from '../interfaces';
 import { IVisConfig } from '../interfaces';
 import { IBarConfig } from './utils';
 interface BarVisProps {
@@ -32,7 +32,7 @@ interface BarVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (VisNumericalColumn | VisCategoricalColumn)[];
+    columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
 }

@@ -15,6 +15,7 @@ import Plotly from 'plotly.js';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { WarningMessage } from '../sidebar/WarningMessage';
+import { useAsync } from '../..';
 const defaultConfig = {
     color: {
         enable: true,
@@ -54,10 +55,12 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
-    const traces = useMemo(() => {
-        return createScatterTraces(columns, selected, config, scales, shapes);
-    }, [columns, selected, config, scales, shapes]);
+    const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
+    console.log(traces, traceStatus, traceError);
     const layout = useMemo(() => {
+        if (!traces) {
+            return null;
+        }
         const layout = {
             showlegend: true,
             legend: {
@@ -75,8 +78,8 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: "position-relative d-flex justify-content-center align-items-center flex-grow-1" },
             mergedExtensions.prePlot,
-            traces.plots.length > 0 ?
-                (React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
+            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ?
+                React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
                         d ? selectionCallback(d.points.map((d) => +d.id)) : selectionCallback([]);
                     }, 
                     //plotly redraws everything on updates, so you need to reappend title and
@@ -97,7 +100,8 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                                 .append('title')
                                 .text(p.yLabel);
                         }
-                    } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
+                    } }) :
+                traceStatus !== 'pending' ? React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) }) : null,
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },
                 React.createElement(BrushOptionButtons, { callback: (e) => setConfig({ ...config, isRectBrush: e }), isRectBrush: config.isRectBrush }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),

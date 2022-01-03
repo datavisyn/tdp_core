@@ -1,4 +1,4 @@
-import { VisNumericalColumn, VisCategoricalColumn, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis } from '../interfaces';
+import { ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis, VisColumn } from '../interfaces';
 import { PlotlyInfo } from '../interfaces';
 export declare enum ENumericalColorScaleType {
     SEQUENTIAL = "Sequential",
@@ -14,7 +14,7 @@ export interface IScatterConfig {
     isRectBrush: boolean;
     alphaSliderVal: number;
 }
-export declare function scatterMergeDefaultConfig(columns: (VisNumericalColumn | VisCategoricalColumn)[], config: IScatterConfig): IVisConfig;
-export declare function createScatterTraces(columns: (VisNumericalColumn | VisCategoricalColumn)[], selected: {
+export declare function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatterConfig): IVisConfig;
+export declare function createScatterTraces(columns: VisColumn[], selected: {
     [key: number]: boolean;
-}, config: IScatterConfig, scales: Scales, shapes: string[] | null): PlotlyInfo;
+}, config: IScatterConfig, scales: Scales, shapes: string[] | null): Promise<PlotlyInfo>;

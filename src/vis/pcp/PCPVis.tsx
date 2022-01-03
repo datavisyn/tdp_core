@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales, VisColumn} from '../interfaces';
 import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
@@ -68,6 +68,7 @@ export function PCPVis({
           });
     }, []);
 
+    //@ts-ignore
     const layout = useMemo<Partial<Plotly.Layout> | null>(() => {
         return traces ? {
             showlegend: true,
@@ -83,13 +84,13 @@ export function PCPVis({
     }, [traces]);
 
 
-    console.log(traces, traceStatus, traceError)
+    console.log(traces, traceStatus, traceError);
 
     return (
         <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
             <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
-                {traceStatus === 'success' && traces?.plots.length > 0 ? 
+                {traceStatus === 'success' && traces?.plots.length > 0 ?
                     <Plot
                         divId={`plotlyDiv${id}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
@@ -112,7 +113,7 @@ export function PCPVis({
                                     .text(p.yLabel);
                             }
                         }}
-                    /> : 
+                    /> :
                     traceStatus !== 'pending' ? <InvalidCols message={traceError?.message || traces?.errorMessage} /> : null}
             {mergedExtensions.postPlot}
 

@@ -1,4 +1,4 @@
-import { VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
 import { PlotlyInfo } from '../interfaces';
 export declare function isStrip(s: IVisConfig): s is IStripConfig;
 export interface IStripConfig {
@@ -6,5 +6,5 @@ export interface IStripConfig {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
 }
-export declare function stripMergeDefaultConfig(columns: (VisNumericalColumn | VisCategoricalColumn)[], config: IStripConfig): IVisConfig;
-export declare function createStripTraces(columns: (VisNumericalColumn | VisCategoricalColumn)[], config: IStripConfig, scales: Scales): PlotlyInfo;
+export declare function stripMergeDefaultConfig(columns: VisColumn[], config: IStripConfig): IVisConfig;
+export declare function createStripTraces(columns: VisColumn[], config: IStripConfig, scales: Scales): PlotlyInfo;

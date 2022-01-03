@@ -78,9 +78,9 @@ export async function createPCPTraces(columns, config) {
                     };
                 }),
             ],
-            type: "parcoords",
+            type: 'parcoords',
             line: {
-                shape: "spline",
+                shape: 'spline',
                 // @ts-ignore
                 opacity: 0.2,
             },

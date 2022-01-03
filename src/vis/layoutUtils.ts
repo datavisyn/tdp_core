@@ -1,5 +1,5 @@
 import {Layout} from 'plotly.js';
-import {PlotlyInfo, VisCategoricalColumn, VisNumericalColumn} from './interfaces';
+import {PlotlyInfo, VisCategoricalColumn, VisColumn, VisNumericalColumn} from './interfaces';
 
 /**
  * Truncate long texts (e.g., to use as axes title)
@@ -134,5 +134,11 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
 }
 
 export function resolveColumnValues(columns: VisColumn[]) {
+    console.log(columns);
     return Promise.all(columns.map(async (col) => ({...col, resolvedValues: await col.values()})));
+}
+
+export async function resolveSingleColumn(column: VisColumn) {
+    if(!column) {return null;}
+    return ({...column, resolvedValues: await column.values()});
 }

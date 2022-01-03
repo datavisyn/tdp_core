@@ -101,9 +101,9 @@ export async function createPCPTraces(
             };
           }),
         ],
-        type: "parcoords",
+        type: 'parcoords',
         line: {
-          shape: "spline",
+          shape: 'spline',
           // @ts-ignore
           opacity: 0.2,
         },

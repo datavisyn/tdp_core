@@ -1,4 +1,4 @@
 /// <reference types="react" />
-import { ColumnInfo, VisNumericalColumn, VisCategoricalColumn } from '../interfaces';
+import { ColumnInfo, VisNumericalColumn, VisCategoricalColumn, VisColumn } from '../interfaces';
 export declare const formatOptionLabel: (option: any, ctx: any) => JSX.Element;
-export declare function getCol(columns: (VisNumericalColumn | VisCategoricalColumn)[], info: ColumnInfo | null): VisNumericalColumn | VisCategoricalColumn | null;
+export declare function getCol(columns: VisColumn[], info: ColumnInfo | null): VisNumericalColumn | VisCategoricalColumn | null;
