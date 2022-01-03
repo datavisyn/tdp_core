@@ -22,7 +22,8 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1'),
     getCssValue('visyn-c7'),
     getCssValue('visyn-c8'),
     getCssValue('visyn-c9'),
-    getCssValue('visyn-c10')], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null }) {
+    getCssValue('visyn-c10')
+], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null }) {
     const [visConfig, setVisConfig] = useState({
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
