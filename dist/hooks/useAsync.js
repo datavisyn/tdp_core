@@ -40,15 +40,15 @@ export const useAsync = (asyncFunction, immediate = null) => {
         const currentPromise = Promise.resolve(asyncFunction(...args))
             .then((response) => {
             if (currentPromise === latestPromiseRef.current) {
-                setStatus('success');
                 setValue(response);
+                setStatus('success');
             }
             return response;
         })
             .catch((error) => {
             if (currentPromise === latestPromiseRef.current) {
-                setStatus('error');
                 setError(error);
+                setStatus('error');
             }
             throw error;
         });

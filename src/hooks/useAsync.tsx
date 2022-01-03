@@ -48,15 +48,15 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
     const currentPromise = Promise.resolve(asyncFunction(...args))
       .then((response: T) => {
         if(currentPromise === latestPromiseRef.current) {
-          setStatus('success');
           setValue(response);
+          setStatus('success');
         }
         return response;
       })
       .catch((error: E) => {
         if(currentPromise === latestPromiseRef.current) {
-          setStatus('error');
           setError(error);
+          setStatus('error');
         }
         throw error;
       });
