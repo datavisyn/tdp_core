@@ -1,4 +1,5 @@
 import { merge } from 'lodash';
+import { I18nextManager } from '../..';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
 import { resolveColumnValues } from '../layoutUtils';
 export function isStrip(s) {
@@ -25,7 +26,7 @@ export async function createStripTraces(columns, config, scales) {
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Strip plot, please select at least 1 numerical column.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
         };
     }
     const _numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
@@ -105,7 +106,7 @@ export async function createStripTraces(columns, config, scales) {
         legendPlots: [],
         rows: numColValues.length,
         cols: catColValues.length > 0 ? catColValues.length : 1,
-        errorMessage: 'To create a Strip plot, please select at least 1 numerical column',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
     };
 }
 //# sourceMappingURL=utils.js.map

@@ -4,6 +4,7 @@ import { merge } from 'lodash';
 import d3 from 'd3';
 import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../layoutUtils';
+import { I18nextManager } from '../..';
 export var ENumericalColorScaleType;
 (function (ENumericalColorScaleType) {
     ENumericalColorScaleType["SEQUENTIAL"] = "Sequential";
@@ -38,16 +39,16 @@ export function scatterMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-const emptyVal = {
-    plots: [],
-    legendPlots: [],
-    rows: 0,
-    cols: 0,
-    errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-    formList: ['color', 'shape', 'bubble', 'opacity']
-};
 export async function createScatterTraces(columns, selected, config, scales, shapes) {
     let plotCounter = 1;
+    const emptyVal = {
+        plots: [],
+        legendPlots: [],
+        rows: 0,
+        cols: 0,
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+        formList: ['color', 'shape', 'bubble', 'opacity']
+    };
     if (!config.numColumnsSelected) {
         return emptyVal;
     }
@@ -218,7 +219,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         legendPlots,
         rows: Math.sqrt(plots.length),
         cols: Math.sqrt(plots.length),
-        errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
     };
 }
 //# sourceMappingURL=utils.js.map

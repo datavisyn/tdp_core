@@ -1,4 +1,5 @@
 import {merge} from 'lodash';
+import {I18nextManager} from '../..';
 import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 import {resolveColumnValues, resolveSingleColumn} from '../layoutUtils';
@@ -80,7 +81,7 @@ export async function createBarTraces(
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
         };
     }
 
@@ -108,7 +109,7 @@ export async function createBarTraces(
         legendPlots: [],
         rows,
         cols,
-        errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
     };
 }
 

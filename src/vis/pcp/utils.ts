@@ -1,5 +1,6 @@
 import d3 from 'd3';
 import {merge} from 'lodash';
+import {I18nextManager} from '../..';
 import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, VisColumn} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 import {resolveColumnValues} from '../layoutUtils';
@@ -52,7 +53,7 @@ export async function createPCPTraces(
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
 
@@ -65,7 +66,7 @@ export async function createPCPTraces(
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
 
@@ -115,6 +116,6 @@ export async function createPCPTraces(
         legendPlots: [],
         rows: 1,
         cols: 1,
-        errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
     };
 }

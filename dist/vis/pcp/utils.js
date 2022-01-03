@@ -1,5 +1,6 @@
 import d3 from 'd3';
 import { merge } from 'lodash';
+import { I18nextManager } from '../..';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
 import { resolveColumnValues } from '../layoutUtils';
 export function isPCP(s) {
@@ -34,7 +35,7 @@ export async function createPCPTraces(columns, config) {
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
     const numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
@@ -45,7 +46,7 @@ export async function createPCPTraces(columns, config) {
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
     const numColValues = await resolveColumnValues(numCols);
@@ -91,7 +92,7 @@ export async function createPCPTraces(columns, config) {
         legendPlots: [],
         rows: 1,
         cols: 1,
-        errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
     };
 }
 //# sourceMappingURL=utils.js.map

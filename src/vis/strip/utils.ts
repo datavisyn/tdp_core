@@ -1,4 +1,5 @@
 import {merge} from 'lodash';
+import {I18nextManager} from '../..';
 import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 import {resolveColumnValues} from '../layoutUtils';
@@ -47,7 +48,7 @@ export async function createStripTraces(
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Strip plot, please select at least 1 numerical column.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
         };
     }
 
@@ -136,6 +137,6 @@ export async function createStripTraces(
         legendPlots: [],
         rows: numColValues.length,
         cols: catColValues.length > 0 ? catColValues.length : 1,
-        errorMessage: 'To create a Strip plot, please select at least 1 numerical column',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
     };
 }

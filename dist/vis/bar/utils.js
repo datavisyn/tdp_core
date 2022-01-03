@@ -1,4 +1,5 @@
 import { merge } from 'lodash';
+import { I18nextManager } from '../..';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../layoutUtils';
 import { getCol } from '../sidebar/utils';
@@ -52,7 +53,7 @@ export async function createBarTraces(columns, config, scales) {
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
         };
     }
     const plots = [];
@@ -78,7 +79,7 @@ export async function createBarTraces(columns, config, scales) {
         legendPlots: [],
         rows,
         cols,
-        errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
     };
 }
 async function setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter) {

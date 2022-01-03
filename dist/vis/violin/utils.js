@@ -2,6 +2,7 @@ import { merge } from 'lodash';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
 import { EViolinOverlay } from '../bar/utils';
 import { resolveColumnValues } from '../layoutUtils';
+import { I18nextManager } from '../..';
 export function isViolin(s) {
     return s.type === ESupportedPlotlyVis.VIOLIN;
 }
@@ -27,7 +28,7 @@ export async function createViolinTraces(columns, config, scales) {
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Violin plot, please select at least 1 numerical column.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.violinError'),
         };
     }
     const _numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
@@ -107,7 +108,7 @@ export async function createViolinTraces(columns, config, scales) {
         legendPlots: [],
         rows: numColValues.length,
         cols: catColValues.length > 0 ? catColValues.length : 1,
-        errorMessage: 'To create a Violin plot, please select at least 1 numerical column.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.violinError'),
     };
 }
 //# sourceMappingURL=utils.js.map
