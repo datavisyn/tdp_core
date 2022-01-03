@@ -9,4 +9,4 @@ export interface IViolinConfig {
     violinOverlay: EViolinOverlay;
 }
 export declare function violinMergeDefaultConfig(columns: VisColumn[], config: IViolinConfig): IVisConfig;
-export declare function createViolinTraces(columns: VisColumn[], config: IViolinConfig, scales: Scales): PlotlyInfo;
+export declare function createViolinTraces(columns: VisColumn[], config: IViolinConfig, scales: Scales): Promise<PlotlyInfo>;

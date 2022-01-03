@@ -1,6 +1,7 @@
 import { merge } from 'lodash';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
 import { EViolinOverlay } from '../bar/utils';
+import { resolveColumnValues } from '../layoutUtils';
 export function isViolin(s) {
     return s.type === ESupportedPlotlyVis.VIOLIN;
 }
@@ -18,7 +19,7 @@ export function violinMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-export function createViolinTraces(columns, config, scales) {
+export async function createViolinTraces(columns, config, scales) {
     let plotCounter = 1;
     if (!config.numColumnsSelected || !config.catColumnsSelected) {
         return {
@@ -29,15 +30,17 @@ export function createViolinTraces(columns, config, scales) {
             errorMessage: 'To create a Violin plot, please select at least 1 numerical column.',
         };
     }
-    const numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
-    const catCols = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL);
+    const _numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
+    const _catCols = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL);
     const plots = [];
+    const numColValues = await resolveColumnValues(_numCols);
+    const catColValues = await resolveColumnValues(_catCols);
     //if we onl have numerical columns, add them individually.
-    if (catCols.length === 0) {
-        for (const numCurr of numCols) {
+    if (catColValues.length === 0) {
+        for (const numCurr of numColValues) {
             plots.push({
                 data: {
-                    y: numCurr.values.map((v) => v.val),
+                    y: numCurr.resolvedValues.map((v) => v.val),
                     xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
                     yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                     type: 'violin',
@@ -62,12 +65,12 @@ export function createViolinTraces(columns, config, scales) {
             plotCounter += 1;
         }
     }
-    for (const numCurr of numCols) {
-        for (const catCurr of catCols) {
+    for (const numCurr of numColValues) {
+        for (const catCurr of catColValues) {
             plots.push({
                 data: {
-                    x: catCurr.values.map((v) => v.val),
-                    y: numCurr.values.map((v) => v.val),
+                    x: catCurr.resolvedValues.map((v) => v.val),
+                    y: numCurr.resolvedValues.map((v) => v.val),
                     xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
                     yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                     type: 'violin',
@@ -87,8 +90,8 @@ export function createViolinTraces(columns, config, scales) {
                     showlegend: false,
                     transforms: [{
                             type: 'groupby',
-                            groups: catCurr.values.map((v) => v.val),
-                            styles: [...new Set(catCurr.values.map((v) => v.val))].map((c) => {
+                            groups: catCurr.resolvedValues.map((v) => v.val),
+                            styles: [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { line: { color: scales.color(c) } } };
                             })
                         }]
@@ -102,8 +105,8 @@ export function createViolinTraces(columns, config, scales) {
     return {
         plots,
         legendPlots: [],
-        rows: numCols.length,
-        cols: catCols.length > 0 ? catCols.length : 1,
+        rows: numColValues.length,
+        cols: catColValues.length > 0 ? catColValues.length : 1,
         errorMessage: 'To create a Violin plot, please select at least 1 numerical column.',
     };
 }
