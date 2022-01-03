@@ -19,6 +19,7 @@ import {BarDisplayButtons} from '../sidebar/BarDisplayTypeButtons';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {WarningMessage} from '../sidebar/WarningMessage';
 import Plotly from 'plotly.js';
+import {useAsync} from '../..';
 
 interface BarVisProps {
     config: IBarConfig;
@@ -97,15 +98,12 @@ export function BarVis({
         return merge({}, defaultConfig, optionsConfig);
     }, []);
 
-
-
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
 
-    const traces: PlotlyInfo = useMemo(() => {
-        return createBarTraces(columns, config, scales);
-    }, [columns, config, scales]);
+    const {value: traces, status: traceStatus, error: traceError} = useAsync(createBarTraces, [columns, config, scales]);
+
 
     const uniqueId = useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
@@ -124,6 +122,11 @@ export function BarVis({
     }, []);
 
     const layout = useMemo(() => {
+        if(!traces)
+        {
+            return null;
+        }
+
         const layout = {
             showlegend: true,
             legend: {
@@ -144,8 +147,8 @@ export function BarVis({
         <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
             <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
                 {mergedExtensions.prePlot}
-                {traces.plots.length > 0 ?
-                    (<Plot
+                {traceStatus === 'success' && traces?.plots.length > 0 ?
+                    <Plot
                         divId={`plotlyDiv${uniqueId}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout as any}
@@ -167,9 +170,8 @@ export function BarVis({
                                     .text(p.yLabel);
                             }
                         }}
-                    />) : (<InvalidCols
-                        message={traces.errorMessage} />)
-                }
+                    /> : 
+                    traceStatus !== 'pending' ? <InvalidCols message={traceError?.message || traces?.errorMessage} /> : null}
                 {mergedExtensions.postPlot}
 
             </div>

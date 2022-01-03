@@ -100,19 +100,6 @@ export function PCPVis({
                         style={{width: '100%', height: '100%'}}
                         //plotly redraws everything on updates, so you need to reappend title and
                         // change opacity on update, instead of just in a use effect
-                        onUpdate={() => {
-                            for(const p of traces.plots) {
-                                d3.select(`g .${(p.data as any).xaxis}title`)
-                                    .style('pointer-events', 'all')
-                                    .append('title')
-                                    .text(p.xLabel);
-
-                                d3.select(`g .${(p.data as any).yaxis}title`)
-                                    .style('pointer-events', 'all')
-                                    .append('title')
-                                    .text(p.yLabel);
-                            }
-                        }}
                     /> :
                     traceStatus !== 'pending' ? <InvalidCols message={traceError?.message || traces?.errorMessage} /> : null}
             {mergedExtensions.postPlot}
