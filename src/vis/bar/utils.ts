@@ -1,6 +1,6 @@
 import {merge} from 'lodash';
 import {I18nextManager} from '../..';
-import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn, VisCategoricalValues, VisCategoricalValue} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn, VisCategoricalValue} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 import {resolveColumnValues, resolveSingleColumn} from '../layoutUtils';
 import {getCol} from '../sidebar/utils';
