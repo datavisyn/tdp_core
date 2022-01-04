@@ -89,7 +89,7 @@ export class FormSelect2 extends AFormElement {
         const $searchContainer = $('.select2.select2-container', formNode);
         const $search = $searchContainer.find('input');
         $search.attr('data-testid', 'select2-search-field');
-        this.$jqSelect.on('select2:open', function (e) {
+        this.$jqSelect.on('select2:selecting', function (e) {
             const $optionsContainer = $('.select2-results__options');
             // wait for options to be loaded
             setTimeout(() => {
