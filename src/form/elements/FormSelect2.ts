@@ -184,13 +184,19 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       setTimeout(() => {
         [...$optionsContainer[0].children].forEach((child) => {
           const childAsElement = (<HTMLElement>child);
-          if (childAsElement.lastElementChild.className === 'select2-results__options select2-results__options--nested') {
+          // grouped options
+          if (childAsElement.lastElementChild && childAsElement.lastElementChild.className === 'select2-results__options select2-results__options--nested') {
             const nested = $('.select2-results__options--nested');
             [...nested].forEach((nest) => {
               [...nest.children].forEach((nestedChild) => {
                 nestedChild.setAttribute('data-testid', `select2-option-${(<HTMLElement>nestedChild).innerText}`);
               });
             });
+          // single option elements
+          } else if (childAsElement.tagName.toString() === 'LI') {
+            const end = (<HTMLElement>childAsElement).innerText.indexOf('(');
+            const subString= (<HTMLElement>childAsElement).innerText.substring(0 , end - 1).replace(/\s+/g, '-').toLowerCase();
+            childAsElement.setAttribute('data-testid', `select2-option-${subString}`);
           }
         });
       }, 1000);
