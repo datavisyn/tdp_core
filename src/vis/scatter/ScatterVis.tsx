@@ -13,7 +13,6 @@ import d3 from 'd3';
 import {createScatterTraces, ENumericalColorScaleType, IScatterConfig} from './utils';
 import {beautifyLayout} from '../layoutUtils';
 import {merge, uniqueId} from 'lodash';
-import Plotly from 'plotly.js';
 import {BrushOptionButtons} from '../sidebar/BrushOptionButtons';
 import {OpacitySlider} from '../sidebar/OpacitySlider';
 import {WarningMessage} from '../sidebar/WarningMessage';
@@ -92,11 +91,11 @@ export function ScatterVis({
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+            window.dispatchEvent(new Event('resize'));
           });
 
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+            window.dispatchEvent(new Event('resize'));
           });
     }, []);
 

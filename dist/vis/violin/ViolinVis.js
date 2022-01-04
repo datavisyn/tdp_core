@@ -11,7 +11,6 @@ import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
 import { merge } from 'lodash';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import Plotly from 'plotly.js';
 import { useAsync } from '../..';
 const defaultConfig = {
     overlay: {
@@ -39,10 +38,10 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
         });
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
         });
     }, []);
     const layout = useMemo(() => {

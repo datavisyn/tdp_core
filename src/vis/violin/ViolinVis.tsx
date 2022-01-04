@@ -14,7 +14,6 @@ import {ViolinOverlayButtons} from '../sidebar/ViolinOverlayButtons';
 import {EViolinOverlay} from '../bar/utils';
 import {merge} from 'lodash';
 import {WarningMessage} from '../sidebar/WarningMessage';
-import Plotly from 'plotly.js';
 import {useAsync} from '../..';
 
 interface ViolinVisProps {
@@ -78,11 +77,11 @@ export function ViolinVis({
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
           });
 
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
           });
     }, []);
 

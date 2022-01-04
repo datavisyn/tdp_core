@@ -8,7 +8,6 @@ import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { merge, uniqueId } from 'lodash';
 import { createPCPTraces } from './utils';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import Plotly from 'plotly.js';
 import { useAsync } from '../..';
 const defaultConfig = {};
 const defaultExtensions = {
@@ -29,10 +28,10 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, 
     useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+            window.dispatchEvent(new Event('resize'));
         });
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+            window.dispatchEvent(new Event('resize'));
         });
     }, []);
     //@ts-ignore

@@ -41,12 +41,21 @@ export interface VisCommonColumn {
     values: ValueGetter<{id: number, val: string|number}[]>;
 }
 
+export interface VisNumericalValue {
+    id: number;
+    val: number;
+}
+
+export interface VisCategoricalValue {
+    id: number;
+    val: string;
+}
+
 export interface VisNumericalColumn extends VisCommonColumn {
     type: EColumnTypes.NUMERICAL;
 }
 
 export interface VisCategoricalColumn extends VisCommonColumn {
-    colors: string[];
     type: EColumnTypes.CATEGORICAL;
 }
 

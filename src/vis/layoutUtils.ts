@@ -138,6 +138,11 @@ export function resolveColumnValues(columns: VisColumn[]) {
 }
 
 export async function resolveSingleColumn(column: VisColumn) {
-    if(!column) {return null;}
-    return ({...column, resolvedValues: await column.values()});
+    if(!column) {
+        return null;
+    }
+    return ({
+        ...column,
+        resolvedValues: await column.values()
+    });
 }

@@ -18,7 +18,6 @@ import {BarGroupTypeButtons} from '../sidebar/BarGroupTypeButtons';
 import {BarDisplayButtons} from '../sidebar/BarDisplayTypeButtons';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {WarningMessage} from '../sidebar/WarningMessage';
-import Plotly from 'plotly.js';
 import {useAsync} from '../..';
 
 interface BarVisProps {
@@ -113,11 +112,11 @@ export function BarVis({
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
           });
 
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
           });
     }, []);
 

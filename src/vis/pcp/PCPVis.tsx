@@ -6,12 +6,10 @@ import {VisTypeSelect} from '../sidebar/VisTypeSelect';
 import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
 import Plot from 'react-plotly.js';
 import {InvalidCols} from '../InvalidCols';
-import d3 from 'd3';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {merge, uniqueId} from 'lodash';
 import {createPCPTraces, IPCPConfig} from './utils';
 import {WarningMessage} from '../sidebar/WarningMessage';
-import Plotly from 'plotly.js';
 import {useAsync} from '../..';
 
 interface PCPVisProps {
@@ -60,11 +58,11 @@ export function PCPVis({
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+            window.dispatchEvent(new Event('resize'));
           });
 
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+            window.dispatchEvent(new Event('resize'));
           });
     }, []);
 

@@ -14,7 +14,7 @@ const defaultConfig = {
 export function pcpMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
     if (merged.numColumnsSelected.length === 0 && columns.length > 1) {
-        // TODO: Bug. It is always selecting the last two columns, no matter their type.
+        // FIXME It is always selecting the last two columns, no matter their type.
         merged.numColumnsSelected.push(columns[columns.length - 1].info);
         merged.numColumnsSelected.push(columns[columns.length - 2].info);
     }

@@ -124,6 +124,9 @@ export async function resolveSingleColumn(column) {
     if (!column) {
         return null;
     }
-    return ({ ...column, resolvedValues: await column.values() });
+    return ({
+        ...column,
+        resolvedValues: await column.values()
+    });
 }
 //# sourceMappingURL=layoutUtils.js.map

@@ -22,7 +22,6 @@ export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
         id: number;
         val: string | number;
     }[];
-    colors: string[];
     type: import("./interfaces").EColumnTypes.CATEGORICAL;
     info: import("./interfaces").ColumnInfo;
     values: () => Promise<{
@@ -46,7 +45,6 @@ export declare function resolveSingleColumn(column: VisColumn): Promise<{
         id: number;
         val: string | number;
     }[];
-    colors: string[];
     type: import("./interfaces").EColumnTypes.CATEGORICAL;
     info: import("./interfaces").ColumnInfo;
     values: () => Promise<{

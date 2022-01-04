@@ -1,6 +1,6 @@
 import {merge} from 'lodash';
 import {I18nextManager} from '../..';
-import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn, VisCategoricalValues, VisCategoricalValue} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
 import {resolveColumnValues, resolveSingleColumn} from '../layoutUtils';
 import {getCol} from '../sidebar/utils';
@@ -122,8 +122,8 @@ async function setPlotsWithGroupsAndMultiples(columns: VisColumn[], catCols: Vis
     const currGroupColumn = await resolveSingleColumn(getCol(columns, config.group));
     const currMultiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
-    const uniqueGroupVals = [...new Set(currGroupColumn.resolvedValues.map((v) => v.val))];
-    const uniqueMultiplesVals = [...new Set(currMultiplesColumn.resolvedValues.map((v) => v.val))];
+    const uniqueGroupVals: string[] = [...new Set(currGroupColumn.resolvedValues.map((v) => v.val))] as string[];
+    const uniqueMultiplesVals: string[] = [...new Set(currMultiplesColumn.resolvedValues.map((v) => v.val))] as string[];
 
     const uniqueColVals = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
 
@@ -131,9 +131,9 @@ async function setPlotsWithGroupsAndMultiples(columns: VisColumn[], catCols: Vis
         uniqueGroupVals.forEach((uniqueGroup) => {
 
             const groupedLength = uniqueColVals.map((v) => {
-                const allObjs = (catCurr.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === v).map((c) => c.id);
-                const allGroupObjs = (currGroupColumn.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === uniqueGroup).map((c) => c.id);
-                const allMultiplesObjs = (currMultiplesColumn.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === uniqueMultiples).map((c) => c.id);
+                const allObjs = (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
+                const allGroupObjs = (currGroupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueGroup).map((c) => c.id);
+                const allMultiplesObjs = (currMultiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueMultiples).map((c) => c.id);
 
                 const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c) && allMultiplesObjs.includes(c));
 
@@ -149,7 +149,7 @@ async function setPlotsWithGroupsAndMultiples(columns: VisColumn[], catCols: Vis
                     yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                     showlegend: plotCounter === 1 ? true : false,
                     type: 'bar',
-                    name: uniqueGroup as string,
+                    name: uniqueGroup,
                     marker: {
                         color: scales.color(uniqueGroup),
                     }
@@ -172,14 +172,14 @@ async function setPlotsWithGroups(columns: VisColumn[], catCols: VisCategoricalC
     const catCurr = catColValues[0];
     const groupColumn = await resolveSingleColumn(getCol(columns, config.group));
 
-    const uniqueGroupVals = [...new Set(groupColumn.resolvedValues.map((v) => v.val))];
-    const uniqueColVals = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
+    const uniqueGroupVals: string[] = [...new Set(groupColumn.resolvedValues.map((v) => v.val))] as string[];
+    const uniqueColVals: string[] = [...new Set(catCurr.resolvedValues.map((v) => v.val))] as string[];
 
     uniqueGroupVals.forEach((uniqueVal) => {
 
         const groupedLength = uniqueColVals.map((v) => {
-            const allObjs = (catCurr.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === v).map((c) => c.id);
-            const allGroupObjs = (groupColumn.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
+            const allObjs = (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
+            const allGroupObjs = (groupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
             const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
 
             return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
@@ -194,7 +194,7 @@ async function setPlotsWithGroups(columns: VisColumn[], catCols: VisCategoricalC
                 yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                 showlegend: plotCounter === 1 ? true : false,
                 type: 'bar',
-                name: uniqueVal as string,
+                name: uniqueVal,
                 marker: {
                     color: scales.color(uniqueVal),
                 }
@@ -215,14 +215,14 @@ async function setPlotsWithMultiples(columns: VisColumn[], catCols: VisCategoric
     const catCurr = catColValues[0];
     const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
-    const uniqueGroupVals = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))];
-    const uniqueColVals = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
+    const uniqueGroupVals: string[] = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))] as string[];
+    const uniqueColVals: string[] = [...new Set(catCurr.resolvedValues.map((v) => v.val))] as string[];
 
     uniqueGroupVals.forEach((uniqueVal) => {
 
         const groupedLength = uniqueColVals.map((v) => {
-            const allObjs = (catCurr.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === v).map((c) => c.id);
-            const allGroupObjs = (multiplesColumn.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
+            const allObjs = (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
+            const allGroupObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
             const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
 
             return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
@@ -237,7 +237,7 @@ async function setPlotsWithMultiples(columns: VisColumn[], catCols: VisCategoric
                 yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                 showlegend: plotCounter === 1 ? true : false,
                 type: 'bar',
-                name: uniqueVal as string,
+                name: uniqueVal,
             },
             xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
             yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
@@ -255,7 +255,7 @@ async function setPlotsBasic(columns: VisColumn[], catCols: VisCategoricalColumn
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const catCurr = catColValues[0];
 
-    const count = [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((curr) => (catCurr.resolvedValues as {id: number, val:string}[]).filter((c) => c.val === curr).length);
+    const count = [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((curr) => (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === curr).length);
     const valArr = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
     plots.push({
         data: {

@@ -10,7 +10,6 @@ import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { merge } from 'lodash';
 import { createStripTraces } from './utils';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import Plotly from 'plotly.js';
 import { useAsync } from '../..';
 const defaultConfig = {};
 const defaultExtensions = {
@@ -33,10 +32,10 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
     useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
         });
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            window.dispatchEvent(new Event('resize'));
         });
     }, []);
     const layout = useMemo(() => {

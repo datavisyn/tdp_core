@@ -85,15 +85,13 @@ export class GeneralVisWrapper extends EventHandler {
 
         const getColumnInfo = (column: Column): ColumnInfo => {
             return {
+                // This regex strips any html off of the label and summary, leaving only the center text. For example, <div><span>Hello</span></div> would be hello.
                 name: column.getMetaData().label.replace(/(<([^>]+)>)/gi, ''),
                 description: column.getMetaData().summary.replace(/(<([^>]+)>)/gi, ''),
                 // TODO: What kind of id to use?
                 id: column.fqid,
             };
         };
-
-
-        // wait for 2 seconds
 
         const getColumnValue = async <T,>(column: ValueColumn<T>) => {
 
@@ -102,6 +100,7 @@ export class GeneralVisWrapper extends EventHandler {
             }
 
             return new Promise<{id: number, val: T}[]>((resolve, reject) => {
+                //times out if we take longer than 60 seconds to load the columns.
                 const timeout = setTimeout(() => {
                     reject('Timeout');
                 }, 60000);
@@ -125,8 +124,6 @@ export class GeneralVisWrapper extends EventHandler {
                 cols.push({
                     info: getColumnInfo(c),
                     values: () => getColumnValue(c).then((res) => res.map((v) => v.val ? v : {...v, val: '--'})),
-                    // TODO: This is required?
-                    colors: null,
                     type: EColumnTypes.CATEGORICAL
                 });
             }
