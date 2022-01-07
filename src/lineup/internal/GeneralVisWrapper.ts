@@ -11,6 +11,11 @@ import {LineUpSelectionHelper} from './LineUpSelectionHelper';
 import {IDType} from '../../idtype';
 
 export class GeneralVisWrapper extends EventHandler {
+    /**
+     * This string is assigned if a categorical value is missing and rendered by Plotly.
+     */
+    private static PLOTLY_CATEGORICAL_MISSING_VALUE: string = '--';
+
     readonly node: HTMLElement; // wrapper node
     private viewable: boolean;
     private provider: LocalDataProvider;
@@ -119,11 +124,11 @@ export class GeneralVisWrapper extends EventHandler {
                     values: () => getColumnValue(c),
                     type: EColumnTypes.NUMERICAL
                 });
-            }
-            if(c instanceof CategoricalColumn) {
+
+            } else if(c instanceof CategoricalColumn) {
                 cols.push({
                     info: getColumnInfo(c),
-                    values: () => getColumnValue(c).then((res) => res.map((v) => v.val ? v : {...v, val: '--'})),
+                    values: () => getColumnValue(c).then((res) => res.map((v) => v.val ? v : {...v, val: GeneralVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE})),
                     type: EColumnTypes.CATEGORICAL
                 });
             }

@@ -4,6 +4,10 @@ import { ARankingView } from '..';
 import { LineUpSelectionHelper } from './LineUpSelectionHelper';
 import { IDType } from '../../idtype';
 export declare class GeneralVisWrapper extends EventHandler {
+    /**
+     * This string is assigned if a categorical value is missing and rendered by Plotly.
+     */
+    private static PLOTLY_CATEGORICAL_MISSING_VALUE;
     readonly node: HTMLElement;
     private viewable;
     private provider;

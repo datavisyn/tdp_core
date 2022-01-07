@@ -85,10 +85,10 @@ export class GeneralVisWrapper extends EventHandler {
                     type: EColumnTypes.NUMERICAL
                 });
             }
-            if (c instanceof CategoricalColumn) {
+            else if (c instanceof CategoricalColumn) {
                 cols.push({
                     info: getColumnInfo(c),
-                    values: () => getColumnValue(c).then((res) => res.map((v) => v.val ? v : { ...v, val: '--' })),
+                    values: () => getColumnValue(c).then((res) => res.map((v) => v.val ? v : { ...v, val: GeneralVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE })),
                     type: EColumnTypes.CATEGORICAL
                 });
             }
@@ -117,4 +117,8 @@ export class GeneralVisWrapper extends EventHandler {
         this.node.style.display = 'none';
     }
 }
+/**
+ * This string is assigned if a categorical value is missing and rendered by Plotly.
+ */
+GeneralVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE = '--';
 //# sourceMappingURL=GeneralVisWrapper.js.map
