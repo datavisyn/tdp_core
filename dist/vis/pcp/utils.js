@@ -14,7 +14,7 @@ const defaultConfig = {
 export function pcpMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
     if (merged.numColumnsSelected.length === 0 && columns.length > 1) {
-        // FIXME It is always selecting the last two columns, no matter their type.
+        // FIXME It is always selecting the last two columns, no matter their type. (@see https://github.com/datavisyn/reprovisyn/issues/199)
         merged.numColumnsSelected.push(columns[columns.length - 1].info);
         merged.numColumnsSelected.push(columns[columns.length - 2].info);
     }
