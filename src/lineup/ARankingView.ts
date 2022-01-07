@@ -126,10 +126,11 @@ export abstract class ARankingView extends AView {
           const desc = node.ownerDocument.createElement('span');
           desc.textContent = summary;
           node.appendChild(desc);
-          return undefined;
         }
+
+      } else {
+        node.textContent = item.text;
       }
-      return item.text;
     },
     panelAddColumnBtnOptions: {}
   };
