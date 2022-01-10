@@ -1,5 +1,5 @@
 import { scale } from 'd3';
-import { LineupUtils } from '../utils';
+import { difference } from 'lodash';
 export class LineUpColors {
     constructor() {
         /**
@@ -15,7 +15,7 @@ export class LineUpColors {
         let color = '';
         if (!this.colorMap.has(id)) {
             const usedColors = Array.from(this.colorMap.values()).map((item) => item.color);
-            color = LineupUtils.array_diff(this.colors, usedColors)[0];
+            color = difference(this.colors, usedColors)[0];
             this.colorMap.set(id, { color, items: 1 });
         }
         else {

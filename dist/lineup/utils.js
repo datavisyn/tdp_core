@@ -133,31 +133,6 @@ export class LineupUtils {
             });
         };
     }
-    /**
-     * Returns the all items that are not in the given two arrays
-     * TODO improve performance of diff algorithm
-     * @param array1
-     * @param array2
-     * @returns {any}
-     */
-    static array_diff(array1, array2) {
-        return array1.filter((elm) => array2.indexOf(elm) === -1);
-    }
-    /**
-     * Returns all elements from set1 which are not in set2
-     * @param set1
-     * @param set2
-     * @returns Set<T>
-     */
-    static set_diff(set1, set2) {
-        const diff = new Set();
-        set1.forEach((elem) => {
-            if (!set2.has(elem)) {
-                diff.add(elem);
-            }
-        });
-        return diff;
-    }
     static wrapRanking(data, ranking) {
         const findColumn = (column) => ranking.find((d) => d.desc.column === column || d.desc.label === column);
         return {
