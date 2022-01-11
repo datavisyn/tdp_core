@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, EFilterOptions, NumericalColumn, Scales } from '../interfaces';
+import { EFilterOptions, Scales, VisColumn } from '../interfaces';
 import { IVisConfig } from '../interfaces';
 import { IScatterConfig } from './utils';
 interface ScatterVisProps {
@@ -25,7 +25,7 @@ interface ScatterVisProps {
         postSidebar?: React.ReactNode;
     };
     shapes?: string[];
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
     selectionCallback?: (s: number[]) => void;
     selected?: {

@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
+import { ColumnInfo, VisColumn } from '../interfaces';
 interface GroupSelectProps {
     callback: (c: ColumnInfo) => void;
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     currentSelected: ColumnInfo | null;
 }
 export declare function GroupSelect(props: GroupSelectProps): JSX.Element;

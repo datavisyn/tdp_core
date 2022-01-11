@@ -7,7 +7,7 @@ import Select, {
   } from 'react-select';
 
 
-import {CategoricalColumn, ColumnInfo, EColumnTypes, NumericalColumn} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, VisNumericalColumn, VisColumn} from '../interfaces';
 import {formatOptionLabel} from './utils';
 import {
     SortableContainer,
@@ -21,7 +21,7 @@ import {MultiValueGenericProps} from 'react-select/src/components/MultiValue';
 
 interface NumericalColumnSelectProps {
     callback: (s: ColumnInfo[]) => void;
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     currentSelected: ColumnInfo[];
 }
 

@@ -117,4 +117,16 @@ export function beautifyLayout(traces, layout) {
     });
     return layout;
 }
+export function resolveColumnValues(columns) {
+    return Promise.all(columns.map(async (col) => ({ ...col, resolvedValues: await col.values() })));
+}
+export async function resolveSingleColumn(column) {
+    if (!column) {
+        return null;
+    }
+    return ({
+        ...column,
+        resolvedValues: await column.values()
+    });
+}
 //# sourceMappingURL=layoutUtils.js.map

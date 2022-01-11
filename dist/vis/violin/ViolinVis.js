@@ -11,6 +11,7 @@ import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
 import { merge } from 'lodash';
 import { WarningMessage } from '../sidebar/WarningMessage';
+import { useAsync } from '../..';
 import Plotly from 'plotly.js';
 const defaultConfig = {
     overlay: {
@@ -31,9 +32,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
-    const traces = useMemo(() => {
-        return createViolinTraces(columns, config, scales);
-    }, [columns, config, scales]);
+    const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
     const uniqueId = useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
     }, []);
@@ -47,6 +46,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         });
     }, []);
     const layout = useMemo(() => {
+        if (!traces) {
+            return null;
+        }
         const layout = {
             showlegend: true,
             legend: {
@@ -61,10 +63,10 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         return beautifyLayout(traces, layout);
     }, [traces]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
-        React.createElement("div", { className: "position-relative d-flex justify-content-center align-items-center flex-grow-1" },
+        React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traces.plots.length > 0 ?
-                (React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
+            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ?
+                React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
                     //plotly redraws everything on updates, so you need to reappend title and
                     // change opacity on update, instead of just in a use effect
                     onUpdate: () => {
@@ -78,7 +80,8 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
                                 .append('title')
                                 .text(p.yLabel);
                         }
-                    } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
+                    } }) :
+                traceStatus !== 'pending' ? React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) }) : null,
             mergedExtensions.postPlot),
         React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },

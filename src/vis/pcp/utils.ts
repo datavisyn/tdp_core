@@ -1,7 +1,9 @@
 import d3 from 'd3';
 import {merge} from 'lodash';
-import {CategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn} from '../interfaces';
+import {I18nextManager} from '../..';
+import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, VisColumn} from '../interfaces';
 import {PlotlyInfo, PlotlyData} from '../interfaces';
+import {resolveColumnValues} from '../layoutUtils';
 
 export function isPCP(s: IVisConfig): s is IPCPConfig {
     return s.type === ESupportedPlotlyVis.PCP;
@@ -20,12 +22,13 @@ const defaultConfig: IPCPConfig = {
 };
 
 export function pcpMergeDefaultConfig(
-    columns: (NumericalColumn | CategoricalColumn)[],
+    columns: VisColumn[],
     config: IPCPConfig,
 ): IVisConfig {
     const merged = merge({}, defaultConfig, config);
 
     if(merged.numColumnsSelected.length === 0 && columns.length > 1) {
+        // FIXME It is always selecting the last two columns, no matter their type. (@see https://github.com/datavisyn/reprovisyn/issues/199)
         merged.numColumnsSelected.push(columns[columns.length - 1].info);
         merged.numColumnsSelected.push(columns[columns.length - 2].info);
     } else if(merged.numColumnsSelected.length === 1 && columns.length > 1) {
@@ -39,10 +42,10 @@ export function pcpMergeDefaultConfig(
     return merged;
 }
 
-export function createPCPTraces(
-    columns: (NumericalColumn | CategoricalColumn)[],
+export async function createPCPTraces(
+    columns: VisColumn[],
     config: IPCPConfig,
-): PlotlyInfo {
+): Promise<PlotlyInfo> {
 
     if(!config.numColumnsSelected || !config.catColumnsSelected) {
         return {
@@ -50,12 +53,12 @@ export function createPCPTraces(
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
 
-    const numCols: NumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as NumericalColumn[];
-    const catCols: CategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as CategoricalColumn[];
+    const numCols: VisNumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as VisNumericalColumn[];
+    const catCols: VisCategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as VisCategoricalColumn[];
 
     if(numCols.length + catCols.length < 2) {
         return {
@@ -63,45 +66,56 @@ export function createPCPTraces(
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
 
-    const plot = {
-        xLabel: null,
-        yLabel: null,
-        //yo why does this error i dunno but it works
-        data: {dimensions: [...numCols.map((c) => {
-            return {
-                range: [d3.min(c.values.map((v) => v.val) as number[]), d3.max(c.values.map((v) => v.val) as number[])],
-                label: c.info.name,
-                values: c.values.map((v) => v.val)
-            };
-        }), ...catCols.map((c) => {
+    const numColValues = await resolveColumnValues(numCols);
+    const catColValues = await resolveColumnValues(catCols);
 
-            const uniqueList = [...new Set<string>(c.values.map((v) => v.val) as string[])];
+    const plot: PlotlyData = {
+      xLabel: null,
+      yLabel: null,
+      data: {
+        dimensions: [
+          ...numColValues.map((c, i) => {
+            return {
+              range: [
+                d3.min(c.resolvedValues.map((v) => v.val) as number[]),
+                d3.max(c.resolvedValues.map((v) => v.val) as number[]),
+              ],
+              label: c.info.name,
+              values: c.resolvedValues.map((v) => v.val),
+            };
+          }),
+          ...catColValues.map((c) => {
+            const uniqueList = [
+              ...new Set<string>(c.resolvedValues.map((v) => v.val) as string[]),
+            ];
 
             return {
-                range: [0, uniqueList.length - 1],
-                label: c.info.name,
-                values: c.values.map((curr) => uniqueList.indexOf(curr.val)),
-                tickvals: [...uniqueList.keys()],
-                ticktext: uniqueList
+              range: [0, uniqueList.length - 1],
+              label: c.info.name,
+              values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val as string)),
+              tickvals: [...uniqueList.keys()],
+              ticktext: uniqueList,
             };
-        })],
+          }),
+        ],
         type: 'parcoords',
         line: {
-            shape: 'spline',
-            opacity: .2
-            },
-        }
+          shape: 'spline',
+          // @ts-ignore
+          opacity: 0.2,
+        },
+      },
     };
 
     return {
-        plots: [plot as PlotlyData],
+        plots: [plot],
         legendPlots: [],
         rows: 1,
         cols: 1,
-        errorMessage: 'To create a Parallel Coordinates plot, please select at least 2 columns.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
     };
 }

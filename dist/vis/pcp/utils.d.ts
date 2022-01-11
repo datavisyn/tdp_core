@@ -1,4 +1,4 @@
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, IVisConfig, NumericalColumn } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, IVisConfig, VisColumn } from '../interfaces';
 import { PlotlyInfo } from '../interfaces';
 export declare function isPCP(s: IVisConfig): s is IPCPConfig;
 export interface IPCPConfig {
@@ -6,5 +6,5 @@ export interface IPCPConfig {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
 }
-export declare function pcpMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IPCPConfig): IVisConfig;
-export declare function createPCPTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IPCPConfig): PlotlyInfo;
+export declare function pcpMergeDefaultConfig(columns: VisColumn[], config: IPCPConfig): IVisConfig;
+export declare function createPCPTraces(columns: VisColumn[], config: IPCPConfig): Promise<PlotlyInfo>;

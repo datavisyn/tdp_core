@@ -10,11 +10,12 @@ import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
-import { merge } from 'lodash';
-import Plotly from 'plotly.js';
+import { merge, uniqueId } from 'lodash';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { WarningMessage } from '../sidebar/WarningMessage';
+import { useAsync } from '../..';
+import Plotly from 'plotly.js';
 const defaultConfig = {
     color: {
         enable: true,
@@ -36,11 +37,9 @@ const defaultExtensions = {
     postSidebar: null
 };
 export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, scales }) {
-    const uniqueId = useMemo(() => {
-        return Math.random().toString(36).substr(2, 5);
-    }, []);
+    const id = useMemo(() => uniqueId('ScatterVis'), []);
     useEffect(() => {
-        const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
@@ -54,10 +53,11 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
-    const traces = useMemo(() => {
-        return createScatterTraces(columns, selected, config, scales, shapes);
-    }, [columns, selected, config, scales, shapes]);
+    const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
     const layout = useMemo(() => {
+        if (!traces) {
+            return null;
+        }
         const layout = {
             showlegend: true,
             legend: {
@@ -73,10 +73,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         return beautifyLayout(traces, layout);
     }, [traces, config.isRectBrush]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
-        React.createElement("div", { className: "position-relative d-flex justify-content-center align-items-center flex-grow-1" },
+        React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traces.plots.length > 0 ?
-                (React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
+            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ?
+                React.createElement(Plot, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
                         d ? selectionCallback(d.points.map((d) => +d.id)) : selectionCallback([]);
                     }, 
                     //plotly redraws everything on updates, so you need to reappend title and
@@ -97,15 +97,16 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                                 .append('title')
                                 .text(p.yLabel);
                         }
-                    } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
+                    } }) :
+                traceStatus !== 'pending' ? React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) }) : null,
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },
                 React.createElement(BrushOptionButtons, { callback: (e) => setConfig({ ...config, isRectBrush: e }), isRectBrush: config.isRectBrush }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             mergedExtensions.postPlot),
         React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto" },
-            React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
+            React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
                 React.createElement("i", { className: "fas fa-bars" })),
-            React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
+            React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${id}` },
                 React.createElement("div", { className: "container pb-3", style: { width: '20rem' } },
                     React.createElement(WarningMessage, null),
                     React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),

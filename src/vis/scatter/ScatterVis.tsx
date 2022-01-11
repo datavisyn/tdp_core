@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales, VisColumn} from '../interfaces';
 import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
@@ -12,11 +12,12 @@ import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
 import {createScatterTraces, ENumericalColorScaleType, IScatterConfig} from './utils';
 import {beautifyLayout} from '../layoutUtils';
-import {merge} from 'lodash';
-import Plotly from 'plotly.js';
+import {merge, uniqueId} from 'lodash';
 import {BrushOptionButtons} from '../sidebar/BrushOptionButtons';
 import {OpacitySlider} from '../sidebar/OpacitySlider';
 import {WarningMessage} from '../sidebar/WarningMessage';
+import {useAsync} from '../..';
+import Plotly from 'plotly.js';
 
 interface ScatterVisProps {
     config: IScatterConfig;
@@ -41,7 +42,7 @@ interface ScatterVisProps {
         postSidebar?: React.ReactNode;
     };
     shapes?: string[];
-    columns: (NumericalColumn | CategoricalColumn) [];
+    columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
     selectionCallback?: (s: number[]) => void;
     selected?: {[key: number]: boolean};
@@ -84,12 +85,11 @@ export function ScatterVis({
     scales
 }: ScatterVisProps) {
 
-    const uniqueId = useMemo(() => {
-        return Math.random().toString(36).substr(2, 5);
-    }, []);
+    const id = useMemo(() => uniqueId('ScatterVis'), []);
+
 
     useEffect(() => {
-        const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
@@ -108,11 +108,13 @@ export function ScatterVis({
         return merge({}, defaultExtensions, extensions);
     }, []);
 
-    const traces: PlotlyInfo = useMemo(() => {
-        return createScatterTraces(columns, selected, config, scales, shapes);
-    }, [columns, selected, config, scales, shapes]);
+    const {value: traces, status: traceStatus, error: traceError} = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
 
     const layout = useMemo(() => {
+        if(!traces) {
+            return null;
+        }
+
         const layout = {
             showlegend: true,
             legend: {
@@ -131,11 +133,11 @@ export function ScatterVis({
 
     return (
         <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
-            <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+            <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
-                {traces.plots.length > 0 ?
-                    (<Plot
-                        divId={`plotlyDiv${uniqueId}`}
+                {traceStatus === 'success' && traces?.plots.length > 0 ?
+                    <Plot
+                        divId={`plotlyDiv${id}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout as any}
                         config={{responsive: true, displayModeBar: false}}
@@ -167,9 +169,8 @@ export function ScatterVis({
                                     .text(p.yLabel);
                             }
                         }}
-                    />) : (<InvalidCols
-                        message={traces.errorMessage} />)
-                }
+                    /> :
+                    traceStatus !== 'pending' ? <InvalidCols message={traceError?.message || traces?.errorMessage} /> : null}
                 <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x">
                     <BrushOptionButtons
                         callback={(e: boolean) => setConfig({...config, isRectBrush: e})}
@@ -183,10 +184,10 @@ export function ScatterVis({
                 {mergedExtensions.postPlot}
             </div>
             <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
+                <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${id}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
-                <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
+                <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
                     <div className="container pb-3" style={{width: '20rem'}}>
                         <WarningMessage/>
                         <VisTypeSelect

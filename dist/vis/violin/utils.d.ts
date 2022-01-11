@@ -1,4 +1,4 @@
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
 import { PlotlyInfo } from '../interfaces';
 import { EViolinOverlay } from '../bar/utils';
 export declare function isViolin(s: IVisConfig): s is IViolinConfig;
@@ -8,5 +8,5 @@ export interface IViolinConfig {
     catColumnsSelected: ColumnInfo[];
     violinOverlay: EViolinOverlay;
 }
-export declare function violinMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IViolinConfig): IVisConfig;
-export declare function createViolinTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IViolinConfig, scales: Scales): PlotlyInfo;
+export declare function violinMergeDefaultConfig(columns: VisColumn[], config: IViolinConfig): IVisConfig;
+export declare function createViolinTraces(columns: VisColumn[], config: IViolinConfig, scales: Scales): Promise<PlotlyInfo>;

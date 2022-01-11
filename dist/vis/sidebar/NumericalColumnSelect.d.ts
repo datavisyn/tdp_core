@@ -1,8 +1,8 @@
 /// <reference types="react" />
-import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
+import { ColumnInfo, VisColumn } from '../interfaces';
 interface NumericalColumnSelectProps {
     callback: (s: ColumnInfo[]) => void;
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     currentSelected: ColumnInfo[];
 }
 export declare function NumericalColumnSelect(props: NumericalColumnSelectProps): JSX.Element;

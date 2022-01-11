@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
+import {VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales, VisColumn} from '../interfaces';
 import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
@@ -12,6 +12,7 @@ import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {merge} from 'lodash';
 import {createStripTraces, IStripConfig} from './utils';
 import {WarningMessage} from '../sidebar/WarningMessage';
+import {useAsync} from '../..';
 import Plotly from 'plotly.js';
 
 interface StripVisProps {
@@ -23,7 +24,7 @@ interface StripVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn) [];
+    columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
 }
@@ -54,9 +55,7 @@ export function StripVis({
         return merge({}, defaultExtensions, extensions);
     }, []);
 
-    const traces: PlotlyInfo = useMemo(() => {
-        return createStripTraces(columns, config, scales);
-    }, [columns, config, scales]);
+    const {value: traces, status: traceStatus, error: traceError} = useAsync(createStripTraces, [columns, config, scales]);
 
     const uniqueId = useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
@@ -75,6 +74,10 @@ export function StripVis({
     }, []);
 
     const layout = useMemo(() => {
+        if(!traces) {
+            return null;
+        }
+
         const layout = {
             showlegend: true,
             legend: {
@@ -92,11 +95,11 @@ export function StripVis({
 
     return (
         <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
-            <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+            <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
 
-                {traces.plots.length > 0 ?
-                    (<Plot
+                {traceStatus === 'success' && traces?.plots.length > 0 ?
+                    <Plot
                         divId={`plotlyDiv${uniqueId}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout as any}
@@ -118,9 +121,8 @@ export function StripVis({
                                     .text(p.yLabel);
                             }
                         }}
-                    />) : (<InvalidCols
-                        message={traces.errorMessage} />)
-                }
+                    /> :
+                    traceStatus !== 'pending' ? <InvalidCols message={traceError?.message || traces?.errorMessage} /> : null}
             {mergedExtensions.postPlot}
 
             </div>
