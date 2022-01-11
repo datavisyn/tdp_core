@@ -15,6 +15,7 @@ import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { useAsync } from '../..';
+import Plotly from 'plotly.js';
 const defaultConfig = {
     group: {
         enable: true,
@@ -57,10 +58,10 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
         menu.addEventListener('hidden.bs.collapse', () => {
-            window.dispatchEvent(new Event('resize'));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
         menu.addEventListener('shown.bs.collapse', () => {
-            window.dispatchEvent(new Event('resize'));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
     }, []);
     const layout = useMemo(() => {

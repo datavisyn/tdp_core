@@ -11,6 +11,7 @@ import {merge, uniqueId} from 'lodash';
 import {createPCPTraces, IPCPConfig} from './utils';
 import {WarningMessage} from '../sidebar/WarningMessage';
 import {useAsync} from '../..';
+import Plotly from 'plotly.js';
 
 interface PCPVisProps {
     config: IPCPConfig;
@@ -58,11 +59,11 @@ export function PCPVis({
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
-            window.dispatchEvent(new Event('resize'));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
           });
 
         menu.addEventListener('shown.bs.collapse', () => {
-            window.dispatchEvent(new Event('resize'));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
           });
     }, []);
 

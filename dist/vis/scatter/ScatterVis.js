@@ -15,6 +15,7 @@ import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { useAsync } from '../..';
+import Plotly from 'plotly.js';
 const defaultConfig = {
     color: {
         enable: true,
@@ -40,10 +41,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
-            window.dispatchEvent(new Event('resize'));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
         menu.addEventListener('shown.bs.collapse', () => {
-            window.dispatchEvent(new Event('resize'));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
     }, []);
     const mergedOptionsConfig = useMemo(() => {
