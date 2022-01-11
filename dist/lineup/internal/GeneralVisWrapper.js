@@ -2,20 +2,17 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CategoricalColumn, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
 import { EventHandler } from '../../base';
-import { IDTypeManager } from '../../idtype';
-import { Range } from '../../range';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 export class GeneralVisWrapper extends EventHandler {
-    constructor(provider, view, selectionHelper, idType, doc = document) {
+    // tslint:disable-next-line:variable-name
+    constructor(args) {
         super();
-        this.view = view;
-        this.provider = provider;
-        this.selectionHelper = selectionHelper;
-        this.node = doc.createElement('div');
+        this.selectionCallback = args.selectionCallback;
+        this.provider = args.provider;
+        this.node = args.doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
-        this.idType = idType;
         this.viewable = false;
     }
     getSelectionMap() {
@@ -30,11 +27,11 @@ export class GeneralVisWrapper extends EventHandler {
         }
         return selectedMap;
     }
-    selectCallback(selected) {
-        const r = Range.list(selected);
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
-    }
+    // selectCallback(selected: number[]) {
+    //     const r = Range.list(selected);
+    //     const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
+    //     this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
+    // }
     filterCallback(s) {
         const selectedIds = this.provider.getSelection();
         if (selectedIds.length === 0 && s !== 'Clear Filter') {
@@ -43,9 +40,8 @@ export class GeneralVisWrapper extends EventHandler {
         this.provider.setFilter((row) => {
             return s === 'Filter In' ? selectedIds.includes(row.i) : s === 'Filter Out' ? !selectedIds.includes(row.i) : true;
         });
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
         //de select everything after filtering.
-        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: Range.list([]) });
+        this.selectionCallback([]);
         this.updateCustomVis();
     }
     updateCustomVis() {
@@ -96,7 +92,7 @@ export class GeneralVisWrapper extends EventHandler {
         ReactDOM.render(React.createElement(Vis, {
             columns: cols,
             selected: selectedMap,
-            selectionCallback: (s) => this.selectCallback(s),
+            selectionCallback: (s) => this.selectionCallback(s),
             filterCallback: (s) => this.filterCallback(s)
         }), this.node);
     }

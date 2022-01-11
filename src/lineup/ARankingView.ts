@@ -27,6 +27,8 @@ import {BaseUtils} from '../base';
 import {I18nextManager} from '../i18n';
 import {IDTypeManager} from '../idtype';
 import {ISecureItem} from '../security';
+import {Range} from '../range';
+
 
 /**
  * base class for views based on LineUp
@@ -209,7 +211,16 @@ export abstract class ARankingView extends AView {
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-    this.generalVis = new GeneralVisWrapper(this.provider, this, this.selectionHelper, this.itemIDType, this.node.ownerDocument);
+
+    const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
+    this.generalVis = new GeneralVisWrapper({
+      provider: this.provider,
+      selectionCallback: (selected: number[]) => {
+        const r = Range.list(selected);
+        this.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
+      },
+      doc: this.node.ownerDocument
+    });
 
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());

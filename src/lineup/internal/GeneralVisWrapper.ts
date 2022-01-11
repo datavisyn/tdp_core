@@ -3,12 +3,17 @@ import * as ReactDOM from 'react-dom';
 import {CategoricalColumn, Column, LocalDataProvider, NumberColumn, Ranking, ValueColumn} from 'lineupjs';
 import {EventHandler, IRow} from '../../base';
 import {IDTypeManager} from '../../idtype';
-import {Range} from '../../range';
 import {ARankingView} from '..';
 import {Vis} from '../../vis/Vis';
 import {EColumnTypes, ColumnInfo, VisColumn} from '../../vis/interfaces';
 import {LineUpSelectionHelper} from './LineUpSelectionHelper';
 import {IDType} from '../../idtype';
+
+export interface IGeneralVisWrapperArgs {
+    provider: LocalDataProvider;
+    selectionCallback: (selected: number[]) => void;
+    doc: Document;
+}
 
 export class GeneralVisWrapper extends EventHandler {
     /**
@@ -17,23 +22,19 @@ export class GeneralVisWrapper extends EventHandler {
     private static PLOTLY_CATEGORICAL_MISSING_VALUE: string = '--';
 
     readonly node: HTMLElement; // wrapper node
+    private selectionCallback: (selected: number[]) => void;
     private viewable: boolean;
     private provider: LocalDataProvider;
-    private selectionHelper: LineUpSelectionHelper;
-    private idType: IDType;
-    private view: ARankingView;
-    private data: any[];
 
-    constructor(provider: LocalDataProvider, view: ARankingView, selectionHelper: LineUpSelectionHelper, idType: IDType, doc = document) {
+    // tslint:disable-next-line:variable-name
+    constructor(args: IGeneralVisWrapperArgs) {
         super();
 
-        this.view = view;
-        this.provider = provider;
-        this.selectionHelper = selectionHelper;
-        this.node = doc.createElement('div');
+        this.selectionCallback = args.selectionCallback;
+        this.provider = args.provider;
+        this.node = args.doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
-        this.idType = idType;
         this.viewable = false;
     }
 
@@ -54,11 +55,11 @@ export class GeneralVisWrapper extends EventHandler {
         return selectedMap;
     }
 
-    selectCallback(selected: number[]) {
-        const r = Range.list(selected);
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-        this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
-    }
+    // selectCallback(selected: number[]) {
+    //     const r = Range.list(selected);
+    //     const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
+    //     this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
+    // }
 
     filterCallback(s: string) {
         const selectedIds = this.provider.getSelection();
@@ -71,10 +72,8 @@ export class GeneralVisWrapper extends EventHandler {
             return s === 'Filter In' ? selectedIds.includes(row.i) : s === 'Filter Out' ? !selectedIds.includes(row.i) : true;
         });
 
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-
         //de select everything after filtering.
-        this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: Range.list([])});
+        this.selectionCallback([]);
 
         this.updateCustomVis();
     }
@@ -140,7 +139,7 @@ export class GeneralVisWrapper extends EventHandler {
                 {
                     columns: cols,
                     selected: selectedMap,
-                    selectionCallback: (s: number[]) => this.selectCallback(s),
+                    selectionCallback: (s: number[]) => this.selectionCallback(s),
                     filterCallback: (s: string) => this.filterCallback(s)
                 }
             ),
