@@ -236,7 +236,7 @@ export interface IViewLayoutContainer extends ILayoutContainer {
 /**
  * interface for the actual view
  */
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PHOVEA_UI_IView {
   /**
    * HTMLElement of this view

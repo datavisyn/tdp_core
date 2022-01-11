@@ -53,8 +53,8 @@ export class AIterator<T> {
    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map<U>(callbackfn: (value: T) => U, thisArg?: any): IIterator<U> {
-    // tslint:disable:no-use-before-declare
     // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new TransformIterator(this, callbackfn, thisArg);
   }
 

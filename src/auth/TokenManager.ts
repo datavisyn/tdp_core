@@ -1,8 +1,8 @@
+import { castArray } from 'lodash';
+import { IEvent, EventHandler, GlobalEventHandler, IEventListener } from '../base';
+import { UserSession } from '../app';
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
-import { castArray } from 'lodash';
-import {UserSession} from '../app';
-import {IEvent, EventHandler, GlobalEventHandler, IEventListener} from '../base';
 
 // Extract all parameters except the first one
 type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
@@ -254,5 +254,4 @@ export class InvalidTokenError extends Error {
 /**
  * Global token manager for TDP applications.
  */
-/* tslint:disable-next-line:variable-name */
 export const TDPTokenManager = new TokenManager();

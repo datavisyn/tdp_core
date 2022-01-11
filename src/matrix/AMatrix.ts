@@ -81,8 +81,8 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
     if (r.isAll) {
       return this.root;
     }
-    // tslint:disable:no-use-before-declare
     // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new MatrixView(this.root, r);
   }
 
@@ -140,9 +140,7 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
 
   restore(persisted: any): IPersistable {
     if (persisted && persisted.f) {
-      /* tslint:disable:no-eval */
       return this.reduce(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
-      /* tslint:enable:no-eval */
     } else if (persisted && persisted.range) { //some view onto it
       return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
     } else if (persisted && persisted.transposed) {

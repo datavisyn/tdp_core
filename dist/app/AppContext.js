@@ -11,9 +11,9 @@ export class AppContext {
          * @type {boolean}
          */
         this.offline = false;
-        /* tslint:disable:variable-name */
+        // eslint-disable @typescript-eslint/naming-convention disable
         /**
-         * server prefix ofr api calls
+         * server prefix of api calls
          * @type {string}
          */
         this.server_url = (WebpackEnv.__APP_CONTEXT__ || '/') + 'api';
@@ -35,7 +35,7 @@ export class AppContext {
         this.param = new PropertyHandler(location.search);
         this.defaultGenerator = () => Promise.reject('offline');
     }
-    /* tslint:enable:variable-name */
+    // eslint-enable @typescript-eslint/naming-convention disable
     /**
      * initializes certain properties of the core
      * @param config

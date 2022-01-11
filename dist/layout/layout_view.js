@@ -1,6 +1,6 @@
 import { PluginRegistry } from '../app/PluginRegistry';
 import { EventHandler } from '../base/event';
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_CORE_AView extends EventHandler {
     constructor() {
         super(...arguments);

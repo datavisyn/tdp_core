@@ -123,7 +123,6 @@ function useBSShowHide(instance, show) {
         }
     }, [show, instance]);
 }
-/* tslint:disable: variable-name */
 export const BSModal = BSClass(useBSModal, (instance, { show, setShow }) => {
     useBSListeners(instance, {
         'shown.bs.modal': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
@@ -182,5 +181,4 @@ export const BSDropdown = BSClass(useBSDropdown, (instance, { show, setShow }) =
     });
     useBSShowHide(instance, show);
 });
-/* tslint:enable */
 //# sourceMappingURL=useBootstrap.js.map

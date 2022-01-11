@@ -133,9 +133,8 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     if (plugin.preview) {
       plugin.preview().then((previewImage) => {
         const image = <HTMLElement>this.node.querySelector('.preview-image > div');
-        /* tslint:disable:no-string-literal */
+        // eslint-disable-next-line @typescript-eslint/dot-notation
         image.style.backgroundImage = `url("${previewImage['default']}")`;
-        /* tslint:enable:no-string-literal */
       });
     }
 
@@ -155,7 +154,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       //lazy init
       this.createView(selection);
     } else {
-      this.update();  // if the view was just created we don't need to call update again
+      this.update(); // if the view was just created we don't need to call update again
     }
   }
 

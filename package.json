@@ -53,6 +53,7 @@
     "test": "npm run test:web && npm run test:python",
     "lint": "eslint src/**/*.ts{,x}",
     "lint:fix": "eslint --fix src/**/*.ts{,x}",
+    "lint:fix:output": "eslint --fix src/**/*.ts{,x} -o ./report.html",
     "docs:web": "typedoc --options typedoc.json src/**.ts",
     "docs:python": "sphinx-apidoc -o docs -f ./tdp_core && sphinx-build ./docs build/docs",
     "docs": "npm run docs:web && npm run docs:python",

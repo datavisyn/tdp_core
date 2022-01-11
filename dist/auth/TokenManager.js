@@ -1,8 +1,8 @@
+import { castArray } from 'lodash';
+import { EventHandler, GlobalEventHandler } from '../base';
+import { UserSession } from '../app';
 import { ERenderAuthorizationStatus } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
-import { castArray } from 'lodash';
-import { UserSession } from '../app';
-import { EventHandler, GlobalEventHandler } from '../base';
 export class TokenManager extends EventHandler {
     constructor() {
         super();
@@ -200,6 +200,5 @@ export class InvalidTokenError extends Error {
 /**
  * Global token manager for TDP applications.
  */
-/* tslint:disable-next-line:variable-name */
 export const TDPTokenManager = new TokenManager();
 //# sourceMappingURL=TokenManager.js.map

@@ -53,7 +53,7 @@ export interface IValueTypeEditor {
   getOptionsMarkup(current: ValueTypeEditor, def: ITypeDefinition): Promise<string> | string;
 }
 
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_IMPORTER_ValueTypeUtils {
   static createDialog(title: string, classSuffix: string, onSubmit: () => any) {
     const dialog = Dialog.generateDialog(title, I18nextManager.getInstance().i18n.t('phovea:importer.save'));

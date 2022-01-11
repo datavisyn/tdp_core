@@ -139,7 +139,7 @@ export class Dialog {
     }
 }
 Dialog.openDialogs = 0;
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_UI_FormDialog extends Dialog {
     constructor(title, primaryBtnText = 'OK', formId = 'form' + BaseUtils.randomId(5), additionalCSSClasses = '') {
         super(title, primaryBtnText, additionalCSSClasses);

@@ -20,13 +20,13 @@ export interface IViewDesc extends IPluginDesc {
   readonly location: string;
 }
 
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PHOVEA_CORE_IView extends ILayoutElem, IEventHandler {
   readonly data: IDataType[];
   readonly idtypes: IDType[];
 }
 
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export abstract class PHOVEA_CORE_AView extends EventHandler implements PHOVEA_CORE_IView {
   private _layoutOptions: any = {};
 

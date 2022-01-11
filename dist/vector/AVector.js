@@ -22,8 +22,8 @@ export class AVector extends ASelectAble {
         return this.size();
     }
     view(range = Range.all()) {
-        // tslint:disable:no-use-before-declare
         // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new VectorView(this.root, ParseRangeUtils.parseRangeLike(range));
     }
     async idView(idRange = Range.all()) {
@@ -114,9 +114,7 @@ export class AVector extends ASelectAble {
     restore(persisted) {
         let r = this;
         if (persisted && persisted.f) {
-            /* tslint:disable:no-eval */
             return this.reduceAtom(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
-            /* tslint:enable:no-eval */
         }
         else if (persisted && persisted.range) { //some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));

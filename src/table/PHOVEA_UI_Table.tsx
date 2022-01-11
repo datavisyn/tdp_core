@@ -6,7 +6,7 @@ export interface ITableProps<T extends object> {
   data: T[];
 }
 
-// tslint:disable-next-line: variable-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export function TDP_UI_Table<T extends object>(props: ITableProps<T>) {
   const {columns, data} = props;
 

@@ -12,7 +12,7 @@ import {ResolveNow} from '../base/promise';
 import {IDataType} from '../data/datatype';
 import {AGraph} from '../graph';
 
-// tslint:disable-next-line: no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IRemoteStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
   // empty for now
 }

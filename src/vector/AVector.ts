@@ -35,9 +35,9 @@ export abstract class AVector<T,D extends IValueTypeDesc> extends ASelectAble {
     return this.size();
   }
 
-  view(range: RangeLike = Range.all()): IVector<T,D> {
-    // tslint:disable:no-use-before-declare
+  view(range: RangeLike = Range.all()): IVector<T, D> {
     // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new VectorView(this.root, ParseRangeUtils.parseRangeLike(range));
   }
 
@@ -144,9 +144,7 @@ export abstract class AVector<T,D extends IValueTypeDesc> extends ASelectAble {
   restore(persisted: any) {
     let r: IVector<T,D> = <IVector<T,D>>(<any>this);
     if (persisted && persisted.f) {
-      /* tslint:disable:no-eval */
       return this.reduceAtom(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
-      /* tslint:enable:no-eval */
     } else if (persisted && persisted.range) { //some view onto it
       r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
     }

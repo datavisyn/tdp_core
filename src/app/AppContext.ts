@@ -21,9 +21,9 @@ export class AppContext {
    */
   public static version = WebpackEnv.__VERSION__;
 
-  /* tslint:disable:variable-name */
+  // eslint-disable @typescript-eslint/naming-convention disable
   /**
-   * server prefix ofr api calls
+   * server prefix of api calls
    * @type {string}
    */
   public server_url: string = (WebpackEnv.__APP_CONTEXT__ || '/') + 'api';
@@ -32,7 +32,7 @@ export class AppContext {
    * @type {string}
    */
   public server_json_suffix: string = '';
-  /* tslint:enable:variable-name */
+  // eslint-enable @typescript-eslint/naming-convention disable
 
   /**
    * initializes certain properties of the core

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useTable } from 'react-table';
-// tslint:disable-next-line: variable-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export function TDP_UI_Table(props) {
     const { columns, data } = props;
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });

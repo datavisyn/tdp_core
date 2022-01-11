@@ -171,7 +171,6 @@ function useBSShowHide(instance: Modal | Toast | Popover | Tooltip | Dropdown, s
   }, [show, instance]);
 }
 
-/* tslint:disable: variable-name */
 export const BSModal = BSClass(useBSModal, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
   useBSListeners(instance, {
     'shown.bs.modal': () => setShow?.(true),
@@ -232,4 +231,3 @@ export const BSDropdown = BSClass(useBSDropdown, (instance, { show, setShow }: {
   });
   useBSShowHide(instance, show);
 });
-/* tslint:enable */

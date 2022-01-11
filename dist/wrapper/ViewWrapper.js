@@ -85,9 +85,8 @@ export class ViewWrapper extends EventHandler {
         if (plugin.preview) {
             plugin.preview().then((previewImage) => {
                 const image = this.node.querySelector('.preview-image > div');
-                /* tslint:disable:no-string-literal */
+                // eslint-disable-next-line @typescript-eslint/dot-notation
                 image.style.backgroundImage = `url("${previewImage['default']}")`;
-                /* tslint:enable:no-string-literal */
             });
         }
         this.ref = graph.findOrAddObject(ObjectRefUtils.objectRef(this, plugin.name, ObjectRefUtils.category.visual));
