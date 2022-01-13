@@ -82,11 +82,12 @@ class ReferenceWrapper extends React.Component {
  * @param hook Main BS hook for this class.
  * @param additionalHook An additional hook to support additional properties for each instance type, i.e. show/hide in modals.
  */
-function BSClass<HookType extends BSHook, HookParameters extends (Parameters<HookType>[0] extends undefined ? {} : Parameters<HookType>[0]), AdditionalHookOptions extends object = {}>(
-  hook: HookType,
-  additionalHook?: (instance: ReturnType<HookType>[1], options: AdditionalHookOptions) => void
-) {
-  return ({
+function BSClass<
+  HookType extends BSHook,
+  HookParameters extends Parameters<HookType>[0] extends undefined ? {} : Parameters<HookType>[0],
+  AdditionalHookOptions extends object = {},
+>(hook: HookType, additionalHook?: (instance: ReturnType<HookType>[1], options: AdditionalHookOptions) => void) {
+  return function ({
     children,
     instanceRef,
     // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
@@ -100,7 +101,8 @@ function BSClass<HookType extends BSHook, HookParameters extends (Parameters<Hoo
      * Optional ref to get access to the instance of the BS class.
      */
     instanceRef?: React.RefCallback<ReturnType<HookType>[1]>;
-  } & HookParameters & AdditionalHookOptions) => {
+  } & HookParameters &
+    AdditionalHookOptions) {
     // Instantiate the hook
     const [ref, instance] = hook(options);
 
@@ -122,7 +124,7 @@ function BSClass<HookType extends BSHook, HookParameters extends (Parameters<Hoo
           ref(null);
         }
       },
-      [ref]
+      [ref],
     );
 
     // Call the render function
@@ -165,7 +167,7 @@ function useBSShowHide(instance: Modal | Toast | Popover | Tooltip | Dropdown, s
       } else {
         instance?.hide();
       }
-    } catch(e) {
+    } catch (e) {
       console.error(e);
     }
   }, [show, instance]);
@@ -207,7 +209,7 @@ export const BSOffcanvas = BSClass(
         instance?.hide();
       }
     }, [show, instance]);
-  }
+  },
 );
 export const BSTooltip = BSClass(useBSTooltip, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
   useBSListeners(instance, {

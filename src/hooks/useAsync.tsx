@@ -1,10 +1,8 @@
 import * as React from 'react';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 
-
 // https://stackoverflow.com/questions/48011353/how-to-unwrap-type-of-a-promise
 type Awaited<T> = T extends PromiseLike<infer U> ? { 0: Awaited<U>; 1: U }[U extends PromiseLike<any> ? 0 : 1] : T;
-
 
 export type useAsyncStatus = 'idle' | 'pending' | 'success' | 'error';
 
@@ -32,7 +30,10 @@ export type useAsyncStatus = 'idle' | 'pending' | 'success' | 'error';
  * @param asyncFunction Async function to be wrapped.
  * @param immediate Null if function should not be triggered immediately, or the initial parameter array if immediate.
  */
-export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Awaited<ReturnType<F>>>(asyncFunction: F, immediate: Parameters<F> | null = null) => {
+export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Awaited<ReturnType<F>>>(
+  asyncFunction: F,
+  immediate: Parameters<F> | null = null,
+) => {
   const [status, setStatus] = React.useState<useAsyncStatus>('idle');
   const [value, setValue] = React.useState<T | null>(null);
   const [error, setError] = React.useState<E | null>(null);
@@ -40,22 +41,25 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
   // handles setting state for pending, value, and error.
   // useCallback ensures the below useEffect is not called
   // on every render, but only if asyncFunction changes.
-  const execute = React.useCallback((...args: Parameters<typeof asyncFunction>) => {
-    setStatus('pending');
-    setValue(null);
-    setError(null);
-    return Promise.resolve(asyncFunction(...args))
-      .then((response: T) => {
-        setValue(response);
-        setStatus('success');
-        return response;
-      })
-      .catch((error: E) => {
-        setError(error);
-        setStatus('error');
-        throw error;
-      });
-  }, [asyncFunction]);
+  const execute = React.useCallback(
+    (...args: Parameters<typeof asyncFunction>) => {
+      setStatus('pending');
+      setValue(null);
+      setError(null);
+      return Promise.resolve(asyncFunction(...args))
+        .then((response: T) => {
+          setValue(response);
+          setStatus('success');
+          return response;
+        })
+        .catch((error: E) => {
+          setError(error);
+          setStatus('error');
+          throw error;
+        });
+    },
+    [asyncFunction],
+  );
   // Call execute if we want to fire it right away.
   // Otherwise execute can be called later, such as
   // in an onClick handler.

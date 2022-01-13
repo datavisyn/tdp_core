@@ -81,10 +81,6 @@ it('flagId', () => expect(UniqueIdManager.getInstance().flagId('fake', 1)).toEqu
 // TODO: _init is limited to core... make private?
 // TODO: argFilter is limited to core... make private?
 
-//  argList external usages:
-//  caleydo_window/main.ts:        return vis.locate.apply(vis, C.argList(arguments)).then(function (r) {
-//  caleydo_window/main.ts:        return vis.locateById.apply(vis, C.argList(arguments)).then(function (r) {
-
 // TODO: argSort is limited to core... make private?
 // TODO: callable is defined but unused... delete?
 

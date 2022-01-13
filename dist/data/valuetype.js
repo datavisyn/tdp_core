@@ -3,7 +3,7 @@
  */
 import { BaseUtils } from '../base';
 function isNumeric(obj) {
-    return (obj - parseFloat(obj) + 1) >= 0;
+    return obj - parseFloat(obj) + 1 >= 0;
 }
 export class ValueTypeUtils {
     /**
@@ -13,7 +13,7 @@ export class ValueTypeUtils {
      */
     static guessValueTypeDesc(arr) {
         if (arr.length === 0) {
-            return { type: 'string' }; //doesn't matter
+            return { type: 'string' }; // doesn't matter
         }
         const test = arr[0];
         if (typeof test === 'number' || isNumeric(test)) {
@@ -21,7 +21,7 @@ export class ValueTypeUtils {
         }
         const values = new Set(arr);
         if (values.size < arr.length * 0.2 || values.size < 8) {
-            //guess as categorical
+            // guess as categorical
             return { type: 'categorical', categories: Array.from(values.values()) };
         }
         return { type: 'string' };
@@ -30,7 +30,7 @@ export class ValueTypeUtils {
         if (Array.isArray(arr)) {
             const vs = arr;
             if (vs.indexOf(missing) >= 0) {
-                return vs.map((v) => v === missing ? NaN : v);
+                return vs.map((v) => (v === missing ? NaN : v));
             }
         }
         return arr === missing ? NaN : arr;

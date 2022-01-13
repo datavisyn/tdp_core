@@ -1,8 +1,7 @@
-import {GraphNode, AttributeContainer, GraphEdge} from '../graph/graph';
-import {ObjectNode, IObjectRef} from './ObjectNode';
-import {ICmdFunction, IInverseActionCreator, ICmdFunctionFactory, IAction} from './ICmd';
-import {ActionMetaData} from './ActionMeta';
-
+import { GraphNode, AttributeContainer, GraphEdge } from '../graph/graph';
+import { ObjectNode, IObjectRef } from './ObjectNode';
+import { ICmdFunction, IInverseActionCreator, ICmdFunctionFactory, IAction } from './ICmd';
+import { ActionMetaData } from './ActionMeta';
 
 export class ActionUtils {
   /**
@@ -20,11 +19,10 @@ export class ActionUtils {
       id,
       f,
       inputs,
-      parameter
+      parameter,
     };
   }
 }
-
 
 export class ActionNode extends GraphNode {
   public inverter: IInverseActionCreator;
@@ -104,9 +102,10 @@ export class ActionNode extends GraphNode {
     if (this.f_id !== that.f_id) {
       return false;
     }
-    //TODO check parameters if they are the same
+    // TODO check parameters if they are the same
     return true;
   }
+
   get uses(): ObjectNode<any>[] {
     return this.outgoing.filter(GraphEdge.isGraphType(/(creates|removes|requires)/)).map((e) => <ObjectNode<any>>e.target);
   }
@@ -116,11 +115,17 @@ export class ActionNode extends GraphNode {
   }
 
   get removes(): ObjectNode<any>[] {
-    return this.outgoing.filter(GraphEdge.isGraphType('removes')).sort(AttributeContainer.byIndex).map((e) => <ObjectNode<any>>e.target);
+    return this.outgoing
+      .filter(GraphEdge.isGraphType('removes'))
+      .sort(AttributeContainer.byIndex)
+      .map((e) => <ObjectNode<any>>e.target);
   }
 
   get requires(): ObjectNode<any>[] {
-    return this.outgoing.filter(GraphEdge.isGraphType('requires')).sort(AttributeContainer.byIndex).map((e) => <ObjectNode<any>>e.target);
+    return this.outgoing
+      .filter(GraphEdge.isGraphType('requires'))
+      .sort(AttributeContainer.byIndex)
+      .map((e) => <ObjectNode<any>>e.target);
   }
 }
 

@@ -16,7 +16,7 @@ export class AppContext {
          * server prefix of api calls
          * @type {string}
          */
-        this.server_url = (WebpackEnv.__APP_CONTEXT__ || '/') + 'api';
+        this.server_url = `${WebpackEnv.__APP_CONTEXT__ || '/'}api`;
         /**
          * server suffix for api calls
          * @type {string}
@@ -32,7 +32,7 @@ export class AppContext {
          * access to get parameters
          * @type {PropertyHandler}
          */
-        this.param = new PropertyHandler(location.search);
+        this.param = new PropertyHandler(window.location.search);
         this.defaultGenerator = () => Promise.reject('offline');
     }
     // eslint-enable @typescript-eslint/naming-convention disable
@@ -44,7 +44,7 @@ export class AppContext {
         config = BaseUtils.mixin({
             offline: this.offline,
             server_url: this.server_url,
-            server_json_suffix: this.server_json_suffix
+            server_json_suffix: this.server_json_suffix,
         }, config);
         this.offline = config.offline;
         this.server_url = config.server_url;
@@ -63,20 +63,22 @@ export class AppContext {
             if (!node) {
                 return undefined;
             }
-            return node.dataset['phovea' + camelCaseName];
+            return node.dataset[`phovea${camelCaseName}`];
         }
         const config = {};
-        if ('true' === find('offline')) {
+        if (find('offline') === 'true') {
             config.offline = true;
         }
         let v;
+        // eslint-disable-next-line no-cond-assign
         if ((v = find('server-url', 'ServerUrl')) !== undefined) {
             config.server_url = v;
         }
+        // eslint-disable-next-line no-cond-assign
         if ((v = find('server-json-suffix', 'ServerJsonSuffix')) !== undefined) {
             config.server_json_suffix = v;
         }
-        //init myself
+        // init myself
         this.init(config);
     }
     /**

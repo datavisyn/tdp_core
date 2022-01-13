@@ -14,11 +14,12 @@ export class Player {
         this.graph = graph;
         this.anim = -1;
         this.options = {
-            //default animation step duration
-            step: 1000
+            // default animation step duration
+            step: 1000,
         };
         BaseUtils.mixin(this.options, options);
         const $controls = d3.select(controls);
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         this.$play = $controls.select('[data-player="play"]').on('click', function () {
             const $i = d3.select(this);
@@ -41,12 +42,12 @@ export class Player {
         });
         d3.select(document).on('keydown.playpause', () => {
             const k = d3.event;
-            //pause key
+            // pause key
             if (k.keyCode === 19) {
                 k.preventDefault();
-                //fake a click event
+                // fake a click event
                 const event = document.createEvent('MouseEvents');
-                event.initMouseEvent('click', /* type */ true, /* canBubble */ true, /* cancelable */ window, /* view */ 0, /* detail */ 0, /* screenX */ 0, /* screenY */ 0, /* clientX */ 0, /* clientY */ false, /* ctrlKey */ false, /* altKey */ false, /* shiftKey */ false, /* metaKey */ 0, /* button */ null /* relatedTarget */);
+                event.initMouseEvent('click' /* type */, true /* canBubble */, true /* cancelable */, window /* view */, 0 /* detail */, 0 /* screenX */, 0 /* screenY */, 0 /* clientX */, 0 /* clientY */, false /* ctrlKey */, false /* altKey */, false /* shiftKey */, false /* metaKey */, 0 /* button */, null /* relatedTarget */);
                 this.$play.node().dispatchEvent(event);
             }
         });
@@ -56,18 +57,16 @@ export class Player {
         const act = this.graph.selectedSlides()[0] || l[l.length - 1];
         if (act) {
             this.render(act).then(() => {
-                this.anim = self.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
+                this.anim = window.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
             });
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
     render(story) {
-        //render by selecting the slide
+        // render by selecting the slide
         this.graph.selectSlide(story);
-        //TODO transition time
+        // TODO transition time
         return ResolveNow.resolveImmediately(story);
     }
     stopAnim() {
@@ -92,7 +91,7 @@ export class Player {
         const r = this.forward();
         if (r) {
             r.then((act) => {
-                this.anim = self.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
+                this.anim = window.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
             });
         }
     }
@@ -108,9 +107,7 @@ export class Player {
             this.stop();
             return null;
         }
-        else {
-            return this.render(act);
-        }
+        return this.render(act);
     }
     /**
      * jumps to the previous slide
@@ -124,9 +121,7 @@ export class Player {
             this.stop();
             return null;
         }
-        else {
-            return this.render(act);
-        }
+        return this.render(act);
     }
 }
 //# sourceMappingURL=Player.js.map

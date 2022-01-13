@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,21 +7,20 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
-import {ReactElement} from 'react';
+ ******************************************************** */
+import { ReactElement } from 'react';
 import * as ReactDOM from 'react-dom';
-import {AView} from '.';
-import {ISelection, IViewContext} from '../base';
-import {Errors} from '../components';
-import {IDTypeLike, IDTypeManager} from '../idtype';
-import {Range} from '../range';
-
+import { AView } from '.';
+import { ISelection, IViewContext } from '../base';
+import { Errors } from '../components';
+import { IDTypeLike, IDTypeManager } from '../idtype';
+import { Range } from '../range';
 
 /**
  * definition how to select elements within the react view
  */
 export interface ISelector {
-  (name: string|string[], op?: 'add' | 'set' | 'remove' | 'toggle'): void;
+  (name: string | string[], op?: 'add' | 'set' | 'remove' | 'toggle'): void;
 }
 
 /**
@@ -39,12 +38,11 @@ export interface IReactViewOptions {
  * a TDP view that is internally implemented using react.js
  */
 export abstract class AReactView extends AView {
-
   private readonly select: ISelector = this.selectImpl.bind(this);
 
   private readonly handler?: IReactHandler;
 
-  constructor(context: IViewContext, selection: ISelection, parent:HTMLElement, options: Partial<Readonly<IReactViewOptions>> = {}) {
+  constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<Readonly<IReactViewOptions>> = {}) {
     super(context, selection, parent);
 
     this.handler = options && options.reactHandler ? options.reactHandler : null;
@@ -66,22 +64,22 @@ export abstract class AReactView extends AView {
     return this.update();
   }
 
-  private selectImpl(name: string|string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set') {
-    const names = Array.isArray(name) ? name: [name];
+  private selectImpl(name: string | string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set') {
+    const names = Array.isArray(name) ? name : [name];
     const idtype = this.itemIDType;
     return idtype.map(names).then((ids) => {
       const range = Range.list(ids);
       const act = this.getItemSelection();
       let r: number[] = [];
-      switch(op) {
+      switch (op) {
         case 'add':
           const union = act.range.union(range);
-          this.setItemSelection({idtype, range: union});
+          this.setItemSelection({ idtype, range: union });
           r = union.dim(0).asList();
           break;
         case 'remove':
           const without = act.range.without(range);
-          this.setItemSelection({idtype, range: without});
+          this.setItemSelection({ idtype, range: without });
           r = without.dim(0).asList();
           break;
         case 'toggle':
@@ -96,10 +94,10 @@ export abstract class AReactView extends AView {
           });
           r.sort((a, b) => a - b);
           const result = Range.list(r);
-          this.setItemSelection({idtype, range: result});
+          this.setItemSelection({ idtype, range: result });
           break;
         default:
-          this.setItemSelection({idtype, range});
+          this.setItemSelection({ idtype, range });
           r = range.dim(0).asList();
           break;
       }
@@ -123,22 +121,21 @@ export abstract class AReactView extends AView {
     this.setBusy(true);
     const item = this.getItemSelection();
     return Promise.all([this.resolveSelection(), item.idtype ? item.idtype.unmap(item.range) : []])
-    .then((names: string[][]) => {
-      const inputSelection = names[0];
-      const itemSelection = names[1];
-      return this.render(inputSelection, itemSelection, this.select);
-    }).then((elem: ReactElement<any>) => {
-      this.setBusy(false);
-      ReactDOM.render(
-        elem,
-        <HTMLElement>this.node.querySelector('div.react-view-body')
-      );
-    }).catch(Errors.showErrorModalDialog)
-    .catch((r) => {
-      console.error(r);
-      this.setBusy(false);
-      this.setHint(true, 'Error creating view');
-    });
+      .then((names: string[][]) => {
+        const inputSelection = names[0];
+        const itemSelection = names[1];
+        return this.render(inputSelection, itemSelection, this.select);
+      })
+      .then((elem: ReactElement<any>) => {
+        this.setBusy(false);
+        ReactDOM.render(elem, <HTMLElement>this.node.querySelector('div.react-view-body'));
+      })
+      .catch(Errors.showErrorModalDialog)
+      .catch((r) => {
+        console.error(r);
+        this.setBusy(false);
+        this.setHint(true, 'Error creating view');
+      });
   }
 
   /**

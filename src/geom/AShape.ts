@@ -1,10 +1,11 @@
-import {IShape} from '../2D/IShape';
-import {IRect} from './IRect';
-import {Vector2D} from '../2D/Vector2D';
-import {Intersection} from '../2D/Intersection';
-import {IIntersectionParam} from '../2D/IIntersectionParam';
+/* eslint-disable prefer-rest-params */
+import { IShape } from '../2D/IShape';
+import { IRect } from './IRect';
+import { Vector2D } from '../2D/Vector2D';
+import { Intersection } from '../2D/Intersection';
+import { IIntersectionParam } from '../2D/IIntersectionParam';
 
-export module Corner {
+export namespace Corner {
   export const CORNER: any = <any>[];
   CORNER.N = CORNER[0] = 'n';
   CORNER.NE = CORNER[1] = 'ne';
@@ -20,14 +21,13 @@ export module Corner {
  * a simple basic shape
  */
 export abstract class AShape implements IShape {
-
   /**
    * shift the shape by the given amount
    * @param x
    * @param y
    */
   shift(x: number, y: number): AShape;
-  shift(xy: {x: number, y: number}): AShape;
+  shift(xy: { x: number; y: number }): AShape;
   shift(xy: [number, number]): AShape;
   shift() {
     if (typeof arguments[0] === 'number') {

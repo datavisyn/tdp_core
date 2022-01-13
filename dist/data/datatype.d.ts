@@ -8,7 +8,7 @@ import { IHistogram } from './histogram';
 import { IAdvancedStatistics, IStatistics } from '../base/statistics';
 import { RangeLike, Range } from '../range';
 import { IDataDescription } from './DataDescription';
-import { IValueTypeDesc } from './valuetype';
+import type { IValueTypeDesc } from './valuetype';
 /**
  * Basic data type interface
  */
@@ -45,7 +45,6 @@ export declare abstract class ADataType<T extends IDataDescription> extends ASel
     static isADataType(v: IDataType): boolean;
 }
 export declare class DummyDataType extends ADataType<IDataDescription> {
-    constructor(desc: IDataDescription);
 }
 export interface IHistAbleDataType<D extends IValueTypeDesc> extends IDataType {
     valuetype: D;

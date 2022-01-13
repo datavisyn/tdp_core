@@ -1,5 +1,5 @@
 import { castArray } from 'lodash';
-import { IEvent, EventHandler, GlobalEventHandler, IEventListener } from '../base';
+import { IEvent, EventHandler, GlobalEventHandler, IEventListener } from '../base/event';
 import { UserSession } from '../app';
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
@@ -12,16 +12,19 @@ export declare function authorizationRemoved(event: IEvent, ids: string[]): void
 
 export class TokenManager extends EventHandler {
   static EVENT_AUTHORIZATION_STORED = 'event_authorization_stored';
+
   static EVENT_AUTHORIZATION_REMOVED = 'event_authorization_removed';
 
   /**
    * Map of saved tokens.
    */
   protected tokens = new Map<string, string>();
+
   /**
    * Map of authorization configurations.
    */
   protected authorizationConfigurations = new Map<string, IAuthorizationConfiguration>();
+
   /**
    * Map of possible authorization flows.
    */
@@ -32,7 +35,7 @@ export class TokenManager extends EventHandler {
 
     // TODO: Currently, only one authorization flow is possible. Maybe add an extension point in the future.
     this.addAuthorizationFlow({
-      simplePopup: simplePopupFlow
+      simplePopup: simplePopupFlow,
     });
 
     // Clear all tokens as soon as a user logs out.
@@ -76,7 +79,7 @@ export class TokenManager extends EventHandler {
    * Adds authorization flows to the token manager.
    * @param authorizationFlows Authorization flows to be added.
    */
-  public async addAuthorizationFlow(authorizationFlows: {[id: string]: IAuthorizationFlow}): Promise<void> {
+  public async addAuthorizationFlow(authorizationFlows: { [id: string]: IAuthorizationFlow }): Promise<void> {
     // Fill the authorization flows with the predefined configurations.
     Object.entries(authorizationFlows).forEach(([id, flow]) => this.authorizationFlows.set(id, flow));
   }
@@ -104,7 +107,7 @@ export class TokenManager extends EventHandler {
        * Note that it will wait forever until a `EVENT_AUTHORIZATION_STORED` is triggered.
        */
       wait?: boolean;
-    }
+    },
   ): Promise<string | null> {
     const token = this.tokens.get(id);
     if (!token && options?.wait) {
@@ -170,7 +173,7 @@ export class TokenManager extends EventHandler {
        * True if the authorization should be run even if a token already exists (i.e. to override it).
        */
       force?: boolean;
-    }
+    },
   ): Promise<void> {
     if (authConfigurations) {
       // Iterate over all authorization configurations
@@ -186,11 +189,14 @@ export class TokenManager extends EventHandler {
    * @param options Options for the authorization run.
    * @returns The retrieved token, or null if no token is available.
    */
-  protected async runAuthorization(authConfiguration: string | IAuthorizationConfiguration, options: Parameters<TokenManager['runAuthorizations']>[1]): Promise<string | null> {
+  protected async runAuthorization(
+    authConfiguration: string | IAuthorizationConfiguration,
+    options: Parameters<TokenManager['runAuthorizations']>[1],
+  ): Promise<string | null> {
     let config: IAuthorizationConfiguration = null;
-    if(typeof(authConfiguration) === 'string') {
+    if (typeof authConfiguration === 'string') {
       config = this.authorizationConfigurations.get(authConfiguration);
-      if(!config) {
+      if (!config) {
         throw Error(`No authorization configuration with id ${authConfiguration} exists.`);
       }
     } else {
@@ -199,7 +205,7 @@ export class TokenManager extends EventHandler {
 
     const existingToken = this.tokens.get(config.id);
     if (!options.force && existingToken) {
-      return;
+      return undefined;
     }
 
     const render = (override: Pick<IRenderAuthorizationOptions, 'status' | 'error'>) => {
@@ -244,6 +250,7 @@ export class TokenManager extends EventHandler {
  */
 export class InvalidTokenError extends Error {
   public readonly ids: string[] = null;
+
   constructor(ids: string | string[]) {
     super(`Token is invalid for ${castArray(ids).join(', ')}`);
 

@@ -10,7 +10,7 @@ export class AttributeContainer extends EventHandler {
     persist() {
         if (this.attrMap.size > 0) {
             const attrs = {};
-            this.attrMap.forEach((v, k) => attrs[k] = v);
+            this.attrMap.forEach((v, k) => (attrs[k] = v));
             return { attrs };
         }
         return {};
@@ -21,7 +21,7 @@ export class AttributeContainer extends EventHandler {
             return;
         }
         this.attrMap.set(attr, value);
-        this.fire('attr-' + attr, value, bak);
+        this.fire(`attr-${attr}`, value, bak);
         this.fire('setAttr', attr, value, bak);
     }
     hasAttr(attr) {
@@ -136,7 +136,7 @@ export class GraphEdge extends AttributeContainer {
         return this;
     }
     static isGraphType(type) {
-        return (edge) => type instanceof RegExp ? type.test(edge.type) : edge.type === type;
+        return (edge) => (type instanceof RegExp ? type.test(edge.type) : edge.type === type);
     }
 }
 export class AGraph extends ASelectAble {
@@ -150,7 +150,7 @@ export class AGraph extends ASelectAble {
         return [this.nodes.length, this.edges.length];
     }
     ids(range = Range.all()) {
-        const ids = (Range.list(this.nodes.map((n) => n.id), this.edges.map((n) => n.id)));
+        const ids = Range.list(this.nodes.map((n) => n.id), this.edges.map((n) => n.id));
         return Promise.resolve(ids.preMultiply(ParseRangeUtils.parseRangeLike(range)));
     }
     idView(idRange = Range.all()) {

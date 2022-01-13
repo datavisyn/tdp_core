@@ -1,13 +1,14 @@
-import {event as d3event, select, time} from 'd3';
+import { event as d3event, select, time } from 'd3';
 import * as $ from 'jquery';
-import {Dialog, PHOVEA_UI_FormDialog} from '../components';
-import {CLUEGraphManager} from '../base/CLUEGraphManager';
-import {UserSession} from '../app';
-import {I18nextManager} from '../i18n';
-import {ProvenanceGraph, IProvenanceGraphDataDescription} from '../provenance';
+import { Dialog, PHOVEA_UI_FormDialog } from '../components';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { UserSession } from '../app';
+import { I18nextManager } from '../i18n';
+import { ProvenanceGraph, IProvenanceGraphDataDescription } from '../provenance';
 
 export class ProvenanceGraphMenu {
   private readonly $node: d3.Selection<any>;
+
   private graph: ProvenanceGraph;
 
   constructor(private readonly manager: CLUEGraphManager, parent: HTMLElement, appendChild = true) {
@@ -27,13 +28,10 @@ export class ProvenanceGraphMenu {
   }
 
   private init(parent: HTMLElement) {
-    const manager = this.manager;
-    //add provenance graph management menu entry
+    const { manager } = this;
+    // add provenance graph management menu entry
     const ul = parent.ownerDocument.createElement('ul');
-    const $ul = select(ul)
-      .attr('class', 'navbar-nav')
-      .attr('data-clue', 'provenanceGraphList')
-      .html(`<li class="nav-item dropdown">
+    const $ul = select(ul).attr('class', 'navbar-nav').attr('data-clue', 'provenanceGraphList').html(`<li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="provenanceGraphDropdown" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-code-branch fa-lg fa-rotate-180 fa-fw"></i>
         </a>
@@ -58,18 +56,18 @@ export class ProvenanceGraphMenu {
         </div>
       </li>`);
 
-    //new button
+    // new button
     $ul.select('#provenancegraph_new_remote').on('click', () => {
       (<Event>d3event).preventDefault();
       manager.newRemoteGraph();
     });
-    //new local
+    // new local
     $ul.select('#provenancegraph_new').on('click', () => {
       (<Event>d3event).preventDefault();
       manager.newGraph();
     });
     $ul.select('#provenancegraph_export').on('click', () => {
-      const e = (<Event>d3event);
+      const e = <Event>d3event;
       e.preventDefault();
       e.stopPropagation();
 
@@ -78,8 +76,8 @@ export class ProvenanceGraphMenu {
       console.log(r);
 
       const str = JSON.stringify(r, null, '\t');
-      //create blob and save it
-      const blob = new Blob([str], {type: 'application/json;charset=utf-8'});
+      // create blob and save it
+      const blob = new Blob([str], { type: 'application/json;charset=utf-8' });
       const a = new FileReader();
       a.onload = (e) => {
         const url = (<any>e.target).result;
@@ -95,24 +93,29 @@ export class ProvenanceGraphMenu {
     });
 
     $ul.selectAll('#provenancegraph_import, #provenancegraph_import_remote').on('click', function () {
-      const e = (<Event>d3event);
+      const e = <Event>d3event;
       e.preventDefault();
       e.stopPropagation();
       const remote = this.id === 'provenancegraph_import_remote';
-      //import dialog
-      const d = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.upload'));
+      // import dialog
+      const d = Dialog.generateDialog(
+        I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.selectFile'),
+        I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.upload'),
+      );
       d.body.innerHTML = `<input type="file" placeholder=${I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.selectFileToUpload')}>`;
-      select(d.body).select('input').on('change', function () {
-        const file = (<any>d3event).target.files[0];
-        const reader = new FileReader();
-        reader.onload = function (e: any) {
-          const dataS = e.target.result;
-          const dump = JSON.parse(dataS);
-          manager.importGraph(dump, remote);
-        };
-        // Read in the image file as a data URL.
-        reader.readAsText(file);
-      });
+      select(d.body)
+        .select('input')
+        .on('change', function () {
+          const file = (<any>d3event).target.files[0];
+          const reader = new FileReader();
+          reader.onload = function (e: any) {
+            const dataS = e.target.result;
+            const dump = JSON.parse(dataS);
+            manager.importGraph(dump, remote);
+          };
+          // Read in the image file as a data URL.
+          reader.readAsText(file);
+        });
       d.show();
     });
 
@@ -120,33 +123,37 @@ export class ProvenanceGraphMenu {
   }
 
   build(graphs: IProvenanceGraphDataDescription[]) {
-    const manager = this.manager;
+    const { manager } = this;
     const $list = this.$node.select('#provenancegraph_list').selectAll('li.graph').data(graphs);
-    $list.enter().insert('li', ':first-child')
+    $list
+      .enter()
+      .insert('li', ':first-child')
       .classed('graph', true)
       .html((d) => `<a href="#clue_graph=${d.id}"><i class="fas fa-code-branch fa-rotate-180" aria-hidden="true"></i> ${d.name} </a>`)
-      .select('a').on('click', (d) => {
+      .select('a')
+      .on('click', (d) => {
         (<Event>d3event).preventDefault();
         manager.loadGraph(d);
       });
     const format = time.format.utc('%Y-%m-%dT%H:%M');
-    (<any>$('#provenancegraph_list li.graph a')).popover({
-      html: true,
-      placement: 'left',
-      trigger: 'manual',
-      title() {
-        const graph = select(this).datum();
-        return `${graph.name}`;
-      },
-      content() {
-        const graph = select(this).datum();
-        const creator = graph.creator;
-        const description = graph.description || '';
-        const ts = graph.ts ? format(new Date(graph.ts)) : 'Unknown';
-        const nnodes = graph.size[0];
-        const nedges = graph.size[1];
-        //const locked = false;
-        const $elem = $(`
+    (<any>$('#provenancegraph_list li.graph a'))
+      .popover({
+        html: true,
+        placement: 'left',
+        trigger: 'manual',
+        title() {
+          const graph = select(this).datum();
+          return `${graph.name}`;
+        },
+        content() {
+          const graph = select(this).datum();
+          const { creator } = graph;
+          const description = graph.description || '';
+          const ts = graph.ts ? format(new Date(graph.ts)) : 'Unknown';
+          const nnodes = graph.size[0];
+          const nedges = graph.size[1];
+          // const locked = false;
+          const $elem = $(`
             <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-3">${I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.creator')}:</div>
@@ -166,33 +173,47 @@ export class ProvenanceGraphMenu {
             </div>
             <div class="row">
                 <div class="col-sm-12 text-end">
-                    <button class="btn btn-primary" ${!UserSession.getInstance().isLoggedIn() && !graph.local ? 'disabled="disabled"' : ''} data-action="select" data-bs-toggle="modal"><span class="fas fa-folder-open" aria-hidden="true"></span> ${I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.select')}</button>
-                    <button class="btn btn-primary" data-action="clone" data-bs-toggle="modal"><span class="fas fa-clone" aria-hidden="true"></span> ${I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.clone')}</button>
-                    <button class="btn btn-danger" ${!UserSession.getInstance().isLoggedIn() && !graph.local ? 'disabled="disabled"' : ''} data-bs-toggle="modal"><i class="fas fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.delete')}</button>
+                    <button class="btn btn-primary" ${
+                      !UserSession.getInstance().isLoggedIn() && !graph.local ? 'disabled="disabled"' : ''
+                    } data-action="select" data-bs-toggle="modal"><span class="fas fa-folder-open" aria-hidden="true"></span> ${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provenanceMenu.select',
+          )}</button>
+                    <button class="btn btn-primary" data-action="clone" data-bs-toggle="modal"><span class="fas fa-clone" aria-hidden="true"></span> ${I18nextManager.getInstance().i18n.t(
+                      'phovea:clue.provenanceMenu.clone',
+                    )}</button>
+                    <button class="btn btn-danger" ${
+                      !UserSession.getInstance().isLoggedIn() && !graph.local ? 'disabled="disabled"' : ''
+                    } data-bs-toggle="modal"><i class="fas fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provenanceMenu.delete',
+          )}</button>
                 </div>
             </div>
         </div>`);
-        $elem.find<HTMLElement>('button.btn-danger').on('click', () => {
-          PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.areYouSureToDelete', {name: graph.name})).then((deleteIt) => {
-            if (deleteIt) {
-              manager.delete(graph);
-            }
+          $elem.find<HTMLElement>('button.btn-danger').on('click', () => {
+            PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.areYouSureToDelete', { name: graph.name })).then(
+              (deleteIt) => {
+                if (deleteIt) {
+                  manager.delete(graph);
+                }
+              },
+            );
           });
-        });
-        $elem.find<HTMLElement>('button.btn-primary').on('click', function () {
-          const isSelect = this.dataset.action === 'select';
-          manager.loadOrClone(graph, isSelect);
-          return false;
-        });
-        return $elem;
-      }
-    }).parent().on({
-      mouseenter() {
-        (<any>$(this).find<HTMLElement>('a')).popover('show');
-      },
-      mouseleave() {
-        (<any>$(this).find<HTMLElement>('a')).popover('hide');
-      }
-    });
+          $elem.find<HTMLElement>('button.btn-primary').on('click', function () {
+            const isSelect = this.dataset.action === 'select';
+            manager.loadOrClone(graph, isSelect);
+            return false;
+          });
+          return $elem;
+        },
+      })
+      .parent()
+      .on({
+        mouseenter() {
+          (<any>$(this).find<HTMLElement>('a')).popover('show');
+        },
+        mouseleave() {
+          (<any>$(this).find<HTMLElement>('a')).popover('hide');
+        },
+      });
   }
 }

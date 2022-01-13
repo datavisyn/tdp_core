@@ -1,11 +1,10 @@
-import {ITourContext} from './Tour';
-import {Tour} from './Tour';
-import {IStep} from './extensions';
-import Popper, {PopperOptions, ReferenceObject} from 'popper.js';
-import {AppHeader} from '../components';
-import {TourUtils} from './TourUtils';
-import {BaseUtils, GlobalEventHandler} from '../base';
-import {I18nextManager} from '../i18n';
+import Popper, { PopperOptions, ReferenceObject } from 'popper.js';
+import { ITourContext, Tour } from './Tour';
+import { IStep } from './extensions';
+import { AppHeader } from '../components';
+import { TourUtils } from './TourUtils';
+import { BaseUtils, GlobalEventHandler } from '../base';
+import { I18nextManager } from '../i18n';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';
@@ -24,27 +23,35 @@ interface IBoundingBox {
 }
 
 export class TourManager {
-
   private readonly keyListener = (evt: KeyboardEvent) => {
-    if (evt.which === 27) { // esc
+    if (evt.which === 27) {
+      // esc
       this.hideTour();
     }
-  }
+  };
 
   private readonly resizeListener = BaseUtils.debounce(() => {
     this.activeTour.refreshCurrent(this.activeTourContext);
   }, 250);
 
   private readonly backdrop: HTMLElement;
+
   private readonly backdropBlocker: HTMLElement;
+
   private readonly step: HTMLElement;
+
   private readonly stepCount: HTMLElement;
+
   private stepPopper: Popper;
+
   readonly chooser: HTMLElement;
 
   private readonly tours: Tour[];
+
   private readonly tourContext: ITourContext;
+
   private activeTour: Tour | null = null;
+
   private activeTourContext: ITourContext | null = null;
 
   constructor(context: ITourManagerContext) {
@@ -53,7 +60,7 @@ export class TourManager {
       header: context.header,
       steps: (count) => this.setSteps(count),
       hide: (finished?: boolean) => this.hideTour(finished),
-      show: (stepNumber, step) => this.showStep(stepNumber, step)
+      show: (stepNumber, step) => this.showStep(stepNumber, step),
     };
 
     this.backdrop = context.doc.createElement('div');
@@ -74,10 +81,18 @@ export class TourManager {
       <div class="tdp-tour-step-dots">
       </div>
       <div class="btn-group" role="group">
-        <button type="button" data-switch="--" class="btn-sm btn btn-light"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
-        <button type="button" data-switch="-" class="btn-sm btn btn-light"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
-        <button type="button" data-switch="0" class="btn-sm btn btn-light"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
-        <button type="button" data-switch="+" class="btn-sm btn btn-primary"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
+        <button type="button" data-switch="--" class="btn-sm btn btn-light"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t(
+          'tdp:core.TourManager.restartButton',
+        )}</button>
+        <button type="button" data-switch="-" class="btn-sm btn btn-light"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t(
+          'tdp:core.TourManager.backButton',
+        )}</button>
+        <button type="button" data-switch="0" class="btn-sm btn btn-light"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t(
+          'tdp:core.TourManager.cancelButton',
+        )}</button>
+        <button type="button" data-switch="+" class="btn-sm btn btn-primary"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t(
+          'tdp:core.TourManager.nextButton',
+        )}</button>
       </div>
     </div>
     `;
@@ -121,16 +136,25 @@ export class TourManager {
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.helpTours')}</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.closeButton')}">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t(
+                  'tdp:core.TourManager.closeButton',
+                )}">
                 </button>
             </div>
             <div class="modal-body">
               <ul class="fa-ul">
-                ${this.tours.filter((d) => d.canBeListed()).map((d) => `<li data-id="${d.id}">
+                ${this.tours
+                  .filter((d) => d.canBeListed())
+                  .map(
+                    (d) => `<li data-id="${d.id}">
                   <i class="fa-li ${finished.has(d.id) ? 'fas fa-check-square' : 'far fa-square'}"></i>
-                  <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-bs-dismiss="modal" data-name="${d.name}">${d.name}</a>
+                  <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-bs-dismiss="modal" data-name="${d.name}">${
+                      d.name
+                    }</a>
                   ${d.description ? `<p>${d.description}</p>` : ''}
-                </li>`).join('')}
+                </li>`,
+                  )
+                  .join('')}
               </ul>
             </div>
         </div>
@@ -156,11 +180,15 @@ export class TourManager {
       if (tour) {
         this.showTour(tour);
       } else {
-        console.warn('invalid tour to start:', tourId, this.tours.map((d) => d.id));
+        console.warn(
+          'invalid tour to start:',
+          tourId,
+          this.tours.map((d) => d.id),
+        );
       }
     });
 
-    GlobalEventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_END_TOUR, (_,  finished) => {
+    GlobalEventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_END_TOUR, (_, finished) => {
       this.hideTour(finished);
     });
 
@@ -219,7 +247,10 @@ export class TourManager {
     const dots = this.step.querySelector<HTMLElement>('.tdp-tour-step-dots');
     dots.innerHTML = '';
     for (let i = 0; i < count; ++i) {
-      dots.insertAdjacentHTML('beforeend', `<div title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.jumpToStep', {step: i + 1})}" data-step="${i}" class="fas fa-circle"></div>`);
+      dots.insertAdjacentHTML(
+        'beforeend',
+        `<div title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.jumpToStep', { step: i + 1 })}" data-step="${i}" class="fas fa-circle"></div>`,
+      );
     }
 
     Array.from(this.step.querySelectorAll('.tdp-tour-step-dots div')).forEach((button: HTMLElement) => {
@@ -250,10 +281,10 @@ export class TourManager {
     }
     // merge to one big bounding box
     const base = all[0].getBoundingClientRect();
-    let top = base.top;
-    let left = base.left;
-    let bottom = base.bottom;
-    let right = base.right;
+    let { top } = base;
+    let { left } = base;
+    let { bottom } = base;
+    let { right } = base;
     for (const elem of all) {
       const bb = elem.getBoundingClientRect();
       if (bb.top < top) {
@@ -272,7 +303,7 @@ export class TourManager {
     return {
       clientWidth: right - left,
       clientHeight: bottom - top,
-      getBoundingClientRect: () => ({left, right, top, bottom, width: right - left, height: bottom - top})
+      getBoundingClientRect: () => ({ left, right, top, bottom, width: right - left, height: bottom - top }),
     };
   }
 
@@ -298,7 +329,10 @@ export class TourManager {
       this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
       this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0 || this.activeTour.desc.canJumpAround === false;
 
-      next.innerHTML = stepNumber === steps.length - 1 ? `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.finishButton')}` : `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}`;
+      next.innerHTML =
+        stepNumber === steps.length - 1
+          ? `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.finishButton')}`
+          : `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}`;
       next.disabled = false;
       if (step.pageBreak === 'user' && this.activeTour.multiPage) {
         next.disabled = true;
@@ -342,24 +376,24 @@ export class TourManager {
     if (focus) {
       const options: PopperOptions = {
         modifiers: {
-          preventOverflow: {boundariesElement: 'window'}
-        }
+          preventOverflow: { boundariesElement: 'window' },
+        },
       };
       if (step.placement === 'centered') {
         // center but avoid the focus element
         const base = focus.getBoundingClientRect();
         const bb = this.step.getBoundingClientRect();
         const parent = this.step.ownerDocument.body.getBoundingClientRect();
-        const centerLeft = (parent.width / 2 - bb.width / 2);
-        let centerTop = (parent.height / 2 - bb.height / 2);
+        const centerLeft = parent.width / 2 - bb.width / 2;
+        let centerTop = parent.height / 2 - bb.height / 2;
         const centerBottom = centerTop + bb.height;
 
-        if (!(base.bottom < centerTop || base.top > centerBottom) && !(base.right < centerLeft || base.left > (centerLeft + bb.width))) {
+        if (!(base.bottom < centerTop || base.top > centerBottom) && !(base.right < centerLeft || base.left > centerLeft + bb.width)) {
           // overlap with the focus element shift step vertically
-          if ((base.bottom + bb.height) < parent.height) {
+          if (base.bottom + bb.height < parent.height) {
             // can shift down
             centerTop = base.bottom + 5; // space
-          } else if ((base.top - bb.height) >= 0) {
+          } else if (base.top - bb.height >= 0) {
             // above is ok
             centerTop = base.top - bb.height;
           } else {
@@ -380,7 +414,7 @@ export class TourManager {
       // center
       const bb = this.step.getBoundingClientRect();
       const parent = this.step.ownerDocument.body.getBoundingClientRect();
-      this.step.style.transform = `translate(${(parent.width / 2 - bb.width / 2)}px, ${(parent.height / 2 - bb.height / 2)}px)`;
+      this.step.style.transform = `translate(${parent.width / 2 - bb.width / 2}px, ${parent.height / 2 - bb.height / 2}px)`;
     }
     this.step.scrollIntoView(true);
 
@@ -399,18 +433,17 @@ export class TourManager {
     }
   }
 
-
   private setUp(tour: Tour, context: any = {}) {
     this.backdrop.ownerDocument.defaultView.addEventListener('resize', this.resizeListener, {
-      passive: true
+      passive: true,
     });
     this.backdrop.ownerDocument.addEventListener('keyup', this.keyListener, {
-      passive: true
+      passive: true,
     });
     this.backdrop.style.display = 'block';
 
     this.activeTour = tour;
-    this.activeTourContext = Object.assign({}, context, this.tourContext);
+    this.activeTourContext = { ...context, ...this.tourContext };
     this.step.classList.toggle('tdp-tour-back-disabled', tour.desc.canJumpAround === false);
   }
 
@@ -440,7 +473,7 @@ export class TourManager {
     this.activeTour.start(this.activeTourContext);
   }
 
-  hideTour(finished: boolean = false) {
+  hideTour(finished = false) {
     this.clearHighlight();
     this.takeDown();
     if (finished) {

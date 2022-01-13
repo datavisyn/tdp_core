@@ -1,9 +1,9 @@
-import { createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, createRankDesc } from 'lineupjs';
+import { createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, createRankDesc, } from 'lineupjs';
 import { extent } from 'd3';
 import { ValueTypeUtils } from '../data';
 export class ColumnDescUtils {
     static baseColumn(column, options = {}) {
-        return Object.assign({
+        return {
             type: 'string',
             column,
             label: column,
@@ -11,13 +11,15 @@ export class ColumnDescUtils {
             initialRanking: options.visible != null ? options.visible : true,
             width: -1,
             selectedId: -1,
-            selectedSubtype: undefined
-        }, options, options.extras || {});
+            selectedSubtype: undefined,
+            ...options,
+            ...(options.extras || {}),
+        };
     }
     static numberColFromArray(column, rows, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'number',
-            domain: extent(rows, (d) => d[column])
+            domain: extent(rows, (d) => d[column]),
         });
     }
     /**
@@ -31,7 +33,7 @@ export class ColumnDescUtils {
     static numberCol(column, min, max, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'number',
-            domain: [min, max]
+            domain: [min, max],
         });
     }
     /**
@@ -47,13 +49,13 @@ export class ColumnDescUtils {
         }
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'categorical',
-            categories
+            categories,
         });
     }
     static hierarchicalCol(column, hierarchy, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'hierarchy',
-            hierarchy
+            hierarchy,
         });
     }
     /**
@@ -75,7 +77,7 @@ export class ColumnDescUtils {
     static linkCol(column, linkPattern, options = {}) {
         return Object.assign(ColumnDescUtils.stringCol(column, options), {
             type: 'link',
-            pattern: linkPattern
+            pattern: linkPattern,
         });
     }
     /**
@@ -86,12 +88,12 @@ export class ColumnDescUtils {
      */
     static booleanCol(column, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
-            type: 'boolean'
+            type: 'boolean',
         });
     }
     static deriveCol(col) {
         const r = {
-            column: col.desc.name
+            column: col.desc.name,
         };
         const desc = col.desc;
         if (desc.color) {
@@ -121,12 +123,7 @@ export class ColumnDescUtils {
         return r;
     }
     static createInitialRanking(provider, options = {}) {
-        const o = Object.assign({
-            aggregate: true,
-            selection: true,
-            rank: true,
-            order: []
-        }, options);
+        const o = { aggregate: true, selection: true, rank: true, order: [], ...options };
         const ranking = provider.pushRanking();
         const r = ranking.find((d) => d.desc.type === 'rank');
         if (o.rank) {
@@ -162,7 +159,10 @@ export class ColumnDescUtils {
         });
     }
     static deriveColumns(columns) {
-        const niceName = (label) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
+        const niceName = (label) => label
+            .split('_')
+            .map((l) => l[0].toUpperCase() + l.slice(1))
+            .join(' ');
         return columns.map((col) => {
             switch (col.type) {
                 case 'categorical':
@@ -191,7 +191,7 @@ export class ColumnDescUtils {
                 label: c.name,
                 name: c.name,
                 color: DEFAULT_COLOR,
-                value: 0
+                value: 0,
             }, lookup.get(c.name) || {}, c);
             lookup.set(c.name, item);
             if (!lookup.has(p)) {

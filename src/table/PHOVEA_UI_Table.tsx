@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useTable, Column} from 'react-table';
+import { useTable, Column } from 'react-table';
 
 export interface ITableProps<T extends object> {
   columns: Column<T>[];
@@ -8,7 +8,7 @@ export interface ITableProps<T extends object> {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export function TDP_UI_Table<T extends object>(props: ITableProps<T>) {
-  const {columns, data} = props;
+  const { columns, data } = props;
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable<T>({ columns, data });
 
@@ -25,18 +25,16 @@ export function TDP_UI_Table<T extends object>(props: ITableProps<T>) {
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-        {rows.map(
-          (row, i) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                })}
-              </tr>
-            );
-          }
-        )}
+        {rows.map((row, i) => {
+          prepareRow(row);
+          return (
+            <tr {...row.getRowProps()}>
+              {row.cells.map((cell) => {
+                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+              })}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

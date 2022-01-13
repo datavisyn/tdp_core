@@ -25,12 +25,12 @@ export class Circle extends AShape {
         return this.xy;
     }
     transform(scale, rotate) {
-        return new Circle(this.x * scale[0], this.y * scale[1], this.radius * (scale[0] + scale[1]) / 2);
+        return new Circle(this.x * scale[0], this.y * scale[1], (this.radius * (scale[0] + scale[1])) / 2);
     }
     asIntersectionParams() {
         return {
             name: 'Circle',
-            params: [this.xy, this.radius]
+            params: [this.xy, this.radius],
         };
     }
     static circle(x, y, radius) {

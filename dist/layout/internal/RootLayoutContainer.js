@@ -5,7 +5,7 @@ export class RootLayoutContainer extends AParentLayoutContainer {
     constructor(document, build, restorer) {
         super(document, {
             name: '',
-            fixed: true
+            fixed: true,
         });
         this.build = build;
         this.restorer = restorer;
@@ -20,12 +20,12 @@ export class RootLayoutContainer extends AParentLayoutContainer {
             this.viewDump = {
                 parent: {
                     viewParent: view.node.parentElement,
-                    headerParent: view.header.parentElement
+                    headerParent: view.header.parentElement,
                 },
                 sibling: {
                     viewSibling: view.node.nextElementSibling,
-                    headerSibling: view.header.nextElementSibling
-                }
+                    headerSibling: view.header.nextElementSibling,
+                },
             };
             section.appendChild(view.header);
             section.appendChild(view.node);
@@ -60,7 +60,7 @@ export class RootLayoutContainer extends AParentLayoutContainer {
     addedChild(child, index) {
         super.addedChild(child, index);
         if (child instanceof TabbingLayoutContainer) {
-            //need the header
+            // need the header
             this.node.appendChild(child.header);
         }
         this.node.appendChild(child.node);
@@ -88,7 +88,7 @@ export class RootLayoutContainer extends AParentLayoutContainer {
     }
     persist() {
         return Object.assign(super.persist(), {
-            type: 'root'
+            type: 'root',
         });
     }
     static restore(dump, doc, build, restorer, restoreView) {

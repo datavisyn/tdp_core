@@ -1,5 +1,5 @@
 import { castArray } from 'lodash';
-import { EventHandler, GlobalEventHandler } from '../base';
+import { EventHandler, GlobalEventHandler } from '../base/event';
 import { UserSession } from '../app';
 import { ERenderAuthorizationStatus } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
@@ -20,7 +20,7 @@ export class TokenManager extends EventHandler {
         this.authorizationFlows = new Map();
         // TODO: Currently, only one authorization flow is possible. Maybe add an extension point in the future.
         this.addAuthorizationFlow({
-            simplePopup: simplePopupFlow
+            simplePopup: simplePopupFlow,
         });
         // Clear all tokens as soon as a user logs out.
         GlobalEventHandler.getInstance().on(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT, () => {
@@ -136,7 +136,7 @@ export class TokenManager extends EventHandler {
      */
     async runAuthorization(authConfiguration, options) {
         let config = null;
-        if (typeof (authConfiguration) === 'string') {
+        if (typeof authConfiguration === 'string') {
             config = this.authorizationConfigurations.get(authConfiguration);
             if (!config) {
                 throw Error(`No authorization configuration with id ${authConfiguration} exists.`);
@@ -147,7 +147,7 @@ export class TokenManager extends EventHandler {
         }
         const existingToken = this.tokens.get(config.id);
         if (!options.force && existingToken) {
-            return;
+            return undefined;
         }
         const render = (override) => {
             options.render({

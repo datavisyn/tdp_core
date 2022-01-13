@@ -8,17 +8,20 @@ function createRangeFromGroups(name, groups) {
 }
 export class StratificationLoaderUtils {
     static viaAPILoader() {
-        let _data = undefined;
+        let _data;
         return (desc) => {
-            if (!_data) { //in the cache
-                _data = AppContext.getInstance().getAPIJSON('/dataset/' + desc.id).then((data) => {
+            if (!_data) {
+                // in the cache
+                _data = AppContext.getInstance()
+                    .getAPIJSON(`/dataset/${desc.id}`)
+                    .then((data) => {
                     const idType = IDTypeManager.getInstance().resolveIdType(desc.idtype);
                     const rowIds = ParseRangeUtils.parseRangeLike(data.rowIds);
                     idType.fillMapCache(rowIds.dim(0).asList(data.rows.length), data.rows);
                     return {
                         rowIds,
                         rows: data.rows,
-                        range: createRangeFromGroups(desc.name, data.groups)
+                        range: createRangeFromGroups(desc.name, data.groups),
                     };
                 });
             }
@@ -26,13 +29,14 @@ export class StratificationLoaderUtils {
         };
     }
     static viaDataLoader(rows, rowIds, range) {
-        let _data = undefined;
+        let _data;
         return () => {
-            if (!_data) { //in the cache
+            if (!_data) {
+                // in the cache
                 _data = Promise.resolve({
                     rowIds: Range.list(rowIds),
                     rows,
-                    range
+                    range,
                 });
             }
             return _data;

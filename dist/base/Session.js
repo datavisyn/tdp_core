@@ -31,7 +31,7 @@ export class Session {
      * @returns {boolean}
      */
     has(key) {
-        return (this.context.getItem(key) !== null);
+        return this.context.getItem(key) !== null;
     }
     /**
      * Returns the value for the given key if it exists in the session.

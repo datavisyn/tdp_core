@@ -17,14 +17,14 @@ export class GraphProxy extends ADataType {
         if (this.loaded) {
             return this.loaded.nnodes;
         }
-        const size = this.desc.size;
+        const { size } = this.desc;
         return size[AGraph.DIM_NODES] || 0;
     }
     get nedges() {
         if (this.loaded) {
             return this.loaded.nedges;
         }
-        const size = this.desc.size;
+        const { size } = this.desc;
         return size[AGraph.DIM_EDGES] || 0;
     }
     get dim() {
@@ -36,7 +36,7 @@ export class GraphProxy extends ADataType {
         }
         const type = this.desc.storage || 'remote';
         if (type === 'memory') {
-            //memory only
+            // memory only
             this.loaded = new MemoryGraph(this.desc, [], [], factory);
             this.cache = ResolveNow.resolveImmediately(this.loaded);
         }
@@ -53,7 +53,7 @@ export class GraphProxy extends ADataType {
             this.cache = ResolveNow.resolveImmediately(this.loaded);
         }
         else {
-            this.cache = ResolveNow.resolveImmediately(RemoteStoreGraph.load(this.desc, factory)).then((graph) => this.loaded = graph);
+            this.cache = ResolveNow.resolveImmediately(RemoteStoreGraph.load(this.desc, factory)).then((graph) => (this.loaded = graph));
         }
         return this.cache;
     }

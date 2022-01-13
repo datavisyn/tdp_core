@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,9 +7,9 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
-import { IReactHandler } from './AReactView';
+ ******************************************************** */
 import * as React from 'react';
+import { IReactHandler } from './AReactView';
 import { IViewPluginDesc } from '../base';
 export interface ITDPViewProps {
     viewId: string;

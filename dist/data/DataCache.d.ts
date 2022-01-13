@@ -24,9 +24,9 @@ export declare class DataCache {
      * @param filter optional filter either a function or a server side interpretable filter object
      * @returns {Promise<IDataType[]>}
      */
-    list(filter?: ({
+    list(filter?: {
         [key: string]: string;
-    }) | ((d: IDataType) => boolean)): Promise<IDataType[]>;
+    } | ((d: IDataType) => boolean)): Promise<IDataType[]>;
     /**
      * converts a given list of datasets to a tree
      * @param list
@@ -36,9 +36,9 @@ export declare class DataCache {
     /**
      * returns a tree of all available datasets
      */
-    tree(filter?: ({
+    tree(filter?: {
         [key: string]: string;
-    }) | ((d: IDataType) => boolean)): Promise<INode>;
+    } | ((d: IDataType) => boolean)): Promise<INode>;
     /**
      * Returns the first dataset matching the given query
      * @param query

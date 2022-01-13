@@ -1,28 +1,32 @@
-import {AParentLayoutContainer} from './AParentLayoutContainer';
-import {ILayoutContainer, ILayoutDump, IRootLayoutContainer, LayoutContainerEvents, PHOVEA_UI_IView, IBuildAbleOrViewLike} from '../interfaces';
-import {TabbingLayoutContainer} from './TabbingLayoutContainer';
-import {ILayoutContainerOption} from './ALayoutContainer';
-import {IDropArea} from '../interfaces';
+import { AParentLayoutContainer } from './AParentLayoutContainer';
+import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, LayoutContainerEvents, PHOVEA_UI_IView, IBuildAbleOrViewLike, IDropArea } from '../interfaces';
+import { TabbingLayoutContainer } from './TabbingLayoutContainer';
+import { ILayoutContainerOption } from './ALayoutContainer';
 
 export class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainerOption> implements IRootLayoutContainer {
   readonly minChildCount = 0;
+
   readonly type = 'root';
 
   private viewDump: {
     parent: {
-      viewParent: HTMLElement,
-      headerParent: HTMLElement
-    },
+      viewParent: HTMLElement;
+      headerParent: HTMLElement;
+    };
     sibling: {
-      viewSibling: HTMLElement,
-      headerSibling: HTMLElement
-    }
+      viewSibling: HTMLElement;
+      headerSibling: HTMLElement;
+    };
   } | null = null;
 
-  constructor(document: Document, public readonly build: (layout: IBuildAbleOrViewLike)=> ILayoutContainer, private readonly restorer: (dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView) => ILayoutContainer) {
+  constructor(
+    document: Document,
+    public readonly build: (layout: IBuildAbleOrViewLike) => ILayoutContainer,
+    private readonly restorer: (dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView) => ILayoutContainer,
+  ) {
     super(document, {
       name: '',
-      fixed: true
+      fixed: true,
     });
     this.node.dataset.layout = 'root';
     this.visible = true;
@@ -34,12 +38,12 @@ export class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainer
       this.viewDump = {
         parent: {
           viewParent: <HTMLElement>view.node.parentElement,
-          headerParent: <HTMLElement>view.header.parentElement
+          headerParent: <HTMLElement>view.header.parentElement,
         },
         sibling: {
           viewSibling: <HTMLElement>view.node.nextElementSibling,
-          headerSibling: <HTMLElement>view.header.nextElementSibling
-        }
+          headerSibling: <HTMLElement>view.header.nextElementSibling,
+        },
       };
 
       section.appendChild(view.header);
@@ -81,7 +85,7 @@ export class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainer
   protected addedChild(child: ILayoutContainer, index: number) {
     super.addedChild(child, index);
     if (child instanceof TabbingLayoutContainer) {
-      //need the header
+      // need the header
       this.node.appendChild(child.header);
     }
     this.node.appendChild(child.node);
@@ -113,7 +117,7 @@ export class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainer
 
   persist() {
     return Object.assign(super.persist(), {
-      type: 'root'
+      type: 'root',
     });
   }
 

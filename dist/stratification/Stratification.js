@@ -27,7 +27,7 @@ export class Stratification extends ADataType {
         return new StratificationGroup(this, group, this.groups[group]);
     }
     async hist(bins, range) {
-        //TODO
+        // TODO
         return RangeHistogram.rangeHist(await this.range());
     }
     vector() {
@@ -51,7 +51,7 @@ export class Stratification extends ADataType {
     async idRange() {
         const data = await this.loader(this.desc);
         const ids = data.rowIds.dim(0);
-        const range = data.range;
+        const { range } = data;
         return ids.preMultiply(range, this.dim[0]);
     }
     async names(range = Range.all()) {
@@ -106,14 +106,14 @@ export class Stratification extends ADataType {
         const desc = BaseUtils.mixin(StratificationUtils.createDefaultStratificationDesc(), {
             size: 0,
             groups: range.groups.map((r) => ({ name: r.name, color: r.color, size: r.length })),
-            ngroups: range.groups.length
+            ngroups: range.groups.length,
         }, options);
         const rowAssigner = options.rowassigner || LocalIDAssigner.create();
         return new Stratification(desc, StratificationLoaderUtils.viaDataLoader(rows, rowAssigner(rows), range));
     }
     static wrapCategoricalVector(v) {
         if (v.valuetype.type !== ValueTypeUtils.VALUE_TYPE_CATEGORICAL) {
-            throw new Error('invalid vector value type: ' + v.valuetype.type);
+            throw new Error(`invalid vector value type: ${v.valuetype.type}`);
         }
         const toGroup = (g) => {
             if (typeof g === 'string') {
@@ -124,26 +124,26 @@ export class Stratification extends ADataType {
         };
         const cats = v.desc.value.categories.map(toGroup);
         const desc = {
-            id: v.desc.id + '-s',
+            id: `${v.desc.id}-s`,
             type: 'stratification',
-            name: v.desc.name + '-s',
-            fqname: v.desc.fqname + '-s',
+            name: `${v.desc.name}-s`,
+            fqname: `${v.desc.fqname}-s`,
             description: v.desc.description,
             idtype: v.idtype.id,
             ngroups: cats.length,
             groups: cats,
             size: v.length,
             creator: v.desc.creator,
-            ts: v.desc.ts
+            ts: v.desc.ts,
         };
         function loader() {
             return Promise.all([v.groups(), v.ids(), v.names()]).then((args) => {
                 const range = args[0];
-                range.groups.forEach((g, i) => cats[i].size = g.length);
+                range.groups.forEach((g, i) => (cats[i].size = g.length));
                 return {
                     range: args[0],
                     rowIds: args[1],
-                    rows: args[2]
+                    rows: args[2],
                 };
             });
         }

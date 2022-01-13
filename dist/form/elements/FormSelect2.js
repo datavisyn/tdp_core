@@ -20,7 +20,7 @@ export class FormSelect2 extends AFormElement {
         this.listener = () => {
             this.fire(FormSelect2.EVENT_CHANGE, this.value, this.$jqSelect);
         };
-        this.isMultiple = (pluginDesc.selection === 'multiple');
+        this.isMultiple = pluginDesc.selection === 'multiple';
     }
     /**
      * Build the label and select element
@@ -42,10 +42,10 @@ export class FormSelect2 extends AFormElement {
     init() {
         super.init();
         const values = this.handleDependent(() => {
-            //not supported
+            // not supported
         });
         const df = this.elementDesc.options.data;
-        const data = Array.isArray(df) ? df : (typeof df === 'function' ? df(values) : undefined);
+        const data = Array.isArray(df) ? df : typeof df === 'function' ? df(values) : undefined;
         this.buildSelect2(this.$inputNode, this.elementDesc.options || {}, data);
         // propagate change action with the data of the selected option
         this.$jqSelect.on('change.propagate', this.listener);
@@ -60,15 +60,16 @@ export class FormSelect2 extends AFormElement {
         if (defaultVal) {
             if (this.isMultiple) {
                 const defaultValues = Array.isArray(defaultVal) ? defaultVal : [defaultVal];
-                initialValue = defaultValues.map((d) => typeof d === 'string' ? d : d.id);
-                if (!data) { //derive default data if none is set explictly
-                    data = defaultValues.map((d) => (typeof d === 'string' ? ({ id: d, text: d }) : d));
+                initialValue = defaultValues.map((d) => (typeof d === 'string' ? d : d.id));
+                if (!data) {
+                    // derive default data if none is set explictly
+                    data = defaultValues.map((d) => (typeof d === 'string' ? { id: d, text: d } : d));
                 }
             }
             else {
                 initialValue = [typeof defaultVal === 'string' ? defaultVal : defaultVal.id];
                 if (!data) {
-                    data = [typeof defaultVal === 'string' ? ({ id: defaultVal, text: defaultVal }) : defaultVal];
+                    data = [typeof defaultVal === 'string' ? { id: defaultVal, text: defaultVal } : defaultVal];
                 }
             }
         }
@@ -87,7 +88,7 @@ export class FormSelect2 extends AFormElement {
     }
     resolveValue(items) {
         const returnValue = this.elementDesc.options.return;
-        const returnF = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
+        const returnF = returnValue === 'id' ? (d) => d.id : returnValue === 'text' ? (d) => d.text : (d) => d;
         if (!items || items.length === 0) {
             return this.isMultiple ? [] : returnF({ id: '', text: '' });
         }
@@ -106,9 +107,7 @@ export class FormSelect2 extends AFormElement {
         if (this.isMultiple) {
             return v.length > 0;
         }
-        else {
-            return v !== '' || v.id !== '';
-        }
+        return v !== '' || v.id !== '';
     }
     /**
      * Select the option by value. If no value found, then the first option is selected.
@@ -139,7 +138,8 @@ export class FormSelect2 extends AFormElement {
                     r = vi.value || vi.id;
                 }
                 const old = this.value;
-                if (old.id === r) { // no change
+                if (old.id === r) {
+                    // no change
                     return;
                 }
             }
@@ -175,13 +175,13 @@ FormSelect2.DEFAULT_OPTIONS = {
     placeholder: 'Start typing...',
     theme: 'bootstrap',
     minimumInputLength: 0,
-    //selectOnClose: true,
-    //tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
+    // selectOnClose: true,
+    // tokenSeparators: [' ', ',', ';'], // requires multiple attribute for select element
     escapeMarkup: (markup) => markup,
     templateResult: (item) => item.text,
-    templateSelection: (item) => item.text
+    templateSelection: (item) => item.text,
 };
-FormSelect2.DEFAULT_AJAX_OPTIONS = Object.assign({
+FormSelect2.DEFAULT_AJAX_OPTIONS = {
     ajax: {
         url: AppContext.getInstance().api2absURL('url_needed'),
         dataType: 'json',
@@ -190,7 +190,7 @@ FormSelect2.DEFAULT_AJAX_OPTIONS = Object.assign({
         data: (params) => {
             return {
                 query: params.term === undefined ? '' : params.term,
-                page: params.page === undefined ? 0 : params.page
+                page: params.page === undefined ? 0 : params.page,
             };
         },
         processResults: (data, params) => {
@@ -198,10 +198,12 @@ FormSelect2.DEFAULT_AJAX_OPTIONS = Object.assign({
             return {
                 results: data.items,
                 pagination: {
-                    more: data.more
-                }
+                    // indicate infinite scrolling
+                    more: data.more,
+                },
             };
-        }
-    }
-}, FormSelect2.DEFAULT_OPTIONS);
+        },
+    },
+    ...FormSelect2.DEFAULT_OPTIONS,
+};
 //# sourceMappingURL=FormSelect2.js.map

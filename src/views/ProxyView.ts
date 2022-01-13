@@ -1,12 +1,11 @@
-import {IDTypeManager} from '../idtype';
-import {BaseUtils} from '../base';
-import {I18nextManager} from '../i18n';
-import {IViewContext, ISelection} from '../base/interfaces';
-import {FormElementType} from '../form/interfaces';
-import {IFormSelectElement, IFormSelectOption} from '../form/elements/FormSelect';
-import {AD3View} from './AD3View';
-import {RestBaseUtils} from '../base/rest';
-
+import { IDTypeManager } from '../idtype';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
+import { IViewContext, ISelection } from '../base/interfaces';
+import { FormElementType } from '../form/interfaces';
+import { IFormSelectElement, IFormSelectOption } from '../form/elements/FormSelect';
+import { AD3View } from './AD3View';
+import { RestBaseUtils } from '../base/rest';
 
 export interface IProxyViewOptions {
   proxy?: string;
@@ -21,7 +20,6 @@ export interface IProxyViewOptions {
  * helper view for proxying an existing external website using an iframe
  */
 export class ProxyView extends AD3View {
-
   public static readonly FORM_ID_SELECTED_ITEM = 'externalItem';
 
   protected options: IProxyViewOptions = {
@@ -42,7 +40,7 @@ export class ProxyView extends AD3View {
      */
     idtype: null,
     extra: {},
-    openExternally: false
+    openExternally: false,
   };
 
   private readonly openExternally: HTMLElement;
@@ -71,14 +69,13 @@ export class ProxyView extends AD3View {
   protected initImpl() {
     super.initImpl();
     // update the selection first, then update the proxy view
-    return this.updateSelectedItemSelect()
-      .then(() => {
-        this.updateProxyView();
-      });
+    return this.updateSelectedItemSelect().then(() => {
+      this.updateProxyView();
+    });
   }
 
   protected createUrl(args: any) {
-    //use internal proxy
+    // use internal proxy
     if (this.options.proxy) {
       return RestBaseUtils.getProxyUrl(this.options.proxy, args);
     }
@@ -89,15 +86,17 @@ export class ProxyView extends AD3View {
   }
 
   protected getParameterFormDescs() {
-    return super.getParameterFormDescs().concat([{
-      type: FormElementType.SELECT,
-      label: 'Show',
-      id: ProxyView.FORM_ID_SELECTED_ITEM,
-      options: {
-        optionsData: [],
+    return super.getParameterFormDescs().concat([
+      {
+        type: FormElementType.SELECT,
+        label: 'Show',
+        id: ProxyView.FORM_ID_SELECTED_ITEM,
+        options: {
+          optionsData: [],
+        },
+        useSession: true,
       },
-      useSession: true
-    }]);
+    ]);
   }
 
   protected parameterChanged(name: string) {
@@ -119,7 +118,7 @@ export class ProxyView extends AD3View {
       .then((names) => Promise.all<any>([names, this.getSelectionSelectData(names)]))
       .then((args: any[]) => {
         const names = <string[]>args[0]; // use names to get the last selected element
-        const data = <{value: string, name: string, data: any}[]>args[1];
+        const data = <{ value: string; name: string; data: any }[]>args[1];
         const selectedItemSelect: IFormSelectElement = <IFormSelectElement>this.getParameterElement(ProxyView.FORM_ID_SELECTED_ITEM);
 
         // backup entry and restore the selectedIndex by value afterwards again,
@@ -147,7 +146,7 @@ export class ProxyView extends AD3View {
     }
 
     // hook
-    return Promise.resolve(names.map((d) => ({value: d, name: d, data: d})));
+    return Promise.resolve(names.map((d) => ({ value: d, name: d, data: d })));
   }
 
   protected updateProxyView() {
@@ -160,14 +159,14 @@ export class ProxyView extends AD3View {
       return;
     }
 
-    //remove old mapping error notice if any exists
+    // remove old mapping error notice if any exists
     this.openExternally.innerHTML = '';
     this.$node.selectAll('p').remove();
     this.$node.selectAll('iframe').remove();
 
     this.setBusy(true);
 
-    const args = BaseUtils.mixin(this.options.extra, {[this.options.argument]: selectedItemId});
+    const args = BaseUtils.mixin(this.options.extra, { [this.options.argument]: selectedItemId });
     const url = this.createUrl(args);
 
     if (ProxyView.isNoNSecurePage(url)) {
@@ -177,28 +176,37 @@ export class ProxyView extends AD3View {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML = `<div class="alert alert-info mx-auto" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+      this.node.innerHTML = `<div class="alert alert-info mx-auto" role="alert">${I18nextManager.getInstance().i18n.t(
+        'tdp:core.views.proxyPageCannotBeShownHere',
+      )}
       <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
       </div>`;
       return;
     }
 
-    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t(
+      'tdp:core.views.isLoaded',
+    )} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${
+      url.startsWith('http') ? url : `${location.protocol}${url}`
+    }</a>`;
 
-    //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
-    this.$node.append('iframe')
+    // console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
+    this.$node
+      .append('iframe')
       .attr('src', url)
       .on('load', () => {
         this.setBusy(false);
-        //console.log('finished loading', this.$node.select('iframe').node().getBoundingClientRect());
+        // console.log('finished loading', this.$node.select('iframe').node().getBoundingClientRect());
         this.fire(ProxyView.EVENT_LOADING_FINISHED);
       });
   }
 
   protected showErrorMessage(selectedItemId: string) {
     this.setBusy(false);
-    const to = this.options.idtype ? IDTypeManager.getInstance().resolveIdType(this.options.idtype).name : I18nextManager.getInstance().i18n.t('tdp:core.views.unknown');
-    this.$node.html(`<p>${I18nextManager.getInstance().i18n.t('tdp:core.views.cannotMap', {name: this.selection.idtype.name, selectedItemId, to})}</p>`);
+    const to = this.options.idtype
+      ? IDTypeManager.getInstance().resolveIdType(this.options.idtype).name
+      : I18nextManager.getInstance().i18n.t('tdp:core.views.unknown');
+    this.$node.html(`<p>${I18nextManager.getInstance().i18n.t('tdp:core.views.cannotMap', { name: this.selection.idtype.name, selectedItemId, to })}</p>`);
     this.openExternally.innerHTML = ``;
     this.fire(ProxyView.EVENT_LOADING_FINISHED);
   }

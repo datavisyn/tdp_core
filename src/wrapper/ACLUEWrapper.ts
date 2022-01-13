@@ -1,13 +1,13 @@
-import {ModeWrapper, CLUEMode} from '../base/mode';
-import {LayoutedProvVis} from '../vis/provvis';
-import {VerticalStoryVis} from '../vis/storyvis';
-import {ProvenanceGraph, StateNode, SlideNode} from '../provenance';
-import {CLUEGraphManager, IClueState} from '../base/CLUEGraphManager';
-import {WrapperUtils} from '../base/WrapperUtils';
-import {EP_PHOVEA_CLUE_PROVENANCE_GRAPH, IProvenanceGraphEPDesc, IProvenanceGraphEP} from '../base/extensions';
-import {EventHandler, ResolveNow} from '../base';
-import {I18nextManager} from '../i18n';
-import {PluginRegistry} from '../app';
+import { ModeWrapper, CLUEMode } from '../base/mode';
+import { LayoutedProvVis } from '../vis/provvis';
+import { VerticalStoryVis } from '../vis/storyvis';
+import { ProvenanceGraph, StateNode, SlideNode } from '../provenance';
+import { CLUEGraphManager, IClueState } from '../base/CLUEGraphManager';
+import { WrapperUtils } from '../base/WrapperUtils';
+import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, IProvenanceGraphEPDesc, IProvenanceGraphEP } from '../base/extensions';
+import { EventHandler, ResolveNow } from '../base';
+import { I18nextManager } from '../i18n';
+import { PluginRegistry } from '../app';
 
 const getTemplate = () => `<div class="box">
   <div class="content">
@@ -18,11 +18,17 @@ const getTemplate = () => `<div class="box">
         <h2>${I18nextManager.getInstance().i18n.t('phovea:clue.ClueWrapper.annotations')}</h2>
       </div>
       <div class="btn-group" role="group" aria-label="annotations">
-        <button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('phovea:clue.ClueWrapper.addTextAnnotation')}" data-ann="text"><i class="fas fa-font"></i>
+        <button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.ClueWrapper.addTextAnnotation',
+        )}" data-ann="text"><i class="fas fa-font"></i>
         </button>
-        <button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('phovea:clue.ClueWrapper.addArrow')}" data-ann="arrow"><i class="fas fa-arrow-right"></i>
+        <button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.ClueWrapper.addArrow',
+        )}" data-ann="arrow"><i class="fas fa-arrow-right"></i>
         </button>
-        <button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t('phovea:clue.ClueWrapper.addFrame')}" data-ann="frame"><i class="far fa-square"></i>
+        <button class="btn btn-light btn-sm" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.ClueWrapper.addFrame',
+        )}" data-ann="frame"><i class="far fa-square"></i>
         </button>
       </div>
     </aside>
@@ -36,17 +42,22 @@ export interface IACLUEWrapperOptions {
 enum EUrlTracking {
   ENABLE,
   DISABLE_JUMPING,
-  DISABLE_RESTORING
+  DISABLE_RESTORING,
 }
-
 
 export abstract class ACLUEWrapper extends EventHandler {
   static readonly EVENT_MODE_CHANGED = 'modeChanged';
+
   static readonly EVENT_JUMPED_TO = 'jumped_to';
+
   clueManager: CLUEGraphManager;
+
   graph: Promise<ProvenanceGraph>;
+
   private storyVis: () => Promise<VerticalStoryVis>;
+
   private provVis: () => Promise<LayoutedProvVis>;
+
   private urlTracking = EUrlTracking.ENABLE;
 
   protected async build(body: HTMLElement, options: IACLUEWrapperOptions) {
@@ -56,7 +67,7 @@ export abstract class ACLUEWrapper extends EventHandler {
       body.insertAdjacentHTML('afterbegin', getTemplate());
     }
     WrapperUtils.handleMagicHashElements(body, this);
-    const {graph, storyVis, manager, provVis} = this.buildImpl(body);
+    const { graph, storyVis, manager, provVis } = this.buildImpl(body);
 
     this.graph = graph;
     this.clueManager = manager;
@@ -65,9 +76,11 @@ export abstract class ACLUEWrapper extends EventHandler {
 
     this.graph.then((graph) => {
       // load registered extensions and pass the ready graph to extension
-      PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CLUE_PROVENANCE_GRAPH).map((desc: IProvenanceGraphEPDesc) => {
-        desc.load().then((plugin: IProvenanceGraphEP) => plugin.factory(graph));
-      });
+      PluginRegistry.getInstance()
+        .listPlugins(EP_PHOVEA_CLUE_PROVENANCE_GRAPH)
+        .map((desc: IProvenanceGraphEPDesc) => {
+          desc.load().then((plugin: IProvenanceGraphEP) => plugin.factory(graph));
+        });
 
       graph.on('run_chain', () => {
         if (this.urlTracking === EUrlTracking.ENABLE) {
@@ -114,7 +127,12 @@ export abstract class ACLUEWrapper extends EventHandler {
     });
   }
 
-  protected abstract buildImpl(body: HTMLElement): {graph: Promise<ProvenanceGraph>, storyVis: () => Promise<VerticalStoryVis>, provVis: () => Promise<LayoutedProvVis>, manager: CLUEGraphManager};
+  protected abstract buildImpl(body: HTMLElement): {
+    graph: Promise<ProvenanceGraph>;
+    storyVis: () => Promise<VerticalStoryVis>;
+    provVis: () => Promise<LayoutedProvVis>;
+    manager: CLUEGraphManager;
+  };
 
   private handleModeChange() {
     const $right = <HTMLElement>document.querySelector('aside.provenance-layout-vis');
@@ -124,19 +142,19 @@ export abstract class ACLUEWrapper extends EventHandler {
       document.body.dataset.clue = newMode.toString();
       // lazy jquery
       import('jquery').then((jquery) => {
-        //$('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
+        // $('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
         if (newMode.presentation > 0.8) {
-          $($right).animate({width: 'hide'}, 'fast');
+          $($right).animate({ width: 'hide' }, 'fast');
         } else {
-          $($right).animate({width: 'show'}, 'fast');
+          $($right).animate({ width: 'show' }, 'fast');
           if (this.provVis) {
             this.provVis();
           }
         }
         if (newMode.exploration > 0.8) {
-          $($rightStory).animate({width: 'hide'}, 'fast');
+          $($rightStory).animate({ width: 'hide' }, 'fast');
         } else {
-          $($rightStory).animate({width: 'show'}, 'fast');
+          $($rightStory).animate({ width: 'show' }, 'fast');
           if (this.storyVis) {
             this.storyVis();
           }
@@ -145,10 +163,11 @@ export abstract class ACLUEWrapper extends EventHandler {
     };
     ModeWrapper.getInstance().on('modeChanged', (event, newMode) => update(newMode));
     this.fire(ACLUEWrapper.EVENT_MODE_CHANGED, ModeWrapper.getInstance().getMode());
-    { //no animation initially
+    {
+      // no animation initially
       const mode = ModeWrapper.getInstance().getMode();
       document.body.dataset.clue = mode.toString();
-      //$('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
+      // $('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
       if (mode.presentation > 0.8) {
         $right.style.display = 'none';
       } else {
@@ -167,7 +186,6 @@ export abstract class ACLUEWrapper extends EventHandler {
       }
     }
   }
-
 
   async nextSlide() {
     if (!this.storyVis) {
@@ -230,7 +248,7 @@ export abstract class ACLUEWrapper extends EventHandler {
   }
 
   jumpToStored() {
-    //jump to stored state
+    // jump to stored state
     const targetStory = this.clueManager.storedSlide;
     if (targetStory !== null) {
       return this.jumpToStory(targetStory);
@@ -240,12 +258,12 @@ export abstract class ACLUEWrapper extends EventHandler {
       return this.jumpToState(targetState);
     }
     this.fire(ACLUEWrapper.EVENT_JUMPED_TO, null);
-    //no stored state nothing to jump to
+    // no stored state nothing to jump to
     return ResolveNow.resolveImmediately(this);
   }
 
   jumpToStoredOrLastState() {
-    //jump to stored state
+    // jump to stored state
     const targetStory = this.clueManager.storedSlide;
     if (targetStory !== null) {
       return this.jumpToStory(targetStory);

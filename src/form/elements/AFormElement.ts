@@ -1,19 +1,21 @@
-import {Selection} from 'd3';
-import {IFormElementDesc, IForm, IFormElement, FormElementType} from '../interfaces';
-import {EP_TDP_CORE_FORM_ELEMENT} from '../../base/extensions';
-import {UserSession, PluginRegistry} from '../../app';
-import {EventHandler, IPluginDesc} from '../../base';
+import { Selection } from 'd3';
+import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
+import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
+import { UserSession, PluginRegistry } from '../../app';
+import { EventHandler, IPluginDesc } from '../../base';
 
 /**
  * Abstract form element class that is used as parent class for other form elements
  */
 export abstract class AFormElement<T extends IFormElementDesc> extends EventHandler implements IFormElement {
   static readonly EVENT_CHANGE = 'change';
+
   static readonly EVENT_INITIAL_VALUE = 'initial';
 
   readonly id: string;
 
   protected $rootNode: Selection<any>;
+
   protected $inputNode: Selection<any> | null;
 
   protected previousValue: any = null;
@@ -42,15 +44,15 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     UserSession.getInstance().store(`${this.id}_value`, this.value);
   }
 
-  protected getStoredValue<T>(defaultValue:T): T {
+  protected getStoredValue<D>(defaultValue: D): D {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return  UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
+    return UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
   }
 
   protected hasStoredValue(): boolean {
-    return  UserSession.getInstance().has(`${this.id}_value`);
+    return UserSession.getInstance().has(`${this.id}_value`);
   }
 
   isRequired() {
@@ -78,7 +80,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * Set the visibility of an form element (default = true)
    * @param visible
    */
-  setVisible(visible: boolean = true) {
+  setVisible(visible = true) {
     this.$rootNode.attr('hidden', visible ? null : '');
   }
 
@@ -95,7 +97,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     if (!this.elementDesc.onChange) {
       return;
     }
-    const value = this.value;
+    const { value } = this;
     const old = this.previousValue;
     this.previousValue = value;
     this.elementDesc.onChange(this, value, AFormElement.toData(value), old);
@@ -119,7 +121,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    */
   protected appendLabel($node: Selection<any>): Selection<any> {
     if (this.elementDesc.hideLabel) {
-      return;
+      return undefined;
     }
     const colWidth = this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12';
     // TODO: Better move this logic to the corresponding class, i.e. FormCheckbox.
@@ -133,7 +135,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * @param $node
    * @param attributes Plain JS object with key as attribute name and the value as attribute value
    */
-  protected setAttributes($node: Selection<any>, attributes: {[key: string]: any}) {
+  protected setAttributes($node: Selection<any>, attributes: { [key: string]: any }) {
     if (!attributes) {
       return;
     }
@@ -141,6 +143,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     Object.keys(attributes).forEach((key) => {
       switch (key) {
         case 'clazz':
+          // eslint-disable-next-line no-case-declarations
           const cssClasses = attributes[key].split(' '); // tokenize CSS classes at space
           cssClasses.forEach((cssClass) => $node.classed(cssClass, true));
           break;
@@ -161,14 +164,14 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
       return [];
     }
 
-    const showIf = this.elementDesc.showIf;
+    const { showIf } = this.elementDesc;
 
     const dependElements = (this.elementDesc.dependsOn || []).map((depOn) => this.form.getElementById(depOn));
 
     dependElements.forEach((depElem) => {
       depElem.on(AFormElement.EVENT_CHANGE, () => {
         const values = dependElements.map((d) => d.value);
-        if(onDependentChange) {
+        if (onDependentChange) {
           onDependentChange(values);
         }
         if (showIf) {
@@ -203,7 +206,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     if (Array.isArray(value)) {
       return value.map(AFormElement.toData);
     }
-    return (value != null && value.data !== undefined) ? value.data : value;
+    return value != null && value.data !== undefined ? value.data : value;
   }
 
   /**
@@ -216,8 +219,8 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    */
   static createFormElement(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement> {
     const plugin = PluginRegistry.getInstance().getPlugin(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
-    if(!plugin) {
-      throw new Error('unknown form element type: ' + elementDesc.type);
+    if (!plugin) {
+      throw new Error(`unknown form element type: ${elementDesc.type}`);
     }
     return plugin.load().then((p) => {
       return p.factory(form, <any>elementDesc, p.desc);

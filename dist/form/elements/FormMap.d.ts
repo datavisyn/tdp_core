@@ -1,10 +1,10 @@
 import 'select2';
+import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { ISelectOptions } from './FormSelect';
-import { IFormElement } from '..';
+import type { IFormElement } from '..';
 import { ISelect3Options, IdTextPair } from './Select3';
-import * as d3 from 'd3';
 import { IPluginDesc } from '../../base';
 export interface ISubDesc {
     name: string;
@@ -43,7 +43,7 @@ export interface IFormMapDesc extends IFormElementDesc {
      */
     options?: {
         badgeProvider?: (value: IFormRow[], ...dependent: IFormElement[]) => Promise<string> | string;
-        entries: (ISubDescs[]) | ((...dependent: IFormElement[]) => (ISubDescs[]));
+        entries: ISubDescs[] | ((...dependent: IFormElement[]) => ISubDescs[]);
         /**
          * whether an element can just be selected once
          */

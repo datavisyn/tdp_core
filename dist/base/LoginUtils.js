@@ -15,10 +15,10 @@ export class LoginUtils {
             UserSession.getInstance().login(user);
             return user;
         });
-        //separate for multiple catch clauses
+        // separate for multiple catch clauses
         r.catch(() => {
             UserSession.getInstance().logout({
-                msg: 'Error logging in.'
+                msg: 'Error logging in.',
             });
         });
         return r;
@@ -29,22 +29,23 @@ export class LoginUtils {
      */
     static logout() {
         if (!AppContext.getInstance().offline) {
-            return Ajax.send('/logout', {}, 'post').then((r) => {
+            return Ajax.send('/logout', {}, 'post')
+                .then((r) => {
                 UserSession.getInstance().logout(r);
-            }).catch(() => {
+            })
+                .catch(() => {
                 UserSession.getInstance().logout({
-                    msg: 'Error logging out via server. Logging out manually.'
+                    msg: 'Error logging out via server. Logging out manually.',
                 });
             });
         }
         UserSession.getInstance().logout({
-            msg: 'Logging out in offline mode'
+            msg: 'Logging out in offline mode',
         });
         return Promise.resolve(true);
     }
     static loggedInAs() {
-        return Ajax.send('/loggedinas', {}, 'POST')
-            .then((user) => {
+        return Ajax.send('/loggedinas', {}, 'POST').then((user) => {
             if (user !== 'not_yet_logged_in' && user.name) {
                 return user;
             }
@@ -59,11 +60,13 @@ export class LoginUtils {
     static bindLoginForm(form, callback, onSubmit) {
         UserSession.getInstance().reset();
         if (!AppContext.getInstance().offline) {
-            LoginUtils.loggedInAs().then((user) => {
+            LoginUtils.loggedInAs()
+                .then((user) => {
                 UserSession.getInstance().login(user);
                 callback(null, user);
-            }).catch(() => {
-                //ignore not yet logged in
+            })
+                .catch(() => {
+                // ignore not yet logged in
             });
         }
         form.onsubmit = (event) => {
@@ -76,8 +79,9 @@ export class LoginUtils {
             LoginUtils.login(username, password, rememberMe)
                 .then((user) => callback(null, user))
                 .catch((error) => {
-                if (error.response && error.response.status !== 401) { // 401 = Unauthorized
-                    //server error
+                if (error.response && error.response.status !== 401) {
+                    // 401 = Unauthorized
+                    // server error
                     callback('not_reachable', null);
                 }
                 else {
@@ -89,7 +93,7 @@ export class LoginUtils {
         };
     }
 }
-LoginUtils.defaultLoginForm = () => (`<form class="form-signin" action="/login" method="post">
+LoginUtils.defaultLoginForm = () => `<form class="form-signin" action="/login" method="post">
     <div class="mb-3">
       <label class="form-label" for="login_username">${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}</label>
       <input type="text" class="form-control" id="login_username" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}" required="required" autofocus="autofocus" autocomplete="username">
@@ -106,5 +110,5 @@ LoginUtils.defaultLoginForm = () => (`<form class="form-signin" action="/login" 
     </div>
     <button type="submit" class="btn btn-primary"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.submit')}</button>
     </form>
-    `);
+    `;
 //# sourceMappingURL=LoginUtils.js.map

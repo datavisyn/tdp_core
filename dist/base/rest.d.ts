@@ -170,7 +170,9 @@ export declare class RestBaseUtils {
      * @param params URL parameters
      * @param filters URL filter parameters
      */
-    static mergeParamAndFilters(params: IParams, filters: IParams): IParams;
+    static mergeParamAndFilters(params: IParams, filters: IParams): {
+        [x: string]: string | number | boolean | string[] | number[] | boolean[];
+    };
     /**
      * query the TDP rest api to read data with additional given filters
      * @param {string} database the database connector key

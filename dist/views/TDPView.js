@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,9 +7,9 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
-import { AReactView } from './AReactView';
+ ******************************************************** */
 import * as React from 'react';
+import { AReactView } from './AReactView';
 import { EXTENSION_POINT_TDP_VIEW } from '../base';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
@@ -27,7 +27,7 @@ export class TDPView extends React.Component {
             this.triggerSelection(newSelection);
         };
         this.state = {
-            viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, props.viewId))
+            viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, props.viewId)),
         };
     }
     componentDidMount() {
@@ -58,7 +58,7 @@ export class TDPView extends React.Component {
             this.viewPromise = null;
             this.viewId = viewId;
             this.setState({
-                viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, viewId))
+                viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, viewId)),
             });
         }
         if (!this.state.viewPlugin) {
@@ -67,7 +67,7 @@ export class TDPView extends React.Component {
         const idType = IDTypeManager.getInstance().resolveIdType(this.state.viewPlugin.idtype);
         if (!this.viewPromise) {
             const options = {
-                reactHandler: this
+                reactHandler: this,
             };
             const selection = this.buildSelection(idType, this.props.inputSelection);
             const context = this.createContext();
@@ -115,7 +115,7 @@ export class TDPView extends React.Component {
         return {
             graph,
             desc: this.state.viewPlugin,
-            ref
+            ref,
         };
     }
     buildSelection(idtype, selection) {
@@ -140,14 +140,14 @@ export class TDPView extends React.Component {
             }
             return '';
         };
-        return React.createElement("div", { ref: (ref) => this.node = ref, className: "tdp-view" },
+        return (React.createElement("div", { ref: (ref) => (this.node = ref), className: "tdp-view" },
             React.createElement("header", null),
-            React.createElement("main", null, buildItem()));
+            React.createElement("main", null, buildItem())));
     }
     selectNative(item, op = 'set') {
         const items = Array.isArray(item) ? item : [item];
         if (!this.props.onItemSelectionChanged) {
-            return; //nobody cares
+            return; // nobody cares
         }
         const s = new Set(this.props.itemSelection || []);
         switch (op) {
@@ -162,7 +162,7 @@ export class TDPView extends React.Component {
                 items.forEach((item) => s.delete(item));
                 break;
             case 'toggle':
-                items.forEach((item) => s.has(item) ? s.delete(item) : s.add(item));
+                items.forEach((item) => (s.has(item) ? s.delete(item) : s.add(item)));
                 break;
         }
         this.props.onItemSelectionChanged(Array.from(s), this.view.itemIDType ? this.view.itemIDType.id : null);

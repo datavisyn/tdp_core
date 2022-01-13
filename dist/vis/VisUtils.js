@@ -9,7 +9,7 @@ export class VisUtils {
             r.filter = (data) => data && data.desc.type && data.desc.type.match(v) != null;
         }
         else if (Array.isArray(v)) {
-            r.filter = (data) => data && data && (data.desc.type && data.desc.type.match(v[0])) && (data.desc.value === undefined || data.desc.value.type.match(v[1]));
+            r.filter = (data) => data && data && data.desc.type && data.desc.type.match(v[0]) && (data.desc.value === undefined || data.desc.value.type.match(v[1]));
         }
     }
     static extrapolateIconify(r) {
@@ -30,7 +30,7 @@ export class VisUtils {
                 node.style.textAlign = 'center';
                 node.style.backgroundSize = '100%';
                 node.style.backgroundRepeat = 'no-repeat';
-                //lazy load icon
+                // lazy load icon
                 anyThis.icon().then((iconData) => {
                     node.style.backgroundImage = `url(${iconData})`;
                 });
@@ -56,10 +56,11 @@ export class VisUtils {
     }
     static extrapolateRotation(r) {
         const m = {
+            // string to text mappings
             free: NaN,
             no: 0,
             transpose: 90,
-            swap: 180
+            swap: 180,
         };
         if (typeof r.rotation === 'string' && r.rotation in m) {
             r.rotation = m[r.rotation];
@@ -88,8 +89,11 @@ export class VisUtils {
      * @returns {IPluginDesc[]}
      */
     static listVisPlugins(data) {
-        //filter additionally with the filter attribute, which can be a function or the expected data type
-        return PluginRegistry.getInstance().listPlugins('vis').map(VisUtils.toVisPlugin).filter((desc) => desc.filter(data));
+        // filter additionally with the filter attribute, which can be a function or the expected data type
+        return PluginRegistry.getInstance()
+            .listPlugins('vis')
+            .map(VisUtils.toVisPlugin)
+            .filter((desc) => desc.filter(data));
     }
     static assignVis(node, vis) {
         node.__vis__ = vis;

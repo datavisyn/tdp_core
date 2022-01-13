@@ -38,18 +38,18 @@ export class Line extends AShape {
     bs() {
         const x = 0.5 * (this.x1 + this.x2);
         const y = 0.5 * (this.y1 + this.y2);
-        const dx = (this.x1 - this.x2);
-        const dy = (this.y1 - this.y2);
+        const dx = this.x1 - this.x2;
+        const dy = this.y1 - this.y2;
         return new Circle(x, y, Math.sqrt(dx * dx + dy * dy) / 2);
     }
     transform(scale, rotate) {
-        //TODO rotate
+        // TODO rotate
         return new Line(this.x1 * scale[0], this.y1 * scale[1], this.x2 * scale[0], this.y2 * scale[1]);
     }
     asIntersectionParams() {
         return {
             name: 'Line',
-            params: [this.xy, this.x2y2]
+            params: [this.xy, this.x2y2],
         };
     }
     static line(x1, y1, x2, y2) {

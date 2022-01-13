@@ -1,7 +1,10 @@
-import {ISecureItem} from '../security';
+import { ISecureItem } from '../security';
 
 export enum ENamedSetType {
-  NAMEDSET, CUSTOM, PANEL, FILTER
+  NAMEDSET,
+  CUSTOM,
+  PANEL,
+  FILTER,
 }
 
 export interface IBaseNamedSet {

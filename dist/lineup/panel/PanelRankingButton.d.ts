@@ -1,5 +1,5 @@
-import { IPanelButton } from './PanelButton';
 import { LocalDataProvider, Ranking } from 'lineupjs';
+import { IPanelButton } from './PanelButton';
 /**
  * Plain HTML button with a custom title, CSS class and an onClick function.
  * Injects through the onClick callback the current ranking.

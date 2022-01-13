@@ -15,7 +15,7 @@ function toBase(groups) {
 }
 export class CompositeRange1D extends Range1D {
     constructor(name, groups, base) {
-        super(base ? base : toBase(groups));
+        super(base || toBase(groups));
         this.name = name;
         this.groups = groups;
     }
@@ -48,7 +48,7 @@ export class CompositeRange1D extends Range1D {
         return new CompositeRange1D(this.name, this.groups.map((g) => g.toSet(size)), r);
     }
     toString() {
-        return '"' + this.name + '"{' + this.groups.join(',') + '}';
+        return `"${this.name}"{${this.groups.join(',')}}`;
     }
     fromLikeComposite(groups) {
         return new CompositeRange1D(this.name, groups);

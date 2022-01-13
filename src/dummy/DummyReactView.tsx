@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {AReactView, ISelector} from '../views/AReactView';
-import {AReactChooserView} from '../views/AReactChooserView';
+import { AReactView, ISelector } from '../views/AReactView';
+import { AReactChooserView } from '../views/AReactChooserView';
 
 export class DummyReactView extends AReactChooserView {
   getItemType() {
@@ -9,13 +9,20 @@ export class DummyReactView extends AReactChooserView {
 
   createSelectionChooserOptions() {
     return {
-      target: 'IDTypeA'
+      target: 'IDTypeA',
     };
   }
 
   render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector) {
-    return <ul>
-        {inputSelection.map((s) => <li key={s} style={{backgroundColor: itemSelection.indexOf(s) >= 0 ? 'orange': null}} onClick={() => itemSelector(s)}>{s}</li>)}
-    </ul>;
+    return (
+      <ul>
+        {inputSelection.map((s) => (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+          <li key={s} style={{ backgroundColor: itemSelection.indexOf(s) >= 0 ? 'orange' : null }} onClick={() => itemSelector(s)}>
+            {s}
+          </li>
+        ))}
+      </ul>
+    );
   }
 }

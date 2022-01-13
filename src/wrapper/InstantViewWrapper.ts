@@ -1,7 +1,7 @@
 // TODO: Why?
 import '../webpack/_bootstrap';
-import {IInstanceViewExtensionDesc, IItemSelection} from '../base/interfaces';
-import {FindViewUtils} from '../views/FindViewUtils';
+import { IInstanceViewExtensionDesc, IItemSelection } from '../base/interfaces';
+import { FindViewUtils } from '../views/FindViewUtils';
 
 export class InstantViewWrapper {
   readonly node: HTMLElement;
@@ -25,19 +25,25 @@ export class InstantViewWrapper {
     const ul = this.node.querySelector('ul');
     const content = <HTMLElement>this.node.querySelector('.tab-content');
 
-    content.insertAdjacentHTML('beforeend', `<div role="tabpanel" class="tab-pane tdp-busy" id="instantView_${view.id}" role="tabpanel" aria-labelledby="instantView_${view.id}"></div>`);
+    content.insertAdjacentHTML(
+      'beforeend',
+      `<div role="tabpanel" class="tab-pane tdp-busy" id="instantView_${view.id}" role="tabpanel" aria-labelledby="instantView_${view.id}"></div>`,
+    );
     const body = <HTMLElement>content.lastElementChild!;
 
-    ul.insertAdjacentHTML('beforeend', `<li class="nav-item"><a class="nav-link" href="#instantView_${view.id}" aria-controls="instantView_${view.id}" role="tab" data-bs-toggle="tab">${view.name}</a></li>`);
+    ul.insertAdjacentHTML(
+      'beforeend',
+      `<li class="nav-item"><a class="nav-link" href="#instantView_${view.id}" aria-controls="instantView_${view.id}" role="tab" data-bs-toggle="tab">${view.name}</a></li>`,
+    );
     ul.lastElementChild.firstElementChild!.addEventListener('click', (evt) => {
       evt.preventDefault();
-        // avoid Property 'tab' does not exist on type 'JQuery<EventTarget>'
+      // avoid Property 'tab' does not exist on type 'JQuery<EventTarget>'
       // @ts-ignore
       import('jquery').then((jquery) => $(evt.currentTarget).tab('show'));
       if (body.classList.contains('tdp-busy')) {
         // need to load
         view.load().then((r) => {
-          const instance = r.factory(this.selection, {document: this.node.ownerDocument});
+          const instance = r.factory(this.selection, { document: this.node.ownerDocument });
           body.appendChild(instance.node);
           body.classList.remove('tdp-busy');
         });

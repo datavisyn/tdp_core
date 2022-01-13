@@ -37,9 +37,6 @@ export interface IEvent {
 export interface IEventListener {
     (event: IEvent, ...args: any[]): void;
 }
-export interface IEventListener {
-    (event: IEvent, ...args: any[]): any;
-}
 /**
  * EventHandler base class
  */

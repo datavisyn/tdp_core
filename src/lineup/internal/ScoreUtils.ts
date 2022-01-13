@@ -1,15 +1,14 @@
-import {IScore} from '../../base/interfaces';
-import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../../base/extensions';
-import {AttachemntUtils} from '../../storage/internal/attachment';
-import {IViewProvider} from '../IViewProvider';
-import {PluginRegistry} from '../../app';
-import {I18nextManager} from '../../i18n';
-import {IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode} from '../../provenance';
-
+import { IScore } from '../../base/interfaces';
+import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
+import { AttachemntUtils } from '../../storage/internal/attachment';
+import { IViewProvider } from '../IViewProvider';
+import { PluginRegistry } from '../../app';
+import { I18nextManager } from '../../i18n';
+import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../../provenance';
 
 export class ScoreUtils {
-
   public static readonly CMD_ADD_SCORE = 'tdpAddScore';
+
   public static readonly CMD_REMOVE_SCORE = 'tdpRemoveScore';
 
   private static async addScoreLogic(waitForScore: boolean, inputs: IObjectRef<IViewProvider>[], parameter: any) {
@@ -25,7 +24,13 @@ export class ScoreUtils {
     const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
 
     return {
-      inverse: ScoreUtils.removeScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id))
+      inverse: ScoreUtils.removeScore(
+        inputs[0],
+        I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'),
+        scoreId,
+        parameter.storedParams ? parameter.storedParams : parameter.params,
+        col.map((c) => c.id),
+      ),
     };
   }
 
@@ -39,37 +44,70 @@ export class ScoreUtils {
 
   static async removeScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any) {
     const view = await inputs[0].v.then((vi) => vi.getInstance());
-    const columnId: string | string[] = parameter.columnId;
+    const { columnId } = parameter;
     const columnIds = Array.isArray(columnId) ? columnId : [columnId];
 
     columnIds.forEach((id) => view.removeTrackedScoreColumn(id));
 
     return {
-      inverse: ScoreUtils.addScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), parameter.id, parameter.params)
+      inverse: ScoreUtils.addScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), parameter.id, parameter.params),
     };
   }
 
   static addScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
-    return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), ObjectRefUtils.category.data, ObjectRefUtils.operation.create), ScoreUtils.CMD_ADD_SCORE, ScoreUtils.addScoreImpl, [provider], {
-      id: scoreId,
-      params
-    });
+    return ActionUtils.action(
+      ActionMetaData.actionMeta(
+        I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', { scoreName }),
+        ObjectRefUtils.category.data,
+        ObjectRefUtils.operation.create,
+      ),
+      ScoreUtils.CMD_ADD_SCORE,
+      ScoreUtils.addScoreImpl,
+      [provider],
+      {
+        id: scoreId,
+        params,
+      },
+    );
   }
 
   static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
     const storedParams = await AttachemntUtils.externalize(params);
-    const currentParams = {id: scoreId, params, storedParams};
+    const currentParams = { id: scoreId, params, storedParams };
     const result = await ScoreUtils.addScoreAsync([provider], currentParams);
-    const toStoreParams = {id: scoreId, params: storedParams};
-    return graph.pushWithResult(ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', {scoreName}), ObjectRefUtils.category.data, ObjectRefUtils.operation.create), ScoreUtils.CMD_ADD_SCORE, ScoreUtils.addScoreImpl, [provider], toStoreParams), result);
+    const toStoreParams = { id: scoreId, params: storedParams };
+    return graph.pushWithResult(
+      ActionUtils.action(
+        ActionMetaData.actionMeta(
+          I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', { scoreName }),
+          ObjectRefUtils.category.data,
+          ObjectRefUtils.operation.create,
+        ),
+        ScoreUtils.CMD_ADD_SCORE,
+        ScoreUtils.addScoreImpl,
+        [provider],
+        toStoreParams,
+      ),
+      result,
+    );
   }
 
   static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]) {
-    return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.remove', {scoreName}), ObjectRefUtils.category.data, ObjectRefUtils.operation.remove), ScoreUtils.CMD_REMOVE_SCORE, ScoreUtils.removeScoreImpl, [provider], {
-      id: scoreId,
-      params,
-      columnId
-    });
+    return ActionUtils.action(
+      ActionMetaData.actionMeta(
+        I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.remove', { scoreName }),
+        ObjectRefUtils.category.data,
+        ObjectRefUtils.operation.remove,
+      ),
+      ScoreUtils.CMD_REMOVE_SCORE,
+      ScoreUtils.removeScoreImpl,
+      [provider],
+      {
+        id: scoreId,
+        params,
+        columnId,
+      },
+    );
   }
 
   private static shallowEqualObjects(a: any, b: any) {
@@ -111,10 +149,10 @@ export class ScoreUtils {
         for (let j = i + 1; j < manipulate.length; ++j) {
           const next = manipulate[j];
           if (next.f_id === remCmd && ScoreUtils.shallowEqualObjects(act.parameter, next.parameter)) {
-            //TODO remove lineup actions that uses this score -> how to identify?
-            //found match, delete both
-            manipulate.slice(j, 1); //delete remove cmd
-            continue outer; //skip adding of add cmd
+            // TODO remove lineup actions that uses this score -> how to identify?
+            // found match, delete both
+            manipulate.slice(j, 1); // delete remove cmd
+            continue outer; // skip adding of add cmd
           }
         }
       }

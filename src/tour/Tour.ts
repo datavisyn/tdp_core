@@ -1,7 +1,7 @@
-import {PluginRegistry} from '../app';
-import {ITDPTourExtensionDesc, IStep} from './extensions';
-import {AppHeader} from '../components';
-import {TourUtils} from './TourUtils';
+import { PluginRegistry } from '../app';
+import { ITDPTourExtensionDesc, IStep } from './extensions';
+import { AppHeader } from '../components';
+import { TourUtils } from './TourUtils';
 
 export interface ITourContext {
   /**
@@ -35,13 +35,11 @@ export interface ITourContext {
 }
 
 export class Tour {
-  private current: number = -1;
+  private current = -1;
 
   private steps: IStep[] = [];
 
-  constructor(public readonly desc: ITDPTourExtensionDesc) {
-
-  }
+  constructor(public readonly desc: ITDPTourExtensionDesc) {}
 
   get multiPage() {
     return this.desc.multiPage === true;
@@ -78,7 +76,6 @@ export class Tour {
 
   async start(context: ITourContext) {
     return this.jumpTo(0, context);
-
   }
 
   private loadSteps() {

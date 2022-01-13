@@ -1,23 +1,26 @@
-import {IPanelButton} from './PanelButton';
-
+import { IPanelButton } from './PanelButton';
 
 export enum EPanelHeaderToolbar {
   NAV,
   START,
   CENTER,
-  END
+  END,
 }
 
 /**
  * The panel header contains a list of panel buttons.
  */
 export class PanelHeader {
-
   node: HTMLElement;
+
   private navToolbar: HTMLElement;
+
   private startToolbar: HTMLElement;
+
   private centerToolbar: HTMLElement;
+
   private endToolbar: HTMLElement;
+
   private buttons: IPanelButton[] = [];
 
   /**
@@ -31,12 +34,12 @@ export class PanelHeader {
     parent.appendChild(this.node);
   }
 
-
-  private createToolbar(cssClass: string = '') {
+  private createToolbar(cssClass = '') {
     const n = this.node.ownerDocument.createElement('div');
     n.className = `panel-toolbar ${cssClass}`;
     return n;
   }
+
   /**
    * Add a panel button to this header
    * @param button Panel button instance to add

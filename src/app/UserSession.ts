@@ -1,16 +1,15 @@
-import {Session} from '../base/Session';
-import {IUser,UserUtils,ISecureItem, Permission, EPermission, EEntity} from '../security';
-import {GlobalEventHandler} from '../base/event';
-import {PluginRegistry} from './PluginRegistry';
-import {ILoginExtensionPointDesc, ILogoutEP, ILogoutEPDesc, ILoginExtensionPoint, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT} from './extensions';
-import {ILogoutOptions} from './interfaces';
-
-
+import { Session } from '../base/Session';
+import { IUser, UserUtils, ISecureItem, Permission, EPermission, EEntity } from '../security';
+import { GlobalEventHandler } from '../base/event';
+import { PluginRegistry } from './PluginRegistry';
+import { ILoginExtensionPointDesc, ILogoutEP, ILogoutEPDesc, ILoginExtensionPoint, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT } from './extensions';
+import { ILogoutOptions } from './interfaces';
 
 export class UserSession extends Session {
-
   public static GLOBAL_EVENT_USER_LOGGED_IN = 'USER_LOGGED_IN';
+
   public static GLOBAL_EVENT_USER_LOGGED_OUT = 'USER_LOGGED_OUT';
+
   /**
    * resets the stored session data that will be automatically filled during login
    */
@@ -37,9 +36,11 @@ export class UserSession extends Session {
     UserSession.getInstance().store('username', user.name);
     UserSession.getInstance().store('user', user);
 
-    PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CORE_LOGIN).map((desc: ILoginExtensionPointDesc) => {
-      desc.load().then((plugin: ILoginExtensionPoint) => plugin.factory(user));
-    });
+    PluginRegistry.getInstance()
+      .listPlugins(EP_PHOVEA_CORE_LOGIN)
+      .forEach((desc: ILoginExtensionPointDesc) => {
+        desc.load().then((plugin: ILoginExtensionPoint) => plugin.factory(user));
+      });
 
     GlobalEventHandler.getInstance().fire(UserSession.GLOBAL_EVENT_USER_LOGGED_IN, user);
   }
@@ -51,27 +52,28 @@ export class UserSession extends Session {
     const wasLoggedIn = UserSession.getInstance().isLoggedIn();
     UserSession.getInstance().reset();
     if (wasLoggedIn) {
-      PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CORE_LOGOUT).map((desc: ILogoutEPDesc) => {
-        desc.load().then((plugin: ILogoutEP) => plugin.factory());
-      });
+      PluginRegistry.getInstance()
+        .listPlugins(EP_PHOVEA_CORE_LOGOUT)
+        .forEach((desc: ILogoutEPDesc) => {
+          desc.load().then((plugin: ILogoutEP) => plugin.factory());
+        });
 
       // Notify all listeners
       GlobalEventHandler.getInstance().fire(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT, options);
 
       // Handle different logout options
       // TODO: Maybe extract them to extension points later?
-      if(options.alb_security_store?.redirect) {
-        location.href = options.alb_security_store?.redirect;
+      if (options.alb_security_store?.redirect) {
+        window.location.href = options.alb_security_store?.redirect;
       }
     }
   }
-
 
   /**
    * returns the current user or null
    * @returns {any}
    */
-  public currentUser(): IUser|null {
+  public currentUser(): IUser | null {
     if (!UserSession.getInstance().isLoggedIn()) {
       return null;
     }
@@ -141,11 +143,11 @@ export class UserSession extends Session {
     return UserSession.getInstance().can(item, EPermission.EXECUTE, user);
   }
 
-
   public hasPermission(item: ISecureItem, entity: EEntity = EEntity.USER, permission: EPermission = EPermission.READ) {
     const permissions = Permission.decode(item.permissions);
     return permissions.hasPermission(entity, permission);
   }
+
   private isEqual(a: string, b: string) {
     if (a === b) {
       return true;
@@ -166,6 +168,7 @@ export class UserSession extends Session {
   }
 
   private static instance: UserSession;
+
   public static getInstance(): UserSession {
     if (!UserSession.instance) {
       UserSession.instance = new UserSession();
@@ -174,4 +177,3 @@ export class UserSession extends Session {
     return UserSession.instance;
   }
 }
-

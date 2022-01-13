@@ -25,7 +25,7 @@ export class SessionWatcher {
     }
     checkSession() {
         const now = Date.now();
-        if ((now - this.lastChecked) < DEFAULT_SESSION_TIMEOUT) {
+        if (now - this.lastChecked < DEFAULT_SESSION_TIMEOUT) {
             // too early assume good
             return;
         }
@@ -57,7 +57,7 @@ export class SessionWatcher {
     start() {
         this.pause();
         if (UserSession.getInstance().isLoggedIn()) {
-            this.timeout = self.setTimeout(() => this.checkSession(), DEFAULT_SESSION_TIMEOUT + 100);
+            this.timeout = window.setTimeout(() => this.checkSession(), DEFAULT_SESSION_TIMEOUT + 100);
         }
     }
     /**
@@ -67,6 +67,7 @@ export class SessionWatcher {
         if (AppContext.getInstance().offline) {
             return;
         }
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const _ = new SessionWatcher(logout);
     }
 }

@@ -17,7 +17,7 @@ export class ATableView extends AView {
             condensed: false,
             sortable: true,
             exportable: false,
-            exportSeparator: ','
+            exportSeparator: ',',
         };
         /**
          * clears and rebuilds this lineup instance from scratch
@@ -46,13 +46,15 @@ export class ATableView extends AView {
         <thead><tr></tr></thead>
         <tbody></tbody>
     </table>`;
-        return this.built = this.build();
+        return (this.built = this.build());
     }
     renderHeader(tr, rows) {
         if (rows.length === 0) {
             return [];
         }
-        const keys = Object.keys(rows[0]).filter((d) => d !== 'id' && d !== '_id').sort();
+        const keys = Object.keys(rows[0])
+            .filter((d) => d !== 'id' && d !== '_id')
+            .sort();
         tr.innerHTML = keys.map((key) => `<th>${key}</th>`).join('');
         return keys;
     }
@@ -66,10 +68,12 @@ export class ATableView extends AView {
     build() {
         this.setBusy(true);
         this.buildHook();
-        return Promise.resolve(this.loadRows()).then((rows) => {
+        return Promise.resolve(this.loadRows())
+            .then((rows) => {
             this.renderTable(rows);
             this.setBusy(false);
-        }).catch(ErrorAlertHandler.getInstance().errorAlert)
+        })
+            .catch(ErrorAlertHandler.getInstance().errorAlert)
             .catch((error) => {
             console.error(error);
             this.setBusy(false);
@@ -102,19 +106,19 @@ export class ATableView extends AView {
                     evt.stopPropagation();
                     this.setItemSelection({
                         idtype: this.itemIDType,
-                        range: ParseRangeUtils.parseRangeLike([row._id])
+                        range: ParseRangeUtils.parseRangeLike([row._id]),
                     });
                 };
             }
         });
     }
     reloadDataImpl() {
-        return this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
+        return (this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
             this.renderTable(r[1]);
-        });
+        }));
     }
     rebuildImpl() {
-        return this.built = this.built.then(() => this.build());
+        return (this.built = this.built.then(() => this.build()));
     }
     /**
      * Add icon to export HTML Table content to the most right column in the table header.
@@ -149,9 +153,9 @@ export class ATableView extends AView {
             return () => {
                 const current = th.dataset.sort;
                 const rows = Array.from(body.children);
-                const next = current === 'no' ? 'asc' : (current === 'asc' ? 'desc' : 'no');
+                const next = current === 'no' ? 'asc' : current === 'asc' ? 'desc' : 'no';
                 th.dataset.sort = next;
-                const sorter = sortFunction ? sortFunction : (th.dataset.num != null ? numeric : text);
+                const sorter = sortFunction || (th.dataset.num != null ? numeric : text);
                 const sort = (a, b) => {
                     const acol = a.children[i];
                     const bcol = b.children[i];
@@ -205,7 +209,7 @@ export class ATableView extends AView {
             return typeof value === 'string' && !isNaN(parseFloat(value));
         }
         // parse numbers
-        const guessed = rows.map((row) => row.map((s) => isNumeric(s) ? parseFloat(s) : s));
+        const guessed = rows.map((row) => row.map((s) => (isNumeric(s) ? parseFloat(s) : s)));
         guessed.unshift(columns);
         XlsxUtils.jsonArray2xlsx(guessed).then((blob) => ATableView.download(document, blob, `${name}.xlsx`));
     }
@@ -222,16 +226,14 @@ export class ATableView extends AView {
      * @returns {string} The table content in csv format
      */
     static extractFromHTML(tableRoot) {
-        const columns = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
-            .map((d) => d.innerText);
-        const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'))
-            .filter((tr) => tr.parentElement.parentElement === tableRoot || tr.parentElement === tableRoot); // only parse first nested level
+        const columns = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th')).map((d) => d.innerText);
+        const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr')).filter((tr) => tr.parentElement.parentElement === tableRoot || tr.parentElement === tableRoot); // only parse first nested level
         const rows = bodyRows.map((row) => {
             return Array.from(row.children).map((d) => d.innerText);
         });
         return {
             columns,
-            rows
+            rows,
         };
     }
     /**
@@ -249,11 +251,15 @@ export class ATableView extends AView {
         };
         const { columns, rows } = ATableView.extractFromHTML(tableRoot);
         const headerContent = columns.join(separator);
-        const bodyContent = rows.map((row) => {
-            return row.map((text) => {
+        const bodyContent = rows
+            .map((row) => {
+            return row
+                .map((text) => {
                 return hasMultilines(text) || text.includes(separator) ? `"${text.replace(/\t/g, ':')}"` : text;
-            }).join(separator);
-        }).join('\n');
+            })
+                .join(separator);
+        })
+            .join('\n');
         const content = `${headerContent}\n${bodyContent}`;
         return content;
     }

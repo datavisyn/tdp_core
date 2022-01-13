@@ -1,5 +1,11 @@
 import { PluginRegistry } from '../app/PluginRegistry';
 import { EventHandler } from '../base/event';
+function convertDesc(desc) {
+    const d = desc;
+    d.type = d.type || 'main';
+    d.location = d.location || 'center';
+    return d;
+}
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_CORE_AView extends EventHandler {
     constructor() {
@@ -24,11 +30,5 @@ export class PHOVEA_CORE_AView extends EventHandler {
     static list() {
         return PluginRegistry.getInstance().listPlugins('view').map(convertDesc);
     }
-}
-function convertDesc(desc) {
-    const d = desc;
-    d.type = d.type || 'main';
-    d.location = d.location || 'center';
-    return d;
 }
 //# sourceMappingURL=layout_view.js.map

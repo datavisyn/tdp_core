@@ -1,7 +1,7 @@
-import {DataCache} from '../data/DataCache';
-import {ADataType, IDataType} from '../data/datatype';
-import {GraphNode} from '../graph/graph';
-import {ResolveNow} from '../base/promise';
+import { DataCache } from '../data/DataCache';
+import { ADataType, IDataType } from '../data/datatype';
+import { GraphNode } from '../graph/graph';
+import { ResolveNow } from '../base/promise';
 
 /**
  * an object reference is a common description of an object node in the provenance graph
@@ -32,7 +32,6 @@ export interface IObjectRef<T> {
 }
 
 export class ObjectRefUtils {
-
   /**
    * list of categories for actions and objects
    */
@@ -43,7 +42,7 @@ export class ObjectRefUtils {
     layout: 'layout',
     logic: 'logic',
     custom: 'custom',
-    annotation: 'annotation'
+    annotation: 'annotation',
   };
 
   /**
@@ -52,7 +51,7 @@ export class ObjectRefUtils {
   public static operation = {
     create: 'create',
     update: 'update',
-    remove: 'remove'
+    remove: 'remove',
   };
 
   /**
@@ -63,13 +62,13 @@ export class ObjectRefUtils {
    * @param hash
    * @returns {{v: T, name: string, category: string}}
    */
-  static objectRef<T>(v: T, name: string, category = ObjectRefUtils.category.data, hash = name + '_' + category): IObjectRef<T> {
+  static objectRef<T>(v: T, name: string, category = ObjectRefUtils.category.data, hash = `${name}_${category}`): IObjectRef<T> {
     return {
       v: ResolveNow.resolveImmediately(v),
       value: v,
       name,
       category,
-      hash
+      hash,
     };
   }
 }
@@ -84,16 +83,16 @@ function persistData(v: any): any {
     return null;
   }
   if (v instanceof Element) {
-    const e = <Element>v,
-      id = e.getAttribute('id');
-    return {type: 'element', id};
+    const e = <Element>v;
+    const id = e.getAttribute('id');
+    return { type: 'element', id };
   }
   if (ADataType.isADataType(v)) {
     const e = <IDataType>v;
-    return {type: 'dataset', id: e.desc.id, persist: e.persist()};
+    return { type: 'dataset', id: e.desc.id, persist: e.persist() };
   }
   if (typeof v === 'string' || typeof v === 'number') {
-    return {type: 'primitive', v};
+    return { type: 'primitive', v };
   }
   return null;
 }
@@ -124,11 +123,13 @@ export class ObjectNode<T> extends GraphNode implements IObjectRef<T> {
    * a promise of the value accessible via .v
    */
   private _promise: PromiseLike<T>;
+
   private _persisted: any = null;
 
-  constructor(private _v: T, name: string, category = ObjectRefUtils.category.data, hash = name + '_' + category, description = '') {
+  constructor(private _v: T, name: string, category = ObjectRefUtils.category.data, hash = `${name}_${category}`, description = '') {
     super('object');
-    if (_v != null) { //if the value is given, auto generate a promise for it
+    if (_v != null) {
+      // if the value is given, auto generate a promise for it
       this._promise = ResolveNow.resolveImmediately(_v);
     }
     super.setAttr('name', name);
@@ -184,7 +185,6 @@ export class ObjectNode<T> extends GraphNode implements IObjectRef<T> {
     return super.getAttr('description', '');
   }
 
-
   persist() {
     const r = super.persist();
     if (!r.attrs) {
@@ -202,7 +202,7 @@ export class ObjectNode<T> extends GraphNode implements IObjectRef<T> {
   }
 
   static restore(p: any) {
-    const r = new ObjectNode<any>(null, p.attrs.name, p.attrs.category, p.attrs.hash || p.attrs.name + '_' + p.attrs.category);
+    const r = new ObjectNode<any>(null, p.attrs.name, p.attrs.category, p.attrs.hash || `${p.attrs.name}_${p.attrs.category}`);
     return r.restore(p);
   }
 

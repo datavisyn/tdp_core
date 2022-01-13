@@ -1,9 +1,8 @@
-import {ITable} from '../ITable';
-import {RangeLike, Range} from '../../range';
-import {ANameVector, IStringVector} from '../../stratification/vector/ANameVector';
+import { ITable } from '../ITable';
+import { RangeLike, Range } from '../../range';
+import { ANameVector, IStringVector } from '../../stratification/vector/ANameVector';
 
 export class TableNameVector extends ANameVector<ITable> implements IStringVector {
-
   constructor(table: ITable) {
     super(table);
     this.root = this;

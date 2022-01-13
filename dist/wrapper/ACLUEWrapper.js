@@ -50,7 +50,9 @@ export class ACLUEWrapper extends EventHandler {
         this.provVis = provVis;
         this.graph.then((graph) => {
             // load registered extensions and pass the ready graph to extension
-            PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CLUE_PROVENANCE_GRAPH).map((desc) => {
+            PluginRegistry.getInstance()
+                .listPlugins(EP_PHOVEA_CLUE_PROVENANCE_GRAPH)
+                .map((desc) => {
                 desc.load().then((plugin) => plugin.factory(graph));
             });
             graph.on('run_chain', () => {
@@ -102,7 +104,7 @@ export class ACLUEWrapper extends EventHandler {
             document.body.dataset.clue = newMode.toString();
             // lazy jquery
             import('jquery').then((jquery) => {
-                //$('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
+                // $('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
                 if (newMode.presentation > 0.8) {
                     $($right).animate({ width: 'hide' }, 'fast');
                 }
@@ -125,10 +127,11 @@ export class ACLUEWrapper extends EventHandler {
         };
         ModeWrapper.getInstance().on('modeChanged', (event, newMode) => update(newMode));
         this.fire(ACLUEWrapper.EVENT_MODE_CHANGED, ModeWrapper.getInstance().getMode());
-        { //no animation initially
+        {
+            // no animation initially
             const mode = ModeWrapper.getInstance().getMode();
             document.body.dataset.clue = mode.toString();
-            //$('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
+            // $('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
             if (mode.presentation > 0.8) {
                 $right.style.display = 'none';
             }
@@ -207,7 +210,7 @@ export class ACLUEWrapper extends EventHandler {
         return Promise.reject(I18nextManager.getInstance().i18n.t('phovea:clue.ClueWrapper.stateNotFound'));
     }
     jumpToStored() {
-        //jump to stored state
+        // jump to stored state
         const targetStory = this.clueManager.storedSlide;
         if (targetStory !== null) {
             return this.jumpToStory(targetStory);
@@ -217,11 +220,11 @@ export class ACLUEWrapper extends EventHandler {
             return this.jumpToState(targetState);
         }
         this.fire(ACLUEWrapper.EVENT_JUMPED_TO, null);
-        //no stored state nothing to jump to
+        // no stored state nothing to jump to
         return ResolveNow.resolveImmediately(this);
     }
     jumpToStoredOrLastState() {
-        //jump to stored state
+        // jump to stored state
         const targetStory = this.clueManager.storedSlide;
         if (targetStory !== null) {
             return this.jumpToStory(targetStory);

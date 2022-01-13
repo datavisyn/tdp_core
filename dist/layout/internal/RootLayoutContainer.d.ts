@@ -1,7 +1,6 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuildAbleOrViewLike } from '../interfaces';
+import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuildAbleOrViewLike, IDropArea } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
-import { IDropArea } from '../interfaces';
 export declare class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainerOption> implements IRootLayoutContainer {
     readonly build: (layout: IBuildAbleOrViewLike) => ILayoutContainer;
     private readonly restorer;

@@ -68,7 +68,9 @@ export class LineUpOrderedRowIndicies extends EventHandler {
             if (index > 0 || !provider.getFirstRanking()) {
                 return;
             }
-            provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous, current, _previousGroups, _currentGroups, dirtyReason) => {
+            provider
+                .getFirstRanking()
+                .on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous, current, _previousGroups, _currentGroups, dirtyReason) => {
                 // update filtered rows on filter and sort events
                 if (dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
                     // no rows are filtered -> reset array
@@ -78,7 +80,8 @@ export class LineUpOrderedRowIndicies extends EventHandler {
                     }
                     else {
                         // NOTE: `current` contains always the *sorted* and *filtered* row indices of the (first) ranking!
-                        this._filtered = (current instanceof Uint8Array || current instanceof Uint16Array || current instanceof Uint32Array) ? Array.from(current) : current; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+                        this._filtered =
+                            current instanceof Uint8Array || current instanceof Uint16Array || current instanceof Uint32Array ? Array.from(current) : current; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
                     }
                     this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, this._filtered);
                 }

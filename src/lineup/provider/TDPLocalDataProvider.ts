@@ -1,4 +1,4 @@
-import {IColumnConstructor, IColumnDesc, IDataProviderOptions, ILocalDataProviderOptions, isSupportType, ITypeFactory, LocalDataProvider} from 'lineupjs';
+import { IColumnConstructor, IColumnDesc, IDataProviderOptions, ILocalDataProviderOptions, isSupportType, ITypeFactory, LocalDataProvider } from 'lineupjs';
 
 /**
  * A data provider which changes the default column width from LineUp

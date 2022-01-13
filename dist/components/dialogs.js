@@ -44,7 +44,8 @@ export class Dialog {
         this.bakKeyDownListener = document.onkeydown;
         document.onkeydown = (evt) => {
             evt = evt || window.event;
-            if (evt.keyCode === 27) { // 27 === ESC key
+            if (evt.keyCode === 27) {
+                // 27 === ESC key
                 this.hide();
             }
         };
@@ -102,7 +103,7 @@ export class Dialog {
         const o = {
             title: 'Input',
             placeholder: 'Enter...',
-            multiline: false
+            multiline: false,
         };
         if (typeof options === 'string') {
             options = { title: options };
@@ -141,7 +142,7 @@ export class Dialog {
 Dialog.openDialogs = 0;
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_UI_FormDialog extends Dialog {
-    constructor(title, primaryBtnText = 'OK', formId = 'form' + BaseUtils.randomId(5), additionalCSSClasses = '') {
+    constructor(title, primaryBtnText = 'OK', formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {
         super(title, primaryBtnText, additionalCSSClasses);
         this.formId = formId;
         this.body.innerHTML = `<form id="${formId}"></form>`;
@@ -168,7 +169,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
         const o = {
             title: 'Choose',
             placeholder: 'Enter...',
-            editable: false
+            editable: false,
         };
         if (typeof options === 'string') {
             options = { title: options };
@@ -206,7 +207,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
         const o = {
             title: I18nextManager.getInstance().i18n.t('phovea:ui.areYouSure'),
             button: `<i class="fas fa-trash" aria-hidden="true"></i>  ${I18nextManager.getInstance().i18n.t('phovea:ui.delete')}`,
-            cancelButton: I18nextManager.getInstance().i18n.t('phovea:ui.cancel')
+            cancelButton: I18nextManager.getInstance().i18n.t('phovea:ui.cancel'),
         };
         if (typeof options === 'string') {
             options = { title: options };
@@ -217,10 +218,14 @@ export class PHOVEA_UI_FormDialog extends Dialog {
             dialog.body.innerHTML = msg;
             $(`<button class="btn btn-danger">${o.button}</button>`).appendTo(dialog.footer);
             let clicked = false;
-            $(dialog.footer).find('button.btn-primary').on('click', function () {
+            $(dialog.footer)
+                .find('button.btn-primary')
+                .on('click', function () {
                 dialog.hide();
             });
-            $(dialog.footer).find('button.btn-danger').on('click', function () {
+            $(dialog.footer)
+                .find('button.btn-danger')
+                .on('click', function () {
                 clicked = true;
                 dialog.hide();
             });

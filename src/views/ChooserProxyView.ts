@@ -1,8 +1,8 @@
-import {AView }from './AView';
-import {IViewContext, ISelection} from '../base/interfaces';
-import {RestBaseUtils} from '../base/rest';
-import {SelectionChooser, ISelectionChooserOptions} from './SelectionChooser';
-import {I18nextManager} from '../i18n';
+import { AView } from './AView';
+import { IViewContext, ISelection } from '../base/interfaces';
+import { RestBaseUtils } from '../base/rest';
+import { SelectionChooser, ISelectionChooserOptions } from './SelectionChooser';
+import { I18nextManager } from '../i18n';
 
 export interface IProxyViewChooserOptions extends Partial<ISelectionChooserOptions> {
   /**
@@ -46,10 +46,11 @@ export class ChooserProxyView extends AView {
     argument: 'gene',
     idtype: null,
     extra: {},
-    openExternally: false
+    openExternally: false,
   };
 
   protected readonly chooser: SelectionChooser;
+
   private readonly openExternally: HTMLElement;
 
   readonly naturalSize = [1280, 800];
@@ -98,7 +99,7 @@ export class ChooserProxyView extends AView {
   }
 
   protected createUrl(args: any) {
-    //use internal proxy
+    // use internal proxy
     if (this.options.proxy) {
       return RestBaseUtils.getProxyUrl(this.options.proxy, args);
     }
@@ -109,7 +110,7 @@ export class ChooserProxyView extends AView {
   }
 
   protected build() {
-    //remove old mapping error notice if any exists
+    // remove old mapping error notice if any exists
     this.openExternally.innerHTML = '';
     this.node.innerHTML = '';
     this.setHint(false);
@@ -117,14 +118,14 @@ export class ChooserProxyView extends AView {
 
     const selectedItemId = this.chooser.chosen();
     if (selectedItemId == null) {
-      const to = this.options.idtype ? I18nextManager.getInstance().i18n.t('tdp:core.views.toOption', {id: this.options.idtype}) : '';
-      this.setNoMappingFoundHint(true, I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFound', {name: to}));
+      const to = this.options.idtype ? I18nextManager.getInstance().i18n.t('tdp:core.views.toOption', { id: this.options.idtype }) : '';
+      this.setNoMappingFoundHint(true, I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFound', { name: to }));
       return;
     }
 
     this.setBusy(true);
 
-    const args = Object.assign({}, this.options.extra, {[this.options.argument]: selectedItemId.name});
+    const args = { ...this.options.extra, [this.options.argument]: selectedItemId.name };
     const url = this.createUrl(args);
 
     if (ChooserProxyView.isNoNSecurePage(url)) {
@@ -134,13 +135,19 @@ export class ChooserProxyView extends AView {
 
     if (this.options.openExternally) {
       this.setBusy(false);
-      this.node.innerHTML = `<div class="alert alert-info mx-auto" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.proxyPageCannotBeShownHere')}
+      this.node.innerHTML = `<div class="alert alert-info mx-auto" role="alert">${I18nextManager.getInstance().i18n.t(
+        'tdp:core.views.proxyPageCannotBeShownHere',
+      )}
       <a href="${url}" target="_blank" rel="noopener" class="alert-link">${url}</a>
       </div>`;
       return;
     }
 
-    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+    this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t(
+      'tdp:core.views.isLoaded',
+    )} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${
+      url.startsWith('http') ? url : `${location.protocol}${url}`
+    }</a>`;
 
     const iframe = this.node.ownerDocument.createElement('iframe');
     iframe.src = url;

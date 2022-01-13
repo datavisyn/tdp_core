@@ -1,30 +1,36 @@
-import {ArrayUtils} from '../../base/ArrayUtils';
-import {BaseUtils} from '../../base/BaseUtils';
-import {ParseRangeUtils, RangeLike, Range} from '../../range';
-import {IValueTypeDesc, IValueType} from '../../data';
-import {IVector, IVectorDataDescription} from '../../vector';
-import {ITable} from '../ITable';
-import {AVector} from '../../vector/AVector';
+import { ArrayUtils } from '../../base/ArrayUtils';
+import { BaseUtils } from '../../base/BaseUtils';
+import { ParseRangeUtils, RangeLike, Range } from '../../range';
+import { IValueTypeDesc, IValueType } from '../../data';
+import { IVector, IVectorDataDescription } from '../../vector';
+import { ITable } from '../ITable';
+import { AVector } from '../../vector/AVector';
 
 /**
  * @internal
  */
-export class MultiTableVector<T, D extends IValueTypeDesc> extends AVector<T, D> implements IVector<T,D> {
+export class MultiTableVector<T, D extends IValueTypeDesc> extends AVector<T, D> implements IVector<T, D> {
   readonly desc: IVectorDataDescription<D>;
 
-  constructor(private table: ITable, private f: (row: IValueType[]) => T, private thisArgument = table, public readonly valuetype: D = null, private _idtype = table.idtype) {
+  constructor(
+    private table: ITable,
+    private f: (row: IValueType[]) => T,
+    private thisArgument = table,
+    public readonly valuetype: D = null,
+    private _idtype = table.idtype,
+  ) {
     super(null);
     this.desc = {
-      name: table.desc.name + '-p',
-      fqname: table.desc.fqname + '-p',
+      name: `${table.desc.name}-p`,
+      fqname: `${table.desc.fqname}-p`,
       description: f.toString(),
       type: 'vector',
-      id: BaseUtils.fixId(table.desc.id + '-p' + f.toString()),
+      id: BaseUtils.fixId(`${table.desc.id}-p${f.toString()}`),
       idtype: table.desc.idtype,
       size: table.nrow,
       value: valuetype,
       creator: table.desc.creator,
-      ts: Date.now()
+      ts: Date.now(),
     };
     this.root = this;
   }
@@ -42,13 +48,15 @@ export class MultiTableVector<T, D extends IValueTypeDesc> extends AVector<T, D>
       root: this.table.persist(),
       f: this.f.toString(),
       valuetype: this.valuetype ? this.valuetype : undefined,
-      idtype: this.idtype === this.table.idtype ? undefined : this.idtype.name
+      idtype: this.idtype === this.table.idtype ? undefined : this.idtype.name,
     };
   }
 
   restore(persisted: any) {
-    let r: IVector<T,D> = this;
-    if (persisted && persisted.range) { //some view onto it
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let r: IVector<T, D> = this;
+    if (persisted && persisted.range) {
+      // some view onto it
       r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
     }
     return r;
@@ -85,13 +93,13 @@ export class MultiTableVector<T, D extends IValueTypeDesc> extends AVector<T, D>
     return (await this.table.data(range)).map(this.f, this.thisArgument);
   }
 
-  async sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T,D>> {
+  async sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T, D>> {
     const d = await this.data();
     const indices = ArrayUtils.argSort(d, compareFn, thisArg);
     return this.view(Range.list(indices));
   }
 
-  async filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T,D>> {
+  async filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T, D>> {
     const d = await this.data();
     const indices = ArrayUtils.argFilter(d, callbackfn, thisArg);
     return this.view(Range.list(indices));

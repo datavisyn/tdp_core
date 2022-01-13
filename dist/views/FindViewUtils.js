@@ -1,5 +1,5 @@
 import { ViewUtils } from './ViewUtils';
-import { EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW, EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS } from '../base/extensions';
+import { EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW, EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, } from '../base/extensions';
 import { IDTypeManager } from '../idtype';
 import { PluginRegistry, UserSession } from '../app';
 export class FindViewUtils {
@@ -12,32 +12,38 @@ export class FindViewUtils {
     static findViews(idType, selection) {
         const selectionLength = selection.isNone ? 0 : selection.dim(0).length;
         function bySelection(p) {
-            return (ViewUtils.matchLength(p.selection, selectionLength) || (ViewUtils.showAsSmallMultiple(p) && selectionLength > 1));
+            return ViewUtils.matchLength(p.selection, selectionLength) || (ViewUtils.showAsSmallMultiple(p) && selectionLength > 1);
         }
         return FindViewUtils.findViewBase(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
-            return r.map(ViewUtils.toViewPluginDesc).map((v) => {
+            return r
+                .map(ViewUtils.toViewPluginDesc)
+                .map((v) => {
                 const access = FindViewUtils.canAccess(v);
                 const selection = bySelection(v);
                 const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
                 return {
                     enabled: access && selection,
                     v,
-                    disabledReason: !access ? (hasAccessHint ? 'security' : 'invalid') : (!selection ? 'selection' : undefined)
+                    disabledReason: !access ? (hasAccessHint ? 'security' : 'invalid') : !selection ? 'selection' : undefined,
                 };
-            }).filter((v) => v.disabledReason !== 'invalid');
+            })
+                .filter((v) => v.disabledReason !== 'invalid');
         });
     }
     static findAllViews(idType) {
         return FindViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
-            return r.map(ViewUtils.toViewPluginDesc).map((v) => {
+            return r
+                .map(ViewUtils.toViewPluginDesc)
+                .map((v) => {
                 const access = FindViewUtils.canAccess(v);
                 const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
                 return {
                     enabled: access,
                     v,
-                    disabledReason: !access ? (hasAccessHint ? 'security' : 'invalid') : undefined
+                    disabledReason: !access ? (hasAccessHint ? 'security' : 'invalid') : undefined,
                 };
-            }).filter((v) => v.disabledReason !== 'invalid');
+            })
+                .filter((v) => v.disabledReason !== 'invalid');
         });
     }
     static async findViewBase(idType, views, hasSelection) {
@@ -47,22 +53,22 @@ export class FindViewUtils {
             return (p) => {
                 const idType = p.idType !== undefined ? p.idType : p.idtype;
                 const pattern = idType ? new RegExp(idType) : /.*/;
-                return all.some((i) => pattern.test(i.id)) && (!hasSelection || (p.selection === 'any' || !ViewUtils.matchLength(p.selection, 0)));
+                return all.some((i) => pattern.test(i.id)) && (!hasSelection || p.selection === 'any' || !ViewUtils.matchLength(p.selection, 0));
             };
         };
         const byType = idType ? await byTypeChecker() : () => true;
         // execute extension filters
-        const filters = await Promise.all(PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load()));
+        const filters = await Promise.all(PluginRegistry.getInstance()
+            .listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS)
+            .map((plugin) => plugin.load()));
         function extensionFilters(p) {
             const f = p.filter || {};
             return filters.every((filter) => filter.factory(f));
         }
-        return views
-            .filter((p) => byType(p) && extensionFilters(p))
-            .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+        return views.filter((p) => byType(p) && extensionFilters(p)).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     }
     static canAccess(p) {
-        let security = p.security;
+        let { security } = p;
         if (security === undefined) {
             return true;
         }
@@ -78,7 +84,8 @@ export class FindViewUtils {
             return security(user);
         }
         if (typeof security === 'boolean') {
-            if (security === true) { // if security is set on a view with a boolean flag check if the user is at least logged in
+            if (security === true) {
+                // if security is set on a view with a boolean flag check if the user is at least logged in
                 return UserSession.getInstance().isLoggedIn();
             }
             return true; // security is disabled - the resource is publicly available, the user can access it

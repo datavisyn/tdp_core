@@ -1,7 +1,7 @@
-import {EventHandler, GlobalEventHandler, IEvent} from './event';
-import {AppContext} from '../app';
-import {I18nextManager} from '../i18n';
-import {BaseUtils} from './BaseUtils';
+import { EventHandler, GlobalEventHandler, IEvent } from './event';
+import { AppContext } from '../app';
+import { I18nextManager } from '../i18n';
+import { BaseUtils } from './BaseUtils';
 
 /**
  * normalizes the given coordinates to sum up to one
@@ -38,8 +38,9 @@ export class CLUEMode {
   value(index: number | string): number {
     if (typeof index === 'number') {
       return this.coord[index];
-    } else if (typeof index === 'string') {
-      const lookup = {e: this.coord[0], a: this.coord[1], p: this.coord[2]};
+    }
+    if (typeof index === 'string') {
+      const lookup = { e: this.coord[0], a: this.coord[1], p: this.coord[2] };
       return lookup[index.charAt(0).toLowerCase()];
     }
     return null;
@@ -63,7 +64,7 @@ export class CLUEMode {
     if (this.presentation === 1) {
       return 'P';
     }
-    return '(' + this.coord.map((s) => (Math.round(s * 1000) / 1000).toString()).join('-') + ')';
+    return `(${this.coord.map((s) => (Math.round(s * 1000) / 1000).toString()).join('-')})`;
   }
 
   /**
@@ -84,18 +85,23 @@ export class CLUEMode {
   static modes = {
     Exploration: CLUEMode.mode(1, 0, 0),
     Authoring: CLUEMode.mode(0, 1, 0),
-    Presentation: CLUEMode.mode(0, 0, 1)
+    Presentation: CLUEMode.mode(0, 0, 1),
   };
 
   static fromString(s: string) {
     if (s === 'P') {
       return CLUEMode.modes.Presentation;
-    } else if (s === 'A') {
+    }
+    if (s === 'A') {
       return CLUEMode.modes.Authoring;
-    } else if (s === 'E') {
+    }
+    if (s === 'E') {
       return CLUEMode.modes.Exploration;
     }
-    const coords = s.slice(1, s.length - 1).split('-').map(parseFloat);
+    const coords = s
+      .slice(1, s.length - 1)
+      .split('-')
+      .map(parseFloat);
     return new CLUEMode(coords[0], coords[1], coords[2]);
   }
 
@@ -106,7 +112,6 @@ export class CLUEMode {
     return CLUEMode.fromString(AppContext.getInstance().hash.getProp('clue', 'E'));
   }
 }
-
 
 /**
  * wrapper containing the current mode
@@ -124,12 +129,12 @@ export class ModeWrapper extends EventHandler {
       return;
     }
     if (value.isAtomic) {
-      //use the real atomic one for a shared instance
+      // use the real atomic one for a shared instance
       value = CLUEMode.fromString(value.toString());
     }
     const bak = ModeWrapper.getInstance()._mode;
     ModeWrapper.getInstance()._mode = value;
-    //store in hash
+    // store in hash
     AppContext.getInstance().hash.setProp('clue', value.toString());
     this.fire('modeChanged', value, bak);
     GlobalEventHandler.getInstance().fire('clue.modeChanged', value, bak);
@@ -140,6 +145,7 @@ export class ModeWrapper extends EventHandler {
   }
 
   private static instance: ModeWrapper;
+
   public static getInstance(): ModeWrapper {
     if (!ModeWrapper.instance) {
       ModeWrapper.instance = new ModeWrapper();
@@ -147,7 +153,6 @@ export class ModeWrapper extends EventHandler {
     return ModeWrapper.instance;
   }
 }
-
 
 /**
  * utility to select the mode using three buttons to the atomic versions using bootstrap buttons
@@ -157,8 +162,9 @@ export class ButtonModeSelector {
     /**
      * button size, i.e. the class btn-{size] will be added
      */
-    size: 'xs'
+    size: 'xs',
   };
+
   private readonly node: HTMLElement;
 
   constructor(parent: Element, options: any = {}) {
@@ -168,7 +174,7 @@ export class ButtonModeSelector {
     const listener = (event: IEvent, newMode: CLUEMode) => {
       this.node.dataset.mode = newMode.toString();
       Array.from(parent.lastElementChild!.querySelectorAll('label')).forEach((label: HTMLElement) => {
-        const input = (<HTMLInputElement>label.firstElementChild!);
+        const input = <HTMLInputElement>label.firstElementChild!;
         const d = CLUEMode.fromString(input.value);
         label.classList.toggle('active', d === newMode);
         input.checked = d === newMode;
@@ -181,17 +187,32 @@ export class ButtonModeSelector {
   }
 
   private build(parent: Element) {
-    parent.insertAdjacentHTML('beforeend', `<div class="clue_buttonmodeselector btn-group" role="group" data-mode="${ModeWrapper.getInstance().getMode().toString()}">
-        <label for="mode_radio_btngroup_1" class="form-label btn btn-${this.options.size} clue-${CLUEMode.modes.Exploration.toString()}${CLUEMode.modes.Exploration === ModeWrapper.getInstance().getMode() ? ' active' : ''}">
-          <input type="radio" class="btn-check" id="mode_radio_btngroup_1" name="clue_mode" autocomplete="off" value="${CLUEMode.modes.Exploration.toString()}" ${CLUEMode.modes.Exploration === ModeWrapper.getInstance().getMode() ? 'checked="checked"' : ''}>${I18nextManager.getInstance().i18n.t('phovea:clue.exploration')}
+    parent.insertAdjacentHTML(
+      'beforeend',
+      `<div class="clue_buttonmodeselector btn-group" role="group" data-mode="${ModeWrapper.getInstance().getMode().toString()}">
+        <label for="mode_radio_btngroup_1" class="form-label btn btn-${this.options.size} clue-${CLUEMode.modes.Exploration.toString()}${
+        CLUEMode.modes.Exploration === ModeWrapper.getInstance().getMode() ? ' active' : ''
+      }">
+          <input type="radio" class="btn-check" id="mode_radio_btngroup_1" name="clue_mode" autocomplete="off" value="${CLUEMode.modes.Exploration.toString()}" ${
+        CLUEMode.modes.Exploration === ModeWrapper.getInstance().getMode() ? 'checked="checked"' : ''
+      }>${I18nextManager.getInstance().i18n.t('phovea:clue.exploration')}
         </label>
-        <label for="mode_radio_btngroup_2" class="form-label btn btn-${this.options.size} clue-${CLUEMode.modes.Authoring.toString()}${CLUEMode.modes.Authoring === ModeWrapper.getInstance().getMode() ? ' active' : ''}">
-          <input type="radio" class="btn-check" id="mode_radio_btngroup_2" name="clue_mode" autocomplete="off" value="${CLUEMode.modes.Authoring.toString()}" ${CLUEMode.modes.Authoring === ModeWrapper.getInstance().getMode() ? 'checked="checked"' : ''}>${I18nextManager.getInstance().i18n.t('phovea:clue.authoring')}
+        <label for="mode_radio_btngroup_2" class="form-label btn btn-${this.options.size} clue-${CLUEMode.modes.Authoring.toString()}${
+        CLUEMode.modes.Authoring === ModeWrapper.getInstance().getMode() ? ' active' : ''
+      }">
+          <input type="radio" class="btn-check" id="mode_radio_btngroup_2" name="clue_mode" autocomplete="off" value="${CLUEMode.modes.Authoring.toString()}" ${
+        CLUEMode.modes.Authoring === ModeWrapper.getInstance().getMode() ? 'checked="checked"' : ''
+      }>${I18nextManager.getInstance().i18n.t('phovea:clue.authoring')}
         </label>
-        <label for="mode_radio_btngroup_3" class="form-label btn btn-${this.options.size} clue-${CLUEMode.modes.Presentation.toString()}${CLUEMode.modes.Presentation === ModeWrapper.getInstance().getMode() ? ' active' : ''}">
-          <input type="radio" class="btn-check" id="mode_radio_btngroup_3" name="clue_mode" autocomplete="off" value="${CLUEMode.modes.Presentation.toString()}" ${CLUEMode.modes.Presentation === ModeWrapper.getInstance().getMode() ? 'checked="checked"' : ''}>${I18nextManager.getInstance().i18n.t('phovea:clue.presentation')}
+        <label for="mode_radio_btngroup_3" class="form-label btn btn-${this.options.size} clue-${CLUEMode.modes.Presentation.toString()}${
+        CLUEMode.modes.Presentation === ModeWrapper.getInstance().getMode() ? ' active' : ''
+      }">
+          <input type="radio" class="btn-check" id="mode_radio_btngroup_3" name="clue_mode" autocomplete="off" value="${CLUEMode.modes.Presentation.toString()}" ${
+        CLUEMode.modes.Presentation === ModeWrapper.getInstance().getMode() ? 'checked="checked"' : ''
+      }>${I18nextManager.getInstance().i18n.t('phovea:clue.presentation')}
         </label>
-    </div>`);
+    </div>`,
+    );
     Array.from(parent.lastElementChild!.querySelectorAll('label')).forEach((label: HTMLElement) => {
       label.onclick = () => ModeWrapper.getInstance().setMode(CLUEMode.fromString((<HTMLInputElement>label.firstElementChild!).value));
     });
@@ -362,6 +383,6 @@ export class ButtonModeSelector {
 // export function createTriangle(parent:Element, options:any = {}) {
 //   return new TriangleModeSelector(parent, options);
 // }
-//export function createSlider(parent:Element, options:any = {}) {
+// export function createSlider(parent:Element, options:any = {}) {
 //  return new SliderModeSelector(parent, options);
-//}
+// }

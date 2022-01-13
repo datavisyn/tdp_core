@@ -1,8 +1,8 @@
+import { LocalDataProvider } from 'lineupjs';
 import { ARankingView } from './ARankingView';
 import { IARankingViewOptions } from './IARankingViewOptions';
 import { ISelection, IViewContext } from '../base/interfaces';
 import { IRow } from '../base/rest';
-import { LocalDataProvider } from 'lineupjs';
 export declare abstract class AOverviewDetailRankingView extends ARankingView {
     protected readonly overview: HTMLElement;
     private readonly split;

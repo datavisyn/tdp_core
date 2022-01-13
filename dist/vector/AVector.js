@@ -2,7 +2,7 @@ import { Range, Range1DGroup, ParseRangeUtils } from '../range';
 import { CompositeRange1D } from '../range/CompositeRange1D';
 import { ArrayUtils } from '../base/ArrayUtils';
 import { ASelectAble, IDTypeManager } from '../idtype';
-import { Categorical2PartioningUtils, ValueTypeUtils } from '../data';
+import { Categorical2PartioningUtils, ValueTypeUtils, } from '../data';
 import { Histogram, CatHistogram } from '../data/histogram';
 import { Statistics, AdvancedStatistics } from '../base/statistics';
 import { ProjectedAtom } from './ProjectedAtom';
@@ -32,13 +32,13 @@ export class AVector extends ASelectAble {
     }
     async stats(range = Range.all()) {
         if (this.root.valuetype.type !== ValueTypeUtils.VALUE_TYPE_INT && this.root.valuetype.type !== ValueTypeUtils.VALUE_TYPE_REAL) {
-            return Promise.reject('invalid value type: ' + this.root.valuetype.type);
+            return Promise.reject(`invalid value type: ${this.root.valuetype.type}`);
         }
         return Statistics.computeStats(await this.data(range));
     }
     async statsAdvanced(range = Range.all()) {
         if (this.root.valuetype.type !== ValueTypeUtils.VALUE_TYPE_INT && this.root.valuetype.type !== ValueTypeUtils.VALUE_TYPE_REAL) {
-            return Promise.reject('invalid value type: ' + this.root.valuetype.type);
+            return Promise.reject(`invalid value type: ${this.root.valuetype.type}`);
         }
         return AdvancedStatistics.computeAdvancedStats(await this.data(range));
     }
@@ -54,36 +54,36 @@ export class AVector extends ASelectAble {
             const vc = v;
             const d = await this.data();
             const options = {
-                name: this.root.desc.id
+                name: this.root.desc.id,
             };
             if (typeof vc.categories[0] !== 'string') {
                 const vcc = vc.categories;
                 if (vcc[0].color) {
-                    options.colors = vcc.map((d) => d.color);
+                    options.colors = vcc.map((a) => a.color);
                 }
                 if (vcc[0].label) {
-                    options.labels = vcc.map((d) => d.label);
+                    options.labels = vcc.map((a) => a.label);
                 }
             }
-            return Categorical2PartioningUtils.categorical2partitioning(d, vc.categories.map((d) => typeof d === 'string' ? d : d.name), options);
+            return Categorical2PartioningUtils.categorical2partitioning(d, vc.categories.map((a) => (typeof a === 'string' ? a : a.name)), options);
         }
-        else {
-            return Promise.resolve(CompositeRange1D.composite(this.root.desc.id, [Range1DGroup.asUngrouped(this.indices.dim(0))]));
-        }
+        return Promise.resolve(CompositeRange1D.composite(this.root.desc.id, [Range1DGroup.asUngrouped(this.indices.dim(0))]));
     }
     async hist(bins, range = Range.all()) {
         const v = this.root.valuetype;
         const d = await this.data(range);
         switch (v.type) {
             case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
+                // eslint-disable-next-line no-case-declarations
                 const vc = v;
-                return CatHistogram.categoricalHist(d, this.indices.dim(0), d.length, vc.categories.map((d) => typeof d === 'string' ? d : d.name), vc.categories.map((d) => typeof d === 'string' ? d : d.label || d.name), vc.categories.map((d) => typeof d === 'string' ? 'gray' : d.color || 'gray'));
+                return CatHistogram.categoricalHist(d, this.indices.dim(0), d.length, vc.categories.map((a) => (typeof a === 'string' ? a : a.name)), vc.categories.map((a) => (typeof a === 'string' ? a : a.label || a.name)), vc.categories.map((a) => (typeof a === 'string' ? 'gray' : a.color || 'gray')));
             case ValueTypeUtils.VALUE_TYPE_REAL:
             case ValueTypeUtils.VALUE_TYPE_INT:
+                // eslint-disable-next-line no-case-declarations
                 const vn = v;
-                return Histogram.hist(d, this.indices.dim(0), d.length, bins ? bins : Math.round(Math.sqrt(this.length)), vn.range);
+                return Histogram.hist(d, this.indices.dim(0), d.length, bins || Math.round(Math.sqrt(this.length)), vn.range);
             default:
-                return null; //cant create hist for unique objects or other ones
+                return null; // cant create hist for unique objects or other ones
         }
     }
     async every(callbackfn, thisArg) {
@@ -97,12 +97,14 @@ export class AVector extends ASelectAble {
     }
     async reduce(callbackfn, initialValue, thisArg) {
         function helper() {
+            // eslint-disable-next-line prefer-rest-params
             return callbackfn.apply(thisArg, Array.from(arguments));
         }
         return (await this.data()).reduce(helper, initialValue);
     }
     async reduceRight(callbackfn, initialValue, thisArg) {
         function helper() {
+            // eslint-disable-next-line prefer-rest-params
             return callbackfn.apply(thisArg, Array.from(arguments));
         }
         return (await this.data()).reduceRight(helper, initialValue);
@@ -114,9 +116,12 @@ export class AVector extends ASelectAble {
     restore(persisted) {
         let r = this;
         if (persisted && persisted.f) {
-            return this.reduceAtom(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
+            return this.reduceAtom(
+            // eslint-disable-next-line no-eval
+            eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
         }
-        else if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;
@@ -141,7 +146,7 @@ export class VectorView extends AVector {
     persist() {
         return {
             root: this.root.persist(),
-            range: this.range.toString()
+            range: this.range.toString(),
         };
     }
     size() {
@@ -176,9 +181,9 @@ export class VectorView extends AVector {
     get idtypes() {
         return [this.idtype];
     }
-    /*get indices() {
+    /* get indices() {
      return this.range;
-     }*/
+     } */
     async sort(compareFn, thisArg) {
         const d = await this.data();
         const indices = ArrayUtils.argSort(d, compareFn, thisArg);

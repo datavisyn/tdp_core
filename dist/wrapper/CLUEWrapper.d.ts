@@ -1,12 +1,9 @@
 /// <amd-dependency path="font-awesome" />
 /// <amd-dependency path="bootstrap" />
-/**
- * provides a template wrapper around an application for including CLUE. Includes the common frame for switching modes, provenance, and story visualizations
- */
+import * as d3 from 'd3';
 import { IObjectRef, ProvenanceGraph } from '../provenance';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
-import * as d3 from 'd3';
 import { AppHeader, IAppHeaderOptions, IHeaderLink } from '../components';
 export interface ICLUEWrapperOptions extends IACLUEWrapperOptions {
     /**

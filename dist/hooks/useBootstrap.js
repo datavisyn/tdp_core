@@ -56,9 +56,9 @@ ReferenceWrapper.displayName = 'BSReferenceWrapper';
  * @param additionalHook An additional hook to support additional properties for each instance type, i.e. show/hide in modals.
  */
 function BSClass(hook, additionalHook) {
-    return ({ children, instanceRef, 
+    return function ({ children, instanceRef, 
     // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
-    ...options }) => {
+    ...options }) {
         // Instantiate the hook
         const [ref, instance] = hook(options);
         // Store the ref to the onInstance callback to avoid putting it into the deps

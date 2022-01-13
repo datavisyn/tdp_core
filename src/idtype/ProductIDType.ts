@@ -1,10 +1,10 @@
-import {EventHandler, IEvent, IEventListener} from '../base/event';
-import {Range, RangeLike, ParseRangeUtils, Range1D} from '../range';
-import {SelectOperation, SelectionUtils} from './SelectionUtils';
-import {IIDType} from './IIDType';
-import {IDType} from './IDType';
+import { EventHandler, IEvent, IEventListener } from '../base/event';
+import { Range, RangeLike, ParseRangeUtils, Range1D } from '../range';
+import { SelectOperation, SelectionUtils } from './SelectionUtils';
+import { IIDType } from './IIDType';
+import { IDType } from './IDType';
 
-//function indicesCompare(a: number[], b: number[]) {
+// function indicesCompare(a: number[], b: number[]) {
 //  //assert a.length = b.length
 //  for(let i = 0; i < a.length; ++i) {
 //    if (a[i] !== b[i]) {
@@ -12,15 +12,15 @@ import {IDType} from './IDType';
 //    }
 //  }
 //  return 0;
-//}
+// }
 //
-//function compressPairs(pairs: number[][]): Range[] {
+// function compressPairs(pairs: number[][]): Range[] {
 //  return pairs.map((a) => rlist(...a));
-//}
+// }
 
 function overlaps(r: Range, withRange: Range, ndim: number) {
   if (withRange.ndim === 0) {
-    return true; //catch all
+    return true; // catch all
   }
   for (let i = 0; i < Math.min(r.ndim, ndim); ++i) {
     const ri = r.dim(i);
@@ -29,10 +29,10 @@ function overlaps(r: Range, withRange: Range, ndim: number) {
       return true;
     }
     if (!ri.isUnbound && ri.asList().every((rii) => !wi.contains(rii))) {
-      //it the ids at dimension i are not overlapping can't overlap in others
+      // it the ids at dimension i are not overlapping can't overlap in others
       return false;
     }
-    //TODO
+    // TODO
   }
   return false;
 }
@@ -44,9 +44,9 @@ function removeCells(b: Range[], without: Range[], ndim: number) {
   const r: Range[] = [];
   b.forEach((bi) => {
     if (without.some((w) => w.eq(bi))) {
-      //skip
+      // skip
     } else if (without.some((w) => overlaps(bi, w, ndim))) {
-      //TODO
+      // TODO
     } else {
       r.push(bi);
     }
@@ -58,21 +58,36 @@ function removeCells(b: Range[], without: Range[], ndim: number) {
  */
 export class ProductIDType extends EventHandler implements IIDType {
   static readonly EVENT_SELECT_DIM = 'selectDim';
+
   static readonly EVENT_SELECT_PRODUCT = 'selectProduct';
 
   private sel = new Map<string, Range[]>();
 
   private isOn = false;
+
   private selectionListener = (event: IEvent, type: string, act: Range, added: Range, removed: Range) => {
-    this.fire(`${ProductIDType.EVENT_SELECT_DIM},${ProductIDType.EVENT_SELECT_PRODUCT}`, this.elems.indexOf(<IDType>event.currentTarget), type, act, added, removed);
-    this.fire(`${ProductIDType.EVENT_SELECT_DIM}-${type},${ProductIDType.EVENT_SELECT_PRODUCT}-${type}`, this.elems.indexOf(<IDType>event.currentTarget), act, added, removed);
-  }
+    this.fire(
+      `${ProductIDType.EVENT_SELECT_DIM},${ProductIDType.EVENT_SELECT_PRODUCT}`,
+      this.elems.indexOf(<IDType>event.currentTarget),
+      type,
+      act,
+      added,
+      removed,
+    );
+    this.fire(
+      `${ProductIDType.EVENT_SELECT_DIM}-${type},${ProductIDType.EVENT_SELECT_PRODUCT}-${type}`,
+      this.elems.indexOf(<IDType>event.currentTarget),
+      act,
+      added,
+      removed,
+    );
+  };
 
   constructor(public readonly elems: IDType[], public readonly internal = false) {
     super();
   }
 
-  on(events: string|{[key: string]: IEventListener}, listener?: IEventListener) {
+  on(events: string | { [key: string]: IEventListener }, listener?: IEventListener) {
     if (!this.isOn) {
       this.enable();
       this.isOn = true;
@@ -102,9 +117,9 @@ export class ProductIDType extends EventHandler implements IIDType {
 
   persist() {
     const s: any = {};
-    this.sel.forEach((v, type) => s[type] = v.map((r) => r.toString()));
+    this.sel.forEach((v, type) => (s[type] = v.map((r) => r.toString())));
     return {
-      sel: s
+      sel: s,
     };
   }
 
@@ -134,16 +149,16 @@ export class ProductIDType extends EventHandler implements IIDType {
     return [];
   }
 
-  productSelections(type = SelectionUtils.defaultSelectionType /*, wildcardLookup: (idtype: IDType) => Promise<number> */): Range[] {
+  productSelections(type = SelectionUtils.defaultSelectionType /* , wildcardLookup: (idtype: IDType) => Promise<number> */): Range[] {
     const cells = this.selections(type);
     const usedCells = this.toPerDim(cells);
     this.elems.forEach((e, i) => {
       const s = e.selections(type);
-      //remove all already used rows / columns as part of the cells
+      // remove all already used rows / columns as part of the cells
       const wildcard = s.without(usedCells[i]);
       if (!wildcard.isNone) {
-        //create wildcard cells, e.g., the remaining ones are row/column selections
-        cells.push(Range.list(this.elems.map((e2) => e === e2 ? wildcard.dim(0) : Range1D.all())));
+        // create wildcard cells, e.g., the remaining ones are row/column selections
+        cells.push(Range.list(this.elems.map((e2) => (e === e2 ? wildcard.dim(0) : Range1D.all()))));
       }
     });
 
@@ -184,10 +199,11 @@ export class ProductIDType extends EventHandler implements IIDType {
   select(type: string, range: RangeLike[]): Range[];
   select(type: string, range: RangeLike[], op: SelectOperation): Range[];
   select() {
+    // eslint-disable-next-line prefer-rest-params
     const a = Array.from(arguments);
-    const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType,
-      range = a[0].map(ParseRangeUtils.parseRangeLike),
-      op = SelectionUtils.asSelectOperation(a[1]);
+    const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+    const range = a[0].map(ParseRangeUtils.parseRangeLike);
+    const op = SelectionUtils.asSelectOperation(a[1]);
     return this.selectImpl(range, op, type);
   }
 
@@ -209,19 +225,19 @@ export class ProductIDType extends EventHandler implements IIDType {
         newRange = removeCells(b, rcells, this.elems.length);
         break;
     }
-    //if (b.eq(new_)) {
+    // if (b.eq(new_)) {
     //  return b;
-    //}
+    // }
     this.sel.set(type, newRange);
 
-    //individual selection per dimension
+    // individual selection per dimension
     const perDimSelections = this.toPerDim(newRange);
     this.disable();
     this.elems.forEach((e, i) => e.select(type, perDimSelections[i]));
     this.enable();
 
     const added = op !== SelectOperation.REMOVE ? rcells : [];
-    const removed = (op === SelectOperation.ADD ? [] : (op === SelectOperation.SET ? b : rcells));
+    const removed = op === SelectOperation.ADD ? [] : op === SelectOperation.SET ? b : rcells;
     this.fire(IDType.EVENT_SELECT, type, newRange, added, removed, b);
     this.fire(ProductIDType.EVENT_SELECT_PRODUCT, -1, type, newRange, added, removed, b);
     this.fire(`${IDType.EVENT_SELECT}-${type}`, newRange, added, removed, b);
@@ -235,7 +251,7 @@ export class ProductIDType extends EventHandler implements IIDType {
         return Range.none();
       }
       const dimselections = sel.map((r) => r.dim(i));
-      const selection = dimselections.reduce((p, a) => p ? p.union(a) : a, null);
+      const selection = dimselections.reduce((p, a) => (p ? p.union(a) : a), null);
       return Range.list(selection);
     });
   }

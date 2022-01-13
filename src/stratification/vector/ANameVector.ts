@@ -1,9 +1,9 @@
-import {AVector} from '../../vector/AVector';
-import {IStringValueTypeDesc, IDataType} from '../../data';
-import {IVector, IVectorDataDescription} from '../../vector';
-import {RangeLike, ParseRangeUtils, Range} from '../../range';
-import {ArrayUtils} from '../../base/ArrayUtils';
-import {IDType} from '../../idtype/IDType';
+import { AVector } from '../../vector/AVector';
+import { IStringValueTypeDesc, IDataType } from '../../data';
+import { IVector, IVectorDataDescription } from '../../vector';
+import { RangeLike, ParseRangeUtils, Range } from '../../range';
+import { ArrayUtils } from '../../base/ArrayUtils';
+import { IDType } from '../../idtype/IDType';
 
 export declare type IStringVector = IVector<string, IStringValueTypeDesc>;
 
@@ -17,16 +17,16 @@ export abstract class ANameVector<T extends IDataType> extends AVector<string, I
       name: base.desc.name,
       fqname: base.desc.fqname,
       description: base.desc.description,
-      id: base.desc.id + '_names',
+      id: `${base.desc.id}_names`,
       value: {
-        type: 'string'
+        type: 'string',
       },
       idtype: this.idtype.id,
       size: this.length,
       ts: base.desc.ts,
       creator: base.desc.creator,
       group: base.desc.group,
-      permissions: base.desc.permissions
+      permissions: base.desc.permissions,
     };
   }
 
@@ -36,7 +36,7 @@ export abstract class ANameVector<T extends IDataType> extends AVector<string, I
 
   // TODO This method should be abstract. However, it results in a compile error with Typescript v2.7.2:
   // `TS2715: Abstract property 'idtype' in class 'ANameVector' cannot be accessed in the constructor.`
-  /*abstract*/ get idtype(): IDType {
+  /* abstract */ get idtype(): IDType {
     return null;
   }
 
@@ -47,13 +47,15 @@ export abstract class ANameVector<T extends IDataType> extends AVector<string, I
   persist(): any {
     return {
       root: this.base.persist(),
-      names: true
+      names: true,
     };
   }
 
   restore(persisted: any) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let r: IVector<string, IStringValueTypeDesc> = this;
-    if (persisted && persisted.range) { //some view onto it
+    if (persisted && persisted.range) {
+      // some view onto it
       r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
     }
     return r;

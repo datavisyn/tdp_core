@@ -46,8 +46,8 @@ export class EditProvenanceGraphMenu {
         this.graph = graph;
     }
     init(parent) {
-        const manager = this.manager;
-        //add provenance graph management menu entry
+        const { manager } = this;
+        // add provenance graph management menu entry
         const li = parent.ownerDocument.createElement('li');
         li.classList.add('nav-item', 'dropdown');
         li.innerHTML = `
@@ -76,7 +76,7 @@ export class EditProvenanceGraphMenu {
                 if (extras !== null) {
                     Promise.resolve(manager.editGraphMetaData(this.graph.desc, extras))
                         .then((desc) => {
-                        //update the name
+                        // update the name
                         this.node.querySelector('a span').innerHTML = desc.name;
                         GlobalEventHandler.getInstance().fire(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED);
                     })
@@ -128,7 +128,9 @@ export class EditProvenanceGraphMenu {
             }
             ProvenanceGraphMenuUtils.persistProvenanceGraphMetaData(this.graph.desc).then((extras) => {
                 if (extras !== null) {
-                    Promise.resolve(manager.migrateGraph(this.graph, extras)).catch(ErrorAlertHandler.getInstance().errorAlert).then(() => {
+                    Promise.resolve(manager.migrateGraph(this.graph, extras))
+                        .catch(ErrorAlertHandler.getInstance().errorAlert)
+                        .then(() => {
                         this.updateGraphMetaData(this.graph);
                         const p = new PropertyHandler(location.hash);
                         const hash = new Map();
@@ -153,12 +155,13 @@ export class EditProvenanceGraphMenu {
             if (!this.graph) {
                 return false;
             }
-            PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', { name: this.graph.desc.name }))
-                .then((deleteIt) => {
+            PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.areYouSure', { name: this.graph.desc.name })).then((deleteIt) => {
                 if (deleteIt) {
-                    Promise.resolve(this.manager.delete(this.graph.desc)).then((r) => {
+                    Promise.resolve(this.manager.delete(this.graph.desc))
+                        .then((r) => {
                         this.manager.startFromScratch();
-                    }).catch(ErrorAlertHandler.getInstance().errorAlert);
+                    })
+                        .catch(ErrorAlertHandler.getInstance().errorAlert);
                 }
             });
             return false;
@@ -173,7 +176,7 @@ export class EditProvenanceGraphMenu {
             const r = this.graph.persist();
             console.log(r);
             const str = JSON.stringify(r, null, '\t');
-            //create blob and save it
+            // create blob and save it
             const blob = new Blob([str], { type: 'application/json;charset=utf-8' });
             const a = new FileReader();
             a.onload = (e) => {
@@ -193,7 +196,7 @@ export class EditProvenanceGraphMenu {
         li.querySelector('a[data-action="import"]').addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
-            //import dialog
+            // import dialog
             const d = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.upload'));
             d.body.innerHTML = `<input type="file" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.fileToUpload')}">`;
             d.body.querySelector('input').addEventListener('change', function (evt) {

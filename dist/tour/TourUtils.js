@@ -117,7 +117,7 @@ export class TourUtils {
         }
         const event = new Event('submit', {
             bubbles: true,
-            cancelable: true
+            cancelable: true,
         });
         e.dispatchEvent(event);
     }
@@ -146,7 +146,7 @@ export class TourUtils {
             key: 'Enter',
             code: 'Enter',
             which: 13,
-            keyCode: 13
+            keyCode: 13,
         });
         e.dispatchEvent(event);
     }
@@ -166,7 +166,7 @@ export class TourUtils {
         e.value = value;
         return e.dispatchEvent(new Event(eventType, {
             bubbles: true,
-            cancelable: true
+            cancelable: true,
         }));
     }
     /**

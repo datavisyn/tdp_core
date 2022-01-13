@@ -12,7 +12,7 @@ export class ChooserProxyView extends AView {
             argument: 'gene',
             idtype: null,
             extra: {},
-            openExternally: false
+            openExternally: false,
         };
         this.naturalSize = [1280, 800];
         Object.assign(this.options, context.desc, options);
@@ -46,7 +46,7 @@ export class ChooserProxyView extends AView {
         return this.build();
     }
     createUrl(args) {
-        //use internal proxy
+        // use internal proxy
         if (this.options.proxy) {
             return RestBaseUtils.getProxyUrl(this.options.proxy, args);
         }
@@ -56,7 +56,7 @@ export class ChooserProxyView extends AView {
         return null;
     }
     build() {
-        //remove old mapping error notice if any exists
+        // remove old mapping error notice if any exists
         this.openExternally.innerHTML = '';
         this.node.innerHTML = '';
         this.setHint(false);
@@ -68,7 +68,7 @@ export class ChooserProxyView extends AView {
             return;
         }
         this.setBusy(true);
-        const args = Object.assign({}, this.options.extra, { [this.options.argument]: selectedItemId.name });
+        const args = { ...this.options.extra, [this.options.argument]: selectedItemId.name };
         const url = this.createUrl(args);
         if (ChooserProxyView.isNoNSecurePage(url)) {
             this.showNoHttpsMessage(url);

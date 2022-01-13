@@ -1,7 +1,6 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer } from '../interfaces';
+import { ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer, IDropArea } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
-import { IDropArea } from '../interfaces';
 export interface ITabbingLayoutContainerOptions extends ILayoutContainerOption {
     readonly active: number;
 }

@@ -15,7 +15,7 @@ export class ScoreUtils {
         const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
         const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
         return {
-            inverse: ScoreUtils.removeScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id))
+            inverse: ScoreUtils.removeScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id)),
         };
     }
     static addScoreImpl(inputs, parameter) {
@@ -26,17 +26,17 @@ export class ScoreUtils {
     }
     static async removeScoreImpl(inputs, parameter) {
         const view = await inputs[0].v.then((vi) => vi.getInstance());
-        const columnId = parameter.columnId;
+        const { columnId } = parameter;
         const columnIds = Array.isArray(columnId) ? columnId : [columnId];
         columnIds.forEach((id) => view.removeTrackedScoreColumn(id));
         return {
-            inverse: ScoreUtils.addScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), parameter.id, parameter.params)
+            inverse: ScoreUtils.addScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), parameter.id, parameter.params),
         };
     }
     static addScore(provider, scoreName, scoreId, params) {
         return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', { scoreName }), ObjectRefUtils.category.data, ObjectRefUtils.operation.create), ScoreUtils.CMD_ADD_SCORE, ScoreUtils.addScoreImpl, [provider], {
             id: scoreId,
-            params
+            params,
         });
     }
     static async pushScoreAsync(graph, provider, scoreName, scoreId, params) {
@@ -50,7 +50,7 @@ export class ScoreUtils {
         return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.remove', { scoreName }), ObjectRefUtils.category.data, ObjectRefUtils.operation.remove), ScoreUtils.CMD_REMOVE_SCORE, ScoreUtils.removeScoreImpl, [provider], {
             id: scoreId,
             params,
-            columnId
+            columnId,
         });
     }
     static shallowEqualObjects(a, b) {
@@ -90,10 +90,10 @@ export class ScoreUtils {
                 for (let j = i + 1; j < manipulate.length; ++j) {
                     const next = manipulate[j];
                     if (next.f_id === remCmd && ScoreUtils.shallowEqualObjects(act.parameter, next.parameter)) {
-                        //TODO remove lineup actions that uses this score -> how to identify?
-                        //found match, delete both
-                        manipulate.slice(j, 1); //delete remove cmd
-                        continue outer; //skip adding of add cmd
+                        // TODO remove lineup actions that uses this score -> how to identify?
+                        // found match, delete both
+                        manipulate.slice(j, 1); // delete remove cmd
+                        continue outer; // skip adding of add cmd
                     }
                 }
             }

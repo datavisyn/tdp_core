@@ -2,10 +2,10 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {ITypeDefinition, IValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils, ValueTypeEditor} from './valuetypes';
-import {IDTypeManager} from '../idtype';
-import {I18nextManager} from '../i18n';
-import {PluginRegistry} from '../app';
+import { ITypeDefinition, IValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils, ValueTypeEditor } from './valuetypes';
+import { IDTypeManager } from '../idtype';
+import { I18nextManager } from '../i18n';
+import { PluginRegistry } from '../app';
 
 /**
  * edits the given type definition in place with idtype properties
@@ -16,7 +16,7 @@ import {PluginRegistry} from '../app';
 const EXTENSION_POINT = 'idTypeDetector';
 
 export interface IIDTypeDetector {
-  detectIDType: (data: any[], accessor: (row: any) => string, sampleSize: number, options?: {[property: string]: any}) => Promise<number> | number;
+  detectIDType: (data: any[], accessor: (row: any) => string, sampleSize: number, options?: { [property: string]: any }) => Promise<number> | number;
 }
 
 interface IPluginResult {
@@ -32,8 +32,7 @@ export class IDTypeUtils {
       const existing = await IDTypeManager.getInstance().listAllIdTypes();
       const existingFiltered = existing.filter((d) => !IDTypeManager.getInstance().isInternalIDType(d));
       const dialog = PHOVEA_IMPORTER_ValueTypeUtils.createDialog(I18nextManager.getInstance().i18n.t('phovea:importer.editIdType'), 'idtype', () => {
-
-        const value = (<HTMLInputElement>dialog.body.querySelector('input')).value;
+        const { value } = <HTMLInputElement>dialog.body.querySelector('input');
         const existingIDType = existingFiltered.find((idType) => idType.id === value);
         const idType = existingIDType ? existingIDType.id : value;
 
@@ -73,7 +72,7 @@ export class IDTypeUtils {
   }
 
   static async isIDType(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
-    //first check if it is number then it cant be an IDType
+    // first check if it is number then it cant be an IDType
     const isNumber = PHOVEA_IMPORTER_ValueTypeUtils.numerical().isType(name, index, data, accessor, sampleSize);
     if (isNumber > 0.8) {
       // pretty sure it is a number
@@ -89,22 +88,24 @@ export class IDTypeUtils {
   }
 
   static async executePlugins(data: any[], accessor: (row: any) => string, sampleSize: number): Promise<IPluginResult[]> {
-    const results = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT).map(async (pluginDesc) => {
-      const factory = await pluginDesc.load();
-      const options = pluginDesc.options ? pluginDesc.options : null;
-      const plugin: IIDTypeDetector = factory.factory();
-      const confidence = await plugin.detectIDType(data, accessor, sampleSize, options);
-      return {
-        idType: pluginDesc.idType,
-        confidence
-      };
-    });
+    const results = PluginRegistry.getInstance()
+      .listPlugins(EXTENSION_POINT)
+      .map(async (pluginDesc) => {
+        const factory = await pluginDesc.load();
+        const options = pluginDesc.options ? pluginDesc.options : null;
+        const plugin: IIDTypeDetector = factory.factory();
+        const confidence = await plugin.detectIDType(data, accessor, sampleSize, options);
+        return {
+          idType: pluginDesc.idType,
+          confidence,
+        };
+      });
 
-    return await Promise.all(results);
+    return Promise.all(results);
   }
 
   static parseIDType(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
-    //TODO check all ids
+    // TODO check all ids
     return [];
   }
 
@@ -113,7 +114,14 @@ export class IDTypeUtils {
     const allNonInternalIDtypes = allIDTypes.filter((idType) => !IDTypeManager.getInstance().isInternalIDType(idType));
 
     return `<optgroup label="${I18nextManager.getInstance().i18n.t('phovea:importer.optionLabel')}" data-type="${this.id}">
-          ${allNonInternalIDtypes.map((type) => `<option value="${type.id}" ${current && current.id === this.id && type.name === def.idType ? 'selected="selected"' : ''}>${type.name}</option>`).join('\n')}
+          ${allNonInternalIDtypes
+            .map(
+              (type) =>
+                `<option value="${type.id}" ${current && current.id === this.id && type.name === def.idType ? 'selected="selected"' : ''}>${
+                  type.name
+                }</option>`,
+            )
+            .join('\n')}
       </optgroup>`;
   }
 
@@ -123,7 +131,7 @@ export class IDTypeUtils {
       parse: IDTypeUtils.parseIDType,
       guessOptions: IDTypeUtils.guessIDType,
       edit: IDTypeUtils.editIDType,
-      getOptionsMarkup: IDTypeUtils.getMarkup
+      getOptionsMarkup: IDTypeUtils.getMarkup,
     };
   }
 }

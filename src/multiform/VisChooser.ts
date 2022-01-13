@@ -1,9 +1,7 @@
-import {IMultiForm} from './IMultiForm';
-import {FormUtils} from './internal/FormUtils';
+import { IMultiForm } from './IMultiForm';
+import { FormUtils } from './internal/FormUtils';
 
 export class VisChooser {
-
-
   /**
    * computes the selectable vis techniques for a given set of multi form objects
    * @param forms
@@ -16,7 +14,7 @@ export class VisChooser {
     if (forms.length === 1) {
       return forms[0].visses;
     }
-    //intersection of all
+    // intersection of all
     return forms[0].visses.filter((vis) => forms.every((f) => f.visses.indexOf(vis) >= 0));
   }
 

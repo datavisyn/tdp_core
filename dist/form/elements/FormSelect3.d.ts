@@ -1,8 +1,8 @@
+import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
 import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
 import { ISelect2Option } from './FormSelect2';
-import * as d3 from 'd3';
 import { IPluginDesc } from '../../base';
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
     return?: 'text' | 'id';

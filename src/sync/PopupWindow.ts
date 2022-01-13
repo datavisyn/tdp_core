@@ -1,4 +1,4 @@
-import {BaseUtils} from '../base/BaseUtils';
+import { BaseUtils } from '../base/BaseUtils';
 
 export interface INodeVis {
   node: Element;
@@ -10,14 +10,14 @@ export interface IPopupProxyOptions {
   name?: string;
 }
 
-
 export class PopupProxy<T extends INodeVis> {
   private current: T;
+
   private popup: Window;
 
   private options: IPopupProxyOptions = {
     args: [],
-    name: `${self.document.title} PopUp ${BaseUtils.randomId(3)}`
+    name: `${self.document.title} PopUp ${BaseUtils.randomId(3)}`,
   };
 
   private handler: ProxyHandler<T> = {};
@@ -31,10 +31,11 @@ export class PopupProxy<T extends INodeVis> {
     this.current = this.factory(parent, ...this.options.args);
   }
 
-
   private buildPopup(callbackFunction: string) {
     const serializer = new XMLSerializer();
-    const links = Array.from(document.head.querySelectorAll('link')).map((link: HTMLLinkElement) => `<link href="${link.href}" rel="${link.rel}" type="${link.type}" />`);
+    const links = Array.from(document.head.querySelectorAll('link')).map(
+      (link: HTMLLinkElement) => `<link href="${link.href}" rel="${link.rel}" type="${link.type}" />`,
+    );
     const template = `<!doctype html>
       <html>
       <head>
@@ -56,7 +57,7 @@ export class PopupProxy<T extends INodeVis> {
       </body>
     </html>`;
 
-    const blob = new Blob([template], {type: 'text/html'});
+    const blob = new Blob([template], { type: 'text/html' });
     return URL.createObjectURL(blob);
   }
 
@@ -85,13 +86,16 @@ export class PopupProxy<T extends INodeVis> {
     this.parent.classList.add('as-popup');
     this.current = null;
     // use a callback function similar to jsonp, don't know why the popup state if overridden
-    const name = 'popupCallback' + BaseUtils.randomId(8);
+    const name = `popupCallback${BaseUtils.randomId(8)}`;
     (<any>window)[name] = (popupBody) => {
       this.build(popupBody);
       delete (<any>window)[name];
     };
-    this.popup = self.open(this.buildPopup(name), this.options.name, `width=${rect.width}, height=${rect.height}, left=${rect.left}, top=${rect.top}, location=no`);
+    this.popup = self.open(
+      this.buildPopup(name),
+      this.options.name,
+      `width=${rect.width}, height=${rect.height}, left=${rect.left}, top=${rect.top}, location=no`,
+    );
     this.popup.onbeforeunload = () => this.close();
   }
 }
-

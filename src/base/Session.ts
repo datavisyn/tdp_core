@@ -32,7 +32,7 @@ export class Session {
    * @returns {boolean}
    */
   public has(key: string) {
-    return (this.context.getItem(key) !== null);
+    return this.context.getItem(key) !== null;
   }
 
   /**
@@ -45,5 +45,4 @@ export class Session {
   public retrieve<T>(key: string, defaultValue: T = null): T {
     return this.has(key) ? JSON.parse(this.context.getItem(key)) : defaultValue;
   }
-
 }

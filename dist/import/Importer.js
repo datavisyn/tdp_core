@@ -1,8 +1,8 @@
 /**
  * Created by Samuel Gratzl on 29.09.2016.
  */
-import { ParserUtils } from './parser';
 import * as d3 from 'd3';
+import { ParserUtils } from './parser';
 import { ValueTypeEditor } from '../valuetype/valuetypes';
 import { ImportUtils } from './ImportUtils';
 import { EventHandler, BaseUtils } from '../base';
@@ -10,18 +10,18 @@ export class Importer extends EventHandler {
     constructor(parent, options = {}) {
         super();
         this.options = {
-            type: 'table'
+            type: 'table',
         };
         BaseUtils.mixin(this.options, options);
         this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
         this.build(this.$parent);
     }
     selectedFile(file) {
-        let name = file.name;
-        name = name.substring(0, name.lastIndexOf('.')); //remove .csv
+        let { name } = file;
+        name = name.substring(0, name.lastIndexOf('.')); // remove .csv
         Promise.all([ParserUtils.parseCSV(file), ValueTypeEditor.createValueTypeEditors()]).then((results) => {
             const editors = results[1];
-            const data = results[0].data;
+            const { data } = results[0];
             const header = data.shift();
             switch (this.options.type) {
                 case 'matrix':
@@ -67,10 +67,10 @@ export class Importer extends EventHandler {
         function select() {
             over();
             const e = d3.event;
-            //either drop or file select
+            // either drop or file select
             const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
             if (files.length > 0) {
-                //just the first file for now
+                // just the first file for now
                 onFileSelected(files[0]);
             }
         }

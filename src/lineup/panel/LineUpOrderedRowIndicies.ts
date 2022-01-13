@@ -1,13 +1,14 @@
-import {EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking} from 'lineupjs';
-import {EventHandler} from '../../base';
+import { EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking } from 'lineupjs';
+import { EventHandler } from '../../base';
 
 /**
  *  Store the ordered row indices for all, selected or filtered rows of the first ranking.
  */
 export class LineUpOrderedRowIndicies extends EventHandler {
-
   static readonly EVENT_UPDATE_ALL = 'updateAll';
+
   static readonly EVENT_UPDATE_SELECTED = 'updateSelected';
+
   static readonly EVENT_UPDATE_FILTERED = 'updateFiltered';
 
   /**
@@ -40,6 +41,7 @@ export class LineUpOrderedRowIndicies extends EventHandler {
   public get all(): number[] {
     return this._all;
   }
+
   /**
    * Indices of the selected rows.
    * Indices are sorted by the *first* ranking.
@@ -55,7 +57,6 @@ export class LineUpOrderedRowIndicies extends EventHandler {
   public get filtered(): number[] {
     return this._filtered;
   }
-
 
   /**
    * Add event listener to LineUp data provider and
@@ -85,28 +86,34 @@ export class LineUpOrderedRowIndicies extends EventHandler {
         return;
       }
 
-      provider.getFirstRanking().on(Ranking.EVENT_ORDER_CHANGED + eventSuffix, (_previous: number[], current: number[], _previousGroups: IOrderedGroup[], _currentGroups: IOrderedGroup[], dirtyReason: EDirtyReason[]) => {
-        // update filtered rows on filter and sort events
-        if (dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
-          // no rows are filtered -> reset array
-          if (current.length === this._all.length) {
-            this._filtered = [];
+      provider
+        .getFirstRanking()
+        .on(
+          Ranking.EVENT_ORDER_CHANGED + eventSuffix,
+          (_previous: number[], current: number[], _previousGroups: IOrderedGroup[], _currentGroups: IOrderedGroup[], dirtyReason: EDirtyReason[]) => {
+            // update filtered rows on filter and sort events
+            if (dirtyReason.indexOf(EDirtyReason.FILTER_CHANGED) > -1 || dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
+              // no rows are filtered -> reset array
+              if (current.length === this._all.length) {
+                this._filtered = [];
 
-            // some rows are filtered
-          } else {
-            // NOTE: `current` contains always the *sorted* and *filtered* row indices of the (first) ranking!
-            this._filtered = (current instanceof Uint8Array || current instanceof Uint16Array || current instanceof Uint32Array) ? Array.from(current) : current; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
-          }
-          this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, this._filtered);
-        }
+                // some rows are filtered
+              } else {
+                // NOTE: `current` contains always the *sorted* and *filtered* row indices of the (first) ranking!
+                this._filtered =
+                  current instanceof Uint8Array || current instanceof Uint16Array || current instanceof Uint32Array ? Array.from(current) : current; // convert UIntTypedArray if necessary -> TODO: https://github.com/datavisyn/tdp_core/issues/412
+              }
+              this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, this._filtered);
+            }
 
-        // update sorting of selected rows
-        if (dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
-          const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
-          this._selected = this.sortValues(provider.getSelection(), order);
-          this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
-        }
-      });
+            // update sorting of selected rows
+            if (dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
+              const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
+              this._selected = this.sortValues(provider.getSelection(), order);
+              this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
+            }
+          },
+        );
     });
 
     provider.on(LocalDataProvider.EVENT_REMOVE_RANKING, (_ranking: Ranking, index: number) => {

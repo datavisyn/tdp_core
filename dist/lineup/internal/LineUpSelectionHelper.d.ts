@@ -1,6 +1,6 @@
+import { LocalDataProvider } from 'lineupjs';
 import { EventHandler, ISelection } from '../../base';
 import { IRow } from '../../base/rest';
-import { LocalDataProvider } from 'lineupjs';
 import { IDType } from '../../idtype';
 import { Range } from '../../range';
 export declare class LineUpSelectionHelper extends EventHandler {

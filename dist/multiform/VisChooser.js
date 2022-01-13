@@ -12,7 +12,7 @@ export class VisChooser {
         if (forms.length === 1) {
             return forms[0].visses;
         }
-        //intersection of all
+        // intersection of all
         return forms[0].visses.filter((vis) => forms.every((f) => f.visses.indexOf(vis) >= 0));
     }
     static addIconVisChooser(toolbar, ...forms) {

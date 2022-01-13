@@ -1,6 +1,5 @@
-import {IDType, IDTypeManager} from '../idtype';
-import {Range} from '../range';
-
+import { IDType, IDTypeManager } from '../idtype';
+import { Range } from '../range';
 
 export class ResolveUtils {
   static resolveIdToNames(fromIDType: IDType, id: number, toIDType: IDType | string = null): Promise<string[][]> {
@@ -11,7 +10,9 @@ export class ResolveUtils {
     }
 
     // assume mappable
-    return IDTypeManager.getInstance().mapToName(fromIDType, [id], target).then((names) => names);
+    return IDTypeManager.getInstance()
+      .mapToName(fromIDType, [id], target)
+      .then((names) => names);
   }
 
   /**
@@ -30,7 +31,9 @@ export class ResolveUtils {
     }
 
     // assume mappable
-    return IDTypeManager.getInstance().mapToFirstName(fromIDType, [id], target).then((names) => names[0]);
+    return IDTypeManager.getInstance()
+      .mapToFirstName(fromIDType, [id], target)
+      .then((names) => names[0]);
   }
 
   /**
@@ -69,7 +72,6 @@ export class ResolveUtils {
     return fromIDType.unmap(ids).then((names) => {
       return IDTypeManager.getInstance().mapNameToFirstName(fromIDType, names, target);
     });
-
   }
 
   /**

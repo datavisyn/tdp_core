@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,7 +7,7 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc } from '../base/interfaces';
 import { AView } from '../views/AView';

@@ -13,7 +13,7 @@ export class ProvenanceGraphMenuUtils {
         return ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, {
             title: `<i class="fas fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}`,
             button: `<i class="fas fa-cloud"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save')}`,
-            name
+            name,
         });
     }
     static isPublic(d) {
@@ -24,14 +24,14 @@ export class ProvenanceGraphMenuUtils {
             button: I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save'),
             title: `<i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
             permission: true,
-            name: d.name
+            name: d.name,
         }, args);
         const dialog = new PHOVEA_UI_FormDialog(args.title, args.button, undefined, 'modal-lg');
-        const prefix = 'd' + BaseUtils.randomId();
+        const prefix = `d${BaseUtils.randomId()}`;
         const permissions = TDPApplicationUtils.permissionForm(d, {
             extra: `<div class="form-text">
           ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
-        </div>`
+        </div>`,
         });
         dialog.form.innerHTML = `
             <div class="mb-3">
@@ -55,10 +55,11 @@ export class ProvenanceGraphMenuUtils {
                 resolve(null);
             });
             dialog.onSubmit(() => {
-                const extras = Object.assign({
+                const extras = {
                     name: dialog.body.querySelector(`#${prefix}_name`).value,
                     description: dialog.body.querySelector(`#${prefix}_desc`).value,
-                }, args.permission ? permissions.resolve(new FormData(dialog.form)) : d.permissions);
+                    ...(args.permission ? permissions.resolve(new FormData(dialog.form)) : d.permissions),
+                };
                 resolve(extras);
                 dialog.hide();
                 return false;

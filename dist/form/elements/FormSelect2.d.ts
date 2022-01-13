@@ -43,6 +43,12 @@ export declare class FormSelect2 extends AFormElement<IFormSelect2> {
         templateSelection: (item: any) => any;
     };
     static readonly DEFAULT_AJAX_OPTIONS: {
+        placeholder: string;
+        theme: string;
+        minimumInputLength: number;
+        escapeMarkup: (markup: any) => any;
+        templateResult: (item: any) => any;
+        templateSelection: (item: any) => any;
         ajax: {
             url: string;
             dataType: string;
@@ -59,13 +65,6 @@ export declare class FormSelect2 extends AFormElement<IFormSelect2> {
                 };
             };
         };
-    } & {
-        placeholder: string;
-        theme: string;
-        minimumInputLength: number;
-        escapeMarkup: (markup: any) => any;
-        templateResult: (item: any) => any;
-        templateSelection: (item: any) => any;
     };
     private $select;
     private $jqSelect;

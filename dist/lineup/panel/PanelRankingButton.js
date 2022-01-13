@@ -15,7 +15,7 @@ export class PanelRankingButton {
                 if (firstRanking) {
                     onClick(firstRanking);
                 }
-            }
+            },
         }).node;
     }
 }

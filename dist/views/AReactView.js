@@ -79,10 +79,12 @@ export class AReactView extends AView {
             const inputSelection = names[0];
             const itemSelection = names[1];
             return this.render(inputSelection, itemSelection, this.select);
-        }).then((elem) => {
+        })
+            .then((elem) => {
             this.setBusy(false);
             ReactDOM.render(elem, this.node.querySelector('div.react-view-body'));
-        }).catch(Errors.showErrorModalDialog)
+        })
+            .catch(Errors.showErrorModalDialog)
             .catch((r) => {
             console.error(r);
             this.setBusy(false);

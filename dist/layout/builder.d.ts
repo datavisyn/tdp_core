@@ -1,5 +1,4 @@
-import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuilder, IBuildAbleOrViewLike } from './interfaces';
-import { EOrientation } from './interfaces';
+import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuilder, IBuildAbleOrViewLike, EOrientation } from './interfaces';
 import { IViewLayoutContainerOptions } from './internal/ViewLayoutContainer';
 import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
 import { LineUpLayoutContainer } from './internal/LineUpLayoutContainer';

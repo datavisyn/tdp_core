@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,7 +7,7 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
@@ -25,7 +25,7 @@ export class ViewWrapper extends EventHandler {
         this.plugin = plugin;
         this.graph = graph;
         this.viewOptionGenerator = viewOptionGenerator;
-        this.instance = null; //lazy
+        this.instance = null; // lazy
         this.instancePromise = null;
         this.listenerItemSelect = (_event, oldSelection, newSelection, name = AView.DEFAULT_SELECTION_NAME) => {
             this.fire(AView.EVENT_ITEM_SELECT, oldSelection, newSelection, name);
@@ -65,7 +65,8 @@ export class ViewWrapper extends EventHandler {
             if (typeof plugin.helpUrl === 'string') {
                 this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpLabel')}"><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
             }
-            else { // object version of helpUrl
+            else {
+                // object version of helpUrl
                 this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span>${plugin.helpUrl.linkText}</span></a>`);
             }
         }
@@ -78,7 +79,7 @@ export class ViewWrapper extends EventHandler {
                     plugin,
                     node: this.node,
                     instance: this.instance,
-                    selection: this.inputSelections.get(AView.DEFAULT_SELECTION_NAME)
+                    selection: this.inputSelections.get(AView.DEFAULT_SELECTION_NAME),
                 });
             });
         }
@@ -109,7 +110,7 @@ export class ViewWrapper extends EventHandler {
             this.node.toggleAttribute('hidden');
         }
         if (visible && this.instance == null && selection && this.match(selection)) {
-            //lazy init
+            // lazy init
             this.createView(selection);
         }
         else {
@@ -132,19 +133,20 @@ export class ViewWrapper extends EventHandler {
     }
     createView(selection) {
         if (!this.allowed) {
-            return;
+            return null;
         }
         return this.plugin.load().then((p) => {
             if (this.instance) {
-                return; // already built race condition
+                return null; // already built race condition
             }
             // create provenance reference
             this.context = ViewUtils.createContext(this.graph, this.plugin, this.ref);
             this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
             this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance, this);
-            return this.instancePromise = ResolveNow.resolveImmediately(this.instance.init(this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
+            return (this.instancePromise = ResolveNow.resolveImmediately(this.instance.init(this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
                 this.inputSelections.forEach((v, k) => {
-                    if (k !== AView.DEFAULT_SELECTION_NAME) { // already handled
+                    if (k !== AView.DEFAULT_SELECTION_NAME) {
+                        // already handled
                         this.instance.setInputSelection(v, k);
                     }
                 });
@@ -157,12 +159,13 @@ export class ViewWrapper extends EventHandler {
                     else {
                         this.instance.setItemSelection({
                             idtype: idType,
-                            range: idType.selections()
+                            range: idType.selections(),
                         });
                     }
                 }
                 this.preInstanceItemSelections.forEach((v, k) => {
-                    if (k !== AView.DEFAULT_SELECTION_NAME) { // already handed
+                    if (k !== AView.DEFAULT_SELECTION_NAME) {
+                        // already handed
                         this.instance.setItemSelection(v, k);
                     }
                 });
@@ -173,7 +176,7 @@ export class ViewWrapper extends EventHandler {
                 this.preInstanceParameter.clear();
                 this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance, this);
                 return this.instance;
-            });
+            }));
         });
     }
     destroy() {
@@ -213,7 +216,7 @@ export class ViewWrapper extends EventHandler {
                 return;
             }
             return this.context.graph.pushWithResult(TDPApplicationUtils.setParameter(this.ref, name, value, previousValue), {
-                inverse: TDPApplicationUtils.setParameter(this.ref, name, previousValue, value)
+                inverse: TDPApplicationUtils.setParameter(this.ref, name, previousValue, value),
             });
         }
         return this.context.graph.push(TDPApplicationUtils.setParameter(this.ref, name, value, previousValue));
@@ -253,18 +256,14 @@ export class ViewWrapper extends EventHandler {
             if (matches) {
                 return this.instance.setInputSelection(selection, name);
             }
-            else {
-                this.destroyInstance();
-            }
+            this.destroyInstance();
         }
         else if (this.instancePromise) {
             return this.instancePromise.then(() => {
                 if (matches) {
                     return this.instance.setInputSelection(selection, name);
                 }
-                else {
-                    this.destroyInstance();
-                }
+                this.destroyInstance();
             });
         }
         else if (matches && this.visible) {

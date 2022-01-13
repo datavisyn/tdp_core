@@ -11,8 +11,8 @@ export interface IFormSelectOptionGroup {
     name: string;
     children: IFormSelectOption[];
 }
-export declare type ISelectOptions = ((string | IFormSelectOption)[] | Promise<(string | IFormSelectOption)[]>);
-export declare type IHierarchicalSelectOptions = ((string | IFormSelectOption | IFormSelectOptionGroup)[] | Promise<(string | IFormSelectOption | IFormSelectOptionGroup)[]>);
+export declare type ISelectOptions = (string | IFormSelectOption)[] | Promise<(string | IFormSelectOption)[]>;
+export declare type IHierarchicalSelectOptions = (string | IFormSelectOption | IFormSelectOptionGroup)[] | Promise<(string | IFormSelectOption | IFormSelectOptionGroup)[]>;
 export interface IFormSelectOptions {
     /**
      * Data for the options elements of the select
@@ -85,5 +85,5 @@ export declare class FormSelect extends AFormElement<IFormSelectDesc> implements
     hasValue(): boolean;
     focus(): void;
     static toOption(d: string | IFormSelectOption | IFormSelectOptionGroup): IFormSelectOption | IFormSelectOptionGroup;
-    static resolveData(data?: IHierarchicalSelectOptions | ((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption | IFormSelectOptionGroup)[]>);
+    static resolveData(data?: IHierarchicalSelectOptions | ((dependents: any[]) => IHierarchicalSelectOptions)): (dependents: any[]) => PromiseLike<(IFormSelectOption | IFormSelectOptionGroup)[]>;
 }

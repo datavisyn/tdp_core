@@ -61,13 +61,13 @@ export class Rect extends AShape {
         return new Vector2D(this.cx, this.cy);
     }
     transform(scale, rotate) {
-        //TODO rotate
+        // TODO rotate
         return new Rect(this.x * scale[0], this.y * scale[1], this.w * scale[0], this.h * scale[1]);
     }
     asIntersectionParams() {
         return {
             name: 'Rectangle',
-            params: [this.xy, this.x2y2]
+            params: [this.xy, this.x2y2],
         };
     }
     static rect(x, y, w, h) {

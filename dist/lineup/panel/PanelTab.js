@@ -17,7 +17,7 @@ export class PanelTab extends EventHandler {
             faIcon: 'fas fa-sliders-h',
             title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
             width: '23em',
-            order: 0
+            order: 0,
         };
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('tab-pane');
@@ -52,7 +52,7 @@ export class PanelTab extends EventHandler {
             title: this.options.title,
             faIcon: this.options.faIcon,
             cssClass: 'shortcut-nav',
-            onClick
+            onClick,
         });
     }
 }
@@ -74,7 +74,7 @@ export class SidePanelTab extends PanelTab {
         this.search = search;
         this.node.classList.add('default');
         this.panel = new SidePanel(ctx, doc, {
-            chooser: false
+            chooser: false,
         });
         this.node.appendChild(this.search.node);
         this.node.appendChild(this.panel.node);

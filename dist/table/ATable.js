@@ -32,14 +32,15 @@ export class ATable extends ASelectAble {
     }
     restore(persisted) {
         if (persisted && persisted.f) {
-            return this.reduce(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
+            return this.reduce(
+            // eslint-disable-next-line no-eval
+            eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
         }
-        else if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
-        else {
-            return this;
-        }
+        return this;
     }
 }
 // circular dependency thus not extractable
@@ -59,12 +60,14 @@ export class TableView extends ATable {
     persist() {
         return {
             root: this.root.persist(),
-            range: this.range.toString()
+            range: this.range.toString(),
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;

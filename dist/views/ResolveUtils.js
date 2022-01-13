@@ -7,7 +7,9 @@ export class ResolveUtils {
             return fromIDType.unmap([id]).then((names) => [names]);
         }
         // assume mappable
-        return IDTypeManager.getInstance().mapToName(fromIDType, [id], target).then((names) => names);
+        return IDTypeManager.getInstance()
+            .mapToName(fromIDType, [id], target)
+            .then((names) => names);
     }
     /**
      * Maps exactly one _id (numeric id) of the fromIDtype to the first occurrence of the toIDtype
@@ -24,7 +26,9 @@ export class ResolveUtils {
             return fromIDType.unmap([id]).then((names) => names[0]);
         }
         // assume mappable
-        return IDTypeManager.getInstance().mapToFirstName(fromIDType, [id], target).then((names) => names[0]);
+        return IDTypeManager.getInstance()
+            .mapToFirstName(fromIDType, [id], target)
+            .then((names) => names[0]);
     }
     /**
      * Maps numerous _ids (numeric ids) of the fromIDtype to each first occurrence of the toIDtype

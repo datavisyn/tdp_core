@@ -9,7 +9,7 @@ export class OverviewColumn extends BooleanColumn {
             label: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection'),
             renderer: 'boolean',
             groupRenderer: 'boolean',
-            summaryRenderer: 'categorical'
+            summaryRenderer: 'categorical',
         }));
         this.overviewSelection = new Set();
         this.setWidthImpl(0); // hide
@@ -19,13 +19,16 @@ export class OverviewColumn extends BooleanColumn {
     }
     setOverview(rows, name = I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.focus')) {
         this.currentOverview = { name, rows };
-        this.fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, this.overviewSelection = new Set(rows || []));
+        this.fire([Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.overviewSelection, (this.overviewSelection = new Set(rows || [])));
     }
     getOverview() {
         return this.currentOverview;
     }
     get categoryLabels() {
-        return [I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'), I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.rest')];
+        return [
+            I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'),
+            I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.rest'),
+        ];
     }
     get categoryColors() {
         return ['#EEEEEE', '#AAAAAA'];

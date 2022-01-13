@@ -1,6 +1,5 @@
 import { IContext, ISelectionAdapter } from '../ISelectionAdapter';
-import { IAdditionalColumnDesc } from '../../../base/interfaces';
-import { IScoreRow } from '../../../base/interfaces';
+import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 export interface IMultiSelectionAdapter {
     /**

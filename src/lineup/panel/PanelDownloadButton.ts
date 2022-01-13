@@ -1,10 +1,10 @@
-import {Column, LocalDataProvider, isSupportType} from 'lineupjs';
-import {ExportUtils, IExportFormat} from '../internal/ExportUtils';
-import {IPanelButton} from './PanelButton';
-import {LineUpOrderedRowIndicies} from './LineUpOrderedRowIndicies';
-import {BaseUtils} from '../../base';
-import {I18nextManager} from '../../i18n';
-import {PHOVEA_UI_FormDialog} from '../../components';
+import { Column, LocalDataProvider, isSupportType } from 'lineupjs';
+import { ExportUtils, IExportFormat } from '../internal/ExportUtils';
+import { IPanelButton } from './PanelButton';
+import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
+import { BaseUtils } from '../../base';
+import { I18nextManager } from '../../i18n';
+import { PHOVEA_UI_FormDialog } from '../../components';
 
 interface IExportData {
   type: IExportFormat;
@@ -29,24 +29,36 @@ export class PanelDownloadButton implements IPanelButton {
       </button>
       <div class="dropdown-menu ${isTopMode ? 'dropdown-menu-start' : 'dropdown-menu-end'}">
         <div class="dropdown-header">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadAsExcel')}</div>
-        <a class="dropdown-item" href="#" data-rows="all" data-format="xlsx" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadEntireList')}</a>
-        <a class="dropdown-item" href="#" data-rows="filtered" data-format="xlsx" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadFilteredRows')}</a>
-        <a class="dropdown-item" href="#" data-rows="selected" data-format="xlsx" data-num-selected-rows="0">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadSelectedRows')}</a>
+        <a class="dropdown-item" href="#" data-rows="all" data-format="xlsx" data-num-all-rows="0">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.lineup.LineupPanelActions.downloadEntireList',
+        )}</a>
+        <a class="dropdown-item" href="#" data-rows="filtered" data-format="xlsx" data-num-filtered-rows="0">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.lineup.LineupPanelActions.downloadFilteredRows',
+        )}</a>
+        <a class="dropdown-item" href="#" data-rows="selected" data-format="xlsx" data-num-selected-rows="0">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.lineup.LineupPanelActions.downloadSelectedRows',
+        )}</a>
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#" data-rows="custom" data-format="custom">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.customize')}</a>
+        <a class="dropdown-item" href="#" data-rows="custom" data-format="custom">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.lineup.LineupPanelActions.customize',
+        )}</a>
       </div>
     `;
 
     lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_ALL, (_event, order: number[]) => {
-      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-all-rows]')).forEach((element) => element.dataset.numAllRows = order.length.toString());
+      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-all-rows]')).forEach((element) => (element.dataset.numAllRows = order.length.toString()));
     });
 
     lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, (_event, order: number[]) => {
-      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-selected-rows]')).forEach((element) => element.dataset.numSelectedRows = order.length.toString());
+      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-selected-rows]')).forEach(
+        (element) => (element.dataset.numSelectedRows = order.length.toString()),
+      );
     });
 
     lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, (_event, order: number[]) => {
-      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-filtered-rows]')).forEach((element) => element.dataset.numFilteredRows = order.length.toString());
+      (<NodeListOf<HTMLElement>>this.node.querySelectorAll('[data-num-filtered-rows]')).forEach(
+        (element) => (element.dataset.numFilteredRows = order.length.toString()),
+      );
     });
 
     this.node.querySelectorAll('a').forEach((link) => {
@@ -64,20 +76,20 @@ export class PanelDownloadButton implements IPanelButton {
               order: lineupOrderRowIndices[link.dataset.rows],
               columns: ranking.flatColumns.filter((c) => !isSupportType(c)),
               type: ExportUtils.getExportFormat(link.dataset.format),
-              name: ranking.getLabel()
+              name: ranking.getLabel(),
             });
         }
 
         promise
           .then((r) => {
-            return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order))
-              .then((blob) => ({ // wait for blob then transform object
-                content: blob,
-                mimeType: r.type.mimeType,
-                name: `${r.name}${r.type.fileExtension}`,
-              }));
+            return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order)).then((blob) => ({
+              // wait for blob then transform object
+              content: blob,
+              mimeType: r.type.mimeType,
+              name: `${r.name}${r.type.fileExtension}`,
+            }));
           })
-          .then(({content, mimeType, name}) => {
+          .then(({ content, mimeType, name }) => {
             this.downloadFile(content, mimeType, name);
           });
 
@@ -87,7 +99,10 @@ export class PanelDownloadButton implements IPanelButton {
   }
 
   private customizeDialog(provider: LocalDataProvider, orderedRowIndices: LineUpOrderedRowIndicies): Promise<IExportData> {
-    const dialog = new PHOVEA_UI_FormDialog(`${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`, `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`);
+    const dialog = new PHOVEA_UI_FormDialog(
+      `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.exportData')}`,
+      `<i class="fa fa-download"></i>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.export')}`,
+    );
     const id = `e${BaseUtils.randomId(3)}`;
     const inlineRadioID1 = `inlineRadio_${BaseUtils.randomId()}`;
     const inlineRadioID2 = `inlineRadio_${BaseUtils.randomId()}`;
@@ -101,29 +116,41 @@ export class PanelDownloadButton implements IPanelButton {
         <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
         <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
         <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
-        ${flat.map((col) => `
+        ${flat
+          .map(
+            (col) => `
           <div class="tdp-ranking-export-form-handle hstack gap-1">
             <i class="fas fa-grip-vertical pb-2"></i>
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${col.id}">
+              <input type="checkbox" class="form-check-input" name="columns" value="${col.id}" ${!isSupportType(col) ? 'checked' : ''} id="customCheck_${
+              col.id
+            }">
               <label class="form-label form-check-label" for="customCheck_${col.id}">${col.label}</label>
             </div>
           </div>
-        `).join('')}
+        `,
+          )
+          .join('')}
       </div>
       <div class="mb-3">
         <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
         <div class="radio form-check" data-num-rows="${orderedRowIndices.all.length}">
           <input type="radio" id="${inlineRadioID1}" name="rows" value="all" checked class="form-check-input">
-          <label class="form-label form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${orderedRowIndices.all.length})</label>
+          <label class="form-label form-check-label" for="${inlineRadioID1}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.allRows')} (${
+      orderedRowIndices.all.length
+    })</label>
         </div>
         <div class="radio form-check" data-num-rows="${orderedRowIndices.filtered.length}">
           <input type="radio" id="${inlineRadioID2}" name="rows" value="filtered" class="form-check-input">
-          <label class="form-label form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${orderedRowIndices.filtered.length})</label>
+          <label class="form-label form-check-label" for="${inlineRadioID2}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.filteredRows')} (${
+      orderedRowIndices.filtered.length
+    })</label>
         </div>
         <div class="radio form-check" data-num-rows="${orderedRowIndices.selected.length}">
           <input type="radio" id="${inlineRadioID3}" name="rows" value="selected" class="form-check-input">
-          <label class="form-label form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${orderedRowIndices.selected.length})</label>
+          <label class="form-label form-check-label" for="${inlineRadioID3}">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.selectedRows')} (${
+      orderedRowIndices.selected.length
+    })</label>
         </div>
       </div>
       <div class="mb-3">
@@ -144,7 +171,9 @@ export class PanelDownloadButton implements IPanelButton {
 
     dialog.form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
       checkbox.addEventListener('change', () => {
-        dialog.form.querySelector('.error-columns').parentElement.classList.toggle('has-error', (dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0));
+        dialog.form
+          .querySelector('.error-columns')
+          .parentElement.classList.toggle('has-error', dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0);
       });
     });
 
@@ -164,7 +193,7 @@ export class PanelDownloadButton implements IPanelButton {
           type: ExportUtils.getExportFormat(<string>data.get('type')),
           columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
           order: orderedRowIndices[data.get('rows').toString()],
-          name: <string>data.get('name')
+          name: <string>data.get('name'),
         });
 
         return false;
@@ -191,7 +220,8 @@ export class PanelDownloadButton implements IPanelButton {
       let nextBB: DOMRect | ClientRect;
 
       const update = () => {
-        prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
+        prevBB =
+          item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
         nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
       };
 
@@ -205,11 +235,11 @@ export class PanelDownloadButton implements IPanelButton {
 
       base.onmousemove = (evt) => {
         const y = evt.clientY;
-        if (prevBB && y < (prevBB.top + prevBB.height / 2)) {
+        if (prevBB && y < prevBB.top + prevBB.height / 2) {
           // move up
           item.parentElement!.insertBefore(item, item.previousElementSibling);
           update();
-        } else if (nextBB && y > (nextBB.top + nextBB.height / 2)) {
+        } else if (nextBB && y > nextBB.top + nextBB.height / 2) {
           // move down
           item.parentElement!.insertBefore(item.nextElementSibling, item);
           update();
@@ -230,7 +260,7 @@ export class PanelDownloadButton implements IPanelButton {
   private downloadFile(content: BufferSource | Blob | string, mimeType: string, name: string) {
     const doc = this.node.ownerDocument;
     const downloadLink = doc.createElement('a');
-    const blob = new Blob([content], {type: mimeType});
+    const blob = new Blob([content], { type: mimeType });
     downloadLink.href = URL.createObjectURL(blob);
     (<any>downloadLink).download = name;
 

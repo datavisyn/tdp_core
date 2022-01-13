@@ -4,7 +4,7 @@ import { SelectOperation, SelectionUtils, IDTypeManager } from '../idtype';
 import { Range, Range1D } from '../range';
 import { ADataType } from '../data/datatype';
 import { ObjectNode, ObjectRefUtils } from './ObjectNode';
-import { StateNode, } from './StateNode';
+import { StateNode } from './StateNode';
 import { ActionNode } from './ActionNode';
 import { SlideNode } from './SlideNode';
 import { GraphEdge } from '../graph/graph';
@@ -23,7 +23,7 @@ export class ProvenanceGraph extends ADataType {
         this._slides = [];
         this.act = null;
         this.lastAction = null;
-        //currently executing promise
+        // currently executing promise
         this.currentlyRunning = false;
         this.executeCurrentActionWithin = -1;
         this.nextQueue = [];
@@ -34,20 +34,20 @@ export class ProvenanceGraph extends ADataType {
             this.backend.addNode(this.act);
         }
         else {
-            const act = desc.act;
-            this._actions = this.backend.nodes.filter((n) => (n instanceof ActionNode));
-            this._objects = this.backend.nodes.filter((n) => (n instanceof ObjectNode));
-            this._states = this.backend.nodes.filter((n) => (n instanceof StateNode));
-            this._slides = this.backend.nodes.filter((n) => (n instanceof SlideNode));
+            const { act } = desc;
+            this._actions = this.backend.nodes.filter((n) => n instanceof ActionNode);
+            this._objects = this.backend.nodes.filter((n) => n instanceof ObjectNode);
+            this._states = this.backend.nodes.filter((n) => n instanceof StateNode);
+            this._slides = this.backend.nodes.filter((n) => n instanceof SlideNode);
             this.act = (act >= 0 ? this.getStateById(act) : this._states[0]);
         }
     }
     migrateBackend(backend) {
-        //asserts that the old backend and the new one have the same nodes inside of them
+        // asserts that the old backend and the new one have the same nodes inside of them
         this.stopPropagation(this.backend, ...ProvenanceGraph.PROPAGATED_EVENTS);
         this.backend = backend;
         this.propagate(this.backend, ...ProvenanceGraph.PROPAGATED_EVENTS);
-        //hack to update the description object
+        // hack to update the description object
         this.desc = backend.desc;
     }
     get isEmpty() {
@@ -65,15 +65,15 @@ export class ProvenanceGraph extends ADataType {
         return Promise.resolve(range.preMultiply(Range.list(actions, objects, states, stories)));
     }
     selectState(state, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, extras = {}) {
-        this.fire('select_state,select_state_' + type, state, type, op, extras);
+        this.fire(`select_state,select_state_${type}`, state, type, op, extras);
         this.select(ProvenanceGraphDim.State, type, state ? [this._states.indexOf(state)] : [], op);
     }
     selectSlide(state, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, extras = {}) {
-        this.fire('select_slide,select_slide_' + type, state, type, op, extras);
+        this.fire(`select_slide,select_slide_${type}`, state, type, op, extras);
         this.select(ProvenanceGraphDim.Slide, type, state ? [this._slides.indexOf(state)] : [], op);
     }
     selectAction(action, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
-        this.fire('select_action,select_action_' + type, action, type, op);
+        this.fire(`select_action,select_action_${type}`, action, type, op);
         this.select(ProvenanceGraphDim.Action, type, action ? [this._actions.indexOf(action)] : [], op);
     }
     selectedStates(type = SelectionUtils.defaultSelectionType) {
@@ -179,19 +179,20 @@ export class ProvenanceGraph extends ADataType {
         return r;
     }
     createInverse(action, inverter) {
-        const creates = action.creates, removes = action.removes;
+        const { creates } = action;
+        const { removes } = action;
         const i = inverter.call(action, action.requires, creates, removes);
         const inverted = this.createAction(i.meta, i.id, i.f, i.inputs, i.parameter);
         inverted.onceExecuted = true;
         this.addEdge(inverted, 'inverses', action);
-        //the inverted action should create the removed ones and removes the crated ones
+        // the inverted action should create the removed ones and removes the crated ones
         removes.forEach((c, i) => {
             this.addEdge(inverted, 'creates', c, { index: i });
         });
         creates.forEach((c) => {
             this.addEdge(inverted, 'removes', c);
         });
-        //create the loop in the states
+        // create the loop in the states
         this.addEdge(StateNode.resultsIn(action), 'next', inverted);
         this.addEdge(inverted, 'resultsIn', StateNode.previous(action));
         return inverted;
@@ -201,10 +202,8 @@ export class ProvenanceGraph extends ADataType {
             if (arg instanceof ActionMetaData) {
                 return this.run(this.createAction(arg, functionId, f, inputs, parameter), null);
             }
-            else {
-                const a = arg;
-                return this.run(this.createAction(a.meta, a.id, a.f, a.inputs || [], a.parameter || {}), null);
-            }
+            const a = arg;
+            return this.run(this.createAction(a.meta, a.id, a.f, a.inputs || [], a.parameter || {}), null);
         });
     }
     pushWithResult(action, result) {
@@ -220,13 +219,13 @@ export class ProvenanceGraph extends ADataType {
         }
         return null;
     }
-    addObject(value, name = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = name + '_' + category) {
+    addObject(value, name = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = `${name}_${category}`) {
         return this.addObjectImpl(value, name, category, hash, true);
     }
-    addJustObject(value, name = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = name + '_' + category) {
+    addJustObject(value, name = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = `${name}_${category}`) {
         return this.addObjectImpl(value, name, category, hash, false);
     }
-    addObjectImpl(value, name = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = name + '_' + category, createEdge = false) {
+    addObjectImpl(value, name = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = `${name}_${category}`, createEdge = false) {
         const r = new ObjectNode(value, name, category, hash);
         this._objects.push(r);
         this.backend.addNode(r);
@@ -244,7 +243,7 @@ export class ProvenanceGraph extends ADataType {
             if (r._resolvesTo instanceof ObjectNode) {
                 return r._resolvesTo;
             }
-            //else create a new instance
+            // else create a new instance
             const result = this.addJustObject(r.value, r.name, r.category, r.hash);
             r._resolvesTo = result;
             return result;
@@ -257,7 +256,7 @@ export class ProvenanceGraph extends ADataType {
         if (r._resolvesTo instanceof ObjectNode) {
             return r._resolvesTo;
         }
-        //else create a new instance
+        // else create a new instance
         const result = arr.find(ProvenanceGraphUtils.findMetaObject(r));
         r._resolvesTo = result;
         return result;
@@ -277,29 +276,30 @@ export class ProvenanceGraph extends ADataType {
         if (j._resolvesTo instanceof ObjectNode) {
             return j._resolvesTo;
         }
-        if (j.hasOwnProperty('value') && j.hasOwnProperty('name')) { //sounds like an proxy
+        if (j.hasOwnProperty('value') && j.hasOwnProperty('name')) {
+            // sounds like an proxy
             j.category = j.category || ObjectRefUtils.category.data;
             r = this._objects.find(ProvenanceGraphUtils.findMetaObject(j));
             if (r) {
-                if (r.value === null) { //restore instance
+                if (r.value === null) {
+                    // restore instance
                     r.value = j.value;
                 }
-                //cache result
+                // cache result
                 j._resolvesTo = r;
                 return r;
             }
             return this.addObjectImpl(j.value, j.name, j.category, j.hash, createEdge);
-        }
-        else { //raw value
-            r = this._objects.find((obj) => (obj.value === null || obj.value === i) && (name === null || obj.name === name) && (type === null || type === obj.category));
-            if (r) {
-                if (r.value === null) { //restore instance
-                    r.value = i;
-                }
-                return r;
+        } // raw value
+        r = this._objects.find((obj) => (obj.value === null || obj.value === i) && (name === null || obj.name === name) && (type === null || type === obj.category));
+        if (r) {
+            if (r.value === null) {
+                // restore instance
+                r.value = i;
             }
-            return this.addObjectImpl(i, name, type, name + '_' + type, createEdge);
+            return r;
         }
+        return this.addObjectImpl(i, name, type, `${name}_${type}`, createEdge);
     }
     inOrder(f) {
         if (this.currentlyRunning) {
@@ -310,9 +310,7 @@ export class ProvenanceGraph extends ADataType {
             this.nextQueue.push(helper);
             return r.then(f);
         }
-        else {
-            return f();
-        }
+        return f();
     }
     executedAction(action, newState, result) {
         const current = this.act;
@@ -324,20 +322,20 @@ export class ProvenanceGraph extends ADataType {
         let created;
         let removed;
         if (firstTime) {
-            //create an link outputs
+            // create an link outputs
             //
             created = this.resolve(result.created);
             created.forEach((c, i) => {
                 this.addEdge(action, 'creates', c, { index: i });
             });
             // a removed one should be part of the inputs
-            const requires = action.requires;
+            const { requires } = action;
             removed = result.removed.map((r) => ProvenanceGraph.findInArray(requires, r));
             removed.forEach((c) => {
-                c.value = null; //free reference
+                c.value = null; // free reference
                 this.addEdge(action, 'removes', c);
             });
-            //update new state
+            // update new state
             if (newState) {
                 const objs = current.consistsOf;
                 objs.push.apply(objs, created);
@@ -351,12 +349,12 @@ export class ProvenanceGraph extends ADataType {
         }
         else {
             created = action.creates;
-            //update creates reference values
+            // update creates reference values
             created.forEach((c, i) => {
                 c.value = result.created[i].value;
             });
             removed = action.removes;
-            removed.forEach((c) => c.value = null);
+            removed.forEach((c) => (c.value = null));
         }
         result.inverse = ProvenanceGraphUtils.asFunction(result.inverse);
         ProvenanceGraph.updateInverse(action, this, result.inverse);
@@ -366,12 +364,14 @@ export class ProvenanceGraph extends ADataType {
             state: next,
             created,
             removed,
-            consumed: result.consumed
+            consumed: result.consumed,
         };
     }
     run(action, result, withinMilliseconds = -1) {
-        let next = StateNode.resultsIn(action), newState = false;
-        if (!next) { //create a new state
+        let next = StateNode.resultsIn(action);
+        let newState = false;
+        if (!next) {
+            // create a new state
             newState = true;
             this.addEdge(this.act, 'next', action);
             next = this.makeState(action.meta.name);
@@ -379,10 +379,10 @@ export class ProvenanceGraph extends ADataType {
         }
         this.fire('execute', action);
         if (AppContext.getInstance().hash.has('debug')) {
-            console.log('execute ' + action.meta + ' ' + action.f_id);
+            console.log(`execute ${action.meta} ${action.f_id}`);
         }
         this.currentlyRunning = true;
-        if (typeof (withinMilliseconds) === 'function') {
+        if (typeof withinMilliseconds === 'function') {
             withinMilliseconds = withinMilliseconds();
         }
         this.executeCurrentActionWithin = withinMilliseconds;
@@ -417,13 +417,13 @@ export class ProvenanceGraph extends ADataType {
             }
             return ResolveNow.resolveImmediately([]);
         }
-        //actions = compress(actions, null);
+        // actions = compress(actions, null);
         const last = actions[actions.length - 1];
         const torun = await ProvenanceGraphUtils.compressGraph(actions);
         let remaining = withinMilliseconds;
         function guessTime(index) {
             const left = torun.length - index;
-            return () => remaining < 0 ? -1 : remaining / left; //uniformly distribute
+            return () => (remaining < 0 ? -1 : remaining / left); // uniformly distribute
         }
         function updateTime(consumed) {
             remaining -= consumed;
@@ -446,32 +446,33 @@ export class ProvenanceGraph extends ADataType {
         if (!this.lastAction) {
             return ResolveNow.resolveImmediately(null);
         }
-        //create and store the inverse
+        // create and store the inverse
         if (this.lastAction.inverses != null) {
-            //undo and undoing should still go one up
+            // undo and undoing should still go one up
             return this.jumpTo(this.act.previousState);
         }
-        else {
-            return this.inOrder(() => this.run(ProvenanceGraph.getOrCreateInverse(this.lastAction, this), null));
-        }
+        return this.inOrder(() => this.run(ProvenanceGraph.getOrCreateInverse(this.lastAction, this), null));
     }
     jumpTo(state, withinMilliseconds = -1) {
         return this.inOrder(() => {
             let actions = [];
-            const act = this.act;
-            if (act === state) { //jump to myself
+            const { act } = this;
+            if (act === state) {
+                // jump to myself
                 return withinMilliseconds >= 0 ? BaseUtils.resolveIn(withinMilliseconds).then(() => []) : ResolveNow.resolveImmediately([]);
             }
-            //lets look at the simple past
-            const actPath = act.path, targetPath = state.path;
+            // lets look at the simple past
+            const actPath = act.path;
+            const targetPath = state.path;
             const common = ProvenanceGraphUtils.findCommon(actPath, targetPath);
             if (common) {
-                const toRevert = actPath.slice(common.i + 1).reverse(), toForward = targetPath.slice(common.j + 1);
+                const toRevert = actPath.slice(common.i + 1).reverse();
+                const toForward = targetPath.slice(common.j + 1);
                 actions = actions.concat(toRevert.map((r) => ProvenanceGraph.getOrCreateInverse(r.resultsFrom[0], this)));
                 actions = actions.concat(toForward.map((r) => r.resultsFrom[0]));
             }
-            //no in the direct branches maybe in different loop instances?
-            //TODO
+            // no in the direct branches maybe in different loop instances?
+            // TODO
             return this.runChain(actions, withinMilliseconds);
         });
     }
@@ -483,8 +484,8 @@ export class ProvenanceGraph extends ADataType {
      * @returns {boolean}
      */
     fork(action, target, objectReplacements = []) {
-        //sanity check if target is a child of target ... bad
-        //collect all states
+        // sanity check if target is a child of target ... bad
+        // collect all states
         const all = [];
         const queue = [StateNode.resultsIn(action)];
         while (queue.length > 0) {
@@ -496,26 +497,26 @@ export class ProvenanceGraph extends ADataType {
             queue.push.apply(queue, next.nextStates);
         }
         if (all.indexOf(target) >= 0) {
-            return false; //target is a child of state
+            return false; // target is a child of state
         }
         const targetObjects = target.consistsOf;
         const sourceObjects = StateNode.previous(action).consistsOf;
-        //function isSame(a: any[], b : any[]) {
+        // function isSame(a: any[], b : any[]) {
         //  return a.length === b.length && a.every((ai, i) => ai === b[i]);
-        //}
-        //if (isSame(targetObjects, sourceObjects)) {
-        //no state change ~ similar state, just create a link
-        //we can copy the action and point to the same target
+        // }
+        // if (isSame(targetObjects, sourceObjects)) {
+        // no state change ~ similar state, just create a link
+        // we can copy the action and point to the same target
         //  const clone = this.initAction(action.clone(), action.requires);
         //  this.addEdge(target, 'next', clone);
         //  this.addEdge(clone, 'resultsIn', action.resultsIn);
-        //} else {
+        // } else {
         const removedObjects = sourceObjects.filter((o) => targetObjects.indexOf(o) < 0);
         const replacements = {};
-        objectReplacements.forEach((d) => replacements[this.findOrAddObject(d.from).id] = d.to);
-        //need to copy all the states and actions
+        objectReplacements.forEach((d) => (replacements[this.findOrAddObject(d.from).id] = d.to));
+        // need to copy all the states and actions
         this.copyBranch(action, target, removedObjects, replacements);
-        //}
+        // }
         this.fire('forked_branch', action, target);
         return true;
     }
@@ -530,11 +531,11 @@ export class ProvenanceGraph extends ADataType {
         const queue = [{ a: action, b: target }];
         while (queue.length > 0) {
             const next = queue.shift();
-            let b = next.b;
-            const a = next.a;
+            let { b } = next;
+            const { a } = next;
             const someRemovedObjectRequired = a.requires.some((ai) => removedObject.indexOf(ai) >= 0 && !(String(ai.id) in objectReplacements));
             if (!someRemovedObjectRequired) {
-                //copy it and create a new pair to execute
+                // copy it and create a new pair to execute
                 b = this.copyAction(a, next.b, objectReplacements);
             }
             queue.push.apply(queue, StateNode.resultsIn(a).next.map((aa) => ({ a: aa, b })));
@@ -587,7 +588,7 @@ export class ProvenanceGraph extends ADataType {
      this.backend.addEdge(n);
      });
      return this;
-     }*/
+     } */
     wrapAsSlide(state) {
         const node = new SlideNode();
         node.name = state.name;
@@ -618,7 +619,8 @@ export class ProvenanceGraph extends ADataType {
             this.fire('add_slide', node);
             return node;
         };
-        let slide = addStartEnd ? addSlide(SlideNode.makeText('Unnamed Story')) : null, prev = slide;
+        let slide = addStartEnd ? addSlide(SlideNode.makeText('Unnamed Story')) : null;
+        let prev = slide;
         states.forEach((s, i) => {
             const node = addSlide(new SlideNode());
             node.name = s.name;
@@ -665,25 +667,29 @@ export class ProvenanceGraph extends ADataType {
     }
     moveSlide(node, to, beforeIt = false) {
         if ((beforeIt && node.next === to) || (!beforeIt && node.previous === to)) {
-            return; //already matches
+            return; // already matches
         }
-        //1. extract the node
-        //create other links
+        // 1. extract the node
+        // create other links
         const prev = node.previous;
         if (prev) {
             node.nexts.forEach((n) => {
                 this.addEdge(prev, 'next', n);
             });
         }
-        //remove links
-        this.edges.filter((e) => (e.source === node || e.target === node) && e.type === 'next').forEach((e) => {
+        // remove links
+        this.edges
+            .filter((e) => (e.source === node || e.target === node) && e.type === 'next')
+            .forEach((e) => {
             this.backend.removeEdge(e);
         });
-        //insert into the new place
+        // insert into the new place
         if (beforeIt) {
             const tprev = to.previous;
             if (tprev) {
-                this.edges.filter((e) => (e.target === to) && e.type === 'next').forEach((e) => {
+                this.edges
+                    .filter((e) => e.target === to && e.type === 'next')
+                    .forEach((e) => {
                     this.backend.removeEdge(e);
                 });
                 this.addEdge(tprev, 'next', node);
@@ -694,7 +700,9 @@ export class ProvenanceGraph extends ADataType {
         else {
             const tnexts = to.nexts;
             if (tnexts.length > 0) {
-                this.edges.filter((e) => (e.source === to) && e.type === 'next').forEach((e) => {
+                this.edges
+                    .filter((e) => e.source === to && e.type === 'next')
+                    .forEach((e) => {
                     this.backend.removeEdge(e);
                 });
                 tnexts.forEach((next) => {
@@ -712,7 +720,9 @@ export class ProvenanceGraph extends ADataType {
                 this.addEdge(prev, 'next', n);
             });
         }
-        this.edges.filter((e) => e.source === node || e.target === node).forEach((e) => {
+        this.edges
+            .filter((e) => e.source === node || e.target === node)
+            .forEach((e) => {
             this.backend.removeEdge(e);
         });
         this._slides.splice(this._slides.indexOf(node), 1);
@@ -720,13 +730,13 @@ export class ProvenanceGraph extends ADataType {
         this.fire('remove_slide', node);
     }
     removeFullSlide(node) {
-        //go to the beginning
+        // go to the beginning
         while (node.previous) {
             node = node.previous;
         }
         const bak = node;
         while (node) {
-            const next = node.next;
+            const { next } = node;
             this.removeSlideNode(node);
             node = next;
         }
@@ -754,8 +764,8 @@ export class ProvenanceGraph extends ADataType {
             size: [0, 0],
             attrs: {
                 graphtype: 'provenance_graph',
-                of: 'dummy'
-            }
+                of: 'dummy',
+            },
         };
         return new ProvenanceGraph(desc, new MemoryGraph(desc, [], [], ProvenanceGraphUtils.provenanceGraphFactory()));
     }
@@ -767,18 +777,19 @@ export class ProvenanceGraph extends ADataType {
         if (node.inverter) {
             return graph.createInverse(node, node.inverter);
         }
-        node.inverter = null; //not needed anymore
+        node.inverter = null; // not needed anymore
         return null;
     }
     static updateInverse(node, graph, inverter) {
         const i = node.inversedBy;
-        if (i) { //update with the actual values / parameter only
+        if (i) {
+            // update with the actual values / parameter only
             const c = inverter.call(node, node.requires, node.creates, node.removes);
             i.parameter = c.parameter;
             node.inverter = null;
         }
         else if (!node.isInverse) {
-            //create inverse action immediatelly
+            // create inverse action immediatelly
             graph.createInverse(node, inverter);
             node.inverter = null;
         }

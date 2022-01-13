@@ -95,12 +95,13 @@ export class Iterator extends AIterator {
         if (this.byOne) {
             return Math.max(this.to - this.from, 0);
         }
-        else if (this.byMinusOne) {
+        if (this.byMinusOne) {
             return Math.max(this.from - this.to, 0);
         }
-        const d = this.isIncreasing ? (this.to - this.from + 1) : (this.from - this.to + 1);
+        const d = this.isIncreasing ? this.to - this.from + 1 : this.from - this.to + 1;
         const s = Math.abs(this.step);
-        if (d <= 0) { //no range
+        if (d <= 0) {
+            // no range
             return 0;
         }
         return Math.floor(d / s);
@@ -225,8 +226,9 @@ export class ConcatIterator extends AIterator {
      * whether more items are available
      */
     hasNext() {
-        //based on http://grepcode.com/file/repo1.maven.org/maven2/com.google.guava/guava/r08/com/google/common/collect/Iterators.java#Iterators.concat%28java.util.Iterator%29
+        // based on http://grepcode.com/file/repo1.maven.org/maven2/com.google.guava/guava/r08/com/google/common/collect/Iterators.java#Iterators.concat%28java.util.Iterator%29
         let currentHasNext = false;
+        // eslint-disable-next-line no-cond-assign
         while (!(currentHasNext = this.act.hasNext()) && this.its.length > 0) {
             this.act = this.its.shift();
         }
@@ -268,7 +270,7 @@ export class ConcatIterator extends AIterator {
         if (its.length === 0) {
             return EmptyIterator.create();
         }
-        else if (its.length === 1) {
+        if (its.length === 1) {
             return its[0];
         }
         return new ConcatIterator(its);

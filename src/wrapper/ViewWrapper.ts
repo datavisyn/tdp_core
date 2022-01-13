@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,39 +7,44 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 
-import {IViewProvider} from '../lineup/IViewProvider';
-import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
-import {FindViewUtils} from '../views/FindViewUtils';
-import {TDPApplicationUtils} from '../utils/TDPApplicationUtils';
-import {ViewUtils} from '../views/ViewUtils';
-import {AView} from '../views/AView';
-import {TourUtils} from '../tour/TourUtils';
-import {EventHandler, IEvent, IEventListener, ResolveNow} from '../base';
-import {NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph} from '../provenance';
-import {Range} from '../range';
-import {I18nextManager} from '../i18n';
-import {IDType, IDTypeManager} from '../idtype';
-import {Dialog} from '../components';
-
+import { IViewProvider } from '../lineup/IViewProvider';
+import { ISelection, IView, IViewContext, IViewPluginDesc } from '../base/interfaces';
+import { FindViewUtils } from '../views/FindViewUtils';
+import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
+import { ViewUtils } from '../views/ViewUtils';
+import { AView } from '../views/AView';
+import { TourUtils } from '../tour/TourUtils';
+import { EventHandler, IEvent, IEventListener, ResolveNow } from '../base';
+import { NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph } from '../provenance';
+import { Range } from '../range';
+import { I18nextManager } from '../i18n';
+import { IDType, IDTypeManager } from '../idtype';
+import { Dialog } from '../components';
 
 export class ViewWrapper extends EventHandler implements IViewProvider {
   static readonly EVENT_VIEW_INITIALIZED = 'viewInitialized';
+
   static readonly EVENT_VIEW_CREATED = 'viewCreated';
+
   static readonly EVENT_VIEW_DESTROYED = 'viewDestroyed';
 
-  private instance: IView = null; //lazy
+  private instance: IView = null; // lazy
+
   private instancePromise: PromiseLike<IView> = null;
+
   private allowed: boolean;
+
   readonly node: HTMLElement;
+
   readonly content: HTMLElement;
 
   off(events: typeof ViewWrapper.EVENT_VIEW_CREATED, handler?: (event: IEvent, view: IView) => void): this;
   off(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, handler?: (event: IEvent, view: IView) => void): this;
   off(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, handler?: (event: IEvent, view: IView, viewWrapper: ViewWrapper) => void): this;
   off(events: typeof AView.EVENT_ITEM_SELECT, handler?: (event: IEvent, oldSelection: ISelection, newSelection: ISelection, name: string) => void): this;
-  off(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+  off(events: string | { [key: string]: IEventListener }, handler?: IEventListener) {
     return super.on(events, handler);
   }
 
@@ -47,7 +52,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   on(events: typeof ViewWrapper.EVENT_VIEW_INITIALIZED, handler?: (event: IEvent, view: IView) => void): this;
   on(events: typeof ViewWrapper.EVENT_VIEW_DESTROYED, handler?: (event: IEvent, view: IView, viewWrapper: ViewWrapper) => void): this;
   on(events: typeof AView.EVENT_ITEM_SELECT, handler?: (event: IEvent, oldSelection: ISelection, newSelection: ISelection, name: string) => void): this;
-  on(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+  on(events: string | { [key: string]: IEventListener }, handler?: IEventListener) {
     return super.on(events, handler);
   }
 
@@ -58,7 +63,6 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   fire(events: string, ...args: any[]) {
     return super.fire(events, ...args);
   }
-
 
   /**
    * Provenance graph reference of this object
@@ -72,17 +76,24 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   private listenerItemSelect = (_event: any, oldSelection: ISelection, newSelection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) => {
     this.fire(AView.EVENT_ITEM_SELECT, oldSelection, newSelection, name);
-  }
+  };
 
   // caches before the instance exists but things are set
   private readonly preInstanceItemSelections = new Map<string, ISelection>();
+
   private readonly preInstanceParameter = new Map<string, any>();
+
   private readonly inputSelections = new Map<string, ISelection>();
 
-  constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document, private readonly viewOptionGenerator: () => any = () => ({})) {
+  constructor(
+    public readonly plugin: IViewPluginDesc,
+    private readonly graph: ProvenanceGraph,
+    document: Document,
+    private readonly viewOptionGenerator: () => any = () => ({}),
+  ) {
     super();
 
-    this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
+    this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, range: Range.none() });
 
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
@@ -101,7 +112,12 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     this.node.classList.toggle('not-allowed', !this.allowed);
 
     if (plugin.helpText) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpLabel')}"><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
+      this.node.insertAdjacentHTML(
+        'beforeend',
+        `<a href="#" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t(
+          'tdp:core.ViewWrapper.showHelpLabel',
+        )}"><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`,
+      );
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -112,12 +128,26 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       });
     } else if (plugin.helpUrl) {
       if (typeof plugin.helpUrl === 'string') {
-        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpLabel')}"><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`);
-      } else { // object version of helpUrl
-        this.node.insertAdjacentHTML('beforeend', `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span>${plugin.helpUrl.linkText}</span></a>`);
+        this.node.insertAdjacentHTML(
+          'beforeend',
+          `<a href="${plugin.helpUrl}" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t(
+            'tdp:core.ViewWrapper.showHelpLabel',
+          )}"><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelp')}</span></a>`,
+        );
+      } else {
+        // object version of helpUrl
+        this.node.insertAdjacentHTML(
+          'beforeend',
+          `<a href="${plugin.helpUrl.url}" target="_blank" rel="noopener" class="view-help" title="${plugin.helpUrl.title}"><span>${plugin.helpUrl.linkText}</span></a>`,
+        );
       }
     } else if (plugin.helpTourId) {
-      this.node.insertAdjacentHTML('beforeend', `<a href="#" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpTourLabel')}"><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpTour')}</span></a>`);
+      this.node.insertAdjacentHTML(
+        'beforeend',
+        `<a href="#" target="_blank" rel="noopener" class="view-help" title="${I18nextManager.getInstance().i18n.t(
+          'tdp:core.ViewWrapper.showHelpTourLabel',
+        )}"><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.showHelpTour')}</span></a>`,
+      );
       this.node.lastElementChild!.addEventListener('click', (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
@@ -125,7 +155,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
           plugin,
           node: this.node,
           instance: this.instance,
-          selection: this.inputSelections.get(AView.DEFAULT_SELECTION_NAME)
+          selection: this.inputSelections.get(AView.DEFAULT_SELECTION_NAME),
         });
       });
     }
@@ -151,7 +181,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     }
 
     if (visible && this.instance == null && selection && this.match(selection)) {
-      //lazy init
+      // lazy init
       this.createView(selection);
     } else {
       this.update(); // if the view was just created we don't need to call update again
@@ -176,19 +206,22 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   private createView(selection: ISelection) {
     if (!this.allowed) {
-      return;
+      return null;
     }
     return this.plugin.load().then((p) => {
       if (this.instance) {
-        return; // already built race condition
+        return null; // already built race condition
       }
       // create provenance reference
       this.context = ViewUtils.createContext(this.graph, this.plugin, this.ref);
       this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
       this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance, this);
-      return this.instancePromise = ResolveNow.resolveImmediately(this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
+      return (this.instancePromise = ResolveNow.resolveImmediately(
+        this.instance.init(<HTMLElement>this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this)),
+      ).then(() => {
         this.inputSelections.forEach((v, k) => {
-          if (k !== AView.DEFAULT_SELECTION_NAME) { // already handled
+          if (k !== AView.DEFAULT_SELECTION_NAME) {
+            // already handled
             this.instance.setInputSelection(v, k);
           }
         });
@@ -201,13 +234,14 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
           } else {
             this.instance.setItemSelection({
               idtype: idType,
-              range: idType.selections()
+              range: idType.selections(),
             });
           }
         }
 
         this.preInstanceItemSelections.forEach((v, k) => {
-          if (k !== AView.DEFAULT_SELECTION_NAME) { // already handed
+          if (k !== AView.DEFAULT_SELECTION_NAME) {
+            // already handed
             this.instance.setItemSelection(v, k);
           }
         });
@@ -221,7 +255,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
         this.fire(ViewWrapper.EVENT_VIEW_INITIALIZED, this.instance, this);
         return this.instance;
-      });
+      }));
     });
   }
 
@@ -265,7 +299,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
         return;
       }
       return this.context.graph.pushWithResult(TDPApplicationUtils.setParameter(this.ref, name, value, previousValue), {
-        inverse: TDPApplicationUtils.setParameter(this.ref, name, previousValue, value)
+        inverse: TDPApplicationUtils.setParameter(this.ref, name, previousValue, value),
       });
     }
     return this.context.graph.push(TDPApplicationUtils.setParameter(this.ref, name, value, previousValue));
@@ -310,16 +344,14 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     if (this.instance) {
       if (matches) {
         return this.instance.setInputSelection(selection, name);
-      } else {
-        this.destroyInstance();
       }
+      this.destroyInstance();
     } else if (this.instancePromise) {
       return this.instancePromise.then(() => {
         if (matches) {
           return this.instance.setInputSelection(selection, name);
-        } else {
-          this.destroyInstance();
         }
+        this.destroyInstance();
       });
     } else if (matches && this.visible) {
       return this.createView(selection);
@@ -380,27 +412,26 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
       case '':
       case 'none':
       case '0':
-        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextNone', {label});
+        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextNone', { label });
       case 'any':
-        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextAny', {label});
+        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextAny', { label });
       case 'single':
       case '1':
-        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextOne', {label});
+        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextOne', { label });
       case 'small_multiple':
       case 'multiple':
       case 'some':
       case 'chooser':
-        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextMultiple', {label});
+        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextMultiple', { label });
       case '2':
-        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextTwo', {label});
+        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextTwo', { label });
       default:
         console.error('unknown selector: ', selection, idType);
-        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextDefault', {selection});
+        return I18nextManager.getInstance().i18n.t('tdp:core.ViewWrapper.selectionTextDefault', { selection });
     }
   }
 
   static guessIDType(v: IViewPluginDesc): IDType | null {
     return v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype);
   }
-
 }

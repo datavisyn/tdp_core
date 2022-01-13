@@ -14,7 +14,7 @@ export class FormSelect3 extends AFormElement {
     constructor(form, elementDesc, pluginDesc) {
         super(form, elementDesc, pluginDesc);
         this.pluginDesc = pluginDesc;
-        this.isMultiple = (pluginDesc.selection === 'multiple');
+        this.isMultiple = pluginDesc.selection === 'multiple';
     }
     /**
      * Build the label and select element
@@ -49,7 +49,7 @@ export class FormSelect3 extends AFormElement {
      */
     get value() {
         const returnValue = this.elementDesc.options.return;
-        const returnFn = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
+        const returnFn = returnValue === 'id' ? (d) => d.id : returnValue === 'text' ? (d) => d.text : (d) => d;
         const value = this.select3.value;
         if (!value || value.length === 0) {
             return this.isMultiple ? [] : returnFn({ id: '', text: '' });
@@ -69,12 +69,10 @@ export class FormSelect3 extends AFormElement {
             if (typeof d === 'string') {
                 return { id: d, text: d };
             }
-            else {
-                return {
-                    id: d.id ? d.id : d.text,
-                    text: d.text ? d.text : d.id
-                };
-            }
+            return {
+                id: d.id ? d.id : d.text,
+                text: d.text ? d.text : d.id,
+            };
         };
         if (!v) {
             this.select3.value = this.previousValue = [];
@@ -82,13 +80,15 @@ export class FormSelect3 extends AFormElement {
             return;
         }
         this.previousValue = this.select3.value;
-        if (Array.isArray(v) && v.length > 0 && !this.isMultiple) { // an array of items or string (id or text)
+        if (Array.isArray(v) && v.length > 0 && !this.isMultiple) {
+            // an array of items or string (id or text)
             this.select3.value = v.slice(0, 1).map(toIdTextPair);
         }
         else if (Array.isArray(v) && v.length > 0 && this.isMultiple) {
             this.select3.value = v.map(toIdTextPair);
         }
-        else if (!Array.isArray(v)) { // an item or string (id or text)
+        else if (!Array.isArray(v)) {
+            // an item or string (id or text)
             this.select3.value = [toIdTextPair(v)];
         }
         this.updateStoredValue();

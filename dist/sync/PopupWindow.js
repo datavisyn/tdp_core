@@ -5,7 +5,7 @@ export class PopupProxy {
         this.factory = factory;
         this.options = {
             args: [],
-            name: `${self.document.title} PopUp ${BaseUtils.randomId(3)}`
+            name: `${self.document.title} PopUp ${BaseUtils.randomId(3)}`,
         };
         this.handler = {};
         this.options = BaseUtils.mixin(this.options, options);
@@ -65,7 +65,7 @@ export class PopupProxy {
         this.parent.classList.add('as-popup');
         this.current = null;
         // use a callback function similar to jsonp, don't know why the popup state if overridden
-        const name = 'popupCallback' + BaseUtils.randomId(8);
+        const name = `popupCallback${BaseUtils.randomId(8)}`;
         window[name] = (popupBody) => {
             this.build(popupBody);
             delete window[name];

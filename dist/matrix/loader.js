@@ -12,7 +12,7 @@ export class MatrixLoaderHelper {
             cols: (desc, range) => loader(desc).then((d) => range.dim(1).filter(d.cols, desc.size[1])),
             ids: (desc, range) => loader(desc).then((d) => range.preMultiply(d.ids, desc.size)),
             at: (desc, i, j) => loader(desc).then((d) => d.data[i][j]),
-            data: (desc, range) => loader(desc).then((d) => range.filter(d.data, desc.size))
+            data: (desc, range) => loader(desc).then((d) => range.filter(d.data, desc.size)),
         };
     }
     static maskIt(desc) {
@@ -22,7 +22,13 @@ export class MatrixLoaderHelper {
         return (v) => v;
     }
     static viaAPI2Loader() {
-        let rowIds = null, rows = null, colIds = null, cols = null, data = null, hist = null, stats = null;
+        let rowIds = null;
+        let rows = null;
+        let colIds = null;
+        let cols = null;
+        let data = null;
+        let hist = null;
+        let stats = null;
         function fillRowIds(desc) {
             if (rowIds !== null && rows !== null) {
                 Promise.all([rowIds, rows]).then(([rowIdValues, rowValues]) => {
@@ -74,8 +80,8 @@ export class MatrixLoaderHelper {
                 if (range.ndim === 1) {
                     return r.rowIds(desc, range);
                 }
-                range.dim(0); //ensure two dim
-                range.dim(1); //ensure two dim
+                range.dim(0); // ensure two dim
+                range.dim(1); // ensure two dim
                 const split = range.split();
                 return Promise.all([r.rowIds(desc, split[0] || Range.all()), r.colIds(desc, split[1] || Range.all())]).then(Range.join);
             },
@@ -87,7 +93,7 @@ export class MatrixLoaderHelper {
                     return stats;
                 }
                 const args = {
-                    range: range.toString()
+                    range: range.toString(),
                 };
                 return AppContext.getInstance().getAPIJSON(`/dataset/matrix/${desc.id}/stats`, args);
             },
@@ -95,17 +101,21 @@ export class MatrixLoaderHelper {
                 const valueRange = desc.value.range;
                 if (range.isAll) {
                     if (hist == null) {
-                        hist = AppContext.getInstance().getAPIJSON(`/dataset/matrix/${desc.id}/hist`).then((hist) => Histogram.wrapHist(hist, valueRange));
+                        hist = AppContext.getInstance()
+                            .getAPIJSON(`/dataset/matrix/${desc.id}/hist`)
+                            .then((hist) => Histogram.wrapHist(hist, valueRange));
                     }
                     return hist;
                 }
                 const args = {
-                    range: range.toString()
+                    range: range.toString(),
                 };
                 if (!isNaN(bins)) {
                     args.bins = bins;
                 }
-                return AppContext.getInstance().getAPIJSON(`/dataset/matrix/${desc.id}/hist`, args).then((hist) => Histogram.wrapHist(hist, valueRange));
+                return AppContext.getInstance()
+                    .getAPIJSON(`/dataset/matrix/${desc.id}/hist`, args)
+                    .then((hist) => Histogram.wrapHist(hist, valueRange));
             },
             at: (desc, i, j) => r.data(desc, Range.list([i], [j])).then((data) => MatrixLoaderHelper.maskIt(desc)(data[0][0])),
             data: (desc, range) => {
@@ -115,21 +125,23 @@ export class MatrixLoaderHelper {
                     }
                     return data;
                 }
-                if (data != null) { //already loading all
+                if (data != null) {
+                    // already loading all
                     return data.then((d) => range.filter(d, desc.size));
                 }
-                const size = desc.size;
-                if (size[0] * size[1] < 1000 || desc.loadAtOnce) { // small file load all
+                const { size } = desc;
+                if (size[0] * size[1] < 1000 || desc.loadAtOnce) {
+                    // small file load all
                     data = AppContext.getInstance().getAPIJSON(`/dataset/matrix/${desc.id}/raw`).then(MatrixLoaderHelper.maskIt(desc)); // TODO avoid <any> type cast
                     return data.then((d) => range.filter(d, desc.size));
                 }
-                //server side slicing
+                // server side slicing
                 return AppContext.getInstance().getAPIData(`/dataset/matrix/${desc.id}/raw`, { range: range.toString() }).then(MatrixLoaderHelper.maskIt(desc));
             },
             heatmapUrl: (desc, range, options) => {
                 const params = MatrixLoaderHelper.prepareHeatmapUrlParameter(range, options);
                 return AppContext.getInstance().api2absURL(`/dataset/matrix/${desc.id}/data`, params);
-            }
+            },
         };
         return r;
     }
@@ -141,7 +153,7 @@ export class MatrixLoaderHelper {
     static prepareHeatmapUrlParameter(range, options) {
         const args = {
             format: options.format || 'png',
-            range: range.toString()
+            range: range.toString(),
         };
         if (options.transpose === true) {
             args.format_transpose = true;

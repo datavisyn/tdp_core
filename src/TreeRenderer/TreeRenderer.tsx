@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {BaseUtils} from '../base';
-import {FindViewUtils, IDiscoveredView} from '../views';
+import { BaseUtils } from '../base';
+import { FindViewUtils, IDiscoveredView } from '../views';
 
 export interface ITreeGroup {
   name: string;
@@ -19,12 +19,12 @@ export function viewPluginDescToTreeElementHelper(views: IDiscoveredView[], open
   const normalizedGroups = openGroups.map((g) => g.toLowerCase());
   return FindViewUtils.groupByCategory(views).map((g) => ({
     name: g.name,
-    items: g.views.map(({v}) => ({
+    items: g.views.map(({ v }) => ({
       name: v.name,
       group: v.group.name,
-      id: v.id
+      id: v.id,
     })),
-    defaultOpen: normalizedGroups.includes(g.name.toLowerCase())
+    defaultOpen: normalizedGroups.includes(g.name.toLowerCase()),
   }));
 }
 
@@ -40,14 +40,23 @@ interface IGroupHeaderProps {
 }
 
 function GroupHeader(props: IGroupHeaderProps) {
-  return <header className={props.defaultOpen ? '' : 'collapsed'} data-bs-toggle="collapse" data-bs-target={`#collapse-${props.index}-${props.randomIdSuffix}`} data-group={props.name} aria-expanded="true" aria-controls={`collapse-${props.index}`}>
-    <h6>{props.name}</h6>
-  </header>;
+  return (
+    <header
+      className={props.defaultOpen ? '' : 'collapsed'}
+      data-bs-toggle="collapse"
+      data-bs-target={`#collapse-${props.index}-${props.randomIdSuffix}`}
+      data-group={props.name}
+      aria-expanded="true"
+      aria-controls={`collapse-${props.index}`}
+    >
+      <h6>{props.name}</h6>
+    </header>
+  );
 }
 
 // TODO: implement Toolbar
 function Toolbar(props) {
-  return <div className="toolbar"></div>;
+  return <div className="toolbar" />;
 }
 
 interface ILeafProps {
@@ -65,18 +74,37 @@ interface ILeafProps {
 }
 
 function Leaf(props: ILeafProps): JSX.Element {
-  let leaf: JSX.Element = <a href={props.getItemURL(props.element.id)} title={props.element.name} onClick={(e) => props.action(e, props.element)}><span>{props.element.name}</span></a>;
+  let leaf: JSX.Element = (
+    <a href={props.getItemURL(props.element.id)} title={props.element.name} onClick={(e) => props.action(e, props.element)}>
+      <span>{props.element.name}</span>
+    </a>
+  );
   if (props.selection.isSelectable) {
-    leaf = <div className="form-check">
-      <input className="form-check-input" id="treeRenderer_checkbox_1" type="checkbox" checked={props.isSelected} disabled={props.readOnly} onChange={(e) => props.selectionChanged && props.selectionChanged(e.target.checked)} value={props.element.id} name={inputNameArrayConventionForm(props.selection.inputNameAttribute)} />
-      <label className="form-check-label" htmlFor="treeRenderer_checkbox_1">{props.element.name}</label>
-      </div>;
+    leaf = (
+      <div className="form-check">
+        <input
+          className="form-check-input"
+          id="treeRenderer_checkbox_1"
+          type="checkbox"
+          checked={props.isSelected}
+          disabled={props.readOnly}
+          onChange={(e) => props.selectionChanged && props.selectionChanged(e.target.checked)}
+          value={props.element.id}
+          name={inputNameArrayConventionForm(props.selection.inputNameAttribute)}
+        />
+        <label className="form-check-label" htmlFor="treeRenderer_checkbox_1">
+          {props.element.name}
+        </label>
+      </div>
+    );
   }
 
-  return <li className={`dashboard-node item`} data-state={props.isActive ? 'active' : ''}>
-    {leaf}
-    <Toolbar />
-  </li>;
+  return (
+    <li className="dashboard-node item" data-state={props.isActive ? 'active' : ''}>
+      {leaf}
+      <Toolbar />
+    </li>
+  );
 }
 
 export interface ITreeRendererProps {
@@ -100,7 +128,6 @@ interface ITreeRendererState {
 }
 
 export class TreeRenderer extends React.Component<Partial<ITreeRendererProps>, ITreeRendererState> {
-
   static defaultProps = {
     /**
      * specify if the tree should be rendered as read only
@@ -109,7 +136,7 @@ export class TreeRenderer extends React.Component<Partial<ITreeRendererProps>, I
 
     selection: {
       isSelectable: false,
-      inputNameAttribute: 'treeItem[]' // usually an array of items
+      inputNameAttribute: 'treeItem[]', // usually an array of items
     },
 
     securityNotAllowedText: `Not allowed`,
@@ -132,7 +159,7 @@ export class TreeRenderer extends React.Component<Partial<ITreeRendererProps>, I
     /**
      * determines what should happen when an items checkbox status is changed
      */
-    selectionChanged: (items: ITreeElement[]) => null
+    selectionChanged: (items: ITreeElement[]) => null,
   };
 
   constructor(props) {
@@ -140,7 +167,7 @@ export class TreeRenderer extends React.Component<Partial<ITreeRendererProps>, I
 
     this.state = {
       activeElement: null,
-      selectedElements: []
+      selectedElements: [],
     };
   }
 
@@ -149,11 +176,11 @@ export class TreeRenderer extends React.Component<Partial<ITreeRendererProps>, I
     e.stopPropagation();
 
     this.setState({
-      activeElement: item
+      activeElement: item,
     });
 
     this.props.itemAction(item);
-  }
+  };
 
   handleSelectionChanged = (item, group, selected) => {
     if (this.props.itemSelectAction) {
@@ -162,49 +189,54 @@ export class TreeRenderer extends React.Component<Partial<ITreeRendererProps>, I
     if (this.props.selectionChanged) {
       this.props.selectionChanged(this.state.selectedElements);
     }
-  }
+  };
 
   setSelectedIds = (itemIds: string[] = []) => {
-    const {groups} = this.props;
+    const { groups } = this.props;
     this.setState({
       selectedElements: groups
         .map((group) => group.items)
         .reduce((acc, val) => acc.concat(val), [])
-        .filter((item) => itemIds.includes(item.id))
+        .filter((item) => itemIds.includes(item.id)),
     });
-  }
+  };
 
   render() {
     const randomIdSuffix = BaseUtils.randomId();
-    return <div className="tree-renderer">
-      {this.props.groups.map((g: ITreeGroup, i: number) => {
-        return <section key={g.name} data-group={g.name} className="group">
-          <GroupHeader name={g.name} defaultOpen={g.defaultOpen} index={i} randomIdSuffix={randomIdSuffix} />
-          <main id={`collapse-${i}-${randomIdSuffix}`} className={`collapse ${g.defaultOpen ? 'in' : ''}`} aria-labelledby={`heading-${i}`}>
-            <ul>
-              {g.items.map((d: ITreeElement) => <Leaf
-                key={d.name}
-                element={d}
-                readOnly={this.props.readOnly}
-                getItemURL={this.props.getItemURL}
-                isActive={this.state.activeElement === d}
-                isSelected={this.state.selectedElements.includes(d)}
-                selection={this.props.selection}
-                action={this.handleItemClick}
-                selectionChanged={(selected) => {
-                  const stateChangedCallback = () => this.handleSelectionChanged(d, g, selected);
-                  if (selected) {
-                    this.setState((prevState) => ({selectedElements: [...prevState.selectedElements, d]}),
-                      stateChangedCallback);
-                  } else {
-                    this.setState((prevState) => ({selectedElements: prevState.selectedElements.filter((elem) => elem !== d)}),
-                      stateChangedCallback);
-                  }
-                }} />)}
-            </ul>
-          </main>
-        </section>;
-      })}
-    </div>;
+    return (
+      <div className="tree-renderer">
+        {this.props.groups.map((g: ITreeGroup, i: number) => {
+          return (
+            <section key={g.name} data-group={g.name} className="group">
+              <GroupHeader name={g.name} defaultOpen={g.defaultOpen} index={i} randomIdSuffix={randomIdSuffix} />
+              <main id={`collapse-${i}-${randomIdSuffix}`} className={`collapse ${g.defaultOpen ? 'in' : ''}`} aria-labelledby={`heading-${i}`}>
+                <ul>
+                  {g.items.map((d: ITreeElement) => (
+                    <Leaf
+                      key={d.name}
+                      element={d}
+                      readOnly={this.props.readOnly}
+                      getItemURL={this.props.getItemURL}
+                      isActive={this.state.activeElement === d}
+                      isSelected={this.state.selectedElements.includes(d)}
+                      selection={this.props.selection}
+                      action={this.handleItemClick}
+                      selectionChanged={(selected) => {
+                        const stateChangedCallback = () => this.handleSelectionChanged(d, g, selected);
+                        if (selected) {
+                          this.setState((prevState) => ({ selectedElements: [...prevState.selectedElements, d] }), stateChangedCallback);
+                        } else {
+                          this.setState((prevState) => ({ selectedElements: prevState.selectedElements.filter((elem) => elem !== d) }), stateChangedCallback);
+                        }
+                      }}
+                    />
+                  ))}
+                </ul>
+              </main>
+            </section>
+          );
+        })}
+      </div>
+    );
   }
 }

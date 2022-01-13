@@ -1,10 +1,11 @@
-import {GlobalEventHandler, BaseUtils} from '../base';
-import {IViewTourContext} from './extensions';
+import { GlobalEventHandler, BaseUtils } from '../base';
+import { IViewTourContext } from './extensions';
 
 export class TourUtils {
-
   public static readonly GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
+
   public static readonly GLOBAL_EVENT_END_TOUR = 'tdpEndTour';
+
   public static readonly EXTENSION_POINT_TDP_TOUR = 'tdpTour';
 
   /**
@@ -16,12 +17,11 @@ export class TourUtils {
     TourUtils.startTour(tourId, context);
   }
 
-
   static startTour(tourId: string, context: any = {}) {
     GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_START_TOUR, tourId, context);
   }
 
-  static endTour(finished: boolean = false) {
+  static endTour(finished = false) {
     GlobalEventHandler.getInstance().fire(TourUtils.GLOBAL_EVENT_END_TOUR, finished);
   }
 
@@ -45,8 +45,8 @@ export class TourUtils {
    * @default pollFrequencyMs 500
    * @returns {Promise<HTMLElement | null>} Resolves with the found element or `null`
    */
-  static waitFor(selector: string | (() => HTMLElement | null), maxWaitingTime: number = 5000, pollFrequencyMs: number = 500): Promise<HTMLElement | null> {
-    const s = typeof selector === 'function' ? selector : () =>  document.querySelector<HTMLElement>(selector);
+  static waitFor(selector: string | (() => HTMLElement | null), maxWaitingTime = 5000, pollFrequencyMs = 500): Promise<HTMLElement | null> {
+    const s = typeof selector === 'function' ? selector : () => document.querySelector<HTMLElement>(selector);
     return new Promise<HTMLElement>(async (resolve) => {
       let elem: HTMLElement = s();
       if (s()) {
@@ -93,7 +93,7 @@ export class TourUtils {
    *
    * @param this Context containing the current selector of the step
    */
-  static clickSelector(this: { selector?: string}) {
+  static clickSelector(this: { selector?: string }) {
     return TourUtils.click(this.selector);
   }
 
@@ -118,7 +118,7 @@ export class TourUtils {
    *
    * @param this Context containing the current selector of the step
    */
-  static doubleClickSelector(this: { selector?: string}) {
+  static doubleClickSelector(this: { selector?: string }) {
     return TourUtils.doubleClick(this.selector);
   }
 
@@ -135,7 +135,7 @@ export class TourUtils {
     }
     const event = new Event('submit', <any>{
       bubbles: true,
-      cancelable: true
+      cancelable: true,
     });
     e.dispatchEvent(event);
   }
@@ -146,7 +146,7 @@ export class TourUtils {
    *
    * @param this Context containing the current selector of the step
    */
-  static submitFormSelector(this: { selector?: string}) {
+  static submitFormSelector(this: { selector?: string }) {
     return TourUtils.submitForm(this.selector);
   }
 
@@ -166,7 +166,7 @@ export class TourUtils {
       key: 'Enter',
       code: 'Enter',
       which: 13,
-      keyCode: 13
+      keyCode: 13,
     });
     e.dispatchEvent(event);
   }
@@ -179,16 +179,22 @@ export class TourUtils {
    * @param eventType Event type `change` or `input` that should be dispatched
    * @default eventType change
    */
-  static setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string, eventType: 'change'|'input' = 'change') {
+  static setValueAndTrigger(
+    elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string,
+    value: string,
+    eventType: 'change' | 'input' = 'change',
+  ) {
     const e = typeof elem === 'string' ? document.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(elem) : elem;
     if (!e) {
       return;
     }
     e.value = value;
-    return e.dispatchEvent(new Event(eventType, {
-      bubbles: true,
-      cancelable: true
-    }));
+    return e.dispatchEvent(
+      new Event(eventType, {
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
   }
 
   /**
@@ -199,8 +205,8 @@ export class TourUtils {
    * @param eventType Event type `change` or `input` that should be dispatched
    * @default eventType change
    */
-  static setValueAndTriggerSelector(value: string, eventType: 'change'|'input' = 'change') {
-    return function(this: {selector?: string}) {
+  static setValueAndTriggerSelector(value: string, eventType: 'change' | 'input' = 'change') {
+    return function (this: { selector?: string }) {
       TourUtils.setValueAndTrigger(this.selector, value, eventType);
     };
   }
@@ -226,7 +232,7 @@ export class TourUtils {
    * @param callback Function to execute. The polling is stopped once the function returns `true`.
    * @param interval Pause in milliseconds between each function call
    */
-  static ensure(callback: () => boolean, interval: number = 250) {
+  static ensure(callback: () => boolean, interval = 250) {
     if (!callback() || !TourUtils.isTourVisible()) {
       return;
     }
@@ -246,7 +252,4 @@ export class TourUtils {
     const counter = document.querySelector<HTMLElement>('.tdp-tour-step-count')!;
     return counter.style.display === 'flex'; // visible -> active
   }
-
-
-
 }

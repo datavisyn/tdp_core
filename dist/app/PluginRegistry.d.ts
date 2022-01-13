@@ -9,7 +9,7 @@ export declare class PluginRegistry implements IRegistry {
      * @param filter
      * @returns {IPluginDesc[]}
      */
-    listPlugins(filter?: (string | ((desc: IPluginDesc) => boolean))): IPluginDesc[];
+    listPlugins(filter?: string | ((desc: IPluginDesc) => boolean)): IPluginDesc[];
     /**
      * returns an extension identified by type and id
      * @param type

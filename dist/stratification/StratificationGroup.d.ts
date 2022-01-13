@@ -1,9 +1,9 @@
 import { Range, RangeLike, CompositeRange1D, Range1DGroup } from '../range';
-import { IDataType } from '../data/datatype';
+import type { IDataType } from '../data/datatype';
 import { ASelectAble } from '../idtype';
-import { ICategoricalVector } from '../vector';
+import type { ICategoricalVector } from '../vector';
 import { IHistogram } from '../data/histogram';
-import { IStratification, IGroup } from './IStratification';
+import type { IStratification, IGroup } from './IStratification';
 /**
  * root matrix implementation holding the data
  * @internal

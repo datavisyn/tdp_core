@@ -1,15 +1,13 @@
-import {Range, RangeLike, ParseRangeUtils} from '../range';
-import {IValueTypeDesc, ValueTypeUtils} from '../data';
-import {IHistogram} from '../data/histogram';
-import {IAdvancedStatistics, IStatistics} from '../base/statistics';
-import {BaseUtils} from '../base/BaseUtils';
-import {IDType, ProductIDType, IDTypeManager, LocalIDAssigner} from '../idtype';
-import {IMatrix, IMatrixDataDescription, IHeatMapUrlOptions, MatrixUtils} from './IMatrix';
-import {AMatrix} from './AMatrix';
-import {TransposedMatrix} from './internal/TransposedMatrix';
-import {IMatrixLoader, IMatrixLoader2, MatrixLoaderHelper} from './loader';
-
-
+import { Range, RangeLike, ParseRangeUtils } from '../range';
+import { IValueTypeDesc, ValueTypeUtils } from '../data';
+import { IHistogram } from '../data/histogram';
+import { IAdvancedStatistics, IStatistics } from '../base/statistics';
+import { BaseUtils } from '../base/BaseUtils';
+import { IDType, ProductIDType, IDTypeManager, LocalIDAssigner } from '../idtype';
+import { IMatrix, IMatrixDataDescription, IHeatMapUrlOptions, MatrixUtils } from './IMatrix';
+import { AMatrix } from './AMatrix';
+import { TransposedMatrix } from './internal/TransposedMatrix';
+import { IMatrixLoader, IMatrixLoader2, MatrixLoaderHelper } from './loader';
 
 export interface IAsMatrixOptions {
   name?: string;
@@ -24,9 +22,13 @@ export interface IAsMatrixOptions {
  */
 export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
   readonly t: IMatrix<T, D>;
+
   readonly valuetype: D;
+
   readonly rowtype: IDType;
+
   readonly coltype: IDType;
+
   private _producttype: ProductIDType;
 
   constructor(public readonly desc: IMatrixDataDescription<D>, private loader: IMatrixLoader2<T>) {
@@ -65,7 +67,6 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
     return this.loader.ids(this.desc, ParseRangeUtils.parseRangeLike(range));
   }
 
-
   /**
    * return the column ids of the matrix
    * @returns {*}
@@ -91,7 +92,8 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
   }
 
   hist(bins?: number, range: RangeLike = Range.all(), containedIds = 0): Promise<IHistogram> {
-    if (this.loader.numericalHist && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) { // use loader for hist
+    if (this.loader.numericalHist && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
+      // use loader for hist
       return this.loader.numericalHist(this.desc, ParseRangeUtils.parseRangeLike(range), bins);
     }
     // compute
@@ -99,7 +101,8 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
   }
 
   stats(range: RangeLike = Range.all()): Promise<IStatistics> {
-    if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) { // use loader for hist
+    if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
+      // use loader for hist
       return this.loader.numericalStats(this.desc, ParseRangeUtils.parseRangeLike(range));
     }
     // compute
@@ -107,7 +110,8 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
   }
 
   statsAdvanced(range: RangeLike = Range.all()): Promise<IAdvancedStatistics> {
-    if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) { // use loader for hist
+    if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
+      // use loader for hist
       return this.loader.numericalStats(this.desc, ParseRangeUtils.parseRangeLike(range));
     }
     // compute
@@ -135,16 +139,16 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
    * @param loader
    * @returns {IMatrix}
    */
-  static create<T, D extends IValueTypeDesc>(desc: IMatrixDataDescription<D>, loader?: IMatrixLoader2<T>|IMatrixLoader<T>): IMatrix<T,D> {
+  static create<T, D extends IValueTypeDesc>(desc: IMatrixDataDescription<D>, loader?: IMatrixLoader2<T> | IMatrixLoader<T>): IMatrix<T, D> {
     if (typeof loader === 'function') {
       return new Matrix(desc, MatrixLoaderHelper.adapterOne2Two(<IMatrixLoader<T>>loader));
     }
     return new Matrix(desc, loader ? <IMatrixLoader2<T>>loader : MatrixLoaderHelper.viaAPI2Loader());
   }
 
-  static asMatrix<T>(data: T[][], options?: IAsMatrixOptions): IMatrix<T,IValueTypeDesc>;
-  static asMatrix<T>(data: T[][], rows: string[], cols: string[]): IMatrix<T,IValueTypeDesc>;
-  static asMatrix<T>(data: T[][], rows: string[], cols: string[], options?: IAsMatrixOptions): IMatrix<T,IValueTypeDesc>;
+  static asMatrix<T>(data: T[][], options?: IAsMatrixOptions): IMatrix<T, IValueTypeDesc>;
+  static asMatrix<T>(data: T[][], rows: string[], cols: string[]): IMatrix<T, IValueTypeDesc>;
+  static asMatrix<T>(data: T[][], rows: string[], cols: string[], options?: IAsMatrixOptions): IMatrix<T, IValueTypeDesc>;
 
   /**
    * parses a given dataset and convert is to a matrix
@@ -154,11 +158,11 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
    * @param options options for defining the dataset description
    * @returns {IMatrix}
    */
-  static asMatrix<T>(data: T[][], rowsIdsOrOptions?: any, colIds?: string[], options: IAsMatrixOptions = {}): IMatrix<T,IValueTypeDesc> {
+  static asMatrix<T>(data: T[][], rowsIdsOrOptions?: any, colIds?: string[], options: IAsMatrixOptions = {}): IMatrix<T, IValueTypeDesc> {
     // first column if not defined, excluding 0,0
     const rows = Array.isArray(rowsIdsOrOptions) ? <string[]>rowsIdsOrOptions : data.map((r) => r[0]).slice(1);
     // first row if not defined, excluding 0,0
-    const cols = colIds ? colIds : data[0].slice(1);
+    const cols = colIds || data[0].slice(1);
     if (typeof rowsIdsOrOptions === 'object') {
       options = rowsIdsOrOptions;
     }
@@ -173,10 +177,14 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
       realData = realData.map((row) => row.map(<any>parseInt));
     }
 
-    const desc = BaseUtils.mixin(MatrixUtils.createDefaultMatrixDesc(), {
-      size: [rows.length, cols.length],
-      value: valueType
-    }, options);
+    const desc = BaseUtils.mixin(
+      MatrixUtils.createDefaultMatrixDesc(),
+      {
+        size: [rows.length, cols.length],
+        value: valueType,
+      },
+      options,
+    );
 
     const rowAssigner = options.rowassigner || LocalIDAssigner.create();
     const colAssigner = options.rowassigner || LocalIDAssigner.create();
@@ -191,9 +199,8 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
       at: (desc: IMatrixDataDescription<any>, i, j) => Promise.resolve(realData[i][j]),
       rows: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(rows)),
       cols: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(cols)),
-      data: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(realData))
+      data: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(realData)),
     };
     return new Matrix(desc, loader);
   }
-
 }

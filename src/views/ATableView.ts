@@ -1,11 +1,11 @@
-import {BaseUtils} from '../base';
-import {I18nextManager} from '../i18n';
-import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
-import {IRow} from '../base/rest';
-import {ISelection, IViewContext} from '../base/interfaces';
-import {AView} from './AView';
-import {XlsxUtils} from '../utils/XlsxUtils';
-import {ParseRangeUtils} from '../range';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
+import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
+import { IRow } from '../base/rest';
+import { ISelection, IViewContext } from '../base/interfaces';
+import { AView } from './AView';
+import { XlsxUtils } from '../utils/XlsxUtils';
+import { ParseRangeUtils } from '../range';
 
 export interface ISortItem<T> {
   node: HTMLElement;
@@ -31,7 +31,6 @@ export interface IATableViewOptions<T> {
  * base class for views based on LineUp
  */
 export abstract class ATableView<T extends IRow> extends AView {
-
   private readonly options: Readonly<IATableViewOptions<T>> = {
     selectAble: true,
     stripedRows: false,
@@ -39,7 +38,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     condensed: false,
     sortable: true,
     exportable: false,
-    exportSeparator: ','
+    exportSeparator: ',',
   };
 
   /**
@@ -73,19 +72,23 @@ export abstract class ATableView<T extends IRow> extends AView {
   protected initImpl() {
     super.initImpl();
 
-    this.node.innerHTML = `<table class="table table-hover ${this.options.condensed ? ' table-sm' : ''}${this.options.bordered ? ' table-bordered' : ''}${this.options.stripedRows ? ' table-striped' : ''}">
+    this.node.innerHTML = `<table class="table table-hover ${this.options.condensed ? ' table-sm' : ''}${this.options.bordered ? ' table-bordered' : ''}${
+      this.options.stripedRows ? ' table-striped' : ''
+    }">
         <thead><tr></tr></thead>
         <tbody></tbody>
     </table>`;
 
-    return this.built = this.build();
+    return (this.built = this.build());
   }
 
   protected renderHeader(tr: HTMLTableRowElement, rows: T[]) {
     if (rows.length === 0) {
       return [];
     }
-    const keys = <(keyof T)[]>Object.keys(rows[0]).filter((d) => d !== 'id' && d !== '_id').sort();
+    const keys = <(keyof T)[]>Object.keys(rows[0])
+      .filter((d) => d !== 'id' && d !== '_id')
+      .sort();
     tr.innerHTML = keys.map((key) => `<th>${key}</th>`).join('');
     return keys;
   }
@@ -108,16 +111,17 @@ export abstract class ATableView<T extends IRow> extends AView {
   private build() {
     this.setBusy(true);
     this.buildHook();
-    return Promise.resolve(this.loadRows()).then((rows) => {
-      this.renderTable(rows);
-      this.setBusy(false);
-    }).catch(ErrorAlertHandler.getInstance().errorAlert)
+    return Promise.resolve(this.loadRows())
+      .then((rows) => {
+        this.renderTable(rows);
+        this.setBusy(false);
+      })
+      .catch(ErrorAlertHandler.getInstance().errorAlert)
       .catch((error) => {
         console.error(error);
         this.setBusy(false);
       });
   }
-
 
   protected renderHook(rows: T[]) {
     // hook
@@ -147,7 +151,7 @@ export abstract class ATableView<T extends IRow> extends AView {
           evt.stopPropagation();
           this.setItemSelection({
             idtype: this.itemIDType,
-            range: ParseRangeUtils.parseRangeLike([row._id])
+            range: ParseRangeUtils.parseRangeLike([row._id]),
           });
         };
       }
@@ -155,13 +159,13 @@ export abstract class ATableView<T extends IRow> extends AView {
   }
 
   private reloadDataImpl() {
-    return this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
+    return (this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
       this.renderTable(r[1]);
-    });
+    }));
   }
 
   private rebuildImpl() {
-    return this.built = this.built.then(() => this.build());
+    return (this.built = this.built.then(() => this.build()));
   }
 
   /**
@@ -170,19 +174,30 @@ export abstract class ATableView<T extends IRow> extends AView {
   private enableExport() {
     const rightTableHeader = this.node.querySelector('thead > tr').lastElementChild;
     (<HTMLElement>rightTableHeader).dataset.export = 'enabled';
-    rightTableHeader.insertAdjacentHTML('beforeend',
-      `<a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fas fa-download"></i></a>`);
+    rightTableHeader.insertAdjacentHTML(
+      'beforeend',
+      `<a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.views.tableDownloadButton')}"><i class="fas fa-download"></i></a>`,
+    );
     (<HTMLElement>rightTableHeader.querySelector('a'))!.onclick = (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
-      ATableView.exportHtmlTableContent(this.node.ownerDocument, (<HTMLElement>this.node.querySelector('table')), this.options.exportSeparator, this.context.desc.name);
+      ATableView.exportHtmlTableContent(
+        this.node.ownerDocument,
+        <HTMLElement>this.node.querySelector('table'),
+        this.options.exportSeparator,
+        this.context.desc.name,
+      );
     };
   }
 
-
-  static enableSort<T>(this: void, header: HTMLElement, body: HTMLElement, sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>)) {
-    const text: ISorter<any> = ({node: a}, {node: b}) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
-    const numeric: ISorter<any> = ({node: a}, {node: b}) => {
+  static enableSort<T>(
+    this: void,
+    header: HTMLElement,
+    body: HTMLElement,
+    sortable: boolean | ((th: HTMLElement, index: number) => boolean | 'number' | 'string' | ISorter<T>),
+  ) {
+    const text: ISorter<any> = ({ node: a }, { node: b }) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
+    const numeric: ISorter<any> = ({ node: a }, { node: b }) => {
       const av = parseFloat(a.textContent);
       const bv = parseFloat(b.textContent);
       if (isNaN(av) && isNaN(bv)) {
@@ -201,9 +216,9 @@ export abstract class ATableView<T extends IRow> extends AView {
       return () => {
         const current = th.dataset.sort;
         const rows = <HTMLElement[]>Array.from(body.children);
-        const next = current === 'no' ? 'asc' : (current === 'asc' ? 'desc' : 'no');
+        const next = current === 'no' ? 'asc' : current === 'asc' ? 'desc' : 'no';
         th.dataset.sort = next;
-        const sorter = sortFunction ? sortFunction : (th.dataset.num != null ? numeric : text);
+        const sorter = sortFunction || (th.dataset.num != null ? numeric : text);
         const sort = (a: HTMLElement, b: HTMLElement) => {
           const acol = <HTMLElement>a.children[i];
           const bcol = <HTMLElement>b.children[i];
@@ -213,7 +228,7 @@ export abstract class ATableView<T extends IRow> extends AView {
           if (!bcol) {
             return -1;
           }
-          return sorter({node: acol, row: (<any>a).__data__, index: i}, {node: bcol, row: (<any>b).__data__, index: i});
+          return sorter({ node: acol, row: (<any>a).__data__, index: i }, { node: bcol, row: (<any>b).__data__, index: i });
         };
 
         switch (next) {
@@ -232,7 +247,6 @@ export abstract class ATableView<T extends IRow> extends AView {
         rows.forEach((r) => body.appendChild(r));
       };
     };
-
 
     Array.from(header.children).forEach((d: HTMLElement, i) => {
       const sort = typeof sortable === 'function' ? sortable(d, i) : sortable;
@@ -253,22 +267,21 @@ export abstract class ATableView<T extends IRow> extends AView {
   static exportHtmlTableContent(document: Document, tableRoot: HTMLElement, separator: string, name: string) {
     if (separator !== 'xlsx') {
       const content = ATableView.parseHtmlTableContent(tableRoot, separator);
-      ATableView.download(document, new Blob([content], {type: 'text/csv;charset=utf-8'}), `${name}.csv`);
+      ATableView.download(document, new Blob([content], { type: 'text/csv;charset=utf-8' }), `${name}.csv`);
       return;
     }
 
-    const {columns, rows} = ATableView.extractFromHTML(tableRoot);
+    const { columns, rows } = ATableView.extractFromHTML(tableRoot);
 
     function isNumeric(value: any): boolean {
       return typeof value === 'string' && !isNaN(parseFloat(value));
     }
 
     // parse numbers
-    const guessed = rows.map((row) => row.map((s) => isNumeric(s) ? parseFloat(s) : s));
+    const guessed = rows.map((row) => row.map((s) => (isNumeric(s) ? parseFloat(s) : s)));
     guessed.unshift(columns);
     XlsxUtils.jsonArray2xlsx(guessed).then((blob) => ATableView.download(document, blob, `${name}.xlsx`));
   }
-
 
   private static download(document: Document, blob: Blob, name: string) {
     const downloadLink = document.createElement('a');
@@ -285,26 +298,25 @@ export abstract class ATableView<T extends IRow> extends AView {
    * @returns {string} The table content in csv format
    */
   private static extractFromHTML(tableRoot: HTMLElement) {
+    const columns = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th')).map((d) => (<HTMLTableHeaderCellElement>d).innerText);
 
-    const columns = Array.from(tableRoot.querySelectorAll('thead:first-of-type > tr > th'))
-      .map((d) => (<HTMLTableHeaderCellElement>d).innerText);
-
-    const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr'))
-      .filter((tr) => tr.parentElement.parentElement === tableRoot || tr.parentElement === tableRoot); // only parse first nested level
+    const bodyRows = Array.from(tableRoot.querySelectorAll('tbody > tr')).filter(
+      (tr) => tr.parentElement.parentElement === tableRoot || tr.parentElement === tableRoot,
+    ); // only parse first nested level
     const rows = bodyRows.map((row: HTMLTableRowElement) => {
       return Array.from(row.children).map((d) => (<HTMLTableDataCellElement>d).innerText);
     });
     return {
       columns,
-      rows
+      rows,
     };
   }
+
   /**
    * Parse HTML Table header and body content.
    * @returns {string} The table content in csv format
    */
   private static parseHtmlTableContent(tableRoot: HTMLElement, separator: string) {
-
     /**
      * has <br> tag that is parsed as \n
      * @param {string} text
@@ -314,14 +326,18 @@ export abstract class ATableView<T extends IRow> extends AView {
       return text.match(/\n/g);
     };
 
-    const {columns, rows} = ATableView.extractFromHTML(tableRoot);
+    const { columns, rows } = ATableView.extractFromHTML(tableRoot);
 
     const headerContent = columns.join(separator);
-    const bodyContent = rows.map((row) => {
-      return row.map((text) => {
-        return hasMultilines(text) || text.includes(separator) ? `"${text.replace(/\t/g, ':')}"` : text;
-      }).join(separator);
-    }).join('\n');
+    const bodyContent = rows
+      .map((row) => {
+        return row
+          .map((text) => {
+            return hasMultilines(text) || text.includes(separator) ? `"${text.replace(/\t/g, ':')}"` : text;
+          })
+          .join(separator);
+      })
+      .join('\n');
     const content = `${headerContent}\n${bodyContent}`;
     return content;
   }

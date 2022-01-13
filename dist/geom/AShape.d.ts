@@ -2,7 +2,7 @@ import { IShape } from '../2D/IShape';
 import { IRect } from './IRect';
 import { Vector2D } from '../2D/Vector2D';
 import { IIntersectionParam } from '../2D/IIntersectionParam';
-export declare module Corner {
+export declare namespace Corner {
     const CORNER: any;
 }
 /**

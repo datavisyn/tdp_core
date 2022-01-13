@@ -1,6 +1,5 @@
-import {IDataRow, Column, isNumberColumn, isDateColumn} from 'lineupjs';
-import {XlsxUtils} from '../../utils/XlsxUtils';
-
+import { IDataRow, Column, isNumberColumn, isDateColumn } from 'lineupjs';
+import { XlsxUtils } from '../../utils/XlsxUtils';
 
 export interface IExportFormat {
   name: string;
@@ -11,8 +10,7 @@ export interface IExportFormat {
 }
 
 export class ExportUtils {
-
-  private static EXPORT_FORMAT: { [key:string]: IExportFormat } = {
+  private static EXPORT_FORMAT: { [key: string]: IExportFormat } = {
     JSON: {
       name: 'json',
       separator: null,
@@ -75,7 +73,7 @@ export class ExportUtils {
    * @param format Export format as string
    */
   static getExportFormat(format: string) {
-    switch(format) {
+    switch (format) {
       case 'json':
       case 'JSON':
         return ExportUtils.EXPORT_FORMAT.JSON;
@@ -101,11 +99,11 @@ export class ExportUtils {
   }
 
   private static getColumnName(column: Column) {
-    return column.label + (column.desc.summary ? ' - ' + column.desc.summary : '') + (column.description ? '\n' + column.description : '');
+    return column.label + (column.desc.summary ? ` - ${column.desc.summary}` : '') + (column.description ? `\n${column.description}` : '');
   }
 
   private static exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
-    //optionally quote not numbers
+    // optionally quote not numbers
     const escape = new RegExp(`["]`, 'g');
     function quote(v: any, c?: Column) {
       if (v == null) {
@@ -148,15 +146,20 @@ export class ExportUtils {
       return r;
     });
     return XlsxUtils.json2xlsx({
-      sheets: [{
-        title: 'LineUp',
-        columns: columns.map((d) => ({name: ExportUtils.getColumnName(d), type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string')})),
-        rows: converted
-      }]
+      sheets: [
+        {
+          title: 'LineUp',
+          columns: columns.map((d) => ({
+            name: ExportUtils.getColumnName(d),
+            type: <'float' | 'string' | 'date'>(isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string'),
+          })),
+          rows: converted,
+        },
+      ],
     });
   }
 
   private static toBlob(content: string, mimeType: string) {
-    return new Blob([content], {type: mimeType});
+    return new Blob([content], { type: mimeType });
   }
 }

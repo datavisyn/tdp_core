@@ -1,8 +1,8 @@
-import {Vector2D} from '../2D/Vector2D';
-import {IIntersectionParam} from '../2D/IIntersectionParam';
-import {AShape} from './AShape';
-import {Circle} from './Circle';
-import {Rect} from './Rect';
+import { Vector2D } from '../2D/Vector2D';
+import { IIntersectionParam } from '../2D/IIntersectionParam';
+import { AShape } from './AShape';
+import { Circle } from './Circle';
+import { Rect } from './Rect';
 
 export class Line extends AShape {
   constructor(public x1 = 0, public y1 = 0, public x2 = 0, public y2 = 0) {
@@ -44,24 +44,24 @@ export class Line extends AShape {
   bs(): Circle {
     const x = 0.5 * (this.x1 + this.x2);
     const y = 0.5 * (this.y1 + this.y2);
-    const dx = (this.x1 - this.x2);
-    const dy = (this.y1 - this.y2);
+    const dx = this.x1 - this.x2;
+    const dy = this.y1 - this.y2;
     return new Circle(x, y, Math.sqrt(dx * dx + dy * dy) / 2);
   }
 
   transform(scale: number[], rotate: number) {
-    //TODO rotate
+    // TODO rotate
     return new Line(this.x1 * scale[0], this.y1 * scale[1], this.x2 * scale[0], this.y2 * scale[1]);
   }
 
   asIntersectionParams(): IIntersectionParam {
     return {
       name: 'Line',
-      params: [this.xy, this.x2y2]
+      params: [this.xy, this.x2y2],
     };
   }
+
   static line(x1: number, y1: number, x2: number, y2: number): Line {
     return new Line(x1, y1, x2, y2);
   }
 }
-

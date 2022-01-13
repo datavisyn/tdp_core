@@ -1,5 +1,4 @@
-
-import {IIterator} from '../../base/iterator';
+import { IIterator } from '../../base/iterator';
 /**
  * fix negative indices given the total size
  * @param v

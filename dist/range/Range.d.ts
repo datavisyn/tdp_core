@@ -1,5 +1,5 @@
 import { Range1D } from './Range1D';
-import { IRangeSlice } from './IRangeSlice';
+import type { IRangeSlice } from './IRangeSlice';
 /**
  * multi dimensional version of a RangeDim
  */

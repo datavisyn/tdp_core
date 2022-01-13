@@ -13,7 +13,7 @@ function flatten(arr, indices, select = 0) {
         r = r.concat.apply(r, arr);
     }
     else {
-        //stupid slicing
+        // stupid slicing
         for (let i = 0; i < dim[1]; ++i) {
             arr.forEach((ai) => {
                 r.push(ai[i]);
@@ -22,7 +22,7 @@ function flatten(arr, indices, select = 0) {
     }
     return {
         data: r,
-        indices: indices.dim(select).repeat(dim[1 - select])
+        indices: indices.dim(select).repeat(dim[1 - select]),
     };
 }
 /**
@@ -65,14 +65,14 @@ export class AMatrix extends AProductSelectAble {
         if (v.type === ValueTypeUtils.VALUE_TYPE_INT || v.type === ValueTypeUtils.VALUE_TYPE_REAL) {
             return Statistics.computeStats(...await this.data(range));
         }
-        return Promise.reject('invalid value type: ' + v.type);
+        return Promise.reject(`invalid value type: ${v.type}`);
     }
     async statsAdvanced(range = Range.all()) {
         const v = this.root.valuetype;
         if (v.type === ValueTypeUtils.VALUE_TYPE_INT || v.type === ValueTypeUtils.VALUE_TYPE_REAL) {
             return AdvancedStatistics.computeAdvancedStats([].concat(...await this.data(range)));
         }
-        return Promise.reject('invalid value type: ' + v.type);
+        return Promise.reject(`invalid value type: ${v.type}`);
     }
     async hist(bins, range = Range.all(), containedIds = 0) {
         const v = this.root.valuetype;
@@ -81,13 +81,13 @@ export class AMatrix extends AProductSelectAble {
         switch (v.type) {
             case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
                 const vc = v;
-                return CatHistogram.categoricalHist(flat.data, flat.indices, flat.data.length, vc.categories.map((d) => typeof d === 'string' ? d : d.name), vc.categories.map((d) => typeof d === 'string' ? d : d.label || d.name), vc.categories.map((d) => typeof d === 'string' ? 'gray' : d.color || 'gray'));
+                return CatHistogram.categoricalHist(flat.data, flat.indices, flat.data.length, vc.categories.map((d) => (typeof d === 'string' ? d : d.name)), vc.categories.map((d) => (typeof d === 'string' ? d : d.label || d.name)), vc.categories.map((d) => (typeof d === 'string' ? 'gray' : d.color || 'gray')));
             case ValueTypeUtils.VALUE_TYPE_INT:
             case ValueTypeUtils.VALUE_TYPE_REAL:
                 const vn = v;
-                return Histogram.hist(flat.data, flat.indices, flat.data.length, bins ? bins : Math.round(Math.sqrt(this.length)), vn.range);
+                return Histogram.hist(flat.data, flat.indices, flat.data.length, bins || Math.round(Math.sqrt(this.length)), vn.range);
             default:
-                return Promise.reject('invalid value type: ' + v.type); //cant create hist for unique objects or other ones
+                return Promise.reject(`invalid value type: ${v.type}`); // cant create hist for unique objects or other ones
         }
     }
     async idView(idRange = Range.all()) {
@@ -105,21 +105,20 @@ export class AMatrix extends AProductSelectAble {
         if (persisted && persisted.f) {
             return this.reduce(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
         }
-        else if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
-        else if (persisted && persisted.transposed) {
+        if (persisted && persisted.transposed) {
             return this.t;
         }
-        else if (persisted && persisted.col) {
+        if (persisted && persisted.col) {
             return this.slice(+persisted.col);
         }
-        else if (persisted && persisted.row) {
+        if (persisted && persisted.row) {
             return this.t.slice(+persisted.row);
         }
-        else {
-            return this;
-        }
+        return this;
     }
 }
 AMatrix.IDTYPE_ROW = 0;
@@ -141,7 +140,7 @@ export class MatrixView extends AMatrix {
         this.range = range;
         this.t = t;
         this.range = range;
-        //ensure that there are two dimensions
+        // ensure that there are two dimensions
         range.dim(0);
         range.dim(1);
         if (!t) {
@@ -154,7 +153,7 @@ export class MatrixView extends AMatrix {
     persist() {
         return {
             root: this.root.persist(),
-            range: this.range.toString()
+            range: this.range.toString(),
         };
     }
     ids(range = Range.all()) {

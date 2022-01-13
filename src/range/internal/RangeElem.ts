@@ -1,12 +1,12 @@
-import {IRangeElem} from './IRangeElem';
-import {RangeUtils} from './RangeUtils';
-import {Iterator, IIterator} from '../../base/iterator';
-import {SingleRangeElem} from './SingleRangeElem';
+import { IRangeElem } from './IRangeElem';
+import { RangeUtils } from './RangeUtils';
+import { Iterator, IIterator } from '../../base/iterator';
+import { SingleRangeElem } from './SingleRangeElem';
 
 export class RangeElem implements IRangeElem {
   constructor(public readonly from: number, public readonly to: number = -1, public readonly step: number = 1) {
     if (step === 0) {
-      throw new Error('invalid step size: ' + step);
+      throw new Error(`invalid step size: ${step}`);
     }
   }
 
@@ -15,7 +15,7 @@ export class RangeElem implements IRangeElem {
   }
 
   get isSingle() {
-    return (this.from + this.step) === this.to;
+    return this.from + this.step === this.to;
   }
 
   get isUnbound() {
@@ -35,25 +35,28 @@ export class RangeElem implements IRangeElem {
   }
 
   static range(from: number, to = -1, step = 1) {
-    if ((from + step) === to) {
+    if (from + step === to) {
       return RangeElem.single(from);
     }
     return new RangeElem(from, to, step);
   }
 
   size(size?: number): number {
-    const t = RangeUtils.fixRange(this.to, size), f = RangeUtils.fixRange(this.from, size);
+    const t = RangeUtils.fixRange(this.to, size);
+    const f = RangeUtils.fixRange(this.from, size);
     if (this.step === 1) {
       return Math.max(t - f, 0);
-    } else if (this.step === -1) {
-      if(this.to === -1) {
+    }
+    if (this.step === -1) {
+      if (this.to === -1) {
         return Math.max(f - -1, 0);
       }
       return Math.max(f - t, 0);
     }
-    const d = this.step > 0 ? (t - f + 1) : (f - t + 1);
+    const d = this.step > 0 ? t - f + 1 : f - t + 1;
     const s = Math.abs(this.step);
-    if (d <= 0) { //no range
+    if (d <= 0) {
+      // no range
       return 0;
     }
     return Math.floor(d / s);
@@ -68,11 +71,10 @@ export class RangeElem implements IRangeElem {
       const t = this.from - 1;
       const f = this.to - 1;
       return new RangeElem(f, t, -this.step);
-    } else { //step <0
-      const t = this.from - 1;
-      const f = this.to - 1;
-      return new RangeElem(f, t, -this.step);
-    }
+    } // step <0
+    const t = this.from - 1;
+    const f = this.to - 1;
+    return new RangeElem(f, t, -this.step);
   }
 
   invert(index: number, size?: number) {
@@ -106,14 +108,15 @@ export class RangeElem implements IRangeElem {
     const t = RangeUtils.fixRange(this.to, size);
     if (this.step === -1) {
       if (this.to === -1) {
-        return (value <= f && value >= 0);
+        return value <= f && value >= 0;
       }
-      return (value <= f) && (value > t);
-    } else if (this.step === +1) { //+1
-      return (value >= f) && (value < t);
-    } else {
-      return this.iter(size).asList().indexOf(value) >= 0;
+      return value <= f && value > t;
     }
+    if (this.step === +1) {
+      // +1
+      return value >= f && value < t;
+    }
+    return this.iter(size).asList().indexOf(value) >= 0;
   }
 
   toString() {
@@ -123,9 +126,9 @@ export class RangeElem implements IRangeElem {
     if (this.isSingle) {
       return this.from.toString();
     }
-    let r = this.from + ':' + this.to;
+    let r = `${this.from}:${this.to}`;
     if (this.step !== 1) {
-      r += ':' + this.step;
+      r += `:${this.step}`;
     }
     return r;
   }
@@ -134,7 +137,7 @@ export class RangeElem implements IRangeElem {
     if (code.length === 0) {
       return RangeElem.all();
     }
-    const parseElem = (v: string, defaultValue= NaN) => {
+    const parseElem = (v: string, defaultValue = NaN) => {
       v = v.trim();
       if (v === '' && !isNaN(defaultValue)) {
         return defaultValue;
@@ -146,7 +149,7 @@ export class RangeElem implements IRangeElem {
       return n;
     };
     const parts = code.split(':');
-    switch(parts.length) {
+    switch (parts.length) {
       case 1:
         return RangeElem.single(parseElem(parts[0]));
       case 2:
@@ -158,4 +161,3 @@ export class RangeElem implements IRangeElem {
     }
   }
 }
-

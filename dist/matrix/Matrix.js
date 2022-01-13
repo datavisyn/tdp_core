@@ -63,21 +63,24 @@ export class Matrix extends AMatrix {
         return this.loader.rowIds(this.desc, ParseRangeUtils.parseRangeLike(range));
     }
     hist(bins, range = Range.all(), containedIds = 0) {
-        if (this.loader.numericalHist && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) { // use loader for hist
+        if (this.loader.numericalHist && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
+            // use loader for hist
             return this.loader.numericalHist(this.desc, ParseRangeUtils.parseRangeLike(range), bins);
         }
         // compute
         return super.hist(bins, range, containedIds);
     }
     stats(range = Range.all()) {
-        if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) { // use loader for hist
+        if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
+            // use loader for hist
             return this.loader.numericalStats(this.desc, ParseRangeUtils.parseRangeLike(range));
         }
         // compute
         return super.stats(range);
     }
     statsAdvanced(range = Range.all()) {
-        if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) { // use loader for hist
+        if (this.loader.numericalStats && (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
+            // use loader for hist
             return this.loader.numericalStats(this.desc, ParseRangeUtils.parseRangeLike(range));
         }
         // compute
@@ -119,7 +122,7 @@ export class Matrix extends AMatrix {
         // first column if not defined, excluding 0,0
         const rows = Array.isArray(rowsIdsOrOptions) ? rowsIdsOrOptions : data.map((r) => r[0]).slice(1);
         // first row if not defined, excluding 0,0
-        const cols = colIds ? colIds : data[0].slice(1);
+        const cols = colIds || data[0].slice(1);
         if (typeof rowsIdsOrOptions === 'object') {
             options = rowsIdsOrOptions;
         }
@@ -134,7 +137,7 @@ export class Matrix extends AMatrix {
         }
         const desc = BaseUtils.mixin(MatrixUtils.createDefaultMatrixDesc(), {
             size: [rows.length, cols.length],
-            value: valueType
+            value: valueType,
         }, options);
         const rowAssigner = options.rowassigner || LocalIDAssigner.create();
         const colAssigner = options.rowassigner || LocalIDAssigner.create();
@@ -149,7 +152,7 @@ export class Matrix extends AMatrix {
             at: (desc, i, j) => Promise.resolve(realData[i][j]),
             rows: (desc, range) => Promise.resolve(range.filter(rows)),
             cols: (desc, range) => Promise.resolve(range.filter(cols)),
-            data: (desc, range) => Promise.resolve(range.filter(realData))
+            data: (desc, range) => Promise.resolve(range.filter(realData)),
         };
         return new Matrix(desc, loader);
     }

@@ -1,19 +1,19 @@
-import {RemoveNodeObserver} from '../internal/RemoveNodeObserver';
-import {HashProperties} from '../base/HashProperties';
-import {PropertyHandler} from '../base/PropertyHandler';
-import {BaseUtils} from '../base/BaseUtils';
-import {Ajax} from '../base/ajax';
-import {WebpackEnv} from '../base/WebpackEnv';
+import { RemoveNodeObserver } from '../internal/RemoveNodeObserver';
+import { HashProperties } from '../base/HashProperties';
+import { PropertyHandler } from '../base/PropertyHandler';
+import { BaseUtils } from '../base/BaseUtils';
+import { Ajax } from '../base/ajax';
+import { WebpackEnv } from '../base/WebpackEnv';
 
 type OfflineGenerator = ((data: any, url: string) => Promise<any>) | Promise<any> | any;
 
 export class AppContext {
-
   /**
    * whether the standard api calls should be prevented
    * @type {boolean}
    */
   public offline = false;
+
   public static context = WebpackEnv.__APP_CONTEXT__;
 
   /**
@@ -26,31 +26,37 @@ export class AppContext {
    * server prefix of api calls
    * @type {string}
    */
-  public server_url: string = (WebpackEnv.__APP_CONTEXT__ || '/') + 'api';
+  public server_url = `${WebpackEnv.__APP_CONTEXT__ || '/'}api`;
+
   /**
    * server suffix for api calls
    * @type {string}
    */
-  public server_json_suffix: string = '';
+  public server_json_suffix = '';
   // eslint-enable @typescript-eslint/naming-convention disable
 
   /**
    * initializes certain properties of the core
    * @param config
    */
-  public init(config: {offline?: boolean, server_url?: string, server_json_suffix?: string} = {}) {
-    config = BaseUtils.mixin({
-      offline: this.offline,
-      server_url: this.server_url,
-      server_json_suffix: this.server_json_suffix
-    }, config);
+  public init(config: { offline?: boolean; server_url?: string; server_json_suffix?: string } = {}) {
+    config = BaseUtils.mixin(
+      {
+        offline: this.offline,
+        server_url: this.server_url,
+        server_json_suffix: this.server_json_suffix,
+      },
+      config,
+    );
     this.offline = config.offline;
     this.server_url = config.server_url;
     this.server_json_suffix = config.server_json_suffix;
   }
+
   public isOffline() {
     return this.offline;
   }
+
   /**
    * initializes itself based on script data attributes
    * @private
@@ -61,21 +67,23 @@ export class AppContext {
       if (!node) {
         return undefined;
       }
-      return node.dataset['phovea' + camelCaseName];
+      return node.dataset[`phovea${camelCaseName}`];
     }
 
     const config: any = {};
-    if ('true' === find('offline')) {
+    if (find('offline') === 'true') {
       config.offline = true;
     }
     let v;
+    // eslint-disable-next-line no-cond-assign
     if ((v = find('server-url', 'ServerUrl')) !== undefined) {
       config.server_url = v;
     }
+    // eslint-disable-next-line no-cond-assign
     if ((v = find('server-json-suffix', 'ServerJsonSuffix')) !== undefined) {
       config.server_json_suffix = v;
     }
-    //init myself
+    // init myself
     this.init(config);
   }
 
@@ -86,7 +94,7 @@ export class AppContext {
    * @param node
    * @param callback
    */
-  public onDOMNodeRemoved(node: Element|Element[], callback: () => void, thisArg?: any) {
+  public onDOMNodeRemoved(node: Element | Element[], callback: () => void, thisArg?: any) {
     if (Array.isArray(node)) {
       node.forEach((nodeid) => AppContext.getInstance().removeNodeObserver.observe(nodeid, callback, thisArg));
     } else {
@@ -99,11 +107,12 @@ export class AppContext {
    * @type {HashProperties}
    */
   public hash = new HashProperties();
+
   /**
    * access to get parameters
    * @type {PropertyHandler}
    */
-  public param = new PropertyHandler(location.search);
+  public param = new PropertyHandler(window.location.search);
 
   /**
    * converts the given api url to an absolute with optional get parameters
@@ -119,7 +128,6 @@ export class AppContext {
     }
     return url;
   }
-
 
   private defaultGenerator: OfflineGenerator = () => Promise.reject('offline');
 
@@ -147,7 +155,13 @@ export class AppContext {
    * @param offlineGenerator in case phovea is set to be offline
    * @returns {Promise<any>}
    */
-  public sendAPI(url: string, data: any = {}, method = 'GET', expectedDataType = 'json', offlineGenerator: OfflineGenerator = AppContext.getInstance().defaultGenerator): Promise<any> {
+  public sendAPI(
+    url: string,
+    data: any = {},
+    method = 'GET',
+    expectedDataType = 'json',
+    offlineGenerator: OfflineGenerator = AppContext.getInstance().defaultGenerator,
+  ): Promise<any> {
     if (AppContext.getInstance().isOffline()) {
       return AppContext.getInstance().sendOffline(offlineGenerator, url, data);
     }
@@ -176,7 +190,12 @@ export class AppContext {
    * @param offlineGenerator in case of offline flag is set what should be returned
    * @returns {Promise<any>}
    */
-  public getAPIData(url: string, data: any = {}, expectedDataType = 'json', offlineGenerator: OfflineGenerator = () => AppContext.getInstance().defaultGenerator): Promise<any> {
+  public getAPIData(
+    url: string,
+    data: any = {},
+    expectedDataType = 'json',
+    offlineGenerator: OfflineGenerator = () => AppContext.getInstance().defaultGenerator,
+  ): Promise<any> {
     if (AppContext.getInstance().isOffline()) {
       return AppContext.getInstance().sendOffline(offlineGenerator, url, data);
     }

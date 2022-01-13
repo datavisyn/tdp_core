@@ -1,2 +1,2 @@
 import { ISimplePopupAuthorizationConfiguration } from '../interfaces';
-export declare function simplePopupFlow({ id, url, tokenParameter, }: ISimplePopupAuthorizationConfiguration): Promise<string>;
+export declare function simplePopupFlow({ id, url, tokenParameter }: ISimplePopupAuthorizationConfiguration): Promise<string>;

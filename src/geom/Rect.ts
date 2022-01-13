@@ -1,7 +1,7 @@
-import {Vector2D} from '../2D/Vector2D';
-import {IIntersectionParam} from '../2D/IIntersectionParam';
-import {IRect} from './IRect';
-import {AShape} from './AShape';
+import { Vector2D } from '../2D/Vector2D';
+import { IIntersectionParam } from '../2D/IIntersectionParam';
+import { IRect } from './IRect';
+import { AShape } from './AShape';
 
 /**
  * a simple bounding rect
@@ -76,18 +76,18 @@ export class Rect extends AShape implements IRect {
     return new Vector2D(this.cx, this.cy);
   }
 
-
   transform(scale: number[], rotate: number) {
-    //TODO rotate
+    // TODO rotate
     return new Rect(this.x * scale[0], this.y * scale[1], this.w * scale[0], this.h * scale[1]);
   }
 
   asIntersectionParams(): IIntersectionParam {
     return {
       name: 'Rectangle',
-      params: [this.xy, this.x2y2]
+      params: [this.xy, this.x2y2],
     };
   }
+
   static rect(x: number, y: number, w: number, h: number): Rect {
     return new Rect(x, y, w, h);
   }

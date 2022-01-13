@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,17 +7,17 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 
-import {AReactView, IReactHandler} from './AReactView';
 import * as React from 'react';
-import {EXTENSION_POINT_TDP_VIEW, ISelection, IView, IViewContext, IViewPlugin, IViewPluginDesc} from '../base';
-import {AView} from './AView';
-import {ViewUtils} from './ViewUtils';
-import {PluginRegistry} from '../app';
-import {IDType, IDTypeManager} from '../idtype';
-import {Range} from '../range';
-import {LocalStorageProvenanceGraphManager, ObjectRefUtils} from '../provenance';
+import { AReactView, IReactHandler } from './AReactView';
+import { EXTENSION_POINT_TDP_VIEW, ISelection, IView, IViewContext, IViewPlugin, IViewPluginDesc } from '../base';
+import { AView } from './AView';
+import { ViewUtils } from './ViewUtils';
+import { PluginRegistry } from '../app';
+import { IDType, IDTypeManager } from '../idtype';
+import { Range } from '../range';
+import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../provenance';
 
 export interface ITDPViewProps {
   viewId: string;
@@ -32,19 +32,22 @@ export interface ITDPViewState {
 
 export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewState> implements IReactHandler {
   private node: HTMLElement;
+
   private viewPromise: Promise<IView> = null;
+
   private view: IView = null;
+
   private viewId: string = null;
 
   private readonly listener = (_: any, _oldSelection: any, newSelection: ISelection) => {
     this.triggerSelection(newSelection);
-  }
+  };
 
   constructor(props: ITDPViewProps, context?: any) {
     super(props, context);
 
     this.state = {
-      viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, props.viewId))
+      viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, props.viewId)),
     };
   }
 
@@ -65,7 +68,7 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
   }
 
   componentDidUpdate() {
-    const {viewId} = this.props;
+    const { viewId } = this.props;
     if (this.viewId !== viewId) {
       if (this.view) {
         this.view.destroy();
@@ -77,7 +80,7 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
       this.viewPromise = null;
       this.viewId = viewId;
       this.setState({
-        viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, viewId))
+        viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, viewId)),
       });
     }
     if (!this.state.viewPlugin) {
@@ -87,7 +90,7 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
 
     if (!this.viewPromise) {
       const options = {
-        reactHandler: this
+        reactHandler: this,
       };
       const selection = this.buildSelection(idType, this.props.inputSelection);
       const context = this.createContext();
@@ -105,7 +108,7 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
         }
 
         this.view.on(AView.EVENT_ITEM_SELECT, this.listener);
-        if ( this.view.itemIDType) {
+        if (this.view.itemIDType) {
           return this.buildSelection(this.view.itemIDType, this.props.itemSelection).then((itemSelection) => {
             this.view.off(AView.EVENT_ITEM_SELECT, this.listener);
             this.view.setItemSelection(itemSelection);
@@ -133,7 +136,6 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
     });
   }
 
-
   private createContext(): IViewContext {
     const manager = new LocalStorageProvenanceGraphManager();
     const graph = manager.createInMemory();
@@ -141,15 +143,15 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
     return {
       graph,
       desc: this.state.viewPlugin,
-      ref
+      ref,
     };
   }
 
   private buildSelection(idtype: IDType, selection: string[]): Promise<ISelection> {
     if (!selection) {
-      return Promise.resolve({idtype, range: Range.none()});
+      return Promise.resolve({ idtype, range: Range.none() });
     }
-    return idtype.map(selection).then((ids) => ({idtype, range: Range.list(ids)}));
+    return idtype.map(selection).then((ids) => ({ idtype, range: Range.list(ids) }));
   }
 
   private triggerSelection(selection: ISelection) {
@@ -170,19 +172,21 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
       return '';
     };
 
-    return <div ref={(ref) => this.node = ref as HTMLElement} className="tdp-view">
-      <header />
-      <main>{buildItem()}</main>
-    </div>;
+    return (
+      <div ref={(ref) => (this.node = ref as HTMLElement)} className="tdp-view">
+        <header />
+        <main>{buildItem()}</main>
+      </div>
+    );
   }
 
-  private selectNative(item: string|string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set') {
-    const items = Array.isArray(item) ? item: [item];
-    if  (!this.props.onItemSelectionChanged) {
-      return; //nobody cares
+  private selectNative(item: string | string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set') {
+    const items = Array.isArray(item) ? item : [item];
+    if (!this.props.onItemSelectionChanged) {
+      return; // nobody cares
     }
     const s = new Set(this.props.itemSelection || []);
-    switch(op) {
+    switch (op) {
       case 'set':
         s.clear();
         items.forEach((item) => s.add(item));
@@ -194,7 +198,7 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
         items.forEach((item) => s.delete(item));
         break;
       case 'toggle':
-        items.forEach((item) => s.has(item) ? s.delete(item) : s.add(item));
+        items.forEach((item) => (s.has(item) ? s.delete(item) : s.add(item)));
         break;
     }
     this.props.onItemSelectionChanged(Array.from(s), this.view.itemIDType ? this.view.itemIDType.id : null);

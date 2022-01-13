@@ -1,19 +1,17 @@
-import {PHOVEA_UI_FormDialog} from '../components';
-import {select, Selection, event} from 'd3';
+import { select, Selection, event } from 'd3';
 import $ from 'jquery';
-import {I18nextManager} from '../i18n';
-import {ErrorAlertHandler} from '../base/ErrorAlertHandler';
-import {TDPApplicationUtils} from './TDPApplicationUtils';
-import {NotificationHandler} from '../base/NotificationHandler';
-import {ProvenanceGraphMenuUtils} from './ProvenanceGraphMenuUtils';
-import {CLUEGraphManager} from '../base/CLUEGraphManager';
-import {GlobalEventHandler} from '../base';
-import {IProvenanceGraphDataDescription} from '../provenance';
-import {UniqueIdManager, UserSession} from '../app';
-
+import { PHOVEA_UI_FormDialog } from '../components';
+import { I18nextManager } from '../i18n';
+import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
+import { TDPApplicationUtils } from './TDPApplicationUtils';
+import { NotificationHandler } from '../base/NotificationHandler';
+import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { GlobalEventHandler } from '../base';
+import { IProvenanceGraphDataDescription } from '../provenance';
+import { UniqueIdManager, UserSession } from '../app';
 
 abstract class ASessionList {
-
   private handler: () => void;
 
   constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
@@ -30,15 +28,35 @@ abstract class ASessionList {
   protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
     switch (type) {
       case 'delete':
-        return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteSession')}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.delete')}</span></a>`;
+        return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.deleteSession',
+        )}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.delete',
+        )}</span></a>`;
       case 'select':
-        return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continueSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.continue')}</span></a>`;
+        return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.continueSession',
+        )}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.continue',
+        )}</span></a>`;
       case 'clone':
-        return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.cloneToTemporary')}</span></a>`;
+        return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.cloneToTemporary',
+        )}"><i class="fas fa-clone" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.cloneToTemporary',
+        )}</span></a>`;
       case 'persist':
-        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
+        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.saveSession',
+        )}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.saveSession',
+        )}</span></a>`;
       case 'edit':
-        return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
+        return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.editSession',
+        )}"><i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
+          'tdp:core.SessionList.editSession',
+        )}</span></a>`;
     }
   }
 
@@ -50,7 +68,7 @@ abstract class ASessionList {
 
     $enter.select('a[data-action="delete"]').on('click', async function (d) {
       stopEvent();
-      const deleteIt = await PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', {name: d.name}));
+      const deleteIt = await PHOVEA_UI_FormDialog.areyousure(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.deleteIt', { name: d.name }));
       if (deleteIt) {
         await manager.delete(d);
         NotificationHandler.successfullyDeleted(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.session'), d.name);
@@ -76,15 +94,20 @@ abstract class ASessionList {
       stopEvent();
       const nameTd = <HTMLElement>this.parentElement.parentElement.firstElementChild;
       const publicI = <HTMLElement>this.parentElement.parentElement.children[1].firstElementChild;
-      ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, {button: I18nextManager.getInstance().i18n.t('tdp:core.SessionList.save')}).then((extras) => {
+      ProvenanceGraphMenuUtils.editProvenanceGraphMetaData(d, { button: I18nextManager.getInstance().i18n.t('tdp:core.SessionList.save') }).then((extras) => {
         if (extras !== null) {
           Promise.resolve(manager.editGraphMetaData(d, extras))
             .then((desc) => {
-              //update the name
+              // update the name
               nameTd.innerText = desc.name;
               NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.SessionList.session'), desc.name);
               publicI.className = ProvenanceGraphMenuUtils.isPublic(desc) ? 'fas fa-users' : 'fas fa-user';
-              publicI.setAttribute('title', ProvenanceGraphMenuUtils.isPublic(d) ? I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', {context: 'private'}));
+              publicI.setAttribute(
+                'title',
+                ProvenanceGraphMenuUtils.isPublic(d)
+                  ? I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status')
+                  : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', { context: 'private' }),
+              );
             })
             .catch(ErrorAlertHandler.getInstance().errorAlert);
         }
@@ -121,7 +144,6 @@ function byDateDesc(a: any, b: any) {
  * a table ot the temporary sessions within this application
  */
 export class TemporarySessionList extends ASessionList {
-
   public static readonly KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES = 10;
 
   protected async getData(manager: CLUEGraphManager) {
@@ -139,10 +161,9 @@ export class TemporarySessionList extends ASessionList {
   }
 
   protected async build(manager: CLUEGraphManager) {
-
     const $parent = this.createLoader();
 
-    //select and sort by date desc
+    // select and sort by date desc
     const workspaces = await this.getData(manager);
 
     const table = `<table class="table table-striped table-hover table-bordered table-sm">
@@ -159,9 +180,9 @@ export class TemporarySessionList extends ASessionList {
   </table>`;
     const list = ``;
 
-    //replace loading
+    // replace loading
     const $table = $parent.html(`<p>
-     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.sessionMessage', {latest: TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES})}
+     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.sessionMessage', { latest: TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES })}
     </p><div>${this.mode === 'table' ? table : list}</div>`);
 
     const updateTable = (data: IProvenanceGraphDataDescription[]) => {
@@ -170,13 +191,23 @@ export class TemporarySessionList extends ASessionList {
       const $trEnter = $tr.enter().append('tr').html(`
           <td></td>
           <td></td>
-          <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</td>`);
+          <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton(
+        'delete',
+      )}</td>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('td').text((d) => d.name).attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') as string : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
-      $tr.select('td:nth-of-type(2)')
-        .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)
-        .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
+      $tr
+        .select('td')
+        .text((d) => d.name)
+        .attr('class', (d) =>
+          ProvenanceGraphMenuUtils.isPublic(d)
+            ? (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') as string)
+            : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', { context: 'private' }) as string),
+        );
+      $tr
+        .select('td:nth-of-type(2)')
+        .text((d) => (d.ts ? TDPApplicationUtils.fromNow(d.ts) : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)))
+        .attr('title', (d) => (d.ts ? new Date(d.ts).toUTCString() : null));
 
       $tr.exit().remove();
     };
@@ -187,13 +218,23 @@ export class TemporarySessionList extends ASessionList {
       const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html(`
           <span></span>
           <span></span>
-          <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton('delete')}</span>`);
+          <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton(
+        'delete',
+      )}</span>`);
 
       this.registerActionListener(manager, $trEnter);
-      $tr.select('span').text((d) => d.name).attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') as string : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', {context: 'private'}) as string);
-      $tr.select('span:nth-of-type(2)')
-        .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)
-        .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
+      $tr
+        .select('span')
+        .text((d) => d.name)
+        .attr('class', (d) =>
+          ProvenanceGraphMenuUtils.isPublic(d)
+            ? (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') as string)
+            : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', { context: 'private' }) as string),
+        );
+      $tr
+        .select('span:nth-of-type(2)')
+        .text((d) => (d.ts ? TDPApplicationUtils.fromNow(d.ts) : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)))
+        .attr('title', (d) => (d.ts ? new Date(d.ts).toUTCString() : null));
 
       $tr.exit().remove();
     };
@@ -204,25 +245,22 @@ export class TemporarySessionList extends ASessionList {
   }
 }
 
-
 /**
  * a table ot the persistent sessions within this application
  */
 export class PersistentSessionList extends ASessionList {
-
   protected async getData(manager: CLUEGraphManager) {
     return (await manager.list()).filter((d) => ProvenanceGraphMenuUtils.isPersistent(d)).sort(byDateDesc);
   }
 
   protected async build(manager: CLUEGraphManager) {
-
     const uniqueId = UniqueIdManager.getInstance().uniqueId();
     const mySessionsTabId = `session_mine_${uniqueId}`;
     const otherSessionsTabId = `session_others_${uniqueId}`;
 
     const $parent = this.createLoader();
 
-    //select and sort by date desc
+    // select and sort by date desc
     const workspaces = await this.getData(manager);
 
     const tableMine = `<table class="table table-striped table-hover table-bordered table-sm">
@@ -256,8 +294,12 @@ export class PersistentSessionList extends ASessionList {
     ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.paragraphText')}
     </p>
         <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item active"><a href="#${mySessionsTabId}" class="nav-link active" role="tab"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.mySessions')}</a></li>
-          <li class="nav-item"><a href="#${otherSessionsTabId}" class="nav-link" role="tab"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.otherSessions')}</a></li>
+          <li class="nav-item active"><a href="#${mySessionsTabId}" class="nav-link active" role="tab"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t(
+      'tdp:core.SessionList.mySessions',
+    )}</a></li>
+          <li class="nav-item"><a href="#${otherSessionsTabId}" class="nav-link" role="tab"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t(
+      'tdp:core.SessionList.otherSessions',
+    )}</a></li>
         </ul>
         <div class="tab-content pt-1">
             <div id="${mySessionsTabId}" class="tab-pane show active" role="tabpanel">
@@ -281,7 +323,7 @@ export class PersistentSessionList extends ASessionList {
       const otherworkspaces = data.filter((d) => d.creator !== me);
 
       const publicTitle = I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status');
-      const privateTitle = I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', {context: 'private'});
+      const privateTitle = I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', { context: 'private' });
       const unknownText = I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown');
 
       if (this.mode === 'table') {
@@ -292,40 +334,47 @@ export class PersistentSessionList extends ASessionList {
             <td></td>
             <td class="text-center"><i class="fa"></i></td>
             <td></td>
-            <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton('delete')}</td>`);
+            <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton(
+            'delete',
+          )}</td>`);
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('td').text((d) => d.name);
-          $tr.select('td:nth-of-type(2) i')
-            .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fas fa-users' : 'fas fa-user')
-            .attr('title', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle);
-          $tr.select('td:nth-of-type(3)')
-            .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText)
-            .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
+          $tr
+            .select('td:nth-of-type(2) i')
+            .attr('class', (d) => (ProvenanceGraphMenuUtils.isPublic(d) ? 'fas fa-users' : 'fas fa-user'))
+            .attr('title', (d) => (ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle));
+          $tr
+            .select('td:nth-of-type(3)')
+            .text((d) => (d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText))
+            .attr('title', (d) => (d.ts ? new Date(d.ts).toUTCString() : null));
 
           $tr.exit().remove();
         }
         {
           const $tr = $parent.select(`#${otherSessionsTabId} tbody`).selectAll('tr').data(otherworkspaces);
 
-          const $trEnter = $tr.enter().append('tr').html((d) => {
-            let actions = '';
-            if (UserSession.getInstance().canWrite(d)) {
-              actions += ASessionList.createButton('select');
-            }
-            actions += ASessionList.createButton('clone');
+          const $trEnter = $tr
+            .enter()
+            .append('tr')
+            .html((d) => {
+              let actions = '';
+              if (UserSession.getInstance().canWrite(d)) {
+                actions += ASessionList.createButton('select');
+              }
+              actions += ASessionList.createButton('clone');
 
-            return `
+              return `
             <td></td>
             <td></td>
             <td></td>
             <td>${actions}</td>`;
-          });
+            });
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('td').text((d) => d.name);
           $tr.select('td:nth-of-type(2)').text((d) => d.creator);
-          $tr.select('td:nth-of-type(3)').text((d) => d.ts ? new Date(d.ts).toUTCString() : 'Unknown');
+          $tr.select('td:nth-of-type(3)').text((d) => (d.ts ? new Date(d.ts).toUTCString() : 'Unknown'));
 
           $tr.exit().remove();
         }
@@ -337,40 +386,48 @@ export class PersistentSessionList extends ASessionList {
             <span></span>
             <span><i class="fa"></i></span>
             <span></span>
-            <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton('delete')}</span>`);
+            <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton(
+            'delete',
+          )}</span>`);
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('span').text((d) => d.name);
-          $tr.select('span:nth-of-type(2) i')
-            .attr('class', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? 'fas fa-users' : 'fas fa-user')
-            .attr('title', (d) => ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle);
-          $tr.select('span:nth-of-type(3)')
-            .text((d) => d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText)
-            .attr('title', (d) => d.ts ? new Date(d.ts).toUTCString() : null);
+          $tr
+            .select('span:nth-of-type(2) i')
+            .attr('class', (d) => (ProvenanceGraphMenuUtils.isPublic(d) ? 'fas fa-users' : 'fas fa-user'))
+            .attr('title', (d) => (ProvenanceGraphMenuUtils.isPublic(d) ? publicTitle : privateTitle));
+          $tr
+            .select('span:nth-of-type(3)')
+            .text((d) => (d.ts ? TDPApplicationUtils.fromNow(d.ts) : unknownText))
+            .attr('title', (d) => (d.ts ? new Date(d.ts).toUTCString() : null));
 
           $tr.exit().remove();
         }
         {
           const $tr = $parent.select(`#${otherSessionsTabId}`).selectAll('div').data(otherworkspaces);
 
-          const $trEnter = $tr.enter().append('div').classed('sessionEntry', true).html((d) => {
-            let actions = '';
-            if (UserSession.getInstance().canWrite(d)) {
-              actions += ASessionList.createButton('select');
-            }
-            actions += ASessionList.createButton('clone');
+          const $trEnter = $tr
+            .enter()
+            .append('div')
+            .classed('sessionEntry', true)
+            .html((d) => {
+              let actions = '';
+              if (UserSession.getInstance().canWrite(d)) {
+                actions += ASessionList.createButton('select');
+              }
+              actions += ASessionList.createButton('clone');
 
-            return `
+              return `
               <span></span>
               <span></span>
               <span></span>
               <span>${actions}</span>`;
-          });
+            });
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('span').text((d) => d.name);
           $tr.select('span:nth-of-type(2)').text((d) => d.creator);
-          $tr.select('span:nth-of-type(3)').text((d) => d.ts ? new Date(d.ts).toUTCString() : unknownText);
+          $tr.select('span:nth-of-type(3)').text((d) => (d.ts ? new Date(d.ts).toUTCString() : unknownText));
 
           $tr.exit().remove();
         }

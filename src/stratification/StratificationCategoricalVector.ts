@@ -1,10 +1,9 @@
-import {ArrayUtils} from '../base/ArrayUtils';
-import {RangeLike, Range, CompositeRange1D, ParseRangeUtils} from '../range';
-import {ICategoricalValueTypeDesc, ValueTypeUtils} from '../data';
-import {ICategoricalVector, IVectorDataDescription} from '../vector';
-import {AVector} from '../vector/AVector';
-import {IStratification} from './IStratification';
-
+import { ArrayUtils } from '../base/ArrayUtils';
+import { RangeLike, Range, CompositeRange1D, ParseRangeUtils } from '../range';
+import { ICategoricalValueTypeDesc, ValueTypeUtils } from '../data';
+import { ICategoricalVector, IVectorDataDescription } from '../vector';
+import { AVector } from '../vector/AVector';
+import { IStratification } from './IStratification';
 
 /**
  * root matrix implementation holding the data
@@ -12,6 +11,7 @@ import {IStratification} from './IStratification';
  */
 export class StratificationCategoricalVector extends AVector<string, ICategoricalValueTypeDesc> implements ICategoricalVector {
   readonly valuetype: ICategoricalValueTypeDesc;
+
   readonly desc: IVectorDataDescription<ICategoricalValueTypeDesc>;
 
   private _cache: string[] = null;
@@ -21,20 +21,20 @@ export class StratificationCategoricalVector extends AVector<string, ICategorica
     this.root = this;
     this.valuetype = {
       type: <any>ValueTypeUtils.VALUE_TYPE_CATEGORICAL,
-      categories: range.groups.map((g) => ({name: g.name, label: g.name, color: g.color}))
+      categories: range.groups.map((g) => ({ name: g.name, label: g.name, color: g.color })),
     };
     const d = strat.desc;
     this.desc = {
       name: d.name,
       fqname: d.fqname,
       description: d.description,
-      id: d.id + '-v',
+      id: `${d.id}-v`,
       type: 'vector',
       size: d.size,
       idtype: d.idtype,
       value: this.valuetype,
       creator: d.creator,
-      ts: d.ts
+      ts: d.ts,
     };
   }
 
@@ -48,13 +48,15 @@ export class StratificationCategoricalVector extends AVector<string, ICategorica
 
   persist() {
     return {
-      root: this.strat.persist()
+      root: this.strat.persist(),
     };
   }
 
   restore(persisted: any) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let r: ICategoricalVector = this;
-    if (persisted && persisted.range) { //some view onto it
+    if (persisted && persisted.range) {
+      // some view onto it
       r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
     }
     return r;
@@ -103,7 +105,7 @@ export class StratificationCategoricalVector extends AVector<string, ICategorica
     return this.view(Range.list(indices));
   }
 
-  async  filter(callbackfn: (value: string, index: number) => boolean, thisArg?: any): Promise<ICategoricalVector> {
+  async filter(callbackfn: (value: string, index: number) => boolean, thisArg?: any): Promise<ICategoricalVector> {
     const d = await this.data();
     const indices = ArrayUtils.argFilter(d, callbackfn, thisArg);
     return this.view(Range.list(indices));
