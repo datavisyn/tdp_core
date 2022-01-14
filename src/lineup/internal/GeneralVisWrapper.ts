@@ -55,12 +55,6 @@ export class GeneralVisWrapper extends EventHandler {
         return selectedMap;
     }
 
-    // selectCallback(selected: number[]) {
-    //     const r = Range.list(selected);
-    //     const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-    //     this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
-    // }
-
     filterCallback(s: string) {
         const selectedIds = this.provider.getSelection();
 
