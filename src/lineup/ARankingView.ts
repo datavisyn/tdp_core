@@ -47,7 +47,7 @@ export abstract class ARankingView extends AView {
    */
   private readonly stats: HTMLElement;
 
-  protected readonly provider: LocalDataProvider;
+  public readonly provider: LocalDataProvider;
   private readonly taggle: EngineRenderer | TaggleRenderer;
   public readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;

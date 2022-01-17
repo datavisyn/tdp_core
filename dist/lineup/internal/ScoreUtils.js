@@ -13,7 +13,7 @@ export class ScoreUtils {
         const params = await AttachemntUtils.resolveExternalized(parameter.params);
         const score = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
-        const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
+        const results = await Promise.all(scores.map((s) => view.getInstance().addTrackedScoreColumn(s)));
         console.log(results);
         const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
         return {
