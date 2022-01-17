@@ -93,9 +93,9 @@ export class ExportUtils {
       case 'xlsx':
       case 'XLSX':
         return ExportUtils.EXPORT_FORMAT.XLSX;
+      default:
+        return null;
     }
-
-    return null;
   }
 
   private static getColumnName(column: Column) {
@@ -104,7 +104,7 @@ export class ExportUtils {
 
   private static exportRanking(columns: Column[], rows: IDataRow[], separator: string) {
     // optionally quote not numbers
-    const escape = new RegExp(`["]`, 'g');
+    const escape = /["]/g;
     function quote(v: any, c?: Column) {
       if (v == null) {
         return '';

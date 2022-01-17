@@ -1,4 +1,4 @@
-import { BaseUtils } from '.';
+import { BaseUtils } from './BaseUtils';
 import { AppContext } from '../app';
 import * as not_available from '../assets/not_available.png';
 import { ProvenanceGraph, StateNode, SlideNode } from '../provenance';

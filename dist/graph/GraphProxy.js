@@ -8,8 +8,8 @@ import { MemoryGraph } from './MemoryGraph';
 import { LocalStorageGraph } from './LocalStorageGraph';
 import { ResolveNow } from '../base/promise';
 export class GraphProxy extends ADataType {
-    constructor(desc) {
-        super(desc);
+    constructor() {
+        super(...arguments);
         this.cache = null;
         this.loaded = null;
     }

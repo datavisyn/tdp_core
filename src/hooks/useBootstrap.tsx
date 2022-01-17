@@ -21,24 +21,29 @@ function useBSClass<T extends SupportedBootstrapClasses>(
 ): [(element: HTMLElement | null) => void, InstanceType<T> | null] {
   const [instance, setInstance] = React.useState<InstanceType<T> | null>(null);
 
-  const setRef = React.useCallback((ref: HTMLElement | null) => {
-    setInstance((currentInstance) => {
-      // If the element ref did not change, do nothing.
-      // @ts-ignore
-      if (currentInstance && ref && ref === currentInstance._element) {
-        return currentInstance;
-      }
-      // Destroy the old instance
-      currentInstance?.dispose();
-      // Create a new one if there is a ref
-      if (ref) {
-        // @ts-ignore The typings are not perfectly shared among all the bootstrap classes.
-        return new clazz(ref, ...options) as InstanceType<T>;
-      }
-      // Set instance to null if no ref is passed
-      return null;
-    });
-  }, []);
+  const setRef = React.useCallback(
+    (ref: HTMLElement | null) => {
+      setInstance((currentInstance) => {
+        // If the element ref did not change, do nothing.
+        // @ts-ignore
+        if (currentInstance && ref && ref === currentInstance._element) {
+          return currentInstance;
+        }
+        // Destroy the old instance
+        currentInstance?.dispose();
+        // Create a new one if there is a ref
+        if (ref) {
+          // @ts-ignore The typings are not perfectly shared among all the bootstrap classes.
+          // eslint-disable-next-line new-cap
+          return new clazz(ref, ...options) as InstanceType<T>;
+        }
+        // Set instance to null if no ref is passed
+        return null;
+      });
+    },
+    // TODO: Check if this causes problems when rerendering
+    [clazz, options],
+  );
 
   React.useEffect(() => {
     // Whenever we are unmounting (an instance), destroy it.
@@ -48,7 +53,9 @@ function useBSClass<T extends SupportedBootstrapClasses>(
   return [setRef, instance];
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 function __useBSClass<T extends SupportedBootstrapClasses>(clazz: T) {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return (...options: OmitFirst<ConstructorParameters<T>>) => useBSClass(clazz, ...options);
 }
 
@@ -84,10 +91,10 @@ class ReferenceWrapper extends React.Component {
  */
 function BSClass<
   HookType extends BSHook,
-  HookParameters extends Parameters<HookType>[0] extends undefined ? {} : Parameters<HookType>[0],
-  AdditionalHookOptions extends object = {},
+  HookParameters extends Parameters<HookType>[0] extends undefined ? Record<string, unknown> : Parameters<HookType>[0],
+  AdditionalHookOptions extends object = Record<string, unknown>,
 >(hook: HookType, additionalHook?: (instance: ReturnType<HookType>[1], options: AdditionalHookOptions) => void) {
-  return function ({
+  return function InnerBSClass({
     children,
     instanceRef,
     // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
@@ -109,7 +116,7 @@ function BSClass<
     // Store the ref to the onInstance callback to avoid putting it into the deps
     React.useEffect(() => {
       instanceRef?.(instance);
-    }, [instance]);
+    }, [instanceRef, instance]);
 
     // Call the optional additional hook with all options
     additionalHook?.(instance, options);
@@ -119,6 +126,7 @@ function BSClass<
         try {
           // Find the DOM node of the wrapper to receive the ref of the child.
           // @see https://github.com/ctrlplusb/react-sizeme/blob/master/src/with-size.js#L28-L39 for details.
+          // eslint-disable-next-line react/no-find-dom-node
           ref(ReactDOM.findDOMNode(wrapperRef) as HTMLElement);
         } catch (e) {
           ref(null);
@@ -151,6 +159,7 @@ function useBSListeners<T extends BSHook>(instance: ReturnType<T>[1], listeners:
         };
       }
     }
+    return undefined;
   }, [instance, listeners]);
 }
 
@@ -208,7 +217,7 @@ export const BSOffcanvas = BSClass(
       } else {
         instance?.hide();
       }
-    }, [show, instance]);
+    }, [show, instance, relatedTarget]);
   },
 );
 export const BSTooltip = BSClass(useBSTooltip, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {

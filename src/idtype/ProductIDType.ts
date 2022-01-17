@@ -212,7 +212,7 @@ export class ProductIDType extends EventHandler implements IIDType {
 
     const b = this.selections(type);
 
-    let newRange: Range[] = [];
+    let newRange: Range[];
 
     switch (op) {
       case SelectOperation.SET:
@@ -224,6 +224,8 @@ export class ProductIDType extends EventHandler implements IIDType {
       case SelectOperation.REMOVE:
         newRange = removeCells(b, rcells, this.elems.length);
         break;
+      default:
+        newRange = [];
     }
     // if (b.eq(new_)) {
     //  return b;

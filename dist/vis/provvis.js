@@ -148,6 +148,7 @@ class StateRepr {
         do {
             changed = false;
             loop++;
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
             byLevel.forEach((level, i) => {
                 // ensure that my children have at least a >= index than me
                 for (let j = 0; j < level.length; ++j) {

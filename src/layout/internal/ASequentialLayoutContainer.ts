@@ -56,6 +56,8 @@ export abstract class ASequentialLayoutContainer<T extends ISequentialLayoutCont
           [0, padding],
         );
       }
+      default:
+        return undefined;
     }
   }
 

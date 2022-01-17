@@ -4,6 +4,7 @@ import { EP_PHOVEA_CORE_LOCALE, PluginRegistry, ILocaleEPDesc, EP_PHOVEA_CORE_LO
 import { IRegistry } from './base';
 
 export default function (registry: IRegistry) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   function actionFunction(id: string, factory: string, loader: () => any, options?: {}) {
     registry.push('actionFunction', id, loader, { factory, ...options });
   }

@@ -41,6 +41,8 @@ export class Permission {
                 return this.others;
             case EEntity.BUDDIES:
                 return this.buddies;
+            default:
+                return undefined;
         }
     }
     hasPermission(entity, permission) {

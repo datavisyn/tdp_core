@@ -88,6 +88,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
           case 'data+desc+scores':
             this.triggerScoreReload = true;
             return this.rebuild();
+          default:
+            return undefined;
         }
       }
 

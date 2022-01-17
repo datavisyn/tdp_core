@@ -9,7 +9,7 @@
  *
  ******************************************************** */
 import { ReactElement } from 'react';
-import { AView } from '.';
+import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
 import { IDTypeLike } from '../idtype';
 /**

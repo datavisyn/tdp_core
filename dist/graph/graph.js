@@ -67,7 +67,7 @@ export class GraphNode extends AttributeContainer {
         this._id = UniqueIdManager.getInstance().flagId('graph_node', id);
     }
     get id() {
-        if (isNaN(this._id)) {
+        if (Number.isNaN(this._id)) {
             this._id = UniqueIdManager.getInstance().uniqueId('graph_node');
         }
         return this._id;
@@ -98,7 +98,7 @@ export class GraphEdge extends AttributeContainer {
         }
     }
     get id() {
-        if (isNaN(this._id)) {
+        if (Number.isNaN(this._id)) {
             this._id = UniqueIdManager.getInstance().uniqueId('graph_edge');
         }
         return this._id;

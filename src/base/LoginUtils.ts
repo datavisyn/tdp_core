@@ -1,7 +1,7 @@
-import { Ajax } from '.';
 import { UserSession, AppContext } from '../app';
 import { I18nextManager } from '../i18n';
 import { IUser } from '../security';
+import { Ajax } from './ajax';
 
 export class LoginUtils {
   static defaultLoginForm = () => `<form class="form-signin" action="/login" method="post">

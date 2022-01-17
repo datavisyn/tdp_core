@@ -96,6 +96,8 @@ export class ActionNode extends GraphNode {
   }
 
   equals(that: ActionNode): boolean {
+    // TODO: check if the last comparison makes sense
+    // eslint-disable-next-line no-self-compare
     if (!(this.meta.category === that.meta.category && that.meta.operation === that.meta.operation)) {
       return false;
     }

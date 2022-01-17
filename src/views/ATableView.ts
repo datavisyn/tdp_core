@@ -200,13 +200,13 @@ export abstract class ATableView<T extends IRow> extends AView {
     const numeric: ISorter<any> = ({ node: a }, { node: b }) => {
       const av = parseFloat(a.textContent);
       const bv = parseFloat(b.textContent);
-      if (isNaN(av) && isNaN(bv)) {
+      if (Number.isNaN(av) && Number.isNaN(bv)) {
         return a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
       }
-      if (isNaN(av)) {
+      if (Number.isNaN(av)) {
         return +1;
       }
-      if (isNaN(bv)) {
+      if (Number.isNaN(bv)) {
         return -1;
       }
       return av - bv;
@@ -218,7 +218,7 @@ export abstract class ATableView<T extends IRow> extends AView {
         const rows = <HTMLElement[]>Array.from(body.children);
         const next = current === 'no' ? 'asc' : current === 'asc' ? 'desc' : 'no';
         th.dataset.sort = next;
-        const sorter = sortFunction || (th.dataset.num != null ? numeric : text);
+        const sorting = sortFunction || (th.dataset.num != null ? numeric : text);
         const sort = (a: HTMLElement, b: HTMLElement) => {
           const acol = <HTMLElement>a.children[i];
           const bcol = <HTMLElement>b.children[i];
@@ -228,7 +228,7 @@ export abstract class ATableView<T extends IRow> extends AView {
           if (!bcol) {
             return -1;
           }
-          return sorter({ node: acol, row: (<any>a).__data__, index: i }, { node: bcol, row: (<any>b).__data__, index: i });
+          return sorting({ node: acol, row: (<any>a).__data__, index: i }, { node: bcol, row: (<any>b).__data__, index: i });
         };
 
         switch (next) {
@@ -274,7 +274,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const { columns, rows } = ATableView.extractFromHTML(tableRoot);
 
     function isNumeric(value: any): boolean {
-      return typeof value === 'string' && !isNaN(parseFloat(value));
+      return typeof value === 'string' && !Number.isNaN(parseFloat(value));
     }
 
     // parse numbers

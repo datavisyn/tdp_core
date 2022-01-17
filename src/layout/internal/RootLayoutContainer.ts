@@ -107,7 +107,7 @@ export class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainer
   restore(dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView) {
     console.assert(dump.type === 'root');
     this.clear();
-    const children = (dump.children || []).map((dump) => this.restorer(dump, restoreView));
+    const children = (dump.children || []).map((d) => this.restorer(d, restoreView));
     if (children.length === 0) {
       return;
     }

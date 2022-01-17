@@ -110,17 +110,19 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
     const flat = flatten(d, this.indices, containedIds);
     switch (v.type) {
       case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
+        // eslint-disable-next-line no-case-declarations
         const vc = <ICategoricalValueTypeDesc>(<any>v);
         return CatHistogram.categoricalHist<string>(
           <any[]>flat.data,
           flat.indices,
           flat.data.length,
-          vc.categories.map((d) => (typeof d === 'string' ? d : d.name)),
-          vc.categories.map((d) => (typeof d === 'string' ? d : d.label || d.name)),
-          vc.categories.map((d) => (typeof d === 'string' ? 'gray' : d.color || 'gray')),
+          vc.categories.map((a) => (typeof a === 'string' ? a : a.name)),
+          vc.categories.map((a) => (typeof a === 'string' ? a : a.label || a.name)),
+          vc.categories.map((a) => (typeof a === 'string' ? 'gray' : a.color || 'gray')),
         );
       case ValueTypeUtils.VALUE_TYPE_INT:
       case ValueTypeUtils.VALUE_TYPE_REAL:
+        // eslint-disable-next-line no-case-declarations
         const vn = <INumberValueTypeDesc>(<any>v);
         return Histogram.hist(<any[]>flat.data, flat.indices, flat.data.length, bins || Math.round(Math.sqrt(this.length)), vn.range);
       default:
@@ -144,6 +146,7 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
   restore(persisted: any): IPersistable {
     if (persisted && persisted.f) {
       return this.reduce(
+        // eslint-disable-next-line no-eval
         eval(persisted.f),
         this,
         persisted.valuetype,

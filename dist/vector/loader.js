@@ -7,6 +7,7 @@ export class VectorLoaderUtils {
      * @internal
      */
     static viaAPILoader() {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         let _loader;
         return (desc) => {
             if (_loader) {
@@ -29,6 +30,7 @@ export class VectorLoaderUtils {
      * @internal
      */
     static viaDataLoader(rows, rowIds, data) {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         let _data;
         return () => {
             if (_data) {

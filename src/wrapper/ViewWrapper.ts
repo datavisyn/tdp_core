@@ -228,9 +228,9 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
         const idType = this.instance.itemIDType;
         if (idType) {
-          const selection = this.preInstanceItemSelections.get(AView.DEFAULT_SELECTION_NAME);
-          if (selection.idtype) {
-            this.instance.setItemSelection(selection);
+          const sel = this.preInstanceItemSelections.get(AView.DEFAULT_SELECTION_NAME);
+          if (sel.idtype) {
+            this.instance.setItemSelection(sel);
           } else {
             this.instance.setItemSelection({
               idtype: idType,
@@ -296,7 +296,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     if (isInitialization) {
       if (NodeUtils.createdBy(this.ref)) {
         // executing during replay
-        return;
+        return undefined;
       }
       return this.context.graph.pushWithResult(TDPApplicationUtils.setParameter(this.ref, name, value, previousValue), {
         inverse: TDPApplicationUtils.setParameter(this.ref, name, previousValue, value),
@@ -332,7 +332,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     const isDefault = name === AView.DEFAULT_SELECTION_NAME;
 
     if (ViewUtils.isSameSelection(current, selection)) {
-      return;
+      return undefined;
     }
     this.inputSelections.set(name, selection);
     if (selection && isDefault) {
@@ -352,10 +352,12 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
           return this.instance.setInputSelection(selection, name);
         }
         this.destroyInstance();
+        return undefined;
       });
     } else if (matches && this.visible) {
       return this.createView(selection);
     }
+    return undefined;
   }
 
   private match(selection: ISelection) {

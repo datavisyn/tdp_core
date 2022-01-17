@@ -341,7 +341,9 @@ export class CompositeView extends EventHandler implements IView {
       const ratio = l.ratios;
       switch (l.type) {
         case 'hsplit':
+          // eslint-disable-next-line no-case-declarations
           const firstH = buildImpl(l.keys[0]);
+          // eslint-disable-next-line no-case-declarations
           const secondH = buildImpl(l.keys[1]);
           return BuilderUtils.horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
         case 'hstack':
@@ -416,6 +418,7 @@ export class CompositeView extends EventHandler implements IView {
     if (WebpackEnv.__DEBUG__) {
       console.warn('invalid parameter detected', name, this.context.desc);
     }
+    return undefined;
   }
 
   setInputSelection(selection: ISelection) {
@@ -489,15 +492,15 @@ export class CompositeView extends EventHandler implements IView {
   protected createSetup(): ICompositeSetup | Promise<ICompositeSetup> {
     const desc = <ICompositeViewPluginDesc>this.context.desc;
 
-    const toEntry = (desc: IElementDesc): Promise<ICompositeInfo> => {
-      const descOptions = desc.options || {};
-      return Promise.resolve(desc.loader()).then(
+    const toEntry = (d: IElementDesc): Promise<ICompositeInfo> => {
+      const descOptions = d.options || {};
+      return Promise.resolve(d.loader()).then(
         (instance) =>
           <ICompositeInfo>{
-            key: desc.key,
-            desc,
+            key: d.key,
+            desc: d,
             options: { ...descOptions, ...this.options }, // also pass the view options from the ViewWrapper to all views
-            create: PluginRegistry.getInstance().getFactoryMethod(instance, desc.factory || 'create'),
+            create: PluginRegistry.getInstance().getFactoryMethod(instance, d.factory || 'create'),
           },
       );
     };

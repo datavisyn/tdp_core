@@ -20,6 +20,7 @@ export class ProvenanceGraphUtils {
       let before: number;
       do {
         before = path.length;
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
         cs.forEach((c) => (path = c(path)));
       } while (before > path.length);
       return path;
@@ -130,7 +131,10 @@ export class ProvenanceGraphUtils {
         // waiting until it is defined
         let counter = 0;
         while (!inputs.every((o) => o.v) && counter < 10) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+          });
           counter++;
         }
         // eslint-disable-next-line @typescript-eslint/no-this-alias

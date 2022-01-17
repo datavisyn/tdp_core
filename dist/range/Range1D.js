@@ -52,16 +52,14 @@ export class Range1D {
                 // just a single item used
                 r.push(RangeElem.single(indices[start]));
             }
-            else {
+            else if (deltas[start] === 1) {
                 // +1 since end is excluded
                 // fix while just +1 is allowed and -1 is not allowed
-                if (deltas[start] === 1) {
-                    r.push(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]));
-                }
-                else {
-                    for (i = start; i < act; i++) {
-                        r.push(RangeElem.single(indices[i]));
-                    }
+                r.push(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]));
+            }
+            else {
+                for (i = start; i < act; i++) {
+                    r.push(RangeElem.single(indices[i]));
                 }
             }
             start = act;

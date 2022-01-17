@@ -1,5 +1,5 @@
 import { AppContext } from '../app';
-import { Ajax } from '../base';
+import { Ajax } from '../base/ajax';
 
 export interface IXLSXColumn {
   name: string;

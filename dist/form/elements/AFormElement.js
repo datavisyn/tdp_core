@@ -112,11 +112,11 @@ export class AFormElement extends EventHandler {
         }
         Object.keys(attributes).forEach((key) => {
             switch (key) {
-                case 'clazz':
-                    // eslint-disable-next-line no-case-declarations
+                case 'clazz': {
                     const cssClasses = attributes[key].split(' '); // tokenize CSS classes at space
                     cssClasses.forEach((cssClass) => $node.classed(cssClass, true));
                     break;
+                }
                 default:
                     $node.attr(key, attributes[key]);
                     break;

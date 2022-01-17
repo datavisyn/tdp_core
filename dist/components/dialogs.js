@@ -1,7 +1,7 @@
 import '../webpack/_bootstrap';
 import $ from 'jquery';
-import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
+import { BaseUtils } from '../base/BaseUtils';
 export class Dialog {
     /**
      * @param title Dialog title

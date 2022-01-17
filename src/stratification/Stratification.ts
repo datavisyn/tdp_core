@@ -109,8 +109,9 @@ export class Stratification extends ADataType<IStratificationDataDescription> im
         return '#e41a1b';
       case 'living':
         return '#377eb8';
+      default:
+        return 'gray';
     }
-    return 'gray';
   }
 
   /**

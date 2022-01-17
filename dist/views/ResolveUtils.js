@@ -79,7 +79,7 @@ export class ResolveUtils {
         const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
         if (fromIDType.id === target.id) {
             // same just unmap to name
-            return fromIDType.unmap(ids).then((ids) => [ids]);
+            return fromIDType.unmap(ids).then((is) => [is]);
         }
         // assume mappable
         return fromIDType.unmap(ids).then((names) => {
@@ -99,7 +99,7 @@ export class ResolveUtils {
         const target = toIDType === null ? fromIDType : IDTypeManager.getInstance().resolveIdType(toIDType);
         if (fromIDType.id === target.id) {
             // same just unmap to name
-            return fromIDType.unmap(ids).then((ids) => [ids]);
+            return fromIDType.unmap(ids).then((is) => [is]);
         }
         // assume mappable
         return IDTypeManager.getInstance().mapToName(fromIDType, ids, target);

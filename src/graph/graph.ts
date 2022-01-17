@@ -3,7 +3,8 @@ import { ParseRangeUtils, RangeLike, Range } from '../range';
 import { UniqueIdManager } from '../app/UniqueIdManager';
 import { IPersistable } from '../base/IPersistable';
 import { EventHandler } from '../base/event';
-import { IDataType, IDataDescription } from '../data';
+import { IDataDescription } from '../data/DataDescription';
+import { IDataType } from '../data/datatype';
 
 export class AttributeContainer extends EventHandler implements IPersistable {
   private attrMap = new Map<string, any>();
@@ -77,7 +78,7 @@ export class GraphNode extends AttributeContainer {
   }
 
   get id() {
-    if (isNaN(this._id)) {
+    if (Number.isNaN(this._id)) {
       this._id = UniqueIdManager.getInstance().uniqueId('graph_node');
     }
     return this._id;
@@ -110,7 +111,7 @@ export class GraphEdge extends AttributeContainer {
   }
 
   get id() {
-    if (isNaN(this._id)) {
+    if (Number.isNaN(this._id)) {
       this._id = UniqueIdManager.getInstance().uniqueId('graph_edge');
     }
     return this._id;

@@ -324,7 +324,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           });
         });
         break;
-      case FormElementType.SELECT3:
+      case FormElementType.SELECT3: {
         const select3 = new Select3(desc);
         parent.appendChild(select3.node);
         if (initialValue) {
@@ -338,6 +338,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           this.fire(FormMap.EVENT_CHANGE, next);
         });
         break;
+      }
       default:
         parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" value="${initialValue || ''}">`);
         parent.firstElementChild.addEventListener('change', function (this: HTMLInputElement) {
@@ -457,6 +458,21 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   }
 
   /**
+   * Sets the value
+   * @param v
+   */
+  set value(v: IFormRow[]) {
+    if (this.isEqual(v, this.value)) {
+      return;
+    }
+    this.rows = v;
+    this.previousValue = this.value; // force update
+    this.buildMap();
+    this.updateBadge();
+    this.updateStoredValue();
+  }
+
+  /**
    * Returns the value
    * @returns {string}
    */
@@ -470,21 +486,6 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
   hasValue() {
     return this.value.length > 0;
-  }
-
-  /**
-   * Sets the value
-   * @param v
-   */
-  set value(v: IFormRow[]) {
-    if (this.isEqual(v, this.value)) {
-      return;
-    }
-    this.rows = v;
-    this.previousValue = this.value; // force update
-    this.buildMap();
-    this.updateBadge();
-    this.updateStoredValue();
   }
 
   focus() {

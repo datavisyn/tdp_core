@@ -112,8 +112,8 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
 
     const data = FormSelect.resolveData(options.optionsData);
 
-    const values = this.handleDependent((values) => {
-      data(values).then((items) => {
+    const values = this.handleDependent((val) => {
+      data(val).then((items) => {
         this.updateOptionElements(items);
         this.$inputNode.property('selectedIndex', options.selectedIndex || 0);
         this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
@@ -250,7 +250,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     return (dependents: any[]) => {
       const r = data(dependents);
       if (r instanceof Promise) {
-        return r.then((r) => r.map(this.toOption));
+        return r.then((a) => a.map(this.toOption));
       }
       if (Array.isArray(r)) {
         return ResolveNow.resolveImmediately(r.map(this.toOption));

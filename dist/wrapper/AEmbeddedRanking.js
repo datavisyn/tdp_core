@@ -63,6 +63,8 @@ export class AEmbeddedRanking {
                     case 'data+desc+scores':
                         this.triggerScoreReload = true;
                         return this.rebuild();
+                    default:
+                        return undefined;
                 }
             }
             setLineUpData(rows) {

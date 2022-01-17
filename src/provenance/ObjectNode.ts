@@ -111,8 +111,9 @@ function restoreData(v: any): any {
       return DataCache.getInstance().get(v.persist);
     case 'primitive':
       return ResolveNow.resolveImmediately(v.v);
+    default:
+      return null;
   }
-  return null;
 }
 
 /**

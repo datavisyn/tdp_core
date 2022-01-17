@@ -83,6 +83,7 @@ export class ScoreUtils {
     static compressImpl(path, addCmd, remCmd) {
         const manipulate = path.slice();
         const r = [];
+        // eslint-disable-next-line no-labels
         outer: for (let i = 0; i < manipulate.length; ++i) {
             const act = manipulate[i];
             if (act.f_id === addCmd) {
@@ -93,6 +94,7 @@ export class ScoreUtils {
                         // TODO remove lineup actions that uses this score -> how to identify?
                         // found match, delete both
                         manipulate.slice(j, 1); // delete remove cmd
+                        // eslint-disable-next-line no-labels
                         continue outer; // skip adding of add cmd
                     }
                 }

@@ -31,32 +31,32 @@ export class Rect extends AShape implements IRect {
     return new Vector2D(this.w, this.h);
   }
 
-  get cx(): number {
-    return this.x + this.w / 2;
-  }
-
   get cy() {
     return this.y + this.h / 2;
-  }
-
-  set cx(val: number) {
-    this.x = val - this.w / 2;
   }
 
   set cy(val: number) {
     this.y = val - this.y / 2;
   }
 
+  get cx(): number {
+    return this.x + this.w / 2;
+  }
+
+  set cx(val: number) {
+    this.x = val - this.w / 2;
+  }
+
   get x2(): number {
     return this.x + this.w;
   }
 
-  get y2() {
-    return this.y + this.h;
-  }
-
   set x2(val: number) {
     this.w = val - this.x;
+  }
+
+  get y2() {
+    return this.y + this.h;
   }
 
   set y2(val: number) {

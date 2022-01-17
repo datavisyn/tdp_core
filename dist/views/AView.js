@@ -233,7 +233,7 @@ export class AView extends EventHandler {
     setInputSelection(selection, name = AView.DEFAULT_SELECTION_NAME) {
         const current = this.selections.get(name);
         if (current && ViewUtils.isSameSelection(current, selection)) {
-            return;
+            return undefined;
         }
         this.selections.set(name, selection);
         if (name === AView.DEFAULT_SELECTION_NAME) {

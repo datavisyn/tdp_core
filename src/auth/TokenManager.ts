@@ -5,6 +5,7 @@ import { ERenderAuthorizationStatus, IAuthorizationConfiguration, IAuthorization
 import { simplePopupFlow } from './simplePopup';
 
 // Extract all parameters except the first one
+// eslint-disable-next-line @typescript-eslint/ban-types
 type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
 
 export declare function authorizationStored(event: IEvent, id: string, token: string): void;
@@ -178,6 +179,7 @@ export class TokenManager extends EventHandler {
     if (authConfigurations) {
       // Iterate over all authorization configurations
       for (const authConfiguration of castArray(authConfigurations)) {
+        // eslint-disable-next-line no-await-in-loop
         await this.runAuthorization(authConfiguration, options);
       }
     }

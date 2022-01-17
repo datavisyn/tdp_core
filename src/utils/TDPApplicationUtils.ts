@@ -237,7 +237,7 @@ export class TDPApplicationUtils {
 
         // sync with others
         const target = d.value === 'public' ? 'read' : 'none';
-        others.forEach((o) => (o.checked = o.value === target));
+        others.forEach((a) => (a.checked = a.value === target));
 
         syncActive();
       };
@@ -251,7 +251,7 @@ export class TDPApplicationUtils {
 
         // sync with public
         const target = d.value === 'none' ? 'private' : 'public';
-        publicSimple.forEach((o) => (o.checked = o.value === target));
+        publicSimple.forEach((a) => (a.checked = a.value === target));
 
         syncActive();
       };
@@ -270,10 +270,10 @@ export class TDPApplicationUtils {
     return {
       node: div,
       resolve: (data: FormData): Partial<ISecureItem> => {
-        const others = toSet(data.get('permission_others').toString());
-        const group = toSet(data.get('permission_group').toString());
+        const oths = toSet(data.get('permission_others').toString());
+        const grp = toSet(data.get('permission_group').toString());
         const groupName = data.get('permission_group_name').toString();
-        const buddies = toSet(data.get('permission_buddies').toString());
+        const bddies = toSet(data.get('permission_buddies').toString());
         const buddiesName = data
           .get('permission_buddies_name')
           .toString()
@@ -283,9 +283,9 @@ export class TDPApplicationUtils {
         return {
           permissions: Permission.encode(
             new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]),
-            <Set<EPermission>>group,
-            <Set<EPermission>>others,
-            <Set<EPermission>>buddies,
+            <Set<EPermission>>grp,
+            <Set<EPermission>>oths,
+            <Set<EPermission>>bddies,
           ),
           group: groupName,
           buddies: buddiesName,

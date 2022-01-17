@@ -49,18 +49,18 @@ export class ImportUtils {
         </table>
       `);
 
-    const configPromises = header.map((name, i) => {
-      return PHOVEA_IMPORTER_ValueTypeUtils.guessValueType(editors, name, i, data, (row) => row[i]);
+    const configPromises = header.map((n, i) => {
+      return PHOVEA_IMPORTER_ValueTypeUtils.guessValueType(editors, n, i, data, (row) => row[i]);
     });
 
     const guessedEditors = await Promise.all(configPromises);
     const config = await Promise.all(
-      header.map(async (name, i) => {
+      header.map(async (n, i) => {
         const value = await guessedEditors[i].guessOptions({ type: null }, data, (col) => col[i]);
         const markup = await PHOVEA_IMPORTER_ValueTypeUtils.createTypeEditor(editors, guessedEditors[i], value);
         return {
           column: i,
-          name,
+          name: n,
           color: '#DDDDDD',
           value,
           editor: guessedEditors[i],
@@ -192,9 +192,7 @@ export class ImportUtils {
           <label for="${prefix}_${i}">${d.name}</label>
           <div class="input-group">
             <select class="form-control" ${i < 2 ? 'disabled="disabled"' : ''} id="${prefix}_${i}">
-              ${editors
-                .map((editor) => `<option value="${editor.id}" ${d.value.type === editor.id ? 'selected="selected"' : ''}>${editor.name}</option>`)
-                .join('\n')}
+              ${editors.map((e) => `<option value="${e.id}" ${d.value.type === e.id ? 'selected="selected"' : ''}>${e.name}</option>`).join('\n')}
             </select>
             <span class="input-group-btn"><button class="btn btn-light" ${
               !d.editor.hasEditor ? 'disabled="disabled' : ''

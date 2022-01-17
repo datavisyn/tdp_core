@@ -5,7 +5,6 @@ import { IGraphFactory } from './GraphBase';
 export declare class GraphProxy extends ADataType<IGraphDataDescription> {
     private cache;
     private loaded;
-    constructor(desc: IGraphDataDescription);
     get nnodes(): number;
     get nedges(): number;
     get dim(): number[];

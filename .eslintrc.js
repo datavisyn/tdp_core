@@ -1,4 +1,5 @@
 module.exports = {
+    root: true,
     extends: [
       "airbnb",
       "airbnb-typescript",
@@ -23,15 +24,19 @@ module.exports = {
     },
     parser: "@typescript-eslint/parser",
     parserOptions: {
-      ecmaVersion: 2018,
-      sourceType: "module",
-      project: "./tsconfig.json"
+      // Make sure eslint and VS Code use the same path for the tsconfig.json:
+      // https://github.com/typescript-eslint/typescript-eslint/issues/251
+      tsconfigRootDir: __dirname,
+      project: "./tsconfig.json",
+      ecmaVersion: 2018, 
+      sourceType: 'module'
     },
     rules: {
       "linebreak-style": "off",
       "class-methods-use-this":"off",
       "no-continue": "off",
       "no-multi-assign": "warn",
+      "no-nested-ternary": "off",
       "no-param-reassign": ["error", { "props": false }],
       "no-return-assign": "warn", 
       "no-restricted-syntax": "off",
@@ -44,7 +49,7 @@ module.exports = {
       "import/no-extraneous-dependencies": "off",
       "import/prefer-default-export": "off",
       "import/order": "error",
-      "prefer-destructuring": ["error", {"object": true, "array": false}],
+      "prefer-destructuring": ["warn", {"object": true, "array": false}],
       "prefer-promise-reject-errors": "warn",
       "prefer-spread": "warn",
       "@typescript-eslint/ban-ts-comment": "warn",

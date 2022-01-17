@@ -2,9 +2,9 @@ import { Column, LocalDataProvider, isSupportType } from 'lineupjs';
 import { ExportUtils, IExportFormat } from '../internal/ExportUtils';
 import { IPanelButton } from './PanelButton';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
-import { BaseUtils } from '../../base';
+import { BaseUtils } from '../../base/BaseUtils';
 import { I18nextManager } from '../../i18n';
-import { PHOVEA_UI_FormDialog } from '../../components';
+import { PHOVEA_UI_FormDialog } from '../../components/dialogs';
 
 interface IExportData {
   type: IExportFormat;
@@ -70,7 +70,7 @@ export class PanelDownloadButton implements IPanelButton {
             promise = this.customizeDialog(provider, lineupOrderRowIndices);
             break;
 
-          default:
+          default: {
             const ranking = provider.getFirstRanking();
             promise = Promise.resolve({
               order: lineupOrderRowIndices[link.dataset.rows],
@@ -78,6 +78,7 @@ export class PanelDownloadButton implements IPanelButton {
               type: ExportUtils.getExportFormat(link.dataset.format),
               name: ranking.getLabel(),
             });
+          }
         }
 
         promise

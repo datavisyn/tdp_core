@@ -204,14 +204,18 @@ export class VerticalStoryVis extends AVisInstance {
                 case 'plus':
                     story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.welcome'));
                     break;
-                case 'clone':
+                case 'clone': {
                     const state = that.data.selectedStates()[0] || that.data.act;
                     story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.myStoryTo') +
                         (state ? state.name : I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.heaven')), state ? state.path : []);
                     break;
-                case 'bookmark':
+                }
+                case 'bookmark': {
                     const states = that.data.states.filter((d) => d.getAttr('starred', false));
                     story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.myFavoriteFindings'), states);
+                    break;
+                }
+                default:
                     break;
             }
             that.switchTo(story);
@@ -532,7 +536,7 @@ export class VerticalStoryVis extends AVisInstance {
                         that.story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.welcome'));
                     }
                     break;
-                case 'extract':
+                case 'extract': {
                     const state = that.data.selectedStates()[0] || that.data.act;
                     const newSlide = that.data.extractSlide([state], false);
                     if (last) {
@@ -542,7 +546,8 @@ export class VerticalStoryVis extends AVisInstance {
                         that.story = newSlide;
                     }
                     break;
-                case 'extract_all':
+                }
+                case 'extract_all': {
                     const state2 = that.data.selectedStates()[0] || that.data.act;
                     const newSlide2 = that.data.extractSlide(state2.path, false);
                     if (last) {
@@ -551,6 +556,9 @@ export class VerticalStoryVis extends AVisInstance {
                     else {
                         that.story = newSlide2;
                     }
+                    break;
+                }
+                default:
                     break;
             }
             that.update();
@@ -705,6 +713,8 @@ export class VerticalStoryVis extends AVisInstance {
                         pos: [10, 10],
                         size: [20, 20],
                     };
+                    break;
+                default:
                     break;
             }
             if (storyvis && ann) {

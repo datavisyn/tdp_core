@@ -113,7 +113,7 @@ export class LayoutUtils {
           dump,
           doc,
           (r, child) => this.toBuilder(child).build(r, doc),
-          (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc),
+          (d, resView) => LayoutUtils.restore(d, resView, doc),
           restoreView,
         );
       case 'split':
@@ -134,7 +134,7 @@ export class LayoutUtils {
    * @param {HTMLElement} node the root node
    * @param {(node: HTMLElement) => PHOVEA_UI_IView} viewFactory how to build a view from a node
    */
-  static derive(node: HTMLElement, viewFactory: (node: HTMLElement) => PHOVEA_UI_IView = (node) => new NodeView(node)): IRootLayoutContainer {
+  static derive(node: HTMLElement, viewFactory: (node: HTMLElement) => PHOVEA_UI_IView = (n) => new NodeView(n)): IRootLayoutContainer {
     const doc = node.ownerDocument;
     const r = new RootLayoutContainer(
       doc,
@@ -142,24 +142,24 @@ export class LayoutUtils {
       (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc),
     );
 
-    const deriveImpl = (node: HTMLElement): ILayoutContainer => {
-      switch (node.dataset.layout || 'view') {
+    const deriveImpl = (n: HTMLElement): ILayoutContainer => {
+      switch (n.dataset.layout || 'view') {
         case 'hsplit':
         case 'vsplit':
         case 'split':
-          return SplitLayoutContainer.derive(node, deriveImpl);
+          return SplitLayoutContainer.derive(n, deriveImpl);
         case 'lineup':
         case 'vlineup':
         case 'hlineup':
         case 'stack':
         case 'hstack':
         case 'vstack':
-          return LineUpLayoutContainer.derive(node, deriveImpl);
+          return LineUpLayoutContainer.derive(n, deriveImpl);
         case 'tabbing':
-          return TabbingLayoutContainer.derive(node, deriveImpl);
+          return TabbingLayoutContainer.derive(n, deriveImpl);
         default:
           // interpret as view
-          return ViewLayoutContainer.derive(viewFactory(node) || new NodeView(node));
+          return ViewLayoutContainer.derive(viewFactory(n) || new NodeView(n));
       }
     };
 
@@ -403,7 +403,7 @@ export class LayoutUtils {
   }
 
   private static isDefault(v: number) {
-    return v < 0 || isNaN(v);
+    return v < 0 || Number.isNaN(v);
   }
 }
 
@@ -533,7 +533,7 @@ export class BuilderUtils {
     const b = LayoutUtils.toBuilder(child);
     const r = new RootLayoutContainer(
       doc,
-      (child) => LayoutUtils.toBuilder(child).build(r, doc),
+      (c) => LayoutUtils.toBuilder(c).build(r, doc),
       (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc),
     );
     r.root = b.build(r, doc);

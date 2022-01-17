@@ -1,7 +1,9 @@
 import * as d3 from 'd3';
-import { BaseUtils, ResolveNow } from '.';
 import { ProvenanceGraph, SlideNode } from '../provenance';
+import { BaseUtils } from './BaseUtils';
+import { ResolveNow } from './promise';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace StoryTransition {
   export const FACTOR = 1;
   export const MIN_DURATION = -1;

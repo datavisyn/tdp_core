@@ -81,6 +81,7 @@ export class LineUpFilterUtils {
         if (matches === null) {
             throw new Error('Unable to parse regular expression from string. The string does not seem to be a valid RegExp.');
         }
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const [_full, regexString, regexFlags] = matches;
         return new RegExp(regexString, regexFlags);
     }

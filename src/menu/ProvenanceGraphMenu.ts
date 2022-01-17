@@ -79,8 +79,8 @@ export class ProvenanceGraphMenu {
       // create blob and save it
       const blob = new Blob([str], { type: 'application/json;charset=utf-8' });
       const a = new FileReader();
-      a.onload = (e) => {
-        const url = (<any>e.target).result;
+      a.onload = (b) => {
+        const url = (<any>b.target).result;
         const helper = parent.ownerDocument.createElement('a');
         helper.setAttribute('href', url);
         helper.setAttribute('target', '_blank');
@@ -108,8 +108,8 @@ export class ProvenanceGraphMenu {
         .on('change', function () {
           const file = (<any>d3event).target.files[0];
           const reader = new FileReader();
-          reader.onload = function (e: any) {
-            const dataS = e.target.result;
+          reader.onload = function (a: any) {
+            const dataS = a.target.result;
             const dump = JSON.parse(dataS);
             manager.importGraph(dump, remote);
           };

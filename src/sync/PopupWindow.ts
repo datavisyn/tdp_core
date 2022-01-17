@@ -17,7 +17,7 @@ export class PopupProxy<T extends INodeVis> {
 
   private options: IPopupProxyOptions = {
     args: [],
-    name: `${self.document.title} PopUp ${BaseUtils.randomId(3)}`,
+    name: `${window.document.title} PopUp ${BaseUtils.randomId(3)}`,
   };
 
   private handler: ProxyHandler<T> = {};
@@ -91,7 +91,7 @@ export class PopupProxy<T extends INodeVis> {
       this.build(popupBody);
       delete (<any>window)[name];
     };
-    this.popup = self.open(
+    this.popup = window.open(
       this.buildPopup(name),
       this.options.name,
       `width=${rect.width}, height=${rect.height}, left=${rect.left}, top=${rect.top}, location=no`,

@@ -19,12 +19,12 @@ export class FindViewUtils {
                 .map(ViewUtils.toViewPluginDesc)
                 .map((v) => {
                 const access = FindViewUtils.canAccess(v);
-                const selection = bySelection(v);
+                const sel = bySelection(v);
                 const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
                 return {
-                    enabled: access && selection,
+                    enabled: access && sel,
                     v,
-                    disabledReason: !access ? (hasAccessHint ? 'security' : 'invalid') : !selection ? 'selection' : undefined,
+                    disabledReason: !access ? (hasAccessHint ? 'security' : 'invalid') : !sel ? 'selection' : undefined,
                 };
             })
                 .filter((v) => v.disabledReason !== 'invalid');
@@ -51,8 +51,8 @@ export class FindViewUtils {
             const mappedTypes = await IDTypeManager.getInstance().getCanBeMappedTo(idType);
             const all = [idType].concat(mappedTypes);
             return (p) => {
-                const idType = p.idType !== undefined ? p.idType : p.idtype;
-                const pattern = idType ? new RegExp(idType) : /.*/;
+                const idT = p.idType !== undefined ? p.idType : p.idtype;
+                const pattern = idT ? new RegExp(idT) : /.*/;
                 return all.some((i) => pattern.test(i.id)) && (!hasSelection || p.selection === 'any' || !ViewUtils.matchLength(p.selection, 0));
             };
         };
@@ -156,12 +156,12 @@ export class FindViewUtils {
             return orderA - orderB;
         };
         const groupData = FindViewUtils.resolveGroupData();
-        const groups = Array.from(grouped).map(([name, views]) => {
+        const groups = Array.from(grouped).map(([name, v]) => {
             let base = groupData.get(name);
             if (!base) {
                 base = { name, label: name, description: '', order: 900 };
             }
-            const sortedViews = views.sort((a, b) => sortView(a, b, base.members));
+            const sortedViews = v.sort((a, b) => sortView(a, b, base.members));
             return Object.assign(base, { views: sortedViews });
         });
         return groups.sort(sortGroup);

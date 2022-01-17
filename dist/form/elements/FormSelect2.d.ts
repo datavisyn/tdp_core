@@ -91,17 +91,17 @@ export declare class FormSelect2 extends AFormElement<IFormSelect2> {
      */
     private buildSelect2;
     private resolveValue;
-    /**
-     * Returns the selected value or if nothing found `null`
-     * @returns {string|{name: string, value: string, data: any}|null}
-     */
-    get value(): (ISelect2Option | string) | (ISelect2Option | string)[];
     hasValue(): boolean;
     /**
      * Select the option by value. If no value found, then the first option is selected.
      * @param v If string then compares to the option value property. Otherwise compares the object reference.
      */
     set value(v: (ISelect2Option | string) | (ISelect2Option | string)[]);
+    /**
+     * Returns the selected value or if nothing found `null`
+     * @returns {string|{name: string, value: string, data: any}|null}
+     */
+    get value(): (ISelect2Option | string) | (ISelect2Option | string)[];
     focus(): void;
     /**
      * compare array independent of the order

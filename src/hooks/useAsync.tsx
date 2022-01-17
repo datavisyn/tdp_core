@@ -4,6 +4,7 @@ import useDeepCompareEffect from 'use-deep-compare-effect';
 // https://stackoverflow.com/questions/48011353/how-to-unwrap-type-of-a-promise
 type Awaited<T> = T extends PromiseLike<infer U> ? { 0: Awaited<U>; 1: U }[U extends PromiseLike<any> ? 0 : 1] : T;
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type useAsyncStatus = 'idle' | 'pending' | 'success' | 'error';
 
 /**
@@ -52,10 +53,11 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
           setStatus('success');
           return response;
         })
-        .catch((error: E) => {
-          setError(error);
+        .catch((e: E) => {
+          setError(e);
           setStatus('error');
-          throw error;
+          // eslint-disable-next-line @typescript-eslint/no-throw-literal
+          throw e;
         });
     },
     [asyncFunction],

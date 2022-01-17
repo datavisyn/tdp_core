@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
-import { BaseUtils, ResolveNow } from '.';
+import { BaseUtils } from './BaseUtils';
+import { ResolveNow } from './promise';
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export var StoryTransition;
 (function (StoryTransition) {
     StoryTransition.FACTOR = 1;

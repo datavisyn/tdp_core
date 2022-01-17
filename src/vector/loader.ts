@@ -26,6 +26,7 @@ export class VectorLoaderUtils {
    * @internal
    */
   static viaAPILoader<T>() {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     let _loader: Promise<IVectorLoaderResult<T>>;
     return (desc: IVectorDataDescription<any>) => {
       if (_loader) {
@@ -50,6 +51,7 @@ export class VectorLoaderUtils {
    * @internal
    */
   static viaDataLoader<T>(rows: string[], rowIds: number[], data: IValueType[]) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     let _data: IVectorLoaderResult<T>;
     return () => {
       if (_data) {

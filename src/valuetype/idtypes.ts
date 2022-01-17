@@ -28,29 +28,31 @@ export class IDTypeUtils {
   static editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
     const idtype = (<any>definition).idType || 'Custom';
 
-    return new Promise(async (resolve) => {
-      const existing = await IDTypeManager.getInstance().listAllIdTypes();
-      const existingFiltered = existing.filter((d) => !IDTypeManager.getInstance().isInternalIDType(d));
-      const dialog = PHOVEA_IMPORTER_ValueTypeUtils.createDialog(I18nextManager.getInstance().i18n.t('phovea:importer.editIdType'), 'idtype', () => {
-        const { value } = <HTMLInputElement>dialog.body.querySelector('input');
-        const existingIDType = existingFiltered.find((idType) => idType.id === value);
-        const idType = existingIDType ? existingIDType.id : value;
+    return new Promise((resolve) => {
+      (async () => {
+        const existing = await IDTypeManager.getInstance().listAllIdTypes();
+        const existingFiltered = existing.filter((d) => !IDTypeManager.getInstance().isInternalIDType(d));
+        const dialog = PHOVEA_IMPORTER_ValueTypeUtils.createDialog(I18nextManager.getInstance().i18n.t('phovea:importer.editIdType'), 'idtype', () => {
+          const { value } = <HTMLInputElement>dialog.body.querySelector('input');
+          const existingIDType = existingFiltered.find((idType) => idType.id === value);
+          const idType = existingIDType ? existingIDType.id : value;
 
-        dialog.hide();
-        definition.type = 'idType';
-        (<any>definition).idType = idType;
+          dialog.hide();
+          definition.type = 'idType';
+          (<any>definition).idType = idType;
 
-        IDTypeManager.getInstance().resolveIdType(idType);
-        resolve(definition);
-      });
-      dialog.body.innerHTML = `
+          IDTypeManager.getInstance().resolveIdType(idType);
+          resolve(definition);
+        });
+        dialog.body.innerHTML = `
           <div class="form-group">
             <label for="idType_new">${I18nextManager.getInstance().i18n.t('phovea:importer.dialogLabel')}</label>
             <input type="text" class="form-control" id="idType_new" value="${existingFiltered.some((i) => i.id === idtype) ? '' : idtype}">
           </div>
       `;
 
-      dialog.show();
+        dialog.show();
+      })();
     });
   }
 

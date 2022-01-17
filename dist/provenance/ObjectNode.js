@@ -78,8 +78,9 @@ function restoreData(v) {
             return DataCache.getInstance().get(v.persist);
         case 'primitive':
             return ResolveNow.resolveImmediately(v.v);
+        default:
+            return null;
     }
-    return null;
 }
 /**
  * a graph node of type object

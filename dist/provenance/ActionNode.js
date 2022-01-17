@@ -77,6 +77,8 @@ export class ActionNode extends GraphNode {
         return this.outgoing.filter(GraphEdge.isGraphType('inverses'))[0] != null;
     }
     equals(that) {
+        // TODO: check if the last comparison makes sense
+        // eslint-disable-next-line no-self-compare
         if (!(this.meta.category === that.meta.category && that.meta.operation === that.meta.operation)) {
             return false;
         }

@@ -124,11 +124,11 @@ export class RangeElem {
         }
         const parseElem = (v, defaultValue = NaN) => {
             v = v.trim();
-            if (v === '' && !isNaN(defaultValue)) {
+            if (v === '' && !Number.isNaN(defaultValue)) {
                 return defaultValue;
             }
             const n = parseInt(v, 10);
-            if (isNaN(n)) {
+            if (Number.isNaN(n)) {
                 throw Error(`parse error: "${v}" is not a valid integer`);
             }
             return n;

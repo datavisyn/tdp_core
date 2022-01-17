@@ -233,7 +233,9 @@ export class CompositeView extends EventHandler {
             const ratio = l.ratios;
             switch (l.type) {
                 case 'hsplit':
+                    // eslint-disable-next-line no-case-declarations
                     const firstH = buildImpl(l.keys[0]);
+                    // eslint-disable-next-line no-case-declarations
                     const secondH = buildImpl(l.keys[1]);
                     return BuilderUtils.horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
                 case 'hstack':
@@ -301,6 +303,7 @@ export class CompositeView extends EventHandler {
         if (WebpackEnv.__DEBUG__) {
             console.warn('invalid parameter detected', name, this.context.desc);
         }
+        return undefined;
     }
     setInputSelection(selection) {
         if (ViewUtils.isSameSelection(this.selection, selection)) {
@@ -367,13 +370,13 @@ export class CompositeView extends EventHandler {
     }
     createSetup() {
         const desc = this.context.desc;
-        const toEntry = (desc) => {
-            const descOptions = desc.options || {};
-            return Promise.resolve(desc.loader()).then((instance) => ({
-                key: desc.key,
-                desc,
+        const toEntry = (d) => {
+            const descOptions = d.options || {};
+            return Promise.resolve(d.loader()).then((instance) => ({
+                key: d.key,
+                desc: d,
                 options: { ...descOptions, ...this.options },
-                create: PluginRegistry.getInstance().getFactoryMethod(instance, desc.factory || 'create'),
+                create: PluginRegistry.getInstance().getFactoryMethod(instance, d.factory || 'create'),
             }));
         };
         return Promise.all((desc.elements || []).map(toEntry)).then((elements) => ({

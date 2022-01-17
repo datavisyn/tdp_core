@@ -33,17 +33,6 @@ export class TDPView extends React.Component {
     componentDidMount() {
         this.componentDidUpdate();
     }
-    componentWillUnmount() {
-        if (this.view) {
-            this.view.destroy();
-            this.view = null;
-            this.viewPromise = null;
-        }
-        if (this.viewPromise) {
-            this.viewPromise.then((r) => r.destroy());
-            this.viewPromise = null;
-        }
-    }
     componentDidUpdate() {
         const { viewId } = this.props;
         if (this.viewId !== viewId) {
@@ -57,6 +46,7 @@ export class TDPView extends React.Component {
             this.view = null;
             this.viewPromise = null;
             this.viewId = viewId;
+            // eslint-disable-next-line react/no-did-update-set-state
             this.setState({
                 viewPlugin: ViewUtils.toViewPluginDesc(PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_VIEW, viewId)),
             });
@@ -79,7 +69,7 @@ export class TDPView extends React.Component {
                 this.node.classList.add('tdp-view-wrapper');
                 if (this.view instanceof AReactView) {
                     // native rendering
-                    return;
+                    return undefined;
                 }
                 this.view.on(AView.EVENT_ITEM_SELECT, this.listener);
                 if (this.view.itemIDType) {
@@ -108,6 +98,17 @@ export class TDPView extends React.Component {
             }
         });
     }
+    componentWillUnmount() {
+        if (this.view) {
+            this.view.destroy();
+            this.view = null;
+            this.viewPromise = null;
+        }
+        if (this.viewPromise) {
+            this.viewPromise.then((r) => r.destroy());
+            this.viewPromise = null;
+        }
+    }
     createContext() {
         const manager = new LocalStorageProvenanceGraphManager();
         const graph = manager.createInMemory();
@@ -130,6 +131,31 @@ export class TDPView extends React.Component {
         }
         selection.idtype.unmap(selection.range).then((names) => this.props.onItemSelectionChanged(names, selection.idtype.id));
     }
+    selectNative(item, op = 'set') {
+        const items = Array.isArray(item) ? item : [item];
+        if (!this.props.onItemSelectionChanged) {
+            return; // nobody cares
+        }
+        const s = new Set(this.props.itemSelection || []);
+        switch (op) {
+            case 'set':
+                s.clear();
+                items.forEach((i) => s.add(i));
+                break;
+            case 'add':
+                items.forEach((i) => s.add(i));
+                break;
+            case 'remove':
+                items.forEach((i) => s.delete(i));
+                break;
+            case 'toggle':
+                items.forEach((i) => (s.has(i) ? s.delete(i) : s.add(i)));
+                break;
+            default:
+                break;
+        }
+        this.props.onItemSelectionChanged(Array.from(s), this.view.itemIDType ? this.view.itemIDType.id : null);
+    }
     render() {
         const buildItem = () => {
             if (!this.state.viewPlugin) {
@@ -143,29 +169,6 @@ export class TDPView extends React.Component {
         return (React.createElement("div", { ref: (ref) => (this.node = ref), className: "tdp-view" },
             React.createElement("header", null),
             React.createElement("main", null, buildItem())));
-    }
-    selectNative(item, op = 'set') {
-        const items = Array.isArray(item) ? item : [item];
-        if (!this.props.onItemSelectionChanged) {
-            return; // nobody cares
-        }
-        const s = new Set(this.props.itemSelection || []);
-        switch (op) {
-            case 'set':
-                s.clear();
-                items.forEach((item) => s.add(item));
-                break;
-            case 'add':
-                items.forEach((item) => s.add(item));
-                break;
-            case 'remove':
-                items.forEach((item) => s.delete(item));
-                break;
-            case 'toggle':
-                items.forEach((item) => (s.has(item) ? s.delete(item) : s.add(item)));
-                break;
-        }
-        this.props.onItemSelectionChanged(Array.from(s), this.view.itemIDType ? this.view.itemIDType.id : null);
     }
 }
 //# sourceMappingURL=TDPView.js.map

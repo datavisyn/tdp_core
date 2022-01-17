@@ -5,19 +5,21 @@ import { ITable, ITableColumn } from '../table';
 function mapType(v: IValueTypeDesc) {
   switch (v.type) {
     case 'real':
-    case 'int':
+    case 'int': {
       const vi = <INumberValueTypeDesc>v;
       return {
         type: <const>'number',
         min: vi.range[0],
         max: vi.range[1],
       };
-    case 'categorical':
+    }
+    case 'categorical': {
       const vc = <ICategoricalValueTypeDesc>v;
       return {
         type: <const>'categorical',
         categories: <any>vc.categories, // internally both are valid
       };
+    }
     default:
       return {
         type: <const>'string',

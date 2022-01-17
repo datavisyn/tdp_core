@@ -10,7 +10,7 @@
  ******************************************************** */
 import { ReactElement } from 'react';
 import * as ReactDOM from 'react-dom';
-import { AView } from '.';
+import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
 import { Errors } from '../components';
 import { IDTypeLike, IDTypeManager } from '../idtype';
@@ -59,7 +59,7 @@ export abstract class AReactView extends AView {
   protected initReact() {
     if (this.handler) {
       // will be handled externally
-      return;
+      return undefined;
     }
     return this.update();
   }
@@ -72,17 +72,19 @@ export abstract class AReactView extends AView {
       const act = this.getItemSelection();
       let r: number[] = [];
       switch (op) {
-        case 'add':
+        case 'add': {
           const union = act.range.union(range);
           this.setItemSelection({ idtype, range: union });
           r = union.dim(0).asList();
           break;
-        case 'remove':
+        }
+        case 'remove': {
           const without = act.range.without(range);
           this.setItemSelection({ idtype, range: without });
           r = without.dim(0).asList();
           break;
-        case 'toggle':
+        }
+        case 'toggle': {
           r = act.range.dim(0).asList();
           ids.forEach((id) => {
             const index = r.indexOf(id);
@@ -96,6 +98,7 @@ export abstract class AReactView extends AView {
           const result = Range.list(r);
           this.setItemSelection({ idtype, range: result });
           break;
+        }
         default:
           this.setItemSelection({ idtype, range });
           r = range.dim(0).asList();
@@ -153,6 +156,7 @@ export abstract class AReactView extends AView {
     } else {
       return this.update();
     }
+    return undefined;
   }
 
   selectionChanged() {

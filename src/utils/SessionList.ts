@@ -57,6 +57,8 @@ abstract class ASessionList {
         )}"><i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.editSession',
         )}</span></a>`;
+      default:
+        return undefined;
     }
   }
 

@@ -1,6 +1,6 @@
 import { BaseUtils } from '../base/BaseUtils';
 import { ProvenanceGraph } from './ProvenanceGraph';
-import { IProvenanceGraphManager } from './provenance';
+import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { GraphBase } from '../graph/GraphBase';
@@ -9,7 +9,6 @@ import { UserSession } from '../app/UserSession';
 import { Permission } from '../security/Permission';
 import { MemoryGraph } from '../graph/MemoryGraph';
 import { ResolveNow } from '../base/promise';
-import { ICommonProvenanceGraphManagerOptions } from '.';
 
 export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
   /**

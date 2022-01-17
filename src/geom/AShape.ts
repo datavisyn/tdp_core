@@ -5,6 +5,7 @@ import { Vector2D } from '../2D/Vector2D';
 import { Intersection } from '../2D/Intersection';
 import { IIntersectionParam } from '../2D/IIntersectionParam';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Corner {
   export const CORNER: any = <any>[];
   CORNER.N = CORNER[0] = 'n';
@@ -75,6 +76,8 @@ export abstract class AShape implements IShape {
         return Vector2D.vec(r.x2, r.y2);
       case Corner.CORNER.SW:
         return Vector2D.vec(r.x, r.y2);
+      default:
+        return undefined;
     }
     return this.center;
   }

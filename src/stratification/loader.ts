@@ -24,6 +24,7 @@ function createRangeFromGroups(name: string, groups: any[]) {
 
 export class StratificationLoaderUtils {
   static viaAPILoader(): IStratificationLoader {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     let _data: Promise<ILoadedStratification>;
     return (desc) => {
       if (!_data) {
@@ -46,6 +47,7 @@ export class StratificationLoaderUtils {
   }
 
   static viaDataLoader(rows: string[], rowIds: number[], range: CompositeRange1D): IStratificationLoader {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     let _data: Promise<ILoadedStratification>;
     return () => {
       if (!_data) {

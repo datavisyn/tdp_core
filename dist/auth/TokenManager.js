@@ -124,6 +124,7 @@ export class TokenManager extends EventHandler {
         if (authConfigurations) {
             // Iterate over all authorization configurations
             for (const authConfiguration of castArray(authConfigurations)) {
+                // eslint-disable-next-line no-await-in-loop
                 await this.runAuthorization(authConfiguration, options);
             }
         }

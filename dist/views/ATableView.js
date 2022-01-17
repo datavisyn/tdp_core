@@ -138,13 +138,13 @@ export class ATableView extends AView {
         const numeric = ({ node: a }, { node: b }) => {
             const av = parseFloat(a.textContent);
             const bv = parseFloat(b.textContent);
-            if (isNaN(av) && isNaN(bv)) {
+            if (Number.isNaN(av) && Number.isNaN(bv)) {
                 return a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase());
             }
-            if (isNaN(av)) {
+            if (Number.isNaN(av)) {
                 return +1;
             }
-            if (isNaN(bv)) {
+            if (Number.isNaN(bv)) {
                 return -1;
             }
             return av - bv;
@@ -155,7 +155,7 @@ export class ATableView extends AView {
                 const rows = Array.from(body.children);
                 const next = current === 'no' ? 'asc' : current === 'asc' ? 'desc' : 'no';
                 th.dataset.sort = next;
-                const sorter = sortFunction || (th.dataset.num != null ? numeric : text);
+                const sorting = sortFunction || (th.dataset.num != null ? numeric : text);
                 const sort = (a, b) => {
                     const acol = a.children[i];
                     const bcol = b.children[i];
@@ -165,7 +165,7 @@ export class ATableView extends AView {
                     if (!bcol) {
                         return -1;
                     }
-                    return sorter({ node: acol, row: a.__data__, index: i }, { node: bcol, row: b.__data__, index: i });
+                    return sorting({ node: acol, row: a.__data__, index: i }, { node: bcol, row: b.__data__, index: i });
                 };
                 switch (next) {
                     case 'no':
@@ -206,7 +206,7 @@ export class ATableView extends AView {
         }
         const { columns, rows } = ATableView.extractFromHTML(tableRoot);
         function isNumeric(value) {
-            return typeof value === 'string' && !isNaN(parseFloat(value));
+            return typeof value === 'string' && !Number.isNaN(parseFloat(value));
         }
         // parse numbers
         const guessed = rows.map((row) => row.map((s) => (isNumeric(s) ? parseFloat(s) : s)));

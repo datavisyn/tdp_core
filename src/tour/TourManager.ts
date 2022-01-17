@@ -188,8 +188,8 @@ export class TourManager {
       }
     });
 
-    GlobalEventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_END_TOUR, (_, finished) => {
-      this.hideTour(finished);
+    GlobalEventHandler.getInstance().on(TourUtils.GLOBAL_EVENT_END_TOUR, (_, fin) => {
+      this.hideTour(fin);
     });
 
     // auto restart stored multi page tour
@@ -213,8 +213,8 @@ export class TourManager {
     this.backdrop.style.width = fullAppWidth;
 
     // also consider the current scroll offset inside the window
-    const scrollOffsetX = self.scrollX;
-    const scrollOffsetY = self.scrollY;
+    const scrollOffsetX = window.scrollX;
+    const scrollOffsetY = window.scrollY;
 
     // @see http://bennettfeely.com/clippy/ -> select `Frame` example
     this.backdrop.style.clipPath = `polygon(
@@ -325,29 +325,28 @@ export class TourManager {
     });
 
     const next = this.step.querySelector<HTMLButtonElement>('button[data-switch="+"]');
-    {
-      this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
-      this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0 || this.activeTour.desc.canJumpAround === false;
 
-      next.innerHTML =
-        stepNumber === steps.length - 1
-          ? `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.finishButton')}`
-          : `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}`;
-      next.disabled = false;
-      if (step.pageBreak === 'user' && this.activeTour.multiPage) {
-        next.disabled = true;
-      } else if (step.waitFor) {
-        next.disabled = true;
-        step.waitFor.call(step, this.activeTourContext).then((r) => {
-          if (this.stepCount.innerText !== String(stepNumber + 1)) {
-            return; // step has changed in the meantime
-          }
-          next.disabled = false;
-          if (r === 'next') {
-            next.click();
-          }
-        });
-      }
+    this.step.querySelector<HTMLButtonElement>('button[data-switch="--"]').disabled = stepNumber === 0;
+    this.step.querySelector<HTMLButtonElement>('button[data-switch="-"]').disabled = stepNumber === 0 || this.activeTour.desc.canJumpAround === false;
+
+    next.innerHTML =
+      stepNumber === steps.length - 1
+        ? `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.finishButton')}`
+        : `<i class="fas fa-step-forward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}`;
+    next.disabled = false;
+    if (step.pageBreak === 'user' && this.activeTour.multiPage) {
+      next.disabled = true;
+    } else if (step.waitFor) {
+      next.disabled = true;
+      step.waitFor.call(step, this.activeTourContext).then((r) => {
+        if (this.stepCount.innerText !== String(stepNumber + 1)) {
+          return; // step has changed in the meantime
+        }
+        next.disabled = false;
+        if (r === 'next') {
+          next.click();
+        }
+      });
     }
 
     const content = this.step.querySelector<HTMLElement>('.tdp-tour-step-content')!;
@@ -365,12 +364,10 @@ export class TourManager {
     this.step.style.display = 'flex';
     this.stepCount.style.display = 'flex';
 
-    {
-      next.focus();
-      if (!step.allowUserInteraction) {
-        // force focus on next button
-        next.onblur = () => next.focus();
-      }
+    next.focus();
+    if (!step.allowUserInteraction) {
+      // force focus on next button
+      next.onblur = () => next.focus();
     }
 
     if (focus) {
@@ -421,8 +418,8 @@ export class TourManager {
     this.stepCount.innerText = String(stepNumber + 1);
     if (focus) {
       const base = focus.getBoundingClientRect();
-      const scrollOffsetX = self.scrollX;
-      const scrollOffsetY = self.scrollY;
+      const scrollOffsetX = window.scrollX;
+      const scrollOffsetY = window.scrollY;
       this.stepCount.style.transform = `translate(${base.left + scrollOffsetX}px, ${base.top + scrollOffsetY}px)`;
     } else {
       this.stepCount.style.transform = this.step.style.transform;

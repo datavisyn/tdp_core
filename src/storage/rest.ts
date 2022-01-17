@@ -29,8 +29,8 @@ export class RestStorageUtils {
     idType: IDType | string,
     ids: RangeLike,
     subType: { key: string; value: string },
-    description = '',
     sec: Partial<ISecureItem>,
+    description = '',
   ) {
     const data = {
       name,

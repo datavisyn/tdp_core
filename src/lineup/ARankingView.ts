@@ -455,79 +455,87 @@ export abstract class ARankingView extends AView {
     const ids = this.selectionHelper.rowIdsAsSet(order);
 
     let columnResolve = null;
-    const columnPromise: Promise<Column> = new Promise((resolve) => (columnResolve = resolve));
-    const data: Promise<IScoreRow<any>[]> = new Promise(async (resolve) => {
-      // Wait for the column to be initialized
-      const col = await columnPromise;
-      /**
-       * An error can occur either when the authorization fails, or the request using the token fails.
-       */
-      let outsideError: InvalidTokenError | null = null;
-      // TODO: Add a button which allows the user to stop this process?
-      let done = false;
-      while (!done) {
-        await TDPTokenManager.runAuthorizations(await score.getAuthorizationConfiguration?.(), {
-          render: ({ authConfiguration, status, error, trigger }) => {
-            const e = error || outsideError;
-            // Select the header of the score column
-            const headerNode = this.node.querySelector(`.lu-header[data-id=${col.id}]`);
-            if (!col.findMyRanker() || !headerNode) {
-              // The column was removed.
-              done = true;
-              return;
-            }
-            // Fetch or create the authorization overlay
-            let overlay = headerNode.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
-            if (!overlay) {
-              overlay = headerNode.ownerDocument.createElement('div');
-              overlay.className = 'tdp-authorization-overlay';
-              // Add element at the very bottom to avoid using z-index
-              headerNode.appendChild(overlay);
-            }
+    const columnPromise: Promise<Column> = new Promise((resolve) => {
+      columnResolve = resolve;
+    });
+    const data: Promise<IScoreRow<any>[]> = new Promise((resolve) => {
+      (async () => {
+        // Wait for the column to be initialized
+        const col = await columnPromise;
+        /**
+         * An error can occur either when the authorization fails, or the request using the token fails.
+         */
+        let outsideError: InvalidTokenError | null = null;
+        // TODO: Add a button which allows the user to stop this process?
+        let done = false;
+        while (!done) {
+          // eslint-disable-next-line no-await-in-loop
+          await TDPTokenManager.runAuthorizations(await score.getAuthorizationConfiguration?.(), {
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
+            render: ({ authConfiguration, status, error, trigger }) => {
+              const e = error || outsideError;
+              // Select the header of the score column
+              const headerNode = this.node.querySelector(`.lu-header[data-id=${col.id}]`);
+              if (!col.findMyRanker() || !headerNode) {
+                // The column was removed.
+                done = true;
+                return;
+              }
+              // Fetch or create the authorization overlay
+              let overlay = headerNode.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
+              if (!overlay) {
+                overlay = headerNode.ownerDocument.createElement('div');
+                overlay.className = 'tdp-authorization-overlay';
+                // Add element at the very bottom to avoid using z-index
+                headerNode.appendChild(overlay);
+              }
 
-            if (status === ERenderAuthorizationStatus.SUCCESS) {
-              overlay.remove();
-            } else {
-              overlay.innerHTML = `${
-                e
-                  ? `<i class="fas fa-exclamation"></i>`
-                  : status === ERenderAuthorizationStatus.PENDING
-                  ? `<i class="fas fa-spinner fa-pulse"></i>`
-                  : `<i class="fas fa-lock"></i>`
-              }<span class="text-truncate" style="max-width: 100%">${
-                e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')
-              }</span>`;
-              overlay.title = e
-                ? e.toString()
-                : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequiredTitle', { name: authConfiguration.name });
-              overlay.style.cursor = 'pointer';
-              overlay.onclick = () => trigger();
-            }
-          },
-        });
+              if (status === ERenderAuthorizationStatus.SUCCESS) {
+                overlay.remove();
+              } else {
+                overlay.innerHTML = `${
+                  e
+                    ? `<i class="fas fa-exclamation"></i>`
+                    : status === ERenderAuthorizationStatus.PENDING
+                    ? `<i class="fas fa-spinner fa-pulse"></i>`
+                    : `<i class="fas fa-lock"></i>`
+                }<span class="text-truncate" style="max-width: 100%">${
+                  e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')
+                }</span>`;
+                overlay.title = e
+                  ? e.toString()
+                  : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequiredTitle', { name: authConfiguration.name });
+                overlay.style.cursor = 'pointer';
+                overlay.onclick = () => trigger();
+              }
+            },
+          });
 
-        try {
-          outsideError = null;
-          return resolve(await score.compute(ids, this.itemIDType, args));
-        } catch (e) {
-          if (e instanceof InvalidTokenError) {
-            console.error(`Score computation failed because of invalid token:`, e.message);
-            outsideError = e;
-            if (col.findMyRanker()) {
-              // Only invalidate authorizations if the column was not removed yet.
-              // TODO: When we invalidate it here, it also "disables" already open detail views for example
-              TDPTokenManager.invalidateToken(e.ids);
-            } else {
-              // We are done if the column was removed
-              done = true;
+          try {
+            outsideError = null;
+            // eslint-disable-next-line no-await-in-loop
+            resolve(await score.compute(ids, this.itemIDType, args));
+            return;
+          } catch (e) {
+            if (e instanceof InvalidTokenError) {
+              console.error(`Score computation failed because of invalid token:`, e.message);
+              outsideError = e;
+              if (col.findMyRanker()) {
+                // Only invalidate authorizations if the column was not removed yet.
+                // TODO: When we invalidate it here, it also "disables" already open detail views for example
+                TDPTokenManager.invalidateToken(e.ids);
+              } else {
+                // We are done if the column was removed
+                done = true;
+                continue;
+              }
               continue;
+            } else {
+              throw e;
             }
-            continue;
-          } else {
-            throw e;
           }
         }
-      }
+      })();
     });
 
     const r = this.addColumn(colDesc, data, -1, position);

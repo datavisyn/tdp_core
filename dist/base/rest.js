@@ -1,4 +1,4 @@
-import { Ajax } from '.';
+import { Ajax } from './ajax';
 import { AppContext } from '../app';
 /**
  * Define empty filter object for use as function default parameter

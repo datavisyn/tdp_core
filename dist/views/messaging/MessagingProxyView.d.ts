@@ -25,8 +25,8 @@ export declare class MessagingProxyView extends AView {
     private build;
     private onWindowMessage;
     destroy(): void;
-    protected selectionChanged(name?: string): Promise<void>;
-    protected itemSelectionChanged(name?: string): Promise<void>;
+    protected selectionChanged(name?: string): void;
+    protected itemSelectionChanged(name?: string): void;
     protected parameterChanged(name: string): void;
     private sendInputSelectionMessage;
     private sendMessage;

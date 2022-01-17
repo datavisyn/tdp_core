@@ -89,16 +89,16 @@ export declare class FormMap extends AFormElement<IFormMapDesc> {
     private buildMap;
     private buildMapImpl;
     /**
+     * Sets the value
+     * @param v
+     */
+    set value(v: IFormRow[]);
+    /**
      * Returns the value
      * @returns {string}
      */
     get value(): IFormRow[];
     hasValue(): boolean;
-    /**
-     * Sets the value
-     * @param v
-     */
-    set value(v: IFormRow[]);
     focus(): void;
     isEqual(a: IFormRow[], b: IFormRow[]): boolean;
     static convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap;

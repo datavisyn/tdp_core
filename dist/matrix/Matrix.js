@@ -132,7 +132,7 @@ export class Matrix extends AMatrix {
         if (valueType.type === ValueTypeUtils.VALUE_TYPE_REAL) {
             realData = realData.map((row) => row.map(parseFloat));
         }
-        else if (valueType.type === ValueTypeUtils.VALUE_TYPE_REAL) {
+        else if (valueType.type === ValueTypeUtils.VALUE_TYPE_INT) {
             realData = realData.map((row) => row.map(parseInt));
         }
         const desc = BaseUtils.mixin(MatrixUtils.createDefaultMatrixDesc(), {
@@ -142,17 +142,17 @@ export class Matrix extends AMatrix {
         const rowAssigner = options.rowassigner || LocalIDAssigner.create();
         const colAssigner = options.rowassigner || LocalIDAssigner.create();
         const loader = {
-            rowIds: (desc, range) => Promise.resolve(rowAssigner(range.filter(rows))),
-            colIds: (desc, range) => Promise.resolve(colAssigner(range.filter(cols))),
-            ids: (desc, range) => {
+            rowIds: (d, range) => Promise.resolve(rowAssigner(range.filter(rows))),
+            colIds: (d, range) => Promise.resolve(colAssigner(range.filter(cols))),
+            ids: (d, range) => {
                 const rc = rowAssigner(range.dim(0).filter(rows));
                 const cc = colAssigner(range.dim(1).filter(cols));
                 return Promise.resolve(Range.join(rc, cc));
             },
-            at: (desc, i, j) => Promise.resolve(realData[i][j]),
-            rows: (desc, range) => Promise.resolve(range.filter(rows)),
-            cols: (desc, range) => Promise.resolve(range.filter(cols)),
-            data: (desc, range) => Promise.resolve(range.filter(realData)),
+            at: (d, i, j) => Promise.resolve(realData[i][j]),
+            rows: (d, range) => Promise.resolve(range.filter(rows)),
+            cols: (d, range) => Promise.resolve(range.filter(cols)),
+            data: (d, range) => Promise.resolve(range.filter(realData)),
         };
         return new Matrix(desc, loader);
     }

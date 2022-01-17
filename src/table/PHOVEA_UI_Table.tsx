@@ -16,10 +16,12 @@ export function TDP_UI_Table<T extends object>(props: ITableProps<T>) {
   return (
     <table {...getTableProps({ className: 'table-component table table-sm' })}>
       <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
+        {headerGroups.map((headerGroup, i) => (
+          <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+              <th key={column.id} {...column.getHeaderProps()}>
+                {column.render('Header')}
+              </th>
             ))}
           </tr>
         ))}
@@ -28,9 +30,14 @@ export function TDP_UI_Table<T extends object>(props: ITableProps<T>) {
         {rows.map((row, i) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+            <tr key={row.id} {...row.getRowProps()}>
+              {row.cells.map((cell, idx) => {
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <td key={idx} {...cell.getCellProps()}>
+                    {cell.render('Cell')}
+                  </td>
+                );
               })}
             </tr>
           );

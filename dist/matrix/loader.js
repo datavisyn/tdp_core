@@ -33,8 +33,8 @@ export class MatrixLoaderHelper {
             if (rowIds !== null && rows !== null) {
                 Promise.all([rowIds, rows]).then(([rowIdValues, rowValues]) => {
                     const idType = IDTypeManager.getInstance().resolveIdType(desc.rowtype);
-                    const rowIds = ParseRangeUtils.parseRangeLike(rowIdValues);
-                    idType.fillMapCache(rowIds.dim(0).asList(rowValues.length), rowValues);
+                    const rIds = ParseRangeUtils.parseRangeLike(rowIdValues);
+                    idType.fillMapCache(rIds.dim(0).asList(rowValues.length), rowValues);
                 });
             }
         }
@@ -42,8 +42,8 @@ export class MatrixLoaderHelper {
             if (colIds !== null && cols !== null) {
                 Promise.all([colIds, cols]).then(([colIdValues, colValues]) => {
                     const idType = IDTypeManager.getInstance().resolveIdType(desc.coltype);
-                    const colIds = ParseRangeUtils.parseRangeLike(colIdValues);
-                    idType.fillMapCache(colIds.dim(0).asList(colValues.length), colValues);
+                    const cIds = ParseRangeUtils.parseRangeLike(colIdValues);
+                    idType.fillMapCache(cIds.dim(0).asList(colValues.length), colValues);
                 });
             }
         }
@@ -103,21 +103,21 @@ export class MatrixLoaderHelper {
                     if (hist == null) {
                         hist = AppContext.getInstance()
                             .getAPIJSON(`/dataset/matrix/${desc.id}/hist`)
-                            .then((hist) => Histogram.wrapHist(hist, valueRange));
+                            .then((h) => Histogram.wrapHist(h, valueRange));
                     }
                     return hist;
                 }
                 const args = {
                     range: range.toString(),
                 };
-                if (!isNaN(bins)) {
+                if (!Number.isNaN(bins)) {
                     args.bins = bins;
                 }
                 return AppContext.getInstance()
                     .getAPIJSON(`/dataset/matrix/${desc.id}/hist`, args)
-                    .then((hist) => Histogram.wrapHist(hist, valueRange));
+                    .then((h) => Histogram.wrapHist(h, valueRange));
             },
-            at: (desc, i, j) => r.data(desc, Range.list([i], [j])).then((data) => MatrixLoaderHelper.maskIt(desc)(data[0][0])),
+            at: (desc, i, j) => r.data(desc, Range.list([i], [j])).then((d) => MatrixLoaderHelper.maskIt(desc)(d[0][0])),
             data: (desc, range) => {
                 if (range.isAll) {
                     if (data == null) {

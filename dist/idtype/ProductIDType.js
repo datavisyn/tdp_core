@@ -167,7 +167,7 @@ export class ProductIDType extends EventHandler {
     selectImpl(cells, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
         const rcells = cells.map(ParseRangeUtils.parseRangeLike);
         const b = this.selections(type);
-        let newRange = [];
+        let newRange;
         switch (op) {
             case SelectOperation.SET:
                 newRange = rcells;
@@ -178,6 +178,8 @@ export class ProductIDType extends EventHandler {
             case SelectOperation.REMOVE:
                 newRange = removeCells(b, rcells, this.elems.length);
                 break;
+            default:
+                newRange = [];
         }
         // if (b.eq(new_)) {
         //  return b;

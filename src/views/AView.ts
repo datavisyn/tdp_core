@@ -306,7 +306,7 @@ export abstract class AView extends EventHandler implements IView {
   setInputSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
     const current = this.selections.get(name);
     if (current && ViewUtils.isSameSelection(current, selection)) {
-      return;
+      return undefined;
     }
     this.selections.set(name, selection);
     if (name === AView.DEFAULT_SELECTION_NAME) {

@@ -71,6 +71,7 @@ interface IBufferedAction {
   execute: (initialValue?: unknown) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 type bufferOrExecute = (action: IBufferedAction, initialValue: any, isActionBuffered?: boolean) => void;
 
 interface IAggregationParameter {
@@ -132,7 +133,9 @@ export class LineupTrackingManager {
       // store the promise and the resolve function in variables
       // the waiter (promise) will only be resolved when the resolver is called
       // so the promise is locked until the `${Ranking.EVENT_ORDER_CHANGED}.track` event is triggered
-      waiter = new Promise<void>((resolve) => (resolver = resolve));
+      waiter = new Promise<void>((resolve) => {
+        resolver = resolve;
+      });
       ranking.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, () => {
         ranking.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, null); // disable
         resolver(); // resolve waiter promise
@@ -168,7 +171,9 @@ export class LineupTrackingManager {
 
     // wait for sorted
     let resolver: () => void;
-    const waiter = new Promise<void>((resolve) => (resolver = resolve));
+    const waiter = new Promise<void>((resolve) => {
+      resolver = resolve;
+    });
     added.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, () => {
       added.on(`${Ranking.EVENT_ORDER_CHANGED}.track`, null); // disable
       resolver();
@@ -290,7 +295,7 @@ export class LineupTrackingManager {
     const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
     const current = ranking.getGroupCriteria().map((d) => d.fqpath);
-    const columns = parameter.columns.map((p) => ranking.findByPath(p));
+    const columns = parameter.columns.map((a) => ranking.findByPath(a));
     LineupTrackingManager.getInstance().ignoreNext = Ranking.EVENT_GROUP_CRITERIA_CHANGED;
 
     const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
@@ -390,18 +395,22 @@ export class LineupTrackingManager {
       }
       const availableMappingFunctions = mappingFunctions();
       const selectedMappingFunction = mappingFunctions()[parameter.value.type];
+      // eslint-disable-next-line new-cap
       source.setMapping(new selectedMappingFunction(parameter.value));
     } else if (source) {
       // fixes bug that is caused by the fact that the function `getRendererType()` does not exist (only `getRenderer()`)
       switch (parameter.prop) {
         case LineUpTrackAndUntrackActions.rendererType:
-          bak = source.getRenderer();
-          source.setRenderer.call(source, parameter.value);
+          if (source instanceof Column) {
+            bak = source.getRenderer();
+            source.setRenderer.call(source, parameter.value);
+          }
           break;
 
         case LineUpTrackAndUntrackActions.filter:
           bak = source[`get${prop}`]();
           // restore serialized regular expression before passing to LineUp
+          // eslint-disable-next-line no-case-declarations
           const value = LineUpFilterUtils.isSerializedFilter(parameter.value) ? LineUpFilterUtils.restoreLineUpFilter(parameter.value) : parameter.value;
           source[`set${prop}`].call(source, value);
           break;
@@ -572,7 +581,7 @@ export class LineupTrackingManager {
       } else {
         oldestValue = oldValue;
       }
-      tm = self.setTimeout(callbackImpl.bind(this, newValue), timeToDelay);
+      tm = window.setTimeout(callbackImpl.bind(this, newValue), timeToDelay);
     };
   }
 
@@ -651,6 +660,7 @@ export class LineupTrackingManager {
       }
 
       execute(); // execute immediately
+      return undefined;
     };
 
     source.on(
@@ -1026,12 +1036,12 @@ export class LineupTrackingManager {
 
     provider.on(
       `${LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED}.track`,
-      (ranking: Ranking, groups: IGroup | IGroup[], previousTopN: number | number[], currentTopN: number) => {
+      (rank: Ranking, groups: IGroup | IGroup[], previousTopN: number | number[], currentTopN: number) => {
         if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED, objectRef)) {
           return;
         }
 
-        const rid = LineupTrackingManager.getInstance().rankingId(provider, ranking);
+        const rid = LineupTrackingManager.getInstance().rankingId(provider, rank);
         const groupNames = Array.isArray(groups) ? groups.map((g) => g.name) : groups.name;
 
         graph.pushWithResult(LineupTrackingManager.getInstance().setAggregation(objectRef, rid, groupNames, currentTopN), {

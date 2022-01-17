@@ -35,19 +35,24 @@ export class TourUtils {
      */
     static waitFor(selector, maxWaitingTime = 5000, pollFrequencyMs = 500) {
         const s = typeof selector === 'function' ? selector : () => document.querySelector(selector);
-        return new Promise(async (resolve) => {
-            let elem = s();
-            if (s()) {
-                return resolve(elem);
-            }
-            for (let waited = 0; waited < maxWaitingTime; waited += pollFrequencyMs) {
-                await TourUtils.wait(pollFrequencyMs);
-                elem = s();
-                if (elem != null) {
-                    return resolve(elem);
+        return new Promise((resolve) => {
+            (async () => {
+                let elem = s();
+                if (s()) {
+                    resolve(elem);
+                    return;
                 }
-            }
-            resolve(null);
+                for (let waited = 0; waited < maxWaitingTime; waited += pollFrequencyMs) {
+                    // eslint-disable-next-line no-await-in-loop
+                    await TourUtils.wait(pollFrequencyMs);
+                    elem = s();
+                    if (elem != null) {
+                        resolve(elem);
+                        return;
+                    }
+                }
+                resolve(null);
+            })();
         });
     }
     /**
@@ -71,6 +76,7 @@ export class TourUtils {
             return false;
         }
         e.click();
+        return undefined;
     }
     /**
      * Dispatches a click event on the HTML element with the given DOM selector.
@@ -94,6 +100,7 @@ export class TourUtils {
         }
         const evt = new Event('dblclick');
         e.dispatchEvent(evt);
+        return undefined;
     }
     /**
      * Dispatches a double click event on the HTML element with the given DOM selector.
@@ -120,6 +127,7 @@ export class TourUtils {
             cancelable: true,
         });
         e.dispatchEvent(event);
+        return undefined;
     }
     /**
      * Dispatches a submit event on the HTML form element with the given DOM selector.
@@ -161,7 +169,7 @@ export class TourUtils {
     static setValueAndTrigger(elem, value, eventType = 'change') {
         const e = typeof elem === 'string' ? document.querySelector(elem) : elem;
         if (!e) {
-            return;
+            return undefined;
         }
         e.value = value;
         return e.dispatchEvent(new Event(eventType, {
@@ -212,7 +220,7 @@ export class TourUtils {
                 clearInterval(id);
             }
         };
-        id = self.setInterval(w, interval);
+        id = window.setInterval(w, interval);
     }
     /**
      * Checks if a tour is visible. The visibility indicates whether the tour is active.

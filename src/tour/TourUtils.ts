@@ -47,19 +47,24 @@ export class TourUtils {
    */
   static waitFor(selector: string | (() => HTMLElement | null), maxWaitingTime = 5000, pollFrequencyMs = 500): Promise<HTMLElement | null> {
     const s = typeof selector === 'function' ? selector : () => document.querySelector<HTMLElement>(selector);
-    return new Promise<HTMLElement>(async (resolve) => {
-      let elem: HTMLElement = s();
-      if (s()) {
-        return resolve(elem);
-      }
-      for (let waited = 0; waited < maxWaitingTime; waited += pollFrequencyMs) {
-        await TourUtils.wait(pollFrequencyMs);
-        elem = s();
-        if (elem != null) {
-          return resolve(elem);
+    return new Promise<HTMLElement>((resolve) => {
+      (async () => {
+        let elem: HTMLElement = s();
+        if (s()) {
+          resolve(elem);
+          return;
         }
-      }
-      resolve(null);
+        for (let waited = 0; waited < maxWaitingTime; waited += pollFrequencyMs) {
+          // eslint-disable-next-line no-await-in-loop
+          await TourUtils.wait(pollFrequencyMs);
+          elem = s();
+          if (elem != null) {
+            resolve(elem);
+            return;
+          }
+        }
+        resolve(null);
+      })();
     });
   }
 
@@ -85,6 +90,7 @@ export class TourUtils {
       return false;
     }
     e.click();
+    return undefined;
   }
 
   /**
@@ -110,6 +116,7 @@ export class TourUtils {
     }
     const evt = new Event('dblclick');
     e.dispatchEvent(evt);
+    return undefined;
   }
 
   /**
@@ -138,6 +145,7 @@ export class TourUtils {
       cancelable: true,
     });
     e.dispatchEvent(event);
+    return undefined;
   }
 
   /**
@@ -186,7 +194,7 @@ export class TourUtils {
   ) {
     const e = typeof elem === 'string' ? document.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(elem) : elem;
     if (!e) {
-      return;
+      return undefined;
     }
     e.value = value;
     return e.dispatchEvent(
@@ -242,7 +250,7 @@ export class TourUtils {
         clearInterval(id);
       }
     };
-    id = self.setInterval(w, interval);
+    id = window.setInterval(w, interval);
   }
 
   /**

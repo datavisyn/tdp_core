@@ -38,6 +38,8 @@ export class ASequentialLayoutContainer extends AParentLayoutContainer {
                     return [Math.max(a[0], cmin[0]), a[1] + cmin[1]];
                 }, [0, padding]);
             }
+            default:
+                return undefined;
         }
     }
     persist() {

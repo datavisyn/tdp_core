@@ -1,9 +1,9 @@
 import { isSupportType } from 'lineupjs';
 import { ExportUtils } from '../internal/ExportUtils';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
-import { BaseUtils } from '../../base';
+import { BaseUtils } from '../../base/BaseUtils';
 import { I18nextManager } from '../../i18n';
-import { PHOVEA_UI_FormDialog } from '../../components';
+import { PHOVEA_UI_FormDialog } from '../../components/dialogs';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
@@ -41,7 +41,7 @@ export class PanelDownloadButton {
                     case 'custom':
                         promise = this.customizeDialog(provider, lineupOrderRowIndices);
                         break;
-                    default:
+                    default: {
                         const ranking = provider.getFirstRanking();
                         promise = Promise.resolve({
                             order: lineupOrderRowIndices[link.dataset.rows],
@@ -49,6 +49,7 @@ export class PanelDownloadButton {
                             type: ExportUtils.getExportFormat(link.dataset.format),
                             name: ranking.getLabel(),
                         });
+                    }
                 }
                 promise
                     .then((r) => {

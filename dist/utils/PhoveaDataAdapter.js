@@ -2,19 +2,21 @@ import { DataCache } from '../data';
 function mapType(v) {
     switch (v.type) {
         case 'real':
-        case 'int':
+        case 'int': {
             const vi = v;
             return {
                 type: 'number',
                 min: vi.range[0],
                 max: vi.range[1],
             };
-        case 'categorical':
+        }
+        case 'categorical': {
             const vc = v;
             return {
                 type: 'categorical',
                 categories: vc.categories,
             };
+        }
         default:
             return {
                 type: 'string',

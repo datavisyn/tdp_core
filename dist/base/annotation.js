@@ -2,10 +2,11 @@ import * as d3 from 'd3';
 import marked from 'marked';
 import { ModeWrapper } from './mode';
 import { StoryTransition } from './Player';
-import { BaseUtils, ResolveNow } from '.';
 import { AppContext } from '../app';
 import { I18nextManager } from '../i18n';
 import { SelectionUtils } from '../idtype';
+import { BaseUtils } from './BaseUtils';
+import { ResolveNow } from './promise';
 const modeFeatures = {
     isEditable: () => ModeWrapper.getInstance().getMode().authoring > 0.8,
 };

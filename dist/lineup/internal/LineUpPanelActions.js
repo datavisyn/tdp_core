@@ -377,9 +377,12 @@ export class LineUpPanelActions extends EventHandler {
         const ungroupedItems = [];
         columnDesc.forEach((item) => {
             if (item.chooserGroup) {
-                groupedItems.has(item.chooserGroup.parent)
-                    ? groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item])
-                    : groupedItems.set(item.chooserGroup.parent, [item]);
+                if (groupedItems.has(item.chooserGroup.parent)) {
+                    groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item]);
+                }
+                else {
+                    groupedItems.set(item.chooserGroup.parent, [item]);
+                }
             }
             else {
                 ungroupedItems.push(item);

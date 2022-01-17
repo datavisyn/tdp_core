@@ -95,13 +95,6 @@ export class FormSelect2 extends AFormElement {
         const data = items.map((d) => ({ id: d.id, text: d.text, data: d.data ? d.data : undefined })).map(returnF);
         return this.isMultiple ? data : data[0];
     }
-    /**
-     * Returns the selected value or if nothing found `null`
-     * @returns {string|{name: string, value: string, data: any}|null}
-     */
-    get value() {
-        return this.resolveValue(this.$jqSelect.select2('data'));
-    }
     hasValue() {
         const v = this.value;
         if (this.isMultiple) {
@@ -152,6 +145,13 @@ export class FormSelect2 extends AFormElement {
         finally {
             this.$jqSelect.on('change.propagate', this.listener);
         }
+    }
+    /**
+     * Returns the selected value or if nothing found `null`
+     * @returns {string|{name: string, value: string, data: any}|null}
+     */
+    get value() {
+        return this.resolveValue(this.$jqSelect.select2('data'));
     }
     focus() {
         this.$jqSelect.select2('open');

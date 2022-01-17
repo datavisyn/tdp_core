@@ -104,6 +104,7 @@ export class CLUEWrapper extends ACLUEWrapper {
 
     this.header.wait();
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const _ = new LoginMenu(this.header, {
       loginForm: this.options.loginForm,
       insertIntoHeader: true,
@@ -125,17 +126,17 @@ export class CLUEWrapper extends ACLUEWrapper {
       return clueManager.choose(graphs);
     });
 
-    graph.then((graph) => {
-      provenanceMenu.setGraph(graph);
-      this.$mainRef = graph.findOrAddObject(this.$main, 'Application', 'visual');
+    graph.then((g) => {
+      provenanceMenu.setGraph(g);
+      this.$mainRef = g.findOrAddObject(this.$main, 'Application', 'visual');
 
-      graph.on('sync_start,sync', (event: IEvent) => {
+      g.on('sync_start,sync', (event: IEvent) => {
         select('nav span.glyphicon-cog').classed('fa-spin', event.type !== 'sync');
       });
 
       if (this.options.recordSelectionTypes) {
         // record selections of the given type
-        SelectionRecorder.createSelectionRecorder(graph, this.options.recordSelectionTypes, {
+        SelectionRecorder.createSelectionRecorder(g, this.options.recordSelectionTypes, {
           filter(idtype) {
             return idtype && idtype.name[0] !== '_';
           },

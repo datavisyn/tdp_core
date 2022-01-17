@@ -5,7 +5,7 @@ export class PopupProxy {
         this.factory = factory;
         this.options = {
             args: [],
-            name: `${self.document.title} PopUp ${BaseUtils.randomId(3)}`,
+            name: `${window.document.title} PopUp ${BaseUtils.randomId(3)}`,
         };
         this.handler = {};
         this.options = BaseUtils.mixin(this.options, options);
@@ -70,7 +70,7 @@ export class PopupProxy {
             this.build(popupBody);
             delete window[name];
         };
-        this.popup = self.open(this.buildPopup(name), this.options.name, `width=${rect.width}, height=${rect.height}, left=${rect.left}, top=${rect.top}, location=no`);
+        this.popup = window.open(this.buildPopup(name), this.options.name, `width=${rect.width}, height=${rect.height}, left=${rect.left}, top=${rect.top}, location=no`);
         this.popup.onbeforeunload = () => this.close();
     }
 }

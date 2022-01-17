@@ -112,7 +112,10 @@ export class MessagingProxyView extends AView {
           return;
         }
         this.changeParameter(name, value);
+        break;
       }
+      default:
+        break;
     }
   };
 
@@ -140,7 +143,7 @@ export class MessagingProxyView extends AView {
     }
 
     const selection = this.getInputSelection(name);
-    return ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
+    ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
       if (!ids || ids.length === 0) {
         this.setNoMappingFoundHint(true);
         return;
@@ -185,7 +188,7 @@ export class MessagingProxyView extends AView {
       return;
     }
 
-    return ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
+    ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
       this.sendMessage(
         {
           type: 'tdpSetItemSelection',
@@ -219,7 +222,7 @@ export class MessagingProxyView extends AView {
   }
 
   private static isNoNSecurePage(url: string) {
-    const self = location.protocol.toLowerCase();
+    const self = window.location.protocol.toLowerCase();
     if (!self.startsWith('https')) {
       return false; // if I'm not secure doesn't matter
     }

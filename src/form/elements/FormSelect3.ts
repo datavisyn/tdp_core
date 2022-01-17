@@ -75,6 +75,10 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
     });
   }
 
+  hasValue() {
+    return this.select3.value.length > 0;
+  }
+
   /**
    * Returns the selected value or if nothing found `null`
    * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
@@ -89,10 +93,6 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
     }
     const data = value.map((d) => ({ id: d.id, text: d.text })).map(returnFn);
     return this.isMultiple ? data : data[0];
-  }
-
-  hasValue() {
-    return this.select3.value.length > 0;
   }
 
   /**

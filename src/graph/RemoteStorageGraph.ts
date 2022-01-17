@@ -123,6 +123,8 @@ export class RemoteStoreGraph extends GraphBase {
           return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, data, 'PUT');
         case 'remove':
           return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, {}, 'DELETE');
+        default:
+          return undefined;
       }
     };
     return create().then(() => {

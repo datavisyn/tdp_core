@@ -17,7 +17,7 @@ export class SelectionSyncerOptionUtils {
     options.selectionTypes.forEach((type) => {
       const key = `${PREFIX}${idType.id}-${type}`;
       let disable = false;
-      idType.on(`select-${type}`, (event, type: string, selection: Range) => {
+      idType.on(`select-${type}`, (event, t: string, selection: Range) => {
         if (disable) {
           return;
         }

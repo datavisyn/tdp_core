@@ -1,9 +1,8 @@
 import { ProvenanceGraph } from './ProvenanceGraph';
-import { IProvenanceGraphManager } from './provenance';
+import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { GraphBase } from '../graph/GraphBase';
 import { LocalStorageGraph } from '../graph/LocalStorageGraph';
-import { ICommonProvenanceGraphManagerOptions } from '.';
 export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
     /**
      * Used storage engine of the browser (`localStorage` or `sessionStorage`)

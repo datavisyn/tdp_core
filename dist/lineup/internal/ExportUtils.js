@@ -24,15 +24,16 @@ export class ExportUtils {
             case 'xlsx':
             case 'XLSX':
                 return ExportUtils.EXPORT_FORMAT.XLSX;
+            default:
+                return null;
         }
-        return null;
     }
     static getColumnName(column) {
         return column.label + (column.desc.summary ? ` - ${column.desc.summary}` : '') + (column.description ? `\n${column.description}` : '');
     }
     static exportRanking(columns, rows, separator) {
         // optionally quote not numbers
-        const escape = new RegExp(`["]`, 'g');
+        const escape = /["]/g;
         function quote(v, c) {
             if (v == null) {
                 return '';

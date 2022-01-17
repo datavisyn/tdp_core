@@ -1,10 +1,11 @@
 import { WrapperUtils } from './WrapperUtils';
-import { ResolveNow, HashProperties } from '.';
 import { EventHandler } from './event';
 import { AppContext, UserSession } from '../app';
 import { I18nextManager } from '../i18n';
 import { IProvenanceGraphDataDescription, ProvenanceGraph } from '../provenance';
 import type { MixedStorageProvenanceGraphManager } from '../provenance/MixedStorageProvenanceGraphManager';
+import { HashProperties } from './HashProperties';
+import { ResolveNow } from './promise';
 
 export interface IClueState {
   graph: string;

@@ -2,7 +2,7 @@ import { SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHe
 import { ISearchOption } from './ISearchOption';
 import { PanelButton, PanelNavButton } from './PanelButton';
 import { IPanelTabDesc } from './IPanelTabDesc';
-import { EventHandler } from '../../base';
+import { EventHandler } from '../../base/event';
 import { I18nextManager } from '../../i18n';
 
 /**

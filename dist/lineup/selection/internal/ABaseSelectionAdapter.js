@@ -46,7 +46,7 @@ export class ABaseSelectionAdapter {
         return (this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt)
             .then(() => {
             if (this.waitingForSelection) {
-                return; // abort selection more important
+                return undefined; // abort selection more important
             }
             return this.parameterChangedImpl(context());
         })

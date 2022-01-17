@@ -1,8 +1,9 @@
 import { WrapperUtils } from './WrapperUtils';
-import { ResolveNow, HashProperties } from '.';
 import { EventHandler } from './event';
 import { AppContext, UserSession } from '../app';
 import { I18nextManager } from '../i18n';
+import { HashProperties } from './HashProperties';
+import { ResolveNow } from './promise';
 export class CLUEGraphManager extends EventHandler {
     constructor(manager, isReadonly = false) {
         super();

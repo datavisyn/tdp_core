@@ -86,6 +86,8 @@ export class IDType extends EventHandler {
             case SelectOperation.REMOVE:
                 newValue = b.without(range);
                 break;
+            default:
+                break;
         }
         if (b.eq(newValue)) {
             return b;

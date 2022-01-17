@@ -42,12 +42,12 @@ export declare class FormSelect3 extends AFormElement<IFormSelect3> {
      * Bind the change listener and propagate the selection by firing a change event
      */
     init(): void;
+    hasValue(): boolean;
     /**
      * Returns the selected value or if nothing found `null`
      * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
      */
     get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[];
-    hasValue(): boolean;
     /**
      * Select the option by value. If no value found, then the first option is selected.
      * @param v If string then compares to the option value property. Otherwise compares the object reference.

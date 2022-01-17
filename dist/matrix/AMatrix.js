@@ -80,10 +80,12 @@ export class AMatrix extends AProductSelectAble {
         const flat = flatten(d, this.indices, containedIds);
         switch (v.type) {
             case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
+                // eslint-disable-next-line no-case-declarations
                 const vc = v;
-                return CatHistogram.categoricalHist(flat.data, flat.indices, flat.data.length, vc.categories.map((d) => (typeof d === 'string' ? d : d.name)), vc.categories.map((d) => (typeof d === 'string' ? d : d.label || d.name)), vc.categories.map((d) => (typeof d === 'string' ? 'gray' : d.color || 'gray')));
+                return CatHistogram.categoricalHist(flat.data, flat.indices, flat.data.length, vc.categories.map((a) => (typeof a === 'string' ? a : a.name)), vc.categories.map((a) => (typeof a === 'string' ? a : a.label || a.name)), vc.categories.map((a) => (typeof a === 'string' ? 'gray' : a.color || 'gray')));
             case ValueTypeUtils.VALUE_TYPE_INT:
             case ValueTypeUtils.VALUE_TYPE_REAL:
+                // eslint-disable-next-line no-case-declarations
                 const vn = v;
                 return Histogram.hist(flat.data, flat.indices, flat.data.length, bins || Math.round(Math.sqrt(this.length)), vn.range);
             default:
@@ -103,7 +105,9 @@ export class AMatrix extends AProductSelectAble {
     }
     restore(persisted) {
         if (persisted && persisted.f) {
-            return this.reduce(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
+            return this.reduce(
+            // eslint-disable-next-line no-eval
+            eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
         }
         if (persisted && persisted.range) {
             // some view onto it

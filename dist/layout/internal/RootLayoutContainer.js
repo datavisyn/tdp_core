@@ -79,7 +79,7 @@ export class RootLayoutContainer extends AParentLayoutContainer {
     restore(dump, restoreView) {
         console.assert(dump.type === 'root');
         this.clear();
-        const children = (dump.children || []).map((dump) => this.restorer(dump, restoreView));
+        const children = (dump.children || []).map((d) => this.restorer(d, restoreView));
         if (children.length === 0) {
             return;
         }

@@ -67,7 +67,7 @@ export class ViewUtils {
         const aAllSize = a.all ? a.all.size : 0;
         const bAllSize = b.all ? b.all.size : 0;
         if (aAllSize !== bAllSize) {
-            return;
+            return undefined;
         }
         if (aAllSize === 0) {
             return true;

@@ -60,7 +60,7 @@ export class CompositeRange1D extends Range1D implements ICompositeRange1D {
   clone(): ICompositeRange1D {
     const r = this.groups.length > 1 ? super.clone() : undefined;
     return new CompositeRange1D(
-      name,
+      window.name,
       this.groups.map((g) => <Range1DGroup>g.clone()),
       r,
     );

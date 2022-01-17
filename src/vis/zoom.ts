@@ -69,6 +69,8 @@ export class ZoomLogic extends EventHandler {
       case 'height-only':
         s[0] = old.scale[0];
         break;
+      default:
+        break;
     }
     if (s[0] <= 0) {
       s[0] = 0.001;

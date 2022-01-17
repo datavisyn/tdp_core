@@ -228,7 +228,7 @@ export class FormMap extends AFormElement {
                     });
                 });
                 break;
-            case FormElementType.SELECT3:
+            case FormElementType.SELECT3: {
                 const select3 = new Select3(desc);
                 parent.appendChild(select3.node);
                 if (initialValue) {
@@ -243,6 +243,7 @@ export class FormMap extends AFormElement {
                     this.fire(FormMap.EVENT_CHANGE, next);
                 });
                 break;
+            }
             default:
                 parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" value="${initialValue || ''}">`);
                 parent.firstElementChild.addEventListener('change', function () {
@@ -358,19 +359,6 @@ export class FormMap extends AFormElement {
         updateOptions();
     }
     /**
-     * Returns the value
-     * @returns {string}
-     */
-    get value() {
-        // just rows with a valid key and value
-        const validRows = this.rows.filter((d) => d.key && d.value !== null);
-        // create copies from each row, such that the previous values don't reference to this.value
-        return validRows.map((row) => ({ ...row }));
-    }
-    hasValue() {
-        return this.value.length > 0;
-    }
-    /**
      * Sets the value
      * @param v
      */
@@ -383,6 +371,19 @@ export class FormMap extends AFormElement {
         this.buildMap();
         this.updateBadge();
         this.updateStoredValue();
+    }
+    /**
+     * Returns the value
+     * @returns {string}
+     */
+    get value() {
+        // just rows with a valid key and value
+        const validRows = this.rows.filter((d) => d.key && d.value !== null);
+        // create copies from each row, such that the previous values don't reference to this.value
+        return validRows.map((row) => ({ ...row }));
+    }
+    hasValue() {
+        return this.value.length > 0;
     }
     focus() {
         // open dropdown

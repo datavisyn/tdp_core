@@ -45,6 +45,8 @@ export abstract class AStartList extends ARankingView {
       case ENamedSetType.FILTER:
         Object.assign(filter, namedSet.filter);
         break;
+      default:
+        break;
     }
     // TODO can't remember why the all exception
     if (this.namedSet.subTypeKey && validFilterKey(this.namedSet.subTypeKey) && this.namedSet.subTypeValue !== 'all') {

@@ -173,7 +173,7 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
 
     if (valueType.type === ValueTypeUtils.VALUE_TYPE_REAL) {
       realData = realData.map((row) => row.map(<any>parseFloat));
-    } else if (valueType.type === ValueTypeUtils.VALUE_TYPE_REAL) {
+    } else if (valueType.type === ValueTypeUtils.VALUE_TYPE_INT) {
       realData = realData.map((row) => row.map(<any>parseInt));
     }
 
@@ -189,17 +189,17 @@ export class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
     const rowAssigner = options.rowassigner || LocalIDAssigner.create();
     const colAssigner = options.rowassigner || LocalIDAssigner.create();
     const loader: IMatrixLoader2<any> = {
-      rowIds: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(rowAssigner(range.filter(rows))),
-      colIds: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(colAssigner(range.filter(cols))),
-      ids: (desc: IMatrixDataDescription<any>, range: Range) => {
+      rowIds: (d: IMatrixDataDescription<any>, range: Range) => Promise.resolve(rowAssigner(range.filter(rows))),
+      colIds: (d: IMatrixDataDescription<any>, range: Range) => Promise.resolve(colAssigner(range.filter(cols))),
+      ids: (d: IMatrixDataDescription<any>, range: Range) => {
         const rc = rowAssigner(range.dim(0).filter(rows));
         const cc = colAssigner(range.dim(1).filter(cols));
         return Promise.resolve(Range.join(rc, cc));
       },
-      at: (desc: IMatrixDataDescription<any>, i, j) => Promise.resolve(realData[i][j]),
-      rows: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(rows)),
-      cols: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(cols)),
-      data: (desc: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(realData)),
+      at: (d: IMatrixDataDescription<any>, i, j) => Promise.resolve(realData[i][j]),
+      rows: (d: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(rows)),
+      cols: (d: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(cols)),
+      data: (d: IMatrixDataDescription<any>, range: Range) => Promise.resolve(range.filter(realData)),
     };
     return new Matrix(desc, loader);
   }

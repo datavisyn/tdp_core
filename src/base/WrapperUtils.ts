@@ -1,4 +1,4 @@
-import { IEventHandler } from '.';
+import { IEventHandler } from './event';
 import { AppContext } from '../app';
 import { ProvenanceGraph } from '../provenance';
 import { CLUEMode, ModeWrapper } from './mode';

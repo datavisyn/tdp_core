@@ -1,6 +1,7 @@
-import { GlobalEventHandler, Ajax } from '.';
 import { UserSession, AppContext } from '../app';
 import { LoginUtils } from './LoginUtils';
+import { Ajax } from './ajax';
+import { GlobalEventHandler } from './event';
 const DEFAULT_SESSION_TIMEOUT = 10 * 60 * 1000; // 10 min
 export class SessionWatcher {
     constructor(logout = LoginUtils.logout) {

@@ -279,7 +279,7 @@ export class SplitLayoutContainer extends ASequentialLayoutContainer<ISequential
     };
     const deriveRatios = () => {
       const ratio = node.dataset.ratio ? parseFloat(node.dataset.ratio) : NaN;
-      if (!isNaN(ratio)) {
+      if (!Number.isNaN(ratio)) {
         const rest = 1 - ratio;
         const r = [ratio];
         for (let i = 1; i < children.length; ++i) {
@@ -288,7 +288,7 @@ export class SplitLayoutContainer extends ASequentialLayoutContainer<ISequential
         return r;
       }
       const ratios = node.dataset.ratios ? node.dataset.ratios.split(' ').map((d) => parseFloat(d)) : [];
-      if (ratios.every((d) => !isNaN(d))) {
+      if (ratios.every((d) => !Number.isNaN(d))) {
         if (ratios.length < children.length) {
           const sum = ratios.reduce((a, b) => a + b, 0);
           const missing = children.length - ratios.length;

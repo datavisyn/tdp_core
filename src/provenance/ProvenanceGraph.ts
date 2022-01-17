@@ -228,8 +228,8 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     this.addEdge(inverted, 'inverses', action);
 
     // the inverted action should create the removed ones and removes the crated ones
-    removes.forEach((c, i) => {
-      this.addEdge(inverted, 'creates', c, { index: i });
+    removes.forEach((c, index) => {
+      this.addEdge(inverted, 'creates', c, { index });
     });
     creates.forEach((c) => {
       this.addEdge(inverted, 'removes', c);
@@ -465,7 +465,7 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       this.executedAction.bind(this, action, newState),
     );
 
-    runningAction.then((result) => {
+    runningAction.then(() => {
       const q = this.nextQueue.shift();
       if (q) {
         q();
@@ -518,6 +518,7 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     const results = [];
     for (let i = 0; i < torun.length; ++i) {
       const action = torun[i];
+      // eslint-disable-next-line no-await-in-loop
       const result = await this.run(action, null, withinMilliseconds < 0 ? -1 : guessTime(i));
       results.push(result);
       updateTime(result.consumed);

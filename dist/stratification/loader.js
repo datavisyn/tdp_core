@@ -8,6 +8,7 @@ function createRangeFromGroups(name, groups) {
 }
 export class StratificationLoaderUtils {
     static viaAPILoader() {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         let _data;
         return (desc) => {
             if (!_data) {
@@ -29,6 +30,7 @@ export class StratificationLoaderUtils {
         };
     }
     static viaDataLoader(rows, rowIds, range) {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         let _data;
         return () => {
             if (!_data) {

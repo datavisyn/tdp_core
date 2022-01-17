@@ -553,20 +553,20 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       };
       addSelection(item);
     });
-    this.validate(valid).then((valid) => {
-      const validated = new Map(valid.map((i) => <[string, ISelect3Item<T>]>[i.text.toLowerCase(), i]));
+    this.validate(valid).then((val) => {
+      const validated = new Map(val.map((i) => <[string, ISelect3Item<T>]>[i.text.toLowerCase(), i]));
       const processing = Array.from(this.node.querySelectorAll('.select2-selection__choice[data-verified=processing]'));
       const items = <ISelect3Item<T>[]>this.$select.select2('data');
       items.forEach((i) => {
         const original = i.text;
-        const valid = validated.get(original.toLowerCase());
+        const v = validated.get(original.toLowerCase());
         const dom = <HTMLElement>processing.find((d) => d.textContent.endsWith(original));
-        if (!valid && i.verified !== 'verified') {
+        if (!v && i.verified !== 'verified') {
           i.verified = 'invalid';
         } else {
           // remove key
           validated.delete(i.text.toLowerCase());
-          Object.assign(i, valid);
+          Object.assign(i, v);
           const o = <HTMLOptionElement>(<any>i).element;
           if (o) {
             // sync option

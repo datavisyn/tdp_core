@@ -26,26 +26,26 @@ export class Rect extends AShape {
     get size() {
         return new Vector2D(this.w, this.h);
     }
-    get cx() {
-        return this.x + this.w / 2;
-    }
     get cy() {
         return this.y + this.h / 2;
-    }
-    set cx(val) {
-        this.x = val - this.w / 2;
     }
     set cy(val) {
         this.y = val - this.y / 2;
     }
+    get cx() {
+        return this.x + this.w / 2;
+    }
+    set cx(val) {
+        this.x = val - this.w / 2;
+    }
     get x2() {
         return this.x + this.w;
     }
-    get y2() {
-        return this.y + this.h;
-    }
     set x2(val) {
         this.w = val - this.x;
+    }
+    get y2() {
+        return this.y + this.h;
     }
     set y2(val) {
         this.h = val - this.y;

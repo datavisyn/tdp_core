@@ -141,7 +141,7 @@ export class ProxyView extends AD3View {
       </div>`;
             return;
         }
-        this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
+        this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${window.location.protocol}${url}`}</a>`;
         // console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
         this.$node
             .append('iframe')
@@ -162,7 +162,7 @@ export class ProxyView extends AD3View {
         this.fire(ProxyView.EVENT_LOADING_FINISHED);
     }
     static isNoNSecurePage(url) {
-        const self = location.protocol.toLowerCase();
+        const self = window.location.protocol.toLowerCase();
         if (!self.startsWith('https')) {
             return false; // if I'm not secure doesn't matter
         }

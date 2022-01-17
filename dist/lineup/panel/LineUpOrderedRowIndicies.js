@@ -1,5 +1,5 @@
 import { EDirtyReason, LocalDataProvider, Ranking } from 'lineupjs';
-import { EventHandler } from '../../base';
+import { EventHandler } from '../../base/event';
 /**
  *  Store the ordered row indices for all, selected or filtered rows of the first ranking.
  */

@@ -50,6 +50,7 @@ export class TableLoaderUtils {
    * @internal
    */
   static viaAPIViewLoader(name: string, args: IQueryArgs): ITableLoader {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     let _loader: Promise<{
       rowIds: Range;
       rows: string[];
@@ -106,8 +107,8 @@ export class TableLoaderUtils {
       if (rowIds !== null && rows !== null) {
         Promise.all([rowIds, rows]).then(([rowIdValues, rowValues]) => {
           const idType = IDTypeManager.getInstance().resolveIdType(desc.idtype);
-          const rowIds = ParseRangeUtils.parseRangeLike(rowIdValues);
-          idType.fillMapCache(rowIds.dim(0).asList(rowValues.length), rowValues);
+          const rIds = ParseRangeUtils.parseRangeLike(rowIdValues);
+          idType.fillMapCache(rIds.dim(0).asList(rowValues.length), rowValues);
         });
       }
     }
@@ -130,7 +131,7 @@ export class TableLoaderUtils {
         if (objs == null && (range.isAll || desc.loadAtOnce)) {
           objs = AppContext.getInstance()
             .getAPIJSON(`/dataset/table/${desc.id}/raw`)
-            .then((data) => TableLoaderUtils.maskObjects(data, desc));
+            .then((d) => TableLoaderUtils.maskObjects(d, desc));
         }
         if (range.isAll) {
           return objs;
@@ -142,11 +143,11 @@ export class TableLoaderUtils {
         // server side slicing
         return AppContext.getInstance()
           .getAPIData(`/dataset/table/${desc.id}/raw`, { range: range.toString() })
-          .then((data) => TableLoaderUtils.maskObjects(data, desc));
+          .then((d) => TableLoaderUtils.maskObjects(d, desc));
       },
       data: (desc: ITableDataDescription, range: Range) => {
         if (data == null && (range.isAll || desc.loadAtOnce)) {
-          data = r.objs(desc, Range.all()).then((objs) => TableLoaderUtils.toFlat(objs, desc.columns));
+          data = r.objs(desc, Range.all()).then((obs) => TableLoaderUtils.toFlat(obs, desc.columns));
         }
         if (range.isAll) {
           return data;
@@ -156,7 +157,7 @@ export class TableLoaderUtils {
           return data.then((d) => range.filter(d, desc.size));
         }
         // server side slicing
-        return r.objs(desc, range).then((objs) => TableLoaderUtils.toFlat(objs, desc.columns));
+        return r.objs(desc, range).then((obs) => TableLoaderUtils.toFlat(obs, desc.columns));
       },
       col: (desc: ITableDataDescription, column: string, range: Range) => {
         const colDesc = (<any>desc).columns.find((c: any) => c.column === column || c.name === column);
@@ -165,15 +166,15 @@ export class TableLoaderUtils {
             if (desc.loadAtOnce) {
               objs = AppContext.getInstance()
                 .getAPIJSON(`/dataset/table/${desc.id}/raw`)
-                .then((data) => TableLoaderUtils.maskObjects(data, desc));
-              cols[column] = objs.then((objs) => objs.map((row) => row[column]));
+                .then((d) => TableLoaderUtils.maskObjects(d, desc));
+              cols[column] = objs.then((obs) => obs.map((row) => row[column]));
             } else {
               cols[column] = AppContext.getInstance()
                 .getAPIJSON(`/dataset/table/${desc.id}/col/${column}`)
-                .then((data) => TableLoaderUtils.maskCol(data, colDesc));
+                .then((d) => TableLoaderUtils.maskCol(d, colDesc));
             }
           } else {
-            cols[column] = objs.then((objs) => objs.map((row) => row[column]));
+            cols[column] = objs.then((obs) => obs.map((row) => row[column]));
           }
         }
         if (range.isAll) {
@@ -186,7 +187,7 @@ export class TableLoaderUtils {
         // server side slicing
         return AppContext.getInstance()
           .getAPIData(`/dataset/table/${desc.id}/col/${column}`, { range: range.toString() })
-          .then((data) => TableLoaderUtils.maskCol(data, colDesc));
+          .then((d) => TableLoaderUtils.maskCol(d, colDesc));
       },
       view: (desc: ITableDataDescription, name: string, args: IQueryArgs) => TableLoaderUtils.viaAPIViewLoader(name, args),
     };
@@ -201,6 +202,7 @@ export class TableLoaderUtils {
    * @internal
    */
   public static viaDataLoader(data: any[], nameProperty: any) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     let _data: any;
     return (desc: any) => {
       if (_data) {
@@ -245,7 +247,7 @@ export class TableLoaderUtils {
       col: (desc: ITableDataDescription, column: string, range: Range) =>
         loader(desc).then((d) =>
           range.filter(
-            d.objs.map((d) => d[column]),
+            d.objs.map((a) => a[column]),
             desc.size,
           ),
         ),

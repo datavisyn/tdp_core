@@ -74,56 +74,57 @@ export abstract class ACLUEWrapper extends EventHandler {
     this.storyVis = storyVis;
     this.provVis = provVis;
 
-    this.graph.then((graph) => {
+    this.graph.then((g) => {
       // load registered extensions and pass the ready graph to extension
       PluginRegistry.getInstance()
         .listPlugins(EP_PHOVEA_CLUE_PROVENANCE_GRAPH)
-        .map((desc: IProvenanceGraphEPDesc) => {
-          desc.load().then((plugin: IProvenanceGraphEP) => plugin.factory(graph));
+        .forEach((desc: IProvenanceGraphEPDesc) => {
+          desc.load().then((plugin: IProvenanceGraphEP) => plugin.factory(g));
         });
 
-      graph.on('run_chain', () => {
+      g.on('run_chain', () => {
         if (this.urlTracking === EUrlTracking.ENABLE) {
           this.urlTracking = EUrlTracking.DISABLE_JUMPING;
         }
       });
-      graph.on('ran_chain', (event: any, state: StateNode) => {
+      g.on('ran_chain', (event: any, state: StateNode) => {
         if (this.urlTracking === EUrlTracking.DISABLE_JUMPING) {
           manager.storedState = state ? state.id : null;
           this.urlTracking = EUrlTracking.ENABLE;
         }
       });
-      graph.on('switch_state', (event: any, state: StateNode) => {
+      g.on('switch_state', (event: any, state: StateNode) => {
         if (this.urlTracking === EUrlTracking.ENABLE) {
           manager.storedState = state ? state.id : null;
         }
       });
-      graph.on('select_slide_selected', (event: any, state: SlideNode) => {
+      g.on('select_slide_selected', (event: any, state: SlideNode) => {
         if (this.urlTracking === EUrlTracking.ENABLE) {
           manager.storedSlide = state ? state.id : null;
         }
       });
 
       manager.on(CLUEGraphManager.EVENT_EXTERNAL_STATE_CHANGE, (_, state: IClueState) => {
-        if (state.graph !== graph.desc.id) {
+        if (state.graph !== g.desc.id) {
           // switch to a completely different graph -> reload page
           CLUEGraphManager.reloadPage();
         }
-        const slide = graph.selectedSlides()[0];
+        const slide = g.selectedSlides()[0];
         const currentSlide = slide ? slide.id : null;
         if (state.slide != null && currentSlide !== state.slide) {
           return this.jumpToStory(state.slide, false);
         }
-        const currentState = graph.act ? graph.act.id : null;
+        const currentState = g.act ? g.act.id : null;
         if (state.state != null && currentState !== state.state) {
           return this.jumpToState(state.state);
         }
+        return undefined;
       });
 
-      WrapperUtils.enableKeyboardShortcuts(graph);
+      WrapperUtils.enableKeyboardShortcuts(g);
       this.handleModeChange();
 
-      this.fire('loaded_graph', graph);
+      this.fire('loaded_graph', g);
     });
   }
 

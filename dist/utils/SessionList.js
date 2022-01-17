@@ -32,6 +32,8 @@ class ASessionList {
                 return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.saveSession')}</span></a>`;
             case 'edit':
                 return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}"><i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.SessionList.editSession')}</span></a>`;
+            default:
+                return undefined;
         }
     }
     registerActionListener(manager, $enter) {

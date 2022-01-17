@@ -13,10 +13,6 @@ export class GraphProxy extends ADataType<IGraphDataDescription> {
 
   private loaded: AGraph = null;
 
-  constructor(desc: IGraphDataDescription) {
-    super(desc);
-  }
-
   get nnodes(): number {
     if (this.loaded) {
       return this.loaded.nnodes;
