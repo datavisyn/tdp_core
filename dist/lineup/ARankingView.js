@@ -15,7 +15,7 @@ import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
-import { BaseUtils } from '../base';
+import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { Range } from '../range';
@@ -47,16 +47,16 @@ export class ARankingView extends AView {
          * clears and rebuilds this lineup instance from scratch
          * @returns {Promise<any[]>} promise when done
          */
-        this.rebuild = BaseUtils.debounce(() => this.rebuildImpl(), 100);
+        this.rebuild = debounceAsync(() => this.rebuildImpl(), 100);
         /**
          * similar to rebuild but just loads new data and keep the columns
          * @returns {Promise<any[]>} promise when done
          */
-        this.reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
+        this.reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
         /**
          * updates the list of available columns in the side panel
          */
-        this.updatePanelChooser = BaseUtils.debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
+        this.updatePanelChooser = debounceAsync(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
         /**
          * promise resolved when everything is built
          * @type {any}
