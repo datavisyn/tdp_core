@@ -25,7 +25,7 @@ export class FormMap extends AFormElement {
     updateBadge() {
         const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
         ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-            this.$inputNode.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }));
+            this.$inputNode.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text })).attr('data-testid', 'form-map-dropdown');
         });
     }
     get sessionKey() {
@@ -49,7 +49,8 @@ export class FormMap extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$rootNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+        // use label for data testid and remove special characters such as a colon
+        this.$rootNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true).attr('data-testid', this.elementDesc.label.replace(/[^\w\s]/gi, ''));
         this.$inputNode = this.$rootNode.append('div');
         this.setVisible(this.elementDesc.visible);
         if (this.inline && this.elementDesc.onChange) {
@@ -155,7 +156,7 @@ export class FormMap extends AFormElement {
         const initialValue = row.value;
         switch (desc.type) {
             case FormElementType.SELECT:
-                parent.insertAdjacentHTML('afterbegin', `<select class="form-control from-control-sm" style="width: 100%"></select>`);
+                parent.insertAdjacentHTML('afterbegin', `<select class="form-control from-control-sm" data-testid="form-select" style="width: 100%"></select>`);
                 // register on change listener
                 parent.firstElementChild.addEventListener('change', function () {
                     row.value = this.value;
@@ -174,7 +175,7 @@ export class FormMap extends AFormElement {
                 });
                 break;
             case FormElementType.SELECT2:
-                parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" style="width: 100%"></select>`);
+                parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" data-testid="select2" style="width: 100%"></select>`);
                 FormSelect.resolveData(desc.optionsData)([]).then((values) => {
                     const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
                     // in case of ajax but have default value
@@ -186,6 +187,9 @@ export class FormMap extends AFormElement {
                     const $s = $(s);
                     // merge only the default options if we have no local data
                     $s.select2(BaseUtils.mixin({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
+                    const $searchContainer = $('.select2.select2-container', parent);
+                    const $search = $searchContainer.find('input');
+                    $search.attr('data-testid', 'select2-search-field');
                     if (initialValue) {
                         $s.val(initially).trigger('change');
                     }
@@ -238,7 +242,7 @@ export class FormMap extends AFormElement {
                 });
                 break;
             default:
-                parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" value="${initialValue || ''}">`);
+                parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" data-testid="default-select" value="${initialValue || ''}">`);
                 parent.firstElementChild.addEventListener('change', function () {
                     row.value = this.value;
                     that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
@@ -287,13 +291,13 @@ export class FormMap extends AFormElement {
             row.setAttribute('data-testid', `row-${this.rows.length}`);
             group.appendChild(row);
             row.innerHTML = `
-        <div class="col-sm-4 form-map-row-key pe-0">
+        <div class="col-sm-4 form-map-row-key pe-0" data-testid="key">
           <select class="form-select form-select-sm map-selector" data-testid="form-select">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
-        <div class="col-sm-7 form-map-row-value ps-1 pe-1"></div>
+        <div class="col-sm-7 form-map-row-value ps-1 pe-1" data-testid="value"></div>
         <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" data-testid="close-button" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
             const valueElem = row.querySelector('.form-map-row-value');
             if (d.key) { // has value
