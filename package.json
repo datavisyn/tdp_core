@@ -92,7 +92,6 @@
     "marked": "~3.0.2",
     "md5": "^2.3.0",
     "papaparse": "~5.3.0",
-    "phovea_clue": "github:phovea/phovea_clue#develop",
     "plotly.js": "^2.5.0",
     "plotly.js-dist": "^1.57.1",
     "popper.js": "^1.15.0",
