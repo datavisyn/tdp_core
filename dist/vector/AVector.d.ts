@@ -33,7 +33,7 @@ export declare abstract class AVector<T, D extends IValueTypeDesc> extends ASele
     reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number) => U, initialValue: U, thisArg?: any): Promise<U>;
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number) => U, initialValue: U, thisArg?: any): Promise<U>;
     reduceAtom<U, UD extends IValueTypeDesc>(f: (data: T[], ids: Range, names: string[]) => IAtomValue<U>, thisArgument?: any, valuetype?: UD, idtype?: IDType): IAtom<U, UD>;
-    restore(persisted: any): IVector<T, D> | IAtom<unknown, any>;
+    restore(persisted: any): IAtom<unknown, any> | IVector<T, D>;
 }
 /**
  * view on the vector restricted by a range

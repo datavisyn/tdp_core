@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ISelector } from '../views/AReactView';
 import { AReactChooserView } from '../views/AReactChooserView';
 export declare class DummyReactView extends AReactChooserView {
