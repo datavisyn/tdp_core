@@ -1,6 +1,6 @@
 import logging
-from .dbview import DBMapping
-from . import db
+from ..dbview import DBMapping
+from ..db import configs, session as db_session
 import itertools
 
 _log = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class SQLMappingTable(object):
     if self._integer_ids:  # convert to integer ids
       ids = [int(i) for i in ids]
 
-    with db.session(self._engine) as session:
+    with db_session(self._engine) as session:
       mapped = session.execute(self._query, ids=ids)
 
       # handle multi mappings
@@ -33,12 +33,11 @@ class SQLMappingTable(object):
 
 
 def _discover_mappings():
-  for k, connector in db.configs.connectors.items():
+  for k, connector in configs.connectors.items():
     if not connector.mappings:
       continue
-    engine = db.configs.engine(k)
+    engine = configs.engine(k)
     for mapping in connector.mappings:
-      _log.info('registering %s to %s', mapping.from_idtype, mapping.to_idtype)
       yield SQLMappingTable(mapping, engine)
 
 

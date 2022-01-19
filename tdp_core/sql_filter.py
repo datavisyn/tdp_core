@@ -36,7 +36,8 @@ def _replace_named_sets_in_ids(v):
 
 
 def _replace_range_in_ids(v, id_type, target_id_type):
-  from phovea_server.dataset import get_mappingmanager, get_idmanager
+  from phovea_server.dataset import get_idmanager
+  from phovea_server.idtype import get_mappingmanager
   from phovea_server.range import parse
 
   manager = get_idmanager()

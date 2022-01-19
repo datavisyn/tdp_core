@@ -37,7 +37,7 @@ def phovea(registry):
                   {
                       'namespace': '/api/tdp/xlsx'
                   })
-  registry.append('mapping_provider', 'tdp_core', 'tdp_core.mapping_table')
+  registry.append('mapping_provider', 'sql_mapping_table', 'tdp_core.idtype.mapping_sql')
   registry.append('greenifier', 'psycopg2', 'tdp_core.sql_use_gevent', {})
   registry.append('json-encoder', 'bytes-to-string-encoder', 'tdp_core.bytes_to_string_encoder', {})
 
@@ -70,7 +70,7 @@ def phovea(registry):
 
   # phovea_data_redis
   registry.append('manager', 'idmanager', 'tdp_core.assigner', dict(priority=-5, singleton=True))
-  registry.append('mapping_provider', 'phovea_data_redis', 'tdp_core.redis_mapping_table')
+  registry.append('mapping_provider', 'redis_mapping_table', 'tdp_core.idtype.mapping_redis')
 
   # phovea_data_mongo
   registry.append('dataset-provider', 'dataset-graph', 'tdp_core.graph', {})

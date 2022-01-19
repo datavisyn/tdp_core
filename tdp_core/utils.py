@@ -16,7 +16,7 @@ def map_scores(scores, from_idtype, to_idtype):
   :param to_idtype:
   :return: a mapped version of the scores
   """
-  from phovea_server.dataset import get_mappingmanager
+  from phovea_server.idtype import get_mappingmanager
 
   if len(scores) == 0:
     return []

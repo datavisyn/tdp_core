@@ -1,6 +1,6 @@
 import logging
 from itertools import islice
-from .utils import wait_for_redis_ready
+from ..utils import wait_for_redis_ready
 
 _log = logging.getLogger(__name__)
 

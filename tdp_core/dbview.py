@@ -515,7 +515,7 @@ default_agg_score = DBViewBuilder().query('{agg}({data_subtype})').replace('agg'
 
 class DBMapping(object):
   """
-  simple mapping based on a query of the form `select from_id as f, to_id as t from mapping_table where f in :ids`
+  simple mapping based on a query of the form `select from_id as f, to_id as t from sql_mapping_table where f in :ids`
   """
 
   def __init__(self, from_idtype, to_idtype, query, integer_ids=False):
