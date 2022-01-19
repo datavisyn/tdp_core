@@ -1,7 +1,7 @@
 import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuilder, IBuildAbleOrViewLike, EOrientation } from './interfaces';
 import { ViewLayoutContainer, HTMLView, IViewLayoutContainerOptions, NodeView } from './internal/ViewLayoutContainer';
 import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
-import { LineUpLayoutContainer } from './internal/LineUpLayoutContainer';
+import { LineUpLayoutContainer, ILineUpLayoutContainer } from './internal/LineUpLayoutContainer';
 import { TabbingLayoutContainer, ITabbingLayoutContainerOptions } from './internal/TabbingLayoutContainer';
 import { RootLayoutContainer } from './internal/RootLayoutContainer';
 import { ILayoutContainerOption } from './internal/ALayoutContainer';
@@ -471,7 +471,7 @@ class LineUpBuilder extends AParentBuilder {
     return super.push(view);
   }
 
-  protected buildOptions(): Partial<ISequentialLayoutContainerOptions> {
+  protected buildOptions(): Partial<ILineUpLayoutContainer> {
     return { orientation: this.orientation, stackLayout: this.stackLayout, ...super.buildOptions() };
   }
 

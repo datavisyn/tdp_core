@@ -47,18 +47,21 @@ export interface IInitialRankingOptions {
 
 export class ColumnDescUtils {
   private static baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
-    return {
-      type: 'string',
-      column,
-      label: column,
-      color: '',
-      initialRanking: options.visible != null ? options.visible : true,
-      width: -1,
-      selectedId: -1,
-      selectedSubtype: undefined,
-      ...options,
-      ...(options.extras || {}),
-    };
+    // eslint-disable-next-line prefer-object-spread
+    return Object.assign(
+      {
+        type: 'string',
+        column,
+        label: column,
+        color: '',
+        initialRanking: options.visible != null ? options.visible : true,
+        width: -1,
+        selectedId: -1,
+        selectedSubtype: undefined,
+      },
+      options,
+      options.extras || {},
+    );
   }
 
   static numberColFromArray(column: string, rows: any[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {

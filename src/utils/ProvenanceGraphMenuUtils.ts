@@ -72,7 +72,7 @@ export class ProvenanceGraphMenuUtils {
         const extras = {
           name: (<HTMLInputElement>dialog.body.querySelector(`#${prefix}_name`)).value,
           description: (<HTMLTextAreaElement>dialog.body.querySelector(`#${prefix}_desc`)).value,
-          ...(args.permission ? permissions.resolve(new FormData(dialog.form)) : d.permissions),
+          ...(args.permission ? permissions.resolve(new FormData(dialog.form)) : { permissions: d.permissions, group: d.group, buddies: d.buddies }),
         };
         resolve(extras);
         dialog.hide();
