@@ -16,6 +16,7 @@ import {
     SortEndHandler,
     SortableHandle,
   } from 'react-sortable-hoc';
+import {MultiValueGenericProps} from 'react-select/src/components/MultiValue';
 
 
 interface NumericalColumnSelectProps {
@@ -51,13 +52,12 @@ const SortableMultiValue = SortableElement(
 
 // tslint:disable-next-line:variable-name
 const SortableMultiValueLabel = SortableHandle(
-    (props: Props<ColumnInfo>) => <components.MultiValueLabel {...props} />
+    (props: MultiValueGenericProps<ColumnInfo>) => <components.MultiValueLabel {...props} />
 );
 
 // tslint:disable-next-line:variable-name
-const SortableSelect = SortableContainer(Select) as React.ComponentClass<
-    Props<ColumnInfo, boolean> & SortableContainerProps
->;
+const SortableSelect = SortableContainer(Select) as unknown as React.ComponentClass<Props<ColumnInfo, boolean> & SortableContainerProps>;
+
 
 export function NumericalColumnSelect(props: NumericalColumnSelectProps) {
     const selectNumOptions = useMemo(() => {
