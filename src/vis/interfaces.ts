@@ -36,7 +36,7 @@ export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripCon
 
 export interface NumericalColumn {
     info: ColumnInfo;
-    values: {id: number, val: number}[];
+    values: {id: string, val: number}[];
     // TODO: Think about making async accessor function:
     // values: (rows: object[]) => Promise<{id: number, val: number}[]>;
     type: EColumnTypes.NUMERICAL;
@@ -45,7 +45,7 @@ export interface NumericalColumn {
 export interface CategoricalColumn {
     info: ColumnInfo;
     colors: string[];
-    values: {id: number, val: string}[];
+    values: {id: string, val: string}[];
     type: EColumnTypes.CATEGORICAL;
 }
 

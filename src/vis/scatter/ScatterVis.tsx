@@ -43,7 +43,7 @@ interface ScatterVisProps {
     shapes?: string[];
     columns: (NumericalColumn | CategoricalColumn) [];
     filterCallback?: (s: EFilterOptions) => void;
-    selectionCallback?: (s: number[]) => void;
+    selectionCallback?: (s: string[]) => void;
     selected?: {[key: number]: boolean};
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
@@ -143,7 +143,7 @@ export function ScatterVis({
                         style={{width: '100%', height: '100%'}}
                         onSelected={(d) => {
                             console.log(d);
-                            d ? selectionCallback(d.points.map((d) => +(d as any).id)) : selectionCallback([]);
+                            d ? selectionCallback(d.points.map((d) => (d as any).id)) : selectionCallback([]);
                         }}
                         //plotly redraws everything on updates, so you need to reappend title and
                         // change opacity on update, instead of just in a use effect
