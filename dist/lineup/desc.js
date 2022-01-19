@@ -3,7 +3,8 @@ import { extent } from 'd3';
 import { ValueTypeUtils } from '../data';
 export class ColumnDescUtils {
     static baseColumn(column, options = {}) {
-        return {
+        // eslint-disable-next-line prefer-object-spread
+        return Object.assign({
             type: 'string',
             column,
             label: column,
@@ -12,9 +13,7 @@ export class ColumnDescUtils {
             width: -1,
             selectedId: -1,
             selectedSubtype: undefined,
-            ...options,
-            ...(options.extras || {}),
-        };
+        }, options, options.extras || {});
     }
     static numberColFromArray(column, rows, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {

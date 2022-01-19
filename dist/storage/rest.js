@@ -19,7 +19,7 @@ export class RestStorageUtils {
     static listNamedSetsAsOptions(idType = null) {
         return RestStorageUtils.listNamedSets(idType).then((namedSets) => namedSets.map((d) => ({ name: d.name, value: d.id })));
     }
-    static saveNamedSet(name, idType, ids, subType, sec, description = '') {
+    static saveNamedSet(name, idType, ids, subType, description = '', sec = {}) {
         const data = {
             name,
             type: ENamedSetType.NAMEDSET,

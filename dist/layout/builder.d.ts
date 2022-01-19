@@ -1,7 +1,7 @@
 import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuilder, IBuildAbleOrViewLike, EOrientation } from './interfaces';
 import { IViewLayoutContainerOptions } from './internal/ViewLayoutContainer';
 import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
-import { LineUpLayoutContainer } from './internal/LineUpLayoutContainer';
+import { LineUpLayoutContainer, ILineUpLayoutContainer } from './internal/LineUpLayoutContainer';
 import { TabbingLayoutContainer, ITabbingLayoutContainerOptions } from './internal/TabbingLayoutContainer';
 import { RootLayoutContainer } from './internal/RootLayoutContainer';
 import { ILayoutContainerOption } from './internal/ALayoutContainer';
@@ -105,7 +105,7 @@ declare class LineUpBuilder extends AParentBuilder {
      * @return {LineUpBuilder} itself
      */
     push(view: IBuildAbleOrViewLike): this;
-    protected buildOptions(): Partial<ISequentialLayoutContainerOptions>;
+    protected buildOptions(): Partial<ILineUpLayoutContainer>;
     build(root: RootLayoutContainer, doc?: Document): LineUpLayoutContainer;
 }
 declare class TabbingBuilder extends AParentBuilder {
