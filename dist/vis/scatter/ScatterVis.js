@@ -61,6 +61,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         const layout = {
             showlegend: true,
             legend: {
+                //@ts-ignore
                 itemclick: false,
                 itemdoubleclick: false
             },

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {CategoricalColumn, Column, LocalDataProvider, NumberColumn, Ranking, ValueColumn} from 'lineupjs';
+import {CategoricalColumn, Column, IDataRow, LocalDataProvider, NumberColumn, Ranking, ValueColumn} from 'lineupjs';
 import {EventHandler, IRow} from '../base';
 import {Vis} from './Vis';
 import {EColumnTypes, ColumnInfo, VisColumn} from './interfaces';
@@ -85,10 +85,14 @@ export class LineupVisWrapper {
             };
         };
 
+        const mapData = <T,>(data: IDataRow[], column: ValueColumn<T>) => {
+            return data.map((d, i) => ({id: (<IRow>d.v)._id, val: column.getRaw(d)}));
+        };
+
         const getColumnValue = async <T,>(column: ValueColumn<T>) => {
 
             if (column.isLoaded()) {
-                return data.map((d, i) => ({id: (<IRow>d.v)._id, val: column.getValue(d)}));
+                return mapData(data, column);
             }
 
             return new Promise<{id: number, val: T}[]>((resolve, reject) => {
@@ -99,7 +103,7 @@ export class LineupVisWrapper {
 
                 column.on(ValueColumn.EVENT_DATA_LOADED, () => {
                     clearTimeout(timeout);
-                    resolve(data.map((d, i) => ({id: (<IRow>d.v)._id, val: column.getValue(d)})));
+                    resolve(mapData(data, column));
                 });
             });
         };

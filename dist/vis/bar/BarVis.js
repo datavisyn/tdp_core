@@ -71,6 +71,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         const layout = {
             showlegend: true,
             legend: {
+                //@ts-ignore
                 itemclick: false,
                 itemdoubleclick: false
             },

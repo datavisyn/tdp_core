@@ -51,9 +51,12 @@ export class LineupVisWrapper {
                 id: column.fqid,
             };
         };
+        const mapData = (data, column) => {
+            return data.map((d, i) => ({ id: d.v._id, val: column.getRaw(d) }));
+        };
         const getColumnValue = async (column) => {
             if (column.isLoaded()) {
-                return data.map((d, i) => ({ id: d.v._id, val: column.getValue(d) }));
+                return mapData(data, column);
             }
             return new Promise((resolve, reject) => {
                 //times out if we take longer than 60 seconds to load the columns.
@@ -62,7 +65,7 @@ export class LineupVisWrapper {
                 }, 60000);
                 column.on(ValueColumn.EVENT_DATA_LOADED, () => {
                     clearTimeout(timeout);
-                    resolve(data.map((d, i) => ({ id: d.v._id, val: column.getValue(d) })));
+                    resolve(mapData(data, column));
                 });
             });
         };

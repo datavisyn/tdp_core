@@ -126,9 +126,10 @@ export function BarVis({
             return null;
         }
 
-        const layout = {
+        const layout: Plotly.Layout = {
             showlegend: true,
             legend: {
+                //@ts-ignore
                 itemclick: false,
                 itemdoubleclick: false
             },

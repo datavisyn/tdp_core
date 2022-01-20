@@ -52,6 +52,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         const layout = {
             showlegend: true,
             legend: {
+                //@ts-ignore
                 itemclick: false,
                 itemdoubleclick: false
             },

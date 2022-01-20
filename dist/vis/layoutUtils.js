@@ -52,7 +52,9 @@ export function beautifyLayout(traces, layout) {
         };
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 0,
             y0: 1,
@@ -68,7 +70,9 @@ export function beautifyLayout(traces, layout) {
         });
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 0,
             y0: 0,
@@ -84,7 +88,9 @@ export function beautifyLayout(traces, layout) {
         });
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 0,
             y0: 0,
@@ -100,7 +106,9 @@ export function beautifyLayout(traces, layout) {
         });
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 1,
             y0: 0,

@@ -1,5 +1,4 @@
-import {Layout} from 'plotly.js';
-import {PlotlyInfo, VisCategoricalColumn, VisColumn, VisNumericalColumn} from './interfaces';
+import {PlotlyInfo, VisColumn} from './interfaces';
 
 /**
  * Truncate long texts (e.g., to use as axes title)
@@ -17,7 +16,7 @@ function truncateText(text: string, maxLength = 50) {
  * @param layout the current layout to be changed. Typed to any because the plotly types complain.
  * @returns the changed layout
  */
-export function beautifyLayout(traces: PlotlyInfo, layout: any) {
+export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
     layout.annotations = [];
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
@@ -62,7 +61,9 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
 
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 0,
             y0: 1,
@@ -79,7 +80,9 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
 
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 0,
             y0: 0,
@@ -96,7 +99,9 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
 
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 0,
             y0: 0,
@@ -114,7 +119,9 @@ export function beautifyLayout(traces: PlotlyInfo, layout: any) {
 
         layout.shapes.push({
             type: 'line',
+            // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
+            // @ts-ignore
             yref: `y${i > 0 ? i + 1 : ''} domain`,
             x0: 1,
             y0: 0,

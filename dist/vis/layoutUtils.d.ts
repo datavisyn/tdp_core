@@ -5,7 +5,7 @@ import { PlotlyInfo, VisColumn } from './interfaces';
  * @param layout the current layout to be changed. Typed to any because the plotly types complain.
  * @returns the changed layout
  */
-export declare function beautifyLayout(traces: PlotlyInfo, layout: any): any;
+export declare function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout): import("plotly.js").Layout;
 export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
     resolvedValues: {
         id: number;
