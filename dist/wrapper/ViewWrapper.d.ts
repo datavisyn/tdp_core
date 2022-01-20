@@ -9,7 +9,7 @@
  *
  ******************************************************** */
 import { IViewProvider } from '../lineup/IViewProvider';
-import { ISelection, IView, IViewPluginDesc } from '../base/interfaces';
+import { ISelection, IView, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { AView } from '../views/AView';
 import { EventHandler, IEvent } from '../base';
 import { ObjectNode, ProvenanceGraph } from '../provenance';
@@ -82,6 +82,7 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     setItemSelection(sel: ISelection, name?: string): void;
     update(): void;
     dumpReference(): number;
+    dump(): IViewWrapperDump;
     selectionText(selection: any, idType: string): string;
     static guessIDType(v: IViewPluginDesc): IDType | null;
 }

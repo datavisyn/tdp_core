@@ -312,6 +312,14 @@ export class ViewWrapper extends EventHandler {
     dumpReference() {
         return this.ref.id;
     }
+    dump() {
+        return {
+            hash: this.ref.hash,
+            dumpReference: this.dumpReference(),
+            plugin: this.plugin.id,
+            parameters: [],
+        };
+    }
     selectionText(selection, idType) {
         const label = idType.includes('*') || idType.includes('(') ? 'item' : IDTypeManager.getInstance().resolveIdType(idType).name;
         switch (String(selection)) {

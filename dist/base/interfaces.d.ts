@@ -376,6 +376,12 @@ export interface IViewPlugin {
      */
     factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
+export interface IViewWrapperDump {
+    hash: string;
+    plugin: string;
+    dumpReference: number;
+    parameters: object;
+}
 export interface IInstantView {
     readonly node: HTMLElement;
     destroy(): void;

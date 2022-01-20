@@ -10,7 +10,7 @@
  ******************************************************** */
 
 import { IViewProvider } from '../lineup/IViewProvider';
-import { ISelection, IView, IViewContext, IViewPluginDesc } from '../base/interfaces';
+import { ISelection, IView, IViewContext, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
@@ -406,6 +406,15 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
   dumpReference() {
     return this.ref.id;
+  }
+
+  dump(): IViewWrapperDump {
+    return {
+      hash: this.ref.hash,
+      dumpReference: this.dumpReference(),
+      plugin: this.plugin.id,
+      parameters: [], // TODO:
+    };
   }
 
   selectionText(selection: any, idType: string) {
