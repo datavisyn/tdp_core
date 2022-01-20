@@ -22,7 +22,7 @@ import {LineupUtils} from './utils';
 import {ISearchOption} from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
-import {GeneralVisWrapper} from './internal/GeneralVisWrapper';
+import {LineupVisWrapper} from '../vis/LineupVisWrapper';
 import {BaseUtils, debounceAsync} from '../base';
 import {I18nextManager} from '../i18n';
 import {IDTypeManager} from '../idtype';
@@ -53,7 +53,7 @@ export abstract class ARankingView extends AView {
   private readonly taggle: EngineRenderer | TaggleRenderer;
   public readonly selectionHelper: LineUpSelectionHelper;
   private readonly panel: LineUpPanelActions;
-  private readonly generalVis: GeneralVisWrapper;
+  private readonly generalVis: LineupVisWrapper;
 
 
   /**
@@ -213,7 +213,7 @@ export abstract class ARankingView extends AView {
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
 
     const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
-    this.generalVis = new GeneralVisWrapper({
+    this.generalVis = new LineupVisWrapper({
       provider: this.provider,
       selectionCallback: (selected: number[]) => {
         const r = Range.list(selected);

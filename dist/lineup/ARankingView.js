@@ -14,7 +14,7 @@ import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
@@ -166,7 +166,7 @@ export class ARankingView extends AView {
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
-        this.generalVis = new GeneralVisWrapper({
+        this.generalVis = new LineupVisWrapper({
             provider: this.provider,
             selectionCallback: (selected) => {
                 const r = Range.list(selected);
