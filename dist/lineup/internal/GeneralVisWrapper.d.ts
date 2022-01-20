@@ -1,11 +1,10 @@
 import { LocalDataProvider } from 'lineupjs';
-import { EventHandler } from '../../base';
 export interface IGeneralVisWrapperArgs {
     provider: LocalDataProvider;
     selectionCallback: (selected: number[]) => void;
     doc: Document;
 }
-export declare class GeneralVisWrapper extends EventHandler {
+export declare class GeneralVisWrapper {
     /**
      * This string is assigned if a categorical value is missing and rendered by Plotly.
      */

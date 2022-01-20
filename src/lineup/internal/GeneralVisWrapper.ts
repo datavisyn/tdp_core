@@ -2,12 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {CategoricalColumn, Column, LocalDataProvider, NumberColumn, Ranking, ValueColumn} from 'lineupjs';
 import {EventHandler, IRow} from '../../base';
-import {IDTypeManager} from '../../idtype';
-import {ARankingView} from '..';
 import {Vis} from '../../vis/Vis';
 import {EColumnTypes, ColumnInfo, VisColumn} from '../../vis/interfaces';
-import {LineUpSelectionHelper} from './LineUpSelectionHelper';
-import {IDType} from '../../idtype';
 
 export interface IGeneralVisWrapperArgs {
     provider: LocalDataProvider;
@@ -15,7 +11,7 @@ export interface IGeneralVisWrapperArgs {
     doc: Document;
 }
 
-export class GeneralVisWrapper extends EventHandler {
+export class GeneralVisWrapper {
     /**
      * This string is assigned if a categorical value is missing and rendered by Plotly.
      */
@@ -28,8 +24,6 @@ export class GeneralVisWrapper extends EventHandler {
 
     // tslint:disable-next-line:variable-name
     constructor(args: IGeneralVisWrapperArgs) {
-        super();
-
         this.selectionCallback = args.selectionCallback;
         this.provider = args.provider;
         this.node = args.doc.createElement('div');

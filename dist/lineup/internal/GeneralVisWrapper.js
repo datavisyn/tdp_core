@@ -1,13 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CategoricalColumn, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
-import { EventHandler } from '../../base';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
-export class GeneralVisWrapper extends EventHandler {
+export class GeneralVisWrapper {
     // tslint:disable-next-line:variable-name
     constructor(args) {
-        super();
         this.selectionCallback = args.selectionCallback;
         this.provider = args.provider;
         this.node = args.doc.createElement('div');
