@@ -1,8 +1,8 @@
 import { merge } from 'lodash';
-import { I18nextManager } from '../..';
+import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
-import { resolveColumnValues, resolveSingleColumn } from '../layoutUtils';
-import { getCol } from '../sidebar/utils';
+import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
+import { getCol } from '../sidebar';
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["DEFAULT"] = "Default";

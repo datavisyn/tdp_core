@@ -1,9 +1,8 @@
 import {merge} from 'lodash';
-import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
-import {PlotlyInfo, PlotlyData} from '../interfaces';
+import {PlotlyInfo, PlotlyData, VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
 import {EViolinOverlay} from '../bar/utils';
-import {resolveColumnValues} from '../layoutUtils';
-import {I18nextManager} from '../..';
+import {resolveColumnValues} from '../general/layoutUtils';
+import {I18nextManager} from '../../i18n';
 
 export function isViolin(s: IVisConfig): s is IViolinConfig {
     return s.type === ESupportedPlotlyVis.VIOLIN;
@@ -75,6 +74,7 @@ export async function createViolinTraces(
                         type: 'violin',
                         pointpos: 0,
                         jitter: .3,
+                        // @ts-ignore
                         hoveron: 'violins',
                         points: config.violinOverlay === EViolinOverlay.STRIP ? 'all' : false,
                         box: {
@@ -105,6 +105,7 @@ export async function createViolinTraces(
                         xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
                         yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
                         type: 'violin',
+                        // @ts-ignore
                         hoveron: 'violins',
                         hoverinfo: 'y',
                         meanline: {

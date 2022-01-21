@@ -1,5 +1,4 @@
-import { ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis, VisColumn } from '../interfaces';
-import { PlotlyInfo } from '../interfaces';
+import { PlotlyInfo, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis, VisColumn } from '../interfaces';
 export declare enum ENumericalColorScaleType {
     SEQUENTIAL = "Sequential",
     DIVERGENT = "Divergent"

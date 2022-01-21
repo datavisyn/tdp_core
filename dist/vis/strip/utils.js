@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
-import { I18nextManager } from '../..';
+import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
-import { resolveColumnValues } from '../layoutUtils';
+import { resolveColumnValues } from '../general/layoutUtils';
 export function isStrip(s) {
     return s.type === ESupportedPlotlyVis.STRIP;
 }
@@ -48,6 +48,7 @@ export async function createStripTraces(columns, config, scales) {
                     name: 'All points',
                     mode: 'none',
                     pointpos: 0,
+                    // @ts-ignore
                     box: {
                         visible: true
                     },
@@ -78,6 +79,7 @@ export async function createStripTraces(columns, config, scales) {
                     name: 'All points',
                     mode: 'none',
                     pointpos: 0,
+                    // @ts-ignore
                     box: {
                         visible: true
                     },

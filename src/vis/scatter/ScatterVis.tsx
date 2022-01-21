@@ -1,23 +1,13 @@
 import * as React from 'react';
-import {VisCategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales, VisColumn} from '../interfaces';
-import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
-import {ColorSelect} from '../sidebar/ColorSelect';
-import {ShapeSelect} from '../sidebar/ShapeSelect';
-import {FilterButtons} from '../sidebar/FilterButtons';
-import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
+import {IVisConfig, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, Scales, VisColumn} from '../interfaces';
+import {BrushOptionButtons, ColorSelect, FilterButtons, NumericalColumnSelect, OpacitySlider, ShapeSelect, VisTypeSelect, WarningMessage} from '../sidebar';
+import {PlotlyComponent, Plotly} from '../Plot';
+import {InvalidCols} from '../general';
 import d3 from 'd3';
 import {createScatterTraces, ENumericalColorScaleType, IScatterConfig} from './utils';
-import {beautifyLayout} from '../layoutUtils';
+import {beautifyLayout} from '../general/layoutUtils';
 import {merge, uniqueId} from 'lodash';
-import {BrushOptionButtons} from '../sidebar/BrushOptionButtons';
-import {OpacitySlider} from '../sidebar/OpacitySlider';
-import {WarningMessage} from '../sidebar/WarningMessage';
-import {useAsync} from '../..';
-import Plotly from 'plotly.js';
+import {useAsync} from '../../hooks';
 
 interface ScatterVisProps {
     config: IScatterConfig;
@@ -85,10 +75,10 @@ export function ScatterVis({
     scales
 }: ScatterVisProps) {
 
-    const id = useMemo(() => uniqueId('ScatterVis'), []);
+    const id = React.useMemo(() => uniqueId('ScatterVis'), []);
 
 
-    useEffect(() => {
+    React.useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
@@ -100,17 +90,17 @@ export function ScatterVis({
           });
     }, []);
 
-    const mergedOptionsConfig = useMemo(() => {
+    const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, []);
 
-    const mergedExtensions = useMemo(() => {
+    const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
 
     const {value: traces, status: traceStatus, error: traceError} = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
 
-    const layout = useMemo(() => {
+    const layout = React.useMemo(() => {
         if(!traces) {
             return null;
         }
@@ -137,7 +127,7 @@ export function ScatterVis({
             <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
                 {traceStatus === 'success' && traces?.plots.length > 0 ?
-                    <Plot
+                    <PlotlyComponent
                         divId={`plotlyDiv${id}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout as any}
@@ -147,7 +137,7 @@ export function ScatterVis({
                         onSelected={(d) => {
                             d ? selectionCallback(d.points.map((d) => +(d as any).id)) : selectionCallback([]);
                         }}
-                        //plotly redraws everything on updates, so you need to reappend title and
+                        // plotly redraws everything on updates, so you need to reappend title and
                         // change opacity on update, instead of just in a use effect
                         onInitialized={() => {
                             d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
@@ -159,12 +149,12 @@ export function ScatterVis({
                             d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
 
                             for(const p of traces.plots) {
-                                d3.select(`g .${(p.data as any).xaxis}title`)
+                                d3.select(`g .${p.data.xaxis}title`)
                                     .style('pointer-events', 'all')
                                     .append('title')
                                     .text(p.xLabel);
 
-                                d3.select(`g .${(p.data as any).yaxis}title`)
+                                d3.select(`g .${p.data.yaxis}title`)
                                     .style('pointer-events', 'all')
                                     .append('title')
                                     .text(p.yLabel);

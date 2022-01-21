@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Scales, VisColumn } from '../interfaces';
-import { IVisConfig } from '../interfaces';
+import { IVisConfig, Scales, VisColumn } from '../interfaces';
 import { IStripConfig } from './utils';
 interface StripVisProps {
     config: IStripConfig;

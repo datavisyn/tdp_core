@@ -1,9 +1,8 @@
 import d3 from 'd3';
 import {merge} from 'lodash';
-import {I18nextManager} from '../..';
-import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, VisColumn} from '../interfaces';
-import {PlotlyInfo, PlotlyData} from '../interfaces';
-import {resolveColumnValues} from '../layoutUtils';
+import {I18nextManager} from '../../i18n';
+import {PlotlyInfo, PlotlyData, VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, VisColumn} from '../interfaces';
+import {resolveColumnValues} from '../general/layoutUtils';
 
 export function isPCP(s: IVisConfig): s is IPCPConfig {
     return s.type === ESupportedPlotlyVis.PCP;

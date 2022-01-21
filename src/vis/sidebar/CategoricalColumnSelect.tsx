@@ -1,7 +1,6 @@
 import * as React from 'react';
-import {useMemo} from 'react';
 import Select from 'react-select';
-import {VisCategoricalColumn, ColumnInfo, EColumnTypes, VisNumericalColumn, VisColumn} from '../interfaces';
+import {ColumnInfo, EColumnTypes, VisColumn} from '../interfaces';
 import {formatOptionLabel} from './utils';
 
 interface CategoricalColumnSelectProps {
@@ -11,7 +10,7 @@ interface CategoricalColumnSelectProps {
 }
 
 export function CategoricalColumnSelect(props: CategoricalColumnSelectProps) {
-    const selectCatOptions = useMemo(() => {
+    const selectCatOptions = React.useMemo(() => {
         return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
     }, [props.columns.length]);
 

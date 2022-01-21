@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { useMemo } from 'react';
 import Select from 'react-select';
 import { EColumnTypes } from '../interfaces';
 import { formatOptionLabel } from './utils';
 export function CategoricalColumnSelect(props) {
-    const selectCatOptions = useMemo(() => {
+    const selectCatOptions = React.useMemo(() => {
         return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
     }, [props.columns.length]);
     return (React.createElement(React.Fragment, null,

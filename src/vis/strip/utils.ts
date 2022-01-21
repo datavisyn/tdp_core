@@ -1,8 +1,8 @@
 import {merge} from 'lodash';
-import {I18nextManager} from '../..';
-import {VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
-import {PlotlyInfo, PlotlyData} from '../interfaces';
-import {resolveColumnValues} from '../layoutUtils';
+import {I18nextManager} from '../../i18n';
+import {PlotlyInfo, PlotlyData, VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisNumericalColumn, Scales, VisColumn} from '../interfaces';
+import {} from '../interfaces';
+import {resolveColumnValues} from '../general/layoutUtils';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
     return s.type === ESupportedPlotlyVis.STRIP;
@@ -74,6 +74,7 @@ export async function createStripTraces(
                         name: 'All points',
                         mode: 'none',
                         pointpos: 0,
+                        // @ts-ignore
                         box: {
                             visible: true
                         },
@@ -107,6 +108,7 @@ export async function createStripTraces(
                     name: 'All points',
                     mode: 'none',
                     pointpos: 0,
+                    // @ts-ignore
                     box: {
                         visible: true
                     },

@@ -1,11 +1,10 @@
-import {EColumnTypes, VisNumericalColumn, VisCategoricalColumn, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis, VisColumn} from '../interfaces';
-import {PlotlyInfo, PlotlyData} from '../interfaces';
-import {getCol} from '../sidebar/utils';
+import {PlotlyInfo, PlotlyData, EColumnTypes, VisNumericalColumn, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis, VisColumn} from '../interfaces';
+import {getCol} from '../sidebar';
 import {merge} from 'lodash';
 import d3 from 'd3';
 import {getCssValue} from '../../utils';
-import {resolveColumnValues, resolveSingleColumn} from '../layoutUtils';
-import {I18nextManager} from '../..';
+import {resolveColumnValues, resolveSingleColumn} from '../general/layoutUtils';
+import {I18nextManager} from '../../i18n';
 
 export enum ENumericalColorScaleType {
     SEQUENTIAL = 'Sequential',

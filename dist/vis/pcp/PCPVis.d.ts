@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { VisColumn } from '../interfaces';
-import { IVisConfig } from '../interfaces';
+import { VisColumn, IVisConfig } from '../interfaces';
 import { IPCPConfig } from './utils';
 interface PCPVisProps {
     config: IPCPConfig;

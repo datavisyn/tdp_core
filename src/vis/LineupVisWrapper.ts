@@ -1,11 +1,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {CategoricalColumn, Column, IDataRow, LocalDataProvider, NumberColumn, Ranking, ValueColumn} from 'lineupjs';
-import {EventHandler, IRow} from '../base';
 import {Vis} from './Vis';
-import {EColumnTypes, ColumnInfo, VisColumn} from './interfaces';
+import {EColumnTypes, ColumnInfo, VisColumn, EFilterOptions} from './interfaces';
 
-export interface ILineupVisWrapperArgs {
+export interface ILineupVisWrapperProps {
     provider: LocalDataProvider;
     selectionCallback: (selected: number[]) => void;
     doc: Document;
@@ -17,26 +16,22 @@ export class LineupVisWrapper {
      */
     private static PLOTLY_CATEGORICAL_MISSING_VALUE: string = '--';
 
-    readonly node: HTMLElement; // wrapper node
-    private selectionCallback: (selected: number[]) => void;
+    readonly node: HTMLElement;
     private viewable: boolean;
-    private provider: LocalDataProvider;
 
     // tslint:disable-next-line:variable-name
-    constructor(args: ILineupVisWrapperArgs) {
-        this.selectionCallback = args.selectionCallback;
-        this.provider = args.provider;
-        this.node = args.doc.createElement('div');
+    constructor(protected readonly props: ILineupVisWrapperProps) {
+        this.node = props.doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
         this.viewable = false;
     }
 
-    getSelectionMap() {
-        const sel = this.provider.getSelection();
+    getSelectionMap = () => {
+        const sel = this.props.provider.getSelection();
         const selectedMap: { [key: number]: boolean } = {};
 
-        const allData = this.provider.data;
+        const allData = this.props.provider.data;
 
         for(const i of allData) {
             selectedMap[i._id] = false;
@@ -49,27 +44,24 @@ export class LineupVisWrapper {
         return selectedMap;
     }
 
-    filterCallback(s: string) {
-        const selectedIds = this.provider.getSelection();
+    filterCallback = (s: string) => {
+        const selectedIds = this.props.provider.getSelection();
 
-        if(selectedIds.length === 0 && s !== 'Clear Filter') {
+        if(selectedIds.length === 0 && s !== EFilterOptions.CLEAR) {
             return;
         }
 
-        this.provider.setFilter((row) => {
-            return s === 'Filter In' ? selectedIds.includes(row.i) : s === 'Filter Out' ? !selectedIds.includes(row.i) : true;
+        this.props.provider.setFilter((row) => {
+            return s === EFilterOptions.IN ? selectedIds.includes(row.i) : s === EFilterOptions.OUT ? !selectedIds.includes(row.i) : true;
         });
 
-        //de select everything after filtering.
-        this.selectionCallback([]);
-
+        this.props.selectionCallback([]);
         this.updateCustomVis();
     }
 
-    updateCustomVis() {
-        const ranking = this.provider.getFirstRanking();
-
-        const data = this.provider.viewRawRows(ranking.getOrder());
+    updateCustomVis = () => {
+        const ranking = this.props.provider.getFirstRanking();
+        const data = this.props.provider.viewRawRows(ranking.getOrder());
 
         const cols: VisColumn[] = [];
 
@@ -80,17 +72,16 @@ export class LineupVisWrapper {
                 // This regex strips any html off of the label and summary, leaving only the center text. For example, <div><span>Hello</span></div> would be hello.
                 name: column.getMetaData().label.replace(/(<([^>]+)>)/gi, ''),
                 description: column.getMetaData().summary.replace(/(<([^>]+)>)/gi, ''),
-                // TODO: What kind of id to use?
                 id: column.fqid,
             };
         };
 
-        const mapData = <T,>(data: IDataRow[], column: ValueColumn<T>) => {
-            return data.map((d, i) => ({id: (<IRow>d.v)._id, val: column.getRaw(d)}));
+        const mapData = <T extends ValueColumn<any>,>(data: IDataRow[], column: T) => {
+            // TODO: Refactor to use _visyn_id instead.
+            return data.map((d, i) => ({id: d.v._id, val: column.getRaw(d)}));
         };
 
-        const getColumnValue = async <T,>(column: ValueColumn<T>) => {
-
+        const getColumnValue = async <T extends ValueColumn<any>,>(column: T) => {
             if (column.isLoaded()) {
                 return mapData(data, column);
             }
@@ -131,7 +122,7 @@ export class LineupVisWrapper {
                 {
                     columns: cols,
                     selected: selectedMap,
-                    selectionCallback: (s: number[]) => this.selectionCallback(s),
+                    selectionCallback: (s: number[]) => this.props.selectionCallback(s),
                     filterCallback: (s: string) => this.filterCallback(s)
                 }
             ),
@@ -139,22 +130,17 @@ export class LineupVisWrapper {
         );
     }
 
-    toggleCustomVis() {
+    toggleCustomVis = () => {
         this.viewable = !this.viewable;
         this.node.style.display = this.viewable ? 'flex' : 'none';
 
-        this.provider.getFirstRanking().on(`${Ranking.EVENT_FILTER_CHANGED}.track`, () => {
-            this.updateCustomVis();
-        });
-
-        this.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, () => {
-            this.updateCustomVis();
-        });
+        this.props.provider.getFirstRanking().on(`${Ranking.EVENT_FILTER_CHANGED}.track`, this.updateCustomVis);
+        this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, this.updateCustomVis);
 
         this.updateCustomVis();
     }
 
-    hide() {
+    hide = () => {
         ReactDOM.unmountComponentAtNode(this.node);
         this.viewable = false;
         this.node.style.display = 'none';

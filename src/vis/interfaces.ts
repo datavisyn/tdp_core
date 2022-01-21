@@ -1,4 +1,4 @@
-import {Data} from 'plotly.js';
+import {Plotly} from './Plot';
 import {IBarConfig} from './bar/utils';
 import {IPCPConfig} from './pcp/utils';
 import {IScatterConfig} from './scatter/utils';
@@ -70,7 +70,7 @@ export type PlotlyInfo = {
 };
 
 export type PlotlyData = {
-    data: Data,
+    data: Partial<Plotly.PlotData>,
     xLabel: string,
     yLabel: string
 };

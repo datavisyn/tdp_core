@@ -1,5 +1,4 @@
-import { ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
-import { PlotlyInfo } from '../interfaces';
+import { PlotlyInfo, ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
 export declare function isStrip(s: IVisConfig): s is IStripConfig;
 export interface IStripConfig {
     type: ESupportedPlotlyVis.STRIP;

@@ -1,4 +1,4 @@
-import {PlotlyInfo, VisColumn} from './interfaces';
+import {PlotlyInfo, VisColumn} from '../interfaces';
 
 /**
  * Truncate long texts (e.g., to use as axes title)
@@ -6,7 +6,7 @@ import {PlotlyInfo, VisColumn} from './interfaces';
  * @param maxLength Maximum text length (default: 50)
  */
 function truncateText(text: string, maxLength = 50) {
-    return (text.length > maxLength) ? `${text.substr(0, maxLength)}...` : text;
+    return (text.length > maxLength) ? `${text.substring(0, maxLength)}...` : text;
 }
 
 

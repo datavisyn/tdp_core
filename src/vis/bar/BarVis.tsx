@@ -1,25 +1,14 @@
 import * as React from 'react';
-import {VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales, VisColumn} from '../interfaces';
-import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
-
-import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
+import {ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig} from '../interfaces';
+import {PlotlyComponent, Plotly} from '../Plot';
+import {InvalidCols} from '../general';
 import d3 from 'd3';
-import {beautifyLayout} from '../layoutUtils';
+import {beautifyLayout} from '../general/layoutUtils';
 import {merge} from 'lodash';
 import {createBarTraces, EBarDirection, EBarDisplayType, EBarGroupingType, IBarConfig} from './utils';
-import {GroupSelect} from '../sidebar/GroupSelect';
-import {MultiplesSelect} from '../sidebar/MultiplesSelect';
-import {BarDirectionButtons} from '../sidebar/BarDirectionButtons';
-import {BarGroupTypeButtons} from '../sidebar/BarGroupTypeButtons';
-import {BarDisplayButtons} from '../sidebar/BarDisplayTypeButtons';
-import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
-import {WarningMessage} from '../sidebar/WarningMessage';
-import {useAsync} from '../..';
-import Plotly from 'plotly.js';
+import {useAsync} from '../../hooks';
+import {BarDirectionButtons, BarDisplayButtons, BarGroupTypeButtons, CategoricalColumnSelect, GroupSelect, MultiplesSelect, VisTypeSelect, WarningMessage} from '../sidebar';
+
 
 interface BarVisProps {
     config: IBarConfig;
@@ -94,22 +83,22 @@ export function BarVis({
     setConfig,
     scales
 }: BarVisProps) {
-    const mergedOptionsConfig = useMemo(() => {
+    const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, []);
 
-    const mergedExtensions = useMemo(() => {
+    const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
 
     const {value: traces, status: traceStatus, error: traceError} = useAsync(createBarTraces, [columns, config, scales]);
 
 
-    const uniqueId = useMemo(() => {
+    const uniqueId = React.useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
     }, []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
@@ -121,7 +110,7 @@ export function BarVis({
           });
     }, []);
 
-    const layout = useMemo(() => {
+    const layout = React.useMemo(() => {
         if(!traces) {
             return null;
         }
@@ -148,23 +137,22 @@ export function BarVis({
             <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
                 {traceStatus === 'success' && traces?.plots.length > 0 ?
-                    <Plot
+                    <PlotlyComponent
                         divId={`plotlyDiv${uniqueId}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout as any}
                         config={{responsive: true, displayModeBar: false}}
                         useResizeHandler={true}
                         style={{width: '100%', height: '100%'}}
-                        //plotly redraws everything on updates, so you need to reappend title and
-                        // change opacity on update, instead of just in a use effect
+                        // plotly redraws everything on updates, so you need to reappend title and
                         onUpdate={() => {
                             for(const p of traces.plots) {
-                                d3.select(`g .${(p.data as any).xaxis}title`)
+                                d3.select(`g .${p.data.xaxis}title`)
                                     .style('pointer-events', 'all')
                                     .append('title')
                                     .text(p.xLabel);
 
-                                d3.select(`g .${(p.data as any).yaxis}title`)
+                                d3.select(`g .${p.data.yaxis}title`)
                                     .style('pointer-events', 'all')
                                     .append('title')
                                     .text(p.yLabel);

@@ -51,9 +51,9 @@ export interface VisProps {
      */
     selectionCallback?: (s: number[]) => void;
     /**
-     * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
+     * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
      */
-    filterCallback?: (s: string) => void;
+    filterCallback?: (s: EFilterOptions) => void;
 }
 ```
 

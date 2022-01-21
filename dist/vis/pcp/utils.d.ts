@@ -1,5 +1,4 @@
-import { ColumnInfo, ESupportedPlotlyVis, IVisConfig, VisColumn } from '../interfaces';
-import { PlotlyInfo } from '../interfaces';
+import { PlotlyInfo, ColumnInfo, ESupportedPlotlyVis, IVisConfig, VisColumn } from '../interfaces';
 export declare function isPCP(s: IVisConfig): s is IPCPConfig;
 export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;

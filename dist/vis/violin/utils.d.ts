@@ -1,5 +1,4 @@
-import { ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
-import { PlotlyInfo } from '../interfaces';
+import { PlotlyInfo, ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
 import { EViolinOverlay } from '../bar/utils';
 export declare function isViolin(s: IVisConfig): s is IViolinConfig;
 export interface IViolinConfig {

@@ -1,8 +1,8 @@
 import d3 from 'd3';
 import { merge } from 'lodash';
-import { I18nextManager } from '../..';
+import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
-import { resolveColumnValues } from '../layoutUtils';
+import { resolveColumnValues } from '../general/layoutUtils';
 export function isPCP(s) {
     return s.type === ESupportedPlotlyVis.PCP;
 }

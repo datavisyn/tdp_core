@@ -1,18 +1,13 @@
-import d3 from 'd3';
 import * as React from 'react';
+import d3 from 'd3';
 import { useEffect, useMemo, useState } from 'react';
-import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig } from './scatter/utils';
 import { ESupportedPlotlyVis } from './interfaces';
-import { ScatterVis } from './scatter/ScatterVis';
-import { ViolinVis } from './violin/ViolinVis';
-import { isViolin, violinMergeDefaultConfig } from './violin/utils';
-import { isStrip, stripMergeDefaultConfig } from './strip/utils';
-import { StripVis } from './strip/StripVis';
-import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
-import { PCPVis } from './pcp/PCPVis';
-import { BarVis } from './bar/BarVis';
-import { getCssValue } from '..';
+import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
+import { barMergeDefaultConfig, isBar, BarVis } from './bar';
+import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
+import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
+import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
+import { getCssValue } from '../utils';
 export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
     getCssValue('visyn-c3'),

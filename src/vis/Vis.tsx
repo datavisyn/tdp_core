@@ -1,18 +1,13 @@
-import d3 from 'd3';
 import * as React from 'react';
+import d3 from 'd3';
 import {useEffect, useMemo, useState} from 'react';
-import {barMergeDefaultConfig, isBar} from './bar/utils';
-import {ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig} from './scatter/utils';
-import {VisCategoricalColumn, VisNumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn} from './interfaces';
-import {ScatterVis} from './scatter/ScatterVis';
-import {ViolinVis} from './violin/ViolinVis';
-import {isViolin, violinMergeDefaultConfig} from './violin/utils';
-import {isStrip, stripMergeDefaultConfig} from './strip/utils';
-import {StripVis} from './strip/StripVis';
-import {isPCP, pcpMergeDefaultConfig} from './pcp/utils';
-import {PCPVis} from './pcp/PCPVis';
-import {BarVis} from './bar/BarVis';
-import {getCssValue} from '..';
+import {ESupportedPlotlyVis, IVisConfig, Scales, VisColumn, EFilterOptions} from './interfaces';
+import {ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig, ScatterVis} from './scatter';
+import {barMergeDefaultConfig, isBar, BarVis} from './bar';
+import {isViolin, violinMergeDefaultConfig, ViolinVis} from './violin';
+import {isStrip, stripMergeDefaultConfig, StripVis} from './strip';
+import {isPCP, pcpMergeDefaultConfig, PCPVis} from './pcp';
+import {getCssValue} from '../utils';
 
 export interface VisProps {
     /**
@@ -36,9 +31,9 @@ export interface VisProps {
      */
     selectionCallback?: (s: number[]) => void;
     /**
-     * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
+     * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
      */
-    filterCallback?: (s: string) => void;
+    filterCallback?: (s: EFilterOptions) => void;
 }
 
 export function Vis({

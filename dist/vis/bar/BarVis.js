@@ -1,21 +1,12 @@
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
-import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import Plot from 'react-plotly.js';
-import { InvalidCols } from '../InvalidCols';
+import { PlotlyComponent, Plotly } from '../Plot';
+import { InvalidCols } from '../general';
 import d3 from 'd3';
-import { beautifyLayout } from '../layoutUtils';
+import { beautifyLayout } from '../general/layoutUtils';
 import { merge } from 'lodash';
 import { createBarTraces, EBarGroupingType } from './utils';
-import { GroupSelect } from '../sidebar/GroupSelect';
-import { MultiplesSelect } from '../sidebar/MultiplesSelect';
-import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
-import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
-import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
-import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
-import { WarningMessage } from '../sidebar/WarningMessage';
-import { useAsync } from '../..';
-import Plotly from 'plotly.js';
+import { useAsync } from '../../hooks';
+import { BarDirectionButtons, BarDisplayButtons, BarGroupTypeButtons, CategoricalColumnSelect, GroupSelect, MultiplesSelect, VisTypeSelect, WarningMessage } from '../sidebar';
 const defaultConfig = {
     group: {
         enable: true,
@@ -45,17 +36,17 @@ const defaultExtensions = {
     postSidebar: null
 };
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
-    const mergedOptionsConfig = useMemo(() => {
+    const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, []);
-    const mergedExtensions = useMemo(() => {
+    const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
-    const uniqueId = useMemo(() => {
+    const uniqueId = React.useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
     }, []);
-    useEffect(() => {
+    React.useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
@@ -64,7 +55,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
     }, []);
-    const layout = useMemo(() => {
+    const layout = React.useMemo(() => {
         if (!traces) {
             return null;
         }
@@ -87,9 +78,8 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
             traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ?
-                React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
-                    //plotly redraws everything on updates, so you need to reappend title and
-                    // change opacity on update, instead of just in a use effect
+                React.createElement(PlotlyComponent, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
+                    // plotly redraws everything on updates, so you need to reappend title and
                     onUpdate: () => {
                         for (const p of traces.plots) {
                             d3.select(`g .${p.data.xaxis}title`)

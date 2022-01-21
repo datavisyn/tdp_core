@@ -1,17 +1,11 @@
 import * as React from 'react';
-import {VisCategoricalColumn, ColumnInfo, ESupportedPlotlyVis, VisNumericalColumn, PlotlyInfo, Scales, VisColumn} from '../interfaces';
-import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
-import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
-import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
+import {ColumnInfo, ESupportedPlotlyVis, VisColumn, IVisConfig} from '../interfaces';
+import {CategoricalColumnSelect, NumericalColumnSelect, VisTypeSelect, WarningMessage} from '../sidebar';
+import {PlotlyComponent, Plotly} from '../Plot';
+import {InvalidCols} from '../general';
 import {merge, uniqueId} from 'lodash';
 import {createPCPTraces, IPCPConfig} from './utils';
-import {WarningMessage} from '../sidebar/WarningMessage';
-import {useAsync} from '../..';
-import Plotly from 'plotly.js';
+import {useAsync} from '../../hooks';
 
 interface PCPVisProps {
     config: IPCPConfig;
@@ -43,19 +37,19 @@ export function PCPVis({
     setConfig,
 }: PCPVisProps) {
 
-    const mergedOptionsConfig = useMemo(() => {
+    const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, []);
 
-    const mergedExtensions = useMemo(() => {
+    const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
 
     const {value: traces, status: traceStatus, error: traceError} = useAsync(createPCPTraces, [columns, config]);
 
-    const id = useMemo(() => uniqueId('PCPVis'), []);
+    const id = React.useMemo(() => uniqueId('PCPVis'), []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
@@ -87,7 +81,7 @@ export function PCPVis({
             <div className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}`}>
                 {mergedExtensions.prePlot}
                 {traceStatus === 'success' && traces?.plots.length > 0 ?
-                    <Plot
+                    <PlotlyComponent
                         divId={`plotlyDiv${id}`}
                         data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
                         layout={layout}

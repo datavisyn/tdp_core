@@ -1,5 +1,4 @@
-import { ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
-import { PlotlyInfo } from '../interfaces';
+import { PlotlyInfo, ColumnInfo, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn } from '../interfaces';
 export declare enum EBarDisplayType {
     DEFAULT = "Default",
     NORMALIZED = "Normalized"
