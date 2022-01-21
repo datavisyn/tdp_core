@@ -112,8 +112,8 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;
         manager: CLUEGraphManager;
-        storyVis: () => Promise<import("./vis").VerticalStoryVis>;
-        provVis: () => Promise<import("./vis").LayoutedProvVis>;
+        storyVis: () => Promise<import("./provvis").VerticalStoryVis>;
+        provVis: () => Promise<import("./provvis").LayoutedProvVis>;
     };
     /**
      * customize the using extension point

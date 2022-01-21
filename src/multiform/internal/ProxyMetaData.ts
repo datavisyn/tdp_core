@@ -1,5 +1,5 @@
 
-import {IVisMetaData} from '../../vis/IVisMetaData';
+import {IVisMetaData} from '../../provvis';
 
 /**
  * @internal

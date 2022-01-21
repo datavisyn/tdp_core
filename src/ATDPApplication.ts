@@ -14,7 +14,7 @@ import {Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager} from './base';
 import {UserSession, PluginRegistry} from './app';
 import {I18nextManager} from './i18n';
 import {IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph} from './provenance';
-import {VisLoader} from './vis';
+import {VisLoader} from './provvis';
 
 export interface ITDPOptions {
   /**

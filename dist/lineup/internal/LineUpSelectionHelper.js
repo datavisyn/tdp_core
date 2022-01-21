@@ -121,6 +121,20 @@ export class LineUpSelectionHelper extends EventHandler {
         }
         this.provider.setSelection(indices);
     }
+    getSelection() {
+        if (!this.provider) {
+            return;
+        }
+        const sel = this.provider.getSelection();
+        const indices = [];
+        sel.forEach((uid) => {
+            const index = this.uid2index.get(uid);
+            if (typeof index === 'number') {
+                indices.push(index);
+            }
+        });
+        return indices;
+    }
 }
 LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION = 'setItemSelection';
 //# sourceMappingURL=LineUpSelectionHelper.js.map

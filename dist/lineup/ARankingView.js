@@ -14,10 +14,11 @@ import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
-import { BaseUtils } from '../base';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
+import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
+import { Range } from '../range';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -46,16 +47,16 @@ export class ARankingView extends AView {
          * clears and rebuilds this lineup instance from scratch
          * @returns {Promise<any[]>} promise when done
          */
-        this.rebuild = BaseUtils.debounce(() => this.rebuildImpl(), 100);
+        this.rebuild = debounceAsync(() => this.rebuildImpl(), 100);
         /**
          * similar to rebuild but just loads new data and keep the columns
          * @returns {Promise<any[]>} promise when done
          */
-        this.reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
+        this.reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
         /**
          * updates the list of available columns in the side panel
          */
-        this.updatePanelChooser = BaseUtils.debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
+        this.updatePanelChooser = debounceAsync(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
         /**
          * promise resolved when everything is built
          * @type {any}
@@ -72,7 +73,7 @@ export class ARankingView extends AView {
             subType: { key: '', value: '' },
             enableOverviewMode: true,
             enableZoom: true,
-            enableCustomVis: true,
+            enableVisPanel: true,
             enableDownload: true,
             enableSaveRanking: true,
             enableAddingColumns: true,
@@ -162,8 +163,17 @@ export class ARankingView extends AView {
         // Append `lu-backdrop` one level higher so fading effect can be applied also to the sidePanel when a dialog is opened.
         const luBackdrop = this.node.querySelector('.lu-backdrop');
         this.node.appendChild(luBackdrop);
+        this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        this.generalVis = new GeneralVisWrapper(this.provider, this, this.node.ownerDocument);
+        const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
+        this.generalVis = new LineupVisWrapper({
+            provider: this.provider,
+            selectionCallback: (selected) => {
+                const r = Range.list(selected);
+                this.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
+            },
+            doc: this.node.ownerDocument
+        });
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -203,7 +213,6 @@ export class ARankingView extends AView {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }
         }
-        this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection) => {
             this.setItemSelection(selection);
             this.generalVis.updateCustomVis();
@@ -316,6 +325,7 @@ export class ARankingView extends AView {
             return;
         }
         this.panel.hide();
+        this.generalVis.hide();
         if (this.dump !== null) {
             return;
         }

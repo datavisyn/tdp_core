@@ -347,7 +347,6 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   setItemSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
-    console.log(selection, name);
     const current = this.itemSelections.get(name);
     if (current && ViewUtils.isSameSelection(current, selection)) {
       return;
@@ -376,7 +375,6 @@ export abstract class AView extends EventHandler implements IView {
       this.itemSelectionChanged(name);
     }
 
-    console.log('firing');
     this.fire(AView.EVENT_ITEM_SELECT, current, selection, name);
   }
 
