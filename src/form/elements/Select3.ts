@@ -328,25 +328,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     }
 
     this.$select.on('change', this.onChange);
-    this.$select.select2(this.select2Options).on('select2:open',  function (e) {
-      const $optionsContainer = $('.select2-results__options');
-      // wait for options to be loaded
-      setTimeout(() => {
-        [...$optionsContainer[0].children].forEach((child) => {
-          const childAsElement = (<HTMLElement>child);
-          if (childAsElement.className === 'select2-results__option' || childAsElement.className === 'select2-results__option select2-results__option--highlighted') {
-            childAsElement.setAttribute('data-testid', `select3-option-${childAsElement.innerText}`);
-          } else if (child.lastElementChild && child.lastElementChild.className === 'select2-results__options select2-results__options--nested') {
-            const nested = $('.select2-results__options--nested');
-            [...nested].forEach((nest) => {
-              [...nest.children].forEach((nestedChild) => {
-                nestedChild.setAttribute('data-testid', `select3-option-${(<HTMLElement>nestedChild).innerText}`);
-              });
-            });
-          }
-        });
-      }, 1000);
-    });
+    this.$select.select2(this.select2Options);
     if (this.options.validate && this.options.dropable) {
       this.dropFile(<HTMLElement>this.node.querySelector('.select2-container'));
     }

@@ -173,34 +173,11 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
     }
 
+    // add data-testid to
     const formNode = (<any>this.form).$node[0][0];
     const $searchContainer = $('.select2.select2-container', formNode);
     const $search = $searchContainer.find('input');
     $search.attr('data-testid', 'select2-search-field');
-
-    this.$jqSelect.on('select2:selecting', function (e) {
-      const $optionsContainer = $('.select2-results__options');
-      // wait for options to be loaded
-      setTimeout(() => {
-        [...$optionsContainer[0].children].forEach((child) => {
-          const childAsElement = (<HTMLElement>child);
-          // grouped options
-          if (childAsElement.lastElementChild && childAsElement.lastElementChild.className === 'select2-results__options select2-results__options--nested') {
-            const nested = $('.select2-results__options--nested');
-            [...nested].forEach((nest) => {
-              [...nest.children].forEach((nestedChild) => {
-                nestedChild.setAttribute('data-testid', `select2-option-${(<HTMLElement>nestedChild).innerText}`);
-              });
-            });
-          // single option elements
-          } else if (childAsElement.tagName.toString() === 'LI') {
-            const end = (<HTMLElement>childAsElement).innerText.indexOf('(');
-            const subString= (<HTMLElement>childAsElement).innerText.substring(0 , end - 1).replace(/\s+/g, '-').toLowerCase();
-            childAsElement.setAttribute('data-testid', `select2-option-${subString}`);
-          }
-        });
-      }, 1000);
-    });
 
     return this.$jqSelect;
   }
