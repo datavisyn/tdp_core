@@ -39,3 +39,4 @@ export declare class LocalStorageProvenanceGraphManager implements IProvenanceGr
     createInMemory(): ProvenanceGraph;
     cloneInMemory(graph: GraphBase): ProvenanceGraph;
 }
+//# sourceMappingURL=LocalStorageProvenanceGraphManager.d.ts.map

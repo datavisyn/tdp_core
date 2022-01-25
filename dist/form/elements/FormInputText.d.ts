@@ -53,3 +53,4 @@ export declare class FormInputText extends AFormElement<IFormInputTextDesc> {
     set value(v: string);
     focus(): void;
 }
+//# sourceMappingURL=FormInputText.d.ts.map

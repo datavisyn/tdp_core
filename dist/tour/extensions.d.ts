@@ -111,3 +111,4 @@ export interface IViewTourContext {
     instance: IView | null;
     selection: ISelection;
 }
+//# sourceMappingURL=extensions.d.ts.map

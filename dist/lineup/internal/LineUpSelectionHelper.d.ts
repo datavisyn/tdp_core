@@ -29,3 +29,4 @@ export declare class LineUpSelectionHelper extends EventHandler {
     setGeneralVisSelection(sel: ISelection): void;
     getSelection(): number[];
 }
+//# sourceMappingURL=LineUpSelectionHelper.d.ts.map

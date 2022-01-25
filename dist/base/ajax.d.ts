@@ -43,3 +43,4 @@ export declare class Ajax {
      */
     static encodeParams(data?: any): string;
 }
+//# sourceMappingURL=ajax.d.ts.map

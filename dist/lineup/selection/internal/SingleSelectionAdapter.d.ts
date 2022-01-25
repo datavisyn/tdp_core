@@ -28,3 +28,4 @@ export declare class SingleSelectionAdapter extends ABaseSelectionAdapter implem
         id: number;
     }[]>;
 }
+//# sourceMappingURL=SingleSelectionAdapter.d.ts.map

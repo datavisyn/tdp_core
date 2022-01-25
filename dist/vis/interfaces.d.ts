@@ -30,7 +30,7 @@ export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | I
 export interface NumericalColumn {
     info: ColumnInfo;
     values: {
-        id: number;
+        id: string;
         val: number;
     }[];
     type: EColumnTypes.NUMERICAL;
@@ -39,7 +39,7 @@ export interface CategoricalColumn {
     info: ColumnInfo;
     colors: string[];
     values: {
-        id: number;
+        id: string;
         val: string;
     }[];
     type: EColumnTypes.CATEGORICAL;
@@ -64,3 +64,4 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
+//# sourceMappingURL=interfaces.d.ts.map

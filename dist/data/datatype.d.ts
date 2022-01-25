@@ -58,3 +58,4 @@ export interface IStatsAbleDataType<D extends IValueTypeDesc> extends IDataType 
     statsAdvanced(): Promise<IAdvancedStatistics>;
     readonly length: number;
 }
+//# sourceMappingURL=datatype.d.ts.map

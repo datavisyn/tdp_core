@@ -134,3 +134,4 @@ export declare class Range {
     static join(ranges: Range[]): Range;
     static join(...ranges: Range[]): Range;
 }
+//# sourceMappingURL=Range.d.ts.map

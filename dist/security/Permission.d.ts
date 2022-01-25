@@ -40,3 +40,4 @@ export declare class Permission {
     static encode(user: Set<EPermission>, group: Set<EPermission>, others: Set<EPermission>, buddies?: Set<EPermission>): number;
     static decode(permission?: number): Permission;
 }
+//# sourceMappingURL=Permission.d.ts.map

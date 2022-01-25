@@ -87,3 +87,4 @@ export declare class FormSelect extends AFormElement<IFormSelectDesc> implements
     static toOption(d: string | IFormSelectOption | IFormSelectOptionGroup): IFormSelectOption | IFormSelectOptionGroup;
     static resolveData(data?: IHierarchicalSelectOptions | ((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption | IFormSelectOptionGroup)[]>);
 }
+//# sourceMappingURL=FormSelect.d.ts.map

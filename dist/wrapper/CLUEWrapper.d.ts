@@ -83,3 +83,4 @@ export declare class CLUEWrapper extends ACLUEWrapper {
         jumpToStored: () => number;
     };
 }
+//# sourceMappingURL=CLUEWrapper.d.ts.map

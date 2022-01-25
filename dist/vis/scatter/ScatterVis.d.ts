@@ -27,7 +27,7 @@ interface ScatterVisProps {
     shapes?: string[];
     columns: (NumericalColumn | CategoricalColumn)[];
     filterCallback?: (s: EFilterOptions) => void;
-    selectionCallback?: (s: number[]) => void;
+    selectionCallback?: (s: string[]) => void;
     selected?: {
         [key: number]: boolean;
     };
@@ -36,3 +36,4 @@ interface ScatterVisProps {
 }
 export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales }: ScatterVisProps): JSX.Element;
 export {};
+//# sourceMappingURL=ScatterVis.d.ts.map

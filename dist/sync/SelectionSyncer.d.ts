@@ -8,3 +8,4 @@ export declare class SelectionSyncerOptionUtils {
     private static syncIDType;
     static create(store: Store, options?: ISelectionSyncerOptions): any;
 }
+//# sourceMappingURL=SelectionSyncer.d.ts.map

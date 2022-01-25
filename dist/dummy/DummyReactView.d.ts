@@ -7,3 +7,4 @@ export declare class DummyReactView extends AReactChooserView {
     };
     render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector): JSX.Element;
 }
+//# sourceMappingURL=DummyReactView.d.ts.map

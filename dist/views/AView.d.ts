@@ -126,3 +126,4 @@ export declare abstract class AView extends EventHandler implements IView {
     destroy(): void;
     isRegex(v: string): boolean;
 }
+//# sourceMappingURL=AView.d.ts.map

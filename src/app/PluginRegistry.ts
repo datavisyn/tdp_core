@@ -2,7 +2,6 @@ import {IPluginDesc, IRegistry, IPlugin} from '../base/plugin';
 import {UniqueIdManager} from './UniqueIdManager';
 import {BaseUtils} from '../base/BaseUtils';
 
-
 export class PluginRegistry implements IRegistry {
 
   private registry: IPluginDesc[] = [];

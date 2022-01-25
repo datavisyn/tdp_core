@@ -1,0 +1,1 @@
+{"version":3,"file":"DummyReactView.d.ts","sourceRoot":"","sources":["../../src/dummy/DummyReactView.tsx"],"names":[],"mappings":"AACA,OAAO,EAAa,SAAS,EAAC,MAAM,qBAAqB,CAAC;AAC1D,OAAO,EAAC,iBAAiB,EAAC,MAAM,4BAA4B,CAAC;AAE7D,qBAAa,cAAe,SAAQ,iBAAiB;IACnD,WAAW;IAIX,6BAA6B;;;IAM7B,MAAM,CAAC,cAAc,EAAE,MAAM,EAAE,EAAE,aAAa,EAAE,MAAM,EAAE,EAAE,YAAY,EAAE,SAAS;CAKlF"}

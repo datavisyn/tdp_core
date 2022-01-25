@@ -35,3 +35,4 @@ export declare class RemoteStoreGraph extends GraphBase {
     updateEdge(e: GraphEdge): Promise<this>;
     clear(): Promise<this>;
 }
+//# sourceMappingURL=RemoteStorageGraph.d.ts.map

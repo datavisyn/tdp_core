@@ -9,3 +9,4 @@ export interface IViewProvider {
         removeTrackedScoreColumn(columnId: string): any;
     };
 }
+//# sourceMappingURL=IViewProvider.d.ts.map

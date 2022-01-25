@@ -5,3 +5,4 @@ export interface IIntersectionParam {
 export declare class IntersectionParamUtils {
     static createIntersectionParam(name: string, params: any[]): IIntersectionParam;
 }
+//# sourceMappingURL=IIntersectionParam.d.ts.map

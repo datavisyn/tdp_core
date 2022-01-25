@@ -49,3 +49,4 @@ export declare class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     set value(v: any);
     focus(): void;
 }
+//# sourceMappingURL=FormCheckBox.d.ts.map

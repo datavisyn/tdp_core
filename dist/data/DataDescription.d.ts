@@ -39,3 +39,4 @@ export interface IDataDescription extends IDataDescriptionMetaData {
      */
     readonly id: string;
 }
+//# sourceMappingURL=DataDescription.d.ts.map

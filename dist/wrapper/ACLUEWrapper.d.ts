@@ -28,3 +28,4 @@ export declare abstract class ACLUEWrapper extends EventHandler {
     jumpToStored(): PromiseLike<this>;
     jumpToStoredOrLastState(): Promise<this>;
 }
+//# sourceMappingURL=ACLUEWrapper.d.ts.map

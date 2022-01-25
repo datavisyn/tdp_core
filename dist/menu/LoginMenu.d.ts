@@ -7,3 +7,4 @@ export declare class LoginMenu extends BaseLoginMenu {
     private readonly header;
     constructor(header: AppHeader, options?: ILoginMenuOptions);
 }
+//# sourceMappingURL=LoginMenu.d.ts.map

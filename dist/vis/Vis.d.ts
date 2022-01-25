@@ -21,10 +21,11 @@ export interface VisProps {
     /**
      * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
      */
-    selectionCallback?: (s: number[]) => void;
+    selectionCallback?: (s: string[]) => void;
     /**
      * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
      */
     filterCallback?: (s: string) => void;
 }
 export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback }: VisProps): JSX.Element;
+//# sourceMappingURL=Vis.d.ts.map

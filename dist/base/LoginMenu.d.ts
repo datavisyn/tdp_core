@@ -44,3 +44,4 @@ export declare class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
     forceShowDialog(): void;
     private initLoginDialog;
 }
+//# sourceMappingURL=LoginMenu.d.ts.map

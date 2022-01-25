@@ -31,3 +31,4 @@ interface IRestoreLayout {
     (dump: ILayoutDump, restoreView: IViewRestorer): ILayoutContainer;
 }
 export {};
+//# sourceMappingURL=RootLayoutContainer.d.ts.map

@@ -32,3 +32,4 @@ export declare class GridElem implements IPersistable {
     };
     transform(scale?: [number, number], rotate?: number): ITransform;
 }
+//# sourceMappingURL=GridElem.d.ts.map

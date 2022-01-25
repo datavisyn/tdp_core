@@ -17,3 +17,4 @@ export declare class PanelAddColumnButton implements IPanelButton {
      */
     constructor(parent: HTMLElement, search: SearchBox<ISearchOption>, options?: IPanelAddColumnButtonOptions);
 }
+//# sourceMappingURL=PanelAddColumnButton.d.ts.map

@@ -52,3 +52,4 @@ export declare class LineUpPanelActions extends EventHandler {
     private scoreColumnDialog;
 }
 export declare function findMappablePlugins(target: IDType, all: IPluginDesc[]): any[] | Promise<IPluginDesc[]>;
+//# sourceMappingURL=LineUpPanelActions.d.ts.map

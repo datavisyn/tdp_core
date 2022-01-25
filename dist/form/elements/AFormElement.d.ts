@@ -80,3 +80,4 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
      */
     static createFormElement(form: IForm, elementDesc: IFormElementDesc): Promise<IFormElement>;
 }
+//# sourceMappingURL=AFormElement.d.ts.map

@@ -20,3 +20,4 @@ export declare abstract class ASequentialLayoutContainer<T extends ISequentialLa
     };
     static wrap(child: ILayoutContainer): HTMLElement;
 }
+//# sourceMappingURL=ASequentialLayoutContainer.d.ts.map

@@ -27,3 +27,4 @@ export declare class ProvenanceGraphUtils {
     static provenanceGraphFactory(): IGraphFactory;
     static findMetaObject<T>(find: IObjectRef<T>): (obj: ObjectNode<any>) => boolean;
 }
+//# sourceMappingURL=ProvenanceGraphUtils.d.ts.map

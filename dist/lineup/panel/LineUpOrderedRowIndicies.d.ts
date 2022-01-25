@@ -45,3 +45,4 @@ export declare class LineUpOrderedRowIndicies extends EventHandler {
     private addEventListener;
     private sortValues;
 }
+//# sourceMappingURL=LineUpOrderedRowIndicies.d.ts.map

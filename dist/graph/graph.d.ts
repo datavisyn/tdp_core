@@ -95,3 +95,4 @@ export declare abstract class AGraph extends ASelectAble {
     selectedEdges(): Promise<GraphEdge[]>;
     get idtypes(): import("../idtype").IDType[];
 }
+//# sourceMappingURL=graph.d.ts.map

@@ -128,3 +128,4 @@ export declare class BaseUtils {
      */
     static extent(arr: IIterable<number>): [number, number];
 }
+//# sourceMappingURL=BaseUtils.d.ts.map

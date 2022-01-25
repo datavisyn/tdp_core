@@ -65,3 +65,4 @@ export declare class Matrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
     static asMatrix<T>(data: T[][], rows: string[], cols: string[]): IMatrix<T, IValueTypeDesc>;
     static asMatrix<T>(data: T[][], rows: string[], cols: string[], options?: IAsMatrixOptions): IMatrix<T, IValueTypeDesc>;
 }
+//# sourceMappingURL=Matrix.d.ts.map

@@ -9,3 +9,4 @@ export declare class PanelSaveNamedSetButton extends EventHandler implements IPa
     readonly node: HTMLElement;
     constructor(parent: HTMLElement, lineupOrderRowIndices: LineUpOrderedRowIndicies, isTopMode: boolean);
 }
+//# sourceMappingURL=PanelSaveNamedSetButton.d.ts.map

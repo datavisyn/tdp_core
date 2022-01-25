@@ -39,3 +39,4 @@ export declare class FormRadio extends AFormElement<IRadioElementDesc> {
     set value(v: any);
     focus(): void;
 }
+//# sourceMappingURL=FormRadio.d.ts.map

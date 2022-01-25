@@ -15,3 +15,4 @@ export declare class EmbeddedCLUE {
     clue_random_id(length?: number): string;
     static embedCLUE(parent: HTMLElement, server: string, app: string, provenanceGraph: string): Promise<unknown>;
 }
+//# sourceMappingURL=EmbeddedCLUE.d.ts.map

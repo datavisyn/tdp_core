@@ -20,6 +20,7 @@ export declare class FindViewUtils {
      */
     static findViews(idType: IDType, selection: Range): Promise<IDiscoveredView[]>;
     static findAllViews(idType?: IDType): Promise<IDiscoveredView[]>;
+    static findVisynViews(idType?: IDType): Promise<IDiscoveredView[]>;
     private static findViewBase;
     static canAccess(p: any): any;
     static findInstantViews(idType: IDType): Promise<IInstanceViewExtensionDesc[]>;
@@ -34,3 +35,4 @@ export declare class FindViewUtils {
         v: IViewPluginDesc;
     }>(views: T[]): IGroupedViews<T>[];
 }
+//# sourceMappingURL=FindViewUtils.d.ts.map

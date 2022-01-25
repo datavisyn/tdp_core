@@ -20,3 +20,4 @@ export declare class AttachemntUtils {
      */
     static resolveExternalized(attachment: string | object): PromiseLike<object>;
 }
+//# sourceMappingURL=attachment.d.ts.map

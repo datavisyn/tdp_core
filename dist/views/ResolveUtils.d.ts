@@ -50,3 +50,4 @@ export declare class ResolveUtils {
      */
     static resolveAllIds(fromIDType: IDType, ids: Range | number[], toIDType?: IDType | string): Promise<string[][]>;
 }
+//# sourceMappingURL=ResolveUtils.d.ts.map

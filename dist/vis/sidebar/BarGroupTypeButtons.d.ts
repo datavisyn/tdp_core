@@ -5,3 +5,4 @@ interface BarGroupTypeProps {
 }
 export declare function BarGroupTypeButtons(props: BarGroupTypeProps): JSX.Element;
 export {};
+//# sourceMappingURL=BarGroupTypeButtons.d.ts.map

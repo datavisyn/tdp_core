@@ -88,3 +88,4 @@ export declare class GlobalEventHandler extends EventHandler {
     private static instance;
     static getInstance(): GlobalEventHandler;
 }
+//# sourceMappingURL=event.d.ts.map

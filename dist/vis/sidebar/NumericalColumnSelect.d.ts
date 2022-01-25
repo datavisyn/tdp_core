@@ -6,3 +6,4 @@ interface NumericalColumnSelectProps {
 }
 export declare function NumericalColumnSelect(props: NumericalColumnSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=NumericalColumnSelect.d.ts.map

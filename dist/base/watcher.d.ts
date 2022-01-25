@@ -14,3 +14,4 @@ export declare class SessionWatcher {
      */
     static startWatching(logout?: () => any): void;
 }
+//# sourceMappingURL=watcher.d.ts.map

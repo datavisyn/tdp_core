@@ -134,3 +134,4 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
      */
     protected abstract initSessionImpl(app: T): any;
 }
+//# sourceMappingURL=ATDPApplication.d.ts.map

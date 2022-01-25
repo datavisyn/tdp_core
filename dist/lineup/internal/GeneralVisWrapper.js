@@ -56,7 +56,7 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
     selectCallback(selected) {
-        const r = Range.list(selected);
+        const r = Range.list(selected.map((s) => +s));
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
         this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });

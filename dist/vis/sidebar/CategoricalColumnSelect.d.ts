@@ -6,3 +6,4 @@ interface CategoricalColumnSelectProps {
 }
 export declare function CategoricalColumnSelect(props: CategoricalColumnSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=CategoricalColumnSelect.d.ts.map

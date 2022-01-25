@@ -38,3 +38,4 @@ export declare class Multiform {
     };
     static attach(graph: ProvenanceGraph, v: IObjectRef<IVisInstance>): void;
 }
+//# sourceMappingURL=Multiform.d.ts.map

@@ -5,3 +5,4 @@ export * from './ProvenanceGraphMenuUtils';
 export * from './EditProvenanceGraphMenu';
 export * from './PhoveaDataAdapter';
 export * from './getCssValue';
+//# sourceMappingURL=index.d.ts.map

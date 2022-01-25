@@ -69,3 +69,4 @@ export declare abstract class AReactView extends AView {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
     }) => Promise<unknown>)>;
 }
+//# sourceMappingURL=AReactView.d.ts.map

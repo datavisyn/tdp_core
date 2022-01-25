@@ -34,3 +34,4 @@ export declare class PluginRegistry implements IRegistry {
     private static instance;
     static getInstance(): PluginRegistry;
 }
+//# sourceMappingURL=PluginRegistry.d.ts.map

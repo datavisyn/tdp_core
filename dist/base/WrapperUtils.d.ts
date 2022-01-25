@@ -22,3 +22,4 @@ export declare class WrapperUtils {
      */
     static enableKeyboardShortcuts(graph: ProvenanceGraph): void;
 }
+//# sourceMappingURL=WrapperUtils.d.ts.map

@@ -20,3 +20,4 @@ export declare class UniqueIdManager {
     private static instance;
     static getInstance(): UniqueIdManager;
 }
+//# sourceMappingURL=UniqueIdManager.d.ts.map

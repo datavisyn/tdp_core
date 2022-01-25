@@ -95,3 +95,4 @@ export declare class DataCache {
     private static instance;
     static getInstance(): DataCache;
 }
+//# sourceMappingURL=DataCache.d.ts.map

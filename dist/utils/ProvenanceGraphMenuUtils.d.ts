@@ -12,3 +12,4 @@ export declare class ProvenanceGraphMenuUtils {
         name?: string;
     }): Promise<unknown>;
 }
+//# sourceMappingURL=ProvenanceGraphMenuUtils.d.ts.map

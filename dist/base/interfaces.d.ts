@@ -7,6 +7,7 @@ import { IDType } from '../idtype';
 import { ProvenanceGraph, IObjectRef } from '../provenance';
 import { RangeLike, Range } from '../range';
 import { IUser } from '../security';
+import { IVisynViewProps } from '../views/VisynView';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column
@@ -375,6 +376,10 @@ export interface IViewPlugin {
      */
     factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
+export interface IVisynViewPlugin {
+    readonly desc: IViewPluginDesc;
+    factory(prop: IVisynViewProps<any, any>): JSX.Element;
+}
 export interface IInstantView {
     readonly node: HTMLElement;
     destroy(): void;
@@ -416,3 +421,4 @@ export interface IAppExtensionExtension {
 export interface IAppExtensionExtensionDesc extends IPluginDesc {
     load(): Promise<IPlugin & IAppExtensionExtension>;
 }
+//# sourceMappingURL=interfaces.d.ts.map

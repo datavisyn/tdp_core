@@ -28,3 +28,4 @@ export declare abstract class IParentLayoutContainerUtils {
     static canDrop(area: IDropArea): boolean;
     static get rootParent(): IRootLayoutContainer & ILayoutParentContainer;
 }
+//# sourceMappingURL=IParentLayoutContainer.d.ts.map

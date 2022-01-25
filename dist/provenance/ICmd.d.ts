@@ -52,3 +52,4 @@ export interface ICmdFunction {
 export interface ICmdFunctionFactory {
     (id: string): ICmdFunction;
 }
+//# sourceMappingURL=ICmd.d.ts.map

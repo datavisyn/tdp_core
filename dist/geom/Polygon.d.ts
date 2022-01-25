@@ -26,3 +26,4 @@ export declare class Polygon extends AShape {
     static polygon(...points: Vector2D[]): Polygon;
     static polygon(points: Vector2D[]): Polygon;
 }
+//# sourceMappingURL=Polygon.d.ts.map

@@ -41,13 +41,12 @@ export declare class TDPApplicationUtils {
         inverse: import("../provenance").IAction;
     };
     static initSession(map: object): import("../provenance").IAction;
-    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): Promise<{
-        inverse: import("../provenance").IAction;
-    }>;
-    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("../provenance").IAction;
+    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): any;
+    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): any;
     static compressSetParameter(path: ActionNode[]): ActionNode[];
     /**
      * @deprecated
      */
     static compressSetParameterOld(path: ActionNode[]): ActionNode[];
 }
+//# sourceMappingURL=TDPApplicationUtils.d.ts.map

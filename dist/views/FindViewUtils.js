@@ -1,5 +1,5 @@
 import { ViewUtils } from './ViewUtils';
-import { EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW, EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS } from '../base/extensions';
+import { EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW, EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
 import { IDTypeManager } from '../idtype';
 import { PluginRegistry, UserSession } from '../app';
 export class FindViewUtils {
@@ -29,6 +29,19 @@ export class FindViewUtils {
     }
     static findAllViews(idType) {
         return FindViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
+            return r.map(ViewUtils.toViewPluginDesc).map((v) => {
+                const access = FindViewUtils.canAccess(v);
+                const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
+                return {
+                    enabled: access,
+                    v,
+                    disabledReason: !access ? (hasAccessHint ? 'security' : 'invalid') : undefined
+                };
+            }).filter((v) => v.disabledReason !== 'invalid');
+        });
+    }
+    static findVisynViews(idType) {
+        return FindViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_VISYN_VIEW), true).then((r) => {
             return r.map(ViewUtils.toViewPluginDesc).map((v) => {
                 const access = FindViewUtils.canAccess(v);
                 const hasAccessHint = !access && Boolean(v.securityNotAllowedText);

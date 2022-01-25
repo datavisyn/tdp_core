@@ -75,8 +75,8 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
 
-    selectCallback(selected: number[]) {
-        const r = Range.list(selected);
+    selectCallback(selected: string[]) {
+        const r = Range.list(selected.map((s) => +s));
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
 
@@ -136,7 +136,7 @@ export class GeneralVisWrapper extends EventHandler {
                 {
                     columns: cols,
                     selected: selectedMap,
-                    selectionCallback: (s: number[]) => this.selectCallback(s),
+                    selectionCallback: (s: string[]) => this.selectCallback(s),
                     filterCallback: (s: string) => this.filterCallback(s)
                 }
             ),

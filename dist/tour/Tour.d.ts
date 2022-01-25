@@ -49,3 +49,4 @@ export declare class Tour {
     refreshCurrent(context: ITourContext): void;
     static resolveTours(): Tour[];
 }
+//# sourceMappingURL=Tour.d.ts.map

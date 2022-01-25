@@ -33,3 +33,4 @@ export declare class Player {
      */
     backward(): PromiseLike<SlideNode>;
 }
+//# sourceMappingURL=Player.d.ts.map

@@ -6,3 +6,4 @@ interface GroupSelectProps {
 }
 export declare function GroupSelect(props: GroupSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=GroupSelect.d.ts.map
