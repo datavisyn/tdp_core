@@ -196,3 +196,9 @@ span.lu-mapping-hint {
 .lu-dialog-rename {
   width: 20rem;
 }
+
+.lu-dialog-mapper-warning {
+  @extend .alert; // apply base styles of Bootstrap alert
+  @extend .alert-warning;
+  margin-bottom: 0; // override margin
+}
