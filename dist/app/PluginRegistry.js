@@ -1,5 +1,6 @@
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
+import { EXTENSION_POINT_VISYN_VIEW } from '..';
 export class PluginRegistry {
     constructor() {
         this.registry = [];
@@ -17,6 +18,10 @@ export class PluginRegistry {
             version: '1.0.0',
             load: async () => {
                 const instance = await Promise.resolve(loader());
+                if (type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory) {
+                    //@ts-ignore
+                    return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory) };
+                }
                 return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory) };
             }
         }, typeof descOrLoader === 'function' ? desc : descOrLoader);
@@ -93,7 +98,7 @@ export class PluginRegistry {
                 }
             }
             else {
-                console.error(`neighter a default export nor the 'create' method exists in the module:`, instance);
+                console.error(`neither a default export nor the 'create' method exists in the module:`, instance);
             }
         }
         if (f.startsWith('new ')) {

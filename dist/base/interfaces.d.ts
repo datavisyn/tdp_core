@@ -379,6 +379,7 @@ export interface IViewPlugin {
 export interface IVisynViewPlugin {
     readonly desc: IViewPluginDesc;
     factory(prop: IVisynViewProps<any, any>): JSX.Element;
+    headerFactory(prop: IVisynViewProps<any, any>): JSX.Element;
 }
 export interface IInstantView {
     readonly node: HTMLElement;
