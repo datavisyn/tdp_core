@@ -17,8 +17,6 @@ export declare class IDType extends EventHandler implements IIDType {
      * the current selections
      */
     private readonly sel;
-    private readonly name2idCache;
-    private readonly id2nameCache;
     canBeMappedTo: Promise<IDType[]>;
     /**
      * @param id the system identifier of this IDType
@@ -51,19 +49,6 @@ export declare class IDType extends EventHandler implements IIDType {
     select(type: string, selection: string[], op: SelectOperation): string[];
     private selectImpl;
     clear(type?: string): string[];
-    /**
-     * Request the system identifiers for the given entity names.
-     * @param names the entity names to resolve
-     * @returns a promise of system identifiers that match the input names
-     */
-    map(names: string[]): Promise<number[]>;
-    /**
-     * search for all matching ids for a given pattern
-     * @param pattern
-     * @param limit maximal number of results
-     * @return {Promise<void>}
-     */
-    search(pattern: string, limit?: number): Promise<IDPair[]>;
     /**
      * chooses whether a GET or POST request based on the expected url length
      * @param url

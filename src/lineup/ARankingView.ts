@@ -330,7 +330,7 @@ export abstract class ARankingView extends AView {
     return {
       columns,
       selection: this.selection,
-      freeColor: (id: number) => this.colors.freeColumnColor(id),
+      freeColor: (id: string) => this.colors.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => this.withoutTracking(() => {
         columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
       }),
@@ -402,7 +402,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id: string = null, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
@@ -486,7 +486,7 @@ export abstract class ARankingView extends AView {
       }
     });
 
-    const r = this.addColumn(colDesc, data, -1, position);
+    const r = this.addColumn(colDesc, data, null, position);
     columnResolve(r.col);
 
     // use _score function to reload the score

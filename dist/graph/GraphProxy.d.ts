@@ -9,7 +9,6 @@ export declare class GraphProxy extends ADataType<IGraphDataDescription> {
     get nedges(): number;
     get dim(): number[];
     impl(factory?: IGraphFactory): PromiseLike<AGraph>;
-    ids(selection?: string[]): Promise<string[]>;
     get idtypes(): import("../idtype").IDType[];
     /**
      * module entry point for creating a datatype

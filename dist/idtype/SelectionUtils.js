@@ -1,4 +1,4 @@
-import { isEqual } from "lodash";
+import { isEqual } from 'lodash';
 export var SelectOperation;
 (function (SelectOperation) {
     SelectOperation[SelectOperation["SET"] = 0] = "SET";

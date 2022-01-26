@@ -1,7 +1,6 @@
 import { AppContext } from '../app/AppContext';
 import { EventHandler } from '../base/event';
 import { SelectOperation, SelectionUtils } from './SelectionUtils';
-import { ResolveNow } from '../base/promise';
 /**
  * An IDType is a semantic aggregation of an entity type, like Patient and Gene.
  *
@@ -25,8 +24,6 @@ export class IDType extends EventHandler {
          * the current selections
          */
         this.sel = new Map();
-        this.name2idCache = new Map();
-        this.id2nameCache = new Map();
         this.canBeMappedTo = null;
     }
     persist() {
@@ -80,40 +77,6 @@ export class IDType extends EventHandler {
     }
     clear(type = SelectionUtils.defaultSelectionType) {
         return this.selectImpl([], SelectOperation.SET, type);
-    }
-    /**
-     * Request the system identifiers for the given entity names.
-     * @param names the entity names to resolve
-     * @returns a promise of system identifiers that match the input names
-     */
-    async map(names) {
-        names = names.map((s) => String(s)); // ensure strings
-        const toResolve = names.filter((name) => !this.name2idCache.has(name));
-        if (toResolve.length === 0) {
-            return ResolveNow.resolveImmediately(names.map((name) => this.name2idCache.get(name)));
-        }
-        const ids = await IDType.chooseRequestMethod(`/idtype/${this.id}/map`, { ids: toResolve });
-        toResolve.forEach((name, i) => {
-            this.name2idCache.set(name, ids[i]);
-            this.id2nameCache.set(ids[i], name);
-        });
-        return names.map((name) => this.name2idCache.get(name));
-    }
-    /**
-     * search for all matching ids for a given pattern
-     * @param pattern
-     * @param limit maximal number of results
-     * @return {Promise<void>}
-     */
-    async search(pattern, limit = 10) {
-        const result = await AppContext.getInstance().getAPIJSON(`/idtype/${this.id}/search`, { q: pattern, limit });
-        // cache results
-        result.forEach((pair) => {
-            const r = String(pair.name);
-            this.id2nameCache.set(pair.id, r);
-            this.name2idCache.set(r, pair.id);
-        });
-        return result;
     }
     /**
      * chooses whether a GET or POST request based on the expected url length

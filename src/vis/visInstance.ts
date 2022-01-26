@@ -111,8 +111,6 @@ export class AVisInstance extends EventHandler {
     }
   }
 
-/* 
-
   locate(...selectionIds: string[][]): Promise<any> {
     if (selectionIds.length === 1) {
       return this.locateImpl(selectionIds[0]);
@@ -120,28 +118,11 @@ export class AVisInstance extends EventHandler {
     return Promise.all(selectionIds.map((sel) => this.locateImpl(sel)));
   }
 
-  // TODO: is this correct?
   async locateById(...selectionIndices: string[][]) {
-    const ids: string[] = await this.data.ids();
     if (selectionIndices.length === 1) {
       return this.locateImpl(selectionIndices[0]);
     }
     return Promise.all(selectionIndices.map((r) => this.locateImpl(r)));
-  } */
-
-  locate(...range: Range[]): Promise<any> {
-    if (range.length === 1) {
-      return this.locateImpl(range[0]);
-    }
-    return Promise.all(range.map(this.locateImpl, this));
-  }
-
-  async locateById(...range: Range[]) {
-    const ids: Range = await (<any>this).data.ids();
-    if (range.length === 1) {
-      return this.locateImpl(ids.indexOf(range[0]));
-    }
-    return Promise.all(range.map((r) => this.locateImpl(ids.indexOf(r))));
   }
 
   locateImpl(selectionIndices: string[]) {

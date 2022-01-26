@@ -1,6 +1,5 @@
 import { IIDType } from './IIDType';
 import { IDType, IDTypeLike } from './IDType';
-import { ProductIDType } from './ProductIDType';
 import { IPluginDesc } from '../base/plugin';
 export declare class IDTypeManager {
     static EXTENSION_POINT_IDTYPE: string;
@@ -10,10 +9,9 @@ export declare class IDTypeManager {
     private fillUpData;
     private toPlural;
     resolveIdType(id: IDTypeLike): IDType;
-    resolveProduct(...idtypes: IDType[]): ProductIDType;
     /**
      * list currently resolved idtypes
-     * @returns {Array<IDType|ProductIDType>}
+     * @returns {Array<IDType>}
      */
     listIdTypes(): IIDType[];
     /**
@@ -21,7 +19,7 @@ export declare class IDTypeManager {
      * @returns {any}
      */
     listAllIdTypes(): Promise<IIDType[]>;
-    registerIdType(id: string, idtype: IDType | ProductIDType): IDType | ProductIDType;
+    registerIdType(id: string, idtype: IDType): IDType;
     persistIdTypes(): any;
     restoreIdType(persisted: any): void;
     clearSelection(type?: string): void;

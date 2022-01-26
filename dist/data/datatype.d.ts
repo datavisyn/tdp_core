@@ -3,12 +3,12 @@
  */
 import { IPersistable } from '../base/IPersistable';
 import { IDType } from '../idtype/IDType';
-import { ISelectAble, ASelectAble } from '../idtype/ASelectAble';
+import { ASelectAble } from '../idtype/ASelectAble';
 import { IDataDescription } from './DataDescription';
 /**
  * Basic data type interface
  */
-export interface IDataType extends ISelectAble, IPersistable {
+export interface IDataType extends IPersistable {
     /**
      * its description
      */
@@ -18,7 +18,6 @@ export interface IDataType extends ISelectAble, IPersistable {
      * rows, cols, ....
      */
     readonly dim: number[];
-    idView(selectionIds: string[]): Promise<IDataType>;
 }
 /**
  * dummy data type just holding the description
@@ -27,7 +26,6 @@ export declare abstract class ADataType<T extends IDataDescription> extends ASel
     readonly desc: T;
     constructor(desc: T);
     get dim(): number[];
-    ids(selectionIds: string[]): Promise<string[]>;
     idView(selectionIds?: string[]): Promise<ADataType<T>>;
     get idtypes(): IDType[];
     persist(): any;

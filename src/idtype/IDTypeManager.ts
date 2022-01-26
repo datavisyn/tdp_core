@@ -3,7 +3,6 @@ import {GlobalEventHandler} from '../base/event';
 import {IIDType} from './IIDType';
 import {SelectionUtils} from './SelectionUtils';
 import {IDType, IDTypeLike} from './IDType';
-import {ProductIDType} from './ProductIDType';
 import {PluginRegistry} from '../app/PluginRegistry';
 import {IPluginDesc} from '../base/plugin';
 
@@ -14,7 +13,7 @@ export class IDTypeManager {
   public static EVENT_REGISTER_IDTYPE = 'register.idtype';
 
 
-  private cache = new Map<string, IDType|ProductIDType>();
+  private cache = new Map<string, IDType>();
   private filledUp = false;
 
 
@@ -46,8 +45,6 @@ export class IDTypeManager {
     return name + 's';
   }
 
-
-
   public resolveIdType(id: IDTypeLike): IDType {
     if (id instanceof IDType) {
       return id;
@@ -56,14 +53,10 @@ export class IDTypeManager {
       return <IDType>IDTypeManager.getInstance().registerIdType(sid, new IDType(sid, sid, IDTypeManager.getInstance().toPlural(sid)));
     }
   }
-  public resolveProduct(...idtypes: IDType[]): ProductIDType {
-    const p = new ProductIDType(idtypes);
-    return <ProductIDType>IDTypeManager.getInstance().registerIdType(p.id, p);
-  }
 
   /**
    * list currently resolved idtypes
-   * @returns {Array<IDType|ProductIDType>}
+   * @returns {Array<IDType>}
    */
   public listIdTypes(): IIDType[] {
     return Array.from(IDTypeManager.getInstance().cache.values());
@@ -84,7 +77,7 @@ export class IDTypeManager {
     return IDTypeManager.getInstance().listIdTypes();
   }
 
-  public registerIdType(id: string, idtype: IDType|ProductIDType): IDType|ProductIDType {
+  public registerIdType(id: string, idtype: IDType): IDType {
     if (IDTypeManager.getInstance().cache.has(id)) {
       return IDTypeManager.getInstance().cache.get(id);
     }

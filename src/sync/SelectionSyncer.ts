@@ -24,7 +24,7 @@ export class SelectionSyncerOptionUtils {
         // sync just the latest state
         store.setValue(key, selection);
       });
-      store.on(key, (event: any, newValue: string) => {
+      store.on(key, (event: any, newValue: string[]) => {
         disable = true; //don't track on changes
         idType.select(type, newValue);
         disable = false;

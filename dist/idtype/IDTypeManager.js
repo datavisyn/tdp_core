@@ -2,7 +2,6 @@ import { AppContext } from '../app/AppContext';
 import { GlobalEventHandler } from '../base/event';
 import { SelectionUtils } from './SelectionUtils';
 import { IDType } from './IDType';
-import { ProductIDType } from './ProductIDType';
 import { PluginRegistry } from '../app/PluginRegistry';
 export class IDTypeManager {
     constructor() {
@@ -44,13 +43,9 @@ export class IDTypeManager {
             return IDTypeManager.getInstance().registerIdType(sid, new IDType(sid, sid, IDTypeManager.getInstance().toPlural(sid)));
         }
     }
-    resolveProduct(...idtypes) {
-        const p = new ProductIDType(idtypes);
-        return IDTypeManager.getInstance().registerIdType(p.id, p);
-    }
     /**
      * list currently resolved idtypes
-     * @returns {Array<IDType|ProductIDType>}
+     * @returns {Array<IDType>}
      */
     listIdTypes() {
         return Array.from(IDTypeManager.getInstance().cache.values());

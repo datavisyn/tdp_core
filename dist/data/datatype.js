@@ -10,9 +10,6 @@ export class ADataType extends ASelectAble {
     get dim() {
         return [];
     }
-    ids(selectionIds) {
-        return Promise.resolve(selectionIds);
-    }
     idView(selectionIds) {
         return Promise.resolve(this);
     }
@@ -41,7 +38,7 @@ export class ADataType extends ASelectAble {
             return true;
         }
         //sounds good
-        return (typeof (v.idView) === 'function' && typeof (v.persist) === 'function' && typeof (v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v) && ('dim' in v));
+        return (typeof (v.persist) === 'function' && typeof (v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v));
     }
 }
 export class DummyDataType extends ADataType {

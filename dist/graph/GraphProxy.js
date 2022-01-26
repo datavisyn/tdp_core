@@ -56,12 +56,6 @@ export class GraphProxy extends ADataType {
         }
         return this.cache;
     }
-    ids(selection = []) {
-        if (this.cache) {
-            return Promise.resolve(this.cache.then((i) => i.ids(selection))); // TODO avoid <any> type cast
-        }
-        return Promise.resolve([]);
-    }
     get idtypes() {
         return [AGraph.IDTYPE_NODES, AGraph.IDTYPE_EDGES].map(IDTypeManager.getInstance().resolveIdType);
     }

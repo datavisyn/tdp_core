@@ -42,7 +42,7 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
 }
 
 export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc): item is IAdditionalColumnDesc {
-  return (item as IAdditionalColumnDesc).selectedId != undefined;
+  return (item as IAdditionalColumnDesc).selectedId != null;
 }
 
 /**

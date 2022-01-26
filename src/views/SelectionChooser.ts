@@ -98,7 +98,7 @@ export class SelectionChooser {
       }));
     }
 
-    const targetIds = await IDTypeManager.getInstance().mapToName(source, sourceNames, target);
+    const targetIds = await IDTypeManager.getInstance().mapNameToName(source, sourceNames, target);
     const targetNames = targetIds.flat();
 
 

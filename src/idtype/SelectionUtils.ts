@@ -1,4 +1,4 @@
-import {isEqual} from "lodash";
+import {isEqual} from 'lodash';
 
 export enum SelectOperation {
   SET, ADD, REMOVE

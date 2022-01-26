@@ -24,7 +24,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
         return ResolveNow.resolveImmediately(this.adapter.createDesc(id)).then((desc) => [{
                 desc: ABaseSelectionAdapter.patchDesc(desc, id),
                 data: this.adapter.loadData(id),
-                id: id
+                id
             }]);
     }
 }

@@ -3,14 +3,12 @@
  */
 import {IPersistable} from '../base/IPersistable';
 import {IDType} from '../idtype/IDType';
-import {ISelectAble, ASelectAble} from '../idtype/ASelectAble';
-import {IAdvancedStatistics, IStatistics} from '../base/statistics';
+import {ASelectAble, ISelectAble} from '../idtype/ASelectAble';
 import {IDataDescription} from './DataDescription';
-import {IValueTypeDesc} from './valuetype';
 /**
  * Basic data type interface
  */
-export interface IDataType extends ISelectAble, IPersistable {
+export interface IDataType extends IPersistable {
   /**
    * its description
    */
@@ -20,9 +18,6 @@ export interface IDataType extends ISelectAble, IPersistable {
    * rows, cols, ....
    */
   readonly dim: number[];
-
-
-  idView(selectionIds: string[]): Promise<IDataType>;
 }
 /**
  * dummy data type just holding the description
@@ -34,10 +29,6 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
 
   get dim(): number[] {
     return [];
-  }
-
-  ids(selectionIds: string[]): Promise<string[]> {
-    return Promise.resolve(selectionIds);
   }
 
   idView(selectionIds?: string[]): Promise<ADataType<T>> {
@@ -72,7 +63,7 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
       return true;
     }
     //sounds good
-    return (typeof(v.idView) === 'function' && typeof(v.persist) === 'function' && typeof(v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v) && ('dim' in v));
+    return (typeof(v.persist) === 'function' && typeof(v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v));
   }
 }
 

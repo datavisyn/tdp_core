@@ -76,8 +76,8 @@ export declare class AVisInstance extends EventHandler {
     persist(): any;
     get isBuilt(): boolean;
     protected markReady(built?: boolean): void;
-    locate(...range: Range[]): Promise<any>;
-    locateById(...range: Range[]): Promise<any>;
+    locate(...selectionIds: string[][]): Promise<any>;
+    locateById(...selectionIndices: string[][]): Promise<any>;
     locateImpl(selectionIndices: string[]): Promise<any>;
     restore(persisted: any): Promise<AVisInstance>;
     update(): void;

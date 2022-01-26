@@ -60,7 +60,7 @@ export class SelectionChooser {
                 data: { id: d, name: sourceNames[i], label: labels[i] }
             }));
         }
-        const targetIds = await IDTypeManager.getInstance().mapToName(source, sourceNames, target);
+        const targetIds = await IDTypeManager.getInstance().mapNameToName(source, sourceNames, target);
         const targetNames = targetIds.flat();
         if (target === readAble && targetIds.every((d) => d.length === 1)) {
             // keep it simple target = readable and single hit - so just show flat

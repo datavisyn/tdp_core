@@ -65,7 +65,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
 
       const position = this.computePositionToInsert(context, id);
 
-      return columnsToBeAdded.map((desc, i) => ({desc, data: data[i], id: id, position}));
+      return columnsToBeAdded.map((desc, i) => ({desc, data: data[i], id, position}));
     });
   }
 

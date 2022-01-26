@@ -17,9 +17,6 @@ export class IDType extends EventHandler implements IIDType {
    */
   private readonly sel = new Map<string, string[]>();
 
-  private readonly name2idCache = new Map<string, number>();
-  private readonly id2nameCache = new Map<number, string>();
-
   canBeMappedTo: Promise<IDType[]> = null;
 
   /**
@@ -89,7 +86,7 @@ export class IDType extends EventHandler implements IIDType {
 
   private selectImpl(selection: string[], op = SelectOperation.SET, type: string = SelectionUtils.defaultSelectionType) {
     const b = this.selections(type);
-    const newValue = SelectionUtils.integrateSelection(b, selection, op)
+    const newValue = SelectionUtils.integrateSelection(b, selection, op);
     this.sel.set(type, newValue);
     const added = op !== SelectOperation.REMOVE ? selection : [];
     const removed = (op === SelectOperation.ADD ? [] : (op === SelectOperation.SET ? b : selection));
@@ -100,42 +97,6 @@ export class IDType extends EventHandler implements IIDType {
 
   clear(type = SelectionUtils.defaultSelectionType) {
     return this.selectImpl([], SelectOperation.SET, type);
-  }
-
-  /**
-   * Request the system identifiers for the given entity names.
-   * @param names the entity names to resolve
-   * @returns a promise of system identifiers that match the input names
-   */
-  async map(names: string[]): Promise<number[]> {
-    names = names.map((s) => String(s)); // ensure strings
-    const toResolve = names.filter((name) => !this.name2idCache.has(name));
-    if (toResolve.length === 0) {
-      return ResolveNow.resolveImmediately(names.map((name) => this.name2idCache.get(name)));
-    }
-    const ids: number[] = await IDType.chooseRequestMethod(`/idtype/${this.id}/map`, {ids: toResolve});
-    toResolve.forEach((name, i) => {
-      this.name2idCache.set(name, ids[i]);
-      this.id2nameCache.set(ids[i], name);
-    });
-    return names.map((name) => this.name2idCache.get(name));
-  }
-
-  /**
-   * search for all matching ids for a given pattern
-   * @param pattern
-   * @param limit maximal number of results
-   * @return {Promise<void>}
-   */
-  async search(pattern: string, limit = 10): Promise<IDPair[]> {
-   const result: IDPair[] = await AppContext.getInstance().getAPIJSON(`/idtype/${this.id}/search`, {q: pattern, limit});
-    // cache results
-    result.forEach((pair) => {
-      const r = String(pair.name);
-      this.id2nameCache.set(pair.id, r);
-      this.name2idCache.set(r, pair.id);
-    });
-    return result;
   }
 
   /**
