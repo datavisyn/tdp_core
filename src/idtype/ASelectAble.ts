@@ -1,25 +1,22 @@
 import {EventHandler, IEventHandler, IEventListener} from '../base/event';
-import {Range, RangeLike, ParseRangeUtils} from '../range';
 import {SelectOperation, SelectionUtils} from './SelectionUtils';
 import {IDType} from './IDType';
 
 export interface ISelectAble extends IEventHandler {
-  ids(range?: RangeLike): Promise<Range>;
-
-  fromIdRange(idRange?: RangeLike): Promise<Range>;
+  ids(selectionIndices?: string[]): Promise<string[]>;
 
   readonly idtypes: IDType[];
 
-  selections(type?: string): Promise<Range>;
+  selections(type?: string): Promise<string[]>;
 
-  select(range: RangeLike): Promise<Range>;
-  select(range: RangeLike, op: SelectOperation): Promise<Range>;
-  select(type: string, range: RangeLike): Promise<Range>;
-  select(type: string, range: RangeLike, op: SelectOperation): Promise<Range>;
-  select(dim: number, range: RangeLike): Promise<Range>;
-  select(dim: number, range: RangeLike, op: SelectOperation): Promise<Range>;
-  select(dim: number, type: string, range: RangeLike): Promise<Range>;
-  select(dim: number, type: string, range: RangeLike, op: SelectOperation): Promise<Range>;
+  select(selectionIds: string[]): Promise<string[]>;
+  select(selectionIds: string[], op: SelectOperation): Promise<string[]>;
+  select(type: string, selectionIds: string[]): Promise<string[]>;
+  select(type: string, selectionIds: string[], op: SelectOperation): Promise<string[]>;
+  select(dim: number, selectionIds: string[]): Promise<string[]>;
+  select(dim: number, selectionIds: string[], op: SelectOperation): Promise<string[]>;
+  select(dim: number, type: string, selectionIds: string[]): Promise<string[]>;
+  select(dim: number, type: string, selectionIds: string[], op: SelectOperation): Promise<string[]>;
 
   /**
    * clear the specific selection (type) and dimension
@@ -31,7 +28,7 @@ export interface ISelectAble extends IEventHandler {
 }
 
 interface ISingleSelectionListener {
-  (event: any, type: string, act: Range, added: Range, removed: Range): void;
+  (event: any, type: string, act: string[], added: string[], removed: string[]): void;
 }
 
 export abstract class ASelectAble extends EventHandler implements ISelectAble {
@@ -39,39 +36,31 @@ export abstract class ASelectAble extends EventHandler implements ISelectAble {
 
   private numSelectListeners = 0;
   private selectionListeners: ISingleSelectionListener[] = [];
-  private singleSelectionListener = async (event: any, type: string, act: Range, added: Range, removed: Range) => {
-    const ids = await this.ids();
+  private singleSelectionListener = async (event: any, type: string, act: number[], added: number[], removed: number[]) => {
+    const ids = Array.from(await this.ids());
     //filter to the right ids and convert to indices format
     //given all ids convert the selected ids to the indices in the data type
-    act = ids.indexOf(act);
-    added = ids.indexOf(added);
-    removed = ids.indexOf(removed);
-    if (act.isNone && added.isNone && removed.isNone) {
+    act = act.map((id) => ids.indexOf(id));
+    added = added.map((id) => ids.indexOf(id));
+    removed = removed.map((id) => ids.indexOf(id));
+    if (act.length === 0 && added.length === 0 && removed.length === 0) {
       return;
     }
-    //ensure the right number of dimensions
-    SelectionUtils.fillWithNone(act, ids.ndim);
-    SelectionUtils.fillWithNone(added, ids.ndim);
-    SelectionUtils.fillWithNone(removed, ids.ndim);
 
     this.fire(ASelectAble.EVENT_SELECT, type, act, added, removed);
     this.fire(`${ASelectAble.EVENT_SELECT}-${type}`, act, added, removed);
   }
-  private selectionCache: {act: Range, added: Range, removed: Range}[] = [];
+  private selectionCache: {act: string[], added: string[], removed: string[]}[] = [];
   private accumulateEvents = -1;
 
-  abstract ids(range?: RangeLike): Promise<Range>;
-
-  async fromIdRange(idRange: RangeLike = Range.all()) {
-    return (await this.ids()).indexOf(ParseRangeUtils.parseRangeLike(idRange));
-  }
+  abstract ids(selectionIds?: string[]): Promise<string[]>;
 
   get idtypes(): IDType[] {
     return [];
   }
 
   private selectionListener(idtype: IDType, index: number, total: number) {
-    return (event: any, type: string, act: Range, added: Range, removed: Range) => {
+    return (event: any, type: string, act: string[], added: string[], removed: string[]) => {
       this.selectionCache[index] = {act, added, removed};
       if (this.accumulateEvents < 0 || (++this.accumulateEvents) === total) {
         this.fillAndSend(type, index);
@@ -88,12 +77,12 @@ export abstract class ASelectAble extends EventHandler implements ISelectAble {
       }
       return {
         act: id.selections(type),
-        added: Range.none(),
-        removed: Range.none()
+        added: [],
+        removed: []
       };
     });
 
-    const act = Range.join(full.map((entry) => entry.act));
+    const act = full.map((entry) => entry.act);
     const added = Range.join(full.map((entry) => entry.added));
     const removed = Range.join(full.map((entry) => entry.removed));
 
@@ -134,31 +123,29 @@ export abstract class ASelectAble extends EventHandler implements ISelectAble {
   }
 
   async selections(type = SelectionUtils.defaultSelectionType) {
-    const ids = await this.ids();
-    const r = Range.join(this.idtypes.map((idtype) => idtype.selections(type)));
-    return ids.indexRangeOf(r);
+    return this.idtypes.map((idtype) => idtype.selections(type)).flat();
   }
 
-  select(range: RangeLike): Promise<Range>;
-  select(range: RangeLike, op: SelectOperation): Promise<Range>;
-  select(type: string, range: RangeLike): Promise<Range>;
-  select(type: string, range: RangeLike, op: SelectOperation): Promise<Range>;
-  select(dim: number, range: RangeLike): Promise<Range>;
-  select(dim: number, range: RangeLike, op: SelectOperation): Promise<Range>;
-  select(dim: number, type: string, range: RangeLike): Promise<Range>;
-  select(dim: number, type: string, range: RangeLike, op: SelectOperation): Promise<Range>;
+  select(selectionIds: string[]): Promise<string[]>;
+  select(selectionIds: string[], op: SelectOperation): Promise<string[]>;
+  select(type: string, selectionIds: string[]): Promise<string[]>;
+  select(type: string, selectionIds: string[], op: SelectOperation): Promise<string[]>;
+  select(dim: number, selectionIds: string[]): Promise<string[]>;
+  select(dim: number, selectionIds: string[], op: SelectOperation): Promise<string[]>;
+  select(dim: number, type: string, selectionIds: string[]): Promise<string[]>;
+  select(dim: number, type: string, selectionIds: string[], op: SelectOperation): Promise<string[]>;
   select() {
     const a = Array.from(arguments);
     const dim = (typeof a[0] === 'number') ? +a.shift() : -1,
       type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType,
-      range = ParseRangeUtils.parseRangeLike(a[0]),
+      range = new Set<string>(a[0]),
       op = SelectionUtils.asSelectOperation(a[1]);
     return this.selectImpl(range, op, type, dim);
   }
 
-  private async selectImpl(range: Range, op = SelectOperation.SET, type: string = SelectionUtils.defaultSelectionType, dim = -1): Promise<Range> {
+  private async selectImpl(selection: Set<string>, op = SelectOperation.SET, type: string = SelectionUtils.defaultSelectionType, dim = -1): Promise<Set<string>> {
     const types = this.idtypes;
-    let ids = await this.ids();
+    let ids = await this.indices();
 
     if (dim === -1) {
       range = ids.preMultiply(range);
@@ -191,6 +178,6 @@ export abstract class ASelectAble extends EventHandler implements ISelectAble {
     const a = Array.from(arguments);
     const dim = (typeof a[0] === 'number') ? +a.shift() : -1;
     const type = (typeof a[0] === 'string') ? a[0] : SelectionUtils.defaultSelectionType;
-    return this.selectImpl(Range.none(), SelectOperation.SET, type, dim);
+    return this.selectImpl(new Set<string>(), SelectOperation.SET, type, dim);
   }
 }

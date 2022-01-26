@@ -1,5 +1,4 @@
 import { SelectOperation, IDTypeManager, ASelectAble } from '../idtype';
-import { ParseRangeUtils, Range } from '../range';
 import { UniqueIdManager } from '../app/UniqueIdManager';
 import { EventHandler } from '../base/event';
 export class AttributeContainer extends EventHandler {

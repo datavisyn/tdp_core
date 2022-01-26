@@ -15,7 +15,6 @@ import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
 import { PluginRegistry } from '../app';
 import { IDTypeManager } from '../idtype';
-import { Range } from '../range';
 import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../provenance';
 export class TDPView extends React.Component {
     constructor(props, context) {
@@ -120,15 +119,15 @@ export class TDPView extends React.Component {
     }
     buildSelection(idtype, selection) {
         if (!selection) {
-            return Promise.resolve({ idtype, range: Range.none() });
+            return Promise.resolve({ idtype, selectionIds: [] });
         }
-        return idtype.map(selection).then((ids) => ({ idtype, range: Range.list(ids) }));
+        return Promise.resolve({ idtype, selectionIds: selection });
     }
     triggerSelection(selection) {
         if (!this.props.onItemSelectionChanged) {
             return;
         }
-        selection.idtype.unmap(selection.range).then((names) => this.props.onItemSelectionChanged(names, selection.idtype.id));
+        this.props.onItemSelectionChanged(Array.from(selection.selectionIds), selection.idtype.id);
     }
     render() {
         const buildItem = () => {

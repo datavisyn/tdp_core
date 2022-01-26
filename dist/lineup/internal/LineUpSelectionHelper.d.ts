@@ -2,7 +2,6 @@ import { EventHandler, ISelection } from '../../base';
 import { IRow } from '../../base/rest';
 import { LocalDataProvider } from 'lineupjs';
 import { IDType } from '../../idtype';
-import { Range } from '../../range';
 export declare class LineUpSelectionHelper extends EventHandler {
     private readonly provider;
     private readonly idType;
@@ -24,6 +23,6 @@ export declare class LineUpSelectionHelper extends EventHandler {
     /**
      * gets the rows ids as a set, i.e. the order doesn't mean anything
      */
-    rowIdsAsSet(indices: number[]): Range;
+    rowIdsAsSet(indices: number[]): string[];
     setItemSelection(sel: ISelection): void;
 }

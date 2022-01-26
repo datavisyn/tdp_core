@@ -1,5 +1,4 @@
 import {SelectOperation, IDTypeManager, ASelectAble} from '../idtype';
-import {ParseRangeUtils, RangeLike, Range} from '../range';
 import {UniqueIdManager} from '../app/UniqueIdManager';
 import {IPersistable} from '../base/IPersistable';
 import {EventHandler} from '../base/event';

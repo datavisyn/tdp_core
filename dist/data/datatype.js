@@ -1,5 +1,4 @@
 import { ASelectAble } from '../idtype/ASelectAble';
-import { Range } from '../range';
 /**
  * dummy data type just holding the description
  */
@@ -11,10 +10,10 @@ export class ADataType extends ASelectAble {
     get dim() {
         return [];
     }
-    ids(range = Range.all()) {
-        return Promise.resolve(Range.none());
+    ids(selectionIds) {
+        return Promise.resolve(selectionIds);
     }
-    idView(idRange) {
+    idView(selectionIds) {
         return Promise.resolve(this);
     }
     get idtypes() {

@@ -1,6 +1,5 @@
 import {IColumnDesc, LocalDataProvider} from 'lineupjs';
 import {ProvenanceGraph, ObjectRefUtils} from '../provenance';
-import {ParseRangeUtils, Range} from '../range';
 import {ARankingView} from '../lineup/ARankingView';
 import {IARankingViewOptions} from '../lineup/IARankingViewOptions';
 import {IInitialRankingOptions} from '../lineup/desc';
@@ -46,7 +45,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     };
     const selection = {
       idtype,
-      range: Range.none()
+      selectionIds: []
     };
 
     const that = this;
@@ -63,7 +62,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
         return columns.map((c) => Object.assign(c, {
           initialRanking: true,
           width: -1,
-          selectedId: -1,
+          selectedId: null,
           selectedSubtype: undefined,
           ...c
         }));
@@ -157,7 +156,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', null);
     this.ranking.setItemSelection({
       idtype: this.ranking.itemIDType,
-      range: ParseRangeUtils.parseRangeLike(rows.map((d) => d._id))
+      selectionIds: rows.map((d) => d.id)
     });
     lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection: number[]) => {
       const rows = selection.map((d) => lineup.data[d]);

@@ -1,5 +1,5 @@
 export function isAdditionalColumnDesc(item) {
-    return item.selectedId !== undefined;
+    return item.selectedId != undefined;
 }
 /**
  * mode of the view depending on the view state

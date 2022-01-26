@@ -1,6 +1,5 @@
 import {IDTypeManager} from '../idtype';
 import {ADataType} from '../data/datatype';
-import {Range, RangeLike} from '../range';
 import {AGraph, IGraphDataDescription} from './graph';
 import {GraphFactoryUtils, IGraphFactory} from './GraphBase';
 import {RemoteStoreGraph} from './RemoteStorageGraph';
@@ -60,11 +59,11 @@ export class GraphProxy extends ADataType<IGraphDataDescription> {
     return this.cache;
   }
 
-  ids(range: RangeLike = Range.all()): Promise<Range> {
+  ids(selection: string[] = []): Promise<string[]> {
     if (this.cache) {
-      return Promise.resolve(<any>this.cache.then((i) => i.ids(range))); // TODO avoid <any> type cast
+      return Promise.resolve(<any>this.cache.then((i) => i.ids(selection))); // TODO avoid <any> type cast
     }
-    return Promise.resolve(Range.none());
+    return Promise.resolve([]);
   }
 
   get idtypes() {

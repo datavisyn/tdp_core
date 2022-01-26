@@ -3,7 +3,6 @@ import { I18nextManager } from '../i18n';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { AView } from './AView';
 import { XlsxUtils } from '../utils/XlsxUtils';
-import { ParseRangeUtils } from '../range';
 /**
  * base class for views based on LineUp
  */
@@ -102,7 +101,7 @@ export class ATableView extends AView {
                     evt.stopPropagation();
                     this.setItemSelection({
                         idtype: this.itemIDType,
-                        range: ParseRangeUtils.parseRangeLike([row._id])
+                        selectionIds: [row.id]
                     });
                 };
             }

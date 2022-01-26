@@ -388,7 +388,7 @@ export class LayoutedProvVis extends AVisInstance {
             this.options[name] = val;
         }
     }
-    locateImpl(range) {
+    locateImpl(selectionIds) {
         return Promise.resolve(null);
     }
     build($parent) {

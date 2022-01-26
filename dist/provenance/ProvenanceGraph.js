@@ -1,7 +1,6 @@
 import { BaseUtils } from '../base/BaseUtils';
 import { AppContext } from '../app/AppContext';
 import { SelectOperation, SelectionUtils, IDTypeManager } from '../idtype';
-import { Range, Range1D } from '../range';
 import { ADataType } from '../data/datatype';
 import { ObjectNode, ObjectRefUtils } from './ObjectNode';
 import { StateNode, } from './StateNode';

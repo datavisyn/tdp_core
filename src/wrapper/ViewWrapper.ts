@@ -18,7 +18,6 @@ import {AView} from '../views/AView';
 import {TourUtils} from '../tour/TourUtils';
 import {EventHandler, IEvent, IEventListener, ResolveNow} from '../base';
 import {NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph} from '../provenance';
-import {Range} from '../range';
 import {I18nextManager} from '../i18n';
 import {IDType, IDTypeManager} from '../idtype';
 import {Dialog} from '../components';
@@ -82,7 +81,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   constructor(public readonly plugin: IViewPluginDesc, private readonly graph: ProvenanceGraph, document: Document, private readonly viewOptionGenerator: () => any = () => ({})) {
     super();
 
-    this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
+    this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, selectionIds: []});
 
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
@@ -202,7 +201,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
           } else {
             this.instance.setItemSelection({
               idtype: idType,
-              range: idType.selections()
+              selectionIds: idType.selections()
             });
           }
         }
@@ -328,7 +327,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   private match(selection: ISelection) {
-    return ViewUtils.matchLength(this.plugin.selection, selection.range.dim(0).length);
+    return ViewUtils.matchLength(this.plugin.selection, selection.selectionIds.length);
   }
 
   /**

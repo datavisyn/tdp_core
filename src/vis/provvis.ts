@@ -11,7 +11,6 @@ import {SelectionUtils, SelectOperation} from '../idtype';
 import {BaseUtils} from '../base';
 import {AppContext, DnDUtils} from '../app';
 import {I18nextManager} from '../i18n';
-import {Range} from '../range';
 
 
 const DOI_LARGE = 0.9;
@@ -343,7 +342,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
   private onStateAdded = (event: any, state: StateNode) => {
     state.on('setAttr', this.trigger);
   }
-  private onSelectionChanged = (event: any, type: string, act: Range) => {
+  private onSelectionChanged = (event: any, type: string, act: number[]) => {
     const selectedStates = this.data.selectedStates(type);
     this.$node.selectAll('div.state').classed('phovea-select-' + type, function (d: StateRepr) {
       const isSelected = selectedStates.indexOf(d.s) >= 0;
@@ -448,7 +447,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     }
   }
 
-  locateImpl(range: Range) {
+  locateImpl(selectionIds: string[]) {
     return Promise.resolve(null);
   }
 

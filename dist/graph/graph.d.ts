@@ -1,5 +1,4 @@
 import { SelectOperation, ASelectAble } from '../idtype';
-import { RangeLike, Range } from '../range';
 import { IPersistable } from '../base/IPersistable';
 import { EventHandler } from '../base/event';
 import { IDataType, IDataDescription } from '../data';
@@ -87,7 +86,7 @@ export declare abstract class AGraph extends ASelectAble {
     abstract get edges(): GraphEdge[];
     get nedges(): number;
     get dim(): number[];
-    ids(range?: RangeLike): Promise<Range>;
+    ids(range?: RangeLike): Promise<any>;
     idView(idRange?: RangeLike): Promise<IGraph>;
     selectNode(node: GraphNode, op?: SelectOperation): void;
     selectedNodes(): Promise<GraphNode[]>;

@@ -1,5 +1,4 @@
 import { EventHandler, IEventListener } from '../base/event';
-import { Range, RangeLike } from '../range';
 import { SelectOperation } from './SelectionUtils';
 import { IIDType } from './IIDType';
 import { IDType } from './IDType';
@@ -46,5 +45,5 @@ export declare class ProductIDType extends EventHandler implements IIDType {
     select(type: string, range: RangeLike[], op: SelectOperation): Range[];
     private selectImpl;
     private toPerDim;
-    clear(type?: string): Range[];
+    clear(type?: string): any[];
 }

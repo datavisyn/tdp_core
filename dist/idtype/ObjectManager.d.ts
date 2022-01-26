@@ -21,5 +21,5 @@ export declare class ObjectManager<T extends IHasUniqueId> extends IDType {
     get entries(): T[];
     remove(id: number): T;
     remove(item: T): T;
-    selectedObjects(type?: string): any;
+    selectedObjects(type?: string): string[];
 }

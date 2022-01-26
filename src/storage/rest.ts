@@ -2,7 +2,6 @@ import {AppContext, UserSession} from '../app';
 import {Ajax} from '../base';
 import {RestBaseUtils} from '../base/rest';
 import {IDType, IDTypeManager} from '../idtype';
-import {RangeLike, ParseRangeUtils} from '../range';
 import {ISecureItem, Permission} from '../security';
 import {ENamedSetType, IStoredNamedSet} from './interfaces';
 
@@ -24,18 +23,19 @@ export class RestStorageUtils {
     return RestStorageUtils.listNamedSets(idType).then((namedSets) => namedSets.map((d) => ({name: d.name, value: d.id})));
   }
 
-  static saveNamedSet(name: string, idType: IDType | string, ids: RangeLike, subType: { key: string, value: string }, description = '', sec: Partial<ISecureItem>) {
-    const data = Object.assign({
+  static saveNamedSet(name: string, idType: IDType | string, ids: string[], subType: { key: string, value: string }, description = '', sec: Partial<ISecureItem>) {
+    const data = {
       name,
       type: ENamedSetType.NAMEDSET,
       creator: UserSession.getInstance().currentUserNameOrAnonymous(),
       permissions: Permission.ALL_READ_NONE,
       idType: IDTypeManager.getInstance().resolveIdType(idType).id,
-      ids: ParseRangeUtils.parseRangeLike(ids).toString(),
+      ids,
       subTypeKey: subType.key,
       subTypeValue: subType.value,
-      description
-    }, sec);
+      description,
+      ...sec
+    };
     return AppContext.getInstance().sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedsets/`, data, 'POST');
   }
 

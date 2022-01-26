@@ -1,5 +1,4 @@
 import { EventHandler } from '../base/event';
-import { Range, ParseRangeUtils, Range1D } from '../range';
 import { SelectOperation, SelectionUtils } from './SelectionUtils';
 import { IDType } from './IDType';
 //function indicesCompare(a: number[], b: number[]) {

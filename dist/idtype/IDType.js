@@ -1,6 +1,5 @@
 import { AppContext } from '../app/AppContext';
 import { EventHandler } from '../base/event';
-import { Range, ParseRangeUtils } from '../range';
 import { SelectOperation, SelectionUtils } from './SelectionUtils';
 import { ResolveNow } from '../base/promise';
 /**
@@ -26,7 +25,6 @@ export class IDType extends EventHandler {
          * the current selections
          */
         this.sel = new Map();
-        // TODO: is this cache ever emptied, or do we assume a reasonable upper bound on the entities in IDType?
         this.name2idCache = new Map();
         this.id2nameCache = new Map();
         this.canBeMappedTo = null;
@@ -55,59 +53,33 @@ export class IDType extends EventHandler {
     /**
      * return the current selections of the given type
      * @param type optional the selection type
-     * @returns {Range}
+     * @returns {string[]}
      */
     selections(type = SelectionUtils.defaultSelectionType) {
         if (this.sel.has(type)) {
             return this.sel.get(type);
         }
-        const v = Range.none();
+        const v = [];
         this.sel.set(type, v);
         return v;
     }
     select() {
         const a = Array.from(arguments);
-        const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType, range = ParseRangeUtils.parseRangeLike(a[0]), op = SelectionUtils.asSelectOperation(a[1]);
-        return this.selectImpl(range, op, type);
+        const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType, selection = a[0], op = SelectionUtils.asSelectOperation(a[1]);
+        return this.selectImpl(selection, op, type);
     }
-    selectImpl(range, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
+    selectImpl(selection, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
         const b = this.selections(type);
-        let newValue = Range.none();
-        switch (op) {
-            case SelectOperation.SET:
-                newValue = range;
-                break;
-            case SelectOperation.ADD:
-                newValue = b.union(range);
-                break;
-            case SelectOperation.REMOVE:
-                newValue = b.without(range);
-                break;
-        }
-        if (b.eq(newValue)) {
-            return b;
-        }
+        const newValue = SelectionUtils.integrateSelection(b, selection, op);
         this.sel.set(type, newValue);
-        const added = op !== SelectOperation.REMOVE ? range : Range.none();
-        const removed = (op === SelectOperation.ADD ? Range.none() : (op === SelectOperation.SET ? b : range));
+        const added = op !== SelectOperation.REMOVE ? selection : [];
+        const removed = (op === SelectOperation.ADD ? [] : (op === SelectOperation.SET ? b : selection));
         this.fire(IDType.EVENT_SELECT, type, newValue, added, removed, b);
         this.fire(`${IDType.EVENT_SELECT}-${type}`, newValue, added, removed, b);
         return b;
     }
     clear(type = SelectionUtils.defaultSelectionType) {
-        return this.selectImpl(Range.none(), SelectOperation.SET, type);
-    }
-    /**
-     * Cache identifier <-> name mapping in bulk.
-     * @param ids the entity identifiers to cache
-     * @param names the matching entity names to cache
-     */
-    fillMapCache(ids, names) {
-        ids.forEach((id, i) => {
-            const name = String(names[i]);
-            this.name2idCache.set(name, id);
-            this.id2nameCache.set(id, name);
-        });
+        return this.selectImpl([], SelectOperation.SET, type);
     }
     /**
      * Request the system identifiers for the given entity names.
@@ -126,30 +98,6 @@ export class IDType extends EventHandler {
             this.id2nameCache.set(ids[i], name);
         });
         return names.map((name) => this.name2idCache.get(name));
-    }
-    /**
-     * Request the names for the given entity system identifiers.
-     * @param ids the entity names to resolve
-     * @returns a promise of system identifiers that match the input names
-     */
-    async unmap(ids) {
-        const r = ParseRangeUtils.parseRangeLike(ids);
-        const toResolve = [];
-        r.dim(0).forEach((name) => !(this.id2nameCache.has(name)) ? toResolve.push(name) : null);
-        if (toResolve.length === 0) {
-            const result = [];
-            r.dim(0).forEach((name) => result.push(this.id2nameCache.get(name)));
-            return ResolveNow.resolveImmediately(result);
-        }
-        const result = await IDType.chooseRequestMethod(`/idtype/${this.id}/unmap`, { ids: Range.list(toResolve).toString() });
-        toResolve.forEach((id, i) => {
-            const r = String(result[i]);
-            this.id2nameCache.set(id, r);
-            this.name2idCache.set(r, id);
-        });
-        const out = [];
-        r.dim(0).forEach((name) => out.push(this.id2nameCache.get(name)));
-        return out;
     }
     /**
      * search for all matching ids for a given pattern

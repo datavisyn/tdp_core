@@ -1,5 +1,4 @@
 import {EventHandler, IEvent, IEventListener} from '../base/event';
-import {Range, RangeLike, ParseRangeUtils, Range1D} from '../range';
 import {SelectOperation, SelectionUtils} from './SelectionUtils';
 import {IIDType} from './IIDType';
 import {IDType} from './IDType';

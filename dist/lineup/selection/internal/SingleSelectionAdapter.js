@@ -7,8 +7,8 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
     }
     parameterChangedImpl(context) {
         // remove all and start again
-        const selectedIds = context.selection.range.dim(0).asList();
-        const usedCols = context.columns.filter((d) => d.desc.selectedId !== -1 && d.desc.selectedId !== undefined);
+        const selectedIds = context.selection.selectionIds;
+        const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // remove deselected columns
         if (lineupColIds.length > 0) {
@@ -18,13 +18,13 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
         if (selectedIds.length <= 0) {
             return null;
         }
-        return context.selection.idtype.unmap(selectedIds).then((names) => this.addDynamicColumns(context, selectedIds, names));
+        return this.addDynamicColumns(context, selectedIds);
     }
-    createColumnsFor(context, _id, id) {
-        return ResolveNow.resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [{
-                desc: ABaseSelectionAdapter.patchDesc(desc, _id),
-                data: this.adapter.loadData(_id, id),
-                id: _id
+    createColumnsFor(context, id) {
+        return ResolveNow.resolveImmediately(this.adapter.createDesc(id)).then((desc) => [{
+                desc: ABaseSelectionAdapter.patchDesc(desc, id),
+                data: this.adapter.loadData(id),
+                id: id
             }]);
     }
 }

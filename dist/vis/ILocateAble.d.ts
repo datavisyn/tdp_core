@@ -1,5 +1,4 @@
 import { IDataType } from '../data/datatype';
-import { Range } from '../range/Range';
 /**
  *
  */
@@ -13,6 +12,6 @@ export interface ILocateAble {
      * just a promise with this range, else an array
      * the return type should be something convertable using the geom module
      */
-    locate(...range: Range[]): Promise<any>;
-    locateById(...range: Range[]): Promise<any>;
+    locate(...selectionIds: string[][]): Promise<any>;
+    locateById(...selectionIndices: string[][]): Promise<any>;
 }

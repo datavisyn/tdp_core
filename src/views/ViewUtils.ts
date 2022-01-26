@@ -1,3 +1,4 @@
+import {SelectionUtils} from '..';
 import {IPluginDesc} from '../base';
 import {IViewPluginDesc, IViewContext, ISelection} from '../base/interfaces';
 import {IObjectRef, ProvenanceGraph} from '../provenance';
@@ -81,7 +82,7 @@ export class ViewUtils {
     if (aNull || bNull) {
       return aNull === bNull;
     }
-    const base = a.idtype.id === b.idtype.id && a.range.eq(b.range);
+    const base = a.idtype.id === b.idtype.id && SelectionUtils.selectionEq(a.selectionIds, b.selectionIds);
     if (!base) {
       return false;
     }
@@ -99,7 +100,7 @@ export class ViewUtils {
       if (!other) {
         return false;
       }
-      return value.eq(other);
+      return SelectionUtils.selectionEq(value, other);
     });
   }
 

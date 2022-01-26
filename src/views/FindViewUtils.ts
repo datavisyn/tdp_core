@@ -8,7 +8,6 @@ import {IGroupData, IInstanceViewExtensionDesc,
   IViewPluginDesc
 } from '../base/interfaces';
 import {IDType, IDTypeManager} from '../idtype';
-import {Range} from '../range';
 import {PluginRegistry, UserSession} from '../app';
 import {IPluginDesc} from '../base';
 
@@ -28,11 +27,11 @@ export class FindViewUtils {
   /**
    * finds for the given IDType and selection matching views
    * @param {IDType} idType the idtype to lookfor
-   * @param {Range} selection the current input selection
+   * @param {string[]} selection the current input selection
    * @returns {Promise<IDiscoveredView[]>} list of views and whether the current selection count matches their requirements
    */
-  static findViews(idType: IDType, selection: Range): Promise<IDiscoveredView[]> {
-    const selectionLength = selection.isNone ? 0 : selection.dim(0).length;
+  static findViews(idType: IDType, selection: string[]): Promise<IDiscoveredView[]> {
+    const selectionLength = selection.length;
 
     function bySelection(p: any) {
       return (ViewUtils.matchLength(p.selection, selectionLength) || (ViewUtils.showAsSmallMultiple(p) && selectionLength > 1));

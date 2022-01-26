@@ -28,6 +28,23 @@ export class AVisInstance extends EventHandler {
             this.fire('ready');
         }
     }
+    /*
+    
+      locate(...selectionIds: string[][]): Promise<any> {
+        if (selectionIds.length === 1) {
+          return this.locateImpl(selectionIds[0]);
+        }
+        return Promise.all(selectionIds.map((sel) => this.locateImpl(sel)));
+      }
+    
+      // TODO: is this correct?
+      async locateById(...selectionIndices: string[][]) {
+        const ids: string[] = await this.data.ids();
+        if (selectionIndices.length === 1) {
+          return this.locateImpl(selectionIndices[0]);
+        }
+        return Promise.all(selectionIndices.map((r) => this.locateImpl(r)));
+      } */
     locate(...range) {
         if (range.length === 1) {
             return this.locateImpl(range[0]);
@@ -41,7 +58,7 @@ export class AVisInstance extends EventHandler {
         }
         return Promise.all(range.map((r) => this.locateImpl(ids.indexOf(r))));
     }
-    locateImpl(range) {
+    locateImpl(selectionIndices) {
         //no resolution by default
         return Promise.resolve(null);
     }

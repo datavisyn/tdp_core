@@ -45,7 +45,7 @@ export class ColumnDescUtils {
       color: '',
       initialRanking: options.visible != null ? options.visible: true,
       width: -1,
-      selectedId: -1,
+      selectedId: null,
       selectedSubtype: undefined
     }, options, options.extras || {});
   }

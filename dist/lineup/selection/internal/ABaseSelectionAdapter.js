@@ -5,8 +5,8 @@ export class ABaseSelectionAdapter {
         this.waitingForSelection = null;
         this.waitingForParameter = null;
     }
-    addDynamicColumns(context, _ids, ids) {
-        return Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i]))).then((columns) => {
+    addDynamicColumns(context, ids) {
+        return Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {
             // sort new columns to insert them in the correct order
             const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
             flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
@@ -50,8 +50,8 @@ export class ABaseSelectionAdapter {
         });
     }
     selectionChangedImpl(context) {
-        const selectedIds = context.selection.range.dim(0).asList();
-        const usedCols = context.columns.filter((d) => d.desc.selectedId !== -1 && d.desc.selectedId !== undefined);
+        const selectedIds = context.selection.selectionIds;
+        const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // compute the difference
         const diffAdded = LineupUtils.array_diff(selectedIds, lineupColIds);
@@ -65,8 +65,7 @@ export class ABaseSelectionAdapter {
         if (diffAdded.length <= 0) {
             return null;
         }
-        //console.log('add columns', diffAdded);
-        return context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
+        return this.addDynamicColumns(context, diffAdded);
     }
     static patchDesc(desc, selectedId) {
         desc.selectedId = selectedId;

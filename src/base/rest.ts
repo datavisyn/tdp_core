@@ -14,6 +14,9 @@ export interface IRow {
   /**
    * unique internal number id, e.g. 42
    */
+  readonly _visyn_id: string;
+
+  // TODO: Remove
   readonly _id: number;
 
   [key: string]: any;

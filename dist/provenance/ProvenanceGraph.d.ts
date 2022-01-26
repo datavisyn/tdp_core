@@ -1,5 +1,4 @@
 import { IDType, SelectOperation } from '../idtype';
-import { Range } from '../range';
 import { ADataType } from '../data/datatype';
 import { ObjectNode, IObjectRef } from './ObjectNode';
 import { StateNode } from './StateNode';
@@ -26,7 +25,7 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     migrateBackend(backend: GraphBase): void;
     get isEmpty(): boolean;
     get dim(): number[];
-    ids(range?: Range): Promise<Range>;
+    ids(range?: Range): Promise<any>;
     selectState(state: StateNode, op?: SelectOperation, type?: string, extras?: {}): void;
     selectSlide(state: SlideNode, op?: SelectOperation, type?: string, extras?: {}): void;
     selectAction(action: ActionNode, op?: SelectOperation, type?: string): void;

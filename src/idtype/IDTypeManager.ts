@@ -5,7 +5,6 @@ import {SelectionUtils} from './SelectionUtils';
 import {IDType, IDTypeLike} from './IDType';
 import {ProductIDType} from './ProductIDType';
 import {PluginRegistry} from '../app/PluginRegistry';
-import {RangeLike, ParseRangeUtils} from '../range';
 import {IPluginDesc} from '../base/plugin';
 
 
@@ -145,48 +144,21 @@ export class IDTypeManager {
     return idType.canBeMappedTo;
   }
 
-  public mapToFirstName(idType: IDType, ids: RangeLike, toIDType: IDTypeLike): Promise<string[]> {
-    const target = IDTypeManager.getInstance().resolveIdType(toIDType);
-    const r = ParseRangeUtils.parseRangeLike(ids);
-    return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}`, {ids: r.toString(), mode: 'first'});
-  }
-
-  public mapNameToFirstName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[]> {
+  public async mapNameToFirstName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[]> {
     const target = IDTypeManager.getInstance().resolveIdType(toIDtype);
+    if(idType.id === target.id) {
+      return names;
+    }
     return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}`, {q: names, mode: 'first'});
   }
 
-  public mapToName(idType: IDType, ids: RangeLike, toIDType: string|IDType): Promise<string[][]> {
-    const target = IDTypeManager.getInstance().resolveIdType(toIDType);
-    const r = ParseRangeUtils.parseRangeLike(ids);
-    return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}`, {ids: r.toString()});
-  }
-
-  public mapNameToName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[][]> {
+  public async mapNameToName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[][]> {
     const target = IDTypeManager.getInstance().resolveIdType(toIDtype);
+    // TODO: Check if this makes sense, what if we have synonyms?
+    // if(idType.id === target.id) {
+    //   return names.map((name) => [name]);
+    // }
     return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}`, {q: names});
-  }
-
-  public mapToFirstID(idType: IDType, ids: RangeLike, toIDType: IDTypeLike): Promise<number[]> {
-    const target = IDTypeManager.getInstance().resolveIdType(toIDType);
-    const r = ParseRangeUtils.parseRangeLike(ids);
-    return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}/map`, {ids: r.toString(), mode: 'first'});
-  }
-
-  public mapToID(idType: IDType, ids: RangeLike, toIDType: IDTypeLike): Promise<number[][]> {
-    const target = IDTypeManager.getInstance().resolveIdType(toIDType);
-    const r = ParseRangeUtils.parseRangeLike(ids);
-    return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}/map`, {ids: r.toString()});
-  }
-
-  public mapNameToFirstID(idType: IDType, names: string[], toIDType: IDTypeLike): Promise<number[]> {
-    const target = IDTypeManager.getInstance().resolveIdType(toIDType);
-    return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}/map`, {q: names, mode: 'first'});
-  }
-
-  public mapNameToID(idType: IDType, names: string[], toIDType: IDTypeLike): Promise<number[][]> {
-    const target = IDTypeManager.getInstance().resolveIdType(toIDType);
-    return IDType.chooseRequestMethod(`/idtype/${idType.id}/${target.id}/map`, {q: names});
   }
 
   public findMappablePlugins(target: IDType, all: IPluginDesc[]) {

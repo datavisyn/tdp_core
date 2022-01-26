@@ -1,3 +1,4 @@
+import { SelectionUtils } from '..';
 export class ViewUtils {
     static toViewPluginDesc(p) {
         const r = p;
@@ -60,7 +61,7 @@ export class ViewUtils {
         if (aNull || bNull) {
             return aNull === bNull;
         }
-        const base = a.idtype.id === b.idtype.id && a.range.eq(b.range);
+        const base = a.idtype.id === b.idtype.id && SelectionUtils.selectionEq(a.selectionIds, b.selectionIds);
         if (!base) {
             return false;
         }
@@ -78,7 +79,7 @@ export class ViewUtils {
             if (!other) {
                 return false;
             }
-            return value.eq(other);
+            return SelectionUtils.selectionEq(value, other);
         });
     }
     static createContext(graph, desc, ref) {

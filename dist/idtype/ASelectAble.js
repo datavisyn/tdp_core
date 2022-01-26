@@ -1,5 +1,4 @@
 import { EventHandler } from '../base/event';
-import { Range, ParseRangeUtils } from '../range';
 import { SelectOperation, SelectionUtils } from './SelectionUtils';
 import { IDType } from './IDType';
 export class ASelectAble extends EventHandler {
@@ -8,27 +7,20 @@ export class ASelectAble extends EventHandler {
         this.numSelectListeners = 0;
         this.selectionListeners = [];
         this.singleSelectionListener = async (event, type, act, added, removed) => {
-            const ids = await this.ids();
+            const ids = Array.from(await this.ids());
             //filter to the right ids and convert to indices format
             //given all ids convert the selected ids to the indices in the data type
-            act = ids.indexOf(act);
-            added = ids.indexOf(added);
-            removed = ids.indexOf(removed);
-            if (act.isNone && added.isNone && removed.isNone) {
+            act = act.map((id) => ids.indexOf(id));
+            added = added.map((id) => ids.indexOf(id));
+            removed = removed.map((id) => ids.indexOf(id));
+            if (act.length === 0 && added.length === 0 && removed.length === 0) {
                 return;
             }
-            //ensure the right number of dimensions
-            SelectionUtils.fillWithNone(act, ids.ndim);
-            SelectionUtils.fillWithNone(added, ids.ndim);
-            SelectionUtils.fillWithNone(removed, ids.ndim);
             this.fire(ASelectAble.EVENT_SELECT, type, act, added, removed);
             this.fire(`${ASelectAble.EVENT_SELECT}-${type}`, act, added, removed);
         };
         this.selectionCache = [];
         this.accumulateEvents = -1;
-    }
-    async fromIdRange(idRange = Range.all()) {
-        return (await this.ids()).indexOf(ParseRangeUtils.parseRangeLike(idRange));
     }
     get idtypes() {
         return [];
@@ -50,11 +42,11 @@ export class ASelectAble extends EventHandler {
             }
             return {
                 act: id.selections(type),
-                added: Range.none(),
-                removed: Range.none()
+                added: [],
+                removed: []
             };
         });
-        const act = Range.join(full.map((entry) => entry.act));
+        const act = full.map((entry) => entry.act);
         const added = Range.join(full.map((entry) => entry.added));
         const removed = Range.join(full.map((entry) => entry.removed));
         this.selectionCache = [];
@@ -92,18 +84,16 @@ export class ASelectAble extends EventHandler {
         return super.off(events, handler);
     }
     async selections(type = SelectionUtils.defaultSelectionType) {
-        const ids = await this.ids();
-        const r = Range.join(this.idtypes.map((idtype) => idtype.selections(type)));
-        return ids.indexRangeOf(r);
+        return this.idtypes.map((idtype) => idtype.selections(type)).flat();
     }
     select() {
         const a = Array.from(arguments);
-        const dim = (typeof a[0] === 'number') ? +a.shift() : -1, type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType, range = ParseRangeUtils.parseRangeLike(a[0]), op = SelectionUtils.asSelectOperation(a[1]);
+        const dim = (typeof a[0] === 'number') ? +a.shift() : -1, type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType, range = new Set(a[0]), op = SelectionUtils.asSelectOperation(a[1]);
         return this.selectImpl(range, op, type, dim);
     }
-    async selectImpl(range, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, dim = -1) {
+    async selectImpl(selection, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, dim = -1) {
         const types = this.idtypes;
-        let ids = await this.ids();
+        let ids = await this.indices();
         if (dim === -1) {
             range = ids.preMultiply(range);
             this.accumulateEvents = 0;
@@ -128,7 +118,7 @@ export class ASelectAble extends EventHandler {
         const a = Array.from(arguments);
         const dim = (typeof a[0] === 'number') ? +a.shift() : -1;
         const type = (typeof a[0] === 'string') ? a[0] : SelectionUtils.defaultSelectionType;
-        return this.selectImpl(Range.none(), SelectOperation.SET, type, dim);
+        return this.selectImpl(new Set(), SelectOperation.SET, type, dim);
     }
 }
 ASelectAble.EVENT_SELECT = IDType.EVENT_SELECT;

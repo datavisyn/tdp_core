@@ -4,9 +4,7 @@
 import {IPersistable} from '../base/IPersistable';
 import {IDType} from '../idtype/IDType';
 import {ISelectAble, ASelectAble} from '../idtype/ASelectAble';
-import {IHistogram} from './histogram';
 import {IAdvancedStatistics, IStatistics} from '../base/statistics';
-import {RangeLike, Range} from '../range';
 import {IDataDescription} from './DataDescription';
 import {IValueTypeDesc} from './valuetype';
 /**
@@ -24,7 +22,7 @@ export interface IDataType extends ISelectAble, IPersistable {
   readonly dim: number[];
 
 
-  idView(idRange?: RangeLike): Promise<IDataType>;
+  idView(selectionIds: string[]): Promise<IDataType>;
 }
 /**
  * dummy data type just holding the description
@@ -38,11 +36,11 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
     return [];
   }
 
-  ids(range: RangeLike = Range.all()): Promise<Range> {
-    return Promise.resolve(Range.none());
+  ids(selectionIds: string[]): Promise<string[]> {
+    return Promise.resolve(selectionIds);
   }
 
-  idView(idRange?: RangeLike): Promise<ADataType<T>> {
+  idView(selectionIds?: string[]): Promise<ADataType<T>> {
     return Promise.resolve(this);
   }
 
@@ -83,18 +81,4 @@ export class DummyDataType extends ADataType<IDataDescription> {
     super(desc);
   }
 
-}
-
-
-export interface IHistAbleDataType<D extends IValueTypeDesc> extends IDataType {
-  valuetype: D;
-  hist(nbins?: number): Promise<IHistogram>;
-  readonly length: number;
-}
-
-export interface IStatsAbleDataType<D extends IValueTypeDesc> extends IDataType {
-  valuetype: D;
-  stats(): Promise<IStatistics>;
-  statsAdvanced(): Promise<IAdvancedStatistics>;
-  readonly length: number;
 }

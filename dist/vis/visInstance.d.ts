@@ -1,6 +1,5 @@
 import { IPersistable } from '../base/IPersistable';
 import { IDataType } from '../data/datatype';
-import { Range } from '../range/Range';
 import { IEventHandler, EventHandler } from '../base/event';
 import { ITransform } from './ITransform';
 import { ILocateAble } from './ILocateAble';
@@ -79,7 +78,7 @@ export declare class AVisInstance extends EventHandler {
     protected markReady(built?: boolean): void;
     locate(...range: Range[]): Promise<any>;
     locateById(...range: Range[]): Promise<any>;
-    locateImpl(range: Range): Promise<any>;
+    locateImpl(selectionIndices: string[]): Promise<any>;
     restore(persisted: any): Promise<AVisInstance>;
     update(): void;
     destroy(): void;

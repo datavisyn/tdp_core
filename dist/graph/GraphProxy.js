@@ -1,6 +1,5 @@
 import { IDTypeManager } from '../idtype';
 import { ADataType } from '../data/datatype';
-import { Range } from '../range';
 import { AGraph } from './graph';
 import { GraphFactoryUtils } from './GraphBase';
 import { RemoteStoreGraph } from './RemoteStorageGraph';
@@ -57,11 +56,11 @@ export class GraphProxy extends ADataType {
         }
         return this.cache;
     }
-    ids(range = Range.all()) {
+    ids(selection = []) {
         if (this.cache) {
-            return Promise.resolve(this.cache.then((i) => i.ids(range))); // TODO avoid <any> type cast
+            return Promise.resolve(this.cache.then((i) => i.ids(selection))); // TODO avoid <any> type cast
         }
-        return Promise.resolve(Range.none());
+        return Promise.resolve([]);
     }
     get idtypes() {
         return [AGraph.IDTYPE_NODES, AGraph.IDTYPE_EDGES].map(IDTypeManager.getInstance().resolveIdType);

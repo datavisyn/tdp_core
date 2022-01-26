@@ -1,4 +1,4 @@
-import { ParseRangeUtils, Range1D } from '../range';
+import { isEqual } from "lodash";
 export var SelectOperation;
 (function (SelectOperation) {
     SelectOperation[SelectOperation["SET"] = 0] = "SET";
@@ -44,22 +44,18 @@ export class SelectionUtils {
         }
         return +v;
     }
-    static fillWithNone(r, ndim) {
-        while (r.ndim < ndim) {
-            r.dims[r.ndim] = Range1D.none();
-        }
-        return r;
-    }
-    static integrateSelection(current, additional, operation = SelectOperation.SET) {
-        const next = ParseRangeUtils.parseRangeLike(additional);
-        switch (operation) {
-            case SelectOperation.ADD:
-                return current.union(next);
-            case SelectOperation.REMOVE:
-                return current.without(next);
-            default:
+    static integrateSelection(current, next, op = SelectOperation.SET) {
+        switch (op) {
+            case SelectOperation.SET:
                 return next;
+            case SelectOperation.ADD:
+                return Array.from(new Set([...current, ...next]));
+            case SelectOperation.REMOVE:
+                return current.filter((s) => !next.includes(s));
         }
+    }
+    static selectionEq(as, bs) {
+        return isEqual(as === null || as === void 0 ? void 0 : as.sort(), bs === null || bs === void 0 ? void 0 : bs.sort());
     }
 }
 SelectionUtils.defaultSelectionType = 'selected';
