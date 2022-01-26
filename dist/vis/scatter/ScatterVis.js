@@ -72,7 +72,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         };
         return beautifyLayout(traces, layout);
     }, [traces, config.isRectBrush]);
-    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px', borderTop: '1px solid #ddd' } },
+    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: "position-relative d-flex justify-content-center align-items-center flex-grow-1 mt-2" },
             mergedExtensions.prePlot,
             traces.plots.length > 0 ?

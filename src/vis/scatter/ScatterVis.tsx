@@ -130,7 +130,7 @@ export function ScatterVis({
     }, [traces, config.isRectBrush]);
 
     return (
-        <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px', borderTop: '1px solid #ddd'}}>
+        <div className="d-flex flex-row w-100 h-100" style={{minHeight: '0px'}}>
             <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1 mt-2">
                 {mergedExtensions.prePlot}
                 {traces.plots.length > 0 ?
