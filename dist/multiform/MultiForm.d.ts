@@ -44,7 +44,7 @@ export declare class MultiForm extends AVisInstance implements IVisInstance, IMu
      * @param param
      */
     switchTo(param: number | string | IVisPluginDesc): Promise<IVisInstance>;
-    addIconVisChooser(toolbar: HTMLElement): void;
-    addSelectVisChooser(toolbar: HTMLElement): void;
+    addIconVisChooser(toolbar: HTMLElement): any;
+    addSelectVisChooser(toolbar: HTMLElement): any;
     static create(data: IDataType, parent: HTMLElement, options?: IMultiFormOptions): MultiForm;
 }

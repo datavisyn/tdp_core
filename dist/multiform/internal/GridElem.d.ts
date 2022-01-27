@@ -14,13 +14,13 @@ export declare class GridElem implements IPersistable {
     content: HTMLElement;
     constructor(range: Range, pos: number[], data: IDataType);
     setContent(c: HTMLElement): void;
-    subrange(r: Range): Range;
+    subrange(r: Range): any;
     get hasOne(): boolean;
     destroy(): void;
     get size(): number[];
     get rawSize(): number[];
     persist(): {
-        range: string;
+        range: any;
         content: any;
     };
     restore(persisted: any): any;

@@ -1,5 +1,4 @@
 import { EventHandler } from '../base/event';
-import { Range, RangeLike } from '../range';
 import { IIDType } from './IIDType';
 import { SelectOperation } from './SelectionUtils';
 /**
@@ -18,8 +17,6 @@ export declare class IDType extends EventHandler implements IIDType {
      * the current selections
      */
     private readonly sel;
-    private readonly name2idCache;
-    private readonly id2nameCache;
     canBeMappedTo: Promise<IDType[]>;
     /**
      * @param id the system identifier of this IDType
@@ -39,44 +36,19 @@ export declare class IDType extends EventHandler implements IIDType {
     /**
      * return the current selections of the given type
      * @param type optional the selection type
-     * @returns {Range}
+     * @returns {string[]}
      */
-    selections(type?: string): Range;
+    selections(type?: string): string[];
     /**
      * select the given range as
      * @param range
      */
-    select(range: RangeLike): Range;
-    select(range: RangeLike, op: SelectOperation): Range;
-    select(type: string, range: RangeLike): Range;
-    select(type: string, range: RangeLike, op: SelectOperation): Range;
+    select(selection: string[]): string[];
+    select(selection: string[], op: SelectOperation): string[];
+    select(type: string, selection: string[]): string[];
+    select(type: string, selection: string[], op: SelectOperation): string[];
     private selectImpl;
-    clear(type?: string): Range;
-    /**
-     * Cache identifier <-> name mapping in bulk.
-     * @param ids the entity identifiers to cache
-     * @param names the matching entity names to cache
-     */
-    fillMapCache(ids: number[], names: string[]): void;
-    /**
-     * Request the system identifiers for the given entity names.
-     * @param names the entity names to resolve
-     * @returns a promise of system identifiers that match the input names
-     */
-    map(names: string[]): Promise<number[]>;
-    /**
-     * Request the names for the given entity system identifiers.
-     * @param ids the entity names to resolve
-     * @returns a promise of system identifiers that match the input names
-     */
-    unmap(ids: RangeLike): Promise<string[]>;
-    /**
-     * search for all matching ids for a given pattern
-     * @param pattern
-     * @param limit maximal number of results
-     * @return {Promise<void>}
-     */
-    search(pattern: string, limit?: number): Promise<IDPair[]>;
+    clear(type?: string): string[];
     /**
      * chooses whether a GET or POST request based on the expected url length
      * @param url

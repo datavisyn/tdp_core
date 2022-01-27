@@ -13,7 +13,7 @@ export class SelectionSyncerOptionUtils {
                     return;
                 }
                 // sync just the latest state
-                store.setValue(key, selection.toString());
+                store.setValue(key, selection);
             });
             store.on(key, (event, newValue) => {
                 disable = true; //don't track on changes

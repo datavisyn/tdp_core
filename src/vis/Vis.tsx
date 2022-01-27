@@ -22,7 +22,7 @@ export interface VisProps {
     /**
      * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
      */
-    selected?: {[key: number]: boolean};
+    selected?: {[key: string]: boolean};
     /**
      * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
      */
@@ -34,7 +34,7 @@ export interface VisProps {
     /**
      * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
      */
-    selectionCallback?: (s: number[]) => void;
+    selectionCallback?: (s: string[]) => void;
     /**
      * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
      */

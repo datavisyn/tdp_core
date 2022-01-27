@@ -1,12 +1,10 @@
 import { select } from 'd3';
 import { IDTypeManager, SelectionUtils } from '../idtype';
 import { EventHandler, WebpackEnv } from '../base';
-import { Range } from '../range';
 import { I18nextManager } from '../i18n';
 import { FormBuilder } from '../form/FormBuilder';
 import { AFormElement } from '../form/elements/AFormElement';
 import { ViewUtils } from './ViewUtils';
-import { ResolveUtils } from './ResolveUtils';
 import { ERenderAuthorizationStatus, TokenManager, TDPTokenManager } from '../auth';
 /**
  * base class for all views
@@ -21,7 +19,7 @@ export class AView extends EventHandler {
         this.itemSelections = new Map();
         this.selections = new Map();
         this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
-        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, range: Range.none() });
+        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, selectionIds: [] });
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('tdp-view');
         parent.appendChild(this.node);
@@ -256,56 +254,36 @@ export class AView extends EventHandler {
      * @returns {Promise<string[]>}
      */
     resolveSelection(idType = this.idType) {
-        return ResolveUtils.resolveIds(this.selection.idtype, this.selection.range, idType);
-    }
-    /**
-     * resolve the name of the current input selection
-     * @returns {Promise<string[]>}
-     */
-    resolveSelectionByName(idType = this.idType) {
-        return ResolveUtils.resolveNames(this.selection.idtype, this.selection.range, idType);
-    }
-    /**
-     * resolve the ids of the current input selection to all 1:n related names, not just the first one like `resolveSelection` does
-     * @returns {Promise<string[]>}
-     */
-    resolveMultipleSelections(idType = this.idType) {
-        return ResolveUtils.resolveAllIds(this.selection.idtype, this.selection.range, idType);
-    }
-    /**
-     * resolve the names of the current input selection to all 1:n related names, not just the first one like `resolveSelectionByName` does
-     * @returns {Promise<string[]>}
-     */
-    resolveMultipleSelectionsByName(idType = this.idType) {
-        return ResolveUtils.resolveAllNames(this.selection.idtype, this.selection.range, idType);
+        // return Promise.resolve(this.selection.selectionIds);
+        return IDTypeManager.getInstance().mapNameToFirstName(this.selection.idtype, this.selection.selectionIds, idType);
     }
     setItemSelection(selection, name = AView.DEFAULT_SELECTION_NAME) {
         const current = this.itemSelections.get(name);
         if (current && ViewUtils.isSameSelection(current, selection)) {
             return;
         }
-        const wasEmpty = current == null || current.idtype == null || current.range.isNone;
+        const wasEmpty = current == null || current.idtype == null || current.selectionIds.length === 0;
         this.itemSelections.set(name, selection);
         // propagate
         if (selection.idtype) {
             if (name === AView.DEFAULT_SELECTION_NAME) {
-                if (selection.range.isNone) {
+                if (selection.selectionIds.length === 0) {
                     selection.idtype.clear(SelectionUtils.defaultSelectionType);
                 }
                 else {
-                    selection.idtype.select(selection.range);
+                    selection.idtype.select(selection.selectionIds);
                 }
             }
             else {
-                if (selection.range.isNone) {
+                if (selection.selectionIds.length === 0) {
                     selection.idtype.clear(name);
                 }
                 else {
-                    selection.idtype.select(name, selection.range);
+                    selection.idtype.select(name, selection.selectionIds);
                 }
             }
         }
-        const isEmpty = selection == null || selection.idtype == null || selection.range.isNone;
+        const isEmpty = selection == null || selection.idtype == null || selection.selectionIds.length === 0;
         if (!(wasEmpty && isEmpty)) {
             // the selection has changed when we really have some new values not just another empty one
             this.itemSelectionChanged(name);
@@ -319,7 +297,7 @@ export class AView extends EventHandler {
         // hook
     }
     getItemSelection(name = AView.DEFAULT_SELECTION_NAME) {
-        return this.itemSelections.get(name) || { idtype: null, range: Range.none() };
+        return this.itemSelections.get(name) || { idtype: null, selectionIds: [] };
     }
     modeChanged(mode) {
         // hook

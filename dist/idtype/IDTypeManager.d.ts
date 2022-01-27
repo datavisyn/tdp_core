@@ -1,7 +1,5 @@
 import { IIDType } from './IIDType';
 import { IDType, IDTypeLike } from './IDType';
-import { ProductIDType } from './ProductIDType';
-import { RangeLike } from '../range';
 import { IPluginDesc } from '../base/plugin';
 export declare class IDTypeManager {
     static EXTENSION_POINT_IDTYPE: string;
@@ -11,10 +9,9 @@ export declare class IDTypeManager {
     private fillUpData;
     private toPlural;
     resolveIdType(id: IDTypeLike): IDType;
-    resolveProduct(...idtypes: IDType[]): ProductIDType;
     /**
      * list currently resolved idtypes
-     * @returns {Array<IDType|ProductIDType>}
+     * @returns {Array<IDType>}
      */
     listIdTypes(): IIDType[];
     /**
@@ -22,7 +19,7 @@ export declare class IDTypeManager {
      * @returns {any}
      */
     listAllIdTypes(): Promise<IIDType[]>;
-    registerIdType(id: string, idtype: IDType | ProductIDType): IDType | ProductIDType;
+    registerIdType(id: string, idtype: IDType): IDType;
     persistIdTypes(): any;
     restoreIdType(persisted: any): void;
     clearSelection(type?: string): void;
@@ -47,14 +44,8 @@ export declare class IDTypeManager {
      * @returns {Promise<IDType[]>}
      */
     getCanBeMappedTo(idType: IDType): Promise<IDType[]>;
-    mapToFirstName(idType: IDType, ids: RangeLike, toIDType: IDTypeLike): Promise<string[]>;
     mapNameToFirstName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[]>;
-    mapToName(idType: IDType, ids: RangeLike, toIDType: string | IDType): Promise<string[][]>;
     mapNameToName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[][]>;
-    mapToFirstID(idType: IDType, ids: RangeLike, toIDType: IDTypeLike): Promise<number[]>;
-    mapToID(idType: IDType, ids: RangeLike, toIDType: IDTypeLike): Promise<number[][]>;
-    mapNameToFirstID(idType: IDType, names: string[], toIDType: IDTypeLike): Promise<number[]>;
-    mapNameToID(idType: IDType, names: string[], toIDType: IDTypeLike): Promise<number[][]>;
     findMappablePlugins(target: IDType, all: IPluginDesc[]): any[] | Promise<IPluginDesc[]>;
     init(): void;
     private static instance;

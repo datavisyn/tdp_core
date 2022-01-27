@@ -27,7 +27,7 @@ interface ScatterVisProps {
     shapes?: string[];
     columns: (NumericalColumn | CategoricalColumn)[];
     filterCallback?: (s: EFilterOptions) => void;
-    selectionCallback?: (s: number[]) => void;
+    selectionCallback?: (s: string[]) => void;
     selected?: {
         [key: number]: boolean;
     };

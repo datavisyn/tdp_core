@@ -1,6 +1,4 @@
-import {ParseRangeUtils, Range, Range1D, RangeLike} from '../range';
-
-
+import {isEqual} from 'lodash';
 
 export enum SelectOperation {
   SET, ADD, REMOVE
@@ -63,22 +61,18 @@ export class SelectionUtils {
     return +v;
   }
 
-  static fillWithNone(r: Range, ndim: number) {
-    while (r.ndim < ndim) {
-      r.dims[r.ndim] = Range1D.none();
+  static integrateSelection(current: string[], next: string[], op: SelectOperation = SelectOperation.SET): string[] {
+    switch (op) {
+      case SelectOperation.SET:
+        return next;
+      case SelectOperation.ADD:
+        return Array.from(new Set([...current, ...next]));
+      case SelectOperation.REMOVE:
+        return current.filter((s) => !next.includes(s));
     }
-    return r;
   }
 
-  static integrateSelection(current: Range, additional: RangeLike, operation: SelectOperation = SelectOperation.SET) {
-    const next = ParseRangeUtils.parseRangeLike(additional);
-    switch (operation) {
-      case SelectOperation.ADD:
-        return current.union(next);
-      case SelectOperation.REMOVE:
-        return current.without(next);
-      default:
-        return next;
-    }
+  static selectionEq(as: string[], bs: string[]) {
+    return isEqual(as?.sort(), bs?.sort());
   }
 }

@@ -226,7 +226,7 @@ export class TDPApplicationUtils {
       resolve: (data: FormData): Partial<ISecureItem> => {
         const others = toSet(data.get('permission_others').toString());
         const group = toSet(data.get('permission_group').toString());
-        const groupName = data.get('permission_group_name').toString();
+        const groupName = data.get('permission_group_name')?.toString();
         const buddies = toSet(data.get('permission_buddies').toString());
         const buddiesName = data.get('permission_buddies_name').toString().split(';').map((d) => d.trim()).filter((d) => d.length > 0);
         return {
@@ -283,7 +283,7 @@ export class TDPApplicationUtils {
   }
 
   static compressSetParameter(path: ActionNode[]) {
-    return Compression.lastOnly(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
+    return Compression.lastConsecutive(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
   }
 
 

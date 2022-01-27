@@ -158,18 +158,6 @@ export default function (registry: IRegistry) {
   });
   /// #endif
 
-  /// #if include('clue', 'multiform')
-  registry.push('actionFunction', 'transform', function () {return import('./base/Multiform').then((m) => m.Multiform);}, {
-    'factory': 'transform'
-  });
-  registry.push('actionFunction', 'changeVis', function () {return import('./base/Multiform').then((m) => m.Multiform);}, {
-    'factory': 'changeVis'
-  });
-  registry.push('actionFunction', 'select', function () {return import('./base/Multiform').then((m) => m.Multiform);}, {
-    'factory': 'select'
-  });
-  /// #endif
-
   registry.push(EP_PHOVEA_CORE_LOCALE, 'phoveaClueLocaleEN', function () {
     return import('./locales/en/phovea.json').then(PluginRegistry.getInstance().asResource);
   }, <ILocaleEPDesc>{
@@ -177,36 +165,8 @@ export default function (registry: IRegistry) {
   });
 
   /* phovea_core */
-  /// #if include('datatype', 'matrix')
-  registry.push('datatype', 'matrix', function () { return import('./matrix/Matrix').then((m) => m.Matrix); }, {
-    factory: 'create',
-    static: true
-  });
-  /// #endif
-  /// #if include('datatype', 'table')
-  registry.push('datatype', 'table', function () { return import('./table/Table').then((m) => m.Table); }, {
-    factory: 'create',
-    static: true
-  });
-  /// #endif
-  /// #if include('datatype', 'vector')
-  registry.push('datatype', 'vector', function () { return import('./vector/Vector').then((m) => m.Vector); }, {
-    factory: 'create',
-    static: true
-  });
-  /// #endif
-  /// #if include('datatype', 'stratification')
-  registry.push('datatype', 'stratification', function () { return import('./stratification/Stratification').then((m) => m.Stratification); },{
-    factory: 'create'
-  });
-  /// #endif
   /// #if include('datatype', 'graph')
   registry.push('datatype', 'graph', function () { return import('./graph/GraphProxy').then((m) => m.GraphProxy); },{
-    factory: 'create'
-  });
-  /// #endif
-  /// #if include('datatype', 'atom')
-  registry.push('datatype', 'atom', function () { return import('./atom/Atom').then((m) => m.Atom); }, {
     factory: 'create'
   });
   /// #endif
@@ -236,6 +196,56 @@ export default function (registry: IRegistry) {
 
   registry.push(EP_PHOVEA_CLUE_PROVENANCE_GRAPH, 'matomoAnalytics', () => import('./app/Matomo').then((m) => m.Matomo), {
     factory: 'trackProvenance'
+  });
+
+  /* phovea_importer */
+  registry.push('importer_value_type', 'boolean', function () {
+    return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+  }, {
+    'factory': 'boolean',
+    'name': 'Boolean',
+    'priority': 30 // test first for boolean then for categorical
+  });
+
+  registry.push('importer_value_type', 'categorical', function () {
+    return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+  }, {
+    'factory': 'categorical',
+    'name': 'Categorical',
+    'priority': 40 // test first for boolean then for categorical
+  });
+
+  registry.push('importer_value_type', 'real', function () {
+    return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+  }, {
+    'factory': 'numerical',
+    'name': 'Float',
+    'priority': 10
+  });
+
+  registry.push('importer_value_type', 'int', function () {
+    return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+  }, {
+    'factory': 'numerical',
+    'name': 'Integer',
+    'priority': 20
+  });
+
+  registry.push('importer_value_type', 'string', function () {
+    return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+  }, {
+    'factory': 'string_',
+    'name': 'String',
+    'priority': 100
+  });
+
+  registry.push('importer_value_type', 'idType', function () {
+    return import('./valuetype/idtypes').then((v) => v.IDTypeUtils);
+  }, {
+    'factory': 'idType',
+    'name': 'IDType',
+    'priority': 50,
+    'implicit': true
   });
 
   /// #endif

@@ -15,7 +15,6 @@ import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
 import { EventHandler, ResolveNow } from '../base';
 import { NodeUtils, ObjectRefUtils } from '../provenance';
-import { Range } from '../range';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { Dialog } from '../components';
@@ -34,7 +33,7 @@ export class ViewWrapper extends EventHandler {
         this.preInstanceItemSelections = new Map();
         this.preInstanceParameter = new Map();
         this.inputSelections = new Map();
-        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, range: Range.none() });
+        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, selectionIds: [] });
         this.node = document.createElement('article');
         this.node.classList.add('tdp-view-wrapper');
         this.allowed = FindViewUtils.canAccess(plugin);
@@ -158,7 +157,7 @@ export class ViewWrapper extends EventHandler {
                     else {
                         this.instance.setItemSelection({
                             idtype: idType,
-                            range: idType.selections()
+                            selectionIds: idType.selections()
                         });
                     }
                 }
@@ -273,7 +272,7 @@ export class ViewWrapper extends EventHandler {
         }
     }
     match(selection) {
-        return ViewUtils.matchLength(this.plugin.selection, selection.range.dim(0).length);
+        return ViewUtils.matchLength(this.plugin.selection, selection.selectionIds.length);
     }
     /**
      * @deprecated use getInputSelection instead

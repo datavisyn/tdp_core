@@ -388,9 +388,6 @@ export class LayoutedProvVis extends AVisInstance {
             this.options[name] = val;
         }
     }
-    locateImpl(range) {
-        return Promise.resolve(null);
-    }
     build($parent) {
         //  scale = this.options.scale;
         let $p = $parent.select('aside.provenance-layout-vis');

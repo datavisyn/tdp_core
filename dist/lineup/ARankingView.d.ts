@@ -34,16 +34,16 @@ export declare abstract class ARankingView extends AView {
      * clears and rebuilds this lineup instance from scratch
      * @returns {Promise<any[]>} promise when done
      */
-    protected rebuild: (...args: any[]) => void;
+    protected rebuild: () => Promise<unknown>;
     /**
      * similar to rebuild but just loads new data and keep the columns
      * @returns {Promise<any[]>} promise when done
      */
-    protected reloadData: (...args: any[]) => void;
+    protected reloadData: () => Promise<unknown>;
     /**
      * updates the list of available columns in the side panel
      */
-    protected updatePanelChooser: (...args: any[]) => void;
+    protected updatePanelChooser: () => Promise<unknown>;
     /**
      * promise resolved when everything is built
      * @type {any}
