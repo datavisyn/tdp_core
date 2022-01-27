@@ -1,20 +1,7 @@
 import {IColumnDesc} from 'lineupjs';
 import {IViewPluginDesc} from '..';
 
-export interface IVisynViewPluginDesc extends Pick<IViewPluginDesc, 'selection'> {
-    rankingOptions?: {
-      columns: IColumnDesc[]
-    };
-  }
-
-  // The other way
-  export interface IRankingVisynViewPluginDesc extends IVisynViewPluginDesc {
-    rankingOptions?: {
-      columns: IColumnDesc[]
-    };
-  }
-
-  export interface IVisynViewProps<C extends IVisynViewPluginDesc, P> {
+export interface IVisynViewProps<C, P> {
     desc: C;
     data: {[key: string]: any};
     // better way of saving this??
@@ -25,4 +12,4 @@ export interface IVisynViewPluginDesc extends Pick<IViewPluginDesc, 'selection'>
     onSelectionChanged: (selection: string[]) => void;
     onFiltersChanged: (newFilter: string[]) => void;
     onParametersChanged: (parameters: P) => void;
-  }
+}
