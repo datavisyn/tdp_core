@@ -28,22 +28,6 @@ export class AVisInstance extends EventHandler {
             this.fire('ready');
         }
     }
-    locate(...selectionIds) {
-        if (selectionIds.length === 1) {
-            return this.locateImpl(selectionIds[0]);
-        }
-        return Promise.all(selectionIds.map((sel) => this.locateImpl(sel)));
-    }
-    async locateById(...selectionIndices) {
-        if (selectionIndices.length === 1) {
-            return this.locateImpl(selectionIndices[0]);
-        }
-        return Promise.all(selectionIndices.map((r) => this.locateImpl(r)));
-    }
-    locateImpl(selectionIndices) {
-        //no resolution by default
-        return Promise.resolve(null);
-    }
     restore(persisted) {
         return Promise.resolve(this);
     }

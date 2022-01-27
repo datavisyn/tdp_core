@@ -3,7 +3,6 @@ import {UniqueIdManager} from '../app/UniqueIdManager';
 import {IDataType} from '../data/datatype';
 import {IEventHandler, EventHandler} from '../base/event';
 import {ITransform} from './ITransform';
-import {ILocateAble} from './ILocateAble';
 
 export interface IVisInstanceOptions {
   rotate?: number;
@@ -13,7 +12,7 @@ export interface IVisInstanceOptions {
 /**
  * basic interface of an visualization instance
  */
-export interface IVisInstance extends IPersistable, IEventHandler, ILocateAble {
+export interface IVisInstance extends IPersistable, IEventHandler {
   /**
    * the unique id of this vis instance
    */
@@ -109,25 +108,6 @@ export class AVisInstance extends EventHandler {
     if (built) {
       this.fire('ready');
     }
-  }
-
-  locate(...selectionIds: string[][]): Promise<any> {
-    if (selectionIds.length === 1) {
-      return this.locateImpl(selectionIds[0]);
-    }
-    return Promise.all(selectionIds.map((sel) => this.locateImpl(sel)));
-  }
-
-  async locateById(...selectionIndices: string[][]) {
-    if (selectionIndices.length === 1) {
-      return this.locateImpl(selectionIndices[0]);
-    }
-    return Promise.all(selectionIndices.map((r) => this.locateImpl(r)));
-  }
-
-  locateImpl(selectionIndices: string[]) {
-    //no resolution by default
-    return Promise.resolve(null);
   }
 
   restore(persisted: any): Promise<AVisInstance> {

@@ -2,7 +2,6 @@ import { IPersistable } from '../base/IPersistable';
 import { IDataType } from '../data/datatype';
 import { IEventHandler, EventHandler } from '../base/event';
 import { ITransform } from './ITransform';
-import { ILocateAble } from './ILocateAble';
 export interface IVisInstanceOptions {
     rotate?: number;
     scale?: [number, number];
@@ -10,7 +9,7 @@ export interface IVisInstanceOptions {
 /**
  * basic interface of an visualization instance
  */
-export interface IVisInstance extends IPersistable, IEventHandler, ILocateAble {
+export interface IVisInstance extends IPersistable, IEventHandler {
     /**
      * the unique id of this vis instance
      */
@@ -76,9 +75,6 @@ export declare class AVisInstance extends EventHandler {
     persist(): any;
     get isBuilt(): boolean;
     protected markReady(built?: boolean): void;
-    locate(...selectionIds: string[][]): Promise<any>;
-    locateById(...selectionIndices: string[][]): Promise<any>;
-    locateImpl(selectionIndices: string[]): Promise<any>;
     restore(persisted: any): Promise<AVisInstance>;
     update(): void;
     destroy(): void;

@@ -21,7 +21,6 @@ export declare class LayoutedProvVis extends AVisInstance implements IVisInstanc
     get rawSize(): [number, number];
     get node(): Element;
     option(name: string, val?: any): any;
-    locateImpl(selectionIds: string[]): Promise<any>;
     private build;
     private onStateClick;
     update(): void;

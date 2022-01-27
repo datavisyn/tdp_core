@@ -447,10 +447,6 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     }
   }
 
-  locateImpl(selectionIds: string[]) {
-    return Promise.resolve(null);
-  }
-
   private build($parent: d3.Selection<any>) {
     //  scale = this.options.scale;
     let $p = $parent.select('aside.provenance-layout-vis');
