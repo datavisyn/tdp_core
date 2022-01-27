@@ -23,7 +23,7 @@ import {ISearchOption} from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
 import {GeneralVisWrapper} from './internal/GeneralVisWrapper';
-import {BaseUtils} from '../base';
+import {BaseUtils, debounceAsync} from '../base';
 import {I18nextManager} from '../i18n';
 import {IDTypeManager} from '../idtype';
 import {ISecureItem} from '../security';
@@ -58,18 +58,18 @@ export abstract class ARankingView extends AView {
    * clears and rebuilds this lineup instance from scratch
    * @returns {Promise<any[]>} promise when done
    */
-  protected rebuild = BaseUtils.debounce(() => this.rebuildImpl(), 100);
+  protected rebuild = debounceAsync(() => this.rebuildImpl(), 100);
 
   /**
    * similar to rebuild but just loads new data and keep the columns
    * @returns {Promise<any[]>} promise when done
    */
-  protected reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
+  protected reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
 
   /**
    * updates the list of available columns in the side panel
    */
-  protected updatePanelChooser = BaseUtils.debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
+  protected updatePanelChooser = debounceAsync(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
 
   /**
    * promise resolved when everything is built
@@ -341,9 +341,13 @@ export abstract class ARankingView extends AView {
     return {
       columns,
       selection: this.selection,
-      freeColor: (id: number) => this.colors.freeColumnColor(id),
-      add: (columns: ISelectionColumn[]) => columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe())
+      freeColor: (id: string) => this.colors.freeColumnColor(id),
+      add: (columns: ISelectionColumn[]) => this.withoutTracking(() => {
+        columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
+      }),
+      remove: (columns: Column[]) => this.withoutTracking(() => {
+        columns.forEach((c) => c.removeMe());
+      })
     };
   }
 
@@ -411,7 +415,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id: string = null, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
@@ -495,7 +499,7 @@ export abstract class ARankingView extends AView {
       }
     });
 
-    const r = this.addColumn(colDesc, data, -1, position);
+    const r = this.addColumn(colDesc, data, null, position);
     columnResolve(r.col);
 
     // use _score function to reload the score
@@ -509,7 +513,7 @@ export abstract class ARankingView extends AView {
     return r;
   }
 
-  protected reloadScores(visibleOnly = false) {
+  protected reloadScores(visibleOnly = false): Promise<any[]> {
     let scores: {_score: () => any}[] = <any[]>this.provider.getColumns().filter((d) => typeof (<any>d)._score === 'function');
 
     if (visibleOnly) {
@@ -587,7 +591,7 @@ export abstract class ARankingView extends AView {
     });
   }
 
-  private build() {
+  private build(): Promise<void> {
     this.setBusy(true);
     return Promise.all([this.getColumns(), this.loadRows()]).then((r) => {
       const columns: IColumnDesc[] = r[0];

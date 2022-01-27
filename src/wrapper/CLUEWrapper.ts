@@ -14,7 +14,7 @@ import {CLUEMode, ButtonModeSelector, ModeWrapper} from '../base/mode';
 import {VisLoader} from '../provvis';
 import {CLUEGraphManager} from '../base/CLUEGraphManager';
 import {ProvenanceGraphMenu} from '../menu/ProvenanceGraphMenu';
-import {LoginMenu} from '../menu/LoginMenu';
+import {LoginMenu} from '../base/LoginMenu';
 import {ACLUEWrapper, IACLUEWrapperOptions} from './ACLUEWrapper';
 import * as d3 from 'd3';
 import {AppHeader, AppHeaderLink, IAppHeaderOptions, IHeaderLink} from '../components';

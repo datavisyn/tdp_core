@@ -16,7 +16,6 @@ import {AView} from './AView';
 import {ViewUtils} from './ViewUtils';
 import {PluginRegistry} from '../app';
 import {IDType, IDTypeManager} from '../idtype';
-import {Range} from '../range';
 import {LocalStorageProvenanceGraphManager, ObjectRefUtils} from '../provenance';
 
 export interface ITDPViewProps {
@@ -147,16 +146,16 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
 
   private buildSelection(idtype: IDType, selection: string[]): Promise<ISelection> {
     if (!selection) {
-      return Promise.resolve({idtype, range: Range.none()});
+      return Promise.resolve({idtype, selectionIds: []});
     }
-    return idtype.map(selection).then((ids) => ({idtype, range: Range.list(ids)}));
+    return Promise.resolve({idtype, selectionIds: selection});
   }
 
   private triggerSelection(selection: ISelection) {
     if (!this.props.onItemSelectionChanged) {
       return;
     }
-    selection.idtype.unmap(selection.range).then((names) => this.props.onItemSelectionChanged(names, selection.idtype.id));
+    this.props.onItemSelectionChanged(Array.from(selection.selectionIds), selection.idtype.id);
   }
 
   render() {

@@ -1,5 +1,4 @@
 import { ASelectAble } from '../idtype/ASelectAble';
-import { Range } from '../range';
 /**
  * dummy data type just holding the description
  */
@@ -11,10 +10,7 @@ export class ADataType extends ASelectAble {
     get dim() {
         return [];
     }
-    ids(range = Range.all()) {
-        return Promise.resolve(Range.none());
-    }
-    idView(idRange) {
+    idView(selectionIds) {
         return Promise.resolve(this);
     }
     get idtypes() {
@@ -42,7 +38,7 @@ export class ADataType extends ASelectAble {
             return true;
         }
         //sounds good
-        return (typeof (v.idView) === 'function' && typeof (v.persist) === 'function' && typeof (v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v) && ('dim' in v));
+        return (typeof (v.persist) === 'function' && typeof (v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v));
     }
 }
 export class DummyDataType extends ADataType {

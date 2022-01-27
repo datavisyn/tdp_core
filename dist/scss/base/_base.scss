@@ -72,7 +72,8 @@ li[data-header=optionsLink] {
 }
 
 .#{$tdp-css-prefix}-busy,
-.#{$tdp-css-prefix}-busy-overlay {
+.#{$tdp-css-prefix}-busy-overlay,
+.#{$tdp-css-prefix}-busy-partial-overlay {
   &::before {
     position: absolute;
     top: 0;

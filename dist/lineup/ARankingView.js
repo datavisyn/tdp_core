@@ -15,7 +15,7 @@ import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
-import { BaseUtils } from '../base';
+import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 /**
@@ -46,16 +46,16 @@ export class ARankingView extends AView {
          * clears and rebuilds this lineup instance from scratch
          * @returns {Promise<any[]>} promise when done
          */
-        this.rebuild = BaseUtils.debounce(() => this.rebuildImpl(), 100);
+        this.rebuild = debounceAsync(() => this.rebuildImpl(), 100);
         /**
          * similar to rebuild but just loads new data and keep the columns
          * @returns {Promise<any[]>} promise when done
          */
-        this.reloadData = BaseUtils.debounce(() => this.reloadDataImpl(), 100);
+        this.reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
         /**
          * updates the list of available columns in the side panel
          */
-        this.updatePanelChooser = BaseUtils.debounce(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
+        this.updatePanelChooser = debounceAsync(() => this.panel.updateChooser(this.itemIDType, this.provider.getColumns()), 100);
         /**
          * promise resolved when everything is built
          * @type {any}
@@ -281,8 +281,12 @@ export class ARankingView extends AView {
             columns,
             selection: this.selection,
             freeColor: (id) => this.colors.freeColumnColor(id),
-            add: (columns) => columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (columns) => columns.forEach((c) => c.removeMe())
+            add: (columns) => this.withoutTracking(() => {
+                columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
+            }),
+            remove: (columns) => this.withoutTracking(() => {
+                columns.forEach((c) => c.removeMe());
+            })
         };
     }
     /**
@@ -340,7 +344,7 @@ export class ARankingView extends AView {
         NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
         this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
     }
-    addColumn(colDesc, data, id = -1, position) {
+    addColumn(colDesc, data, id = null, position) {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : (colDesc.color ? colDesc.color : this.colors.getColumnColor(id));
         return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
@@ -423,7 +427,7 @@ export class ARankingView extends AView {
                 }
             }
         });
-        const r = this.addColumn(colDesc, data, -1, position);
+        const r = this.addColumn(colDesc, data, null, position);
         columnResolve(r.col);
         // use _score function to reload the score
         colDesc._score = () => {

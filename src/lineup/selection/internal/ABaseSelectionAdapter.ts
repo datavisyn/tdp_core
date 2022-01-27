@@ -1,12 +1,12 @@
 import {ResolveNow} from '../../../base';
 import {IAdditionalColumnDesc} from '../../../base/interfaces';
 import {LineupUtils} from '../../utils';
-import {ISelectionColumn, IContext} from '../ISelectionAdapter';
+import {ISelectionColumn, IContext, ISelectionAdapter} from '../ISelectionAdapter';
 
-export abstract class ABaseSelectionAdapter {
+export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
 
-  protected addDynamicColumns(context: IContext, _ids: number[], ids: string[]) {
-    return Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i]))).then((columns) => {
+  protected addDynamicColumns(context: IContext, ids: string[]) {
+    return Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {
       // sort new columns to insert them in the correct order
       const flattenedColumns = [].concat(...columns).map((d, i) => ({d, i}));
       flattenedColumns.sort(({d: a, i: ai}, {d: b, i: bi}) => {
@@ -19,7 +19,7 @@ export abstract class ABaseSelectionAdapter {
     });
   }
 
-  protected removeDynamicColumns(context: IContext, _ids: number[]): void {
+  protected removeDynamicColumns(context: IContext, _ids: string[]): void {
     const columns = context.columns;
     context.remove([].concat(..._ids.map((_id) => {
       context.freeColor(_id);
@@ -59,8 +59,8 @@ export abstract class ABaseSelectionAdapter {
   protected abstract parameterChangedImpl(context: IContext): PromiseLike<any>;
 
   protected selectionChangedImpl(context: IContext) {
-    const selectedIds = context.selection.range.dim(0).asList();
-    const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1 && (<IAdditionalColumnDesc>d.desc).selectedId !== undefined);
+    const selectedIds = context.selection.selectionIds;
+    const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
     // compute the difference
@@ -76,13 +76,12 @@ export abstract class ABaseSelectionAdapter {
     if (diffAdded.length <= 0) {
       return null;
     }
-    //console.log('add columns', diffAdded);
-    return context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
+    return this.addDynamicColumns(context, diffAdded);
   }
 
-  protected abstract createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<ISelectionColumn[]>;
+  protected abstract createColumnsFor(context: IContext, _id: string): PromiseLike<ISelectionColumn[]>;
 
-  static patchDesc(desc: IAdditionalColumnDesc, selectedId: number) {
+  static patchDesc(desc: IAdditionalColumnDesc, selectedId: string) {
     desc.selectedId = selectedId;
     return desc;
   }

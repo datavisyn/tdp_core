@@ -5,7 +5,6 @@ import {IRow} from '../base/rest';
 import {ISelection, IViewContext} from '../base/interfaces';
 import {AView} from './AView';
 import {XlsxUtils} from '../utils/XlsxUtils';
-import {ParseRangeUtils} from '../range';
 
 export interface ISortItem<T> {
   node: HTMLElement;
@@ -147,7 +146,7 @@ export abstract class ATableView<T extends IRow> extends AView {
           evt.stopPropagation();
           this.setItemSelection({
             idtype: this.itemIDType,
-            range: ParseRangeUtils.parseRangeLike([row._id])
+            selectionIds: [row.id]
           });
         };
       }

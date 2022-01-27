@@ -2,7 +2,6 @@ import {BaseUtils} from '../base/BaseUtils';
 import {Store} from './Store';
 import {IDTypeManager, SelectionUtils} from '../idtype';
 import {IDType} from '../idtype/IDType';
-import {Range} from '../range/Range';
 import {GlobalEventHandler} from '../base/event';
 
 const PREFIX = 'selection-idtype-';
@@ -18,14 +17,14 @@ export class SelectionSyncerOptionUtils {
     options.selectionTypes.forEach((type) => {
       const key = `${PREFIX}${idType.id}-${type}`;
       let disable = false;
-      idType.on('select-' + type, (event, type: string, selection: Range) => {
+      idType.on('select-' + type, (event, type: string, selection: string[]) => {
         if (disable) {
           return;
         }
         // sync just the latest state
-        store.setValue(key, selection.toString());
+        store.setValue(key, selection);
       });
-      store.on(key, (event: any, newValue: string) => {
+      store.on(key, (event: any, newValue: string[]) => {
         disable = true; //don't track on changes
         idType.select(type, newValue);
         disable = false;

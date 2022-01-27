@@ -1,7 +1,6 @@
 import {BaseUtils} from '../base/BaseUtils';
 import {AppContext} from '../app/AppContext';
 import {IDType, SelectOperation, SelectionUtils, IDTypeManager} from '../idtype';
-import {Range, Range1D} from '../range';
 import {ADataType} from '../data/datatype';
 import {ObjectNode, IObjectRef, ObjectRefUtils} from './ObjectNode';
 import {StateNode, } from './StateNode';
@@ -67,39 +66,30 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return [this._actions.length, this._objects.length, this._states.length, this._slides.length];
   }
 
-  ids(range: Range = Range.all()) {
-    const toID = (a: any) => a.id;
-    const actions = Range1D.from(this._actions.map(toID));
-    const objects = Range1D.from(this._objects.map(toID));
-    const states = Range1D.from(this._states.map(toID));
-    const stories = Range1D.from(this._slides.map(toID));
-    return Promise.resolve(range.preMultiply(Range.list(actions, objects, states, stories)));
-  }
-
   selectState(state: StateNode, op: SelectOperation = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, extras = {}) {
     this.fire('select_state,select_state_' + type, state, type, op, extras);
-    this.select(ProvenanceGraphDim.State, type, state ? [this._states.indexOf(state)] : [], op);
+    this.idtypes[ProvenanceGraphDim.State].select(type, state ? [this._states.indexOf(state).toString()] : [], op);
   }
 
-  selectSlide(state: SlideNode, op: SelectOperation = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, extras = {}) {
-    this.fire('select_slide,select_slide_' + type, state, type, op, extras);
-    this.select(ProvenanceGraphDim.Slide, type, state ? [this._slides.indexOf(state)] : [], op);
+  selectSlide(slide: SlideNode, op: SelectOperation = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, extras = {}) {
+    this.fire('select_slide,select_slide_' + type, slide, type, op, extras);
+    this.idtypes[ProvenanceGraphDim.Slide].select(type, slide ? [this._slides.indexOf(slide).toString()] : [], op);
   }
 
   selectAction(action: ActionNode, op: SelectOperation = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
     this.fire('select_action,select_action_' + type, action, type, op);
-    this.select(ProvenanceGraphDim.Action, type, action ? [this._actions.indexOf(action)] : [], op);
+    this.idtypes[ProvenanceGraphDim.Action].select(type, action ? [this._actions.indexOf(action).toString()] : [], op);
   }
 
   selectedStates(type = SelectionUtils.defaultSelectionType): StateNode[] {
     const sel = this.idtypes[ProvenanceGraphDim.State].selections(type);
-    if (sel.isNone) {
+    if (sel?.length === 0) {
       return [];
     }
-    const lookup = new Map<number,StateNode>();
-    this._states.forEach((s) => lookup.set(s.id, s));
+    const lookup = new Map<string, StateNode>();
+    this._states.forEach((s) => lookup.set(`${s.id}`, s));
     const nodes: StateNode[] = [];
-    sel.dim(0).forEach((id) => {
+    sel.forEach((id) => {
       const n = lookup.get(id);
       if (n) {
         nodes.push(n);
@@ -108,16 +98,15 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return nodes;
   }
 
-
   selectedSlides(type = SelectionUtils.defaultSelectionType): SlideNode[] {
     const sel = this.idtypes[ProvenanceGraphDim.Slide].selections(type);
-    if (sel.isNone) {
+    if (sel?.length === 0) {
       return [];
     }
-    const lookup = new Map<number, SlideNode>();
-    this._slides.forEach((s) => lookup.set(s.id, s));
+    const lookup = new Map<string, SlideNode>();
+    this._slides.forEach((s) => lookup.set(`${s.id}`, s));
     const nodes: SlideNode[] = [];
-    sel.dim(0).forEach((id) => {
+    sel.forEach((id) => {
       const n = lookup.get(id);
       if (n) {
         nodes.push(n);

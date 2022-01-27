@@ -5,7 +5,6 @@ import {PanelTab} from '../lineup/panel';
 import {IPluginDesc, IPlugin, IEventHandler} from '.';
 import {IDType} from '../idtype';
 import {ProvenanceGraph, IObjectRef} from '../provenance';
-import {RangeLike, Range} from '../range';
 import {IUser} from '../security';
 import {ReactElement, ReactNode} from 'react';
 import {IVisynViewProps} from '../views/VisynView';
@@ -16,12 +15,12 @@ import {IVisynViewProps} from '../views/VisynView';
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
    * used internally to match selections to column
-   * @default -1
+   * @default undefined
    */
-  selectedId: number;
+  selectedId: string;
   /**
    * used internally to match selections to multiple columns
-   * @default: undefined
+   * @default undefined
    */
   selectedSubtype?: string;
   /**
@@ -45,7 +44,7 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
 }
 
 export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc): item is IAdditionalColumnDesc {
-  return (item as IAdditionalColumnDesc).selectedId !== undefined;
+  return (item as IAdditionalColumnDesc).selectedId != null;
 }
 
 /**
@@ -83,12 +82,12 @@ export interface IScore<T> {
 
   /**
    * start the computation of the score for the given ids
-   * @param {RangeLike} ids the currently visible ids
+   * @param {string[]} ids the currently visible ids
    * @param {IDType} idtype of this idtype
    * @param {Object} extras extra arguments
    * @returns {Promise<IScoreRow<T>[]>} the scores
    */
-  compute(ids: RangeLike, idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
+  compute(ids: string[], idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
 
   /**
    * Hook to override returning which authorizations are required for this score.
@@ -256,12 +255,12 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
 
 export interface ISelection {
   readonly idtype: IDType; // see phovea_core/src/idtype/manager#resolve
-  readonly range: Range;
+  selectionIds: string[];
 
   /**
    * other selections floating around in a multi selection environment
    */
-  readonly all?: Map<IDType, Range>;
+  readonly all?: Map<IDType, string[]>;
 }
 
 export interface IViewContext {

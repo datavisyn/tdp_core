@@ -1,6 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
 import { ObjectRefUtils } from '../provenance';
-import { ParseRangeUtils, Range } from '../range';
 import { ARankingView } from '../lineup/ARankingView';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
 import { PluginRegistry } from '../app';
@@ -24,7 +23,7 @@ export class AEmbeddedRanking {
         };
         const selection = {
             idtype,
-            range: Range.none()
+            selectionIds: []
         };
         const that = this;
         class EmbeddedRankingView extends ARankingView {
@@ -40,7 +39,7 @@ export class AEmbeddedRanking {
                 return columns.map((c) => Object.assign(c, {
                     initialRanking: true,
                     width: -1,
-                    selectedId: -1,
+                    selectedId: null,
                     selectedSubtype: undefined,
                     ...c
                 }));
@@ -118,16 +117,16 @@ export class AEmbeddedRanking {
         lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', null);
         this.ranking.setItemSelection({
             idtype: this.ranking.itemIDType,
-            range: ParseRangeUtils.parseRangeLike(rows.map((d) => d._id))
+            selectionIds: rows.map((d) => d.id)
         });
         lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection) => {
             const rows = selection.map((d) => lineup.data[d]);
             this.selectedRowsChanged(rows);
         });
     }
-    rebuild(mode = 'data') {
+    async rebuild(mode = 'data') {
         if (this.ranking) {
-            this.ranking.rebuildLineUp(mode);
+            return this.ranking.rebuildLineUp(mode);
         }
     }
     runWithoutTracking(f) {
@@ -135,7 +134,7 @@ export class AEmbeddedRanking {
     }
     addTrackedScoreColumn(score, scoreParams, position) {
         if (typeof score !== 'string') {
-            return new Promise(() => this.ranking.addTrackedScoreColumn(score, scoreParams)); // aka scoreParams = position
+            return Promise.resolve(this.ranking.addTrackedScoreColumn(score, scoreParams)); // aka scoreParams = position
         }
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, score);
         return pluginDesc.load().then((plugin) => {

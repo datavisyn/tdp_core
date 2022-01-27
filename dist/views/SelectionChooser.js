@@ -48,26 +48,24 @@ export class SelectionChooser {
     }
     async toItems(selection) {
         const source = selection.idtype;
-        const sourceIds = selection.range.dim(0).asList();
-        const sourceNames = await source.unmap(sourceIds);
+        const sourceNames = selection.selectionIds;
         const readAble = this.readAble || null;
-        const readAbleNames = !readAble || readAble === source ? null : await IDTypeManager.getInstance().mapToFirstName(source, sourceIds, readAble);
+        const readAbleNames = !readAble || readAble === source ? null : await IDTypeManager.getInstance().mapNameToFirstName(source, sourceNames, readAble);
         const labels = readAbleNames ? (this.options.appendOriginalLabel ? readAbleNames.map((d, i) => `${d} (${sourceNames[i]})`) : readAbleNames) : sourceNames;
         const target = this.target || source;
         if (target === source) {
-            return sourceIds.map((d, i) => ({
-                value: String(d),
+            return sourceNames.map((d, i) => ({
+                value: d,
                 name: labels[i],
                 data: { id: d, name: sourceNames[i], label: labels[i] }
             }));
         }
-        const targetIds = await IDTypeManager.getInstance().mapToID(source, sourceIds, target);
-        const targetIdsFlat = [].concat(...targetIds);
-        const targetNames = await target.unmap(targetIdsFlat);
+        const targetIds = await IDTypeManager.getInstance().mapNameToName(source, sourceNames, target);
+        const targetNames = targetIds.flat();
         if (target === readAble && targetIds.every((d) => d.length === 1)) {
             // keep it simple target = readable and single hit - so just show flat
             return targetIds.map((d, i) => ({
-                value: String(d[0]),
+                value: d[0],
                 name: labels[i],
                 data: { id: d[0], name: targetNames[i], label: labels[i] }
             }));

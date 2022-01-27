@@ -69,7 +69,6 @@ def phovea(registry):
   })
 
   # phovea_data_redis
-  registry.append('manager', 'idmanager', 'tdp_core.assigner', dict(priority=-5, singleton=True))
   registry.append('mapping_provider', 'phovea_data_redis', 'tdp_core.redis_mapping_table')
 
   # phovea_data_mongo
