@@ -272,7 +272,7 @@ export class TDPApplicationUtils {
       resolve: (data: FormData): Partial<ISecureItem> => {
         const oths = toSet(data.get('permission_others').toString());
         const grp = toSet(data.get('permission_group').toString());
-        const groupName = data.get('permission_group_name').toString();
+        const groupName = data.get('permission_group_name')?.toString();
         const bddies = toSet(data.get('permission_buddies').toString());
         const buddiesName = data
           .get('permission_buddies_name')
