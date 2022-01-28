@@ -1,9 +1,8 @@
-import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../../../base/interfaces';
-import {LineupUtils} from '../../utils';
-import {IScoreRow} from '../../../base/interfaces';
-import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
-import {ResolveNow} from '../../../base';
+import { IContext } from '../ISelectionAdapter';
+import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
+import { LineupUtils } from '../../utils';
+import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
+import { ResolveNow } from '../../../base';
 
 export interface IMultiSelectionAdapter {
   /**
@@ -49,7 +48,9 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
       descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
 
       const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
-      const dynamicColumnIDs = new Set<string>(usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`));
+      const dynamicColumnIDs = new Set<string>(
+        usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`),
+      );
       // Save which columns have been added for a specific element in the selection
       const selectedElements = new Set<string>(descs.map((desc) => `${id}_${desc.selectedSubtype}`));
 
@@ -65,12 +66,12 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
 
       const position = this.computePositionToInsert(context, id);
 
-      return columnsToBeAdded.map((desc, i) => ({desc, data: data[i], id, position}));
+      return columnsToBeAdded.map((desc, i) => ({ desc, data: data[i], id, position }));
     });
   }
 
   private removePartialDynamicColumns(context: IContext, ids: string[]): void {
-    const columns = context.columns;
+    const { columns } = context;
     const selectedSubTypes = this.adapter.getSelectedSubTypes();
     if (selectedSubTypes.length === 0) {
       ids.forEach((id) => context.freeColor(id));
@@ -86,9 +87,13 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     // check which parameters have been removed
     const removedParameters = Array.from(LineupUtils.set_diff(dynamicColumnSubtypes, selectedElements));
 
-    context.remove([].concat(...removedParameters.map((param) => {
-      return usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === param);
-    })));
+    context.remove(
+      [].concat(
+        ...removedParameters.map((param) => {
+          return usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === param);
+        }),
+      ),
+    );
   }
 
   private computePositionToInsert(context: IContext, id: string) {

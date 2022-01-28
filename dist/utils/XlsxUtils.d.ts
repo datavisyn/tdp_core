@@ -18,3 +18,4 @@ export declare class XlsxUtils {
     static json2xlsx(file: IXLSXJSONFile): Promise<Blob>;
     static jsonArray2xlsx(file: any[][]): Promise<Blob>;
 }
+//# sourceMappingURL=XlsxUtils.d.ts.map

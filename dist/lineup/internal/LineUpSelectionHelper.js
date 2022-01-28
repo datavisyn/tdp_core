@@ -1,5 +1,5 @@
-import { EventHandler } from '../../base';
 import { LocalDataProvider } from 'lineupjs';
+import { EventHandler } from '../../base';
 import { LineupUtils } from '../utils';
 export class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType) {

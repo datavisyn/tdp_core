@@ -1,12 +1,12 @@
 import { behavior, mouse as d3mouse, select, selectAll } from 'd3';
+import * as d3 from 'd3';
+import marked from 'marked';
+import * as $ from 'jquery';
 import { Renderer } from '../base/annotation';
 import { ModeWrapper } from '../base/mode';
-import * as d3 from 'd3';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
-import marked from 'marked';
 import { StoryTransition, Player } from '../base/Player';
-import * as $ from 'jquery';
 import * as textPNG from '../assets/text.png';
 import { Dialog } from '../components';
 import { SlideNode } from '../provenance';
@@ -22,7 +22,7 @@ export class VerticalStoryVis extends AVisInstance {
         this.parent = parent;
         this.trigger = this.update.bind(this);
         this.onSelectionChanged = (event, slide, type, op, extras) => {
-            this.$node.selectAll('div.story:not(.placeholder)').classed('phovea-select-' + type, function (d) {
+            this.$node.selectAll('div.story:not(.placeholder)').classed(`phovea-select-${type}`, function (d) {
                 const isSelected = d === slide;
                 if (isSelected && type === SelectionUtils.defaultSelectionType) {
                     this.scrollIntoView();
@@ -57,7 +57,7 @@ export class VerticalStoryVis extends AVisInstance {
             xy: 'y',
             wh: 'height',
             topleft: 'top',
-            thumbnails: true
+            thumbnails: true,
         };
         this.duration2pixel = d3.scale.linear().domain([0, 10000]).range([VerticalStoryVis.MIN_HEIGHT, 200]);
         this.story = null;
@@ -104,26 +104,28 @@ export class VerticalStoryVis extends AVisInstance {
         if (arguments.length === 1) {
             return this.options[name];
         }
-        else {
-            this.fire('option.' + name, val, this.options[name]);
-            this.options[name] = val;
-        }
+        this.fire(`option.${name}`, val, this.options[name]);
+        this.options[name] = val;
+        return undefined;
     }
     transform(scale, rotate = 0) {
         const bak = {
             scale: this.options.scale || [1, 1],
-            rotate: this.options.rotate || 0
+            rotate: this.options.rotate || 0,
         };
         if (arguments.length === 0) {
             return bak;
         }
         const dims = this.data.dim;
-        const width = 20, height = dims[0];
-        this.$node.attr({
+        const width = 20;
+        const height = dims[0];
+        this.$node
+            .attr({
             width: width * scale[0],
-            height: height * scale[1]
-        }).style('transform', 'rotate(' + rotate + 'deg)');
-        //this.$node.select('g').attr('transform', 'scale(' + scale[0] + ',' + scale[1] + ')');
+            height: height * scale[1],
+        })
+            .style('transform', `rotate(${rotate}deg)`);
+        // this.$node.select('g').attr('transform', 'scale(' + scale[0] + ',' + scale[1] + ')');
         const act = { scale, rotate };
         this.fire('transform', act, bak);
         this.options.scale = scale;
@@ -149,9 +151,11 @@ export class VerticalStoryVis extends AVisInstance {
         if ($node.empty()) {
             $node = $parent.append('aside').classed('provenance-story-vis', true).classed('provenance-sidepanel', true);
         }
-        $node.attr({
-            'class': 'provenance-story-vis provenance-sidepanel ' + this.options.class
-        }).style('transform', 'rotate(' + this.options.rotate + 'deg)');
+        $node
+            .attr({
+            class: `provenance-story-vis provenance-sidepanel ${this.options.class}`,
+        })
+            .style('transform', `rotate(${this.options.rotate}deg)`);
         $node.html(`
       <div>
         <h2><i class="fas fa-video"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.story')} <span id="player_controls">
@@ -188,21 +192,27 @@ export class VerticalStoryVis extends AVisInstance {
         <div class="time_marker"><i class="fas fa-circle"></i></div>
       </div>
     `);
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         $node.selectAll('button[data-create]').on('click', function () {
-            const create = this.dataset.create;
+            const { create } = this.dataset;
             let story;
             switch (create) {
                 case 'plus':
                     story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.welcome'));
                     break;
-                case 'clone':
+                case 'clone': {
                     const state = that.data.selectedStates()[0] || that.data.act;
-                    story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.myStoryTo') + (state ? state.name : I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.heaven')), state ? state.path : []);
+                    story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.myStoryTo') +
+                        (state ? state.name : I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.heaven')), state ? state.path : []);
                     break;
-                case 'bookmark':
+                }
+                case 'bookmark': {
                     const states = that.data.states.filter((d) => d.getAttr('starred', false));
                     story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.myFavoriteFindings'), states);
+                    break;
+                }
+                default:
                     break;
             }
             that.switchTo(story);
@@ -229,7 +239,7 @@ export class VerticalStoryVis extends AVisInstance {
                     d.description = this.value;
                 }
                 $base.select('div.description').html(marked(d.description));
-                //that.update();
+                // that.update();
             });
         }
         if (this.data.getSlideChains().length === 0) {
@@ -239,9 +249,15 @@ export class VerticalStoryVis extends AVisInstance {
     }
     updateInfo(slide) {
         const $base = this.$node.select('div.current').datum(slide);
-        $base.select('input').property('value', slide ? slide.name : '').attr('disabled', slide ? null : 'disabled');
+        $base
+            .select('input')
+            .property('value', slide ? slide.name : '')
+            .attr('disabled', slide ? null : 'disabled');
         $base.select('div.name').html(slide ? marked(slide.name) : '');
-        $base.select('textarea').property('value', slide ? slide.description : '').attr('disabled', slide ? null : 'disabled');
+        $base
+            .select('textarea')
+            .property('value', slide ? slide.description : '')
+            .attr('disabled', slide ? null : 'disabled');
         $base.select('div.description').html(slide ? marked(slide.description) : '');
     }
     pushAnnotation(ann) {
@@ -257,29 +273,40 @@ export class VerticalStoryVis extends AVisInstance {
         }
     }
     dndSupport(elem) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         elem
             .on('dragenter', function (d) {
-            if (DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-state') || DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story') || DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story-text')) {
+            if (DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-state') ||
+                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story') ||
+                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story-text')) {
                 d3.select(this).classed('hover', true);
                 return false;
             }
-        }).on('dragover', (d) => {
-            if (DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-state') || DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story') || DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story-text')) {
+            return undefined;
+        })
+            .on('dragover', (d) => {
+            if (DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-state') ||
+                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story') ||
+                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story-text')) {
                 d3.event.preventDefault();
                 DnDUtils.getInstance().updateDropEffect(d3.event);
                 return false;
             }
-        }).on('dragleave', function (d) {
+            return undefined;
+        })
+            .on('dragleave', function (d) {
             d3.select(this).classed('hover', false);
-        }).on('drop', function (d) {
+        })
+            .on('drop', function (d) {
             d3.select(this).classed('hover', false);
             const e = d3.event;
             e.preventDefault();
             const fullStory = SlideNode.toSlidePath(that.story);
             const dStory = d.isPlaceholder ? d.to : d;
             const insertIntoStory = (newSlide) => {
-                if (dStory == null) { //at the beginning
+                if (dStory == null) {
+                    // at the beginning
                     const bak = that.story;
                     that.story = newSlide;
                     if (bak) {
@@ -300,8 +327,10 @@ export class VerticalStoryVis extends AVisInstance {
             }
             else if (DnDUtils.getInstance().hasDnDType(e, 'application/phovea-prov-story')) {
                 const story = that.data.getSlideById(parseInt(e.dataTransfer.getData('application/phovea-prov-story'), 10));
-                if (fullStory.indexOf(story) >= 0 && e.dataTransfer.dropEffect !== 'copy') { //internal move
-                    if (dStory == null) { //no self move
+                if (fullStory.indexOf(story) >= 0 && e.dataTransfer.dropEffect !== 'copy') {
+                    // internal move
+                    if (dStory == null) {
+                        // no self move
                         if (story !== that.story) {
                             const bak = that.story;
                             that.story = story;
@@ -312,7 +341,7 @@ export class VerticalStoryVis extends AVisInstance {
                     else {
                         const ref = dStory;
                         if (ref !== story) {
-                            //we might moved the first one
+                            // we might moved the first one
                             if (story === that.story) {
                                 that.story = story.next;
                             }
@@ -321,71 +350,83 @@ export class VerticalStoryVis extends AVisInstance {
                         }
                     }
                 }
-                else { //multi story move
+                else {
+                    // multi story move
                     insertIntoStory(that.data.cloneSingleSlideNode(story));
                 }
             }
             return false;
         });
     }
-    changeDuration($elem) {
+    changeDuration($element) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
-        $elem.call(d3.behavior.drag()
+        $element.call(d3.behavior
+            .drag()
             .origin(() => ({ x: 0, y: 0 }))
             .on('drag', function (d, i) {
-            //update the height of the slide node
+            // update the height of the slide node
             const e = d3.event;
             const $elem = d3.select(this.parentElement);
             const height = Math.max(that.duration2pixel.range()[0], that.duration2pixel(d.duration) + e[that.options.xy]);
-            $elem.style(that.options.wh, height + 'px');
+            $elem.style(that.options.wh, `${height}px`);
             const change = that.duration2pixel.invert(height) - d.duration;
-            const durations = that.$node.selectAll('div.story').filter((d) => !d.isPlaceholder);
+            const durations = that.$node.selectAll('div.story').filter((a) => !a.isPlaceholder);
             const stories = SlideNode.toSlidePath(that.story);
             durations.select('div.duration span').text((k) => {
                 const index = stories.indexOf(k);
                 return VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(k, stories) + (index > i ? change : 0));
             });
-            that.$node.select('div.story.placeholder div.duration span').text(VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(null, stories) + change));
-        }).on('dragend', function (d) {
-            //update the stored duration just once
+            that.$node
+                .select('div.story.placeholder div.duration span')
+                .text(VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(null, stories) + change));
+        })
+            .on('dragend', function (d) {
+            // update the stored duration just once
             const h = parseInt(d3.select(this.parentElement).style(that.options.wh), 10);
             d.duration = that.duration2pixel.invert(h);
         }));
     }
-    changeTransition($elem) {
+    changeTransition($element) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
-        $elem.call(d3.behavior.drag()
+        $element.call(d3.behavior
+            .drag()
             .origin(() => ({ x: 0, y: 0 }))
             .on('drag', function (d, i) {
-            //update the height of the slide node
+            // update the height of the slide node
             const e = d3.event;
             const $elem = d3.select(this.parentElement);
             const offset = Math.max(0, that.duration2pixel(d.transition) - VerticalStoryVis.MIN_HEIGHT + e[that.options.xy]);
-            $elem.style('margin-' + that.options.topleft, offset + 'px');
+            $elem.style(`margin-${that.options.topleft}`, `${offset}px`);
             const change = that.duration2pixel.invert(offset + VerticalStoryVis.MIN_HEIGHT) - d.transition;
-            const durations = that.$node.selectAll('div.story').filter((d) => !d.isPlaceholder);
+            const durations = that.$node.selectAll('div.story').filter((a) => !a.isPlaceholder);
             const stories = SlideNode.toSlidePath(that.story);
             durations.select('div.duration span').text((k) => {
                 const index = stories.indexOf(k);
                 return VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(k, stories) + (index >= i ? change : 0));
             });
-            that.$node.select('div.story.placeholder div.duration span').text(VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(null, stories) + change));
-        }).on('dragend', function (d) {
-            //update the stored duration just once
-            const h = parseInt(d3.select(this.parentElement).style('margin-' + that.options.topleft), 10);
+            that.$node
+                .select('div.story.placeholder div.duration span')
+                .text(VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(null, stories) + change));
+        })
+            .on('dragend', function (d) {
+            // update the stored duration just once
+            const h = parseInt(d3.select(this.parentElement).style(`margin-${that.options.topleft}`), 10);
             d.transition = that.duration2pixel.invert(h + VerticalStoryVis.MIN_HEIGHT);
         }));
     }
     storyInteraction(elem) {
         const graph = this.data;
-        elem.attr('draggable', true)
+        elem
+            .attr('draggable', true)
             .on('dragstart', (d) => {
             if (!DetailUtils.isEditAble()) {
                 d3.event.preventDefault();
                 return;
             }
             const e = d3.event;
-            e.dataTransfer.effectAllowed = 'copyMove'; //none, copy, copyLink, copyMove, link, linkMove, move, all
+            e.dataTransfer.effectAllowed = 'copyMove'; // none, copy, copyLink, copyMove, link, linkMove, move, all
             e.dataTransfer.setData('text/plain', d.name);
             e.dataTransfer.setData('application/phovea-prov-story', String(d.id));
         })
@@ -405,15 +446,18 @@ export class VerticalStoryVis extends AVisInstance {
     }
     createToolbar($elem) {
         const $toolbarEnter = $elem.append('div').classed('toolbar', true);
-        $toolbarEnter.append('i').attr('class', 'fas fa-edit').on('click', (d) => {
+        $toolbarEnter
+            .append('i')
+            .attr('class', 'fas fa-edit')
+            .on('click', (d) => {
             const e = d3.event;
-            //remove me
+            // remove me
             e.stopPropagation();
             e.preventDefault();
             Dialog.prompt(d.name, {
                 title: I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.editName'),
                 placeholder: I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.markdownSupported'),
-                multiline: true
+                multiline: true,
             }).then((text) => {
                 if (text === null) {
                     return; // dialog was closed without submitting the form
@@ -424,16 +468,20 @@ export class VerticalStoryVis extends AVisInstance {
             });
             return false;
         });
-        $toolbarEnter.append('i').attr('class', 'fas fa-copy').attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.cloneSlide')).on('click', (d) => {
+        $toolbarEnter
+            .append('i')
+            .attr('class', 'fas fa-copy')
+            .attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.cloneSlide'))
+            .on('click', (d) => {
             const e = d3.event;
-            //remove me
+            // remove me
             e.stopPropagation();
             e.preventDefault();
             this.data.moveSlide(this.data.cloneSingleSlideNode(d), d, false);
             this.update();
             return false;
         });
-        /*$toolbar_enter.append('i').attr('class', 'fas fa-camera').attr('title','force update of preview').on('click', (d) => {
+        /* $toolbar_enter.append('i').attr('class', 'fas fa-camera').attr('title','force update of preview').on('click', (d) => {
          //remove me
          d3.event.stopPropagation();
          d3.event.preventDefault();
@@ -442,9 +490,13 @@ export class VerticalStoryVis extends AVisInstance {
          return false;
          });
          */
-        $toolbarEnter.append('i').attr('class', 'fas fa-times').attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.removeSlide')).on('click', (d) => {
+        $toolbarEnter
+            .append('i')
+            .attr('class', 'fas fa-times')
+            .attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.removeSlide'))
+            .on('click', (d) => {
             const e = d3.event;
-            //remove me
+            // remove me
             e.stopPropagation();
             e.preventDefault();
             if (d === this.story) {
@@ -459,6 +511,7 @@ export class VerticalStoryVis extends AVisInstance {
         });
     }
     createLastPlaceholder($p) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         $p.html(`<div>
        <button class="btn btn-light btn-sm" data-add="text" title="${I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.addTextSlide')}"><i class="far fa-file-alt"></i></button>
@@ -480,7 +533,7 @@ export class VerticalStoryVis extends AVisInstance {
                         that.story = that.data.startNewSlide(I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.welcome'));
                     }
                     break;
-                case 'extract':
+                case 'extract': {
                     const state = that.data.selectedStates()[0] || that.data.act;
                     const newSlide = that.data.extractSlide([state], false);
                     if (last) {
@@ -490,7 +543,8 @@ export class VerticalStoryVis extends AVisInstance {
                         that.story = newSlide;
                     }
                     break;
-                case 'extract_all':
+                }
+                case 'extract_all': {
                     const state2 = that.data.selectedStates()[0] || that.data.act;
                     const newSlide2 = that.data.extractSlide(state2.path, false);
                     if (last) {
@@ -500,6 +554,9 @@ export class VerticalStoryVis extends AVisInstance {
                         that.story = newSlide2;
                     }
                     break;
+                }
+                default:
+                    break;
             }
             that.update();
         });
@@ -507,9 +564,13 @@ export class VerticalStoryVis extends AVisInstance {
     updateSelection() {
         const stories = this.data.getSlideChains();
         const $stories = this.$node.select('.dropdown-menu').selectAll('li').data(stories);
-        $stories.enter().insert('li').append('a')
+        $stories
+            .enter()
+            .insert('li')
+            .append('a')
             .attr('class', 'dropdown-item')
-            .attr('href', '#').on('click', (d) => {
+            .attr('href', '#')
+            .on('click', (d) => {
             this.switchTo(d);
             d3.event.preventDefault();
         });
@@ -523,29 +584,30 @@ export class VerticalStoryVis extends AVisInstance {
         storyRaw.forEach((s, i) => {
             story.push(s);
         });
-        //duplicate the last placeholder
+        // duplicate the last placeholder
         story.push({
-            id: 'l' + (storyRaw.length - 1),
+            id: `l${storyRaw.length - 1}`,
             i: storyRaw.length - 1,
             isPlaceholder: true,
             to: storyRaw[storyRaw.length - 1],
-            isLastPlaceholder: true
+            isLastPlaceholder: true,
         });
-        //this.$node.attr('width', (story.length * 70+4)*1.2);
+        // this.$node.attr('width', (story.length * 70+4)*1.2);
         const toId = (d) => String(d.id);
         const lod = DetailUtils.getLevelOfDetail();
         this.$node
             .classed('large', lod === LevelOfDetail.Large)
             .classed('medium', lod === LevelOfDetail.Medium)
             .classed('small', lod === LevelOfDetail.Small);
-        this.$node.select('div.stories')
+        this.$node
+            .select('div.stories')
             .classed('large', lod === LevelOfDetail.Large)
             .classed('medium', lod === LevelOfDetail.Medium)
             .classed('small', lod === LevelOfDetail.Small)
             .classed('no-thumbnails', !this.options.thumbnails);
-        //var levelShift = [];
-        //nodes.forEach((n: any) => levelShift[n.depth] = Math.min(levelShift[n.depth] || 10000, n.x));
-        //nodes.forEach((n: any) => n.x -= levelShift[n.depth]);
+        // var levelShift = [];
+        // nodes.forEach((n: any) => levelShift[n.depth] = Math.min(levelShift[n.depth] || 10000, n.x));
+        // nodes.forEach((n: any) => n.x -= levelShift[n.depth]);
         const $states = this.$node.select('div.stories').selectAll('div.story').data(story, toId);
         const $statesEnter = $states.enter().append('div').classed('story', true);
         const $storyEnter = $statesEnter.filter((d) => !d.isPlaceholder);
@@ -555,11 +617,8 @@ export class VerticalStoryVis extends AVisInstance {
         $storyEnter.append('div').classed('slabel', true);
         $storyEnter.call(this.createToolbar.bind(this));
         $storyEnter.append('div').classed('duration', true).html('<span></span><i class="fas fa-circle"></i>');
-        $storyEnter.append('div').classed('dragger', true)
-            .call(this.changeDuration.bind(this))
-            .call(this.dndSupport.bind(this));
-        $storyEnter.append('div').classed('dragger-transition', true)
-            .call(this.changeTransition.bind(this));
+        $storyEnter.append('div').classed('dragger', true).call(this.changeDuration.bind(this)).call(this.dndSupport.bind(this));
+        $storyEnter.append('div').classed('dragger-transition', true).call(this.changeTransition.bind(this));
         $placeholderEnter.call(this.dndSupport.bind(this));
         {
             const p = $placeholderEnter.filter((d) => d.isLastPlaceholder);
@@ -569,15 +628,22 @@ export class VerticalStoryVis extends AVisInstance {
         const $stories = $states.filter((d) => !d.isPlaceholder);
         $stories.classed('text', (d) => d.isTextOnly);
         $stories.attr('data-id', (d) => d.id);
-        $stories.attr('title', (d) => d.name + '\n' + (d.transition > 0 ? '(' + VerticalStoryVis.to_duration(d.transition) + ')' : '') + '(' + VerticalStoryVis.to_duration(d.duration) + ')');
-        //$stories.attr('data-bs-toggle', 'tooltip');
-        $stories.select('div.preview').style('background-image', lod < LevelOfDetail.Medium || !this.options.thumbnails ? null : ((d) => d.isTextOnly ? `url(${textPNG})` : `url(${ThumbnailUtils.thumbnail_url(this.data, d.state)})`));
-        $stories.select('div.slabel').html((d) => d.name ? marked(d.name) : '');
+        $stories.attr('title', (d) => `${d.name}\n${d.transition > 0 ? `(${VerticalStoryVis.to_duration(d.transition)})` : ''}(${VerticalStoryVis.to_duration(d.duration)})`);
+        // $stories.attr('data-bs-toggle', 'tooltip');
+        $stories
+            .select('div.preview')
+            .style('background-image', lod < LevelOfDetail.Medium || !this.options.thumbnails
+            ? null
+            : (d) => (d.isTextOnly ? `url(${textPNG})` : `url(${ThumbnailUtils.thumbnail_url(this.data, d.state)})`));
+        $stories.select('div.slabel').html((d) => (d.name ? marked(d.name) : ''));
         $stories.select('div.duration span').text((d, i) => `${VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(d, storyRaw))}`);
-        $stories.style(this.options.wh, (d) => this.duration2pixel(d.duration) + 'px');
-        $stories.style('margin-' + this.options.topleft, (d) => this.duration2pixel(d.transition) - VerticalStoryVis.MIN_HEIGHT + 'px');
-        //const $placeholders = $states.filter((d) => d.isPlaceholder);
-        $states.filter((d) => d.isLastPlaceholder).select('div.duration span').text(VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(null, storyRaw)));
+        $stories.style(this.options.wh, (d) => `${this.duration2pixel(d.duration)}px`);
+        $stories.style(`margin-${this.options.topleft}`, (d) => `${this.duration2pixel(d.transition) - VerticalStoryVis.MIN_HEIGHT}px`);
+        // const $placeholders = $states.filter((d) => d.isPlaceholder);
+        $states
+            .filter((d) => d.isLastPlaceholder)
+            .select('div.duration span')
+            .text(VerticalStoryVis.to_duration(VerticalStoryVis.to_starting_time(null, storyRaw)));
         $states.exit().remove();
     }
     updateTimeIndicator(slide, withTransition) {
@@ -586,16 +652,18 @@ export class VerticalStoryVis extends AVisInstance {
             $marker.style('display', 'none');
             return;
         }
-        const bounds = BaseUtils.bounds(this.$node.node().querySelector('div.story[data-id="' + slide.id + '"]'));
+        const bounds = BaseUtils.bounds(this.$node.node().querySelector(`div.story[data-id="${slide.id}"]`));
         const base = BaseUtils.bounds(this.$node.node().querySelector('div.stories'));
-        //console.log(bounds, base, bounds.y - base.y);
+        // console.log(bounds, base, bounds.y - base.y);
         const t = $marker
-            .transition().ease('linear')
+            .transition()
+            .ease('linear')
             .duration(slide.transition < 0 || !withTransition ? StoryTransition.MIN_TRANSITION : slide.transition * StoryTransition.FACTOR)
-            .style('top', (bounds.y - base.y) + 'px');
-        t.transition().ease('linear')
+            .style('top', `${bounds.y - base.y}px`);
+        t.transition()
+            .ease('linear')
             .duration(slide.duration < 0 || !withTransition ? StoryTransition.MIN_DURATION : slide.duration * StoryTransition.FACTOR)
-            .style('top', (bounds.y - base.y + bounds.h - 4) + 'px');
+            .style('top', `${bounds.y - base.y + bounds.h - 4}px`);
     }
     static createVerticalStoryVis(data, parent, options = {}) {
         return new VerticalStoryVis(data, parent, options);
@@ -604,7 +672,7 @@ export class VerticalStoryVis extends AVisInstance {
         const r = Renderer.createAnnotation(main, graph);
         const storyvis = VerticalStoryVis.createVerticalStoryVis(graph, parent, {
             render: r.render,
-            thumbnails: options.thumbnails
+            thumbnails: options.thumbnails,
         });
         graph.on('select_slide_selected', (event, state) => {
             select('aside.annotations').style('display', state ? null : 'none');
@@ -612,8 +680,8 @@ export class VerticalStoryVis extends AVisInstance {
         select('aside.annotations > div:first-of-type').call(behavior.drag().on('drag', function () {
             const mouse = d3mouse(this.parentElement.parentElement);
             select(this.parentElement).style({
-                left: mouse[0] + 'px',
-                top: mouse[1] + 'px'
+                left: `${mouse[0]}px`,
+                top: `${mouse[1]}px`,
             });
         }));
         selectAll('aside.annotations button[data-ann]').on('click', function () {
@@ -624,24 +692,26 @@ export class VerticalStoryVis extends AVisInstance {
                     ann = {
                         type: 'text',
                         pos: [10, 10],
-                        text: ''
+                        text: '',
                     };
                     break;
                 case 'arrow':
                     ann = {
                         type: 'arrow',
                         pos: [10, 10],
-                        at: [200, 200]
+                        at: [200, 200],
                     };
-                    //that.data.appendToStory(that.story.story, that.data.makeTextStory('Unnamed');
-                    //this.actStory.addText();
+                    // that.data.appendToStory(that.story.story, that.data.makeTextStory('Unnamed');
+                    // this.actStory.addText();
                     break;
                 case 'frame':
                     ann = {
                         type: 'frame',
                         pos: [10, 10],
-                        size: [20, 20]
+                        size: [20, 20],
                     };
+                    break;
+                default:
                     break;
             }
             if (storyvis && ann) {
@@ -656,7 +726,7 @@ export class VerticalStoryVis extends AVisInstance {
     }
     static to_starting_time(d, story) {
         if (!d) {
-            return d3.sum(story, (d) => d.duration + d.transition);
+            return d3.sum(story, (a) => a.duration + a.transition);
         }
         const i = story.indexOf(d);
         return story.slice(0, i).reduce((a, b) => a + b.duration + b.transition, d.transition);

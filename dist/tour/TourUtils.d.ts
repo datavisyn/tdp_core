@@ -132,3 +132,4 @@ export declare class TourUtils {
      */
     static isTourVisible(): boolean;
 }
+//# sourceMappingURL=TourUtils.d.ts.map

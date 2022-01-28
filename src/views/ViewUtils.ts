@@ -1,25 +1,26 @@
-import {SelectionUtils} from '..';
-import {IPluginDesc} from '../base';
-import {IViewPluginDesc, IViewContext, ISelection} from '../base/interfaces';
-import {IObjectRef, ProvenanceGraph} from '../provenance';
-
+import { SelectionUtils } from '../idtype';
+import { IPluginDesc } from '../base';
+import { IViewPluginDesc, IViewContext, ISelection } from '../base/interfaces';
+import { IObjectRef, ProvenanceGraph } from '../provenance';
 
 export class ViewUtils {
-
   /**
    * event when one or more elements are selected for the next level
    * @type {string}
    * @argument selection {ISelection}
    */
   public static readonly VIEW_EVENT_ITEM_SELECT = 'select';
+
   public static readonly VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
+
   public static readonly VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
+
   public static readonly VIEW_EVENT_UPDATE_SHARED = 'updateShared';
 
   static toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
     const r: any = p;
     r.selection = r.selection || 'none';
-    r.group = Object.assign({name: 'Other', order: 99}, r.group);
+    r.group = { name: 'Other', order: 99, ...r.group };
     r.securityNotAllowedText = r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
 
     // common typo
@@ -77,8 +78,8 @@ export class ViewUtils {
    * @returns {boolean}
    */
   static isSameSelection(a: ISelection, b: ISelection): boolean {
-    const aNull = (a == null || a.idtype == null);
-    const bNull = (b == null || b.idtype == null);
+    const aNull = a == null || a.idtype == null;
+    const bNull = b == null || b.idtype == null;
     if (aNull || bNull) {
       return aNull === bNull;
     }
@@ -89,7 +90,7 @@ export class ViewUtils {
     const aAllSize = a.all ? a.all.size : 0;
     const bAllSize = b.all ? b.all.size : 0;
     if (aAllSize !== bAllSize) {
-      return;
+      return undefined;
     }
     if (aAllSize === 0) {
       return true;
@@ -108,7 +109,7 @@ export class ViewUtils {
     return {
       graph,
       desc: ViewUtils.toViewPluginDesc(desc),
-      ref
+      ref,
     };
   }
 }

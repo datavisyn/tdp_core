@@ -79,3 +79,4 @@ export declare class ColumnDescUtils {
     private static isHierarchical;
     private static deriveHierarchy;
 }
+//# sourceMappingURL=desc.d.ts.map

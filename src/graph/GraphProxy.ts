@@ -1,25 +1,22 @@
-import {IDTypeManager} from '../idtype';
-import {ADataType} from '../data/datatype';
-import {AGraph, IGraphDataDescription} from './graph';
-import {GraphFactoryUtils, IGraphFactory} from './GraphBase';
-import {RemoteStoreGraph} from './RemoteStorageGraph';
-import {MemoryGraph} from './MemoryGraph';
-import {LocalStorageGraph} from './LocalStorageGraph';
-import {ResolveNow} from '../base/promise';
+import { IDTypeManager } from '../idtype';
+import { ADataType } from '../data/datatype';
+import { AGraph, IGraphDataDescription } from './graph';
+import { GraphFactoryUtils, IGraphFactory } from './GraphBase';
+import { RemoteStoreGraph } from './RemoteStorageGraph';
+import { MemoryGraph } from './MemoryGraph';
+import { LocalStorageGraph } from './LocalStorageGraph';
+import { ResolveNow } from '../base/promise';
 
 export class GraphProxy extends ADataType<IGraphDataDescription> {
   private cache: PromiseLike<AGraph> = null;
-  private loaded: AGraph = null;
 
-  constructor(desc: IGraphDataDescription) {
-    super(desc);
-  }
+  private loaded: AGraph = null;
 
   get nnodes(): number {
     if (this.loaded) {
       return this.loaded.nnodes;
     }
-    const size = this.desc.size;
+    const { size } = this.desc;
     return size[AGraph.DIM_NODES] || 0;
   }
 
@@ -27,7 +24,7 @@ export class GraphProxy extends ADataType<IGraphDataDescription> {
     if (this.loaded) {
       return this.loaded.nedges;
     }
-    const size = this.desc.size;
+    const { size } = this.desc;
     return size[AGraph.DIM_EDGES] || 0;
   }
 
@@ -41,7 +38,7 @@ export class GraphProxy extends ADataType<IGraphDataDescription> {
     }
     const type = this.desc.storage || 'remote';
     if (type === 'memory') {
-      //memory only
+      // memory only
       this.loaded = new MemoryGraph(this.desc, [], [], factory);
       this.cache = ResolveNow.resolveImmediately(this.loaded);
     } else if (type === 'local') {
@@ -54,7 +51,7 @@ export class GraphProxy extends ADataType<IGraphDataDescription> {
       this.loaded = this.desc.graph;
       this.cache = ResolveNow.resolveImmediately(this.loaded);
     } else {
-      this.cache = ResolveNow.resolveImmediately(RemoteStoreGraph.load(this.desc, factory)).then((graph: AGraph) => this.loaded = graph);
+      this.cache = ResolveNow.resolveImmediately(RemoteStoreGraph.load(this.desc, factory)).then((graph: AGraph) => (this.loaded = graph));
     }
     return this.cache;
   }

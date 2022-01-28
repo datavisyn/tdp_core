@@ -1,29 +1,36 @@
-import {AppContext, UserSession} from '../app';
-import {Ajax} from '../base';
-import {RestBaseUtils} from '../base/rest';
-import {IDType, IDTypeManager} from '../idtype';
-import {ISecureItem, Permission} from '../security';
-import {ENamedSetType, IStoredNamedSet} from './interfaces';
-
+import { AppContext, UserSession } from '../app';
+import { Ajax } from '../base';
+import { RestBaseUtils } from '../base/rest';
+import { IDType, IDTypeManager } from '../idtype';
+import { ISecureItem, Permission } from '../security';
+import { ENamedSetType, IStoredNamedSet } from './interfaces';
 
 export class RestStorageUtils {
-
   public static readonly REST_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/storage`;
 
   public static listNamedSets(idType: IDType | string = null): Promise<IStoredNamedSet[]> {
-    const args = idType ? {idType: IDTypeManager.getInstance().resolveIdType(idType).id} : {};
-    return AppContext.getInstance().getAPIJSON(`${RestStorageUtils.REST_NAMESPACE}/namedsets/`, args).then((sets: IStoredNamedSet[]) => {
-      // default value
-      sets.forEach((s) => s.type = s.type || ENamedSetType.NAMEDSET);
-      return sets;
-    });
+    const args = idType ? { idType: IDTypeManager.getInstance().resolveIdType(idType).id } : {};
+    return AppContext.getInstance()
+      .getAPIJSON(`${RestStorageUtils.REST_NAMESPACE}/namedsets/`, args)
+      .then((sets: IStoredNamedSet[]) => {
+        // default value
+        sets.forEach((s) => (s.type = s.type || ENamedSetType.NAMEDSET));
+        return sets;
+      });
   }
 
   static listNamedSetsAsOptions(idType: IDType | string = null) {
-    return RestStorageUtils.listNamedSets(idType).then((namedSets) => namedSets.map((d) => ({name: d.name, value: d.id})));
+    return RestStorageUtils.listNamedSets(idType).then((namedSets) => namedSets.map((d) => ({ name: d.name, value: d.id })));
   }
 
-  static saveNamedSet(name: string, idType: IDType | string, ids: string[], subType: { key: string, value: string }, description = '', sec: Partial<ISecureItem>) {
+  static saveNamedSet(
+    name: string,
+    idType: IDType | string,
+    ids: string[],
+    subType: { key: string; value: string },
+    description = '',
+    sec: Partial<ISecureItem> = {},
+  ) {
     const data = {
       name,
       type: ENamedSetType.NAMEDSET,
@@ -34,7 +41,7 @@ export class RestStorageUtils {
       subTypeKey: subType.key,
       subTypeValue: subType.value,
       description,
-      ...sec
+      ...sec,
     };
     return AppContext.getInstance().sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedsets/`, data, 'POST');
   }
@@ -44,12 +51,13 @@ export class RestStorageUtils {
   }
 
   static editNamedSet(id: string, data: { [key: string]: any }) {
-    return AppContext.getInstance().sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedset/${id}`, data, 'PUT').then((s) => {
-      s.type = s.type || ENamedSetType.NAMEDSET;
-      return s;
-    });
+    return AppContext.getInstance()
+      .sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedset/${id}`, data, 'PUT')
+      .then((s) => {
+        s.type = s.type || ENamedSetType.NAMEDSET;
+        return s;
+      });
   }
-
 
   /**
    * get the content of an uploaded attachment

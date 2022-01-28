@@ -1,5 +1,5 @@
-import {IPersistable} from '../base/IPersistable';
-import {IEventHandler} from '../base/event';
+import { IPersistable } from '../base/IPersistable';
+import { IEventHandler } from '../base/event';
 
 export interface IIDType extends IEventHandler, IPersistable {
   readonly id: string;

@@ -15,3 +15,4 @@ export declare class Store extends EventHandler {
     parse(v: string): any;
     stringify(v: any): string;
 }
+//# sourceMappingURL=Store.d.ts.map

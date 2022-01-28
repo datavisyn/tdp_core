@@ -23,3 +23,4 @@ export declare class SelectionUtils {
     static integrateSelection(current: string[], next: string[], op?: SelectOperation): string[];
     static selectionEq(as: string[], bs: string[]): boolean;
 }
+//# sourceMappingURL=SelectionUtils.d.ts.map

@@ -1,6 +1,6 @@
-import {EventHandler, IEventHandler, IEventListener} from '../base/event';
-import {SelectOperation, SelectionUtils} from './SelectionUtils';
-import {IDType} from './IDType';
+import { EventHandler, IEventHandler, IEventListener } from '../base/event';
+import { SelectOperation, SelectionUtils } from './SelectionUtils';
+import { IDType } from './IDType';
 
 export interface ISelectAble extends IEventHandler {
   ids(selectionIndices?: string[]): Promise<string[]>;
@@ -23,11 +23,6 @@ export interface ISelectAble extends IEventHandler {
   clear(dim: number, type: string): Promise<any>;
 }
 
-interface ISingleSelectionListener {
-  (event: any, type: string, act: string[], added: string[], removed: string[]): void;
-}
-
 export abstract class ASelectAble extends EventHandler {
   static readonly EVENT_SELECT = IDType.EVENT_SELECT;
-
 }

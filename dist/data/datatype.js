@@ -37,13 +37,10 @@ export class ADataType extends ASelectAble {
         if (v instanceof ADataType) {
             return true;
         }
-        //sounds good
-        return (typeof (v.persist) === 'function' && typeof (v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v));
+        // sounds good
+        return typeof v.persist === 'function' && typeof v.restore === 'function' && v instanceof ASelectAble && 'desc' in v;
     }
 }
 export class DummyDataType extends ADataType {
-    constructor(desc) {
-        super(desc);
-    }
 }
 //# sourceMappingURL=datatype.js.map

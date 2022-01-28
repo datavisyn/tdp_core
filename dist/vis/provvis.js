@@ -1,16 +1,15 @@
 // TODO: Why?
 import '../webpack/_bootstrap';
-import { ModeWrapper } from '../base/mode';
-import { Dialog } from '../components';
 import * as d3 from 'd3';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
 import { SelectionUtils, SelectOperation } from '../idtype';
-import { BaseUtils } from '../base';
+import { BaseUtils, ModeWrapper } from '../base';
 import { AppContext, DnDUtils } from '../app';
 import { I18nextManager } from '../i18n';
+import { Dialog } from '../components/dialogs';
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;
 const DOI_SMALL = 0.4;
@@ -34,7 +33,7 @@ class StateRepr {
         if (p) {
             this.parent = lookup[p.id];
             if (line.indexOf(this) >= 0) {
-                //ensure first
+                // ensure first
                 this.parent.children.unshift(this);
             }
             else {
@@ -86,9 +85,9 @@ class StateRepr {
         return this.s.name;
     }
     static toRepr(graph, highlight, options = {}) {
-        //assign doi
+        // assign doi
         const lookup = {};
-        //mark selected
+        // mark selected
         const selected = graph.act;
         const selectedPath = selected.path.reverse();
         const lod = DetailUtils.getLevelOfDetail();
@@ -99,36 +98,36 @@ class StateRepr {
             const meta = a ? a.meta : ActionMetaData.actionMeta('No', 'none', 'none');
             const category = highlight.category[meta.category] ? 1 : 0;
             const operation = highlight.operation[meta.operation] ? 1 : 0;
-            const bookmark = (s.getAttr('starred', false) ? 1 : 0);
-            const tags = (highlight.tags.length > 0 ? (s.getAttr('tags', []).some((d) => highlight.tags.indexOf(d) >= 0) ? 1 : 0) : 0);
+            const bookmark = s.getAttr('starred', false) ? 1 : 0;
+            const tags = highlight.tags.length > 0 ? (s.getAttr('tags', []).some((d) => highlight.tags.indexOf(d) >= 0) ? 1 : 0) : 0;
             const isSelected = s === selected ? 3 : 0;
             const inpath = selectedPath.indexOf(s) >= 0 ? Math.max(-2.5, 6 - selectedPath.indexOf(s)) : -2.5;
             const sizePenality = Math.max(-1, -size / 10);
-            //combine to a doi value
+            // combine to a doi value
             const sum = 6 + isSelected + inpath + sizePenality;
             r.doi = d3.round(Math.max(0, Math.min(10, sum)) / 10, 1);
-            if ((category + operation + bookmark + tags) > 0) {
-                //boost to next level if any of the filters apply
+            if (category + operation + bookmark + tags > 0) {
+                // boost to next level if any of the filters apply
                 r.doi = Math.max(r.doi, DOI_SMALL);
             }
             if (!ThumbnailUtils.areThumbnailsAvailable(graph) || options.thumbnails === false) {
-                r.doi = Math.min(r.doi, DOI_LARGE - 0.01); //border for switching to thumbnails
+                r.doi = Math.min(r.doi, DOI_LARGE - 0.01); // border for switching to thumbnails
             }
             r.selected = s === selected;
             lookup[s.id] = r;
             return r;
         };
         const states = (lod < LevelOfDetail.Medium ? selectedPath : graph.states).map(toState);
-        //route to path = 1
+        // route to path = 1
         const line = selected.path.map((p) => lookup[p.id]);
-        //build tree
+        // build tree
         states.forEach((s) => s.build(lookup, line));
         this.layout(states, line);
-        //boost all on the right side if they are small to medium
+        // boost all on the right side if they are small to medium
         return states;
     }
     static layout(states, line) {
-        //horizontally align the line
+        // horizontally align the line
         let byLevel = [];
         const root = states.filter((s) => s.parent === null)[0];
         byLevel.push([root]);
@@ -138,17 +137,19 @@ class StateRepr {
         }
         byLevel.forEach((level, i) => {
             if (i < line.length) {
-                //resort such that the element will be at the first place
+                // resort such that the element will be at the first place
                 level.splice(level.indexOf(line[i]), 1);
                 level.unshift(line[i]);
             }
         });
-        let changed = false, loop = 0;
+        let changed = false;
+        let loop = 0;
         do {
             changed = false;
             loop++;
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
             byLevel.forEach((level, i) => {
-                //ensure that my children have at least a >= index than me
+                // ensure that my children have at least a >= index than me
                 for (let j = 0; j < level.length; ++j) {
                     const s = level[j];
                     if (s) {
@@ -170,31 +171,33 @@ class StateRepr {
             });
         } while (changed && loop < 5);
         byLevel = byLevel.filter((d) => d.length > 0);
-        //boost all states that are on the left side to medium if they are small
+        // boost all states that are on the left side to medium if they are small
         byLevel.forEach((level) => {
             const s = level[0];
             if (s && s.lod === LevelOfDetail.Small) {
-                s.doi = 0.8; //boost to medium
+                s.doi = 0.8; // boost to medium
             }
         });
-        //we have a bread first with the line at the first position
-        //align all columns by their max width
-        const colwidths = [], rowheights = [];
+        // we have a bread first with the line at the first position
+        // align all columns by their max width
+        const colwidths = [];
+        const rowheights = [];
         states.forEach((s) => {
             colwidths[s.xy[0]] = Math.max(colwidths[s.xy[0]] || 0, s.size[0]);
             rowheights[s.xy[1]] = Math.max(rowheights[s.xy[1]] || 0, s.size[1]);
         });
-        //convert indices to real positions
+        // convert indices to real positions
         const acccolwidths = colwidths.reduce((arr, b, i) => {
             arr[i + 1] = arr[arr.length - 1] + b;
             return arr;
-        }, [0]), accrowheights = rowheights.reduce((arr, b, i) => {
+        }, [0]);
+        const accrowheights = rowheights.reduce((arr, b, i) => {
             arr[i + 1] = arr[arr.length - 1] + b;
             return arr;
         }, [0]);
         acccolwidths.shift();
         states.forEach((s) => {
-            const xy = s.xy;
+            const { xy } = s;
             const x = acccolwidths[acccolwidths.length - 1] - acccolwidths[xy[0]] + 5; // + (colwidths[xy[0]]);
             const y = accrowheights[xy[1]];
             s.xy = [x, y];
@@ -202,20 +205,20 @@ class StateRepr {
     }
     static toIcon(repr) {
         if (!repr.a) {
-            return ''; //`<i class="fas fa-circle" title="${repr.s.name}"></i>`;
+            return ''; // `<i class="fas fa-circle" title="${repr.s.name}"></i>`;
         }
-        const meta = repr.a.meta;
+        const { meta } = repr.a;
         const catIcons = {
             visual: 'chart-bar',
             data: 'database',
             logic: 'cog',
             layout: 'desktop',
-            selection: 'pen-square'
+            selection: 'pen-square',
         };
         const typeIcons = {
             create: 'plus',
             update: 'sync',
-            remove: 'times'
+            remove: 'times',
         };
         return `<span title="${meta.name} @ ${meta.timestamp} (${meta.user})"><i class="fas fa-${catIcons[meta.category]}"></i><i class="super fas fa-${typeIcons[meta.operation]}"></i></span>`;
     }
@@ -231,17 +234,18 @@ class StateRepr {
             .attr('title', (d) => d.name);
         $elem.select('span.icon').html(StateRepr.toIcon);
         $elem.select('span.slabel').text((d) => d.name);
-        $elem.select('i.bookmark')
+        $elem
+            .select('i.bookmark')
             .classed('far', (d) => !d.s.getAttr('starred', false))
             .classed('fas', (d) => d.s.getAttr('starred', false));
-        $elem.select('div.sthumbnail')
-            .style('background-image', (d) => d.lod === LevelOfDetail.Large ? d.thumbnail : null);
+        $elem.select('div.sthumbnail').style('background-image', (d) => (d.lod === LevelOfDetail.Large ? d.thumbnail : null));
         $elem.transition().style({
-            'padding-left': (d) => (d.xy[0] + 4) + 'px',
-            top: (d) => d.xy[1] + 'px'
+            'padding-left': (d) => `${d.xy[0] + 4}px`,
+            top: (d) => `${d.xy[1]}px`,
         });
     }
     showDialog() {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const d = this;
         const icon = StateRepr.toIcon(d);
         const title = d.s.name;
@@ -299,7 +303,7 @@ export class LayoutedProvVis extends AVisInstance {
         };
         this.onSelectionChanged = (event, type, act) => {
             const selectedStates = this.data.selectedStates(type);
-            this.$node.selectAll('div.state').classed('phovea-select-' + type, function (d) {
+            this.$node.selectAll('div.state').classed(`phovea-select-${type}`, function (d) {
                 const isSelected = selectedStates.indexOf(d.s) >= 0;
                 if (isSelected && type === SelectionUtils.defaultSelectionType) {
                     this.scrollIntoView();
@@ -307,7 +311,11 @@ export class LayoutedProvVis extends AVisInstance {
                 return isSelected;
             });
         };
-        this.line = d3.svg.line().interpolate('step-after').x((d) => d.cx).y((d) => d.cy);
+        this.line = d3.svg
+            .line()
+            .interpolate('step-after')
+            .x((d) => d.cx)
+            .y((d) => d.cy);
         this.dim = [200, 100];
         this.highlight = {
             category: {
@@ -316,20 +324,20 @@ export class LayoutedProvVis extends AVisInstance {
                 selection: false,
                 logic: false,
                 layout: false,
-                none: false
+                none: false,
             },
             operation: {
                 create: false,
                 remove: false,
                 update: false,
-                none: false
+                none: false,
             },
-            tags: []
+            tags: [],
         };
         this.options = BaseUtils.mixin({
             thumbnails: true,
             provVisCollapsed: false,
-            hideCLUEButtonsOnCollapse: false
+            hideCLUEButtonsOnCollapse: false,
         }, options);
         this.options.scale = [1, 1];
         this.options.rotate = 0;
@@ -383,10 +391,9 @@ export class LayoutedProvVis extends AVisInstance {
         if (arguments.length === 1) {
             return this.options[name];
         }
-        else {
-            this.fire('option.' + name, val, this.options[name]);
-            this.options[name] = val;
-        }
+        this.fire(`option.${name}`, val, this.options[name]);
+        this.options[name] = val;
+        return undefined;
     }
     build($parent) {
         //  scale = this.options.scale;
@@ -394,14 +401,14 @@ export class LayoutedProvVis extends AVisInstance {
         if ($p.empty()) {
             $p = $parent.append('aside').classed('provenance-layout-vis', true);
         }
-        $p
-            .classed('collapsed', this.options.provVisCollapsed)
-            .style('transform', 'rotate(' + this.options.rotate + 'deg)');
+        $p.classed('collapsed', this.options.provVisCollapsed).style('transform', `rotate(${this.options.rotate}deg)`);
         if (this.options.hideCLUEButtonsOnCollapse && this.options.provVisCollapsed) {
             d3.select('header.clue-modeselector').classed('collapsed', true);
         }
         $p.html(`
-      <a href="#" class="btn-collapse" title="${(this.options.provVisCollapsed) ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph') : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph')}"><i class="far ${(this.options.provVisCollapsed) ? 'fa-arrow-alt-circle-left' : 'fa-arrow-alt-circle-right'}"></i></a>
+      <a href="#" class="btn-collapse" title="${this.options.provVisCollapsed
+            ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph')
+            : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph')}"><i class="far ${this.options.provVisCollapsed ? 'fa-arrow-alt-circle-left' : 'fa-arrow-alt-circle-right'}"></i></a>
       <div>
         <h2>
           <i class="fas fa-code-branch fa-rotate-180"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.provenance')}
@@ -496,10 +503,11 @@ export class LayoutedProvVis extends AVisInstance {
         </div>
       </div>
     `);
-        //init the toolbar filter options
+        // init the toolbar filter options
         const jp = $($p.node());
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
-        //must use bootstrap since they are manually triggered
+        // must use bootstrap since they are manually triggered
         jp.find('div.toolbar input, .legend input').on('change', function () {
             const inputElement = this;
             if (inputElement.type === 'text') {
@@ -511,7 +519,7 @@ export class LayoutedProvVis extends AVisInstance {
             }
             that.update();
         });
-        //initialize bootstrap
+        // initialize bootstrap
         import('jquery').then((jquery) => {
             // avoid Property 'button' does not exist on type 'JQuery<HTMLElement>'
             // @ts-ignore
@@ -525,7 +533,9 @@ export class LayoutedProvVis extends AVisInstance {
             evt.preventDefault();
             const collapsed = !$p.classed('collapsed');
             this.toggleBinding(!collapsed);
-            $p.select('.btn-collapse').attr('title', collapsed ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph') : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph'));
+            $p.select('.btn-collapse').attr('title', collapsed
+                ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph')
+                : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph'));
             $p.select('.btn-collapse > i').classed('fa-arrow-alt-circle-right', !collapsed).classed('fa-arrow-alt-circle-left', collapsed);
             $p.classed('collapsed', collapsed);
             if (this.options.hideCLUEButtonsOnCollapse) {
@@ -540,6 +550,7 @@ export class LayoutedProvVis extends AVisInstance {
         this.data.jumpTo(d.s);
     }
     update() {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         const graph = this.data;
         const lod = DetailUtils.getLevelOfDetail();
@@ -548,8 +559,13 @@ export class LayoutedProvVis extends AVisInstance {
         this.$node.classed('small', lod === LevelOfDetail.Small);
         this.$node.classed('xsmall', lod === LevelOfDetail.ExtraSmall);
         const states = StateRepr.toRepr(graph, this.highlight, { thumbnails: this.options.thumbnails });
-        const $states = this.$node.select('div.states').selectAll('div.state').data(states, (d) => '' + d.s.id);
-        const $statesEnter = $states.enter().append('div')
+        const $states = this.$node
+            .select('div.states')
+            .selectAll('div.state')
+            .data(states, (d) => `${d.s.id}`);
+        const $statesEnter = $states
+            .enter()
+            .append('div')
             .classed('state', true)
             .attr('data-id', (d) => d.s.id)
             .append('div')
@@ -563,7 +579,7 @@ export class LayoutedProvVis extends AVisInstance {
             .attr('draggable', true)
             .on('dragstart', (d) => {
             const e = d3.event;
-            e.dataTransfer.effectAllowed = 'copy'; //none, copy, copyLink, copyMove, link, linkMove, move, all
+            e.dataTransfer.effectAllowed = 'copy'; // none, copy, copyLink, copyMove, link, linkMove, move, all
             e.dataTransfer.setData('text/plain', d.s.name);
             e.dataTransfer.setData('application/phovea-prov-state', String(d.s.id));
         })
@@ -572,15 +588,20 @@ export class LayoutedProvVis extends AVisInstance {
                 d3.select(this).classed('hover', true);
                 return false;
             }
-        }).on('dragover', () => {
+            return undefined;
+        })
+            .on('dragover', () => {
             if (DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-state')) {
                 d3.event.preventDefault();
                 DnDUtils.getInstance().updateDropEffect(d3.event);
                 return false;
             }
-        }).on('dragleave', function () {
+            return undefined;
+        })
+            .on('dragleave', function () {
             d3.select(this).classed('hover', false);
-        }).on('drop', function (d) {
+        })
+            .on('drop', function (d) {
             d3.select(this).classed('hover', false);
             const e = d3.event;
             e.preventDefault();
@@ -591,7 +612,7 @@ export class LayoutedProvVis extends AVisInstance {
         const $inner = $statesEnter;
         $inner.append('i').attr('class', 'fas fa-circle glyph');
         $inner.append('span').classed('icon', true);
-        /*$states_enter.append('span').attr('class','fas fa-star').on('click', (d) => {
+        /* $states_enter.append('span').attr('class','fas fa-star').on('click', (d) => {
           d.s.setAttr('starred',!d.s.getAttr('starred',false));
           d3.event.stopPropagation();
           d3.event.preventDefault();
@@ -603,11 +624,14 @@ export class LayoutedProvVis extends AVisInstance {
           });
           d3.event.stopPropagation();
           d3.event.preventDefault();
-        });*/
+        }); */
         $inner.append('span').classed('slabel', true);
         $inner.append('div').classed('sthumbnail', true);
         const $toolbarEnter = $statesEnter.append('div').classed('toolbar', true);
-        $toolbarEnter.append('i').attr('class', 'bookmark far fa-bookmark').on('click', function (d) {
+        $toolbarEnter
+            .append('i')
+            .attr('class', 'bookmark far fa-bookmark')
+            .on('click', function (d) {
             const v = !d.s.getAttr('starred', false);
             const e = d3.event;
             d.s.setAttr('starred', v);
@@ -615,7 +639,10 @@ export class LayoutedProvVis extends AVisInstance {
             e.stopPropagation();
             e.preventDefault();
         });
-        $toolbarEnter.append('i').attr('class', 'fas fa-edit').on('click', (d) => {
+        $toolbarEnter
+            .append('i')
+            .attr('class', 'fas fa-edit')
+            .on('click', (d) => {
             const e = d3.event;
             d.showDialog();
             e.stopPropagation();
@@ -623,8 +650,8 @@ export class LayoutedProvVis extends AVisInstance {
         });
         $states.call(StateRepr.render);
         $states.exit().remove();
-        //just for the entered ones
-        //(<any>$($states_enter[0][0]).find<HTMLElement>('> span.icon')).popover(StateRepr.popover)
+        // just for the entered ones
+        // (<any>$($states_enter[0][0]).find<HTMLElement>('> span.icon')).popover(StateRepr.popover)
         //  .parent().on({
         //    mouseenter: function () {
         //      var $icon = $(this).find<HTMLElement>('> span.icon');
@@ -653,31 +680,34 @@ export class LayoutedProvVis extends AVisInstance {
         });
         this.dim = [
             d3.max(states, (s) => s.xy[0] + s.size[0]) + (lod >= LevelOfDetail.Medium ? 200 : 0),
-            d3.max(states, (s) => s.xy[1] + s.size[1])
+            d3.max(states, (s) => s.xy[1] + s.size[1]),
         ];
-        this.$node.select('svg')
-            .attr('width', this.dim[0])
-            .attr('height', this.dim[1]);
-        const $edges = this.$node.select('svg g.edges').selectAll('path').data(edges, (d) => d.s.s.id + '-' + d.t.s.id);
+        this.$node.select('svg').attr('width', this.dim[0]).attr('height', this.dim[1]);
+        const $edges = this.$node
+            .select('svg g.edges')
+            .selectAll('path')
+            .data(edges, (d) => `${d.s.s.id}-${d.t.s.id}`);
         $edges.enter().append('path');
         $edges.transition().attr('d', (d) => this.line([d.s, d.t]));
         $edges.exit().remove();
         this.updateStoryHighlight();
     }
     updateStoryHighlight() {
-        //TODO hide if not needed
+        // TODO hide if not needed
         const $g = this.$node.select('svg g.storyhighlights');
         const $states = this.$node.select('div.states').selectAll('div.state');
         const states = $states.data();
         const lookup = {};
-        states.forEach((s) => lookup[s.s.id] = s);
+        states.forEach((s) => (lookup[s.s.id] = s));
         let firstSlide = this.data.selectedSlides()[0] || this.data.getSlideChains()[0];
         if (firstSlide) {
             $g.style('display', null);
             while (firstSlide.previous) {
                 firstSlide = firstSlide.previous;
             }
-            const line = SlideNode.toSlidePath(firstSlide).map((s) => s.state ? lookup[s.state.id] : null).filter((d) => !!d);
+            const line = SlideNode.toSlidePath(firstSlide)
+                .map((s) => (s.state ? lookup[s.state.id] : null))
+                .filter((d) => !!d);
             $states.classed('story_member', (d) => line.indexOf(d) >= 0);
             $g.select('path').attr('d', this.line.interpolate('linear')(line));
             this.line.interpolate('step-after');

@@ -62,3 +62,4 @@ export interface IDPair {
     readonly name: string;
     readonly id: number;
 }
+//# sourceMappingURL=IDType.d.ts.map

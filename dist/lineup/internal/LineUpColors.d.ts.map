@@ -1,0 +1,1 @@
+{"version":3,"file":"LineUpColors.d.ts","sourceRoot":"","sources":["../../../src/lineup/internal/LineUpColors.ts"],"names":[],"mappings":"AAGA,qBAAa,YAAY;IACvB;;OAEG;IACH,OAAO,CAAC,QAAQ,CAAC,QAAQ,CAAuD;IAEhF,OAAO,CAAC,MAAM,CAQV;IAEJ,cAAc,CAAC,EAAE,EAAE,MAAM,GAAG,MAAM;IAkBlC,eAAe,CAAC,EAAE,EAAE,MAAM,GAAG,IAAI;IAYjC,KAAK;CAGN"}

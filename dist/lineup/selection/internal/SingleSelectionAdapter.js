@@ -21,11 +21,13 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
         return this.addDynamicColumns(context, selectedIds);
     }
     createColumnsFor(context, id) {
-        return ResolveNow.resolveImmediately(this.adapter.createDesc(id)).then((desc) => [{
+        return ResolveNow.resolveImmediately(this.adapter.createDesc(id)).then((desc) => [
+            {
                 desc: ABaseSelectionAdapter.patchDesc(desc, id),
                 data: this.adapter.loadData(id),
-                id
-            }]);
+                id,
+            },
+        ]);
     }
 }
 //# sourceMappingURL=SingleSelectionAdapter.js.map

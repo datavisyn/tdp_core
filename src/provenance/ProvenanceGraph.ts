@@ -1,34 +1,40 @@
-import {BaseUtils} from '../base/BaseUtils';
-import {AppContext} from '../app/AppContext';
-import {IDType, SelectOperation, SelectionUtils, IDTypeManager} from '../idtype';
-import {ADataType} from '../data/datatype';
-import {ObjectNode, IObjectRef, ObjectRefUtils} from './ObjectNode';
-import {StateNode, } from './StateNode';
-import {ActionNode} from './ActionNode';
-import {IAction} from './ICmd';
-import {SlideNode} from './SlideNode';
-import {GraphEdge, GraphNode} from '../graph/graph';
-import {GraphBase} from '../graph/GraphBase';
-import {ResolveNow} from '../base/promise';
-import {ProvenanceGraphDim} from './provenance';
-import {IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph} from './ICmd';
-import {ProvenanceGraphUtils} from './ProvenanceGraphUtils';
-import {MemoryGraph} from '../graph/MemoryGraph';
-import {ActionMetaData} from './ActionMeta';
+import { BaseUtils } from '../base/BaseUtils';
+import { AppContext } from '../app/AppContext';
+import { IDType, SelectOperation, SelectionUtils, IDTypeManager } from '../idtype';
+import { ADataType } from '../data/datatype';
+import { ObjectNode, IObjectRef, ObjectRefUtils } from './ObjectNode';
+import { StateNode } from './StateNode';
+import { ActionNode } from './ActionNode';
+import { IAction, IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
+import { SlideNode } from './SlideNode';
+import { GraphEdge, GraphNode } from '../graph/graph';
+import { GraphBase } from '../graph/GraphBase';
+import { ResolveNow } from '../base/promise';
+import { ProvenanceGraphDim } from './provenance';
+import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
+import { MemoryGraph } from '../graph/MemoryGraph';
+import { ActionMetaData } from './ActionMeta';
 
 export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> implements IProvenanceGraph {
   private static readonly PROPAGATED_EVENTS = ['sync', 'add_edge', 'add_node', 'sync_node', 'sync_edge', 'sync_start'];
+
   private _actions: ActionNode[] = [];
+
   private _objects: ObjectNode<any>[] = [];
+
   private _states: StateNode[] = [];
+
   private _slides: SlideNode[] = [];
 
   act: StateNode = null;
+
   private lastAction: ActionNode = null;
 
-  //currently executing promise
+  // currently executing promise
   private currentlyRunning = false;
+
   executeCurrentActionWithin = -1;
+
   private nextQueue: (() => any)[] = [];
 
   constructor(desc: IProvenanceGraphDataDescription, public backend: GraphBase) {
@@ -40,21 +46,21 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       this._states.push(this.act);
       this.backend.addNode(this.act);
     } else {
-      const act = (<any>desc).act;
-      this._actions = <any>this.backend.nodes.filter((n) => (n instanceof ActionNode));
-      this._objects = <any>this.backend.nodes.filter((n) => (n instanceof ObjectNode));
-      this._states = <any>this.backend.nodes.filter((n) => (n instanceof StateNode));
-      this._slides = <any>this.backend.nodes.filter((n) => (n instanceof SlideNode));
+      const { act } = <any>desc;
+      this._actions = <any>this.backend.nodes.filter((n) => n instanceof ActionNode);
+      this._objects = <any>this.backend.nodes.filter((n) => n instanceof ObjectNode);
+      this._states = <any>this.backend.nodes.filter((n) => n instanceof StateNode);
+      this._slides = <any>this.backend.nodes.filter((n) => n instanceof SlideNode);
       this.act = <StateNode>(act >= 0 ? this.getStateById(act) : this._states[0]);
     }
   }
 
   migrateBackend(backend: GraphBase) {
-    //asserts that the old backend and the new one have the same nodes inside of them
+    // asserts that the old backend and the new one have the same nodes inside of them
     this.stopPropagation(this.backend, ...ProvenanceGraph.PROPAGATED_EVENTS);
     this.backend = backend;
     this.propagate(this.backend, ...ProvenanceGraph.PROPAGATED_EVENTS);
-    //hack to update the description object
+    // hack to update the description object
     (<any>this).desc = <IProvenanceGraphDataDescription>backend.desc;
   }
 
@@ -67,17 +73,17 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
   }
 
   selectState(state: StateNode, op: SelectOperation = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, extras = {}) {
-    this.fire('select_state,select_state_' + type, state, type, op, extras);
+    this.fire(`select_state,select_state_${type}`, state, type, op, extras);
     this.idtypes[ProvenanceGraphDim.State].select(type, state ? [this._states.indexOf(state).toString()] : [], op);
   }
 
   selectSlide(slide: SlideNode, op: SelectOperation = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, extras = {}) {
-    this.fire('select_slide,select_slide_' + type, slide, type, op, extras);
+    this.fire(`select_slide,select_slide_${type}`, slide, type, op, extras);
     this.idtypes[ProvenanceGraphDim.Slide].select(type, slide ? [this._slides.indexOf(slide).toString()] : [], op);
   }
 
   selectAction(action: ActionNode, op: SelectOperation = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
-    this.fire('select_action,select_action_' + type, action, type, op);
+    this.fire(`select_action,select_action_${type}`, action, type, op);
     this.idtypes[ProvenanceGraphDim.Action].select(type, action ? [this._actions.indexOf(action).toString()] : [], op);
   }
 
@@ -180,7 +186,7 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return this.backend.edges;
   }
 
-  private addEdge(s: GraphNode, type: string, t: GraphNode, attrs:any = {}) {
+  private addEdge(s: GraphNode, type: string, t: GraphNode, attrs: any = {}) {
     const l = new GraphEdge(type, s, t);
     Object.keys(attrs).forEach((attr) => l.setAttr(attr, attrs[attr]));
     this.backend.addEdge(l);
@@ -198,28 +204,28 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     this.backend.addNode(r);
     this.fire('add_action', r);
     inobjects.forEach((obj, i) => {
-      this.addEdge(r, 'requires', obj, {index: i});
+      this.addEdge(r, 'requires', obj, { index: i });
     });
     return r;
   }
 
   createInverse(action: ActionNode, inverter: IInverseActionCreator) {
-    const creates = action.creates,
-      removes = action.removes;
+    const { creates } = action;
+    const { removes } = action;
     const i = inverter.call(action, action.requires, creates, removes);
     const inverted = this.createAction(i.meta, i.id, i.f, i.inputs, i.parameter);
     inverted.onceExecuted = true;
     this.addEdge(inverted, 'inverses', action);
 
-    //the inverted action should create the removed ones and removes the crated ones
-    removes.forEach((c, i) => {
-      this.addEdge(inverted, 'creates', c, {index: i});
+    // the inverted action should create the removed ones and removes the crated ones
+    removes.forEach((c, index) => {
+      this.addEdge(inverted, 'creates', c, { index });
     });
     creates.forEach((c) => {
       this.addEdge(inverted, 'removes', c);
     });
 
-    //create the loop in the states
+    // create the loop in the states
     this.addEdge(StateNode.resultsIn(action), 'next', inverted);
     this.addEdge(inverted, 'resultsIn', StateNode.previous(action));
 
@@ -228,14 +234,13 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
 
   push(action: IAction): Promise<ICmdResult>;
   push(meta: ActionMetaData, functionId: string, f: ICmdFunction, inputs: IObjectRef<any>[], parameter: any): Promise<ICmdResult>;
-  push(arg: any, functionId: string = '', f: ICmdFunction = null, inputs: IObjectRef<any>[] = [], parameter: any = {}) {
+  push(arg: any, functionId = '', f: ICmdFunction = null, inputs: IObjectRef<any>[] = [], parameter: any = {}) {
     return this.inOrder(() => {
       if (arg instanceof ActionMetaData) {
         return this.run(this.createAction(<ActionMetaData>arg, functionId, f, inputs, parameter), null);
-      } else {
-        const a = <IAction>arg;
-        return this.run(this.createAction(a.meta, a.id, a.f, a.inputs || [], a.parameter || {}), null);
       }
+      const a = <IAction>arg;
+      return this.run(this.createAction(a.meta, a.id, a.f, a.inputs || [], a.parameter || {}), null);
     });
   }
 
@@ -254,16 +259,21 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return null;
   }
 
-
-  addObject<T>(value: T, name: string = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = name + '_' + category) {
+  addObject<T>(value: T, name: string = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = `${name}_${category}`) {
     return this.addObjectImpl(value, name, category, hash, true);
   }
 
-  addJustObject<T>(value: T, name: string = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = name + '_' + category) {
+  addJustObject<T>(value: T, name: string = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = `${name}_${category}`) {
     return this.addObjectImpl(value, name, category, hash, false);
   }
 
-  private addObjectImpl<T>(value: T, name: string = value ? value.toString() : 'Null', category = ObjectRefUtils.category.data, hash = name + '_' + category, createEdge = false) {
+  private addObjectImpl<T>(
+    value: T,
+    name: string = value ? value.toString() : 'Null',
+    category = ObjectRefUtils.category.data,
+    hash = `${name}_${category}`,
+    createEdge = false,
+  ) {
     const r = new ObjectNode<T>(value, name, category, hash);
     this._objects.push(r);
     this.backend.addNode(r);
@@ -282,7 +292,7 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       if ((<any>r)._resolvesTo instanceof ObjectNode) {
         return <ObjectNode<any>>(<any>r)._resolvesTo;
       }
-      //else create a new instance
+      // else create a new instance
       const result = this.addJustObject(r.value, r.name, r.category, r.hash);
       (<any>r)._resolvesTo = result;
       return result;
@@ -296,21 +306,21 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     if ((<any>r)._resolvesTo instanceof ObjectNode) {
       return <ObjectNode<any>>(<any>r)._resolvesTo;
     }
-    //else create a new instance
+    // else create a new instance
     const result = arr.find(ProvenanceGraphUtils.findMetaObject(r));
     (<any>r)._resolvesTo = result;
     return result;
   }
 
-  findOrAddObject<T>(i: T|IObjectRef<T>, name?: string, type?: any): ObjectNode<T> {
+  findOrAddObject<T>(i: T | IObjectRef<T>, name?: string, type?: any): ObjectNode<T> {
     return this.findOrAddObjectImpl(i, name, type, true);
   }
 
-  findOrAddJustObject<T>(i: T|IObjectRef<T>, name?: string, type?: any): ObjectNode<T> {
+  findOrAddJustObject<T>(i: T | IObjectRef<T>, name?: string, type?: any): ObjectNode<T> {
     return this.findOrAddObjectImpl(i, name, type, false);
   }
 
-  private findOrAddObjectImpl<T>(i: T|IObjectRef<T>, name?: string, type?: any, createEdge = false): ObjectNode<T> {
+  private findOrAddObjectImpl<T>(i: T | IObjectRef<T>, name?: string, type?: any, createEdge = false): ObjectNode<T> {
     let r: ObjectNode<T>;
     const j = <any>i;
     if (i instanceof ObjectNode) {
@@ -319,47 +329,50 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     if (j._resolvesTo instanceof ObjectNode) {
       return <ObjectNode<T>>j._resolvesTo;
     }
-    if (j.hasOwnProperty('value') && j.hasOwnProperty('name')) { //sounds like an proxy
+    if (j.hasOwnProperty('value') && j.hasOwnProperty('name')) {
+      // sounds like an proxy
       j.category = j.category || ObjectRefUtils.category.data;
       r = this._objects.find(ProvenanceGraphUtils.findMetaObject(j));
       if (r) {
-        if (r.value === null) { //restore instance
+        if (r.value === null) {
+          // restore instance
           r.value = j.value;
         }
-        //cache result
+        // cache result
         j._resolvesTo = r;
         return r;
       }
       return this.addObjectImpl(j.value, j.name, j.category, j.hash, createEdge);
-    } else { //raw value
-      r = this._objects.find((obj) => (obj.value === null || obj.value === i) && (name === null || obj.name === name) && (type === null || type === obj.category));
-      if (r) {
-        if (r.value === null) { //restore instance
-          r.value = <T>i;
-        }
-        return r;
+    } // raw value
+    r = this._objects.find(
+      (obj) => (obj.value === null || obj.value === i) && (name === null || obj.name === name) && (type === null || type === obj.category),
+    );
+    if (r) {
+      if (r.value === null) {
+        // restore instance
+        r.value = <T>i;
       }
-      return this.addObjectImpl(<any>i, name, type, name + '_' + type, createEdge);
+      return r;
     }
+    return this.addObjectImpl(<any>i, name, type, `${name}_${type}`, createEdge);
   }
 
   private inOrder(f: () => PromiseLike<any>): PromiseLike<any> {
     if (this.currentlyRunning) {
-      let helper: ()=>void;
+      let helper: () => void;
       const r = new Promise((resolve) => {
         helper = resolve.bind(this);
       });
       this.nextQueue.push(helper);
       return r.then(f);
-    } else {
-      return f();
     }
+    return f();
   }
 
   private executedAction(action: ActionNode, newState: boolean, result: ICmdResult) {
     const current = this.act;
     const next = StateNode.resultsIn(action);
-    result = BaseUtils.mixin({created: [], removed: [], inverse: null, consumed: 0}, result);
+    result = BaseUtils.mixin({ created: [], removed: [], inverse: null, consumed: 0 }, result);
     this.fire('executed', action, result);
 
     const firstTime = !action.onceExecuted;
@@ -369,21 +382,21 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     let removed: ObjectNode<any>[];
 
     if (firstTime) {
-      //create an link outputs
+      // create an link outputs
       //
       created = this.resolve(result.created);
       created.forEach((c, i) => {
-        this.addEdge(action, 'creates', c, {index: i});
+        this.addEdge(action, 'creates', c, { index: i });
       });
       // a removed one should be part of the inputs
-      const requires = action.requires;
+      const { requires } = action;
       removed = result.removed.map((r) => ProvenanceGraph.findInArray(requires, r));
       removed.forEach((c) => {
-        c.value = null; //free reference
+        c.value = null; // free reference
         this.addEdge(action, 'removes', c);
       });
 
-      //update new state
+      // update new state
       if (newState) {
         const objs = current.consistsOf;
         objs.push.apply(objs, created);
@@ -396,12 +409,12 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       this.fire('executed_first', action, next);
     } else {
       created = action.creates;
-      //update creates reference values
+      // update creates reference values
       created.forEach((c, i) => {
         c.value = result.created[i].value;
       });
       removed = action.removes;
-      removed.forEach((c) => c.value = null);
+      removed.forEach((c) => (c.value = null));
     }
     result.inverse = ProvenanceGraphUtils.asFunction(result.inverse);
     ProvenanceGraph.updateInverse(action, this, <IInverseActionCreator>result.inverse);
@@ -413,14 +426,15 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       state: next,
       created,
       removed,
-      consumed: result.consumed
+      consumed: result.consumed,
     };
   }
 
   private run(action: ActionNode, result: ICmdResult, withinMilliseconds: number | (() => number) = -1): PromiseLike<ICmdResult> {
-    let next: StateNode = StateNode.resultsIn(action),
-      newState = false;
-    if (!next) { //create a new state
+    let next: StateNode = StateNode.resultsIn(action);
+    let newState = false;
+    if (!next) {
+      // create a new state
       newState = true;
       this.addEdge(this.act, 'next', action);
       next = this.makeState(action.meta.name);
@@ -428,18 +442,20 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     }
     this.fire('execute', action);
     if (AppContext.getInstance().hash.has('debug')) {
-      console.log('execute ' + action.meta + ' ' + action.f_id);
+      console.log(`execute ${action.meta} ${action.f_id}`);
     }
     this.currentlyRunning = true;
 
-    if (typeof(withinMilliseconds) === 'function') {
+    if (typeof withinMilliseconds === 'function') {
       withinMilliseconds = (<any>withinMilliseconds)();
     }
     this.executeCurrentActionWithin = <number>withinMilliseconds;
 
-    const runningAction = (result ? ResolveNow.resolveImmediately(result) : ProvenanceGraph.execute(action, this, this.executeCurrentActionWithin)).then(this.executedAction.bind(this, action, newState));
+    const runningAction = (result ? ResolveNow.resolveImmediately(result) : ProvenanceGraph.execute(action, this, this.executeCurrentActionWithin)).then(
+      this.executedAction.bind(this, action, newState),
+    );
 
-    runningAction.then((result) => {
+    runningAction.then(() => {
       const q = this.nextQueue.shift();
       if (q) {
         q();
@@ -472,17 +488,16 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       }
       return ResolveNow.resolveImmediately([]);
     }
-    //actions = compress(actions, null);
+    // actions = compress(actions, null);
     const last = actions[actions.length - 1];
 
     const torun = await ProvenanceGraphUtils.compressGraph(actions);
-
 
     let remaining = withinMilliseconds;
 
     function guessTime(index: number) {
       const left = torun.length - index;
-      return () => remaining < 0 ? -1 : remaining / left; //uniformly distribute
+      return () => (remaining < 0 ? -1 : remaining / left); // uniformly distribute
     }
 
     function updateTime(consumed: number) {
@@ -490,9 +505,10 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     }
 
     this.fire('run_chain', torun);
-    const results =[];
+    const results = [];
     for (let i = 0; i < torun.length; ++i) {
       const action = torun[i];
+      // eslint-disable-next-line no-await-in-loop
       const result = await this.run(action, null, withinMilliseconds < 0 ? -1 : guessTime(i));
       results.push(result);
       updateTime(result.consumed);
@@ -509,34 +525,34 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     if (!this.lastAction) {
       return ResolveNow.resolveImmediately(null);
     }
-    //create and store the inverse
+    // create and store the inverse
     if (this.lastAction.inverses != null) {
-      //undo and undoing should still go one up
+      // undo and undoing should still go one up
       return this.jumpTo(this.act.previousState);
-    } else {
-      return this.inOrder(() => this.run(ProvenanceGraph.getOrCreateInverse(this.lastAction, this), null));
     }
+    return this.inOrder(() => this.run(ProvenanceGraph.getOrCreateInverse(this.lastAction, this), null));
   }
 
   jumpTo(state: StateNode, withinMilliseconds = -1) {
     return this.inOrder(() => {
       let actions: ActionNode[] = [];
-      const act = this.act;
-      if (act === state) { //jump to myself
+      const { act } = this;
+      if (act === state) {
+        // jump to myself
         return withinMilliseconds >= 0 ? BaseUtils.resolveIn(withinMilliseconds).then(() => []) : ResolveNow.resolveImmediately([]);
       }
-      //lets look at the simple past
-      const actPath = act.path,
-        targetPath = state.path;
+      // lets look at the simple past
+      const actPath = act.path;
+      const targetPath = state.path;
       const common = ProvenanceGraphUtils.findCommon(actPath, targetPath);
       if (common) {
-        const toRevert = actPath.slice(common.i + 1).reverse(),
-          toForward = targetPath.slice(common.j + 1);
+        const toRevert = actPath.slice(common.i + 1).reverse();
+        const toForward = targetPath.slice(common.j + 1);
         actions = actions.concat(toRevert.map((r) => ProvenanceGraph.getOrCreateInverse(r.resultsFrom[0], this)));
         actions = actions.concat(toForward.map((r) => r.resultsFrom[0]));
       }
-      //no in the direct branches maybe in different loop instances?
-      //TODO
+      // no in the direct branches maybe in different loop instances?
+      // TODO
       return this.runChain(actions, withinMilliseconds);
     });
   }
@@ -548,9 +564,9 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
    * @param objectReplacements mappings of object replacements
    * @returns {boolean}
    */
-  fork(action: ActionNode, target: StateNode, objectReplacements: {from: IObjectRef<any>, to: IObjectRef<any>}[] = []) {
-    //sanity check if target is a child of target ... bad
-    //collect all states
+  fork(action: ActionNode, target: StateNode, objectReplacements: { from: IObjectRef<any>; to: IObjectRef<any> }[] = []) {
+    // sanity check if target is a child of target ... bad
+    // collect all states
     const all: StateNode[] = [];
     const queue = [StateNode.resultsIn(action)];
     while (queue.length > 0) {
@@ -562,52 +578,58 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       queue.push.apply(queue, next.nextStates);
     }
     if (all.indexOf(target) >= 0) {
-      return false; //target is a child of state
+      return false; // target is a child of state
     }
 
     const targetObjects = target.consistsOf;
     const sourceObjects = StateNode.previous(action).consistsOf;
-    //function isSame(a: any[], b : any[]) {
+    // function isSame(a: any[], b : any[]) {
     //  return a.length === b.length && a.every((ai, i) => ai === b[i]);
-    //}
-    //if (isSame(targetObjects, sourceObjects)) {
-    //no state change ~ similar state, just create a link
-    //we can copy the action and point to the same target
+    // }
+    // if (isSame(targetObjects, sourceObjects)) {
+    // no state change ~ similar state, just create a link
+    // we can copy the action and point to the same target
     //  const clone = this.initAction(action.clone(), action.requires);
     //  this.addEdge(target, 'next', clone);
     //  this.addEdge(clone, 'resultsIn', action.resultsIn);
-    //} else {
+    // } else {
     const removedObjects = sourceObjects.filter((o) => targetObjects.indexOf(o) < 0);
-    const replacements: {[id: string]: IObjectRef<any>} = {};
-    objectReplacements.forEach((d) => replacements[this.findOrAddObject(d.from).id] = d.to);
-    //need to copy all the states and actions
+    const replacements: { [id: string]: IObjectRef<any> } = {};
+    objectReplacements.forEach((d) => (replacements[this.findOrAddObject(d.from).id] = d.to));
+    // need to copy all the states and actions
     this.copyBranch(action, target, removedObjects, replacements);
-    //}
+    // }
 
     this.fire('forked_branch', action, target);
     return true;
   }
 
-  private copyAction(action: ActionNode, appendTo: StateNode, objectReplacements: {[id: string]: IObjectRef<any>}) {
-    const clone = this.initAction(action.clone(), action.requires.map((a) => objectReplacements[String(a.id)] || a));
+  private copyAction(action: ActionNode, appendTo: StateNode, objectReplacements: { [id: string]: IObjectRef<any> }) {
+    const clone = this.initAction(
+      action.clone(),
+      action.requires.map((a) => objectReplacements[String(a.id)] || a),
+    );
     this.addEdge(appendTo, 'next', clone);
     const s = this.makeState(StateNode.resultsIn(action).name, StateNode.resultsIn(action).description);
     this.addEdge(clone, 'resultsIn', s);
     return s;
   }
 
-  private copyBranch(action: ActionNode, target: StateNode, removedObject: ObjectNode<any>[], objectReplacements: {[id: string]: IObjectRef<any>}) {
-    const queue = [{a: action, b: target}];
+  private copyBranch(action: ActionNode, target: StateNode, removedObject: ObjectNode<any>[], objectReplacements: { [id: string]: IObjectRef<any> }) {
+    const queue = [{ a: action, b: target }];
     while (queue.length > 0) {
       const next = queue.shift();
-      let b = next.b;
-      const a = next.a;
+      let { b } = next;
+      const { a } = next;
       const someRemovedObjectRequired = a.requires.some((ai) => removedObject.indexOf(ai) >= 0 && !(String(ai.id) in objectReplacements));
       if (!someRemovedObjectRequired) {
-        //copy it and create a new pair to execute
+        // copy it and create a new pair to execute
         b = this.copyAction(a, next.b, objectReplacements);
       }
-      queue.push.apply(queue, StateNode.resultsIn(a).next.map((aa) => ({a: aa, b})));
+      queue.push.apply(
+        queue,
+        StateNode.resultsIn(a).next.map((aa) => ({ a: aa, b })),
+      );
     }
   }
 
@@ -660,8 +682,7 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
    this.backend.addEdge(n);
    });
    return this;
-   }*/
-
+   } */
 
   wrapAsSlide(state: StateNode) {
     const node = new SlideNode();
@@ -680,7 +701,10 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
         clone.setAttr(attr, state.getAttr(attr, null));
       }
     });
-    clone.setAttr('annotations', state.annotations.map((a) => BaseUtils.mixin({}, a)));
+    clone.setAttr(
+      'annotations',
+      state.annotations.map((a) => BaseUtils.mixin({}, a)),
+    );
     return clone;
   }
 
@@ -695,8 +719,8 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       this.fire('add_slide', node);
       return node;
     };
-    let slide: SlideNode = addStartEnd ? addSlide(SlideNode.makeText('Unnamed Story')) : null,
-      prev = slide;
+    let slide: SlideNode = addStartEnd ? addSlide(SlideNode.makeText('Unnamed Story')) : null;
+    let prev = slide;
     states.forEach((s, i) => {
       const node = addSlide(new SlideNode());
       node.name = s.name;
@@ -730,7 +754,6 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return s;
   }
 
-
   makeTextSlide(title?: string) {
     const s = SlideNode.makeText(title);
     this._slides.push(s);
@@ -739,7 +762,7 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return s;
   }
 
-  insertIntoSlide(toInsert: SlideNode, slide: SlideNode, beforeIt: boolean = false) {
+  insertIntoSlide(toInsert: SlideNode, slide: SlideNode, beforeIt = false) {
     this.moveSlide(toInsert, slide, beforeIt);
   }
 
@@ -748,30 +771,34 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return this.moveSlide(elem, s[s.length - 1], false);
   }
 
-  moveSlide(node: SlideNode, to: SlideNode, beforeIt: boolean = false) {
+  moveSlide(node: SlideNode, to: SlideNode, beforeIt = false) {
     if ((beforeIt && node.next === to) || (!beforeIt && node.previous === to)) {
-      return; //already matches
+      return; // already matches
     }
-    //1. extract the node
-    //create other links
+    // 1. extract the node
+    // create other links
     const prev = node.previous;
     if (prev) {
       node.nexts.forEach((n) => {
         this.addEdge(prev, 'next', n);
       });
     }
-    //remove links
-    this.edges.filter((e) => (e.source === node || e.target === node) && e.type === 'next').forEach((e) => {
-      this.backend.removeEdge(e);
-    });
+    // remove links
+    this.edges
+      .filter((e) => (e.source === node || e.target === node) && e.type === 'next')
+      .forEach((e) => {
+        this.backend.removeEdge(e);
+      });
 
-    //insert into the new place
+    // insert into the new place
     if (beforeIt) {
       const tprev = to.previous;
       if (tprev) {
-        this.edges.filter((e) => (e.target === to) && e.type === 'next').forEach((e) => {
-          this.backend.removeEdge(e);
-        });
+        this.edges
+          .filter((e) => e.target === to && e.type === 'next')
+          .forEach((e) => {
+            this.backend.removeEdge(e);
+          });
         this.addEdge(tprev, 'next', node);
         this.addEdge(node, 'next', to);
       }
@@ -779,9 +806,11 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     } else {
       const tnexts = to.nexts;
       if (tnexts.length > 0) {
-        this.edges.filter((e) => (e.source === to) && e.type === 'next').forEach((e) => {
-          this.backend.removeEdge(e);
-        });
+        this.edges
+          .filter((e) => e.source === to && e.type === 'next')
+          .forEach((e) => {
+            this.backend.removeEdge(e);
+          });
         tnexts.forEach((next) => {
           this.addEdge(node, 'next', next);
         });
@@ -798,22 +827,24 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
         this.addEdge(prev, 'next', n);
       });
     }
-    this.edges.filter((e) => e.source === node || e.target === node).forEach((e) => {
-      this.backend.removeEdge(e);
-    });
+    this.edges
+      .filter((e) => e.source === node || e.target === node)
+      .forEach((e) => {
+        this.backend.removeEdge(e);
+      });
     this._slides.splice(this._slides.indexOf(node), 1);
     this.backend.removeNode(node);
     this.fire('remove_slide', node);
   }
 
   removeFullSlide(node: SlideNode) {
-    //go to the beginning
+    // go to the beginning
     while (node.previous) {
       node = node.previous;
     }
     const bak = node;
     while (node) {
-      const next = node.next;
+      const { next } = node;
       this.removeSlideNode(node);
       node = next;
     }
@@ -831,7 +862,6 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     this.fire('set_jump_target', node, old ? old.target : null, state);
   }
 
-
   static createDummy() {
     const desc: IProvenanceGraphDataDescription = {
       type: 'provenance_graph',
@@ -844,8 +874,8 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       size: [0, 0],
       attrs: {
         graphtype: 'provenance_graph',
-        of: 'dummy'
-      }
+        of: 'dummy',
+      },
     };
     return new ProvenanceGraph(desc, new MemoryGraph(desc, [], [], ProvenanceGraphUtils.provenanceGraphFactory()));
   }
@@ -858,18 +888,19 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     if (node.inverter) {
       return graph.createInverse(node, node.inverter);
     }
-    node.inverter = null; //not needed anymore
+    node.inverter = null; // not needed anymore
     return null;
   }
 
   static updateInverse(node: ActionNode, graph: ProvenanceGraph, inverter: IInverseActionCreator) {
     const i = node.inversedBy;
-    if (i) { //update with the actual values / parameter only
+    if (i) {
+      // update with the actual values / parameter only
       const c = inverter.call(node, node.requires, node.creates, node.removes);
       i.parameter = c.parameter;
       node.inverter = null;
     } else if (!node.isInverse) {
-      //create inverse action immediatelly
+      // create inverse action immediatelly
       graph.createInverse(node, inverter);
       node.inverter = null;
     } else {
@@ -881,5 +912,4 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     const r = node.f.call(node, node.requires, node.parameter, graph, <number>withinMilliseconds);
     return ResolveNow.resolveImmediately(r);
   }
-
 }

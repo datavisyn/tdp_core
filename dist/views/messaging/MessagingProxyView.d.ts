@@ -35,3 +35,4 @@ export declare class MessagingProxyView extends AView {
     private static isNoNSecurePage;
     private showNoHttpsMessage;
 }
+//# sourceMappingURL=MessagingProxyView.d.ts.map

@@ -2,8 +2,9 @@ import { GraphEdge, AttributeContainer } from '../graph/graph';
 export class NodeUtils {
     static findLatestPath(state) {
         const path = state.path.slice();
-        //compute the first path to the end
-        while ((state = state.nextState) != null && (path.indexOf(state) < 0)) {
+        // compute the first path to the end
+        // eslint-disable-next-line no-cond-assign
+        while ((state = state.nextState) != null && path.indexOf(state) < 0) {
             path.push(state);
         }
         return path;
@@ -29,10 +30,16 @@ export class NodeUtils {
         return node.outgoing.filter(GraphEdge.isGraphType('creates')).map((e) => e.target);
     }
     static removes(node) {
-        return node.outgoing.filter(GraphEdge.isGraphType('removes')).sort(AttributeContainer.byIndex).map((e) => e.target);
+        return node.outgoing
+            .filter(GraphEdge.isGraphType('removes'))
+            .sort(AttributeContainer.byIndex)
+            .map((e) => e.target);
     }
     static requires(node) {
-        return node.outgoing.filter(GraphEdge.isGraphType('requires')).sort(AttributeContainer.byIndex).map((e) => e.target);
+        return node.outgoing
+            .filter(GraphEdge.isGraphType('requires'))
+            .sort(AttributeContainer.byIndex)
+            .map((e) => e.target);
     }
     static resultsIn(node) {
         const r = node.outgoing.filter(GraphEdge.isGraphType('resultsIn'))[0];

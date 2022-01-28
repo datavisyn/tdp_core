@@ -1,9 +1,9 @@
-import {IScore} from '../base/interfaces';
-import {Column} from 'lineupjs';
+import { Column } from 'lineupjs';
+import { IScore } from '../base/interfaces';
 
 export interface IViewProvider {
-    getInstance(): {
-      addTrackedScoreColumn(score: IScore<any>): Promise<{col: Column, loaded: Promise<Column>}>;
-      removeTrackedScoreColumn(columnId: string);
-    };
+  getInstance(): {
+    addTrackedScoreColumn(score: IScore<any>): Promise<{ col: Column; loaded: Promise<Column> }>;
+    removeTrackedScoreColumn(columnId: string);
+  };
 }

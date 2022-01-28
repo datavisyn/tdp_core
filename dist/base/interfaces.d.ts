@@ -2,9 +2,10 @@ import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
 import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import { IPluginDesc, IPlugin, IEventHandler } from '.';
+import { IPluginDesc, IPlugin } from './plugin';
+import { IEventHandler } from './event';
 import { IDType } from '../idtype';
-import { ProvenanceGraph, IObjectRef } from '../provenance';
+import type { ProvenanceGraph, IObjectRef } from '../provenance';
 import { IUser } from '../security';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
@@ -374,6 +375,12 @@ export interface IViewPlugin {
      */
     factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
+export interface IViewWrapperDump {
+    hash: string;
+    plugin: string;
+    dumpReference: number;
+    parameters: object;
+}
 export interface IInstantView {
     readonly node: HTMLElement;
     destroy(): void;
@@ -415,3 +422,4 @@ export interface IAppExtensionExtension {
 export interface IAppExtensionExtensionDesc extends IPluginDesc {
     load(): Promise<IPlugin & IAppExtensionExtension>;
 }
+//# sourceMappingURL=interfaces.d.ts.map

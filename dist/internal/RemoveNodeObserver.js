@@ -1,3 +1,18 @@
+/**
+ * the parents of the given node (including itself) from root to leaf
+ * @param node
+ * @return {Node[]}
+ */
+function parentList(node) {
+    const result = [];
+    let parent = node;
+    while (parent) {
+        result.push(parent);
+        parent = parent.parentNode;
+    }
+    // from top to bottom
+    return result.reverse();
+}
 class RemoveParentObserver {
     constructor(parent) {
         this.parent = parent;
@@ -14,18 +29,18 @@ class RemoveParentObserver {
         this.observer.disconnect();
     }
     onChange(mutations) {
-        //just remove events
+        // just remove events
         const events = mutations.filter((mutation) => mutation.type === 'childList' && mutation.removedNodes.length > 0);
         if (events.length === 0 || this.observed.size === 0) {
             return;
         }
-        //build cache - create the list of parents all the time new to consider moving nodes?
+        // build cache - create the list of parents all the time new to consider moving nodes?
         const toCheck = Array.from(this.observed.entries()).map(([node, callback]) => {
             return { node, callback, parents: parentList(node) };
         });
         const cleanUp = (found) => {
             if (toCheck.length === found.length) {
-                //did we disable all? then we can stop early
+                // did we disable all? then we can stop early
                 this.observed.clear();
                 this.disable();
                 return true;
@@ -37,15 +52,15 @@ class RemoveParentObserver {
             });
             return false;
         };
-        //optimization if the parents of any child doesn't contain the parent anymore it was already removed
+        // optimization if the parents of any child doesn't contain the parent anymore it was already removed
         {
-            //mark already found entries
+            // mark already found entries
             const found = [];
             toCheck.forEach(({ node, parents, callback }, i) => {
                 if (parents.indexOf(this.parent) < 0) {
-                    //doesn't contain my parent anymore -> will never be found -> deleted
+                    // doesn't contain my parent anymore -> will never be found -> deleted
                     callback(node);
-                    found.unshift(i); //mark for removal - reverse order for simpler splicing
+                    found.unshift(i); // mark for removal - reverse order for simpler splicing
                 }
             });
             if (cleanUp(found)) {
@@ -53,21 +68,22 @@ class RemoveParentObserver {
             }
         }
         for (const mutation of events) {
-            const target = mutation.target;
+            const { target } = mutation;
             const removed = new Set(Array.from(mutation.removedNodes));
-            //mark already found entries
+            // mark already found entries
             const found = [];
             toCheck.forEach(({ node, callback, parents }, i) => {
                 const index = parents.indexOf(target);
-                if (index < 0) { //none of my parents were changed
+                if (index < 0) {
+                    // none of my parents were changed
                     return;
                 }
                 // child to watch for removing
                 const child = parents[index + 1];
                 if (removed.has(child)) {
-                    //me or one of my parents were removed
+                    // me or one of my parents were removed
                     callback(node);
-                    found.unshift(i); //mark for removal - reverse order for simpler splicing
+                    found.unshift(i); // mark for removal - reverse order for simpler splicing
                 }
             });
             if (cleanUp(found)) {
@@ -82,28 +98,13 @@ class RemoveParentObserver {
         }
     }
 }
-/**
- * the parents of the given node (including itself) from root to leaf
- * @param node
- * @return {Node[]}
- */
-function parentList(node) {
-    const result = [];
-    let parent = node;
-    while (parent) {
-        result.push(parent);
-        parent = parent.parentNode;
-    }
-    // from top to bottom
-    return result.reverse();
-}
 export class RemoveNodeObserver {
     constructor() {
-        //weak since if the root is gone anyhow, we don't care about its listener
+        // weak since if the root is gone anyhow, we don't care about its listener
         this.documents = new WeakMap();
     }
     observe(node, callback, thisArg) {
-        //use body as root element
+        // use body as root element
         const document = node.ownerDocument.body;
         let observer = this.documents.get(document);
         if (!observer) {

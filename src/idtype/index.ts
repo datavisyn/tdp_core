@@ -5,5 +5,5 @@ export * from './ASelectAble';
 export * from './IDTypeManager';
 
 export interface IHasUniqueId {
-    id: number;
+  id: number;
 }

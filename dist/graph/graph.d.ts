@@ -1,7 +1,7 @@
 import { ASelectAble } from '../idtype';
 import { IPersistable } from '../base/IPersistable';
 import { EventHandler } from '../base/event';
-import { IDataType, IDataDescription } from '../data';
+import type { IDataType, IDataDescription } from '../data';
 export declare class AttributeContainer extends EventHandler implements IPersistable {
     private attrMap;
     persist(): any;
@@ -88,3 +88,4 @@ export declare abstract class AGraph extends ASelectAble {
     get dim(): number[];
     get idtypes(): import("../idtype").IDType[];
 }
+//# sourceMappingURL=graph.d.ts.map

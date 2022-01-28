@@ -1,23 +1,23 @@
-import {IPluginDesc} from '../base/plugin';
-import {PluginRegistry} from '../app/PluginRegistry';
-import {IDataType} from '../data/datatype';
-import {IVisPluginDesc} from './IVisPluginDesc';
-import {IVisInstance} from './visInstance';
+import { IPluginDesc } from '../base/plugin';
+import { PluginRegistry } from '../app/PluginRegistry';
+import { IDataType } from '../data/datatype';
+import { IVisPluginDesc } from './IVisPluginDesc';
+import { IVisInstance } from './visInstance';
 
 export class VisUtils {
-
-  static extrapolateFilter(r: {filter?: string|((data: IDataType) => boolean)}) {
+  static extrapolateFilter(r: { filter?: string | ((data: IDataType) => boolean) }) {
     const v = r.filter;
     if (typeof v === 'undefined') {
       r.filter = () => true;
     } else if (typeof v === 'string') {
       r.filter = (data) => data && data.desc.type && data.desc.type.match(v) != null;
     } else if (Array.isArray(v)) {
-      r.filter = (data) => data && data && (data.desc.type && data.desc.type.match(v[0])) && ((<any>data.desc).value === undefined || (<any>data.desc).value.type.match(v[1]));
+      r.filter = (data) =>
+        data && data && data.desc.type && data.desc.type.match(v[0]) && ((<any>data.desc).value === undefined || (<any>data.desc).value.type.match(v[1]));
     }
   }
 
-  static extrapolateIconify(r: {iconify?(node: HTMLElement): void}) {
+  static extrapolateIconify(r: { iconify?(node: HTMLElement): void }) {
     if (typeof r.iconify === 'function') {
       return;
     }
@@ -34,7 +34,7 @@ export class VisUtils {
         node.style.textAlign = 'center';
         node.style.backgroundSize = '100%';
         node.style.backgroundRepeat = 'no-repeat';
-        //lazy load icon
+        // lazy load icon
         anyThis.icon().then((iconData: string) => {
           node.style.backgroundImage = `url(${iconData})`;
         });
@@ -45,7 +45,8 @@ export class VisUtils {
       return node;
     };
   }
-  static extrapolateSize(r: {scaling?: string, sizeDependsOnDataDimension: boolean|[boolean, boolean]}) {
+
+  static extrapolateSize(r: { scaling?: string; sizeDependsOnDataDimension: boolean | [boolean, boolean] }) {
     r.scaling = r.scaling || 'free';
 
     if (Array.isArray(r.sizeDependsOnDataDimension) && typeof r.sizeDependsOnDataDimension[0] === 'boolean') {
@@ -57,12 +58,13 @@ export class VisUtils {
     }
   }
 
-  static extrapolateRotation(r: {rotation: string|number|null}) {
-    const m = { //string to text mappings
+  static extrapolateRotation(r: { rotation: string | number | null }) {
+    const m = {
+      // string to text mappings
       free: NaN,
       no: 0,
       transpose: 90,
-      swap: 180
+      swap: 180,
     };
     if (typeof r.rotation === 'string' && r.rotation in m) {
       r.rotation = (<any>m)[r.rotation];
@@ -90,8 +92,11 @@ export class VisUtils {
    * @returns {IPluginDesc[]}
    */
   static listVisPlugins(data: IDataType): IVisPluginDesc[] {
-    //filter additionally with the filter attribute, which can be a function or the expected data type
-    return PluginRegistry.getInstance().listPlugins('vis').map(VisUtils.toVisPlugin).filter((desc) => desc.filter(data));
+    // filter additionally with the filter attribute, which can be a function or the expected data type
+    return PluginRegistry.getInstance()
+      .listPlugins('vis')
+      .map(VisUtils.toVisPlugin)
+      .filter((desc) => desc.filter(data));
   }
 
   static assignVis(node: Element, vis: IVisInstance) {

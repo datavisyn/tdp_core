@@ -1,10 +1,10 @@
 /**
  * This file defines interfaces for various data types and their metadata.
  */
-import {IPersistable} from '../base/IPersistable';
-import {IDType} from '../idtype/IDType';
-import {ASelectAble, ISelectAble} from '../idtype/ASelectAble';
-import {IDataDescription} from './DataDescription';
+import { IPersistable } from '../base/IPersistable';
+import { IDType } from '../idtype/IDType';
+import { ASelectAble, ISelectAble } from '../idtype/ASelectAble';
+import { IDataDescription } from './DataDescription';
 /**
  * Basic data type interface
  */
@@ -50,6 +50,7 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
   toString() {
     return this.persist();
   }
+
   /**
    * since there is no instanceOf for interfaces
    * @param v
@@ -62,14 +63,9 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
     if (v instanceof ADataType) {
       return true;
     }
-    //sounds good
-    return (typeof(v.persist) === 'function' && typeof(v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v));
+    // sounds good
+    return typeof v.persist === 'function' && typeof v.restore === 'function' && v instanceof ASelectAble && 'desc' in v;
   }
 }
 
-export class DummyDataType extends ADataType<IDataDescription> {
-  constructor(desc: IDataDescription) {
-    super(desc);
-  }
-
-}
+export class DummyDataType extends ADataType<IDataDescription> {}

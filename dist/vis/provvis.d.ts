@@ -27,3 +27,4 @@ export declare class LayoutedProvVis extends AVisInstance implements IVisInstanc
     private updateStoryHighlight;
     static createLayoutedProvVis(data: ProvenanceGraph, parent: Element, options?: {}): LayoutedProvVis;
 }
+//# sourceMappingURL=provvis.d.ts.map

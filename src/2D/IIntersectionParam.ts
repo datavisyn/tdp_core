@@ -4,8 +4,7 @@ export interface IIntersectionParam {
 }
 
 export class IntersectionParamUtils {
-
   static createIntersectionParam(name: string, params: any[]): IIntersectionParam {
-    return {name, params};
+    return { name, params };
   }
 }

@@ -41,3 +41,4 @@ export declare class ZoomLogic extends EventHandler {
 export declare class ZoomBehavior extends ZoomLogic {
     constructor(node: Element, v: IVisInstance, meta: IVisMetaData);
 }
+//# sourceMappingURL=zoom.d.ts.map

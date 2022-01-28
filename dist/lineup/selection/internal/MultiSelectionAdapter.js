@@ -35,7 +35,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         });
     }
     removePartialDynamicColumns(context, ids) {
-        const columns = context.columns;
+        const { columns } = context;
         const selectedSubTypes = this.adapter.getSelectedSubTypes();
         if (selectedSubTypes.length === 0) {
             ids.forEach((id) => context.freeColor(id));

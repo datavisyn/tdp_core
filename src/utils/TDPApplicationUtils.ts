@@ -1,10 +1,9 @@
-import {IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode} from '../provenance';
-import {BaseUtils} from '../base';
-import {I18nextManager} from '../i18n';
-import {Compression} from '../base/Compression';
-import {EPermission, ISecureItem, Permission, UserUtils} from '../security';
-import {UserSession} from '../app';
-
+import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../provenance';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
+import { Compression } from '../base/Compression';
+import { EPermission, ISecureItem, Permission, UserUtils } from '../security';
+import { UserSession } from '../app';
 
 export interface IPermissionFormOptions {
   /**
@@ -22,12 +21,15 @@ export interface IParameterAble {
 }
 
 export class TDPApplicationUtils {
-
   static readonly MIN = 60;
+
   static readonly HOUR = TDPApplicationUtils.MIN * 60;
+
   static readonly DAY = TDPApplicationUtils.HOUR * 24;
-  //old name
+
+  // old name
   static readonly CMD_INIT_SESSION = 'tdpInitSession';
+
   static readonly CMD_SET_PARAMETER = 'tdpSetParameter';
 
   static readonly getAreas: () => [number, string | ((d: number) => string)][] = () => {
@@ -36,16 +38,28 @@ export class TDPApplicationUtils {
       [43, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.fewSecondsAgo')],
       [44, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.secondsAgo')],
       [89, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.minute')],
-      [44 * TDPApplicationUtils.MIN, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.minute', {count: Math.ceil(d / TDPApplicationUtils.MIN)})],
+      [
+        44 * TDPApplicationUtils.MIN,
+        (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.minute', { count: Math.ceil(d / TDPApplicationUtils.MIN) }),
+      ],
       [89 * TDPApplicationUtils.MIN, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour')],
-      [21 * TDPApplicationUtils.HOUR, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour', {count: Math.ceil(d / TDPApplicationUtils.HOUR)})],
+      [
+        21 * TDPApplicationUtils.HOUR,
+        (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour', { count: Math.ceil(d / TDPApplicationUtils.HOUR) }),
+      ],
       [35 * TDPApplicationUtils.HOUR, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.day')],
-      [25 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.day', {count: Math.ceil(d / TDPApplicationUtils.DAY)})],
+      [
+        25 * TDPApplicationUtils.DAY,
+        (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.day', { count: Math.ceil(d / TDPApplicationUtils.DAY) }),
+      ],
       [45 * TDPApplicationUtils.DAY, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month')],
-      [319 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month', {count: Math.ceil(d / TDPApplicationUtils.DAY / 30)})],
-      [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.year')]
+      [
+        319 * TDPApplicationUtils.DAY,
+        (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month', { count: Math.ceil(d / TDPApplicationUtils.DAY / 30) }),
+      ],
+      [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.year')],
     ];
-  }
+  };
 
   /**
    * see http://momentjs.com/docs/#/displaying/fromnow/
@@ -62,11 +76,11 @@ export class TDPApplicationUtils {
       return typeof formatter === 'string' ? formatter : formatter(deltaInSeconds);
     }
 
-    return new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric'}).format(new Date(date)); // e.g. Oct 10, 2021
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date)); // e.g. Oct 10, 2021
   }
 
   static notAllowedText(notAllowed: boolean | string) {
-    return (typeof notAllowed === 'string' ? notAllowed : I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.notAllowed'));
+    return typeof notAllowed === 'string' ? notAllowed : I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.notAllowed');
   }
 
   /**
@@ -74,10 +88,7 @@ export class TDPApplicationUtils {
    * @param item
    */
   static permissionForm(item?: ISecureItem, options: Partial<IPermissionFormOptions> = {}) {
-    const o: Readonly<IPermissionFormOptions> = Object.assign({
-      extra: '',
-      doc: document
-    }, options);
+    const o: Readonly<IPermissionFormOptions> = { extra: '', doc: document, ...options };
     const user = UserSession.getInstance().currentUser();
     const roles = user ? user.roles : UserUtils.ANONYMOUS_USER.roles;
 
@@ -88,30 +99,46 @@ export class TDPApplicationUtils {
     div.classList.add('mb-3');
     div.innerHTML = `
       <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="permission_public" id="global_permission_private_${id}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="form-label form-check-label" for="global_permission_private_${id}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
+          <input class="form-check-input" type="radio" name="permission_public" id="global_permission_private_${id}" value="private" ${
+      !permission.others.has(EPermission.READ) ? 'checked' : ''
+    }>
+          <label class="form-label form-check-label" for="global_permission_private_${id}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t(
+      'tdp:core.utilsInternal.private',
+    )}</label>
       </div>
       <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="permission_public" id="global_permission_public_${id}" value="public" ${permission.others.has(EPermission.READ) ? 'checked' : ''}>
-          <label class="form-label form-check-label" for="global_permission_public_${id}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
+          <input class="form-check-input" type="radio" name="permission_public" id="global_permission_public_${id}" value="public" ${
+      permission.others.has(EPermission.READ) ? 'checked' : ''
+    }>
+          <label class="form-label form-check-label" for="global_permission_public_${id}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t(
+      'tdp:core.utilsInternal.publicMsg',
+    )}</label>
       </div>
 
-      <button type="button" name="permission_advanced" class="btn btn-outline-secondary btn-sm float-end">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
+      <button type="button" name="permission_advanced" class="btn btn-outline-secondary btn-sm float-end">${I18nextManager.getInstance().i18n.t(
+        'tdp:core.utilsInternal.advanced',
+      )}</button>
       ${o.extra}
       <div class="tdp-permissions">
         <div class="tdp-permissions-entry row d-flex align-items-center">
           <label class="form-label col-sm-auto ps-2">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.public')}</label>
           <span></span>
           <div class="btn-group col-sm-auto" role="group">
-            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_none" value="none" autocomplete="off" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_none" value="none" autocomplete="off" ${
+      !permission.others.has(EPermission.READ) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_public_${id}_none" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-ban"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
-            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_read" value="read" autocomplete="off" ${permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_read" value="read" autocomplete="off" ${
+      permission.others.has(EPermission.READ) && !permission.others.has(EPermission.WRITE) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_public_${id}_read" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
-            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_write" value="write" autocomplete="off" ${permission.others.has(EPermission.WRITE) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_others" id="btnradio_permissions_public_${id}_write" value="write" autocomplete="off" ${
+      permission.others.has(EPermission.WRITE) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_public_${id}_write" class="form-label btn btn-outline-secondary btn-sm">
               <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
@@ -121,20 +148,28 @@ export class TDPApplicationUtils {
         ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.definePermissions')}
         </p>
         <div class="tdp-permissions-entry row">
-          <label class="form-label col-sm-auto ps-2" for="permission_group_name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.group')}</label>
+          <label class="form-label col-sm-auto ps-2" for="permission_group_name_${id}">${I18nextManager.getInstance().i18n.t(
+      'tdp:core.utilsInternal.group',
+    )}</label>
           <select id="permission_group_name_${id}" name="permission_group_name" class="form-select form-select-sm">
             ${roles.map((d) => `<option value="${d}" ${item && item.group === d ? 'selected' : ''}>${d}</option>`).join('')}
           </select>
           <div class="btn-group col-sm-auto" role="group">
-          <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_none" value="none" autocomplete="off" ${!permission.group.has(EPermission.READ) ? 'checked' : ''}>
+          <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_none" value="none" autocomplete="off" ${
+      !permission.group.has(EPermission.READ) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_group_${id}_none" class="form-label btn btn-outline-secondary btn-sm">
               <i class="fas fa-ban"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
-            <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_read" value="read" autocomplete="off" ${permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_read" value="read" autocomplete="off" ${
+      permission.group.has(EPermission.READ) && !permission.group.has(EPermission.WRITE) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_group_${id}_read" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
-            <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_write" value="write" autocomplete="off" ${permission.group.has(EPermission.WRITE) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_group" id="btnradio_permissions_group_${id}_write" value="write" autocomplete="off" ${
+      permission.group.has(EPermission.WRITE) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_group_${id}_write" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
@@ -144,18 +179,28 @@ export class TDPApplicationUtils {
         ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.specifyRole')}
         </p>
         <div class="tdp-permissions-entry row">
-          <label class="form-label col-sm-auto ps-2" for="permission_buddies_name_${id}">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddies')}</label>
-          <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control form-control-sm" placeholder="${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.buddiesPlaceholder')}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
+          <label class="form-label col-sm-auto ps-2" for="permission_buddies_name_${id}">${I18nextManager.getInstance().i18n.t(
+      'tdp:core.utilsInternal.buddies',
+    )}</label>
+          <input id="permission_buddies_name_${id}" name="permission_buddies_name" class="form-control form-control-sm" placeholder="${I18nextManager.getInstance().i18n.t(
+      'tdp:core.utilsInternal.buddiesPlaceholder',
+    )}" value="${item && item.buddies ? item.buddies.join(';') : ''}">
           <div class="btn-group col-sm-auto" role="group">
-            <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_none" value="none" autocomplete="off" ${!permission.buddies.has(EPermission.READ) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_none" value="none" autocomplete="off" ${
+      !permission.buddies.has(EPermission.READ) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_buddies_${id}_none" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-ban"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
             </label>
-            <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_read" value="read" autocomplete="off" ${permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_read" value="read" autocomplete="off" ${
+      permission.buddies.has(EPermission.READ) && !permission.buddies.has(EPermission.WRITE) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_buddies_${id}_read" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-eye"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
             </label>
-            <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_write" value="write" autocomplete="off" ${permission.buddies.has(EPermission.WRITE) ? 'checked' : ''}>
+            <input type="radio" class="btn-check" name="permission_buddies" id="btnradio_permissions_buddies_${id}_write" value="write" autocomplete="off" ${
+      permission.buddies.has(EPermission.WRITE) ? 'checked' : ''
+    }>
             <label for="btnradio_permissions_buddies_${id}_write" class="form-label btn btn-outline-secondary btn-sm">
                <i class="fas fa-edit"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
             </label>
@@ -191,8 +236,8 @@ export class TDPApplicationUtils {
         }
 
         // sync with others
-        const target = (d.value === 'public') ? 'read' : 'none';
-        others.forEach((o) => o.checked = (o.value === target));
+        const target = d.value === 'public' ? 'read' : 'none';
+        others.forEach((a) => (a.checked = a.value === target));
 
         syncActive();
       };
@@ -206,7 +251,7 @@ export class TDPApplicationUtils {
 
         // sync with public
         const target = d.value === 'none' ? 'private' : 'public';
-        publicSimple.forEach((o) => o.checked = o.value === target);
+        publicSimple.forEach((a) => (a.checked = a.value === target));
 
         syncActive();
       };
@@ -215,7 +260,8 @@ export class TDPApplicationUtils {
     const toSet = (value: string) => {
       if (value === 'read') {
         return new Set([EPermission.READ]);
-      } else if (value === 'write') {
+      }
+      if (value === 'write') {
         return new Set([EPermission.READ, EPermission.WRITE]);
       }
       return new Set();
@@ -224,17 +270,27 @@ export class TDPApplicationUtils {
     return {
       node: div,
       resolve: (data: FormData): Partial<ISecureItem> => {
-        const others = toSet(data.get('permission_others').toString());
-        const group = toSet(data.get('permission_group').toString());
+        const oths = toSet(data.get('permission_others').toString());
+        const grp = toSet(data.get('permission_group').toString());
         const groupName = data.get('permission_group_name')?.toString();
-        const buddies = toSet(data.get('permission_buddies').toString());
-        const buddiesName = data.get('permission_buddies_name').toString().split(';').map((d) => d.trim()).filter((d) => d.length > 0);
+        const bddies = toSet(data.get('permission_buddies').toString());
+        const buddiesName = data
+          .get('permission_buddies_name')
+          .toString()
+          .split(';')
+          .map((d) => d.trim())
+          .filter((d) => d.length > 0);
         return {
-          permissions: Permission.encode(new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]), <Set<EPermission>>group, <Set<EPermission>>others, <Set<EPermission>>buddies),
+          permissions: Permission.encode(
+            new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]),
+            <Set<EPermission>>grp,
+            <Set<EPermission>>oths,
+            <Set<EPermission>>bddies,
+          ),
           group: groupName,
-          buddies: buddiesName
+          buddies: buddiesName,
         };
-      }
+      },
     };
   }
 
@@ -254,38 +310,57 @@ export class TDPApplicationUtils {
       }
     });
     return {
-      inverse: TDPApplicationUtils.initSession(old)
+      inverse: TDPApplicationUtils.initSession(old),
     };
   }
 
   static initSession(map: object) {
-    return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.initializeSession'), ObjectRefUtils.category.custom, ObjectRefUtils.operation.update), TDPApplicationUtils.CMD_INIT_SESSION, TDPApplicationUtils.initSessionImpl, [], map);
+    return ActionUtils.action(
+      ActionMetaData.actionMeta(
+        I18nextManager.getInstance().i18n.t('tdp:core.initializeSession'),
+        ObjectRefUtils.category.custom,
+        ObjectRefUtils.operation.update,
+      ),
+      TDPApplicationUtils.CMD_INIT_SESSION,
+      TDPApplicationUtils.initSessionImpl,
+      [],
+      map,
+    );
   }
 
   static async setParameterImpl(inputs: IObjectRef<any>[], parameter, graph: ProvenanceGraph) {
     const view: IParameterAble = await inputs[0].v;
-    const name = parameter.name;
-    const value = parameter.value;
+    const { name } = parameter;
+    const { value } = parameter;
     const previousValue = parameter.previousValue === undefined ? view.getParameter(name) : parameter.previousValue;
     view.setParameterImpl(name, value);
     return {
-      inverse: TDPApplicationUtils.setParameter(inputs[0], name, previousValue, value)
+      inverse: TDPApplicationUtils.setParameter(inputs[0], name, previousValue, value),
     };
   }
 
   static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any) {
-    //assert view
-    return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.setParameter', {name}), ObjectRefUtils.category.visual, ObjectRefUtils.operation.update), TDPApplicationUtils.CMD_SET_PARAMETER, TDPApplicationUtils.setParameterImpl, [view], {
-      name,
-      value,
-      previousValue
-    });
+    // assert view
+    return ActionUtils.action(
+      ActionMetaData.actionMeta(
+        I18nextManager.getInstance().i18n.t('tdp:core.setParameter', { name }),
+        ObjectRefUtils.category.visual,
+        ObjectRefUtils.operation.update,
+      ),
+      TDPApplicationUtils.CMD_SET_PARAMETER,
+      TDPApplicationUtils.setParameterImpl,
+      [view],
+      {
+        name,
+        value,
+        previousValue,
+      },
+    );
   }
 
   static compressSetParameter(path: ActionNode[]) {
     return Compression.lastConsecutive(path, TDPApplicationUtils.CMD_SET_PARAMETER, (p: ActionNode) => `${p.requires[0].id}_${p.parameter.name}`);
   }
-
 
   /**
    * @deprecated

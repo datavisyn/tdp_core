@@ -31,13 +31,13 @@ export class Ellipse extends AShape {
         return c.xy;
     }
     transform(scale, rotate) {
-        //TODO rotate
+        // TODO rotate
         return new Ellipse(this.x * scale[0], this.y * scale[1], this.radiusX * scale[0], this.radiusY * scale[1]);
     }
     asIntersectionParams() {
         return {
             name: 'Ellipse',
-            params: [this.xy, this.radiusX, this.radiusY]
+            params: [this.xy, this.radiusX, this.radiusY],
         };
     }
     static ellipse(x, y, radiusX, radiusY) {

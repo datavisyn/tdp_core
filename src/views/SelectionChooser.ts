@@ -1,9 +1,9 @@
-import {IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption} from '../form/elements/FormSelect';
-import {FormElementType, IFormElement, IFormElementDesc} from '../form/interfaces';
-import {ISelection} from '../base/interfaces';
-import {IDType, IDTypeLike, IDTypeManager} from '../idtype';
-import {BaseUtils} from '../base';
-import {I18nextManager} from '../i18n';
+import { IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption } from '../form/elements/FormSelect';
+import { FormElementType, IFormElement, IFormElementDesc } from '../form/interfaces';
+import { ISelection } from '../base/interfaces';
+import { IDType, IDTypeLike, IDTypeManager } from '../idtype';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
 
 export interface ISelectionChooserOptions {
   /**
@@ -23,25 +23,30 @@ export interface ISelectionChooserOptions {
  * helper class for chooser logic
  */
 export class SelectionChooser {
-
   private static readonly INVALID_MAPPING = {
     name: 'Invalid',
     id: -1,
-    label: ''
+    label: '',
   };
 
   private readonly target: IDType | null;
+
   private readonly readAble: IDType | null;
+
   private readonly readableTargetIDType: IDType | null;
+
   readonly desc: IFormElementDesc;
+
   private readonly formID: string;
+
   private readonly options: Readonly<ISelectionChooserOptions> = {
     appendOriginalLabel: true,
     selectNewestByDefault: true,
     readableIDType: null,
     readableTargetIDType: null,
-    label: 'Show'
+    label: 'Show',
   };
+
   private currentOptions: IFormSelectOption[];
 
   constructor(private readonly accessor: (id: string) => IFormElement, targetIDType?: IDTypeLike, options: Partial<ISelectionChooserOptions> = {}) {
@@ -58,7 +63,7 @@ export class SelectionChooser {
       options: {
         optionsData: [],
       },
-      useSession: true
+      useSession: true,
     };
   }
 
@@ -70,7 +75,7 @@ export class SelectionChooser {
     return this.updateImpl(selection, true);
   }
 
-  chosen(): {id: number, name: string, label: string} | null {
+  chosen(): { id: number; name: string; label: string } | null {
     const s = this.accessor(this.formID).value;
     if (!s || s.data === SelectionChooser.INVALID_MAPPING) {
       return null;
@@ -78,7 +83,7 @@ export class SelectionChooser {
     if (s.data) {
       return s.data;
     }
-    return {id: parseInt(s.id, 10), name: s.name, label: s.name};
+    return { id: parseInt(s.id, 10), name: s.name, label: s.name };
   }
 
   private async toItems(selection: ISelection): Promise<(IFormSelectOption | IFormSelectOptionGroup)[]> {
@@ -94,20 +99,19 @@ export class SelectionChooser {
       return sourceNames.map((d, i) => ({
         value: d,
         name: labels[i],
-        data: {id: d, name: sourceNames[i], label: labels[i]}
+        data: { id: d, name: sourceNames[i], label: labels[i] },
       }));
     }
 
     const targetIds = await IDTypeManager.getInstance().mapNameToName(source, sourceNames, target);
     const targetNames = targetIds.flat();
 
-
     if (target === readAble && targetIds.every((d) => d.length === 1)) {
       // keep it simple target = readable and single hit - so just show flat
       return targetIds.map((d, i) => ({
         value: d[0],
         name: labels[i],
-        data: {id: d[0], name: targetNames[i], label: labels[i]}
+        data: { id: d[0], name: targetNames[i], label: labels[i] },
       }));
     }
 
@@ -132,11 +136,13 @@ export class SelectionChooser {
         // fake option with null value
         return <IFormSelectOptionGroup>{
           name,
-          children: [{
-            name: I18nextManager.getInstance().i18n.t('tdp:core.views.formSelectName'),
-            value: '',
-            data: SelectionChooser.INVALID_MAPPING
-          }]
+          children: [
+            {
+              name: I18nextManager.getInstance().i18n.t('tdp:core.views.formSelectName'),
+              value: '',
+              data: SelectionChooser.INVALID_MAPPING,
+            },
+          ],
         };
       }
       return <IFormSelectOptionGroup>{
@@ -147,9 +153,9 @@ export class SelectionChooser {
           data: {
             id: d,
             name: originalTargetNames[j], // this is the original ID from the target's idType to be used internally in the detail view
-            label: groupNames[j]
-          }
-        }))
+            label: groupNames[j],
+          },
+        })),
       };
     });
     return base.length === 1 ? base[0].children : base;
@@ -211,5 +217,4 @@ export class SelectionChooser {
 
     element.value = value;
   }
-
 }

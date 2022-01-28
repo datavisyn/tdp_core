@@ -1,5 +1,5 @@
-import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import * as d3 from 'd3';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { AFormElement } from './AFormElement';
 import { IPluginDesc } from '../../base';
 export interface ICheckBoxElementDesc extends IFormElementDesc {
@@ -49,3 +49,4 @@ export declare class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
     set value(v: any);
     focus(): void;
 }
+//# sourceMappingURL=FormCheckBox.d.ts.map

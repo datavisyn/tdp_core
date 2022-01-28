@@ -7,7 +7,7 @@ export class FormRadio extends AFormElement {
      * @param pluginDesc The phovea extension point description
      */
     constructor(form, elementDesc, pluginDesc) {
-        super(form, Object.assign({ options: { buttons: [] } }, elementDesc), pluginDesc);
+        super(form, { options: { buttons: [] }, ...elementDesc }, pluginDesc);
         this.pluginDesc = pluginDesc;
     }
     /**
@@ -20,9 +20,13 @@ export class FormRadio extends AFormElement {
         this.setVisible(this.elementDesc.visible);
         const $label = this.appendLabel(this.$rootNode);
         $label.classed('me-2', true);
-        const options = this.elementDesc.options;
+        const { options } = this.elementDesc;
         const $buttons = this.$rootNode.selectAll('div.radio-inline').data(options.buttons);
-        $buttons.enter().append('div').classed('radio-inline form-check form-check-inline', true).html((d, i) => `<input class="form-check-input" type="radio"
+        $buttons
+            .enter()
+            .append('div')
+            .classed('radio-inline form-check form-check-inline', true)
+            .html((d, i) => `<input class="form-check-input" type="radio"
         name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
       <label class="form-label form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>`);
         this.$inputNode = $buttons.select('input');
@@ -38,7 +42,7 @@ export class FormRadio extends AFormElement {
      */
     init() {
         super.init();
-        const options = this.elementDesc.options;
+        const { options } = this.elementDesc;
         const defaultOption = options.buttons[0].data;
         const defaultValue = this.getStoredValue(defaultOption);
         this.value = defaultValue;

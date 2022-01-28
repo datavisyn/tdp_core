@@ -37,3 +37,4 @@ export declare class FormDialog extends PHOVEA_UI_FormDialog {
      */
     showAsPromise<T>(processData: (form: IForm) => T): Promise<T>;
 }
+//# sourceMappingURL=FormDialog.d.ts.map

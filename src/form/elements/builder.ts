@@ -1,5 +1,5 @@
-import {RestBaseUtils, IParams} from '../../base/rest';
-import {FormElementType, IFormElementDesc} from '../interfaces';
+import { RestBaseUtils, IParams } from '../../base/rest';
+import { FormElementType, IFormElementDesc } from '../interfaces';
 
 export interface INameLookupOptions {
   /**
@@ -52,7 +52,7 @@ export class NameLookupUtils {
    * @returns {IFormElementDesc}
    */
   static nameLookupDesc(database: string, table: string, options: Partial<INameLookupOptions> = {}): IFormElementDesc {
-    const {formID, label, multiple, column, view, required, params, useSession} = Object.assign({
+    const { formID, label, multiple, column, view, required, params, useSession } = {
       formID: table,
       label: `${table[0].toUpperCase()}${table.slice(1)}`,
       multiple: false,
@@ -60,15 +60,16 @@ export class NameLookupUtils {
       required: true,
       view: `${table}_items`,
       params: {},
-      useSession: false
-    }, options);
+      useSession: false,
+      ...options,
+    };
 
     return {
       type: multiple ? FormElementType.SELECT2_MULTIPLE : FormElementType.SELECT2,
       label,
       id: formID,
       attributes: {
-        style: 'width:100%'
+        style: 'width:100%',
       },
       required,
       options: {
@@ -76,15 +77,11 @@ export class NameLookupUtils {
         ajax: {
           url: RestBaseUtils.getTDPLookupUrl(database, view),
           data: (query: any) => {
-            return Object.assign({
-              column,
-              query: query.term === undefined ? '' : query.term,
-              page: query.page === undefined ? 0 : query.page
-            }, params);
-          }
-        }
+            return { column, query: query.term === undefined ? '' : query.term, page: query.page === undefined ? 0 : query.page, ...params };
+          },
+        },
       },
-      useSession
+      useSession,
     };
   }
 }

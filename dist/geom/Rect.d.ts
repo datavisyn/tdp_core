@@ -16,13 +16,13 @@ export declare class Rect extends AShape implements IRect {
     get xy(): Vector2D;
     get x2y2(): Vector2D;
     get size(): Vector2D;
-    get cx(): number;
     get cy(): number;
-    set cx(val: number);
     set cy(val: number);
+    get cx(): number;
+    set cx(val: number);
     get x2(): number;
-    get y2(): number;
     set x2(val: number);
+    get y2(): number;
     set y2(val: number);
     protected shiftImpl(x: number, y: number): void;
     aabb(): Rect;
@@ -31,3 +31,4 @@ export declare class Rect extends AShape implements IRect {
     asIntersectionParams(): IIntersectionParam;
     static rect(x: number, y: number, w: number, h: number): Rect;
 }
+//# sourceMappingURL=Rect.d.ts.map

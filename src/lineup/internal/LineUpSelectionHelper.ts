@@ -1,9 +1,8 @@
-import {EventHandler, ISelection} from '../../base';
-import {IRow} from '../../base/rest';
-import {LocalDataProvider} from 'lineupjs';
-import {LineupUtils} from '../utils';
-import {IDType} from '../../idtype';
-
+import { LocalDataProvider } from 'lineupjs';
+import { EventHandler, ISelection } from '../../base';
+import { IRow } from '../../base/rest';
+import { LineupUtils } from '../utils';
+import { IDType } from '../../idtype';
 
 export class LineUpSelectionHelper extends EventHandler {
   static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';
@@ -15,6 +14,7 @@ export class LineUpSelectionHelper extends EventHandler {
    * @type {number[]}
    */
   private readonly orderedSelectedIndices = <number[]>[];
+
   private uid2index = new Map<string, number>();
 
   constructor(private readonly provider: LocalDataProvider, private readonly idType: () => IDType) {
@@ -55,13 +55,12 @@ export class LineUpSelectionHelper extends EventHandler {
       this.orderedSelectedIndices.push(d);
     });
 
-
     const idType = this.idType();
     if (!idType) {
       console.warn('no idType defined for this ranking view');
       return;
     }
-    const selection: ISelection = {idtype: idType, selectionIds: this.orderedSelectedIndices.map((i) => this._rows[i].id)};
+    const selection: ISelection = { idtype: idType, selectionIds: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }

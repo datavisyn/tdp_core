@@ -2,12 +2,12 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {I18nextManager} from '../i18n';
-import {Dialog} from '../components';
-import {BaseUtils, IPlugin} from '../base';
-import {PluginRegistry} from '../app';
+import { I18nextManager } from '../i18n';
+import { Dialog } from '../components';
+import { BaseUtils, IPlugin } from '../base';
+import { PluginRegistry } from '../app';
 
-//https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
+// https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
 const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
 
 export interface ITypeDefinition {
@@ -53,11 +53,11 @@ export interface IValueTypeEditor {
   getOptionsMarkup(current: ValueTypeEditor, def: ITypeDefinition): Promise<string> | string;
 }
 
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_IMPORTER_ValueTypeUtils {
   static createDialog(title: string, classSuffix: string, onSubmit: () => any) {
     const dialog = Dialog.generateDialog(title, I18nextManager.getInstance().i18n.t('phovea:importer.save'));
-    dialog.body.classList.add('caleydo-importer-' + classSuffix);
+    dialog.body.classList.add(`caleydo-importer-${classSuffix}`);
     const form = dialog.body.ownerDocument.createElement('form');
     dialog.body.appendChild(form);
     form.addEventListener('submit', function (e) {
@@ -86,9 +86,11 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
       const dialog = PHOVEA_IMPORTER_ValueTypeUtils.createDialog(I18nextManager.getInstance().i18n.t('phovea:importer.editStringConversion'), 'string', () => {
         dialog.hide();
         definition.type = 'string';
+        // Circular dependency
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         def.convert = findSelectedRadio();
-        def.regexFrom = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexFrom"]'))).value : null;
-        def.regexTo = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexTo"]'))).value : null;
+        def.regexFrom = def.convert === 'regex' ? (<HTMLInputElement>dialog.body.querySelector('input[name="regexFrom"]')).value : null;
+        def.regexTo = def.convert === 'regex' ? (<HTMLInputElement>dialog.body.querySelector('input[name="regexTo"]')).value : null;
 
         resolve(definition);
       });
@@ -98,22 +100,30 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
 
             <div class="radio">
               <label class="radio">
-                <input type="radio" name="string-convert" value="" ${!convert ? 'checked="checked"' : ''}> ${I18nextManager.getInstance().i18n.t('phovea:importer.none')}
+                <input type="radio" name="string-convert" value="" ${!convert ? 'checked="checked"' : ''}> ${I18nextManager.getInstance().i18n.t(
+        'phovea:importer.none',
+      )}
               </label>
             </div>
             <div class="radio">
               <label class="radio">
-                <input type="radio" name="string-convert" value="toUpperCase" ${convert === 'toUpperCase' ? 'checked="checked"' : ''}> ${I18nextManager.getInstance().i18n.t('phovea:importer.upperCase')}
+                <input type="radio" name="string-convert" value="toUpperCase" ${
+                  convert === 'toUpperCase' ? 'checked="checked"' : ''
+                }> ${I18nextManager.getInstance().i18n.t('phovea:importer.upperCase')}
               </label>
             </div>
             <div class="radio">
               <label class="radio">
-                <input type="radio" name="string-convert" value="toLowerCase" ${convert === 'toLowerCase' ? 'checked="checked"' : ''}> ${I18nextManager.getInstance().i18n.t('phovea:importer.lowerCase')}
+                <input type="radio" name="string-convert" value="toLowerCase" ${
+                  convert === 'toLowerCase' ? 'checked="checked"' : ''
+                }> ${I18nextManager.getInstance().i18n.t('phovea:importer.lowerCase')}
               </label>
             </div>
             <div class="radio">
               <label class="radio">
-                <input type="radio" name="string-convert" value="regex" ${convert === 'regex"' ? 'checked="checked"' : ''}> ${I18nextManager.getInstance().i18n.t('phovea:importer.regexReplacement')}
+                <input type="radio" name="string-convert" value="regex" ${
+                  convert === 'regex"' ? 'checked="checked"' : ''
+                }> ${I18nextManager.getInstance().i18n.t('phovea:importer.regexReplacement')}
               </label>
             </div>
             </div>
@@ -126,11 +136,13 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
               <input type="text" class="form-control"  ${convert !== 'regex' ? 'disabled="disabled"' : ''} name="regexTo" value="${regexTo || ''}">
             </div>
       `;
-      const choices = ([].slice.apply(dialog.body.querySelectorAll('input[type="radio"]')));
-      choices.forEach((e) => e.addEventListener('change', function () {
-        const regexSelected = (this.checked && this.value === 'regex');
-        ([].slice.apply(dialog.body.querySelectorAll('input[type="text"]'))).forEach((e) => e.disabled = !regexSelected);
-      }));
+      const choices = [].slice.apply(dialog.body.querySelectorAll('input[type="radio"]'));
+      choices.forEach((e) =>
+        e.addEventListener('change', function () {
+          const regexSelected = this.checked && this.value === 'regex';
+          [].slice.apply(dialog.body.querySelectorAll('input[type="text"]')).forEach((a) => (a.disabled = !regexSelected));
+        }),
+      );
 
       function findSelectedRadio() {
         const first = choices.filter((e) => e.checked)[0];
@@ -153,12 +165,12 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
   static parseString(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
     const anydef: any = def;
     const regexFrom = new RegExp(anydef.regexFrom);
-    const regexTo = anydef.regexTo;
+    const { regexTo } = anydef;
 
     const lookup = {
       toLowerCase: (d: string) => d.toLowerCase(),
       toUpperCase: (d: string) => d.toUpperCase(),
-      regex: (d: string) => d.replace(regexFrom, regexTo)
+      regex: (d: string) => d.replace(regexFrom, regexTo),
     };
     const op = lookup[anydef.convert];
 
@@ -181,11 +193,11 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
 
   static string_(): IValueTypeEditor {
     return {
-      isType: () => 1, //always a string
+      isType: () => 1, // always a string
       parse: PHOVEA_IMPORTER_ValueTypeUtils.parseString,
       guessOptions: PHOVEA_IMPORTER_ValueTypeUtils.guessString,
       edit: PHOVEA_IMPORTER_ValueTypeUtils.editString,
-      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption
+      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption,
     };
   }
 
@@ -200,10 +212,13 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
     return new Promise((resolve) => {
       const dialog = PHOVEA_IMPORTER_ValueTypeUtils.createDialog(I18nextManager.getInstance().i18n.t('phovea:importer.editCategories'), 'categorical', () => {
         const text = (<HTMLTextAreaElement>dialog.body.querySelector('textarea')).value;
-        const categories = text.trim().split('\n').map((row) => {
-          const l = row.trim().split('\t');
-          return {name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray'};
-        });
+        const categories = text
+          .trim()
+          .split('\n')
+          .map((row) => {
+            const l = row.trim().split('\t');
+            return { name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray' };
+          });
         dialog.hide();
         definition.type = 'categorical';
         (<any>definition).categories = categories;
@@ -211,15 +226,15 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
       });
       dialog.body.classList.add('caleydo-importer-');
       dialog.body.innerHTML = `
-          <textarea class="form-control">${cats.map((cat) => cat.name + '\t' + cat.color).join('\n')}</textarea>
+          <textarea class="form-control">${cats.map((cat) => `${cat.name}\t${cat.color}`).join('\n')}</textarea>
       `;
       const textarea = dialog.body.querySelector('textarea');
-      //http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea#6637396 enable tab character
+      // http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea#6637396 enable tab character
       textarea.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.keyCode === 9 || e.which === 9) {
           e.preventDefault();
           const s = textarea.selectionStart;
-          textarea.value = textarea.value.substring(0, textarea.selectionStart) + '\t' + textarea.value.substring(textarea.selectionEnd);
+          textarea.value = `${textarea.value.substring(0, textarea.selectionStart)}\t${textarea.value.substring(textarea.selectionEnd)}`;
           textarea.selectionEnd = s + 1;
         }
       });
@@ -232,16 +247,18 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
     if (typeof anyDef.categories !== 'undefined') {
       return def;
     }
-    //unique values
+    // unique values
     const cache = {};
     data.forEach((row) => {
       const v = accessor(row);
       cache[v] = v;
     });
-    anyDef.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat, i) => ({
-      name: cat,
-      color: categoryColors[i] || 'gray'
-    }));
+    anyDef.categories = Object.keys(cache)
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+      .map((cat, i) => ({
+        name: cat,
+        color: categoryColors[i] || 'gray',
+      }));
     return def;
   }
 
@@ -255,7 +272,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
     for (let i = 0; i < testSize; ++i) {
       const v = accessor(data[i]);
       if (PHOVEA_IMPORTER_ValueTypeUtils.isEmptyString(v)) {
-        continue; //skip empty samples
+        continue; // skip empty samples
       }
       validSize++;
       categories[v] = v;
@@ -288,7 +305,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
       parse: PHOVEA_IMPORTER_ValueTypeUtils.parseCategorical,
       guessOptions: PHOVEA_IMPORTER_ValueTypeUtils.guessCategorical,
       edit: PHOVEA_IMPORTER_ValueTypeUtils.editCategorical,
-      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption
+      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption,
     };
   }
 
@@ -341,7 +358,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
   }
 
   static guessNumerical(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
-    //TODO support different notations, comma vs point
+    // TODO support different notations, comma vs point
     const anyDef: any = def;
     if (typeof anyDef.range !== 'undefined') {
       return def;
@@ -351,17 +368,17 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
     data.forEach((row) => {
       const raw = accessor(row);
       if (PHOVEA_IMPORTER_ValueTypeUtils.isMissingNumber(raw)) {
-        return; //skip
+        return; // skip
       }
       const v = parseFloat(raw);
-      if (isNaN(minV) || v < minV) {
+      if (Number.isNaN(minV) || v < minV) {
         minV = v;
       }
-      if (isNaN(maxV) || v > maxV) {
+      if (Number.isNaN(maxV) || v > maxV) {
         maxV = v;
       }
     });
-    anyDef.range = [isNaN(minV) ? 0 : minV, isNaN(maxV) ? 100 : maxV];
+    anyDef.range = [Number.isNaN(minV) ? 0 : minV, Number.isNaN(maxV) ? 100 : maxV];
     return def;
   }
 
@@ -377,7 +394,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
     for (let i = 0; i < testSize; ++i) {
       const v = accessor(data[i]);
       if (PHOVEA_IMPORTER_ValueTypeUtils.isMissingNumber(v)) {
-        continue; //skip empty samples
+        continue; // skip empty samples
       }
       validSize++;
       if (isFloat.test(v) || v === 'NaN') {
@@ -412,10 +429,9 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
       parse: PHOVEA_IMPORTER_ValueTypeUtils.parseNumerical,
       guessOptions: PHOVEA_IMPORTER_ValueTypeUtils.guessNumerical,
       edit: PHOVEA_IMPORTER_ValueTypeUtils.editNumerical,
-      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption
+      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption,
     };
   }
-
 
   static isBoolean(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
     const testSize = Math.min(data.length, sampleSize);
@@ -427,7 +443,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
     for (let i = 0; i < testSize; ++i) {
       const v = accessor(data[i]);
       if (typeof v !== 'boolean' || v === null || v === undefined) {
-        continue; //skip empty samples
+        continue; // skip empty samples
       }
       validSize++;
       categories[v] = v;
@@ -443,7 +459,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
       parse: PHOVEA_IMPORTER_ValueTypeUtils.parseCategorical,
       guessOptions: PHOVEA_IMPORTER_ValueTypeUtils.guessCategorical,
       edit: PHOVEA_IMPORTER_ValueTypeUtils.editCategorical,
-      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption
+      getOptionsMarkup: PHOVEA_IMPORTER_ValueTypeUtils.singleOption,
     };
   }
 
@@ -457,16 +473,26 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
    * @param options additional options
    * @return {any}
    */
-  static async guessValueType(editors: ValueTypeEditor[], name: string, index: number, data: any[], accessor: (row: any) => any, options: IGuessOptions = {}): Promise<ValueTypeEditor> {
-    options = BaseUtils.mixin({
-      sampleSize: 100,
-      thresholds: <any>{
-        numerical: 0.7,
-        categorical: 0.7,
-        real: 0.7,
-        int: 0.7
-      }
-    }, options);
+  static async guessValueType(
+    editors: ValueTypeEditor[],
+    name: string,
+    index: number,
+    data: any[],
+    accessor: (row: any) => any,
+    options: IGuessOptions = {},
+  ): Promise<ValueTypeEditor> {
+    options = BaseUtils.mixin(
+      {
+        sampleSize: 100,
+        thresholds: <any>{
+          numerical: 0.7,
+          categorical: 0.7,
+          real: 0.7,
+          int: 0.7,
+        },
+      },
+      options,
+    );
     const testSize = Math.min(options.sampleSize, data.length);
 
     // one promise for each editor for a given column
@@ -478,18 +504,18 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
       type: editor.id,
       editor,
       confidence: confidenceValues[i],
-      priority: editor.priority
+      priority: editor.priority,
     }));
 
-    //filter all 0 confidence ones by its threshold
-    results = results.filter((r) => typeof options.thresholds[r.type] !== 'undefined' ? r.confidence >= options.thresholds[r.type] : r.confidence > 0);
+    // filter all 0 confidence ones by its threshold
+    results = results.filter((r) => (typeof options.thresholds[r.type] !== 'undefined' ? r.confidence >= options.thresholds[r.type] : r.confidence > 0));
 
     if (results.length <= 0) {
       return null;
     }
-    //order by priority (less more important)
+    // order by priority (less more important)
     results = results.sort((a, b) => a.priority - b.priority);
-    //choose the first one
+    // choose the first one
     return results[0].editor;
   }
 
@@ -537,101 +563,106 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
       tr.className = isIDType ? 'info' : '';
       const input = tr.querySelector('input');
       if (input) {
-        (<HTMLInputElement>(input)).disabled = isIDType;
+        (<HTMLInputElement>input).disabled = isIDType;
       }
     };
   }
-
 }
-  export class ValueTypeEditor implements IValueTypeEditor {
-    private desc: any;
-    private impl: IValueTypeEditor;
+export class ValueTypeEditor implements IValueTypeEditor {
+  private desc: any;
 
-    constructor(impl: IPlugin) {
-      this.desc = impl.desc;
-      this.impl = impl.factory();
-    }
+  private impl: IValueTypeEditor;
 
-    get hasEditor() {
-      return this.impl.edit != null;
-    }
-
-    get isImplicit() {
-      return this.desc.implicit === true;
-    }
-
-    get priority() {
-      return typeof this.desc.priority !== 'undefined' ? this.desc.priority : 100;
-    }
-
-    get name() {
-      return this.desc.name;
-    }
-
-    get id() {
-      return this.desc.id;
-    }
-
-    isType(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
-      return this.impl.isType(name, index, data, accessor, sampleSize);
-    }
-
-    parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => any): number[] {
-      def.type = this.id;
-      this.impl.guessOptions(def, data, accessor);
-      return this.impl.parse(def, data, accessor);
-    }
-
-    guessOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => any) {
-      def.type = this.id;
-      return this.impl.guessOptions(def, data, accessor);
-    }
-
-    edit(def: ITypeDefinition) {
-      def.type = this.id;
-      return this.impl.edit(def);
-    }
-
-    getOptionsMarkup(current: ValueTypeEditor, def: ITypeDefinition) {
-      return this.impl.getOptionsMarkup.call(this, current, def);
-    }
-    static createCustomValueTypeEditor(name: string, id: string, implicit: boolean, desc: IValueTypeEditor) {
-      return new ValueTypeEditor(<any>{
-        desc: {
-          name,
-          id,
-          implicit
-        },
-        factory: () => desc
-      });
-    }
-
-    static EXTENSION_POINT = 'importer_value_type';
-
-    static createValueTypeEditor(id: string): Promise<ValueTypeEditor> {
-      const p = PluginRegistry.getInstance().getPlugin(ValueTypeEditor.EXTENSION_POINT, id);
-      if (!p) {
-        return Promise.reject('not found: ' + id);
-      }
-      return p.load().then((impl) => new ValueTypeEditor(impl));
-    }
-
-    static createValueTypeEditors(): Promise<ValueTypeEditor[]> {
-      return PluginRegistry.getInstance().loadPlugin(PluginRegistry.getInstance().listPlugins(ValueTypeEditor.EXTENSION_POINT).sort((a, b) => a.name.localeCompare(b.name))).then((impls) => impls.map((i) => new ValueTypeEditor(i)));
-    }
+  constructor(impl: IPlugin) {
+    this.desc = impl.desc;
+    this.impl = impl.factory();
   }
 
-
-
-  export interface IGuessOptions {
-    /**
-     * number of samples considered
-     */
-    sampleSize?: number; //100
-    /**
-     * threshold if more than X percent of the samples are numbers it will be detected as number
-     * numerical - 0.7
-     * categorical - 0.7
-     */
-    thresholds?: {[type: string]: number};
+  get hasEditor() {
+    return this.impl.edit != null;
   }
+
+  get isImplicit() {
+    return this.desc.implicit === true;
+  }
+
+  get priority() {
+    return typeof this.desc.priority !== 'undefined' ? this.desc.priority : 100;
+  }
+
+  get name() {
+    return this.desc.name;
+  }
+
+  get id() {
+    return this.desc.id;
+  }
+
+  isType(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
+    return this.impl.isType(name, index, data, accessor, sampleSize);
+  }
+
+  parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => any): number[] {
+    def.type = this.id;
+    this.impl.guessOptions(def, data, accessor);
+    return this.impl.parse(def, data, accessor);
+  }
+
+  guessOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => any) {
+    def.type = this.id;
+    return this.impl.guessOptions(def, data, accessor);
+  }
+
+  edit(def: ITypeDefinition) {
+    def.type = this.id;
+    return this.impl.edit(def);
+  }
+
+  getOptionsMarkup(current: ValueTypeEditor, def: ITypeDefinition) {
+    return this.impl.getOptionsMarkup.call(this, current, def);
+  }
+
+  static createCustomValueTypeEditor(name: string, id: string, implicit: boolean, desc: IValueTypeEditor) {
+    return new ValueTypeEditor(<any>{
+      desc: {
+        name,
+        id,
+        implicit,
+      },
+      factory: () => desc,
+    });
+  }
+
+  static EXTENSION_POINT = 'importer_value_type';
+
+  static createValueTypeEditor(id: string): Promise<ValueTypeEditor> {
+    const p = PluginRegistry.getInstance().getPlugin(ValueTypeEditor.EXTENSION_POINT, id);
+    if (!p) {
+      return Promise.reject(`not found: ${id}`);
+    }
+    return p.load().then((impl) => new ValueTypeEditor(impl));
+  }
+
+  static createValueTypeEditors(): Promise<ValueTypeEditor[]> {
+    return PluginRegistry.getInstance()
+      .loadPlugin(
+        PluginRegistry.getInstance()
+          .listPlugins(ValueTypeEditor.EXTENSION_POINT)
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      )
+      .then((impls) => impls.map((i) => new ValueTypeEditor(i)));
+  }
+}
+
+export interface IGuessOptions {
+  /**
+   * number of samples considered
+   */
+  sampleSize?: number; // 100
+  /**
+   * threshold if more than X percent of the samples are numbers it will be detected as number
+   * numerical - 0.7
+   * categorical - 0.7
+   */
+  thresholds?: { [type: string]: number };
+}

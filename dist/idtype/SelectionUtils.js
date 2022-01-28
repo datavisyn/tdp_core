@@ -7,11 +7,17 @@ export var SelectOperation;
 })(SelectOperation || (SelectOperation = {}));
 export class SelectionUtils {
     static toSelectOperation(event) {
-        let ctryKeyDown, shiftDown, altDown, metaDown;
+        let ctryKeyDown;
+        let shiftDown;
+        let altDown;
+        let metaDown;
         if (typeof event === 'boolean') {
             ctryKeyDown = event;
+            // eslint-disable-next-line prefer-rest-params
             altDown = arguments[1] || false;
+            // eslint-disable-next-line prefer-rest-params
             shiftDown = arguments[2] || false;
+            // eslint-disable-next-line prefer-rest-params
             metaDown = arguments[3] || false;
         }
         else {
@@ -23,7 +29,7 @@ export class SelectionUtils {
         if (ctryKeyDown || shiftDown) {
             return SelectOperation.ADD;
         }
-        else if (altDown || metaDown) {
+        if (altDown || metaDown) {
             return SelectOperation.REMOVE;
         }
         return SelectOperation.SET;
@@ -45,14 +51,16 @@ export class SelectionUtils {
         return +v;
     }
     static integrateSelection(current, next, op = SelectOperation.SET) {
-        switch (op) {
-            case SelectOperation.SET:
-                return next;
-            case SelectOperation.ADD:
-                return Array.from(new Set([...current, ...next]));
-            case SelectOperation.REMOVE:
-                return current.filter((s) => !next.includes(s));
+        if (op === SelectOperation.SET) {
+            return next;
         }
+        if (SelectOperation.ADD) {
+            return Array.from(new Set([...current, ...next]));
+        }
+        if (SelectOperation.REMOVE) {
+            return current.filter((s) => !next.includes(s));
+        }
+        return [];
     }
     static selectionEq(as, bs) {
         return isEqual(as === null || as === void 0 ? void 0 : as.sort(), bs === null || bs === void 0 ? void 0 : bs.sort());

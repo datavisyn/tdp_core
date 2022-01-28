@@ -1,5 +1,6 @@
 # general things to ignore
 /.tscache
+/.eslintcache
 /.idea
 /build/
 /dist/tsBuildInfoFile

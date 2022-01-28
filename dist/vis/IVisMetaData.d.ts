@@ -25,3 +25,4 @@ export interface IVisMetaData {
      */
     readonly sizeDependsOnDataDimension: boolean[];
 }
+//# sourceMappingURL=IVisMetaData.d.ts.map

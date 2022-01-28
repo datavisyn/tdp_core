@@ -39,5 +39,5 @@ export declare abstract class ADataType<T extends IDataDescription> extends ASel
     static isADataType(v: IDataType): boolean;
 }
 export declare class DummyDataType extends ADataType<IDataDescription> {
-    constructor(desc: IDataDescription);
 }
+//# sourceMappingURL=datatype.d.ts.map

@@ -1,9 +1,9 @@
-import { SelectionUtils } from '..';
+import { SelectionUtils } from '../idtype';
 export class ViewUtils {
     static toViewPluginDesc(p) {
         const r = p;
         r.selection = r.selection || 'none';
-        r.group = Object.assign({ name: 'Other', order: 99 }, r.group);
+        r.group = { name: 'Other', order: 99, ...r.group };
         r.securityNotAllowedText = r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
         // common typo
         if (r.idType !== undefined) {
@@ -56,8 +56,8 @@ export class ViewUtils {
      * @returns {boolean}
      */
     static isSameSelection(a, b) {
-        const aNull = (a == null || a.idtype == null);
-        const bNull = (b == null || b.idtype == null);
+        const aNull = a == null || a.idtype == null;
+        const bNull = b == null || b.idtype == null;
         if (aNull || bNull) {
             return aNull === bNull;
         }
@@ -68,7 +68,7 @@ export class ViewUtils {
         const aAllSize = a.all ? a.all.size : 0;
         const bAllSize = b.all ? b.all.size : 0;
         if (aAllSize !== bAllSize) {
-            return;
+            return undefined;
         }
         if (aAllSize === 0) {
             return true;
@@ -86,7 +86,7 @@ export class ViewUtils {
         return {
             graph,
             desc: ViewUtils.toViewPluginDesc(desc),
-            ref
+            ref,
         };
     }
 }

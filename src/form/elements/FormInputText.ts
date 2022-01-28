@@ -1,8 +1,7 @@
 import * as d3 from 'd3';
-import {AFormElement} from './AFormElement';
-import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
-import {IPluginDesc} from '../../base';
-
+import { AFormElement } from './AFormElement';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
+import { IPluginDesc } from '../../base';
 
 /**
  * Add specific options for input form elements
@@ -49,7 +48,10 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
     this.setVisible(this.elementDesc.visible);
     this.appendLabel(this.$rootNode);
 
-    this.$inputNode = this.$rootNode.append('input').classed('form-control', true).attr('type', (this.elementDesc.options || {}).type || 'text');
+    this.$inputNode = this.$rootNode
+      .append('input')
+      .classed('form-control', true)
+      .attr('type', (this.elementDesc.options || {}).type || 'text');
     this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 
@@ -59,7 +61,7 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
   init() {
     super.init();
 
-    if((this.elementDesc.options || {}).type === 'number' && (this.elementDesc.options || {}).step) {
+    if ((this.elementDesc.options || {}).type === 'number' && (this.elementDesc.options || {}).step) {
       this.$inputNode.attr('step', this.elementDesc.options.step);
     }
 

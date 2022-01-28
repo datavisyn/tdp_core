@@ -8,7 +8,7 @@ export class Matomo {
         if (!config.url) {
             return false;
         }
-        const userId = (config.encryptUserName === true) ? md5(this.userId) : this.userId;
+        const userId = config.encryptUserName === true ? md5(this.userId) : this.userId;
         _paq.push(['setUserId', userId]);
         // _paq.push(['requireConsent']); TODO user consent form with opt out
         _paq.push(['trackPageView']);
@@ -24,6 +24,7 @@ export class Matomo {
         s.src = `${config.url}matomo.js`;
         const base = document.getElementsByTagName('script')[0];
         base.insertAdjacentElement('beforebegin', s);
+        return true;
     }
     trackEvent(category, action, name, value) {
         const t = ['trackEvent', category, action];
@@ -68,7 +69,9 @@ export class Matomo {
         }
         const trackableActions = new Map();
         // load all registered actionFunction extension points and look if they contain a `analytics` property
-        PluginRegistry.getInstance().listPlugins((desc) => desc.type === 'actionFunction' && desc.analytics).forEach((desc) => {
+        PluginRegistry.getInstance()
+            .listPlugins((desc) => desc.type === 'actionFunction' && desc.analytics)
+            .forEach((desc) => {
             trackableActions.set(desc.id, desc.analytics);
         });
         graph.on('execute', (_, node) => {
@@ -76,7 +79,7 @@ export class Matomo {
                 return;
             }
             const event = trackableActions.get(node.getAttr('f_id'));
-            Matomo.getInstance().trackEvent(event.category, event.action, (typeof event.name === 'function') ? event.name(node) : node.name, (typeof event.value === 'function') ? event.value(node) : null);
+            Matomo.getInstance().trackEvent(event.category, event.action, typeof event.name === 'function' ? event.name(node) : node.name, typeof event.value === 'function' ? event.value(node) : null);
         });
         graph.on('run_chain', (_, nodes) => {
             Matomo.getInstance().trackEvent('provenance', 'runChain', 'Run actions in chain', nodes.length);

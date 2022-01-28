@@ -12,3 +12,4 @@ export declare abstract class ABaseSelectionAdapter implements ISelectionAdapter
     protected abstract createColumnsFor(context: IContext, _id: string): PromiseLike<ISelectionColumn[]>;
     static patchDesc(desc: IAdditionalColumnDesc, selectedId: string): IAdditionalColumnDesc;
 }
+//# sourceMappingURL=ABaseSelectionAdapter.d.ts.map

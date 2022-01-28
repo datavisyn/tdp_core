@@ -45,3 +45,4 @@ export declare class VerticalStoryVis extends AVisInstance implements IVisInstan
     static to_duration(d: number): string;
     static to_starting_time(d: SlideNode, story: SlideNode[]): number;
 }
+//# sourceMappingURL=storyvis.d.ts.map

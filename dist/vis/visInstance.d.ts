@@ -82,3 +82,4 @@ export declare class AVisInstance extends EventHandler {
     get rawSize(): number[];
     get size(): [number, number];
 }
+//# sourceMappingURL=visInstance.d.ts.map

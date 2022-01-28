@@ -1,5 +1,5 @@
 import * as ReactDOM from 'react-dom';
-import { AView } from '.';
+import { AView } from './AView';
 import { Errors } from '../components';
 import { IDTypeManager } from '../idtype';
 /**
@@ -20,7 +20,7 @@ export class AReactView extends AView {
     initReact() {
         if (this.handler) {
             // will be handled externally
-            return;
+            return undefined;
         }
         return this.update();
     }
@@ -37,6 +37,7 @@ export class AReactView extends AView {
                 sel = act.selectionIds.filter((actId) => !ids.includes(actId));
                 break;
             case 'toggle':
+                // eslint-disable-next-line no-case-declarations
                 const toggling = new Set(act.selectionIds);
                 ids.forEach((id) => {
                     if (toggling.has(id)) {
@@ -68,10 +69,12 @@ export class AReactView extends AView {
             const inputSelection = names[0];
             const itemSelection = names[1];
             return this.render(inputSelection, itemSelection, this.select);
-        }).then((elem) => {
+        })
+            .then((elem) => {
             this.setBusy(false);
             ReactDOM.render(elem, this.node.querySelector('div.react-view-body'));
-        }).catch(Errors.showErrorModalDialog)
+        })
+            .catch(Errors.showErrorModalDialog)
             .catch((r) => {
             console.error(r);
             this.setBusy(false);
@@ -85,6 +88,7 @@ export class AReactView extends AView {
         else {
             return this.update();
         }
+        return undefined;
     }
     selectionChanged() {
         return this.update();

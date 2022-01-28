@@ -24,3 +24,4 @@ export declare class Importer extends EventHandler {
     static createImporter(parent: Element, options?: IImporterOptions): Importer;
     static selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File) => any, overCssClass?: string): void;
 }
+//# sourceMappingURL=Importer.d.ts.map

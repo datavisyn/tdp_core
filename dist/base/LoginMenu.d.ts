@@ -26,3 +26,4 @@ export declare class LoginMenu extends EventHandler {
     forceShowDialog(): void;
     private initLoginDialog;
 }
+//# sourceMappingURL=LoginMenu.d.ts.map

@@ -47,3 +47,4 @@ export declare class ActionNode extends GraphNode {
 export interface IActionCompressor {
     (path: ActionNode[]): ActionNode[];
 }
+//# sourceMappingURL=ActionNode.d.ts.map

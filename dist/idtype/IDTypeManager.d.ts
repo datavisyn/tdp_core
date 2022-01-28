@@ -51,3 +51,4 @@ export declare class IDTypeManager {
     private static instance;
     static getInstance(): IDTypeManager;
 }
+//# sourceMappingURL=IDTypeManager.d.ts.map

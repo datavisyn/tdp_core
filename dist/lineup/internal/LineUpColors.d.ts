@@ -8,3 +8,4 @@ export declare class LineUpColors {
     freeColumnColor(id: string): void;
     clear(): void;
 }
+//# sourceMappingURL=LineUpColors.d.ts.map

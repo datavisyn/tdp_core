@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import 'select2';
-import {EventHandler, BaseUtils} from '../../base';
+import { EventHandler, BaseUtils } from '../../base';
 
 export interface IdTextPair {
   id: string;
@@ -32,7 +32,6 @@ export interface ISelect3Group<T extends Readonly<IdTextPair>> {
 function isSelect3Item(item: ISelect3Item<any> | ISelect3Group<any>): item is ISelect3Item<any> {
   return typeof (<ISelect3Item<any>>item).verified === 'string';
 }
-
 
 interface ISearchResult<T extends Readonly<IdTextPair>> {
   readonly results: (ISelect3Group<T> | ISelect3Item<T>)[];
@@ -110,7 +109,7 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
    * @param {number} pageSize the size of a page
    * @returns {Promise<{ more: boolean, items: IdTextPair[] }>} list of results along with a hint whether more are available
    */
-  search(query: string, page: number, pageSize: number): Promise<{ more: boolean, items: Readonly<T>[] }>;
+  search(query: string, page: number, pageSize: number): Promise<{ more: boolean; items: Readonly<T>[] }>;
 
   group(items: ISelect3Item<T>[], query: string, page: number): (ISelect3Item<T> | ISelect3Group<T>)[];
 
@@ -178,7 +177,6 @@ export class Select3Utils {
     return match !== '' ? `<mark>${p1}</mark>` : '';
   }
 
-
   static splitEscaped(value: string, reg: RegExp, unescape: boolean) {
     const elems = value.split(reg);
     const seps = value.match(reg) || [];
@@ -208,7 +206,7 @@ export class Select3Utils {
   static escapeRegex(re: string) {
     const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
     const reHasRegExpChar = RegExp(reRegExpChar.source);
-    return (re && reHasRegExpChar.test(re)) ? re.replace(reRegExpChar, '\\$&') : re;
+    return re && reHasRegExpChar.test(re) ? re.replace(reRegExpChar, '\\$&') : re;
   }
 
   static equalArrays<T extends IdTextPair>(a: T[], b: T[]) {
@@ -217,7 +215,6 @@ export class Select3Utils {
     }
     return a.every((ai, i) => ai.id === b[i].id && ai.text === b[i].text);
   }
-
 }
 
 export class Select3<T extends IdTextPair> extends EventHandler {
@@ -240,7 +237,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     dropable: true,
     placeholder: 'Search...',
     validate: null,
-    search: () => Promise.resolve({more: false, items: []}),
+    search: () => Promise.resolve({ more: false, items: [] }),
     group: (items) => items,
     format: (item: ISelect3Item<T>, node: HTMLElement, mode: 'result' | 'selection', currentSearchQuery?: RegExp) => {
       if (mode === 'result' && currentSearchQuery) {
@@ -260,7 +257,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     defaultTokenSeparator: ' ',
     id: null,
     name: null,
-    queryDelay: 250
+    queryDelay: 250,
   };
 
   private readonly select2Options: Select2Options = <any>{
@@ -277,16 +274,20 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       dataType: 'json',
       delay: this.options.queryDelay,
       cache: true,
-      transport: this.searchImpl.bind(this)
-    }
+      transport: this.searchImpl.bind(this),
+    },
   };
 
   readonly node: HTMLElement;
+
   private readonly $select: JQuery;
 
   private previousValue: T[] = [];
+
   private lastSearchQuery: RegExp | null = null;
+
   private readonly cache = new Map<string, ISearchResult<T>>();
+
   private readonly cacheItem = new Map<string, ISelect3Item<T>>();
 
   // debounce since "clear" is removing one by one
@@ -295,7 +296,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     if (this.options.equalValues(this.previousValue, next)) {
       return;
     }
-    this.fire(Select3.EVENT_SELECT, this.previousValue, this.previousValue = next);
+    this.fire(Select3.EVENT_SELECT, this.previousValue, (this.previousValue = next));
   }, 20);
 
   constructor(options: Partial<ISelect3Options<T>> = {}) {
@@ -310,13 +311,16 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       multiple: this.options.multiple,
       placeholder: this.options.placeholder,
       tags: Boolean(this.options.validate), // only if a validate method is there
-      ajax: Object.assign(this.select2Options.ajax, { // also override ajax options
-        delay: this.options.queryDelay
-      })
+      ajax: Object.assign(this.select2Options.ajax, {
+        // also override ajax options
+        delay: this.options.queryDelay,
+      }),
     });
 
     this.node = this.options.document.createElement('div');
-    this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : '' } ${this.options.readonly ? 'readonly' : ''} ${this.options.disabled ? 'disabled' : ''}></select>`;
+    this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''} ${
+      this.options.readonly ? 'readonly' : ''
+    } ${this.options.disabled ? 'disabled' : ''}></select>`;
     this.node.classList.add('select3');
     this.$select = $('select', this.node);
 
@@ -338,7 +342,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       // the browser normalizes copy-paste data by its own but to avoid that we do it ourselves
       const value = evt.clipboardData ? evt.clipboardData.getData('Text') : '';
       if (!value) {
-        return;
+        return undefined;
       }
       const data = Select3Utils.splitEscaped(value, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
       this.setSearchQuery(data);
@@ -353,7 +357,6 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     value = value.trim() + this.options.defaultTokenSeparator;
     $(this.node).find('input.select2-search__field').val(value).trigger('input');
   }
-
 
   get value(): T[] {
     const data: ISelect3Item<T>[] = this.$select.select2('data');
@@ -375,10 +378,9 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     // reset
     this.$select.val(null).trigger('change');
     // add all
-    items.forEach((item) => this.$select.select2('trigger', 'select', <any>{data: item}));
+    items.forEach((item) => this.$select.select2('trigger', 'select', <any>{ data: item }));
     this.$select.on('change', this.onChange);
   }
-
 
   private dropFile(node: HTMLElement) {
     node.addEventListener('dragover', (evt) => {
@@ -396,7 +398,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     });
     node.addEventListener('drop', (evt) => {
       node.classList.remove('drag-over');
-      const files = evt.dataTransfer.files;
+      const { files } = evt.dataTransfer;
       if (files.length > 0) {
         // mark success
         evt.stopPropagation();
@@ -419,7 +421,9 @@ export class Select3<T extends IdTextPair> extends EventHandler {
   reformatItems() {
     const data: ISelect3Item<T>[] = this.$select.select2('data');
     const current = Array.from(this.node.querySelectorAll('.select2-selection__choice'));
-    current.forEach((node: HTMLElement, i) => node.innerHTML = (<HTMLElement>node.firstElementChild!).outerHTML + this.formatItem('selection', data[i], node));
+    current.forEach(
+      (node: HTMLElement, i) => (node.innerHTML = (<HTMLElement>node.firstElementChild!).outerHTML + this.formatItem('selection', data[i], node)),
+    );
   }
 
   private formatItem(mode: 'result' | 'selection', item: ISelect3Item<T> | ISelect3Group<T>, container: HTMLElement | JQuery) {
@@ -440,19 +444,19 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       data,
       text: data.text,
       id: data.id,
-      verified: <'verified'>'verified'
+      verified: <const>'verified',
     }));
   }
 
-  private searchImpl(x: { data: { q: string, page: number } }, success: (data: ISearchResult<T>) => void, failure: () => void) {
-    const q = x.data.q;
+  private searchImpl(x: { data: { q: string; page: number } }, success: (data: ISearchResult<T>) => void, failure: () => void) {
+    const { q } = x.data;
     this.lastSearchQuery = new RegExp(`(${Select3Utils.escapeRegex(q)})`, 'im');
     if (x.data.page === undefined) {
       x.data.page = 0; // init properly otherwise select2 will assume 1 instead of zero based
     }
-    //dummy wrapper for select2
+    // dummy wrapper for select2
     const result = {
-      status: 0
+      status: 0,
     };
     const cachedValue = this.resolveCachedValue(q, x.data.page);
     if (cachedValue) {
@@ -460,21 +464,24 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       return result;
     }
     this.setBusy(true);
-    this.options.search(q, x.data.page, this.options.pageSize).then(({items, more}) => {
-      this.setBusy(false);
-      const r = {
-        results: this.options.group(Select3.wrap<T>(items), q, x.data.page),
-        pagination: {
-          more
-        }
-      };
-      this.cacheValue(q, x.data.page, r);
-      success(r);
-    }).catch((error) => {
-      console.error(`error fetching search results`, error);
-      this.setBusy(false);
-      failure();
-    });
+    this.options
+      .search(q, x.data.page, this.options.pageSize)
+      .then(({ items, more }) => {
+        this.setBusy(false);
+        const r = {
+          results: this.options.group(Select3.wrap<T>(items), q, x.data.page),
+          pagination: {
+            more,
+          },
+        };
+        this.cacheValue(q, x.data.page, r);
+        success(r);
+      })
+      .catch((error) => {
+        console.error(`error fetching search results`, error);
+        this.setBusy(false);
+        failure();
+      });
     return result;
   }
 
@@ -512,7 +519,8 @@ export class Select3<T extends IdTextPair> extends EventHandler {
       // all cached
       return Promise.resolve(cached);
     }
-    return this.options.validate(terms)
+    return this.options
+      .validate(terms)
       .then((r) => cached.concat(Select3.wrap<T>(r)))
       .catch((error) => {
         console.error(`error validating results:`, error);
@@ -521,19 +529,19 @@ export class Select3<T extends IdTextPair> extends EventHandler {
   }
 
   private tokenize(query: { term: string }, _options: any, addSelection: (item: ISelect3Item<T>) => void) {
-    const term = query.term;
+    const { term } = query;
     if (term.length === 0) {
       return query;
     }
     const arr = Select3Utils.splitEscaped(term, this.options.tokenSeparators, true);
-    //filter to valid (non empty) entries
+    // filter to valid (non empty) entries
     const valid = Array.from(new Set(arr.map((a) => a.trim().toLowerCase()).filter((a) => a.length > 0)));
 
     if (arr.length <= 1) {
       return query; // single term
     }
 
-    //multiple terms validate all and return empty string
+    // multiple terms validate all and return empty string
 
     this.setBusy(true);
     valid.forEach((text) => {
@@ -541,24 +549,24 @@ export class Select3<T extends IdTextPair> extends EventHandler {
         id: text,
         text,
         data: null,
-        verified: 'processing'
+        verified: 'processing',
       };
       addSelection(item);
     });
-    this.validate(valid).then((valid) => {
-      const validated = new Map((valid.map((i) => <[string, ISelect3Item<T>]>[i.text.toLowerCase(), i])));
+    this.validate(valid).then((val) => {
+      const validated = new Map(val.map((i) => <[string, ISelect3Item<T>]>[i.text.toLowerCase(), i]));
       const processing = Array.from(this.node.querySelectorAll('.select2-selection__choice[data-verified=processing]'));
       const items = <ISelect3Item<T>[]>this.$select.select2('data');
       items.forEach((i) => {
         const original = i.text;
-        const valid = validated.get(original.toLowerCase());
+        const v = validated.get(original.toLowerCase());
         const dom = <HTMLElement>processing.find((d) => d.textContent.endsWith(original));
-        if (!valid && i.verified !== 'verified') {
+        if (!v && i.verified !== 'verified') {
           i.verified = 'invalid';
         } else {
           // remove key
           validated.delete(i.text.toLowerCase());
-          Object.assign(i, valid);
+          Object.assign(i, v);
           const o = <HTMLOptionElement>(<any>i).element;
           if (o) {
             // sync option
@@ -577,7 +585,7 @@ export class Select3<T extends IdTextPair> extends EventHandler {
     });
 
     return {
-      term: ''
+      term: '',
     };
   }
 

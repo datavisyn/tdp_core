@@ -1,5 +1,5 @@
-import { IAdditionalColumnDesc } from '../../base/interfaces';
 import { IColumnDesc } from 'lineupjs';
+import type { IAdditionalColumnDesc } from '../../base/interfaces';
 export interface ISearchOption extends Pick<IAdditionalColumnDesc, 'chooserGroup'> {
     text: string;
     id: string;
@@ -10,3 +10,4 @@ export interface ISearchOption extends Pick<IAdditionalColumnDesc, 'chooserGroup
      */
     desc?: IColumnDesc;
 }
+//# sourceMappingURL=ISearchOption.d.ts.map

@@ -1,13 +1,14 @@
-import {isEqual} from 'lodash';
+import { isEqual } from 'lodash';
 
 export enum SelectOperation {
-  SET, ADD, REMOVE
+  SET,
+  ADD,
+  REMOVE,
 }
 
 export class SelectionUtils {
-
-
   public static defaultSelectionType = 'selected';
+
   public static hoverSelectionType = 'hovered';
 
   /**
@@ -24,11 +25,17 @@ export class SelectionUtils {
    */
   static toSelectOperation(ctryKey: boolean, altKey: boolean, shiftKey: boolean, metaKey: boolean): SelectOperation;
   static toSelectOperation(event: any) {
-    let ctryKeyDown, shiftDown, altDown, metaDown;
+    let ctryKeyDown;
+    let shiftDown;
+    let altDown;
+    let metaDown;
     if (typeof event === 'boolean') {
       ctryKeyDown = event;
+      // eslint-disable-next-line prefer-rest-params
       altDown = arguments[1] || false;
+      // eslint-disable-next-line prefer-rest-params
       shiftDown = arguments[2] || false;
+      // eslint-disable-next-line prefer-rest-params
       metaDown = arguments[3] || false;
     } else {
       ctryKeyDown = event.ctrlKey || false;
@@ -38,7 +45,8 @@ export class SelectionUtils {
     }
     if (ctryKeyDown || shiftDown) {
       return SelectOperation.ADD;
-    } else if (altDown || metaDown) {
+    }
+    if (altDown || metaDown) {
       return SelectOperation.REMOVE;
     }
     return SelectOperation.SET;
@@ -50,11 +58,11 @@ export class SelectionUtils {
     }
     if (typeof v === 'string') {
       switch (v.toLowerCase()) {
-        case 'add' :
+        case 'add':
           return SelectOperation.ADD;
-        case 'remove' :
+        case 'remove':
           return SelectOperation.REMOVE;
-        default :
+        default:
           return SelectOperation.SET;
       }
     }
@@ -62,14 +70,16 @@ export class SelectionUtils {
   }
 
   static integrateSelection(current: string[], next: string[], op: SelectOperation = SelectOperation.SET): string[] {
-    switch (op) {
-      case SelectOperation.SET:
-        return next;
-      case SelectOperation.ADD:
-        return Array.from(new Set([...current, ...next]));
-      case SelectOperation.REMOVE:
-        return current.filter((s) => !next.includes(s));
+    if (op === SelectOperation.SET) {
+      return next;
     }
+    if (SelectOperation.ADD) {
+      return Array.from(new Set([...current, ...next]));
+    }
+    if (SelectOperation.REMOVE) {
+      return current.filter((s) => !next.includes(s));
+    }
+    return [];
   }
 
   static selectionEq(as: string[], bs: string[]) {

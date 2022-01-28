@@ -1,6 +1,6 @@
+import { LocalDataProvider } from 'lineupjs';
 import { EventHandler, ISelection } from '../../base';
 import { IRow } from '../../base/rest';
-import { LocalDataProvider } from 'lineupjs';
 import { IDType } from '../../idtype';
 export declare class LineUpSelectionHelper extends EventHandler {
     private readonly provider;
@@ -26,3 +26,4 @@ export declare class LineUpSelectionHelper extends EventHandler {
     rowIdsAsSet(indices: number[]): string[];
     setItemSelection(sel: ISelection): void;
 }
+//# sourceMappingURL=LineUpSelectionHelper.d.ts.map

@@ -6,3 +6,4 @@ export interface ICircle extends IShape {
     radius: number;
     xy: Vector2D;
 }
+//# sourceMappingURL=ICircle.d.ts.map

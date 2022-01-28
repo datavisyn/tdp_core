@@ -18,3 +18,4 @@ export declare class ScoreUtils {
     private static compressImpl;
     static compressComp(path: ActionNode[]): ActionNode[];
 }
+//# sourceMappingURL=ScoreUtils.d.ts.map

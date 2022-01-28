@@ -7,21 +7,21 @@ export class MessagingProxyView extends AView {
         this.options = {
             site: null,
             idtype: null,
-            itemIDType: null
+            itemIDType: null,
         };
         this.naturalSize = [1280, 800];
         this.iframeWindow = null;
         this.messageQueue = [];
         this.onWindowMessage = (evt) => {
-            if (!this.iframeWindow || evt.source !== this.iframeWindow || !evt.data || (typeof evt.data.type !== 'string') || !evt.data.payload) {
+            if (!this.iframeWindow || evt.source !== this.iframeWindow || !evt.data || typeof evt.data.type !== 'string' || !evt.data.payload) {
                 return;
             }
             const msg = evt.data;
             switch (msg.type) {
                 case 'tdpSetItemSelection': {
-                    const payload = msg.payload;
+                    const { payload } = msg;
                     const name = payload.name || AView.DEFAULT_SELECTION_NAME;
-                    const ids = payload.ids;
+                    const { ids } = payload;
                     const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
                     if (!ids || ids.length === 0) {
                         this.setItemSelection({ idtype: idType, selectionIds: [] }, name);
@@ -34,16 +34,18 @@ export class MessagingProxyView extends AView {
                     return;
                 }
                 case 'tdpSetParameter': {
-                    const payload = msg.payload;
-                    const name = payload.name;
+                    const { payload } = msg;
+                    const { name } = payload;
                     const value = payload.value == null ? null : payload.value;
                     if (!name) {
                         console.warn('cannot set item parameter with no name');
                         return;
                     }
                     this.changeParameter(name, value);
-                    return;
+                    break;
                 }
+                default:
+                    break;
             }
         };
         Object.assign(this.options, context.desc, options);
@@ -75,7 +77,7 @@ export class MessagingProxyView extends AView {
         iframe.src = this.options.site;
         // listen on iframe events
         window.addEventListener('message', this.onWindowMessage, {
-            passive: true
+            passive: true,
         });
         this.node.appendChild(iframe);
     }
@@ -104,11 +106,12 @@ export class MessagingProxyView extends AView {
         }
         this.setNoMappingFoundHint(false);
         this.sendMessage({
-            type: 'tdpSetInputSelection', payload: {
+            type: 'tdpSetInputSelection',
+            payload: {
                 name,
                 idType: this.idType.id,
-                ids: selection.selectionIds
-            }
+                ids: selection.selectionIds,
+            },
         });
     }
     sendMessage(msg, queueIfNotExisting = false) {
@@ -125,21 +128,25 @@ export class MessagingProxyView extends AView {
         const s = this.getItemSelection(name);
         if (!s || s.selectionIds.length === 0) {
             this.sendMessage({
-                type: 'tdpSetItemSelection', payload: {
+                type: 'tdpSetItemSelection',
+                payload: {
                     name,
                     idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
-                    ids: []
-                }
+                    ids: [],
+                },
             }, true);
-            return;
+            return undefined;
         }
-        return IDTypeManager.getInstance().mapNameToFirstName(s.idtype, s.selectionIds, this.itemIDType).then((ids) => {
+        return IDTypeManager.getInstance()
+            .mapNameToFirstName(s.idtype, s.selectionIds, this.itemIDType)
+            .then((ids) => {
             this.sendMessage({
-                type: 'tdpSetItemSelection', payload: {
+                type: 'tdpSetItemSelection',
+                payload: {
                     name,
                     idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
-                    ids
-                }
+                    ids,
+                },
             }, true);
         });
     }
@@ -149,14 +156,15 @@ export class MessagingProxyView extends AView {
         }
         const value = this.getParameter(name);
         this.sendMessage({
-            type: 'tdpSetParameter', payload: {
+            type: 'tdpSetParameter',
+            payload: {
                 name,
-                value
-            }
+                value,
+            },
         }, true);
     }
     static isNoNSecurePage(url) {
-        const self = location.protocol.toLowerCase();
+        const self = window.location.protocol.toLowerCase();
         if (!self.startsWith('https')) {
             return false; // if I'm not secure doesn't matter
         }

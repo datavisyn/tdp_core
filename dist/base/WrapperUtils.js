@@ -20,7 +20,7 @@ export class WrapperUtils {
         const w = window;
         w.__caleydo = w.__caleydo || {};
         w.__caleydo.clue = wrapper;
-        //initial jump
+        // initial jump
         const jumpListener = (s) => {
             window.top.postMessage({ type: 'caleydo', clue: 'jumped_to_initial' }, '*');
             wrapper.off('jumped_to', jumpListener);
@@ -33,16 +33,22 @@ export class WrapperUtils {
                 return;
             }
             if (d.clue === 'jump_to') {
-                wrapper.jumpToState(d.state).then(() => {
+                wrapper
+                    .jumpToState(d.state)
+                    .then(() => {
                     s.postMessage({ type: 'caleydo', clue: 'jumped_to', state: d.state, ref: d.ref }, '*');
-                }).catch(() => {
+                })
+                    .catch(() => {
                     s.postMessage({ type: 'caleydo', clue: 'jump_to_error', state: d.state, ref: d.ref }, '*');
                 });
             }
             else if (d.clue === 'show_slide') {
-                wrapper.jumpToStory(d.slide).then(() => {
+                wrapper
+                    .jumpToStory(d.slide)
+                    .then(() => {
                     s.postMessage({ type: 'caleydo', clue: 'show_slide', slide: d.slide, ref: d.ref }, '*');
-                }).catch(() => {
+                })
+                    .catch(() => {
                     s.postMessage({ type: 'caleydo', clue: 'show_slide_error', slide: d.slide, ref: d.ref }, '*');
                 });
             }
@@ -59,14 +65,12 @@ export class WrapperUtils {
         });
     }
     static handleMagicHashElements(body, manager) {
-        //special flag for rendering server side screenshots
+        // special flag for rendering server side screenshots
         if (AppContext.getInstance().hash.has('clue_headless')) {
-            console.log('init headless mode');
             WrapperUtils.injectHeadlessSupport(manager);
             body.classList.add('headless');
         }
         if (AppContext.getInstance().hash.has('clue_contained')) {
-            console.log('init contained mode');
             WrapperUtils.injectParentWindowSupport(manager);
             body.classList.add('headless');
         }
@@ -85,27 +89,27 @@ export class WrapperUtils {
      * @param graph
      */
     static enableKeyboardShortcuts(graph) {
-        //undo using ctrl-z
+        // undo using ctrl-z
         document.addEventListener('keydown', (k) => {
             if (WrapperUtils.triggeredByInputField(k)) {
                 return;
             }
             if (k.keyCode === 90 && k.ctrlKey) {
-                //ctrl-z
+                // ctrl-z
                 k.preventDefault();
                 graph.undo();
             }
             else if (k.keyCode === 37 && k.ctrlKey) {
-                //left arrow 	37
+                // left arrow 	37
                 ModeWrapper.getInstance().setMode(CLUEMode.modes.Exploration);
             }
             else if ((k.keyCode === 38 || k.keyCode === 40) && k.ctrlKey) {
-                //up arrow 	38
-                //down arrow 	40
+                // up arrow 	38
+                // down arrow 	40
                 ModeWrapper.getInstance().setMode(CLUEMode.modes.Authoring);
             }
             else if (k.keyCode === 39 && k.ctrlKey) {
-                //right arrow 	39
+                // right arrow 	39
                 ModeWrapper.getInstance().setMode(CLUEMode.modes.Presentation);
             }
         });

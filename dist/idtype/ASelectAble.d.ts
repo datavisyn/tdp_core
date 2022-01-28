@@ -20,3 +20,4 @@ export interface ISelectAble extends IEventHandler {
 export declare abstract class ASelectAble extends EventHandler {
     static readonly EVENT_SELECT = "select";
 }
+//# sourceMappingURL=ASelectAble.d.ts.map

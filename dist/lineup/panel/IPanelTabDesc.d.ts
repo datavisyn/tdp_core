@@ -31,3 +31,4 @@ export interface IPanelTabDesc {
      */
     shortcut?: boolean;
 }
+//# sourceMappingURL=IPanelTabDesc.d.ts.map

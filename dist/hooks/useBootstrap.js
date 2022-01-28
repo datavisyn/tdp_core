@@ -15,19 +15,24 @@ function useBSClass(clazz, ...options) {
             // Create a new one if there is a ref
             if (ref) {
                 // @ts-ignore The typings are not perfectly shared among all the bootstrap classes.
+                // eslint-disable-next-line new-cap
                 return new clazz(ref, ...options);
             }
             // Set instance to null if no ref is passed
             return null;
         });
-    }, []);
+    }, 
+    // TODO: Check if this causes problems when rerendering
+    [clazz, options]);
     React.useEffect(() => {
         // Whenever we are unmounting (an instance), destroy it.
         return () => instance === null || instance === void 0 ? void 0 : instance.dispose();
     }, [instance]);
     return [setRef, instance];
 }
+// eslint-disable-next-line @typescript-eslint/naming-convention
 function __useBSClass(clazz) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     return (...options) => useBSClass(clazz, ...options);
 }
 export const useBSModal = __useBSClass(Modal);
@@ -56,21 +61,22 @@ ReferenceWrapper.displayName = 'BSReferenceWrapper';
  * @param additionalHook An additional hook to support additional properties for each instance type, i.e. show/hide in modals.
  */
 function BSClass(hook, additionalHook) {
-    return ({ children, instanceRef, 
+    return function InnerBSClass({ children, instanceRef, 
     // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
-    ...options }) => {
+    ...options }) {
         // Instantiate the hook
         const [ref, instance] = hook(options);
         // Store the ref to the onInstance callback to avoid putting it into the deps
         React.useEffect(() => {
             instanceRef === null || instanceRef === void 0 ? void 0 : instanceRef(instance);
-        }, [instance]);
+        }, [instanceRef, instance]);
         // Call the optional additional hook with all options
         additionalHook === null || additionalHook === void 0 ? void 0 : additionalHook(instance, options);
         const callbackRef = React.useCallback((wrapperRef) => {
             try {
                 // Find the DOM node of the wrapper to receive the ref of the child.
                 // @see https://github.com/ctrlplusb/react-sizeme/blob/master/src/with-size.js#L28-L39 for details.
+                // eslint-disable-next-line react/no-find-dom-node
                 ref(ReactDOM.findDOMNode(wrapperRef));
             }
             catch (e) {
@@ -101,6 +107,7 @@ function useBSListeners(instance, listeners) {
                 };
             }
         }
+        return undefined;
     }, [instance, listeners]);
 }
 /**
@@ -123,7 +130,6 @@ function useBSShowHide(instance, show) {
         }
     }, [show, instance]);
 }
-/* tslint:disable: variable-name */
 export const BSModal = BSClass(useBSModal, (instance, { show, setShow }) => {
     useBSListeners(instance, {
         'shown.bs.modal': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
@@ -158,7 +164,7 @@ export const BSOffcanvas = BSClass(useBSOffcanvas, (instance, { show, relatedTar
         else {
             instance === null || instance === void 0 ? void 0 : instance.hide();
         }
-    }, [show, instance]);
+    }, [show, instance, relatedTarget]);
 });
 export const BSTooltip = BSClass(useBSTooltip, (instance, { show, setShow }) => {
     useBSListeners(instance, {
@@ -182,5 +188,4 @@ export const BSDropdown = BSClass(useBSDropdown, (instance, { show, setShow }) =
     });
     useBSShowHide(instance, show);
 });
-/* tslint:enable */
 //# sourceMappingURL=useBootstrap.js.map

@@ -9,3 +9,4 @@ export declare class InstantViewWrapper {
     private clear;
     setSelection(selection?: IItemSelection): void;
 }
+//# sourceMappingURL=InstantViewWrapper.d.ts.map

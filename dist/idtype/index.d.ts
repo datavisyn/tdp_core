@@ -6,3 +6,4 @@ export * from './IDTypeManager';
 export interface IHasUniqueId {
     id: number;
 }
+//# sourceMappingURL=index.d.ts.map

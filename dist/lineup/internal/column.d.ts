@@ -12,3 +12,4 @@ export declare class LazyColumn {
     private static markLoaded;
     private static patchColumn;
 }
+//# sourceMappingURL=column.d.ts.map

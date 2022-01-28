@@ -9,7 +9,7 @@ export class AttributeContainer extends EventHandler {
     persist() {
         if (this.attrMap.size > 0) {
             const attrs = {};
-            this.attrMap.forEach((v, k) => attrs[k] = v);
+            this.attrMap.forEach((v, k) => (attrs[k] = v));
             return { attrs };
         }
         return {};
@@ -20,7 +20,7 @@ export class AttributeContainer extends EventHandler {
             return;
         }
         this.attrMap.set(attr, value);
-        this.fire('attr-' + attr, value, bak);
+        this.fire(`attr-${attr}`, value, bak);
         this.fire('setAttr', attr, value, bak);
     }
     hasAttr(attr) {
@@ -66,7 +66,7 @@ export class GraphNode extends AttributeContainer {
         this._id = UniqueIdManager.getInstance().flagId('graph_node', id);
     }
     get id() {
-        if (isNaN(this._id)) {
+        if (Number.isNaN(this._id)) {
             this._id = UniqueIdManager.getInstance().uniqueId('graph_node');
         }
         return this._id;
@@ -97,7 +97,7 @@ export class GraphEdge extends AttributeContainer {
         }
     }
     get id() {
-        if (isNaN(this._id)) {
+        if (Number.isNaN(this._id)) {
             this._id = UniqueIdManager.getInstance().uniqueId('graph_edge');
         }
         return this._id;
@@ -135,7 +135,7 @@ export class GraphEdge extends AttributeContainer {
         return this;
     }
     static isGraphType(type) {
-        return (edge) => type instanceof RegExp ? type.test(edge.type) : edge.type === type;
+        return (edge) => (type instanceof RegExp ? type.test(edge.type) : edge.type === type);
     }
 }
 export class AGraph extends ASelectAble {

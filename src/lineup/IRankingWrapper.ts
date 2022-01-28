@@ -1,4 +1,4 @@
-import {Column} from 'lineupjs';
+import { Column } from 'lineupjs';
 
 export interface IRankingWrapper {
   sortBy(column: string, asc?: boolean): boolean;

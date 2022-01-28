@@ -1,8 +1,8 @@
-import {AppContext} from '../app/AppContext';
-import {EventHandler} from '../base/event';
-import {IIDType} from './IIDType';
-import {SelectOperation, SelectionUtils} from './SelectionUtils';
-import {ResolveNow} from '../base/promise';
+import { AppContext } from '../app/AppContext';
+import { EventHandler } from '../base/event';
+import { IIDType } from './IIDType';
+import { SelectOperation, SelectionUtils } from './SelectionUtils';
+
 /**
  * An IDType is a semantic aggregation of an entity type, like Patient and Gene.
  *
@@ -10,8 +10,8 @@ import {ResolveNow} from '../base/promise';
  * which is mapped to a common, external identifier or name (string) as well.
  */
 export class IDType extends EventHandler implements IIDType {
-
   static readonly EVENT_SELECT = 'select';
+
   /**
    * the current selections
    */
@@ -31,11 +31,11 @@ export class IDType extends EventHandler implements IIDType {
 
   persist() {
     const s: any = {};
-    this.sel.forEach((v, k) => s[k] = v.toString());
+    this.sel.forEach((v, k) => (s[k] = v.toString()));
     return {
       sel: s,
       name: this.name,
-      names: this.names
+      names: this.names,
     };
   }
 
@@ -77,10 +77,11 @@ export class IDType extends EventHandler implements IIDType {
   select(type: string, selection: string[]): string[];
   select(type: string, selection: string[], op: SelectOperation): string[];
   select() {
+    // eslint-disable-next-line prefer-rest-params
     const a = Array.from(arguments);
-    const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType,
-      selection = a[0],
-      op = SelectionUtils.asSelectOperation(a[1]);
+    const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+    const selection = a[0];
+    const op = SelectionUtils.asSelectOperation(a[1]);
     return this.selectImpl(selection, op, type);
   }
 
@@ -89,7 +90,7 @@ export class IDType extends EventHandler implements IIDType {
     const newValue = SelectionUtils.integrateSelection(b, selection, op);
     this.sel.set(type, newValue);
     const added = op !== SelectOperation.REMOVE ? selection : [];
-    const removed = (op === SelectOperation.ADD ? [] : (op === SelectOperation.SET ? b : selection));
+    const removed = op === SelectOperation.ADD ? [] : op === SelectOperation.SET ? b : selection;
     this.fire(IDType.EVENT_SELECT, type, newValue, added, removed, b);
     this.fire(`${IDType.EVENT_SELECT}-${type}`, newValue, added, removed, b);
     return b;
@@ -114,9 +115,7 @@ export class IDType extends EventHandler implements IIDType {
   }
 }
 
-
-
-export declare type IDTypeLike = string|IDType;
+export declare type IDTypeLike = string | IDType;
 
 export interface IDPair {
   readonly name: string;

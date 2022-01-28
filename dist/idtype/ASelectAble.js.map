@@ -1,1 +1,1 @@
-{"version":3,"file":"ASelectAble.js","sourceRoot":"","sources":["../../src/idtype/ASelectAble.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,YAAY,EAAgC,MAAM,eAAe,CAAC;AAE1E,OAAO,EAAC,MAAM,EAAC,MAAM,UAAU,CAAC;AA2BhC,MAAM,OAAgB,WAAY,SAAQ,YAAY;;AACpC,wBAAY,GAAG,MAAM,CAAC,YAAY,CAAC"}
+{"version":3,"file":"ASelectAble.js","sourceRoot":"","sources":["../../src/idtype/ASelectAble.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAiC,MAAM,eAAe,CAAC;AAE5E,OAAO,EAAE,MAAM,EAAE,MAAM,UAAU,CAAC;AAuBlC,MAAM,OAAgB,WAAY,SAAQ,YAAY;;AACpC,wBAAY,GAAG,MAAM,CAAC,YAAY,CAAC"}
