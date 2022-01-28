@@ -1,9 +1,20 @@
 // TODO override the following SCSS variables once SCSS import is working again
-$lu_dialog_font_size: 1rem !default;
-$lu_toolbar_font_size: 1rem !default;
+$lu_dialog_font_size: 0.9rem !default;
+$lu_toolbar_font_size: 0.9rem !default;
 
 // use css because importing sass file from src requires font awesome v4 dependency
 @import '~lineupjs/build/LineUpJS.css';
+
+.lu {
+  // use a fixed font-size for the ranking + side panel with the Roboto font family.
+  // this font-size corresponds with the visual size of the previous font family Yantramanav
+  // and allows to display more rows by default.
+  // the LineUp zoom buttons are still working as they are using percentages (e.g., `font-size: 100%`)
+  // which works relative to the font size defined here.
+  font-size: 13.4px;
+  // unset to reset the LineUp default line height and set it to the Bootstrap default line height
+  line-height: unset;
+}
 
 // override the font-size manually (since the SCSS variables above does not work)
 .lu-tooltip,
