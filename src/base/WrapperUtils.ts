@@ -76,13 +76,11 @@ export class WrapperUtils {
   static handleMagicHashElements(body: HTMLElement, manager: ICLUEWrapper) {
     // special flag for rendering server side screenshots
     if (AppContext.getInstance().hash.has('clue_headless')) {
-      console.log('init headless mode');
       WrapperUtils.injectHeadlessSupport(manager);
       body.classList.add('headless');
     }
 
     if (AppContext.getInstance().hash.has('clue_contained')) {
-      console.log('init contained mode');
       WrapperUtils.injectParentWindowSupport(manager);
       body.classList.add('headless');
     }

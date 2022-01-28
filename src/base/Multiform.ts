@@ -90,20 +90,17 @@ export class Multiform {
     if (typeof (<any>m).switchTo === 'function') {
       m.on('changed', (event, newValue, old) => {
         if (disabled[`switch-${id}`] !== true) {
-          console.log('push switch');
           graph.push(Multiform.createChangeVis(<IObjectRef<IMultiForm>>v, newValue.id, old ? old.id : null));
         }
       });
     }
     m.on('transform', (event, newValue, old) => {
       if (disabled[`transform-${id}`] !== true) {
-        console.log('push transform');
         graph.push(Multiform.createTransform(v, newValue, old));
       }
     });
     m.on('option', (event, name, newValue, old) => {
       if (disabled[`option-${id}`] !== true) {
-        console.log('push option');
         graph.push(Multiform.createSetOption(v, name, newValue, old));
       }
     });

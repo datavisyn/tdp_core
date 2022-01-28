@@ -71,9 +71,7 @@ export class ProvenanceGraphMenu {
       e.preventDefault();
       e.stopPropagation();
 
-      console.log(this.graph);
       const r = this.graph.persist();
-      console.log(r);
 
       const str = JSON.stringify(r, null, '\t');
       // create blob and save it

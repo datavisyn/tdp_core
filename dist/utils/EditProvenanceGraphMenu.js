@@ -172,9 +172,7 @@ export class EditProvenanceGraphMenu {
             if (!this.graph) {
                 return false;
             }
-            console.log(this.graph);
             const r = this.graph.persist();
-            console.log(r);
             const str = JSON.stringify(r, null, '\t');
             // create blob and save it
             const blob = new Blob([str], { type: 'application/json;charset=utf-8' });

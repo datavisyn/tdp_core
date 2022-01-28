@@ -60,9 +60,7 @@ export class ProvenanceGraphMenu {
             const e = d3event;
             e.preventDefault();
             e.stopPropagation();
-            console.log(this.graph);
             const r = this.graph.persist();
-            console.log(r);
             const str = JSON.stringify(r, null, '\t');
             // create blob and save it
             const blob = new Blob([str], { type: 'application/json;charset=utf-8' });
