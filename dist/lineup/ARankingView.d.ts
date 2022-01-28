@@ -147,3 +147,4 @@ export declare abstract class ARankingView extends AView {
      */
     protected clear(): Promise<void>;
 }
+//# sourceMappingURL=ARankingView.d.ts.map

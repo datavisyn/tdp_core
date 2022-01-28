@@ -60,3 +60,4 @@ export interface IRegistry {
     push(type: string, id: string, loader: () => any, desc?: any): void;
     push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
 }
+//# sourceMappingURL=plugin.d.ts.map

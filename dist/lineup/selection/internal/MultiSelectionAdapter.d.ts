@@ -37,3 +37,4 @@ export declare class MultiSelectionAdapter extends ABaseSelectionAdapter impleme
     private removePartialDynamicColumns;
     private computePositionToInsert;
 }
+//# sourceMappingURL=MultiSelectionAdapter.d.ts.map

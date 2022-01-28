@@ -24,3 +24,4 @@ export declare class SelectionUtils {
     static fillWithNone(r: Range, ndim: number): Range;
     static integrateSelection(current: Range, additional: RangeLike, operation?: SelectOperation): Range;
 }
+//# sourceMappingURL=SelectionUtils.d.ts.map

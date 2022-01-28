@@ -33,3 +33,4 @@ export declare class TabbingLayoutContainer extends AParentLayoutContainer<ITabb
     static derive(node: HTMLElement, derive: (node: HTMLElement) => ILayoutContainer): TabbingLayoutContainer;
     private toggleFrozenLayout;
 }
+//# sourceMappingURL=TabbingLayoutContainer.d.ts.map

@@ -27,3 +27,4 @@ export declare class ValueCache {
     private static instance;
     static getInstance(): ValueCache;
 }
+//# sourceMappingURL=ValueCache.d.ts.map

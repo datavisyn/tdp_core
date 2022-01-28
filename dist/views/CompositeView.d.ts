@@ -72,3 +72,4 @@ export declare class CompositeView extends EventHandler implements IView {
     isRegex(v: string): boolean;
 }
 export {};
+//# sourceMappingURL=CompositeView.d.ts.map

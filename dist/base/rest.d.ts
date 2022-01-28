@@ -240,3 +240,4 @@ export declare class RestBaseUtils {
      */
     static getTDPLookup(database: string, view: string, params?: IParams, assignIds?: boolean): Promise<Readonly<ILookupResult>>;
 }
+//# sourceMappingURL=rest.d.ts.map

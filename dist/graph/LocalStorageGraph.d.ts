@@ -28,3 +28,4 @@ export declare class LocalStorageGraph extends GraphBase implements IGraph {
     clear(): Promise<this>;
     persist(): any;
 }
+//# sourceMappingURL=LocalStorageGraph.d.ts.map

@@ -140,3 +140,4 @@ export interface IARankingViewOptions {
      */
     panelAddColumnBtnOptions: IPanelAddColumnButtonOptions;
 }
+//# sourceMappingURL=IARankingViewOptions.d.ts.map

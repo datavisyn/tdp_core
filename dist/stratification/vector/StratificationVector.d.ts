@@ -33,3 +33,4 @@ export declare class StratificationVector extends ADataType<IStratificationDataD
         asstrat: boolean;
     };
 }
+//# sourceMappingURL=StratificationVector.d.ts.map

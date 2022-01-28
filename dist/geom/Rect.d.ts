@@ -31,3 +31,4 @@ export declare class Rect extends AShape implements IRect {
     asIntersectionParams(): IIntersectionParam;
     static rect(x: number, y: number, w: number, h: number): Rect;
 }
+//# sourceMappingURL=Rect.d.ts.map

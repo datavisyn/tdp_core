@@ -9,3 +9,4 @@ export declare class PanelRankingButton implements IPanelButton {
     readonly node: HTMLElement;
     constructor(parent: HTMLElement, provider: LocalDataProvider, title: string, cssClass: string, faIcon: string, onClick: (ranking: Ranking) => void);
 }
+//# sourceMappingURL=PanelRankingButton.d.ts.map

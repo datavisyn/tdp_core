@@ -12,7 +12,7 @@ export declare class RangeElem implements IRangeElem {
     static all(): RangeElem;
     static none(): RangeElem;
     static single(val: number): SingleRangeElem;
-    static range(from: number, to?: number, step?: number): RangeElem | SingleRangeElem;
+    static range(from: number, to?: number, step?: number): SingleRangeElem | RangeElem;
     size(size?: number): number;
     clone(): RangeElem;
     reverse(): RangeElem;
@@ -25,5 +25,6 @@ export declare class RangeElem implements IRangeElem {
     get __iterator__(): IIterator<number>;
     contains(value: number, size?: number): boolean;
     toString(): string;
-    static parse(code: string): RangeElem | SingleRangeElem;
+    static parse(code: string): SingleRangeElem | RangeElem;
 }
+//# sourceMappingURL=RangeElem.d.ts.map

@@ -27,9 +27,7 @@ module.exports = {
     // Make sure eslint and VS Code use the same path for the tsconfig.json:
     // https://github.com/typescript-eslint/typescript-eslint/issues/251
     tsconfigRootDir: __dirname,
-    project: "./tsconfig.json",
-    ecmaVersion: 2018, 
-    sourceType: 'module'
+    project: "./tsconfig.eslint.json"
   },
   rules: {
     // Disables jsx-a11y https://github.com/import-js/eslint-plugin-import/blob/v2.25.4/docs/rules/no-webpack-loader-syntax.md

@@ -63,3 +63,4 @@ export declare class LineupUtils {
     static set_diff<T>(set1: Set<T>, set2: Set<T>): Set<T>;
     static wrapRanking(data: LocalDataProvider, ranking: Ranking): IRankingWrapper;
 }
+//# sourceMappingURL=utils.d.ts.map

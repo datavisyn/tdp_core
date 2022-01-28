@@ -33,3 +33,4 @@ export declare class ProxyView extends AD3View {
     private showNoHttpsMessage;
     static create(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<IProxyViewOptions>): ProxyView;
 }
+//# sourceMappingURL=ProxyView.d.ts.map

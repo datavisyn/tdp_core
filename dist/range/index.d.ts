@@ -5,3 +5,4 @@ export * from './Range';
 export * from './CompositeRange1D';
 export * from './RangeLike';
 export * from './parser';
+//# sourceMappingURL=index.d.ts.map

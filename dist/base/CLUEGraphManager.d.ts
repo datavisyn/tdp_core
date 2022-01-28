@@ -51,3 +51,4 @@ export declare class CLUEGraphManager extends EventHandler {
      */
     static choose(manager: CLUEGraphManager): Promise<ProvenanceGraph>;
 }
+//# sourceMappingURL=CLUEGraphManager.d.ts.map

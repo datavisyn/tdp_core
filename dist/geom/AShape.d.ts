@@ -39,3 +39,4 @@ export declare abstract class AShape implements IShape {
     abstract asIntersectionParams(): IIntersectionParam;
     intersects(other: AShape): any;
 }
+//# sourceMappingURL=AShape.d.ts.map

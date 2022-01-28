@@ -16,3 +16,4 @@ import { Range } from './Range';
  * rules on string ranges.
  */
 export declare type RangeLike = Range | number[] | number[][] | string;
+//# sourceMappingURL=RangeLike.d.ts.map

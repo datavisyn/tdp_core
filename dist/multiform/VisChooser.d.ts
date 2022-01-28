@@ -9,3 +9,4 @@ export declare class VisChooser {
     static addIconVisChooser(toolbar: HTMLElement, ...forms: IMultiForm[]): void;
     static addSelectVisChooser(toolbar: HTMLElement, ...forms: IMultiForm[]): void;
 }
+//# sourceMappingURL=VisChooser.d.ts.map

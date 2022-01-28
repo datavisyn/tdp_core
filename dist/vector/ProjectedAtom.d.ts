@@ -29,3 +29,4 @@ export declare class ProjectedAtom<T, D extends IValueTypeDesc, M, MD extends IV
     };
     restore(persisted: any): this;
 }
+//# sourceMappingURL=ProjectedAtom.d.ts.map

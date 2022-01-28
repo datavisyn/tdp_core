@@ -16,3 +16,4 @@ export interface ILogoutOptions {
         redirect?: string;
     };
 }
+//# sourceMappingURL=interfaces.d.ts.map

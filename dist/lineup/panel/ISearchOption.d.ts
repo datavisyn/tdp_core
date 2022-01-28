@@ -10,3 +10,4 @@ export interface ISearchOption extends Pick<IAdditionalColumnDesc, 'chooserGroup
      */
     desc?: IColumnDesc;
 }
+//# sourceMappingURL=ISearchOption.d.ts.map

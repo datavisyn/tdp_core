@@ -38,3 +38,4 @@ export declare class StateNode extends GraphNode {
     static resultsIn<T>(node: GraphNode): StateNode;
     static previous(node: GraphNode): StateNode;
 }
+//# sourceMappingURL=StateNode.d.ts.map

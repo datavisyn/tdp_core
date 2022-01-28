@@ -30,3 +30,4 @@ export declare abstract class PHOVEA_CORE_AView extends EventHandler implements 
     layoutOption<T>(name: string, defaultValue?: T): T;
     static list(): IViewDesc[];
 }
+//# sourceMappingURL=layout_view.d.ts.map

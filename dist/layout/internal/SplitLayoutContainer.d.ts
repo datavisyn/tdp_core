@@ -34,3 +34,4 @@ export declare class SplitLayoutContainer extends ASequentialLayoutContainer<ISe
     static restore(dump: ILayoutDump, restore: (dump: ILayoutDump) => ILayoutContainer, doc: Document): SplitLayoutContainer;
     static derive(node: HTMLElement, derive: (node: HTMLElement) => ILayoutContainer): SplitLayoutContainer;
 }
+//# sourceMappingURL=SplitLayoutContainer.d.ts.map

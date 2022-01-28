@@ -35,3 +35,4 @@ export declare class ReactViewWrapper extends AReactView {
     protected getItemType(): any;
     render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector): JSX.Element;
 }
+//# sourceMappingURL=ReactViewWrapper.d.ts.map

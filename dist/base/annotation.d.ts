@@ -57,3 +57,4 @@ export declare class Renderer {
         render: any;
     };
 }
+//# sourceMappingURL=annotation.d.ts.map

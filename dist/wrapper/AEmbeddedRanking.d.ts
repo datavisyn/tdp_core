@@ -38,3 +38,4 @@ export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewP
      */
     protected getParameterFormDescs(): IFormElementDesc[];
 }
+//# sourceMappingURL=AEmbeddedRanking.d.ts.map

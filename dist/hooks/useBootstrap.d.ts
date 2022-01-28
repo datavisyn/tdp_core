@@ -121,3 +121,4 @@ export declare const BSDropdown: ({ children, instanceRef, ...options }: {
     show?: boolean;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
+//# sourceMappingURL=useBootstrap.d.ts.map

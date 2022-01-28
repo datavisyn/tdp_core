@@ -423,3 +423,4 @@ export interface IAppExtensionExtension {
 export interface IAppExtensionExtensionDesc extends IPluginDesc {
     load(): Promise<IPlugin & IAppExtensionExtension>;
 }
+//# sourceMappingURL=interfaces.d.ts.map

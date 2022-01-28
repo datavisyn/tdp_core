@@ -18,3 +18,4 @@ export declare class GraphProxy extends ADataType<IGraphDataDescription> {
      */
     static create(desc: IGraphDataDescription): GraphProxy;
 }
+//# sourceMappingURL=GraphProxy.d.ts.map

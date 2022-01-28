@@ -112,3 +112,4 @@ export declare class FormSelect2 extends AFormElement<IFormSelect2> {
     static sameIds(a: string[], b: string[]): boolean;
 }
 export {};
+//# sourceMappingURL=FormSelect2.d.ts.map

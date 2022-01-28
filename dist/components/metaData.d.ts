@@ -10,3 +10,4 @@ export interface IAppMetaData {
 export declare class AppMetaDataUtils {
     static getMetaData(): Promise<IAppMetaData>;
 }
+//# sourceMappingURL=metaData.d.ts.map

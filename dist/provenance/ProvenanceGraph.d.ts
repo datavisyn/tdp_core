@@ -106,3 +106,4 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     static updateInverse(node: ActionNode, graph: ProvenanceGraph, inverter: IInverseActionCreator): void;
     static execute(node: ActionNode, graph: ProvenanceGraph, withinMilliseconds: number): PromiseLike<ICmdResult>;
 }
+//# sourceMappingURL=ProvenanceGraph.d.ts.map

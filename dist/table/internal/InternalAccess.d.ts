@@ -6,3 +6,4 @@ export interface IInternalAccess {
      */
     dataOfColumn<T>(column: string, range?: RangeLike): Promise<T[]>;
 }
+//# sourceMappingURL=InternalAccess.d.ts.map

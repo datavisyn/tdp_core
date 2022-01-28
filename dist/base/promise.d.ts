@@ -9,3 +9,4 @@ export declare class ResolveNow<T> implements PromiseLike<T> {
      */
     static resolveImmediately<T>(result: T | PromiseLike<T>): PromiseLike<T>;
 }
+//# sourceMappingURL=promise.d.ts.map

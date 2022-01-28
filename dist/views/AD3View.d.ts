@@ -9,3 +9,4 @@ export declare abstract class AD3View extends AView {
     protected readonly $node: Selection<this>;
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement);
 }
+//# sourceMappingURL=AD3View.d.ts.map

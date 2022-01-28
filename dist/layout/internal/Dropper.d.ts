@@ -7,3 +7,4 @@ export declare class Dropper {
     static dropLogic(item: ILayoutContainer, reference: ALayoutContainer<any> & ILayoutContainer, area: IDropArea): any;
     static autoWrap(item: ILayoutContainer): ILayoutContainer | TabbingLayoutContainer;
 }
+//# sourceMappingURL=Dropper.d.ts.map

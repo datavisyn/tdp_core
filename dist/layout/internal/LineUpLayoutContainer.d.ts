@@ -25,3 +25,4 @@ export declare class LineUpLayoutContainer extends ASequentialLayoutContainer<IL
         stackLayout: boolean;
     };
 }
+//# sourceMappingURL=LineUpLayoutContainer.d.ts.map

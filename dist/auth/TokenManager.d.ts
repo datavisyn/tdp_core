@@ -108,3 +108,4 @@ export declare class InvalidTokenError extends Error {
  */
 export declare const TDPTokenManager: TokenManager;
 export {};
+//# sourceMappingURL=TokenManager.d.ts.map

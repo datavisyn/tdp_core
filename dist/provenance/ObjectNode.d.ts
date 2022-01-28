@@ -82,3 +82,4 @@ export declare class ObjectNode<T> extends GraphNode implements IObjectRef<T> {
     static restore(p: any): ObjectNode<any>;
     toString(): string;
 }
+//# sourceMappingURL=ObjectNode.d.ts.map

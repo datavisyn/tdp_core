@@ -44,3 +44,4 @@ export declare class SidePanelTab extends PanelTab {
      */
     constructor(parent: HTMLElement, search: SearchBox<ISearchOption>, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, doc?: Document, options?: IPanelTabDesc);
 }
+//# sourceMappingURL=PanelTab.d.ts.map

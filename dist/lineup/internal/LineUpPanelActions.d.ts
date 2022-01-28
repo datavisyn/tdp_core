@@ -51,3 +51,4 @@ export declare class LineUpPanelActions extends EventHandler {
     private buildMetaDataDescriptions;
     private scoreColumnDialog;
 }
+//# sourceMappingURL=LineUpPanelActions.d.ts.map

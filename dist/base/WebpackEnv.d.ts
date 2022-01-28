@@ -6,3 +6,4 @@ export declare class WebpackEnv {
     static __APP_CONTEXT__: string;
     static __DEBUG__: string;
 }
+//# sourceMappingURL=WebpackEnv.d.ts.map

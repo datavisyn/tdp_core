@@ -49,3 +49,4 @@ export interface ISelectionAdapter {
      */
     selectionChanged(waitForIt: Promise<any> | null, context: () => IContext): PromiseLike<any>;
 }
+//# sourceMappingURL=ISelectionAdapter.d.ts.map

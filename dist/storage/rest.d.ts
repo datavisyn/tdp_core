@@ -30,3 +30,4 @@ export declare class RestStorageUtils {
      */
     static addAttachment(data: object): Promise<string>;
 }
+//# sourceMappingURL=rest.d.ts.map

@@ -29,3 +29,4 @@ export declare abstract class AOverviewDetailRankingView extends ARankingView {
         rows: IRow[];
     }): void;
 }
+//# sourceMappingURL=AOverviewDetailRankingView.d.ts.map

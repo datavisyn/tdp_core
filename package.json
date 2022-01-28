@@ -51,8 +51,8 @@
     "test:web": "test ! $(find tests -name \"*.ts\") || jest -w=1",
     "test:python": "test ! $(find tests -name \"*.py\") || python setup.py test",
     "test": "npm run test:web && npm run test:python",
-    "lint": "eslint src/**/*.ts{,x}",
-    "lint:fix": "eslint --fix src/**/*.ts{,x}",
+    "lint": "eslint --cache src/**/*.ts{,x} tests/**/*.ts{,x}",
+    "lint:fix": "eslint --fix --cache src/**/*.ts{,x} tests/**/*.ts{,x}",
     "docs:web": "typedoc --options typedoc.json src/**.ts",
     "docs:python": "sphinx-apidoc -o docs -f ./tdp_core && sphinx-build ./docs build/docs",
     "docs": "npm run docs:web && npm run docs:python",
@@ -78,8 +78,7 @@
     "docker": "docker build -t tdp_core -f deploy/Dockerfile .",
     "db-migration:base": "docker-compose run api python phovea_server/__main__.py --env dev db-migration",
     "db-migration": "npm run db-migration:base exec --",
-    "db-migration:list": "npm run db-migration:base list --",
-    "precommit": "npm run build"
+    "db-migration:list": "npm run db-migration:base list --"
   },
   "dependencies": {
     "d3": "~3.5.17",
@@ -127,7 +126,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "husky": "^7.0.4",
     "identity-obj-proxy": "~3.0.0",
     "jest": "~26.6.3",
     "jest-raw-loader": "~1.0.1",

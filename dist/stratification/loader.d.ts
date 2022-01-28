@@ -12,3 +12,4 @@ export declare class StratificationLoaderUtils {
     static viaAPILoader(): IStratificationLoader;
     static viaDataLoader(rows: string[], rowIds: number[], range: CompositeRange1D): IStratificationLoader;
 }
+//# sourceMappingURL=loader.d.ts.map

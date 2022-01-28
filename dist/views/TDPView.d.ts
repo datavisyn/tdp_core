@@ -36,3 +36,4 @@ export declare class TDPView extends React.Component<Readonly<ITDPViewProps>, IT
     private selectNative;
     render(): JSX.Element;
 }
+//# sourceMappingURL=TDPView.d.ts.map

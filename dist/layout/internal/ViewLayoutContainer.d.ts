@@ -39,3 +39,4 @@ export declare class ViewLayoutContainer extends ALayoutContainer<IViewLayoutCon
     static restore(dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView, doc: Document): ViewLayoutContainer;
     static derive(view: PHOVEA_UI_IView): ViewLayoutContainer;
 }
+//# sourceMappingURL=ViewLayoutContainer.d.ts.map

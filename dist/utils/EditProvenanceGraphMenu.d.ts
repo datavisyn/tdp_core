@@ -9,3 +9,4 @@ export declare class EditProvenanceGraphMenu {
     setGraph(graph: ProvenanceGraph): void;
     private init;
 }
+//# sourceMappingURL=EditProvenanceGraphMenu.d.ts.map

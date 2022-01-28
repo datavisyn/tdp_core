@@ -42,3 +42,4 @@ export declare class StratificationGroup extends ASelectAble implements IStratif
     };
     restore(persisted: any): this;
 }
+//# sourceMappingURL=StratificationGroup.d.ts.map

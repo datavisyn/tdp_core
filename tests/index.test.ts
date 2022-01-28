@@ -1,21 +1,16 @@
 /// <reference types="jest" />
-import {BaseUtils} from '../src/base/BaseUtils';
-import {ArrayUtils} from '../src/base/ArrayUtils';
-import {UniqueIdManager} from '../src/app/UniqueIdManager';
-
+import { BaseUtils } from '../src/base/BaseUtils';
+import { ArrayUtils } from '../src/base/ArrayUtils';
+import { UniqueIdManager } from '../src/app/UniqueIdManager';
 
 import * as pkg from '../package.json';
 
-
 describe('argFilter', () => {
-  it('evens', () => expect(ArrayUtils.argFilter([1, 3, 5, 2, 4, 6, 7, 9, 11], (d) => d % 2 === 0))
-      .toEqual([3, 4, 5]));
+  it('evens', () => expect(ArrayUtils.argFilter([1, 3, 5, 2, 4, 6, 7, 9, 11], (d) => d % 2 === 0)).toEqual([3, 4, 5]));
 });
 
 describe('argSort', () => {
-  it('length', () => expect(ArrayUtils.argSort(['lizard', 'marsupial', 'cat', 'dolphin'], (a, b) => a.length - b.length))
-      .toEqual([2, 0, 3, 1])
-  );
+  it('length', () => expect(ArrayUtils.argSort(['lizard', 'marsupial', 'cat', 'dolphin'], (a, b) => a.length - b.length)).toEqual([2, 0, 3, 1]));
 });
 
 describe('mod', () => {
@@ -33,8 +28,10 @@ describe('bounds', () => {
   // TODO: DOM object
 });
 
-//regex for sem ver: https://github.com/sindresorhus/semver-regex/blob/master/index.js
-it('version is sem ver', () => expect(pkg.version).toMatch(/\bv?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?\b/ig));
+// regex for sem ver: https://github.com/sindresorhus/semver-regex/blob/master/index.js
+it('version is sem ver', () =>
+  // eslint-disable-next-line no-useless-escape
+  expect(pkg.version).toMatch(/\bv?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?\b/gi));
 
 describe('uniqueId', () => {
   it('first time', () => expect(UniqueIdManager.getInstance().uniqueId()).toEqual(0));
@@ -48,13 +45,12 @@ describe('uniqueString', () => {
 });
 
 describe('resolveIn', () => {
-  it('200ms', (done) => {
+  it('200ms', async () => {
     const past = Date.now();
-    BaseUtils.resolveIn(200).then(function() {
+    await BaseUtils.resolveIn(200).then(() => {
       const present = Date.now();
       const actual = present - past;
       expect(actual).toBeGreaterThanOrEqual(200);
-      done();
     });
   });
 });
@@ -137,4 +133,3 @@ it('flagId', () => expect(UniqueIdManager.getInstance().flagId('fake', 1)).toEqu
 // TODO: Add at least one test for main.server_json_suffix
 // TODO: Add at least one test for main.server_url
 // TODO: Add at least one test for main.updateDropEffect
-
