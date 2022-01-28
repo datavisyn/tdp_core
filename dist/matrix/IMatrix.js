@@ -6,7 +6,7 @@ export class MatrixUtils {
             type: 'matrix',
             rowtype: '_rows',
             coltype: '_cols',
-            size: [0, 0]
+            size: [0, 0],
         });
     }
 }

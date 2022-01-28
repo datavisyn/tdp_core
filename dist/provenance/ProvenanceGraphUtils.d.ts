@@ -1,6 +1,6 @@
 import { ObjectNode, IObjectRef } from './ObjectNode';
 import { ActionNode } from './ActionNode';
-import { IGraphFactory } from '../graph/GraphBase';
+import type { IGraphFactory } from '../graph/GraphBase';
 export declare class ProvenanceGraphUtils {
     private static removeNoops;
     private static compositeCompressor;
@@ -27,3 +27,4 @@ export declare class ProvenanceGraphUtils {
     static provenanceGraphFactory(): IGraphFactory;
     static findMetaObject<T>(find: IObjectRef<T>): (obj: ObjectNode<any>) => boolean;
 }
+//# sourceMappingURL=ProvenanceGraphUtils.d.ts.map

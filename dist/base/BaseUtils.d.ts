@@ -135,3 +135,4 @@ export declare class BaseUtils {
  * @param wait Wait time in milliseconds.
  */
 export declare function debounceAsync<T, Callback extends (...args: any[]) => Promise<T>>(callback: Callback, wait: number): (...args: Parameters<Callback>) => Promise<T>;
+//# sourceMappingURL=BaseUtils.d.ts.map

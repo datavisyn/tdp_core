@@ -1,20 +1,19 @@
-import {Range, RangeLike} from '../../range';
-import {CompositeRange1D} from '../../range/CompositeRange1D';
-import {IDataType, ADataType, IValueTypeDesc,} from '../../data';
-import {IHistogram, RangeHistogram} from '../../data/histogram';
-import {ICategoricalVector, IVector} from '../../vector/IVector';
-import {IStratification, IStratificationDataDescription} from '../IStratification';
-import {StratificationGroup} from '../StratificationGroup';
+import { Range, RangeLike } from '../../range';
+import { CompositeRange1D } from '../../range/CompositeRange1D';
+import { IDataType, ADataType, IValueTypeDesc } from '../../data';
+import { IHistogram, RangeHistogram } from '../../data/histogram';
+import { ICategoricalVector, IVector } from '../../vector/IVector';
+import { IStratification, IStratificationDataDescription } from '../IStratification';
+import { StratificationGroup } from '../StratificationGroup';
 
 /**
  * root matrix implementation holding the data
  * @internal
  */
 export class StratificationVector extends ADataType<IStratificationDataDescription> implements IStratification {
-
   constructor(private v: IVector<any, IValueTypeDesc>, private r: CompositeRange1D) {
     super({
-      id: v.desc.id + '-s',
+      id: `${v.desc.id}-s`,
       name: v.desc.name,
       description: v.desc.description,
       creator: v.desc.creator,
@@ -24,7 +23,7 @@ export class StratificationVector extends ADataType<IStratificationDataDescripti
       idtype: v.idtype.id,
       size: v.length,
       ngroups: r.groups.length,
-      groups: r.groups.map((ri) => ({name: ri.name, color: ri.color, size: ri.length}))
+      groups: r.groups.map((ri) => ({ name: ri.name, color: ri.color, size: ri.length })),
     });
   }
 
@@ -97,7 +96,7 @@ export class StratificationVector extends ADataType<IStratificationDataDescripti
   persist() {
     return {
       root: this.v.persist(),
-      asstrat: true
+      asstrat: true,
     };
   }
 }

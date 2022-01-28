@@ -13,7 +13,7 @@ function filterObjects(objs, range, desc) {
         const toKeepNames = toKeep.map((col) => col.column || col.name);
         return objs.map((obj) => {
             const r = {};
-            toKeepNames.forEach((key) => r[key] = obj[key]);
+            toKeepNames.forEach((key) => (r[key] = obj[key]));
             return r;
         });
     }
@@ -24,13 +24,17 @@ export class TableLoaderUtils {
      * @internal
      */
     static viaAPIViewLoader(name, args) {
-        let _loader = undefined;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        let _loader;
         return (desc) => {
-            if (!_loader) { //in the cache
-                _loader = AppContext.getInstance().getAPIJSON(`/dataset/table/${desc.id}/view/${name}`, args).then((data) => {
+            if (!_loader) {
+                // in the cache
+                _loader = AppContext.getInstance()
+                    .getAPIJSON(`/dataset/table/${desc.id}/view/${name}`, args)
+                    .then((data) => {
                     data.rowIds = ParseRangeUtils.parseRangeLike(data.rowIds);
                     data.objs = TableLoaderUtils.maskObjects(data.data, desc);
-                    //mask the data
+                    // mask the data
                     return data;
                 });
             }
@@ -38,18 +42,18 @@ export class TableLoaderUtils {
         };
     }
     static maskCol(arr, col) {
-        //mask data
+        // mask data
         if (col.value && (col.value.type === ValueTypeUtils.VALUE_TYPE_INT || col.value.type === ValueTypeUtils.VALUE_TYPE_REAL)) {
             return ValueTypeUtils.mask(arr, col.value);
         }
         return arr;
     }
     static maskObjects(arr, desc) {
-        //mask data
+        // mask data
         const maskAble = desc.columns.filter((col) => col.value && (col.value.type === ValueTypeUtils.VALUE_TYPE_INT || col.value.type === ValueTypeUtils.VALUE_TYPE_REAL));
         if (maskAble.length > 0) {
             arr.forEach((row) => {
-                maskAble.forEach((col) => row[col.name] = ValueTypeUtils.mask(row[col.name], col.value));
+                maskAble.forEach((col) => (row[col.name] = ValueTypeUtils.mask(row[col.name], col.value)));
             });
         }
         return arr;
@@ -59,13 +63,16 @@ export class TableLoaderUtils {
      */
     static viaAPI2Loader() {
         const cols = {};
-        let rowIds = null, rows = null, objs = null, data = null;
+        let rowIds = null;
+        let rows = null;
+        let objs = null;
+        let data = null;
         function fillIds(desc) {
             if (rowIds !== null && rows !== null) {
                 Promise.all([rowIds, rows]).then(([rowIdValues, rowValues]) => {
                     const idType = IDTypeManager.getInstance().resolveIdType(desc.idtype);
-                    const rowIds = ParseRangeUtils.parseRangeLike(rowIdValues);
-                    idType.fillMapCache(rowIds.dim(0).asList(rowValues.length), rowValues);
+                    const rIds = ParseRangeUtils.parseRangeLike(rowIdValues);
+                    idType.fillMapCache(rIds.dim(0).asList(rowValues.length), rowValues);
                 });
             }
         }
@@ -86,56 +93,69 @@ export class TableLoaderUtils {
             },
             objs: (desc, range) => {
                 if (objs == null && (range.isAll || desc.loadAtOnce)) {
-                    objs = AppContext.getInstance().getAPIJSON(`/dataset/table/${desc.id}/raw`).then((data) => TableLoaderUtils.maskObjects(data, desc));
+                    objs = AppContext.getInstance()
+                        .getAPIJSON(`/dataset/table/${desc.id}/raw`)
+                        .then((d) => TableLoaderUtils.maskObjects(d, desc));
                 }
                 if (range.isAll) {
                     return objs;
                 }
-                if (objs != null) { //already loading all
+                if (objs != null) {
+                    // already loading all
                     return objs.then((d) => range.filter(d, desc.size));
                 }
-                //server side slicing
-                return AppContext.getInstance().getAPIData(`/dataset/table/${desc.id}/raw`, { range: range.toString() }).then((data) => TableLoaderUtils.maskObjects(data, desc));
+                // server side slicing
+                return AppContext.getInstance()
+                    .getAPIData(`/dataset/table/${desc.id}/raw`, { range: range.toString() })
+                    .then((d) => TableLoaderUtils.maskObjects(d, desc));
             },
             data: (desc, range) => {
                 if (data == null && (range.isAll || desc.loadAtOnce)) {
-                    data = r.objs(desc, Range.all()).then((objs) => TableLoaderUtils.toFlat(objs, desc.columns));
+                    data = r.objs(desc, Range.all()).then((obs) => TableLoaderUtils.toFlat(obs, desc.columns));
                 }
                 if (range.isAll) {
                     return data;
                 }
-                if (data != null) { //already loading all
+                if (data != null) {
+                    // already loading all
                     return data.then((d) => range.filter(d, desc.size));
                 }
-                //server side slicing
-                return r.objs(desc, range).then((objs) => TableLoaderUtils.toFlat(objs, desc.columns));
+                // server side slicing
+                return r.objs(desc, range).then((obs) => TableLoaderUtils.toFlat(obs, desc.columns));
             },
             col: (desc, column, range) => {
                 const colDesc = desc.columns.find((c) => c.column === column || c.name === column);
                 if (cols[column] == null && (range.isAll || desc.loadAtOnce)) {
                     if (objs === null) {
                         if (desc.loadAtOnce) {
-                            objs = AppContext.getInstance().getAPIJSON(`/dataset/table/${desc.id}/raw`).then((data) => TableLoaderUtils.maskObjects(data, desc));
-                            cols[column] = objs.then((objs) => objs.map((row) => row[column]));
+                            objs = AppContext.getInstance()
+                                .getAPIJSON(`/dataset/table/${desc.id}/raw`)
+                                .then((d) => TableLoaderUtils.maskObjects(d, desc));
+                            cols[column] = objs.then((obs) => obs.map((row) => row[column]));
                         }
                         else {
-                            cols[column] = AppContext.getInstance().getAPIJSON(`/dataset/table/${desc.id}/col/${column}`).then((data) => TableLoaderUtils.maskCol(data, colDesc));
+                            cols[column] = AppContext.getInstance()
+                                .getAPIJSON(`/dataset/table/${desc.id}/col/${column}`)
+                                .then((d) => TableLoaderUtils.maskCol(d, colDesc));
                         }
                     }
                     else {
-                        cols[column] = objs.then((objs) => objs.map((row) => row[column]));
+                        cols[column] = objs.then((obs) => obs.map((row) => row[column]));
                     }
                 }
                 if (range.isAll) {
                     return cols[column];
                 }
-                if (cols[column] != null) { //already loading all
+                if (cols[column] != null) {
+                    // already loading all
                     return cols[column].then((d) => filterObjects(d, range, desc));
                 }
-                //server side slicing
-                return AppContext.getInstance().getAPIData(`/dataset/table/${desc.id}/col/${column}`, { range: range.toString() }).then((data) => TableLoaderUtils.maskCol(data, colDesc));
+                // server side slicing
+                return AppContext.getInstance()
+                    .getAPIData(`/dataset/table/${desc.id}/col/${column}`, { range: range.toString() })
+                    .then((d) => TableLoaderUtils.maskCol(d, colDesc));
             },
-            view: (desc, name, args) => TableLoaderUtils.viaAPIViewLoader(name, args)
+            view: (desc, name, args) => TableLoaderUtils.viaAPIViewLoader(name, args),
         };
         return r;
     }
@@ -146,12 +166,14 @@ export class TableLoaderUtils {
      * @internal
      */
     static viaDataLoader(data, nameProperty) {
-        let _data = undefined;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        let _data;
         return (desc) => {
-            if (_data) { //in the cache
+            if (_data) {
+                // in the cache
                 return Promise.resolve(_data);
             }
-            const name = typeof (nameProperty) === 'function' ? nameProperty : (d) => d[nameProperty.toString()];
+            const name = typeof nameProperty === 'function' ? nameProperty : (d) => d[nameProperty.toString()];
             function toGetter(col) {
                 if (col.getter) {
                     return col.getter;
@@ -171,7 +193,7 @@ export class TableLoaderUtils {
                 rowIds: desc.rowassigner ? desc.rowassigner.map(rows) : Range.range(0, data.length),
                 rows,
                 objs,
-                data: getters.map((getter) => data.map(getter))
+                data: getters.map((getter) => data.map(getter)),
             };
             return Promise.resolve(_data);
         };
@@ -183,12 +205,12 @@ export class TableLoaderUtils {
         return {
             rowIds: (desc, range) => loader(desc).then((d) => range.preMultiply(d.rowIds, desc.size)),
             rows: (desc, range) => loader(desc).then((d) => range.dim(0).filter(d.rows, desc.size[0])),
-            col: (desc, column, range) => loader(desc).then((d) => range.filter(d.objs.map((d) => d[column]), desc.size)),
+            col: (desc, column, range) => loader(desc).then((d) => range.filter(d.objs.map((a) => a[column]), desc.size)),
             objs: (desc, range) => loader(desc).then((d) => filterObjects(d.objs, range, desc)),
             data: (desc, range) => loader(desc).then((d) => range.filter(TableLoaderUtils.toFlat(d.objs, desc.columns), desc.size)),
             view: (desc, name, args) => {
                 throw new Error('not implemented');
-            }
+            },
         };
     }
 }

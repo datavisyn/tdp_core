@@ -6,3 +6,4 @@ export declare class PhoveaDataAdapter {
     getDesc(): Promise<IServerColumnDesc>;
     getRows(): Promise<IRow[]>;
 }
+//# sourceMappingURL=PhoveaDataAdapter.d.ts.map

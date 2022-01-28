@@ -65,3 +65,4 @@ export declare class Intersection {
     static bezout(e1: number[], e2: number[]): Polynomial;
     static intersectShape(path: Path, shape: IShape): Intersection;
 }
+//# sourceMappingURL=Intersection.d.ts.map

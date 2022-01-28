@@ -6,3 +6,4 @@ export declare class ErrorAlertHandler {
     private static instance;
     static getInstance(): ErrorAlertHandler;
 }
+//# sourceMappingURL=ErrorAlertHandler.d.ts.map

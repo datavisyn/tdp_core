@@ -1,8 +1,10 @@
 import * as d3 from 'd3';
-import {BaseUtils, ResolveNow} from '.';
-import {ProvenanceGraph, SlideNode} from '../provenance';
+import { ProvenanceGraph, SlideNode } from '../provenance';
+import { BaseUtils } from './BaseUtils';
+import { ResolveNow } from './promise';
 
-export module StoryTransition {
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace StoryTransition {
   export const FACTOR = 1;
   export const MIN_DURATION = -1;
   export const MIN_TRANSITION = -1;
@@ -15,16 +17,17 @@ export class Player {
   private anim = -1;
 
   private options = {
-    //default animation step duration
-    step: 1000
+    // default animation step duration
+    step: 1000,
   };
 
-  private $play:d3.Selection<any>;
+  private $play: d3.Selection<any>;
 
-  constructor(private graph: ProvenanceGraph, controls:Element, options:any = {}) {
+  constructor(private graph: ProvenanceGraph, controls: Element, options: any = {}) {
     BaseUtils.mixin(this.options, options);
 
     const $controls = d3.select(controls);
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
 
     this.$play = $controls.select('[data-player="play"]').on('click', function () {
@@ -49,26 +52,27 @@ export class Player {
 
     d3.select(document).on('keydown.playpause', () => {
       const k = <KeyboardEvent>d3.event;
-      //pause key
+      // pause key
       if (k.keyCode === 19) {
         k.preventDefault();
-        //fake a click event
+        // fake a click event
         const event = <MouseEvent>document.createEvent('MouseEvents');
-        event.initMouseEvent('click', /* type */
-          true, /* canBubble */
-          true, /* cancelable */
-          window, /* view */
-          0, /* detail */
-          0, /* screenX */
-          0, /* screenY */
-          0, /* clientX */
-          0, /* clientY */
-          false, /* ctrlKey */
-          false, /* altKey */
-          false, /* shiftKey */
-          false, /* metaKey */
-          0, /* button */
-          null /* relatedTarget */
+        event.initMouseEvent(
+          'click' /* type */,
+          true /* canBubble */,
+          true /* cancelable */,
+          window /* view */,
+          0 /* detail */,
+          0 /* screenX */,
+          0 /* screenY */,
+          0 /* clientX */,
+          0 /* clientY */,
+          false /* ctrlKey */,
+          false /* altKey */,
+          false /* shiftKey */,
+          false /* metaKey */,
+          0 /* button */,
+          null /* relatedTarget */,
         );
         this.$play.node().dispatchEvent(event);
       }
@@ -80,18 +84,17 @@ export class Player {
     const act = this.graph.selectedSlides()[0] || l[l.length - 1];
     if (act) {
       this.render(act).then(() => {
-        this.anim = self.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
+        this.anim = window.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
       });
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   render(story: SlideNode) {
-    //render by selecting the slide
+    // render by selecting the slide
     this.graph.selectSlide(story);
-    //TODO transition time
+    // TODO transition time
     return ResolveNow.resolveImmediately(story);
   }
 
@@ -120,7 +123,7 @@ export class Player {
     const r = this.forward();
     if (r) {
       r.then((act) => {
-        this.anim = self.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
+        this.anim = window.setTimeout(this.next.bind(this), act.duration * StoryTransition.FACTOR);
       });
     }
   }
@@ -136,9 +139,8 @@ export class Player {
     if (act == null) {
       this.stop();
       return null;
-    } else {
-      return this.render(act);
     }
+    return this.render(act);
   }
 
   /**
@@ -152,8 +154,7 @@ export class Player {
     if (act == null) {
       this.stop();
       return null;
-    } else {
-      return this.render(act);
     }
+    return this.render(act);
   }
 }

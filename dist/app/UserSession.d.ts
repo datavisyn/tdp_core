@@ -59,3 +59,4 @@ export declare class UserSession extends Session {
     private static instance;
     static getInstance(): UserSession;
 }
+//# sourceMappingURL=UserSession.d.ts.map

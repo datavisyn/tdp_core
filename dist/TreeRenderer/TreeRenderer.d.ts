@@ -64,3 +64,4 @@ export declare class TreeRenderer extends React.Component<Partial<ITreeRendererP
     render(): JSX.Element;
 }
 export {};
+//# sourceMappingURL=TreeRenderer.d.ts.map

@@ -1,15 +1,13 @@
-import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
-import {AppHeader} from '../components';
-import {IAuthorizationConfiguration} from '../auth';
-import {PanelTab} from '../lineup/panel';
-import {IPluginDesc, IPlugin, IEventHandler} from '.';
-import {IDType} from '../idtype';
-import {ProvenanceGraph, IObjectRef} from '../provenance';
-import {RangeLike, Range} from '../range';
-import {IUser} from '../security';
-
-
-
+import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
+import { AppHeader } from '../components';
+import { IAuthorizationConfiguration } from '../auth';
+import { PanelTab } from '../lineup/panel';
+import { IDType } from '../idtype';
+import { ProvenanceGraph, IObjectRef } from '../provenance';
+import { RangeLike, Range } from '../range';
+import { IUser } from '../security';
+import { IPluginDesc, IPlugin } from './plugin';
+import { IEventHandler } from './event';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
@@ -34,11 +32,11 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * the name of the parent group as defined in the `databaseColumnGroups` of the ranking.
      */
-    parent: string,
+    parent: string;
     /**
      * the rank of the current item in the group
      */
-    order?: number
+    order?: number;
   };
 }
 
@@ -50,7 +48,9 @@ export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc
  * mode of the view depending on the view state
  */
 export enum EViewMode {
-  FOCUS, CONTEXT, HIDDEN
+  FOCUS,
+  CONTEXT,
+  HIDDEN,
 }
 
 /**
@@ -77,7 +77,7 @@ export interface IScore<T> {
    * creates the LineUp column description
    * @returns {IColumnDesc & {[p: string]: any}}
    */
-  createDesc(extras?: object): IColumnDesc & {[key: string]: any};
+  createDesc(extras?: object): IColumnDesc & { [key: string]: any };
 
   /**
    * start the computation of the score for the given ids
@@ -134,7 +134,7 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   /**
    * view group hint
    */
-  readonly group?: {name: string, order: number};
+  readonly group?: { name: string; order: number };
 
   load(): Promise<IPlugin & IScoreLoaderExtension>;
 }
@@ -157,8 +157,6 @@ export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 
-
-
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;
   factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
@@ -179,7 +177,6 @@ export interface IRankingButtonExtensionDesc extends IPluginDesc {
   faIcon: string;
   load(): Promise<IPlugin & IRankingButtonExtension>;
 }
-
 
 export interface IPanelTabExtension {
   desc: IPanelTabExtensionDesc;
@@ -243,14 +240,12 @@ export interface IGroupData {
   members?: string[];
 }
 
-
 /**
  * helper extension point for grouping views and provide meta data
  */
 export interface IViewGroupExtensionDesc extends IPluginDesc {
   groups: IGroupData[];
 }
-
 
 export interface ISelection {
   readonly idtype: IDType; // see phovea_core/src/idtype/manager#resolve
@@ -353,9 +348,8 @@ export interface IView extends IEventHandler {
   destroy(): void;
 }
 
-
 export interface IViewClass {
-  new(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
+  new (context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
 export interface IViewPluginDesc extends IPluginDesc {
@@ -373,7 +367,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * view group hint
    */
-  group: {name: string, order: number};
+  group: { name: string; order: number };
 
   /**
    * optional preview callback function returning a url promise, the preview image should have 320x180 px
@@ -400,7 +394,7 @@ export interface IViewPluginDesc extends IPluginDesc {
   /**
    * a link to an external help page
    */
-  helpUrl?: string | {url: string, linkText: string, title: string};
+  helpUrl?: string | { url: string; linkText: string; title: string };
   /**
    * as an alternative an help text shown as pop up
    */
@@ -432,6 +426,13 @@ export interface IViewPlugin {
   factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
+export interface IViewWrapperDump {
+  hash: string;
+  plugin: string;
+  dumpReference: number;
+  parameters: object;
+}
+
 export interface IInstantView {
   readonly node: HTMLElement;
 
@@ -443,7 +444,7 @@ export interface IInstantViewOptions {
 }
 
 export interface IItemSelection extends ISelection {
-  readonly items: {_id: number, id: string, text: string}[];
+  readonly items: { _id: number; id: string; text: string }[];
 }
 
 export interface IInstanceViewExtension {
@@ -476,6 +477,5 @@ export interface IAppExtensionExtension {
 }
 
 export interface IAppExtensionExtensionDesc extends IPluginDesc {
-
   load(): Promise<IPlugin & IAppExtensionExtension>;
 }

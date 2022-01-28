@@ -59,3 +59,4 @@ export declare abstract class ASelectAble extends EventHandler implements ISelec
     clear(dim: number): Promise<any>;
     clear(dim: number, type: string): Promise<any>;
 }
+//# sourceMappingURL=ASelectAble.d.ts.map

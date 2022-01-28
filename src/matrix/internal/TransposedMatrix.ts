@@ -1,22 +1,22 @@
-import {RangeLike, Range, ParseRangeUtils} from '../../range';
-import {IValueTypeDesc} from '../../data/valuetype';
-import {DataUtils} from '../../data';
-import {IMatrix, IHeatMapUrlOptions} from '../IMatrix';
-import {AMatrix, MatrixView} from '../AMatrix';
-import {SliceRowVector} from './SliceRowVector';
-import {IVector} from '../../vector';
-import {IHistogram} from '../../data/histogram';
-import {IAdvancedStatistics, IStatistics} from '../../base/statistics';
+import { RangeLike, Range, ParseRangeUtils } from '../../range';
+import { IValueTypeDesc } from '../../data/valuetype';
+import { DataUtils } from '../../data';
+import { IMatrix, IHeatMapUrlOptions } from '../IMatrix';
+import { AMatrix, MatrixView } from '../AMatrix';
+import { SliceRowVector } from './SliceRowVector';
+import { IVector } from '../../vector';
+import { IHistogram } from '../../data/histogram';
+import { IAdvancedStatistics, IStatistics } from '../../base/statistics';
 
 /**
  * view on the underlying matrix as transposed version
  * @param base
  * @constructor
  */
-export class TransposedMatrix<T, D extends IValueTypeDesc> extends AMatrix<T,D> {
-  readonly t: IMatrix<T,D>;
+export class TransposedMatrix<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
+  readonly t: IMatrix<T, D>;
 
-  constructor(base: IMatrix<T,D>) {
+  constructor(base: IMatrix<T, D>) {
     super(base);
     this.t = base;
   }
@@ -28,7 +28,7 @@ export class TransposedMatrix<T, D extends IValueTypeDesc> extends AMatrix<T,D> 
   persist() {
     return {
       root: this.root.persist(),
-      transposed: true
+      transposed: true,
     };
   }
 
@@ -73,7 +73,7 @@ export class TransposedMatrix<T, D extends IValueTypeDesc> extends AMatrix<T,D> 
     return this.t.colIds(range ? ParseRangeUtils.parseRangeLike(range).swap() : undefined);
   }
 
-  view(range: RangeLike = Range.all()): IMatrix<T,D> {
+  view(range: RangeLike = Range.all()): IMatrix<T, D> {
     const r = ParseRangeUtils.parseRangeLike(range);
     if (r.isAll) {
       return this;
@@ -81,13 +81,13 @@ export class TransposedMatrix<T, D extends IValueTypeDesc> extends AMatrix<T,D> 
     return new MatrixView(this.root, r.swap()).t;
   }
 
-  slice(col: number): IVector<T,D> {
+  slice(col: number): IVector<T, D> {
     return new SliceRowVector(this.root, col);
   }
 
   size() {
     const s = this.t.dim;
-    return [s[1], s[0]]; //swap dimension
+    return [s[1], s[0]]; // swap dimension
   }
 
   at(i: number, j: number) {

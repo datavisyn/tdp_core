@@ -2,8 +2,8 @@ import { GraphNode, GraphEdge, AGraph } from './graph';
 export class GraphFactoryUtils {
 }
 GraphFactoryUtils.defaultGraphFactory = {
-    makeNode: (p) => ((new GraphNode()).restore(p)),
-    makeEdge: (p, lookup) => ((new GraphEdge()).restore(p, lookup))
+    makeNode: (p) => new GraphNode().restore(p),
+    makeEdge: (p, lookup) => new GraphEdge().restore(p, lookup),
 };
 export class GraphBase extends AGraph {
     constructor(desc, nodes = [], edges = []) {
@@ -25,7 +25,7 @@ export class GraphBase extends AGraph {
     migrate() {
         return {
             nodes: this.nodes,
-            edges: this.edges
+            edges: this.edges,
         };
     }
     addNode(n) {
@@ -34,7 +34,7 @@ export class GraphBase extends AGraph {
         return this;
     }
     updateNode(n) {
-        //since we store a reference we don't need to do anything
+        // since we store a reference we don't need to do anything
         this.fire('update_node', n);
         return this;
     }
@@ -57,7 +57,7 @@ export class GraphBase extends AGraph {
         return this.addEdge(new GraphEdge(type, edgeOrSource, t));
     }
     updateEdge(e) {
-        //since we store a reference we don't need to do anything
+        // since we store a reference we don't need to do anything
         this.fire('update_edge', e);
         return this;
     }
@@ -78,7 +78,7 @@ export class GraphBase extends AGraph {
     }
     persist() {
         const r = {
-            root: this.desc.id
+            root: this.desc.id,
         };
         r.nodes = this.nodes.map((s) => s.persist());
         r.edges = this.edges.map((l) => l.persist());

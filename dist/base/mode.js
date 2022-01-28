@@ -31,7 +31,7 @@ export class CLUEMode {
         if (typeof index === 'number') {
             return this.coord[index];
         }
-        else if (typeof index === 'string') {
+        if (typeof index === 'string') {
             const lookup = { e: this.coord[0], a: this.coord[1], p: this.coord[2] };
             return lookup[index.charAt(0).toLowerCase()];
         }
@@ -54,7 +54,7 @@ export class CLUEMode {
         if (this.presentation === 1) {
             return 'P';
         }
-        return '(' + this.coord.map((s) => (Math.round(s * 1000) / 1000).toString()).join('-') + ')';
+        return `(${this.coord.map((s) => (Math.round(s * 1000) / 1000).toString()).join('-')})`;
     }
     /**
      * mode factory by the given components
@@ -70,13 +70,16 @@ export class CLUEMode {
         if (s === 'P') {
             return CLUEMode.modes.Presentation;
         }
-        else if (s === 'A') {
+        if (s === 'A') {
             return CLUEMode.modes.Authoring;
         }
-        else if (s === 'E') {
+        if (s === 'E') {
             return CLUEMode.modes.Exploration;
         }
-        const coords = s.slice(1, s.length - 1).split('-').map(parseFloat);
+        const coords = s
+            .slice(1, s.length - 1)
+            .split('-')
+            .map(parseFloat);
         return new CLUEMode(coords[0], coords[1], coords[2]);
     }
     /**
@@ -93,7 +96,7 @@ export class CLUEMode {
 CLUEMode.modes = {
     Exploration: CLUEMode.mode(1, 0, 0),
     Authoring: CLUEMode.mode(0, 1, 0),
-    Presentation: CLUEMode.mode(0, 0, 1)
+    Presentation: CLUEMode.mode(0, 0, 1),
 };
 /**
  * wrapper containing the current mode
@@ -109,12 +112,12 @@ export class ModeWrapper extends EventHandler {
             return;
         }
         if (value.isAtomic) {
-            //use the real atomic one for a shared instance
+            // use the real atomic one for a shared instance
             value = CLUEMode.fromString(value.toString());
         }
         const bak = ModeWrapper.getInstance()._mode;
         ModeWrapper.getInstance()._mode = value;
-        //store in hash
+        // store in hash
         AppContext.getInstance().hash.setProp('clue', value.toString());
         this.fire('modeChanged', value, bak);
         GlobalEventHandler.getInstance().fire('clue.modeChanged', value, bak);
@@ -138,7 +141,7 @@ export class ButtonModeSelector {
             /**
              * button size, i.e. the class btn-{size] will be added
              */
-            size: 'xs'
+            size: 'xs',
         };
         BaseUtils.mixin(this.options, options);
         this.node = this.build(parent);
@@ -336,7 +339,7 @@ export class ButtonModeSelector {
 // export function createTriangle(parent:Element, options:any = {}) {
 //   return new TriangleModeSelector(parent, options);
 // }
-//export function createSlider(parent:Element, options:any = {}) {
+// export function createSlider(parent:Element, options:any = {}) {
 //  return new SliderModeSelector(parent, options);
-//}
+// }
 //# sourceMappingURL=mode.js.map

@@ -14,15 +14,15 @@ export class TableVector extends AVector {
         this.root = this;
         this.desc = {
             type: 'vector',
-            id: table.desc.id + '_' + desc.name,
+            id: `${table.desc.id}_${desc.name}`,
             name: desc.name,
             description: desc.description || '',
-            fqname: table.desc.fqname + '/' + desc.name,
+            fqname: `${table.desc.fqname}/${desc.name}`,
             idtype: table.idtype.id,
             size: table.nrow,
             value: desc.value,
             creator: table.desc.creator,
-            ts: table.desc.ts
+            ts: table.desc.ts,
         };
     }
     get valuetype() {
@@ -37,12 +37,14 @@ export class TableVector extends AVector {
     persist() {
         return {
             root: this.table.persist(),
-            col: this.index
+            col: this.index,
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;

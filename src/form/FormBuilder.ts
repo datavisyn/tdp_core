@@ -1,14 +1,13 @@
 import * as d3 from 'd3';
-import {BaseUtils} from '../base';
-import {IFormElement, IFormElementDesc, IForm} from './interfaces';
-import {AFormElement} from './elements/AFormElement';
-import {Form} from './elements/Form';
+import { BaseUtils } from '../base';
+import { IFormElement, IFormElementDesc, IForm } from './interfaces';
+import { AFormElement } from './elements/AFormElement';
+import { Form } from './elements/Form';
 
 /**
  * Builds a form from a given collection of form elements
  */
 export class FormBuilder {
-
   /**
    * The form that will be build
    */
@@ -35,7 +34,7 @@ export class FormBuilder {
    * @param elementDesc
    */
   appendElement(elementDesc: IFormElementDesc) {
-    if(!elementDesc.options) {
+    if (!elementDesc.options) {
       elementDesc.options = {};
     }
 
@@ -64,11 +63,10 @@ export class FormBuilder {
    */
   build(): Promise<IForm> {
     // initialize when all elements are loaded
-    return Promise.all(this.elementPromises)
-      .then((elements: IFormElement[]) => {
-        this.form.appendElements(elements);
-        this.form.initAllElements();
-        return this.form;
-      });
+    return Promise.all(this.elementPromises).then((elements: IFormElement[]) => {
+      this.form.appendElements(elements);
+      this.form.initAllElements();
+      return this.form;
+    });
   }
 }

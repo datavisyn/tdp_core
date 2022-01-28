@@ -10,3 +10,4 @@ export interface IIDType extends IEventHandler, IPersistable {
     clear(): void;
     clear(type: string): void;
 }
+//# sourceMappingURL=IIDType.d.ts.map

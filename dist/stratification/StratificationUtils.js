@@ -7,7 +7,7 @@ export class StratificationUtils {
             idtype: '_rows',
             size: 0,
             groups: [],
-            ngroups: 0
+            ngroups: 0,
         });
     }
 }

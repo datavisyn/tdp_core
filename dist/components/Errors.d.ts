@@ -25,3 +25,4 @@ export declare class Errors {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): Dialog;
     }) => Promise<unknown>>;
 }
+//# sourceMappingURL=Errors.d.ts.map

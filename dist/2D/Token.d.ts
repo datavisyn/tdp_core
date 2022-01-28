@@ -4,3 +4,4 @@ export declare class Token {
     constructor(type: number, text: any);
     typeis(t: number): boolean;
 }
+//# sourceMappingURL=Token.d.ts.map

@@ -1,12 +1,32 @@
-import {Token} from './Token';
-import {IntersectionParamUtils} from './IIntersectionParam';
-import {IPathSegment, AbsoluteArcPath, AbsoluteCurveto3, RelativeCurveto3, AbsoluteHLineto, AbsoluteLineto, RelativeLineto, AbsoluteMoveto, RelativeMoveto, AbsoluteCurveto2, RelativeCurveto2, AbsoluteSmoothCurveto3, RelativeSmoothCurveto3, AbsoluteSmoothCurveto2, RelativeSmoothCurveto2, RelativeClosePath} from './PathSegment';
+import { Token } from './Token';
+import { IntersectionParamUtils } from './IIntersectionParam';
+import {
+  IPathSegment,
+  AbsoluteArcPath,
+  AbsoluteCurveto3,
+  RelativeCurveto3,
+  AbsoluteHLineto,
+  AbsoluteLineto,
+  RelativeLineto,
+  AbsoluteMoveto,
+  RelativeMoveto,
+  AbsoluteCurveto2,
+  RelativeCurveto2,
+  AbsoluteSmoothCurveto3,
+  RelativeSmoothCurveto3,
+  AbsoluteSmoothCurveto2,
+  RelativeSmoothCurveto2,
+  RelativeClosePath,
+} from './PathSegment';
 
 export class Path {
   static COMMAND = 0;
+
   static NUMBER = 1;
+
   static EOD = 2;
-  static PARAMS: {[key: string]: string[]}= {
+
+  static PARAMS: { [key: string]: string[] } = {
     A: ['rx', 'ry', 'x-axis-rotation', 'large-arc-flag', 'sweep-flag', 'x', 'y'],
     a: ['rx', 'ry', 'x-axis-rotation', 'large-arc-flag', 'sweep-flag', 'x', 'y'],
     C: ['x1', 'y1', 'x2', 'y2', 'x', 'y'],
@@ -26,7 +46,7 @@ export class Path {
     V: ['y'],
     v: ['y'],
     Z: <string[]>[],
-    z: <string[]>[]
+    z: <string[]>[],
   };
 
   segments: IPathSegment[];
@@ -58,78 +78,76 @@ export class Path {
         } else {
           throw new Error('Path data must begin with a moveto command');
         }
+      } else if (token.typeis(Path.NUMBER)) {
+        paramLength = Path.PARAMS[mode].length;
       } else {
-        if (token.typeis(Path.NUMBER)) {
-          paramLength = Path.PARAMS[mode].length;
-        } else {
-          index++;
-          paramLength = Path.PARAMS[token.text].length;
-          mode = token.text;
-        }
+        index++;
+        paramLength = Path.PARAMS[token.text].length;
+        mode = token.text;
       }
-      if ((index + paramLength) < tokens.length) {
+      if (index + paramLength < tokens.length) {
         for (let i = index; i < index + paramLength; i++) {
           const n = tokens[i];
           if (n.typeis(Path.NUMBER)) {
             params[params.length] = n.text;
           } else {
-            throw new Error('Parameter type is not a number: ' + mode + ',' + n.text);
+            throw new Error(`Parameter type is not a number: ${mode},${n.text}`);
           }
         }
         let segment;
-        const length = this.segments.length;
-        const previous = (length === 0) ? null : this.segments[length - 1];
+        const { length } = this.segments;
+        const previous = length === 0 ? null : this.segments[length - 1];
         switch (mode) {
-          case'A':
+          case 'A':
             segment = new AbsoluteArcPath(params, this, previous);
             break;
-          case'C':
+          case 'C':
             segment = new AbsoluteCurveto3(params, this, previous);
             break;
-          case'c':
+          case 'c':
             segment = new RelativeCurveto3(params, this, previous);
             break;
-          case'H':
+          case 'H':
             segment = new AbsoluteHLineto(params, this, previous);
             break;
-          case'L':
+          case 'L':
             segment = new AbsoluteLineto(params, this, previous);
             break;
-          case'l':
+          case 'l':
             segment = new RelativeLineto(params, this, previous);
             break;
-          case'M':
+          case 'M':
             segment = new AbsoluteMoveto(params, this, previous);
             break;
-          case'm':
+          case 'm':
             segment = new RelativeMoveto(params, this, previous);
             break;
-          case'Q':
+          case 'Q':
             segment = new AbsoluteCurveto2(params, this, previous);
             break;
-          case'q':
+          case 'q':
             segment = new RelativeCurveto2(params, this, previous);
             break;
-          case'S':
+          case 'S':
             segment = new AbsoluteSmoothCurveto3(params, this, previous);
             break;
-          case's':
+          case 's':
             segment = new RelativeSmoothCurveto3(params, this, previous);
             break;
-          case'T':
+          case 'T':
             segment = new AbsoluteSmoothCurveto2(params, this, previous);
             break;
-          case't':
+          case 't':
             segment = new RelativeSmoothCurveto2(params, this, previous);
             break;
-          case'Z':
+          case 'Z':
             segment = new RelativeClosePath(params, this, previous);
             break;
-          case'z':
+          case 'z':
             segment = new RelativeClosePath(params, this, previous);
             break;
           default:
-            throw new Error('Unsupported segment type: ' + mode);
+            throw new Error(`Unsupported segment type: ${mode}`);
         }
         this.segments.push(segment);
         index += paramLength;
@@ -158,14 +176,12 @@ export class Path {
         tokens[tokens.length] = new Token(Path.NUMBER, parseFloat(RegExp.$1));
         d = d.substr(RegExp.$1.length);
       } else {
-        throw new Error('Unrecognized segment command: ' + d);
+        throw new Error(`Unrecognized segment command: ${d}`);
       }
     }
     tokens[tokens.length] = new Token(Path.EOD, null);
     return tokens;
   }
-
-
 
   asIntersectionParams() {
     return IntersectionParamUtils.createIntersectionParam('Path', []);

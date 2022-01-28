@@ -16,10 +16,10 @@ export class DnDUtils {
     hasDnDType(e, ...typesToCheck) {
         const available = e.dataTransfer.types;
         /*
-        * In Chrome datatransfer.types is an Array,
-        * while in Firefox it is a DOMStringList
-        * that only implements a contains-method!
-        */
+         * In Chrome datatransfer.types is an Array,
+         * while in Firefox it is a DOMStringList
+         * that only implements a contains-method!
+         */
         if (typeof available.indexOf === 'function') {
             return typesToCheck.some((type) => available.indexOf(type) >= 0);
         }
@@ -41,7 +41,7 @@ export class DnDUtils {
      */
     copyDnD(e) {
         const dT = e.dataTransfer;
-        return Boolean((e.ctrlKey && dT.effectAllowed.match(/copy/gi)) || (!dT.effectAllowed.match(/move/gi)));
+        return Boolean((e.ctrlKey && dT.effectAllowed.match(/copy/gi)) || !dT.effectAllowed.match(/move/gi));
     }
     /**
      * updates the drop effect accoriding to the current copyDnD state
@@ -78,14 +78,14 @@ export class DnDUtils {
                     e.dataTransfer.setData(k, payload.data[k]);
                     return true;
                 }
-                catch (e) {
+                catch (err) {
                     return false;
                 }
             });
             if (allSucceded) {
                 return;
             }
-            //compatibility mode for edge
+            // compatibility mode for edge
             const text = payload.data['text/plain'] || '';
             e.dataTransfer.setData('text/plain', `${id}${text ? `: ${text}` : ''}`);
             DnDUtils.getInstance().dndTransferStorage.set(id, payload.data);
@@ -96,7 +96,7 @@ export class DnDUtils {
                 e.stopPropagation();
             }
             if (DnDUtils.getInstance().dndTransferStorage.size > 0) {
-                //clear the id
+                // clear the id
                 DnDUtils.getInstance().dndTransferStorage.delete(id);
             }
         });
@@ -117,18 +117,18 @@ export class DnDUtils {
      */
     dropAble(node, mimeTypes, onDrop, onDragOver = null, stopPropagation = false) {
         node.addEventListener('dragenter', (e) => {
-            //var xy = mouse($node.node());
+            // var xy = mouse($node.node());
             if (DnDUtils.getInstance().hasDnDType(e, ...mimeTypes) || DnDUtils.getInstance().isEdgeDnD(e)) {
                 node.classList.add('phovea-dragover');
                 if (stopPropagation) {
                     e.stopPropagation();
                 }
-                //sounds good
+                // sounds good
                 return false;
             }
-            //not a valid mime type
+            // not a valid mime type
             node.classList.remove('phovea-dragover');
-            return;
+            return undefined;
         });
         node.addEventListener('dragover', (e) => {
             if (DnDUtils.getInstance().hasDnDType(e, ...mimeTypes) || DnDUtils.getInstance().isEdgeDnD(e)) {
@@ -141,10 +141,10 @@ export class DnDUtils {
                 if (onDragOver) {
                     onDragOver(e);
                 }
-                //sound good
+                // sound good
                 return false;
             }
-            return;
+            return undefined;
         });
         node.addEventListener('dragleave', (evt) => {
             evt.target.classList.remove('phovea-dragover');
@@ -170,11 +170,11 @@ export class DnDUtils {
                     DnDUtils.getInstance().dndTransferStorage.delete(id);
                     return !onDrop({ effect, data }, e);
                 }
-                return;
+                return undefined;
             }
             if (DnDUtils.getInstance().hasDnDType(e, ...mimeTypes)) {
                 const data = {};
-                //selects the data contained in the data transfer
+                // selects the data contained in the data transfer
                 mimeTypes.forEach((mime) => {
                     const value = e.dataTransfer.getData(mime);
                     if (value !== '') {
@@ -183,7 +183,7 @@ export class DnDUtils {
                 });
                 return !onDrop({ effect, data }, e);
             }
-            return;
+            return undefined;
         });
     }
     static getInstance() {

@@ -9,3 +9,4 @@ export declare class ProxyMetaData implements IVisMetaData {
     get rotation(): number;
     get sizeDependsOnDataDimension(): boolean[];
 }
+//# sourceMappingURL=ProxyMetaData.d.ts.map

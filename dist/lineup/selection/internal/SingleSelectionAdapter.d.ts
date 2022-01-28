@@ -1,7 +1,6 @@
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 import { IContext, ISelectionAdapter } from '../ISelectionAdapter';
-import { IAdditionalColumnDesc } from '../../../base/interfaces';
-import { IScoreRow } from '../../../base/interfaces';
+import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 export interface ISingleSelectionAdapter {
     /**
      * create the column description for the given selection
@@ -28,3 +27,4 @@ export declare class SingleSelectionAdapter extends ABaseSelectionAdapter implem
         id: number;
     }[]>;
 }
+//# sourceMappingURL=SingleSelectionAdapter.d.ts.map

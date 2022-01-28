@@ -1,20 +1,21 @@
-import {ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuilder, IBuildAbleOrViewLike} from './interfaces';
-import {EOrientation} from './interfaces';
-import {ViewLayoutContainer, HTMLView, IViewLayoutContainerOptions, NodeView} from './internal/ViewLayoutContainer';
-import {SplitLayoutContainer} from './internal/SplitLayoutContainer';
-import {LineUpLayoutContainer} from './internal/LineUpLayoutContainer';
-import {TabbingLayoutContainer, ITabbingLayoutContainerOptions} from './internal/TabbingLayoutContainer';
-import {RootLayoutContainer} from './internal/RootLayoutContainer';
-import {ILayoutContainerOption} from './internal/ALayoutContainer';
-import {ISequentialLayoutContainerOptions} from './internal/ASequentialLayoutContainer';
-import {ILayoutElem, IPadding} from './layout';
-
+import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuilder, IBuildAbleOrViewLike, EOrientation } from './interfaces';
+import { ViewLayoutContainer, HTMLView, IViewLayoutContainerOptions, NodeView } from './internal/ViewLayoutContainer';
+import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
+import { LineUpLayoutContainer, ILineUpLayoutContainer } from './internal/LineUpLayoutContainer';
+import { TabbingLayoutContainer, ITabbingLayoutContainerOptions } from './internal/TabbingLayoutContainer';
+import { RootLayoutContainer } from './internal/RootLayoutContainer';
+import { ILayoutContainerOption } from './internal/ALayoutContainer';
+import { ISequentialLayoutContainerOptions } from './internal/ASequentialLayoutContainer';
+import { ILayoutElem, IPadding } from './layout';
 
 export abstract class ABuilder implements IBuilder {
-  protected _name: string = 'View';
-  protected _fixed: boolean = false;
+  protected _name = 'View';
+
+  protected _fixed = false;
+
   protected _autoWrap: boolean | string = false;
-  protected _fixedLayout: boolean = false;
+
+  protected _fixedLayout = false;
 
   /**
    * specify the name of the view
@@ -60,7 +61,7 @@ export abstract class ABuilder implements IBuilder {
       name: this._name,
       fixed: this._fixed,
       autoWrap: this._autoWrap,
-      fixedLayout: this._fixedLayout
+      fixedLayout: this._fixedLayout,
     };
   }
 
@@ -68,7 +69,7 @@ export abstract class ABuilder implements IBuilder {
 }
 
 export class ViewBuilder extends ABuilder {
-  private _hideHeader: boolean = false;
+  private _hideHeader = false;
 
   constructor(private readonly view: string | PHOVEA_UI_IView | HTMLElement) {
     super();
@@ -81,9 +82,7 @@ export class ViewBuilder extends ABuilder {
   }
 
   protected buildOptions(): Partial<IViewLayoutContainerOptions> {
-    return Object.assign({
-      hideHeader: this._hideHeader
-    }, super.buildOptions());
+    return { hideHeader: this._hideHeader, ...super.buildOptions() };
   }
 
   build(root: RootLayoutContainer, doc: Document): ILayoutContainer {
@@ -99,7 +98,6 @@ export class ViewBuilder extends ABuilder {
 }
 
 export class LayoutUtils {
-
   /**
    * restores the given layout dump
    * @param {ILayoutDump} dump the dump
@@ -111,7 +109,13 @@ export class LayoutUtils {
     const restorer = (d: ILayoutDump) => LayoutUtils.restore(d, restoreView, doc);
     switch (dump.type) {
       case 'root':
-        return RootLayoutContainer.restore(dump, doc, (r, child) => this.toBuilder(child).build(r, doc), (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc), restoreView);
+        return RootLayoutContainer.restore(
+          dump,
+          doc,
+          (r, child) => this.toBuilder(child).build(r, doc),
+          (d, resView) => LayoutUtils.restore(d, resView, doc),
+          restoreView,
+        );
       case 'split':
         return SplitLayoutContainer.restore(dump, restorer, doc);
       case 'lineup':
@@ -130,35 +134,39 @@ export class LayoutUtils {
    * @param {HTMLElement} node the root node
    * @param {(node: HTMLElement) => PHOVEA_UI_IView} viewFactory how to build a view from a node
    */
-  static derive(node: HTMLElement, viewFactory: (node: HTMLElement) => PHOVEA_UI_IView = (node) => new NodeView(node)): IRootLayoutContainer {
+  static derive(node: HTMLElement, viewFactory: (node: HTMLElement) => PHOVEA_UI_IView = (n) => new NodeView(n)): IRootLayoutContainer {
     const doc = node.ownerDocument;
-    const r = new RootLayoutContainer(doc, (child) => this.toBuilder(child).build(r, doc), (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc));
+    const r = new RootLayoutContainer(
+      doc,
+      (child) => this.toBuilder(child).build(r, doc),
+      (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc),
+    );
 
-    const deriveImpl = (node: HTMLElement): ILayoutContainer => {
-      switch (node.dataset.layout || 'view') {
+    const deriveImpl = (n: HTMLElement): ILayoutContainer => {
+      switch (n.dataset.layout || 'view') {
         case 'hsplit':
         case 'vsplit':
         case 'split':
-          return SplitLayoutContainer.derive(node, deriveImpl);
+          return SplitLayoutContainer.derive(n, deriveImpl);
         case 'lineup':
         case 'vlineup':
         case 'hlineup':
         case 'stack':
         case 'hstack':
         case 'vstack':
-          return LineUpLayoutContainer.derive(node, deriveImpl);
+          return LineUpLayoutContainer.derive(n, deriveImpl);
         case 'tabbing':
-          return TabbingLayoutContainer.derive(node, deriveImpl);
+          return TabbingLayoutContainer.derive(n, deriveImpl);
         default:
           // interpret as view
-          return ViewLayoutContainer.derive(viewFactory(node) || new NodeView(node));
+          return ViewLayoutContainer.derive(viewFactory(n) || new NodeView(n));
       }
     };
 
     r.root = deriveImpl(node);
 
     if (node.parentElement) {
-      //replace old node with new root
+      // replace old node with new root
       node.parentElement.replaceChild(r.node, node);
     }
     return r;
@@ -173,25 +181,26 @@ export class LayoutUtils {
 
   /* phovea_core */
   static padding(v: number): IPadding {
-    return {top: v, left: v, right: v, bottom: v};
+    return { top: v, left: v, right: v, bottom: v };
   }
 
   public static noPadding = LayoutUtils.padding(0);
 
-  static flowLayout(horizontal: boolean, gap: number, padding = {top: 0, left: 0, right: 0, bottom: 0}) {
+  static flowLayout(horizontal: boolean, gap: number, padding = { top: 0, left: 0, right: 0, bottom: 0 }) {
     function getSize(w: number, h: number, child: ILayoutElem, value: number) {
       if (horizontal) {
         return [value, LayoutUtils.grab(child.layoutOption('prefHeight', Number.NaN), h)];
-      } else {
-        return [LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value];
       }
+      return [LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value];
     }
 
     function FlowLayout(elems: ILayoutElem[], w: number, h: number, parent: ILayoutElem) {
       w -= padding.left + padding.right;
       h -= padding.top + padding.bottom;
       const freeSpace = (horizontal ? w : h) - gap * (elems.length - 1);
-      let unbound = 0, fixUsed = 0, ratioSum = 0;
+      let unbound = 0;
+      let fixUsed = 0;
+      let ratioSum = 0;
 
       // count statistics
       elems.forEach((elem) => {
@@ -206,8 +215,8 @@ export class LayoutUtils {
         }
       });
 
-      const ratioMax = (ratioSum < 1) ? 1 : ratioSum;
-      const unboundedSpace = (freeSpace - fixUsed - freeSpace * ratioSum / ratioMax) / unbound;
+      const ratioMax = ratioSum < 1 ? 1 : ratioSum;
+      const unboundedSpace = (freeSpace - fixUsed - (freeSpace * ratioSum) / ratioMax) / unbound;
 
       // set all sizes
       const sizes = elems.map((elem) => {
@@ -215,12 +224,12 @@ export class LayoutUtils {
         const ratio = elem.layoutOption('ratio', Number.NaN);
         if (LayoutUtils.isDefault(fix) && LayoutUtils.isDefault(ratio)) {
           return getSize(w, h, elem, unboundedSpace);
-        } else if (fix >= 0) {
-          return getSize(w, h, elem, fix);
-        } else { // (ratio > 0)
-          const value = (ratio / ratioMax) * freeSpace;
-          return getSize(w, h, elem, value);
         }
+        if (fix >= 0) {
+          return getSize(w, h, elem, fix);
+        } // (ratio > 0)
+        const value = (ratio / ratioMax) * freeSpace;
+        return getSize(w, h, elem, value);
       });
       // set all locations
       let xAccumulator = padding.left;
@@ -245,15 +254,14 @@ export class LayoutUtils {
     function setBounds(x: number, y: number, w: number, h: number, child: ILayoutElem, value: number) {
       if (horizontal) {
         return child.setBounds(x, y, value, LayoutUtils.grab(child.layoutOption('prefHeight', Number.NaN), h));
-      } else {
-        return child.setBounds(x, y, LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value);
       }
+      return child.setBounds(x, y, LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value);
     }
 
     function DistributeLayout(elems: ILayoutElem[], w: number, h: number, parent: ILayoutElem) {
       w -= padding.left + padding.right;
       h -= padding.top + padding.bottom;
-      const freeSpace = (horizontal ? w : h);
+      const freeSpace = horizontal ? w : h;
       let fixUsed = 0;
 
       // count statistics
@@ -270,7 +278,8 @@ export class LayoutUtils {
       let xAccumulator = padding.left;
       let yAccumulator = padding.top;
 
-      if (elems.length === 1) { //center the single one
+      if (elems.length === 1) {
+        // center the single one
         if (horizontal) {
           xAccumulator += (freeSpace - fixUsed) / 2;
         } else {
@@ -307,16 +316,24 @@ export class LayoutUtils {
   //-------------
   //   bottom
 
-  static borderLayout(horizontal: boolean, gap: number, percentages: IPadding = {
-    top: 0.2,
-    left: 0.2,
-    right: 0.2,
-    bottom: 0.2
-  }, padding: IPadding = LayoutUtils.noPadding) {
+  static borderLayout(
+    horizontal: boolean,
+    gap: number,
+    percentages: IPadding = {
+      top: 0.2,
+      left: 0.2,
+      right: 0.2,
+      bottom: 0.2,
+    },
+    padding: IPadding = LayoutUtils.noPadding,
+  ) {
     function BorderLayout(elems: ILayoutElem[], w: number, h: number, parent: ILayoutElem) {
       w -= padding.left + padding.right;
       h -= padding.top + padding.bottom;
-      let x = padding.top, y = padding.left, wc = w, hc = h;
+      let x = padding.top;
+      let y = padding.left;
+      let wc = w;
+      let hc = h;
       const pos = new Map<string, ILayoutElem[]>();
       pos.set('top', []);
       pos.set('center', []);
@@ -326,7 +343,7 @@ export class LayoutUtils {
       elems.forEach((elem) => {
         let border = elem.layoutOption('border', 'center');
         if (!pos.has(border)) {
-          border = 'center'; //invalid one
+          border = 'center'; // invalid one
         }
         pos.get(border).push(elem);
       });
@@ -361,26 +378,32 @@ export class LayoutUtils {
   }
 
   static layers(elems: ILayoutElem[], w: number, h: number, parent: ILayoutElem) {
-    return LayoutUtils.waitFor(elems.map((elem) => {
-      const x = LayoutUtils.grab(elem.layoutOption('prefX', Number.NaN), 0);
-      const y = LayoutUtils.grab(elem.layoutOption('prefY', Number.NaN), 0);
-      return elem.setBounds(x, y, w - x, h - y);
-    }));
+    return LayoutUtils.waitFor(
+      elems.map((elem) => {
+        const x = LayoutUtils.grab(elem.layoutOption('prefX', Number.NaN), 0);
+        const y = LayoutUtils.grab(elem.layoutOption('prefY', Number.NaN), 0);
+        return elem.setBounds(x, y, w - x, h - y);
+      }),
+    );
   }
-  static waitFor(promises: Promise<any>[], redo: boolean = false): Promise<boolean> {
+
+  static waitFor(promises: Promise<any>[], redo = false): Promise<boolean> {
     promises = promises.filter((p) => p != null);
     if (promises.length === 0) {
       return Promise.resolve(redo);
-    } else if (promises.length === 1) {
+    }
+    if (promises.length === 1) {
       return promises[0].then(() => redo);
     }
     return Promise.all(promises).then(() => redo);
   }
+
   static grab(definition: number, v: number) {
     return LayoutUtils.isDefault(definition) ? v : definition;
   }
+
   private static isDefault(v: number) {
-    return v < 0 || isNaN(v);
+    return v < 0 || Number.isNaN(v);
   }
 }
 
@@ -404,7 +427,7 @@ export abstract class AParentBuilder extends ABuilder {
 }
 
 export class SplitBuilder extends AParentBuilder {
-  private _ratio: number = 0.5;
+  private _ratio = 0.5;
 
   constructor(private readonly orientation: EOrientation, ratio: number, left: IBuildAbleOrViewLike, right: IBuildAbleOrViewLike) {
     super([left, right]);
@@ -422,9 +445,7 @@ export class SplitBuilder extends AParentBuilder {
   }
 
   protected buildOptions(): Partial<ISequentialLayoutContainerOptions> {
-    return Object.assign({
-      orientation: this.orientation,
-    }, super.buildOptions());
+    return { orientation: this.orientation, ...super.buildOptions() };
   }
 
   build(root: RootLayoutContainer, doc = document) {
@@ -434,11 +455,9 @@ export class SplitBuilder extends AParentBuilder {
     built.slice(2).forEach((c) => r.push(c));
     return r;
   }
-
 }
 
 class LineUpBuilder extends AParentBuilder {
-
   constructor(private readonly orientation: EOrientation, children: IBuildAbleOrViewLike[], private readonly stackLayout: boolean = false) {
     super(children);
   }
@@ -452,11 +471,8 @@ class LineUpBuilder extends AParentBuilder {
     return super.push(view);
   }
 
-  protected buildOptions(): Partial<ISequentialLayoutContainerOptions> {
-    return Object.assign({
-      orientation: this.orientation,
-      stackLayout: this.stackLayout
-    }, super.buildOptions());
+  protected buildOptions(): Partial<ILineUpLayoutContainer> {
+    return { orientation: this.orientation, stackLayout: this.stackLayout, ...super.buildOptions() };
   }
 
   build(root: RootLayoutContainer, doc = document) {
@@ -488,9 +504,7 @@ class TabbingBuilder extends AParentBuilder {
   }
 
   protected buildOptions(): Partial<ITabbingLayoutContainerOptions> {
-    return Object.assign({
-      active: this._active
-    }, super.buildOptions());
+    return { active: this._active, ...super.buildOptions() };
   }
 
   build(root: RootLayoutContainer, doc) {
@@ -517,7 +531,11 @@ export class BuilderUtils {
    */
   static root(child: IBuildAbleOrViewLike, doc = document): IRootLayoutContainer {
     const b = LayoutUtils.toBuilder(child);
-    const r = new RootLayoutContainer(doc, (child) => LayoutUtils.toBuilder(child).build(r, doc), (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc));
+    const r = new RootLayoutContainer(
+      doc,
+      (c) => LayoutUtils.toBuilder(c).build(r, doc),
+      (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc),
+    );
     r.root = b.build(r, doc);
     return r;
   }
@@ -543,6 +561,7 @@ export class BuilderUtils {
   static verticalSplit(ratio: number, left: IBuildAbleOrViewLike, right: IBuildAbleOrViewLike): SplitBuilder {
     return new SplitBuilder(EOrientation.VERTICAL, ratio, left, right);
   }
+
   /**
    * builder for creating a horizontal lineup layout (each container has the same full size with scrollbars)
    * @param {IBuildAbleOrViewLike} children the children of the layout
@@ -551,7 +570,6 @@ export class BuilderUtils {
   static horizontalLineUp(...children: IBuildAbleOrViewLike[]): LineUpBuilder {
     return new LineUpBuilder(EOrientation.HORIZONTAL, children);
   }
-
 
   /**
    * builder for creating a vertical lineup layout (each container has the same full size with scrollbars)
@@ -570,7 +588,6 @@ export class BuilderUtils {
   static horizontalStackedLineUp(...children: IBuildAbleOrViewLike[]): LineUpBuilder {
     return new LineUpBuilder(EOrientation.HORIZONTAL, children, true);
   }
-
 
   /**
    * similar to the verticalLineUp, except that each container takes its own amount of space

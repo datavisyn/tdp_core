@@ -22,7 +22,7 @@ export class RemoteStoreGraph extends GraphBase {
     migrate() {
         this.nodes.forEach((n) => n.off('setAttr', this.updateHandler));
         this.edges.forEach((n) => n.off('setAttr', this.updateHandler));
-        //TODO delete old
+        // TODO delete old
         return super.migrate();
     }
     static load(desc, factory) {
@@ -37,7 +37,8 @@ export class RemoteStoreGraph extends GraphBase {
         return this;
     }
     loadImpl(nodes, edges, factory) {
-        const lookup = new Map(), lookupFun = lookup.get.bind(lookup);
+        const lookup = new Map();
+        const lookupFun = lookup.get.bind(lookup);
         nodes.forEach((n) => {
             const nn = factory.makeNode(n);
             lookup.set(nn.id, nn);
@@ -58,10 +59,8 @@ export class RemoteStoreGraph extends GraphBase {
         if (this.batchSize <= 1) {
             return this.sendNow(type, op, elem);
         }
-        else {
-            const item = { type, op, id: elem.id, desc: elem.persist() };
-            return this.enqueue(item);
-        }
+        const item = { type, op, id: elem.id, desc: elem.persist() };
+        return this.enqueue(item);
     }
     enqueue(item) {
         if (this.flushTimeout >= 0) {
@@ -69,19 +68,21 @@ export class RemoteStoreGraph extends GraphBase {
             this.flushTimeout = -1;
         }
         this.queue.push(item);
-        if (this.queue.length >= this.batchSize * 2) { //really full
+        if (this.queue.length >= this.batchSize * 2) {
+            // really full
             return this.sendQueued();
         }
         const wait = this.queue.length >= this.batchSize ? RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_FULL_FLUSH : RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_EARLY_FLUSH;
-        //send it at most timeout ms if there is no update in between
+        // send it at most timeout ms if there is no update in between
         this.flushTimeout = setTimeout(() => {
             this.sendQueued();
         }, wait);
+        return undefined;
     }
     sendNow(type, op, elem) {
         this.fire(`sync_start_${type},sync_start`, ++this.waitForSynced, `${op}_{type}`, elem);
         const data = {
-            desc: JSON.stringify(elem.persist())
+            desc: JSON.stringify(elem.persist()),
         };
         const create = () => {
             switch (op) {
@@ -91,6 +92,8 @@ export class RemoteStoreGraph extends GraphBase {
                     return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, data, 'PUT');
                 case 'remove':
                     return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, {}, 'DELETE');
+                default:
+                    return undefined;
             }
         };
         return create().then(() => {
@@ -105,7 +108,9 @@ export class RemoteStoreGraph extends GraphBase {
         // clear
         this.queue.splice(0, this.queue.length);
         this.fire(`sync_start`, ++this.waitForSynced, 'batch');
-        return AppContext.getInstance().sendAPI(`/dataset/${this.desc.id}`, { desc: param }, 'POST').then(() => {
+        return AppContext.getInstance()
+            .sendAPI(`/dataset/${this.desc.id}`, { desc: param }, 'POST')
+            .then(() => {
             this.fire(`sync`, --this.waitForSynced, 'batch');
             return this;
         });
@@ -117,7 +122,7 @@ export class RemoteStoreGraph extends GraphBase {
         return this.sendQueued();
     }
     addAll(nodes, edges) {
-        //add all and and to queue
+        // add all and and to queue
         nodes.forEach((n) => {
             super.addNode(n);
             n.on('setAttr', this.updateHandler);
@@ -179,17 +184,20 @@ export class RemoteStoreGraph extends GraphBase {
         this.nodes.forEach((n) => n.off('setAttr', this.updateHandler));
         this.edges.forEach((n) => n.off('setAttr', this.updateHandler));
         super.clear();
-        this.flush().then(() => {
+        this.flush()
+            .then(() => {
             this.fire('sync_start', ++this.waitForSynced, 'clear');
-            //clear all nodes
+            // clear all nodes
             return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/node`, {}, 'DELETE');
-        }).then(() => {
+        })
+            .then(() => {
             this.fire('sync');
             return this;
         });
+        return undefined;
     }
 }
 RemoteStoreGraph.DEFAULT_BATCH_SIZE = 10;
-RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_EARLY_FLUSH = 1000; //ms
-RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_FULL_FLUSH = 100; //ms
+RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_EARLY_FLUSH = 1000; // ms
+RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_FULL_FLUSH = 100; // ms
 //# sourceMappingURL=RemoteStorageGraph.js.map

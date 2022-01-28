@@ -14,3 +14,4 @@ export declare class TableNameVector extends ANameVector<ITable> implements IStr
      */
     static asNameVector(table: ITable): IStringVector;
 }
+//# sourceMappingURL=TableNameVector.d.ts.map

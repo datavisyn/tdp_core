@@ -14,3 +14,4 @@ export declare class VectorNameVector extends ANameVector<IAnyVector> implements
      */
     static asNameVector(vector: IAnyVector): IStringVector;
 }
+//# sourceMappingURL=VectorNameVector.d.ts.map

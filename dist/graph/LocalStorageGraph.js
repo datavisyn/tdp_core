@@ -14,11 +14,11 @@ export class LocalStorageGraph extends GraphBase {
                 this.updateEdge(s);
             }
         };
-        const uid = this.uid;
+        const { uid } = this;
         if (nodes.length > 0 || edges.length > 0) {
             this.storage.setItem(`${uid}.nodes`, JSON.stringify(nodes.map((d) => d.id)));
             nodes.forEach((n) => {
-                this.storage.setItem(uid + '.node.' + n.id, JSON.stringify(n.persist()));
+                this.storage.setItem(`${uid}.node.${n.id}`, JSON.stringify(n.persist()));
                 n.on('setAttr', this.updateHandler);
             });
             this.storage.setItem(`${uid}.edges`, JSON.stringify(edges.map((d) => d.id)));
@@ -54,7 +54,7 @@ export class LocalStorageGraph extends GraphBase {
         return `graph${this.desc.id}`;
     }
     load(factory) {
-        const uid = this.uid;
+        const { uid } = this;
         if (this.storage.getItem(`${uid}.nodes`) == null) {
             return;
         }
@@ -106,23 +106,23 @@ export class LocalStorageGraph extends GraphBase {
     }
     addNode(n) {
         super.addNode(n);
-        const uid = this.uid;
-        this.storage.setItem(uid + '.node.' + n.id, JSON.stringify(n.persist()));
+        const { uid } = this;
+        this.storage.setItem(`${uid}.node.${n.id}`, JSON.stringify(n.persist()));
         this.storage.setItem(`${uid}.nodes`, JSON.stringify(this.nodes.map((d) => d.id)));
         n.on('setAttr', this.updateHandler);
         return this;
     }
     updateNode(n) {
         super.updateNode(n);
-        const uid = this.uid;
-        this.storage.setItem(uid + '.node.' + n.id, JSON.stringify(n.persist()));
+        const { uid } = this;
+        this.storage.setItem(`${uid}.node.${n.id}`, JSON.stringify(n.persist()));
         return this;
     }
     removeNode(n) {
         if (!super.removeNode(n)) {
             return null;
         }
-        const uid = this.uid;
+        const { uid } = this;
         this.storage.setItem(`${uid}.nodes`, JSON.stringify(this.nodes.map((d) => d.id)));
         this.storage.removeItem(`${uid}.node.${n.id}`);
         n.off('setAttr', this.updateHandler);
@@ -132,7 +132,7 @@ export class LocalStorageGraph extends GraphBase {
         if (edgeOrSource instanceof GraphEdge) {
             super.addEdge(edgeOrSource);
             const e = edgeOrSource;
-            const uid = this.uid;
+            const { uid } = this;
             this.storage.setItem(`${uid}.edges`, JSON.stringify(this.edges.map((d) => d.id)));
             this.storage.setItem(`${uid}.edge.${e.id}`, JSON.stringify(e.persist()));
             e.on('setAttr', this.updateHandler);
@@ -144,8 +144,8 @@ export class LocalStorageGraph extends GraphBase {
         if (!super.removeEdge(e)) {
             return null;
         }
-        //need to shift all
-        const uid = this.uid;
+        // need to shift all
+        const { uid } = this;
         this.storage.setItem(`${uid}.edges`, JSON.stringify(this.edges.map((d) => d.id)));
         this.storage.removeItem(`${uid}.edge.${e.id}`);
         e.off('setAttr', this.updateHandler);
@@ -153,24 +153,25 @@ export class LocalStorageGraph extends GraphBase {
     }
     updateEdge(e) {
         super.updateEdge(e);
-        const uid = this.uid;
+        const { uid } = this;
         this.storage.setItem(`${uid}.edge.${e.id}`, JSON.stringify(e.persist()));
         return this;
     }
     clear() {
-        const nnodes = this.nnodes, nedges = this.nedges;
+        const { nnodes } = this;
+        const { nedges } = this;
         if (nnodes === 0 && nedges === 0) {
             return Promise.resolve(this);
         }
         this.nodes.forEach((n) => n.off('setAttr', this.updateHandler));
         this.edges.forEach((n) => n.off('setAttr', this.updateHandler));
         super.clear();
-        const uid = this.uid;
-        JSON.parse(this.storage.getItem(uid + '.nodes')).forEach((id) => {
+        const { uid } = this;
+        JSON.parse(this.storage.getItem(`${uid}.nodes`)).forEach((id) => {
             this.storage.removeItem(`${uid}.node.${id}`);
         });
         this.storage.removeItem(`${uid}.nodes`);
-        JSON.parse(this.storage.getItem(uid + '.edges')).forEach((id) => {
+        JSON.parse(this.storage.getItem(`${uid}.edges`)).forEach((id) => {
             this.storage.removeItem(`${uid}.edge.${id}`);
         });
         this.storage.removeItem(`${uid}.edges`);
@@ -178,7 +179,7 @@ export class LocalStorageGraph extends GraphBase {
     }
     persist() {
         const r = {
-            root: this.desc.id
+            root: this.desc.id,
         };
         r.nodes = this.nodes.map((s) => s.persist());
         r.edges = this.edges.map((l) => l.persist());

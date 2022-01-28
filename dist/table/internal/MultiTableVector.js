@@ -14,16 +14,16 @@ export class MultiTableVector extends AVector {
         this.valuetype = valuetype;
         this._idtype = _idtype;
         this.desc = {
-            name: table.desc.name + '-p',
-            fqname: table.desc.fqname + '-p',
+            name: `${table.desc.name}-p`,
+            fqname: `${table.desc.fqname}-p`,
             description: f.toString(),
             type: 'vector',
-            id: BaseUtils.fixId(table.desc.id + '-p' + f.toString()),
+            id: BaseUtils.fixId(`${table.desc.id}-p${f.toString()}`),
             idtype: table.desc.idtype,
             size: table.nrow,
             value: valuetype,
             creator: table.desc.creator,
-            ts: Date.now()
+            ts: Date.now(),
         };
         this.root = this;
     }
@@ -38,12 +38,14 @@ export class MultiTableVector extends AVector {
             root: this.table.persist(),
             f: this.f.toString(),
             valuetype: this.valuetype ? this.valuetype : undefined,
-            idtype: this.idtype === this.table.idtype ? undefined : this.idtype.name
+            idtype: this.idtype === this.table.idtype ? undefined : this.idtype.name,
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;

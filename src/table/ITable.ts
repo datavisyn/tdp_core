@@ -1,12 +1,12 @@
-import {RangeLike} from '../range';
-import {Range} from '../range/Range';
-import {IDType} from '../idtype/IDType';
-import {IDataType, IValueType, IValueTypeDesc, IDataDescription, DataUtils} from '../data';
-import {IVector} from '../vector';
-import {IAnyVector} from '../vector/IVector';
+import { RangeLike } from '../range';
+import { Range } from '../range/Range';
+import { IDType } from '../idtype/IDType';
+import { IDataType, IValueType, IValueTypeDesc, IDataDescription, DataUtils } from '../data';
+import { IVector } from '../vector';
+import { IAnyVector } from '../vector/IVector';
 
 export interface IQueryArgs {
-  [key: string]: number|string;
+  [key: string]: number | string;
 }
 
 export interface ITableColumn<D extends IValueTypeDesc> {

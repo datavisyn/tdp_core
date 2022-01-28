@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {IEventHandler} from '../base';
+import { IEventHandler } from '../base';
 
 /**
  * List of all available for elements that the form builder can handle
@@ -11,48 +11,48 @@ export enum FormElementType {
    * @see IFormSelectDesc
    */
   SELECT = 'FormSelect',
-    /**
-     * shows a select box based on select2
-     * @see IFormSelect2
-     */
+  /**
+   * shows a select box based on select2
+   * @see IFormSelect2
+   */
   SELECT2 = 'FormSelect2',
-    /**
-     * similar to SELECT2 but with multiple selections allowed
-     */
+  /**
+   * similar to SELECT2 but with multiple selections allowed
+   */
   SELECT2_MULTIPLE = 'FormSelect2Multiple',
-    /**
-     * SELECT2 with additional functionality such as validation, tokenize and file drag
-     */
+  /**
+   * SELECT2 with additional functionality such as validation, tokenize and file drag
+   */
   SELECT3 = 'FormSelect3',
-    /**
-     * similar to SELECT3 but with multiple selections allowed
-     */
+  /**
+   * similar to SELECT3 but with multiple selections allowed
+   */
   SELECT3_MULTIPLE = 'FormSelect3Multiple',
-    /**
-     * a text field
-     * @see IFormInputTextDesc
-     */
+  /**
+   * a text field
+   * @see IFormInputTextDesc
+   */
   INPUT_TEXT = 'FormInputText',
-    /**
-     * a complex dynamic sub map form element
-     * @see IFormMapDesc
-     */
+  /**
+   * a complex dynamic sub map form element
+   * @see IFormMapDesc
+   */
   MAP = 'FormMap',
-    /**
-     * a simple button
-     * @see IButtonElementDesc
-     */
+  /**
+   * a simple button
+   * @see IButtonElementDesc
+   */
   BUTTON = 'FormButton',
-    /**
-     * a checkbox
-     * @see ICheckBoxElementDesc
-     */
+  /**
+   * a checkbox
+   * @see ICheckBoxElementDesc
+   */
   CHECKBOX = 'FormCheckBox',
-    /**
-     * a checkbox
-     * @see IRadioElementDesc
-     */
-  RADIO = 'FormRadio'
+  /**
+   * a checkbox
+   * @see IRadioElementDesc
+   */
+  RADIO = 'FormRadio',
 }
 
 /**
@@ -91,15 +91,15 @@ export interface IFormElementDesc {
     /**
      * Note: Used `clazz` instead of the DOM property `class`, due to JS reserved keyword
      */
-    clazz?: string,
+    clazz?: string;
     /**
      * Id attribute can be set independently from the `id` property above or will be copied if empty
      */
-    id?: string,
+    id?: string;
     /**
      * Style attribute
      */
-    style?: string
+    style?: string;
   };
 
   /**
@@ -143,11 +143,10 @@ export interface IFormElementDesc {
    * @param data the data associated with the the value, i.e. value.data || value
    * @param previousValue the previous value
    */
-  onChange?: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
+  onChange?: (formElement: IFormElement, value: any, data: any, previousValue: any) => void;
 
-  onInit?: (formElement: IFormElement, value: any, data: any, previousValue: any)=>void;
+  onInit?: (formElement: IFormElement, value: any, data: any, previousValue: any) => void;
 }
-
 
 export interface IForm {
   /**

@@ -1,29 +1,35 @@
-import {ArrayUtils} from '../../base/ArrayUtils';
-import {Range, RangeLike, ParseRangeUtils} from '../../range';
-import {IValueTypeDesc} from '../../data/valuetype';
-import {IVector, IVectorDataDescription} from '../../vector';
-import {AVector} from '../../vector/AVector';
-import {IMatrix} from '../IMatrix';
+import { ArrayUtils } from '../../base/ArrayUtils';
+import { Range, RangeLike, ParseRangeUtils } from '../../range';
+import { IValueTypeDesc } from '../../data/valuetype';
+import { IVector, IVectorDataDescription } from '../../vector';
+import { AVector } from '../../vector/AVector';
+import { IMatrix } from '../IMatrix';
 
 /**
  * a simple projection of a matrix columns to a vector
  */
-export class ProjectedVector<T, D extends IValueTypeDesc, M, MD extends IValueTypeDesc> extends AVector<T,D> implements IVector<T,D> {
+export class ProjectedVector<T, D extends IValueTypeDesc, M, MD extends IValueTypeDesc> extends AVector<T, D> implements IVector<T, D> {
   readonly desc: IVectorDataDescription<D>;
 
-  constructor(private m: IMatrix<M, MD>, private f: (row: M[]) => T, private thisArgument = m, public readonly valuetype: D = <any>m.valuetype, private _idtype = m.rowtype) {
+  constructor(
+    private m: IMatrix<M, MD>,
+    private f: (row: M[]) => T,
+    private thisArgument = m,
+    public readonly valuetype: D = <any>m.valuetype,
+    private _idtype = m.rowtype,
+  ) {
     super(null);
     this.desc = {
-      name: m.desc.name + '-p',
-      fqname: m.desc.fqname + '-p',
+      name: `${m.desc.name}-p`,
+      fqname: `${m.desc.fqname}-p`,
       type: 'vector',
-      id: m.desc.id + '-p',
+      id: `${m.desc.id}-p`,
       size: this.dim[0],
       idtype: m.rowtype,
       value: this.valuetype,
       description: m.desc.description,
       creator: m.desc.creator,
-      ts: m.desc.ts
+      ts: m.desc.ts,
     };
     this.root = this;
   }
@@ -33,13 +39,15 @@ export class ProjectedVector<T, D extends IValueTypeDesc, M, MD extends IValueTy
       root: this.m.persist(),
       f: this.f.toString(),
       valuetype: this.valuetype === <any>this.m.valuetype ? undefined : this.valuetype,
-      idtype: this.idtype === this.m.rowtype ? undefined : this.idtype.name
+      idtype: this.idtype === this.m.rowtype ? undefined : this.idtype.name,
     };
   }
 
   restore(persisted: any) {
-    let r: IVector<T,D> = this;
-    if (persisted && persisted.range) { //some view onto it
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let r: IVector<T, D> = this;
+    if (persisted && persisted.range) {
+      // some view onto it
       r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
     }
     return r;
@@ -85,13 +93,13 @@ export class ProjectedVector<T, D extends IValueTypeDesc, M, MD extends IValueTy
     return (await this.m.data(range)).map(this.f, this.thisArgument);
   }
 
-  async sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T,D>> {
+  async sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T, D>> {
     const d = await this.data();
     const indices = ArrayUtils.argSort(d, compareFn, thisArg);
     return this.view(Range.list(indices));
   }
 
-  async filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T,D>> {
+  async filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T, D>> {
     const d = await this.data();
     const indices = ArrayUtils.argFilter(d, callbackfn, thisArg);
     return this.view(Range.list(indices));

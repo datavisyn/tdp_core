@@ -1,17 +1,14 @@
-import {Range, RangeLike, CompositeRange1D} from '../range';
-import {IDataType, IDataDescription} from '../data';
-import {IDType} from '../idtype';
-import {IHistogram} from '../data/histogram';
-import {ICategoricalVector} from '../vector/IVector';
-
-
+import { Range, RangeLike, CompositeRange1D } from '../range';
+import { IDataType, IDataDescription } from '../data';
+import { IDType } from '../idtype';
+import { IHistogram } from '../data/histogram';
+import { ICategoricalVector } from '../vector/IVector';
 
 export interface IGroup {
   readonly name: string;
   readonly color: string;
   readonly size: number;
 }
-
 
 export interface IStratificationDataDescription extends IDataDescription {
   readonly idtype: string;

@@ -1,11 +1,9 @@
-import {IScoreRow} from '../base/interfaces';
-import {RestBaseUtils, IParams, IRow} from '../base/rest';
-import {IDataRow} from 'lineupjs';
-import {IFormMultiMap, IFormRow, FormMap} from '../form/elements/FormMap';
-import {IScoreLoader} from '../base/interfaces';
-import {Ranking, LocalDataProvider} from 'lineupjs';
-import {IRankingWrapper} from './IRankingWrapper';
-import {IPluginDesc, Ajax} from '../base';
+import { IDataRow, Ranking, LocalDataProvider } from 'lineupjs';
+import { IScoreRow, IScoreLoader } from '../base/interfaces';
+import { RestBaseUtils, IParams, IRow } from '../base/rest';
+import { IFormMultiMap, IFormRow, FormMap } from '../form/elements/FormMap';
+import { IRankingWrapper } from './IRankingWrapper';
+import { IPluginDesc, Ajax } from '../base';
 
 /**
  * Interface for AScoreAccessorProxy
@@ -20,18 +18,17 @@ export class AScoreAccessorProxy<T> {
    * @param row
    */
   readonly accessor: IAccessorFunc<T> = (row: IDataRow) => this.access(row.v);
+
   private readonly scores = new Map<string, T>();
 
-  constructor(private readonly missingValue: T = null) {
-
-  }
+  constructor(private readonly missingValue: T = null) {}
 
   clear() {
     this.scores.clear();
   }
 
   setRows(rows: IScoreRow<T>[]) {
-    rows.forEach(({id, score}) => this.scores.set(String(id), score));
+    rows.forEach(({ id, score }) => this.scores.set(String(id), score));
   }
 
   protected access(row: IRow) {
@@ -43,20 +40,16 @@ export class AScoreAccessorProxy<T> {
   }
 }
 
-class NumberScoreAccessorProxy extends AScoreAccessorProxy<number> {
-}
-
+class NumberScoreAccessorProxy extends AScoreAccessorProxy<number> {}
 
 class CategoricalScoreAccessorProxy extends AScoreAccessorProxy<string> {
-
   protected access(row: IRow) {
     const v = super.access(row);
-    return String(v); //even null values;
+    return String(v); // even null values;
   }
 }
 
 export class LineupUtils {
-
   /**
    * Wraps the score such that the plugin is loaded and the score modal opened, when the factory function is called
    * @param score
@@ -69,20 +62,21 @@ export class LineupUtils {
       scoreId: score.id,
       factory(extraArgs: object, count: number) {
         return score.load().then((p) => Promise.resolve(p.factory(score, extraArgs, count)));
-      }
+      },
     };
   }
+
   /**
    * creates and accessor helper
    * @param colDesc
    * @returns {CategoricalScoreAccessorProxy|NumberScoreAccessorProxy}
    */
   static createAccessor(colDesc: any): AScoreAccessorProxy<any> {
-    const accessor = colDesc.type === 'categorical' ? new CategoricalScoreAccessorProxy(colDesc.missingValue) : new NumberScoreAccessorProxy(colDesc.missingValue);
+    const accessor =
+      colDesc.type === 'categorical' ? new CategoricalScoreAccessorProxy(colDesc.missingValue) : new NumberScoreAccessorProxy(colDesc.missingValue);
     colDesc.accessor = accessor.accessor;
     return accessor;
   }
-
 
   /**
    * converts the given filter object to request params
@@ -90,7 +84,7 @@ export class LineupUtils {
    */
   static toFilter(filter: IFormMultiMap | IFormRow[]): IParams {
     if (Array.isArray(filter)) {
-      //map first
+      // map first
       return LineupUtils.toFilter(FormMap.convertRow2MultiMap(filter));
     }
     const clean = (v: any) => {
@@ -120,12 +114,14 @@ export class LineupUtils {
       }
       return v.toString();
     };
-    return keys.map((d) => {
-      const v = filter[d];
-      const label = key2name && key2name.has(d) ? key2name.get(d) : d;
-      const vn = Array.isArray(v) ? '["' + v.map(toString).join('","') + '"]' : '"' + toString(v) + '"';
-      return `${label}=${vn}`;
-    }).join(' & ');
+    return keys
+      .map((d) => {
+        const v = filter[d];
+        const label = key2name && key2name.has(d) ? key2name.get(d) : d;
+        const vn = Array.isArray(v) ? `["${v.map(toString).join('","')}"]` : `"${toString(v)}"`;
+        return `${label}=${vn}`;
+      })
+      .join(' & ');
   }
 
   /**
@@ -136,13 +132,15 @@ export class LineupUtils {
     const cache = new Map<string, Promise<number>>();
 
     return (rows: IFormRow[]) => {
-      if (total === null) { // compute all by no setting any filter
-        total = RestBaseUtils.getTDPCount(database, view, (extraParams ? extraParams() : {}));
+      if (total === null) {
+        // compute all by no setting any filter
+        total = RestBaseUtils.getTDPCount(database, view, extraParams ? extraParams() : {});
       }
-      if (!rows) { //if no filter is set return all
+      if (!rows) {
+        // if no filter is set return all
         return total.then((count: number) => `${count} / ${count}`);
       }
-      //compute filtered ones
+      // compute filtered ones
       const filter = LineupUtils.toFilter(rows);
       const param: IParams = {};
       if (extraParams) {
@@ -152,12 +150,15 @@ export class LineupUtils {
       if (!cache.has(key)) {
         cache.set(key, RestBaseUtils.getTDPCount(database, view, param, filter));
       }
-      return Promise.all([total, cache.get(key)]).then((results: number[]) => {
-        return `${results[1]} / ${results[0]}`;
-      }, () => {
-        // ignore error and return dunno
-        return `? / ?`;
-      });
+      return Promise.all([total, cache.get(key)]).then(
+        (results: number[]) => {
+          return `${results[1]} / ${results[0]}`;
+        },
+        () => {
+          // ignore error and return dunno
+          return `? / ?`;
+        },
+      );
     };
   }
 
@@ -190,14 +191,14 @@ export class LineupUtils {
 
   static wrapRanking(data: LocalDataProvider, ranking: Ranking) {
     const findColumn = (column: string) => ranking.find((d) => (<any>d.desc).column === column || d.desc.label === column);
-    return <IRankingWrapper> {
+    return <IRankingWrapper>{
       findColumn,
       sortBy: (column: string, asc = true) => {
         const col = findColumn(column);
         if (!col) {
           return false;
         }
-        ranking.setSortCriteria({col, asc});
+        ranking.setSortCriteria({ col, asc });
         return true;
       },
       groupBy: (column: string, aggregate = false) => {
@@ -213,7 +214,7 @@ export class LineupUtils {
           });
         }
         return true;
-      }
+      },
     };
   }
 }

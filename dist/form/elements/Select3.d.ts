@@ -189,3 +189,4 @@ export declare class Select3<T extends IdTextPair> extends EventHandler {
     private tokenize;
     focus(): void;
 }
+//# sourceMappingURL=Select3.d.ts.map

@@ -25,7 +25,8 @@ class HTMLLayoutElem extends ALayoutElem {
         this.node = node;
     }
     setBounds(x, y, w, h) {
-        const unit = this.layoutOption('unit', 'px'), style = this.node.style;
+        const unit = this.layoutOption('unit', 'px');
+        const { style } = this.node;
         style.left = x + unit;
         style.top = y + unit;
         style.width = w + unit;
@@ -33,7 +34,8 @@ class HTMLLayoutElem extends ALayoutElem {
         return null;
     }
     getBounds() {
-        const unit = this.layoutOption('unit', 'px'), style = this.node.style;
+        const unit = this.layoutOption('unit', 'px');
+        const { style } = this.node;
         function v(f) {
             if (f.length >= unit.length && f.substring(f.length - unit.length) === unit) {
                 f = f.substring(0, f.length - unit.length);

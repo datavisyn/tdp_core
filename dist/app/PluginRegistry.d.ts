@@ -9,7 +9,7 @@ export declare class PluginRegistry implements IRegistry {
      * @param filter
      * @returns {IPluginDesc[]}
      */
-    listPlugins(filter?: (string | ((desc: IPluginDesc) => boolean))): IPluginDesc[];
+    listPlugins(filter?: string | ((desc: IPluginDesc) => boolean)): IPluginDesc[];
     /**
      * returns an extension identified by type and id
      * @param type
@@ -34,3 +34,4 @@ export declare class PluginRegistry implements IRegistry {
     private static instance;
     static getInstance(): PluginRegistry;
 }
+//# sourceMappingURL=PluginRegistry.d.ts.map

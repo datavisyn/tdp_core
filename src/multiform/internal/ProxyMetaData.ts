@@ -1,13 +1,10 @@
-
-import {IVisMetaData} from '../../vis/IVisMetaData';
+import { IVisMetaData } from '../../vis/IVisMetaData';
 
 /**
  * @internal
  */
 export class ProxyMetaData implements IVisMetaData {
-  constructor(private proxy: () => IVisMetaData) {
-
-  }
+  constructor(private proxy: () => IVisMetaData) {}
 
   get scaling() {
     const p = this.proxy();

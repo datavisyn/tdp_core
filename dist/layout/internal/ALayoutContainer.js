@@ -7,7 +7,8 @@ export class ALayoutContainer extends EventHandler {
         this.parent = null;
         this.id = UniqueIdManager.getInstance().uniqueId(ALayoutContainer.MIME_TYPE);
         this.keyDownListener = (evt) => {
-            if (evt.keyCode === 27) { // Escape
+            if (evt.keyCode === 27) {
+                // Escape
                 this.toggleMaximizedView();
             }
         };
@@ -21,21 +22,21 @@ export class ALayoutContainer extends EventHandler {
         this.header.innerHTML = `
         <button type="button" class="btn-close float-end" ${this.options.fixed ? 'hidden' : ''} aria-label="Close"></button>
         <span>${this.name}</span>`;
-        //remove
+        // remove
         this.header.firstElementChild.addEventListener('click', (evt) => {
             evt.preventDefault();
             evt.stopPropagation();
             this.destroy();
         });
-        //drag
+        // drag
         if (!this.options.fixedLayout) {
             DnDUtils.getInstance().dragAble(this.header, () => {
                 return {
                     effectAllowed: 'move',
                     data: {
                         'text/plain': this.name,
-                        [ALayoutContainer.MIME_TYPE]: String(this.id)
-                    }
+                        [ALayoutContainer.MIME_TYPE]: String(this.id),
+                    },
                 };
             }, true);
         }
@@ -61,7 +62,7 @@ export class ALayoutContainer extends EventHandler {
             fixed: false,
             hideAbleHeader: false,
             autoWrap: false,
-            fixedLayout: false
+            fixedLayout: false,
         };
     }
     destroy() {
@@ -74,7 +75,7 @@ export class ALayoutContainer extends EventHandler {
         if (this.options.name === name) {
             return;
         }
-        this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_NAME_CHANGED), this.options.name, this.options.name = name);
+        this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_NAME_CHANGED), this.options.name, (this.options.name = name));
         this.updateName(name);
     }
     updateName(name) {
@@ -86,7 +87,7 @@ export class ALayoutContainer extends EventHandler {
             name: this.name,
             fixed: this.options.fixed,
             autoWrap: this.options.autoWrap,
-            fixedLayout: this.options.fixedLayout
+            fixedLayout: this.options.fixedLayout,
         };
     }
     static restoreOptions(dump) {
@@ -94,7 +95,7 @@ export class ALayoutContainer extends EventHandler {
             name: dump.name,
             fixed: dump.fixed,
             autoWrap: dump.autoWrap === true,
-            fixedLayout: dump.fixedLayout === true
+            fixedLayout: dump.fixedLayout === true,
         };
     }
     static deriveOptions(node) {
@@ -102,7 +103,7 @@ export class ALayoutContainer extends EventHandler {
             name: node.dataset.name || 'View',
             fixed: node.dataset.fixed !== undefined,
             autoWrap: node.dataset.autoWrap !== undefined,
-            fixedLayout: node.dataset.fixedLayout !== undefined
+            fixedLayout: node.dataset.fixedLayout !== undefined,
         };
     }
     find(id) {
@@ -115,7 +116,7 @@ export class ALayoutContainer extends EventHandler {
         if (!this.parent) {
             return null;
         }
-        const parent = this.parent;
+        const { parent } = this;
         if ((typeof id === 'number' && parent.id === id) || (typeof id === 'function' && id(parent))) {
             return parent;
         }

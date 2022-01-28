@@ -5,7 +5,6 @@ import { IGraphFactory } from './GraphBase';
 export declare class GraphProxy extends ADataType<IGraphDataDescription> {
     private cache;
     private loaded;
-    constructor(desc: IGraphDataDescription);
     get nnodes(): number;
     get nedges(): number;
     get dim(): number[];
@@ -19,3 +18,4 @@ export declare class GraphProxy extends ADataType<IGraphDataDescription> {
      */
     static create(desc: IGraphDataDescription): GraphProxy;
 }
+//# sourceMappingURL=GraphProxy.d.ts.map

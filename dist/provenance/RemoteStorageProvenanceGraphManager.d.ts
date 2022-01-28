@@ -18,3 +18,4 @@ export declare class RemoteStorageProvenanceGraphManager implements IProvenanceG
     edit(graph: ProvenanceGraph | IProvenanceGraphDataDescription, desc?: any): Promise<IProvenanceGraphDataDescription>;
     create(desc?: any): Promise<ProvenanceGraph>;
 }
+//# sourceMappingURL=RemoteStorageProvenanceGraphManager.d.ts.map

@@ -53,8 +53,8 @@ export class AIterator<T> {
    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
   map<U>(callbackfn: (value: T) => U, thisArg?: any): IIterator<U> {
-    // tslint:disable:no-use-before-declare
     // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new TransformIterator(this, callbackfn, thisArg);
   }
 
@@ -90,7 +90,6 @@ export class AIterator<T> {
  * iterator for a given range
  */
 export class Iterator extends AIterator<number> implements IIterator<number> {
-
   private act: number;
 
   constructor(public from: number, public to: number, public step: number) {
@@ -141,12 +140,14 @@ export class Iterator extends AIterator<number> implements IIterator<number> {
   get size() {
     if (this.byOne) {
       return Math.max(this.to - this.from, 0);
-    } else if (this.byMinusOne) {
+    }
+    if (this.byMinusOne) {
       return Math.max(this.from - this.to, 0);
     }
-    const d = this.isIncreasing ? (this.to - this.from + 1) : (this.from - this.to + 1);
+    const d = this.isIncreasing ? this.to - this.from + 1 : this.from - this.to + 1;
     const s = Math.abs(this.step);
-    if (d <= 0) { //no range
+    if (d <= 0) {
+      // no range
       return 0;
     }
     return Math.floor(d / s);
@@ -249,8 +250,11 @@ export class SingleIterator<T> extends AIterator<T> implements IIterator<T> {
 
 export class EmptyIterator<T> extends AIterator<T> implements IIterator<T> {
   isIncreasing = false;
+
   isDecreasing = false;
+
   byOne = false;
+
   byMinusOne = false;
 
   /**
@@ -280,9 +284,7 @@ export class EmptyIterator<T> extends AIterator<T> implements IIterator<T> {
   }
 }
 
-
 export class ConcatIterator<T> extends AIterator<T> implements IIterator<T> {
-
   private act: IIterator<T>;
 
   constructor(private its: IIterator<T>[]) {
@@ -294,8 +296,9 @@ export class ConcatIterator<T> extends AIterator<T> implements IIterator<T> {
    * whether more items are available
    */
   hasNext() {
-    //based on http://grepcode.com/file/repo1.maven.org/maven2/com.google.guava/guava/r08/com/google/common/collect/Iterators.java#Iterators.concat%28java.util.Iterator%29
+    // based on http://grepcode.com/file/repo1.maven.org/maven2/com.google.guava/guava/r08/com/google/common/collect/Iterators.java#Iterators.concat%28java.util.Iterator%29
     let currentHasNext = false;
+    // eslint-disable-next-line no-cond-assign
     while (!(currentHasNext = this.act.hasNext()) && this.its.length > 0) {
       this.act = this.its.shift();
     }
@@ -343,14 +346,15 @@ export class ConcatIterator<T> extends AIterator<T> implements IIterator<T> {
   static concatIterators<T>(...its: IIterator<T>[]) {
     if (its.length === 0) {
       return EmptyIterator.create();
-    } else if (its.length === 1) {
+    }
+    if (its.length === 1) {
       return its[0];
     }
     return new ConcatIterator<T>(its);
   }
 }
 
-class TransformIterator<O,T> extends AIterator<T> implements IIterator<T> {
+class TransformIterator<O, T> extends AIterator<T> implements IIterator<T> {
   constructor(private it: IIterator<O>, private f: (elem: O) => T, private thisArg?: any) {
     super();
   }

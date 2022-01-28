@@ -1,7 +1,5 @@
-import {PanelTab} from './PanelTab';
-import {PanelNavButton} from './PanelButton';
-
-
+import { PanelTab } from './PanelTab';
+import { PanelNavButton } from './PanelButton';
 
 /**
  * The header of the PanelTab
@@ -29,7 +27,6 @@ class PanelTabHeader {
 }
 
 export interface ITabContainer {
-
   /**
    * HTMLElement of the tab container
    */
@@ -118,15 +115,17 @@ export class NullTabContainer implements ITabContainer {
  * The PanelTabContainer creates tab able nav buttons that toggle their corresponding PanelTab.
  */
 export class PanelTabContainer implements ITabContainer {
-
   readonly node: HTMLElement;
 
   private readonly tabContentNode: HTMLElement;
-  private parent: HTMLElement;
-  private tabs: PanelTab[] = [];
-  private tabHeader: PanelTabHeader;
-  private currentTab: PanelTab;
 
+  private parent: HTMLElement;
+
+  private tabs: PanelTab[] = [];
+
+  private tabHeader: PanelTabHeader;
+
+  private currentTab: PanelTab;
 
   /**
    * @param parent The parent HTML DOM element.
@@ -160,9 +159,11 @@ export class PanelTabContainer implements ITabContainer {
   addTab(tab: PanelTab, onClick?: () => void): void {
     this.tabs = [...this.tabs, tab];
 
-    const listener = (onClick) ? onClick : () => {
-      this.showTab(tab);
-    };
+    const listener =
+      onClick ||
+      (() => {
+        this.showTab(tab);
+      });
 
     this.tabHeader.addNavButton(tab.getNavButton(listener));
     this.tabContentNode.appendChild(tab.node);

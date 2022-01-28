@@ -18,7 +18,7 @@ export class TransposedMatrix extends AMatrix {
     persist() {
         return {
             root: this.root.persist(),
-            transposed: true
+            transposed: true,
         };
     }
     get valuetype() {
@@ -64,7 +64,7 @@ export class TransposedMatrix extends AMatrix {
     }
     size() {
         const s = this.t.dim;
-        return [s[1], s[0]]; //swap dimension
+        return [s[1], s[0]]; // swap dimension
     }
     at(i, j) {
         return this.t.at(j, i);

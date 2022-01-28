@@ -25,7 +25,7 @@ export class Range1DGroup extends Range1D {
         return new Range1DGroup(this.name, this.color, super.clone());
     }
     toString() {
-        return '"' + this.name + '""' + this.color + '"' + super.toString();
+        return `"${this.name}""${this.color}"${super.toString()}`;
     }
     toSet(size) {
         return new Range1DGroup(this.name, this.color, super.toSet(size));

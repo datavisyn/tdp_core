@@ -7,3 +7,4 @@ export * from './ProductIDType';
 export * from './ASelectAble';
 export * from './AProductSelectAble';
 export * from './IDTypeManager';
+//# sourceMappingURL=index.d.ts.map

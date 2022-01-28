@@ -31,3 +31,4 @@ export declare type IAnyAtom = IAtom<any, IValueTypeDesc>;
 export declare class AtomUtils {
     static createDefaultAtomDesc(): IAtomDataDescription<IValueTypeDesc>;
 }
+//# sourceMappingURL=IAtom.d.ts.map
