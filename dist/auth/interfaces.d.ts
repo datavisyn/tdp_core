@@ -62,3 +62,4 @@ export interface IRenderAuthorizationOptions {
      */
     error?: Error;
 }
+//# sourceMappingURL=interfaces.d.ts.map

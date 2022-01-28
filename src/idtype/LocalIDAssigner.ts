@@ -1,9 +1,9 @@
-import {IdPool} from '../internal/IdPool';
-import {Range} from '../range';
-
+import { IdPool } from '../internal/IdPool';
+import { Range } from '../range';
 
 export class LocalIDAssigner {
   private readonly pool = new IdPool();
+
   private readonly lookup = new Map<string, number>();
 
   unmapOne(id: number) {

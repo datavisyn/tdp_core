@@ -29,3 +29,4 @@ export declare class SelectionRecorder {
     destroy(): void;
     static createSelectionRecorder(graph: ProvenanceGraph, type?: string, options?: any): SelectionRecorder;
 }
+//# sourceMappingURL=Selection.d.ts.map

@@ -11,28 +11,30 @@ export class SliceRowVector extends AVector {
         this.row = row;
         this.rowRange = Range1D.from([this.row]);
         this.desc = {
-            name: m.desc.name + '-r' + row,
-            fqname: m.desc.fqname + '-r' + row,
-            id: m.desc.id + '-r' + row,
+            name: `${m.desc.name}-r${row}`,
+            fqname: `${m.desc.fqname}-r${row}`,
+            id: `${m.desc.id}-r${row}`,
             type: 'vector',
             idtype: m.coltype,
             size: m.ncol,
             value: m.valuetype,
             description: m.desc.description,
             creator: m.desc.creator,
-            ts: m.desc.ts
+            ts: m.desc.ts,
         };
         this.root = this;
     }
     persist() {
         return {
             root: this.m.persist(),
-            row: this.row
+            row: this.row,
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;

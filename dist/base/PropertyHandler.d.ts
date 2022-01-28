@@ -45,3 +45,4 @@ export declare class PropertyHandler extends EventHandler {
     toString(): string;
     protected parse(code?: string): void;
 }
+//# sourceMappingURL=PropertyHandler.d.ts.map

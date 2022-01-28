@@ -33,10 +33,16 @@ export class Permission {
     }
     getPermissions(entity) {
         switch (entity) {
-            case EEntity.USER: return this.user;
-            case EEntity.GROUP: return this.group;
-            case EEntity.OTHERS: return this.others;
-            case EEntity.BUDDIES: return this.buddies;
+            case EEntity.USER:
+                return this.user;
+            case EEntity.GROUP:
+                return this.group;
+            case EEntity.OTHERS:
+                return this.others;
+            case EEntity.BUDDIES:
+                return this.buddies;
+            default:
+                return undefined;
         }
     }
     hasPermission(entity, permission) {

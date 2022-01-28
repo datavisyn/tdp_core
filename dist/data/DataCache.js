@@ -10,7 +10,7 @@ import { PluginRegistry } from '../app/PluginRegistry';
 import { DummyDataType } from './datatype';
 export class DataCache {
     constructor() {
-        //find all datatype plugins
+        // find all datatype plugins
         this.available = PluginRegistry.getInstance().listPlugins('datatype');
         this.cacheById = new Map();
         this.cacheByName = new Map();
@@ -55,13 +55,13 @@ export class DataCache {
         if (DataCache.getInstance().cacheById.has(desc.id)) {
             return DataCache.getInstance().cacheById.get(desc.id);
         }
-        //find matching type
+        // find matching type
         const plugin = DataCache.getInstance().available.filter((p) => p.id === desc.type);
-        //no type there create a dummy one
+        // no type there create a dummy one
         if (plugin.length === 0) {
             return DataCache.getInstance().cached(desc, Promise.resolve(new DummyDataType(desc)));
         }
-        //take the first matching one
+        // take the first matching one
         return DataCache.getInstance().cached(desc, plugin[0].load().then((d) => d.factory(desc)));
     }
     /**
@@ -70,15 +70,17 @@ export class DataCache {
      * @returns {Promise<IDataType[]>}
      */
     async list(filter) {
-        const f = (typeof filter === 'function') ? filter : null;
-        const q = (typeof filter !== 'undefined' && typeof filter !== 'function') ? filter : {};
+        const f = typeof filter === 'function' ? filter : null;
+        const q = typeof filter !== 'undefined' && typeof filter !== 'function' ? filter : {};
         let r;
         if (AppContext.getInstance().isOffline()) {
             r = DataCache.getInstance().getCachedEntries();
         }
         else {
-            //load descriptions and create data out of them
-            r = AppContext.getInstance().getAPIJSON('/dataset/', q).then((r) => Promise.all(r.map(DataCache.getInstance().transformEntry)));
+            // load descriptions and create data out of them
+            r = AppContext.getInstance()
+                .getAPIJSON('/dataset/', q)
+                .then((result) => Promise.all(result.map(DataCache.getInstance().transformEntry)));
         }
         if (f !== null) {
             r = r.then((d) => d.filter(f));
@@ -91,7 +93,7 @@ export class DataCache {
      * @returns {{children: Array, name: string, data: null}}
      */
     convertToTree(list) {
-        //create a tree out of the list by the fqname
+        // create a tree out of the list by the fqname
         const root = { children: [], name: '/', data: null };
         list.forEach((entry) => {
             const path = entry.desc.fqname.split('/');
@@ -131,9 +133,9 @@ export class DataCache {
         }
         return Promise.resolve(result[0]);
     }
-    /*function escapeRegExp(string){
+    /* function escapeRegExp(string){
     return string.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1');
-    }*/
+    } */
     getFirstByName(name) {
         return DataCache.getInstance().getFirstWithCache(name, DataCache.getInstance().cacheByName, 'name');
     }
@@ -148,7 +150,7 @@ export class DataCache {
             }
         }
         return DataCache.getInstance().getFirst({
-            [attr]: typeof name === 'string' ? name : name.source
+            [attr]: typeof name === 'string' ? name : name.source,
         });
     }
     /**
@@ -171,15 +173,13 @@ export class DataCache {
         if (typeof persisted === 'string') {
             return DataCache.getInstance().getById(persisted);
         }
-        //resolve parent and then resolve it using restore item
+        // resolve parent and then resolve it using restore item
         if (persisted.root) {
             const parent = await DataCache.getInstance().get(persisted.root);
             return parent ? parent.restore(persisted) : null;
         }
-        else {
-            //can't restore non root and non data id
-            return Promise.reject('cannot restore non root and non data id');
-        }
+        // can't restore non root and non data id
+        return Promise.reject('cannot restore non root and non data id');
     }
     /**
      * creates a new dataset for the given description
@@ -216,7 +216,7 @@ export class DataCache {
         const desc = await AppContext.getInstance().sendAPI(`/dataset/${entry.desc.id}`, data, 'PUT');
         // clear existing cache
         DataCache.getInstance().clearCache(entry);
-        //update with current one
+        // update with current one
         return DataCache.getInstance().transformEntry(desc);
     }
     /**

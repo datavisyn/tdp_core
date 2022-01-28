@@ -1,3 +1,4 @@
+/* eslint-disable prefer-rest-params */
 import { Range1D } from './Range1D';
 /**
  * multi dimensional version of a RangeDim
@@ -39,7 +40,7 @@ export class Range {
         if (this === other || (this.isAll && other.isAll) || (this.isNone && other.isNone)) {
             return true;
         }
-        //TODO more performant comparison
+        // TODO more performant comparison
         return this.toString() === other.toString();
     }
     /**
@@ -135,17 +136,20 @@ export class Range {
         if (this.isAll) {
             return data;
         }
-        const ndim = this.ndim;
+        const { ndim } = this;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
-        //recursive variant for just filtering the needed rows
+        // recursive variant for just filtering the needed rows
         const filterDim = (i) => {
-            if (i >= ndim) { //out of range no filtering anymore
+            if (i >= ndim) {
+                // out of range no filtering anymore
                 return (d) => d;
             }
             const d = that.dim(i);
-            const next = filterDim(i + 1); //compute next transform
+            const next = filterDim(i + 1); // compute next transform
             const s = size ? size[i] : undefined;
             return (elem) => {
+                // if the value is an array, filter it else return the value
                 return Array.isArray(elem) ? d.filter(elem, s, next) : elem;
             };
         };
@@ -162,7 +166,7 @@ export class Range {
         if (r) {
             return r;
         }
-        //not yet existing create one
+        // not yet existing create one
         this.dims[dimension] = Range1D.all();
         return this.dims[dimension];
     }
@@ -231,7 +235,7 @@ export class Range {
      * @param size
      */
     product(callback, size) {
-        const ndim = this.ndim;
+        const { ndim } = this;
         const iter = (ids) => {
             const act = ids.length;
             if (act < ndim) {
@@ -252,9 +256,11 @@ export class Range {
      * encoded the given range in a string
      */
     toString() {
-        return this.dims.map(function (d) {
+        return this.dims
+            .map(function (d) {
             return d.toString();
-        }).join(',');
+        })
+            .join(',');
     }
     /**
      * creates a new range including everything
@@ -264,7 +270,7 @@ export class Range {
         return new Range();
     }
     static none() {
-        //ensure two dimensions
+        // ensure two dimensions
         return new Range([Range1D.none(), Range1D.none()]);
     }
     /**
@@ -290,7 +296,8 @@ export class Range {
             return Range.all();
         }
         const r = new Range();
-        if (Array.isArray(arguments[0])) { //array mode
+        if (Array.isArray(arguments[0])) {
+            // array mode
             Array.from(arguments).forEach((arr, i) => {
                 if (arr.length === 0) {
                     return;
@@ -304,7 +311,8 @@ export class Range {
                 r.dim(i).setSlice(slice.from, slice.to, slice.step);
             });
         }
-        else if (typeof arguments[0] === 'number') { //single slice mode
+        else if (typeof arguments[0] === 'number') {
+            // single slice mode
             r.dim(0).setSlice(arguments[0], arguments[1], arguments[2]);
         }
         return r;
@@ -316,7 +324,8 @@ export class Range {
         if (Array.isArray(arguments[0]) && arguments[0][0] instanceof Range1D) {
             return new Range(arguments[0]);
         }
-        else if (Array.isArray(arguments[0])) { //array mode
+        if (Array.isArray(arguments[0])) {
+            // array mode
             const r = new Range();
             Array.from(arguments).forEach((arr, i) => {
                 if (arr instanceof Range1D) {
@@ -328,12 +337,13 @@ export class Range {
             });
             return r;
         }
-        else if (typeof arguments[0] === 'number') { //single slice mode
+        if (typeof arguments[0] === 'number') {
+            // single slice mode
             const r = new Range();
             r.dim(0).setList(Array.from(arguments));
             return r;
         }
-        else if (arguments[0] instanceof Range1D) {
+        if (arguments[0] instanceof Range1D) {
             return new Range(Array.from(arguments));
         }
         return Range.none();
@@ -343,7 +353,8 @@ export class Range {
             return Range.all();
         }
         let ranges = arguments[0];
-        if (!Array.isArray(ranges)) { //array mode
+        if (!Array.isArray(ranges)) {
+            // array mode
             ranges = Array.from(arguments);
         }
         return new Range(ranges.map((r) => r.dim(0)));

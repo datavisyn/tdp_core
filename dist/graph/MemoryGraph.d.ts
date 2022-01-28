@@ -6,3 +6,4 @@ export declare class MemoryGraph extends GraphBase implements IPersistable {
     constructor(desc: IGraphDataDescription, nodes?: GraphNode[], edges?: GraphEdge[], factory?: import("./GraphBase").IGraphFactory);
     restore(persisted: any): this;
 }
+//# sourceMappingURL=MemoryGraph.d.ts.map

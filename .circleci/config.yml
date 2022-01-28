@@ -8,7 +8,7 @@ executors:
   node-executor:
     working_directory: ~/phovea-web
     docker:
-      - image: circleci/node:12.13-buster-browsers
+      - image: circleci/node:14.17-buster
 
 jobs:
   python-build:

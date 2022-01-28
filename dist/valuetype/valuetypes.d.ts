@@ -136,3 +136,4 @@ export interface IGuessOptions {
         [type: string]: number;
     };
 }
+//# sourceMappingURL=valuetypes.d.ts.map

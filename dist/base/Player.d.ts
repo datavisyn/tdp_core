@@ -1,5 +1,5 @@
 import { ProvenanceGraph, SlideNode } from '../provenance';
-export declare module StoryTransition {
+export declare namespace StoryTransition {
     const FACTOR = 1;
     const MIN_DURATION = -1;
     const MIN_TRANSITION = -1;
@@ -33,3 +33,4 @@ export declare class Player {
      */
     backward(): PromiseLike<SlideNode>;
 }
+//# sourceMappingURL=Player.d.ts.map

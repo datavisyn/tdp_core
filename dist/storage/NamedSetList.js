@@ -1,10 +1,10 @@
+import { select, event as d3event } from 'd3';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { StoreUtils } from './StoreUtils';
 import { RestStorageUtils } from './rest';
 import { ENamedSetType } from './interfaces';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { EXTENSION_POINT_TDP_LIST_FILTERS } from '../base/extensions';
-import { select, event as d3event } from 'd3';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { UserSession, PluginRegistry } from '../app';
 import { I18nextManager } from '../i18n';
@@ -30,7 +30,7 @@ export class NamedSetList {
       <section class="other-named-sets"><header> ${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.publicSets')}</header><ul class="loading"></ul></section>`;
         this.filter = await this.findFilters();
         const data = await this.list();
-        //store
+        // store
         this.data.push(...data);
         this.loaded = true;
         this.update();
@@ -40,10 +40,7 @@ export class NamedSetList {
             return;
         }
         StoreUtils.editDialog(namedSet, I18nextManager.getInstance().i18n.t(`tdp:core.editDialog.listOfEntities.default`), async (name, description, sec) => {
-            const params = Object.assign({
-                name,
-                description
-            }, sec);
+            const params = { name, description, ...sec };
             const editedSet = await RestStorageUtils.editNamedSet(namedSet.id, params);
             NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.namedSet'), name);
             this.replace(namedSet, editedSet);
@@ -62,10 +59,16 @@ export class NamedSetList {
         this.updateGroup($node.select('.other-named-sets ul'), otherNamedSets);
     }
     updateGroup($base, data) {
-        const $options = $base.classed('loading', data.length === 0 && !this.loaded).selectAll('li').data(data);
-        const $enter = $options.enter()
-            .append('li').classed('namedset', (d) => d.type === ENamedSetType.NAMEDSET);
-        $enter.append('a')
+        const $options = $base
+            .classed('loading', data.length === 0 && !this.loaded)
+            .selectAll('li')
+            .data(data);
+        const $enter = $options
+            .enter()
+            .append('li')
+            .classed('namedset', (d) => d.type === ENamedSetType.NAMEDSET);
+        $enter
+            .append('a')
             .classed('goto', true)
             .attr('href', '#')
             .on('click', (namedSet) => {
@@ -73,7 +76,8 @@ export class NamedSetList {
             d3event.preventDefault();
             this.sessionCreator(namedSet);
         });
-        $enter.append('a')
+        $enter
+            .append('a')
             .classed('public', true)
             .attr('href', '#')
             .html(`<i class="fas fa-fw" aria-hidden="true"></i> <span class="visually-hidden"></span>`)
@@ -82,7 +86,8 @@ export class NamedSetList {
             d3event.preventDefault();
             this.edit(namedSet);
         });
-        $enter.append('a')
+        $enter
+            .append('a')
             .classed('edit', true)
             .attr('href', '#')
             .html(`<i class="fas fa-edit" aria-hidden="true"></i> <span class="visually-hidden"> ${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.edit')}</span>`)
@@ -92,7 +97,8 @@ export class NamedSetList {
             d3event.preventDefault();
             this.edit(namedSet);
         });
-        $enter.append('a')
+        $enter
+            .append('a')
             .classed('delete', true)
             .attr('href', '#')
             .html(`<i class="fas fa-trash" aria-hidden="true"></i> <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.delete')}</span>`)
@@ -110,16 +116,25 @@ export class NamedSetList {
                 this.remove(namedSet);
             }
         });
-        //update
-        $options.select('a.goto').text((d) => d.name)
+        // update
+        $options
+            .select('a.goto')
+            .text((d) => d.name)
             .attr('title', (d) => {
-            const extendedData = d.type === ENamedSetType.NAMEDSET ? { context: 'extended', creator: d.creator, public: UserSession.getInstance().hasPermission(d, EEntity.OTHERS) } : {};
+            const extendedData = d.type === ENamedSetType.NAMEDSET
+                ? {
+                    context: 'extended',
+                    creator: d.creator,
+                    public: UserSession.getInstance().hasPermission(d, EEntity.OTHERS),
+                }
+                : {};
             return I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.title', { name: d.name, description: d.description, ...extendedData }); // i18next context feature
         });
-        $options.select('a.delete').attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d)) ? '' : null);
+        $options.select('a.delete').attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d) ? '' : null));
         $options.select('a.edit').attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d) ? '' : null));
-        $options.select('a.public')
-            .attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d)) ? '' : null)
+        $options
+            .select('a.public')
+            .attr('hidden', (d) => (d.type !== ENamedSetType.NAMEDSET || !UserSession.getInstance().canWrite(d) ? '' : null))
             .html((d) => {
             const isPublic = d.type === ENamedSetType.NAMEDSET && UserSession.getInstance().hasPermission(d, EEntity.OTHERS);
             const publicOrPrivate = I18nextManager.getInstance().i18n.t('tdp:core.NamedSetList.status', { context: isPublic ? '' : 'private' });
@@ -140,7 +155,9 @@ export class NamedSetList {
         this.update();
     }
     findFilters() {
-        return Promise.all(PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS).map((plugin) => plugin.load())).then((filters) => {
+        return Promise.all(PluginRegistry.getInstance()
+            .listPlugins(EXTENSION_POINT_TDP_LIST_FILTERS)
+            .map((plugin) => plugin.load())).then((filters) => {
             return (metaData) => filters.every((f) => f.factory(metaData));
         });
     }

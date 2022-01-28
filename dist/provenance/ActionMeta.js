@@ -29,7 +29,9 @@ export class ActionMetaData {
         if (this.operation === ObjectRefUtils.operation.update) {
             return that.operation === ObjectRefUtils.operation.update;
         }
-        return this.operation === ObjectRefUtils.operation.create ? that.operation === ObjectRefUtils.operation.remove : that.operation === ObjectRefUtils.operation.create;
+        return this.operation === ObjectRefUtils.operation.create
+            ? that.operation === ObjectRefUtils.operation.remove
+            : that.operation === ObjectRefUtils.operation.create;
     }
     toString() {
         return `${this.category}:${this.operation} ${this.name}`;

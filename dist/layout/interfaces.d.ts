@@ -229,3 +229,4 @@ export interface PHOVEA_UI_IView {
      */
     dumpReference(): number;
 }
+//# sourceMappingURL=interfaces.d.ts.map

@@ -1,4 +1,3 @@
-
 /**
  * basic interface of a plugin
  */
@@ -63,10 +62,8 @@ export interface IPlugin {
   factory(...args: any[]): any;
 }
 
-
 export interface IRegistry {
   push(type: string, loader: () => any, desc?: any): void;
   push(type: string, id: string, loader: () => any, desc?: any): void;
   push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
 }
-

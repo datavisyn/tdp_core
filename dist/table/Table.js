@@ -16,7 +16,7 @@ export class Table extends ATable {
         this.desc = desc;
         this.loader = loader;
         // set default column
-        desc.columns.forEach((col) => col.column = col.column || col.name);
+        desc.columns.forEach((col) => (col.column = col.column || col.name));
         this.root = this;
         this.vectors = desc.columns.map((cdesc, i) => new TableVector(this, i, cdesc));
     }
@@ -89,7 +89,7 @@ export class Table extends ATable {
     static toObjects(data, cols) {
         return data.map((row) => {
             const r = {};
-            cols.forEach((col, i) => r[col] = row[i]);
+            cols.forEach((col, i) => (r[col] = row[i]));
             return r;
         });
     }
@@ -99,7 +99,7 @@ export class Table extends ATable {
     static asTableImpl(columns, rows, objs, data, options = {}) {
         const desc = BaseUtils.mixin(TableUtils.createDefaultTableDesc(), {
             columns,
-            size: [rows.length, columns.length]
+            size: [rows.length, columns.length],
         }, options);
         const rowAssigner = options.rowassigner || LocalIDAssigner.create();
         const loader = () => {
@@ -107,7 +107,7 @@ export class Table extends ATable {
                 rowIds: rowAssigner(rows),
                 rows,
                 objs,
-                data
+                data,
             };
             return Promise.resolve(r);
         };
@@ -121,10 +121,10 @@ export class Table extends ATable {
             return {
                 name: col,
                 column: col,
-                value: ValueTypeUtils.guessValueTypeDesc(tableData.map((row) => row[i]))
+                value: ValueTypeUtils.guessValueTypeDesc(tableData.map((row) => row[i])),
             };
         });
-        const realData = tableData.map((row) => columns.map((col, i) => (col.value.type === ValueTypeUtils.VALUE_TYPE_REAL || col.value.type === ValueTypeUtils.VALUE_TYPE_INT) ? parseFloat(row[i]) : row[i]));
+        const realData = tableData.map((row) => columns.map((col, i) => col.value.type === ValueTypeUtils.VALUE_TYPE_REAL || col.value.type === ValueTypeUtils.VALUE_TYPE_INT ? parseFloat(row[i]) : row[i]));
         const objs = Table.toObjects(realData, cols);
         return Table.asTableImpl(columns, rows, objs, realData, options);
     }
@@ -145,7 +145,7 @@ export class Table extends ATable {
             return {
                 name: col,
                 column: col,
-                value: ValueTypeUtils.guessValueTypeDesc(realData.map((row) => row[i]))
+                value: ValueTypeUtils.guessValueTypeDesc(realData.map((row) => row[i])),
             };
         });
         return Table.asTableImpl(columns, rows, objs, realData, options);
@@ -157,7 +157,7 @@ export class Table extends ATable {
      */
     static convertToTable(list) {
         return Table.wrapObjects({
-            id: '_data' + BaseUtils.randomId(5),
+            id: `_data${BaseUtils.randomId(5)}`,
             name: 'data',
             description: 'list of data types',
             fqname: 'custom/data',
@@ -170,32 +170,32 @@ export class Table extends ATable {
                 {
                     name: 'Name',
                     value: {
-                        type: 'string'
+                        type: 'string',
                     },
-                    getter: (d) => d.desc.name
+                    getter: (d) => d.desc.name,
                 },
                 {
                     name: 'Type',
                     value: {
-                        type: 'string'
+                        type: 'string',
                     },
-                    getter: (d) => d.desc.type
+                    getter: (d) => d.desc.type,
                 },
                 {
                     name: 'Dimensions',
                     value: {
-                        type: 'string'
+                        type: 'string',
                     },
-                    getter: (d) => d.dim.join(' x ')
+                    getter: (d) => d.dim.join(' x '),
                 },
                 {
                     name: 'ID Types',
                     value: {
-                        type: 'string'
+                        type: 'string',
                     },
-                    getter: (d) => d.idtypes.join(' x ')
+                    getter: (d) => d.idtypes.join(' x '),
                 },
-            ]
+            ],
         }, list, (d) => d.desc.name);
     }
     /**

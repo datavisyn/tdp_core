@@ -3,3 +3,4 @@ export * from './MultiTableVector';
 export * from './TableNameVector';
 export * from './TableVector';
 export * from './VectorTable';
+//# sourceMappingURL=internal.d.ts.map

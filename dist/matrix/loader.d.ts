@@ -35,3 +35,4 @@ export declare class MatrixLoaderHelper {
      */
     static prepareHeatmapUrlParameter(range: Range, options: IHeatMapUrlOptions): IHeatMapUrlParameter;
 }
+//# sourceMappingURL=loader.d.ts.map

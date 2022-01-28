@@ -14,3 +14,4 @@ export declare abstract class AStartList extends ARankingView {
     protected get namedSet(): INamedSet | null;
     protected buildNamedSetFilters(namedSetIdFilterKey?: string, validFilterKey?: (key: string) => boolean): IParams;
 }
+//# sourceMappingURL=AStartList.d.ts.map

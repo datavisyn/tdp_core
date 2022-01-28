@@ -1,9 +1,9 @@
 import { isSupportType } from 'lineupjs';
 import { ExportUtils } from '../internal/ExportUtils';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
-import { BaseUtils } from '../../base';
+import { BaseUtils } from '../../base/BaseUtils';
 import { I18nextManager } from '../../i18n';
-import { PHOVEA_UI_FormDialog } from '../../components';
+import { PHOVEA_UI_FormDialog } from '../../components/dialogs';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
@@ -26,13 +26,13 @@ export class PanelDownloadButton {
       </div>
     `;
         lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_ALL, (_event, order) => {
-            this.node.querySelectorAll('[data-num-all-rows]').forEach((element) => element.dataset.numAllRows = order.length.toString());
+            this.node.querySelectorAll('[data-num-all-rows]').forEach((element) => (element.dataset.numAllRows = order.length.toString()));
         });
         lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, (_event, order) => {
-            this.node.querySelectorAll('[data-num-selected-rows]').forEach((element) => element.dataset.numSelectedRows = order.length.toString());
+            this.node.querySelectorAll('[data-num-selected-rows]').forEach((element) => (element.dataset.numSelectedRows = order.length.toString()));
         });
         lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, (_event, order) => {
-            this.node.querySelectorAll('[data-num-filtered-rows]').forEach((element) => element.dataset.numFilteredRows = order.length.toString());
+            this.node.querySelectorAll('[data-num-filtered-rows]').forEach((element) => (element.dataset.numFilteredRows = order.length.toString()));
         });
         this.node.querySelectorAll('a').forEach((link) => {
             link.onclick = (_evt) => {
@@ -41,19 +41,20 @@ export class PanelDownloadButton {
                     case 'custom':
                         promise = this.customizeDialog(provider, lineupOrderRowIndices);
                         break;
-                    default:
+                    default: {
                         const ranking = provider.getFirstRanking();
                         promise = Promise.resolve({
                             order: lineupOrderRowIndices[link.dataset.rows],
                             columns: ranking.flatColumns.filter((c) => !isSupportType(c)),
                             type: ExportUtils.getExportFormat(link.dataset.format),
-                            name: ranking.getLabel()
+                            name: ranking.getLabel(),
                         });
+                    }
                 }
                 promise
                     .then((r) => {
-                    return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order))
-                        .then((blob) => ({
+                    return r.type.getRankingContent(r.columns, provider.viewRawRows(r.order)).then((blob) => ({
+                        // wait for blob then transform object
                         content: blob,
                         mimeType: r.type.mimeType,
                         name: `${r.name}${r.type.fileExtension}`,
@@ -81,7 +82,8 @@ export class PanelDownloadButton {
         <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columns')}</h5>
         <p class="text-info"><i class="fas fa-info-circle"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsReorderTip')}</p>
         <p class="error-columns">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.columnsError')}</p>
-        ${flat.map((col) => `
+        ${flat
+            .map((col) => `
           <div class="tdp-ranking-export-form-handle hstack gap-1">
             <i class="fas fa-grip-vertical pb-2"></i>
             <div class="form-check">
@@ -89,7 +91,8 @@ export class PanelDownloadButton {
               <label class="form-label form-check-label" for="customCheck_${col.id}">${col.label}</label>
             </div>
           </div>
-        `).join('')}
+        `)
+            .join('')}
       </div>
       <div class="mb-3">
         <h5>${I18nextManager.getInstance().i18n.t('tdp:core.lineup.export.rows')}</h5>
@@ -123,7 +126,9 @@ export class PanelDownloadButton {
     `;
         dialog.form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
             checkbox.addEventListener('change', () => {
-                dialog.form.querySelector('.error-columns').parentElement.classList.toggle('has-error', (dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0));
+                dialog.form
+                    .querySelector('.error-columns')
+                    .parentElement.classList.toggle('has-error', dialog.form.querySelectorAll('input[type="checkbox"]:checked').length === 0);
             });
         });
         this.resortAble(dialog.form.firstElementChild, '.tdp-ranking-export-form-handle');
@@ -138,7 +143,7 @@ export class PanelDownloadButton {
                     type: ExportUtils.getExportFormat(data.get('type')),
                     columns: data.getAll('columns').map((d) => lookup.get(d.toString())),
                     order: orderedRowIndices[data.get('rows').toString()],
-                    name: data.get('name')
+                    name: data.get('name'),
                 });
                 return false;
             });
@@ -159,7 +164,8 @@ export class PanelDownloadButton {
             let prevBB;
             let nextBB;
             const update = () => {
-                prevBB = item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
+                prevBB =
+                    item.previousElementSibling && item.previousElementSibling.matches(elementSelector) ? item.previousElementSibling.getBoundingClientRect() : null;
                 nextBB = item.nextElementSibling && item.nextElementSibling.matches(elementSelector) ? item.nextElementSibling.getBoundingClientRect() : null;
             };
             update();
@@ -170,12 +176,12 @@ export class PanelDownloadButton {
             };
             base.onmousemove = (evt) => {
                 const y = evt.clientY;
-                if (prevBB && y < (prevBB.top + prevBB.height / 2)) {
+                if (prevBB && y < prevBB.top + prevBB.height / 2) {
                     // move up
                     item.parentElement.insertBefore(item, item.previousElementSibling);
                     update();
                 }
-                else if (nextBB && y > (nextBB.top + nextBB.height / 2)) {
+                else if (nextBB && y > nextBB.top + nextBB.height / 2) {
                     // move down
                     item.parentElement.insertBefore(item.nextElementSibling, item);
                     update();

@@ -1,13 +1,17 @@
-import {ObjectRefUtils} from './ObjectNode';
-import {UserSession} from '../app/UserSession';
+import { ObjectRefUtils } from './ObjectNode';
+import { UserSession } from '../app/UserSession';
 
 /**
  * additional data about a performed action
  */
 export class ActionMetaData {
-  constructor(public readonly category: string, public readonly operation: string, public readonly name: string, public readonly timestamp: number = Date.now(), public readonly user: string = UserSession.getInstance().currentUserNameOrAnonymous()) {
-
-  }
+  constructor(
+    public readonly category: string,
+    public readonly operation: string,
+    public readonly name: string,
+    public readonly timestamp: number = Date.now(),
+    public readonly user: string = UserSession.getInstance().currentUserNameOrAnonymous(),
+  ) {}
 
   static restore(p: any) {
     return new ActionMetaData(p.category, p.operation, p.name, p.timestamp, p.user);
@@ -29,14 +33,22 @@ export class ActionMetaData {
     if (this.operation === ObjectRefUtils.operation.update) {
       return that.operation === ObjectRefUtils.operation.update;
     }
-    return this.operation === ObjectRefUtils.operation.create ? that.operation === ObjectRefUtils.operation.remove : that.operation === ObjectRefUtils.operation.create;
+    return this.operation === ObjectRefUtils.operation.create
+      ? that.operation === ObjectRefUtils.operation.remove
+      : that.operation === ObjectRefUtils.operation.create;
   }
 
   toString() {
     return `${this.category}:${this.operation} ${this.name}`;
   }
 
-  static actionMeta(name: string, category: string = ObjectRefUtils.category.data, operation: string = ObjectRefUtils.operation.update, timestamp: number = Date.now(), user: string = UserSession.getInstance().currentUserNameOrAnonymous()) {
+  static actionMeta(
+    name: string,
+    category: string = ObjectRefUtils.category.data,
+    operation: string = ObjectRefUtils.operation.update,
+    timestamp: number = Date.now(),
+    user: string = UserSession.getInstance().currentUserNameOrAnonymous(),
+  ) {
     return new ActionMetaData(category, operation, name, timestamp, user);
   }
 }

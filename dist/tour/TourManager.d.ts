@@ -37,3 +37,4 @@ export declare class TourManager {
     private clearStepMemorize;
     private continueTour;
 }
+//# sourceMappingURL=TourManager.d.ts.map

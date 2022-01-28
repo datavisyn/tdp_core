@@ -30,7 +30,7 @@ export class Store extends EventHandler {
     }
     includes(key) {
         key = this.toFullKey(key);
-        return (this.storage.getItem(key) !== null);
+        return this.storage.getItem(key) !== null;
     }
     getValue(key, defaultValue = null) {
         key = this.toFullKey(key);

@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {ValueCache} from '../src/base/ValueCache';
+import { ValueCache } from '../src/base/ValueCache';
 
 describe('cached', () => {
   describe('cached', () => {

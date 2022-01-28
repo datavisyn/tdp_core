@@ -1,9 +1,8 @@
-import {IStratification} from '../IStratification';
-import {RangeLike, Range} from '../../range';
-import {ANameVector, IStringVector} from '../vector/ANameVector';
+import { IStratification } from '../IStratification';
+import { RangeLike, Range } from '../../range';
+import { ANameVector, IStringVector } from '../vector/ANameVector';
 
 export class StratificationNameVector extends ANameVector<IStratification> implements IStringVector {
-
   constructor(strat: IStratification) {
     super(strat);
     this.root = this;
@@ -24,6 +23,7 @@ export class StratificationNameVector extends ANameVector<IStratification> imple
   size() {
     return this.base.length;
   }
+
   /**
    * converts the rows of the given stratification as a string vector
    * @param stratification
@@ -33,7 +33,3 @@ export class StratificationNameVector extends ANameVector<IStratification> imple
     return new StratificationNameVector(stratification);
   }
 }
-
-
-
-

@@ -1,6 +1,6 @@
-import {IRangeElem} from './internal/internal';
-import {RangeElem} from './internal/RangeElem';
-import {IIterator, Iterator, ListIterator, ConcatIterator} from '../base/iterator';
+import { IRangeElem } from './internal/internal';
+import { RangeElem } from './internal/RangeElem';
+import { IIterator, Iterator, ListIterator, ConcatIterator } from '../base/iterator';
 
 function sortNumeric(a: number, b: number) {
   return a - b;
@@ -9,7 +9,7 @@ function sortNumeric(a: number, b: number) {
 export class Range1D {
   private readonly arr: IRangeElem[];
 
-  constructor(arg?: Range1D|IRangeElem[]) {
+  constructor(arg?: Range1D | IRangeElem[]) {
     if (arg instanceof Range1D) {
       this.arr = (<Range1D>arg).arr;
     } else if (Array.isArray(arg)) {
@@ -42,34 +42,38 @@ export class Range1D {
   private static compress(indices: number[]): IRangeElem[] {
     if (indices.length === 0) {
       return [];
-    } else if (indices.length === 1) {
+    }
+    if (indices.length === 1) {
       return [RangeElem.single(indices[0])];
     }
-    //return indices.map(RangeElem.single);
-    const r = <IRangeElem[]>[],
-      deltas = indices.slice(1).map((e, i) => e - indices[i]);
-    let start = 0, act = 1, i = 0;
+    // return indices.map(RangeElem.single);
+    const r = <IRangeElem[]>[];
+    const deltas = indices.slice(1).map((e, i) => e - indices[i]);
+    let start = 0;
+    let act = 1;
+    let i = 0;
     while (act < indices.length) {
-      while (deltas[start] === deltas[act - 1] && act < indices.length) { //while the same delta
+      while (deltas[start] === deltas[act - 1] && act < indices.length) {
+        // while the same delta
         act++;
       }
-      if (act === start + 1) { //just a single item used
+      if (act === start + 1) {
+        // just a single item used
         r.push(RangeElem.single(indices[start]));
+      } else if (deltas[start] === 1) {
+        // +1 since end is excluded
+        // fix while just +1 is allowed and -1 is not allowed
+        r.push(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]));
       } else {
-        //+1 since end is excluded
-        //fix while just +1 is allowed and -1 is not allowed
-        if (deltas[start] === 1) {
-          r.push(RangeElem.range(indices[start], indices[act - 1] + deltas[start], deltas[start]));
-        } else {
-          for (i = start; i < act; i++) {
-            r.push(RangeElem.single(indices[i]));
-          }
+        for (i = start; i < act; i++) {
+          r.push(RangeElem.single(indices[i]));
         }
       }
       start = act;
       act += 1;
     }
-    while (start < indices.length) { //corner case by adding act+1, it might happen that the last one isnt considered
+    while (start < indices.length) {
+      // corner case by adding act+1, it might happen that the last one isnt considered
       r.push(RangeElem.single(indices[start++]));
     }
     return r;
@@ -91,13 +95,15 @@ export class Range1D {
     return this.arr.every((d) => d.isSingle);
   }
 
-  push(...items: (IRangeElem|string|number|[number, number, number])[]): number {
+  push(...items: (IRangeElem | string | number | [number, number, number])[]): number {
     function p(item: any) {
       if (typeof item === 'string') {
         return RangeElem.parse(item.toString());
-      } else if (typeof item === 'number') {
+      }
+      if (typeof item === 'number') {
         return RangeElem.single(<number>item);
-      } else if (Array.isArray(item)) {
+      }
+      if (Array.isArray(item)) {
         return new RangeElem(item[0], item[1], item[2]);
       }
       return <RangeElem>item;
@@ -106,7 +112,7 @@ export class Range1D {
     return this.arr.push(...items.map(p));
   }
 
-  pushSlice(from: number, to: number = -1, step: number = 1): void {
+  pushSlice(from: number, to = -1, step = 1): void {
     this.arr.push(new RangeElem(from, to, step));
   }
 
@@ -114,7 +120,7 @@ export class Range1D {
     this.arr.push(...Range1D.compress(indices));
   }
 
-  setSlice(from: number, to: number = -1, step: number = 1): void {
+  setSlice(from: number, to = -1, step = 1): void {
     this.arr.length = 0;
     this.pushSlice(from, to, step);
   }
@@ -152,7 +158,7 @@ export class Range1D {
       return this;
     }
     const r = this.arr.slice();
-    //push n times
+    // push n times
     for (let i = 1; i < ntimes; ++i) {
       r.push.apply(r, this.arr);
     }
@@ -174,27 +180,28 @@ export class Range1D {
     if (sub.isNone || this.isNone) {
       return Range1D.none();
     }
-    if (this.isIdentityRange) { //identity lookup
+    if (this.isIdentityRange) {
+      // identity lookup
       return sub.clone();
     }
-    //TODO optimize
+    // TODO optimize
     const l = this.iter(size).asList();
-    const mapImpl = (sub: Range1D) => {
-      const s = sub.iter(l.length);
-      const r: number[]= [];
+    const mapImpl = (sup: Range1D) => {
+      const s = sup.iter(l.length);
+      const r: number[] = [];
       s.forEach((i) => {
-        if (i >= 0 && i < l.length) { //check for out of range
+        if (i >= 0 && i < l.length) {
+          // check for out of range
           r.push(l[i]);
         }
       });
-      return sub.fromLike(r);
+      return sup.fromLike(r);
     };
     if (typeof (<ICompositeRange1D>sub).fromLikeComposite === 'function') {
       const csub = <ICompositeRange1D>sub;
       return csub.fromLikeComposite(<any>csub.groups.map(mapImpl));
-    } else {
-      return mapImpl(sub);
     }
+    return mapImpl(sub);
   }
 
   /**
@@ -293,19 +300,20 @@ export class Range1D {
       return index;
     }
     if (this.isNone) {
-      return -1; //not mapped
+      return -1; // not mapped
     }
     // find the range element that contain the index-th element
     let s = this.arr[0].size(size);
-    let act = 0, total: number = s;
-    const nElems = this.arr.length-1;
+    let act = 0;
+    let total: number = s;
+    const nElems = this.arr.length - 1;
     while (total < index && act < nElems) {
       act++;
       s = this.arr[act].size(size);
       total += s;
     }
     if (act >= this.arr.length) {
-      return -1; //not mapped
+      return -1; // not mapped
     }
     return this.arr[act].invert(index - total + s, size);
   }
@@ -323,17 +331,23 @@ export class Range1D {
    * @return {*}
    */
   indexOf(): any {
+    // eslint-disable-next-line prefer-rest-params
     if (arguments[0] instanceof Range1D) {
+      // eslint-disable-next-line prefer-rest-params
       return this.indexRangeOf(arguments[0], arguments[1]);
     }
     let arr: number[];
     const base = this.iter().asList();
     if (arguments.length === 1) {
+      // eslint-disable-next-line prefer-rest-params
       if (typeof arguments[0] === 'number') {
+        // eslint-disable-next-line prefer-rest-params
         return base.indexOf(<number>arguments[0]);
       }
+      // eslint-disable-next-line prefer-rest-params
       arr = arguments[0];
     } else {
+      // eslint-disable-next-line prefer-rest-params
       arr = Array.from(arguments);
     }
     if (arr.length === 0) {
@@ -352,11 +366,12 @@ export class Range1D {
     if (r.isNone || this.isNone) {
       return r.fromLike([]);
     }
-    if (r.isAll) { //index of all is still all
+    if (r.isAll) {
+      // index of all is still all
       return Range1D.all();
     }
     //
-    let mapImpl: (d: number, result: number[])=>void;
+    let mapImpl: (d: number, result: number[]) => void;
     if (this.isIdentityRange) {
       const end = this.arr[0].to;
       mapImpl = (d, result) => {
@@ -375,16 +390,17 @@ export class Range1D {
     }
     if (typeof (<ICompositeRange1D>r).fromLikeComposite === 'function') {
       const csub = <ICompositeRange1D>r;
-      return csub.fromLikeComposite(csub.groups.map((g) => {
-        const result: number[]= [];
-        g.forEach((d) => mapImpl(d, result));
-        return g.fromLike(result);
-      }));
-    } else {
-      const result: number[] = [];
-      r.forEach((d) => mapImpl(d, result));
-      return r.fromLike(result);
+      return csub.fromLikeComposite(
+        csub.groups.map((g) => {
+          const result: number[] = [];
+          g.forEach((d) => mapImpl(d, result));
+          return g.fromLike(result);
+        }),
+      );
     }
+    const result: number[] = [];
+    r.forEach((d) => mapImpl(d, result));
+    return r.fromLike(result);
   }
 
   /**
@@ -398,20 +414,19 @@ export class Range1D {
       return data.map(transform);
     }
     const it = this.iter(size);
-    //optimization
+    // optimization
     if (it.byOne && it instanceof Iterator) {
-      return data.slice((<Iterator><any>it).from, (<Iterator><any>it).to).map(transform);
-      //} else if (it.byMinusOne) {
+      return data.slice((<Iterator>(<any>it)).from, (<Iterator>(<any>it)).to).map(transform);
+      // } else if (it.byMinusOne) {
       //  var d = data.slice();
       //  d.reverse();
       //  return d;
-    } else {
-      const r = [];
-      while (it.hasNext()) {
-        r.push(transform(data[it.next()]));
-      }
-      return r;
     }
+    const r = [];
+    while (it.hasNext()) {
+      r.push(transform(data[it.next()]));
+    }
+    return r;
   }
 
   /**
@@ -475,7 +490,7 @@ export class Range1D {
   private removeDuplicates(size?: number): Range1D {
     let arr = this.iter().asList();
     arr = arr.sort(sortNumeric);
-    arr = arr.filter((di, i) => di !== arr[i - 1]); //same value as before, remove
+    arr = arr.filter((di, i) => di !== arr[i - 1]); // same value as before, remove
     return Range1D.from(arr);
   }
 
@@ -495,14 +510,14 @@ export class Range1D {
     if (this.length === 1) {
       return this.arr[0].toString();
     }
-    return '(' + this.arr.join(',') + ')';
+    return `(${this.arr.join(',')})`;
   }
 
   eq(other: Range1D) {
     if (this === other || (this.isAll && other.isAll) || (this.isNone && other.isNone)) {
       return true;
     }
-    //TODO more performant comparison
+    // TODO more performant comparison
     return this.toString() === other.toString();
   }
 

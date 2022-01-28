@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {RangeElem} from '../../../src/range/internal/RangeElem';
+import { RangeElem } from '../../../src/range/internal/RangeElem';
 
 describe('RangeElem', () => {
   describe('from', () => {
@@ -13,7 +13,7 @@ describe('RangeElem', () => {
   describe('step', () => {
     it('default', () => expect(new RangeElem(0).step).toBe(1));
     it('set value', () => expect(new RangeElem(0, 2, 1).step).toBe(1));
-    it('set value', () => expect(new RangeElem(0, 2, 2).step).toBe(2));
+    it('set value again', () => expect(new RangeElem(0, 2, 2).step).toBe(2));
   });
   describe('isAll', () => {
     it('default', () => expect(new RangeElem(0).isAll).toBeTruthy());
@@ -73,7 +73,6 @@ describe('RangeElem', () => {
     it('default 4:-1:-1', () => expect(new RangeElem(4, -1, -1).iter().asList()).toEqual([4, 3, 2, 1, 0]));
     it('default 0:5:2', () => expect(new RangeElem(0, 5, 2).iter().asList()).toEqual([0, 2, 4]));
     it('default 0:-1 (5)', () => expect(new RangeElem(0).iter(5).asList()).toEqual([0, 1, 2, 3, 4]));
-    it('default 0:-1 (5)', () => expect(new RangeElem(-2, -1, -1).iter(5).asList()).toEqual([4, 3, 2, 1, 0]));
     it('default -1:4:-1 (10)', () => expect(new RangeElem(-1, 4, -1).iter(10).asList()).toEqual([10, 9, 8, 7, 6, 5]));
   });
   describe('size', () => {

@@ -1,8 +1,8 @@
+import { castArray } from 'lodash';
+import { EventHandler, GlobalEventHandler } from '../base/event';
+import { UserSession } from '../app';
 import { ERenderAuthorizationStatus } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
-import { castArray } from 'lodash';
-import { UserSession } from '../app';
-import { EventHandler, GlobalEventHandler } from '../base';
 export class TokenManager extends EventHandler {
     constructor() {
         super();
@@ -20,7 +20,7 @@ export class TokenManager extends EventHandler {
         this.authorizationFlows = new Map();
         // TODO: Currently, only one authorization flow is possible. Maybe add an extension point in the future.
         this.addAuthorizationFlow({
-            simplePopup: simplePopupFlow
+            simplePopup: simplePopupFlow,
         });
         // Clear all tokens as soon as a user logs out.
         GlobalEventHandler.getInstance().on(UserSession.GLOBAL_EVENT_USER_LOGGED_OUT, () => {
@@ -124,6 +124,7 @@ export class TokenManager extends EventHandler {
         if (authConfigurations) {
             // Iterate over all authorization configurations
             for (const authConfiguration of castArray(authConfigurations)) {
+                // eslint-disable-next-line no-await-in-loop
                 await this.runAuthorization(authConfiguration, options);
             }
         }
@@ -136,7 +137,7 @@ export class TokenManager extends EventHandler {
      */
     async runAuthorization(authConfiguration, options) {
         let config = null;
-        if (typeof (authConfiguration) === 'string') {
+        if (typeof authConfiguration === 'string') {
             config = this.authorizationConfigurations.get(authConfiguration);
             if (!config) {
                 throw Error(`No authorization configuration with id ${authConfiguration} exists.`);
@@ -147,7 +148,7 @@ export class TokenManager extends EventHandler {
         }
         const existingToken = this.tokens.get(config.id);
         if (!options.force && existingToken) {
-            return;
+            return undefined;
         }
         const render = (override) => {
             options.render({
@@ -200,6 +201,5 @@ export class InvalidTokenError extends Error {
 /**
  * Global token manager for TDP applications.
  */
-/* tslint:disable-next-line:variable-name */
 export const TDPTokenManager = new TokenManager();
 //# sourceMappingURL=TokenManager.js.map

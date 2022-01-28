@@ -1,10 +1,9 @@
-
-import {Range, RangeLike, CompositeRange1D, Range1DGroup, ParseRangeUtils} from '../range';
-import {IDataType} from '../data/datatype';
-import {ASelectAble} from '../idtype';
-import {ICategoricalVector} from '../vector';
-import {IHistogram, RangeHistogram} from '../data/histogram';
-import {IStratification, IGroup} from './IStratification';
+import { Range, RangeLike, CompositeRange1D, Range1DGroup, ParseRangeUtils } from '../range';
+import type { IDataType } from '../data/datatype';
+import { ASelectAble } from '../idtype';
+import type { ICategoricalVector } from '../vector';
+import { IHistogram, RangeHistogram } from '../data/histogram';
+import type { IStratification, IGroup } from './IStratification';
 
 /**
  * root matrix implementation holding the data
@@ -31,7 +30,7 @@ export class StratificationGroup extends ASelectAble implements IStratification 
     if (groupIndex === 0) {
       return this;
     }
-    return null; //can't sub a single group
+    return null; // can't sub a single group
   }
 
   get idtype() {
@@ -39,7 +38,7 @@ export class StratificationGroup extends ASelectAble implements IStratification 
   }
 
   async hist(bins?: number, range: RangeLike = Range.all()): Promise<IHistogram> {
-    //FIXME
+    // FIXME
     return RangeHistogram.rangeHist(await this.range());
   }
 
@@ -110,7 +109,7 @@ export class StratificationGroup extends ASelectAble implements IStratification 
   persist() {
     return {
       root: this.root.persist(),
-      group: this.groupIndex
+      group: this.groupIndex,
     };
   }
 

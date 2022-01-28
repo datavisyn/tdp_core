@@ -11,3 +11,4 @@ export * from './ProvenanceGraph';
 export * from './LocalStorageProvenanceGraphManager';
 export * from './RemoteStorageProvenanceGraphManager';
 export * from './MixedStorageProvenanceGraphManager';
+//# sourceMappingURL=index.d.ts.map

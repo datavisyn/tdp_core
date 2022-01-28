@@ -7,8 +7,8 @@ export class VectorUtils {
             idtype: '_rows',
             size: 0,
             value: {
-                type: 'string'
-            }
+                type: 'string',
+            },
         });
     }
 }

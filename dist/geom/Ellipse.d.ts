@@ -19,3 +19,4 @@ export declare class Ellipse extends AShape {
     asIntersectionParams(): IIntersectionParam;
     static ellipse(x: number, y: number, radiusX: number, radiusY: number): Ellipse;
 }
+//# sourceMappingURL=Ellipse.d.ts.map

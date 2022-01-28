@@ -28,22 +28,22 @@ export class Statistics {
         if (this.n === 0) {
             return 0;
         }
-        return Math.sqrt(this.n) * this.moment3 / (Math.pow(this.moment2, 3. / 2.));
+        return (Math.sqrt(this.n) * this.moment3) / this.moment2 ** (3 / 2);
     }
     push(x) {
         if (typeof x !== 'number') {
             x = Number.NaN;
         }
-        if (isNaN(x)) {
+        if (Number.isNaN(x)) {
             this.nans++;
             return;
         }
         this.n++;
         this.sum += x;
-        if (x < this.min || isNaN(this.min)) {
+        if (x < this.min || Number.isNaN(this.min)) {
             this.min = x;
         }
-        if (this.max < x || isNaN(this.max)) {
+        if (this.max < x || Number.isNaN(this.max)) {
             this.max = x;
         }
         // http://www.johndcook.com/standard_deviation.html
@@ -57,7 +57,7 @@ export class Statistics {
         else {
             const meanMinus1 = this.mean;
             this.mean = meanMinus1 + (x - meanMinus1) / this.n;
-            this._var = this._var + (x - meanMinus1) * (x - this.mean);
+            this._var += (x - meanMinus1) * (x - this.mean);
             const delta = x - meanMinus1;
             const deltaN = delta / this.n;
             const deltaNSquare = deltaN * deltaN;
@@ -70,20 +70,6 @@ export class Statistics {
     static computeStats(...arr) {
         const r = new Statistics();
         arr.forEach((a) => a.forEach(r.push, r));
-        return r;
-    }
-}
-export class AdvancedStatistics extends Statistics {
-    constructor(median, q1, q3) {
-        super();
-        this.median = median;
-        this.q1 = q1;
-        this.q3 = q3;
-    }
-    static computeAdvancedStats(arr) {
-        arr = arr.slice().sort((a, b) => a - b);
-        const r = new AdvancedStatistics(quantile(arr, 0.5), quantile(arr, 0.25), quantile(arr, 0.75));
-        arr.forEach((a) => r.push(a));
         return r;
     }
 }
@@ -100,7 +86,22 @@ function quantile(arr, percentile) {
     }
     const target = percentile * (n - 1);
     const targetIndex = Math.floor(target);
-    const a = arr[targetIndex], b = arr[targetIndex + 1];
+    const a = arr[targetIndex];
+    const b = arr[targetIndex + 1];
     return a + (b - a) * (target - targetIndex);
+}
+export class AdvancedStatistics extends Statistics {
+    constructor(median, q1, q3) {
+        super();
+        this.median = median;
+        this.q1 = q1;
+        this.q3 = q3;
+    }
+    static computeAdvancedStats(arr) {
+        arr = arr.slice().sort((a, b) => a - b);
+        const r = new AdvancedStatistics(quantile(arr, 0.5), quantile(arr, 0.25), quantile(arr, 0.75));
+        arr.forEach((a) => r.push(a));
+        return r;
+    }
 }
 //# sourceMappingURL=statistics.js.map

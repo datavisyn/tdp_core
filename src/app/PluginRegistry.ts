@@ -1,27 +1,28 @@
-import {IPluginDesc, IRegistry, IPlugin} from '../base/plugin';
-import {UniqueIdManager} from './UniqueIdManager';
-import {BaseUtils} from '../base/BaseUtils';
-
+import { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
+import { UniqueIdManager } from './UniqueIdManager';
+import { BaseUtils } from '../base/BaseUtils';
 
 export class PluginRegistry implements IRegistry {
-
   private registry: IPluginDesc[] = [];
 
   public push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any) {
     const id = typeof idOrLoader === 'string' ? <string>idOrLoader : UniqueIdManager.getInstance().uniqueString(type);
     const loader = typeof idOrLoader === 'string' ? <() => any>descOrLoader : <() => any>descOrLoader;
-    const p: IPluginDesc = BaseUtils.mixin({
-      type,
-      id,
-      name: id,
-      factory: 'create',
-      description: '',
-      version: '1.0.0',
-      load: async (): Promise<IPlugin> => {
-        const instance = await Promise.resolve(loader());
-        return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory)};
-      }
-    }, typeof descOrLoader === 'function' ? desc : descOrLoader);
+    const p: IPluginDesc = BaseUtils.mixin(
+      {
+        type,
+        id,
+        name: id,
+        factory: 'create',
+        description: '',
+        version: '1.0.0',
+        load: async (): Promise<IPlugin> => {
+          const instance = await Promise.resolve(loader());
+          return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory) };
+        },
+      },
+      typeof descOrLoader === 'function' ? desc : descOrLoader,
+    );
 
     PluginRegistry.getInstance().registry.push(p);
   }
@@ -30,7 +31,7 @@ export class PluginRegistry implements IRegistry {
 
   public register(plugin: string, generator?: (registry: IRegistry) => void) {
     if (typeof generator !== 'function') {
-      //wrong type - not a function, maybe a dummy inline
+      // wrong type - not a function, maybe a dummy inline
       return;
     }
     if (PluginRegistry.getInstance().knownPlugins.has(plugin)) {
@@ -46,7 +47,7 @@ export class PluginRegistry implements IRegistry {
    * @param filter
    * @returns {IPluginDesc[]}
    */
-  public listPlugins(filter: (string | ((desc: IPluginDesc) => boolean)) = () => true) {
+  public listPlugins(filter: string | ((desc: IPluginDesc) => boolean) = () => true) {
     if (typeof filter === 'string') {
       const v = filter;
       filter = (desc) => desc.type === v;
@@ -76,10 +77,9 @@ export class PluginRegistry implements IRegistry {
    */
   public asResource(data: any) {
     return {
-      create: () => data
+      create: () => data,
     };
   }
-
 
   /**
    * determines the factory method to use in case of the 'new ' syntax wrap the class constructor using a factory method
@@ -88,18 +88,20 @@ export class PluginRegistry implements IRegistry {
     let f = factory.trim();
 
     if (f === 'new') {
-      //instantiate the default class
+      // instantiate the default class
       f = 'new default';
     }
-    if (f === 'create') { //default value
+    if (f === 'create') {
+      // default value
       if (typeof instance.create === 'function') {
-        //default exists
+        // default exists
         return instance.create;
       }
       // try another default
       if (typeof instance.default === 'function') {
-        //we have a default export
-        if (instance.default.prototype !== undefined) { // it has a prototype so guess it is a class
+        // we have a default export
+        if (instance.default.prototype !== undefined) {
+          // it has a prototype so guess it is a class
           f = 'new default';
         } else {
           f = 'default';
@@ -115,8 +117,8 @@ export class PluginRegistry implements IRegistry {
     return instance[f];
   }
 
-
   private static instance: PluginRegistry;
+
   public static getInstance(): PluginRegistry {
     if (!PluginRegistry.instance) {
       PluginRegistry.instance = new PluginRegistry();
@@ -124,5 +126,4 @@ export class PluginRegistry implements IRegistry {
 
     return PluginRegistry.instance;
   }
-
 }

@@ -9,3 +9,4 @@ export declare class DetailUtils {
     static getLevelOfDetail(): LevelOfDetail;
     static isEditAble(): boolean;
 }
+//# sourceMappingURL=DetailUtils.d.ts.map

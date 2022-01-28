@@ -4,3 +4,4 @@
  * @returns the value which is stored in the css variable or undefined if the variable could not be found
  */
 export declare function getCssValue(name: string): string | undefined;
+//# sourceMappingURL=getCssValue.d.ts.map

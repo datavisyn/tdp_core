@@ -7,3 +7,4 @@ export * from './Line';
 export * from './Polygon';
 export * from './Ellipse';
 export * from './ShapeUtils';
+//# sourceMappingURL=index.d.ts.map

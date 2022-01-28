@@ -28,3 +28,4 @@ export declare class ParseRangeUtils {
     static parseRangeLike(arange?: RangeLike): Range;
 }
 export {};
+//# sourceMappingURL=parser.d.ts.map

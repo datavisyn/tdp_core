@@ -37,3 +37,4 @@ export declare class VectorTable extends ATable implements ITable {
     queryView(name: string, args: IQueryArgs): ITable;
     static fromVectors(desc: IDataDescription, vecs: IAnyVector[]): VectorTable;
 }
+//# sourceMappingURL=VectorTable.d.ts.map

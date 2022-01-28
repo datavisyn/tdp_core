@@ -49,9 +49,9 @@ export class AbsoluteArcPath extends AbsolutePathSegment {
     get center() {
         const startPoint = this.previous.lastPoint;
         const endPoint = this.points[0];
-        let rx = this.rx;
-        let ry = this.ry;
-        const angle = this.angle * Math.PI / 180;
+        let { rx } = this;
+        let { ry } = this;
+        const angle = (this.angle * Math.PI) / 180;
         const c = Math.cos(angle);
         const s = Math.sin(angle);
         const TOLERANCE = 1e-6;
@@ -60,7 +60,7 @@ export class AbsoluteArcPath extends AbsolutePathSegment {
         const y1p = halfDiff.x * -s + halfDiff.y * c;
         const x1px1p = x1p * x1p;
         const y1py1p = y1p * y1p;
-        const lambda = (x1px1p / (rx * rx)) + (y1py1p / (ry * ry));
+        const lambda = x1px1p / (rx * rx) + y1py1p / (ry * ry);
         let factor;
         if (lambda > 1) {
             factor = Math.sqrt(lambda);
@@ -80,8 +80,8 @@ export class AbsoluteArcPath extends AbsolutePathSegment {
             sq = -sq;
         }
         const mid = startPoint.add(endPoint).divide(2);
-        const cxp = sq * rx * y1p / ry;
-        const cyp = sq * -ry * x1p / rx;
+        const cxp = (sq * rx * y1p) / ry;
+        const cyp = (sq * -ry * x1p) / rx;
         return new Vector2D(cxp * c - cyp * s + mid.x, cxp * s + cyp * c + mid.y);
     }
 }
@@ -139,7 +139,7 @@ export class AbsoluteMoveto extends AbsolutePathSegment {
         super('M', params, owner, previous);
     }
     toString() {
-        return 'M' + this.points[0].toString();
+        return `M${this.points[0].toString()}`;
     }
 }
 export class AbsoluteSmoothCurveto2 extends AbsolutePathSegment {
@@ -147,7 +147,7 @@ export class AbsoluteSmoothCurveto2 extends AbsolutePathSegment {
         super('T', params, owner, previous);
     }
     get controlPoint() {
-        const lastPoint = this.previous.lastPoint;
+        const { lastPoint } = this.previous;
         let point;
         if (this.previous.command.match(/^[QqTt]$/)) {
             const ctrlPoint = this.previous.controlPoint;
@@ -168,7 +168,7 @@ export class AbsoluteSmoothCurveto3 extends AbsolutePathSegment {
         super('S', params, owner, previous);
     }
     get firstControlPoint() {
-        const lastPoint = this.previous.lastPoint;
+        const { lastPoint } = this.previous;
         let point;
         if (this.previous.command.match(/^[SsCc]$/)) {
             const lastControl = this.previous.lastControlPoint;
@@ -285,7 +285,7 @@ export class RelativeMoveto extends RelativePathSegment {
         super('m', params, owner, previous);
     }
     toString() {
-        return 'm' + this.points[0].toString();
+        return `m${this.points[0].toString()}`;
     }
 }
 export class RelativeSmoothCurveto2 extends RelativePathSegment {
@@ -293,7 +293,7 @@ export class RelativeSmoothCurveto2 extends RelativePathSegment {
         super('t', params, owner, previous);
     }
     get controlPoint() {
-        const lastPoint = this.previous.lastPoint;
+        const { lastPoint } = this.previous;
         let point;
         if (this.previous.command.match(/^[QqTt]$/)) {
             const ctrlPoint = this.previous.controlPoint;
@@ -314,7 +314,7 @@ export class RelativeSmoothCurveto3 extends RelativePathSegment {
         super('s', params, owner, previous);
     }
     get firstControlPoint() {
-        const lastPoint = this.previous.lastPoint;
+        const { lastPoint } = this.previous;
         let point;
         if (this.previous.command.match(/^[SsCc]$/)) {
             const lastControl = this.previous.lastControlPoint;

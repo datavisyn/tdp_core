@@ -1,5 +1,4 @@
-
-import {IIntersectionParam} from './IIntersectionParam';
+import { IIntersectionParam } from './IIntersectionParam';
 
 export interface IShape {
   asIntersectionParams(): IIntersectionParam;

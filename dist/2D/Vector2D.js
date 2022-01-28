@@ -52,19 +52,19 @@ export class Vector2D {
         return this;
     }
     eq(that) {
-        return (this.x === that.x && this.y === that.y);
+        return this.x === that.x && this.y === that.y;
     }
     lt(that) {
-        return (this.x < that.x && this.y < that.y);
+        return this.x < that.x && this.y < that.y;
     }
     lte(that) {
-        return (this.x <= that.x && this.y <= that.y);
+        return this.x <= that.x && this.y <= that.y;
     }
     gt(that) {
-        return (this.x > that.x && this.y > that.y);
+        return this.x > that.x && this.y > that.y;
     }
     gte(that) {
-        return (this.x >= that.x && this.y >= that.y);
+        return this.x >= that.x && this.y >= that.y;
     }
     lerp(that, t) {
         return new Vector2D(this.x + (that.x - this.x) * t, this.y + (that.y - this.y) * t);
@@ -81,7 +81,7 @@ export class Vector2D {
         return new Vector2D(Math.max(this.x, that.x), Math.max(this.y, that.y));
     }
     toString() {
-        return this.x + ',' + this.y;
+        return `${this.x},${this.y}`;
     }
     setXY(x, y) {
         this.x = x;
@@ -92,8 +92,8 @@ export class Vector2D {
         this.y = that.y;
     }
     swap(that) {
-        const x = this.x;
-        const y = this.y;
+        const { x } = this;
+        const { y } = this;
         this.x = that.x;
         this.y = that.y;
         that.x = x;
@@ -125,9 +125,7 @@ export class Vector2D {
         if (typeof x === 'number') {
             return new Vector2D(x, y);
         }
-        else {
-            return new Vector2D(x.x, x.y);
-        }
+        return new Vector2D(x.x, x.y);
     }
     static vec2(x, y) {
         return new Vector2D(x, y);

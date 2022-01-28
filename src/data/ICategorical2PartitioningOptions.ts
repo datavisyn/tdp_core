@@ -2,12 +2,10 @@
  * This file defines interfaces for various data types and their metadata.
  */
 
-import {BaseUtils} from '../base/BaseUtils';
-import {Range1D, Range1DGroup, CompositeRange1D} from '../range';
-
+import { BaseUtils } from '../base/BaseUtils';
+import { Range1D, Range1DGroup, CompositeRange1D } from '../range';
 
 export interface ICategorical2PartitioningOptions {
-
   /**
    * name of the partitioning
    * default: 'Partitioning'
@@ -38,18 +36,21 @@ export class Categorical2PartioningUtils {
    * @return {CompositeRange1D}
    */
   static categorical2partitioning<T>(data: T[], categories: T[], options: ICategorical2PartitioningOptions = {}): CompositeRange1D {
-    const m: ICategorical2PartitioningOptions = BaseUtils.mixin({
-      skipEmptyCategories: true,
-      colors: ['gray'],
-      labels: null,
-      name: 'Partitioning'
-    }, options);
+    const m: ICategorical2PartitioningOptions = BaseUtils.mixin(
+      {
+        skipEmptyCategories: true,
+        colors: ['gray'],
+        labels: null,
+        name: 'Partitioning',
+      },
+      options,
+    );
 
     let groups = categories.map((d, i) => {
       return {
         name: m.labels ? m.labels[i] : d.toString(),
         color: m.colors[Math.min(i, m.colors.length - 1)],
-        indices: []
+        indices: [],
       };
     });
     data.forEach((d, j) => {

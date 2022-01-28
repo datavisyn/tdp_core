@@ -21,3 +21,4 @@ export declare class CompositeRange1D extends Range1D implements ICompositeRange
      */
     static composite(name: string, groups: Range1DGroup[]): CompositeRange1D;
 }
+//# sourceMappingURL=CompositeRange1D.d.ts.map

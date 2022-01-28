@@ -1,5 +1,5 @@
-import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc } from 'lineupjs';
-import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB } from '../../base/extensions';
+import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, } from 'lineupjs';
+import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB, } from '../../base/extensions';
 import { PanelButton } from '../panel/PanelButton';
 import { PanelTabContainer, NullTabContainer } from '../panel/PanelTabContainer';
 import { PanelTab, SidePanelTab } from '../panel/PanelTab';
@@ -8,8 +8,8 @@ import { EPanelHeaderToolbar, PanelHeader } from '../panel/PanelHeader';
 import { PanelRankingButton } from '../panel/PanelRankingButton';
 import { PanelAddColumnButton } from '../panel/PanelAddColumnButton';
 import { PanelDownloadButton } from '../panel/PanelDownloadButton';
+import { isAdditionalColumnDesc, } from '../../base/interfaces';
 import { LineupUtils } from '../utils';
-import { isAdditionalColumnDesc } from '../../base/interfaces';
 import { FormElementType } from '../../form/interfaces';
 import { FormDialog } from '../../form';
 import { PanelSaveNamedSetButton } from '../panel/PanelSaveNamedSetButton';
@@ -18,6 +18,26 @@ import { PluginRegistry } from '../../app';
 import { EventHandler } from '../../base';
 import { I18nextManager } from '../../i18n';
 import { IDTypeManager } from '../../idtype';
+export function findMappablePlugins(target, all) {
+    if (!target) {
+        return [];
+    }
+    const idTypes = Array.from(new Set(all.map((d) => d.idtype)));
+    function canBeMappedTo(idtype) {
+        if (idtype === target.id) {
+            return true;
+        }
+        // lookup the targets and check if our target is part of it
+        return IDTypeManager.getInstance()
+            .getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype))
+            .then((mappables) => mappables.some((d) => d.id === target.id));
+    }
+    // check which idTypes can be mapped to the target one
+    return Promise.all(idTypes.map(canBeMappedTo)).then((mappable) => {
+        const valid = idTypes.filter((d, i) => mappable[i]);
+        return all.filter((d) => valid.indexOf(d.idtype) >= 0);
+    });
+}
 export class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();
@@ -85,14 +105,15 @@ export class LineUpPanelActions extends EventHandler {
     }
     init() {
         const buttons = this.header.node;
-        if (!this.isTopMode && this.options.enableSidePanelCollapsing) { // top mode doesn't need collapse feature
+        if (!this.isTopMode && this.options.enableSidePanelCollapsing) {
+            // top mode doesn't need collapse feature
             const collapseButton = new PanelButton(buttons, {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.collapseButton'),
                 faIcon: 'fas fa-arrow-right',
                 cssClass: 'collapse-button',
                 onClick: () => {
                     this.collapse = !this.collapse;
-                }
+                },
             });
             this.header.addButton(collapseButton, EPanelHeaderToolbar.NAV);
         }
@@ -118,14 +139,14 @@ export class LineUpPanelActions extends EventHandler {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.zoomIn'),
                 cssClass: 'zoom-in-button',
                 faIcon: 'fas fa-search-plus',
-                onClick: () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN)
+                onClick: () => this.fire(LineUpPanelActions.EVENT_ZOOM_IN),
             });
             this.header.addButton(zoomInButton, EPanelHeaderToolbar.CENTER);
             const zoomOutButton = new PanelButton(buttons, {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.zoomOut'),
                 cssClass: 'zoom-out-button',
                 faIcon: 'fas fa-search-minus',
-                onClick: () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT)
+                onClick: () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT),
             });
             this.header.addButton(zoomOutButton, EPanelHeaderToolbar.CENTER);
         }
@@ -137,7 +158,7 @@ export class LineUpPanelActions extends EventHandler {
                 onClick: () => {
                     const selected = this.overview.classList.toggle('active');
                     this.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, selected);
-                }
+                },
             });
             this.overview = overviewButton.node; // TODO might be removed
             if (this.options.enableOverviewMode === 'active') {
@@ -159,7 +180,7 @@ export class LineUpPanelActions extends EventHandler {
     }
     appendExtraButtons(parent) {
         const buttons = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_RANKING_BUTTON);
-        return buttons.map((button) => {
+        return buttons.forEach((button) => {
             const listener = () => {
                 button.load().then((p) => this.scoreColumnDialog(p));
             };
@@ -168,7 +189,9 @@ export class LineUpPanelActions extends EventHandler {
         });
     }
     appendExtraTabs() {
-        const plugins = PluginRegistry.getInstance().listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB).sort((a, b) => a.order - b.order);
+        const plugins = PluginRegistry.getInstance()
+            .listPlugins(EP_TDP_CORE_LINEUP_PANEL_TAB)
+            .sort((a, b) => a.order - b.order);
         plugins.forEach((plugin) => {
             let isLoaded = false;
             const tab = new PanelTab(this.tabContainer.node, plugin);
@@ -206,7 +229,7 @@ export class LineUpPanelActions extends EventHandler {
                 text: d.label,
                 id: d.column.toString(),
                 action: () => this.addColumn(d),
-                chooserGroup: isAdditionalColumnDesc(d) ? d.chooserGroup : null
+                chooserGroup: isAdditionalColumnDesc(d) ? d.chooserGroup : null,
             };
         })
             .sort((a, b) => a.text.localeCompare(b.text));
@@ -218,9 +241,9 @@ export class LineUpPanelActions extends EventHandler {
     async resolveScores(idType) {
         // load plugins, which need to be checked if the IDTypes are mappable
         const ordinoScores = await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE));
-        const metaDataPluginDescs = await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER));
-        const metaDataPluginPromises = metaDataPluginDescs
-            .map((plugin) => plugin.load()
+        const metaDataPluginDescs = (await findMappablePlugins(idType, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_SCORE_LOADER)));
+        const metaDataPluginPromises = metaDataPluginDescs.map((plugin) => plugin
+            .load()
             .then((loadedPlugin) => loadedPlugin.factory(plugin))
             .then((scores) => {
             return this.buildMetaDataDescriptions(plugin, scores.sort((a, b) => a.text.localeCompare(b.text)));
@@ -245,7 +268,7 @@ export class LineUpPanelActions extends EventHandler {
             items.push(this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.databaseColumns'), ungroupedItems));
             const sortOrder = (a, b) => {
                 // Return the group with the higher order
-                return a === b ? 0 : (a != null && b != null ? a - b : (a != null ? -1 : 1));
+                return a === b ? 0 : a != null && b != null ? a - b : a != null ? -1 : 1;
             };
             // Then, add the grouped columns with the ordered group and ordered columns
             Array.from(groupedItems.entries())
@@ -269,10 +292,12 @@ export class LineUpPanelActions extends EventHandler {
                             // number of rows of the last ranking
                             const amountOfRows = this.provider.getLastRanking().getOrder().length;
                             // the factory function call executes the score's implementation
-                            score.factory(this.resolveArgs(), amountOfRows).then((params) => this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, score.text, score.id, params));
-                        }
+                            score
+                                .factory(this.resolveArgs(), amountOfRows)
+                                .then((params) => this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, score.text, score.id, params));
+                        },
                     };
-                })
+                }),
             });
         }
         if (this.options.enableAddingPreviousColumns) {
@@ -280,29 +305,61 @@ export class LineUpPanelActions extends EventHandler {
             if (scoreDescs.length > 0) {
                 items.push({
                     text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.previouslyAddedColumns'),
-                    children: scoreDescs
+                    children: scoreDescs,
                 });
             }
         }
         const specialColumnsOption = {
             text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.specialColumns'),
-            children: []
+            children: [],
         };
         if (this.options.enableAddingCombiningColumns) {
             const combiningColumns = this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.combiningColumns'), [
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'), id: 'weightedSum', action: () => this.addColumn(createStackDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'))) },
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'), id: 'scriptedCombination', action: () => this.addColumn(createScriptDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'))) },
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.nested'), id: 'nested', action: () => this.addColumn(createNestedDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.nested'))) },
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.reduce'), id: 'reduce', action: () => this.addColumn(createReduceDesc()) },
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.imposition'), id: 'imposition', action: () => this.addColumn(createImpositionDesc()) }
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'),
+                    id: 'weightedSum',
+                    action: () => this.addColumn(createStackDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.weightedSum'))),
+                },
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'),
+                    id: 'scriptedCombination',
+                    action: () => this.addColumn(createScriptDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.scriptedCombination'))),
+                },
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.nested'),
+                    id: 'nested',
+                    action: () => this.addColumn(createNestedDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.nested'))),
+                },
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.reduce'),
+                    id: 'reduce',
+                    action: () => this.addColumn(createReduceDesc()),
+                },
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.imposition'),
+                    id: 'imposition',
+                    action: () => this.addColumn(createImpositionDesc()),
+                },
             ]);
             specialColumnsOption.children.push(combiningColumns);
         }
         if (this.options.enableAddingSupportColumns) {
             const supportColumns = this.groupedDialog(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.supportColumns'), [
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'), id: 'group', action: () => this.addColumn(createGroupDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.group'))) },
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'), id: 'selection', action: () => this.addColumn(createSelectionDesc()) },
-                { text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'), id: 'aggregate', action: () => this.addColumn(createAggregateDesc()) }
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.groupInformation'),
+                    id: 'group',
+                    action: () => this.addColumn(createGroupDesc(I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.group'))),
+                },
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.selectionCheckbox'),
+                    id: 'selection',
+                    action: () => this.addColumn(createSelectionDesc()),
+                },
+                {
+                    text: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.aggregateGroup'),
+                    id: 'aggregate',
+                    action: () => this.addColumn(createAggregateDesc()),
+                },
             ]);
             specialColumnsOption.children.push(supportColumns);
         }
@@ -318,9 +375,14 @@ export class LineUpPanelActions extends EventHandler {
     groupColumnDescs(columnDesc) {
         const groupedItems = new Map();
         const ungroupedItems = [];
-        columnDesc.map((item) => {
+        columnDesc.forEach((item) => {
             if (item.chooserGroup) {
-                groupedItems.has(item.chooserGroup.parent) ? groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item]) : groupedItems.set(item.chooserGroup.parent, [item]);
+                if (groupedItems.has(item.chooserGroup.parent)) {
+                    groupedItems.set(item.chooserGroup.parent, [...groupedItems.get(item.chooserGroup.parent), item]);
+                }
+                else {
+                    groupedItems.set(item.chooserGroup.parent, [item]);
+                }
             }
             else {
                 ungroupedItems.push(item);
@@ -349,7 +411,7 @@ export class LineUpPanelActions extends EventHandler {
                     required: true,
                     options: {
                         placeholder: 'Start typing...',
-                        data: children
+                        data: children,
                     },
                 };
                 dialog.append(formDesc);
@@ -361,7 +423,7 @@ export class LineUpPanelActions extends EventHandler {
                         child.action();
                     });
                 });
-            }
+            },
         };
     }
     buildMetaDataDescriptions(desc, columns) {
@@ -376,15 +438,16 @@ export class LineUpPanelActions extends EventHandler {
                         const amountOfRows = this.provider.getLastRanking().getOrder().length;
                         const params = plugin.factory(this.resolveArgs(), amountOfRows);
                         this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, plugin.scoreId, params);
-                    }
+                    },
                 };
-            })
+            }),
         };
     }
     scoreColumnDialog(scorePlugin) {
         // pass dataSource into InvertedAggregatedScore factory method
         Promise.resolve(scorePlugin.factory(scorePlugin.desc, this.idType, this.resolveArgs())) // open modal dialog
             .then((params) => {
+            // modal dialog is closed and score created
             if (Array.isArray(params)) {
                 params.forEach((param) => this.fire(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, scorePlugin.desc.name, scorePlugin.desc.id, param));
             }
@@ -407,22 +470,4 @@ LineUpPanelActions.EVENT_ADD_SCORE_COLUMN = 'addScoreColumn';
  * @type {string}
  */
 LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
-export function findMappablePlugins(target, all) {
-    if (!target) {
-        return [];
-    }
-    const idTypes = Array.from(new Set(all.map((d) => d.idtype)));
-    function canBeMappedTo(idtype) {
-        if (idtype === target.id) {
-            return true;
-        }
-        // lookup the targets and check if our target is part of it
-        return IDTypeManager.getInstance().getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype)).then((mappables) => mappables.some((d) => d.id === target.id));
-    }
-    // check which idTypes can be mapped to the target one
-    return Promise.all(idTypes.map(canBeMappedTo)).then((mappable) => {
-        const valid = idTypes.filter((d, i) => mappable[i]);
-        return all.filter((d) => valid.indexOf(d.idtype) >= 0);
-    });
-}
 //# sourceMappingURL=LineUpPanelActions.js.map

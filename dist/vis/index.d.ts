@@ -9,3 +9,4 @@ export * from './IVisPluginDesc';
 export * from './visInstance';
 export * from './zoom';
 export * from './VisUtils';
+//# sourceMappingURL=index.d.ts.map

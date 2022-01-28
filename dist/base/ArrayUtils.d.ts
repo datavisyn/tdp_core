@@ -16,14 +16,6 @@ export declare class ArrayUtils {
      */
     static indexOf<T>(arr: T[], f: (v: T) => boolean): number;
     /**
-     * converts the given arguments object into an array
-     * @param args
-     * @deprecated use Array.from(arguments) instead
-     * @internal
-     * @returns {*|Array}
-     */
-    static argList(args: IArguments): any;
-    /**
      * array with indices of 0...n-1
      * @param n
      * @returns {any[]}
@@ -44,3 +36,4 @@ export declare class ArrayUtils {
      */
     static argFilter<T>(arr: T[], callbackfn: (value: T, index: number) => boolean, thisArg?: any): number[];
 }
+//# sourceMappingURL=ArrayUtils.d.ts.map

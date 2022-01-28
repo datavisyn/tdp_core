@@ -1,18 +1,17 @@
-import {ILayoutElem} from './layout';
-import {PluginRegistry} from '../app/PluginRegistry';
-import {IPluginDesc} from '../base/plugin';
-import {IDataType} from '../data/datatype';
-import {IDType} from '../idtype';
-import {EventHandler, IEventHandler} from '../base/event';
-import {Rect} from '../geom';
-
+import { ILayoutElem } from './layout';
+import { PluginRegistry } from '../app/PluginRegistry';
+import { IPluginDesc } from '../base/plugin';
+import { IDataType } from '../data/datatype';
+import { IDType } from '../idtype';
+import { EventHandler, IEventHandler } from '../base/event';
+import { Rect } from '../geom';
 
 export interface IViewDesc extends IPluginDesc {
   /**
    * view type. support, main
    * default: main
    */
-  readonly type: string; //support, main
+  readonly type: string; // support, main
   /**
    * view location: left, top, bottom, right, center
    * default: center
@@ -20,17 +19,24 @@ export interface IViewDesc extends IPluginDesc {
   readonly location: string;
 }
 
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PHOVEA_CORE_IView extends ILayoutElem, IEventHandler {
   readonly data: IDataType[];
   readonly idtypes: IDType[];
 }
 
-// tslint:disable-next-line: class-name
+function convertDesc(desc: IPluginDesc): IViewDesc {
+  const d = <any>desc;
+  d.type = d.type || 'main';
+  d.location = d.location || 'center';
+  return d;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export abstract class PHOVEA_CORE_AView extends EventHandler implements PHOVEA_CORE_IView {
   private _layoutOptions: any = {};
 
-  abstract setBounds(x: number, y: number, w: number, h: number): Promise<void>|any;
+  abstract setBounds(x: number, y: number, w: number, h: number): Promise<void> | any;
 
   abstract getBounds(): Rect;
 
@@ -52,16 +58,8 @@ export abstract class PHOVEA_CORE_AView extends EventHandler implements PHOVEA_C
     }
     return defaultValue;
   }
+
   static list() {
     return PluginRegistry.getInstance().listPlugins('view').map(convertDesc);
   }
 }
-
-function convertDesc(desc: IPluginDesc): IViewDesc {
-  const d = <any>desc;
-  d.type = d.type || 'main';
-  d.location = d.location || 'center';
-  return d;
-}
-
-

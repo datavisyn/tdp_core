@@ -1,5 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="select2" />
+/// <reference types="ion.rangeslider" />
 /// <reference types="bootstrap" />
 import '../webpack/_bootstrap';
 export interface IDialogOptions {
@@ -70,3 +71,4 @@ export declare class PHOVEA_UI_FormDialog extends Dialog {
     static choose(items: string[], options?: IChooseOptions | string): Promise<string>;
     static areyousure(msg?: string, options?: IAreYouSureOptions | string): Promise<boolean>;
 }
+//# sourceMappingURL=dialogs.d.ts.map

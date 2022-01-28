@@ -124,3 +124,4 @@ export interface IVector<T, D extends IValueTypeDesc> extends IHistAbleDataType<
 export declare type INumericalVector = IVector<number, INumberValueTypeDesc>;
 export declare type ICategoricalVector = IVector<string, ICategoricalValueTypeDesc>;
 export declare type IAnyVector = IVector<any, IValueTypeDesc>;
+//# sourceMappingURL=IVector.d.ts.map
