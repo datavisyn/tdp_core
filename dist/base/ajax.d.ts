@@ -20,7 +20,7 @@ export declare class Ajax {
      * @param requestBody body mime type, default auto derive
      * @returns {Promise<any>}
      */
-    static send(url: string, data?: any, method?: string, expectedDataType?: string, requestBody?: string): Promise<any>;
+    static send<T = any>(url: string, data?: any, method?: string, expectedDataType?: string, requestBody?: string, options?: Partial<RequestInit>): Promise<T>;
     /**
      * to get some ajax json file
      * @param url

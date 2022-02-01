@@ -3,6 +3,7 @@ import {IViewPluginDesc} from '..';
 
 export interface IVisynViewProps<C, P> {
     desc: C;
+    entityId: string;
     data: {[key: string]: any};
     // better way of saving this??
     dataDesc: any[];

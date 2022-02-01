@@ -1,4 +1,3 @@
-import { Range, RangeLike } from '../range';
 export declare enum SelectOperation {
     SET = 0,
     ADD = 1,
@@ -21,7 +20,7 @@ export declare class SelectionUtils {
      */
     static toSelectOperation(ctryKey: boolean, altKey: boolean, shiftKey: boolean, metaKey: boolean): SelectOperation;
     static asSelectOperation(v: any): number;
-    static fillWithNone(r: Range, ndim: number): Range;
-    static integrateSelection(current: Range, additional: RangeLike, operation?: SelectOperation): Range;
+    static integrateSelection(current: string[], next: string[], op?: SelectOperation): string[];
+    static selectionEq(as: string[], bs: string[]): boolean;
 }
 //# sourceMappingURL=SelectionUtils.d.ts.map

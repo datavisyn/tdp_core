@@ -8,7 +8,7 @@ export interface VisProps {
      * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
      */
     selected?: {
-        [key: number]: boolean;
+        [key: string]: boolean;
     };
     /**
      * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme

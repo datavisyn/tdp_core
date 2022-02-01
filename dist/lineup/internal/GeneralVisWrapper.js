@@ -1,5 +1,5 @@
 import { Ranking } from 'lineupjs';
-import { EventHandler, IDTypeManager, Range } from '../..';
+import { EventHandler, IDTypeManager } from '../..';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Vis } from '../../vis/Vis';
@@ -56,10 +56,9 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
     selectCallback(selected) {
-        const r = Range.list(selected.map((s) => +s));
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
+        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, selectionIds: selected });
     }
     filterCallback(s) {
         const selectedIds = this.provider.getSelection();
@@ -75,7 +74,7 @@ export class GeneralVisWrapper extends EventHandler {
         const data = this.getAllData();
         const colDescriptions = this.provider.getColumns();
         //need some way to convert these to _ids.
-        const selectedIndeces = this.selectionHelper.getSelection();
+        const selectedIndeces = this.provider.getSelection();
         const cols = [];
         const selectedMap = {};
         for (const i of data) {

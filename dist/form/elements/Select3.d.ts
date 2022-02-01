@@ -36,6 +36,17 @@ export interface ISelect3Options<T extends Readonly<IdTextPair>> {
      */
     required: boolean;
     /**
+     * readonly flag
+     * @default false
+     */
+    readonly: boolean;
+    /**
+     * disabled flag
+     * select is readonly and the value is ignored when submitting the form
+     * @default false
+     */
+    disabled: boolean;
+    /**
      * page size to use for searching
      * @default 30
      */

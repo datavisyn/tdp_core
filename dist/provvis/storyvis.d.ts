@@ -1,7 +1,6 @@
 import { Player } from '../base/Player';
 import { IStateAnnotation, ProvenanceGraph, SlideNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
-import { Range } from '../range';
 export declare class VerticalStoryVis extends AVisInstance implements IVisInstance {
     data: ProvenanceGraph;
     parent: Element;
@@ -21,7 +20,6 @@ export declare class VerticalStoryVis extends AVisInstance implements IVisInstan
     get rawSize(): [number, number];
     get node(): Element;
     option(name: string, val?: any): any;
-    locateImpl(range: Range): Promise<any>;
     transform(scale?: [number, number], rotate?: number): {
         scale: [number, number];
         rotate: number;

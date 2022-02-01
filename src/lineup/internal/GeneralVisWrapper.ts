@@ -100,7 +100,7 @@ export class GeneralVisWrapper extends EventHandler {
         const data = this.getAllData();
         const colDescriptions = this.provider.getColumns();
         //need some way to convert these to _ids.
-        const selectedIndeces = this.selectionHelper.getSelection();
+        const selectedIndeces = this.provider.getSelection();
         const cols: any[] = [];
 
         const selectedMap: { [key: number]: boolean } = {};

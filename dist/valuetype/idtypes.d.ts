@@ -21,3 +21,4 @@ export declare class IDTypeUtils {
     static idType(): IValueTypeEditor;
 }
 export {};
+//# sourceMappingURL=idtypes.d.ts.map

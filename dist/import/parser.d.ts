@@ -20,3 +20,4 @@ export declare class ParserUtils {
     static parseCSV(data: any, options?: ICSVParsingOptions): Promise<IParseResult>;
     static streamCSV(data: any, chunk: (chunk: IParseResult) => any, options?: ICSVParsingOptions): Promise<IParseResult>;
 }
+//# sourceMappingURL=parser.d.ts.map

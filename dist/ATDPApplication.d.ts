@@ -3,7 +3,7 @@ import './webpack/_bootstrap';
 import { TourManager } from './tour/TourManager';
 import { IAuthorizationConfiguration } from './auth';
 import { ACLUEWrapper } from './wrapper';
-import { LoginMenu } from './menu';
+import { LoginMenu } from './base';
 import { CLUEGraphManager } from './base';
 import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './provenance';
 export interface ITDPOptions {

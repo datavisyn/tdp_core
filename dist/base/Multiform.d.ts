@@ -18,7 +18,7 @@ export declare class Multiform {
         meta: ActionMetaData;
         id: string;
         f: typeof Multiform.changeVis;
-        inputs: IObjectRef<IMultiForm>[];
+        inputs: IObjectRef<any>[];
         parameter: {
             to: string;
             from: string;

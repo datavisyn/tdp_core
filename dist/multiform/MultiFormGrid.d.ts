@@ -1,5 +1,5 @@
 import { IDataType } from '../data';
-import { AShape, Rect } from '../geom';
+import { Rect } from '../geom';
 import { IVisMetaData, IVisInstance, IVisPluginDesc, AVisInstance, ITransform } from '../provvis';
 import { IMultiForm, IMultiFormOptions } from './IMultiForm';
 import { Range } from '../range';
@@ -31,7 +31,7 @@ export declare class MultiFormGrid extends AVisInstance implements IVisInstance,
     constructor(data: IDataType, range: Range, parent: HTMLElement, viewFactory: IViewFactory, options?: IMultiFormGridOptions);
     get dimSizes(): number[];
     private toElem;
-    getRange(...indices: number[]): Range;
+    getRange(...indices: number[]): any;
     getData(...indices: number[]): IDataType;
     getBounds(...indices: number[]): Rect;
     /**
@@ -45,7 +45,7 @@ export declare class MultiFormGrid extends AVisInstance implements IVisInstance,
     persist(): any;
     restore(persisted: any): Promise<MultiFormGrid>;
     private locateGroup;
-    locateGroupById(range: Range): Promise<AShape>;
+    locateGroupById(range: Range): any;
     locate(...range: Range[]): Promise<any>;
     locateById(...range: Range[]): Promise<any>;
     /**
@@ -66,8 +66,8 @@ export declare class MultiFormGrid extends AVisInstance implements IVisInstance,
      * @param param
      */
     switchTo(param: string | number | IVisPluginDesc): Promise<IVisInstance[]>;
-    addIconVisChooser(toolbar: HTMLElement): void;
-    addSelectVisChooser(toolbar: HTMLElement): void;
+    addIconVisChooser(toolbar: HTMLElement): any;
+    addSelectVisChooser(toolbar: HTMLElement): any;
     static create(data: IDataType, range: Range, parent: HTMLElement, viewFactory: IViewFactory, options?: IMultiFormGridOptions): MultiFormGrid;
 }
 //# sourceMappingURL=MultiFormGrid.d.ts.map

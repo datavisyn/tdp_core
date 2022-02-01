@@ -1,5 +1,6 @@
 export interface IVisynViewProps<C, P> {
     desc: C;
+    entityId: string;
     data: {
         [key: string]: any;
     };

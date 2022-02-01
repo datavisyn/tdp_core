@@ -90,7 +90,7 @@ export class LineUpSelectionHelper extends EventHandler {
         }
         const old = this.provider.getSelection().sort((a, b) => a - b);
         const indices = [];
-        sel.range.dim(0).forEach((uid) => {
+        sel.selectionIds.forEach((uid) => {
             const index = this.uid2index.get(uid);
             if (typeof index === 'number') {
                 indices.push(index);
@@ -101,20 +101,6 @@ export class LineUpSelectionHelper extends EventHandler {
             return; // no change
         }
         this.provider.setSelection(indices);
-    }
-    getSelection() {
-        if (!this.provider) {
-            return;
-        }
-        const sel = this.provider.getSelection();
-        const indices = [];
-        sel.forEach((uid) => {
-            const index = this.uid2index.get(uid);
-            if (typeof index === 'number') {
-                indices.push(index);
-            }
-        });
-        return indices;
     }
 }
 LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION = 'setItemSelection';

@@ -438,6 +438,8 @@ export interface IVisynViewPlugin {
 
   factory(prop: IVisynViewProps<any, any>): JSX.Element;
   headerFactory(prop: IVisynViewProps<any, any>): JSX.Element;
+  tabFactory(prop: IVisynViewProps<any, any>): JSX.Element;
+
 }
 
 export interface IInstantView {

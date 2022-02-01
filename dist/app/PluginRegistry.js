@@ -20,7 +20,7 @@ export class PluginRegistry {
                 const instance = await Promise.resolve(loader());
                 if (type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory) {
                     //@ts-ignore
-                    return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory) };
+                    return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory), tabFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.tabFactory) };
                 }
                 return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory) };
             }

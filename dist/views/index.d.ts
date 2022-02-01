@@ -1,5 +1,4 @@
 export * from './ViewUtils';
-export * from './ResolveUtils';
 export * from './messaging';
 export * from './tooltip';
 export * from './SelectionChooser';
