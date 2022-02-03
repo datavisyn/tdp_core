@@ -120,15 +120,15 @@ export class TDPView extends React.Component {
     }
     buildSelection(idtype, selection) {
         if (!selection) {
-            return Promise.resolve({ idtype, selectionIds: [] });
+            return Promise.resolve({ idtype, ids: [] });
         }
-        return Promise.resolve({ idtype, selectionIds: selection });
+        return Promise.resolve({ idtype, ids: selection });
     }
     triggerSelection(selection) {
         if (!this.props.onItemSelectionChanged) {
             return;
         }
-        this.props.onItemSelectionChanged(Array.from(selection.selectionIds), selection.idtype.id);
+        this.props.onItemSelectionChanged(Array.from(selection.ids), selection.idtype.id);
     }
     selectNative(item, op = 'set') {
         const items = Array.isArray(item) ? item : [item];

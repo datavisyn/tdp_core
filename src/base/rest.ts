@@ -15,9 +15,12 @@ export interface IRow {
    * unique internal number id, e.g. 42
    */
   readonly _visyn_id: string;
-
-  // TODO: Remove
-  readonly _id: number;
+  /**
+   * Legacy internal id.
+   * TODO: Remove after all usages are refactored.
+   * @deprecated Use _visyn_id instead.
+   */
+  readonly _id: never;
 
   [key: string]: any;
 }
@@ -103,7 +106,7 @@ const emptyFilters: IAllFilters = {
 };
 
 export interface ILookupItem {
-  _id: number;
+  _id: never;
   id: string;
   text: string;
 }

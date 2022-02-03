@@ -247,9 +247,14 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
 }
 
 export interface ISelection {
-  readonly idtype: IDType; // see phovea_core/src/idtype/manager#resolve
-  selectionIds: string[];
-
+  /**
+   * TODO:
+   */
+  readonly idtype: IDType;
+  /**
+   * TODO:
+   */
+  ids: string[];
   /**
    * other selections floating around in a multi selection environment
    */
@@ -443,7 +448,7 @@ export interface IInstantViewOptions {
 }
 
 export interface IItemSelection extends ISelection {
-  readonly items: { _id: number; id: string; text: string }[];
+  readonly items: { id: string; text: string }[];
 }
 
 export interface IInstanceViewExtension {

@@ -43,7 +43,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     };
     const selection = {
       idtype,
-      selectionIds: [],
+      ids: [],
     };
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -156,7 +156,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, null);
     this.ranking.setItemSelection({
       idtype: this.ranking.itemIDType,
-      selectionIds: rows.map((d) => d.id),
+      ids: rows.map((d) => d.id),
     });
     lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, (selection: number[]) => {
       const rs = selection.map((d) => lineup.data[d]);

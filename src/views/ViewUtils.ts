@@ -1,4 +1,4 @@
-import { SelectionUtils } from '../idtype';
+import { isEqual } from 'lodash';
 import { IPluginDesc } from '../base';
 import { IViewPluginDesc, IViewContext, ISelection } from '../base/interfaces';
 import { IObjectRef, ProvenanceGraph } from '../provenance';
@@ -83,7 +83,7 @@ export class ViewUtils {
     if (aNull || bNull) {
       return aNull === bNull;
     }
-    const base = a.idtype.id === b.idtype.id && SelectionUtils.selectionEq(a.selectionIds, b.selectionIds);
+    const base = a.idtype.id === b.idtype.id && isEqual(a.ids?.sort(), b.ids?.sort());
     if (!base) {
       return false;
     }
@@ -101,7 +101,7 @@ export class ViewUtils {
       if (!other) {
         return false;
       }
-      return SelectionUtils.selectionEq(value, other);
+      return isEqual(value?.sort(), other?.sort());
     });
   }
 

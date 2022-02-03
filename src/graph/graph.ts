@@ -1,4 +1,4 @@
-import { IDTypeManager, ASelectAble } from '../idtype';
+import { IDTypeManager } from '../idtype';
 import { UniqueIdManager } from '../app/UniqueIdManager';
 import { IPersistable } from '../base/IPersistable';
 import { EventHandler } from '../base/event';
@@ -195,7 +195,7 @@ export interface IGraph extends IDataType {
   removeEdge(e: GraphEdge): this | PromiseLike<this>;
 }
 
-export abstract class AGraph extends ASelectAble {
+export abstract class AGraph extends EventHandler {
   public static DIM_NODES = 0;
 
   public static IDTYPE_NODES = '_nodes';

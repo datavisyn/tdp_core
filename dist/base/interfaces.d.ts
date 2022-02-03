@@ -218,8 +218,14 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
     groups: IGroupData[];
 }
 export interface ISelection {
+    /**
+     * TODO:
+     */
     readonly idtype: IDType;
-    selectionIds: string[];
+    /**
+     * TODO:
+     */
+    ids: string[];
     /**
      * other selections floating around in a multi selection environment
      */
@@ -390,7 +396,6 @@ export interface IInstantViewOptions {
 }
 export interface IItemSelection extends ISelection {
     readonly items: {
-        _id: number;
         id: string;
         text: string;
     }[];

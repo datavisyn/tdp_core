@@ -1,7 +1,13 @@
 import { AppContext } from '../app/AppContext';
-import { EventHandler } from '../base/event';
-import { IIDType } from './IIDType';
+import { EventHandler, IEventHandler } from '../base/event';
+import { IPersistable } from '../base/IPersistable';
 import { SelectOperation, SelectionUtils } from './SelectionUtils';
+
+export interface IPersistedIDType {
+  sel: { [key: string]: string[] };
+  name: string;
+  names: string;
+}
 
 /**
  * An IDType is a semantic aggregation of an entity type, like Patient and Gene.
@@ -9,7 +15,7 @@ import { SelectOperation, SelectionUtils } from './SelectionUtils';
  * An entity is tracked by a unique identifier (integer) within the system,
  * which is mapped to a common, external identifier or name (string) as well.
  */
-export class IDType extends EventHandler implements IIDType {
+export class IDType extends EventHandler implements IEventHandler, IPersistable {
   static readonly EVENT_SELECT = 'select';
 
   /**
@@ -29,9 +35,11 @@ export class IDType extends EventHandler implements IIDType {
     super();
   }
 
-  persist() {
-    const s: any = {};
-    this.sel.forEach((v, k) => (s[k] = v.toString()));
+  persist(): IPersistedIDType {
+    const s: { [key: string]: string[] } = {};
+    this.sel.forEach((v, k) => {
+      s[k] = v;
+    });
     return {
       sel: s,
       name: this.name,
@@ -39,9 +47,11 @@ export class IDType extends EventHandler implements IIDType {
     };
   }
 
-  restore(persisted: any) {
-    (<any>this).name = persisted.name;
-    (<any>this).names = persisted.names;
+  restore(persisted: IPersistedIDType) {
+    // @ts-ignore
+    this.name = persisted.name;
+    // @ts-ignore
+    this.names = persisted.names;
     Object.keys(persisted.sel).forEach((type) => this.sel.set(type, persisted.sel[type]));
     return this;
   }
@@ -106,7 +116,13 @@ export class IDType extends EventHandler implements IIDType {
    * @param data
    * @returns {Promise<any>}
    */
-  static chooseRequestMethod(url: string, data: any = {}) {
+  static chooseRequestMethod(
+    url: string,
+    data: {
+      q?: string[];
+      mode?: 'all' | 'first';
+    } = {},
+  ) {
     const dataLengthGuess = JSON.stringify(data);
     const lengthGuess = url.length + dataLengthGuess.length;
 

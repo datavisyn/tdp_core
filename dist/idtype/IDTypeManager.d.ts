@@ -1,5 +1,4 @@
-import { IIDType } from './IIDType';
-import { IDType, IDTypeLike } from './IDType';
+import { IDType, IDTypeLike, IPersistedIDType } from './IDType';
 import { IPluginDesc } from '../base/plugin';
 export declare class IDTypeManager {
     static EXTENSION_POINT_IDTYPE: string;
@@ -13,22 +12,24 @@ export declare class IDTypeManager {
      * list currently resolved idtypes
      * @returns {Array<IDType>}
      */
-    listIdTypes(): IIDType[];
+    listIdTypes(): IDType[];
     /**
-     * Get a list of all IIDTypes available on both the server and the client.
+     * Get a list of all IDTypes available on both the server and the client.
      * @returns {any}
      */
-    listAllIdTypes(): Promise<IIDType[]>;
+    listAllIdTypes(): Promise<IDType[]>;
     registerIdType(id: string, idtype: IDType): IDType;
-    persistIdTypes(): any;
-    restoreIdType(persisted: any): void;
+    persistIdTypes(): {};
+    restoreIdType(persisted: {
+        [key: string]: IPersistedIDType;
+    }): void;
     clearSelection(type?: string): void;
     /**
      * whether the given idtype is an internal one or not, i.e. the internal flag is set or it starts with an underscore
      * @param idtype
      * @return {boolean}
      */
-    isInternalIDType(idtype: IIDType): boolean;
+    isInternalIDType(idtype: IDType): boolean;
     /**
      * search for all matching ids for a given pattern
      * @param pattern

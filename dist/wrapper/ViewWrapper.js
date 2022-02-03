@@ -23,7 +23,7 @@ export class ViewWrapper extends EventHandler {
         this.preInstanceItemSelections = new Map();
         this.preInstanceParameter = new Map();
         this.inputSelections = new Map();
-        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, selectionIds: [] });
+        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
         this.node = document.createElement('article');
         this.node.classList.add('tdp-view-wrapper');
         this.allowed = FindViewUtils.canAccess(plugin);
@@ -148,7 +148,7 @@ export class ViewWrapper extends EventHandler {
                     else {
                         this.instance.setItemSelection({
                             idtype: idType,
-                            selectionIds: idType.selections(),
+                            ids: idType.selections(),
                         });
                     }
                 }
@@ -262,7 +262,7 @@ export class ViewWrapper extends EventHandler {
         return undefined;
     }
     match(selection) {
-        return ViewUtils.matchLength(this.plugin.selection, selection.selectionIds.length);
+        return ViewUtils.matchLength(this.plugin.selection, selection.ids.length);
     }
     /**
      * @deprecated use getInputSelection instead

@@ -19,13 +19,13 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     });
   }
 
-  protected removeDynamicColumns(context: IContext, _ids: string[]): void {
+  protected removeDynamicColumns(context: IContext, ids: string[]): void {
     const { columns } = context;
     context.remove(
       [].concat(
-        ..._ids.map((_id) => {
-          context.freeColor(_id);
-          return columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId === _id);
+        ...ids.map((id) => {
+          context.freeColor(id);
+          return columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId === id);
         }),
       ),
     );
@@ -68,7 +68,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
   protected abstract parameterChangedImpl(context: IContext): PromiseLike<any>;
 
   protected selectionChangedImpl(context: IContext) {
-    const selectedIds = context.selection.selectionIds;
+    const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
@@ -88,7 +88,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     return this.addDynamicColumns(context, diffAdded);
   }
 
-  protected abstract createColumnsFor(context: IContext, _id: string): PromiseLike<ISelectionColumn[]>;
+  protected abstract createColumnsFor(context: IContext, id: string): PromiseLike<ISelectionColumn[]>;
 
   static patchDesc(desc: IAdditionalColumnDesc, selectedId: string) {
     desc.selectedId = selectedId;

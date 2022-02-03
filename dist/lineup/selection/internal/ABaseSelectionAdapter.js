@@ -19,11 +19,11 @@ export class ABaseSelectionAdapter {
             context.add(flattenedColumns.map((d) => d.d));
         });
     }
-    removeDynamicColumns(context, _ids) {
+    removeDynamicColumns(context, ids) {
         const { columns } = context;
-        context.remove([].concat(..._ids.map((_id) => {
-            context.freeColor(_id);
-            return columns.filter((d) => d.desc.selectedId === _id);
+        context.remove([].concat(...ids.map((id) => {
+            context.freeColor(id);
+            return columns.filter((d) => d.desc.selectedId === id);
         })));
     }
     selectionChanged(waitForIt, context) {
@@ -55,7 +55,7 @@ export class ABaseSelectionAdapter {
         }));
     }
     selectionChangedImpl(context) {
-        const selectedIds = context.selection.selectionIds;
+        const selectedIds = context.selection.ids;
         const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // compute the difference

@@ -7,7 +7,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
     }
     parameterChangedImpl(context) {
         // remove all and start again
-        const selectedIds = context.selection.selectionIds;
+        const selectedIds = context.selection.ids;
         const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // remove deselected columns

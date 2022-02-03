@@ -19,7 +19,7 @@ export class AView extends EventHandler {
         this.itemSelections = new Map();
         this.selections = new Map();
         this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
-        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, selectionIds: [] });
+        this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('tdp-view');
         parent.appendChild(this.node);
@@ -259,34 +259,34 @@ export class AView extends EventHandler {
      * @returns {Promise<string[]>}
      */
     resolveSelection(idType = this.idType) {
-        // return Promise.resolve(this.selection.selectionIds);
-        return IDTypeManager.getInstance().mapNameToFirstName(this.selection.idtype, this.selection.selectionIds, idType);
+        // return Promise.resolve(this.selection.ids);
+        return IDTypeManager.getInstance().mapNameToFirstName(this.selection.idtype, this.selection.ids, idType);
     }
     setItemSelection(selection, name = AView.DEFAULT_SELECTION_NAME) {
         const current = this.itemSelections.get(name);
         if (current && ViewUtils.isSameSelection(current, selection)) {
             return;
         }
-        const wasEmpty = current == null || current.idtype == null || current.selectionIds.length === 0;
+        const wasEmpty = current == null || current.idtype == null || current.ids.length === 0;
         this.itemSelections.set(name, selection);
         // propagate
         if (selection.idtype) {
             if (name === AView.DEFAULT_SELECTION_NAME) {
-                if (selection.selectionIds.length === 0) {
+                if (selection.ids.length === 0) {
                     selection.idtype.clear(SelectionUtils.defaultSelectionType);
                 }
                 else {
-                    selection.idtype.select(selection.selectionIds);
+                    selection.idtype.select(selection.ids);
                 }
             }
-            else if (selection.selectionIds.length === 0) {
+            else if (selection.ids.length === 0) {
                 selection.idtype.clear(name);
             }
             else {
-                selection.idtype.select(name, selection.selectionIds);
+                selection.idtype.select(name, selection.ids);
             }
         }
-        const isEmpty = selection == null || selection.idtype == null || selection.selectionIds.length === 0;
+        const isEmpty = selection == null || selection.idtype == null || selection.ids.length === 0;
         if (!(wasEmpty && isEmpty)) {
             // the selection has changed when we really have some new values not just another empty one
             this.itemSelectionChanged(name);
@@ -300,7 +300,7 @@ export class AView extends EventHandler {
         // hook
     }
     getItemSelection(name = AView.DEFAULT_SELECTION_NAME) {
-        return this.itemSelections.get(name) || { idtype: null, selectionIds: [] };
+        return this.itemSelections.get(name) || { idtype: null, ids: [] };
     }
     modeChanged(mode) {
         // hook

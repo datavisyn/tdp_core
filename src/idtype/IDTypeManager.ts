@@ -1,8 +1,7 @@
 import { AppContext } from '../app/AppContext';
 import { GlobalEventHandler } from '../base/event';
-import { IIDType } from './IIDType';
 import { SelectionUtils } from './SelectionUtils';
-import { IDType, IDTypeLike } from './IDType';
+import { IDType, IDTypeLike, IPersistedIDType } from './IDType';
 import { PluginRegistry } from '../app/PluginRegistry';
 import { IPluginDesc } from '../base/plugin';
 
@@ -15,14 +14,16 @@ export class IDTypeManager {
 
   private filledUp = false;
 
-  private fillUpData(entries: IIDType[]) {
+  private fillUpData(entries: IDType[]) {
     entries.forEach((row) => {
       let entry = IDTypeManager.getInstance().cache.get(row.id);
       let newOne = false;
       if (entry) {
         if (entry instanceof IDType) {
-          (<any>entry).name = row.name;
-          (<any>entry).names = row.names;
+          // @ts-ignore
+          entry.name = row.name;
+          // @ts-ignore
+          entry.names = row.names;
         }
       } else {
         entry = new IDType(row.id, row.name, row.names);
@@ -54,19 +55,19 @@ export class IDTypeManager {
    * list currently resolved idtypes
    * @returns {Array<IDType>}
    */
-  public listIdTypes(): IIDType[] {
+  public listIdTypes(): IDType[] {
     return Array.from(IDTypeManager.getInstance().cache.values());
   }
 
   /**
-   * Get a list of all IIDTypes available on both the server and the client.
+   * Get a list of all IDTypes available on both the server and the client.
    * @returns {any}
    */
-  public async listAllIdTypes(): Promise<IIDType[]> {
+  public async listAllIdTypes(): Promise<IDType[]> {
     if (IDTypeManager.getInstance().filledUp) {
       return Promise.resolve(IDTypeManager.getInstance().listIdTypes());
     }
-    const c = await (<Promise<IIDType[]>>AppContext.getInstance().getAPIJSON('/idtype/', {}, []));
+    const c = await (<Promise<IDType[]>>AppContext.getInstance().getAPIJSON('/idtype/', {}, []));
     IDTypeManager.getInstance().filledUp = true;
     IDTypeManager.getInstance().fillUpData(c);
     return IDTypeManager.getInstance().listIdTypes();
@@ -82,15 +83,10 @@ export class IDTypeManager {
   }
 
   public persistIdTypes() {
-    const r: any = {};
-
-    IDTypeManager.getInstance().cache.forEach((v, id) => {
-      r[id] = v.persist();
-    });
-    return r;
+    return Array.from(IDTypeManager.getInstance().cache.entries()).reduce((acc, [id, idType]) => ({ ...acc, [id]: idType.persist() }), {});
   }
 
-  public restoreIdType(persisted: any) {
+  public restoreIdType(persisted: { [key: string]: IPersistedIDType }) {
     Object.keys(persisted).forEach((id) => {
       IDTypeManager.getInstance().resolveIdType(id).restore(persisted[id]);
     });
@@ -105,7 +101,7 @@ export class IDTypeManager {
    * @param idtype
    * @return {boolean}
    */
-  public isInternalIDType(idtype: IIDType) {
+  public isInternalIDType(idtype: IDType) {
     return idtype.internal || idtype.id.startsWith('_');
   }
 

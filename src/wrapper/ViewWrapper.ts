@@ -81,7 +81,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   ) {
     super();
 
-    this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, selectionIds: [] });
+    this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
 
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
@@ -222,7 +222,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
           } else {
             this.instance.setItemSelection({
               idtype: idType,
-              selectionIds: idType.selections(),
+              ids: idType.selections(),
             });
           }
         }
@@ -349,7 +349,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   private match(selection: ISelection) {
-    return ViewUtils.matchLength(this.plugin.selection, selection.selectionIds.length);
+    return ViewUtils.matchLength(this.plugin.selection, selection.ids.length);
   }
 
   /**

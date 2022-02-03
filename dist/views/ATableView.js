@@ -58,7 +58,7 @@ export class ATableView extends AView {
         return keys;
     }
     renderRow(tr, row, index, keys) {
-        tr.dataset.id = row._id.toString();
+        tr.dataset.id = row.id;
         tr.innerHTML = keys.map((key) => `<td>${row[key]}</td>`).join('');
     }
     buildHook() {
@@ -105,7 +105,7 @@ export class ATableView extends AView {
                     evt.stopPropagation();
                     this.setItemSelection({
                         idtype: this.itemIDType,
-                        selectionIds: [row.id],
+                        ids: [row.id],
                     });
                 };
             }

@@ -1,13 +1,20 @@
-import { EventHandler } from '../base/event';
-import { IIDType } from './IIDType';
+import { EventHandler, IEventHandler } from '../base/event';
+import { IPersistable } from '../base/IPersistable';
 import { SelectOperation } from './SelectionUtils';
+export interface IPersistedIDType {
+    sel: {
+        [key: string]: string[];
+    };
+    name: string;
+    names: string;
+}
 /**
  * An IDType is a semantic aggregation of an entity type, like Patient and Gene.
  *
  * An entity is tracked by a unique identifier (integer) within the system,
  * which is mapped to a common, external identifier or name (string) as well.
  */
-export declare class IDType extends EventHandler implements IIDType {
+export declare class IDType extends EventHandler implements IEventHandler, IPersistable {
     id: string;
     readonly name: string;
     readonly names: string;
@@ -25,12 +32,8 @@ export declare class IDType extends EventHandler implements IIDType {
      * @param internal whether this is an internal type or not
      */
     constructor(id: string, name: string, names: string, internal?: boolean);
-    persist(): {
-        sel: any;
-        name: string;
-        names: string;
-    };
-    restore(persisted: any): this;
+    persist(): IPersistedIDType;
+    restore(persisted: IPersistedIDType): this;
     toString(): string;
     selectionTypes(): string[];
     /**
@@ -55,7 +58,10 @@ export declare class IDType extends EventHandler implements IIDType {
      * @param data
      * @returns {Promise<any>}
      */
-    static chooseRequestMethod(url: string, data?: any): Promise<any>;
+    static chooseRequestMethod(url: string, data?: {
+        q?: string[];
+        mode?: 'all' | 'first';
+    }): Promise<any>;
 }
 export declare type IDTypeLike = string | IDType;
 export interface IDPair {

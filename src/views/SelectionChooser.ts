@@ -88,7 +88,7 @@ export class SelectionChooser {
 
   private async toItems(selection: ISelection): Promise<(IFormSelectOption | IFormSelectOptionGroup)[]> {
     const source = selection.idtype;
-    const sourceNames = selection.selectionIds;
+    const sourceNames = selection.ids;
 
     const readAble = this.readAble || null;
     const readAbleNames = !readAble || readAble === source ? null : await IDTypeManager.getInstance().mapNameToFirstName(source, sourceNames, readAble);

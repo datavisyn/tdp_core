@@ -93,7 +93,7 @@ export abstract class ATableView<T extends IRow> extends AView {
   }
 
   protected renderRow(tr: HTMLTableRowElement, row: T, index: number, keys: (keyof T)[]) {
-    tr.dataset.id = row._id.toString();
+    tr.dataset.id = row.id;
     tr.innerHTML = keys.map((key) => `<td>${row[key]}</td>`).join('');
   }
 
@@ -150,7 +150,7 @@ export abstract class ATableView<T extends IRow> extends AView {
           evt.stopPropagation();
           this.setItemSelection({
             idtype: this.itemIDType,
-            selectionIds: [row.id],
+            ids: [row.id],
           });
         };
       }

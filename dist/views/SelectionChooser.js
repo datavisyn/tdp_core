@@ -48,7 +48,7 @@ export class SelectionChooser {
     }
     async toItems(selection) {
         const source = selection.idtype;
-        const sourceNames = selection.selectionIds;
+        const sourceNames = selection.ids;
         const readAble = this.readAble || null;
         const readAbleNames = !readAble || readAble === source ? null : await IDTypeManager.getInstance().mapNameToFirstName(source, sourceNames, readAble);
         const labels = readAbleNames ? (this.options.appendOriginalLabel ? readAbleNames.map((d, i) => `${d} (${sourceNames[i]})`) : readAbleNames) : sourceNames;

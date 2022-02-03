@@ -70,14 +70,14 @@ export abstract class AReactView extends AView {
     let sel: string[] = [];
     switch (op) {
       case 'add':
-        sel = Array.from(new Set([...act.selectionIds, ...ids]));
+        sel = Array.from(new Set([...act.ids, ...ids]));
         break;
       case 'remove':
-        sel = act.selectionIds.filter((actId) => !ids.includes(actId));
+        sel = act.ids.filter((actId) => !ids.includes(actId));
         break;
       case 'toggle':
         // eslint-disable-next-line no-case-declarations
-        const toggling = new Set(act.selectionIds);
+        const toggling = new Set(act.ids);
         ids.forEach((id) => {
           if (toggling.has(id)) {
             toggling.delete(id);
@@ -91,7 +91,7 @@ export abstract class AReactView extends AView {
         sel = ids;
         break;
     }
-    this.setItemSelection({ idtype, selectionIds: sel });
+    this.setItemSelection({ idtype, ids: sel });
     this.update();
     return sel;
   }
@@ -110,7 +110,7 @@ export abstract class AReactView extends AView {
     console.assert(!this.handler);
     this.setBusy(true);
     const item = this.getItemSelection();
-    return Promise.all([this.resolveSelection(), item.idtype ? item.selectionIds : []])
+    return Promise.all([this.resolveSelection(), item.idtype ? item.ids : []])
       .then((names: string[][]) => {
         const inputSelection = names[0];
         const itemSelection = names[1];

@@ -1,4 +1,3 @@
-import { isEqual } from 'lodash';
 export var SelectOperation;
 (function (SelectOperation) {
     SelectOperation[SelectOperation["SET"] = 0] = "SET";
@@ -61,9 +60,6 @@ export class SelectionUtils {
             return current.filter((s) => !next.includes(s));
         }
         return [];
-    }
-    static selectionEq(as, bs) {
-        return isEqual(as === null || as === void 0 ? void 0 : as.sort(), bs === null || bs === void 0 ? void 0 : bs.sort());
     }
 }
 SelectionUtils.defaultSelectionType = 'selected';

@@ -7,7 +7,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         this.adapter = adapter;
     }
     parameterChangedImpl(context) {
-        const selectedIds = context.selection.selectionIds;
+        const selectedIds = context.selection.ids;
         this.removePartialDynamicColumns(context, selectedIds);
         return this.addDynamicColumns(context, selectedIds);
     }

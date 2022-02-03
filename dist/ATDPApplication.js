@@ -12,7 +12,7 @@ import { LoginMenu, Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
 import { MixedStorageProvenanceGraphManager } from './provenance';
-import { VisLoader } from './vis';
+import { VisLoader } from './provvis';
 /**
  * base class for TDP based applications
  */

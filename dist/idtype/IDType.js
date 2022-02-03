@@ -28,7 +28,9 @@ export class IDType extends EventHandler {
     }
     persist() {
         const s = {};
-        this.sel.forEach((v, k) => (s[k] = v.toString()));
+        this.sel.forEach((v, k) => {
+            s[k] = v;
+        });
         return {
             sel: s,
             name: this.name,
@@ -36,7 +38,9 @@ export class IDType extends EventHandler {
         };
     }
     restore(persisted) {
+        // @ts-ignore
         this.name = persisted.name;
+        // @ts-ignore
         this.names = persisted.names;
         Object.keys(persisted.sel).forEach((type) => this.sel.set(type, persisted.sel[type]));
         return this;

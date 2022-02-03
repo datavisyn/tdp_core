@@ -24,13 +24,13 @@ export class MessagingProxyView extends AView {
                     const { ids } = payload;
                     const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
                     if (!ids || ids.length === 0) {
-                        this.setItemSelection({ idtype: idType, selectionIds: [] }, name);
+                        this.setItemSelection({ idtype: idType, ids: [] }, name);
                     }
                     if (!idType) {
                         console.warn('cannot set item selection since of unknown idType');
                         return;
                     }
-                    this.setItemSelection({ idtype: idType, selectionIds: ids }, name);
+                    this.setItemSelection({ idtype: idType, ids }, name);
                     return;
                 }
                 case 'tdpSetParameter': {
@@ -100,7 +100,7 @@ export class MessagingProxyView extends AView {
             return;
         }
         const selection = this.getInputSelection(name);
-        if (!selection.selectionIds || selection.selectionIds.length === 0) {
+        if (!selection.ids || selection.ids.length === 0) {
             this.setNoMappingFoundHint(true);
             return;
         }
@@ -110,7 +110,7 @@ export class MessagingProxyView extends AView {
             payload: {
                 name,
                 idType: this.idType.id,
-                ids: selection.selectionIds,
+                ids: selection.ids,
             },
         });
     }
@@ -126,7 +126,7 @@ export class MessagingProxyView extends AView {
     }
     sendItemSelectionMessage(name) {
         const s = this.getItemSelection(name);
-        if (!s || s.selectionIds.length === 0) {
+        if (!s || s.ids.length === 0) {
             this.sendMessage({
                 type: 'tdpSetItemSelection',
                 payload: {
@@ -138,7 +138,7 @@ export class MessagingProxyView extends AView {
             return undefined;
         }
         return IDTypeManager.getInstance()
-            .mapNameToFirstName(s.idtype, s.selectionIds, this.itemIDType)
+            .mapNameToFirstName(s.idtype, s.ids, this.itemIDType)
             .then((ids) => {
             this.sendMessage({
                 type: 'tdpSetItemSelection',

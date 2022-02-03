@@ -60,7 +60,7 @@ export class LineUpSelectionHelper extends EventHandler {
       console.warn('no idType defined for this ranking view');
       return;
     }
-    const selection: ISelection = { idtype: idType, selectionIds: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
+    const selection: ISelection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }
@@ -89,7 +89,7 @@ export class LineUpSelectionHelper extends EventHandler {
     const old = this.provider.getSelection().sort();
 
     const indices: number[] = [];
-    sel.selectionIds.forEach((uid) => {
+    sel.ids.forEach((uid) => {
       const index = this.uid2index.get(uid);
       if (typeof index === 'number') {
         indices.push(index);

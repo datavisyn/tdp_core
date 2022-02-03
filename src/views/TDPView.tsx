@@ -149,16 +149,16 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
 
   private buildSelection(idtype: IDType, selection: string[]): Promise<ISelection> {
     if (!selection) {
-      return Promise.resolve({ idtype, selectionIds: [] });
+      return Promise.resolve({ idtype, ids: [] });
     }
-    return Promise.resolve({ idtype, selectionIds: selection });
+    return Promise.resolve({ idtype, ids: selection });
   }
 
   private triggerSelection(selection: ISelection) {
     if (!this.props.onItemSelectionChanged) {
       return;
     }
-    this.props.onItemSelectionChanged(Array.from(selection.selectionIds), selection.idtype.id);
+    this.props.onItemSelectionChanged(Array.from(selection.ids), selection.idtype.id);
   }
 
   private selectNative(item: string | string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set') {

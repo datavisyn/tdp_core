@@ -14,7 +14,9 @@ export class IDTypeManager {
             let newOne = false;
             if (entry) {
                 if (entry instanceof IDType) {
+                    // @ts-ignore
                     entry.name = row.name;
+                    // @ts-ignore
                     entry.names = row.names;
                 }
             }
@@ -49,7 +51,7 @@ export class IDTypeManager {
         return Array.from(IDTypeManager.getInstance().cache.values());
     }
     /**
-     * Get a list of all IIDTypes available on both the server and the client.
+     * Get a list of all IDTypes available on both the server and the client.
      * @returns {any}
      */
     async listAllIdTypes() {
@@ -70,11 +72,7 @@ export class IDTypeManager {
         return idtype;
     }
     persistIdTypes() {
-        const r = {};
-        IDTypeManager.getInstance().cache.forEach((v, id) => {
-            r[id] = v.persist();
-        });
-        return r;
+        return Array.from(IDTypeManager.getInstance().cache.entries()).reduce((acc, [id, idType]) => ({ ...acc, [id]: idType.persist() }), {});
     }
     restoreIdType(persisted) {
         Object.keys(persisted).forEach((id) => {

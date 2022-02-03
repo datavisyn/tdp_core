@@ -1,5 +1,3 @@
-import { isEqual } from 'lodash';
-
 export enum SelectOperation {
   SET,
   ADD,
@@ -80,9 +78,5 @@ export class SelectionUtils {
       return current.filter((s) => !next.includes(s));
     }
     return [];
-  }
-
-  static selectionEq(as: string[], bs: string[]) {
-    return isEqual(as?.sort(), bs?.sort());
   }
 }

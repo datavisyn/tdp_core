@@ -1,4 +1,4 @@
-import { IDTypeManager, ASelectAble } from '../idtype';
+import { IDTypeManager } from '../idtype';
 import { UniqueIdManager } from '../app/UniqueIdManager';
 import { EventHandler } from '../base/event';
 export class AttributeContainer extends EventHandler {
@@ -138,7 +138,7 @@ export class GraphEdge extends AttributeContainer {
         return (edge) => (type instanceof RegExp ? type.test(edge.type) : edge.type === type);
     }
 }
-export class AGraph extends ASelectAble {
+export class AGraph extends EventHandler {
     get nnodes() {
         return this.nodes.length;
     }

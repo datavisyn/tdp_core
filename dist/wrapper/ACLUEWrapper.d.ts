@@ -1,5 +1,5 @@
-import { LayoutedProvVis } from '../vis/provvis';
-import { VerticalStoryVis } from '../vis/storyvis';
+import { LayoutedProvVis } from '../provvis/provvis';
+import { VerticalStoryVis } from '../provvis/storyvis';
 import { ProvenanceGraph, SlideNode } from '../provenance';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { EventHandler } from '../base';

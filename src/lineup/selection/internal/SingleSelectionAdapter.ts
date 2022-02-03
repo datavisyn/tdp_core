@@ -26,7 +26,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
 
   protected parameterChangedImpl(context: IContext) {
     // remove all and start again
-    const selectedIds = context.selection.selectionIds;
+    const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
