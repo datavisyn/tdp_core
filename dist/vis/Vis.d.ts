@@ -1,4 +1,4 @@
-import { CategoricalColumn, NumericalColumn } from './interfaces';
+import { CategoricalColumn, NumericalColumn, IVisConfig } from './interfaces';
 export interface VisProps {
     /**
      * Required data columns which are displayed.
@@ -26,6 +26,8 @@ export interface VisProps {
      * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
      */
     filterCallback?: (s: string) => void;
+    externalConfig?: IVisConfig;
+    hideSidebar?: boolean;
 }
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback }: VisProps): JSX.Element;
+export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, externalConfig }: VisProps): JSX.Element;
 //# sourceMappingURL=Vis.d.ts.map

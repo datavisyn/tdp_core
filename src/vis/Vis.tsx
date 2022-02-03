@@ -39,6 +39,8 @@ export interface VisProps {
      * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
      */
     filterCallback?: (s: string) => void;
+    externalConfig?: IVisConfig;
+    hideSidebar?: boolean;
 }
 
 export function Vis({
@@ -56,10 +58,11 @@ export function Vis({
                 getCssValue('visyn-c10').slice(1)],
     shapes = ['circle', 'square', 'triangle-up', 'star'],
     selectionCallback = () => null,
-    filterCallback = () => null
+    filterCallback = () => null,
+    externalConfig = null
 }: VisProps) {
 
-    const [visConfig, setVisConfig] = useState<IVisConfig>({
+    const [visConfig, setVisConfig] = useState<IVisConfig>(externalConfig ? externalConfig : {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
@@ -68,6 +71,10 @@ export function Vis({
         isRectBrush: true,
         alphaSliderVal: 1
     });
+
+    useEffect(() => {
+        setVisConfig(externalConfig);
+    }, [externalConfig]);
 
     useEffect(() => {
         if(isScatter(visConfig)) { setVisConfig(scatterMergeDefaultConfig(columns, visConfig)); }

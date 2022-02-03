@@ -1,20 +1,15 @@
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
-import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
-import { ColorSelect } from '../sidebar/ColorSelect';
-import { ShapeSelect } from '../sidebar/ShapeSelect';
-import { FilterButtons } from '../sidebar/FilterButtons';
 import Plot from 'react-plotly.js';
 import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
 import { merge } from 'lodash';
-import Plotly from 'plotly.js';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
-import { WarningMessage } from '../sidebar/WarningMessage';
+import { ScatterVisSidebar } from './ScatterVisSidebar';
+import Plotly from 'plotly.js';
 const defaultConfig = {
     color: {
         enable: true,
@@ -35,7 +30,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, scales }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, hideSidebar = false, scales }) {
     const uniqueId = useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
     }, []);
@@ -80,7 +75,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                         console.log(d);
                         d ? selectionCallback(d.points.map((d) => d.id)) : selectionCallback([]);
                     }, 
-                    //plotly redraws everything on updates, so you need to reappend title and
+                    // plotly redraws everything on updates, so you need to reappend title and
                     // change opacity on update, instead of just in a use effect
                     onInitialized: () => {
                         d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
@@ -103,24 +98,11 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 React.createElement(BrushOptionButtons, { callback: (e) => setConfig({ ...config, isRectBrush: e }), isRectBrush: config.isRectBrush }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             mergedExtensions.postPlot),
-        React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
-            React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
-                React.createElement("i", { className: "fas fa-bars" })),
-            React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
-                React.createElement("div", { className: "container pb-3", style: { width: '20rem' } },
-                    React.createElement(WarningMessage, null),
-                    React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
-                    React.createElement("hr", null),
-                    React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
-                    React.createElement("hr", null),
-                    mergedExtensions.preSidebar,
-                    mergedOptionsConfig.color.enable ? mergedOptionsConfig.color.customComponent
-                        || React.createElement(ColorSelect, { callback: (color) => setConfig({ ...config, color }), numTypeCallback: (numColorScaleType) => setConfig({ ...config, numColorScaleType }), currentNumType: config.numColorScaleType, columns: columns, currentSelected: config.color }) : null,
-                    mergedOptionsConfig.shape.enable ? mergedOptionsConfig.shape.customComponent
-                        || React.createElement(ShapeSelect, { callback: (shape) => setConfig({ ...config, shape }), columns: columns, currentSelected: config.shape }) : null,
-                    React.createElement("hr", null),
-                    mergedOptionsConfig.filter.enable ? mergedOptionsConfig.filter.customComponent
-                        || React.createElement(FilterButtons, { callback: filterCallback }) : null,
-                    mergedExtensions.postSidebar)))));
+        !hideSidebar ?
+            React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
+                React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
+                    React.createElement("i", { className: "fas fa-bars" })),
+                React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
+                    React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=ScatterVis.js.map

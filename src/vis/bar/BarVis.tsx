@@ -19,6 +19,7 @@ import {BarDisplayButtons} from '../sidebar/BarDisplayTypeButtons';
 import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
 import {WarningMessage} from '../sidebar/WarningMessage';
 import Plotly from 'plotly.js';
+import {BarVisSidebar} from './BarVisSidebar';
 
 interface BarVisProps {
     config: IBarConfig;
@@ -53,6 +54,7 @@ interface BarVisProps {
     columns: (NumericalColumn | CategoricalColumn) [];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
+    hideSidebar?: boolean;
 }
 
 const defaultConfig = {
@@ -91,7 +93,8 @@ export function BarVis({
     extensions,
     columns,
     setConfig,
-    scales
+    scales,
+    hideSidebar = false,
 }: BarVisProps) {
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
@@ -173,61 +176,15 @@ export function BarVis({
                 {mergedExtensions.postPlot}
 
             </div>
-            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
+            {!hideSidebar ?
+            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
                 <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
-                    <div className="container pb-3" style={{width: '20rem'}}>
-                        <WarningMessage/>
-                        <VisTypeSelect
-                            callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
-                            currentSelected={config.type}
-                        />
-                        <hr/>
-                        <CategoricalColumnSelect
-                            callback={(catColumnsSelected: ColumnInfo[]) => setConfig({...config, catColumnsSelected})}
-                            columns={columns}
-                            currentSelected={config.catColumnsSelected || []}
-                        />
-                        <hr/>
-                        {mergedExtensions.preSidebar}
-
-                        {mergedOptionsConfig.group.enable ? mergedOptionsConfig.group.customComponent
-                        || <GroupSelect
-                            callback={(group: ColumnInfo) => setConfig({...config, group})}
-                            columns={columns}
-                            currentSelected={config.group}
-                        /> : null }
-                        {mergedOptionsConfig.multiples.enable ? mergedOptionsConfig.multiples.customComponent
-                        || <MultiplesSelect
-                            callback={(multiples: ColumnInfo) => setConfig({...config, multiples})}
-                            columns={columns}
-                            currentSelected={config.multiples}
-                        /> : null }
-                        <hr/>
-                        {mergedOptionsConfig.direction.enable ? mergedOptionsConfig.direction.customComponent
-                        || <BarDirectionButtons
-                            callback={(direction: EBarDirection) => setConfig({...config, direction})}
-                            currentSelected={config.direction}
-                        /> : null }
-
-                        {mergedOptionsConfig.groupType.enable ? mergedOptionsConfig.groupType.customComponent
-                        || <BarGroupTypeButtons
-                            callback={(groupType: EBarGroupingType) => setConfig({...config, groupType})}
-                            currentSelected={config.groupType}
-                        /> : null }
-
-                        {mergedOptionsConfig.display.enable ? mergedOptionsConfig.display.customComponent
-                        || <BarDisplayButtons
-                            callback={(display: EBarDisplayType) => setConfig({...config, display})}
-                            currentSelected={config.display}
-                        /> : null }
-
-                        {mergedExtensions.postSidebar}
-                    </div>
+                    <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig}/>
                 </div>
-            </div>
+            </div> : null}
         </div>);
 }
 

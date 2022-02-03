@@ -19,7 +19,8 @@ interface ViolinVisProps {
     columns: (NumericalColumn | CategoricalColumn)[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
+    hideSidebar?: boolean;
 }
-export declare function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales }: ViolinVisProps): JSX.Element;
+export declare function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar, }: ViolinVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=ViolinVis.d.ts.map

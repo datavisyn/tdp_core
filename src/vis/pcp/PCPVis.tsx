@@ -12,6 +12,8 @@ import {merge} from 'lodash';
 import {createPCPTraces, IPCPConfig} from './utils';
 import {WarningMessage} from '../sidebar/WarningMessage';
 import Plotly from 'plotly.js';
+import {ScatterVisSidebar} from '../scatter/ScatterVisSidebar';
+import {PCPVisSidebar} from './PCPVisSidebar';
 
 interface PCPVisProps {
     config: IPCPConfig;
@@ -24,6 +26,7 @@ interface PCPVisProps {
     };
     columns: (NumericalColumn | CategoricalColumn) [];
     setConfig: (config: IVisConfig) => void;
+    hideSidebar?: boolean;
 }
 
 const defaultConfig = {};
@@ -41,6 +44,7 @@ export function PCPVis({
     extensions,
     columns,
     setConfig,
+    hideSidebar = false
 }: PCPVisProps) {
 
     const mergedOptionsConfig = useMemo(() => {
@@ -119,33 +123,14 @@ export function PCPVis({
             {mergedExtensions.postPlot}
 
             </div>
-            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
+            {!hideSidebar ?
+            <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
                 <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
-                    <div className="container pb-3" style={{width: '20rem'}}>
-                        <WarningMessage/>
-                        <VisTypeSelect
-                            callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
-                            currentSelected={config.type}
-                        />
-                        <hr/>
-                        <NumericalColumnSelect
-                            callback={(numColumnsSelected: ColumnInfo[]) => setConfig({...config, numColumnsSelected})}
-                            columns={columns}
-                            currentSelected={config.numColumnsSelected || []}
-                        />
-                        <CategoricalColumnSelect
-                            callback={(catColumnsSelected: ColumnInfo[]) => setConfig({...config, catColumnsSelected})}
-                            columns={columns}
-                            currentSelected={config.catColumnsSelected || []}
-                        />
-                        <hr/>
-                        {mergedExtensions.preSidebar}
-                        {mergedExtensions.postSidebar}
-                    </div>
+                    <PCPVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig}/>
                 </div>
-            </div>
+            </div> : null}
         </div>);
 }

@@ -19,9 +19,15 @@ export class PluginRegistry implements IRegistry {
       version: '1.0.0',
       load: async (): Promise<IPlugin> => {
         const instance = await Promise.resolve(loader());
-        if(type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory) {
+        if(type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory && p.tabFactory) {
           //@ts-ignore
           return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory), tabFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.tabFactory)};
+        } else if(type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory) {
+          //@ts-ignore
+          return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory)};
+        } else if(type === EXTENSION_POINT_VISYN_VIEW && p.tabFactory) {
+          //@ts-ignore
+          return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), tabFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.tabFactory)};
         }
         return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory)};
       }

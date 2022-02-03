@@ -22,8 +22,8 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1').
     getCssValue('visyn-c7').slice(1),
     getCssValue('visyn-c8').slice(1),
     getCssValue('visyn-c9').slice(1),
-    getCssValue('visyn-c10').slice(1)], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null }) {
-    const [visConfig, setVisConfig] = useState({
+    getCssValue('visyn-c10').slice(1)], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null }) {
+    const [visConfig, setVisConfig] = useState(externalConfig ? externalConfig : {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
@@ -32,6 +32,9 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1').
         isRectBrush: true,
         alphaSliderVal: 1
     });
+    useEffect(() => {
+        setVisConfig(externalConfig);
+    }, [externalConfig]);
     useEffect(() => {
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));

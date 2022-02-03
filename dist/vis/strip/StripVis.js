@@ -1,16 +1,13 @@
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
-import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import Plot from 'react-plotly.js';
 import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
 import { beautifyLayout } from '../layoutUtils';
-import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { merge } from 'lodash';
 import { createStripTraces } from './utils';
-import { WarningMessage } from '../sidebar/WarningMessage';
 import Plotly from 'plotly.js';
+import { StripVisSidebar } from './StripVisSidebar';
 const defaultConfig = {};
 const defaultExtensions = {
     prePlot: null,
@@ -18,7 +15,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null
 };
-export function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
+export function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false, }) {
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, []);
@@ -74,18 +71,11 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
                         }
                     } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
             mergedExtensions.postPlot),
-        React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto" },
-            React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
-                React.createElement("i", { className: "fas fa-bars" })),
-            React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
-                React.createElement("div", { className: "container pb-3", style: { width: '20rem' } },
-                    React.createElement(WarningMessage, null),
-                    React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
-                    React.createElement("hr", null),
-                    React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
-                    React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
-                    React.createElement("hr", null),
-                    mergedExtensions.preSidebar,
-                    mergedExtensions.postSidebar)))));
+        !hideSidebar ?
+            React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
+                React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
+                    React.createElement("i", { className: "fas fa-bars" })),
+                React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${uniqueId}` },
+                    React.createElement(StripVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=StripVis.js.map

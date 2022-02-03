@@ -1,22 +1,17 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
+import {CategoricalColumn, EFilterOptions, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
 import {useEffect, useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
-import {ColorSelect} from '../sidebar/ColorSelect';
-import {ShapeSelect} from '../sidebar/ShapeSelect';
-import {FilterButtons} from '../sidebar/FilterButtons';
 import Plot from 'react-plotly.js';
 import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
-import {createScatterTraces, ENumericalColorScaleType, IScatterConfig} from './utils';
+import {createScatterTraces, IScatterConfig} from './utils';
 import {beautifyLayout} from '../layoutUtils';
 import {merge} from 'lodash';
-import Plotly from 'plotly.js';
 import {BrushOptionButtons} from '../sidebar/BrushOptionButtons';
 import {OpacitySlider} from '../sidebar/OpacitySlider';
-import {WarningMessage} from '../sidebar/WarningMessage';
+import {ScatterVisSidebar} from './ScatterVisSidebar';
+import Plotly from 'plotly.js';
 
 interface ScatterVisProps {
     config: IScatterConfig;
@@ -47,6 +42,7 @@ interface ScatterVisProps {
     selected?: {[key: number]: boolean};
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
+    hideSidebar?: boolean;
 }
 
 const defaultConfig = {
@@ -81,6 +77,7 @@ export function ScatterVis({
     selectionCallback = () => null,
     selected = {},
     setConfig,
+    hideSidebar = false,
     scales
 }: ScatterVisProps) {
 
@@ -145,7 +142,7 @@ export function ScatterVis({
                             console.log(d);
                             d ? selectionCallback(d.points.map((d) => (d as any).id)) : selectionCallback([]);
                         }}
-                        //plotly redraws everything on updates, so you need to reappend title and
+                        // plotly redraws everything on updates, so you need to reappend title and
                         // change opacity on update, instead of just in a use effect
                         onInitialized={() => {
                             d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
@@ -183,50 +180,15 @@ export function ScatterVis({
                 </div>
                 {mergedExtensions.postPlot}
             </div>
+            {!hideSidebar ?
             <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
                 <button className="btn btn-primary-outline" type="button" data-bs-toggle="collapse" data-bs-target={`#generalVisBurgerMenu${uniqueId}`} aria-expanded="true" aria-controls="generalVisBurgerMenu">
                     <i className="fas fa-bars"/>
                 </button>
                 <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
-                    <div className="container pb-3" style={{width: '20rem'}}>
-                        <WarningMessage/>
-                        <VisTypeSelect
-                            callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}
-                            currentSelected={config.type}
-                        />
-                        <hr/>
-                        <NumericalColumnSelect
-                            callback={(numColumnsSelected: ColumnInfo[]) => setConfig({...config, numColumnsSelected})}
-                            columns={columns}
-                            currentSelected={config.numColumnsSelected || []}
-                        />
-                        <hr/>
-                        {mergedExtensions.preSidebar}
-
-                        {mergedOptionsConfig.color.enable ? mergedOptionsConfig.color.customComponent
-                        || <ColorSelect
-                            callback={(color: ColumnInfo) => setConfig({...config, color})}
-                            numTypeCallback={(numColorScaleType: ENumericalColorScaleType) => setConfig({...config, numColorScaleType})}
-                            currentNumType={config.numColorScaleType}
-                            columns={columns}
-                            currentSelected={config.color}
-                        /> : null }
-                        {mergedOptionsConfig.shape.enable ? mergedOptionsConfig.shape.customComponent
-                        || <ShapeSelect
-                            callback={(shape: ColumnInfo) => setConfig({...config, shape})}
-                            columns={columns}
-                            currentSelected={config.shape}
-                        /> : null }
-                        <hr/>
-                        {mergedOptionsConfig.filter.enable ? mergedOptionsConfig.filter.customComponent
-                        || <FilterButtons
-                            callback={filterCallback}
-                        /> : null }
-
-                        {mergedExtensions.postSidebar}
-                    </div>
+                    <ScatterVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} filterCallback={filterCallback} setConfig={setConfig}/>
                 </div>
-            </div>
+            </div> : null}
         </div>);
 }
 
