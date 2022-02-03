@@ -538,7 +538,7 @@ export class ARankingView extends AView {
             .then(() => {
             this.builtLineUp(this.provider);
             // record after the initial one
-            LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+            // LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
             this.setBusy(false);
             this.update();
         })
