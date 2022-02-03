@@ -1,9 +1,9 @@
-import {AppContext} from '../app/AppContext';
-import {EventHandler} from '../base/event';
-import {Range, RangeLike, ParseRangeUtils} from '../range';
-import {IIDType} from './IIDType';
-import {SelectOperation, SelectionUtils} from './SelectionUtils';
-import {ResolveNow} from '../base/promise';
+import { AppContext } from '../app/AppContext';
+import { EventHandler } from '../base/event';
+import { Range, RangeLike, ParseRangeUtils } from '../range';
+import { IIDType } from './IIDType';
+import { SelectOperation, SelectionUtils } from './SelectionUtils';
+import { ResolveNow } from '../base/promise';
 /**
  * An IDType is a semantic aggregation of an entity type, like Patient and Gene.
  *
@@ -11,8 +11,8 @@ import {ResolveNow} from '../base/promise';
  * which is mapped to a common, external identifier or name (string) as well.
  */
 export class IDType extends EventHandler implements IIDType {
-
   static readonly EVENT_SELECT = 'select';
+
   /**
    * the current selections
    */
@@ -20,6 +20,7 @@ export class IDType extends EventHandler implements IIDType {
 
   // TODO: is this cache ever emptied, or do we assume a reasonable upper bound on the entities in IDType?
   private readonly name2idCache = new Map<string, number>();
+
   private readonly id2nameCache = new Map<number, string>();
 
   canBeMappedTo: Promise<IDType[]> = null;
@@ -36,11 +37,11 @@ export class IDType extends EventHandler implements IIDType {
 
   persist() {
     const s: any = {};
-    this.sel.forEach((v, k) => s[k] = v.toString());
+    this.sel.forEach((v, k) => (s[k] = v.toString()));
     return {
       sel: s,
       name: this.name,
-      names: this.names
+      names: this.names,
     };
   }
 
@@ -82,10 +83,11 @@ export class IDType extends EventHandler implements IIDType {
   select(type: string, range: RangeLike): Range;
   select(type: string, range: RangeLike, op: SelectOperation): Range;
   select() {
+    // eslint-disable-next-line prefer-rest-params
     const a = Array.from(arguments);
-    const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType,
-      range = ParseRangeUtils.parseRangeLike(a[0]),
-      op = SelectionUtils.asSelectOperation(a[1]);
+    const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+    const range = ParseRangeUtils.parseRangeLike(a[0]);
+    const op = SelectionUtils.asSelectOperation(a[1]);
     return this.selectImpl(range, op, type);
   }
 
@@ -102,13 +104,15 @@ export class IDType extends EventHandler implements IIDType {
       case SelectOperation.REMOVE:
         newValue = b.without(range);
         break;
+      default:
+        break;
     }
     if (b.eq(newValue)) {
       return b;
     }
     this.sel.set(type, newValue);
     const added = op !== SelectOperation.REMOVE ? range : Range.none();
-    const removed = (op === SelectOperation.ADD ? Range.none() : (op === SelectOperation.SET ? b : range));
+    const removed = op === SelectOperation.ADD ? Range.none() : op === SelectOperation.SET ? b : range;
     this.fire(IDType.EVENT_SELECT, type, newValue, added, removed, b);
     this.fire(`${IDType.EVENT_SELECT}-${type}`, newValue, added, removed, b);
     return b;
@@ -131,8 +135,6 @@ export class IDType extends EventHandler implements IIDType {
     });
   }
 
-
-
   /**
    * Request the system identifiers for the given entity names.
    * @param names the entity names to resolve
@@ -144,7 +146,7 @@ export class IDType extends EventHandler implements IIDType {
     if (toResolve.length === 0) {
       return ResolveNow.resolveImmediately(names.map((name) => this.name2idCache.get(name)));
     }
-    const ids: number[] = await IDType.chooseRequestMethod(`/idtype/${this.id}/map`, {ids: toResolve});
+    const ids: number[] = await IDType.chooseRequestMethod(`/idtype/${this.id}/map`, { ids: toResolve });
     toResolve.forEach((name, i) => {
       this.name2idCache.set(name, ids[i]);
       this.id2nameCache.set(ids[i], name);
@@ -160,17 +162,17 @@ export class IDType extends EventHandler implements IIDType {
   async unmap(ids: RangeLike): Promise<string[]> {
     const r = ParseRangeUtils.parseRangeLike(ids);
     const toResolve: number[] = [];
-    r.dim(0).forEach((name) => !(this.id2nameCache.has(name)) ? toResolve.push(name) : null);
+    r.dim(0).forEach((name) => (!this.id2nameCache.has(name) ? toResolve.push(name) : null));
     if (toResolve.length === 0) {
       const result: string[] = [];
       r.dim(0).forEach((name) => result.push(this.id2nameCache.get(name)));
       return ResolveNow.resolveImmediately(result);
     }
-    const result: string[] = await IDType.chooseRequestMethod(`/idtype/${this.id}/unmap`, {ids: Range.list(toResolve).toString()});
+    const result: string[] = await IDType.chooseRequestMethod(`/idtype/${this.id}/unmap`, { ids: Range.list(toResolve).toString() });
     toResolve.forEach((id, i) => {
-      const r = String(result[i]);
-      this.id2nameCache.set(id, r);
-      this.name2idCache.set(r, id);
+      const res = String(result[i]);
+      this.id2nameCache.set(id, res);
+      this.name2idCache.set(res, id);
     });
     const out: string[] = [];
     r.dim(0).forEach((name) => out.push(this.id2nameCache.get(name)));
@@ -184,7 +186,7 @@ export class IDType extends EventHandler implements IIDType {
    * @return {Promise<void>}
    */
   async search(pattern: string, limit = 10): Promise<IDPair[]> {
-   const result: IDPair[] = await AppContext.getInstance().getAPIJSON(`/idtype/${this.id}/search`, {q: pattern, limit});
+    const result: IDPair[] = await AppContext.getInstance().getAPIJSON(`/idtype/${this.id}/search`, { q: pattern, limit });
     // cache results
     result.forEach((pair) => {
       const r = String(pair.name);
@@ -209,9 +211,7 @@ export class IDType extends EventHandler implements IIDType {
   }
 }
 
-
-
-export declare type IDTypeLike = string|IDType;
+export declare type IDTypeLike = string | IDType;
 
 export interface IDPair {
   readonly name: string;

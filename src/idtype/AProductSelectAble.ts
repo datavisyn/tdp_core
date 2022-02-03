@@ -1,8 +1,9 @@
-import {IEvent, IEventListener} from '../base/event';
-import {Range, RangeLike, ParseRangeUtils} from '../range';
-import {SelectOperation, SelectionUtils} from './SelectionUtils';
-import {ASelectAble, ISelectAble} from './ASelectAble';
-import {ProductIDType} from './ProductIDType';
+/* eslint-disable prefer-rest-params */
+import { IEvent, IEventListener } from '../base/event';
+import { Range, RangeLike, ParseRangeUtils } from '../range';
+import { SelectOperation, SelectionUtils } from './SelectionUtils';
+import { ASelectAble, ISelectAble } from './ASelectAble';
+import { ProductIDType } from './ProductIDType';
 
 export interface IProductSelectAble extends ISelectAble {
   producttype: ProductIDType;
@@ -28,17 +29,17 @@ export abstract class AProductSelectAble extends ASelectAble {
       if (act.length === 0) {
         return;
       }
-      //ensure the right number of dimensions
+      // ensure the right number of dimensions
       act.forEach((a) => SelectionUtils.fillWithNone(a, ids.ndim));
 
       this.fire(ProductIDType.EVENT_SELECT_PRODUCT, type, act);
       this.fire(`${ProductIDType.EVENT_SELECT_PRODUCT}-${type}`, act);
     });
-  }
+  };
 
   abstract get producttype(): ProductIDType;
 
-  on(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+  on(events: string | { [key: string]: IEventListener }, handler?: IEventListener) {
     if (typeof events === 'string' && (events === 'select' || events === 'selectProduct' || events.slice(0, 'select-'.length) === 'select-')) {
       this.numProductSelectListeners++;
       if (this.numProductSelectListeners === 1) {
@@ -48,7 +49,7 @@ export abstract class AProductSelectAble extends ASelectAble {
     return super.on(events, handler);
   }
 
-  off(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+  off(events: string | { [key: string]: IEventListener }, handler?: IEventListener) {
     if (typeof events === 'string' && (events === 'select' || events === 'selectProduct' || events.slice(0, 'select-'.length) === 'select-')) {
       this.numProductSelectListeners--;
       if (this.numProductSelectListeners === 0) {
@@ -62,7 +63,7 @@ export abstract class AProductSelectAble extends ASelectAble {
     return this.ids().then((ids: Range) => {
       const cells = this.producttype.productSelections(type);
       const act = cells.map((c) => ids.indexRangeOf(c)).filter((c) => !c.isNone);
-      //ensure the right number of dimensions
+      // ensure the right number of dimensions
       act.forEach((a) => SelectionUtils.fillWithNone(a, ids.ndim));
       return act;
     });
@@ -72,9 +73,9 @@ export abstract class AProductSelectAble extends ASelectAble {
   selectProduct(type: string, range: RangeLike[], op?: SelectOperation): Promise<Range[]>;
   selectProduct() {
     const a = Array.from(arguments);
-    const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType,
-      range = a[0].map(ParseRangeUtils.parseRangeLike),
-      op = SelectionUtils.asSelectOperation(a[1]);
+    const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+    const range = a[0].map(ParseRangeUtils.parseRangeLike);
+    const op = SelectionUtils.asSelectOperation(a[1]);
     return this.selectProductImpl(range, op, type);
   }
 
@@ -97,7 +98,7 @@ export abstract class AProductSelectAble extends ASelectAble {
     if (typeof a[0] === 'number') {
       a.shift();
     }
-    const type = (typeof a[0] === 'string') ? a[0] : SelectionUtils.defaultSelectionType;
+    const type = typeof a[0] === 'string' ? a[0] : SelectionUtils.defaultSelectionType;
     return this.selectProductImpl([], SelectOperation.SET, type || SelectionUtils.defaultSelectionType);
   }
 }

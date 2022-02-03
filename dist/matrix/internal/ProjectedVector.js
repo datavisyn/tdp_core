@@ -13,16 +13,16 @@ export class ProjectedVector extends AVector {
         this.valuetype = valuetype;
         this._idtype = _idtype;
         this.desc = {
-            name: m.desc.name + '-p',
-            fqname: m.desc.fqname + '-p',
+            name: `${m.desc.name}-p`,
+            fqname: `${m.desc.fqname}-p`,
             type: 'vector',
-            id: m.desc.id + '-p',
+            id: `${m.desc.id}-p`,
             size: this.dim[0],
             idtype: m.rowtype,
             value: this.valuetype,
             description: m.desc.description,
             creator: m.desc.creator,
-            ts: m.desc.ts
+            ts: m.desc.ts,
         };
         this.root = this;
     }
@@ -31,12 +31,14 @@ export class ProjectedVector extends AVector {
             root: this.m.persist(),
             f: this.f.toString(),
             valuetype: this.valuetype === this.m.valuetype ? undefined : this.valuetype,
-            idtype: this.idtype === this.m.rowtype ? undefined : this.idtype.name
+            idtype: this.idtype === this.m.rowtype ? undefined : this.idtype.name,
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;

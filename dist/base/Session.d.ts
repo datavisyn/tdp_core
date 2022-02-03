@@ -32,3 +32,4 @@ export declare class Session {
      */
     retrieve<T>(key: string, defaultValue?: T): T;
 }
+//# sourceMappingURL=Session.d.ts.map

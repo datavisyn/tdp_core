@@ -1,8 +1,8 @@
 import { toCategories } from 'lineupjs';
+import { extent, min, max } from 'd3';
 import { LineupUtils } from '../utils';
 import { EP_TDP_CORE_SCORE_COLUMN_PATCHER } from '../../base/extensions';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
-import { extent, min, max } from 'd3';
 import { PluginRegistry } from '../../app';
 function extentByType(type, rows, acc) {
     switch (type) {
@@ -21,7 +21,7 @@ export class LazyColumn {
         // generate a unique column
         colDesc.column = colDesc.scoreID || `dC${colDesc.label.replace(/\s+/, '')}`;
         provider.pushDesc(colDesc);
-        //mark as lazy loaded
+        // mark as lazy loaded
         colDesc.lazyLoaded = true;
         const col = provider.create(colDesc);
         if (position == null) {
@@ -40,9 +40,7 @@ export class LazyColumn {
             col.groupByMe();
         }
         // error handling
-        data
-            .catch(ErrorAlertHandler.getInstance().errorAlert)
-            .catch(() => {
+        data.catch(ErrorAlertHandler.getInstance().errorAlert).catch(() => {
             ranking.remove(col);
         });
         // success
@@ -76,13 +74,14 @@ export class LazyColumn {
             columns.forEach((column) => column.setLoaded(loaded));
         });
         // mark the description as loaded true
-        //mark as lazy loaded
+        // mark as lazy loaded
         colDesc.lazyLoaded = !loaded;
     }
     static async patchColumn(colDesc, rows, col) {
         if (colDesc.type === 'number' || colDesc.type === 'boxplot' || colDesc.type === 'numbers') {
             const ncol = col;
-            if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
+            if (!colDesc.constantDomain || colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min') {
+                // create a dynamic range if not fixed
                 const domain = extentByType(colDesc.type, rows, (d) => d.score);
                 if (colDesc.constantDomain === 'min') {
                     domain[0] = colDesc.domain[0];
@@ -90,7 +89,7 @@ export class LazyColumn {
                 else if (colDesc.constantDomain === 'max') {
                     domain[1] = colDesc.domain[1];
                 }
-                //HACK by pass the setMapping function and set it inplace
+                // HACK by pass the setMapping function and set it inplace
                 const ori = ncol.original;
                 const current = ncol.mapping;
                 colDesc.domain = domain;
@@ -117,7 +116,9 @@ export class LazyColumn {
             categories.forEach((c) => ccol.lookup.set(c.name, c));
         }
         // Await all patchers to complete before returning
-        await Promise.all(PluginRegistry.getInstance().listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER).map(async (pluginDesc) => {
+        await Promise.all(PluginRegistry.getInstance()
+            .listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER)
+            .map(async (pluginDesc) => {
             const plugin = await pluginDesc.load();
             plugin.factory(pluginDesc, colDesc, rows, col);
         }));

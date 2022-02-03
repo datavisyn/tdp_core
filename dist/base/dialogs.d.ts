@@ -15,3 +15,4 @@ export declare class DialogUtils {
      */
     static showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses?: string): void;
 }
+//# sourceMappingURL=dialogs.d.ts.map

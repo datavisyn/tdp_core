@@ -11,16 +11,17 @@ export class DetailUtils {
         const regex = /(?:^|\s)(?:#)([a-zA-Z\d]+)/gm;
         let match;
         const matches = [];
-        while (match = regex.exec(text)) {
+        // eslint-disable-next-line no-cond-assign
+        while ((match = regex.exec(text))) {
             matches.push(match[1]);
         }
         return matches;
     }
     static getLevelOfDetail() {
         const mode = ModeWrapper.getInstance().getMode();
-        //if (mode.exploration >= 0.8) {
+        // if (mode.exploration >= 0.8) {
         //  return LevelOfDetail.Small;
-        //}
+        // }
         if (mode.presentation > 0.3) {
             return LevelOfDetail.ExtraSmall;
         }

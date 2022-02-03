@@ -34,7 +34,7 @@ export class VectorTable extends ATable {
     }
     data(range = Range.all()) {
         return Promise.all(this.vectors.map((v) => v.data(range))).then((arr) => {
-            const r = arr[0].map((i) => ([i]));
+            const r = arr[0].map((i) => [i]);
             arr.slice(1).forEach((ai) => ai.forEach((d, i) => r[i].push(d)));
             return r;
         });
@@ -51,7 +51,7 @@ export class VectorTable extends ATable {
             const r = arr[0].map((i) => ({ [names[0]]: i }));
             arr.slice(1).forEach((ai, j) => {
                 const name = names[j + 1];
-                ai.forEach((d, i) => r[i][name] = d);
+                ai.forEach((d, i) => (r[i][name] = d));
             });
             return r;
         });

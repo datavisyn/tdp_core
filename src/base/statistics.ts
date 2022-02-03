@@ -1,4 +1,4 @@
-import {IIterable} from './IIterable';
+import { IIterable } from './IIterable';
 
 /**
  * simple number statistics similar to DoubleStatistics in Caleydo
@@ -27,16 +27,25 @@ export interface IAdvancedStatistics extends IStatistics {
 }
 
 export class Statistics implements IStatistics {
-  min: number = NaN;
-  max: number = NaN;
-  sum: number = 0;
-  mean: number = 0;
-  private _var: number = 0;
-  n: number = 0;
-  nans: number = 0;
-  moment2: number = NaN;
-  moment3: number = NaN;
-  moment4: number = NaN;
+  min = NaN;
+
+  max = NaN;
+
+  sum = 0;
+
+  mean = 0;
+
+  private _var = 0;
+
+  n = 0;
+
+  nans = 0;
+
+  moment2 = NaN;
+
+  moment3 = NaN;
+
+  moment4 = NaN;
 
   get var() {
     return this.n > 1 ? this._var / (this.n - 1) : 0;
@@ -58,7 +67,7 @@ export class Statistics implements IStatistics {
     if (this.n === 0) {
       return 0;
     }
-    return Math.sqrt(this.n) * this.moment3 / (Math.pow(this.moment2, 3. / 2.));
+    return (Math.sqrt(this.n) * this.moment3) / this.moment2 ** (3 / 2);
   }
 
   push(x: number) {
@@ -66,17 +75,17 @@ export class Statistics implements IStatistics {
       x = Number.NaN;
     }
 
-    if (isNaN(x)) {
+    if (Number.isNaN(x)) {
       this.nans++;
       return;
     }
 
     this.n++;
     this.sum += x;
-    if (x < this.min || isNaN(this.min)) {
+    if (x < this.min || Number.isNaN(this.min)) {
       this.min = x;
     }
-    if (this.max < x || isNaN(this.max)) {
+    if (this.max < x || Number.isNaN(this.max)) {
       this.max = x;
     }
     // http://www.johndcook.com/standard_deviation.html
@@ -90,7 +99,7 @@ export class Statistics implements IStatistics {
     } else {
       const meanMinus1 = this.mean;
       this.mean = meanMinus1 + (x - meanMinus1) / this.n;
-      this._var = this._var + (x - meanMinus1) * (x - this.mean);
+      this._var += (x - meanMinus1) * (x - this.mean);
 
       const delta = x - meanMinus1;
       const deltaN = delta / this.n;
@@ -109,18 +118,6 @@ export class Statistics implements IStatistics {
   }
 }
 
-export class AdvancedStatistics extends Statistics implements IAdvancedStatistics {
-  constructor(public readonly median: number, public readonly q1: number, public readonly q3: number) {
-    super();
-  }
-  static computeAdvancedStats(arr: number[]): IAdvancedStatistics {
-    arr = arr.slice().sort((a, b) => a - b);
-    const r = new AdvancedStatistics(quantile(arr, 0.5), quantile(arr, 0.25), quantile(arr, 0.75));
-    arr.forEach((a) => r.push(a));
-    return r;
-  }
-}
-
 function quantile(arr: number[], percentile: number) {
   const n = arr.length;
   if (n === 0) {
@@ -134,6 +131,20 @@ function quantile(arr: number[], percentile: number) {
   }
   const target = percentile * (n - 1);
   const targetIndex = Math.floor(target);
-  const a = arr[targetIndex], b = arr[targetIndex + 1];
+  const a = arr[targetIndex];
+  const b = arr[targetIndex + 1];
   return a + (b - a) * (target - targetIndex);
+}
+
+export class AdvancedStatistics extends Statistics implements IAdvancedStatistics {
+  constructor(public readonly median: number, public readonly q1: number, public readonly q3: number) {
+    super();
+  }
+
+  static computeAdvancedStats(arr: number[]): IAdvancedStatistics {
+    arr = arr.slice().sort((a, b) => a - b);
+    const r = new AdvancedStatistics(quantile(arr, 0.5), quantile(arr, 0.25), quantile(arr, 0.75));
+    arr.forEach((a) => r.push(a));
+    return r;
+  }
 }

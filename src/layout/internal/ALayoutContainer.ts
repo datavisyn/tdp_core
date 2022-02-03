@@ -1,18 +1,16 @@
-import {UniqueIdManager, DnDUtils} from '../../app';
-import {EventHandler} from '../../base';
-import {ILayoutDump, LayoutContainerEvents, ILayoutContainer, ILayoutParentContainer} from '../interfaces';
-import {IParentLayoutContainer} from './IParentLayoutContainer';
-
+import { UniqueIdManager, DnDUtils } from '../../app';
+import { EventHandler } from '../../base';
+import { ILayoutDump, LayoutContainerEvents, ILayoutContainer, ILayoutParentContainer } from '../interfaces';
+import { IParentLayoutContainer } from './IParentLayoutContainer';
 
 export interface ILayoutContainerOption {
   name: string;
   readonly fixed: boolean;
-  readonly autoWrap: boolean|string;
+  readonly autoWrap: boolean | string;
   /**
    * if true the user can't drag and drop view, but the separator can still be changed, i.e. it is an intermediate solution between a non-fixed and a fixed layout
    */
   fixedLayout: boolean;
-
 }
 export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends EventHandler {
   static readonly MIME_TYPE = 'text/x-phovea-layout-container';
@@ -20,17 +18,19 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
   parent: IParentLayoutContainer | null = null;
 
   protected readonly options: T;
+
   readonly header: HTMLElement;
 
   readonly id = UniqueIdManager.getInstance().uniqueId(ALayoutContainer.MIME_TYPE);
 
   private readonly keyDownListener = (evt: KeyboardEvent) => {
-    if (evt.keyCode === 27) { // Escape
+    if (evt.keyCode === 27) {
+      // Escape
       this.toggleMaximizedView();
     }
-  }
+  };
 
-  protected isMaximized: boolean = false;
+  protected isMaximized = false;
 
   constructor(document: Document, options: Partial<T>) {
     super();
@@ -46,24 +46,28 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
         <button type="button" class="btn-close float-end" ${this.options.fixed ? 'hidden' : ''} aria-label="Close"></button>
         <span>${this.name}</span>`;
 
-    //remove
+    // remove
     this.header.firstElementChild.addEventListener('click', (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
       this.destroy();
     });
 
-    //drag
+    // drag
     if (!this.options.fixedLayout) {
-      DnDUtils.getInstance().dragAble(this.header, () => {
-        return {
-          effectAllowed: 'move',
-          data: {
-            'text/plain': this.name,
-            [ALayoutContainer.MIME_TYPE]: String(this.id)
-          }
-        };
-      }, true);
+      DnDUtils.getInstance().dragAble(
+        this.header,
+        () => {
+          return {
+            effectAllowed: 'move',
+            data: {
+              'text/plain': this.name,
+              [ALayoutContainer.MIME_TYPE]: String(this.id),
+            },
+          };
+        },
+        true,
+      );
     }
   }
 
@@ -91,7 +95,7 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
       fixed: false,
       hideAbleHeader: false,
       autoWrap: false,
-      fixedLayout: false
+      fixedLayout: false,
     };
   }
 
@@ -107,7 +111,7 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
     if (this.options.name === name) {
       return;
     }
-    this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_NAME_CHANGED), this.options.name, this.options.name = name);
+    this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_NAME_CHANGED), this.options.name, (this.options.name = name));
     this.updateName(name);
   }
 
@@ -121,7 +125,7 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
       name: this.name,
       fixed: this.options.fixed,
       autoWrap: this.options.autoWrap,
-      fixedLayout: this.options.fixedLayout
+      fixedLayout: this.options.fixedLayout,
     };
   }
 
@@ -130,7 +134,7 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
       name: dump.name,
       fixed: dump.fixed,
       autoWrap: dump.autoWrap === true,
-      fixedLayout: dump.fixedLayout === true
+      fixedLayout: dump.fixedLayout === true,
     };
   }
 
@@ -139,23 +143,24 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
       name: node.dataset.name || 'View',
       fixed: node.dataset.fixed !== undefined,
       autoWrap: node.dataset.autoWrap !== undefined,
-      fixedLayout: node.dataset.fixedLayout !== undefined
+      fixedLayout: node.dataset.fixedLayout !== undefined,
     };
   }
 
-  find(id: number|((container: ILayoutContainer)=>boolean)) {
+  find(id: number | ((container: ILayoutContainer) => boolean)) {
     return (typeof id === 'number' && this.id === id) || (typeof id === 'function' && id(<any>this)) ? this : null;
   }
-  findAll(predicate: (container: ILayoutContainer)=>boolean): ILayoutContainer[] {
-    return predicate(<any>this) ? [<any>this]: [];
+
+  findAll(predicate: (container: ILayoutContainer) => boolean): ILayoutContainer[] {
+    return predicate(<any>this) ? [<any>this] : [];
   }
 
-  closest(id: number|((container: ILayoutParentContainer)=>boolean)) {
+  closest(id: number | ((container: ILayoutParentContainer) => boolean)) {
     if (!this.parent) {
       return null;
     }
-    const parent = this.parent;
-    if ((typeof id === 'number' && parent.id === id) || (typeof id === 'function' && id(parent) )) {
+    const { parent } = this;
+    if ((typeof id === 'number' && parent.id === id) || (typeof id === 'function' && id(parent))) {
       return parent;
     }
     return parent.closest(id);
@@ -194,7 +199,7 @@ export abstract class ALayoutContainer<T extends ILayoutContainerOption> extends
   }
 
   protected updateTitle() {
-    this.header.title = `Double click to ${this.isMaximized? 'restore default size' : 'expand view'}`;
+    this.header.title = `Double click to ${this.isMaximized ? 'restore default size' : 'expand view'}`;
   }
 
   static withChanged(event: string) {

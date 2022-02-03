@@ -11,7 +11,7 @@ export class ErrorAlertHandler {
                     }
                     if (xhr.status !== 400) {
                         body = `${body}<hr>
-          ${I18nextManager.getInstance().i18n.t('tdp:core.requestedUrl')}<br><a href="${xhr.url}" target="_blank" rel="noopener" class="alert-link">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
+          ${I18nextManager.getInstance().i18n.t('tdp:core.requestedUrl')}<br><a href="${xhr.url}" target="_blank" rel="noopener" class="alert-link">${xhr.url.length > 100 ? `${xhr.url.substring(0, 100)}...` : xhr.url}</a>`;
                     }
                     NotificationHandler.pushNotification('danger', I18nextManager.getInstance().i18n.t('tdp:core.errorNotification', { status: xhr.status, statusText: xhr.statusText, body }), NotificationHandler.DEFAULT_ERROR_AUTO_HIDE);
                     return Promise.reject(error);
@@ -32,7 +32,7 @@ export class ErrorAlertHandler {
             const xhr = error instanceof Response ? error : error.response;
             return `<strong>${error.message.replace('\n', '<br>')}</strong><br><small>${xhr.status} (${xhr.statusText})</small>`;
         }
-        else if (error instanceof Error) {
+        if (error instanceof Error) {
             return `<strong>${error.name}</strong>: ${error.message.replace('\n', '<br>')}`;
         }
         return `<strong>Unknown Error</strong>: ${error.toString().replace('\n', '<br>')}`;

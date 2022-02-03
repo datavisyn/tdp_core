@@ -10,3 +10,4 @@ export interface IPersistable {
      */
     restore(persisted: any): IPersistable | Promise<IPersistable>;
 }
+//# sourceMappingURL=IPersistable.d.ts.map

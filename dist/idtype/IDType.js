@@ -33,11 +33,11 @@ export class IDType extends EventHandler {
     }
     persist() {
         const s = {};
-        this.sel.forEach((v, k) => s[k] = v.toString());
+        this.sel.forEach((v, k) => (s[k] = v.toString()));
         return {
             sel: s,
             name: this.name,
-            names: this.names
+            names: this.names,
         };
     }
     restore(persisted) {
@@ -66,8 +66,11 @@ export class IDType extends EventHandler {
         return v;
     }
     select() {
+        // eslint-disable-next-line prefer-rest-params
         const a = Array.from(arguments);
-        const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType, range = ParseRangeUtils.parseRangeLike(a[0]), op = SelectionUtils.asSelectOperation(a[1]);
+        const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+        const range = ParseRangeUtils.parseRangeLike(a[0]);
+        const op = SelectionUtils.asSelectOperation(a[1]);
         return this.selectImpl(range, op, type);
     }
     selectImpl(range, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
@@ -83,13 +86,15 @@ export class IDType extends EventHandler {
             case SelectOperation.REMOVE:
                 newValue = b.without(range);
                 break;
+            default:
+                break;
         }
         if (b.eq(newValue)) {
             return b;
         }
         this.sel.set(type, newValue);
         const added = op !== SelectOperation.REMOVE ? range : Range.none();
-        const removed = (op === SelectOperation.ADD ? Range.none() : (op === SelectOperation.SET ? b : range));
+        const removed = op === SelectOperation.ADD ? Range.none() : op === SelectOperation.SET ? b : range;
         this.fire(IDType.EVENT_SELECT, type, newValue, added, removed, b);
         this.fire(`${IDType.EVENT_SELECT}-${type}`, newValue, added, removed, b);
         return b;
@@ -135,7 +140,7 @@ export class IDType extends EventHandler {
     async unmap(ids) {
         const r = ParseRangeUtils.parseRangeLike(ids);
         const toResolve = [];
-        r.dim(0).forEach((name) => !(this.id2nameCache.has(name)) ? toResolve.push(name) : null);
+        r.dim(0).forEach((name) => (!this.id2nameCache.has(name) ? toResolve.push(name) : null));
         if (toResolve.length === 0) {
             const result = [];
             r.dim(0).forEach((name) => result.push(this.id2nameCache.get(name)));
@@ -143,9 +148,9 @@ export class IDType extends EventHandler {
         }
         const result = await IDType.chooseRequestMethod(`/idtype/${this.id}/unmap`, { ids: Range.list(toResolve).toString() });
         toResolve.forEach((id, i) => {
-            const r = String(result[i]);
-            this.id2nameCache.set(id, r);
-            this.name2idCache.set(r, id);
+            const res = String(result[i]);
+            this.id2nameCache.set(id, res);
+            this.name2idCache.set(res, id);
         });
         const out = [];
         r.dim(0).forEach((name) => out.push(this.id2nameCache.get(name)));

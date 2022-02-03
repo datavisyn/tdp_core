@@ -1,8 +1,8 @@
-/******************************************************************************
+/** ****************************************************************************
  * Caleydo - Visualization for Molecular Biology - http://caleydo.org
  * Copyright (c) The Caleydo Team. All rights reserved.
  * Licensed under the new BSD license, available at http://caleydo.org/license
- *****************************************************************************/
+ **************************************************************************** */
 import { BaseUtils } from '../base/BaseUtils';
 import { DataUtils } from '../data';
 import { Rect } from '../geom';
@@ -33,37 +33,35 @@ export class MultiFormGrid extends AVisInstance {
         this.options = BaseUtils.mixin({
             initialVis: 0,
             singleRowOptimization: true,
-            filter: () => true
+            filter: () => true,
         }, options);
         this.node = FormUtils.createNode(parent, 'div', 'multiformgrid');
         DataUtils.assignData(parent, data);
         VisUtils.assignVis(this.node, this);
-        //find all suitable plugins
+        // find all suitable plugins
         this.visses = VisUtils.listVisPlugins(data).filter(this.options.filter);
-        //compute the dimensions and build the grid
-        const dims = this.dims = range.dims.map((dim) => {
+        // compute the dimensions and build the grid
+        const dims = (this.dims = range.dims.map((dim) => {
             if (dim instanceof CompositeRange1D) {
                 return dim.groups;
             }
-            else if (dim instanceof Range1DGroup) {
+            if (dim instanceof Range1DGroup) {
                 return [dim];
             }
-            else {
-                return [Range1DGroup.asUngrouped(dim)];
-            }
-        });
-        const grid = this.grid = [];
-        function product(level, range, pos) {
+            return [Range1DGroup.asUngrouped(dim)];
+        }));
+        const grid = (this.grid = []);
+        function product(level, ran, pos) {
             if (level === dims.length) {
-                const r = range.length === 0 ? Range.all() : Range.list(range.slice()); //work on a copy for safety reason
+                const r = ran.length === 0 ? Range.all() : Range.list(ran.slice()); // work on a copy for safety reason
                 grid.push(new GridElem(r, pos.slice(), viewFactory(data, r, pos.slice())));
             }
             else {
                 dims[level].forEach((group, i) => {
-                    range.push(group);
+                    ran.push(group);
                     pos.push(i);
-                    product(level + 1, range, pos);
-                    range.pop();
+                    product(level + 1, ran, pos);
+                    ran.pop();
                     pos.pop();
                 });
             }
@@ -92,7 +90,7 @@ export class MultiFormGrid extends AVisInstance {
     getBounds(...indices) {
         const elem = this.toElem(indices);
         const absloc = elem.location;
-        const size = elem.size;
+        const { size } = elem;
         const parentLoc = BaseUtils.offset(this.content);
         return Rect.rect(absloc.x - parentLoc.left, absloc.y - parentLoc.top, size[0], size[1]);
     }
@@ -104,12 +102,12 @@ export class MultiFormGrid extends AVisInstance {
         return this._metaData;
     }
     build() {
-        //create select option field
-        //create content
+        // create select option field
+        // create content
         this.content = this.node;
         const wrap = this.options.wrap || ((d) => d);
-        //create groups for all grid elems
-        //TODO how to layout as a grid
+        // create groups for all grid elems
+        // TODO how to layout as a grid
         if (this.dims.length === 1) {
             if (this.options.singleRowOptimization) {
                 this.grid.forEach((elem) => elem.setContent(wrap(FormUtils.createNode(this.node, 'div', 'content gridrow'), elem.data, elem.range, elem.pos)));
@@ -135,7 +133,7 @@ export class MultiFormGrid extends AVisInstance {
                 }
             }
         }
-        //switch to first
+        // switch to first
         this.switchTo(this.options.initialVis);
     }
     destroy() {
@@ -149,30 +147,31 @@ export class MultiFormGrid extends AVisInstance {
                 this.grid.forEach((g) => g.transform(scale, rotate));
                 this.fire('transform', {
                     scale,
-                    rotate
+                    rotate,
                 }, bak);
             }
             return bak;
         }
         return {
             scale: [1, 1],
-            rotate: 0
+            rotate: 0,
         };
     }
     persist() {
         return {
             id: this.actDesc ? this.actDesc.id : null,
-            contents: this.grid.map((elem) => elem.persist())
+            contents: this.grid.map((elem) => elem.persist()),
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         if (persisted.id) {
             const selected = this.visses.find((e) => e.id === persisted.id);
             if (selected) {
                 return this.switchTo(selected).then((vis) => {
-                    //FIXME
-                    if (vis && persisted.content && typeof (vis.restore) === 'function') {
+                    // FIXME
+                    if (vis && persisted.content && typeof vis.restore === 'function') {
                         return Promise.resolve(vis.restore(persisted.content)).then(() => that);
                     }
                     return Promise.resolve(that);
@@ -190,18 +189,19 @@ export class MultiFormGrid extends AVisInstance {
         function relativePos(pos) {
             return {
                 x: pos.x - parentLoc.left,
-                y: pos.y - parentLoc.top
+                y: pos.y - parentLoc.top,
             };
         }
         const filterTo = () => {
             const inElems = [];
             for (const g of this.grid) {
                 const matched = g.subrange(range);
-                if (!matched.isNone) { //direct group hit
+                if (!matched.isNone) {
+                    // direct group hit
                     inElems.push({
                         g,
                         pos: relativePos(g.location),
-                        r: matched
+                        r: matched,
                     });
                 }
             }
@@ -214,11 +214,14 @@ export class MultiFormGrid extends AVisInstance {
             });
         }
         return Promise.all(inElems.map((elem) => elem.g.actVis.locate(elem.r))).then((locations) => {
-            //shift the locations according to grid position
-            locations = locations.map((loc, i) => loc ? loc.shift(inElems[i].pos) : loc).filter((loc) => loc != null);
-            //merge into a single one
+            // shift the locations according to grid position
+            locations = locations.map((loc, i) => (loc ? loc.shift(inElems[i].pos) : loc)).filter((loc) => loc != null);
+            // merge into a single one
             const base = locations[0].aabb();
-            let x = base.x, y = base.y, x2 = base.x2, y2 = base.y2;
+            let { x } = base;
+            let { y } = base;
+            let { x2 } = base;
+            let { y2 } = base;
             locations.forEach((loc) => {
                 const aab = loc.aabb();
                 x = Math.min(x, aab.x);
@@ -238,40 +241,32 @@ export class MultiFormGrid extends AVisInstance {
         const p = this.actVisPromise || Promise.resolve(null);
         return p.then((visses) => {
             if (!visses) {
-                return Promise.resolve((range.length === 1 ? undefined : new Array(range.length)));
+                return Promise.resolve(range.length === 1 ? undefined : new Array(range.length));
             }
             if (visses.length === 1) {
                 return visses[0].locate.apply(visses[0], range);
             }
-            else {
-                //multiple groups
-                if (range.length === 1) {
-                    return this.locateGroup(range[0]);
-                }
-                else {
-                    return Promise.all(range.map((arg) => this.locateGroup(arg)));
-                }
+            // multiple groups
+            if (range.length === 1) {
+                return this.locateGroup(range[0]);
             }
+            return Promise.all(range.map((arg) => this.locateGroup(arg)));
         });
     }
     locateById(...range) {
         const p = this.actVisPromise || Promise.resolve(null);
         return p.then((visses) => {
             if (!visses) {
-                return Promise.resolve((range.length === 1 ? undefined : new Array(range.length)));
+                return Promise.resolve(range.length === 1 ? undefined : new Array(range.length));
             }
             if (visses.length === 1) {
                 return visses[0].locateById.apply(visses[0], range);
             }
-            else {
-                //multiple groups
-                if (range.length === 1) {
-                    return this.locateGroupById(range[0]);
-                }
-                else {
-                    return Promise.all(range.map((arg) => this.locateGroupById(arg)));
-                }
+            // multiple groups
+            if (range.length === 1) {
+                return this.locateGroupById(range[0]);
             }
+            return Promise.all(range.map((arg) => this.locateGroupById(arg)));
         });
     }
     /**
@@ -287,22 +282,21 @@ export class MultiFormGrid extends AVisInstance {
     gridSize(raw = false) {
         const sizes = this.grid.map(raw ? (elem) => elem.rawSize : (elem) => elem.size);
         if (this.dims.length === 1) {
-            //vertically groups only
+            // vertically groups only
             return {
                 cols: [max(sizes, (s) => s[0])],
                 rows: sizes.map((s) => s[1]),
-                grid: sizes.map((s) => [s])
+                grid: sizes.map((s) => [s]),
             };
         }
-        else { //if (this.dims.length === 2)
-            const cols = this.dims[1].length;
-            const grid = this.dims[0].map((row, i) => sizes.slice(i * cols, (i + 1) * cols));
-            return {
-                cols: this.dims[1].map((d, i) => max(grid, (row) => row[i][0])),
-                rows: grid.map((row) => max(row, (s) => s[1])),
-                grid
-            };
-        }
+        // if (this.dims.length === 2)
+        const cols = this.dims[1].length;
+        const grid = this.dims[0].map((row, i) => sizes.slice(i * cols, (i + 1) * cols));
+        return {
+            cols: this.dims[1].map((d, i) => max(grid, (row) => row[i][0])),
+            rows: grid.map((row) => max(row, (s) => s[1])),
+            grid,
+        };
     }
     get size() {
         const gridSize = this.gridSize();
@@ -319,20 +313,21 @@ export class MultiFormGrid extends AVisInstance {
     switchTo(param) {
         const vis = FormUtils.selectVis(param, this.visses);
         if (vis === this.actDesc) {
-            return this.actVisPromise; //already selected
+            return this.actVisPromise; // already selected
         }
-        //gracefully destroy
+        // gracefully destroy
         this.grid.forEach((elem) => elem.switchDestroy());
-        //switch and trigger event
+        // switch and trigger event
         const bak = this.actDesc;
         this.actDesc = vis;
         this.markReady(false);
         this.fire('change', vis, bak);
         this.actVisPromise = null;
         if (vis) {
-            //load the plugin and create the instance
-            return this.actVisPromise = vis.load().then((plugin) => {
-                if (this.actDesc !== vis) { //changed in the meanwhile
+            // load the plugin and create the instance
+            return (this.actVisPromise = vis.load().then((plugin) => {
+                if (this.actDesc !== vis) {
+                    // changed in the meanwhile
                     return null;
                 }
                 const options = BaseUtils.mixin({}, this.options.all, this.options[vis.id] || {});
@@ -341,18 +336,17 @@ export class MultiFormGrid extends AVisInstance {
                 r.forEach((ri) => {
                     ri.on('ready', () => {
                         c--;
-                        if (c === 0) { //all built
+                        if (c === 0) {
+                            // all built
                             this.markReady();
                         }
                     });
                 });
                 this.fire('changed', vis, bak);
                 return r;
-            });
+            }));
         }
-        else {
-            return Promise.resolve([]);
-        }
+        return Promise.resolve([]);
     }
     addIconVisChooser(toolbar) {
         return VisChooser.addIconVisChooser(toolbar, this);

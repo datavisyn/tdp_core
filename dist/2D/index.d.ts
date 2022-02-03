@@ -7,3 +7,4 @@ export * from './IPath';
 export * from './PathSegment';
 export * from './Path';
 export * from './Intersection';
+//# sourceMappingURL=index.d.ts.map

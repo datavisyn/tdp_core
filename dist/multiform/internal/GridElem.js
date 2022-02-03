@@ -23,7 +23,7 @@ export class GridElem {
         return this.actVis != null;
     }
     destroy() {
-        if (this.actVis && typeof (this.actVis.destroy) === 'function') {
+        if (this.actVis && typeof this.actVis.destroy === 'function') {
             this.actVis.destroy();
         }
     }
@@ -36,12 +36,12 @@ export class GridElem {
     persist() {
         return {
             range: this.range.toString(),
-            content: this.actVis && typeof (this.actVis.persist) === 'function' ? this.actVis.persist() : null
+            content: this.actVis && typeof this.actVis.persist === 'function' ? this.actVis.persist() : null,
         };
     }
     restore(persisted) {
-        //FIXME
-        /*if (persisted.id) {
+        // FIXME
+        /* if (persisted.id) {
          var selected = search(this.visses, (e) => e.id === persisted.id);
          if (selected) {
          this.switchTo(selected).then((vis) => {
@@ -50,13 +50,13 @@ export class GridElem {
          }
          });
          }
-         }*/
+         } */
         return null;
     }
     switchDestroy() {
-        //remove content dom side
+        // remove content dom side
         FormUtils.clearNode(this.content);
-        if (this.actVis && typeof (this.actVis.destroy) === 'function') {
+        if (this.actVis && typeof this.actVis.destroy === 'function') {
             this.actVis.destroy();
         }
         this.actVis = null;
@@ -70,7 +70,7 @@ export class GridElem {
         const o = BaseUtils.offset(this.content);
         return {
             x: o.left,
-            y: o.top
+            y: o.top,
         };
     }
     transform(scale, rotate) {
@@ -78,13 +78,11 @@ export class GridElem {
             if (arguments.length > 0) {
                 return this.actVis.transform(scale, rotate);
             }
-            else {
-                return this.actVis.transform();
-            }
+            return this.actVis.transform();
         }
         return {
             scale: [1, 1],
-            rotate: 0
+            rotate: 0,
         };
     }
 }

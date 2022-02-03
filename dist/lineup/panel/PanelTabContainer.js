@@ -94,9 +94,10 @@ export class PanelTabContainer {
      */
     addTab(tab, onClick) {
         this.tabs = [...this.tabs, tab];
-        const listener = (onClick) ? onClick : () => {
-            this.showTab(tab);
-        };
+        const listener = onClick ||
+            (() => {
+                this.showTab(tab);
+            });
         this.tabHeader.addNavButton(tab.getNavButton(listener));
         this.tabContentNode.appendChild(tab.node);
     }

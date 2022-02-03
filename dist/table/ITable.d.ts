@@ -127,3 +127,4 @@ export interface ITable extends IDataType {
      */
     objects(range?: RangeLike): Promise<any[]>;
 }
+//# sourceMappingURL=ITable.d.ts.map

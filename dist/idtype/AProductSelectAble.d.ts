@@ -31,3 +31,4 @@ export declare abstract class AProductSelectAble extends ASelectAble {
     clear(dim: number): Promise<Range[]>;
     clear(dim: number, type: string): Promise<Range[]>;
 }
+//# sourceMappingURL=AProductSelectAble.d.ts.map

@@ -28,3 +28,4 @@ export declare class PanelHeader {
      */
     addButton(button: IPanelButton, position: EPanelHeaderToolbar): void;
 }
+//# sourceMappingURL=PanelHeader.d.ts.map

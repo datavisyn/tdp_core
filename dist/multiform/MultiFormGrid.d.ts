@@ -70,3 +70,4 @@ export declare class MultiFormGrid extends AVisInstance implements IVisInstance,
     addSelectVisChooser(toolbar: HTMLElement): void;
     static create(data: IDataType, range: Range, parent: HTMLElement, viewFactory: IViewFactory, options?: IMultiFormGridOptions): MultiFormGrid;
 }
+//# sourceMappingURL=MultiFormGrid.d.ts.map

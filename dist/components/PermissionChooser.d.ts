@@ -9,3 +9,4 @@ export declare function PermissionChooser({ permission, buddies, group, setPermi
     setGroup: (group: string) => void;
     extra?: React.ReactNode;
 }): JSX.Element;
+//# sourceMappingURL=PermissionChooser.d.ts.map

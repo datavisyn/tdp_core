@@ -11,19 +11,18 @@ export class IdPool {
      * @return {*}
      */
     checkOut() {
-        if (this.free.length === 0) { //no more cached
+        if (this.free.length === 0) {
+            // no more cached
             return this.counter++;
         }
-        else {
-            return this.free.shift();
-        }
+        return this.free.shift();
     }
     /**
      * returns an id again
      * @param id
      */
     checkIn(id) {
-        //returned the last one, can decrease the counter
+        // returned the last one, can decrease the counter
         if (id === this.counter - 1) {
             this.counter--;
         }
@@ -37,7 +36,7 @@ export class IdPool {
      * @return {boolean}
      */
     isCheckedOut(id) {
-        //smaller than counter and not a free one
+        // smaller than counter and not a free one
         return id < this.counter && this.free.indexOf(id) < 0;
     }
     /**

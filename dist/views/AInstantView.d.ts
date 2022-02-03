@@ -6,3 +6,4 @@ export declare class AInstantView implements IInstantView {
     protected initImpl(): void;
     destroy(): void;
 }
+//# sourceMappingURL=AInstantView.d.ts.map

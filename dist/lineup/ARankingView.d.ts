@@ -1,8 +1,6 @@
 import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
 import { AView } from '../views/AView';
-import { IViewContext, ISelection } from '../base/interfaces';
-import { EViewMode } from '../base/interfaces';
-import { IScore, IAdditionalColumnDesc } from '../base/interfaces';
+import { IViewContext, ISelection, EViewMode, IScore, IAdditionalColumnDesc } from '../base/interfaces';
 import { IInitialRankingOptions } from './desc';
 import { IRankingWrapper } from './IRankingWrapper';
 import { IRow, IServerColumn, IServerColumnDesc } from '../base/rest';
@@ -149,3 +147,4 @@ export declare abstract class ARankingView extends AView {
      */
     protected clear(): Promise<void>;
 }
+//# sourceMappingURL=ARankingView.d.ts.map

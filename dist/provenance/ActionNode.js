@@ -16,7 +16,7 @@ export class ActionUtils {
             id,
             f,
             inputs,
-            parameter
+            parameter,
         };
     }
 }
@@ -77,13 +77,15 @@ export class ActionNode extends GraphNode {
         return this.outgoing.filter(GraphEdge.isGraphType('inverses'))[0] != null;
     }
     equals(that) {
+        // TODO: check if the last comparison makes sense
+        // eslint-disable-next-line no-self-compare
         if (!(this.meta.category === that.meta.category && that.meta.operation === that.meta.operation)) {
             return false;
         }
         if (this.f_id !== that.f_id) {
             return false;
         }
-        //TODO check parameters if they are the same
+        // TODO check parameters if they are the same
         return true;
     }
     get uses() {
@@ -93,10 +95,16 @@ export class ActionNode extends GraphNode {
         return this.outgoing.filter(GraphEdge.isGraphType('creates')).map((e) => e.target);
     }
     get removes() {
-        return this.outgoing.filter(GraphEdge.isGraphType('removes')).sort(AttributeContainer.byIndex).map((e) => e.target);
+        return this.outgoing
+            .filter(GraphEdge.isGraphType('removes'))
+            .sort(AttributeContainer.byIndex)
+            .map((e) => e.target);
     }
     get requires() {
-        return this.outgoing.filter(GraphEdge.isGraphType('requires')).sort(AttributeContainer.byIndex).map((e) => e.target);
+        return this.outgoing
+            .filter(GraphEdge.isGraphType('requires'))
+            .sort(AttributeContainer.byIndex)
+            .map((e) => e.target);
     }
 }
 //# sourceMappingURL=ActionNode.js.map

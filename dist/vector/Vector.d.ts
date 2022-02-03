@@ -48,3 +48,4 @@ export declare class Vector<T, D extends IValueTypeDesc> extends AVector<T, D> {
     static wrap<T, D extends IValueTypeDesc>(desc: IVectorDataDescription<D>, rows: string[], rowIds: number[], data: T[]): Vector<unknown, D>;
     static asVector<T>(rows: string[], data: T[], options?: IAsVectorOptions): Vector<unknown, IValueTypeDesc>;
 }
+//# sourceMappingURL=Vector.d.ts.map

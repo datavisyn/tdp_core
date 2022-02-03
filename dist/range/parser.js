@@ -11,14 +11,16 @@ export class ParseRangeUtils {
      */
     static parseRange(code) {
         const dims = [];
-        let act = 0, c, t;
+        let act = 0;
+        let c;
+        let t;
         code = code.trim();
         while (act < code.length) {
             c = code.charAt(act);
             switch (c) {
                 case '"':
                     t = ParseRangeUtils.parseNamedRange1D(code, act);
-                    act = t.act + 1; //skip ,
+                    act = t.act + 1; // skip ,
                     dims.push(t.dim);
                     break;
                 case ',':
@@ -31,19 +33,20 @@ export class ParseRangeUtils {
                     }
                     else {
                         t = ParseRangeUtils.parseRange1D(code, act);
-                        act = t.act + 1; //skip ,
+                        act = t.act + 1; // skip ,
                         dims.push(t.dim);
                     }
                     break;
             }
         }
-        if (code.charAt(code.length - 1) === ',') { //last is an empty one
+        if (code.charAt(code.length - 1) === ',') {
+            // last is an empty one
             dims.push(Range1D.all());
         }
         return new Range(dims);
     }
     static parseNamedRange1D(code, act) {
-        act += 1; //skip "
+        act += 1; // skip "
         let end = code.indexOf('"', act);
         const name = code.slice(act, end);
         let r;
@@ -54,9 +57,10 @@ export class ParseRangeUtils {
                 r = ParseRangeUtils.parseRange1D(code, end + 1);
                 return {
                     dim: new Range1DGroup(name, code.slice(act + 1, end), r.dim),
-                    act: r.act
+                    act: r.act,
                 };
             case '{':
+                // eslint-disable-next-line no-case-declarations
                 const groups = [];
                 while (code.charAt(act) !== '}') {
                     r = ParseRangeUtils.parseNamedRange1D(code, act + 1);
@@ -65,17 +69,19 @@ export class ParseRangeUtils {
                 }
                 return {
                     dim: new CompositeRange1D(name, groups),
-                    act: r.act + 1
+                    act: r.act + 1,
                 };
-            default: //ERROR
+            default:
+                // ERROR
                 return {
                     dim: Range1D.all(),
-                    act
+                    act,
                 };
         }
     }
     static parseRange1D(code, act) {
-        let next, r;
+        let next;
+        let r;
         switch (code.charAt(act)) {
             case ',':
             case '}':
@@ -85,13 +91,18 @@ export class ParseRangeUtils {
             case '(':
                 r = new Range1D();
                 next = code.indexOf(')', act);
-                if (next > act + 1) { //not ()
-                    r.push.apply(r, code.slice(act + 1, next).split(',').map(RangeElem.parse));
+                if (next > act + 1) {
+                    // not ()
+                    r.push.apply(r, code
+                        .slice(act + 1, next)
+                        .split(',')
+                        .map(RangeElem.parse));
                 }
-                next += 1; //skip )
+                next += 1; // skip )
                 break;
             default:
                 next = code.indexOf('}', act);
+                // eslint-disable-next-line no-case-declarations
                 const n2 = code.indexOf(',', act);
                 if (next >= 0 && n2 >= 0) {
                     next = Math.min(next, n2);
@@ -107,7 +118,7 @@ export class ParseRangeUtils {
         }
         return {
             act: next,
-            dim: r
+            dim: r,
         };
     }
     /**
@@ -134,7 +145,8 @@ export class ParseRangeUtils {
             }
             return Range.list(arange);
         }
-        //join given array as string combined with ,
+        // join given array as string combined with ,
+        // eslint-disable-next-line prefer-rest-params
         return ParseRangeUtils.parseRange(Array.from(arguments).map(String).join(','));
     }
 }

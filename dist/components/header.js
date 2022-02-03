@@ -1,4 +1,4 @@
-import { BaseUtils } from '../base';
+import { BaseUtils } from '../base/BaseUtils';
 import { I18nextManager } from '../i18n';
 // TODO: Why?
 import '../webpack/_bootstrap';
@@ -8,7 +8,7 @@ import { AppMetaDataUtils } from './metaData';
  * header html template declared inline so we can use i18next
  */
 const getTemplate = () => {
-    return (`<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
+    return `<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#" data-header="appLink"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavBar" aria-controls="headerNavBar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,7 +110,7 @@ const getTemplate = () => {
 
 <div id="headerWaitingOverlay" class="phovea-busy" hidden>
 </div>
-`);
+`;
 };
 /**
  * Header link extends the header link with a  flag for disabling the logo
@@ -138,6 +138,33 @@ function createLi(name, action, href = '#') {
         li.querySelector('a').onclick = action;
     }
     return li;
+}
+function defaultBuildInfo(_title, content) {
+    BuildInfo.build()
+        .then((buildInfo) => {
+        content.innerHTML = buildInfo.toHTML();
+    })
+        .catch((error) => {
+        content.innerHTML = error.toString();
+    });
+}
+function defaultAboutInfo(title, content) {
+    content = content.querySelector('.metaData');
+    AppMetaDataUtils.getMetaData().then((metaData) => {
+        title.innerHTML = (metaData.displayName || metaData.name).replace('_', ' ');
+        let contentTpl = `<p class="description">${metaData.description}</p>`;
+        if (metaData.homepage) {
+            contentTpl += `<p class="homepage"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.homepage')}</strong>: <a href="${metaData.homepage}" target="_blank" rel="noopener">${metaData.homepage}</a></p>`;
+        }
+        contentTpl += `<p class="version"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.version')}</strong>: ${metaData.version}</p>`;
+        if (metaData.screenshot) {
+            contentTpl += `<img src="${metaData.screenshot}" class="mx-auto img-fluid img-thumbnail"/>`;
+        }
+        content.innerHTML = contentTpl;
+    });
+}
+function defaultOptionsInfo(_title, content) {
+    content.innerHTML = I18nextManager.getInstance().i18n.t('phovea:ui.noOptionsAvailable');
 }
 /**
  * The Caleydo App Header provides an app name and customizable menus
@@ -170,11 +197,11 @@ export class AppHeader {
             /**
              * @DEPRECATED use `appLink.name` instead
              */
-            //app: 'Caleydo Web',
+            // app: 'Caleydo Web',
             /**
              * @DEPRECATED use `appLink.addLogo` instead
              */
-            //addLogo: true,
+            // addLogo: true,
             /**
              * the app link with the app name
              */
@@ -202,7 +229,7 @@ export class AppHeader {
             /**
              * show help link
              */
-            showHelpLink: false
+            showHelpLink: false,
         };
         BaseUtils.mixin(this.options, options);
         this.addEUCookieDisclaimer();
@@ -275,7 +302,7 @@ export class AppHeader {
     }
     toggleDarkTheme(force) {
         const navbarElement = this.parent.querySelector('nav.navbar');
-        this.options.inverse = (force !== undefined) ? force : !this.options.inverse;
+        this.options.inverse = force !== undefined ? force : !this.options.inverse;
         if (this.options.inverse) {
             navbarElement.classList.remove('navbar-light', 'bg-light');
             navbarElement.classList.add('navbar-dark', 'bg-dark');
@@ -287,7 +314,7 @@ export class AppHeader {
     }
     togglePositionFixed(force) {
         const navbarElement = this.parent.querySelector('nav.navbar');
-        this.options.positionFixed = (force !== undefined) ? force : !this.options.positionFixed;
+        this.options.positionFixed = force !== undefined ? force : !this.options.positionFixed;
         navbarElement.classList.toggle('fixed-top', this.options.positionFixed);
     }
     wait() {
@@ -362,7 +389,8 @@ export class AppHeader {
     showAndFocusOn(selector, focusSelector) {
         import('jquery').then((jquery) => {
             const $selector = $(selector);
-            $selector.modal('show')
+            $selector
+                .modal('show')
                 // @ts-ignore
                 .on('shown.bs.modal', function () {
                 $($selector).trigger('focus');
@@ -372,30 +400,5 @@ export class AppHeader {
     static create(parent, options = {}) {
         return new AppHeader(parent, options);
     }
-}
-function defaultBuildInfo(_title, content) {
-    BuildInfo.build().then((buildInfo) => {
-        content.innerHTML = buildInfo.toHTML();
-    }).catch((error) => {
-        content.innerHTML = error.toString();
-    });
-}
-function defaultAboutInfo(title, content) {
-    content = content.querySelector('.metaData');
-    AppMetaDataUtils.getMetaData().then((metaData) => {
-        title.innerHTML = (metaData.displayName || metaData.name).replace('_', ' ');
-        let contentTpl = `<p class="description">${metaData.description}</p>`;
-        if (metaData.homepage) {
-            contentTpl += `<p class="homepage"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.homepage')}</strong>: <a href="${metaData.homepage}" target="_blank" rel="noopener">${metaData.homepage}</a></p>`;
-        }
-        contentTpl += `<p class="version"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.version')}</strong>: ${metaData.version}</p>`;
-        if (metaData.screenshot) {
-            contentTpl += `<img src="${metaData.screenshot}" class="mx-auto img-fluid img-thumbnail"/>`;
-        }
-        content.innerHTML = contentTpl;
-    });
-}
-function defaultOptionsInfo(_title, content) {
-    content.innerHTML = I18nextManager.getInstance().i18n.t('phovea:ui.noOptionsAvailable');
 }
 //# sourceMappingURL=header.js.map

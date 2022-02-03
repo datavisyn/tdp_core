@@ -7,7 +7,7 @@ import { ResolveNow } from '../base/promise';
 export class RemoteStorageProvenanceGraphManager {
     constructor(options = {}) {
         this.options = {
-            application: 'unknown'
+            application: 'unknown',
         };
         BaseUtils.mixin(this.options, options);
     }
@@ -31,16 +31,18 @@ export class RemoteStorageProvenanceGraphManager {
             type: 'graph',
             attrs: {
                 graphtype: 'provenance_graph',
-                of: this.options.application
+                of: this.options.application,
             },
             name: 'Persistent WS',
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
             ts: Date.now(),
             description: '',
             nodes: json.nodes,
-            edges: json.edges
+            edges: json.edges,
         }, desc);
-        return DataCache.getInstance().upload(pdesc).then((base) => {
+        return DataCache.getInstance()
+            .upload(pdesc)
+            .then((base) => {
             return base.impl(ProvenanceGraphUtils.provenanceGraphFactory());
         });
     }
@@ -54,7 +56,8 @@ export class RemoteStorageProvenanceGraphManager {
             return ResolveNow.resolveImmediately(graph.backend.migrate())
                 .then(({ nodes, edges }) => {
                 return backend.addAll(nodes, edges);
-            }).then(() => {
+            })
+                .then(() => {
                 graph.migrateBackend(backend);
                 return graph;
             });
@@ -73,14 +76,14 @@ export class RemoteStorageProvenanceGraphManager {
             type: 'graph',
             attrs: {
                 graphtype: 'provenance_graph',
-                of: this.options.application
+                of: this.options.application,
             },
             name: `Persistent WS`,
             fqname: `provenance_graphs/Persistent WS`,
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
             size: [0, 0],
             ts: Date.now(),
-            description: ''
+            description: '',
         }, desc);
         const impl = (await DataCache.getInstance().upload(pdesc)).impl(ProvenanceGraphUtils.provenanceGraphFactory());
         return impl.then((i) => new ProvenanceGraph(i.desc, i));

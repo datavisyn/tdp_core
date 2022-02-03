@@ -1,4 +1,3 @@
-
 export interface IPath {
-    parseData(d: string): void;
+  parseData(d: string): void;
 }

@@ -1,8 +1,8 @@
-import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import * as d3 from 'd3';
-import {AFormElement} from './AFormElement';
-import {IFormSelectOption} from './FormSelect';
-import {IPluginDesc} from '../../base';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
+import { AFormElement } from './AFormElement';
+import { IFormSelectOption } from './FormSelect';
+import { IPluginDesc } from '../../base';
 
 export interface IRadioElementDesc extends IFormElementDesc {
   type: FormElementType.RADIO;
@@ -12,7 +12,6 @@ export interface IRadioElementDesc extends IFormElementDesc {
 }
 
 export class FormRadio extends AFormElement<IRadioElementDesc> {
-
   /**
    * Constructor
    * @param form The form this element is a part of
@@ -20,7 +19,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, Object.assign({options: {buttons: []}}, elementDesc), pluginDesc);
+    super(form, { options: { buttons: [] }, ...elementDesc }, pluginDesc);
   }
 
   /**
@@ -34,12 +33,18 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
     const $label = this.appendLabel(this.$rootNode);
 
     $label.classed('me-2', true);
-    const options = this.elementDesc.options;
+    const { options } = this.elementDesc;
 
     const $buttons = this.$rootNode.selectAll('div.radio-inline').data(options.buttons);
-    $buttons.enter().append('div').classed('radio-inline form-check form-check-inline', true).html((d, i) => `<input class="form-check-input" type="radio"
+    $buttons
+      .enter()
+      .append('div')
+      .classed('radio-inline form-check form-check-inline', true)
+      .html(
+        (d, i) => `<input class="form-check-input" type="radio"
         name="${this.id}" id="${this.id}${i === 0 ? '' : i}" value="${d.value}">
-      <label class="form-label form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>`);
+      <label class="form-label form-check-label" for="${this.id}${i === 0 ? '' : i}"> ${d.name}</label>`,
+      );
     this.$inputNode = $buttons.select('input');
 
     this.$inputNode.on('change', (d) => {
@@ -57,7 +62,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
   init() {
     super.init();
 
-    const options = this.elementDesc.options;
+    const { options } = this.elementDesc;
     const defaultOption = options.buttons[0].data;
     const defaultValue = this.getStoredValue(defaultOption);
     this.value = defaultValue;

@@ -25,3 +25,4 @@ export declare class VectorLoaderUtils {
      */
     static viaDataLoader<T>(rows: string[], rowIds: number[], data: IValueType[]): () => Promise<IVectorLoaderResult<T>>;
 }
+//# sourceMappingURL=loader.d.ts.map

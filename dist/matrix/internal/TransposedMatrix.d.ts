@@ -38,3 +38,4 @@ export declare class TransposedMatrix<T, D extends IValueTypeDesc> extends AMatr
     statsAdvanced(range?: RangeLike): Promise<IAdvancedStatistics>;
     heatmapUrl(range?: RangeLike, options?: IHeatMapUrlOptions): string;
 }
+//# sourceMappingURL=TransposedMatrix.d.ts.map

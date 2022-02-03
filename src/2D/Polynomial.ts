@@ -1,5 +1,6 @@
 export class Polynomial {
   static TOLERANCE = 1e-6;
+
   static ACCURACY = 6;
 
   coefs: any[] = [];
@@ -85,7 +86,7 @@ export class Polynomial {
     for (i = this.coefs.length - 1; i >= 0; i--) {
       let value = this.coefs[i];
       if (value !== 0) {
-        const sign = (value < 0) ? ' - ' : ' + ';
+        const sign = value < 0 ? ' - ' : ' + ';
         value = Math.abs(value);
         if (i > 0 && value === 1) {
           value = 'x';
@@ -93,13 +94,13 @@ export class Polynomial {
           value += 'x';
         }
         if (i > 1) {
-          value += '^' + i;
+          value += `^${i}`;
         }
         signs.push(sign);
         coefs.push(value);
       }
     }
-    signs[0] = (signs[0] === ' + ') ? '' : '-';
+    signs[0] = signs[0] === ' + ' ? '' : '-';
     let result = '';
     for (i = 0; i < coefs.length; i++) {
       result += signs[i] + coefs[i];
@@ -219,7 +220,7 @@ export class Polynomial {
       const a = (3 * c1 - c2 * c2) / 3;
       const b = (2 * c2 * c2 * c2 - 9 * c1 * c2 + 27 * c0) / 27;
       const offset = c2 / 3;
-      const discrim = b * b / 4 + a * a * a / 27;
+      const discrim = (b * b) / 4 + (a * a * a) / 27;
       const halfB = b / 2;
       if (Math.abs(discrim) <= Polynomial.TOLERANCE) {
         disrim = 0;
@@ -230,15 +231,15 @@ export class Polynomial {
         let root;
         tmp = -halfB + e;
         if (tmp >= 0) {
-          root = Math.pow(tmp, 1 / 3);
+          root = tmp ** (1 / 3);
         } else {
-          root = -Math.pow(-tmp, 1 / 3);
+          root = -((-tmp) ** (1 / 3));
         }
         tmp = -halfB - e;
         if (tmp >= 0) {
-          root += Math.pow(tmp, 1 / 3);
+          root += tmp ** (1 / 3);
         } else {
-          root -= Math.pow(-tmp, 1 / 3);
+          root -= (-tmp) ** (1 / 3);
         }
         results.push(root - offset);
       } else if (discrim < 0) {
@@ -252,9 +253,9 @@ export class Polynomial {
         results.push(-distance * (cos - sqrt3 * sin) - offset);
       } else {
         if (halfB >= 0) {
-          tmp = -Math.pow(halfB, 1 / 3);
+          tmp = -(halfB ** (1 / 3));
         } else {
-          tmp = Math.pow(-halfB, 1 / 3);
+          tmp = (-halfB) ** (1 / 3);
         }
         results.push(2 * tmp - offset);
         results.push(-tmp - offset);
@@ -273,7 +274,7 @@ export class Polynomial {
       const c0 = this.coefs[0] / c4;
       const resolveRoots = new Polynomial(1, -c2, c3 * c1 - 4 * c0, -c3 * c3 * c0 + 4 * c2 * c0 - c1 * c1).getCubicRoots();
       const y = resolveRoots[0];
-      let discrim = c3 * c3 / 4 - c2 + y;
+      let discrim = (c3 * c3) / 4 - c2 + y;
       if (Math.abs(discrim) <= Polynomial.TOLERANCE) {
         discrim = 0;
       }
@@ -282,7 +283,7 @@ export class Polynomial {
       let d: number;
       if (discrim > 0) {
         const e = Math.sqrt(discrim);
-        const t1 = 3 * c3 * c3 / 4 - e * e - 2 * c2;
+        const t1 = (3 * c3 * c3) / 4 - e * e - 2 * c2;
         t2 = (4 * c3 * c2 - 8 * c1 - c3 * c3 * c3) / (4 * e);
         let plus = t1 + t2;
         let minus = t1 - t2;
@@ -310,7 +311,7 @@ export class Polynomial {
             t2 = 0;
           }
           t2 = 2 * Math.sqrt(t2);
-          const t1 = 3 * c3 * c3 / 4 - 2 * c2;
+          const t1 = (3 * c3 * c3) / 4 - 2 * c2;
           if (t1 + t2 >= Polynomial.TOLERANCE) {
             d = Math.sqrt(t1 + t2);
             results.push(-c3 / 4 + d / 2);

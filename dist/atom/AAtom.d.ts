@@ -19,3 +19,4 @@ export declare abstract class AAtom<T, D extends IValueTypeDesc> extends ASelect
     persist(): string;
     restore(persisted: any): this;
 }
+//# sourceMappingURL=AAtom.d.ts.map

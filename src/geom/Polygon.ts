@@ -1,8 +1,9 @@
-import {Vector2D} from '../2D/Vector2D';
-import {IIntersectionParam} from '../2D/IIntersectionParam';
-import {AShape} from './AShape';
-import {Circle} from './Circle';
-import {Rect} from './Rect';
+/* eslint-disable prefer-rest-params */
+import { Vector2D } from '../2D/Vector2D';
+import { IIntersectionParam } from '../2D/IIntersectionParam';
+import { AShape } from './AShape';
+import { Circle } from './Circle';
+import { Rect } from './Rect';
 
 export class Polygon extends AShape {
   constructor(private points: Vector2D[] = []) {
@@ -35,7 +36,10 @@ export class Polygon extends AShape {
   }
 
   aabb(): Rect {
-    let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
     this.points.forEach((p) => {
       if (p.x < minX) {
         minX = p.x;
@@ -59,7 +63,7 @@ export class Polygon extends AShape {
   }
 
   bs(): Circle {
-    const centroid = this.centroid;
+    const { centroid } = this;
     let radius2 = 0;
     this.points.forEach((p) => {
       const dx = p.x - centroid.x;
@@ -73,47 +77,47 @@ export class Polygon extends AShape {
   }
 
   transform(scale: number[], rotate: number) {
-    //TODO rotate
+    // TODO rotate
     return new Polygon(this.points.map((p) => new Vector2D(p.x * scale[0], p.y * scale[1])));
   }
 
   pointInPolygon(point: Vector2D) {
-    const length = this.points.length;
+    const { length } = this.points;
     let counter = 0;
     let p1 = this.points[0];
     for (let i = 1; i <= length; i++) {
       const p2 = this.points[i % length];
       if (point.y > Math.min(p1.y, p2.y) && point.y <= Math.max(p1.y, p2.y) && point.x <= Math.max(p1.x, p2.x) && p1.y !== p2.y) {
-        const xInter = (point.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
+        const xInter = ((point.y - p1.y) * (p2.x - p1.x)) / (p2.y - p1.y) + p1.x;
         if (p1.x === p2.x || point.x <= xInter) {
           counter++;
         }
       }
       p1 = p2;
     }
-    return (counter % 2 === 1);
+    return counter % 2 === 1;
   }
 
   get area() {
     let area = 0;
-    const length = this.points.length;
+    const { length } = this.points;
     for (let i = 0; i < length; i++) {
       const h1 = this.points[i];
       const h2 = this.points[(i + 1) % length];
-      area += (h1.x * h2.y - h2.x * h1.y);
+      area += h1.x * h2.y - h2.x * h1.y;
     }
     return area / 2;
   }
 
   get centroid() {
-    const length = this.points.length;
+    const { length } = this.points;
     const area6x = 6 * this.area;
     let xSum = 0;
     let ySum = 0;
     for (let i = 0; i < length; i++) {
       const p1 = this.points[i];
       const p2 = this.points[(i + 1) % length];
-      const cross = (p1.x * p2.y - p2.x * p1.y);
+      const cross = p1.x * p2.y - p2.x * p1.y;
       xSum += (p1.x + p2.x) * cross;
       ySum += (p1.y + p2.y) * cross;
     }
@@ -131,7 +135,7 @@ export class Polygon extends AShape {
   get isConcave() {
     let positive = 0;
     let negative = 0;
-    const length = this.points.length;
+    const { length } = this.points;
     for (let i = 0; i < length; i++) {
       const p0 = this.points[i];
       const p1 = this.points[(i + 1) % length];
@@ -145,7 +149,7 @@ export class Polygon extends AShape {
         positive++;
       }
     }
-    return (negative !== 0 && positive !== 0);
+    return negative !== 0 && positive !== 0;
   }
 
   get isConvex() {
@@ -155,9 +159,10 @@ export class Polygon extends AShape {
   asIntersectionParams(): IIntersectionParam {
     return {
       name: 'Polygon',
-      params: [this.points.slice()]
+      params: [this.points.slice()],
     };
   }
+
   static polygon(...points: Vector2D[]): Polygon;
   static polygon(points: Vector2D[]): Polygon;
   static polygon(): Polygon {
@@ -166,5 +171,4 @@ export class Polygon extends AShape {
     }
     return new Polygon(Array.from(arguments));
   }
-
 }

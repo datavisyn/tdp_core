@@ -1,8 +1,8 @@
-import {Vector2D} from '../2D/Vector2D';
-import {IIntersectionParam} from '../2D/IIntersectionParam';
-import {AShape} from './AShape';
-import {ICircle} from './ICircle';
-import {Rect} from './Rect';
+import { Vector2D } from '../2D/Vector2D';
+import { IIntersectionParam } from '../2D/IIntersectionParam';
+import { AShape } from './AShape';
+import { ICircle } from './ICircle';
+import { Rect } from './Rect';
 
 export class Circle extends AShape implements ICircle {
   constructor(public x = 0, public y = 0, public radius = 0) {
@@ -31,17 +31,17 @@ export class Circle extends AShape implements ICircle {
   }
 
   transform(scale: number[], rotate: number) {
-    return new Circle(this.x * scale[0], this.y * scale[1], this.radius * (scale[0] + scale[1]) / 2);
+    return new Circle(this.x * scale[0], this.y * scale[1], (this.radius * (scale[0] + scale[1])) / 2);
   }
 
   asIntersectionParams(): IIntersectionParam {
     return {
       name: 'Circle',
-      params: [this.xy, this.radius]
+      params: [this.xy, this.radius],
     };
   }
+
   static circle(x: number, y: number, radius: number): Circle {
     return new Circle(x, y, radius);
   }
 }
-

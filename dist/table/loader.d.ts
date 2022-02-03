@@ -43,3 +43,4 @@ export declare class TableLoaderUtils {
      */
     static adapterOne2Two(loader: ITableLoader): ITableLoader2;
 }
+//# sourceMappingURL=loader.d.ts.map

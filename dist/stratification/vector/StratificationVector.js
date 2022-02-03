@@ -1,5 +1,5 @@
 import { Range } from '../../range';
-import { ADataType, } from '../../data';
+import { ADataType } from '../../data';
 import { RangeHistogram } from '../../data/histogram';
 import { StratificationGroup } from '../StratificationGroup';
 /**
@@ -9,7 +9,7 @@ import { StratificationGroup } from '../StratificationGroup';
 export class StratificationVector extends ADataType {
     constructor(v, r) {
         super({
-            id: v.desc.id + '-s',
+            id: `${v.desc.id}-s`,
             name: v.desc.name,
             description: v.desc.description,
             creator: v.desc.creator,
@@ -19,7 +19,7 @@ export class StratificationVector extends ADataType {
             idtype: v.idtype.id,
             size: v.length,
             ngroups: r.groups.length,
-            groups: r.groups.map((ri) => ({ name: ri.name, color: ri.color, size: ri.length }))
+            groups: r.groups.map((ri) => ({ name: ri.name, color: ri.color, size: ri.length })),
         });
         this.v = v;
         this.r = r;
@@ -77,7 +77,7 @@ export class StratificationVector extends ADataType {
     persist() {
         return {
             root: this.v.persist(),
-            asstrat: true
+            asstrat: true,
         };
     }
 }

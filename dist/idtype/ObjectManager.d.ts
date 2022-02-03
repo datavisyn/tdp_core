@@ -23,3 +23,4 @@ export declare class ObjectManager<T extends IHasUniqueId> extends IDType {
     remove(item: T): T;
     selectedObjects(type?: string): any;
 }
+//# sourceMappingURL=ObjectManager.d.ts.map

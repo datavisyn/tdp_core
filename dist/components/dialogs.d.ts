@@ -70,3 +70,4 @@ export declare class PHOVEA_UI_FormDialog extends Dialog {
     static choose(items: string[], options?: IChooseOptions | string): Promise<string>;
     static areyousure(msg?: string, options?: IAreYouSureOptions | string): Promise<boolean>;
 }
+//# sourceMappingURL=dialogs.d.ts.map

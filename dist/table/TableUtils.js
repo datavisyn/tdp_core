@@ -6,7 +6,7 @@ export class TableUtils {
             type: 'table',
             idtype: '_rows',
             columns: [],
-            size: [0, 0]
+            size: [0, 0],
         });
     }
 }

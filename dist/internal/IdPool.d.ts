@@ -26,3 +26,4 @@ export declare class IdPool {
      */
     get size(): number;
 }
+//# sourceMappingURL=IdPool.d.ts.map

@@ -23,7 +23,7 @@ export class EmbeddedCLUE {
             this.callbacks[msg.ref] = {
                 resolve,
                 reject,
-                type
+                type,
             };
             this.iframe.contentWindow.postMessage(msg, '*');
         });
@@ -42,7 +42,7 @@ export class EmbeddedCLUE {
     }
     onCLUEMessage(type, data) {
         if (type === 'jumped_to_initial') {
-            //ready
+            // ready
             this.ready = true;
             this.readyCallback(this);
             return;
@@ -66,7 +66,7 @@ export class EmbeddedCLUE {
     static embedCLUE(parent, server, app, provenanceGraph) {
         const url = `${server}/${app}/#clue_graph=${provenanceGraph}&clue_contained=T&clue=P`;
         return new Promise((resolve) => {
-            return new EmbeddedCLUE(parent, url, resolve);
+            const clue = new EmbeddedCLUE(parent, url, resolve);
         });
     }
 }

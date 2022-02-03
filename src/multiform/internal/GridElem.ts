@@ -1,20 +1,20 @@
-import {BaseUtils} from '../../base/BaseUtils';
-import {IPersistable} from '../../base/IPersistable';
-import {IDataType, DataUtils} from '../../data';
-import {IVisInstance, VisUtils, ITransform} from '../../vis';
-import {Range} from '../../range';
-import {IPlugin} from '../../base/plugin';
-import {FormUtils} from './FormUtils';
+import { BaseUtils } from '../../base/BaseUtils';
+import { IPersistable } from '../../base/IPersistable';
+import { IDataType, DataUtils } from '../../data';
+import { IVisInstance, VisUtils, ITransform } from '../../vis';
+import { Range } from '../../range';
+import { IPlugin } from '../../base/plugin';
+import { FormUtils } from './FormUtils';
 
 /**
  * @internal
  */
 export class GridElem implements IPersistable {
   actVis: IVisInstance;
+
   content: HTMLElement;
 
-  constructor(public readonly range: Range, public readonly pos: number[], public readonly data: IDataType) {
-  }
+  constructor(public readonly range: Range, public readonly pos: number[], public readonly data: IDataType) {}
 
   setContent(c: HTMLElement) {
     this.content = c;
@@ -31,7 +31,7 @@ export class GridElem implements IPersistable {
   }
 
   destroy() {
-    if (this.actVis && typeof(this.actVis.destroy) === 'function') {
+    if (this.actVis && typeof this.actVis.destroy === 'function') {
       this.actVis.destroy();
     }
   }
@@ -47,13 +47,13 @@ export class GridElem implements IPersistable {
   persist() {
     return {
       range: this.range.toString(),
-      content: this.actVis && typeof(this.actVis.persist) === 'function' ? this.actVis.persist() : null
+      content: this.actVis && typeof this.actVis.persist === 'function' ? this.actVis.persist() : null,
     };
   }
 
   restore(persisted: any): any {
-    //FIXME
-    /*if (persisted.id) {
+    // FIXME
+    /* if (persisted.id) {
      var selected = search(this.visses, (e) => e.id === persisted.id);
      if (selected) {
      this.switchTo(selected).then((vis) => {
@@ -62,14 +62,14 @@ export class GridElem implements IPersistable {
      }
      });
      }
-     }*/
+     } */
     return null;
   }
 
   switchDestroy() {
-    //remove content dom side
+    // remove content dom side
     FormUtils.clearNode(this.content);
-    if (this.actVis && typeof(this.actVis.destroy) === 'function') {
+    if (this.actVis && typeof this.actVis.destroy === 'function') {
       this.actVis.destroy();
     }
     this.actVis = null;
@@ -85,23 +85,20 @@ export class GridElem implements IPersistable {
     const o = BaseUtils.offset(this.content);
     return {
       x: o.left,
-      y: o.top
+      y: o.top,
     };
   }
-
 
   transform(scale?: [number, number], rotate?: number): ITransform {
     if (this.actVis) {
       if (arguments.length > 0) {
         return this.actVis.transform(scale, rotate);
-      } else {
-        return this.actVis.transform();
       }
+      return this.actVis.transform();
     }
     return {
       scale: [1, 1],
-      rotate: 0
+      rotate: 0,
     };
   }
 }
-

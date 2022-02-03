@@ -27,7 +27,9 @@ export class UserSession extends Session {
         UserSession.getInstance().store('logged_in', true);
         UserSession.getInstance().store('username', user.name);
         UserSession.getInstance().store('user', user);
-        PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CORE_LOGIN).map((desc) => {
+        PluginRegistry.getInstance()
+            .listPlugins(EP_PHOVEA_CORE_LOGIN)
+            .forEach((desc) => {
             desc.load().then((plugin) => plugin.factory(user));
         });
         GlobalEventHandler.getInstance().fire(UserSession.GLOBAL_EVENT_USER_LOGGED_IN, user);
@@ -40,7 +42,9 @@ export class UserSession extends Session {
         const wasLoggedIn = UserSession.getInstance().isLoggedIn();
         UserSession.getInstance().reset();
         if (wasLoggedIn) {
-            PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CORE_LOGOUT).map((desc) => {
+            PluginRegistry.getInstance()
+                .listPlugins(EP_PHOVEA_CORE_LOGOUT)
+                .forEach((desc) => {
                 desc.load().then((plugin) => plugin.factory());
             });
             // Notify all listeners
@@ -48,7 +52,7 @@ export class UserSession extends Session {
             // Handle different logout options
             // TODO: Maybe extract them to extension points later?
             if ((_a = options.alb_security_store) === null || _a === void 0 ? void 0 : _a.redirect) {
-                location.href = (_b = options.alb_security_store) === null || _b === void 0 ? void 0 : _b.redirect;
+                window.location.href = (_b = options.alb_security_store) === null || _b === void 0 ? void 0 : _b.redirect;
             }
         }
     }

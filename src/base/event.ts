@@ -1,6 +1,6 @@
 export interface IEventHandler {
-  on(events: string|{[key: string]: IEventListener}, handler?: IEventListener): void;
-  off(events: string|{[key: string]: IEventListener}, handler?: IEventListener): void;
+  on(events: string | { [key: string]: IEventListener }, handler?: IEventListener): void;
+  off(events: string | { [key: string]: IEventListener }, handler?: IEventListener): void;
 }
 
 export interface IDataBinding {
@@ -40,12 +40,17 @@ export interface IEventListener {
 
 class Event implements IEvent {
   readonly timeStamp = new Date();
+
   private stopped = false;
+
   private stopedPropagation = false;
 
-  constructor(public readonly type: string, public readonly args: any[], public readonly target: IEventHandler, public readonly delegateTarget: IEventHandler) {
-
-  }
+  constructor(
+    public readonly type: string,
+    public readonly args: any[],
+    public readonly target: IEventHandler,
+    public readonly delegateTarget: IEventHandler,
+  ) {}
 
   get currentTarget() {
     return this.target;
@@ -72,7 +77,7 @@ class SingleEventHandler {
   private listeners: IEventListener[] = [];
 
   constructor(public readonly type: string) {
-    //nothing else to do
+    // nothing else to do
   }
 
   push(listener: IEventListener) {
@@ -96,8 +101,9 @@ class SingleEventHandler {
     if (this.listeners.length === 1) {
       this.listeners[0].apply(event, largs);
     } else {
-      //work on a copy in case the number changes
-      const l = this.listeners.slice(), ll = l.length;
+      // work on a copy in case the number changes
+      const l = this.listeners.slice();
+      const ll = l.length;
       for (let i = 0; i < ll && !event.isImmediatePropagationStopped(); ++i) {
         l[i].apply(event, largs);
       }
@@ -117,15 +123,10 @@ function propagateEvent(event: IEvent, target: IEventHandler) {
   return new Event(event.type, event.args, target, event.target);
 }
 
-export interface IEventListener {
-  (event: IEvent, ...args: any[]): any;
-}
 /**
  * EventHandler base class
  */
 export class EventHandler implements IEventHandler {
-
-
   public static readonly MULTI_EVENT_SEPARATOR = ',';
 
   private readonly handlers = new Map<string, SingleEventHandler>();
@@ -134,14 +135,14 @@ export class EventHandler implements IEventHandler {
     if (!event.isPropagationStopped()) {
       this.fireEvent(propagateEvent(event, this));
     }
-  }
+  };
 
   /**
    * register a global event handler
    * @param events either one event string (multiple are supported using , as separator) or a map of event handlers
    * @param handler the handler in case of a given string
    */
-  on(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+  on(events: string | { [key: string]: IEventListener }, handler?: IEventListener) {
     if (typeof events === 'string') {
       events.split(EventHandler.MULTI_EVENT_SEPARATOR).forEach((event) => {
         if (!this.handlers.has(event)) {
@@ -163,7 +164,7 @@ export class EventHandler implements IEventHandler {
    * @param events
    * @param handler
    */
-  off(events: string|{[key: string]: IEventListener}, handler?: IEventListener) {
+  off(events: string | { [key: string]: IEventListener }, handler?: IEventListener) {
     if (typeof events === 'string') {
       events.split(EventHandler.MULTI_EVENT_SEPARATOR).forEach((event) => {
         if (this.handlers.has(event)) {
@@ -183,18 +184,16 @@ export class EventHandler implements IEventHandler {
     return this;
   }
 
-
   /**
    * list for each registered event the number of listeners
    */
-  getRegisteredHandlerCount(): {[key: string]: number} {
-    const r: {[key: string]: number} = {};
+  getRegisteredHandlerCount(): { [key: string]: number } {
+    const r: { [key: string]: number } = {};
     this.handlers.forEach((handler, type) => {
       r[type] = handler.length;
     });
     return r;
   }
-
 
   /**
    * fires an event
@@ -228,11 +227,9 @@ export class EventHandler implements IEventHandler {
   stopPropagation(progatee: IEventHandler, ...events: string[]) {
     progatee.off(events.join(EventHandler.MULTI_EVENT_SEPARATOR), this.propagationHandler);
   }
-
 }
 
 export class GlobalEventHandler extends EventHandler {
-
   private static instance: GlobalEventHandler;
 
   public static getInstance(): GlobalEventHandler {

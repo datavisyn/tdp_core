@@ -75,3 +75,4 @@ export declare class Form implements IForm {
      */
     static updateElementDesc(desc: IFormElementDesc, formId: string): IFormElementDesc;
 }
+//# sourceMappingURL=Form.d.ts.map

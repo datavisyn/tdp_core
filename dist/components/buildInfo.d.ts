@@ -22,3 +22,4 @@ export declare class BuildInfo {
     static build(): Promise<BuildInfo>;
 }
 export {};
+//# sourceMappingURL=buildInfo.d.ts.map

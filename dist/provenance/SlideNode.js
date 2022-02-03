@@ -65,7 +65,7 @@ export class SlideNode extends GraphNode {
         this.setAttr('annotations', old);
     }
     updateAnnotation(ann) {
-        //since it is a reference just updated
+        // since it is a reference just updated
         this.setAttr('annotations', this.annotations);
     }
     removeAnnotation(index) {
@@ -93,7 +93,8 @@ export class SlideNode extends GraphNode {
             s.pushAnnotation({
                 type: 'text',
                 pos: [25, 25],
-                text: '# ${name}'
+                // eslint-disable-next-line no-template-curly-in-string
+                text: '# ${name}',
             });
             s.name = title;
         }
@@ -111,6 +112,6 @@ export class SlideNode extends GraphNode {
         return r;
     }
 }
-SlideNode.DEFAULT_DURATION = 1500; //ms
-SlideNode.DEFAULT_TRANSITION = 0; //ms
+SlideNode.DEFAULT_DURATION = 1500; // ms
+SlideNode.DEFAULT_TRANSITION = 0; // ms
 //# sourceMappingURL=SlideNode.js.map

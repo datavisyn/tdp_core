@@ -110,3 +110,4 @@ export declare type IAnyMatrix = IMatrix<any, IValueTypeDesc>;
 export declare class MatrixUtils {
     static createDefaultMatrixDesc(): IMatrixDataDescription<IValueTypeDesc>;
 }
+//# sourceMappingURL=IMatrix.d.ts.map

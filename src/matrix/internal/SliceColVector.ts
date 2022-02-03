@@ -1,31 +1,32 @@
-import {ArrayUtils} from '../../base/ArrayUtils';
-import {RangeLike, Range, ParseRangeUtils, Range1D} from '../../range';
-import {IValueTypeDesc} from '../../data/valuetype';
-import {IVector, IVectorDataDescription} from '../../vector';
-import {AVector} from '../../vector/AVector';
-import {IMatrix} from '../IMatrix';
+import { ArrayUtils } from '../../base/ArrayUtils';
+import { RangeLike, Range, ParseRangeUtils, Range1D } from '../../range';
+import { IValueTypeDesc } from '../../data/valuetype';
+import { IVector, IVectorDataDescription } from '../../vector';
+import { AVector } from '../../vector/AVector';
+import { IMatrix } from '../IMatrix';
 
 /**
  * a simple projection of a matrix columns to a vector
  */
 export class SliceColVector<T, D extends IValueTypeDesc> extends AVector<T, D> implements IVector<T, D> {
   readonly desc: IVectorDataDescription<D>;
+
   private colRange: Range1D;
 
   constructor(private m: IMatrix<T, D>, private col: number) {
     super(null);
     this.colRange = Range1D.from([this.col]);
     this.desc = {
-      name: m.desc.name + '-c' + col,
-      fqname: m.desc.fqname + '-c' + col,
-      id: m.desc.id + '-c' + col,
+      name: `${m.desc.name}-c${col}`,
+      fqname: `${m.desc.fqname}-c${col}`,
+      id: `${m.desc.id}-c${col}`,
       type: 'vector',
       idtype: m.rowtype,
       size: m.nrow,
       value: m.valuetype,
       description: m.desc.description,
       creator: m.desc.creator,
-      ts: m.desc.ts
+      ts: m.desc.ts,
     };
     this.root = this;
   }
@@ -33,13 +34,15 @@ export class SliceColVector<T, D extends IValueTypeDesc> extends AVector<T, D> i
   persist() {
     return {
       root: this.m.persist(),
-      col: this.col
+      col: this.col,
     };
   }
 
   restore(persisted: any) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let r: IVector<T, D> = this;
-    if (persisted && persisted.range) { //some view onto it
+    if (persisted && persisted.range) {
+      // some view onto it
       r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
     }
     return r;

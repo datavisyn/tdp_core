@@ -1,6 +1,5 @@
 import { Column, IColumnDesc } from 'lineupjs';
-import { ISelection } from '../../base/interfaces';
-import { IScoreRow } from '../../base/interfaces';
+import { ISelection, IScoreRow } from '../../base/interfaces';
 export interface ISelectionColumn {
     readonly id: number;
     readonly desc: IColumnDesc;
@@ -50,3 +49,4 @@ export interface ISelectionAdapter {
      */
     selectionChanged(waitForIt: Promise<any> | null, context: () => IContext): PromiseLike<any>;
 }
+//# sourceMappingURL=ISelectionAdapter.d.ts.map

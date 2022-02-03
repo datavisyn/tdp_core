@@ -37,3 +37,4 @@ export declare abstract class ALayoutContainer<T extends ILayoutContainerOption>
     protected updateTitle(): void;
     static withChanged(event: string): string;
 }
+//# sourceMappingURL=ALayoutContainer.d.ts.map

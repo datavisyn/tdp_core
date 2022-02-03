@@ -21,3 +21,4 @@ export declare class SearchBoxProvider {
      */
     update(items: (ISearchOption | IGroupSearchItem<ISearchOption>)[]): void;
 }
+//# sourceMappingURL=SearchBoxProvider.d.ts.map

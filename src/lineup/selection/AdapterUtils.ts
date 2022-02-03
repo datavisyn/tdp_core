@@ -1,6 +1,6 @@
-import {ISelectionAdapter} from './ISelectionAdapter';
-import {SingleSelectionAdapter, ISingleSelectionAdapter} from './internal/SingleSelectionAdapter';
-import {MultiSelectionAdapter, IMultiSelectionAdapter} from './internal/MultiSelectionAdapter';
+import { ISelectionAdapter } from './ISelectionAdapter';
+import { SingleSelectionAdapter, ISingleSelectionAdapter } from './internal/SingleSelectionAdapter';
+import { MultiSelectionAdapter, IMultiSelectionAdapter } from './internal/MultiSelectionAdapter';
 
 export class AdapterUtils {
   /**
@@ -11,7 +11,6 @@ export class AdapterUtils {
   static single(adapter: ISingleSelectionAdapter): ISelectionAdapter {
     return new SingleSelectionAdapter(adapter);
   }
-
 
   /**
    * create a multi selection adapter, i.e that one selected item results in N additional columsn in LineUp
@@ -29,8 +28,7 @@ export class AdapterUtils {
   static none(): ISelectionAdapter {
     return {
       parameterChanged: () => undefined,
-      selectionChanged: () => undefined
+      selectionChanged: () => undefined,
     };
   }
 }
-

@@ -31,7 +31,7 @@ function PermissionsEntry({
         }}
       />
       <label htmlFor={`btnradio_permissions_${id}_none`} className="form-label btn btn-outline-secondary btn-sm">
-        <i className="fas fa-ban"></i> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
+        <i className="fas fa-ban" /> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.noPermission')}
       </label>
       <input
         type="radio"
@@ -48,7 +48,7 @@ function PermissionsEntry({
         }}
       />
       <label htmlFor={`btnradio_permissions_${id}_read`} className="form-label btn btn-outline-secondary btn-sm">
-        <i className="fas fa-eye"></i> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
+        <i className="fas fa-eye" /> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.read')}
       </label>
       <input
         type="radio"
@@ -66,7 +66,7 @@ function PermissionsEntry({
         }}
       />
       <label htmlFor={`btnradio_permissions_${id}_write`} className="form-label btn btn-outline-secondary btn-sm">
-        <i className="fas fa-edit"></i> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
+        <i className="fas fa-edit" /> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.write')}
       </label>
     </div>
   );
@@ -111,7 +111,7 @@ export function PermissionChooser({
         />
         <label className="form-label form-check-label" htmlFor={`global_permission_private_${id}`}>
           {' '}
-          <i className="fas fa-user"></i> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}
+          <i className="fas fa-user" /> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}
         </label>
       </div>
       <div className="form-check form-check-inline">
@@ -129,7 +129,7 @@ export function PermissionChooser({
           }}
         />
         <label className="form-label form-check-label" htmlFor={`global_permission_public_${id}`}>
-          <i className="fas fa-users"></i> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}
+          <i className="fas fa-users" /> {I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}
         </label>
       </div>
 
@@ -139,8 +139,9 @@ export function PermissionChooser({
       {extra}
       <div className={advancedOpen ? 'd-block' : 'd-none'}>
         <div className="tdp-permissions-entry row d-flex align-items-center mt-1">
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="form-label col-sm-auto ps-2">{I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.public')}</label>
-          <span></span>
+          <span />
           <PermissionsEntry permission={permission} setPermission={setPermission} setGetter={(p) => p.others} />
         </div>
 

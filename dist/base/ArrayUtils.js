@@ -7,7 +7,7 @@ export class ArrayUtils {
      * @return {T}
      */
     static search(arr, f) {
-        let r = undefined;
+        let r;
         arr.some((v) => {
             if (f(v)) {
                 r = v;
@@ -36,28 +36,12 @@ export class ArrayUtils {
         return r;
     }
     /**
-     * converts the given arguments object into an array
-     * @param args
-     * @deprecated use Array.from(arguments) instead
-     * @internal
-     * @returns {*|Array}
-     */
-    static argList(args) {
-        if (arguments.length > 1) {
-            return Array.prototype.slice.call(arguments);
-        }
-        else {
-            return Array.prototype.slice.call(args);
-        }
-    }
-    /**
      * array with indices of 0...n-1
      * @param n
      * @returns {any[]}
      */
     static indexRange(n) {
-        //http://stackoverflow.com/questions/3746725/create-a-javascript-array-containing-1-n
-        return Array.apply(null, { length: n }).map(Number.call, Number);
+        return Array.from(Array(n).keys());
     }
     /**
      * returns the sorted indices of this array, when sorting by the given function

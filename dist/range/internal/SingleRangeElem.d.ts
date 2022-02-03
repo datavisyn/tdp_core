@@ -17,3 +17,4 @@ export declare class SingleRangeElem implements IRangeElem {
     get __iterator__(): IIterator<number>;
     toString(): string;
 }
+//# sourceMappingURL=SingleRangeElem.d.ts.map

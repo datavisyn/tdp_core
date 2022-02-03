@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {Stratification} from '../src/stratification';
+import { Stratification } from '../src/stratification';
 
 /*
   TODO: StratificationGroup:

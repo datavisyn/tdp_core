@@ -51,19 +51,19 @@ export class Dropper {
     }
     static dropLogic(item, reference, area) {
         if (item instanceof AParentLayoutContainer && reference.parents.indexOf(item) >= 0) {
-            //can drop item within one of its children
+            // can drop item within one of its children
             return false;
         }
-        const parent = reference.parent;
+        const { parent } = reference;
         const canDirectly = parent.canDrop(area);
         if (canDirectly) {
             if (parent.children.indexOf(item) < 0 && item !== reference) {
-                return parent.place(item, reference, area); //tod
+                return parent.place(item, reference, area); // tod
             }
-            return false; //already a child
+            return false; // already a child
         }
         if (area === 'center' && item !== reference) {
-            //replace myself with a tab container
+            // replace myself with a tab container
             const p = new TabbingLayoutContainer(item.node.ownerDocument, {});
             parent.replace(reference, p);
             p.push(reference);
@@ -71,29 +71,29 @@ export class Dropper {
             p.active = item;
             return true;
         }
-        //corner case if I'm the child of a tabbing, tab that and not me
+        // corner case if I'm the child of a tabbing, tab that and not me
         if (parent instanceof TabbingLayoutContainer && !(area === 'horizontal-scroll' || area === 'vertical-scroll')) {
             return Dropper.dropLogic(item, parent, area);
         }
         if (parent === reference || item === reference) {
-            //can't split my parent with my parent
+            // can't split my parent with my parent
             return false;
         }
         if (area === 'horizontal-scroll' || area === 'vertical-scroll') {
             const orientation = area === 'horizontal-scroll' ? EOrientation.HORIZONTAL : EOrientation.VERTICAL;
             const p = new LineUpLayoutContainer(item.node.ownerDocument, {
                 orientation,
-                stackLayout: true
+                stackLayout: true,
             });
             parent.replace(reference, p);
             p.push(reference);
             p.push(item);
             return true;
         }
-        //replace myself with a split container
+        // replace myself with a split container
         const p = new SplitLayoutContainer(item.node.ownerDocument, {
-            orientation: (area === 'left' || area === 'right') ? EOrientation.HORIZONTAL : EOrientation.VERTICAL,
-            name: (area === 'left' || area === 'top') ? `${item.name}|${reference.name}` : `${reference.name}|${item.name}`
+            orientation: area === 'left' || area === 'right' ? EOrientation.HORIZONTAL : EOrientation.VERTICAL,
+            name: area === 'left' || area === 'top' ? `${item.name}|${reference.name}` : `${reference.name}|${item.name}`,
         });
         parent.replace(reference, p);
         if (area === 'left' || area === 'top') {
@@ -104,7 +104,7 @@ export class Dropper {
             p.push(reference, -1, 0.5);
             p.push(Dropper.autoWrap(item), -1, 0.5);
         }
-        //force ratios
+        // force ratios
         p.ratios = [0.5, 0.5];
         return true;
     }
