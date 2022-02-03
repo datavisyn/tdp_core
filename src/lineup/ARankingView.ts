@@ -15,6 +15,7 @@ import {
   updateLodRules,
   UIntTypedArray,
   IGroupSearchItem,
+  IValueColumnDesc,
 } from 'lineupjs';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IScoreRow, IAdditionalColumnDesc } from '../base/interfaces';
@@ -433,9 +434,9 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
+  private addColumn(colDesc: IValueColumnDesc<any>, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
-    colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : this.colors.getColumnColor(id);
+    (<any>colDesc).colorMapping = (<any>colDesc).colorMapping ? (<any>colDesc).colorMapping : colDesc.color ? colDesc.color : this.colors.getColumnColor(id);
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
     });

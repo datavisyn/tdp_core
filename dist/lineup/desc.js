@@ -41,6 +41,7 @@ export class ColumnDescUtils {
      * @param {(string | Partial<ICategory>)[]} categories description of the categories
      * @param {Partial<IColumnOptions>} options
      * @returns {IAdditionalColumnDesc}
+     * @deprecated use `LineUpBuilder` instead, i.e. `buildCategoricalColumn(column).categories(categories).custom('initialRanking', true)`.
      */
     static categoricalCol(column, categories, options = {}) {
         if (ColumnDescUtils.isHierarchical(categories)) {
@@ -174,11 +175,11 @@ export class ColumnDescUtils {
         });
     }
     static isHierarchical(categories) {
-        if (categories.length === 0 || typeof categories[0] === 'string') {
+        if ((categories === null || categories === void 0 ? void 0 : categories.length) === 0 || typeof (categories === null || categories === void 0 ? void 0 : categories[0]) === 'string') {
             return false;
         }
         // check if any has a given parent name
-        return categories.some((c) => c.parent != null);
+        return categories === null || categories === void 0 ? void 0 : categories.some((c) => c.parent != null);
     }
     static deriveHierarchy(categories) {
         const lookup = new Map();

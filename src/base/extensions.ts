@@ -30,8 +30,6 @@ export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
  */
 export const EP_TDP_CORE_FORM_ELEMENT = 'epTdpCoreFormElement';
 
-export const EP_TDP_CORE_SCORE_COLUMN_PATCHER = 'epTdpCoreScoreColumnPatcher';
-
 /**
  * Provides the loaded provenance graph
  *
