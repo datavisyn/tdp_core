@@ -1,6 +1,5 @@
 /// <reference types="jquery" />
 /// <reference types="select2" />
-/// <reference types="ion.rangeslider" />
 /// <reference types="bootstrap" />
 import '../webpack/_bootstrap';
 export interface IDialogOptions {
