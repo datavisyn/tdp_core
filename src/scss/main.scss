@@ -4,8 +4,8 @@
 @import "./abstracts/vis_colors";
 @import "./abstracts/ui_colors";
 
-@import "./fonts/yantramanav";
-@import "./fonts/monda";
+@import "./fonts/roboto";
+
 
 @import './base/base';
 
@@ -42,9 +42,10 @@
 // tdp_ui
 @import './components/table';
 @import './components/tree';
+// phovea_importer
+@import './components/importer';
 
 // import the header navbar with a more specific CSS selector again, to style it with the CLUE colors
 .box {
   @import "./components/header_navbar";
 }
- 

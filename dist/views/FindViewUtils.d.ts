@@ -1,6 +1,5 @@
 import { IGroupData, IInstanceViewExtensionDesc, IViewPluginDesc } from '../base/interfaces';
 import { IDType } from '../idtype';
-import { Range } from '../range';
 export interface IDiscoveredView {
     enabled: boolean;
     v: IViewPluginDesc;
@@ -15,10 +14,10 @@ export declare class FindViewUtils {
     /**
      * finds for the given IDType and selection matching views
      * @param {IDType} idType the idtype to lookfor
-     * @param {Range} selection the current input selection
+     * @param {string[]} selection the current input selection
      * @returns {Promise<IDiscoveredView[]>} list of views and whether the current selection count matches their requirements
      */
-    static findViews(idType: IDType, selection: Range): Promise<IDiscoveredView[]>;
+    static findViews(idType: IDType, selection: string[]): Promise<IDiscoveredView[]>;
     static findAllViews(idType?: IDType): Promise<IDiscoveredView[]>;
     private static findViewBase;
     static canAccess(p: any): any;
@@ -34,3 +33,4 @@ export declare class FindViewUtils {
         v: IViewPluginDesc;
     }>(views: T[]): IGroupedViews<T>[];
 }
+//# sourceMappingURL=FindViewUtils.d.ts.map

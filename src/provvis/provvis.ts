@@ -1,18 +1,15 @@
 // TODO: Why?
 import '../webpack/_bootstrap';
-import {ModeWrapper} from '../base/mode';
-import {Dialog} from '../components';
 import * as d3 from 'd3';
-import {DetailUtils, LevelOfDetail} from './DetailUtils';
-import {ThumbnailUtils} from '../base/ThumbnailUtils';
-import {ActionMetaData, ActionNode, ProvenanceGraph, SlideNode, StateNode} from '../provenance';
-import {AVisInstance, IVisInstance} from './visInstance';
-import {SelectionUtils, SelectOperation} from '../idtype';
-import {BaseUtils} from '../base';
-import {AppContext, DnDUtils} from '../app';
-import {I18nextManager} from '../i18n';
-import {Range} from '../range';
-
+import { DetailUtils, LevelOfDetail } from './DetailUtils';
+import { ThumbnailUtils } from '../base/ThumbnailUtils';
+import { ActionMetaData, ActionNode, ProvenanceGraph, SlideNode, StateNode } from '../provenance';
+import { AVisInstance, IVisInstance } from './visInstance';
+import { SelectionUtils, SelectOperation } from '../idtype';
+import { BaseUtils, ModeWrapper } from '../base';
+import { AppContext, DnDUtils } from '../app';
+import { I18nextManager } from '../i18n';
+import { Dialog } from '../components/dialogs';
 
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;
@@ -20,10 +17,13 @@ const DOI_SMALL = 0.4;
 
 class StateRepr {
   doi: number;
+
   xy: [number, number] = [0, 0];
 
   selected = false;
+
   parent: StateRepr = null;
+
   children: StateRepr[] = [];
 
   a: ActionNode = null;
@@ -37,12 +37,12 @@ class StateRepr {
     return `url(${ThumbnailUtils.thumbnail_url(this.graph, this.s)})`;
   }
 
-  build(lookup: {[id: number]: StateRepr}, line: StateRepr[]) {
+  build(lookup: { [id: number]: StateRepr }, line: StateRepr[]) {
     const p = this.s.previousState;
     if (p) {
       this.parent = lookup[p.id];
       if (line.indexOf(this) >= 0) {
-        //ensure first
+        // ensure first
         this.parent.children.unshift(this);
       } else {
         this.parent.children.push(this);
@@ -100,12 +100,11 @@ class StateRepr {
     return this.s.name;
   }
 
-
   static toRepr(graph: ProvenanceGraph, highlight: any, options: any = {}) {
-    //assign doi
+    // assign doi
     const lookup: any = {};
 
-    //mark selected
+    // mark selected
     const selected = graph.act;
     const selectedPath = selected.path.reverse();
 
@@ -120,23 +119,23 @@ class StateRepr {
 
       const category = highlight.category[meta.category] ? 1 : 0;
       const operation = highlight.operation[meta.operation] ? 1 : 0;
-      const bookmark = (s.getAttr('starred', false) ? 1 : 0);
-      const tags = (highlight.tags.length > 0 ? (s.getAttr('tags', []).some((d) => highlight.tags.indexOf(d) >= 0) ? 1 : 0) : 0);
+      const bookmark = s.getAttr('starred', false) ? 1 : 0;
+      const tags = highlight.tags.length > 0 ? (s.getAttr('tags', []).some((d) => highlight.tags.indexOf(d) >= 0) ? 1 : 0) : 0;
       const isSelected = s === selected ? 3 : 0;
       const inpath = selectedPath.indexOf(s) >= 0 ? Math.max(-2.5, 6 - selectedPath.indexOf(s)) : -2.5;
 
       const sizePenality = Math.max(-1, -size / 10);
-      //combine to a doi value
+      // combine to a doi value
       const sum = 6 + isSelected + inpath + sizePenality;
       r.doi = d3.round(Math.max(0, Math.min(10, sum)) / 10, 1);
 
-      if ((category + operation + bookmark + tags) > 0) {
-        //boost to next level if any of the filters apply
+      if (category + operation + bookmark + tags > 0) {
+        // boost to next level if any of the filters apply
         r.doi = Math.max(r.doi, DOI_SMALL);
       }
 
       if (!ThumbnailUtils.areThumbnailsAvailable(graph) || options.thumbnails === false) {
-        r.doi = Math.min(r.doi, DOI_LARGE - 0.01); //border for switching to thumbnails
+        r.doi = Math.min(r.doi, DOI_LARGE - 0.01); // border for switching to thumbnails
       }
       r.selected = s === selected;
 
@@ -145,45 +144,51 @@ class StateRepr {
     };
     const states = (lod < LevelOfDetail.Medium ? selectedPath : graph.states).map(toState);
 
-    //route to path = 1
+    // route to path = 1
     const line = selected.path.map((p) => lookup[p.id]);
-    //build tree
+    // build tree
     states.forEach((s) => s.build(lookup, line));
 
     this.layout(states, line);
 
-    //boost all on the right side if they are small to medium
-
+    // boost all on the right side if they are small to medium
 
     return states;
   }
 
   private static layout(states: StateRepr[], line: StateRepr[]) {
-    //horizontally align the line
+    // horizontally align the line
     let byLevel: StateRepr[][] = [];
     const root = states.filter((s) => s.parent === null)[0];
     byLevel.push([root]);
     byLevel.push(root.children.slice());
 
     while (byLevel[byLevel.length - 1].length > 0) {
-      byLevel.push([].concat.apply([], byLevel[byLevel.length - 1].map((c) => c.children.slice())));
+      byLevel.push(
+        [].concat.apply(
+          [],
+          byLevel[byLevel.length - 1].map((c) => c.children.slice()),
+        ),
+      );
     }
 
     byLevel.forEach((level, i) => {
       if (i < line.length) {
-        //resort such that the element will be at the first place
+        // resort such that the element will be at the first place
         level.splice(level.indexOf(line[i]), 1);
         level.unshift(line[i]);
       }
     });
 
-    let changed = false, loop = 0;
+    let changed = false;
+    let loop = 0;
     do {
       changed = false;
       loop++;
 
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
       byLevel.forEach((level, i) => {
-        //ensure that my children have at least a >= index than me
+        // ensure that my children have at least a >= index than me
         for (let j = 0; j < level.length; ++j) {
           const s = level[j];
           if (s) {
@@ -202,42 +207,46 @@ class StateRepr {
           }
         }
       });
-
     } while (changed && loop < 5);
 
     byLevel = byLevel.filter((d) => d.length > 0);
-    //boost all states that are on the left side to medium if they are small
+    // boost all states that are on the left side to medium if they are small
     byLevel.forEach((level) => {
       const s = level[0];
       if (s && s.lod === LevelOfDetail.Small) {
-        s.doi = 0.8; //boost to medium
+        s.doi = 0.8; // boost to medium
       }
     });
 
+    // we have a bread first with the line at the first position
 
-
-    //we have a bread first with the line at the first position
-
-    //align all columns by their max width
-    const colwidths = [], rowheights = [];
+    // align all columns by their max width
+    const colwidths = [];
+    const rowheights = [];
     states.forEach((s) => {
       colwidths[s.xy[0]] = Math.max(colwidths[s.xy[0]] || 0, s.size[0]);
       rowheights[s.xy[1]] = Math.max(rowheights[s.xy[1]] || 0, s.size[1]);
     });
 
-    //convert indices to real positions
-    const acccolwidths = colwidths.reduce((arr, b, i) => {
-      arr[i + 1] = arr[arr.length - 1] + b;
-      return arr;
-    }, [0]),
-      accrowheights = rowheights.reduce((arr, b, i) => {
+    // convert indices to real positions
+    const acccolwidths = colwidths.reduce(
+      (arr, b, i) => {
         arr[i + 1] = arr[arr.length - 1] + b;
         return arr;
-      }, [0]);
+      },
+      [0],
+    );
+    const accrowheights = rowheights.reduce(
+      (arr, b, i) => {
+        arr[i + 1] = arr[arr.length - 1] + b;
+        return arr;
+      },
+      [0],
+    );
     acccolwidths.shift();
 
     states.forEach((s) => {
-      const xy = s.xy;
+      const { xy } = s;
       const x = acccolwidths[acccolwidths.length - 1] - acccolwidths[xy[0]] + 5; // + (colwidths[xy[0]]);
       const y = accrowheights[xy[1]];
       s.xy = [x, y];
@@ -246,22 +255,24 @@ class StateRepr {
 
   static toIcon(repr: StateRepr) {
     if (!repr.a) {
-      return ''; //`<i class="fas fa-circle" title="${repr.s.name}"></i>`;
+      return ''; // `<i class="fas fa-circle" title="${repr.s.name}"></i>`;
     }
-    const meta = repr.a.meta;
+    const { meta } = repr.a;
     const catIcons = {
       visual: 'chart-bar',
       data: 'database',
       logic: 'cog',
       layout: 'desktop',
-      selection: 'pen-square'
+      selection: 'pen-square',
     };
     const typeIcons = {
       create: 'plus',
       update: 'sync',
-      remove: 'times'
+      remove: 'times',
     };
-    return `<span title="${meta.name} @ ${meta.timestamp} (${meta.user})"><i class="fas fa-${catIcons[meta.category]}"></i><i class="super fas fa-${typeIcons[meta.operation]}"></i></span>`;
+    return `<span title="${meta.name} @ ${meta.timestamp} (${meta.user})"><i class="fas fa-${catIcons[meta.category]}"></i><i class="super fas fa-${
+      typeIcons[meta.operation]
+    }"></i></span>`;
   }
 
   static render($elem: d3.Selection<StateRepr>) {
@@ -277,25 +288,26 @@ class StateRepr {
 
     $elem.select('span.icon').html(StateRepr.toIcon);
     $elem.select('span.slabel').text((d) => d.name);
-    $elem.select('i.bookmark')
+    $elem
+      .select('i.bookmark')
       .classed('far', (d) => !d.s.getAttr('starred', false))
       .classed('fas', (d) => d.s.getAttr('starred', false));
 
-    $elem.select('div.sthumbnail')
-      .style('background-image', (d) => d.lod === LevelOfDetail.Large ? d.thumbnail : null);
+    $elem.select('div.sthumbnail').style('background-image', (d) => (d.lod === LevelOfDetail.Large ? d.thumbnail : null));
     $elem.transition().style({
-      'padding-left': (d) => (d.xy[0] + 4) + 'px',
-      top: (d) => d.xy[1] + 'px'
+      'padding-left': (d) => `${d.xy[0] + 4}px`,
+      top: (d) => `${d.xy[1]}px`,
     });
   }
 
   showDialog() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const d = this;
     const icon = StateRepr.toIcon(d);
     const title = d.s.name;
     const dia = Dialog.generateDialog(`<span class="icon">${icon}</span> ${title}`);
 
-    const thumbnail = ThumbnailUtils.thumbnail_url(d.graph, d.s, {width: 512, format: 'png'});
+    const thumbnail = ThumbnailUtils.thumbnail_url(d.graph, d.s, { width: 512, format: 'png' });
     const notes = d.s.getAttr('note', '');
     const starred = d.s.getAttr('starred', false);
     const $body = d3.select(dia.body);
@@ -338,23 +350,31 @@ class StateRepr {
 
 export class LayoutedProvVis extends AVisInstance implements IVisInstance {
   private $node: d3.Selection<any>;
+
   private trigger = BaseUtils.bind(this.update, this);
+
   private triggerStoryHighlight = BaseUtils.bind(this.updateStoryHighlight, this);
+
   private onStateAdded = (event: any, state: StateNode) => {
     state.on('setAttr', this.trigger);
-  }
-  private onSelectionChanged = (event: any, type: string, act: Range) => {
+  };
+
+  private onSelectionChanged = (event: any, type: string, act: number[]) => {
     const selectedStates = this.data.selectedStates(type);
-    this.$node.selectAll('div.state').classed('phovea-select-' + type, function (d: StateRepr) {
+    this.$node.selectAll('div.state').classed(`phovea-select-${type}`, function (d: StateRepr) {
       const isSelected = selectedStates.indexOf(d.s) >= 0;
       if (isSelected && type === SelectionUtils.defaultSelectionType) {
         this.scrollIntoView();
       }
       return isSelected;
     });
-  }
+  };
 
-  private line = d3.svg.line<{cx: number; cy: number}>().interpolate('step-after').x((d) => d.cx).y((d) => d.cy);
+  private line = d3.svg
+    .line<{ cx: number; cy: number }>()
+    .interpolate('step-after')
+    .x((d) => d.cx)
+    .y((d) => d.cy);
 
   private dim: [number, number] = [200, 100];
 
@@ -365,24 +385,27 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       selection: false,
       logic: false,
       layout: false,
-      none: false
+      none: false,
     },
     operation: {
       create: false,
       remove: false,
       update: false,
-      none: false
+      none: false,
     },
-    tags: []
+    tags: [],
   };
 
   constructor(public data: ProvenanceGraph, public parent: Element, private options: any) {
     super();
-    this.options = BaseUtils.mixin({
-      thumbnails: true,
-      provVisCollapsed: false,
-      hideCLUEButtonsOnCollapse: false
-    }, options);
+    this.options = BaseUtils.mixin(
+      {
+        thumbnails: true,
+        provVisCollapsed: false,
+        hideCLUEButtonsOnCollapse: false,
+      },
+      options,
+    );
     this.options.scale = [1, 1];
     this.options.rotate = 0;
     this.$node = this.build(d3.select(parent));
@@ -441,15 +464,10 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
   option(name: string, val?: any) {
     if (arguments.length === 1) {
       return this.options[name];
-    } else {
-      this.fire('option.' + name, val, this.options[name]);
-      this.options[name] = val;
-
     }
-  }
-
-  locateImpl(range: Range) {
-    return Promise.resolve(null);
+    this.fire(`option.${name}`, val, this.options[name]);
+    this.options[name] = val;
+    return undefined;
   }
 
   private build($parent: d3.Selection<any>) {
@@ -459,18 +477,18 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       $p = $parent.append('aside').classed('provenance-layout-vis', true);
     }
 
-    $p
-      .classed('collapsed', this.options.provVisCollapsed)
-      .style('transform', 'rotate(' + this.options.rotate + 'deg)');
-
-
+    $p.classed('collapsed', this.options.provVisCollapsed).style('transform', `rotate(${this.options.rotate}deg)`);
 
     if (this.options.hideCLUEButtonsOnCollapse && this.options.provVisCollapsed) {
       d3.select('header.clue-modeselector').classed('collapsed', true);
     }
 
     $p.html(`
-      <a href="#" class="btn-collapse" title="${(this.options.provVisCollapsed) ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph') : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph')}"><i class="far ${(this.options.provVisCollapsed) ? 'fa-arrow-alt-circle-left' : 'fa-arrow-alt-circle-right'}"></i></a>
+      <a href="#" class="btn-collapse" title="${
+        this.options.provVisCollapsed
+          ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph')
+          : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph')
+      }"><i class="far ${this.options.provVisCollapsed ? 'fa-arrow-alt-circle-left' : 'fa-arrow-alt-circle-right'}"></i></a>
       <div>
         <h2>
           <i class="fas fa-code-branch fa-rotate-180"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.provenance')}
@@ -483,34 +501,48 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
             <i class="fas fa-database"></i>
           </label>
           <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_visual" name="category" value="visual">
-          <label class="btn btn-outline-secondary btn-sm" for="btncheck_visual" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.visualActions')}">
+          <label class="btn btn-outline-secondary btn-sm" for="btncheck_visual" title="${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provvis.visualActions',
+          )}">
             <i class="fas fa-chart-bar"></i>
           </label>
           <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_selection" name="category" value="selection">
-          <label class="btn btn-outline-secondary btn-sm" for="btncheck_selection" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.selectionActions')}">
+          <label class="btn btn-outline-secondary btn-sm" for="btncheck_selection" title="${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provvis.selectionActions',
+          )}">
             <i class="fas fa-pen-square"></i>
           </label>
           <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_layout" name="category" value="layout">
-          <label class="btn btn-outline-secondary btn-sm" for="btncheck_layout" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.layoutActions')}">
+          <label class="btn btn-outline-secondary btn-sm" for="btncheck_layout" title="${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provvis.layoutActions',
+          )}">
             <i class="fas fa-desktop"></i>
           </label>
           <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_logic" name="category" value="logic">
-          <label class="btn btn-outline-secondary btn-sm" for="btncheck_logic" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.logicActions')}">
+          <label class="btn btn-outline-secondary btn-sm" for="btncheck_logic" title="${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provvis.logicActions',
+          )}">
             <i class="fas fa-cog"></i>
           </label>
         </div>
 
         <div class="btn-group" role="group">
           <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_create" name="operation" value="create">
-          <label class="btn btn-outline-secondary btn-sm" for="btncheck_create" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.createActions')}">
+          <label class="btn btn-outline-secondary btn-sm" for="btncheck_create" title="${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provvis.createActions',
+          )}">
              <i class="fas fa-plus"></i>
           </label>
           <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_update" name="operation" value="update">
-          <label class="btn btn-outline-secondary btn-sm" for="btncheck_update" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.updateActions')}">
+          <label class="btn btn-outline-secondary btn-sm" for="btncheck_update" title="${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provvis.updateActions',
+          )}">
              <i class="fas fa-sync"></i>
           </label>
           <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_remove" name="operation" value="remove">
-          <label class="btn btn-outline-secondary btn-sm" for="btncheck_update" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.removeActions')}">
+          <label class="btn btn-outline-secondary btn-sm" for="btncheck_update" title="${I18nextManager.getInstance().i18n.t(
+            'phovea:clue.provvis.removeActions',
+          )}">
              <i class="fas fa-times"></i>
           </label>
         </div>
@@ -522,8 +554,12 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
               <div class="dropdown-menu dropdown-menu-end" data-bs-popper="static" aria-labelledby="dropdownMenuButton">
                 <form class="px-1" onsubmit="return false;">
                   <div class="input-group input-group-sm">
-                        <span class="input-group-text" id="provenance-filter-tags" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.taggedStates')}"><i class="fas fa-tags"></i></span>
-                        <input name="tags" type="text" class="form-control form-control-sm" placeholder="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.tags')}" aria-describedby="provenance-filter-tags">
+                        <span class="input-group-text" id="provenance-filter-tags" title="${I18nextManager.getInstance().i18n.t(
+                          'phovea:clue.provvis.taggedStates',
+                        )}"><i class="fas fa-tags"></i></span>
+                        <input name="tags" type="text" class="form-control form-control-sm" placeholder="${I18nextManager.getInstance().i18n.t(
+                          'phovea:clue.provvis.tags',
+                        )}" aria-describedby="provenance-filter-tags">
                   </div>
                 </form>
               </div>
@@ -543,34 +579,45 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       <div class="legend">
       <div class="btn-group-vertical" role="group">
       <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_vertical_1" name="category" value="data">
-        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_1" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.dataActions')}">
+        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_1" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.provvis.dataActions',
+        )}">
           <i class="fas fa-database"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.data')}
         </label>
         <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_vertical_2" name="category" value="visual" >
-        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_2" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.visualActions')}">
+        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_2" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.provvis.visualActions',
+        )}">
           <i class="fas fa-chart-bar"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.visual')}
         </label>
         <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_vertical_3" name="category" value="selection" >
-        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_3" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.selectionActions')}">
+        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_3" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.provvis.selectionActions',
+        )}">
            <i class="fas fa-pen-square"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.selections')}
         </label>
         <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_vertical_4" name="category" value="layout">
-        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_4" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.layoutActions')}">
+        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_4" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.provvis.layoutActions',
+        )}">
            <i class="fas fa-desktop"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.layout')}
         </label>
         <input type="checkbox" class="btn-check" autocomplete="off" id="btncheck_vertical_5" name="category" value="logic">
-        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_5" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.logicActions')}">
+        <label class="btn btn-outline-secondary btn-sm mb-0" for="btncheck_vertical_5" title="${I18nextManager.getInstance().i18n.t(
+          'phovea:clue.provvis.logicActions',
+        )}">
            <i class="fas fa-cog"></i> ${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.analysis')}
         </label>
         </div>
       </div>
     `);
 
-    //init the toolbar filter options
+    // init the toolbar filter options
     const jp = $($p.node());
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
-    //must use bootstrap since they are manually triggered
-    jp.find<HTMLElement>('div.toolbar input, .legend input').on('change', function() {
+    // must use bootstrap since they are manually triggered
+    jp.find<HTMLElement>('div.toolbar input, .legend input').on('change', function () {
       const inputElement = <HTMLInputElement>this;
       if (inputElement.type === 'text') {
         that.highlight.tags = inputElement.value.split(' ');
@@ -580,7 +627,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       }
       that.update();
     });
-    //initialize bootstrap
+    // initialize bootstrap
     import('jquery').then((jquery) => {
       // avoid Property 'button' does not exist on type 'JQuery<HTMLElement>'
       // @ts-ignore
@@ -596,7 +643,12 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       evt.preventDefault();
       const collapsed = !$p.classed('collapsed');
       this.toggleBinding(!collapsed);
-      $p.select('.btn-collapse').attr('title', collapsed ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph') as string : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph') as string);
+      $p.select('.btn-collapse').attr(
+        'title',
+        collapsed
+          ? (I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph') as string)
+          : (I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph') as string),
+      );
       $p.select('.btn-collapse > i').classed('fa-arrow-alt-circle-right', !collapsed).classed('fa-arrow-alt-circle-left', collapsed);
       $p.classed('collapsed', collapsed);
 
@@ -615,6 +667,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
   }
 
   update() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     const graph = this.data;
 
@@ -624,9 +677,14 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     this.$node.classed('small', lod === LevelOfDetail.Small);
     this.$node.classed('xsmall', lod === LevelOfDetail.ExtraSmall);
 
-    const states = StateRepr.toRepr(graph, this.highlight, {thumbnails: this.options.thumbnails});
-    const $states = this.$node.select('div.states').selectAll('div.state').data(states, (d) => '' + d.s.id);
-    const $statesEnter = $states.enter().append('div')
+    const states = StateRepr.toRepr(graph, this.highlight, { thumbnails: this.options.thumbnails });
+    const $states = this.$node
+      .select('div.states')
+      .selectAll('div.state')
+      .data(states, (d) => `${d.s.id}`);
+    const $statesEnter = $states
+      .enter()
+      .append('div')
       .classed('state', true)
       .attr('data-id', (d) => d.s.id)
       .append('div')
@@ -640,7 +698,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       .attr('draggable', true)
       .on('dragstart', (d) => {
         const e = <DragEvent>(<any>d3.event);
-        e.dataTransfer.effectAllowed = 'copy'; //none, copy, copyLink, copyMove, link, linkMove, move, all
+        e.dataTransfer.effectAllowed = 'copy'; // none, copy, copyLink, copyMove, link, linkMove, move, all
         e.dataTransfer.setData('text/plain', d.s.name);
         e.dataTransfer.setData('application/phovea-prov-state', String(d.s.id));
       })
@@ -649,15 +707,20 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
           d3.select(this).classed('hover', true);
           return false;
         }
-      }).on('dragover', () => {
+        return undefined;
+      })
+      .on('dragover', () => {
         if (DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-state')) {
           (<Event>d3.event).preventDefault();
           DnDUtils.getInstance().updateDropEffect(<DragEvent>d3.event);
           return false;
         }
-      }).on('dragleave', function () {
+        return undefined;
+      })
+      .on('dragleave', function () {
         d3.select(this).classed('hover', false);
-      }).on('drop', function (d) {
+      })
+      .on('drop', function (d) {
         d3.select(this).classed('hover', false);
         const e = <DragEvent>(<any>d3.event);
         e.preventDefault();
@@ -666,11 +729,10 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
         return false;
       });
 
-
     const $inner = $statesEnter;
     $inner.append('i').attr('class', 'fas fa-circle glyph');
     $inner.append('span').classed('icon', true);
-    /*$states_enter.append('span').attr('class','fas fa-star').on('click', (d) => {
+    /* $states_enter.append('span').attr('class','fas fa-star').on('click', (d) => {
       d.s.setAttr('starred',!d.s.getAttr('starred',false));
       d3.event.stopPropagation();
       d3.event.preventDefault();
@@ -682,32 +744,37 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       });
       d3.event.stopPropagation();
       d3.event.preventDefault();
-    });*/
+    }); */
     $inner.append('span').classed('slabel', true);
     $inner.append('div').classed('sthumbnail', true);
     const $toolbarEnter = $statesEnter.append('div').classed('toolbar', true);
-    $toolbarEnter.append('i').attr('class', 'bookmark far fa-bookmark').on('click', function (d) {
-      const v = !d.s.getAttr('starred', false);
-      const e = <Event>d3.event;
-      d.s.setAttr('starred', v);
-      d3.select(this).classed('fas', v).classed('far', !v);
-      e.stopPropagation();
-      e.preventDefault();
-    });
-    $toolbarEnter.append('i').attr('class', 'fas fa-edit').on('click', (d) => {
-      const e = <Event>d3.event;
-      d.showDialog();
-      e.stopPropagation();
-      e.preventDefault();
-    });
+    $toolbarEnter
+      .append('i')
+      .attr('class', 'bookmark far fa-bookmark')
+      .on('click', function (d) {
+        const v = !d.s.getAttr('starred', false);
+        const e = <Event>d3.event;
+        d.s.setAttr('starred', v);
+        d3.select(this).classed('fas', v).classed('far', !v);
+        e.stopPropagation();
+        e.preventDefault();
+      });
+    $toolbarEnter
+      .append('i')
+      .attr('class', 'fas fa-edit')
+      .on('click', (d) => {
+        const e = <Event>d3.event;
+        d.showDialog();
+        e.stopPropagation();
+        e.preventDefault();
+      });
 
     $states.call(StateRepr.render);
 
     $states.exit().remove();
 
-
-    //just for the entered ones
-    //(<any>$($states_enter[0][0]).find<HTMLElement>('> span.icon')).popover(StateRepr.popover)
+    // just for the entered ones
+    // (<any>$($states_enter[0][0]).find<HTMLElement>('> span.icon')).popover(StateRepr.popover)
     //  .parent().on({
     //    mouseenter: function () {
     //      var $icon = $(this).find<HTMLElement>('> span.icon');
@@ -733,19 +800,23 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
 
     const edges = [];
     states.forEach((s) => {
-      edges.push.apply(edges, s.children.map((c) => ({s, t: c})));
+      edges.push.apply(
+        edges,
+        s.children.map((c) => ({ s, t: c })),
+      );
     });
 
     this.dim = [
-      d3.max(states, (s) => s.xy[0] + s.size[0]) + (lod >= LevelOfDetail.Medium ? 200 : 0), //for label
-      d3.max(states, (s) => s.xy[1] + s.size[1])
+      d3.max(states, (s) => s.xy[0] + s.size[0]) + (lod >= LevelOfDetail.Medium ? 200 : 0), // for label
+      d3.max(states, (s) => s.xy[1] + s.size[1]),
     ];
 
-    this.$node.select('svg')
-      .attr('width', this.dim[0])
-      .attr('height', this.dim[1]);
+    this.$node.select('svg').attr('width', this.dim[0]).attr('height', this.dim[1]);
 
-    const $edges = this.$node.select('svg g.edges').selectAll('path').data(edges, (d) => d.s.s.id + '-' + d.t.s.id);
+    const $edges = this.$node
+      .select('svg g.edges')
+      .selectAll('path')
+      .data(edges, (d) => `${d.s.s.id}-${d.t.s.id}`);
     $edges.enter().append('path');
     $edges.transition().attr('d', (d) => this.line([d.s, d.t]));
     $edges.exit().remove();
@@ -754,19 +825,21 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
   }
 
   private updateStoryHighlight() {
-    //TODO hide if not needed
+    // TODO hide if not needed
     const $g = this.$node.select('svg g.storyhighlights');
     const $states = this.$node.select('div.states').selectAll<StateRepr>('div.state');
     const states = $states.data();
     const lookup: any = {};
-    states.forEach((s) => lookup[s.s.id] = s);
+    states.forEach((s) => (lookup[s.s.id] = s));
     let firstSlide = this.data.selectedSlides()[0] || this.data.getSlideChains()[0];
     if (firstSlide) {
       $g.style('display', null);
       while (firstSlide.previous) {
         firstSlide = firstSlide.previous;
       }
-      const line = SlideNode.toSlidePath(firstSlide).map((s) => s.state ? lookup[s.state.id] : null).filter((d) => !!d);
+      const line = SlideNode.toSlidePath(firstSlide)
+        .map((s) => (s.state ? lookup[s.state.id] : null))
+        .filter((d) => !!d);
       $states.classed('story_member', (d) => line.indexOf(d) >= 0);
       $g.select('path').attr('d', this.line.interpolate('linear')(line));
       this.line.interpolate('step-after');
@@ -774,6 +847,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       $g.style('display', 'none');
     }
   }
+
   static createLayoutedProvVis(data: ProvenanceGraph, parent: Element, options = {}) {
     return new LayoutedProvVis(data, parent, options);
   }

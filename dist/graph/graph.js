@@ -1,5 +1,4 @@
-import { SelectOperation, IDTypeManager, ASelectAble } from '../idtype';
-import { ParseRangeUtils, Range } from '../range';
+import { IDTypeManager } from '../idtype';
 import { UniqueIdManager } from '../app/UniqueIdManager';
 import { EventHandler } from '../base/event';
 export class AttributeContainer extends EventHandler {
@@ -10,7 +9,7 @@ export class AttributeContainer extends EventHandler {
     persist() {
         if (this.attrMap.size > 0) {
             const attrs = {};
-            this.attrMap.forEach((v, k) => attrs[k] = v);
+            this.attrMap.forEach((v, k) => (attrs[k] = v));
             return { attrs };
         }
         return {};
@@ -21,7 +20,7 @@ export class AttributeContainer extends EventHandler {
             return;
         }
         this.attrMap.set(attr, value);
-        this.fire('attr-' + attr, value, bak);
+        this.fire(`attr-${attr}`, value, bak);
         this.fire('setAttr', attr, value, bak);
     }
     hasAttr(attr) {
@@ -67,7 +66,7 @@ export class GraphNode extends AttributeContainer {
         this._id = UniqueIdManager.getInstance().flagId('graph_node', id);
     }
     get id() {
-        if (isNaN(this._id)) {
+        if (Number.isNaN(this._id)) {
             this._id = UniqueIdManager.getInstance().uniqueId('graph_node');
         }
         return this._id;
@@ -98,7 +97,7 @@ export class GraphEdge extends AttributeContainer {
         }
     }
     get id() {
-        if (isNaN(this._id)) {
+        if (Number.isNaN(this._id)) {
             this._id = UniqueIdManager.getInstance().uniqueId('graph_edge');
         }
         return this._id;
@@ -136,10 +135,10 @@ export class GraphEdge extends AttributeContainer {
         return this;
     }
     static isGraphType(type) {
-        return (edge) => type instanceof RegExp ? type.test(edge.type) : edge.type === type;
+        return (edge) => (type instanceof RegExp ? type.test(edge.type) : edge.type === type);
     }
 }
-export class AGraph extends ASelectAble {
+export class AGraph extends EventHandler {
     get nnodes() {
         return this.nodes.length;
     }
@@ -148,31 +147,6 @@ export class AGraph extends ASelectAble {
     }
     get dim() {
         return [this.nodes.length, this.edges.length];
-    }
-    ids(range = Range.all()) {
-        const ids = (Range.list(this.nodes.map((n) => n.id), this.edges.map((n) => n.id)));
-        return Promise.resolve(ids.preMultiply(ParseRangeUtils.parseRangeLike(range)));
-    }
-    idView(idRange = Range.all()) {
-        throw Error('not implemented');
-    }
-    selectNode(node, op = SelectOperation.SET) {
-        this.select(AGraph.DIM_NODES, [this.nodes.indexOf(node)], op);
-    }
-    async selectedNodes() {
-        const r = await this.selections();
-        const nodes = [];
-        r.dim(AGraph.DIM_NODES).forEach((index) => nodes.push(this.nodes[index]));
-        return nodes;
-    }
-    selectEdge(edge, op = SelectOperation.SET) {
-        this.select(AGraph.DIM_EDGES, [this.edges.indexOf(edge)], op);
-    }
-    async selectedEdges() {
-        const r = await this.selections();
-        const edges = [];
-        r.dim(AGraph.DIM_EDGES).forEach((index) => edges.push(this.edges[index]));
-        return edges;
     }
     get idtypes() {
         return [AGraph.IDTYPE_NODES, AGraph.IDTYPE_EDGES].map(IDTypeManager.getInstance().resolveIdType);

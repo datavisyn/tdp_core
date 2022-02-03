@@ -35,3 +35,4 @@ export interface ILocaleEPDesc extends IPluginDesc {
      */
     order?: number;
 }
+//# sourceMappingURL=extensions.d.ts.map

@@ -1,12 +1,9 @@
 /// <amd-dependency path="font-awesome" />
 /// <amd-dependency path="bootstrap" />
-/**
- * provides a template wrapper around an application for including CLUE. Includes the common frame for switching modes, provenance, and story visualizations
- */
+import * as d3 from 'd3';
 import { IObjectRef, ProvenanceGraph } from '../provenance';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
-import * as d3 from 'd3';
 import { AppHeader, IAppHeaderOptions, IHeaderLink } from '../components';
 export interface ICLUEWrapperOptions extends IACLUEWrapperOptions {
     /**
@@ -59,8 +56,8 @@ export declare class CLUEWrapper extends ACLUEWrapper {
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;
         manager: CLUEGraphManager;
-        storyVis: () => Promise<import("../provvis").VerticalStoryVis>;
-        provVis: () => Promise<import("../provvis").LayoutedProvVis>;
+        storyVis: () => Promise<import("..").VerticalStoryVis>;
+        provVis: () => Promise<import("..").LayoutedProvVis>;
     };
     reset(): void;
     /**
@@ -83,3 +80,4 @@ export declare class CLUEWrapper extends ACLUEWrapper {
         jumpToStored: () => number;
     };
 }
+//# sourceMappingURL=CLUEWrapper.d.ts.map

@@ -1,5 +1,6 @@
 import {LocalDataProvider, Ranking} from 'lineupjs';
-import {EventHandler, IDTypeManager, Range} from '../..';
+import {IDTypeManager} from '../..';
+import {EventHandler} from '../../base';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {ARankingView} from '..';
@@ -75,12 +76,11 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
 
-    selectCallback(selected: number[]) {
-        const r = Range.list(selected);
+    selectCallback(selected: string[]) {
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
 
-        this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
+        this.view.selectionHelper.setGeneralVisSelection({idtype: id, ids: selected});
     }
 
     filterCallback(s: string) {
@@ -136,7 +136,7 @@ export class GeneralVisWrapper extends EventHandler {
                 {
                     columns: cols,
                     selected: selectedMap,
-                    selectionCallback: (s: number[]) => this.selectCallback(s),
+                    selectionCallback: (s: string[]) => this.selectCallback(s),
                     filterCallback: (s: string) => this.filterCallback(s)
                 }
             ),

@@ -64,3 +64,4 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
+//# sourceMappingURL=interfaces.d.ts.map

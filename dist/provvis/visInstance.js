@@ -10,10 +10,10 @@ export class AVisInstance extends EventHandler {
         this._built = false;
     }
     option(name, value) {
-        //dummy
-        //if (value) {
+        // dummy
+        // if (value) {
         //  this.fire('option', name, value, null);
-        //}
+        // }
         return null;
     }
     persist() {
@@ -28,28 +28,11 @@ export class AVisInstance extends EventHandler {
             this.fire('ready');
         }
     }
-    locate(...range) {
-        if (range.length === 1) {
-            return this.locateImpl(range[0]);
-        }
-        return Promise.all(range.map(this.locateImpl, this));
-    }
-    async locateById(...range) {
-        const ids = await this.data.ids();
-        if (range.length === 1) {
-            return this.locateImpl(ids.indexOf(range[0]));
-        }
-        return Promise.all(range.map((r) => this.locateImpl(ids.indexOf(r))));
-    }
-    locateImpl(range) {
-        //no resolution by default
-        return Promise.resolve(null);
-    }
     restore(persisted) {
         return Promise.resolve(this);
     }
     update() {
-        //do nothing
+        // do nothing
     }
     destroy() {
         // nothing to destroy
@@ -63,7 +46,7 @@ export class AVisInstance extends EventHandler {
     transform() {
         return {
             scale: [1, 1],
-            rotate: 0
+            rotate: 0,
         };
     }
     get rawSize() {
@@ -72,7 +55,7 @@ export class AVisInstance extends EventHandler {
     get size() {
         const t = this.transform();
         const r = this.rawSize;
-        //TODO rotation
+        // TODO rotation
         return [r[0] * t.scale[0], r[1] * t.scale[1]];
     }
 }

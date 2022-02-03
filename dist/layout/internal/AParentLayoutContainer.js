@@ -12,6 +12,7 @@ export class AParentLayoutContainer extends ALayoutContainer {
         return false;
     }
     get rootParent() {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let p = this;
         while (p.parent !== null) {
             p = p.parent;
@@ -37,11 +38,11 @@ export class AParentLayoutContainer extends ALayoutContainer {
         if (this._visible === visible) {
             return;
         }
-        this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this._visible, this._visible = visible);
+        this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this._visible, (this._visible = visible));
         this.visibilityChanged(visible);
     }
     visibilityChanged(visible) {
-        this.forEach((c) => c.visible = visible);
+        this.forEach((c) => (c.visible = visible));
     }
     push(child, index = -1) {
         this.setupChild(child);
@@ -81,7 +82,7 @@ export class AParentLayoutContainer extends ALayoutContainer {
         this._children.splice(this._children.indexOf(child), 1);
         if (this.minChildCount > this.length && this.parent) {
             if (this.length > 1) {
-                //remove and inline my children (just one since the remove will be called again
+                // remove and inline my children (just one since the remove will be called again
                 this.parent.push(this._children[1]);
             }
             else if (this.length > 0) {
@@ -122,7 +123,7 @@ export class AParentLayoutContainer extends ALayoutContainer {
     }
     persist() {
         return Object.assign(super.persist(), {
-            children: this._children.map((d) => d.persist())
+            children: this._children.map((d) => d.persist()),
         });
     }
     find(id) {

@@ -1,10 +1,8 @@
-import {IPersistable} from '../base/IPersistable';
-import {UniqueIdManager} from '../app/UniqueIdManager';
-import {IDataType} from '../data/datatype';
-import {Range} from '../range/Range';
-import {IEventHandler, EventHandler} from '../base/event';
-import {ITransform} from './ITransform';
-import {ILocateAble} from './ILocateAble';
+import { IPersistable } from '../base/IPersistable';
+import { UniqueIdManager } from '../app/UniqueIdManager';
+import { IDataType } from '../data/datatype';
+import { IEventHandler, EventHandler } from '../base/event';
+import { ITransform } from './ITransform';
 
 export interface IVisInstanceOptions {
   rotate?: number;
@@ -14,7 +12,7 @@ export interface IVisInstanceOptions {
 /**
  * basic interface of an visualization instance
  */
-export interface IVisInstance extends IPersistable, IEventHandler, ILocateAble {
+export interface IVisInstance extends IPersistable, IEventHandler {
   /**
    * the unique id of this vis instance
    */
@@ -87,13 +85,14 @@ export interface IVisInstance extends IPersistable, IEventHandler, ILocateAble {
  */
 export class AVisInstance extends EventHandler {
   readonly id = UniqueIdManager.getInstance().uniqueId('vis');
+
   private _built = false;
 
   option(name: string, value?: any): any {
-    //dummy
-    //if (value) {
+    // dummy
+    // if (value) {
     //  this.fire('option', name, value, null);
-    //}
+    // }
     return null;
   }
 
@@ -105,31 +104,11 @@ export class AVisInstance extends EventHandler {
     return this._built;
   }
 
-  protected markReady(built: boolean = true) {
+  protected markReady(built = true) {
     this._built = built;
     if (built) {
       this.fire('ready');
     }
-  }
-
-  locate(...range: Range[]): Promise<any> {
-    if (range.length === 1) {
-      return this.locateImpl(range[0]);
-    }
-    return Promise.all(range.map(this.locateImpl, this));
-  }
-
-  async locateById(...range: Range[]) {
-    const ids: Range = await (<any>this).data.ids();
-    if (range.length === 1) {
-      return this.locateImpl(ids.indexOf(range[0]));
-    }
-    return Promise.all(range.map((r) => this.locateImpl(ids.indexOf(r))));
-  }
-
-  locateImpl(range: Range) {
-    //no resolution by default
-    return Promise.resolve(null);
   }
 
   restore(persisted: any): Promise<AVisInstance> {
@@ -137,7 +116,7 @@ export class AVisInstance extends EventHandler {
   }
 
   update() {
-    //do nothing
+    // do nothing
   }
 
   destroy() {
@@ -153,7 +132,7 @@ export class AVisInstance extends EventHandler {
   transform(): ITransform {
     return {
       scale: [1, 1],
-      rotate: 0
+      rotate: 0,
     };
   }
 
@@ -164,7 +143,7 @@ export class AVisInstance extends EventHandler {
   get size(): [number, number] {
     const t = this.transform();
     const r = this.rawSize;
-    //TODO rotation
+    // TODO rotation
     return [r[0] * t.scale[0], r[1] * t.scale[1]];
   }
 }

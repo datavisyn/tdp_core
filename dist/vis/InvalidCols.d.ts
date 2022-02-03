@@ -3,3 +3,4 @@ interface InvalidColsProps {
 }
 export declare function InvalidCols(props: InvalidColsProps): JSX.Element;
 export {};
+//# sourceMappingURL=InvalidCols.d.ts.map

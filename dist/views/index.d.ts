@@ -1,5 +1,4 @@
 export * from './ViewUtils';
-export * from './ResolveUtils';
 export * from './messaging';
 export * from './tooltip';
 export * from './SelectionChooser';
@@ -16,3 +15,4 @@ export * from './AReactView';
 export * from './AReactChooserView';
 export * from './ReactViewWrapper';
 export * from './TDPView';
+//# sourceMappingURL=index.d.ts.map

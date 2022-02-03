@@ -5,11 +5,7 @@ import { IDType } from '../../idtype';
  */
 export interface IResult {
     /**
-     * id of this result
-     */
-    readonly _id: number;
-    /**
-     * the name for _id
+     * id of the result
      */
     readonly id: string;
     /**
@@ -63,3 +59,4 @@ export interface ISearchProviderDesc extends IPluginDesc {
      */
     name: string;
 }
+//# sourceMappingURL=SearchProviderInterfaces.d.ts.map

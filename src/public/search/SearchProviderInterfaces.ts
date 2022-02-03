@@ -1,16 +1,12 @@
-import {IPluginDesc} from '../../base';
-import {IDType} from '../../idtype';
+import { IPluginDesc } from '../../base';
+import { IDType } from '../../idtype';
 
 /**
  * a search result
  */
 export interface IResult {
   /**
-   * id of this result
-   */
-  readonly _id: number;
-  /**
-   * the name for _id
+   * id of the result
    */
   readonly id: string;
   /**
@@ -32,7 +28,7 @@ export interface ISearchProvider {
    * @param {number} pageSize the size of a page
    * @returns {Promise<{ more: boolean, items: IResult[] }>} list of results along with a hint whether more are available
    */
-  search(query: string, page: number, pageSize: number): Promise<{ more: boolean, items: IResult[] }>;
+  search(query: string, page: number, pageSize: number): Promise<{ more: boolean; items: IResult[] }>;
 
   /**
    * validates the given fully queries and returns the matching result subsets
@@ -49,7 +45,7 @@ export interface ISearchProvider {
    * @param {string} currentSearchQuery optional the current search query as a regular expression in which the first group is the matched subset
    * @returns {string} the formatted html text
    */
-  format?(item: IResult, node: HTMLElement, mode: 'result'|'selection', currentSearchQuery?: RegExp): string;
+  format?(item: IResult, node: HTMLElement, mode: 'result' | 'selection', currentSearchQuery?: RegExp): string;
 
   produces?(idType: IDType): boolean;
 }

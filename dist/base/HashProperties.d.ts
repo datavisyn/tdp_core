@@ -15,3 +15,4 @@ export declare class HashProperties extends PropertyHandler {
     private update;
     private updateImpl;
 }
+//# sourceMappingURL=HashProperties.d.ts.map

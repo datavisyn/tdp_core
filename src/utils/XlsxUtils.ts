@@ -1,15 +1,15 @@
-import {AppContext} from '../app';
-import {Ajax} from '../base';
+import { AppContext } from '../app';
+import { Ajax } from '../base/ajax';
 
 export interface IXLSXColumn {
   name: string;
-  type: 'string'|'float'|'int'|'date'|'boolean';
+  type: 'string' | 'float' | 'int' | 'date' | 'boolean';
 }
 
 export interface IXLSXSheet {
   title: string;
   columns: IXLSXColumn[];
-  rows: { [key: string]: string|number|Date|boolean|null}[];
+  rows: { [key: string]: string | number | Date | boolean | null }[];
 }
 
 export interface IXLSXJSONFile {
@@ -17,7 +17,6 @@ export interface IXLSXJSONFile {
 }
 
 export class XlsxUtils {
-
   static xlsx2json(file: File): Promise<IXLSXJSONFile> {
     const data = new FormData();
     data.set('file', file);
@@ -35,7 +34,6 @@ export class XlsxUtils {
   static json2xlsx(file: IXLSXJSONFile): Promise<Blob> {
     return Ajax.send(AppContext.getInstance().api2absURL('/tdp/xlsx/from_json'), file, 'POST', 'blob', 'application/json');
   }
-
 
   static jsonArray2xlsx(file: any[][]): Promise<Blob> {
     return Ajax.send(AppContext.getInstance().api2absURL('/tdp/xlsx/from_json_array'), file, 'POST', 'blob', 'application/json');

@@ -1,44 +1,54 @@
-import {IEventHandler} from '../base';
-import {IHasUniqueId} from '../idtype';
+import { IEventHandler } from '../base';
 
 /**
  * [width, height]
  */
 export declare type ISize = [number, number];
 
-
 export interface IBuilder {
   autoWrap(name?: string): IBuilder;
   name(name: string): IBuilder;
-  fixed():IBuilder;
-  fixedLayout():IBuilder;
+  fixed(): IBuilder;
+  fixedLayout(): IBuilder;
 }
 
 export declare type IBuildAbleOrViewLike = IBuilder | PHOVEA_UI_IView | string;
 
-
 export class LayoutContainerEvents {
   static readonly EVENT_LAYOUT_CHANGED = 'changed';
+
   static readonly EVENT_DESTROYED = 'destroy';
+
   static readonly EVENT_VISIBILITY_CHANGED = 'visibilityChanged';
+
   static readonly EVENT_NAME_CHANGED = 'nameChanged';
 
   static readonly EVENT_CHILD_ADDED = 'addChild';
+
   static readonly EVENT_CHILD_REMOVED = 'removeChild';
+
   static readonly EVENT_CHANGE_SPLIT_RATIOS = 'changeRatios';
+
   static readonly EVENT_TAB_REORDED = 'tabReorded';
+
   static readonly EVENT_CHANGE_ACTIVE_TAB = 'changeActiveTab';
+
   static readonly EVENT_MAXIMIZE = 'maximize';
+
   static readonly EVENT_RESTORE_SIZE = 'restoreSize';
 }
 /**
  * base interface for the container
  */
-export interface ILayoutContainer extends IEventHandler, IHasUniqueId {
+export interface ILayoutContainer extends IEventHandler {
+  /**
+   * Unique id of the layout container.
+   */
+  id: number;
   /**
    * the container type
    */
-  readonly type: 'view'|'tabbing'|'split'|'lineup'|'root';
+  readonly type: 'view' | 'tabbing' | 'split' | 'lineup' | 'root';
   /**
    * parent container or null if there is none anymore
    */
@@ -66,7 +76,7 @@ export interface ILayoutContainer extends IEventHandler, IHasUniqueId {
    * true ... yes
    * string ... named of wrapped container
    */
-  readonly autoWrapOnDrop: boolean|string;
+  readonly autoWrapOnDrop: boolean | string;
   /**
    * name of this container
    */
@@ -97,13 +107,13 @@ export interface ILayoutContainer extends IEventHandler, IHasUniqueId {
    * @param {number | ((container: ILayoutContainer) => boolean)} id
    * @return {ILayoutContainer}
    */
-  find(id: number|((container: ILayoutContainer)=>boolean)): ILayoutContainer | null;
-  findAll(predicate: (container: ILayoutContainer)=>boolean): ILayoutContainer[];
+  find(id: number | ((container: ILayoutContainer) => boolean)): ILayoutContainer | null;
+  findAll(predicate: (container: ILayoutContainer) => boolean): ILayoutContainer[];
 
   /**
    * find the closest parent matching the given criteria
    */
-  closest(id: number|((container: ILayoutParentContainer)=>boolean)): ILayoutParentContainer | null;
+  closest(id: number | ((container: ILayoutParentContainer) => boolean)): ILayoutParentContainer | null;
 }
 
 /**
@@ -147,7 +157,7 @@ export interface ILayoutDump {
 
 export enum EOrientation {
   HORIZONTAL,
-  VERTICAL
+  VERTICAL,
 }
 
 export type IDropArea = 'center' | 'left' | 'right' | 'top' | 'bottom' | 'horizontal-scroll' | 'vertical-scroll';
@@ -189,11 +199,10 @@ export interface ILayoutParentContainer extends ILayoutContainer, Iterable<ILayo
    * @return {boolean} true if successful
    */
   remove(child: ILayoutContainer): boolean;
-  rootParent?: IRootLayoutContainer&ILayoutParentContainer;
+  rootParent?: IRootLayoutContainer & ILayoutParentContainer;
   canDrop?(area: IDropArea): boolean;
   place?(child: ILayoutContainer, reference: ILayoutContainer, area: IDropArea): boolean;
 }
-
 
 export interface ITabbingLayoutContainer extends ILayoutParentContainer {
   /**
@@ -232,11 +241,10 @@ export interface IViewLayoutContainer extends ILayoutContainer {
   readonly view: PHOVEA_UI_IView;
 }
 
-
 /**
  * interface for the actual view
  */
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PHOVEA_UI_IView {
   /**
    * HTMLElement of this view

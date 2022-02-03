@@ -1,5 +1,5 @@
-import { IPlugin } from '../base';
 import { Placement, PopperOptions } from 'popper.js';
+import { IPlugin } from '../base';
 import { AppHeader } from '../components';
 import { IViewPluginDesc, IView, ISelection } from '../base/interfaces';
 export interface ITDPTourExtensionDesc {
@@ -111,3 +111,4 @@ export interface IViewTourContext {
     instance: IView | null;
     selection: ISelection;
 }
+//# sourceMappingURL=extensions.d.ts.map

@@ -43,3 +43,4 @@ export declare class SelectionChooser {
      */
     setSelection(value: any): void;
 }
+//# sourceMappingURL=SelectionChooser.d.ts.map

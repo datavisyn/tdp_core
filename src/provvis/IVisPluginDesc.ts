@@ -1,6 +1,6 @@
-import {IPluginDesc} from '../base/plugin';
-import {IDataType} from '../data/datatype';
-import {IVisMetaData} from './IVisMetaData';
+import { IPluginDesc } from '../base/plugin';
+import { IDataType } from '../data/datatype';
+import { IVisMetaData } from './IVisMetaData';
 
 /**
  * formal description of the interface of a plugin description

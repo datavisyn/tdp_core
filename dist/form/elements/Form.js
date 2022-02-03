@@ -61,8 +61,8 @@ export class Form {
     getElementData() {
         const r = {};
         this.elements.forEach((el, key) => {
-            const value = el.value;
-            r[key] = (value !== null && value.data !== undefined) ? value.data : value;
+            const { value } = el;
+            r[key] = value !== null && value.data !== undefined ? value.data : value;
         });
         return r;
     }
@@ -73,7 +73,7 @@ export class Form {
     getElementValues() {
         const r = {};
         this.elements.forEach((el, key) => {
-            const value = el.value;
+            const { value } = el;
             r[key] = value.value || value;
         });
         return r;
@@ -96,9 +96,9 @@ export class Form {
      * @param formId id of the form the element will be append to
      */
     static updateElementDesc(desc, formId) {
-        const elementDesc = Object.assign({}, desc); // create copy
+        const elementDesc = { ...desc }; // create copy
         // inject formId into form element id
-        const uid = elementDesc.id + '_' + formId;
+        const uid = `${elementDesc.id}_${formId}`;
         elementDesc.attributes = elementDesc.attributes || {};
         elementDesc.attributes.id = uid; // add id as attribute
         elementDesc.attributes.clazz = elementDesc.attributes.clazz || '';

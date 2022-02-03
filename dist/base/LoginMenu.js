@@ -8,21 +8,23 @@ import { SessionWatcher } from './watcher';
 /**
  * utility login menu that can be added to the Appheader for instance
  */
-// tslint:disable-next-line: class-name
-export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
-    constructor(adapter, options = {}) {
+export class LoginMenu extends EventHandler {
+    constructor(header, options = {}) {
         super();
-        this.adapter = adapter;
+        this.header = header;
         this.options = {
             loginForm: undefined,
             document,
-            watch: false
+            watch: false,
         };
-        BaseUtils.mixin(this.options, options);
+        BaseUtils.mixin(this.options, { document: header.rightMenu.ownerDocument }, options);
         this.customizer = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM);
         this.node = this.init();
         if (this.options.watch) {
             SessionWatcher.startWatching(() => this.logout());
+        }
+        if (this.options.insertIntoHeader) {
+            this.header.insertCustomRightMenu(this.node);
         }
     }
     init() {
@@ -53,9 +55,9 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
     }
     logout() {
         const doc = this.options.document;
-        this.adapter.wait();
+        this.header.wait();
         LoginUtils.logout().then(() => {
-            this.fire(PHOVEA_SECURITY_FLASK_LoginMenu.EVENT_LOGGED_OUT);
+            this.fire(LoginMenu.EVENT_LOGGED_OUT);
             const userMenu = doc.querySelector('#user_menu');
             if (userMenu) {
                 userMenu.style.display = 'none';
@@ -64,7 +66,7 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
             Array.from(doc.querySelectorAll('.login_required')).forEach((n) => {
                 n.classList.add('disabled');
             });
-            this.adapter.ready();
+            this.header.ready();
         });
     }
     runCustomizer(menu, dialog) {
@@ -76,10 +78,10 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
         const doc = this.options.document;
         const loginDialog = doc.querySelector('#loginDialog');
         loginDialog.querySelector('.modal-header .btn-close').setAttribute('hidden', null); // disable closing the dialog
-        this.adapter.showAndFocusOn('#loginDialog', '#login_username');
+        this.header.showAndFocusOn('#loginDialog', '#login_username');
     }
     initLoginDialog(body) {
-        let loginForm = this.options.loginForm;
+        let { loginForm } = this.options;
         if (!loginForm) {
             const t = this.customizer.find((d) => d.template != null);
             if (t) {
@@ -111,7 +113,7 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
         LoginUtils.bindLoginForm(form, (error, user) => {
             const success = !error && user;
             if (!success) {
-                this.adapter.ready();
+                this.header.ready();
                 if (error === 'not_reachable') {
                     dialog.classList.add('has-warning');
                 }
@@ -121,7 +123,7 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
                 }
                 return;
             }
-            this.fire(PHOVEA_SECURITY_FLASK_LoginMenu.EVENT_LOGGED_IN);
+            this.fire(LoginMenu.EVENT_LOGGED_IN);
             const doc = this.options.document;
             dialog.classList.remove('has-error', 'has-warning');
             const userMenu = doc.querySelector('#user_menu');
@@ -138,7 +140,7 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
                 n.classList.remove('disabled');
                 n.setAttribute('disabled', null);
             });
-            this.adapter.hideDialog('#loginDialog');
+            this.header.hideDialog('#loginDialog');
         }, () => {
             // reset error
             dialog.classList.remove('has-error', 'has-warning');
@@ -146,6 +148,6 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
         return dialog;
     }
 }
-PHOVEA_SECURITY_FLASK_LoginMenu.EVENT_LOGGED_IN = 'loggedIn';
-PHOVEA_SECURITY_FLASK_LoginMenu.EVENT_LOGGED_OUT = 'loggedOut';
+LoginMenu.EVENT_LOGGED_IN = 'loggedIn';
+LoginMenu.EVENT_LOGGED_OUT = 'loggedOut';
 //# sourceMappingURL=LoginMenu.js.map

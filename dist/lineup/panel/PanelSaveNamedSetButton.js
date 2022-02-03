@@ -23,13 +23,13 @@ export class PanelSaveNamedSetButton extends EventHandler {
       </div>
     `;
         lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_ALL, (_event, order) => {
-            this.node.querySelectorAll('[data-num-all-rows]').forEach((element) => element.dataset.numAllRows = order.length.toString());
+            this.node.querySelectorAll('[data-num-all-rows]').forEach((element) => (element.dataset.numAllRows = order.length.toString()));
         });
         lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, (_event, order) => {
-            this.node.querySelectorAll('[data-num-selected-rows]').forEach((element) => element.dataset.numSelectedRows = order.length.toString());
+            this.node.querySelectorAll('[data-num-selected-rows]').forEach((element) => (element.dataset.numSelectedRows = order.length.toString()));
         });
         lineupOrderRowIndices.on(LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED, (_event, order) => {
-            this.node.querySelectorAll('[data-num-filtered-rows]').forEach((element) => element.dataset.numFilteredRows = order.length.toString());
+            this.node.querySelectorAll('[data-num-filtered-rows]').forEach((element) => (element.dataset.numFilteredRows = order.length.toString()));
         });
         this.node.querySelectorAll('a').forEach((link) => {
             link.onclick = (_evt) => {

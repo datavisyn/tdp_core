@@ -16,3 +16,4 @@ interface PCPVisProps {
 }
 export declare function PCPVis({ config, optionsConfig, extensions, columns, setConfig, }: PCPVisProps): JSX.Element;
 export {};
+//# sourceMappingURL=PCPVis.d.ts.map

@@ -1,16 +1,15 @@
-import {BaseUtils} from '../base';
-import {I18nextManager} from '../i18n';
+import { BaseUtils } from '../base/BaseUtils';
+import { I18nextManager } from '../i18n';
 // TODO: Why?
 import '../webpack/_bootstrap';
-import {BuildInfo} from './buildInfo';
-import {AppMetaDataUtils} from './metaData';
-
+import { BuildInfo } from './buildInfo';
+import { AppMetaDataUtils } from './metaData';
 
 /**
  * header html template declared inline so we can use i18next
  */
 const getTemplate = () => {
-  return (`<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
+  return `<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#" data-header="appLink"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavBar" aria-controls="headerNavBar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,19 +22,25 @@ const getTemplate = () => {
         </ul>
         <ul class="navbar-nav" data-header="rightMenu">
             <li class="nav-item" hidden data-header="optionsLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerOptionsDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.options')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerOptionsDialog" title="${I18nextManager.getInstance().i18n.t(
+                  'phovea:ui.options',
+                )}">
                     <i class="fas fa-cog fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.openOptionsDialog')}</span>
                 </a>
             </li>
             <li class="nav-item" hidden data-header="aboutLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.about')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" title="${I18nextManager.getInstance().i18n.t(
+                  'phovea:ui.about',
+                )}">
                     <i class="fas fa-info fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.openAboutDialog')}</span>
                 </a>
             </li>
             <li class="nav-item" hidden data-header="bugLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" title="${I18nextManager.getInstance().i18n.t(
+                  'phovea:ui.reportBug',
+                )}">
                     <i class="fas fa-bug fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}</span>
                 </a>
@@ -112,12 +117,11 @@ const getTemplate = () => {
 
 <div id="headerWaitingOverlay" class="phovea-busy" hidden>
 </div>
-`);
+`;
 };
 
 // declare the function name of the `cookie-bar` for the TS compiler (see addEUCookieDisclaimer())
-declare var setupCookieBar: any;
-
+declare let setupCookieBar: any;
 
 /**
  * Defines a header link
@@ -143,8 +147,12 @@ export interface IHeaderLink {
  * Header link extends the header link with a  flag for disabling the logo
  */
 export class AppHeaderLink implements IHeaderLink {
-  constructor(public name = 'Phovea', public readonly action = (event: MouseEvent) => false, public readonly href: string = '#', public addLogo: boolean = true) {
-  }
+  constructor(
+    public name = 'Phovea',
+    public readonly action = (event: MouseEvent) => false,
+    public readonly href: string = '#',
+    public addLogo: boolean = true,
+  ) {}
 }
 
 /**
@@ -154,7 +162,7 @@ export class AppHeaderLink implements IHeaderLink {
  * @param href
  * @returns {HTMLElement}
  */
-function createLi(name: string, action: (event: MouseEvent) => any, href: string = '#') {
+function createLi(name: string, action: (event: MouseEvent) => any, href = '#') {
   const li = <HTMLElement>document.createElement('li');
   li.classList.add('nav-item');
   li.innerHTML = `<a href="${href}" class="nav-link">${name}</a>`;
@@ -162,6 +170,38 @@ function createLi(name: string, action: (event: MouseEvent) => any, href: string
     (<HTMLElement>li.querySelector('a')).onclick = action;
   }
   return li;
+}
+
+function defaultBuildInfo(_title: HTMLElement, content: HTMLElement) {
+  BuildInfo.build()
+    .then((buildInfo) => {
+      content.innerHTML = buildInfo.toHTML();
+    })
+    .catch((error) => {
+      content.innerHTML = error.toString();
+    });
+}
+
+function defaultAboutInfo(title: HTMLElement, content: HTMLElement) {
+  content = <HTMLElement>content.querySelector('.metaData');
+  AppMetaDataUtils.getMetaData().then((metaData) => {
+    title.innerHTML = (metaData.displayName || metaData.name).replace('_', ' ');
+    let contentTpl = `<p class="description">${metaData.description}</p>`;
+    if (metaData.homepage) {
+      contentTpl += `<p class="homepage"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.homepage')}</strong>: <a href="${
+        metaData.homepage
+      }" target="_blank" rel="noopener">${metaData.homepage}</a></p>`;
+    }
+    contentTpl += `<p class="version"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.version')}</strong>: ${metaData.version}</p>`;
+    if (metaData.screenshot) {
+      contentTpl += `<img src="${metaData.screenshot}" class="mx-auto img-fluid img-thumbnail"/>`;
+    }
+    content.innerHTML = contentTpl;
+  });
+}
+
+function defaultOptionsInfo(_title: HTMLElement, content: HTMLElement) {
+  content.innerHTML = I18nextManager.getInstance().i18n.t('phovea:ui.noOptionsAvailable');
 }
 
 export interface IAppHeaderOptions {
@@ -228,7 +268,6 @@ export interface IAppHeaderOptions {
  * The Caleydo App Header provides an app name and customizable menus
  */
 export class AppHeader {
-
   /**
    * Default options that can be overridden in the constructor
    * @private
@@ -252,12 +291,12 @@ export class AppHeader {
     /**
      * @DEPRECATED use `appLink.name` instead
      */
-    //app: 'Caleydo Web',
+    // app: 'Caleydo Web',
 
     /**
      * @DEPRECATED use `appLink.addLogo` instead
      */
-    //addLogo: true,
+    // addLogo: true,
 
     /**
      * the app link with the app name
@@ -292,7 +331,7 @@ export class AppHeader {
     /**
      * show help link
      */
-    showHelpLink: false
+    showHelpLink: false,
   };
 
   /**
@@ -361,7 +400,7 @@ export class AppHeader {
     this.toggleDarkTheme(this.options.inverse);
 
     // modify app header link
-    const appLink = (<HTMLElement>this.parent.querySelector('*[data-header="appLink"]'));
+    const appLink = <HTMLElement>this.parent.querySelector('*[data-header="appLink"]');
 
     appLink.innerHTML = this.options.appLink.name;
     appLink.onclick = this.options.appLink.action;
@@ -379,7 +418,10 @@ export class AppHeader {
     // show/hide links
     this.toggleOptionsLink(this.options.showOptionsLink !== false, typeof this.options.showOptionsLink === 'function' ? this.options.showOptionsLink : null);
     this.toggleAboutLink(this.options.showAboutLink !== false, typeof this.options.showAboutLink === 'function' ? this.options.showAboutLink : null);
-    this.toggleReportBugLink(this.options.showReportBugLink !== false, typeof this.options.showReportBugLink === 'function' ? this.options.showReportBugLink : null);
+    this.toggleReportBugLink(
+      this.options.showReportBugLink !== false,
+      typeof this.options.showReportBugLink === 'function' ? this.options.showReportBugLink : null,
+    );
     this.toggleHelpLink(this.options.showHelpLink !== false, typeof this.options.showHelpLink === 'string' ? this.options.showHelpLink : null);
 
     this.options.mainMenu.forEach((l) => this.addMainMenu(l.name, l.action, l.href));
@@ -407,14 +449,13 @@ export class AppHeader {
   }
 
   toggleDarkTheme(force?: boolean) {
-    const navbarElement = (<HTMLElement>this.parent.querySelector('nav.navbar'));
+    const navbarElement = <HTMLElement>this.parent.querySelector('nav.navbar');
 
-    this.options.inverse = (force !== undefined) ? force : !this.options.inverse;
+    this.options.inverse = force !== undefined ? force : !this.options.inverse;
 
     if (this.options.inverse) {
       navbarElement.classList.remove('navbar-light', 'bg-light');
       navbarElement.classList.add('navbar-dark', 'bg-dark');
-
     } else {
       navbarElement.classList.add('navbar-light', 'bg-light');
       navbarElement.classList.remove('navbar-dark', 'bg-dark');
@@ -422,8 +463,8 @@ export class AppHeader {
   }
 
   togglePositionFixed(force?: boolean) {
-    const navbarElement = (<HTMLElement>this.parent.querySelector('nav.navbar'));
-    this.options.positionFixed = (force !== undefined) ? force : !this.options.positionFixed;
+    const navbarElement = <HTMLElement>this.parent.querySelector('nav.navbar');
+    this.options.positionFixed = force !== undefined ? force : !this.options.positionFixed;
 
     navbarElement.classList.toggle('fixed-top', this.options.positionFixed);
   }
@@ -512,7 +553,8 @@ export class AppHeader {
   showAndFocusOn(selector: string, focusSelector: string) {
     import('jquery').then((jquery) => {
       const $selector = $(selector);
-      $selector.modal('show')
+      $selector
+        .modal('show')
         // @ts-ignore
         .on('shown.bs.modal', function () {
           $($selector).trigger('focus');
@@ -523,34 +565,4 @@ export class AppHeader {
   static create(parent: HTMLElement, options: IAppHeaderOptions = {}) {
     return new AppHeader(parent, options);
   }
-}
-
-
-
-function defaultBuildInfo(_title: HTMLElement, content: HTMLElement) {
-  BuildInfo.build().then((buildInfo) => {
-    content.innerHTML = buildInfo.toHTML();
-  }).catch((error) => {
-    content.innerHTML = error.toString();
-  });
-}
-
-function defaultAboutInfo(title: HTMLElement, content: HTMLElement) {
-  content = <HTMLElement>content.querySelector('.metaData');
-  AppMetaDataUtils.getMetaData().then((metaData) => {
-    title.innerHTML = (metaData.displayName || metaData.name).replace('_', ' ');
-    let contentTpl = `<p class="description">${metaData.description}</p>`;
-    if (metaData.homepage) {
-      contentTpl += `<p class="homepage"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.homepage')}</strong>: <a href="${metaData.homepage}" target="_blank" rel="noopener">${metaData.homepage}</a></p>`;
-    }
-    contentTpl += `<p class="version"><strong>${I18nextManager.getInstance().i18n.t('phovea:ui.version')}</strong>: ${metaData.version}</p>`;
-    if (metaData.screenshot) {
-      contentTpl += `<img src="${metaData.screenshot}" class="mx-auto img-fluid img-thumbnail"/>`;
-    }
-    content.innerHTML = contentTpl;
-  });
-}
-
-function defaultOptionsInfo(_title: HTMLElement, content: HTMLElement) {
-  content.innerHTML = I18nextManager.getInstance().i18n.t('phovea:ui.noOptionsAvailable');
 }

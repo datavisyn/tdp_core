@@ -57,7 +57,7 @@ export declare const BSAlert: ({ children, instanceRef, ...options }: {
      * Optional ref to get access to the instance of the BS class.
      */
     instanceRef?: (instance: Alert) => void;
-}) => JSX.Element;
+} & Record<string, unknown>) => JSX.Element;
 export declare const BSOffcanvas: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -67,7 +67,7 @@ export declare const BSOffcanvas: ({ children, instanceRef, ...options }: {
      * Optional ref to get access to the instance of the BS class.
      */
     instanceRef?: (instance: Offcanvas) => void;
-} & {
+} & Record<string, unknown> & {
     show?: boolean;
     relatedTarget?: HTMLElement;
     setShow?: (show: boolean) => void;
@@ -94,7 +94,7 @@ export declare const BSTab: ({ children, instanceRef, ...options }: {
      * Optional ref to get access to the instance of the BS class.
      */
     instanceRef?: (instance: Tab) => void;
-}) => JSX.Element;
+} & Record<string, unknown>) => JSX.Element;
 export declare const BSCollapse: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -121,3 +121,4 @@ export declare const BSDropdown: ({ children, instanceRef, ...options }: {
     show?: boolean;
     setShow?: (show: boolean) => void;
 }) => JSX.Element;
+//# sourceMappingURL=useBootstrap.d.ts.map

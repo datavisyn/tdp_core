@@ -22,3 +22,4 @@ interface ViolinVisProps {
 }
 export declare function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales }: ViolinVisProps): JSX.Element;
 export {};
+//# sourceMappingURL=ViolinVis.d.ts.map

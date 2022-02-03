@@ -1,5 +1,4 @@
-import { ILayoutContainer, ILayoutDump } from '../interfaces';
-import { EOrientation, IDropArea } from '../interfaces';
+import { ILayoutContainer, ILayoutDump, EOrientation, IDropArea } from '../interfaces';
 import { ASequentialLayoutContainer, ISequentialLayoutContainerOptions } from './ASequentialLayoutContainer';
 export interface ILineUpLayoutContainer extends ISequentialLayoutContainerOptions {
     stackLayout: boolean;
@@ -26,3 +25,4 @@ export declare class LineUpLayoutContainer extends ASequentialLayoutContainer<IL
         stackLayout: boolean;
     };
 }
+//# sourceMappingURL=LineUpLayoutContainer.d.ts.map

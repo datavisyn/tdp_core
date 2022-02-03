@@ -10,9 +10,7 @@ export * from './Player';
 export * from './Compression';
 export * from './annotation';
 export * from './Selection';
-export * from './Multiform';
 export * from './EmbeddedCLUE';
-export * from './extensions';
 export * from './ThumbnailUtils';
 export * from './WrapperUtils';
 export * from './CLUEGraphManager';
@@ -29,7 +27,7 @@ export * from './BaseUtils';
 export * from './Session';
 export * from './statistics';
 export * from './promise';
-export * from './BaseUtils';
 export * from './PropertyHandler';
 export * from './HashProperties';
 export * from './WebpackEnv';
+//# sourceMappingURL=index.d.ts.map

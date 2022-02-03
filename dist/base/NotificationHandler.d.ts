@@ -5,3 +5,4 @@ export declare class NotificationHandler {
     static successfullySaved(type: string, name: string): void;
     static successfullyDeleted(type: string, name: string): void;
 }
+//# sourceMappingURL=NotificationHandler.d.ts.map

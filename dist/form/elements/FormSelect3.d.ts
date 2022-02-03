@@ -1,8 +1,8 @@
+import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
 import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
 import { ISelect2Option } from './FormSelect2';
-import * as d3 from 'd3';
 import { IPluginDesc } from '../../base';
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
     return?: 'text' | 'id';
@@ -42,12 +42,12 @@ export declare class FormSelect3 extends AFormElement<IFormSelect3> {
      * Bind the change listener and propagate the selection by firing a change event
      */
     init(): void;
+    hasValue(): boolean;
     /**
      * Returns the selected value or if nothing found `null`
      * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
      */
     get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[];
-    hasValue(): boolean;
     /**
      * Select the option by value. If no value found, then the first option is selected.
      * @param v If string then compares to the option value property. Otherwise compares the object reference.
@@ -56,3 +56,4 @@ export declare class FormSelect3 extends AFormElement<IFormSelect3> {
     focus(): void;
 }
 export {};
+//# sourceMappingURL=FormSelect3.d.ts.map

@@ -1,12 +1,11 @@
 import * as d3 from 'd3';
-import {BaseUtils} from '../../base';
-import {IFormElement, IForm, IFormElementDesc} from '../interfaces';
+import { BaseUtils } from '../../base';
+import { IFormElement, IForm, IFormElementDesc } from '../interfaces';
 
 /**
  * Builds a form from a given collection of form elements
  */
 export class Form implements IForm {
-
   /**
    * DOM node for the form itself
    */
@@ -76,8 +75,8 @@ export class Form implements IForm {
   getElementData(): { [key: string]: any } {
     const r: { [key: string]: any } = {};
     this.elements.forEach((el, key) => {
-      const value = el.value;
-      r[key] = (value !== null && value.data !== undefined) ? value.data : value;
+      const { value } = el;
+      r[key] = value !== null && value.data !== undefined ? value.data : value;
     });
     return r;
   }
@@ -89,7 +88,7 @@ export class Form implements IForm {
   getElementValues(): { [key: string]: any } {
     const r: { [key: string]: any } = {};
     this.elements.forEach((el, key) => {
-      const value = el.value;
+      const { value } = el;
       r[key] = value.value || value;
     });
     return r;
@@ -114,10 +113,10 @@ export class Form implements IForm {
    * @param formId id of the form the element will be append to
    */
   static updateElementDesc(desc: IFormElementDesc, formId: string): IFormElementDesc {
-    const elementDesc = Object.assign({}, desc); // create copy
+    const elementDesc = { ...desc }; // create copy
 
     // inject formId into form element id
-    const uid = elementDesc.id + '_' + formId;
+    const uid = `${elementDesc.id}_${formId}`;
 
     elementDesc.attributes = elementDesc.attributes || {};
     elementDesc.attributes.id = uid; // add id as attribute

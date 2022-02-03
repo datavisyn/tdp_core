@@ -20,3 +20,4 @@ export declare class PopupProxy<T extends INodeVis> {
     close(): void;
     open(): void;
 }
+//# sourceMappingURL=PopupWindow.d.ts.map

@@ -25,3 +25,4 @@ export declare class VisUtils {
     static listVisPlugins(data: IDataType): IVisPluginDesc[];
     static assignVis(node: Element, vis: IVisInstance): void;
 }
+//# sourceMappingURL=VisUtils.d.ts.map

@@ -1,8 +1,7 @@
 import { Column, IColumnDesc } from 'lineupjs';
-import { ISelection } from '../../base/interfaces';
-import { IScoreRow } from '../../base/interfaces';
+import { ISelection, IScoreRow } from '../../base/interfaces';
 export interface ISelectionColumn {
-    readonly id: number;
+    readonly id: string;
     readonly desc: IColumnDesc;
     readonly data: Promise<IScoreRow<any>[]>;
     readonly position?: number;
@@ -31,9 +30,9 @@ export interface IContext {
     remove(columns: Column[]): any;
     /**
      * free the color from the color management
-     * @param {number} id
+     * @param {string} id
      */
-    freeColor(id: number): void;
+    freeColor(id: string): void;
 }
 /**
  * adapter for handling input selections as LineUp columns
@@ -50,3 +49,4 @@ export interface ISelectionAdapter {
      */
     selectionChanged(waitForIt: Promise<any> | null, context: () => IContext): PromiseLike<any>;
 }
+//# sourceMappingURL=ISelectionAdapter.d.ts.map

@@ -1,14 +1,12 @@
 import { IDType, SelectOperation } from '../idtype';
-import { Range } from '../range';
 import { ADataType } from '../data/datatype';
 import { ObjectNode, IObjectRef } from './ObjectNode';
 import { StateNode } from './StateNode';
 import { ActionNode } from './ActionNode';
-import { IAction } from './ICmd';
+import { IAction, IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
 import { SlideNode } from './SlideNode';
 import { GraphEdge } from '../graph/graph';
 import { GraphBase } from '../graph/GraphBase';
-import { IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
 import { ActionMetaData } from './ActionMeta';
 export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> implements IProvenanceGraph {
     backend: GraphBase;
@@ -26,9 +24,8 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     migrateBackend(backend: GraphBase): void;
     get isEmpty(): boolean;
     get dim(): number[];
-    ids(range?: Range): Promise<Range>;
     selectState(state: StateNode, op?: SelectOperation, type?: string, extras?: {}): void;
-    selectSlide(state: SlideNode, op?: SelectOperation, type?: string, extras?: {}): void;
+    selectSlide(slide: SlideNode, op?: SelectOperation, type?: string, extras?: {}): void;
     selectAction(action: ActionNode, op?: SelectOperation, type?: string): void;
     selectedStates(type?: string): StateNode[];
     selectedSlides(type?: string): SlideNode[];
@@ -107,3 +104,4 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     static updateInverse(node: ActionNode, graph: ProvenanceGraph, inverter: IInverseActionCreator): void;
     static execute(node: ActionNode, graph: ProvenanceGraph, withinMilliseconds: number): PromiseLike<ICmdResult>;
 }
+//# sourceMappingURL=ProvenanceGraph.d.ts.map

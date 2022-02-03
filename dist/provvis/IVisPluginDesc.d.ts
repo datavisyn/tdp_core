@@ -16,3 +16,4 @@ export interface IVisPluginDesc extends IPluginDesc, IVisMetaData {
      */
     iconify(node: HTMLElement): HTMLElement;
 }
+//# sourceMappingURL=IVisPluginDesc.d.ts.map

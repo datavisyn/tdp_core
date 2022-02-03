@@ -1,25 +1,25 @@
-import {BaseUtils} from '../base/BaseUtils';
-import {DataCache} from '../data/DataCache';
-import {ProvenanceGraph} from './ProvenanceGraph';
-import {IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions} from './provenance';
-import {IProvenanceGraphDataDescription} from './ICmd';
-import {ProvenanceGraphUtils} from './ProvenanceGraphUtils';
-import {GraphBase} from '../graph/GraphBase';
-import {UserSession} from '../app/UserSession';
-import {GraphProxy} from '../graph/GraphProxy';
-import {RemoteStoreGraph} from '../graph/RemoteStorageGraph';
-import {ResolveNow} from '../base/promise';
-import {IDataType} from '../data/datatype';
-import {AGraph} from '../graph';
+import { BaseUtils } from '../base/BaseUtils';
+import { DataCache } from '../data/DataCache';
+import { ProvenanceGraph } from './ProvenanceGraph';
+import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
+import { IProvenanceGraphDataDescription } from './ICmd';
+import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
+import { GraphBase } from '../graph/GraphBase';
+import { UserSession } from '../app/UserSession';
+import { GraphProxy } from '../graph/GraphProxy';
+import { RemoteStoreGraph } from '../graph/RemoteStorageGraph';
+import { ResolveNow } from '../base/promise';
+import { IDataType } from '../data/datatype';
+import { AGraph } from '../graph';
 
-// tslint:disable-next-line: no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IRemoteStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
   // empty for now
 }
 
 export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphManager {
   private options: IRemoteStorageProvenanceGraphManagerOptions = {
-    application: 'unknown'
+    application: 'unknown',
   };
 
   constructor(options: IRemoteStorageProvenanceGraphManagerOptions = {}) {
@@ -27,11 +27,15 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
   }
 
   async list(): Promise<IProvenanceGraphDataDescription[]> {
-    return (await DataCache.getInstance().list((d) => d.desc.type === 'graph' && (<any>d.desc).attrs.graphtype === 'provenance_graph' && (<any>d.desc).attrs.of === this.options.application)).map((di) => <any>di.desc);
+    return (
+      await DataCache.getInstance().list(
+        (d) => d.desc.type === 'graph' && (<any>d.desc).attrs.graphtype === 'provenance_graph' && (<any>d.desc).attrs.of === this.options.application,
+      )
+    ).map((di) => <any>di.desc);
   }
 
   async getGraph(desc: IProvenanceGraphDataDescription): Promise<GraphBase> {
-    return (<any>(await DataCache.getInstance().get(desc.id))).impl(ProvenanceGraphUtils.provenanceGraphFactory());
+    return (<any>await DataCache.getInstance().get(desc.id)).impl(ProvenanceGraphUtils.provenanceGraphFactory());
   }
 
   async get(desc: IProvenanceGraphDataDescription): Promise<ProvenanceGraph> {
@@ -39,31 +43,36 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
   }
 
   delete(desc: IProvenanceGraphDataDescription) {
-    return  DataCache.getInstance().remove(desc);
+    return DataCache.getInstance().remove(desc);
   }
 
   clone(graph: GraphBase, desc: any = {}): PromiseLike<ProvenanceGraph> {
     return this.import(graph.persist(), desc);
   }
 
-  private importImpl(json: {nodes: any[], edges: any[]}, desc: any = {}): PromiseLike<AGraph> {
-    const pdesc: any = BaseUtils.mixin({
-      type: 'graph',
-      attrs: {
-        graphtype: 'provenance_graph',
-        of: this.options.application
-      },
-      name: 'Persistent WS',
-      creator: UserSession.getInstance().currentUserNameOrAnonymous(),
-      ts: Date.now(),
-      description: '',
+  private importImpl(json: { nodes: any[]; edges: any[] }, desc: any = {}): PromiseLike<AGraph> {
+    const pdesc: any = BaseUtils.mixin(
+      {
+        type: 'graph',
+        attrs: {
+          graphtype: 'provenance_graph',
+          of: this.options.application,
+        },
+        name: 'Persistent WS',
+        creator: UserSession.getInstance().currentUserNameOrAnonymous(),
+        ts: Date.now(),
+        description: '',
 
-      nodes: json.nodes,
-      edges: json.edges
-    }, desc);
-    return DataCache.getInstance().upload(pdesc).then((base: IDataType) => {
-      return (<GraphProxy>base).impl(ProvenanceGraphUtils.provenanceGraphFactory());
-    });
+        nodes: json.nodes,
+        edges: json.edges,
+      },
+      desc,
+    );
+    return DataCache.getInstance()
+      .upload(pdesc)
+      .then((base: IDataType) => {
+        return (<GraphProxy>base).impl(ProvenanceGraphUtils.provenanceGraphFactory());
+      });
   }
 
   import(json: any, desc: any = {}): PromiseLike<ProvenanceGraph> {
@@ -73,18 +82,19 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
   }
 
   migrate(graph: ProvenanceGraph, desc: any = {}): PromiseLike<ProvenanceGraph> {
-    return this.importImpl({nodes: [], edges: []}, desc).then((backend: RemoteStoreGraph) => {
+    return this.importImpl({ nodes: [], edges: [] }, desc).then((backend: RemoteStoreGraph) => {
       return ResolveNow.resolveImmediately(graph.backend.migrate())
-        .then(({nodes, edges}) => {
+        .then(({ nodes, edges }) => {
           return backend.addAll(nodes, edges);
-        }).then(() => {
+        })
+        .then(() => {
           graph.migrateBackend(backend);
           return graph;
         });
     });
   }
 
-  async edit(graph: ProvenanceGraph|IProvenanceGraphDataDescription, desc: any = {}) {
+  async edit(graph: ProvenanceGraph | IProvenanceGraphDataDescription, desc: any = {}) {
     const base = graph instanceof ProvenanceGraph ? graph.desc : graph;
     BaseUtils.mixin(base, desc);
     const graphProxy = await DataCache.getInstance().get(base.id);
@@ -93,22 +103,25 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
   }
 
   async create(desc: any = {}) {
-    const pdesc: IProvenanceGraphDataDescription = BaseUtils.mixin({
-      id: undefined,
-      type: 'graph',
-      attrs: {
-        graphtype: 'provenance_graph',
-        of: this.options.application
+    const pdesc: IProvenanceGraphDataDescription = BaseUtils.mixin(
+      {
+        id: undefined,
+        type: 'graph',
+        attrs: {
+          graphtype: 'provenance_graph',
+          of: this.options.application,
+        },
+        name: `Persistent WS`,
+        fqname: `provenance_graphs/Persistent WS`,
+        creator: UserSession.getInstance().currentUserNameOrAnonymous(),
+        size: <[number, number]>[0, 0],
+        ts: Date.now(),
+        description: '',
       },
-      name: `Persistent WS`,
-      fqname: `provenance_graphs/Persistent WS`,
-      creator: UserSession.getInstance().currentUserNameOrAnonymous(),
-      size: <[number, number]>[0, 0],
-      ts: Date.now(),
-      description: ''
-    }, desc);
+      desc,
+    );
 
-    const impl: Promise<GraphBase> = (<any>(await DataCache.getInstance().upload(pdesc))).impl(ProvenanceGraphUtils.provenanceGraphFactory());
+    const impl: Promise<GraphBase> = (<any>await DataCache.getInstance().upload(pdesc)).impl(ProvenanceGraphUtils.provenanceGraphFactory());
     return impl.then((i) => new ProvenanceGraph(<IProvenanceGraphDataDescription>i.desc, i));
   }
 }

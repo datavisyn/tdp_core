@@ -1,6 +1,5 @@
-import {__extends} from 'tslib';
-import {IIterable} from './IIterable';
-
+import { __extends } from 'tslib';
+import { IIterable } from './IIterable';
 
 export class BaseUtils {
   /**
@@ -11,11 +10,11 @@ export class BaseUtils {
    */
   static mixin<T, U>(a: T, b: U, ...bs: any[]): T & U {
     bs.unshift(b);
-    function extend(r: any, b: any) {
-      Object.keys(b).forEach((key) => {
-        const v = b[key];
+    function extend(r: any, p: any) {
+      Object.keys(p).forEach((key) => {
+        const v = p[key];
         if (Object.prototype.toString.call(v) === '[object Object]') {
-          r[key] = (r[key] != null) ? extend(r[key], v) : v;
+          r[key] = r[key] != null ? extend(r[key], v) : v;
         } else {
           r[key] = v;
         }
@@ -23,9 +22,9 @@ export class BaseUtils {
       return r;
     }
 
-    bs.forEach((b) => {
-      if (b) {
-        a = extend(a, b);
+    bs.forEach((p) => {
+      if (p) {
+        a = extend(a, p);
       }
     });
     return <any>a;
@@ -40,8 +39,7 @@ export class BaseUtils {
     return typeof obj === 'undefined';
   }
 
-
-  //fixes a javascript bug on using "%" with negative numbers
+  // fixes a javascript bug on using "%" with negative numbers
   static mod(n: number, m: number) {
     return ((n % m) + m) % m;
   }
@@ -61,7 +59,7 @@ export class BaseUtils {
    * getter generator by name or index
    * @deprecated too simple to write
    */
-  static getter(...attr: (number|string)[]) {
+  static getter(...attr: (number | string)[]) {
     if (attr.length === 1) {
       return (obj: any) => obj[attr[0]];
     }
@@ -74,7 +72,7 @@ export class BaseUtils {
    * @return {boolean}
    */
   static isFunction(f: any) {
-    return typeof(f) === 'function';
+    return typeof f === 'function';
   }
 
   /**
@@ -90,7 +88,7 @@ export class BaseUtils {
    * @deprecated use `()=>undefined`
    */
   static noop() {
-    //no op
+    // no op
   }
 
   /**
@@ -134,11 +132,12 @@ export class BaseUtils {
    * @deprecated
    */
   static callable(obj: any, f: string) {
-    //assert this.isPlainObject(obj);
+    // assert this.isPlainObject(obj);
     function CallAbleFactory() {
       let that: any;
 
       function CallAble() {
+        // eslint-disable-next-line prefer-rest-params
         that[f].apply(that, Array.from(arguments));
       }
 
@@ -169,8 +168,9 @@ export class BaseUtils {
    * @return {string}
    */
   static fixId(name: string) {
+    // eslint-disable-next-line no-useless-escape
     const clean = name.replace(/[\s!#$%&'()*+,.\/:;<=>?@\[\\\]\^`{|}~_-]/g, ' ');
-    const words = clean.trim().split(/\s+/); //remove heading and trailing spaces and combine multiple one during split
+    const words = clean.trim().split(/\s+/); // remove heading and trailing spaces and combine multiple one during split
     return words.map((w, i) => (i === 0 ? w[0].toLowerCase() : w[0].toUpperCase()) + w.slice(1)).join('');
   }
 
@@ -183,7 +183,6 @@ export class BaseUtils {
     __extends(subClass, baseClass);
   }
 
-
   /**
    * create a debounce call, can be called multiple times but only the last one at most delayed by timeToDelay will be executed
    * @param callback
@@ -192,13 +191,14 @@ export class BaseUtils {
    */
   static debounce(this: any, callback: () => void, timeToDelay = 100) {
     let tm = -1;
-    return function(...args: any[]) {
+    return function (...args: any[]) {
       if (tm >= 0) {
-        clearTimeout(tm);
+        window.clearTimeout(tm);
         tm = -1;
       }
       args.unshift(this);
-      tm = self.setTimeout(callback.bind.apply(callback, args), timeToDelay);
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      tm = window.setTimeout(callback.bind.apply(callback, args), timeToDelay);
     };
   }
 
@@ -209,7 +209,7 @@ export class BaseUtils {
    */
   static offset(element: Element) {
     if (!element) {
-      return {left: 0, top: 0, width: 0, height: 0};
+      return { left: 0, top: 0, width: 0, height: 0 };
     }
     const obj = element.getBoundingClientRect();
     const w = element.ownerDocument.defaultView;
@@ -217,7 +217,7 @@ export class BaseUtils {
       left: obj.left + w.pageXOffset,
       top: obj.top + w.pageYOffset,
       width: obj.width,
-      height: obj.height
+      height: obj.height,
     };
   }
 
@@ -228,14 +228,14 @@ export class BaseUtils {
    */
   static bounds(element: Element) {
     if (!element) {
-      return {x: 0, y: 0, w: 0, h: 0};
+      return { x: 0, y: 0, w: 0, h: 0 };
     }
     const obj = element.getBoundingClientRect();
     return {
       x: obj.left,
       y: obj.top,
       w: obj.width,
-      h: obj.height
+      h: obj.height,
     };
   }
 
@@ -258,18 +258,47 @@ export class BaseUtils {
    * @return {[number,number]} [min, max]
    */
   static extent(arr: IIterable<number>): [number, number] {
-    let min = NaN, max = NaN;
+    let min = NaN;
+    let max = NaN;
     arr.forEach((v) => {
-      if (isNaN(v)) {
+      if (Number.isNaN(v)) {
         return;
       }
-      if (isNaN(min) || min > v) {
+      if (Number.isNaN(min) || min > v) {
         min = v;
       }
-      if (isNaN(max) || min < v) {
+      if (Number.isNaN(max) || min < v) {
         max = v;
       }
     });
     return [min, max];
   }
+}
+
+/**
+ * Debounces a function returning a promise and properly returns a promise resolving when the function is finally evaluated.
+ * See https://github.com/lodash/lodash/issues/4400 for details why lodash#debounce does not work in cases like this.
+ * @param callback Function to be debounced.
+ * @param wait Wait time in milliseconds.
+ */
+export function debounceAsync<T, Callback extends (...args: any[]) => Promise<T>>(
+  callback: Callback,
+  wait: number,
+): (...args: Parameters<Callback>) => Promise<T> {
+  let timeoutId: number | null = null;
+
+  return (...args: any[]) => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+
+    return new Promise<T>((resolve) => {
+      const timeoutPromise = new Promise<void>((r) => {
+        timeoutId = window.setTimeout(r, wait);
+      });
+      timeoutPromise.then(async () => {
+        resolve(await callback(...args));
+      });
+    });
+  };
 }

@@ -13,7 +13,7 @@ export class SelectionChooser {
             selectNewestByDefault: true,
             readableIDType: null,
             readableTargetIDType: null,
-            label: 'Show'
+            label: 'Show',
         };
         Object.assign(this.options, options);
         this.target = targetIDType ? IDTypeManager.getInstance().resolveIdType(targetIDType) : null;
@@ -27,7 +27,7 @@ export class SelectionChooser {
             options: {
                 optionsData: [],
             },
-            useSession: true
+            useSession: true,
         };
     }
     init(selection) {
@@ -48,28 +48,26 @@ export class SelectionChooser {
     }
     async toItems(selection) {
         const source = selection.idtype;
-        const sourceIds = selection.range.dim(0).asList();
-        const sourceNames = await source.unmap(sourceIds);
+        const sourceNames = selection.ids;
         const readAble = this.readAble || null;
-        const readAbleNames = !readAble || readAble === source ? null : await IDTypeManager.getInstance().mapToFirstName(source, sourceIds, readAble);
+        const readAbleNames = !readAble || readAble === source ? null : await IDTypeManager.getInstance().mapNameToFirstName(source, sourceNames, readAble);
         const labels = readAbleNames ? (this.options.appendOriginalLabel ? readAbleNames.map((d, i) => `${d} (${sourceNames[i]})`) : readAbleNames) : sourceNames;
         const target = this.target || source;
         if (target === source) {
-            return sourceIds.map((d, i) => ({
-                value: String(d),
+            return sourceNames.map((d, i) => ({
+                value: d,
                 name: labels[i],
-                data: { id: d, name: sourceNames[i], label: labels[i] }
+                data: { id: d, name: sourceNames[i], label: labels[i] },
             }));
         }
-        const targetIds = await IDTypeManager.getInstance().mapToID(source, sourceIds, target);
-        const targetIdsFlat = [].concat(...targetIds);
-        const targetNames = await target.unmap(targetIdsFlat);
+        const targetIds = await IDTypeManager.getInstance().mapNameToName(source, sourceNames, target);
+        const targetNames = targetIds.flat();
         if (target === readAble && targetIds.every((d) => d.length === 1)) {
             // keep it simple target = readable and single hit - so just show flat
             return targetIds.map((d, i) => ({
-                value: String(d[0]),
+                value: d[0],
                 name: labels[i],
-                data: { id: d[0], name: targetNames[i], label: labels[i] }
+                data: { id: d[0], name: targetNames[i], label: labels[i] },
             }));
         }
         // in case of either 1:n mappings or when the target IDType and the readable IDType are different the readableIDType maps to the groups, the actual options would be mapped to the target IDType (e.g. some unreadable IDs).
@@ -90,11 +88,13 @@ export class SelectionChooser {
                 // fake option with null value
                 return {
                     name,
-                    children: [{
+                    children: [
+                        {
                             name: I18nextManager.getInstance().i18n.t('tdp:core.views.formSelectName'),
                             value: '',
-                            data: SelectionChooser.INVALID_MAPPING
-                        }]
+                            data: SelectionChooser.INVALID_MAPPING,
+                        },
+                    ],
                 };
             }
             return {
@@ -105,9 +105,9 @@ export class SelectionChooser {
                     data: {
                         id: d,
                         name: originalTargetNames[j],
-                        label: groupNames[j]
-                    }
-                }))
+                        label: groupNames[j],
+                    },
+                })),
             };
         });
         return base.length === 1 ? base[0].children : base;
@@ -168,6 +168,6 @@ export class SelectionChooser {
 SelectionChooser.INVALID_MAPPING = {
     name: 'Invalid',
     id: -1,
-    label: ''
+    label: '',
 };
 //# sourceMappingURL=SelectionChooser.js.map

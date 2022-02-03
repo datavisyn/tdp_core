@@ -59,3 +59,4 @@ export declare class ButtonModeSelector {
     private build;
     static createButton(parent: Element, options?: any): ButtonModeSelector;
 }
+//# sourceMappingURL=mode.d.ts.map

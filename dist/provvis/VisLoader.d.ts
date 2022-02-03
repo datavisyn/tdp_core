@@ -7,3 +7,4 @@ export declare class VisLoader {
         thumbnails: boolean;
     }): () => Promise<VerticalStoryVis>;
 }
+//# sourceMappingURL=VisLoader.d.ts.map

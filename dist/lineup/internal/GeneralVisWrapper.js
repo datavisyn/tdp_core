@@ -1,5 +1,6 @@
 import { Ranking } from 'lineupjs';
-import { EventHandler, IDTypeManager, Range } from '../..';
+import { IDTypeManager } from '../..';
+import { EventHandler } from '../../base';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Vis } from '../../vis/Vis';
@@ -56,10 +57,9 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
     selectCallback(selected) {
-        const r = Range.list(selected);
         //???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
+        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
     }
     filterCallback(s) {
         const selectedIds = this.provider.getSelection();

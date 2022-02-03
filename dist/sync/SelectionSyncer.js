@@ -8,15 +8,15 @@ export class SelectionSyncerOptionUtils {
         options.selectionTypes.forEach((type) => {
             const key = `${PREFIX}${idType.id}-${type}`;
             let disable = false;
-            idType.on('select-' + type, (event, type, selection) => {
+            idType.on(`select-${type}`, (event, t, selection) => {
                 if (disable) {
                     return;
                 }
                 // sync just the latest state
-                store.setValue(key, selection.toString());
+                store.setValue(key, selection);
             });
             store.on(key, (event, newValue) => {
-                disable = true; //don't track on changes
+                disable = true; // don't track on changes
                 idType.select(type, newValue);
                 disable = false;
             });
@@ -25,10 +25,12 @@ export class SelectionSyncerOptionUtils {
     static create(store, options) {
         options = BaseUtils.mixin({
             filter: () => true,
-            selectionTypes: [SelectionUtils.defaultSelectionType] // by default just selections
+            selectionTypes: [SelectionUtils.defaultSelectionType],
         }, options);
         // store existing
-        const toSync = IDTypeManager.getInstance().listIdTypes().filter((idType) => (idType instanceof IDType && options.filter(idType)));
+        const toSync = IDTypeManager.getInstance()
+            .listIdTypes()
+            .filter((idType) => idType instanceof IDType && options.filter(idType));
         toSync.forEach((idType) => SelectionSyncerOptionUtils.syncIDType(store, idType, options));
         // watch new ones
         GlobalEventHandler.getInstance().on('register.idtype', (event, idType) => {

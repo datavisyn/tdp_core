@@ -18,3 +18,4 @@ export declare function scatterMergeDefaultConfig(columns: (NumericalColumn | Ca
 export declare function createScatterTraces(columns: (NumericalColumn | CategoricalColumn)[], selected: {
     [key: number]: boolean;
 }, config: IScatterConfig, scales: Scales, shapes: string[] | null): PlotlyInfo;
+//# sourceMappingURL=utils.d.ts.map

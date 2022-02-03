@@ -1,7 +1,6 @@
-import { LocalDataProvider, IColumnDesc, ICategory, ICategoryNode } from 'lineupjs';
+import { LocalDataProvider, ICategory, ICategoryNode } from 'lineupjs';
 import { IServerColumn } from '../base/rest';
 import { IAdditionalColumnDesc } from '../base/interfaces';
-import { IAnyVector } from '../vector';
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {
     /**
      * visible by default
@@ -75,9 +74,9 @@ export declare class ColumnDescUtils {
      * @returns {IAdditionalColumnDesc}
      */
     static booleanCol(column: string, options?: Partial<IColumnOptions>): IAdditionalColumnDesc;
-    static deriveCol(col: IAnyVector): IColumnDesc;
     static createInitialRanking(provider: LocalDataProvider, options?: Partial<IInitialRankingOptions>): void;
     static deriveColumns(columns: IServerColumn[]): IAdditionalColumnDesc[];
     private static isHierarchical;
     private static deriveHierarchy;
 }
+//# sourceMappingURL=desc.d.ts.map

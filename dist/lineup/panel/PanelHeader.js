@@ -59,6 +59,9 @@ export class PanelHeader {
                     this.node.append(this.endToolbar);
                 }
                 this.endToolbar.append(button.node);
+                break;
+            default:
+                break;
         }
     }
 }

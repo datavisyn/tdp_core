@@ -19,3 +19,4 @@ export declare class NamedSetList {
     protected findFilters(): Promise<(metaData: object) => boolean>;
     protected list(): Promise<INamedSet[]>;
 }
+//# sourceMappingURL=NamedSetList.d.ts.map

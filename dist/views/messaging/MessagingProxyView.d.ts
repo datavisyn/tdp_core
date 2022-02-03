@@ -25,7 +25,7 @@ export declare class MessagingProxyView extends AView {
     private build;
     private onWindowMessage;
     destroy(): void;
-    protected selectionChanged(name?: string): Promise<void>;
+    protected selectionChanged(name?: string): void;
     protected itemSelectionChanged(name?: string): Promise<void>;
     protected parameterChanged(name: string): void;
     private sendInputSelectionMessage;
@@ -35,3 +35,4 @@ export declare class MessagingProxyView extends AView {
     private static isNoNSecurePage;
     private showNoHttpsMessage;
 }
+//# sourceMappingURL=MessagingProxyView.d.ts.map

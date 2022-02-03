@@ -1,5 +1,5 @@
-import { AView } from './AView';
 import { select } from 'd3';
+import { AView } from './AView';
 /**
  * utiltity view to work with the node using d3
  * @deprecated
