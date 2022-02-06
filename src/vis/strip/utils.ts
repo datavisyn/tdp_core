@@ -52,12 +52,12 @@ export async function createStripTraces(
         };
     }
 
-    const _numCols: VisNumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as VisNumericalColumn[];
-    const _catCols: VisCategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as VisCategoricalColumn[];
+    const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
+    const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
     const plots: PlotlyData[] = [];
 
-    const numColValues = await resolveColumnValues(_numCols);
-    const catColValues = await resolveColumnValues(_catCols);
+    const numColValues = await resolveColumnValues(numCols);
+    const catColValues = await resolveColumnValues(catCols);
 
 
     // if we only have numerical columns, add them individually

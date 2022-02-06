@@ -82,7 +82,7 @@ export async function createScatterTraces(
         return emptyVal;
     }
 
-    const numCols: VisNumericalColumn[] = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL) as VisNumericalColumn[];
+    const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
     const plots: PlotlyData[] = [];
 
     const validCols = await resolveColumnValues(numCols);

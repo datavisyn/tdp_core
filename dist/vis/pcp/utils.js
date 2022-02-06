@@ -8,28 +8,27 @@ export function isPCP(s) {
 }
 const defaultConfig = {
     type: ESupportedPlotlyVis.PCP,
-    numColumnsSelected: [],
-    catColumnsSelected: [],
+    allColumnsSelected: []
 };
 export function pcpMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
-    if (merged.numColumnsSelected.length === 0 && columns.length > 1) {
+    if (merged.allColumnsSelected.length === 0 && columns.length > 1) {
         // FIXME It is always selecting the last two columns, no matter their type. (@see https://github.com/datavisyn/reprovisyn/issues/199)
-        merged.numColumnsSelected.push(columns[columns.length - 1].info);
-        merged.numColumnsSelected.push(columns[columns.length - 2].info);
+        merged.allColumnsSelected.push(columns[columns.length - 1].info);
+        merged.allColumnsSelected.push(columns[columns.length - 2].info);
     }
-    else if (merged.numColumnsSelected.length === 1 && columns.length > 1) {
-        if (columns[columns.length - 1].info.id !== merged.numColumnsSelected[0].id) {
-            merged.numColumnsSelected.push(columns[columns.length - 1].info);
+    else if (merged.allColumnsSelected.length === 1 && columns.length > 1) {
+        if (columns[columns.length - 1].info.id !== merged.allColumnsSelected[0].id) {
+            merged.allColumnsSelected.push(columns[columns.length - 1].info);
         }
         else {
-            merged.numColumnsSelected.push(columns[columns.length - 2].info);
+            merged.allColumnsSelected.push(columns[columns.length - 2].info);
         }
     }
     return merged;
 }
 export async function createPCPTraces(columns, config) {
-    if (!config.numColumnsSelected || !config.catColumnsSelected) {
+    if (!config.allColumnsSelected) {
         return {
             plots: [],
             legendPlots: [],
@@ -38,9 +37,8 @@ export async function createPCPTraces(columns, config) {
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
-    const numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
-    const catCols = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL);
-    if (numCols.length + catCols.length < 2) {
+    const allCols = config.allColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
+    if (config.allColumnsSelected.length < 2) {
         return {
             plots: [],
             legendPlots: [],
@@ -49,14 +47,13 @@ export async function createPCPTraces(columns, config) {
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
         };
     }
-    const numColValues = await resolveColumnValues(numCols);
-    const catColValues = await resolveColumnValues(catCols);
+    const allColValues = await resolveColumnValues(allCols);
     const plot = {
         xLabel: null,
         yLabel: null,
         data: {
-            dimensions: [
-                ...numColValues.map((c, i) => {
+            dimensions: allColValues.map((c, i) => {
+                if (c.type === EColumnTypes.NUMERICAL) {
                     return {
                         range: [
                             d3.min(c.resolvedValues.map((v) => v.val)),
@@ -65,8 +62,8 @@ export async function createPCPTraces(columns, config) {
                         label: c.info.name,
                         values: c.resolvedValues.map((v) => v.val),
                     };
-                }),
-                ...catColValues.map((c) => {
+                }
+                else {
                     const uniqueList = [
                         ...new Set(c.resolvedValues.map((v) => v.val)),
                     ];
@@ -77,8 +74,8 @@ export async function createPCPTraces(columns, config) {
                         tickvals: [...uniqueList.keys()],
                         ticktext: uniqueList,
                     };
-                }),
-            ],
+                }
+            }),
             type: 'parcoords',
             line: {
                 shape: 'spline',

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {ColumnInfo, ESupportedPlotlyVis, VisColumn, IVisConfig} from '../interfaces';
-import {CategoricalColumnSelect, NumericalColumnSelect, VisTypeSelect, WarningMessage} from '../sidebar';
+import {AllColumnSelect, CategoricalColumnSelect, NumericalColumnSelect, VisTypeSelect, WarningMessage} from '../sidebar';
 import {PlotlyComponent, Plotly} from '../Plot';
 import {InvalidCols} from '../general';
 import {merge, uniqueId} from 'lodash';
@@ -108,15 +108,12 @@ export function PCPVis({
                             currentSelected={config.type}
                         />
                         <hr/>
-                        <NumericalColumnSelect
-                            callback={(numColumnsSelected: ColumnInfo[]) => setConfig({...config, numColumnsSelected})}
+                        <AllColumnSelect
+                            callback={(allCols: ColumnInfo[]) => {
+                                setConfig({...config, allColumnsSelected: allCols});
+                            }}
                             columns={columns}
-                            currentSelected={config.numColumnsSelected || []}
-                        />
-                        <CategoricalColumnSelect
-                            callback={(catColumnsSelected: ColumnInfo[]) => setConfig({...config, catColumnsSelected})}
-                            columns={columns}
-                            currentSelected={config.catColumnsSelected || []}
+                            currentSelected={config.allColumnsSelected || []}
                         />
                         <hr/>
                         {mergedExtensions.preSidebar}

@@ -29,11 +29,11 @@ export async function createStripTraces(columns, config, scales) {
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
         };
     }
-    const _numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
-    const _catCols = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL);
+    const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
+    const catCols = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
     const plots = [];
-    const numColValues = await resolveColumnValues(_numCols);
-    const catColValues = await resolveColumnValues(_catCols);
+    const numColValues = await resolveColumnValues(numCols);
+    const catColValues = await resolveColumnValues(catCols);
     // if we only have numerical columns, add them individually
     if (catColValues.length === 0) {
         for (const numCurr of numColValues) {

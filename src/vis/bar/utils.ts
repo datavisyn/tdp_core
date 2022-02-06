@@ -86,7 +86,7 @@ export async function createBarTraces(
 
     const plots: PlotlyData[] = [];
 
-    const catCols: VisCategoricalColumn[] = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL) as VisCategoricalColumn[];
+    const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
 
     if(catCols.length > 0) {
         if(config.group && config.multiples) {

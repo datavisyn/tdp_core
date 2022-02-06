@@ -57,7 +57,7 @@ export async function createBarTraces(columns, config, scales) {
         };
     }
     const plots = [];
-    const catCols = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL);
+    const catCols = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
     if (catCols.length > 0) {
         if (config.group && config.multiples) {
             plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter);

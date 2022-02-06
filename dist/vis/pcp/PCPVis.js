@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumnSelect, NumericalColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
+import { AllColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { merge, uniqueId } from 'lodash';
@@ -60,8 +60,9 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, 
                     React.createElement(WarningMessage, null),
                     React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
                     React.createElement("hr", null),
-                    React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
-                    React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
+                    React.createElement(AllColumnSelect, { callback: (allCols) => {
+                            setConfig({ ...config, allColumnsSelected: allCols });
+                        }, columns: columns, currentSelected: config.allColumnsSelected || [] }),
                     React.createElement("hr", null),
                     mergedExtensions.preSidebar,
                     mergedExtensions.postSidebar)))));

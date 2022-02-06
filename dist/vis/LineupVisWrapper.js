@@ -88,7 +88,7 @@ export class LineupVisWrapper {
         this.toggleCustomVis = () => {
             this.viewable = !this.viewable;
             this.node.style.display = this.viewable ? 'flex' : 'none';
-            this.props.provider.getFirstRanking().on(`${Ranking.EVENT_FILTER_CHANGED}.track`, this.updateCustomVis);
+            this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ORDER_CHANGED}.track`, this.updateCustomVis);
             this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, this.updateCustomVis);
             this.updateCustomVis();
         };

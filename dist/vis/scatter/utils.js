@@ -52,7 +52,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     if (!config.numColumnsSelected) {
         return emptyVal;
     }
-    const numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
+    const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
     const plots = [];
     const validCols = await resolveColumnValues(numCols);
     const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
