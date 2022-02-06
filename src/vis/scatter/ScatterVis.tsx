@@ -86,6 +86,10 @@ export function ScatterVis({
     }, []);
 
     useEffect(() => {
+        if(hideSidebar) {
+            return;
+        }
+
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
@@ -95,7 +99,7 @@ export function ScatterVis({
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
           });
-    }, []);
+    }, [hideSidebar]);
 
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);

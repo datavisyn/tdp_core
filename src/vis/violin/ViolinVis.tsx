@@ -78,6 +78,9 @@ export function ViolinVis({
     }, []);
 
     useEffect(() => {
+        if(hideSidebar) {
+            return;
+        }
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
@@ -87,7 +90,7 @@ export function ViolinVis({
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
           });
-    }, []);
+    }, [hideSidebar]);
 
     const layout = useMemo(() => {
         const layout = {

@@ -84,7 +84,7 @@ export function ScatterVisSidebar({
     }, []);
 
     return (
-            <div className="container pb-3" style={{width}}>
+            <div className="container pb-3 pt-2" style={{width}}>
                 <WarningMessage/>
                 <VisTypeSelect
                     callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}

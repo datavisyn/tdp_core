@@ -64,6 +64,9 @@ export function PCPVis({
     }, []);
 
     useEffect(() => {
+        if(hideSidebar) {
+            return;
+        }
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
 
         menu.addEventListener('hidden.bs.collapse', () => {
@@ -73,7 +76,7 @@ export function PCPVis({
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
           });
-    }, []);
+    }, [hideSidebar]);
 
     const layout = useMemo(() => {
         return {

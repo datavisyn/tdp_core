@@ -59,7 +59,8 @@ export function Vis({
     shapes = ['circle', 'square', 'triangle-up', 'star'],
     selectionCallback = () => null,
     filterCallback = () => null,
-    externalConfig = null
+    externalConfig = null,
+    hideSidebar = false
 }: VisProps) {
 
     const [visConfig, setVisConfig] = useState<IVisConfig>(externalConfig ? externalConfig : {
@@ -111,6 +112,7 @@ export function Vis({
                 selected={selected}
                 columns={columns}
                 scales={scales}
+                hideSidebar={hideSidebar}
             /> : null}
 
         {isViolin(visConfig) ?
@@ -124,6 +126,8 @@ export function Vis({
                 setConfig={setVisConfig}
                 columns={columns}
                 scales={scales}
+                hideSidebar={hideSidebar}
+
             /> : null}
 
         {isStrip(visConfig) ?
@@ -132,6 +136,8 @@ export function Vis({
                 setConfig={setVisConfig}
                 columns={columns}
                 scales={scales}
+                hideSidebar={hideSidebar}
+
             /> : null}
 
         {isPCP(visConfig) ?
@@ -139,6 +145,8 @@ export function Vis({
                 config={visConfig}
                 setConfig={setVisConfig}
                 columns={columns}
+                hideSidebar={hideSidebar}
+
             /> : null}
 
         {isBar(visConfig) ?
@@ -147,6 +155,8 @@ export function Vis({
                 setConfig={setVisConfig}
                 columns={columns}
                 scales={scales}
+                hideSidebar={hideSidebar}
+
             /> : null}
     </>);
 }

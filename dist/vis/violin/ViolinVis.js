@@ -34,6 +34,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         return Math.random().toString(36).substr(2, 5);
     }, []);
     useEffect(() => {
+        if (hideSidebar) {
+            return;
+        }
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
@@ -41,7 +44,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
-    }, []);
+    }, [hideSidebar]);
     const layout = useMemo(() => {
         const layout = {
             showlegend: true,

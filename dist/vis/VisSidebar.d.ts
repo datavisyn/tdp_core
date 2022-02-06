@@ -10,6 +10,7 @@ export interface VisSidebarProps {
     filterCallback?: (s: string) => void;
     externalConfig?: IVisConfig;
     setExternalConfig?: (c: IVisConfig) => void;
+    width?: string;
 }
-export declare function VisSidebar({ columns, filterCallback, externalConfig, setExternalConfig, }: VisSidebarProps): JSX.Element;
+export declare function VisSidebar({ columns, filterCallback, externalConfig, setExternalConfig, width }: VisSidebarProps): JSX.Element;
 //# sourceMappingURL=VisSidebar.d.ts.map

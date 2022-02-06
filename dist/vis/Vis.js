@@ -22,7 +22,7 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1').
     getCssValue('visyn-c7').slice(1),
     getCssValue('visyn-c8').slice(1),
     getCssValue('visyn-c9').slice(1),
-    getCssValue('visyn-c10').slice(1)], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null }) {
+    getCssValue('visyn-c10').slice(1)], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false }) {
     const [visConfig, setVisConfig] = useState(externalConfig ? externalConfig : {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
@@ -66,18 +66,18 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1').
                     color: {
                         enable: true,
                     }
-                }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selected: selected, columns: columns, scales: scales }) : null,
+                }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selected: selected, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null,
         isViolin(visConfig) ?
             React.createElement(ViolinVis, { config: visConfig, optionsConfig: {
                     overlay: {
                         enable: true,
                     }
-                }, setConfig: setVisConfig, columns: columns, scales: scales }) : null,
+                }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null,
         isStrip(visConfig) ?
-            React.createElement(StripVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales }) : null,
+            React.createElement(StripVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null,
         isPCP(visConfig) ?
-            React.createElement(PCPVis, { config: visConfig, setConfig: setVisConfig, columns: columns }) : null,
+            React.createElement(PCPVis, { config: visConfig, setConfig: setVisConfig, columns: columns, hideSidebar: hideSidebar }) : null,
         isBar(visConfig) ?
-            React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales }) : null));
+            React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null));
 }
 //# sourceMappingURL=Vis.js.map

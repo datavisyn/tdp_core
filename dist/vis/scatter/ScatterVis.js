@@ -35,6 +35,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         return Math.random().toString(36).substr(2, 5);
     }, []);
     useEffect(() => {
+        if (hideSidebar) {
+            return;
+        }
         const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
@@ -42,7 +45,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
         });
-    }, []);
+    }, [hideSidebar]);
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, []);

@@ -30,6 +30,7 @@ export interface VisSidebarProps {
     filterCallback?: (s: string) => void;
     externalConfig?: IVisConfig;
     setExternalConfig?: (c: IVisConfig) => void;
+    width?: string;
 }
 
 export function VisSidebar({
@@ -37,6 +38,7 @@ export function VisSidebar({
     filterCallback = () => null,
     externalConfig = null,
     setExternalConfig = null,
+    width = '20rem'
 }: VisSidebarProps) {
 
     const [visConfig, setVisConfig] = useState<IVisConfig>(externalConfig ? externalConfig : {
@@ -50,11 +52,7 @@ export function VisSidebar({
     });
 
     useEffect(() => {
-        setVisConfig(externalConfig);
-    }, [externalConfig]);
-
-    useEffect(() => {
-        setExternalConfig(externalConfig);
+        setExternalConfig(visConfig);
     }, [visConfig]);
 
     useEffect(() => {
@@ -77,6 +75,7 @@ export function VisSidebar({
                 setConfig={setVisConfig}
                 filterCallback={filterCallback}
                 columns={columns}
+                width={width}
             /> : null}
 
         {isViolin(visConfig) ?
@@ -89,6 +88,8 @@ export function VisSidebar({
                 }}
                 setConfig={setVisConfig}
                 columns={columns}
+                width={width}
+
             /> : null}
 
         {isStrip(visConfig) ?
@@ -96,6 +97,8 @@ export function VisSidebar({
                 config={visConfig}
                 setConfig={setVisConfig}
                 columns={columns}
+                width={width}
+
             /> : null}
 
         {isPCP(visConfig) ?
@@ -103,6 +106,8 @@ export function VisSidebar({
                 config={visConfig}
                 setConfig={setVisConfig}
                 columns={columns}
+                width={width}
+
             /> : null}
 
         {isBar(visConfig) ?
@@ -110,6 +115,8 @@ export function VisSidebar({
                 config={visConfig}
                 setConfig={setVisConfig}
                 columns={columns}
+                width={width}
+
             /> : null}
     </>);
 }

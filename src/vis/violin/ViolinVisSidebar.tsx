@@ -66,7 +66,7 @@ export function ViolinVisSidebar({
     }, []);
 
     return (
-        <div className="container pb-3" style={{width: '20rem'}}>
+        <div className="container pb-3 pt-2" style={{width}}>
             <WarningMessage/>
             <VisTypeSelect
                 callback={(type: ESupportedPlotlyVis) => setConfig({...config as any, type})}

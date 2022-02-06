@@ -22,7 +22,7 @@ export function StripVisSidebar({ config, optionsConfig, extensions, columns, se
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, []);
-    return (React.createElement("div", { className: "container pb-3", style: { width } },
+    return (React.createElement("div", { className: "container pb-3 pt-2", style: { width } },
         React.createElement(WarningMessage, null),
         React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
         React.createElement("hr", null),
