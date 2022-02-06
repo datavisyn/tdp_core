@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { merge, sum } from 'lodash';
 import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
@@ -197,11 +197,12 @@ async function setPlotsBasic(columns, catCols, config, plots, scales, plotCounte
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const catCurr = catColValues[0];
     const count = [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((curr) => catCurr.resolvedValues.filter((c) => c.val === curr).length);
+    const countTotal = sum(count);
     const valArr = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
     plots.push({
         data: {
-            x: vertFlag ? valArr : count,
-            y: !vertFlag ? valArr : count,
+            x: vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
+            y: !vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
             yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,

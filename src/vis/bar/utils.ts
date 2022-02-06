@@ -1,4 +1,4 @@
-import {merge} from 'lodash';
+import {merge, sum} from 'lodash';
 import {I18nextManager} from '../../i18n';
 import {PlotlyInfo, PlotlyData, VisCategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, Scales, VisColumn, VisCategoricalValue} from '../interfaces';
 import {resolveColumnValues, resolveSingleColumn} from '../general/layoutUtils';
@@ -255,11 +255,12 @@ async function setPlotsBasic(columns: VisColumn[], catCols: VisCategoricalColumn
     const catCurr = catColValues[0];
 
     const count = [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((curr) => (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === curr).length);
+    const countTotal = sum(count);
     const valArr = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
     plots.push({
         data: {
-            x: vertFlag ? valArr : count,
-            y: !vertFlag ? valArr : count,
+            x: vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
+            y: !vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
             yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
