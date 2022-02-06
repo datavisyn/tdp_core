@@ -32,10 +32,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     React.useEffect(() => {
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
     }, []);
     const mergedOptionsConfig = React.useMemo(() => {
