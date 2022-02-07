@@ -37,7 +37,7 @@ export class LineupVisWrapper {
             const selectedMap = this.getSelectionMap();
             const getColumnInfo = (column) => {
                 return {
-                    // This regex strips any html off of the label and summary, leaving only the center text. For example, <div><span>Hello</span></div> would be hello.
+                    // This regex strips any html off of the label and summary, leaving only the center text. For example, <div><span>Hello</span></div> would be Hello.
                     name: column.getMetaData().label.replace(/(<([^>]+)>)/gi, ''),
                     description: column.getMetaData().summary.replace(/(<([^>]+)>)/gi, ''),
                     id: column.fqid,
