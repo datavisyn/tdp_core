@@ -40,7 +40,7 @@ import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { ISecureItem } from '../security';
-import {GeneralVisWrapper} from './internal/GeneralVisWrapper';
+import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
 
 /**
  * base class for views based on LineUp
@@ -69,7 +69,6 @@ export abstract class ARankingView extends AView {
   private readonly panel: LineUpPanelActions;
 
   private readonly generalVis: GeneralVisWrapper;
-
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -374,7 +373,7 @@ export abstract class ARankingView extends AView {
       selection: this.selection,
       freeColor: (id: string) => this.colors.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe())
+      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
     };
   }
 
@@ -409,7 +408,6 @@ export abstract class ARankingView extends AView {
 
     this.panel.hide();
     this.generalVis.hide();
-
 
     if (this.dump !== null) {
       return;
@@ -587,7 +585,6 @@ export abstract class ARankingView extends AView {
   }
 
   private pushTrackedScoreColumn(scoreName: string, scoreId: string, params: any) {
-
     return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
   }
 

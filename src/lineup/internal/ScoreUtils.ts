@@ -77,7 +77,7 @@ export class ScoreUtils {
   static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
     console.log(provider);
     const storedParams = await AttachemntUtils.externalize(params);
-    const toStoreParams = {id: scoreId, params: storedParams};
+    const toStoreParams = { id: scoreId, params: storedParams };
     return ScoreUtils.addScoreImpl([provider], toStoreParams);
     // const currentParams = { id: scoreId, params, storedParams };
     // const result = await ScoreUtils.addScoreAsync([provider], currentParams);
