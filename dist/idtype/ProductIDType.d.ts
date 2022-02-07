@@ -48,3 +48,4 @@ export declare class ProductIDType extends EventHandler implements IIDType {
     private toPerDim;
     clear(type?: string): Range[];
 }
+//# sourceMappingURL=ProductIDType.d.ts.map

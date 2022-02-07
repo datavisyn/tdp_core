@@ -1,8 +1,7 @@
-import {IPlugin} from '../base';
-import {Placement, PopperOptions} from 'popper.js';
-import {AppHeader} from '../components';
-import {IViewPluginDesc, IView, ISelection} from '../base/interfaces';
-
+import { Placement, PopperOptions } from 'popper.js';
+import { IPlugin } from '../base';
+import { AppHeader } from '../components';
+import { IViewPluginDesc, IView, ISelection } from '../base/interfaces';
 
 export interface ITDPTourExtensionDesc {
   /**
@@ -25,7 +24,7 @@ export interface ITDPTourExtensionDesc {
    * The preview image should have 350x200 px
    * @returns {Promise<string>}
    */
-   preview?: () => Promise<string>;
+  preview?: () => Promise<string>;
 
   /**
    * Set a level for the tour.
@@ -87,14 +86,21 @@ export interface IStep {
   /**
    * Contains html text to display.
    */
-  html: string | ((node: HTMLElement)=>void);
+  html: string | ((node: HTMLElement) => void);
 
   /**
    * Optional property that allows more precise popper placement.
    * The value `centered` places the element in the center of the screen but avoids the highlighted element.
    * @default auto
    */
-  placement?: Placement | ((options: PopperOptions)=>void) | 'centered';
+  placement?: Placement | ((options: PopperOptions) => void) | 'centered';
+
+  /**
+   * Optional property that allows on the fly adjustments of the indicator icon.
+   * The offset can be specified for the x and y direction and is added to the default placement.
+   * @param Object containing the x and y offset values - x: Offset for x direction in px; y: Offset for y direction in px.
+   */
+  iconPlacementOffset?: { x?: number; y?: number };
 
   /**
    * Is executed before the step is shown.
@@ -105,7 +111,7 @@ export interface IStep {
   /**
    * Waits for this function to return either `next` to automatically go to the next step or `enable` to enable the next button only.
    */
-  waitFor?(context: IStepContext): Promise<'next'|'enable'>;
+  waitFor?(context: IStepContext): Promise<'next' | 'enable'>;
 
   /**
    * Is executed after the step is shown.
@@ -127,7 +133,6 @@ export interface IStep {
    */
   allowUserInteraction?: boolean;
 }
-
 
 export interface IViewTourContext {
   plugin: IViewPluginDesc;

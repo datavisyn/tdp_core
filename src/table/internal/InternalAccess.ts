@@ -1,4 +1,4 @@
-import {RangeLike} from '../../range';
+import { RangeLike } from '../../range';
 
 export interface IInternalAccess {
   /**

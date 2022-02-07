@@ -34,4 +34,13 @@
       $disabled-color: rgba($value, $btn-disabled-opacity)
     );
   }
+
+  // override the background color of button-outline-variant
+  .btn-outline-#{$color} {
+    @include button-outline-variant(
+      $color: $value,
+      $color-hover: $value,
+      $active-background: rgba($value, 0.10)
+    )
+  }
 }

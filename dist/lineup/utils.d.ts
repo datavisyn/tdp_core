@@ -1,9 +1,7 @@
-import { IScoreRow } from '../base/interfaces';
+import { IDataRow, Ranking, LocalDataProvider } from 'lineupjs';
+import { IScoreRow, IScoreLoader } from '../base/interfaces';
 import { IParams, IRow } from '../base/rest';
-import { IDataRow } from 'lineupjs';
 import { IFormMultiMap, IFormRow } from '../form/elements/FormMap';
-import { IScoreLoader } from '../base/interfaces';
-import { Ranking, LocalDataProvider } from 'lineupjs';
 import { IRankingWrapper } from './IRankingWrapper';
 import { IPluginDesc } from '../base';
 /**
@@ -19,7 +17,7 @@ export declare class AScoreAccessorProxy<T> {
      * @param row
      */
     readonly accessor: IAccessorFunc<T>;
-    readonly scores: Map<string, T>;
+    private readonly scores;
     constructor(missingValue?: T);
     clear(): void;
     setRows(rows: IScoreRow<T>[]): void;
@@ -50,3 +48,4 @@ export declare class LineupUtils {
     static previewFilterHint(database: string, view: string, extraParams?: () => any): (rows: IFormRow[]) => Promise<string>;
     static wrapRanking(data: LocalDataProvider, ranking: Ranking): IRankingWrapper;
 }
+//# sourceMappingURL=utils.d.ts.map

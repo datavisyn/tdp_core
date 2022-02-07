@@ -1,9 +1,8 @@
-import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../../../base/interfaces';
-import {IScoreRow} from '../../../base/interfaces';
-import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
-import {ResolveNow} from '../../../base';
-import {difference} from 'lodash';
+import { difference } from 'lodash';
+import { IContext, ISelectionAdapter } from '../ISelectionAdapter';
+import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
+import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
+import { ResolveNow } from '../../../base';
 
 export interface IMultiSelectionAdapter {
   /**
@@ -67,12 +66,12 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISel
 
       const position = this.computePositionToInsert(context, _id);
 
-      return columnsToBeAdded.map((desc, i) => ({desc, data: data[i], id: _id, position}));
+      return columnsToBeAdded.map((desc, i) => ({ desc, data: data[i], id: _id, position }));
     });
   }
 
   private removePartialDynamicColumns(context: IContext, ids: number[]): void {
-    const columns = context.columns;
+    const { columns } = context;
     const selectedSubTypes = this.adapter.getSelectedSubTypes();
     if (selectedSubTypes.length === 0) {
       ids.forEach((id) => context.freeColor(id));
@@ -86,9 +85,13 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter implements ISel
     // check which parameters have been removed
     const removedParameters = difference(dynamicColumnSubtypes, selectedSubTypes);
 
-    context.remove([].concat(...removedParameters.map((param) => {
-      return usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === param);
-    })));
+    context.remove(
+      [].concat(
+        ...removedParameters.map((param) => {
+          return usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === param);
+        }),
+      ),
+    );
   }
 
   private computePositionToInsert(context: IContext, id: number) {

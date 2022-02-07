@@ -21,3 +21,4 @@ export declare class LineupVisWrapper {
     toggleCustomVis: () => void;
     hide: () => void;
 }
+//# sourceMappingURL=LineupVisWrapper.d.ts.map

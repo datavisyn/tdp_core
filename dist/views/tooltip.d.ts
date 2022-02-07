@@ -24,3 +24,4 @@ export declare class TooltipUtils {
      */
     static generateTooltip<T>(contentGenerator: (items: T[]) => string | HTMLElement, simpleTooltip?: boolean): (parent: HTMLElement, items: T[], x: number, y: number, event: MouseEvent) => void;
 }
+//# sourceMappingURL=tooltip.d.ts.map

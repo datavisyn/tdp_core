@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
-import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 export function isStrip(s) {
     return s.type === ESupportedPlotlyVis.STRIP;
@@ -40,8 +40,8 @@ export async function createStripTraces(columns, config, scales) {
             plots.push({
                 data: {
                     y: numCurr.resolvedValues.map((v) => v.val),
-                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                    xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                    yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     showlegend: false,
                     type: 'box',
                     boxpoints: 'all',
@@ -50,14 +50,14 @@ export async function createStripTraces(columns, config, scales) {
                     pointpos: 0,
                     // @ts-ignore
                     box: {
-                        visible: true
+                        visible: true,
                     },
                     line: {
                         color: 'rgba(255,255,255,0)',
                     },
                     marker: {
-                        color: '#337ab7'
-                    }
+                        color: '#337ab7',
+                    },
                 },
                 xLabel: numCurr.info.name,
                 yLabel: numCurr.info.name,
@@ -71,8 +71,8 @@ export async function createStripTraces(columns, config, scales) {
                 data: {
                     x: catCurr.resolvedValues.map((v) => v.val),
                     y: numCurr.resolvedValues.map((v) => v.val),
-                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                    xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                    yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     showlegend: false,
                     type: 'box',
                     boxpoints: 'all',
@@ -81,24 +81,26 @@ export async function createStripTraces(columns, config, scales) {
                     pointpos: 0,
                     // @ts-ignore
                     box: {
-                        visible: true
+                        visible: true,
                     },
                     line: {
                         color: 'rgba(255,255,255,0)',
                     },
                     meanline: {
-                        visible: true
+                        visible: true,
                     },
-                    transforms: [{
+                    transforms: [
+                        {
                             type: 'groupby',
                             groups: catCurr.resolvedValues.map((v) => v.val),
                             styles: [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { marker: { color: scales.color(c) } } };
-                            })
-                        }]
+                            }),
+                        },
+                    ],
                 },
                 xLabel: catCurr.info.name,
-                yLabel: numCurr.info.name
+                yLabel: numCurr.info.name,
             });
             plotCounter += 1;
         }

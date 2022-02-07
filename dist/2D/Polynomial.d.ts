@@ -18,3 +18,4 @@ export declare class Polynomial {
     getCubicRoots(): number[];
     getQuarticRoots(): number[];
 }
+//# sourceMappingURL=Polynomial.d.ts.map

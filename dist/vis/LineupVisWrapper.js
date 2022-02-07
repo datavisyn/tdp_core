@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { CategoricalColumn, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
+import { CategoricalColumn, LocalDataProvider, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
 import { Vis } from './Vis';
 import { EColumnTypes, EFilterOptions } from './interfaces';
 export class LineupVisWrapper {
@@ -52,7 +52,7 @@ export class LineupVisWrapper {
                     return mapData(data, column);
                 }
                 return new Promise((resolve, reject) => {
-                    //times out if we take longer than 60 seconds to load the columns.
+                    // times out if we take longer than 60 seconds to load the columns.
                     const timeout = setTimeout(() => {
                         reject('Timeout');
                     }, 60000);
@@ -67,14 +67,14 @@ export class LineupVisWrapper {
                     cols.push({
                         info: getColumnInfo(c),
                         values: () => getColumnValue(c),
-                        type: EColumnTypes.NUMERICAL
+                        type: EColumnTypes.NUMERICAL,
                     });
                 }
                 else if (c instanceof CategoricalColumn) {
                     cols.push({
                         info: getColumnInfo(c),
-                        values: () => getColumnValue(c).then((res) => res.map((v) => v.val ? v : { ...v, val: LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE })),
-                        type: EColumnTypes.CATEGORICAL
+                        values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
+                        type: EColumnTypes.CATEGORICAL,
                     });
                 }
             }
@@ -82,7 +82,7 @@ export class LineupVisWrapper {
                 columns: cols,
                 selected: selectedMap,
                 selectionCallback: (s) => this.props.selectionCallback(s),
-                filterCallback: (s) => this.filterCallback(s)
+                filterCallback: (s) => this.filterCallback(s),
             }), this.node);
         };
         this.toggleCustomVis = () => {
@@ -90,6 +90,7 @@ export class LineupVisWrapper {
             this.node.style.display = this.viewable ? 'flex' : 'none';
             this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ORDER_CHANGED}.track`, this.updateCustomVis);
             this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, this.updateCustomVis);
+            this.props.provider.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.track`, this.updateCustomVis);
             this.updateCustomVis();
         };
         this.hide = () => {

@@ -1,4 +1,3 @@
-
 // send only
 export interface ITDPSetInputSelectionMessage {
   type: 'tdpSetInputSelection';

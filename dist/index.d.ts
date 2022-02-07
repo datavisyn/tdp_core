@@ -11,6 +11,7 @@ export * from './views';
 export * from './wrapper';
 export * from './ATDPApplication';
 export * from './provvis';
+export * from './vis';
 export * from './menu';
 export * from './layout';
 export * from './components';
@@ -35,3 +36,4 @@ export * from './dummy';
 export * from './TreeRenderer';
 export * from './valuetype';
 export * from './import';
+//# sourceMappingURL=index.d.ts.map

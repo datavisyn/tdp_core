@@ -1,7 +1,7 @@
 /// <reference types="jest" />
-import {Session} from '../src/base/Session';
-const session = new Session();
+import { Session } from '../src/base/Session';
 
+const session = new Session();
 
 describe('methods', () => {
   const key = 'test-key';
@@ -26,7 +26,7 @@ describe('methods', () => {
 
 describe('data types', () => {
   function checkStore(data: any) {
-    it(typeof data, () => {
+    it(`${typeof data}`, () => {
       const key = 'key';
       session.store(key, data);
       expect(session.retrieve(key)).toEqual(data);
@@ -34,5 +34,5 @@ describe('data types', () => {
   }
   checkStore(1);
   checkStore(['array']);
-  checkStore({'hash': true});
+  checkStore({ hash: true });
 });

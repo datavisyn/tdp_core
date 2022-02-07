@@ -2,7 +2,8 @@ import { SelectOperation, ASelectAble } from '../idtype';
 import { RangeLike, Range } from '../range';
 import { IPersistable } from '../base/IPersistable';
 import { EventHandler } from '../base/event';
-import { IDataType, IDataDescription } from '../data';
+import { IDataDescription } from '../data/DataDescription';
+import { IDataType } from '../data/datatype';
 export declare class AttributeContainer extends EventHandler implements IPersistable {
     private attrMap;
     persist(): any;
@@ -95,3 +96,4 @@ export declare abstract class AGraph extends ASelectAble {
     selectedEdges(): Promise<GraphEdge[]>;
     get idtypes(): import("../idtype").IDType[];
 }
+//# sourceMappingURL=graph.d.ts.map

@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
 import { EViolinOverlay } from '../bar/utils';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
@@ -36,25 +36,25 @@ export async function createViolinTraces(columns, config, scales) {
     const plots = [];
     const numColValues = await resolveColumnValues(numCols);
     const catColValues = await resolveColumnValues(catCols);
-    //if we onl have numerical columns, add them individually.
+    // if we onl have numerical columns, add them individually.
     if (catColValues.length === 0) {
         for (const numCurr of numColValues) {
             plots.push({
                 data: {
                     y: numCurr.resolvedValues.map((v) => v.val),
-                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                    xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                    yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     type: 'violin',
                     pointpos: 0,
-                    jitter: .3,
+                    jitter: 0.3,
                     // @ts-ignore
                     hoveron: 'violins',
                     points: config.violinOverlay === EViolinOverlay.STRIP ? 'all' : false,
                     box: {
-                        visible: config.violinOverlay === EViolinOverlay.BOX ? true : false
+                        visible: config.violinOverlay === EViolinOverlay.BOX,
                     },
                     meanline: {
-                        visible: true
+                        visible: true,
                     },
                     name: `${numCurr.info.name}`,
                     hoverinfo: 'y',
@@ -62,7 +62,7 @@ export async function createViolinTraces(columns, config, scales) {
                     showlegend: false,
                 },
                 xLabel: numCurr.info.name,
-                yLabel: numCurr.info.name
+                yLabel: numCurr.info.name,
             });
             plotCounter += 1;
         }
@@ -73,34 +73,36 @@ export async function createViolinTraces(columns, config, scales) {
                 data: {
                     x: catCurr.resolvedValues.map((v) => v.val),
                     y: numCurr.resolvedValues.map((v) => v.val),
-                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                    xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                    yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     type: 'violin',
                     // @ts-ignore
                     hoveron: 'violins',
                     hoverinfo: 'y',
                     meanline: {
-                        visible: true
+                        visible: true,
                     },
                     name: `${catCurr.info.name} + ${numCurr.info.name}`,
                     scalemode: 'width',
                     pointpos: 0,
-                    jitter: .3,
+                    jitter: 0.3,
                     points: config.violinOverlay === EViolinOverlay.STRIP ? 'all' : false,
                     box: {
-                        visible: config.violinOverlay === EViolinOverlay.BOX ? true : false
+                        visible: config.violinOverlay === EViolinOverlay.BOX,
                     },
                     showlegend: false,
-                    transforms: [{
+                    transforms: [
+                        {
                             type: 'groupby',
                             groups: catCurr.resolvedValues.map((v) => v.val),
                             styles: [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { line: { color: scales.color(c) } } };
-                            })
-                        }]
+                            }),
+                        },
+                    ],
                 },
                 xLabel: catCurr.info.name,
-                yLabel: numCurr.info.name
+                yLabel: numCurr.info.name,
             });
             plotCounter += 1;
         }

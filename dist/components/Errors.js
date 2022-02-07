@@ -46,17 +46,15 @@ export class Errors {
                 const title = I18nextManager.getInstance().i18n.t('phovea:ui.errorHeader', { status: xhr.status, statusText: xhr.statusText });
                 if (xhr.status !== 400) {
                     body = `${body}<hr>
-          ${I18nextManager.getInstance().i18n.t('phovea:ui.errorBody')}<br><a href="${xhr.url}" target="_blank">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
+          ${I18nextManager.getInstance().i18n.t('phovea:ui.errorBody')}<br><a href="${xhr.url}" target="_blank">${xhr.url.length > 100 ? `${xhr.url.substring(0, 100)}...` : xhr.url}</a>`;
                 }
                 return commonDialog(title, body);
             });
         }
-        else if (error instanceof Error) {
+        if (error instanceof Error) {
             return commonDialog(error.name, error.message);
         }
-        else {
-            return commonDialog(I18nextManager.getInstance().i18n.t('phovea:ui.unknownError'), error.toString());
-        }
+        return commonDialog(I18nextManager.getInstance().i18n.t('phovea:ui.unknownError'), error.toString());
     }
 }
 //# sourceMappingURL=Errors.js.map

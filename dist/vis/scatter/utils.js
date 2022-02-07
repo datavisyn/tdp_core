@@ -1,7 +1,7 @@
-import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
-import { getCol } from '../sidebar';
 import { merge } from 'lodash';
 import d3 from 'd3';
+import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
+import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
@@ -20,7 +20,7 @@ const defaultConfig = {
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
     isRectBrush: true,
-    alphaSliderVal: 1
+    alphaSliderVal: 1,
 };
 export function scatterMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
@@ -47,7 +47,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         rows: 0,
         cols: 0,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
-        formList: ['color', 'shape', 'bubble', 'opacity']
+        formList: ['color', 'shape', 'bubble', 'opacity'],
     };
     if (!config.numColumnsSelected) {
         return emptyVal;
@@ -57,36 +57,40 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     const validCols = await resolveColumnValues(numCols);
     const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
     const colorCol = await resolveSingleColumn(getCol(columns, config.color));
-    const shapeScale = config.shape ?
-        d3.scale.ordinal().domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))]).range(shapes)
+    const shapeScale = config.shape
+        ? d3.scale
+            .ordinal()
+            .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))])
+            .range(shapes)
         : null;
     let min = 0;
     let max = 0;
     if (config.color) {
-        min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null)),
-            max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+        (min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null))),
+            (max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null)));
     }
-    const numericalColorScale = config.color ?
-        d3.scale.linear()
-            .domain([max,
-            (max + min) / 2,
-            min])
-            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')] : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')])
+    const numericalColorScale = config.color
+        ? d3.scale
+            .linear()
+            .domain([max, (max + min) / 2, min])
+            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL
+            ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
+            : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')])
         : null;
     const legendPlots = [];
-    //cant currently do 1d scatterplots
+    // cant currently do 1d scatterplots
     if (validCols.length === 1) {
         return emptyVal;
     }
-    //if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
+    // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
     if (validCols.length === 2) {
         plots.push({
             data: {
                 x: validCols[0].resolvedValues.map((v) => v.val),
                 y: validCols[1].resolvedValues.map((v) => v.val),
                 ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
-                xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                 type: 'scattergl',
                 mode: 'markers',
                 showlegend: false,
@@ -96,13 +100,15 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                         width: 0,
                     },
                     symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                    color: colorCol ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : validCols[0].resolvedValues.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
+                    color: colorCol
+                        ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
+                        : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                     opacity: config.alphaSliderVal,
-                    size: 10
+                    size: 10,
                 },
             },
             xLabel: validCols[0].info.name,
-            yLabel: validCols[1].info.name
+            yLabel: validCols[1].info.name,
         });
     }
     else {
@@ -113,12 +119,12 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                         x: xCurr.resolvedValues.map((v) => v.val),
                         y: yCurr.resolvedValues.map((v) => v.val),
                         ids: xCurr.resolvedValues.map((v) => v.id.toString()),
-                        xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                        yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                        xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                        yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                         type: 'scattergl',
                         mode: 'markers',
                         hoverlabel: {
-                            namelength: 5
+                            namelength: 5,
                         },
                         showlegend: false,
                         text: validCols[0].resolvedValues.map((v) => v.id.toString()),
@@ -127,19 +133,21 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                                 width: 0,
                             },
                             symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                            color: colorCol ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : xCurr.resolvedValues.map((v) => selected[v.id] ? '#E29609' : '#2e2e2e'),
+                            color: colorCol
+                                ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
+                                : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                             opacity: config.alphaSliderVal,
-                            size: 10
+                            size: 10,
                         },
                     },
                     xLabel: xCurr.info.name,
-                    yLabel: yCurr.info.name
+                    yLabel: yCurr.info.name,
                 });
                 plotCounter += 1;
             }
         }
     }
-    //if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
+    // if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
     if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
         legendPlots.push({
             data: {
@@ -153,30 +161,34 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                 visible: 'legendonly',
                 legendgroup: 'color',
                 legendgrouptitle: {
-                    text: 'Color'
+                    text: 'Color',
                 },
                 marker: {
                     line: {
-                        width: 0
+                        width: 0,
                     },
                     symbol: 'circle',
                     size: 10,
                     color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
-                    opacity: .5
+                    opacity: 0.5,
                 },
-                transforms: [{
+                transforms: [
+                    {
                         type: 'groupby',
                         groups: colorCol.resolvedValues.map((v) => v.val),
-                        styles: [...[...new Set(colorCol.resolvedValues.map((v) => v.val))].map((c) => {
+                        styles: [
+                            ...[...new Set(colorCol.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { name: c } };
-                            })]
-                    }]
+                            }),
+                        ],
+                    },
+                ],
             },
             xLabel: validCols[0].info.name,
-            yLabel: validCols[0].info.name
+            yLabel: validCols[0].info.name,
         });
     }
-    //if we have a column for the shape, add a legendPlot that creates a legend.
+    // if we have a column for the shape, add a legendPlot that creates a legend.
     if (shapeCol) {
         legendPlots.push({
             data: {
@@ -191,27 +203,31 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                 showlegend: true,
                 legendgroup: 'shape',
                 legendgrouptitle: {
-                    text: 'Shape'
+                    text: 'Shape',
                 },
                 marker: {
                     line: {
-                        width: 0
+                        width: 0,
                     },
                     opacity: config.alphaSliderVal,
                     size: 10,
                     symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                    color: '#2e2e2e'
+                    color: '#2e2e2e',
                 },
-                transforms: [{
+                transforms: [
+                    {
                         type: 'groupby',
                         groups: shapeCol.resolvedValues.map((v) => v.val),
-                        styles: [...[...new Set(shapeCol.resolvedValues.map((v) => v.val))].map((c) => {
+                        styles: [
+                            ...[...new Set(shapeCol.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { name: c } };
-                            })]
-                    }]
+                            }),
+                        ],
+                    },
+                ],
             },
             xLabel: validCols[0].info.name,
-            yLabel: validCols[0].info.name
+            yLabel: validCols[0].info.name,
         });
     }
     return {

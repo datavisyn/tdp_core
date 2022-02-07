@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { PlotlyInfo, VisColumn } from '../interfaces';
 /**
  * Cleans up the layout of a given trace, primarily by positioning potential small multiple plots in a reasonable way
@@ -10,46 +9,47 @@ export declare function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout
 export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
     resolvedValues: {
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
     info: import("../interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[]>;
 } | {
     resolvedValues: {
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[];
     type: import("../interfaces").EColumnTypes.CATEGORICAL;
     info: import("../interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[]>;
 })[]>;
 export declare function resolveSingleColumn(column: VisColumn): Promise<{
     resolvedValues: {
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
     info: import("../interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[]>;
 } | {
     resolvedValues: {
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[];
     type: import("../interfaces").EColumnTypes.CATEGORICAL;
     info: import("../interfaces").ColumnInfo;
     values: () => Promise<{
         id: number;
-        val: import("react").ReactText;
+        val: string | number;
     }[]>;
 }>;
+//# sourceMappingURL=layoutUtils.d.ts.map

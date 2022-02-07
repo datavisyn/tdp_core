@@ -5,3 +5,4 @@ import * as React from 'react';
  * @returns Ref containing the always up-to-date value.
  */
 export declare function useSyncedRef<T>(value: T): React.MutableRefObject<T>;
+//# sourceMappingURL=useSyncedRef.d.ts.map

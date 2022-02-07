@@ -6,3 +6,4 @@ interface NumericalColorButtonsProps {
 }
 export declare function NumericalColorButtons(props: NumericalColorButtonsProps): JSX.Element;
 export {};
+//# sourceMappingURL=NumericalColorButtons.d.ts.map

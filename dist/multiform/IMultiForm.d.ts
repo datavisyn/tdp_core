@@ -28,3 +28,4 @@ export interface IMultiFormOptions {
      */
     filter?(vis: IVisPluginDesc): boolean;
 }
+//# sourceMappingURL=IMultiForm.d.ts.map

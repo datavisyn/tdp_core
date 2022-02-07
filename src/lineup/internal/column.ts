@@ -1,10 +1,10 @@
-import {IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, toCategories} from 'lineupjs';
-import {LineupUtils} from '../utils';
-import {IScoreRow,IScoreColumnPatcherExtensionDesc} from '../../base/interfaces';
-import {EP_TDP_CORE_SCORE_COLUMN_PATCHER} from '../../base/extensions';
-import {ErrorAlertHandler} from '../../base/ErrorAlertHandler';
-import {extent, min, max} from 'd3';
-import {PluginRegistry} from '../../app';
+import { IDataProvider, IColumnDesc, ScaleMappingFunction, ValueColumn, NumberColumn, BoxPlotColumn, NumbersColumn, Column, toCategories } from 'lineupjs';
+import { extent, min, max } from 'd3';
+import { LineupUtils } from '../utils';
+import { IScoreRow, IScoreColumnPatcherExtensionDesc } from '../../base/interfaces';
+import { EP_TDP_CORE_SCORE_COLUMN_PATCHER } from '../../base/extensions';
+import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
+import { PluginRegistry } from '../../app';
 
 export interface ILazyLoadedColumn {
   col: Column;
@@ -23,7 +23,13 @@ function extentByType(type: string, rows: any, acc: (d: any) => any): [number, n
   }
 }
 export class LazyColumn {
-  static addLazyColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, provider: IDataProvider & {pushDesc(col: IColumnDesc): void}, position: number, done?: () => void): ILazyLoadedColumn {
+  static addLazyColumn(
+    colDesc: any,
+    data: Promise<IScoreRow<any>[]>,
+    provider: IDataProvider & { pushDesc(col: IColumnDesc): void },
+    position: number,
+    done?: () => void,
+  ): ILazyLoadedColumn {
     const ranking = provider.getLastRanking();
     const accessor = LineupUtils.createAccessor(colDesc);
 
@@ -31,7 +37,7 @@ export class LazyColumn {
     (<any>colDesc).column = colDesc.scoreID || `dC${colDesc.label.replace(/\s+/, '')}`;
 
     provider.pushDesc(colDesc);
-    //mark as lazy loaded
+    // mark as lazy loaded
     (<any>colDesc).lazyLoaded = true;
     const col = provider.create(colDesc);
     if (position == null) {
@@ -51,11 +57,9 @@ export class LazyColumn {
     }
 
     // error handling
-    data
-      .catch(ErrorAlertHandler.getInstance().errorAlert)
-      .catch(() => {
-        ranking.remove(col);
-      });
+    data.catch(ErrorAlertHandler.getInstance().errorAlert).catch(() => {
+      ranking.remove(col);
+    });
 
     // success
     const loaded = data.then(async (rows: IScoreRow<any>[]) => {
@@ -83,7 +87,7 @@ export class LazyColumn {
       });
     };
 
-    return {col, loaded, reload};
+    return { col, loaded, reload };
   }
 
   private static markLoaded(provider: IDataProvider, colDesc: any, loaded: boolean): void {
@@ -94,21 +98,22 @@ export class LazyColumn {
     });
 
     // mark the description as loaded true
-    //mark as lazy loaded
+    // mark as lazy loaded
     (<any>colDesc).lazyLoaded = !loaded;
   }
 
   private static async patchColumn(colDesc: any, rows: IScoreRow<any>[], col: Column): Promise<void> {
     if (colDesc.type === 'number' || colDesc.type === 'boxplot' || colDesc.type === 'numbers') {
       const ncol = <NumberColumn | BoxPlotColumn | NumbersColumn>col;
-      if (!(colDesc.constantDomain) || (colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min')) { //create a dynamic range if not fixed
+      if (!colDesc.constantDomain || colDesc.constantDomain === 'max' || colDesc.constantDomain === 'min') {
+        // create a dynamic range if not fixed
         const domain = extentByType(colDesc.type, rows, (d) => d.score);
         if (colDesc.constantDomain === 'min') {
           domain[0] = colDesc.domain[0];
         } else if (colDesc.constantDomain === 'max') {
           domain[1] = colDesc.domain[1];
         }
-        //HACK by pass the setMapping function and set it inplace
+        // HACK by pass the setMapping function and set it inplace
         const ori = <ScaleMappingFunction>(<any>ncol).original;
         const current = <ScaleMappingFunction>(<any>ncol).mapping;
         colDesc.domain = domain;
@@ -138,9 +143,13 @@ export class LazyColumn {
     }
 
     // Await all patchers to complete before returning
-    await Promise.all(PluginRegistry.getInstance().listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER).map(async (pluginDesc: IScoreColumnPatcherExtensionDesc) => {
-      const plugin = await pluginDesc.load();
-      plugin.factory(pluginDesc, colDesc, rows, col);
-    }));
+    await Promise.all(
+      PluginRegistry.getInstance()
+        .listPlugins(EP_TDP_CORE_SCORE_COLUMN_PATCHER)
+        .map(async (pluginDesc: IScoreColumnPatcherExtensionDesc) => {
+          const plugin = await pluginDesc.load();
+          plugin.factory(pluginDesc, colDesc, rows, col);
+        }),
+    );
   }
 }

@@ -1,6 +1,6 @@
-import { IMultiForm } from '../multiform';
+import type { IMultiForm } from '../multiform';
 import { IObjectRef, ICmdResult, ActionMetaData, ProvenanceGraph } from '../provenance';
-import { IVisInstance, ITransform } from '../provvis';
+import type { IVisInstance, ITransform } from '../provvis';
 export declare class Multiform {
     static transform(inputs: IObjectRef<any>[], parameter: any): ICmdResult;
     static createTransform(v: IObjectRef<IVisInstance>, t: ITransform, old?: ITransform): {
@@ -38,3 +38,4 @@ export declare class Multiform {
     };
     static attach(graph: ProvenanceGraph, v: IObjectRef<IVisInstance>): void;
 }
+//# sourceMappingURL=Multiform.d.ts.map

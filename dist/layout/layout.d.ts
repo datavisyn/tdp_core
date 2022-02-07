@@ -52,3 +52,4 @@ export interface IPadding {
 export interface ILayout {
     (elems: ILayoutElem[], w: number, h: number, parent: ILayoutElem): Promise<boolean>;
 }
+//# sourceMappingURL=layout.d.ts.map

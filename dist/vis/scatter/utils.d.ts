@@ -17,3 +17,4 @@ export declare function scatterMergeDefaultConfig(columns: VisColumn[], config: 
 export declare function createScatterTraces(columns: VisColumn[], selected: {
     [key: number]: boolean;
 }, config: IScatterConfig, scales: Scales, shapes: string[] | null): Promise<PlotlyInfo>;
+//# sourceMappingURL=utils.d.ts.map

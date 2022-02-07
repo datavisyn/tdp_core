@@ -19,3 +19,4 @@ export declare abstract class ANameVector<T extends IDataType> extends AVector<s
     sort(compareFn?: (a: string, b: string) => number, thisArg?: any): Promise<IStringVector>;
     filter(callbackfn: (value: string, index: number) => boolean, thisArg?: any): Promise<IStringVector>;
 }
+//# sourceMappingURL=ANameVector.d.ts.map

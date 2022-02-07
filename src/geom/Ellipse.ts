@@ -1,8 +1,8 @@
-import {Vector2D} from '../2D/Vector2D';
-import {IIntersectionParam} from '../2D/IIntersectionParam';
-import {AShape} from './AShape';
-import {Circle} from './Circle';
-import {Rect} from './Rect';
+import { Vector2D } from '../2D/Vector2D';
+import { IIntersectionParam } from '../2D/IIntersectionParam';
+import { AShape } from './AShape';
+import { Circle } from './Circle';
+import { Rect } from './Rect';
 
 export class Ellipse extends AShape {
   constructor(public x = 0, public y = 0, public radiusX = 0, public radiusY = 0) {
@@ -36,14 +36,14 @@ export class Ellipse extends AShape {
   }
 
   transform(scale: number[], rotate: number) {
-    //TODO rotate
+    // TODO rotate
     return new Ellipse(this.x * scale[0], this.y * scale[1], this.radiusX * scale[0], this.radiusY * scale[1]);
   }
 
   asIntersectionParams(): IIntersectionParam {
     return {
       name: 'Ellipse',
-      params: [this.xy, this.radiusX, this.radiusY]
+      params: [this.xy, this.radiusX, this.radiusY],
     };
   }
 

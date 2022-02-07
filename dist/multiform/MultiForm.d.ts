@@ -48,3 +48,4 @@ export declare class MultiForm extends AVisInstance implements IVisInstance, IMu
     addSelectVisChooser(toolbar: HTMLElement): void;
     static create(data: IDataType, parent: HTMLElement, options?: IMultiFormOptions): MultiForm;
 }
+//# sourceMappingURL=MultiForm.d.ts.map

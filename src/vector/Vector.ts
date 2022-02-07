@@ -1,18 +1,12 @@
-
-import {BaseUtils} from '../base/BaseUtils';
-import {ArrayUtils} from '../base/ArrayUtils';
-import {Range, RangeLike, ParseRangeUtils} from '../range';
-import {IDTypeManager, LocalIDAssigner} from '../idtype';
-import {
-  ValueTypeUtils,
-  INumberValueTypeDesc,
-  IValueTypeDesc
-} from '../data';
-import {IVector, IVectorDataDescription} from './IVector';
-import {VectorUtils} from './VectorUtils';
-import {AVector} from './AVector';
-import {IVectorLoader, VectorLoaderUtils, IVectorLoaderResult} from './loader';
-
+import { BaseUtils } from '../base/BaseUtils';
+import { ArrayUtils } from '../base/ArrayUtils';
+import { Range, RangeLike, ParseRangeUtils } from '../range';
+import { IDTypeManager, LocalIDAssigner } from '../idtype';
+import { ValueTypeUtils, INumberValueTypeDesc, IValueTypeDesc } from '../data';
+import { IVector, IVectorDataDescription } from './IVector';
+import { VectorUtils } from './VectorUtils';
+import { AVector } from './AVector';
+import { IVectorLoader, VectorLoaderUtils, IVectorLoaderResult } from './loader';
 
 export interface IAsVectorOptions {
   name?: string;
@@ -24,8 +18,7 @@ export interface IAsVectorOptions {
  * Base vector implementation holding the data.
  * @internal
  */
-export class Vector<T,D extends IValueTypeDesc> extends AVector<T,D> {
-
+export class Vector<T, D extends IValueTypeDesc> extends AVector<T, D> {
   constructor(public readonly desc: IVectorDataDescription<D>, private loader: IVectorLoader<T>) {
     super(null);
     this.root = this;
@@ -60,8 +53,8 @@ export class Vector<T,D extends IValueTypeDesc> extends AVector<T,D> {
   async data(range: RangeLike = Range.all()) {
     const data = await this.load();
     const d = ParseRangeUtils.parseRangeLike(range).filter(data.data, this.dim);
-    if ((this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
-      return ValueTypeUtils.mask(d, <INumberValueTypeDesc><any>this.valuetype);
+    if (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT) {
+      return ValueTypeUtils.mask(d, <INumberValueTypeDesc>(<any>this.valuetype));
     }
     return d;
   }
@@ -84,13 +77,13 @@ export class Vector<T,D extends IValueTypeDesc> extends AVector<T,D> {
     return this.desc.size;
   }
 
-  async sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T,D>> {
+  async sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T, D>> {
     const d = await this.data();
     const indices = ArrayUtils.argSort(d, compareFn, thisArg);
     return this.view(Range.list(indices));
   }
 
-  async filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T,D>> {
+  async filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T, D>> {
     const d = await this.data();
     const indices = ArrayUtils.argFilter(d, callbackfn, thisArg);
     return this.view(Range.list(indices));
@@ -106,8 +99,8 @@ export class Vector<T,D extends IValueTypeDesc> extends AVector<T,D> {
    * @param desc
    * @returns {IVector}
    */
-  public static create<T, D extends IValueTypeDesc>(desc: IVectorDataDescription<D>): IVector<T,D> {
-    if (typeof((<any>desc).loader) === 'function') {
+  public static create<T, D extends IValueTypeDesc>(desc: IVectorDataDescription<D>): IVector<T, D> {
+    if (typeof (<any>desc).loader === 'function') {
       return new Vector(desc, <IVectorLoader<T>>(<any>desc).loader);
     }
     return new Vector(desc, VectorLoaderUtils.viaAPILoader());
@@ -118,10 +111,14 @@ export class Vector<T,D extends IValueTypeDesc> extends AVector<T,D> {
   }
 
   public static asVector<T>(rows: string[], data: T[], options: IAsVectorOptions = {}) {
-    const desc = BaseUtils.mixin(VectorUtils.createDefaultVectorDesc(), {
-      size: data.length,
-      value: ValueTypeUtils.guessValueTypeDesc(data)
-    }, options);
+    const desc = BaseUtils.mixin(
+      VectorUtils.createDefaultVectorDesc(),
+      {
+        size: data.length,
+        value: ValueTypeUtils.guessValueTypeDesc(data),
+      },
+      options,
+    );
 
     const rowAssigner = options.rowassigner || LocalIDAssigner.create();
     return new Vector(desc, VectorLoaderUtils.viaDataLoader(rows, rowAssigner(rows), data));

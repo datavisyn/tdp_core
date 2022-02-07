@@ -10,3 +10,4 @@ export declare class ProvenanceGraphMenu {
     private init;
     build(graphs: IProvenanceGraphDataDescription[]): void;
 }
+//# sourceMappingURL=ProvenanceGraphMenu.d.ts.map

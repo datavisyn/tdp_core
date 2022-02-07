@@ -14,3 +14,4 @@ export declare class StratificationNameVector extends ANameVector<IStratificatio
      */
     static asNameVector(stratification: IStratification): IStringVector;
 }
+//# sourceMappingURL=StratificationNameVector.d.ts.map

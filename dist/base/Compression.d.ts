@@ -1,4 +1,4 @@
-import { ActionNode } from '../provenance';
+import type { ActionNode } from '../provenance/ActionNode';
 export declare class Compression {
     /**
      * Removes all ActionNodes from the given path that matches the given function id and key.
@@ -24,3 +24,4 @@ export declare class Compression {
     static lastConsecutive(path: ActionNode[], functionId: string, toKey: (action: ActionNode) => string): ActionNode[];
     static createRemove(path: ActionNode[], createFunctionId: string, removeFunctionId: string): ActionNode[];
 }
+//# sourceMappingURL=Compression.d.ts.map

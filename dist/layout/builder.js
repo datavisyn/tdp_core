@@ -51,7 +51,7 @@ export class ABuilder {
             name: this._name,
             fixed: this._fixed,
             autoWrap: this._autoWrap,
-            fixedLayout: this._fixedLayout
+            fixedLayout: this._fixedLayout,
         };
     }
 }
@@ -67,9 +67,7 @@ export class ViewBuilder extends ABuilder {
         return this;
     }
     buildOptions() {
-        return Object.assign({
-            hideHeader: this._hideHeader
-        }, super.buildOptions());
+        return { hideHeader: this._hideHeader, ...super.buildOptions() };
     }
     build(root, doc) {
         const options = this.buildOptions();
@@ -94,7 +92,7 @@ export class LayoutUtils {
         const restorer = (d) => LayoutUtils.restore(d, restoreView, doc);
         switch (dump.type) {
             case 'root':
-                return RootLayoutContainer.restore(dump, doc, (r, child) => this.toBuilder(child).build(r, doc), (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc), restoreView);
+                return RootLayoutContainer.restore(dump, doc, (r, child) => this.toBuilder(child).build(r, doc), (d, resView) => LayoutUtils.restore(d, resView, doc), restoreView);
             case 'split':
                 return SplitLayoutContainer.restore(dump, restorer, doc);
             case 'lineup':
@@ -112,32 +110,32 @@ export class LayoutUtils {
      * @param {HTMLElement} node the root node
      * @param {(node: HTMLElement) => PHOVEA_UI_IView} viewFactory how to build a view from a node
      */
-    static derive(node, viewFactory = (node) => new NodeView(node)) {
+    static derive(node, viewFactory = (n) => new NodeView(n)) {
         const doc = node.ownerDocument;
         const r = new RootLayoutContainer(doc, (child) => this.toBuilder(child).build(r, doc), (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc));
-        const deriveImpl = (node) => {
-            switch (node.dataset.layout || 'view') {
+        const deriveImpl = (n) => {
+            switch (n.dataset.layout || 'view') {
                 case 'hsplit':
                 case 'vsplit':
                 case 'split':
-                    return SplitLayoutContainer.derive(node, deriveImpl);
+                    return SplitLayoutContainer.derive(n, deriveImpl);
                 case 'lineup':
                 case 'vlineup':
                 case 'hlineup':
                 case 'stack':
                 case 'hstack':
                 case 'vstack':
-                    return LineUpLayoutContainer.derive(node, deriveImpl);
+                    return LineUpLayoutContainer.derive(n, deriveImpl);
                 case 'tabbing':
-                    return TabbingLayoutContainer.derive(node, deriveImpl);
+                    return TabbingLayoutContainer.derive(n, deriveImpl);
                 default:
                     // interpret as view
-                    return ViewLayoutContainer.derive(viewFactory(node) || new NodeView(node));
+                    return ViewLayoutContainer.derive(viewFactory(n) || new NodeView(n));
             }
         };
         r.root = deriveImpl(node);
         if (node.parentElement) {
-            //replace old node with new root
+            // replace old node with new root
             node.parentElement.replaceChild(r.node, node);
         }
         return r;
@@ -157,15 +155,15 @@ export class LayoutUtils {
             if (horizontal) {
                 return [value, LayoutUtils.grab(child.layoutOption('prefHeight', Number.NaN), h)];
             }
-            else {
-                return [LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value];
-            }
+            return [LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value];
         }
         function FlowLayout(elems, w, h, parent) {
             w -= padding.left + padding.right;
             h -= padding.top + padding.bottom;
             const freeSpace = (horizontal ? w : h) - gap * (elems.length - 1);
-            let unbound = 0, fixUsed = 0, ratioSum = 0;
+            let unbound = 0;
+            let fixUsed = 0;
+            let ratioSum = 0;
             // count statistics
             elems.forEach((elem) => {
                 const fix = elem.layoutOption(horizontal ? 'prefWidth' : 'prefHeight', Number.NaN);
@@ -180,8 +178,8 @@ export class LayoutUtils {
                     ratioSum += ratio;
                 }
             });
-            const ratioMax = (ratioSum < 1) ? 1 : ratioSum;
-            const unboundedSpace = (freeSpace - fixUsed - freeSpace * ratioSum / ratioMax) / unbound;
+            const ratioMax = ratioSum < 1 ? 1 : ratioSum;
+            const unboundedSpace = (freeSpace - fixUsed - (freeSpace * ratioSum) / ratioMax) / unbound;
             // set all sizes
             const sizes = elems.map((elem) => {
                 const fix = elem.layoutOption(horizontal ? 'prefWidth' : 'prefHeight', Number.NaN);
@@ -189,13 +187,11 @@ export class LayoutUtils {
                 if (LayoutUtils.isDefault(fix) && LayoutUtils.isDefault(ratio)) {
                     return getSize(w, h, elem, unboundedSpace);
                 }
-                else if (fix >= 0) {
+                if (fix >= 0) {
                     return getSize(w, h, elem, fix);
-                }
-                else { // (ratio > 0)
-                    const value = (ratio / ratioMax) * freeSpace;
-                    return getSize(w, h, elem, value);
-                }
+                } // (ratio > 0)
+                const value = (ratio / ratioMax) * freeSpace;
+                return getSize(w, h, elem, value);
             });
             // set all locations
             let xAccumulator = padding.left;
@@ -220,14 +216,12 @@ export class LayoutUtils {
             if (horizontal) {
                 return child.setBounds(x, y, value, LayoutUtils.grab(child.layoutOption('prefHeight', Number.NaN), h));
             }
-            else {
-                return child.setBounds(x, y, LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value);
-            }
+            return child.setBounds(x, y, LayoutUtils.grab(child.layoutOption('prefWidth', Number.NaN), w), value);
         }
         function DistributeLayout(elems, w, h, parent) {
             w -= padding.left + padding.right;
             h -= padding.top + padding.bottom;
-            const freeSpace = (horizontal ? w : h);
+            const freeSpace = horizontal ? w : h;
             let fixUsed = 0;
             // count statistics
             elems.forEach((elem) => {
@@ -240,7 +234,8 @@ export class LayoutUtils {
             const gap = (freeSpace - fixUsed) / (elems.length - 1);
             let xAccumulator = padding.left;
             let yAccumulator = padding.top;
-            if (elems.length === 1) { //center the single one
+            if (elems.length === 1) {
+                // center the single one
                 if (horizontal) {
                     xAccumulator += (freeSpace - fixUsed) / 2;
                 }
@@ -279,12 +274,15 @@ export class LayoutUtils {
         top: 0.2,
         left: 0.2,
         right: 0.2,
-        bottom: 0.2
+        bottom: 0.2,
     }, padding = LayoutUtils.noPadding) {
         function BorderLayout(elems, w, h, parent) {
             w -= padding.left + padding.right;
             h -= padding.top + padding.bottom;
-            let x = padding.top, y = padding.left, wc = w, hc = h;
+            let x = padding.top;
+            let y = padding.left;
+            let wc = w;
+            let hc = h;
             const pos = new Map();
             pos.set('top', []);
             pos.set('center', []);
@@ -294,7 +292,7 @@ export class LayoutUtils {
             elems.forEach((elem) => {
                 let border = elem.layoutOption('border', 'center');
                 if (!pos.has(border)) {
-                    border = 'center'; //invalid one
+                    border = 'center'; // invalid one
                 }
                 pos.get(border).push(elem);
             });
@@ -336,7 +334,7 @@ export class LayoutUtils {
         if (promises.length === 0) {
             return Promise.resolve(redo);
         }
-        else if (promises.length === 1) {
+        if (promises.length === 1) {
             return promises[0].then(() => redo);
         }
         return Promise.all(promises).then(() => redo);
@@ -345,7 +343,7 @@ export class LayoutUtils {
         return LayoutUtils.isDefault(definition) ? v : definition;
     }
     static isDefault(v) {
-        return v < 0 || isNaN(v);
+        return v < 0 || Number.isNaN(v);
     }
 }
 LayoutUtils.noPadding = LayoutUtils.padding(0);
@@ -381,9 +379,7 @@ export class SplitBuilder extends AParentBuilder {
         return this;
     }
     buildOptions() {
-        return Object.assign({
-            orientation: this.orientation,
-        }, super.buildOptions());
+        return { orientation: this.orientation, ...super.buildOptions() };
     }
     build(root, doc = document) {
         const built = this.buildChildren(root, doc);
@@ -408,10 +404,7 @@ class LineUpBuilder extends AParentBuilder {
         return super.push(view);
     }
     buildOptions() {
-        return Object.assign({
-            orientation: this.orientation,
-            stackLayout: this.stackLayout
-        }, super.buildOptions());
+        return { orientation: this.orientation, stackLayout: this.stackLayout, ...super.buildOptions() };
     }
     build(root, doc = document) {
         const built = this.buildChildren(root, doc);
@@ -441,9 +434,7 @@ class TabbingBuilder extends AParentBuilder {
         return super.push(view);
     }
     buildOptions() {
-        return Object.assign({
-            active: this._active
-        }, super.buildOptions());
+        return { active: this._active, ...super.buildOptions() };
     }
     build(root, doc) {
         const built = this.buildChildren(root, doc);
@@ -467,7 +458,7 @@ export class BuilderUtils {
      */
     static root(child, doc = document) {
         const b = LayoutUtils.toBuilder(child);
-        const r = new RootLayoutContainer(doc, (child) => LayoutUtils.toBuilder(child).build(r, doc), (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc));
+        const r = new RootLayoutContainer(doc, (c) => LayoutUtils.toBuilder(c).build(r, doc), (dump, restoreView) => LayoutUtils.restore(dump, restoreView, doc));
         r.root = b.build(r, doc);
         return r;
     }

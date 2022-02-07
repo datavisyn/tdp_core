@@ -7,3 +7,4 @@ export interface IStripConfig {
 }
 export declare function stripMergeDefaultConfig(columns: VisColumn[], config: IStripConfig): IVisConfig;
 export declare function createStripTraces(columns: VisColumn[], config: IStripConfig, scales: Scales): Promise<PlotlyInfo>;
+//# sourceMappingURL=utils.d.ts.map

@@ -16,3 +16,4 @@ interface StripVisProps {
 }
 export declare function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales }: StripVisProps): JSX.Element;
 export {};
+//# sourceMappingURL=StripVis.d.ts.map

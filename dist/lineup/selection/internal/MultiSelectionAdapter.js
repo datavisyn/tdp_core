@@ -1,6 +1,6 @@
+import { difference } from 'lodash';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 import { ResolveNow } from '../../../base';
-import { difference } from 'lodash';
 export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     constructor(adapter) {
         super();
@@ -35,7 +35,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         });
     }
     removePartialDynamicColumns(context, ids) {
-        const columns = context.columns;
+        const { columns } = context;
         const selectedSubTypes = this.adapter.getSelectedSubTypes();
         if (selectedSubTypes.length === 0) {
             ids.forEach((id) => context.freeColor(id));

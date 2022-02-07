@@ -1,12 +1,10 @@
-import {IProvenanceGraphDataDescription, IProvenanceGraph} from './ICmd';
-
-
+import { IProvenanceGraphDataDescription, IProvenanceGraph } from './ICmd';
 
 export enum ProvenanceGraphDim {
   Action = 0,
   Object = 1,
   State = 2,
-  Slide = 3
+  Slide = 3,
 }
 
 export interface ICommonProvenanceGraphManagerOptions {
@@ -22,7 +20,7 @@ export interface IProvenanceGraphManager {
   get(desc: IProvenanceGraphDataDescription): PromiseLike<IProvenanceGraph>;
   create(): PromiseLike<IProvenanceGraph>;
 
-  edit(graph: IProvenanceGraphDataDescription|IProvenanceGraph, desc: any): PromiseLike<IProvenanceGraphDataDescription>;
+  edit(graph: IProvenanceGraphDataDescription | IProvenanceGraph, desc: any): PromiseLike<IProvenanceGraphDataDescription>;
 
   delete(desc: IProvenanceGraphDataDescription): PromiseLike<boolean>;
 

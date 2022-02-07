@@ -1,4 +1,4 @@
-import {EventHandler} from '../base/event';
+import { EventHandler } from '../base/event';
 
 export interface IChangedHandler {
   (newValue: any, oldValue: any, url: string);
@@ -14,7 +14,7 @@ export class Store extends EventHandler {
       if (event.storageArea === storage && event.key.startsWith(prefix)) {
         const key = event.key.substring(prefix.length);
         // send specific and generic event
-        const newValue= this.parse(event.newValue);
+        const newValue = this.parse(event.newValue);
         const oldValue = this.parse(event.oldValue);
         this.fire(key, newValue, oldValue, event.url);
         this.fire(Store.EVENT_CHANGED, key, newValue, oldValue, event.url);
@@ -40,7 +40,7 @@ export class Store extends EventHandler {
 
   includes(key: string) {
     key = this.toFullKey(key);
-    return (this.storage.getItem(key) !== null);
+    return this.storage.getItem(key) !== null;
   }
 
   getValue<T>(key: string, defaultValue: T = null): T {
@@ -50,7 +50,7 @@ export class Store extends EventHandler {
   }
 
   parse(v: string) {
-    return v === null ? null: JSON.parse(v);
+    return v === null ? null : JSON.parse(v);
   }
 
   stringify(v: any) {

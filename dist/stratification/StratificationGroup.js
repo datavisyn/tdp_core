@@ -25,13 +25,13 @@ export class StratificationGroup extends ASelectAble {
         if (groupIndex === 0) {
             return this;
         }
-        return null; //can't sub a single group
+        return null; // can't sub a single group
     }
     get idtype() {
         return this.root.idtype;
     }
     async hist(bins, range = Range.all()) {
-        //FIXME
+        // FIXME
         return RangeHistogram.rangeHist(await this.range());
     }
     vector() {
@@ -87,7 +87,7 @@ export class StratificationGroup extends ASelectAble {
     persist() {
         return {
             root: this.root.persist(),
-            group: this.groupIndex
+            group: this.groupIndex,
         };
     }
     restore(persisted) {

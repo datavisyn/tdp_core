@@ -1,14 +1,11 @@
-import {AShape} from './AShape';
-import {Rect} from './Rect';
-import {Circle} from './Circle';
-import {Ellipse} from './Ellipse';
-import {Line} from './Line';
-import {Polygon} from './Polygon';
-
+import { AShape } from './AShape';
+import { Rect } from './Rect';
+import { Circle } from './Circle';
+import { Ellipse } from './Ellipse';
+import { Line } from './Line';
+import { Polygon } from './Polygon';
 
 export class ShapeUtils {
-
-
   static wrapToShape(obj: any): AShape {
     if (!obj) {
       return obj;
@@ -37,8 +34,6 @@ export class ShapeUtils {
       return Polygon.polygon(obj);
     }
     // TODO throw error?
-    return obj; //can't derive it, yet
+    return obj; // can't derive it, yet
   }
 }
-
-

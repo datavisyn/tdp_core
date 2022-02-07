@@ -6,3 +6,4 @@ export * from './Stratification';
 export * from './vector/ANameVector';
 export * from './vector/StratificationVector';
 export * from './vector/VectorNameVector';
+//# sourceMappingURL=index.d.ts.map

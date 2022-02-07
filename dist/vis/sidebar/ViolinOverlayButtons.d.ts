@@ -6,3 +6,4 @@ interface ViolinOverlayProps {
 }
 export declare function ViolinOverlayButtons(props: ViolinOverlayProps): JSX.Element;
 export {};
+//# sourceMappingURL=ViolinOverlayButtons.d.ts.map

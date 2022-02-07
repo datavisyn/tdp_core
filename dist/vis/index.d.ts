@@ -9,3 +9,4 @@ export * from './interfaces';
 export * from './Plot';
 export * from './Vis';
 export * from './LineupVisWrapper';
+//# sourceMappingURL=index.d.ts.map

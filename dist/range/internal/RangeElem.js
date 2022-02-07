@@ -7,14 +7,14 @@ export class RangeElem {
         this.to = to;
         this.step = step;
         if (step === 0) {
-            throw new Error('invalid step size: ' + step);
+            throw new Error(`invalid step size: ${step}`);
         }
     }
     get isAll() {
         return this.from === 0 && this.to === -1 && this.step === 1;
     }
     get isSingle() {
-        return (this.from + this.step) === this.to;
+        return this.from + this.step === this.to;
     }
     get isUnbound() {
         return this.from < 0 || this.to < 0;
@@ -29,25 +29,27 @@ export class RangeElem {
         return new SingleRangeElem(val);
     }
     static range(from, to = -1, step = 1) {
-        if ((from + step) === to) {
+        if (from + step === to) {
             return RangeElem.single(from);
         }
         return new RangeElem(from, to, step);
     }
     size(size) {
-        const t = RangeUtils.fixRange(this.to, size), f = RangeUtils.fixRange(this.from, size);
+        const t = RangeUtils.fixRange(this.to, size);
+        const f = RangeUtils.fixRange(this.from, size);
         if (this.step === 1) {
             return Math.max(t - f, 0);
         }
-        else if (this.step === -1) {
+        if (this.step === -1) {
             if (this.to === -1) {
                 return Math.max(f - -1, 0);
             }
             return Math.max(f - t, 0);
         }
-        const d = this.step > 0 ? (t - f + 1) : (f - t + 1);
+        const d = this.step > 0 ? t - f + 1 : f - t + 1;
         const s = Math.abs(this.step);
-        if (d <= 0) { //no range
+        if (d <= 0) {
+            // no range
             return 0;
         }
         return Math.floor(d / s);
@@ -60,12 +62,10 @@ export class RangeElem {
             const t = this.from - 1;
             const f = this.to - 1;
             return new RangeElem(f, t, -this.step);
-        }
-        else { //step <0
-            const t = this.from - 1;
-            const f = this.to - 1;
-            return new RangeElem(f, t, -this.step);
-        }
+        } // step <0
+        const t = this.from - 1;
+        const f = this.to - 1;
+        return new RangeElem(f, t, -this.step);
     }
     invert(index, size) {
         if (this.isAll) {
@@ -95,16 +95,15 @@ export class RangeElem {
         const t = RangeUtils.fixRange(this.to, size);
         if (this.step === -1) {
             if (this.to === -1) {
-                return (value <= f && value >= 0);
+                return value <= f && value >= 0;
             }
-            return (value <= f) && (value > t);
+            return value <= f && value > t;
         }
-        else if (this.step === +1) { //+1
-            return (value >= f) && (value < t);
+        if (this.step === +1) {
+            // +1
+            return value >= f && value < t;
         }
-        else {
-            return this.iter(size).asList().indexOf(value) >= 0;
-        }
+        return this.iter(size).asList().indexOf(value) >= 0;
     }
     toString() {
         if (this.isAll) {
@@ -113,9 +112,9 @@ export class RangeElem {
         if (this.isSingle) {
             return this.from.toString();
         }
-        let r = this.from + ':' + this.to;
+        let r = `${this.from}:${this.to}`;
         if (this.step !== 1) {
-            r += ':' + this.step;
+            r += `:${this.step}`;
         }
         return r;
     }
@@ -125,11 +124,11 @@ export class RangeElem {
         }
         const parseElem = (v, defaultValue = NaN) => {
             v = v.trim();
-            if (v === '' && !isNaN(defaultValue)) {
+            if (v === '' && !Number.isNaN(defaultValue)) {
                 return defaultValue;
             }
             const n = parseInt(v, 10);
-            if (isNaN(n)) {
+            if (Number.isNaN(n)) {
                 throw Error(`parse error: "${v}" is not a valid integer`);
             }
             return n;

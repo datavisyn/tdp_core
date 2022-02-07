@@ -29,3 +29,4 @@ export declare class MixedStorageProvenanceGraphManager implements IProvenanceGr
     createInMemory(): ProvenanceGraph;
     cloneInMemory(desc: IProvenanceGraphDataDescription): PromiseLike<ProvenanceGraph>;
 }
+//# sourceMappingURL=MixedStorageProvenanceGraphManager.d.ts.map

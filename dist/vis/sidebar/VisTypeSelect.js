@@ -9,7 +9,7 @@ export function VisTypeSelect(props) {
             onChange: (e) => props.callback(e.value), name: "visTypes", options: allVisTypes.map((t) => {
                 return {
                     value: t,
-                    label: t
+                    label: t,
                 };
             }), value: { value: props.currentSelected, label: props.currentSelected } })));
 }

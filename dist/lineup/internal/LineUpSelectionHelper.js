@@ -1,7 +1,7 @@
-import { EventHandler } from '../../base';
 import { LocalDataProvider } from 'lineupjs';
-import { Range } from '../../range';
 import { difference } from 'lodash';
+import { EventHandler } from '../../base';
+import { Range } from '../../range';
 export class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType) {
         super();
@@ -51,7 +51,7 @@ export class LineUpSelectionHelper extends EventHandler {
             this.orderedSelectedIndices.push(d);
         });
         const uids = Range.list(this.orderedSelectedIndices.map((i) => this._rows[i]._id));
-        //console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
+        // console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
         const idType = this.idType();
         if (!idType) {
             console.warn('no idType defined for this ranking view');
@@ -74,7 +74,7 @@ export class LineUpSelectionHelper extends EventHandler {
     rowIdsAsSet(indices) {
         let ids;
         if (indices.length === this._rows.length) {
-            //all
+            // all
             ids = this._rows.map((d) => d._id);
         }
         else {

@@ -1,6 +1,6 @@
 import { Token } from './Token';
 import { IntersectionParamUtils } from './IIntersectionParam';
-import { AbsoluteArcPath, AbsoluteCurveto3, RelativeCurveto3, AbsoluteHLineto, AbsoluteLineto, RelativeLineto, AbsoluteMoveto, RelativeMoveto, AbsoluteCurveto2, RelativeCurveto2, AbsoluteSmoothCurveto3, RelativeSmoothCurveto3, AbsoluteSmoothCurveto2, RelativeSmoothCurveto2, RelativeClosePath } from './PathSegment';
+import { AbsoluteArcPath, AbsoluteCurveto3, RelativeCurveto3, AbsoluteHLineto, AbsoluteLineto, RelativeLineto, AbsoluteMoveto, RelativeMoveto, AbsoluteCurveto2, RelativeCurveto2, AbsoluteSmoothCurveto3, RelativeSmoothCurveto3, AbsoluteSmoothCurveto2, RelativeSmoothCurveto2, RelativeClosePath, } from './PathSegment';
 export class Path {
     constructor(path) {
         this.segments = null;
@@ -29,29 +29,27 @@ export class Path {
                     throw new Error('Path data must begin with a moveto command');
                 }
             }
-            else {
-                if (token.typeis(Path.NUMBER)) {
-                    paramLength = Path.PARAMS[mode].length;
-                }
-                else {
-                    index++;
-                    paramLength = Path.PARAMS[token.text].length;
-                    mode = token.text;
-                }
+            else if (token.typeis(Path.NUMBER)) {
+                paramLength = Path.PARAMS[mode].length;
             }
-            if ((index + paramLength) < tokens.length) {
+            else {
+                index++;
+                paramLength = Path.PARAMS[token.text].length;
+                mode = token.text;
+            }
+            if (index + paramLength < tokens.length) {
                 for (let i = index; i < index + paramLength; i++) {
                     const n = tokens[i];
                     if (n.typeis(Path.NUMBER)) {
                         params[params.length] = n.text;
                     }
                     else {
-                        throw new Error('Parameter type is not a number: ' + mode + ',' + n.text);
+                        throw new Error(`Parameter type is not a number: ${mode},${n.text}`);
                     }
                 }
                 let segment;
-                const length = this.segments.length;
-                const previous = (length === 0) ? null : this.segments[length - 1];
+                const { length } = this.segments;
+                const previous = length === 0 ? null : this.segments[length - 1];
                 switch (mode) {
                     case 'A':
                         segment = new AbsoluteArcPath(params, this, previous);
@@ -102,7 +100,7 @@ export class Path {
                         segment = new RelativeClosePath(params, this, previous);
                         break;
                     default:
-                        throw new Error('Unsupported segment type: ' + mode);
+                        throw new Error(`Unsupported segment type: ${mode}`);
                 }
                 this.segments.push(segment);
                 index += paramLength;
@@ -134,7 +132,7 @@ export class Path {
                 d = d.substr(RegExp.$1.length);
             }
             else {
-                throw new Error('Unrecognized segment command: ' + d);
+                throw new Error(`Unrecognized segment command: ${d}`);
             }
         }
         tokens[tokens.length] = new Token(Path.EOD, null);
@@ -167,6 +165,6 @@ Path.PARAMS = {
     V: ['y'],
     v: ['y'],
     Z: [],
-    z: []
+    z: [],
 };
 //# sourceMappingURL=Path.js.map

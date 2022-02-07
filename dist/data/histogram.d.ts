@@ -78,3 +78,4 @@ export declare class RangeHistogram implements ICatHistogram {
     forEach(callbackfn: (value: number, index: number) => void, thisArg?: any): void;
     static rangeHist(range: CompositeRange1D): RangeHistogram;
 }
+//# sourceMappingURL=histogram.d.ts.map

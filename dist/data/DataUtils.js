@@ -16,7 +16,7 @@ export class DataUtils {
             fqname: id,
             description: '',
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
-            ts: Date.now()
+            ts: Date.now(),
         };
     }
     /**
@@ -38,7 +38,7 @@ export class DataUtils {
         }
         const r = m[0].map((i) => [i]);
         for (let i = 1; i < m.length; ++i) {
-            m[i].forEach((v, i) => r[i].push(v));
+            m[i].forEach((v, j) => r[j].push(v));
         }
         return r;
     }
@@ -51,7 +51,8 @@ export class DataUtils {
     static defineDataType(name, functions) {
         function DataType(desc) {
             ADataType.call(this, desc);
-            if (typeof (this.init) === 'function') {
+            if (typeof this.init === 'function') {
+                // eslint-disable-next-line prefer-rest-params
                 this.init.apply(this, Array.from(arguments));
             }
         }

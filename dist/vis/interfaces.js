@@ -6,7 +6,13 @@ export var ESupportedPlotlyVis;
     ESupportedPlotlyVis["STRIP"] = "Strip";
     ESupportedPlotlyVis["BAR"] = "Bar";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
-export const allVisTypes = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP, ESupportedPlotlyVis.PCP];
+export const allVisTypes = [
+    ESupportedPlotlyVis.SCATTER,
+    ESupportedPlotlyVis.BAR,
+    ESupportedPlotlyVis.VIOLIN,
+    ESupportedPlotlyVis.STRIP,
+    ESupportedPlotlyVis.PCP,
+];
 export var EColumnTypes;
 (function (EColumnTypes) {
     EColumnTypes["NUMERICAL"] = "Numerical";

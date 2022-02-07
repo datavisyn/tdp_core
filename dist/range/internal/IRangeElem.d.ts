@@ -21,3 +21,4 @@ export interface IRangeElem {
     reverse(): IRangeElem;
     contains(value: number, size?: number): boolean;
 }
+//# sourceMappingURL=IRangeElem.d.ts.map

@@ -5,3 +5,4 @@ export declare class ThumbnailUtils {
     static screenshot_url(graph: ProvenanceGraph, state: StateNode, options?: {}): any;
     static areThumbnailsAvailable(graph: ProvenanceGraph): boolean;
 }
+//# sourceMappingURL=ThumbnailUtils.d.ts.map

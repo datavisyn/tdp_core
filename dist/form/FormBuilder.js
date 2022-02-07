@@ -51,8 +51,7 @@ export class FormBuilder {
      */
     build() {
         // initialize when all elements are loaded
-        return Promise.all(this.elementPromises)
-            .then((elements) => {
+        return Promise.all(this.elementPromises).then((elements) => {
             this.form.appendElements(elements);
             this.form.initAllElements();
             return this.form;

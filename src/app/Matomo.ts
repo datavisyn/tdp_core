@@ -1,8 +1,8 @@
 import md5 from 'md5';
-import {ActionNode, ProvenanceGraph} from '../provenance';
-import {IUser} from '../security';
-import {AppContext} from './AppContext';
-import {PluginRegistry} from './PluginRegistry';
+import { ActionNode, ProvenanceGraph } from '../provenance';
+import { IUser } from '../security';
+import { AppContext } from './AppContext';
+import { PluginRegistry } from './PluginRegistry';
 
 /**
  * Trackable Matomo event
@@ -30,6 +30,7 @@ export interface ITrackableAction {
 
 // assume `_pag` is already declared
 (<any>window)._paq = (<any>window)._paq || [];
+// eslint-disable-next-line @typescript-eslint/naming-convention
 declare const _paq: any[][];
 
 interface IPhoveaMatomoConfig {
@@ -51,7 +52,6 @@ interface IPhoveaMatomoConfig {
 }
 
 export class Matomo {
-
   private userId: string;
 
   init(config: IPhoveaMatomoConfig) {
@@ -59,7 +59,7 @@ export class Matomo {
       return false;
     }
 
-    const userId = (config.encryptUserName === true) ? md5(this.userId) : this.userId;
+    const userId = config.encryptUserName === true ? md5(this.userId) : this.userId;
 
     _paq.push(['setUserId', userId]);
 
@@ -79,6 +79,7 @@ export class Matomo {
     s.src = `${config.url}matomo.js`;
     const base = document.getElementsByTagName('script')[0];
     base.insertAdjacentElement('beforebegin', s);
+    return true;
   }
 
   trackEvent(category: string, action: string, name?: string, value?: number) {
@@ -130,20 +131,22 @@ export class Matomo {
     const trackableActions = new Map<string, IMatomoEvent>();
 
     // load all registered actionFunction extension points and look if they contain a `analytics` property
-    PluginRegistry.getInstance().listPlugins((desc) => desc.type === 'actionFunction' && desc.analytics).forEach((desc) => {
-      trackableActions.set(desc.id, desc.analytics);
-    });
+    PluginRegistry.getInstance()
+      .listPlugins((desc) => desc.type === 'actionFunction' && desc.analytics)
+      .forEach((desc) => {
+        trackableActions.set(desc.id, desc.analytics);
+      });
 
     graph.on('execute', (_, node: ActionNode) => {
-      if(!Array.from(trackableActions.keys()).includes(node.getAttr('f_id'))) {
+      if (!Array.from(trackableActions.keys()).includes(node.getAttr('f_id'))) {
         return;
       }
       const event = trackableActions.get(node.getAttr('f_id'));
       Matomo.getInstance().trackEvent(
         event.category,
         event.action,
-        (typeof event.name === 'function') ? event.name(node) : node.name,
-        (typeof event.value === 'function') ? event.value(node) : null
+        typeof event.name === 'function' ? event.name(node) : node.name,
+        typeof event.value === 'function' ? event.value(node) : null,
       );
     });
 
@@ -156,6 +159,7 @@ export class Matomo {
   }
 
   private static instance: Matomo;
+
   public static getInstance(): Matomo {
     if (!Matomo.instance) {
       Matomo.instance = new Matomo();

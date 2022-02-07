@@ -11,3 +11,4 @@ export declare class PanelDownloadButton implements IPanelButton {
     private resortAble;
     private downloadFile;
 }
+//# sourceMappingURL=PanelDownloadButton.d.ts.map

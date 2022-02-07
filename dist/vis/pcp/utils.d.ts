@@ -6,3 +6,4 @@ export interface IPCPConfig {
 }
 export declare function pcpMergeDefaultConfig(columns: VisColumn[], config: IPCPConfig): IVisConfig;
 export declare function createPCPTraces(columns: VisColumn[], config: IPCPConfig): Promise<PlotlyInfo>;
+//# sourceMappingURL=utils.d.ts.map

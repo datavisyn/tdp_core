@@ -1,17 +1,18 @@
-import {IPersistable} from '../../base/IPersistable';
-import {Range, RangeLike, ParseRangeUtils} from '../../range';
-import {IDType} from '../../idtype/IDType';
-import {IDataDescription, IValueTypeDesc} from '../../data';
-import {ITable, ITableDataDescription, IQueryArgs} from '../ITable';
-import {ATable} from '../ATable';
-import {IAnyVector} from '../../vector/IVector';
-import {IVector} from '../../vector';
+import { IPersistable } from '../../base/IPersistable';
+import { Range, RangeLike, ParseRangeUtils } from '../../range';
+import { IDType } from '../../idtype/IDType';
+import { IDataDescription, IValueTypeDesc } from '../../data';
+import { ITable, ITableDataDescription, IQueryArgs } from '../ITable';
+import { ATable } from '../ATable';
+import { IAnyVector } from '../../vector/IVector';
+import { IVector } from '../../vector';
 
 /**
  * @internal
  */
 export class VectorTable extends ATable implements ITable {
   readonly idtype: IDType;
+
   readonly desc: ITableDataDescription;
 
   constructor(desc: IDataDescription, private vectors: IAnyVector[]) {
@@ -48,7 +49,7 @@ export class VectorTable extends ATable implements ITable {
 
   data(range: RangeLike = Range.all()) {
     return Promise.all(this.vectors.map((v) => v.data(range))).then((arr: any[][]) => {
-      const r = arr[0].map((i) => ([i]));
+      const r = arr[0].map((i) => [i]);
       arr.slice(1).forEach((ai) => ai.forEach((d, i) => r[i].push(d)));
       return r;
     });
@@ -62,15 +63,13 @@ export class VectorTable extends ATable implements ITable {
     return this.vectors.find((d) => d.desc.name === column).data(range);
   }
 
-
-
   objects(range: RangeLike = Range.all()) {
     return Promise.all(this.vectors.map((v) => v.data(range))).then((arr: any[][]) => {
       const names = this.vectors.map((d) => d.desc.name);
-      const r = arr[0].map((i) => ( {[ names[0]]: i}));
+      const r = arr[0].map((i) => ({ [names[0]]: i }));
       arr.slice(1).forEach((ai, j) => {
         const name = names[j + 1];
-        ai.forEach((d, i) => r[i][name] = d);
+        ai.forEach((d, i) => (r[i][name] = d));
       });
       return r;
     });

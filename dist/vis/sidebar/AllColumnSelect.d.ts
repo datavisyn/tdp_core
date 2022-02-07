@@ -7,3 +7,4 @@ interface AllColumnSelectProps {
 }
 export declare function AllColumnSelect(props: AllColumnSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=AllColumnSelect.d.ts.map

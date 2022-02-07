@@ -26,26 +26,26 @@ export class Rect extends AShape {
     get size() {
         return new Vector2D(this.w, this.h);
     }
-    get cx() {
-        return this.x + this.w / 2;
-    }
     get cy() {
         return this.y + this.h / 2;
-    }
-    set cx(val) {
-        this.x = val - this.w / 2;
     }
     set cy(val) {
         this.y = val - this.y / 2;
     }
+    get cx() {
+        return this.x + this.w / 2;
+    }
+    set cx(val) {
+        this.x = val - this.w / 2;
+    }
     get x2() {
         return this.x + this.w;
     }
-    get y2() {
-        return this.y + this.h;
-    }
     set x2(val) {
         this.w = val - this.x;
+    }
+    get y2() {
+        return this.y + this.h;
     }
     set y2(val) {
         this.h = val - this.y;
@@ -61,13 +61,13 @@ export class Rect extends AShape {
         return new Vector2D(this.cx, this.cy);
     }
     transform(scale, rotate) {
-        //TODO rotate
+        // TODO rotate
         return new Rect(this.x * scale[0], this.y * scale[1], this.w * scale[0], this.h * scale[1]);
     }
     asIntersectionParams() {
         return {
             name: 'Rectangle',
-            params: [this.xy, this.x2y2]
+            params: [this.xy, this.x2y2],
         };
     }
     static rect(x, y, w, h) {

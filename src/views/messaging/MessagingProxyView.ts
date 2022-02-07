@@ -1,11 +1,10 @@
-import {AView} from '../AView';
-import {IViewContext, ISelection} from '../../base/interfaces';
-import {ResolveUtils} from '../ResolveUtils';
-import {ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage} from './interfaces';
-import {IDTypeManager} from '../../idtype';
-import {ParseRangeUtils, Range} from '../../range';
-import {I18nextManager} from '../../i18n';
-
+import { AView } from '../AView';
+import { IViewContext, ISelection } from '../../base/interfaces';
+import { ResolveUtils } from '../ResolveUtils';
+import { ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage } from './interfaces';
+import { IDTypeManager } from '../../idtype';
+import { ParseRangeUtils, Range } from '../../range';
+import { I18nextManager } from '../../i18n';
 
 export interface IPartialProxyViewOptions {
   /**
@@ -27,12 +26,13 @@ export class MessagingProxyView extends AView {
   protected options: IPartialProxyViewOptions = {
     site: null,
     idtype: null,
-    itemIDType: null
+    itemIDType: null,
   };
 
   readonly naturalSize = [1280, 800];
 
   private iframeWindow: Window | null = null;
+
   private messageQueue: ITDPMessage[] = [];
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IPartialProxyViewOptions> = {}) {
@@ -73,25 +73,25 @@ export class MessagingProxyView extends AView {
     iframe.src = this.options.site;
     // listen on iframe events
     window.addEventListener('message', this.onWindowMessage, {
-      passive: true
+      passive: true,
     });
 
     this.node.appendChild(iframe);
   }
 
   private onWindowMessage = (evt: MessageEvent) => {
-    if (!this.iframeWindow || evt.source !== this.iframeWindow || !evt.data || (typeof evt.data.type !== 'string') || !evt.data.payload) {
+    if (!this.iframeWindow || evt.source !== this.iframeWindow || !evt.data || typeof evt.data.type !== 'string' || !evt.data.payload) {
       return;
     }
     const msg = <ITDPMessage>evt.data;
     switch (msg.type) {
       case 'tdpSetItemSelection': {
-        const payload = (<ITDPSetItemSelectionMessage>msg).payload;
+        const { payload } = <ITDPSetItemSelectionMessage>msg;
         const name = payload.name || AView.DEFAULT_SELECTION_NAME;
-        const ids: string[] = payload.ids;
+        const { ids } = payload;
         const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
         if (!ids || ids.length === 0) {
-          this.setItemSelection({idtype: idType, range: Range.none()}, name);
+          this.setItemSelection({ idtype: idType, range: Range.none() }, name);
         }
 
         if (!idType) {
@@ -99,23 +99,25 @@ export class MessagingProxyView extends AView {
           return;
         }
         idType.map(ids).then((r) => {
-          this.setItemSelection({idtype: idType, range: ParseRangeUtils.parseRangeLike(r)}, name);
+          this.setItemSelection({ idtype: idType, range: ParseRangeUtils.parseRangeLike(r) }, name);
         });
         return;
       }
       case 'tdpSetParameter': {
-        const payload = (<ITDPSetParameterMessage>msg).payload;
-        const name = payload.name;
+        const { payload } = <ITDPSetParameterMessage>msg;
+        const { name } = payload;
         const value = payload.value == null ? null : payload.value;
         if (!name) {
           console.warn('cannot set item parameter with no name');
           return;
         }
         this.changeParameter(name, value);
-        return;
+        break;
       }
+      default:
+        break;
     }
-  }
+  };
 
   destroy() {
     window.removeEventListener('message', this.onWindowMessage);
@@ -135,25 +137,25 @@ export class MessagingProxyView extends AView {
     return this.sendParameterMessage(name);
   }
 
-
   private sendInputSelectionMessage(name: string) {
     if (!this.iframeWindow) {
       return;
     }
 
     const selection = this.getInputSelection(name);
-    return ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
+    ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
       if (!ids || ids.length === 0) {
         this.setNoMappingFoundHint(true);
         return;
       }
       this.setNoMappingFoundHint(false);
       this.sendMessage({
-        type: 'tdpSetInputSelection', payload: {
+        type: 'tdpSetInputSelection',
+        payload: {
           name,
           idType: this.idType.id,
-          ids
-        }
+          ids,
+        },
       });
     });
   }
@@ -172,24 +174,32 @@ export class MessagingProxyView extends AView {
   private sendItemSelectionMessage(name: string) {
     const s = this.getItemSelection(name);
     if (!s || s.range.isNone) {
-      this.sendMessage({
-        type: 'tdpSetItemSelection', payload: {
-          name,
-          idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
-          ids: []
-        }
-      }, true);
+      this.sendMessage(
+        {
+          type: 'tdpSetItemSelection',
+          payload: {
+            name,
+            idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
+            ids: [],
+          },
+        },
+        true,
+      );
       return;
     }
 
-    return ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
-      this.sendMessage({
-        type: 'tdpSetItemSelection', payload: {
-          name,
-          idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
-          ids
-        }
-      }, true);
+    ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
+      this.sendMessage(
+        {
+          type: 'tdpSetItemSelection',
+          payload: {
+            name,
+            idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
+            ids,
+          },
+        },
+        true,
+      );
     });
   }
 
@@ -199,16 +209,20 @@ export class MessagingProxyView extends AView {
     }
 
     const value = this.getParameter(name);
-    this.sendMessage({
-      type: 'tdpSetParameter', payload: {
-        name,
-        value
-      }
-    }, true);
+    this.sendMessage(
+      {
+        type: 'tdpSetParameter',
+        payload: {
+          name,
+          value,
+        },
+      },
+      true,
+    );
   }
 
   private static isNoNSecurePage(url: string) {
-    const self = location.protocol.toLowerCase();
+    const self = window.location.protocol.toLowerCase();
     if (!self.startsWith('https')) {
       return false; // if I'm not secure doesn't matter
     }

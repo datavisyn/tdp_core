@@ -71,3 +71,4 @@ export declare type Scales = {
     color: any;
 };
 export {};
+//# sourceMappingURL=interfaces.d.ts.map

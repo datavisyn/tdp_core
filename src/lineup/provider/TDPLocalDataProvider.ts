@@ -1,4 +1,4 @@
-import {IColumnConstructor, IColumnDesc, IDataProviderOptions, ILocalDataProviderOptions, isSupportType, ITypeFactory, LocalDataProvider} from 'lineupjs';
+import { IColumnConstructor, IColumnDesc, IDataProviderOptions, ILocalDataProviderOptions, isSupportType, ITypeFactory, LocalDataProvider } from 'lineupjs';
 
 /**
  * A data provider which changes the default column width from LineUp
@@ -13,6 +13,7 @@ export default class TDPLocalDataProvider extends LocalDataProvider {
     const columnWidth = desc.width;
 
     // create a column instance needed for the `isSupportType(col)`
+    // eslint-disable-next-line new-cap
     const col = new type(id, desc, typeFactory);
 
     // do nothing if column width is already defined, there is a default width set by the column instance, or it is a support type column (e.g., rank, aggregation, selection)

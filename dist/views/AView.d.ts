@@ -1,8 +1,7 @@
 import { IDType } from '../idtype';
 import { EventHandler } from '../base';
 import { IFormElementDesc } from '../form/interfaces';
-import { ISelection, IView, IViewContext } from '../base/interfaces';
-import { EViewMode } from '../base/interfaces';
+import { ISelection, IView, IViewContext, EViewMode } from '../base/interfaces';
 import { IAuthorizationConfiguration } from '../auth';
 /**
  * base class for all views
@@ -126,3 +125,4 @@ export declare abstract class AView extends EventHandler implements IView {
     destroy(): void;
     isRegex(v: string): boolean;
 }
+//# sourceMappingURL=AView.d.ts.map

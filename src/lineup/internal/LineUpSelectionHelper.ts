@@ -1,10 +1,10 @@
-import {EventHandler, ISelection} from '../../base';
-import {IRow} from '../../base/rest';
-import {LocalDataProvider} from 'lineupjs';
-import {IDType} from '../../idtype';
-import {Range} from '../../range';
-import {difference} from 'lodash';
-
+import { LocalDataProvider } from 'lineupjs';
+import { difference } from 'lodash';
+import { EventHandler, ISelection } from '../../base';
+import { IRow } from '../../base/rest';
+import { LineupUtils } from '../utils';
+import { IDType } from '../../idtype';
+import { Range } from '../../range';
 
 export class LineUpSelectionHelper extends EventHandler {
   static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';
@@ -16,6 +16,7 @@ export class LineUpSelectionHelper extends EventHandler {
    * @type {number[]}
    */
   private readonly orderedSelectedIndices = <number[]>[];
+
   private uid2index = new Map<number, number>();
 
   constructor(private readonly provider: LocalDataProvider, private readonly idType: () => IDType) {
@@ -35,7 +36,10 @@ export class LineUpSelectionHelper extends EventHandler {
       console.error('no idType defined for this view');
       return;
     }
-    idType.fillMapCache(this._rows.map((r) => r._id), this._rows.map((r) => String(r.id)));
+    idType.fillMapCache(
+      this._rows.map((r) => r._id),
+      this._rows.map((r) => String(r.id)),
+    );
   }
 
   private addEventListener() {
@@ -63,16 +67,15 @@ export class LineUpSelectionHelper extends EventHandler {
       this.orderedSelectedIndices.push(d);
     });
 
-
     const uids = Range.list(this.orderedSelectedIndices.map((i) => this._rows[i]._id));
-    //console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
+    // console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
 
     const idType = this.idType();
     if (!idType) {
       console.warn('no idType defined for this ranking view');
       return;
     }
-    const selection: ISelection = {idtype: idType, range: uids};
+    const selection: ISelection = { idtype: idType, range: uids };
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }
@@ -92,7 +95,7 @@ export class LineUpSelectionHelper extends EventHandler {
   rowIdsAsSet(indices: number[]) {
     let ids: number[];
     if (indices.length === this._rows.length) {
-      //all
+      // all
       ids = this._rows.map((d) => d._id);
     } else {
       ids = indices.map((i) => this._rows[i]._id);

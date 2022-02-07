@@ -4,11 +4,11 @@
  *
  * See IDataDescriptionMetaData in datatype.ts for various legal parameters
  */
-import {AppContext} from '../app/AppContext';
-import {BaseUtils} from '../base/BaseUtils';
-import {PluginRegistry} from '../app/PluginRegistry';
-import {IDataType, DummyDataType} from './datatype';
-import {IDataDescription} from './DataDescription';
+import { AppContext } from '../app/AppContext';
+import { BaseUtils } from '../base/BaseUtils';
+import { PluginRegistry } from '../app/PluginRegistry';
+import { IDataType, DummyDataType } from './datatype';
+import { IDataDescription } from './DataDescription';
 
 export interface INode {
   readonly name: string;
@@ -17,12 +17,13 @@ export interface INode {
 }
 
 export class DataCache {
-
-  //find all datatype plugins
+  // find all datatype plugins
   private available = PluginRegistry.getInstance().listPlugins('datatype');
 
   private cacheById = new Map<string, Promise<IDataType>>();
+
   private cacheByName = new Map<string, Promise<IDataType>>();
+
   private cacheByFQName = new Map<string, Promise<IDataType>>();
 
   public clearCache(dataset?: IDataType | IDataDescription) {
@@ -68,14 +69,17 @@ export class DataCache {
       return DataCache.getInstance().cacheById.get(desc.id);
     }
 
-    //find matching type
+    // find matching type
     const plugin = DataCache.getInstance().available.filter((p) => p.id === desc.type);
-    //no type there create a dummy one
+    // no type there create a dummy one
     if (plugin.length === 0) {
       return DataCache.getInstance().cached(desc, Promise.resolve(new DummyDataType(desc)));
     }
-    //take the first matching one
-    return DataCache.getInstance().cached(desc, plugin[0].load().then((d) =>d.factory(desc)));
+    // take the first matching one
+    return DataCache.getInstance().cached(
+      desc,
+      plugin[0].load().then((d) => d.factory(desc)),
+    );
   }
 
   /**
@@ -83,17 +87,19 @@ export class DataCache {
    * @param filter optional filter either a function or a server side interpretable filter object
    * @returns {Promise<IDataType[]>}
    */
-  public async list(filter?: ({[key: string]: string})|((d: IDataType) => boolean)): Promise<IDataType[]> {
-    const f = (typeof filter === 'function') ? <(d: IDataType) => boolean>filter : null;
-    const q = (typeof filter !== 'undefined' && typeof filter !== 'function') ? <any>filter : {};
+  public async list(filter?: { [key: string]: string } | ((d: IDataType) => boolean)): Promise<IDataType[]> {
+    const f = typeof filter === 'function' ? <(d: IDataType) => boolean>filter : null;
+    const q = typeof filter !== 'undefined' && typeof filter !== 'function' ? <any>filter : {};
 
     let r: Promise<IDataType[]>;
 
     if (AppContext.getInstance().isOffline()) {
       r = DataCache.getInstance().getCachedEntries();
     } else {
-      //load descriptions and create data out of them
-      r = AppContext.getInstance().getAPIJSON('/dataset/', q).then((r) => Promise.all<IDataType>(r.map(DataCache.getInstance().transformEntry)));
+      // load descriptions and create data out of them
+      r = AppContext.getInstance()
+        .getAPIJSON('/dataset/', q)
+        .then((result) => Promise.all<IDataType>(result.map(DataCache.getInstance().transformEntry)));
     }
 
     if (f !== null) {
@@ -108,8 +114,8 @@ export class DataCache {
    * @returns {{children: Array, name: string, data: null}}
    */
   public convertToTree(list: IDataType[]): INode {
-    //create a tree out of the list by the fqname
-    const root: INode = {children: [], name: '/', data: null};
+    // create a tree out of the list by the fqname
+    const root: INode = { children: [], name: '/', data: null };
 
     list.forEach((entry) => {
       const path = entry.desc.fqname.split('/');
@@ -117,7 +123,7 @@ export class DataCache {
       path.forEach((node) => {
         let next = act.children.find((d) => d.name === node);
         if (!next) {
-          next = {children: [], name: node, data: null};
+          next = { children: [], name: node, data: null };
           act.children.push(next);
         }
         act = next;
@@ -131,7 +137,7 @@ export class DataCache {
   /**
    * returns a tree of all available datasets
    */
-  public async tree(filter?: ({[key: string]: string})|((d: IDataType) => boolean)): Promise<INode> {
+  public async tree(filter?: { [key: string]: string } | ((d: IDataType) => boolean)): Promise<INode> {
     return DataCache.getInstance().convertToTree(await DataCache.getInstance().list(filter));
   }
 
@@ -140,27 +146,28 @@ export class DataCache {
    * @param query
    * @returns {any}
    */
-  public async getFirst(query: {[key: string]: string} | string | RegExp): Promise<IDataType> {
+  public async getFirst(query: { [key: string]: string } | string | RegExp): Promise<IDataType> {
     if (typeof query === 'string' || query instanceof RegExp) {
-      return DataCache.getInstance().getFirstByName(<string|RegExp>query);
+      return DataCache.getInstance().getFirstByName(<string | RegExp>query);
     }
     const q = <any>query;
     q.limit = 1;
 
     const result = await DataCache.getInstance().list(q);
     if (result.length === 0) {
-      return Promise.reject({error: 'nothing found, matching', args: q});
+      return Promise.reject({ error: 'nothing found, matching', args: q });
     }
     return Promise.resolve(result[0]);
   }
 
-  /*function escapeRegExp(string){
+  /* function escapeRegExp(string){
   return string.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1');
-  }*/
+  } */
 
   public getFirstByName(name: string | RegExp) {
     return DataCache.getInstance().getFirstWithCache(name, DataCache.getInstance().cacheByName, 'name');
   }
+
   public getFirstByFQName(name: string | RegExp) {
     return DataCache.getInstance().getFirstWithCache(name, DataCache.getInstance().cacheByFQName, 'fqname');
   }
@@ -173,7 +180,7 @@ export class DataCache {
       }
     }
     return DataCache.getInstance().getFirst({
-      [attr]: typeof name === 'string' ? name : name.source
+      [attr]: typeof name === 'string' ? name : name.source,
     });
   }
 
@@ -198,14 +205,13 @@ export class DataCache {
     if (typeof persisted === 'string') {
       return DataCache.getInstance().getById(<string>persisted);
     }
-    //resolve parent and then resolve it using restore item
+    // resolve parent and then resolve it using restore item
     if (persisted.root) {
       const parent = await DataCache.getInstance().get(persisted.root);
       return parent ? <IDataType>parent.restore(persisted) : null;
-    } else {
-      //can't restore non root and non data id
-      return Promise.reject('cannot restore non root and non data id');
     }
+    // can't restore non root and non data id
+    return Promise.reject('cannot restore non root and non data id');
   }
 
   /**
@@ -246,7 +252,7 @@ export class DataCache {
     const desc = await AppContext.getInstance().sendAPI(`/dataset/${entry.desc.id}`, data, 'PUT');
     // clear existing cache
     DataCache.getInstance().clearCache(entry);
-    //update with current one
+    // update with current one
     return DataCache.getInstance().transformEntry(desc);
   }
 
@@ -282,5 +288,4 @@ export class DataCache {
     }
     return DataCache.instance;
   }
-
 }

@@ -9,3 +9,4 @@ export interface IViolinConfig {
 }
 export declare function violinMergeDefaultConfig(columns: VisColumn[], config: IViolinConfig): IVisConfig;
 export declare function createViolinTraces(columns: VisColumn[], config: IViolinConfig, scales: Scales): Promise<PlotlyInfo>;
+//# sourceMappingURL=utils.d.ts.map

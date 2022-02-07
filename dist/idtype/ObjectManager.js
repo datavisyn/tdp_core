@@ -15,7 +15,7 @@ export class HasUniqueIdUtils {
  */
 export class ObjectManager extends IDType {
     constructor(id, name) {
-        super(id, name, name + 's', true);
+        super(id, name, `${name}s`, true);
         this.instances = [];
         this.pool = new IdPool();
     }
@@ -38,7 +38,7 @@ export class ObjectManager extends IDType {
         return this.instances[id];
     }
     forEach(callbackfn, thisArg) {
-        this.instances.forEach((item, i) => this.pool.isCheckedOut(i) ? callbackfn.call(thisArg, item) : null);
+        this.instances.forEach((item, i) => (this.pool.isCheckedOut(i) ? callbackfn.call(thisArg, item) : null));
     }
     get entries() {
         return this.instances.filter((item, i) => this.pool.isCheckedOut(i));
@@ -53,7 +53,7 @@ export class ObjectManager extends IDType {
             delete this.instances[item];
             this.fire('remove', item, old);
         }
-        //clear from selections
+        // clear from selections
         this.selectionTypes().forEach((type) => {
             this.select(type, [item], SelectOperation.REMOVE);
         });

@@ -8,5 +8,6 @@ interface ColorSelectProps {
     columns: VisColumn[];
     currentSelected: ColumnInfo | null;
 }
-export declare function ColorSelect({ callback, numTypeCallback, currentNumType, columns, currentSelected, }: ColorSelectProps): JSX.Element;
+export declare function ColorSelect({ callback, numTypeCallback, currentNumType, columns, currentSelected }: ColorSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=ColorSelect.d.ts.map

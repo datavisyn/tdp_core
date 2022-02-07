@@ -1,4 +1,4 @@
-import { IEventHandler } from '.';
+import { IEventHandler } from './event';
 import { ProvenanceGraph } from '../provenance';
 export interface ICLUEWrapper extends IEventHandler {
     jumpToState(state: number): Promise<any>;
@@ -22,3 +22,4 @@ export declare class WrapperUtils {
      */
     static enableKeyboardShortcuts(graph: ProvenanceGraph): void;
 }
+//# sourceMappingURL=WrapperUtils.d.ts.map

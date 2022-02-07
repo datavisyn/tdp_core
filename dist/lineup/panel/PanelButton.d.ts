@@ -57,3 +57,4 @@ export declare class PanelNavButton implements IPanelButton {
      */
     click(): void;
 }
+//# sourceMappingURL=PanelButton.d.ts.map

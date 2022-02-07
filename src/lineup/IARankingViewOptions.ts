@@ -1,7 +1,6 @@
-import {ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem} from 'lineupjs';
-import {IDTypeLike} from '../idtype';
-import {ISearchOption, IPanelAddColumnButtonOptions} from './panel';
-
+import { ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem } from 'lineupjs';
+import { IDTypeLike } from '../idtype';
+import { ISearchOption, IPanelAddColumnButtonOptions } from './panel';
 
 export interface IARankingViewOptions {
   /**
@@ -30,7 +29,7 @@ export interface IARankingViewOptions {
   /**
    * additional attributes for stored named sets
    */
-  subType: {key: string, value: string};
+  subType: { key: string; value: string };
 
   /**
    * enable taggle overview mode switcher
@@ -122,8 +121,8 @@ export interface IARankingViewOptions {
       /**
        * the rank of the current group in the column selector
        */
-      order?: number
-    }
+      order?: number;
+    };
   };
 
   /**
@@ -151,7 +150,9 @@ export interface IARankingViewOptions {
   itemRowHeight: number | ((item: IGroupItem | IGroupData) => number) | null;
 
   customOptions: Partial<ITaggleOptions>;
-  customProviderOptions: Partial<ILocalDataProviderOptions & IDataProviderOptions  & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true; }>;
+  customProviderOptions: Partial<
+    ILocalDataProviderOptions & IDataProviderOptions & { maxNestedSortingCriteria: number; maxGroupColumns: number; filterGlobally: true }
+  >;
 
   /**
    * Formatting function for the search box item
@@ -163,5 +164,4 @@ export interface IARankingViewOptions {
    * Options for the add column button in the toolbar of the side panel
    */
   panelAddColumnBtnOptions: IPanelAddColumnButtonOptions;
-
 }

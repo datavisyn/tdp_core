@@ -6,3 +6,4 @@ interface VisTypeSelectProps {
 }
 export declare function VisTypeSelect(props: VisTypeSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=VisTypeSelect.d.ts.map

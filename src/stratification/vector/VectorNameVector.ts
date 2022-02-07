@@ -1,9 +1,8 @@
-import {IAnyVector} from '../../vector';
-import {RangeLike, Range} from '../../range';
-import {ANameVector, IStringVector} from './ANameVector';
+import { IAnyVector } from '../../vector';
+import { RangeLike, Range } from '../../range';
+import { ANameVector, IStringVector } from './ANameVector';
 
 export class VectorNameVector extends ANameVector<IAnyVector> implements IStringVector {
-
   constructor(vector: IAnyVector) {
     super(vector);
     this.root = this;
@@ -24,6 +23,7 @@ export class VectorNameVector extends ANameVector<IAnyVector> implements IString
   size() {
     return this.base.length;
   }
+
   /**
    * converts the name of the given vector as a string vector
    * @param vector

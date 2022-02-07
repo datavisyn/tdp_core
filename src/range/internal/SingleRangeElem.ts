@@ -1,10 +1,9 @@
-import {IRangeElem} from './IRangeElem';
-import {RangeUtils} from './RangeUtils';
-import {SingleIterator, IIterator} from '../../base/iterator';
+import { IRangeElem } from './IRangeElem';
+import { RangeUtils } from './RangeUtils';
+import { SingleIterator, IIterator } from '../../base/iterator';
 
 export class SingleRangeElem implements IRangeElem {
-  constructor(public readonly from: number) {
-  }
+  constructor(public readonly from: number) {}
 
   get step() {
     return 1;

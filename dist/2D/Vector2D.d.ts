@@ -47,3 +47,4 @@ export declare class Vector2D {
     }): Vector2D;
     static vec2(x: number, y: number): Vector2D;
 }
+//# sourceMappingURL=Vector2D.d.ts.map

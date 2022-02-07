@@ -24,7 +24,7 @@ export class PanelAddColumnButton {
                 this.node.classList.add('once');
                 this.search.node.querySelector('input').focus();
                 this.search.focus();
-            }
+            },
         }));
         this.node.appendChild(button.node);
         this.node.appendChild(this.search.node);

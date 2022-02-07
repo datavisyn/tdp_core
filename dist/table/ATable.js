@@ -20,8 +20,8 @@ export class ATable extends ASelectAble {
         return this.dim[1];
     }
     view(range = Range.all()) {
-        // tslint:disable:no-use-before-declare
         // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new TableView(this.root, ParseRangeUtils.parseRangeLike(range));
     }
     async idView(idRange = Range.all()) {
@@ -32,16 +32,15 @@ export class ATable extends ASelectAble {
     }
     restore(persisted) {
         if (persisted && persisted.f) {
-            /* tslint:disable:no-eval */
-            return this.reduce(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
-            /* tslint:enable:no-eval */
+            return this.reduce(
+            // eslint-disable-next-line no-eval
+            eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
         }
-        else if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
-        else {
-            return this;
-        }
+        return this;
     }
 }
 // circular dependency thus not extractable
@@ -61,12 +60,14 @@ export class TableView extends ATable {
     persist() {
         return {
             root: this.root.persist(),
-            range: this.range.toString()
+            range: this.range.toString(),
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;

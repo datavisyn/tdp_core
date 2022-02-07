@@ -18,3 +18,4 @@ export declare class TabSyncer {
     private unregisterTab;
     getTabList(): string[];
 }
+//# sourceMappingURL=TabSyncer.d.ts.map

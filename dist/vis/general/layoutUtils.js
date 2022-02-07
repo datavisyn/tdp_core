@@ -4,7 +4,7 @@
  * @param maxLength Maximum text length (default: 50)
  */
 function truncateText(text, maxLength = 50) {
-    return (text.length > maxLength) ? `${text.substring(0, maxLength)}...` : text;
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 }
 /**
  * Cleans up the layout of a given trace, primarily by positioning potential small multiple plots in a reasonable way
@@ -29,8 +29,8 @@ export function beautifyLayout(traces, layout) {
                 font: {
                     family: 'Courier New, monospace',
                     size: traces.plots.length > 9 ? 10 : 14,
-                    color: '#7f7f7f'
-                }
+                    color: '#7f7f7f',
+                },
             },
         };
         layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
@@ -46,8 +46,8 @@ export function beautifyLayout(traces, layout) {
                 font: {
                     family: 'Courier New, monospace',
                     size: traces.plots.length > 9 ? 10 : 14,
-                    color: '#7f7f7f'
-                }
+                    color: '#7f7f7f',
+                },
             },
         };
         layout.shapes.push({
@@ -62,11 +62,11 @@ export function beautifyLayout(traces, layout) {
             y1: 1,
             line: {
                 color: 'rgb(238, 238, 238)',
-                width: 2
+                width: 2,
             },
             opacity: 1,
             row: 2,
-            col: 2
+            col: 2,
         });
         layout.shapes.push({
             type: 'line',
@@ -80,11 +80,11 @@ export function beautifyLayout(traces, layout) {
             y1: 0,
             line: {
                 color: 'rgb(238, 238, 238)',
-                width: 2
+                width: 2,
             },
             opacity: 1,
             row: 2,
-            col: 2
+            col: 2,
         });
         layout.shapes.push({
             type: 'line',
@@ -98,11 +98,11 @@ export function beautifyLayout(traces, layout) {
             y1: 1,
             line: {
                 color: 'rgb(238, 238, 238)',
-                width: 2
+                width: 2,
             },
             opacity: 1,
             row: 2,
-            col: 2
+            col: 2,
         });
         layout.shapes.push({
             type: 'line',
@@ -116,11 +116,11 @@ export function beautifyLayout(traces, layout) {
             y1: 1,
             line: {
                 color: 'rgb(238, 238, 238)',
-                width: 2
+                width: 2,
             },
             opacity: 1,
             row: 2,
-            col: 2
+            col: 2,
         });
     });
     return layout;
@@ -132,9 +132,9 @@ export async function resolveSingleColumn(column) {
     if (!column) {
         return null;
     }
-    return ({
+    return {
         ...column,
-        resolvedValues: await column.values()
-    });
+        resolvedValues: await column.values(),
+    };
 }
 //# sourceMappingURL=layoutUtils.js.map

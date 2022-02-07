@@ -1,0 +1,1 @@
+{"version":3,"file":"ViolinOverlayButtons.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/ViolinOverlayButtons.tsx"],"names":[],"mappings":";AACA,OAAO,EAAE,cAAc,EAAE,MAAM,cAAc,CAAC;AAG9C,UAAU,kBAAkB;IAC1B,QAAQ,EAAE,CAAC,CAAC,EAAE,cAAc,KAAK,IAAI,CAAC;IACtC,eAAe,EAAE,cAAc,CAAC;CACjC;AAED,wBAAgB,oBAAoB,CAAC,KAAK,EAAE,kBAAkB,eA2B7D"}

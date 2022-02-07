@@ -1,5 +1,5 @@
-import { ResolveNow } from '../../../base';
 import { difference } from 'lodash';
+import { ResolveNow } from '../../../base';
 export class ABaseSelectionAdapter {
     constructor() {
         this.waitingForSelection = null;
@@ -10,7 +10,8 @@ export class ABaseSelectionAdapter {
             // sort new columns to insert them in the correct order
             const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
             flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
-                if (a.position === b.position) { // equal position, sort latter element of original array to lower position in sorted array
+                if (a.position === b.position) {
+                    // equal position, sort latter element of original array to lower position in sorted array
                     return bi - ai; // the latter in the array the better
                 }
                 return b.position - a.position; // sort descending by default
@@ -19,7 +20,7 @@ export class ABaseSelectionAdapter {
         });
     }
     removeDynamicColumns(context, _ids) {
-        const columns = context.columns;
+        const { columns } = context;
         context.remove([].concat(..._ids.map((_id) => {
             context.freeColor(_id);
             return columns.filter((d) => d.desc.selectedId === _id);
@@ -29,9 +30,11 @@ export class ABaseSelectionAdapter {
         if (this.waitingForSelection) {
             return this.waitingForSelection;
         }
-        return this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
+        return (this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt)
+            .then(() => this.selectionChangedImpl(context()))
+            .then(() => {
             this.waitingForSelection = null;
-        });
+        }));
     }
     parameterChanged(waitForIt, context) {
         if (this.waitingForSelection) {
@@ -40,14 +43,16 @@ export class ABaseSelectionAdapter {
         if (this.waitingForParameter) {
             return this.waitingForParameter;
         }
-        return this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt).then(() => {
+        return (this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt)
+            .then(() => {
             if (this.waitingForSelection) {
-                return; // abort selection more important
+                return undefined; // abort selection more important
             }
             return this.parameterChangedImpl(context());
-        }).then(() => {
+        })
+            .then(() => {
             this.waitingForParameter = null;
-        });
+        }));
     }
     selectionChangedImpl(context) {
         const selectedIds = context.selection.range.dim(0).asList();
@@ -58,14 +63,14 @@ export class ABaseSelectionAdapter {
         const diffRemoved = difference(lineupColIds, selectedIds);
         // remove deselected columns
         if (diffRemoved.length > 0) {
-            //console.log('remove columns', diffRemoved);
+            // console.log('remove columns', diffRemoved);
             this.removeDynamicColumns(context, diffRemoved);
         }
         // add new columns to the end
         if (diffAdded.length <= 0) {
             return null;
         }
-        //console.log('add columns', diffAdded);
+        // console.log('add columns', diffAdded);
         return context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
     }
     static patchDesc(desc, selectedId) {

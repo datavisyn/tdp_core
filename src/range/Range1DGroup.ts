@@ -1,6 +1,6 @@
-import {Range1D, IRange1DGroup} from './Range1D';
+import { Range1D, IRange1DGroup } from './Range1D';
 
-export class Range1DGroup extends Range1D implements IRange1DGroup  {
+export class Range1DGroup extends Range1D implements IRange1DGroup {
   constructor(public name: string, public color: string, base?: Range1D) {
     super(base);
   }
@@ -30,7 +30,7 @@ export class Range1DGroup extends Range1D implements IRange1DGroup  {
   }
 
   toString() {
-    return '"' + this.name + '""' + this.color + '"' + super.toString();
+    return `"${this.name}""${this.color}"${super.toString()}`;
   }
 
   toSet(size?: number): Range1DGroup {
@@ -40,6 +40,7 @@ export class Range1DGroup extends Range1D implements IRange1DGroup  {
   fromLike(indices: number[]) {
     return new Range1DGroup(this.name, this.color, super.fromLike(indices));
   }
+
   /**
    * TODO document
    * @param range

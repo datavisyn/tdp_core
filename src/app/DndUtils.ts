@@ -1,5 +1,4 @@
-import {UniqueIdManager} from './UniqueIdManager';
-
+import { UniqueIdManager } from './UniqueIdManager';
 
 export type IDragEffect = 'none' | 'copy' | 'copyLink' | 'copyMove' | 'link' | 'linkMove' | 'move' | 'all';
 
@@ -14,7 +13,6 @@ export interface IDropResult {
 }
 
 export class DnDUtils {
-
   /**
    * utility for drag-n-drop support
    * @param e
@@ -25,10 +23,10 @@ export class DnDUtils {
     const available: any = e.dataTransfer.types;
 
     /*
-    * In Chrome datatransfer.types is an Array,
-    * while in Firefox it is a DOMStringList
-    * that only implements a contains-method!
-    */
+     * In Chrome datatransfer.types is an Array,
+     * while in Firefox it is a DOMStringList
+     * that only implements a contains-method!
+     */
     if (typeof available.indexOf === 'function') {
       return typesToCheck.some((type) => available.indexOf(type) >= 0);
     }
@@ -58,7 +56,7 @@ export class DnDUtils {
    */
   copyDnD(e: DragEvent) {
     const dT = e.dataTransfer;
-    return Boolean((e.ctrlKey && dT.effectAllowed.match(/copy/gi)) || (!dT.effectAllowed.match(/move/gi)));
+    return Boolean((e.ctrlKey && dT.effectAllowed.match(/copy/gi)) || !dT.effectAllowed.match(/move/gi));
   }
 
   /**
@@ -80,7 +78,7 @@ export class DnDUtils {
    * @param {() => IDragStartResult} onDragStart callback to compute the payload an object of mime types
    * @param {boolean} stopPropagation whether to stop propagation in case of success
    */
-  dragAble(node: HTMLElement, onDragStart: () => IDragStartResult, stopPropagation: boolean = false) {
+  dragAble(node: HTMLElement, onDragStart: () => IDragStartResult, stopPropagation = false) {
     const id = UniqueIdManager.getInstance().uniqueId('edgeDragHelper');
     node.draggable = true;
     node.addEventListener('dragstart', (e) => {
@@ -97,14 +95,14 @@ export class DnDUtils {
         try {
           e.dataTransfer.setData(k, payload.data[k]);
           return true;
-        } catch (e) {
+        } catch (err) {
           return false;
         }
       });
       if (allSucceded) {
         return;
       }
-      //compatibility mode for edge
+      // compatibility mode for edge
       const text = payload.data['text/plain'] || '';
       e.dataTransfer.setData('text/plain', `${id}${text ? `: ${text}` : ''}`);
       DnDUtils.getInstance().dndTransferStorage.set(id, payload.data);
@@ -115,7 +113,7 @@ export class DnDUtils {
         e.stopPropagation();
       }
       if (DnDUtils.getInstance().dndTransferStorage.size > 0) {
-        //clear the id
+        // clear the id
         DnDUtils.getInstance().dndTransferStorage.delete(id);
       }
     });
@@ -135,20 +133,26 @@ export class DnDUtils {
    * @param {(e: DragEvent) => void} onDragOver optional drag over handler, e.g. for special effects
    * @param {boolean} stopPropagation flag if the event propagation should be stopped in case of success
    */
-  dropAble(node: HTMLElement, mimeTypes: string[], onDrop: (result: IDropResult, e: DragEvent) => boolean, onDragOver: null|((e: DragEvent)=> void) = null, stopPropagation: boolean = false) {
+  dropAble(
+    node: HTMLElement,
+    mimeTypes: string[],
+    onDrop: (result: IDropResult, e: DragEvent) => boolean,
+    onDragOver: null | ((e: DragEvent) => void) = null,
+    stopPropagation = false,
+  ) {
     node.addEventListener('dragenter', (e) => {
-      //var xy = mouse($node.node());
+      // var xy = mouse($node.node());
       if (DnDUtils.getInstance().hasDnDType(e, ...mimeTypes) || DnDUtils.getInstance().isEdgeDnD(e)) {
         node.classList.add('phovea-dragover');
         if (stopPropagation) {
           e.stopPropagation();
         }
-        //sounds good
+        // sounds good
         return false;
       }
-      //not a valid mime type
+      // not a valid mime type
       node.classList.remove('phovea-dragover');
-      return;
+      return undefined;
     });
     node.addEventListener('dragover', (e) => {
       if (DnDUtils.getInstance().hasDnDType(e, ...mimeTypes) || DnDUtils.getInstance().isEdgeDnD(e)) {
@@ -162,10 +166,10 @@ export class DnDUtils {
         if (onDragOver) {
           onDragOver(e);
         }
-        //sound good
+        // sound good
         return false;
       }
-      return;
+      return undefined;
     });
     node.addEventListener('dragleave', (evt) => {
       (<HTMLElement>evt.target).classList.remove('phovea-dragover');
@@ -190,25 +194,24 @@ export class DnDUtils {
         if (DnDUtils.getInstance().dndTransferStorage.has(id)) {
           const data = DnDUtils.getInstance().dndTransferStorage.get(id);
           DnDUtils.getInstance().dndTransferStorage.delete(id);
-          return !onDrop({effect, data}, e);
+          return !onDrop({ effect, data }, e);
         }
-        return;
+        return undefined;
       }
       if (DnDUtils.getInstance().hasDnDType(e, ...mimeTypes)) {
         const data: any = {};
-        //selects the data contained in the data transfer
+        // selects the data contained in the data transfer
         mimeTypes.forEach((mime) => {
           const value = e.dataTransfer.getData(mime);
           if (value !== '') {
             data[mime] = value;
           }
         });
-        return !onDrop({effect, data}, e);
+        return !onDrop({ effect, data }, e);
       }
-      return;
+      return undefined;
     });
   }
-
 
   private static instance: DnDUtils;
 

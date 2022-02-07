@@ -1,4 +1,4 @@
-import { IVisMetaData } from '../../provvis';
+import { IVisMetaData } from '../../provvis/IVisMetaData';
 /**
  * @internal
  */
@@ -9,3 +9,4 @@ export declare class ProxyMetaData implements IVisMetaData {
     get rotation(): number;
     get sizeDependsOnDataDimension(): boolean[];
 }
+//# sourceMappingURL=ProxyMetaData.d.ts.map

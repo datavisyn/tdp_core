@@ -1,13 +1,12 @@
-import {IdPool} from '../internal/IdPool';
-import {SelectOperation, SelectionUtils} from './SelectionUtils';
-import {IDType} from './IDType';
+import { IdPool } from '../internal/IdPool';
+import { SelectOperation, SelectionUtils } from './SelectionUtils';
+import { IDType } from './IDType';
 
 export interface IHasUniqueId {
   id: number;
 }
 
 export class HasUniqueIdUtils {
-
   static toId(elem: IHasUniqueId) {
     return elem.id;
   }
@@ -23,10 +22,11 @@ export class HasUniqueIdUtils {
  */
 export class ObjectManager<T extends IHasUniqueId> extends IDType {
   private readonly instances: T[] = [];
+
   private readonly pool = new IdPool();
 
   constructor(id: string, name: string) {
-    super(id, name, name + 's', true);
+    super(id, name, `${name}s`, true);
   }
 
   nextId(item?: T) {
@@ -51,7 +51,7 @@ export class ObjectManager<T extends IHasUniqueId> extends IDType {
   }
 
   forEach(callbackfn: (value: T) => void, thisArg?: any): void {
-    this.instances.forEach((item, i) => this.pool.isCheckedOut(i) ? callbackfn.call(thisArg, item) : null);
+    this.instances.forEach((item, i) => (this.pool.isCheckedOut(i) ? callbackfn.call(thisArg, item) : null));
   }
 
   get entries() {
@@ -70,7 +70,7 @@ export class ObjectManager<T extends IHasUniqueId> extends IDType {
       delete this.instances[item];
       this.fire('remove', item, old);
     }
-    //clear from selections
+    // clear from selections
     this.selectionTypes().forEach((type) => {
       this.select(type, [item], SelectOperation.REMOVE);
     });

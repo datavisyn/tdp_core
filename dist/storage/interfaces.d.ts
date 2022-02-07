@@ -57,3 +57,4 @@ export interface ICustomNamedSet extends IBaseNamedSet {
     type: ENamedSetType.CUSTOM;
 }
 export declare type INamedSet = IFilterNamedSet | IPanelNamedSet | IStoredNamedSet | ICustomNamedSet;
+//# sourceMappingURL=interfaces.d.ts.map

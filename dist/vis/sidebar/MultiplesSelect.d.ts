@@ -7,3 +7,4 @@ interface MultiplesSelectProps {
 }
 export declare function MultiplesSelect(props: MultiplesSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=MultiplesSelect.d.ts.map

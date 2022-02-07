@@ -1,8 +1,8 @@
-import {EventHandler} from './event';
-
+import { EventHandler } from './event';
 
 export class PropertyHandler extends EventHandler {
   static readonly EVENT_CHANGED = 'changed';
+
   static readonly EVENT_ENTRY_CHANGED = 'entryChanged';
 
   protected readonly map = new Map<string, any>();
@@ -64,7 +64,7 @@ export class PropertyHandler extends EventHandler {
    * @param defaultValue
    * @returns {number}
    */
-  getInt(name: string, defaultValue: number = NaN) {
+  getInt(name: string, defaultValue = NaN) {
     const l: string = this.getProp(name, null);
     if (l === null) {
       return defaultValue;
@@ -89,39 +89,42 @@ export class PropertyHandler extends EventHandler {
   toString() {
     const r: string[] = [];
     this.map.forEach((v, key) => {
-      r.push(encodeURIComponent(key) + '=' + encodeURIComponent(v));
+      r.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`);
     });
     return r.join('&');
   }
 
-  protected parse(code: string = '') {
-    //if available use https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
+  protected parse(code = '') {
+    // if available use https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
     const oldLength = this.map.size;
     this.map.clear();
-    if (code.length <= 1) { //just the starting character ? or #
+    if (code.length <= 1) {
+      // just the starting character ? or #
       if (oldLength !== 0) {
         this.fire(PropertyHandler.EVENT_CHANGED);
       }
       return;
     }
-    //http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/21152762#21152762
-    code.substr(1).split('&').forEach((item) => {
-      const s = item.split('='),
-        k = decodeURIComponent(s[0]),
-        v = s[1] && decodeURIComponent(s[1]);
-      if (this.map.has(k)) {
-        const old = this.map.get(k);
-        if (!Array.isArray(old)) {
-          this.map.set(k, [old, v]);
+    // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/21152762#21152762
+    code
+      .substr(1)
+      .split('&')
+      .forEach((item) => {
+        const s = item.split('=');
+        const k = decodeURIComponent(s[0]);
+        const v = s[1] && decodeURIComponent(s[1]);
+        if (this.map.has(k)) {
+          const old = this.map.get(k);
+          if (!Array.isArray(old)) {
+            this.map.set(k, [old, v]);
+          } else {
+            this.map.get(k).push(v);
+          }
         } else {
-          this.map.get(k).push(v);
+          this.map.set(k, v);
         }
-      } else {
-        this.map.set(k, v);
-      }
-    });
+      });
 
     this.fire(PropertyHandler.EVENT_CHANGED);
   }
 }
-

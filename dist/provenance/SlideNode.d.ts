@@ -57,3 +57,4 @@ export declare class SlideNode extends GraphNode {
     static makeText(title?: string): SlideNode;
     static toSlidePath(s?: SlideNode): SlideNode[];
 }
+//# sourceMappingURL=SlideNode.d.ts.map

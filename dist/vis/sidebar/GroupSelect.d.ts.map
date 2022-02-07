@@ -1,0 +1,1 @@
+{"version":3,"file":"GroupSelect.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/GroupSelect.tsx"],"names":[],"mappings":";AAEA,OAAO,EAAwB,UAAU,EAAoC,SAAS,EAAE,MAAM,eAAe,CAAC;AAG9G,UAAU,gBAAgB;IACxB,QAAQ,EAAE,CAAC,CAAC,EAAE,UAAU,KAAK,IAAI,CAAC;IAClC,OAAO,EAAE,SAAS,EAAE,CAAC;IACrB,eAAe,EAAE,UAAU,GAAG,IAAI,CAAC;CACpC;AAED,wBAAgB,WAAW,CAAC,KAAK,EAAE,gBAAgB,eAgBlD"}

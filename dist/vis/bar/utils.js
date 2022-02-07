@@ -1,6 +1,6 @@
 import { merge, sum } from 'lodash';
 import { I18nextManager } from '../../i18n';
-import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
 export var EBarDisplayType;
@@ -99,24 +99,24 @@ async function setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, s
                 const allGroupObjs = currGroupColumn.resolvedValues.filter((c) => c.val === uniqueGroup).map((c) => c.id);
                 const allMultiplesObjs = currMultiplesColumn.resolvedValues.filter((c) => c.val === uniqueMultiples).map((c) => c.id);
                 const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c) && allMultiplesObjs.includes(c));
-                return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
+                return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
             });
             plots.push({
                 data: {
                     x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
                     y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
                     orientation: vertFlag ? 'v' : 'h',
-                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
-                    showlegend: plotCounter === 1 ? true : false,
+                    xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                    yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+                    showlegend: plotCounter === 1,
                     type: 'bar',
                     name: uniqueGroup,
                     marker: {
                         color: scales.color(uniqueGroup),
-                    }
+                    },
                 },
                 xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-                yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+                yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
             });
         });
         plotCounter += 1;
@@ -136,24 +136,24 @@ async function setPlotsWithGroups(columns, catCols, config, plots, scales, plotC
             const allObjs = catCurr.resolvedValues.filter((c) => c.val === v).map((c) => c.id);
             const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal).map((c) => c.id);
             const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
-            return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
+            return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
         });
         plots.push({
             data: {
                 x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
                 y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
                 orientation: vertFlag ? 'v' : 'h',
-                xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
-                showlegend: plotCounter === 1 ? true : false,
+                xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+                showlegend: plotCounter === 1,
                 type: 'bar',
                 name: uniqueVal,
                 marker: {
                     color: scales.color(uniqueVal),
-                }
+                },
             },
             xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-            yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
         });
     });
     return plotCounter;
@@ -171,21 +171,21 @@ async function setPlotsWithMultiples(columns, catCols, config, plots, scales, pl
             const allObjs = catCurr.resolvedValues.filter((c) => c.val === v).map((c) => c.id);
             const allGroupObjs = multiplesColumn.resolvedValues.filter((c) => c.val === uniqueVal).map((c) => c.id);
             const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
-            return normalizedFlag ? joinedObjs.length / allObjs.length * 100 : joinedObjs.length;
+            return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
         });
         plots.push({
             data: {
                 x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
                 y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
                 orientation: vertFlag ? 'v' : 'h',
-                xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
-                showlegend: plotCounter === 1 ? true : false,
+                xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+                showlegend: plotCounter === 1,
                 type: 'bar',
                 name: uniqueVal,
             },
             xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-            yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
         });
         plotCounter += 1;
     });
@@ -204,13 +204,13 @@ async function setPlotsBasic(columns, catCols, config, plots, scales, plotCounte
             x: vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
             y: !vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
             orientation: vertFlag ? 'v' : 'h',
-            xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-            yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+            xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+            yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
             type: 'bar',
-            name: catCurr.info.name
+            name: catCurr.info.name,
         },
         xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-        yLabel: vertFlag ? normalizedFlag ? 'Percent of Total' : 'Count' : catCurr.info.name
+        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
     });
     plotCounter += 1;
     return plotCounter;

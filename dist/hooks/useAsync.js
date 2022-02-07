@@ -45,12 +45,13 @@ export const useAsync = (asyncFunction, immediate = null) => {
             }
             return response;
         })
-            .catch((error) => {
+            .catch((e) => {
             if (currentPromise === latestPromiseRef.current) {
-                setError(error);
+                setError(e);
                 setStatus('error');
             }
-            throw error;
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
+            throw e;
         });
         latestPromiseRef.current = currentPromise;
         return currentPromise;
