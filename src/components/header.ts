@@ -29,13 +29,13 @@ const getTemplate = () => {
                 </a>
             </li>
             <li class="nav-item" hidden data-header="aboutLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.about')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" data-testid="header-about-link" title="${I18nextManager.getInstance().i18n.t('phovea:ui.about')}">
                     <i class="fas fa-info fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.openAboutDialog')}</span>
                 </a>
             </li>
             <li class="nav-item" hidden data-header="bugLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" title="${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}">
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" data-testid="header-report-bug-link" title="${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}">
                     <i class="fas fa-bug fa-fw" aria-hidden="true"></i>
                     <span class="visually-hidden">${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}</span>
                 </a>
