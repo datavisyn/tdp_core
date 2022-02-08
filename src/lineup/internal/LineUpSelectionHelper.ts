@@ -151,21 +151,4 @@ export class LineUpSelectionHelper extends EventHandler {
 
     this.provider.setSelection(indices);
   }
-
-  getSelection() {
-    if (!this.provider) {
-      return;
-    }
-
-    const sel = this.provider.getSelection();
-
-    const indices: number[] = [];
-    sel.forEach((uid) => {
-      const index = this.uid2index.get(uid);
-      if (typeof index === 'number') {
-        indices.push(index);
-      }
-    });
-    return indices;
-  }
 }
