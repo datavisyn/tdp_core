@@ -58,7 +58,7 @@ const getTemplate = () => {
       <div class="modal-content">
           <div class="modal-header">
               <h4 class="modal-title"> ${I18nextManager.getInstance().i18n.t('phovea:ui.about')}</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label=" ${I18nextManager.getInstance().i18n.t('phovea:ui.close')}">
+              <button type="button" class="btn-close" data-testid="close-button" data-bs-dismiss="modal" aria-label=" ${I18nextManager.getInstance().i18n.t('phovea:ui.close')}">
               </button>
           </div>
           <div class="modal-body" data-header="about">
@@ -82,7 +82,7 @@ const getTemplate = () => {
       <div class="modal-content">
           <div class="modal-header">
               <h4 class="modal-title"> ${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label=" ${I18nextManager.getInstance().i18n.t('phovea:ui.close')}">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" data-testid="close-button" aria-label=" ${I18nextManager.getInstance().i18n.t('phovea:ui.close')}">
               </button>
           </div>
           <div class="modal-body" data-header="bug">

@@ -51,20 +51,20 @@ export class EditProvenanceGraphMenu {
         const li = parent.ownerDocument.createElement('li');
         li.classList.add('nav-item', 'dropdown');
         li.innerHTML = `
-          <a href="#" class="nav-link dropdown-toggle" id="sessionDropdown" data-bs-toggle="dropdown" role="button" aria-haspopup="true"
+          <a href="#" class="nav-link dropdown-toggle" id="sessionDropdown" data-testid="session-dropdown-link" data-bs-toggle="dropdown" role="button" aria-haspopup="true"
              aria-expanded="false"><i class="fas fa-folder-open" aria-hidden="true"></i> <i class="fas fa-save sync-indicator" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionHeader')}</span></a>
           <div class="dropdown-menu" aria-labelledby="sessionDropdown" data-bs-popper="none">
             <div class="dropdown-label"><i class="fas fa-clock" aria-hidden="true"></i> <span class="session-name">${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.sessionName')}</span></div>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a>
-            <a class="dropdown-item" href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}</a>
+            <a class="dropdown-item" data-testid="edit-details-link" href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}"><i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editDetails')}</a>
+            <a class="dropdown-item" data-testid="clone-session-link" href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}"><i class="fas fa-clone" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.cloneTemporary')}</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" data-action="open" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}</a>
-            <a class="dropdown-item" href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}"><i class="fas fa-save" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}</a>
-            <a class="dropdown-item" href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}"><i class="fas fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}</a>
+            <a class="dropdown-item" data-testid="open-session-link" href="#" data-action="open" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openSession')}"><i class="fas fa-folder-open" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}</a>
+            <a class="dropdown-item" data-testid="save-session-link" href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}"><i class="fas fa-save" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.saveSession')}</a>
+            <a class="dropdown-item" data-testid="delete-link" href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}"><i class="fas fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.delete')}</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" data-action="import" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importGraph')}"><i class="fas fa-upload" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importSession')}</a>
-            <a class="dropdown-item" href="#" data-action="export" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportGraph')}"><i class="fas fa-download" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportSession')}</a>
+            <a class="dropdown-item" data-testid="import-session-link" href="#" data-action="import" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importGraph')}"><i class="fas fa-upload" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.importSession')}</a>
+            <a class="dropdown-item" data-testid="export-session-link" href="#" data-action="export" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportGraph')}"><i class="fas fa-download" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.exportSession')}</a>
           </div>`;
         li.querySelector('a[data-action="edit"]').addEventListener('click', (event) => {
             event.preventDefault();
