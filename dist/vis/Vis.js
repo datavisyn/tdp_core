@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { ESupportedPlotlyVis } from './interfaces';
-import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
+import { ESupportedPlotlyVis, ENumericalColorScaleType } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
@@ -44,15 +44,14 @@ export function Vis({ columns, selected = {}, colors = [
         if (isBar(visConfig)) {
             setVisConfig(barMergeDefaultConfig(columns, visConfig));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visConfig.type]);
-    const colorScale = React.useMemo(() => {
-        return d3.scale.ordinal().range(colors);
-    }, [visConfig]);
     const scales = React.useMemo(() => {
+        const colorScale = d3.scale.ordinal().range(colors);
         return {
             color: colorScale,
         };
-    }, [visConfig]);
+    }, [colors]);
     return (React.createElement(React.Fragment, null,
         isScatter(visConfig) ? (React.createElement(ScatterVis, { config: visConfig, optionsConfig: {
                 color: {
