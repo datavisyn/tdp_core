@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import { ENumericalColorScaleType } from '../scatter/utils';
-import { ColumnInfo, VisColumn } from '../interfaces';
+import { ColumnInfo, VisColumn, ENumericalColorScaleType } from '../interfaces';
 interface ColorSelectProps {
     callback: (c: ColumnInfo) => void;
     numTypeCallback?: (c: ENumericalColorScaleType) => void;

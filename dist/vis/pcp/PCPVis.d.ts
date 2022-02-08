@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { VisColumn, IVisConfig } from '../interfaces';
-import { IPCPConfig } from './utils';
+import { VisColumn, IVisConfig, IPCPConfig } from '../interfaces';
 interface PCPVisProps {
     config: IPCPConfig;
-    optionsConfig?: {};
     extensions?: {
         prePlot?: React.ReactNode;
         postPlot?: React.ReactNode;
@@ -13,6 +11,6 @@ interface PCPVisProps {
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
 }
-export declare function PCPVis({ config, optionsConfig, extensions, columns, setConfig }: PCPVisProps): JSX.Element;
+export declare function PCPVis({ config, extensions, columns, setConfig }: PCPVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=PCPVis.d.ts.map

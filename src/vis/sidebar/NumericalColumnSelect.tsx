@@ -36,14 +36,14 @@ const SortableMultiValueLabel = SortableHandle((props: MultiValueGenericProps<Co
 // tslint:disable-next-line:variable-name
 const SortableSelect = SortableContainer(Select) as unknown as React.ComponentClass<Props<ColumnInfo, boolean> & SortableContainerProps>;
 
-export function NumericalColumnSelect(props: NumericalColumnSelectProps) {
+export function NumericalColumnSelect({ callback, columns, currentSelected }: NumericalColumnSelectProps) {
   const selectNumOptions = React.useMemo(() => {
-    return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info);
-  }, [props.columns.length]);
+    return columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info);
+  }, [columns]);
 
   const onSortEnd: SortEndHandler = ({ oldIndex, newIndex }) => {
-    const newValue = arrayMove(props.currentSelected, oldIndex, newIndex);
-    props.callback(newValue);
+    const newValue = arrayMove(currentSelected, oldIndex, newIndex);
+    callback(newValue);
   };
 
   return (
@@ -61,7 +61,7 @@ export function NumericalColumnSelect(props: NumericalColumnSelectProps) {
         getOptionLabel={(option) => option.name}
         getOptionValue={(option) => option.id}
         onChange={(e: ColumnInfo[]) => {
-          props.callback(e.map((c) => c));
+          callback(e.map((c) => c));
         }}
         components={{
           MultiValue: SortableMultiValue,
@@ -69,7 +69,7 @@ export function NumericalColumnSelect(props: NumericalColumnSelectProps) {
         }}
         name="numColumns"
         options={selectNumOptions}
-        value={props.currentSelected}
+        value={currentSelected}
       />
     </>
   );

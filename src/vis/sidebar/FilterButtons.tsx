@@ -5,7 +5,7 @@ interface FilterButtonsProps {
   callback: (s: EFilterOptions) => void;
 }
 
-export function FilterButtons(props: FilterButtonsProps) {
+export function FilterButtons({ callback }: FilterButtonsProps) {
   const options = [EFilterOptions.IN, EFilterOptions.OUT, EFilterOptions.CLEAR];
   return (
     <div key="buttonGroupFilter" className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
@@ -14,7 +14,7 @@ export function FilterButtons(props: FilterButtonsProps) {
           <React.Fragment key={`radioButtonsFilter${opt}`}>
             <input
               checked={false}
-              onChange={(e) => props.callback(e.currentTarget.value as EFilterOptions)}
+              onChange={(e) => callback(e.currentTarget.value as EFilterOptions)}
               value={opt}
               type="checkbox"
               className="btn-check"

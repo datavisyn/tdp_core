@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { EBarDirection, EBarGroupingType } from '../bar/utils';
+import { EBarGroupingType } from '../interfaces';
 
 interface BarGroupTypeProps {
   callback: (s: EBarGroupingType) => void;
   currentSelected: EBarGroupingType;
 }
 
-export function BarGroupTypeButtons(props: BarGroupTypeProps) {
+export function BarGroupTypeButtons({ callback, currentSelected }: BarGroupTypeProps) {
   const options = [EBarGroupingType.GROUP, EBarGroupingType.STACK];
   return (
     <div key="barGroupingTypeButtons" className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
@@ -14,8 +14,8 @@ export function BarGroupTypeButtons(props: BarGroupTypeProps) {
         return (
           <React.Fragment key={`radioButtonsFilter${opt}`}>
             <input
-              checked={props.currentSelected === opt}
-              onChange={(e) => props.callback(e.currentTarget.value as EBarGroupingType)}
+              checked={currentSelected === opt}
+              onChange={(e) => callback(e.currentTarget.value as EBarGroupingType)}
               value={opt}
               type="checkbox"
               className="btn-check"

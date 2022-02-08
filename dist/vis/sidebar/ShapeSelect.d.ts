@@ -5,6 +5,6 @@ interface ShapeSelectProps {
     columns: VisColumn[];
     currentSelected: ColumnInfo | null;
 }
-export declare function ShapeSelect(props: ShapeSelectProps): JSX.Element;
+export declare function ShapeSelect({ callback, columns, currentSelected }: ShapeSelectProps): JSX.Element;
 export {};
 //# sourceMappingURL=ShapeSelect.d.ts.map

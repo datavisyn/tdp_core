@@ -77,9 +77,9 @@ export class LineupVisWrapper {
       };
     };
 
-    const mapData = <T extends ValueColumn<any>>(data: IDataRow[], column: T) => {
+    const mapData = <T extends ValueColumn<any>>(innerData: IDataRow[], column: T) => {
       // TODO: Refactor to use _visyn_id instead.
-      return data.map((d, i) => ({ id: d.v._id, val: column.getRaw(d) }));
+      return innerData.map((d) => ({ id: d.v._id, val: column.getRaw(d) }));
     };
 
     const getColumnValue = async <T extends ValueColumn<any>>(column: T) => {

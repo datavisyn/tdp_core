@@ -4,24 +4,18 @@ import {
   PlotlyInfo,
   PlotlyData,
   VisCategoricalColumn,
-  ColumnInfo,
   EColumnTypes,
   ESupportedPlotlyVis,
   IVisConfig,
   VisNumericalColumn,
   Scales,
   VisColumn,
+  IStripConfig,
 } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
   return s.type === ESupportedPlotlyVis.STRIP;
-}
-
-export interface IStripConfig {
-  type: ESupportedPlotlyVis.STRIP;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
 }
 
 const defaultConfig: IStripConfig = {

@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { IVisConfig, Scales, VisColumn } from '../interfaces';
-import { IStripConfig } from './utils';
+import { IVisConfig, VisColumn, IStripConfig, Scales } from '../interfaces';
 interface StripVisProps {
     config: IStripConfig;
-    optionsConfig?: {};
     extensions?: {
         prePlot?: React.ReactNode;
         postPlot?: React.ReactNode;
@@ -14,6 +12,6 @@ interface StripVisProps {
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
 }
-export declare function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales }: StripVisProps): JSX.Element;
+export declare function StripVis({ config, extensions, columns, setConfig, scales }: StripVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=StripVis.d.ts.map

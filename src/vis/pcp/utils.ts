@@ -1,26 +1,11 @@
 import d3 from 'd3';
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
-import {
-  PlotlyInfo,
-  PlotlyData,
-  VisCategoricalColumn,
-  ColumnInfo,
-  EColumnTypes,
-  ESupportedPlotlyVis,
-  IVisConfig,
-  VisNumericalColumn,
-  VisColumn,
-} from '../interfaces';
+import { PlotlyInfo, PlotlyData, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisColumn, IPCPConfig } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 
 export function isPCP(s: IVisConfig): s is IPCPConfig {
   return s.type === ESupportedPlotlyVis.PCP;
-}
-
-export interface IPCPConfig {
-  type: ESupportedPlotlyVis.PCP;
-  allColumnsSelected: ColumnInfo[];
 }
 
 const defaultConfig: IPCPConfig = {
@@ -75,7 +60,9 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
     xLabel: null,
     yLabel: null,
     data: {
-      dimensions: allColValues.map((c, i) => {
+      type: 'parcoords',
+      // @ts-ignore
+      dimensions: allColValues.map((c) => {
         if (c.type === EColumnTypes.NUMERICAL) {
           return {
             range: [d3.min(c.resolvedValues.map((v) => v.val) as number[]), d3.max(c.resolvedValues.map((v) => v.val) as number[])],
@@ -93,12 +80,6 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
           ticktext: uniqueList,
         };
       }),
-      type: 'parcoords',
-      line: {
-        shape: 'spline',
-        // @ts-ignore
-        opacity: 0.2,
-      },
     },
   };
 

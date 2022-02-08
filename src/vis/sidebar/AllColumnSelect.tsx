@@ -2,7 +2,7 @@ import * as React from 'react';
 import Select, { components, MultiValueProps, Props } from 'react-select';
 import { SortableContainer, SortableContainerProps, SortableElement, SortEndHandler, SortableHandle } from 'react-sortable-hoc';
 import { MultiValueGenericProps } from 'react-select/src/components/MultiValue';
-import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
+import { ColumnInfo, VisColumn } from '../interfaces';
 import { formatOptionLabel } from './utils';
 
 interface AllColumnSelectProps {
@@ -36,14 +36,14 @@ const SortableMultiValueLabel = SortableHandle((props: MultiValueGenericProps<Co
 // tslint:disable-next-line:variable-name
 const SortableSelect = SortableContainer(Select) as unknown as React.ComponentClass<Props<ColumnInfo, boolean> & SortableContainerProps>;
 
-export function AllColumnSelect(props: AllColumnSelectProps) {
+export function AllColumnSelect({ callback, columns, currentSelected }: AllColumnSelectProps) {
   const selectNumOptions = React.useMemo(() => {
-    return props.columns.map((c) => c.info);
-  }, [props.columns.length]);
+    return columns.map((c) => c.info);
+  }, [columns]);
 
   const onSortEnd: SortEndHandler = ({ oldIndex, newIndex }) => {
-    const newValue = arrayMove(props.currentSelected, oldIndex, newIndex);
-    props.callback(newValue);
+    const newValue = arrayMove(currentSelected, oldIndex, newIndex);
+    callback(newValue);
   };
 
   return (
@@ -61,7 +61,7 @@ export function AllColumnSelect(props: AllColumnSelectProps) {
         getOptionLabel={(option) => option.name}
         getOptionValue={(option) => option.id}
         onChange={(newValue: ColumnInfo[]) => {
-          props.callback(newValue);
+          callback(newValue);
         }}
         components={{
           MultiValue: SortableMultiValue,
@@ -69,7 +69,7 @@ export function AllColumnSelect(props: AllColumnSelectProps) {
         }}
         name="numColumns"
         options={selectNumOptions}
-        value={props.currentSelected}
+        value={currentSelected}
       />
     </>
   );

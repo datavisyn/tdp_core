@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Select from 'react-select';
-import { ENumericalColorScaleType } from '../scatter/utils';
-import { VisCategoricalColumn, ColumnInfo, EColumnTypes, VisNumericalColumn, VisColumn } from '../interfaces';
+import { ColumnInfo, EColumnTypes, VisColumn, ENumericalColorScaleType } from '../interfaces';
 import { formatOptionLabel, getCol } from './utils';
 import { NumericalColorButtons } from './NumericalColorButtons';
 

@@ -22,10 +22,10 @@ const defaultExtensions = {
 export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
     const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
-    }, []);
+    }, [optionsConfig]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
-    }, []);
+    }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
     const id = React.useMemo(() => uniqueId('ViolinVis'), []);
     React.useEffect(() => {
@@ -36,12 +36,12 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, []);
+    }, [id]);
     const layout = React.useMemo(() => {
         if (!traces) {
             return null;
         }
-        const layout = {
+        const innerLayout = {
             showlegend: true,
             legend: {
                 // @ts-ignore
@@ -53,7 +53,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             shapes: [],
             violingap: 0,
         };
-        return beautifyLayout(traces, layout);
+        return beautifyLayout(traces, innerLayout);
     }, [traces]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },

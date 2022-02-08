@@ -24,21 +24,21 @@ const SortableMultiValue = SortableElement((props) => {
 const SortableMultiValueLabel = SortableHandle((props) => React.createElement(components.MultiValueLabel, Object.assign({}, props)));
 // tslint:disable-next-line:variable-name
 const SortableSelect = SortableContainer(Select);
-export function NumericalColumnSelect(props) {
+export function NumericalColumnSelect({ callback, columns, currentSelected }) {
     const selectNumOptions = React.useMemo(() => {
-        return props.columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info);
-    }, [props.columns.length]);
+        return columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info);
+    }, [columns]);
     const onSortEnd = ({ oldIndex, newIndex }) => {
-        const newValue = arrayMove(props.currentSelected, oldIndex, newIndex);
-        props.callback(newValue);
+        const newValue = arrayMove(currentSelected, oldIndex, newIndex);
+        callback(newValue);
     };
     return (React.createElement(React.Fragment, null,
         React.createElement("label", { className: "pt-2 pb-1" }, "Numerical Columns"),
         React.createElement(SortableSelect, { useDragHandle: true, axis: "xy", onSortEnd: onSortEnd, distance: 4, getHelperDimensions: ({ node }) => node.getBoundingClientRect(), closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => {
-                props.callback(e.map((c) => c));
+                callback(e.map((c) => c));
             }, components: {
                 MultiValue: SortableMultiValue,
                 MultiValueLabel: SortableMultiValueLabel,
-            }, name: "numColumns", options: selectNumOptions, value: props.currentSelected })));
+            }, name: "numColumns", options: selectNumOptions, value: currentSelected })));
 }
 //# sourceMappingURL=NumericalColumnSelect.js.map

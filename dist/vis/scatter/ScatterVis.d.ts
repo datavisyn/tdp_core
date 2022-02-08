@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { IVisConfig, EFilterOptions, Scales, VisColumn } from '../interfaces';
-import { IScatterConfig } from './utils';
+import { IVisConfig, EFilterOptions, Scales, VisColumn, IScatterConfig } from '../interfaces';
 interface ScatterVisProps {
     config: IScatterConfig;
     optionsConfig?: {

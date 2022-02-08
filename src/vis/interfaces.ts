@@ -1,9 +1,4 @@
 import { Plotly } from './Plot';
-import { IBarConfig } from './bar/utils';
-import { IPCPConfig } from './pcp/utils';
-import { IScatterConfig } from './scatter/utils';
-import { IStripConfig } from './strip/utils';
-import { IViolinConfig } from './violin/utils';
 
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter',
@@ -21,6 +16,27 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
   ESupportedPlotlyVis.PCP,
 ];
 
+export enum EBarDisplayType {
+  DEFAULT = 'Default',
+  NORMALIZED = 'Normalized',
+}
+
+export enum EBarDirection {
+  VERTICAL = 'Vertical',
+  HORIZONTAL = 'Horizontal',
+}
+
+export enum EViolinOverlay {
+  NONE = 'None',
+  STRIP = 'Strip',
+  BOX = 'Box',
+}
+
+export enum EBarGroupingType {
+  STACK = 'Stacked',
+  GROUP = 'Grouped',
+}
+
 export enum EColumnTypes {
   NUMERICAL = 'Numerical',
   CATEGORICAL = 'Categorical',
@@ -36,6 +52,50 @@ export enum EFilterOptions {
   IN = 'Filter In',
   OUT = 'Filter Out',
   CLEAR = 'Clear Filter',
+}
+
+export enum ENumericalColorScaleType {
+  SEQUENTIAL = 'Sequential',
+  DIVERGENT = 'Divergent',
+}
+
+export interface IViolinConfig {
+  type: ESupportedPlotlyVis.VIOLIN;
+  numColumnsSelected: ColumnInfo[];
+  catColumnsSelected: ColumnInfo[];
+  violinOverlay: EViolinOverlay;
+}
+
+export interface IStripConfig {
+  type: ESupportedPlotlyVis.STRIP;
+  numColumnsSelected: ColumnInfo[];
+  catColumnsSelected: ColumnInfo[];
+}
+
+export interface IScatterConfig {
+  type: ESupportedPlotlyVis.SCATTER;
+  numColumnsSelected: ColumnInfo[];
+  color: ColumnInfo | null;
+  numColorScaleType: ENumericalColorScaleType;
+  shape: ColumnInfo | null;
+  isRectBrush: boolean;
+  alphaSliderVal: number;
+}
+
+export interface IBarConfig {
+  type: ESupportedPlotlyVis.BAR;
+  multiples: ColumnInfo | null;
+  group: ColumnInfo | null;
+  direction: EBarDirection;
+  display: EBarDisplayType;
+  groupType: EBarGroupingType;
+  numColumnsSelected: ColumnInfo[];
+  catColumnsSelected: ColumnInfo[];
+}
+
+export interface IPCPConfig {
+  type: ESupportedPlotlyVis.PCP;
+  allColumnsSelected: ColumnInfo[];
 }
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;

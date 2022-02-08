@@ -13,6 +13,27 @@ export const allVisTypes = [
     ESupportedPlotlyVis.STRIP,
     ESupportedPlotlyVis.PCP,
 ];
+export var EBarDisplayType;
+(function (EBarDisplayType) {
+    EBarDisplayType["DEFAULT"] = "Default";
+    EBarDisplayType["NORMALIZED"] = "Normalized";
+})(EBarDisplayType || (EBarDisplayType = {}));
+export var EBarDirection;
+(function (EBarDirection) {
+    EBarDirection["VERTICAL"] = "Vertical";
+    EBarDirection["HORIZONTAL"] = "Horizontal";
+})(EBarDirection || (EBarDirection = {}));
+export var EViolinOverlay;
+(function (EViolinOverlay) {
+    EViolinOverlay["NONE"] = "None";
+    EViolinOverlay["STRIP"] = "Strip";
+    EViolinOverlay["BOX"] = "Box";
+})(EViolinOverlay || (EViolinOverlay = {}));
+export var EBarGroupingType;
+(function (EBarGroupingType) {
+    EBarGroupingType["STACK"] = "Stacked";
+    EBarGroupingType["GROUP"] = "Grouped";
+})(EBarGroupingType || (EBarGroupingType = {}));
 export var EColumnTypes;
 (function (EColumnTypes) {
     EColumnTypes["NUMERICAL"] = "Numerical";
@@ -30,4 +51,9 @@ export var EFilterOptions;
     EFilterOptions["OUT"] = "Filter Out";
     EFilterOptions["CLEAR"] = "Clear Filter";
 })(EFilterOptions || (EFilterOptions = {}));
+export var ENumericalColorScaleType;
+(function (ENumericalColorScaleType) {
+    ENumericalColorScaleType["SEQUENTIAL"] = "Sequential";
+    ENumericalColorScaleType["DIVERGENT"] = "Divergent";
+})(ENumericalColorScaleType || (ENumericalColorScaleType = {}));
 //# sourceMappingURL=interfaces.js.map

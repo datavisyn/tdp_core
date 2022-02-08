@@ -1,6 +1,5 @@
 import { merge } from 'lodash';
-import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
-import { EViolinOverlay } from '../bar/utils';
+import { EColumnTypes, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
 export function isViolin(s) {

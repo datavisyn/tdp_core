@@ -1,28 +1,24 @@
 import { merge } from 'lodash';
 import d3 from 'd3';
-import { PlotlyInfo, PlotlyData, EColumnTypes, VisNumericalColumn, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis, VisColumn } from '../interfaces';
+import {
+  PlotlyInfo,
+  PlotlyData,
+  EColumnTypes,
+  VisNumericalColumn,
+  IVisConfig,
+  Scales,
+  ESupportedPlotlyVis,
+  VisColumn,
+  IScatterConfig,
+  ENumericalColorScaleType,
+} from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
 
-export enum ENumericalColorScaleType {
-  SEQUENTIAL = 'Sequential',
-  DIVERGENT = 'Divergent',
-}
-
 export function isScatter(s: IVisConfig): s is IScatterConfig {
   return s.type === ESupportedPlotlyVis.SCATTER;
-}
-
-export interface IScatterConfig {
-  type: ESupportedPlotlyVis.SCATTER;
-  numColumnsSelected: ColumnInfo[];
-  color: ColumnInfo | null;
-  numColorScaleType: ENumericalColorScaleType;
-  shape: ColumnInfo | null;
-  isRectBrush: boolean;
-  alphaSliderVal: number;
 }
 
 const defaultConfig: IScatterConfig = {
@@ -94,8 +90,8 @@ export async function createScatterTraces(
   let max = 0;
 
   if (config.color) {
-    (min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null))),
-      (max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null)));
+    min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+    max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
   }
 
   const numericalColorScale = config.color
@@ -192,13 +188,14 @@ export async function createScatterTraces(
       data: {
         x: validCols[0].resolvedValues.map((v) => v.val),
         y: validCols[0].resolvedValues.map((v) => v.val),
-        ids: validCols[0].resolvedValues.map((v) => v.id),
+        ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
         xaxis: 'x',
         yaxis: 'y',
         type: 'scattergl',
         mode: 'markers',
         visible: 'legendonly',
         legendgroup: 'color',
+        // @ts-ignore
         legendgrouptitle: {
           text: 'Color',
         },
@@ -214,7 +211,7 @@ export async function createScatterTraces(
         transforms: [
           {
             type: 'groupby',
-            groups: colorCol.resolvedValues.map((v) => v.val),
+            groups: colorCol.resolvedValues.map((v) => v.val as string),
             styles: [
               ...[...new Set<string>(colorCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
                 return { target: c, value: { name: c } };
@@ -225,7 +222,7 @@ export async function createScatterTraces(
       },
       xLabel: validCols[0].info.name,
       yLabel: validCols[0].info.name,
-    } as any);
+    });
   }
 
   // if we have a column for the shape, add a legendPlot that creates a legend.
@@ -242,6 +239,7 @@ export async function createScatterTraces(
         visible: 'legendonly',
         showlegend: true,
         legendgroup: 'shape',
+        // @ts-ignore
         legendgrouptitle: {
           text: 'Shape',
         },
@@ -257,7 +255,7 @@ export async function createScatterTraces(
         transforms: [
           {
             type: 'groupby',
-            groups: shapeCol.resolvedValues.map((v) => v.val),
+            groups: shapeCol.resolvedValues.map((v) => v.val as string),
             styles: [
               ...[...new Set<string>(shapeCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
                 return { target: c, value: { name: c } };
@@ -268,7 +266,7 @@ export async function createScatterTraces(
       },
       xLabel: validCols[0].info.name,
       yLabel: validCols[0].info.name,
-    } as any);
+    });
   }
 
   return {

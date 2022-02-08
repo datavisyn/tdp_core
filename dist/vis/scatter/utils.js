@@ -1,15 +1,10 @@
 import { merge } from 'lodash';
 import d3 from 'd3';
-import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
-export var ENumericalColorScaleType;
-(function (ENumericalColorScaleType) {
-    ENumericalColorScaleType["SEQUENTIAL"] = "Sequential";
-    ENumericalColorScaleType["DIVERGENT"] = "Divergent";
-})(ENumericalColorScaleType || (ENumericalColorScaleType = {}));
 export function isScatter(s) {
     return s.type === ESupportedPlotlyVis.SCATTER;
 }
@@ -66,8 +61,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     let min = 0;
     let max = 0;
     if (config.color) {
-        (min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null))),
-            (max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null)));
+        min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+        max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
     }
     const numericalColorScale = config.color
         ? d3.scale
@@ -153,13 +148,14 @@ export async function createScatterTraces(columns, selected, config, scales, sha
             data: {
                 x: validCols[0].resolvedValues.map((v) => v.val),
                 y: validCols[0].resolvedValues.map((v) => v.val),
-                ids: validCols[0].resolvedValues.map((v) => v.id),
+                ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
                 xaxis: 'x',
                 yaxis: 'y',
                 type: 'scattergl',
                 mode: 'markers',
                 visible: 'legendonly',
                 legendgroup: 'color',
+                // @ts-ignore
                 legendgrouptitle: {
                     text: 'Color',
                 },
@@ -202,6 +198,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                 visible: 'legendonly',
                 showlegend: true,
                 legendgroup: 'shape',
+                // @ts-ignore
                 legendgrouptitle: {
                     text: 'Shape',
                 },

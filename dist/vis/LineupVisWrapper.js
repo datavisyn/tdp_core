@@ -43,9 +43,9 @@ export class LineupVisWrapper {
                     id: column.fqid,
                 };
             };
-            const mapData = (data, column) => {
+            const mapData = (innerData, column) => {
                 // TODO: Refactor to use _visyn_id instead.
-                return data.map((d, i) => ({ id: d.v._id, val: column.getRaw(d) }));
+                return innerData.map((d) => ({ id: d.v._id, val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {
                 if (column.isLoaded()) {

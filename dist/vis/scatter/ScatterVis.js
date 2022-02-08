@@ -37,19 +37,19 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, []);
+    }, [id]);
     const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
-    }, []);
+    }, [optionsConfig]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
-    }, []);
+    }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
     const layout = React.useMemo(() => {
         if (!traces) {
             return null;
         }
-        const layout = {
+        const innerLayout = {
             showlegend: true,
             legend: {
                 // @ts-ignore
@@ -62,14 +62,12 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             violingap: 0,
             dragmode: config.isRectBrush ? 'select' : 'lasso',
         };
-        return beautifyLayout(traces, layout);
+        return beautifyLayout(traces, innerLayout);
     }, [traces, config.isRectBrush]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (d) => {
-                    d ? selectionCallback(d.points.map((d) => +d.id)) : selectionCallback([]);
-                }, 
+            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (sel) => (sel ? selectionCallback(sel.points.map((d) => +d.id)) : selectionCallback([])), 
                 // plotly redraws everything on updates, so you need to reappend title and
                 // change opacity on update, instead of just in a use effect
                 onInitialized: () => {

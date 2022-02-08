@@ -5,6 +5,6 @@ interface GroupSelectProps {
     columns: VisColumn[];
     currentSelected: ColumnInfo | null;
 }
-export declare function GroupSelect(props: GroupSelectProps): JSX.Element;
+export declare function GroupSelect({ callback, columns, currentSelected }: GroupSelectProps): JSX.Element;
 export {};
 //# sourceMappingURL=GroupSelect.d.ts.map

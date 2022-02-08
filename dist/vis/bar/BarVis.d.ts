@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Scales, VisColumn, IVisConfig } from '../interfaces';
-import { IBarConfig } from './utils';
+import { Scales, VisColumn, IVisConfig, IBarConfig } from '../interfaces';
 interface BarVisProps {
     config: IBarConfig;
     optionsConfig?: {

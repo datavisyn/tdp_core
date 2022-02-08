@@ -5,20 +5,16 @@ import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { createPCPTraces } from './utils';
 import { useAsync } from '../../hooks';
-const defaultConfig = {};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function PCPVis({ config, optionsConfig, extensions, columns, setConfig }) {
-    const mergedOptionsConfig = React.useMemo(() => {
-        return merge({}, defaultConfig, optionsConfig);
-    }, []);
+export function PCPVis({ config, extensions, columns, setConfig }) {
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
-    }, []);
+    }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config]);
     const id = React.useMemo(() => uniqueId('PCPVis'), []);
     React.useEffect(() => {
@@ -29,17 +25,11 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig }
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, []);
-    const layout = React.useMemo(
-    // @ts-ignore
-    () => {
+    }, [id]);
+    const layout = React.useMemo(() => {
         return traces
             ? {
                 showlegend: true,
-                legend: {
-                    itemclick: false,
-                    itemdoubleclick: false,
-                },
                 autosize: true,
                 grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
                 shapes: [],

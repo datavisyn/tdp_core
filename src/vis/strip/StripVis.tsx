@@ -1,17 +1,16 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { IVisConfig, ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn } from '../interfaces';
+import { IVisConfig, ColumnInfo, ESupportedPlotlyVis, VisColumn, IStripConfig, Scales } from '../interfaces';
 import { CategoricalColumnSelect, NumericalColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createStripTraces, IStripConfig } from './utils';
+import { createStripTraces } from './utils';
 import { useAsync } from '../../hooks';
 
 interface StripVisProps {
   config: IStripConfig;
-  optionsConfig?: {};
   extensions?: {
     prePlot?: React.ReactNode;
     postPlot?: React.ReactNode;
@@ -23,8 +22,6 @@ interface StripVisProps {
   scales: Scales;
 }
 
-const defaultConfig = {};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,
@@ -32,14 +29,10 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales }: StripVisProps) {
-  const mergedOptionsConfig = React.useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, []);
-
+export function StripVis({ config, extensions, columns, setConfig, scales }: StripVisProps) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, scales]);
 
@@ -55,14 +48,14 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, []);
+  }, [id]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
       return null;
     }
 
-    const layout: Plotly.Layout = {
+    const innerLayout: Plotly.Layout = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -75,7 +68,7 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
       violingap: 0,
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, innerLayout);
   }, [traces]);
 
   return (
@@ -91,7 +84,7 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout as any}
+            layout={layout}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}

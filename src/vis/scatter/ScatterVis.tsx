@@ -1,11 +1,11 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { IVisConfig, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, Scales, VisColumn } from '../interfaces';
+import { IVisConfig, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, Scales, VisColumn, IScatterConfig, ENumericalColorScaleType } from '../interfaces';
 import { BrushOptionButtons, ColorSelect, FilterButtons, NumericalColumnSelect, OpacitySlider, ShapeSelect, VisTypeSelect, WarningMessage } from '../sidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
-import { createScatterTraces, ENumericalColorScaleType, IScatterConfig } from './utils';
+import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
 
@@ -86,15 +86,15 @@ export function ScatterVis({
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, []);
+  }, [id]);
 
   const mergedOptionsConfig = React.useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
 
@@ -103,7 +103,7 @@ export function ScatterVis({
       return null;
     }
 
-    const layout: Plotly.Layout = {
+    const innerLayout: Plotly.Layout = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -117,7 +117,7 @@ export function ScatterVis({
       dragmode: config.isRectBrush ? 'select' : 'lasso',
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, innerLayout);
   }, [traces, config.isRectBrush]);
 
   return (
@@ -132,13 +132,11 @@ export function ScatterVis({
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout as any}
+            layout={layout}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
-            onSelected={(d) => {
-              d ? selectionCallback(d.points.map((d) => +(d as any).id)) : selectionCallback([]);
-            }}
+            onSelected={(sel) => (sel ? selectionCallback(sel.points.map((d) => +(d as any).id)) : selectionCallback([]))}
             // plotly redraws everything on updates, so you need to reappend title and
             // change opacity on update, instead of just in a use effect
             onInitialized={() => {

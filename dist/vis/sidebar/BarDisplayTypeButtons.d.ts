@@ -1,9 +1,9 @@
 /// <reference types="react" />
-import { EBarDisplayType } from '../bar/utils';
+import { EBarDisplayType } from '../interfaces';
 interface BarDisplayProps {
     callback: (s: EBarDisplayType) => void;
     currentSelected: EBarDisplayType;
 }
-export declare function BarDisplayButtons(props: BarDisplayProps): JSX.Element;
+export declare function BarDisplayButtons({ callback, currentSelected }: BarDisplayProps): JSX.Element;
 export {};
 //# sourceMappingURL=BarDisplayTypeButtons.d.ts.map

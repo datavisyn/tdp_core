@@ -9,13 +9,14 @@ function truncateText(text, maxLength = 50) {
 /**
  * Cleans up the layout of a given trace, primarily by positioning potential small multiple plots in a reasonable way
  * @param traces the traces associated with the layout
- * @param layout the current layout to be changed. Typed to any because the plotly types complain.
+ * @param layout the current layout to be changed. Typed to any because the plotly types complain.p
  * @returns the changed layout
  */
 export function beautifyLayout(traces, layout) {
-    layout.annotations = [];
+    const layoutEdit = layout;
+    layoutEdit.annotations = [];
     traces.plots.forEach((t, i) => {
-        layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
+        layoutEdit[`xaxis${i > 0 ? i + 1 : ''}`] = {
             showline: false,
             showspikes: true,
             spikecolor: 'black',
@@ -33,7 +34,7 @@ export function beautifyLayout(traces, layout) {
                 },
             },
         };
-        layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
+        layoutEdit[`yaxis${i > 0 ? i + 1 : ''}`] = {
             showline: false,
             showspikes: true,
             spikecolor: 'black',
@@ -50,7 +51,7 @@ export function beautifyLayout(traces, layout) {
                 },
             },
         };
-        layout.shapes.push({
+        layoutEdit.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -68,7 +69,7 @@ export function beautifyLayout(traces, layout) {
             row: 2,
             col: 2,
         });
-        layout.shapes.push({
+        layoutEdit.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -86,7 +87,7 @@ export function beautifyLayout(traces, layout) {
             row: 2,
             col: 2,
         });
-        layout.shapes.push({
+        layoutEdit.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -104,7 +105,7 @@ export function beautifyLayout(traces, layout) {
             row: 2,
             col: 2,
         });
-        layout.shapes.push({
+        layoutEdit.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -123,7 +124,7 @@ export function beautifyLayout(traces, layout) {
             col: 2,
         });
     });
-    return layout;
+    return layoutEdit;
 }
 export function resolveColumnValues(columns) {
     return Promise.all(columns.map(async (col) => ({ ...col, resolvedValues: await col.values() })));

@@ -3,27 +3,20 @@ import {
   PlotlyInfo,
   PlotlyData,
   VisCategoricalColumn,
-  ColumnInfo,
   EColumnTypes,
   ESupportedPlotlyVis,
   IVisConfig,
   VisNumericalColumn,
   Scales,
   VisColumn,
+  IViolinConfig,
+  EViolinOverlay,
 } from '../interfaces';
-import { EViolinOverlay } from '../bar/utils';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
 
 export function isViolin(s: IVisConfig): s is IViolinConfig {
   return s.type === ESupportedPlotlyVis.VIOLIN;
-}
-
-export interface IViolinConfig {
-  type: ESupportedPlotlyVis.VIOLIN;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
-  violinOverlay: EViolinOverlay;
 }
 
 const defaultConfig: IViolinConfig = {

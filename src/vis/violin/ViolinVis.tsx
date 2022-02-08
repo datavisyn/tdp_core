@@ -1,13 +1,12 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig, IViolinConfig, EViolinOverlay } from '../interfaces';
 import { CategoricalColumnSelect, NumericalColumnSelect, ViolinOverlayButtons, VisTypeSelect, WarningMessage } from '../sidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createViolinTraces, IViolinConfig } from './utils';
-import { EViolinOverlay } from '../bar/utils';
+import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
 
 interface ViolinVisProps {
@@ -46,11 +45,11 @@ const defaultExtensions = {
 export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales }: ViolinVisProps) {
   const mergedOptionsConfig = React.useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
 
@@ -66,14 +65,14 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, []);
+  }, [id]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
       return null;
     }
 
-    const layout: Plotly.Layout = {
+    const innerLayout: Plotly.Layout = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -86,7 +85,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
       violingap: 0,
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, innerLayout);
   }, [traces]);
 
   return (
@@ -102,7 +101,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout as any}
+            layout={layout}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}

@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, VisColumn, IVisConfig } from '../interfaces';
-import { AllColumnSelect, CategoricalColumnSelect, NumericalColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
+import { ColumnInfo, ESupportedPlotlyVis, VisColumn, IVisConfig, IPCPConfig } from '../interfaces';
+import { AllColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
-import { createPCPTraces, IPCPConfig } from './utils';
+import { createPCPTraces } from './utils';
 import { useAsync } from '../../hooks';
 
 interface PCPVisProps {
   config: IPCPConfig;
-  optionsConfig?: {};
   extensions?: {
     prePlot?: React.ReactNode;
     postPlot?: React.ReactNode;
@@ -20,8 +19,6 @@ interface PCPVisProps {
   setConfig: (config: IVisConfig) => void;
 }
 
-const defaultConfig = {};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,
@@ -29,14 +26,10 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function PCPVis({ config, optionsConfig, extensions, columns, setConfig }: PCPVisProps) {
-  const mergedOptionsConfig = React.useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, []);
-
+export function PCPVis({ config, extensions, columns, setConfig }: PCPVisProps) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config]);
 
@@ -52,27 +45,19 @@ export function PCPVis({ config, optionsConfig, extensions, columns, setConfig }
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, []);
+  }, [id]);
 
-  const layout = React.useMemo<Partial<Plotly.Layout> | null>(
-    // @ts-ignore
-    () => {
-      return traces
-        ? {
-            showlegend: true,
-            legend: {
-              itemclick: false,
-              itemdoubleclick: false,
-            },
-            autosize: true,
-            grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
-            shapes: [],
-            violingap: 0,
-          }
-        : null;
-    },
-    [traces],
-  );
+  const layout = React.useMemo<Partial<Plotly.Layout> | null>(() => {
+    return traces
+      ? {
+          showlegend: true,
+          autosize: true,
+          grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
+          shapes: [],
+          violingap: 0,
+        }
+      : null;
+  }, [traces]);
 
   return (
     <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Scales, VisColumn, IVisConfig } from '../interfaces';
-import { IViolinConfig } from './utils';
+import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 interface ViolinVisProps {
     config: IViolinConfig;
     optionsConfig?: {

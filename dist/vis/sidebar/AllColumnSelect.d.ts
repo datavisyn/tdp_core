@@ -5,6 +5,6 @@ interface AllColumnSelectProps {
     columns: VisColumn[];
     currentSelected: ColumnInfo[];
 }
-export declare function AllColumnSelect(props: AllColumnSelectProps): JSX.Element;
+export declare function AllColumnSelect({ callback, columns, currentSelected }: AllColumnSelectProps): JSX.Element;
 export {};
 //# sourceMappingURL=AllColumnSelect.d.ts.map

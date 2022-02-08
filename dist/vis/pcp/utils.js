@@ -1,7 +1,7 @@
 import d3 from 'd3';
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
-import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 export function isPCP(s) {
     return s.type === ESupportedPlotlyVis.PCP;
@@ -52,7 +52,9 @@ export async function createPCPTraces(columns, config) {
         xLabel: null,
         yLabel: null,
         data: {
-            dimensions: allColValues.map((c, i) => {
+            type: 'parcoords',
+            // @ts-ignore
+            dimensions: allColValues.map((c) => {
                 if (c.type === EColumnTypes.NUMERICAL) {
                     return {
                         range: [d3.min(c.resolvedValues.map((v) => v.val)), d3.max(c.resolvedValues.map((v) => v.val))],
@@ -69,12 +71,6 @@ export async function createPCPTraces(columns, config) {
                     ticktext: uniqueList,
                 };
             }),
-            type: 'parcoords',
-            line: {
-                shape: 'spline',
-                // @ts-ignore
-                opacity: 0.2,
-            },
         },
     };
     return {

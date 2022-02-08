@@ -1,11 +1,11 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType, EBarDirection, EBarDisplayType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createBarTraces, EBarDirection, EBarDisplayType, EBarGroupingType, IBarConfig } from './utils';
+import { createBarTraces } from './utils';
 import { useAsync } from '../../hooks';
 import {
   BarDirectionButtons,
@@ -86,11 +86,11 @@ const defaultExtensions = {
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }: BarVisProps) {
   const mergedOptionsConfig = React.useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
@@ -106,14 +106,14 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, []);
+  }, [id]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
       return null;
     }
 
-    const layout: Plotly.Layout = {
+    const innerLayout: Plotly.Layout = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -127,7 +127,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, innerLayout);
   }, [traces, config.groupType]);
 
   return (
@@ -142,7 +142,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout as any}
+            layout={layout}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}

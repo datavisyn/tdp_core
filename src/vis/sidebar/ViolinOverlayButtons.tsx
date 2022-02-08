@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { EViolinOverlay } from '../bar/utils';
-import { EFilterOptions } from '../interfaces';
+import { EViolinOverlay } from '../interfaces';
 
 interface ViolinOverlayProps {
   callback: (s: EViolinOverlay) => void;
   currentSelected: EViolinOverlay;
 }
 
-export function ViolinOverlayButtons(props: ViolinOverlayProps) {
+export function ViolinOverlayButtons({ callback, currentSelected }: ViolinOverlayProps) {
   const options = [EViolinOverlay.NONE, EViolinOverlay.BOX, EViolinOverlay.STRIP];
   return (
     <>
@@ -17,8 +16,8 @@ export function ViolinOverlayButtons(props: ViolinOverlayProps) {
           return (
             <React.Fragment key={`radioButtonsFilter${opt}`}>
               <input
-                checked={props.currentSelected === opt}
-                onChange={(e) => props.callback(e.currentTarget.value as EViolinOverlay)}
+                checked={currentSelected === opt}
+                onChange={(e) => callback(e.currentTarget.value as EViolinOverlay)}
                 value={opt}
                 type="checkbox"
                 className="btn-check"

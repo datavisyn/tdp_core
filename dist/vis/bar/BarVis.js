@@ -1,10 +1,11 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
+import { EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createBarTraces, EBarGroupingType } from './utils';
+import { createBarTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { BarDirectionButtons, BarDisplayButtons, BarGroupTypeButtons, CategoricalColumnSelect, GroupSelect, MultiplesSelect, VisTypeSelect, WarningMessage, } from '../sidebar';
 const defaultConfig = {
@@ -38,10 +39,10 @@ const defaultExtensions = {
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
     const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
-    }, []);
+    }, [optionsConfig]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
-    }, []);
+    }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
     const id = React.useMemo(() => uniqueId('BarVis'), []);
     React.useEffect(() => {
@@ -52,12 +53,12 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, []);
+    }, [id]);
     const layout = React.useMemo(() => {
         if (!traces) {
             return null;
         }
-        const layout = {
+        const innerLayout = {
             showlegend: true,
             legend: {
                 // @ts-ignore
@@ -70,7 +71,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             violingap: 0,
             barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
         };
-        return beautifyLayout(traces, layout);
+        return beautifyLayout(traces, innerLayout);
     }, [traces, config.groupType]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },

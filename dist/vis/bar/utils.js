@@ -1,29 +1,8 @@
 import { merge, sum } from 'lodash';
 import { I18nextManager } from '../../i18n';
-import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, EBarGroupingType, EBarDisplayType, EBarDirection, } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
-export var EBarDisplayType;
-(function (EBarDisplayType) {
-    EBarDisplayType["DEFAULT"] = "Default";
-    EBarDisplayType["NORMALIZED"] = "Normalized";
-})(EBarDisplayType || (EBarDisplayType = {}));
-export var EBarDirection;
-(function (EBarDirection) {
-    EBarDirection["VERTICAL"] = "Vertical";
-    EBarDirection["HORIZONTAL"] = "Horizontal";
-})(EBarDirection || (EBarDirection = {}));
-export var EViolinOverlay;
-(function (EViolinOverlay) {
-    EViolinOverlay["NONE"] = "None";
-    EViolinOverlay["STRIP"] = "Strip";
-    EViolinOverlay["BOX"] = "Box";
-})(EViolinOverlay || (EViolinOverlay = {}));
-export var EBarGroupingType;
-(function (EBarGroupingType) {
-    EBarGroupingType["STACK"] = "Stacked";
-    EBarGroupingType["GROUP"] = "Grouped";
-})(EBarGroupingType || (EBarGroupingType = {}));
 export function isBar(s) {
     return s.type === ESupportedPlotlyVis.BAR;
 }
@@ -45,44 +24,8 @@ export function barMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-export async function createBarTraces(columns, config, scales) {
-    let plotCounter = 1;
-    if (!config.catColumnsSelected) {
-        return {
-            plots: [],
-            legendPlots: [],
-            rows: 0,
-            cols: 0,
-            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
-        };
-    }
-    const plots = [];
-    const catCols = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
-    if (catCols.length > 0) {
-        if (config.group && config.multiples) {
-            plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter);
-        }
-        else if (config.group) {
-            plotCounter = await setPlotsWithGroups(columns, catCols, config, plots, scales, plotCounter);
-        }
-        else if (config.multiples) {
-            plotCounter = await setPlotsWithMultiples(columns, catCols, config, plots, scales, plotCounter);
-        }
-        else {
-            plotCounter = await setPlotsBasic(columns, catCols, config, plots, scales, plotCounter);
-        }
-    }
-    const rows = Math.ceil(Math.sqrt(plotCounter - 1));
-    const cols = Math.ceil((plotCounter - 1) / rows);
-    return {
-        plots,
-        legendPlots: [],
-        rows,
-        cols,
-        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
-    };
-}
 async function setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter) {
+    let plotCounterEdit = plotCounter;
     const catColValues = await resolveColumnValues(catCols);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
@@ -119,9 +62,9 @@ async function setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, s
                 yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
             });
         });
-        plotCounter += 1;
+        plotCounterEdit += 1;
     });
-    return plotCounter;
+    return plotCounterEdit;
 }
 async function setPlotsWithGroups(columns, catCols, config, plots, scales, plotCounter) {
     const catColValues = await resolveColumnValues(catCols);
@@ -158,7 +101,8 @@ async function setPlotsWithGroups(columns, catCols, config, plots, scales, plotC
     });
     return plotCounter;
 }
-async function setPlotsWithMultiples(columns, catCols, config, plots, scales, plotCounter) {
+async function setPlotsWithMultiples(columns, catCols, config, plots, plotCounter) {
+    let plotCounterEdit = plotCounter;
     const catColValues = await resolveColumnValues(catCols);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
@@ -187,11 +131,12 @@ async function setPlotsWithMultiples(columns, catCols, config, plots, scales, pl
             xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
             yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
         });
-        plotCounter += 1;
+        plotCounterEdit += 1;
     });
-    return plotCounter;
+    return plotCounterEdit;
 }
 async function setPlotsBasic(columns, catCols, config, plots, scales, plotCounter) {
+    let plotCounterEdit = plotCounter;
     const catColValues = await resolveColumnValues(catCols);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
@@ -212,7 +157,44 @@ async function setPlotsBasic(columns, catCols, config, plots, scales, plotCounte
         xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
         yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
     });
-    plotCounter += 1;
-    return plotCounter;
+    plotCounterEdit += 1;
+    return plotCounterEdit;
+}
+export async function createBarTraces(columns, config, scales) {
+    let plotCounter = 1;
+    if (!config.catColumnsSelected) {
+        return {
+            plots: [],
+            legendPlots: [],
+            rows: 0,
+            cols: 0,
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+        };
+    }
+    const plots = [];
+    const catCols = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
+    if (catCols.length > 0) {
+        if (config.group && config.multiples) {
+            plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter);
+        }
+        else if (config.group) {
+            plotCounter = await setPlotsWithGroups(columns, catCols, config, plots, scales, plotCounter);
+        }
+        else if (config.multiples) {
+            plotCounter = await setPlotsWithMultiples(columns, catCols, config, plots, plotCounter);
+        }
+        else {
+            plotCounter = await setPlotsBasic(columns, catCols, config, plots, scales, plotCounter);
+        }
+    }
+    const rows = Math.ceil(Math.sqrt(plotCounter - 1));
+    const cols = Math.ceil((plotCounter - 1) / rows);
+    return {
+        plots,
+        legendPlots: [],
+        rows,
+        cols,
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+    };
 }
 //# sourceMappingURL=utils.js.map
