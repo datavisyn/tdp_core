@@ -70,7 +70,9 @@ export class LoginMenu extends EventHandler {
                 'phovea:security_flask.unknown',
               )}</span></a>
           <div class="dropdown-menu dropdown-menu-end" data-bs-popper="none" aria-labelledby="userMenuDropdown">
-              <a class="dropdown-item" data-testid="logout-link" href="#" id="logout_link">${I18nextManager.getInstance().i18n.t('phovea:security_flask.logoutButton')}</a>
+              <a class="dropdown-item" data-testid="logout-link" href="#" id="logout_link">${I18nextManager.getInstance().i18n.t(
+                'phovea:security_flask.logoutButton',
+              )}</a>
           </div>
       </li>`;
 

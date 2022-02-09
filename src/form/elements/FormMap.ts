@@ -132,7 +132,10 @@ export class FormMap extends AFormElement<IFormMapDesc> {
     this.addChangeListener();
 
     // use label for data testid and remove special characters such as a colon
-    this.$rootNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true).attr('data-testid', this.elementDesc.label.replace(/[^\w\s]/gi, ''));
+    this.$rootNode = $formNode
+      .append('div')
+      .classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+      .attr('data-testid', this.elementDesc.label.replace(/[^\w\s]/gi, ''));
     this.$inputNode = this.$rootNode.append('div');
     this.setVisible(this.elementDesc.visible);
 
@@ -161,7 +164,9 @@ export class FormMap extends AFormElement<IFormMapDesc> {
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
           </button>
-          <div class="dropdown-menu p-2" data-bs-popper="static" data-testid="form-map-dropdown" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
+          <div class="dropdown-menu p-2" data-bs-popper="static" data-testid="form-map-dropdown" aria-labelledby="${
+            this.elementDesc.attributes.id
+          }l" style="min-width: 25em">
             <div class="form-map-container"></div>
             <div class="form-map-apply mt-3">
                 <button class="btn btn-secondary btn-sm" data-testid="apply-button">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>

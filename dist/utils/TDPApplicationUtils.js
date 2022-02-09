@@ -20,26 +20,22 @@ export class TDPApplicationUtils {
         return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date)); // e.g. Oct 10, 2021
     }
     static notAllowedText(notAllowed) {
-        return (typeof notAllowed === 'string' ? notAllowed : I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.notAllowed'));
+        return typeof notAllowed === 'string' ? notAllowed : I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.notAllowed');
     }
     /**
      * utilitly for adding a permission form as used in TDP by default
      * @param item
      */
     static permissionForm(item, options = {}) {
-        const o = Object.assign({
-            extra: '',
-            doc: document
-        }, options);
+        const o = { extra: '', doc: document, ...options };
         const user = UserSession.getInstance().currentUser();
         const roles = user ? user.roles : UserUtils.ANONYMOUS_USER.roles;
         const permission = Permission.decode(item ? item.permissions : Permission.ALL_NONE_NONE);
         const id = BaseUtils.randomId();
         const div = o.doc.createElement('div');
         div.classList.add('mb-3');
-        div.innerHTML = `
-      <div class="form-check form-check-inline">
-          <input class="form-check-input" data-testid="permission-private-input" type="radio" name="permission_public" id="global_permission_private_${id}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
+        div.innerHTML = `          
+      <input class="form-check-input" type="radio" data-testid="permission-private-input" name="permission_public" id="global_permission_private_${id}" value="private" ${!permission.others.has(EPermission.READ) ? 'checked' : ''}>
           <label class="form-label form-check-label" for="global_permission_private_${id}"> <i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.private')}</label>
       </div>
       <div class="form-check form-check-inline">
@@ -47,7 +43,7 @@ export class TDPApplicationUtils {
           <label class="form-label form-check-label" for="global_permission_public_${id}"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.publicMsg')}</label>
       </div>
 
-      <button type="button" name="permission_advanced" class="btn btn-outline-secondary btn-sm float-end" data-testid="advanced-button">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
+      <button type="button" name="permission_advanced"  data-testid="advanced-button" class="btn btn-outline-secondary btn-sm float-end">${I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.advanced')}</button>
       ${o.extra}
       <div class="tdp-permissions">
         <div class="tdp-permissions-entry row d-flex align-items-center" data-testid="public">
@@ -137,8 +133,8 @@ export class TDPApplicationUtils {
                     return;
                 }
                 // sync with others
-                const target = (d.value === 'public') ? 'read' : 'none';
-                others.forEach((o) => o.checked = (o.value === target));
+                const target = d.value === 'public' ? 'read' : 'none';
+                others.forEach((a) => (a.checked = a.value === target));
                 syncActive();
             };
         });
@@ -149,7 +145,7 @@ export class TDPApplicationUtils {
                 }
                 // sync with public
                 const target = d.value === 'none' ? 'private' : 'public';
-                publicSimple.forEach((o) => o.checked = o.value === target);
+                publicSimple.forEach((a) => (a.checked = a.value === target));
                 syncActive();
             };
         });
@@ -157,7 +153,7 @@ export class TDPApplicationUtils {
             if (value === 'read') {
                 return new Set([EPermission.READ]);
             }
-            else if (value === 'write') {
+            if (value === 'write') {
                 return new Set([EPermission.READ, EPermission.WRITE]);
             }
             return new Set();
@@ -165,17 +161,23 @@ export class TDPApplicationUtils {
         return {
             node: div,
             resolve: (data) => {
-                const others = toSet(data.get('permission_others').toString());
-                const group = toSet(data.get('permission_group').toString());
-                const groupName = data.get('permission_group_name').toString();
-                const buddies = toSet(data.get('permission_buddies').toString());
-                const buddiesName = data.get('permission_buddies_name').toString().split(';').map((d) => d.trim()).filter((d) => d.length > 0);
+                var _a;
+                const oths = toSet(data.get('permission_others').toString());
+                const grp = toSet(data.get('permission_group').toString());
+                const groupName = (_a = data.get('permission_group_name')) === null || _a === void 0 ? void 0 : _a.toString();
+                const bddies = toSet(data.get('permission_buddies').toString());
+                const buddiesName = data
+                    .get('permission_buddies_name')
+                    .toString()
+                    .split(';')
+                    .map((d) => d.trim())
+                    .filter((d) => d.length > 0);
                 return {
-                    permissions: Permission.encode(new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]), group, others, buddies),
+                    permissions: Permission.encode(new Set([EPermission.READ, EPermission.WRITE, EPermission.EXECUTE]), grp, oths, bddies),
                     group: groupName,
-                    buddies: buddiesName
+                    buddies: buddiesName,
                 };
-            }
+            },
         };
     }
     /**
@@ -194,7 +196,7 @@ export class TDPApplicationUtils {
             }
         });
         return {
-            inverse: TDPApplicationUtils.initSession(old)
+            inverse: TDPApplicationUtils.initSession(old),
         };
     }
     static initSession(map) {
@@ -202,20 +204,20 @@ export class TDPApplicationUtils {
     }
     static async setParameterImpl(inputs, parameter, graph) {
         const view = await inputs[0].v;
-        const name = parameter.name;
-        const value = parameter.value;
+        const { name } = parameter;
+        const { value } = parameter;
         const previousValue = parameter.previousValue === undefined ? view.getParameter(name) : parameter.previousValue;
         view.setParameterImpl(name, value);
         return {
-            inverse: TDPApplicationUtils.setParameter(inputs[0], name, previousValue, value)
+            inverse: TDPApplicationUtils.setParameter(inputs[0], name, previousValue, value),
         };
     }
     static setParameter(view, name, value, previousValue) {
-        //assert view
+        // assert view
         return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.setParameter', { name }), ObjectRefUtils.category.visual, ObjectRefUtils.operation.update), TDPApplicationUtils.CMD_SET_PARAMETER, TDPApplicationUtils.setParameterImpl, [view], {
             name,
             value,
-            previousValue
+            previousValue,
         });
     }
     static compressSetParameter(path) {
@@ -231,7 +233,7 @@ export class TDPApplicationUtils {
 TDPApplicationUtils.MIN = 60;
 TDPApplicationUtils.HOUR = TDPApplicationUtils.MIN * 60;
 TDPApplicationUtils.DAY = TDPApplicationUtils.HOUR * 24;
-//old name
+// old name
 TDPApplicationUtils.CMD_INIT_SESSION = 'tdpInitSession';
 TDPApplicationUtils.CMD_SET_PARAMETER = 'tdpSetParameter';
 TDPApplicationUtils.getAreas = () => {
@@ -240,14 +242,26 @@ TDPApplicationUtils.getAreas = () => {
         [43, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.fewSecondsAgo')],
         [44, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.secondsAgo')],
         [89, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.minute')],
-        [44 * TDPApplicationUtils.MIN, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.minute', { count: Math.ceil(d / TDPApplicationUtils.MIN) })],
+        [
+            44 * TDPApplicationUtils.MIN,
+            (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.minute', { count: Math.ceil(d / TDPApplicationUtils.MIN) }),
+        ],
         [89 * TDPApplicationUtils.MIN, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour')],
-        [21 * TDPApplicationUtils.HOUR, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour', { count: Math.ceil(d / TDPApplicationUtils.HOUR) })],
+        [
+            21 * TDPApplicationUtils.HOUR,
+            (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.hour', { count: Math.ceil(d / TDPApplicationUtils.HOUR) }),
+        ],
         [35 * TDPApplicationUtils.HOUR, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.day')],
-        [25 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.day', { count: Math.ceil(d / TDPApplicationUtils.DAY) })],
+        [
+            25 * TDPApplicationUtils.DAY,
+            (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.day', { count: Math.ceil(d / TDPApplicationUtils.DAY) }),
+        ],
         [45 * TDPApplicationUtils.DAY, I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month')],
-        [319 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month', { count: Math.ceil(d / TDPApplicationUtils.DAY / 30) })],
-        [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.year')]
+        [
+            319 * TDPApplicationUtils.DAY,
+            (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.month', { count: Math.ceil(d / TDPApplicationUtils.DAY / 30) }),
+        ],
+        [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.year')],
     ];
 };
 //# sourceMappingURL=TDPApplicationUtils.js.map

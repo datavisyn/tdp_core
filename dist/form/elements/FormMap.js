@@ -25,7 +25,11 @@ export class FormMap extends AFormElement {
     updateBadge() {
         const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
         ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
-            this.$inputNode.select('span.badge').html(text).attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text })).attr('data-testid', 'form-map-dropdown');
+            this.$inputNode
+                .select('span.badge')
+                .html(text)
+                .attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }))
+                .attr('data-testid', 'form-map-dropdown');
         });
     }
     get sessionKey() {
@@ -50,11 +54,14 @@ export class FormMap extends AFormElement {
     build($formNode) {
         this.addChangeListener();
         // use label for data testid and remove special characters such as a colon
-        this.$rootNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true).attr('data-testid', this.elementDesc.label.replace(/[^\w\s]/gi, ''));
+        this.$rootNode = $formNode
+            .append('div')
+            .classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+            .attr('data-testid', this.elementDesc.label.replace(/[^\w\s]/gi, ''));
         this.$inputNode = this.$rootNode.append('div');
         this.setVisible(this.elementDesc.visible);
         if (this.inline && this.elementDesc.onChange) {
-            //change the default onChange handler for the inline cas
+            // change the default onChange handler for the inline cas
             this.inlineOnChange = this.elementDesc.onChange;
             this.elementDesc.onChange = null;
         }
@@ -62,8 +69,8 @@ export class FormMap extends AFormElement {
         this.$inputNode.classed('row', !this.inline);
         if (this.inline) {
             if (!this.elementDesc.options.badgeProvider) {
-                //default badge provider for inline
-                this.elementDesc.options.badgeProvider = (rows) => rows.length === 0 ? '' : rows.length.toString();
+                // default badge provider for inline
+                this.elementDesc.options.badgeProvider = (rows) => (rows.length === 0 ? '' : rows.length.toString());
             }
             this.$inputNode.classed('dropdown', true);
             this.$inputNode.html(`
@@ -145,12 +152,13 @@ export class FormMap extends AFormElement {
         }
     }
     addValueEditor(row, parent, entries) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         const desc = entries.find((d) => d.value === row.key);
         const defaultSelection = this.elementDesc.options.defaultSelection !== false;
         function mapOptions(d) {
-            const value = typeof d === 'string' || !d ? d : (d.value || d.id);
-            const name = typeof d === 'string' || !d ? d : (d.name || d.text);
+            const value = typeof d === 'string' || !d ? d : d.value || d.id;
+            const name = typeof d === 'string' || !d ? d : d.name || d.text;
             return `<option value="${value}">${name}</option>`;
         }
         const initialValue = row.value;
@@ -163,9 +171,11 @@ export class FormMap extends AFormElement {
                     that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
                 });
                 FormSelect.resolveData(desc.optionsData)([]).then((values) => {
-                    parent.firstElementChild.innerHTML = (!defaultSelection ? `<option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.selectMe')}</option>` : '') + values.map(mapOptions).join('');
+                    parent.firstElementChild.innerHTML =
+                        (!defaultSelection ? `<option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.selectMe')}</option>` : '') +
+                            values.map(mapOptions).join('');
                     if (initialValue) {
-                        parent.firstElementChild.selectedIndex = values.map((d) => typeof d === 'string' ? d : d.value).indexOf(initialValue);
+                        parent.firstElementChild.selectedIndex = values.map((d) => (typeof d === 'string' ? d : d.value)).indexOf(initialValue);
                     }
                     else if (defaultSelection) {
                         const first = values[0];
@@ -177,7 +187,7 @@ export class FormMap extends AFormElement {
             case FormElementType.SELECT2:
                 parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" data-testid="select2" style="width: 100%"></select>`);
                 FormSelect.resolveData(desc.optionsData)([]).then((values) => {
-                    const initially = initialValue ? ((Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => typeof d === 'string' ? d : d.id)) : [];
+                    const initially = initialValue ? (Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => (typeof d === 'string' ? d : d.id)) : [];
                     // in case of ajax but have default value
                     if (desc.ajax && values.length === 0 && initialValue) {
                         values = Array.isArray(initialValue) ? initialValue : [initialValue];
@@ -216,7 +226,7 @@ export class FormMap extends AFormElement {
                                 row.value = data.map((r) => r.text);
                             }
                             else {
-                                row.value = data.map((r) => ({ 'id': r.id, 'text': r.text }));
+                                row.value = data.map((r) => ({ id: r.id, text: r.text }));
                             }
                             if (row.value.length === 1) {
                                 row.value = row.value[0];
@@ -226,7 +236,7 @@ export class FormMap extends AFormElement {
                     });
                 });
                 break;
-            case FormElementType.SELECT3:
+            case FormElementType.SELECT3: {
                 const select3 = new Select3(desc);
                 parent.appendChild(select3.node);
                 if (initialValue) {
@@ -241,6 +251,7 @@ export class FormMap extends AFormElement {
                     this.fire(FormMap.EVENT_CHANGE, next);
                 });
                 break;
+            }
             default:
                 parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" data-testid="default-select" value="${initialValue || ''}">`);
                 parent.firstElementChild.addEventListener('change', function () {
@@ -254,13 +265,15 @@ export class FormMap extends AFormElement {
         if (Array.isArray(this.elementDesc.options.entries)) {
             this.buildMapImpl(this.elementDesc.options.entries);
         }
-        else { // function case
+        else {
+            // function case
             const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
             const entries = this.elementDesc.options.entries(...dependent);
             this.buildMapImpl(entries);
         }
     }
     buildMapImpl(entries) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         const group = this.$group.node();
         group.innerHTML = ''; // remove all approach
@@ -300,7 +313,8 @@ export class FormMap extends AFormElement {
         <div class="col-sm-7 form-map-row-value ps-1 pe-1" data-testid="value"></div>
         <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" data-testid="close-button" title="${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.remove')}"></button></div>`;
             const valueElem = row.querySelector('.form-map-row-value');
-            if (d.key) { // has value
+            if (d.key) {
+                // has value
                 this.addValueEditor(d, valueElem, entries);
             }
             else {
@@ -320,7 +334,7 @@ export class FormMap extends AFormElement {
                     that.rows = [d];
                     const children = Array.from(group.children);
                     // remove all dom rows
-                    children.splice(0, children.length - 1).forEach((d) => d.remove());
+                    children.splice(0, children.length - 1).forEach((c) => c.remove());
                     updateOptions();
                 }
                 that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
@@ -334,8 +348,10 @@ export class FormMap extends AFormElement {
                     that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
                     return;
                 }
-                if (d.key !== this.value) { // value changed
-                    if (d.key) { //has an old value?
+                if (d.key !== this.value) {
+                    // value changed
+                    if (d.key) {
+                        // has an old value?
                         valueElem.innerHTML = '';
                     }
                     else {
@@ -352,19 +368,6 @@ export class FormMap extends AFormElement {
         updateOptions();
     }
     /**
-     * Returns the value
-     * @returns {string}
-     */
-    get value() {
-        // just rows with a valid key and value
-        const validRows = this.rows.filter((d) => d.key && d.value !== null);
-        // create copies from each row, such that the previous values don't reference to this.value
-        return validRows.map((row) => Object.assign({}, row));
-    }
-    hasValue() {
-        return this.value.length > 0;
-    }
-    /**
      * Sets the value
      * @param v
      */
@@ -377,6 +380,19 @@ export class FormMap extends AFormElement {
         this.buildMap();
         this.updateBadge();
         this.updateStoredValue();
+    }
+    /**
+     * Returns the value
+     * @returns {string}
+     */
+    get value() {
+        // just rows with a valid key and value
+        const validRows = this.rows.filter((d) => d.key && d.value !== null);
+        // create copies from each row, such that the previous values don't reference to this.value
+        return validRows.map((row) => ({ ...row }));
+    }
+    hasValue() {
+        return this.value.length > 0;
     }
     focus() {
         // open dropdown

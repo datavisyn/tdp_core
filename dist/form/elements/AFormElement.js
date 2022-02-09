@@ -77,7 +77,7 @@ export class AFormElement extends EventHandler {
         if (!this.elementDesc.onChange) {
             return;
         }
-        const value = this.value;
+        const { value } = this;
         const old = this.previousValue;
         this.previousValue = value;
         this.elementDesc.onChange(this, value, AFormElement.toData(value), old);
@@ -93,12 +93,17 @@ export class AFormElement extends EventHandler {
      */
     appendLabel($node) {
         if (this.elementDesc.hideLabel) {
-            return;
+            return undefined;
         }
         const colWidth = this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12';
         // TODO: Better move this logic to the corresponding class, i.e. FormCheckbox.
         const labelClass = this.elementDesc.type === FormElementType.CHECKBOX ? 'form-check-label' : 'col-form-label';
-        return $node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).attr('data-testid', this.elementDesc.label).text(this.elementDesc.label);
+        return $node
+            .append('label')
+            .classed(`${labelClass} ${colWidth}`, true)
+            .attr('for', this.elementDesc.attributes.id)
+            .attr('data-testid', this.elementDesc.label)
+            .text(this.elementDesc.label);
     }
     /**
      * Set a list of object properties and values to a given node
@@ -112,10 +117,11 @@ export class AFormElement extends EventHandler {
         }
         Object.keys(attributes).forEach((key) => {
             switch (key) {
-                case 'clazz':
+                case 'clazz': {
                     const cssClasses = attributes[key].split(' '); // tokenize CSS classes at space
                     cssClasses.forEach((cssClass) => $node.classed(cssClass, true));
                     break;
+                }
                 default:
                     $node.attr(key, attributes[key]);
                     break;
@@ -130,7 +136,7 @@ export class AFormElement extends EventHandler {
         if (!this.elementDesc.dependsOn) {
             return [];
         }
-        const showIf = this.elementDesc.showIf;
+        const { showIf } = this.elementDesc;
         const dependElements = (this.elementDesc.dependsOn || []).map((depOn) => this.form.getElementById(depOn));
         dependElements.forEach((depElem) => {
             depElem.on(AFormElement.EVENT_CHANGE, () => {
@@ -154,7 +160,7 @@ export class AFormElement extends EventHandler {
         if (Array.isArray(value)) {
             return value.map(AFormElement.toData);
         }
-        return (value != null && value.data !== undefined) ? value.data : value;
+        return value != null && value.data !== undefined ? value.data : value;
     }
     /**
      * Factory method to create form elements for the phovea extension type `tdpFormElement`.
@@ -167,7 +173,7 @@ export class AFormElement extends EventHandler {
     static createFormElement(form, elementDesc) {
         const plugin = PluginRegistry.getInstance().getPlugin(EP_TDP_CORE_FORM_ELEMENT, elementDesc.type);
         if (!plugin) {
-            throw new Error('unknown form element type: ' + elementDesc.type);
+            throw new Error(`unknown form element type: ${elementDesc.type}`);
         }
         return plugin.load().then((p) => {
             return p.factory(form, elementDesc, p.desc);

@@ -35,8 +35,15 @@ export class FormSelect extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        const testId = this.elementDesc.label.replace(/<\/?[^>]+(>|$)/g, '').trim().replace(/\s+/g, '-').toLowerCase();
-        this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true).attr('data-testid', testId);
+        const testId = this.elementDesc.label
+            .replace(/<\/?[^>]+(>|$)/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .toLowerCase();
+        this.$rootNode = $formNode
+            .append('div')
+            .classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+            .attr('data-testid', testId);
         const rowNode = this.$rootNode.append('div').classed('row', true);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel(rowNode);
@@ -51,14 +58,14 @@ export class FormSelect extends AFormElement {
      */
     init() {
         super.init();
-        const options = this.elementDesc.options;
+        const { options } = this.elementDesc;
         // propagate change action with the data of the selected option
         this.$inputNode.on('change.propagate', () => {
             this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
         });
         const data = FormSelect.resolveData(options.optionsData);
-        const values = this.handleDependent((values) => {
-            data(values).then((items) => {
+        const values = this.handleDependent((val) => {
+            data(val).then((items) => {
                 this.updateOptionElements(items);
                 this.$inputNode.property('selectedIndex', options.selectedIndex || 0);
                 this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
@@ -82,7 +89,7 @@ export class FormSelect extends AFormElement {
     getSelectedIndex() {
         const defaultSelectedIndex = this.getStoredValue(0);
         const currentSelectedIndex = this.$inputNode.property('selectedIndex');
-        return (currentSelectedIndex === -1) ? defaultSelectedIndex : currentSelectedIndex;
+        return currentSelectedIndex === -1 ? defaultSelectedIndex : currentSelectedIndex;
     }
     /**
      * Update the options of a select form element using the given data array
@@ -104,16 +111,18 @@ export class FormSelect extends AFormElement {
         }
         const node = this.$inputNode.node();
         const $options = this.$inputNode.selectAll(() => Array.from(node.children)).data(options);
-        $options.enter()
-            .append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
-        const $sub = $options.filter(isGroup)
+        $options.enter().append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
+        const $sub = $options
+            .filter(isGroup)
             .attr('label', (d) => d.name)
-            .selectAll('option').data((d) => d.children);
+            .selectAll('option')
+            .data((d) => d.children);
         $sub.enter().append('option');
         $sub.attr('value', (d) => d.value).html((d) => d.name);
         $sub.exit().remove();
-        $options.filter((d) => !isGroup)
-            .attr('value', (d) => (d.value))
+        $options
+            .filter((d) => !isGroup)
+            .attr('value', (d) => d.value)
             .html((d) => d.name);
         $options.exit().remove();
     }
@@ -123,7 +132,7 @@ export class FormSelect extends AFormElement {
      */
     get value() {
         const option = d3.select(this.$inputNode.node().selectedOptions[0]);
-        return (option.size() > 0) ? option.datum() : null;
+        return option.size() > 0 ? option.datum() : null;
     }
     /**
      * Select the option by value. If no value found, then the first option is selected.
@@ -136,7 +145,10 @@ export class FormSelect extends AFormElement {
             this.previousValue = null;
             return;
         }
-        this.$inputNode.selectAll('option').data().forEach((d, i) => {
+        this.$inputNode
+            .selectAll('option')
+            .data()
+            .forEach((d, i) => {
             if ((v.value && d.value === v.value) || d.value === v || d === v) {
                 this.$inputNode.property('selectedIndex', i);
                 this.updateStoredValue();
@@ -166,11 +178,11 @@ export class FormSelect extends AFormElement {
         if (data instanceof Promise) {
             return () => data.then((r) => r.map(this.toOption));
         }
-        //assume it is a function
+        // assume it is a function
         return (dependents) => {
             const r = data(dependents);
             if (r instanceof Promise) {
-                return r.then((r) => r.map(this.toOption));
+                return r.then((a) => a.map(this.toOption));
             }
             if (Array.isArray(r)) {
                 return ResolveNow.resolveImmediately(r.map(this.toOption));

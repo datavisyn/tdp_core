@@ -15,7 +15,7 @@ export class LoginMenu extends EventHandler {
         this.options = {
             loginForm: undefined,
             document,
-            watch: false
+            watch: false,
         };
         BaseUtils.mixin(this.options, { document: header.rightMenu.ownerDocument }, options);
         this.customizer = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM);
@@ -81,7 +81,7 @@ export class LoginMenu extends EventHandler {
         this.header.showAndFocusOn('#loginDialog', '#login_username');
     }
     initLoginDialog(body) {
-        let loginForm = this.options.loginForm;
+        let { loginForm } = this.options;
         if (!loginForm) {
             const t = this.customizer.find((d) => d.template != null);
             if (t) {

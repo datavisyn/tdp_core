@@ -7,7 +7,7 @@ export class FormCheckBox extends AFormElement {
      * @param pluginDesc The phovea extension point description
      */
     constructor(form, elementDesc, pluginDesc) {
-        super(form, Object.assign({ options: { checked: true, unchecked: false } }, elementDesc), pluginDesc);
+        super(form, { options: { checked: true, unchecked: false }, ...elementDesc }, pluginDesc);
         this.pluginDesc = pluginDesc;
     }
     /**
@@ -29,11 +29,12 @@ export class FormCheckBox extends AFormElement {
      */
     init() {
         super.init();
-        const options = this.elementDesc.options;
+        const { options } = this.elementDesc;
         const isChecked = options.isChecked != null ? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
         this.previousValue = isChecked;
         this.$inputNode.property('checked', isChecked);
-        if (this.hasStoredValue()) { // trigger if we have a stored value
+        if (this.hasStoredValue()) {
+            // trigger if we have a stored value
             // TODO: using the new value `isChecked` may be wrong, because it's of type boolean and options.checked and options.unchecked could be anything --> this.getStoredValue(...) should probably be used instead
             this.fire(FormCheckBox.EVENT_INITIAL_VALUE, isChecked, options.unchecked); // store initial values as actions with results in the provenance graph
         }
@@ -48,7 +49,7 @@ export class FormCheckBox extends AFormElement {
      * @returns {string}
      */
     get value() {
-        const options = this.elementDesc.options;
+        const { options } = this.elementDesc;
         return this.$inputNode.property('checked') ? options.checked : options.unchecked;
     }
     /**
@@ -56,7 +57,7 @@ export class FormCheckBox extends AFormElement {
      * @param v
      */
     set value(v) {
-        const options = this.elementDesc.options;
+        const { options } = this.elementDesc;
         this.$inputNode.property('value', v === options.checked);
         this.previousValue = v === options.checked; // force old value change
         this.updateStoredValue();
