@@ -10,6 +10,8 @@ export interface ILineupVisWrapperProps {
   doc: Document;
 }
 
+type SupportedTypes = string | number;
+
 export class LineupVisWrapper {
   /**
    * This string is assigned if a categorical value is missing and rendered by Plotly.
@@ -77,17 +79,17 @@ export class LineupVisWrapper {
       };
     };
 
-    const mapData = <T extends ValueColumn<any>>(innerData: IDataRow[], column: T) => {
+    const mapData = <T extends ValueColumn<SupportedTypes>>(innerData: IDataRow[], column: T) => {
       // TODO: Refactor to use _visyn_id instead.
       return innerData.map((d) => ({ id: d.v._id, val: column.getRaw(d) }));
     };
 
-    const getColumnValue = async <T extends ValueColumn<any>>(column: T) => {
+    const getColumnValue = async <T extends ValueColumn<SupportedTypes>>(column: T) => {
       if (column.isLoaded()) {
         return mapData(data, column);
       }
 
-      return new Promise<{ id: number; val: T }[]>((resolve, reject) => {
+      return new Promise<{ id: number; val: SupportedTypes }[]>((resolve, reject) => {
         // times out if we take longer than 60 seconds to load the columns.
         const timeout = setTimeout(() => {
           reject('Timeout');
