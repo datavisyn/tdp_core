@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EBarDirection } from '../bar/utils';
+import { EBarDirection } from '../interfaces';
 
 export function WarningMessage() {
   const options = [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL];

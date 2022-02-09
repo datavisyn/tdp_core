@@ -4,14 +4,25 @@ import Plot from 'react-plotly.js';
 import d3 from 'd3';
 import { merge } from 'lodash';
 import Plotly from 'plotly.js';
-import { CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales, IVisConfig } from '../interfaces';
+import {
+  CategoricalColumn,
+  ColumnInfo,
+  EFilterOptions,
+  ESupportedPlotlyVis,
+  IVisConfig,
+  NumericalColumn,
+  PlotlyInfo,
+  Scales,
+  ENumericalColorScaleType,
+  IScatterConfig,
+} from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { ColorSelect } from '../sidebar/ColorSelect';
 import { ShapeSelect } from '../sidebar/ShapeSelect';
 import { FilterButtons } from '../sidebar/FilterButtons';
 import { InvalidCols } from '../InvalidCols';
-import { createScatterTraces, ENumericalColorScaleType, IScatterConfig } from './utils';
+import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
@@ -111,7 +122,7 @@ export function ScatterVis({
   }, [columns, selected, config, scales, shapes]);
 
   const layout = useMemo(() => {
-    const layout = {
+    const scopedLayout = {
       showlegend: true,
       legend: {
         itemclick: false,
@@ -124,7 +135,7 @@ export function ScatterVis({
       dragmode: config.isRectBrush ? 'select' : 'lasso',
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, scopedLayout);
   }, [traces, config.isRectBrush]);
 
   return (
@@ -139,9 +150,13 @@ export function ScatterVis({
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
-            onSelected={(d) => {
-              console.log(d);
-              d ? selectionCallback(d.points.map((d) => (d as any).id)) : selectionCallback([]);
+            onSelected={(data) => {
+              console.log(data);
+              if (data) {
+                selectionCallback(data.points.map((d) => (d as any).id));
+              } else {
+                selectionCallback([]);
+              }
             }}
             // plotly redraws everything on updates, so you need to reappend title and
             // change opacity on update, instead of just in a use effect

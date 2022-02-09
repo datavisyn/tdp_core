@@ -4,15 +4,24 @@ import Plot from 'react-plotly.js';
 import d3 from 'd3';
 import { merge } from 'lodash';
 import Plotly from 'plotly.js';
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales, IVisConfig } from '../interfaces';
+import {
+  CategoricalColumn,
+  ColumnInfo,
+  ESupportedPlotlyVis,
+  EViolinOverlay,
+  NumericalColumn,
+  PlotlyInfo,
+  Scales,
+  IVisConfig,
+  IViolinConfig,
+} from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { InvalidCols } from '../InvalidCols';
 import { beautifyLayout } from '../layoutUtils';
-import { createViolinTraces, IViolinConfig } from './utils';
+import { createViolinTraces } from './utils';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
-import { EViolinOverlay } from '../bar/utils';
 import { WarningMessage } from '../sidebar/WarningMessage';
 
 interface ViolinVisProps {
@@ -78,7 +87,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
   }, []);
 
   const layout = useMemo(() => {
-    const layout = {
+    const scopedLayout = {
       showlegend: true,
       legend: {
         itemclick: false,
@@ -90,7 +99,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
       violingap: 0,
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, scopedLayout);
   }, [traces]);
 
   return (

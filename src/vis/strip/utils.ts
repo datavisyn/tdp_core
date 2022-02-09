@@ -1,14 +1,8 @@
 import { merge } from 'lodash';
-import { CategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales, PlotlyInfo, PlotlyData } from '../interfaces';
+import { CategoricalColumn, IStripConfig, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales, PlotlyInfo, PlotlyData } from '../interfaces';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
   return s.type === ESupportedPlotlyVis.STRIP;
-}
-
-export interface IStripConfig {
-  type: ESupportedPlotlyVis.STRIP;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
 }
 
 const defaultConfig: IStripConfig = {

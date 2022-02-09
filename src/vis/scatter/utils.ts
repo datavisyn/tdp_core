@@ -1,26 +1,22 @@
 import { merge } from 'lodash';
 import d3 from 'd3';
-import { EColumnTypes, NumericalColumn, CategoricalColumn, ColumnInfo, IVisConfig, Scales, ESupportedPlotlyVis, PlotlyInfo, PlotlyData } from '../interfaces';
+import {
+  CategoricalColumn,
+  EColumnTypes,
+  ENumericalColorScaleType,
+  ESupportedPlotlyVis,
+  IScatterConfig,
+  IVisConfig,
+  NumericalColumn,
+  PlotlyInfo,
+  PlotlyData,
+  Scales,
+} from '../interfaces';
 import { getCol } from '../sidebar/utils';
 import { getCssValue } from '../../utils';
 
-export enum ENumericalColorScaleType {
-  SEQUENTIAL = 'Sequential',
-  DIVERGENT = 'Divergent',
-}
-
 export function isScatter(s: IVisConfig): s is IScatterConfig {
   return s.type === ESupportedPlotlyVis.SCATTER;
-}
-
-export interface IScatterConfig {
-  type: ESupportedPlotlyVis.SCATTER;
-  numColumnsSelected: ColumnInfo[];
-  color: ColumnInfo | null;
-  numColorScaleType: ENumericalColorScaleType;
-  shape: ColumnInfo | null;
-  isRectBrush: boolean;
-  alphaSliderVal: number;
 }
 
 const defaultConfig: IScatterConfig = {
@@ -90,8 +86,8 @@ export function createScatterTraces(
   let max = 0;
 
   if (config.color) {
-    (min = d3.min((getCol(columns, config.color) as NumericalColumn).values.map((v) => +v.val).filter((v) => v !== null))),
-      (max = d3.max((getCol(columns, config.color) as NumericalColumn).values.map((v) => +v.val).filter((v) => v !== null)));
+    min = d3.min((getCol(columns, config.color) as NumericalColumn).values.map((v) => +v.val).filter((v) => v !== null));
+    max = d3.max((getCol(columns, config.color) as NumericalColumn).values.map((v) => +v.val).filter((v) => v !== null));
   }
 
   const numericalColorScale = config.color

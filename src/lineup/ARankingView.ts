@@ -40,6 +40,7 @@ import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { ISecureItem } from '../security';
+// eslint-disable-next-line import/no-cycle
 import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
 
 /**
@@ -372,8 +373,8 @@ export abstract class ARankingView extends AView {
       columns,
       selection: this.selection,
       freeColor: (id: string) => this.colors.freeColumnColor(id),
-      add: (columns: ISelectionColumn[]) => columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
+      add: (selectionColumns: ISelectionColumn[]) => selectionColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
+      remove: (removeColumns: Column[]) => removeColumns.forEach((c) => c.removeMe()),
     };
   }
 

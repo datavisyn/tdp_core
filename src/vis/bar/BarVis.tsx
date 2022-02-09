@@ -4,13 +4,24 @@ import Plot from 'react-plotly.js';
 import d3 from 'd3';
 import { merge } from 'lodash';
 import Plotly from 'plotly.js';
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales, IVisConfig } from '../interfaces';
+import {
+  CategoricalColumn,
+  ColumnInfo,
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  ESupportedPlotlyVis,
+  IBarConfig,
+  NumericalColumn,
+  PlotlyInfo,
+  Scales,
+  IVisConfig,
+} from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 
 import { InvalidCols } from '../InvalidCols';
 import { beautifyLayout } from '../layoutUtils';
-import { createBarTraces, EBarDirection, EBarDisplayType, EBarGroupingType, IBarConfig } from './utils';
+import { createBarTraces } from './utils';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
@@ -114,7 +125,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
   }, []);
 
   const layout = useMemo(() => {
-    const layout = {
+    const scopedLayout = {
       showlegend: true,
       legend: {
         itemclick: false,
@@ -127,7 +138,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, scopedLayout);
   }, [traces, config.groupType]);
 
   return (

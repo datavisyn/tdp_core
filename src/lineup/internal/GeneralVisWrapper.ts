@@ -1,12 +1,13 @@
 import { LocalDataProvider, Ranking } from 'lineupjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { IDTypeManager } from '../..';
+import { IDTypeManager } from '../../idtype';
 import { EventHandler } from '../../base';
-import { ARankingView } from '..';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 import { LineUpSelectionHelper } from './LineUpSelectionHelper';
+// eslint-disable-next-line import/no-cycle
+import { ARankingView } from '../ARankingView';
 
 export class GeneralVisWrapper extends EventHandler {
   readonly node: HTMLElement; // wrapper node

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MouseEventHandler, useMemo, useState } from 'react';
+import { MouseEventHandler, useMemo } from 'react';
 import Select, { components, MultiValueProps, Props } from 'react-select';
 
 import { SortableContainer, SortableContainerProps, SortableElement, SortEndHandler, SortableHandle } from 'react-sortable-hoc';

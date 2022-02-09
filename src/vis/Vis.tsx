@@ -2,8 +2,8 @@ import d3 from 'd3';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { CategoricalColumn, NumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
+import { CategoricalColumn, ENumericalColorScaleType, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales } from './interfaces';
 import { ScatterVis } from './scatter/ScatterVis';
 import { ViolinVis } from './violin/ViolinVis';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
@@ -12,7 +12,7 @@ import { StripVis } from './strip/StripVis';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
 import { PCPVis } from './pcp/PCPVis';
 import { BarVis } from './bar/BarVis';
-import { getCssValue } from '..';
+import { getCssValue } from '../utils';
 
 export interface VisProps {
   /**

@@ -1,16 +1,19 @@
 import { merge } from 'lodash';
-import { CategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales, PlotlyInfo, PlotlyData } from '../interfaces';
-import { EViolinOverlay } from '../bar/utils';
+import {
+  EViolinOverlay,
+  CategoricalColumn,
+  EColumnTypes,
+  ESupportedPlotlyVis,
+  IViolinConfig,
+  IVisConfig,
+  NumericalColumn,
+  Scales,
+  PlotlyInfo,
+  PlotlyData,
+} from '../interfaces';
 
 export function isViolin(s: IVisConfig): s is IViolinConfig {
   return s.type === ESupportedPlotlyVis.VIOLIN;
-}
-
-export interface IViolinConfig {
-  type: ESupportedPlotlyVis.VIOLIN;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
-  violinOverlay: EViolinOverlay;
 }
 
 const defaultConfig: IViolinConfig = {

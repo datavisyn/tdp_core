@@ -4,18 +4,18 @@ import Plot from 'react-plotly.js';
 import d3 from 'd3';
 import { merge } from 'lodash';
 import Plotly from 'plotly.js';
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales, IVisConfig } from '../interfaces';
+import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, IVisConfig, IStripConfig, NumericalColumn, PlotlyInfo, Scales } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { InvalidCols } from '../InvalidCols';
 import { beautifyLayout } from '../layoutUtils';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
-import { createStripTraces, IStripConfig } from './utils';
+import { createStripTraces } from './utils';
 import { WarningMessage } from '../sidebar/WarningMessage';
 
 interface StripVisProps {
   config: IStripConfig;
-  optionsConfig?: {};
+  optionsConfig?: unknown;
   extensions?: {
     prePlot?: React.ReactNode;
     postPlot?: React.ReactNode;
@@ -66,7 +66,7 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
   }, []);
 
   const layout = useMemo(() => {
-    const layout = {
+    const scopedLayout = {
       showlegend: true,
       legend: {
         itemclick: false,
@@ -78,7 +78,7 @@ export function StripVis({ config, optionsConfig, extensions, columns, setConfig
       violingap: 0,
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, scopedLayout);
   }, [traces]);
 
   return (

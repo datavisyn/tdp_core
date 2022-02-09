@@ -27,5 +27,5 @@ export interface VisProps {
      */
     filterCallback?: (s: string) => void;
 }
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback }: VisProps): JSX.Element;
+export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, }: VisProps): JSX.Element;
 //# sourceMappingURL=Vis.d.ts.map

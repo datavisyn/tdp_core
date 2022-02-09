@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EBarDirection, EBarGroupingType } from '../bar/utils';
+import { EBarGroupingType } from '../interfaces';
 
 interface BarGroupTypeProps {
   callback: (s: EBarGroupingType) => void;

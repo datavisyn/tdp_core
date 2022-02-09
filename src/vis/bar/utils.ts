@@ -1,41 +1,22 @@
 import { merge } from 'lodash';
-import { CategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales, PlotlyInfo, PlotlyData } from '../interfaces';
+import {
+  CategoricalColumn,
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  EColumnTypes,
+  ESupportedPlotlyVis,
+  IBarConfig,
+  IVisConfig,
+  NumericalColumn,
+  Scales,
+  PlotlyInfo,
+  PlotlyData,
+} from '../interfaces';
 import { getCol } from '../sidebar/utils';
-
-export enum EBarDisplayType {
-  DEFAULT = 'Default',
-  NORMALIZED = 'Normalized',
-}
-
-export enum EBarDirection {
-  VERTICAL = 'Vertical',
-  HORIZONTAL = 'Horizontal',
-}
-
-export enum EViolinOverlay {
-  NONE = 'None',
-  STRIP = 'Strip',
-  BOX = 'Box',
-}
-
-export enum EBarGroupingType {
-  STACK = 'Stacked',
-  GROUP = 'Grouped',
-}
 
 export function isBar(s: IVisConfig): s is IBarConfig {
   return s.type === ESupportedPlotlyVis.BAR;
-}
-
-export interface IBarConfig {
-  type: ESupportedPlotlyVis.BAR;
-  multiples: ColumnInfo | null;
-  group: ColumnInfo | null;
-  direction: EBarDirection;
-  display: EBarDisplayType;
-  groupType: EBarGroupingType;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
 }
 
 const defaultConfig: IBarConfig = {
@@ -59,49 +40,6 @@ export function barMergeDefaultConfig(columns: (NumericalColumn | CategoricalCol
   }
 
   return merged;
-}
-
-export function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig, scales: Scales): PlotlyInfo {
-  let plotCounter = 1;
-
-  if (!config.catColumnsSelected) {
-    return {
-      plots: [],
-      legendPlots: [],
-      rows: 0,
-      cols: 0,
-      errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
-    };
-  }
-
-  const plots: PlotlyData[] = [];
-
-  const catCols: CategoricalColumn[] = columns.filter(
-    (c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL,
-  ) as CategoricalColumn[];
-
-  if (catCols.length > 0) {
-    if (config.group && config.multiples) {
-      plotCounter = setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCounter);
-    } else if (config.group) {
-      plotCounter = setPlotsWithGroups(columns, config, plots, scales, plotCounter);
-    } else if (config.multiples) {
-      plotCounter = setPlotsWithMultiples(columns, config, plots, scales, plotCounter);
-    } else {
-      plotCounter = setPlotsBasic(columns, config, plots, scales, plotCounter);
-    }
-  }
-
-  const rows = Math.ceil(Math.sqrt(plotCounter - 1));
-  const cols = Math.ceil((plotCounter - 1) / rows);
-
-  return {
-    plots,
-    legendPlots: [],
-    rows,
-    cols,
-    errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
-  };
 }
 
 function setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCounter): number {
@@ -265,4 +203,47 @@ function setPlotsBasic(columns, config, plots, scales, plotCounter): number {
   plotCounter += 1;
 
   return plotCounter;
+}
+
+export function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig, scales: Scales): PlotlyInfo {
+  let plotCounter = 1;
+
+  if (!config.catColumnsSelected) {
+    return {
+      plots: [],
+      legendPlots: [],
+      rows: 0,
+      cols: 0,
+      errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+    };
+  }
+
+  const plots: PlotlyData[] = [];
+
+  const catCols: CategoricalColumn[] = columns.filter(
+    (c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL,
+  ) as CategoricalColumn[];
+
+  if (catCols.length > 0) {
+    if (config.group && config.multiples) {
+      plotCounter = setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCounter);
+    } else if (config.group) {
+      plotCounter = setPlotsWithGroups(columns, config, plots, scales, plotCounter);
+    } else if (config.multiples) {
+      plotCounter = setPlotsWithMultiples(columns, config, plots, scales, plotCounter);
+    } else {
+      plotCounter = setPlotsBasic(columns, config, plots, scales, plotCounter);
+    }
+  }
+
+  const rows = Math.ceil(Math.sqrt(plotCounter - 1));
+  const cols = Math.ceil((plotCounter - 1) / rows);
+
+  return {
+    plots,
+    legendPlots: [],
+    rows,
+    cols,
+    errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+  };
 }

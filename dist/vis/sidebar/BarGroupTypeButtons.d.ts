@@ -1,4 +1,4 @@
-import { EBarGroupingType } from '../bar/utils';
+import { EBarGroupingType } from '../interfaces';
 interface BarGroupTypeProps {
     callback: (s: EBarGroupingType) => void;
     currentSelected: EBarGroupingType;

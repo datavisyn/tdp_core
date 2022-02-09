@@ -1,7 +1,7 @@
 import { LocalDataProvider } from 'lineupjs';
 import { EventHandler } from '../../base';
-import { ARankingView } from '..';
 import { LineUpSelectionHelper } from './LineUpSelectionHelper';
+import { ARankingView } from '../ARankingView';
 export declare class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement;
     private viewable;

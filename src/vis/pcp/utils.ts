@@ -1,15 +1,9 @@
 import d3 from 'd3';
 import { merge } from 'lodash';
-import { CategoricalColumn, ColumnInfo, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, PlotlyInfo, PlotlyData } from '../interfaces';
+import { CategoricalColumn, EColumnTypes, ESupportedPlotlyVis, IPCPConfig, IVisConfig, NumericalColumn, PlotlyInfo, PlotlyData } from '../interfaces';
 
 export function isPCP(s: IVisConfig): s is IPCPConfig {
   return s.type === ESupportedPlotlyVis.PCP;
-}
-
-export interface IPCPConfig {
-  type: ESupportedPlotlyVis.PCP;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
 }
 
 const defaultConfig: IPCPConfig = {

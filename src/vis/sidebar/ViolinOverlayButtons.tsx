@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { EViolinOverlay } from '../bar/utils';
-import { EFilterOptions } from '../interfaces';
+import { EViolinOverlay } from '../interfaces';
 
 interface ViolinOverlayProps {
   callback: (s: EViolinOverlay) => void;

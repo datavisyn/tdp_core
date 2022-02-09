@@ -1,4 +1,4 @@
-import { ENumericalColorScaleType } from '../scatter/utils';
+import { ENumericalColorScaleType } from '../interfaces';
 interface NumericalColorButtonsProps {
     callback: (s: ENumericalColorScaleType) => void;
     currentSelected: ENumericalColorScaleType;

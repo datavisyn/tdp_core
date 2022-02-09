@@ -17,6 +17,7 @@ import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '
 import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
+// eslint-disable-next-line import/no-cycle
 import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
 /**
  * base class for views based on LineUp
@@ -290,8 +291,8 @@ export class ARankingView extends AView {
             columns,
             selection: this.selection,
             freeColor: (id) => this.colors.freeColumnColor(id),
-            add: (columns) => columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (columns) => columns.forEach((c) => c.removeMe())
+            add: (selectionColumns) => selectionColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
+            remove: (removeColumns) => removeColumns.forEach((c) => c.removeMe()),
         };
     }
     /**

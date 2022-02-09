@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EBarDirection, EBarDisplayType } from '../bar/utils';
+import { EBarDisplayType } from '../interfaces';
 
 interface BarDisplayProps {
   callback: (s: EBarDisplayType) => void;

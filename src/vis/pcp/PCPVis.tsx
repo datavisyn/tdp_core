@@ -4,17 +4,17 @@ import Plot from 'react-plotly.js';
 import d3 from 'd3';
 import { merge } from 'lodash';
 import Plotly from 'plotly.js';
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales, IVisConfig } from '../interfaces';
+import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, IPCPConfig, NumericalColumn, PlotlyInfo, IVisConfig } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { InvalidCols } from '../InvalidCols';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
-import { createPCPTraces, IPCPConfig } from './utils';
+import { createPCPTraces } from './utils';
 import { WarningMessage } from '../sidebar/WarningMessage';
 
 interface PCPVisProps {
   config: IPCPConfig;
-  optionsConfig?: {};
+  optionsConfig?: unknown;
   extensions?: {
     prePlot?: React.ReactNode;
     postPlot?: React.ReactNode;

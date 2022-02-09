@@ -104,7 +104,7 @@ export class LineUpSelectionHelper extends EventHandler {
     }
     getSelection() {
         if (!this.provider) {
-            return;
+            return [];
         }
         // const sel = this.provider.getSelection();
         // const indices: number[] = [];

@@ -1,4 +1,3 @@
-import { Layout } from 'plotly.js';
 import { PlotlyInfo } from './interfaces';
 
 /**

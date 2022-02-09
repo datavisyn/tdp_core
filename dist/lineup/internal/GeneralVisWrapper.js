@@ -1,8 +1,8 @@
 import { Ranking } from 'lineupjs';
-import { IDTypeManager } from '../..';
-import { EventHandler } from '../../base';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { IDTypeManager } from '../../idtype';
+import { EventHandler } from '../../base';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 export class GeneralVisWrapper extends EventHandler {
@@ -17,29 +17,29 @@ export class GeneralVisWrapper extends EventHandler {
         this.viewable = false;
     }
     getAllData() {
-        //make a real copy at some point
+        // make a real copy at some point
         const globalFilter = this.provider.getFilter();
         // TODO: Think about using this.provider.getFirstRanking().flatColumns instead of the descriptions.
         /* TODO: This is an untested way of resolving the values of all possible ValueColumn variants (could be lazy for example).
-        this.provider.getFirstRanking().flatColumns.forEach((v) => {
-            if(v instanceof ValueColumn) {
-                if(v.isLoaded()) {
-                    return () => this.provider._dataRows.map((row) => v.getValue(row));
-                } else {
-                    let resolve = null;
-                    const promise = new Promise((resolve2) => {
-                        resolve = resolve2;
-                    });
-
-                    v.on(ValueColumn.EVENT_DATA_LOADED, () => {
-                        resolve(this.provider._dataRows.map((row) => v.getValue(row)))
-                    })
-
-                    return () => promise;
+            this.provider.getFirstRanking().flatColumns.forEach((v) => {
+                if(v instanceof ValueColumn) {
+                    if(v.isLoaded()) {
+                        return () => this.provider._dataRows.map((row) => v.getValue(row));
+                    } else {
+                        let resolve = null;
+                        const promise = new Promise((resolve2) => {
+                            resolve = resolve2;
+                        });
+    
+                        v.on(ValueColumn.EVENT_DATA_LOADED, () => {
+                            resolve(this.provider._dataRows.map((row) => v.getValue(row)))
+                        })
+    
+                        return () => promise;
+                    }
                 }
-            }
-        })
-        */
+            })
+            */
         let newData = [];
         if (globalFilter) {
             newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)) && globalFilter(this.provider.getRow(i)));
@@ -57,7 +57,7 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
     selectCallback(selected) {
-        //???
+        // ???
         const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
         this.view.selectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
     }
@@ -74,7 +74,7 @@ export class GeneralVisWrapper extends EventHandler {
     updateCustomVis() {
         const data = this.getAllData();
         const colDescriptions = this.provider.getColumns();
-        //need some way to convert these to _ids.
+        // need some way to convert these to _ids.
         const selectedIndeces = this.selectionHelper.getSelection();
         const cols = [];
         const selectedMap = {};
@@ -90,19 +90,19 @@ export class GeneralVisWrapper extends EventHandler {
                 info: {
                     name: c.label.replace(/(<([^>]+)>)/gi, ''),
                     description: c.summary ? c.summary.replace(/(<([^>]+)>)/gi, '') : '',
-                    id: c.label + c._id
+                    id: c.label + c._id,
                 },
                 values: data.map((d, i) => {
                     return { id: d._id, val: d[c.column] ? d[c.column] : c.type === 'number' ? null : '--' };
                 }),
-                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL
+                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
             });
         }
         ReactDOM.render(React.createElement(Vis, {
             columns: cols,
             selected: selectedMap,
             selectionCallback: (s) => this.selectCallback(s),
-            filterCallback: (s) => this.filterCallback(s)
+            filterCallback: (s) => this.filterCallback(s),
         }), this.node);
     }
     toggleCustomVis() {
